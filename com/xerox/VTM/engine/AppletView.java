@@ -2,7 +2,9 @@
  *   DATE OF CREATION:   Dec 27 2000
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Thu Feb 20 16:31:33 2003 by Emmanuel Pietriga
- *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
+ *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
+ *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Tue Oct 12 09:10:24 2004
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: GLEView.java,v 1.7 2006/06/14 15:02:06 epietrig Exp $
