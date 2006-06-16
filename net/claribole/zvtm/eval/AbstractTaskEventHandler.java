@@ -2,10 +2,10 @@
  *   DATE OF CREATION:  Tue Nov 22 09:51:19 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AbstractTaskEventHandler.java,v 1.40 2006/05/26 14:51:48 epietrig Exp $
+ * $Id:  $
  */
 
 package net.claribole.zvtm.eval;
@@ -37,7 +37,7 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
     static final float WHEEL_ZOOMIN_FACTOR = 8.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 9.0f;
 
-    float oldCameraAltitude = ZLAbstractTask.START_ALTITUDE;
+    float oldCameraAltitude = 0;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;

@@ -2,10 +2,10 @@
  *   DATE OF CREATION:  Tue Nov 22 09:36:06 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZLAbstractTask.java,v 1.69 2006/06/02 14:01:42 epietrig Exp $
+ * $Id: $
  */ 
 
 package net.claribole.zvtm.eval;
@@ -46,11 +46,6 @@ public class ZLAbstractTask implements PostAnimationAction {
     int panelWidth, panelHeight;
     int hpanelWidth, hpanelHeight;
 
-    static final long WORLD_WIDTH = 200000;
-    static final long WORLD_HEIGHT = 100000;
-    static final long HALF_WORLD_WIDTH = WORLD_WIDTH / 2;
-    static final long HALF_WORLD_HEIGHT = WORLD_HEIGHT / 2;
-
     /* ZVTM */
     VirtualSpaceManager vsm;
 
@@ -58,6 +53,8 @@ public class ZLAbstractTask implements PostAnimationAction {
     AbstractTaskEventHandler eh;
     /* log manager (trials) */
     AbstractTaskLogManager logm;
+    /* abstract world manager */
+    AbstractWorldManager wm;
 
     /* main view*/
     View demoView;
@@ -88,10 +85,10 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     /* GRID */
     static final Color GRID_COLOR = new Color(156,53,53);
-    static final int GRID_DEPTH = 8;
+    static final int GRID_DEPTH = 12;
     int currentLevel = -1;
 
-    static final float START_ALTITUDE = 10000;
+//     static final float START_ALTITUDE = 100000000000.0f;
     static final float FLOOR_ALTITUDE = 100.0f;
 
     boolean cameraOnFloor = false;
@@ -109,11 +106,11 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     final static short ZL_TECHNIQUE = 0;  // Zoom + Lens
     final static short PZ_TECHNIQUE = 1;  // Pan Zoom centered on view
-    final static short RZ_TECHNIQUE = 2;  // Pan Zoom centered on view
+    final static short PZL_TECHNIQUE = 2;  // Pan Zoom centered on view
 
     final static String PZ_TECHNIQUE_NAME = "Pan-Zoom (centered on view)";
     final static String ZL_TECHNIQUE_NAME = "Probing Lens";
-    final static String RZ_TECHNIQUE_NAME = "Region Zoom (animated transitions)";
+    final static String PZL_TECHNIQUE_NAME = "Region Zoom (animated transitions)";
     short technique = ZL_TECHNIQUE;
     String techniqueName;
 
@@ -139,9 +136,9 @@ public class ZLAbstractTask implements PostAnimationAction {
  	    eh = new AbstractTaskPZEventHandler(this);
 	    techniqueName = PZ_TECHNIQUE_NAME;
 	}
-	else if (this.technique == RZ_TECHNIQUE){
- 	    eh = new AbstractTaskRZEventHandler(this);
-	    techniqueName = RZ_TECHNIQUE_NAME;
+	else if (this.technique == PZL_TECHNIQUE){
+ 	    eh = new AbstractTaskPZLEventHandler(this);
+	    techniqueName = PZL_TECHNIQUE_NAME;
 	}
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
@@ -159,9 +156,12 @@ public class ZLAbstractTask implements PostAnimationAction {
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
 //  	demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
-	demoCamera.setAltitude(START_ALTITUDE);
+// 	demoCamera.setAltitude(START_ALTITUDE);
+	wm = new AbstractWorldManager(this);
+	wm.generateWorld();
 	buildGrid();
 	logm = new AbstractTaskLogManager(this);
+	getGlobalView();
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
     }
@@ -182,26 +182,26 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     void buildGrid(){
 	// frame
-	ZSegment s = new ZSegment(-HALF_WORLD_WIDTH, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
+	ZSegment s = new ZSegment(-AbstractWorldManager.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldManager.HALF_WORLD_HEIGHT, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(HALF_WORLD_WIDTH, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
+	s = new ZSegment(AbstractWorldManager.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldManager.HALF_WORLD_HEIGHT, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(0, -HALF_WORLD_HEIGHT, 0, HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s = new ZSegment(0, -AbstractWorldManager.HALF_WORLD_HEIGHT, 0, AbstractWorldManager.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(0, HALF_WORLD_HEIGHT, 0, HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s = new ZSegment(0, AbstractWorldManager.HALF_WORLD_HEIGHT, 0, AbstractWorldManager.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
 	// grid (built recursively, max. rec depth control by GRID_DEPTH)
 	tmpHGrid = new Vector();
 	tmpVGrid = new Vector();
-	buildHorizontalGridLevel(-HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0);
-	buildVerticalGridLevel(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0);
+	buildHorizontalGridLevel(-AbstractWorldManager.HALF_WORLD_HEIGHT, AbstractWorldManager.HALF_WORLD_HEIGHT, 0);
+	buildVerticalGridLevel(-AbstractWorldManager.HALF_WORLD_WIDTH, AbstractWorldManager.HALF_WORLD_WIDTH, 0);
 	storeGrid();
 	showGridLevel(1);
     }
 
     void buildHorizontalGridLevel(long c1, long c2, int depth){
 	long c = (c1+c2)/2;
-	ZSegment s = new ZSegment(0, c, 0, HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	ZSegment s = new ZSegment(0, c, 0, AbstractWorldManager.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	storeSegmentInHGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
 	s.setVisible(false);
@@ -213,7 +213,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     void buildVerticalGridLevel(long c1, long c2, int depth){
 	long c = (c1+c2)/2;
-	ZSegment s = new ZSegment(c, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
+	ZSegment s = new ZSegment(c, 0, 0, 0, AbstractWorldManager.HALF_WORLD_HEIGHT, GRID_COLOR);
 	storeSegmentInVGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
 	s.setVisible(false);
@@ -526,25 +526,37 @@ public class ZLAbstractTask implements PostAnimationAction {
     }
 
     void updateGridLevel(long visibleSize){
-	if (visibleSize < 1200){
+	if (visibleSize < 9765625.0f){
+	    showGridLevel(12);
+	}
+	else if (visibleSize < 19531250.0f){
+	    showGridLevel(11);
+	}
+	else if (visibleSize < 39062500.0f){
+	    showGridLevel(10);
+	}
+	else if (visibleSize < 78125000.0f){
+	    showGridLevel(9);
+	}
+	else if (visibleSize < 156250000.0f){
 	    showGridLevel(8);
 	}
-	else if (visibleSize < 2400){
+	else if (visibleSize < 312500000.0f){
 	    showGridLevel(7);
 	}
-	else if (visibleSize < 4800){
+	else if (visibleSize < 625000000.0f){
 	    showGridLevel(6);
 	}
-	else if (visibleSize < 9600){
+	else if (visibleSize < 1250000000.0f){
 	    showGridLevel(5);
 	}
-	else if (visibleSize < 19200){
+	else if (visibleSize < 2500000000.0f){
 	    showGridLevel(4);
 	}
-	else if (visibleSize < 38400){
+	else if (visibleSize < 5000000000.0f){
 	    showGridLevel(3);
 	}
-	else if (visibleSize < 76800){
+	else if (visibleSize < 10000000000.0f){
 	    showGridLevel(2);
 	}
 	else {
