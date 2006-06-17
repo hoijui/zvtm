@@ -37,6 +37,7 @@ import net.claribole.zvtm.engine.PAnimation;
 import net.claribole.zvtm.engine.PResize;
 import net.claribole.zvtm.engine.PTransResize;
 import net.claribole.zvtm.engine.PTranslation;
+import net.claribole.zvtm.engine.PTranslucency;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.lens.FSLMaxMagRadii;
 import net.claribole.zvtm.lens.FSLRadii;
@@ -135,8 +136,10 @@ public class AnimManager implements Runnable{
     public static final short PT_SZ_SIG = 5;
     /**portal size and translation (pacing function=sigmoid - slow in/slow out motion)*/
     public static final short PT_SZ_TRANS_SIG = 6;
-    /**portal sizee and translation (pacing function=linear)*/
+    /**portal size and translation (pacing function=linear)*/
     public static final short PT_SZ_TRANS_LIN = 7;
+    /**portal translucency (pacing function=linear)*/
+    public static final short PT_ALPHA_LIN = 8;
 
     /**Interrupt a glyph translation*/
     public static final String GL_TRANS = "pos";
@@ -162,6 +165,8 @@ public class AnimManager implements Runnable{
     public static final String PT_SZ = "sz";
     /**Interrupt a portal translation+altitude change*/
     public static final String PT_BOTH = "both";
+    /**Interrupt a portal translucency change*/
+    public static final String PT_ALPHA = "alpha";
 
     /**Interrupt max magnification factor animation*/
     public static final String LS_MM = "mm";
@@ -226,7 +231,7 @@ public class AnimManager implements Runnable{
 
     //keys are IDs of portals being animated right now - value is an array with two ordered integers whose value is 0 or 1.
     //  0=no anim running for this dimension, 1=anim running 
-    //  index of dimensions in array: 0=position 1=size
+    //  index of dimensions in array: 0=position 1=size 2=translucency
     Hashtable animatedPortals;
 
     /**Animation listener.
@@ -2052,20 +2057,15 @@ public class AnimManager implements Runnable{
 	}
     }
 
-
-
-
-
     /* ----------------------- PORTAL ANIMATION ------------------------- */
-
-
 
     /**animate a portal
      *@param duration in milliseconds
-     *@param type use one of (PT_TRANS_LIN, PT_TRANS_SIG, PT_SZ_LIN, PT_SZ_SIG, PT_SZ_TRANS_LIN, PT_SZ_TRANS_SIG)
+     *@param type use one of (PT_TRANS_LIN, PT_TRANS_SIG, PT_SZ_LIN, PT_SZ_SIG, PT_SZ_TRANS_LIN, PT_SZ_TRANS_SIG, PT_ALPHA_LIN)
      *@param data for translations, data is java.awt.Point representing X and Y offsets<br>
      *            for size, data is a java.awt.Point offset <br>
-     *            for size + translation, data is an array of 2 Points (Point[]) representing w,h offsets (size) and x,y offsets (position)
+     *            for size + translation, data is an array of 2 Points (Point[]) representing w,h offsets (size) and x,y offsets (position)<br>
+     *            for translucency (alpha channel) data is a Float (alpha channel offset)
      *@param pID ID of portal to be animated
      *@param paa action to perform after animation ends
      */
@@ -2078,7 +2078,7 @@ public class AnimManager implements Runnable{
 	    }
 	    else {
 		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;}
-		else {int[] tmpA={1,0};animatedPortals.put(pID,tmpA);}
+		else {int[] tmpA={1,0,0};animatedPortals.put(pID,tmpA);}
 		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
 		if (nbSteps>0){
 		    PTranslation an=new PTranslation(p,this,duration);
@@ -2107,7 +2107,7 @@ public class AnimManager implements Runnable{
 	    }
 	    else {
 		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;}
-		else {int [] tmpA={1,0};animatedPortals.put(pID,tmpA);}
+		else {int [] tmpA={1,0,0};animatedPortals.put(pID,tmpA);}
 		float nbSteps=Math.round((duration/(float)frameTime));     //number of steps
 		if (nbSteps>0){
 		    PTranslation an=new PTranslation(p,this,duration);
@@ -2138,7 +2138,7 @@ public class AnimManager implements Runnable{
 	    }
 	    else {
 		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[1]=1;}
-		else {int[] tmpA={0,1};animatedPortals.put(pID,tmpA);}
+		else {int[] tmpA={0,1,0};animatedPortals.put(pID,tmpA);}
 		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
 		if (nbSteps>0){
 		    PResize an=new PResize(p,this,duration);
@@ -2167,7 +2167,7 @@ public class AnimManager implements Runnable{
 	    }
 	    else {
 		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[1]=1;}
-		else {int [] tmpA={0,1};animatedPortals.put(pID,tmpA);}
+		else {int [] tmpA={0,1,0};animatedPortals.put(pID,tmpA);}
 		float nbSteps=Math.round((duration/(float)frameTime));     //number of steps
 		if (nbSteps>0){
 		    PResize an=new PResize(p,this,duration);
@@ -2198,7 +2198,7 @@ public class AnimManager implements Runnable{
 	    }
 	    else {
 		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;((int[])animatedPortals.get(pID))[1]=1;}
-		else {int[] tmpA={1,1};animatedPortals.put(pID,tmpA);}
+		else {int[] tmpA={1,1,0};animatedPortals.put(pID,tmpA);}
 		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
 		if (nbSteps>0){
 		    PTransResize an=new PTransResize(p,this,duration);
@@ -2235,7 +2235,7 @@ public class AnimManager implements Runnable{
 	    }
 	    else {
 		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;((int[])animatedPortals.get(pID))[1]=1;}
-		else {int[] tmpA={1,1};animatedPortals.put(pID,tmpA);}
+		else {int[] tmpA={1,1,0};animatedPortals.put(pID,tmpA);}
 		float nbSteps=Math.round((duration/(float)frameTime));     //number of steps
 		if (nbSteps>0){
 		    PTransResize an=new PTransResize(p,this,duration);
@@ -2264,6 +2264,32 @@ public class AnimManager implements Runnable{
 		    }
 		    an.tsteps[(int)nbSteps-1]=new Point(x+tx,y+ty);   //last point is assigned from source value in order to prevent precision error
 		    an.ssteps[(int)nbSteps-1]=new Point(w+tw,h+th);
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	case PT_ALPHA_LIN:{//translucency - linear
+	    if (animatedPortals.containsKey(pID) && ((int[])animatedPortals.get(pID))[2]==1){
+		putAsPendingPAnimation(pID,PT_ALPHA,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[2]=1;}
+		else {int[] tmpA={0,0,1};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
+		if (nbSteps>0){
+		    PTranslucency an=new PTranslucency(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    float tav = ((Float)data).floatValue();
+		    float sav = ((Transparent)p).getTransparencyValue();
+		    double dt = tav / nbSteps;
+		    an.steps=new float[(int)nbSteps];
+		    for (int i=0;i<nbSteps-1;i++){
+			an.steps[i] = sav + i * (float)dt;
+		    }
+		    //last point is assigned from source value in order to prevent precision error
+		    an.steps[(int)nbSteps-1] = sav + tav;
 		    animPortalBag.add(an);
 		    an.start();
 		}
@@ -2304,6 +2330,7 @@ public class AnimManager implements Runnable{
 	    if (dim.equals(PT_TRANS)){animDims[0]=0;}
 	    else if (dim.equals(PT_SZ)){animDims[1]=0;}
 	    else if (dim.equals(PT_BOTH)){animDims[0]=0;animDims[1]=0;}
+	    else if (dim.equals(PT_ALPHA)){animDims[2]=0;}
 	    if (allValuesEqualZero(animDims)){animatedPortals.remove(pID);}
 	}
 	pan.postAnimAction();
