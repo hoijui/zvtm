@@ -128,7 +128,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			    repaintNow=false; //do this first as the thread can be interrupted inside
 			                      //this branch and we want to catch new requests for repaint
 			    updateMouseOnly=false;
-			    size=getSize();
+			    size = this.getSize();
+			    viewW = size.width;//compute region's width and height
+			    viewH = size.height;
 			    if (size.width != oldSize.width || size.height != oldSize.height) {
 				//each time the parent window is resized, adapt the buffer image size
 				buffImg=null;
@@ -200,18 +202,16 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				g2d.setPaintMode();
 				g2d.setBackground(backColor);
 				g2d.clearRect(0,0,getWidth(),getHeight());
+				// call to background java2d painting hook
+				if (parent.painters[Java2DPainter.BACKGROUND] != null){
+				    parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
+				}
 				//begin actual drawing here
 				if (lens != null){// drawing with a lens
  				    synchronized(lens){// prevents flickering when the lens parameters are being animated (caused by concurent access)
 					lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
 					lensG2D.setBackground(backColor);
 					lensG2D.clearRect(0, 0, lens.mbw, lens.mbh);
-					viewW = size.width;//compute region's width and height
-					viewH = size.height;
-					// call to background java2d painting hook
-					if (parent.painters[Java2DPainter.BACKGROUND] != null){
-					    parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
-					}
 					for (int nbcam=0;nbcam<cams.length;nbcam++){
 					    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 						camIndex=cams[nbcam].getIndex();
@@ -309,11 +309,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				    }
 				}
 				else {// standard drawing, with no lens
-				    viewW = size.width;//compute region's width and height
-				    viewH = size.height;
-				    if (parent.painters[Java2DPainter.BACKGROUND] != null){
-					parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
-				    }
 				    for (int nbcam=0;nbcam<cams.length;nbcam++){
 					if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 					    camIndex=cams[nbcam].getIndex();
@@ -373,13 +368,13 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 						}
 					    }
 					}
-					// call to foreground java2d painting hook
-					if (parent.painters[Java2DPainter.FOREGROUND] != null){
-					    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
-					}
-					if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
-					    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
-					}
+				    }
+				    // call to foreground java2d painting hook
+				    if (parent.painters[Java2DPainter.FOREGROUND] != null){
+					parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
+				    }
+				    if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
+					parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
 				    }
 				}
 				if (inside){//deal with mouse glyph only if mouse cursor is inside this window
@@ -568,22 +563,5 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	    }
         }
     }
-
-//     void updatePT(){
-// 	double w = size.getWidth();
-// 	double h = size.getHeight();
-// 	PerspectiveTransform pt = PerspectiveTransform.getQuadToQuad(0,0,w,0,0,h,w,h,-300,-300,w,0,-300,h+300,w,h);
-// 	warp = new WarpPerspective(pt);
-//     }
- 
-//     Warp warp;
-//     PerspectiveTransform pt;
-//     Interpolation interp = new InterpolationBilinear();
-//     ParameterBlock pb;
-// 		pb = new ParameterBlock();
-// 		pb.addSource(buffImg);
-// 		pb.add(warp);
-// 		pb.add(interp);
-// 		g2.drawRenderedImage(JAI.create("warp", pb), AffineTransform.getTranslateInstance(0,0));
 
 }

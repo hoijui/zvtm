@@ -132,7 +132,9 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	try {
 	    repaintNow=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
 	    updateMouseOnly = false;
-	    size=getSize();
+	    size = this.getSize();
+	    viewW = size.width;//compute region's width and height
+	    viewH = size.height;
 	    if (size.width != oldSize.width || size.height != oldSize.height) {
 		if (parent.parent.debug){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
 		oldSize=size;
@@ -147,6 +149,8 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		g2d.setPaintMode();
 		g2d.setBackground(backColor);
 		g2d.clearRect(0,0,getWidth(),getHeight());
+		// call to background java2d painting hook
+		if (parent.painters[0] != null){parent.painters[0].paint(g2d, (int)viewW, (int)viewH);}
 		//begin actual drawing here
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
 		    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
@@ -157,10 +161,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			    //cams[nbcam].parentSpace.getDrawnGlyphs(camIndex).removeAllElements();
 			    drawnGlyphs.removeAllElements();
 			    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
-			    viewW=this.getSize().width;//compute region's width and height
-			    viewH=this.getSize().height;
-			    // call to background java2d painting hook
-			    if (parent.painters[0] != null){parent.painters[0].paint(g2d, (int)viewW, (int)viewH);}
 			    //compute region seen from this view through camera
 			    viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
 			    viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
@@ -181,11 +181,11 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 				    }
 				}
 			    }
-			    // call to foreground java2d painting hook
-			    if (parent.painters[1] != null){parent.painters[1].paint(g2d, (int)viewW, (int)viewH);}
 			}
 		    }
 		}
+		// call to foreground java2d painting hook
+		if (parent.painters[1] != null){parent.painters[1].paint(g2d, (int)viewW, (int)viewH);}
 		if (inside){//deal with mouse glyph only if mouse cursor is inside this window
 		    try {
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
