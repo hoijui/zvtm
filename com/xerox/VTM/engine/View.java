@@ -71,7 +71,7 @@ public abstract class View {
     Portal[] portals = new Portal[0];
     
     /**add a portal to this view*/
-    public Portal addPortal(Portal p){
+    Portal addPortal(Portal p){
 	Portal[] tmpP = new Portal[portals.length+1];
 	System.arraycopy(portals, 0, tmpP, 0, portals.length);
 	tmpP[portals.length] = p;
@@ -81,7 +81,7 @@ public abstract class View {
     }
 
     /**remove a portal from this view*/
-    public void removePortal(Portal p){
+    void removePortal(Portal p){
 	for (int i=0;i<portals.length;i++){
 	    if (portals[i] == p){
 		removePortalAtIndex(i);
@@ -91,7 +91,7 @@ public abstract class View {
     }
 
     /**remove portal at index portalIndex in the list of portals*/
-    public void removePortalAtIndex(int portalIndex){
+    void removePortalAtIndex(int portalIndex){
 	Portal[] tmpP = new Portal[portals.length-1];
 	System.arraycopy(portals, 0, tmpP, 0, portalIndex);
 	System.arraycopy(portals, portalIndex+1, tmpP, portalIndex, portals.length-portalIndex-1);

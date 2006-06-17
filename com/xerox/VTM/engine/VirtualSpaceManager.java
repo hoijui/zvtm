@@ -37,6 +37,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 
 import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.lens.Lens;
 
@@ -89,6 +90,8 @@ public class VirtualSpaceManager implements AWTEventListener {
     private int nextcID;
     /**next lens will have ID...*/
     protected int nextlID;
+    /**next portal will have ID...*/
+    protected int nextpID;
     /**next cursor will have ID...*/
     private int nextmID;
 
@@ -96,6 +99,8 @@ public class VirtualSpaceManager implements AWTEventListener {
     protected Hashtable allGlyphs;
     /**key is camera ID  (Integer)*/
     protected Hashtable allCameras;
+    /**key is portal ID  (Integer)*/
+    protected Hashtable allPortals;
     /**key is lens ID  (Integer), value is a two-element Vector: 1st element is the Lens object, 2nd element is the owning view*/
     protected Hashtable allLenses;
     /**key is space name (String)*/
@@ -140,10 +145,12 @@ public class VirtualSpaceManager implements AWTEventListener {
 	if (debug){System.out.println("Debug mode ON");}
 	nextID=1;
 	nextcID=1;
+	nextpID=1;
 	nextlID=1;
 	nextmID=1;
 	allGlyphs=new Hashtable();
 	allCameras=new Hashtable();
+	allPortals = new Hashtable();
 	allLenses=new Hashtable();
 	allVirtualSpaces=new Hashtable();
 	allViews = new View[0];
@@ -160,10 +167,12 @@ public class VirtualSpaceManager implements AWTEventListener {
 	if (debug){System.out.println("Debug mode ON");}
 	nextID=1;
 	nextcID=1;
+	nextpID=1;
 	nextlID=1;
 	nextmID=1;
 	allGlyphs=new Hashtable();
 	allCameras=new Hashtable();
+	allPortals=new Hashtable();
 	allLenses=new Hashtable();
 	allVirtualSpaces=new Hashtable();
 	allViews = new View[0];
@@ -370,6 +379,32 @@ public class VirtualSpaceManager implements AWTEventListener {
     public Camera getActiveCamera(){
 	return (activeView != null) ? activeView.getActiveCamera() : null;
     }
+
+    /* -------------- PORTALS ------------------ */
+
+    /**add a portal to view v
+     *@param p portal
+     *@param v owning view
+     */
+    public Portal addPortal(Portal p, View v){
+	p.setID(new Integer(nextpID++));
+	allPortals.put(p.getID(), p);
+	return v.addPortal(p);
+    }
+
+    
+    public void destroyPortal(Portal p){
+	View v = p.getOwningView();
+	v.removePortal(p);
+	allPortals.remove(p.getID());
+    }
+
+    /**get portal whose ID is id*/
+    public Portal getPortal(Integer id){
+	return (Portal)(allPortals.get(id));
+    }
+
+    /* ----------------- LENSES ---------------- */
 
     /**get lens whose ID is id*/
     public Lens getLens(Integer id){
