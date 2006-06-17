@@ -17,13 +17,19 @@ import com.xerox.VTM.engine.View;
 
 public abstract class Portal {
     
-    /**top-left horizontal coordinate of portal, in parent's JPanel coordinates*/
+    /** portal ID */
+    Integer ID;
+
+    /** top-left horizontal coordinate of portal, in parent's JPanel coordinates */
     public int x;
-    /**top-left vertical coordinate of portal, in parent's JPanel coordinates*/
+    /** top-left vertical coordinate of portal, in parent's JPanel coordinates */
     public int y;
-    /**Portal dimensions*/
-    public Dimension size;
-    /**View embedding this portal*/
+    /** Portal dimensions width*/
+    public int w;
+    /** Portal dimensions width*/
+    public int h;
+    Dimension size = new Dimension(0,0);
+    /** View embedding this portal */
     View owningView;
 
     /**move the portal by dx and dy inside the view (JPanel coordinates)*/
@@ -38,9 +44,22 @@ public abstract class Portal {
 	this.y = y;
     }    
     
-    /**set the portal's size*/
-    public void setSize(Dimension d){
-	this.size = d;
+    /**set the portal's size (offset)*/
+    public void resize(int dw, int dh){
+	w += dw;
+	h += dh;
+	updateDimensions();
+    }
+
+    /**set the portal's size (absolute value)*/
+    public void sizeTo(int w, int h){
+	this.w = w;
+	this.h = h;
+	updateDimensions();
+    }
+
+    public void updateDimensions(){
+	size.setSize(w, h);
     }
     
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
@@ -51,6 +70,20 @@ public abstract class Portal {
     /**Get the view embedding this portal*/
     public View getOwningView(){
 	return owningView;
+    }
+
+    /**
+     * get portal ID
+     */
+    public Integer getID(){
+	return ID;
+    }
+
+    /**
+     * set new ID for this portal
+     */
+    public void setID(Integer ident){
+	ID = ident;
     }
 
     public abstract void paint(Graphics2D g2d, int viewWidth, int viewHeight);
