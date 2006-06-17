@@ -28,7 +28,7 @@ public class PTransResize extends PAnimation {
     public Point[] ssteps;
 
     /** 
-     *@param c camera to be animated
+     *@param p portal to be animated
      *@param mgr Animation Manager
      *@param d duration in ms
      */

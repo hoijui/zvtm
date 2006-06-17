@@ -25,7 +25,7 @@ public class PTranslucency extends PAnimation {
     public float[] steps;
 
     /** 
-     *@param c camera to be animated
+     *@param p portal to be animated
      *@param mgr Animation Manager
      *@param d duration in ms
      */
