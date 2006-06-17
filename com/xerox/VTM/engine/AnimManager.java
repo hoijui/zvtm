@@ -2351,7 +2351,7 @@ public class AnimManager implements Runnable{
 
     /**
      * Interrupt a portal animation being executed
-     *@param c portal being animated
+     *@param p portal being animated
      *@param dim dimension animated (use one of PT_TRANS, PT_SZ, PT_BOTH)
      *@param all also kill all animations waiting in the queue for this dimension (for this portal) - has no effect if there is no animation waiting in the queue
      *@param finish true=put the portal in its final state (i.e. the state in which it would be if the animation had not been interrupted) ; false=leave it in the current state (at the time when the animation is interrupted)
