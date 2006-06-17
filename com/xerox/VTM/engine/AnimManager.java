@@ -23,6 +23,9 @@
 
 package com.xerox.VTM.engine;
 
+import java.awt.Point;
+import java.awt.Dimension;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -30,6 +33,11 @@ import net.claribole.zvtm.engine.PostAnimationAction;
 import net.claribole.zvtm.engine.LensKillAction;
 import net.claribole.zvtm.engine.GlyphKillAction;
 import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.PAnimation;
+import net.claribole.zvtm.engine.PResize;
+import net.claribole.zvtm.engine.PTransResize;
+import net.claribole.zvtm.engine.PTranslation;
+import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.lens.FSLMaxMagRadii;
 import net.claribole.zvtm.lens.FSLRadii;
 import net.claribole.zvtm.lens.FixedSizeLens;
@@ -113,6 +121,23 @@ public class AnimManager implements Runnable{
     /**camera altitude and translation (pacing function=linear)*/
     public static final short CA_ALT_TRANS_LIN = 7;
 
+    /**portal translation (pacing function=linear)*/
+    public static final short PT_TRANS_LIN = 0;
+    /**portal translation (pacing function=parabolic - slow in/fast out motion)*/
+    public static final short PT_TRANS_PAR = 1;
+    /**portal translation (pacing function=sigmoid - slow in/slow out motion)*/
+    public static final short PT_TRANS_SIG = 2;
+    /**portal size (pacing function=linear)*/
+    public static final short PT_SZ_LIN = 3;
+    /**portal size (pacing function=parabolic - slow in/fast out motion)*/
+    public static final short PT_SZ_PAR = 4;
+    /**portal size (pacing function=sigmoid - slow in/slow out motion)*/
+    public static final short PT_SZ_SIG = 5;
+    /**portal size and translation (pacing function=sigmoid - slow in/slow out motion)*/
+    public static final short PT_SZ_TRANS_SIG = 6;
+    /**portal sizee and translation (pacing function=linear)*/
+    public static final short PT_SZ_TRANS_LIN = 7;
+
     /**Interrupt a glyph translation*/
     public static final String GL_TRANS = "pos";
     /**Interrupt a glyph resizing*/
@@ -130,6 +155,13 @@ public class AnimManager implements Runnable{
     public static final String CA_ALT = "sz";
     /**Interrupt a camera translation+altitude change*/
     public static final String CA_BOTH = "both";
+
+    /**Interrupt a portal translation*/
+    public static final String PT_TRANS = "pos";
+    /**Interrupt a portal altitude change*/
+    public static final String PT_SZ = "sz";
+    /**Interrupt a portal translation+altitude change*/
+    public static final String PT_BOTH = "both";
 
     /**Interrupt max magnification factor animation*/
     public static final String LS_MM = "mm";
@@ -161,6 +193,7 @@ public class AnimManager implements Runnable{
     Vector animCameraBag;  //animations to be executed: cameras
     Vector animGlyphBag;   //animations to be executed: glyphs
     Vector animLensBag;    //animations to be executed: lenses
+    Vector animPortalBag;    //animations to be executed: portals
 
     //key is a glyph ID, value is another hashtable for which:
     //  keys are "pos","sz","or","col","ctrl" and value is a vector of animations waiting to be executed
@@ -171,7 +204,10 @@ public class AnimManager implements Runnable{
     Hashtable pendingCAnims;  
 
     //key is a lens ID, value is a vector of animations waiting to be executed for this dimension
-    Hashtable pendingLAnims;  
+    Hashtable pendingLAnims;
+
+    //key is a portal ID, value is a vector of animations waiting to be executed for this dimension
+    Hashtable pendingPAnims;
     
     //keys are IDs of glyph being animated right now - value is an array with four ordered integers whose value is 0 or 1.
     //  0=no anim running for this dimension, 1=anim running 
@@ -187,6 +223,11 @@ public class AnimManager implements Runnable{
     //  0=no anim running for this dimension, 1=anim running 
     //  index of dimensions in array: 0=maximum magnification 1=radii (outer radius and inner radius)
     Hashtable animatedLenses;
+
+    //keys are IDs of portals being animated right now - value is an array with two ordered integers whose value is 0 or 1.
+    //  0=no anim running for this dimension, 1=anim running 
+    //  index of dimensions in array: 0=position 1=size
+    Hashtable animatedPortals;
 
     /**Animation listener.
      * Set by client application if it wants to be notified of camera animations
@@ -211,6 +252,7 @@ public class AnimManager implements Runnable{
     /*variables related to performance issues*/
     CAnimation vcan;
     LAnimation vlan;
+    PAnimation vpan;
     int vi;
 
 
@@ -219,13 +261,16 @@ public class AnimManager implements Runnable{
 	vsm=parentVSM;
 	repaintViews = new boolean[0];
 	animCameraBag=new Vector();
+	animPortalBag=new Vector();
 	animGlyphBag=new Vector();
 	animLensBag = new Vector();
 	pendingGAnims=new Hashtable();
 	pendingCAnims=new Hashtable();
+	pendingPAnims=new Hashtable();
 	pendingLAnims = new Hashtable();
 	animatedGlyphs=new Hashtable();
 	animatedCameras=new Hashtable();
+	animatedPortals=new Hashtable();
 	animatedLenses = new Hashtable();
 	Xspeed=0;
 	Yspeed=0;
@@ -304,6 +349,17 @@ public class AnimManager implements Runnable{
 		    repaintViews[vi] = true;
 		}
 	    }
+	    for (int i=0;i<animPortalBag.size();i++) {
+		try {
+		    vpan = (PAnimation)(animPortalBag.get(i));
+		    vpan.animate();
+		    vi = vsm.getViewIndex(vpan.target.getOwningView().getName());
+ 		    if (vi != -1){
+			repaintViews[vi] = true;
+ 		    }
+		}
+		catch (NullPointerException e) {if (vsm.debug){System.err.println("animmanager.run.camera anim stopped "+e);}}
+	    }
 	    for (int i=0;i<animGlyphBag.size();i++) {
 		try {
 		    if (((GAnimation)(animGlyphBag.get(i))).animate()){
@@ -377,6 +433,8 @@ public class AnimManager implements Runnable{
 	}
 	repaintViews = tmpA;
     }
+
+    /* ----------------------- GLYPH ANIMATION ------------------------- */
 
     private void newGlyphAnim(long duration,short type,Object data,Long gID,int refresh, PostAnimationAction paa){
 	Glyph g=vsm.getGlyph(gID);
@@ -897,6 +955,9 @@ public class AnimManager implements Runnable{
 	}
     }
 
+
+    /* ----------------------- CURVE CONTROL POINT ANIMATION ------------------------- */
+
     /**animate a quadratic curve control point
      *@param duration in milliseconds
      *@param type use one of (GL_CP_TRANS_LIN, GL_CP_TRANS_PAR, GL_CP_TRANS_SIG)
@@ -1115,6 +1176,9 @@ public class AnimManager implements Runnable{
 	    }
 	}
     }
+
+
+    /* ----------------------- CAMERA ANIMATION ------------------------- */
 
     /**animate a camera
      *@param duration in milliseconds
@@ -1506,6 +1570,9 @@ public class AnimManager implements Runnable{
 	    killCAnim(an,dim);
 	}
     }
+
+
+    /* ----------------------- LENS ANIMATION ------------------------- */
 
     /**animate a lens
      *@param duration in milliseconds
@@ -1984,6 +2051,319 @@ public class AnimManager implements Runnable{
 	    }
 	}
     }
+
+
+
+
+
+    /* ----------------------- PORTAL ANIMATION ------------------------- */
+
+
+
+    /**animate a portal
+     *@param duration in milliseconds
+     *@param type use one of (PT_TRANS_LIN, PT_TRANS_SIG, PT_SZ_LIN, PT_SZ_SIG, PT_SZ_TRANS_LIN, PT_SZ_TRANS_SIG)
+     *@param data for translations, data is java.awt.Point representing X and Y offsets<br>
+     *            for size, data is a java.awt.Point offset <br>
+     *            for size + translation, data is an array of 2 Points (Point[]) representing w,h offsets (size) and x,y offsets (position)
+     *@param pID ID of portal to be animated
+     *@param paa action to perform after animation ends
+     */
+    public void createPortalAnimation(long duration, short type, Object data, Integer pID, PostAnimationAction paa) {
+	Portal p = vsm.getPortal(pID);
+	switch(type){
+	case PT_TRANS_LIN:{//translation - linear
+	    if (animatedPortals.containsKey(pID) && (((int[])animatedPortals.get(pID))[0]==1)){
+		putAsPendingPAnimation(pID,PT_TRANS,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;}
+		else {int[] tmpA={1,0};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
+		if (nbSteps>0){
+		    PTranslation an=new PTranslation(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    int x = p.x;
+		    int y = p.y;
+		    int tx=((Point)data).x;    //data is a Point representing the x and y offsets
+		    int ty=((Point)data).y;
+		    float dx=tx/nbSteps;
+		    float dy=ty/nbSteps;
+		    an.steps=new Point[(int)nbSteps];
+		    for (int i=0;i<nbSteps-1;) {
+			an.steps[i]=new Point(Math.round(x+i*dx), Math.round(y+i*dy));
+			i++;
+		    }
+		    an.steps[(int)nbSteps-1]=new Point(x+tx,y+ty);  //last point is assigned from source value in order to prevent precision error
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	case PT_TRANS_SIG:{//translation - sigmoid
+	    if (animatedPortals.containsKey(pID) && (((int[])animatedPortals.get(pID))[0]==1)){
+		putAsPendingPAnimation(pID,PT_TRANS,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;}
+		else {int [] tmpA={1,0};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((duration/(float)frameTime));     //number of steps
+		if (nbSteps>0){
+		    PTranslation an=new PTranslation(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    int x = p.x;
+		    int y = p.y;
+		    int tx=((Point)data).x;    //data is a Point representing the x and y offsets
+		    int ty=((Point)data).y;
+		    an.steps=new Point[(int)nbSteps];
+		    float stepValue;
+		    int dx,dy;
+		    for (int i=0;i<nbSteps-1;) {
+			stepValue=(float)computeSigmoid(sigFactor,(i+1)/nbSteps);
+			dx=Math.round(tx*stepValue);
+			dy=Math.round(ty*stepValue);
+			an.steps[i++]=new Point(x+dx,y+dy);
+		    }
+		    an.steps[(int)nbSteps-1]=new Point(x+tx,y+ty);   //last point is assigned from source value in order to prevent precision error
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	case PT_SZ_LIN:{//size - linear
+	    if (animatedPortals.containsKey(pID) && (((int[])animatedPortals.get(pID))[1]==1)){
+		putAsPendingPAnimation(pID,PT_SZ,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[1]=1;}
+		else {int[] tmpA={0,1};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
+		if (nbSteps>0){
+		    PResize an=new PResize(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    int w = p.w;
+		    int h = p.h;
+		    int tw=((Point)data).x;    //data is a Point representing the w and h offsets
+		    int th=((Point)data).y;
+		    float dw=tw/nbSteps;
+		    float dh=th/nbSteps;
+		    an.steps=new Point[(int)nbSteps];
+		    for (int i=0;i<nbSteps-1;) {
+			an.steps[i]=new Point(Math.round(w+i*dw), Math.round(h+i*dh));
+			i++;
+		    }
+		    an.steps[(int)nbSteps-1]=new Point(w+tw,h+th);  //last point is assigned from source value in order to prevent precision error
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	case PT_SZ_SIG:{//size - sigmoid
+	    if (animatedPortals.containsKey(pID) && (((int[])animatedPortals.get(pID))[1]==1)){
+		putAsPendingPAnimation(pID,PT_SZ,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[1]=1;}
+		else {int [] tmpA={0,1};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((duration/(float)frameTime));     //number of steps
+		if (nbSteps>0){
+		    PResize an=new PResize(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    int w = p.w;
+		    int h = p.h;
+		    int tw=((Point)data).x;    //data is a Point representing the w and h offsets
+		    int th=((Point)data).y;
+		    an.steps=new Point[(int)nbSteps];
+		    float stepValue;
+		    int dw,dh;
+		    for (int i=0;i<nbSteps-1;) {
+			stepValue=(float)computeSigmoid(sigFactor,(i+1)/nbSteps);
+			dw=Math.round(tw*stepValue);
+			dh=Math.round(th*stepValue);
+			an.steps[i++]=new Point(w+dw,h+dh);
+		    }
+		    an.steps[(int)nbSteps-1]=new Point(w+tw,h+th);   //last point is assigned from source value in order to prevent precision error
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	case PT_SZ_TRANS_LIN:{//size and translation - linear
+	    if (animatedPortals.containsKey(pID) && (((int[])animatedPortals.get(pID))[0]==1 || ((int[])animatedPortals.get(pID))[1]==1)){
+		putAsPendingPAnimation(pID,PT_BOTH,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;((int[])animatedPortals.get(pID))[1]=1;}
+		else {int[] tmpA={1,1};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((float)(duration/frameTime));     //number of steps
+		if (nbSteps>0){
+		    PTransResize an=new PTransResize(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    int x = p.x;
+		    int y = p.y;
+		    int tx=((Point[])data)[1].x;    //data is a Point representing the x and y offsets
+		    int ty=((Point[])data)[1].y;
+		    float dx=tx/nbSteps;
+		    float dy=ty/nbSteps;
+		    int w = p.w;
+		    int h = p.h;
+		    int tw=((Point[])data)[0].x;    //data is a Point representing the w and h offsets
+		    int th=((Point[])data)[0].y;
+		    float dw=tw/nbSteps;
+		    float dh=th/nbSteps;
+		    an.tsteps=new Point[(int)nbSteps];
+		    an.ssteps=new Point[(int)nbSteps];
+		    for (int i=0;i<nbSteps-1;i++) {
+			an.tsteps[i]=new Point(Math.round(x+i*dx), Math.round(y+i*dy));
+			an.ssteps[i]=new Point(Math.round(w+i*dw), Math.round(h+i*dh));
+		    }
+		    an.tsteps[(int)nbSteps-1]=new Point(x+tx,y+ty);  //last point is assigned from source value in order to prevent precision error
+		    an.ssteps[(int)nbSteps-1]=new Point(w+tw,h+th);
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	case PT_SZ_TRANS_SIG:{//size and translation - sigmoid
+	    if (animatedPortals.containsKey(pID) && (((int[])animatedPortals.get(pID))[0]==1 || ((int[])animatedPortals.get(pID))[1]==1)){
+		putAsPendingPAnimation(pID,PT_BOTH,duration,type,data, paa);
+	    }
+	    else {
+		if (animatedPortals.containsKey(pID)){((int[])animatedPortals.get(pID))[0]=1;((int[])animatedPortals.get(pID))[1]=1;}
+		else {int[] tmpA={1,1};animatedPortals.put(pID,tmpA);}
+		float nbSteps=Math.round((duration/(float)frameTime));     //number of steps
+		if (nbSteps>0){
+		    PTransResize an=new PTransResize(p,this,duration);
+		    an.setPostAnimationAction(paa);
+		    int x = p.x;
+		    int y = p.y;
+		    int tx=((Point[])data)[1].x;    //data is a Point[] representing the w,h and x,y offsets
+		    int ty=((Point[])data)[1].y;
+		    int w = p.w;
+		    int h = p.h;
+		    int tw=((Point[])data)[0].x;
+		    int th=((Point[])data)[0].y;
+		    an.tsteps=new Point[(int)nbSteps];
+		    an.ssteps=new Point[(int)nbSteps];
+		    float stepValue;
+		    int dx,dy;
+		    int dw,dh;
+		    for (int i=0;i<nbSteps-1;i++) {
+			stepValue=(float)computeSigmoid(sigFactor,(i+1)/nbSteps);
+			dx=Math.round(tx*stepValue);
+			dy=Math.round(ty*stepValue);
+			dw=Math.round(tw*stepValue);
+			dh=Math.round(th*stepValue);
+			an.tsteps[i]=new Point(x+dx,y+dy);
+			an.ssteps[i]=new Point(w+dw,h+dh);
+		    }
+		    an.tsteps[(int)nbSteps-1]=new Point(x+tx,y+ty);   //last point is assigned from source value in order to prevent precision error
+		    an.ssteps[(int)nbSteps-1]=new Point(w+tw,h+th);
+		    animPortalBag.add(an);
+		    an.start();
+		}
+	    }
+	    break;
+	}
+	default:{
+	    System.err.println("Error : AnimManager.createPortalAnimation : unknown animation type");
+	}
+	}
+    }
+
+    void putAsPendingPAnimation(Integer pID,String dim,long duration,short type,Object data, PostAnimationAction paa){
+	Vector pa;
+	//look for other pending animations for this portal and add this one to the end (FIFO)
+	if (pendingPAnims.containsKey(pID)){
+	    Hashtable animByDim=(Hashtable)pendingPAnims.get(pID);
+	    if (animByDim.containsKey(dim)){pa=(Vector)animByDim.get(dim);}
+	    else {pa=new Vector();}
+	    pa.add(new AnimParams(duration,type,data, paa));
+	    animByDim.put(dim,pa);
+	}
+	else {
+	    pa=new Vector();
+	    pa.add(new AnimParams(duration,type,data, paa));
+	    Hashtable animByDim=new Hashtable();
+	    animByDim.put(dim,pa);
+	    pendingPAnims.put(pID,animByDim);
+	}	
+    }
+
+    /**FOR INTERNAL USE ONLY*/
+    public void killPAnim(PAnimation pan,String dim){
+	Integer pID=pan.target.getID();   //get the portal ID
+	animPortalBag.remove(pan);      //remove animation from bag of anims to be executed (it's over, kill it)
+	if (animatedPortals.containsKey(pID)){//remove portal from list of portals being animated
+	    int[] animDims=(int[])animatedPortals.get(pID);
+	    if (dim.equals(PT_TRANS)){animDims[0]=0;}
+	    else if (dim.equals(PT_SZ)){animDims[1]=0;}
+	    else if (dim.equals(PT_BOTH)){animDims[0]=0;animDims[1]=0;}
+	    if (allValuesEqualZero(animDims)){animatedPortals.remove(pID);}
+	}
+	pan.postAnimAction();
+	if (pendingPAnims.containsKey(pID)) {  //look for first anim standing by whose target is this portal	    
+	    Hashtable pendingDims=(Hashtable)pendingPAnims.get(pID);
+	    if (pendingDims.containsKey(dim)){
+		Vector pa=(Vector)pendingDims.get(dim);
+		AnimParams ap=(AnimParams)pa.elementAt(0);  //get its params
+		pa.removeElementAt(0);  //remove the animation we're about to execute
+		if (pa.isEmpty()) { //if there is no pending anim left, delete entry for this glyph
+		    pendingDims.remove(dim);
+		    if (pendingDims.isEmpty()){pendingPAnims.remove(pID);}
+		}
+		this.createPortalAnimation(ap.duration,ap.type,ap.data,pID, ap.paa);    //create the appropriate animation
+	    }
+	}
+    }
+
+    /**
+     * Interrupt a portal animation being executed
+     *@param c portal being animated
+     *@param dim dimension animated (use one of PT_TRANS, PT_SZ, PT_BOTH)
+     *@param all also kill all animations waiting in the queue for this dimension (for this portal) - has no effect if there is no animation waiting in the queue
+     *@param finish true=put the portal in its final state (i.e. the state in which it would be if the animation had not been interrupted) ; false=leave it in the current state (at the time when the animation is interrupted)
+     */
+    public void interruptPortalAnimation(Portal p,String dim,boolean all,boolean finish){
+	PAnimation an=null;
+	PAnimation tmpAn;
+	for (int i=0;i<animPortalBag.size();i++){
+	    tmpAn=(PAnimation)animPortalBag.elementAt(i);
+	    if (tmpAn.target==p && tmpAn.type==dim){
+		an=tmpAn;
+		break;
+	    }
+	}
+	if (an!=null){
+	    if (all){//interrupt this animation and cancel pending animations for this attribute
+		if (finish){//finish animation before killing it (assign final step to glyph)
+		    an.conclude();
+		}
+		//else leave glyph in its current state
+		if (pendingPAnims.containsKey(p.getID())){//cancel pending animations
+		    Hashtable pendingDims=(Hashtable)pendingPAnims.get(p.getID());
+		    if (pendingDims.containsKey(dim)){
+			pendingDims.remove(dim);
+			if (pendingDims.isEmpty()){pendingPAnims.remove(p.getID());}
+		    }
+		}
+	    }
+	    else {//interrupt this animation only, and take next animation
+		if (finish){//finish animation before killing it (assign final step to glyph)
+		    an.conclude();
+		}
+		//else leave portal in its current state (nothing specific to do, just kill)
+	    }
+	    killPAnim(an,dim);
+	}
+    }
+
+    /* ------------------ Misc. Functions ---------------- */
 
     /**
      *@param n determines the steepness of the function
