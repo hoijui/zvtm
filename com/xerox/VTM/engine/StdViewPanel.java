@@ -316,7 +316,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					    synchronized(drawnGlyphs){
 						drawnGlyphs.removeAllElements();
 						uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
-						// call to background java2d painting hook
 						//compute region seen from this view through camera
 						viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
 						viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
@@ -334,7 +333,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 						    //drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
 						    beginAt=0;
 						    for (int j=drawnGlyphs.size()-1;j>=0;j--){//glyphs must have been projected because fillsView uses
-							if (((Glyph)drawnGlyphs.elementAt(j)).fillsView(viewW,viewH,cams[nbcam].getIndex())){//projected coords
+							if (((Glyph)drawnGlyphs.elementAt(j)).fillsView(viewW, viewH, camIndex)){//projected coords
 							    beginAt=j;
 							    break;
 							}
@@ -356,7 +355,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 								    //if glyph is at least partially visible in the reg. seen from this view, display
 								    gll[i].project(cams[nbcam], size); // an invisible glyph should still be projected
 								    if (gll[i].isVisible()){          // as it can be sensitive
-									gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform);
+									gll[i].draw(g2d, size.width, size.height, camIndex, standardStroke, standardTransform);
 								    }
 								    // notifying outside if branch because glyph sensitivity is not
 								    // affected by glyph visibility when managed through Glyph.setVisible()
@@ -368,6 +367,10 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 						}
 					    }
 					}
+				    }
+				    // paint portals associated with this view
+				    for (int i=0;i<parent.portals.length;i++){
+					parent.portals[i].paint(g2d, size.width, size.height);
 				    }
 				    // call to foreground java2d painting hook
 				    if (parent.painters[Java2DPainter.FOREGROUND] != null){
