@@ -288,9 +288,10 @@ public class Camera {
     }
 
     /**
-     * set view owning this camera
+     * set view owning this camera.
+     * CALLED INTERNALLY - NOT FOR PUBLIC USE
      */
-    protected void setOwningView(View vi){
+    public void setOwningView(View vi){
 	view=vi;
     }
 
