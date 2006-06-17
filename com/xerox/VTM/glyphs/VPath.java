@@ -346,6 +346,7 @@ public class VPath extends Glyph implements Cloneable {
 	g.setColor(this.color);
 // 	if (true){//replace by something using projected size (so that we do not paint it if too small)
  	    at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);
+	    at.preConcatenate(stdT);
  	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
 	    g.setTransform(at);
 	    if (stroke!=null){

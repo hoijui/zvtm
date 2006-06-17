@@ -103,6 +103,7 @@ public class VTextOr extends VText implements Cloneable {
 		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
 		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef*Math.cos(-orient)/2.0,pc[i].cy-pc[i].ch*Math.sin(-orient)*coef/2.0);}
 		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy-pc[i].ch*coef);}
+		at.preConcatenate(stdT);
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		g.setTransform(at);
@@ -125,6 +126,7 @@ public class VTextOr extends VText implements Cloneable {
 		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
 		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef*Math.cos(-orient)/2.0,pc[i].cy-pc[i].ch*Math.sin(-orient)*coef/2.0);}
 		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy-pc[i].ch*coef);}
+		at.preConcatenate(stdT);
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		g.setTransform(at);

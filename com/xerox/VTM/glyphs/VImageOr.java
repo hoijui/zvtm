@@ -147,6 +147,7 @@ public class VImageOr extends VImage implements Cloneable {
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (trueCoef!=1.0f){
 		at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
+		at.concatenate(stdT);
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));}
 		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
 		g.drawImage(image,at,null);
@@ -157,8 +158,8 @@ public class VImageOr extends VImage implements Cloneable {
 		if (orient==0){g.drawImage(image,pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,null);}
 		else {
 		    at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
+		    at.preConcatenate(stdT);
 		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
-		    if (trueCoef!=1.0f){at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));}
 		    g.drawImage(image,at,null);
 		}
 		if (drawBorder==1){if (pc[i].prevMouseIn){g.setColor(borderColor);g.drawPolygon(pc[i].p);}}

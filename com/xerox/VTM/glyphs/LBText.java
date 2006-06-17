@@ -113,6 +113,7 @@ public class LBText extends LText {
 		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
 		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef/2.0f,pc[i].cy);}
 		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy);}
+		at.preConcatenate(stdT);
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		if (borderColor != null){
@@ -134,6 +135,7 @@ public class LBText extends LText {
 		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
 		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef/2.0f,pc[i].cy);}
 		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy);}
+		at.preConcatenate(stdT);
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		if (borderColor != null){

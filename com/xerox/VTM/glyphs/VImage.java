@@ -349,7 +349,9 @@ public class VImage extends Glyph implements RectangularShape,Cloneable {
 	    //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
 	    if (trueCoef!=1.0f){
-		g.setTransform(AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch));
+		at = AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
+		at.preConcatenate(stdT);
+		g.setTransform(at);
 		g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
 		g.setTransform(stdT);
 		if (drawBorder==1){
