@@ -70,7 +70,7 @@ public class PResize extends PAnimation {
 
     public void postAnimAction(){
 	if (paa != null){
-	    paa.animationEnded(target, PostAnimationAction.PORTAL, AnimManager.PT_TRANS);
+	    paa.animationEnded(target, PostAnimationAction.PORTAL, AnimManager.PT_SZ);
 	}
     }
 

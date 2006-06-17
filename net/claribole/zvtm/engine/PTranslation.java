@@ -68,7 +68,7 @@ public class PTranslation extends PAnimation {
 
     public void postAnimAction(){
 	if (paa != null){
-	    paa.animationEnded(target, PostAnimationAction.CAMERA, AnimManager.CA_TRANS);
+	    paa.animationEnded(target, PostAnimationAction.PORTAL, AnimManager.PT_ALPHA);
 	}
     }
 
