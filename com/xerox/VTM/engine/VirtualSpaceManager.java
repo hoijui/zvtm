@@ -392,7 +392,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	return v.addPortal(p);
     }
 
-    
+    /**destroy a portal*/
     public void destroyPortal(Portal p){
 	View v = p.getOwningView();
 	v.removePortal(p);
