@@ -66,8 +66,8 @@ public class PortalWorldDemo {
     static int ANIM_MOVE_LENGTH = 500;
 
     /* Portal */
-    static int PORTAL_WIDTH = 200;
-    static int PORTAL_HEIGHT = 200;
+    static int PORTAL_WIDTH = 140;
+    static int PORTAL_HEIGHT = 100;
     CameraPortalST portal;
     Camera portalCamera;
 
@@ -98,9 +98,9 @@ public class PortalWorldDemo {
 
     void initMap(){
 	System.out.print("Loading World Map...");
-	mainMap = new VImageOr(M1000x, M1000y, 0,
- 			     (new ImageIcon(M1000path)).getImage(),
-			       0.707f); //MN000factor.doubleValue());
+	mainMap = new VImage(M1000x, M1000y, 0,
+			     (new ImageIcon(M1000path)).getImage(),
+			     MN000factor.doubleValue());
 	mainMap.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vsm.addGlyph(mainMap, mainVS);
 	mainVS.atBottom(mainMap);
@@ -131,7 +131,6 @@ public class PortalWorldDemo {
 	    portal = new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);
 	    vsm.addPortal(portal, demoView);
 	    portal.setBorder(Color.RED);
-	    portal.setBackgroundColor(Color.YELLOW);
 	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
 	}
     }
