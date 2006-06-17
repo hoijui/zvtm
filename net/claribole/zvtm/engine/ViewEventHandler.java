@@ -18,7 +18,7 @@ import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 
-/**Abstract class that every VTM-based application should subclass - deals with events like mouse clicks, keyboard events, and entering/leaving a glyph - for every method, mod tells if a modifier key is pressed at the time of the event 0 = no key, 1 = shift, 2 = ctrl, 3 = ctrl+shift, 4 = meta (command for Mac OS)
+/** Interface to handle events happening in a View. Replaces abstract class com.xerox.VTM.engine.AppEventHandler
  * @author Emmanuel Pietriga
  */
 
@@ -91,10 +91,14 @@ public interface ViewEventHandler {
      */
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e);
 
-    /**subclassing methods should call super() if they want automatic glyph border highlighting when entering a glyph*/
+    /**cursor enters a Glyph
+     *@param g Glyph the cursor just entered
+     */
     public void enterGlyph(Glyph g);
 
-    /**subclassing methods should call super() if they want automatic glyph border highlighting when entering a glyph*/
+    /**cursor exits a Glyph
+     *@param g Glyph the cursor just exited
+     */
     public void exitGlyph(Glyph g);
 
     /**beware: code is always 0 in Ktype (it is the value of KeyEvent.getKeyCode() which is always equal to VK_UNDEFINED according to Sun). If you need to access code, use Kpress or Krelease.*/
