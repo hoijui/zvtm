@@ -38,6 +38,7 @@ import java.util.Vector;
 import javax.swing.JLabel;
 
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
 
@@ -64,6 +65,37 @@ public abstract class View {
 	for (int i=0;i<cameras.size();i++){
 	    ((Camera)c.elementAt(i)).setOwningView(this);
 	}
+    }
+
+    /**portals embedded in this view*/
+    Portal[] portals = new Portal[0];
+    
+    /**add a portal to this view*/
+    public Portal addPortal(Portal p){
+	Portal[] tmpP = new Portal[portals.length+1];
+	System.arraycopy(portals, 0, tmpP, 0, portals.length);
+	tmpP[portals.length] = p;
+	portals = tmpP;
+	p.setOwningView(this);
+	return p;
+    }
+
+    /**remove a portal from this view*/
+    public void removePortal(Portal p){
+	for (int i=0;i<portals.length;i++){
+	    if (portals[i] == p){
+		removePortalAtIndex(i);
+		break;
+	    }
+	}
+    }
+
+    /**remove portal at index portalIndex in the list of portals*/
+    public void removePortalAtIndex(int portalIndex){
+	Portal[] tmpP = new Portal[portals.length-1];
+	System.arraycopy(portals, 0, tmpP, 0, portalIndex);
+	System.arraycopy(portals, portalIndex+1, tmpP, portalIndex, portals.length-portalIndex-1);
+	portals = tmpP;
     }
 
     /**mouse glyph*/
