@@ -70,6 +70,9 @@ public class CameraPortalST extends CameraPortal implements Transparent {
 	}
 	g2d.translate(x, y);
 	standardStroke = g2d.getStroke();
+	// be sure to call the translate instruction before getting the standard transform
+	// as the latter's matrix is preconcatenated to the translation matrix of glyphs
+	// that use AffineTransforms for translation
 	standardTransform = g2d.getTransform();
 	drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
 	synchronized(drawnGlyphs){
