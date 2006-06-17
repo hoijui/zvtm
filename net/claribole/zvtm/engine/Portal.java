@@ -22,9 +22,26 @@ public abstract class Portal {
     /**top-left vertical coordinate of portal, in parent's JPanel coordinates*/
     public int y;
     /**Portal dimensions*/
-    Dimension d;
+    public Dimension size;
     /**View embedding this portal*/
     View owningView;
+
+    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    public void move(int dx, int dy){
+	x += dx;
+	y += dy;
+    }
+
+    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    public void moveTo(int x, int y){
+	this.x = x;
+	this.y = y;
+    }    
+    
+    /**set the portal's size*/
+    public void setSize(Dimension d){
+	this.size = d;
+    }
     
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
