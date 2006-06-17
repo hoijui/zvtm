@@ -70,7 +70,7 @@ public class CameraPortal extends Portal {
     public CameraPortal(int x, int y, int w, int h, Camera c){
 	this.x = x;
 	this.y = y;
-	this.d = new Dimension(w, h);
+	this.size = new Dimension(w, h);
 	this.camera = c;
 	this.cameraSpace = this.camera.getOwningSpace();
 	this.camIndex = this.camera.getIndex();
@@ -109,10 +109,10 @@ public class CameraPortal extends Portal {
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
     public long[] getVisibleRegion(){
 	float uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
-	long[] res = {(long)(camera.posx - (d.width/2)*uncoef),
-		      (long)(camera.posy + (d.height/2)*uncoef),
-		      (long)(camera.posx + (d.width/2)*uncoef),
-		      (long)(camera.posy - (d.height/2)*uncoef)};
+	long[] res = {(long)(camera.posx - (size.width/2)*uncoef),
+		      (long)(camera.posy + (size.height/2)*uncoef),
+		      (long)(camera.posx + (size.width/2)*uncoef),
+		      (long)(camera.posy - (size.height/2)*uncoef)};
 	return res;
     }
 
@@ -155,10 +155,10 @@ public class CameraPortal extends Portal {
 
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	g2d.setClip(x, y, d.width, d.height);
+	g2d.setClip(x, y, size.width, size.height);
 	if (bkgColor != null){
 	    g2d.setColor(bkgColor);
-	    g2d.fillRect(x, y, d.width, d.height);
+	    g2d.fillRect(x, y, size.width, size.height);
 	}
 	g2d.translate(x, y);
 	standardStroke = g2d.getStroke();
@@ -168,19 +168,19 @@ public class CameraPortal extends Portal {
 	    drawnGlyphs.removeAllElements();
 	    uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
 	    //compute region seen from this view through camera
-	    viewWC = (long)(camera.posx - (d.width/2)*uncoef);
-	    viewNC = (long)(camera.posy + (d.height/2)*uncoef);
-	    viewEC = (long)(camera.posx + (d.width/2)*uncoef);
-	    viewSC = (long)(camera.posy - (d.height/2)*uncoef);
+	    viewWC = (long)(camera.posx - (size.width/2)*uncoef);
+	    viewNC = (long)(camera.posy + (size.height/2)*uncoef);
+	    viewEC = (long)(camera.posx + (size.width/2)*uncoef);
+	    viewSC = (long)(camera.posy - (size.height/2)*uncoef);
 	    gll = cameraSpace.getVisibleGlyphList();
 	    for (int i=0;i<gll.length;i++){
 		if (gll[i] != null){
 		    synchronized(gll[i]){
 			if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
 			    //if glyph is at least partially visible in the reg. seen from this view, display
-			    gll[i].project(camera, d); // an invisible glyph should still be projected
+			    gll[i].project(camera, size); // an invisible glyph should still be projected
 			    if (gll[i].isVisible()){      // as it can be sensitive
-				gll[i].draw(g2d, d.width, d.height, camIndex, standardStroke, standardTransform);
+				gll[i].draw(g2d, size.width, size.height, camIndex, standardStroke, standardTransform);
 			    }
 			}
 		    }
@@ -191,7 +191,7 @@ public class CameraPortal extends Portal {
 	g2d.setClip(0, 0, viewWidth, viewHeight);
 	if (borderColor != null){
 	    g2d.setColor(borderColor);
-	    g2d.drawRect(x, y, d.width, d.height);
+	    g2d.drawRect(x, y, size.width, size.height);
 	}
     }
 
