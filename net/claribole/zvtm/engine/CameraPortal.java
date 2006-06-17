@@ -19,7 +19,11 @@ import java.awt.geom.AffineTransform;
 import java.util.Vector;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.LongPoint;
+import net.claribole.zvtm.engine.Location;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
 
@@ -28,8 +32,11 @@ import com.xerox.VTM.glyphs.Glyph;
 
 public class CameraPortal extends Portal {
 
-    /**Draw a border delimiting the portal.*/
+    /**Draw a border delimiting the portal (null if no border).*/
     Color borderColor;
+
+    /**Portal's background fill color (null if transparent).*/
+    Color bkgColor;
 
     // Camera used to render the portal
     Camera camera;
@@ -87,6 +94,18 @@ public class CameraPortal extends Portal {
 	return borderColor;
     }
 
+    /**Fill background with a color.
+     *@param bc color of the border (null if none)*/    
+    public void setBackgroundColor(Color bc){
+	this.bkgColor = bc;
+    }
+
+    /**Get the color used to fill the background.
+     *@return color of the border (null if none)*/    
+    public Color getBackgroundColor(){
+	return bkgColor;
+    }
+
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
     public long[] getVisibleRegion(){
 	float uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
@@ -97,8 +116,51 @@ public class CameraPortal extends Portal {
 	return res;
     }
 
+    /**returns the location from which this portal's camera will see everything visible in the associated virtual space
+     *@return the location to which the camera should go
+     */
+    public Location getGlobalView(){
+	long[] wnes = cameraSpace.findFarmostGlyphCoords();
+	long dx = (wnes[2]+wnes[0])/2;  //new coords where camera should go
+	long dy = (wnes[1]+wnes[3])/2;
+	long[] regBounds = getVisibleRegion();
+	/*region that will be visible after translation, but before zoom/unzoom (need to
+	  compute zoom) ; we only take left and down because we only need horizontal and
+	  vertical ratios, which are equals for left and right, up and down*/
+	long[] trRegBounds = {regBounds[0]+dx-camera.posx, regBounds[3]+dy-camera.posy};
+	float currentAlt = camera.getAltitude()+camera.getFocal();
+	float ratio = 0;
+	//compute the mult factor for altitude to see all stuff on X
+	if (trRegBounds[0]!=0){ratio = (dx-wnes[0])/((float)(dx-trRegBounds[0]));}
+	//same for Y ; take the max of both
+	if (trRegBounds[1]!=0){
+	    float tmpRatio = (dy-wnes[3])/((float)(dy-trRegBounds[1]));
+	    if (tmpRatio>ratio){ratio = tmpRatio;}
+	}
+	return new Location(dx, dy, currentAlt*Math.abs(ratio));
+    }
+
+    /**translates and (un)zooms this portal's camera in order to see everything visible in the associated virtual space
+     *@param d duration of the animation in ms
+     *@return the final camera location
+     */
+    public Location getGlobalView(int d, VirtualSpaceManager vsm){
+	Location l = getGlobalView();
+	float dAlt = l.alt - camera.getAltitude() - camera.getFocal();
+	Vector prms=new Vector();
+	prms.add(new Float(dAlt));prms.add(new LongPoint(l.vx-camera.posx, l.vy-camera.posy));
+	vsm.animator.createCameraAnimation(d, AnimManager.CA_ALT_TRANS_SIG, prms, camera.getID());
+	return l;
+    }
+
+
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	g2d.setClip(x,y,d.width,d.height);
+	g2d.setClip(x, y, d.width, d.height);
+	if (bkgColor != null){
+	    g2d.setColor(bkgColor);
+	    g2d.fillRect(x, y, d.width, d.height);
+	}
+	g2d.translate(x, y);
 	standardStroke = g2d.getStroke();
 	standardTransform = g2d.getTransform();
 	drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
@@ -125,6 +187,7 @@ public class CameraPortal extends Portal {
 		}
 	    }
 	}
+	g2d.translate(-x, -y);
 	g2d.setClip(0, 0, viewWidth, viewHeight);
 	if (borderColor != null){
 	    g2d.setColor(borderColor);
