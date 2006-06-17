@@ -188,7 +188,7 @@ public class LocateTask2 implements Java2DPainter {
  			     (new ImageIcon(MapData.M1000path)).getImage(),
 			     MapData.MN000factor.doubleValue());
 	mainMap.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(mainMap, LocateTask.mainVSname);
+	vsm.addGlyph(mainMap, mainVSname);
 	mainVS.atBottom(mainMap);
     }
 
