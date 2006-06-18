@@ -15,13 +15,15 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PortalEventHandler;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-class PWEventHandler implements ViewEventHandler {
+class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     PortalWorldDemo application;
 
@@ -120,5 +122,11 @@ class PWEventHandler implements ViewEventHandler {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
+
+    /**cursor enters portal*/
+    public void enterPortal(Portal p){}
+
+    /**cursor exits portal*/
+    public void exitPortal(Portal p){}
 
 }

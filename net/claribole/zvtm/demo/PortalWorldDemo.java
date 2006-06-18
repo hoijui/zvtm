@@ -129,6 +129,7 @@ public class PortalWorldDemo {
 	}
 	else {// portal not active, create it
 	    portal = new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);
+	    portal.setPortalEventHandler(eh);
 	    vsm.addPortal(portal, demoView);
 	    portal.setBorder(Color.RED);
 	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
