@@ -155,6 +155,14 @@ public class CameraPortal extends Portal {
 	return l;
     }
 
+    /**detects whether the given point is inside this portal or not 
+     *@param cx horizontal cursor coordinate (JPanel)
+     *@param cy vertical cursor coordinate (JPanel)
+     */
+    public boolean coordInside(int cx, int cy){
+	return ((cx >= x) && (cx <= x+w) && 
+		(cy >= y) && (cy <= y+h));
+    }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	g2d.setClip(x, y, w, h);
