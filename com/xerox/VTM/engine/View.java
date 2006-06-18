@@ -96,6 +96,7 @@ public abstract class View {
 	System.arraycopy(portals, 0, tmpP, 0, portalIndex);
 	System.arraycopy(portals, portalIndex+1, tmpP, portalIndex, portals.length-portalIndex-1);
 	portals = tmpP;
+	panel.resetCursorInsidePortals();
     }
 
     /**mouse glyph*/

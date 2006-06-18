@@ -156,7 +156,10 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**should the view be antialiased*/
     boolean antialias=false;
 
-    /**previous coordinates of the mouse (used to erase old cursor before repainting in XOR mode)*/
+    /**Previous coordinates of the mouse.
+     * Used to erase old cursor before repainting in XOR mode.
+     * Also used to resetMouseInsidePortals
+     */
     protected int oldX=0;
     protected int oldY=0;
 
@@ -188,6 +191,33 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     void setEventHandler(ViewEventHandler eh){
 	evH = eh;
     }
+
+    /* -------------------- PORTALS ------------------- */
+
+    // if = 0, not inside any portal,
+    // if = N > 0, inside N portals
+    int cursorInsidePortals = 0;
+    
+    void resetCursorInsidePortals(){
+	synchronized(this){
+	    cursorInsidePortals = 0;
+	    for (int i=0;i<parent.portals.length;i++){
+		if (parent.portals[i].coordInside(oldX, oldY)){
+		    cursorInsidePortals += 1;
+		}
+	    }
+	}
+    }
+
+    void updateCursorInsidePortals(int x, int y){
+	synchronized(this){
+	    for (int i=0;i<parent.portals.length;i++){
+		cursorInsidePortals += parent.portals[i].cursorInOut(x, y);
+	    }
+	}
+    }
+
+    /* -------------------- CURSOR ------------------- */
     
     /**Set the cursor.
      * Either the ZVTM cursor or one of the default AWT cursors.
@@ -241,7 +271,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	this.setCursor(awtCursor);
     }
     
-    /**true will draw a segment between origin of drag and current mouse pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
+    /**true will draw a segment between origin of drag and current cursor pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
     public void setDrawDrag(boolean b){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -249,7 +279,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	parent.repaintNow();
     }
 
-    /**true will draw a segment between origin of drag and current mouse pos until drag is finished*/
+    /**true will draw a segment between origin of drag and current cursor pos until drag is finished*/
     public void setDrawSegment(boolean b){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -257,7 +287,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	parent.repaintNow();
     }
 
-    /**true will draw a rectangle between origin of drag and current mouse pos until drag is finished*/
+    /**true will draw a rectangle between origin of drag and current cursor pos until drag is finished*/
     public void setDrawRect(boolean b){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -265,7 +295,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	parent.repaintNow();
     }
 
-    /**draw a circle between origin of drag and current mouse pos until drag is finished (drag segment represents the radius of the circle, not its diameter) - use OVAL for any oval, CIRCLE for circle, NONE to stop drawing it*/
+    /**draw a circle between origin of drag and current cursor pos until drag is finished (drag segment represents the radius of the circle, not its diameter) - use OVAL for any oval, CIRCLE for circle, NONE to stop drawing it*/
     public void setDrawOval(short s){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -467,7 +497,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	inside=false;
 	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
     }
-    
+
+
     public void mouseMoved(MouseEvent e){
 	try {
 	    if (parent.parent.mouseSync){
@@ -477,6 +508,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 		    updateMouseOnly=true;
 		}
 		parent.mouse.propagateMove();  //translate glyphs sticked to mouse
+		// find out is the cursor is inside one (or more) portals
+		updateCursorInsidePortals(e.getX(), e.getY());
+		// forward mouseMoved event to View event handler
 		if (evH != null){
 		    if (parent.notifyMouseMoved){
 			evH.mouseMoved(this, e.getX(), e.getY(), e);
@@ -524,7 +558,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 			else {evH.mouseDragged(this,ViewEventHandler.NO_MODIFIER,buttonNumber,e.getX(),e.getY(), e);}
 		    }
 		}
-		curDragx=e.getX();curDragy=e.getY();  //assign anyway, even if the current drag command does not want to display a segment
+		//assign anyway, even if the current drag command does not want to display a segment
+		curDragx=e.getX();curDragy=e.getY();  
 		parent.repaintNow();
 		if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evH,cams[activeLayer],this.lens);}
 	    }
