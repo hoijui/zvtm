@@ -14,9 +14,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.Portal;
-import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.*;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -124,9 +122,9 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void viewClosing(View v){System.exit(0);}
 
     /**cursor enters portal*/
-    public void enterPortal(Portal p){}
+    public void enterPortal(Portal p){((CameraPortal)p).setBorder(Color.WHITE);application.vsm.repaintNow();}
 
     /**cursor exits portal*/
-    public void exitPortal(Portal p){}
+    public void exitPortal(Portal p){((CameraPortal)p).setBorder(Color.RED);application.vsm.repaintNow();}
 
 }

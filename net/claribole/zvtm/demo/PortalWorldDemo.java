@@ -19,7 +19,7 @@ import java.util.Vector;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.CameraPortalST;
+import net.claribole.zvtm.engine.*;
 
 public class PortalWorldDemo {
 
@@ -66,9 +66,9 @@ public class PortalWorldDemo {
     static int ANIM_MOVE_LENGTH = 500;
 
     /* Portal */
-    static int PORTAL_WIDTH = 140;
+    static int PORTAL_WIDTH = 100;
     static int PORTAL_HEIGHT = 100;
-    CameraPortalST portal;
+    CameraPortal portal;
     Camera portalCamera;
 
     PortalWorldDemo(){
@@ -128,11 +128,13 @@ public class PortalWorldDemo {
 	    vsm.repaintNow();
 	}
 	else {// portal not active, create it
-	    portal = new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);
+// 	    portal = new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);
+	    portal = new RoundCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
 	    portal.setPortalEventHandler(eh);
 	    vsm.addPortal(portal, demoView);
 	    portal.setBorder(Color.RED);
-	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
+	    vsm.repaintNow();
+// 	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
 	}
     }
 
