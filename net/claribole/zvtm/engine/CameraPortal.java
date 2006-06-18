@@ -1,4 +1,4 @@
-/*   FILE: Portal.java
+/*   FILE: CameraPortal.java
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -27,7 +27,7 @@ import net.claribole.zvtm.engine.Location;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
 
-/**A portal showing what is seen through a camera.
+/**A portal showing what is seen through a camera. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
 
 public class CameraPortal extends Portal {
