@@ -155,6 +155,23 @@ public class CameraPortal extends Portal {
 	return l;
     }
 
+    /** Position this portal's camera so that it seamlessly integrates with the surrounding context
+     *@param c camera observing the context (associated with the View)
+     *@param v View
+     */
+    public Location getSeamlessView(Camera c){
+	int hvw = c.getOwningView().getFrame().getWidth() / 2;
+	int hvh = c.getOwningView().getFrame().getHeight() / 2;
+	// get the region seen through the portal from the View's camera
+	float uncoef = (float)((c.focal+c.altitude) / (float)c.focal);
+	long[] wnes = {(long) (c.getOwningView().mouse.vx - w/2*uncoef),
+		       (long) (c.getOwningView().mouse.vy + h/2*uncoef),
+		       (long) (c.getOwningView().mouse.vx + w/2*uncoef),
+		       (long) (c.getOwningView().mouse.vy - h/2*uncoef)};
+	// compute the portal camera's new (x,y) coordinates and altitude
+	return new Location((wnes[2]+wnes[0]) / 2, (wnes[1]+wnes[3]) / 2, camera.focal * ((wnes[2]-wnes[0])/((float)w)));
+    }
+
     /**detects whether the given point is inside this portal or not 
      *@param cx horizontal cursor coordinate (JPanel)
      *@param cy vertical cursor coordinate (JPanel)
