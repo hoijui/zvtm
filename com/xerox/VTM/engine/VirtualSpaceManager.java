@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.Portal;
@@ -760,6 +761,41 @@ public class VirtualSpaceManager implements AWTEventListener {
 	name2viewIndex.put(v.name, new Integer(allViews.length-1));
 	animator.registerView();
     }
+
+     /**
+       * Creates an external view which presents itself
+       * in a JPanel in a window (JFrame) provided by the client application (and which can contain other components).
+	 * @param cameraList vector of cameras superimposed in this view
+	 * @param name	View name. Since this view is
+	 * not itself a window, this does not affect the
+	 * window's title: use setTitle() for that.
+	 * @param panelWidth	width of panel in pixels
+	 * @param panelHeight	width of panel in pixels
+	 * @param visible	should the view be made visible automatically or not
+	 * @param decorated	should the view be decorated with the underlying window manager's window frame or not
+	 * @param viewType	One of <code>View.STD_VIEW</code>,
+	 * <code>View.OPENGL_VIEW</code>,
+	 * or <code>View.VOLATILE_VIEW</code>.
+	 * @param parentPanel	This is the parent panel for this view. A JPanel
+	 * presenting this view will be created as a child of this panel.
+	 * If the parent is <code>null</code>, the frame's content panel
+	 * will be used as the parent.
+	 * @param frame	The frame in which this panel will be created.
+	 * (This is to be compatible with the <code>View</code> API.)
+	 * @return	View	The created view.
+	 */
+    public View addExternalView(Vector cameraList, String name, int panelWidth, int panelHeight,
+				boolean visible, boolean decorated, short viewType,
+				JPanel parentPanel, JFrame frame) {
+    	View v = new JPanelView(cameraList, name, panelWidth, panelHeight,
+				visible, decorated, this, viewType,
+				parentPanel, frame);
+	v.mouse.setID(new Long(nextmID++));
+	addView(v);
+	v.setRepaintPolicy(generalRepaintPolicy);
+	if (!animator.started){animator.start();} //start animator only when a view is created
+	return v;
+     }
 
     /**Get view whose name is n (-1 if view does not exist).*/
     protected int getViewIndex(String n){
