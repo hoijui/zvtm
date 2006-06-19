@@ -27,6 +27,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
 
+    int prevJPX,prevJPY;
+
     PWEventHandler(PortalWorldDemo appli){
 	application = appli;
     }
@@ -60,11 +62,23 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     }
 
+    static final int PORTAL_INITIAL_X_OFFSET = 0;
+    static final int PORTAL_INITIAL_Y_OFFSET = 0;
+
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	application.switchPortal(jpx, jpy);
+	application.switchPortal(jpx+PORTAL_INITIAL_X_OFFSET, jpy+PORTAL_INITIAL_Y_OFFSET);
+	prevJPX = jpx;
+	prevJPY = jpy;
     }
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+	if (application.portal != null){
+	    application.portal.move(jpx-prevJPX, jpy-prevJPY);
+	    application.vsm.repaintNow();
+	    prevJPX = jpx;
+	    prevJPY = jpy;
+	}
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (buttonNumber == 1){
@@ -107,13 +121,17 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code==KeyEvent.VK_PAGE_UP){application.getHigherView(mod == CTRL_MOD);}
-	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView(mod == CTRL_MOD);}
-	else if (code==KeyEvent.VK_HOME){application.getGlobalView(mod == CTRL_MOD);}
-	else if (code==KeyEvent.VK_UP){application.translateView(PortalWorldDemo.MOVE_UP, mod == CTRL_MOD);}
-	else if (code==KeyEvent.VK_DOWN){application.translateView(PortalWorldDemo.MOVE_DOWN, mod == CTRL_MOD);}
-	else if (code==KeyEvent.VK_LEFT){application.translateView(PortalWorldDemo.MOVE_LEFT, mod == CTRL_MOD);}
-	else if (code==KeyEvent.VK_RIGHT){application.translateView(PortalWorldDemo.MOVE_RIGHT, mod == CTRL_MOD);}
+	if (code == KeyEvent.VK_PAGE_UP){application.getHigherView(mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_PAGE_DOWN){application.getLowerView(mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_HOME){application.getGlobalView(mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_UP){application.translateView(PortalWorldDemo.MOVE_UP, mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_DOWN){application.translateView(PortalWorldDemo.MOVE_DOWN, mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_LEFT){application.translateView(PortalWorldDemo.MOVE_LEFT, mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_RIGHT){application.translateView(PortalWorldDemo.MOVE_RIGHT, mod == CTRL_MOD);}
+	else if (code == KeyEvent.VK_F1){application.portalType = PortalWorldDemo.SQUARE;}
+	else if (code == KeyEvent.VK_F2){application.portalType = PortalWorldDemo.SQUARE_ST;}
+	else if (code == KeyEvent.VK_F3){application.portalType = PortalWorldDemo.CIRCLE;}
+	else if (code == KeyEvent.VK_F4){application.portalType = PortalWorldDemo.CIRCLE_ST;}
     }
 
     public void viewActivated(View v){}

@@ -127,6 +127,23 @@ public class PortalWorldDemo {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
+    static final short SQUARE = 0;
+    static final short SQUARE_ST = 1;
+    static final short CIRCLE = 2;
+    static final short CIRCLE_ST = 3;
+    short portalType = SQUARE;
+
+    CameraPortal getPortal(int x, int y){
+	switch(portalType){
+	case SQUARE:{return new CameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);}
+	case SQUARE_ST:{return new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);}
+	case CIRCLE:{return new RoundCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);}
+	case CIRCLE_ST:{return new RoundCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);}
+	default:{return new RoundCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);}
+	}
+    }
+
+
     void switchPortal(int x, int y){
 	if (portal != null){// portal is active, destroy it it
 	    //XXX:animate its disappearance (use a postanimaction to call following lines)
@@ -135,13 +152,19 @@ public class PortalWorldDemo {
 	    vsm.repaintNow();
 	}
 	else {// portal not active, create it
-// 	    portal = new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);
-	    portal = new RoundCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
+	    portal = getPortal(x, y);
 	    portal.setPortalEventHandler(eh);
 	    vsm.addPortal(portal, demoView);
-	    portal.setBorder(Color.RED);
-	    vsm.repaintNow();
-// 	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
+ 	    portal.setBorder(Color.RED);
+ 	    if (portalType == SQUARE_ST || portalType == CIRCLE_ST){
+		vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
+	    }
+	    else {
+		Location l = portal.getSeamlessView(demoCamera);
+		portalCamera.moveTo(l.vx, l.vy);
+		portalCamera.setAltitude(l.alt);
+	    }
+	    getHigherView(true);
 	}
     }
 
