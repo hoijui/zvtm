@@ -69,7 +69,7 @@ public class ZLAbstractTask implements PostAnimationAction {
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static final int GRID_ANIM_TIME = 500;
-    static double DEFAULT_MAG_FACTOR = 4.0;
+    static double DEFAULT_MAG_FACTOR = 6.0;
     static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
 
@@ -159,7 +159,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 // 	demoCamera.setAltitude(START_ALTITUDE);
 	wm = new AbstractWorldManager(this);
 	wm.generateWorld();
-	buildGrid();
+ 	buildGrid();
 	logm = new AbstractTaskLogManager(this);
 	getGlobalView();
 	System.gc();
