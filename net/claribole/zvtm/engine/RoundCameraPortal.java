@@ -61,6 +61,24 @@ public class RoundCameraPortal extends CameraPortal {
 	return clippingShape.contains(cx, cy);
     }
 
+    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    public void move(int dx, int dy){
+	super.move(dx, dy);
+	clippingShape.setFrame(x, y, w, h);
+    }
+
+    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    public void moveTo(int x, int y){
+	super.moveTo(x, y);
+	clippingShape.setFrame(x, y, w, h);
+    }
+
+    public void updateDimensions(){
+	size.setSize(w, h);
+	if (clippingShape != null){clippingShape.setFrame(x, y, w, h);}
+	else {clippingShape = new Ellipse2D.Float(x, y, w, h);}
+    }
+    
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
  	g2d.setClip(clippingShape);
 	if (bkgColor != null){
