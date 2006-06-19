@@ -63,6 +63,13 @@ public class PortalWorldDemo {
 
     static final Color HCURSOR_COLOR = new Color(200,48,48);
 
+    /*translation constants*/
+    static final short MOVE_UP = 0;
+    static final short MOVE_DOWN = 1;
+    static final short MOVE_LEFT = 2;
+    static final short MOVE_RIGHT = 3;
+
+    /*animation timing*/
     static int ANIM_MOVE_LENGTH = 500;
 
     /* Portal */
@@ -73,7 +80,7 @@ public class PortalWorldDemo {
 
     PortalWorldDemo(){
 	vsm = new VirtualSpaceManager();
-// 	vsm.setDebug(true);
+ 	vsm.setDebug(true);
 	init();
     }
 
@@ -92,7 +99,7 @@ public class PortalWorldDemo {
 	demoView.setNotifyMouseMoved(true);
 	portalCamera = vsm.addCamera(mainVSname);
 	initMap();
-	getGlobalView();
+	getGlobalView(false);
 	System.gc();
     }
 
@@ -138,12 +145,71 @@ public class PortalWorldDemo {
 	}
     }
 
-    void getGlobalViewInPortal(){
-	portal.getGlobalView(ANIM_MOVE_LENGTH, vsm);
+    void getGlobalView(boolean inPortal){
+	if (inPortal){
+	    portal.getGlobalView(ANIM_MOVE_LENGTH, vsm);
+	}
+	else {
+	    vsm.getGlobalView(demoCamera, ANIM_MOVE_LENGTH);
+	}
     }
 
-    void getGlobalView(){
- 	vsm.getGlobalView(demoCamera, ANIM_MOVE_LENGTH);
+    /*higher view (multiply altitude by altitudeFactor)*/
+    void getHigherView(boolean inPortal){
+	Camera c;
+	if (inPortal){
+	    c = portalCamera;
+	}
+	else {
+	    c = demoCamera;
+	}
+	Float alt=new Float(c.getAltitude()+c.getFocal());
+	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+    }
+
+    /*higher view (multiply altitude by altitudeFactor)*/
+    void getLowerView(boolean inPortal){
+	Camera c;
+	if (inPortal){
+	    c = portalCamera;
+	}
+	else {
+	    c = demoCamera;
+	}
+	Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
+	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+    }
+
+    /*direction should be one of ZGRViewer.MOVE_* */
+    void translateView(short direction, boolean inPortal){
+	Camera c;
+	LongPoint trans;
+	long[] rb;
+	if (inPortal){
+	    c = portalCamera;
+	    rb = portal.getVisibleRegion();
+	}
+	else {
+	    c = demoCamera;
+	    rb = demoView.getVisibleRegion(c);
+	}
+	if (direction==MOVE_UP){
+	    long qt=Math.round((rb[1]-rb[3])/2.4);
+	    trans=new LongPoint(0,qt);
+	}
+	else if (direction==MOVE_DOWN){
+	    long qt=Math.round((rb[3]-rb[1])/2.4);
+	    trans=new LongPoint(0,qt);
+	}
+	else if (direction==MOVE_RIGHT){
+	    long qt=Math.round((rb[2]-rb[0])/2.4);
+	    trans=new LongPoint(qt,0);
+	}
+	else {// direction==MOVE_LEFT
+	    long qt=Math.round((rb[0]-rb[2])/2.4);
+	    trans=new LongPoint(qt,0);
+	}
+	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
     }
 
     public static void main(String[] args){

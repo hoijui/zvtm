@@ -107,8 +107,13 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code == KeyEvent.VK_HOME){application.getGlobalView();}
-	else if (code == KeyEvent.VK_C){application.getGlobalViewInPortal();}
+	if (code==KeyEvent.VK_PAGE_UP){application.getHigherView(mod == CTRL_MOD);}
+	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView(mod == CTRL_MOD);}
+	else if (code==KeyEvent.VK_HOME){application.getGlobalView(mod == CTRL_MOD);}
+	else if (code==KeyEvent.VK_UP){application.translateView(PortalWorldDemo.MOVE_UP, mod == CTRL_MOD);}
+	else if (code==KeyEvent.VK_DOWN){application.translateView(PortalWorldDemo.MOVE_DOWN, mod == CTRL_MOD);}
+	else if (code==KeyEvent.VK_LEFT){application.translateView(PortalWorldDemo.MOVE_LEFT, mod == CTRL_MOD);}
+	else if (code==KeyEvent.VK_RIGHT){application.translateView(PortalWorldDemo.MOVE_RIGHT, mod == CTRL_MOD);}
     }
 
     public void viewActivated(View v){}
