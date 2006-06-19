@@ -157,7 +157,6 @@ public class CameraPortal extends Portal {
 
     /** Position this portal's camera so that it seamlessly integrates with the surrounding context
      *@param c camera observing the context (associated with the View)
-     *@param v View
      */
     public Location getSeamlessView(Camera c){
 	int hvw = c.getOwningView().getFrame().getWidth() / 2;
