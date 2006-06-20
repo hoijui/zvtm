@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.BasicStroke;
 import java.awt.Image;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Graphics2D;
 import javax.swing.text.Style;
@@ -33,13 +34,15 @@ public class ZLAbstractTask implements PostAnimationAction {
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
 
     /* max dimensions of ZVTM view */
-    static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 1024;
+    static final int VIEW_MAX_W = 800;
+    static final int VIEW_MAX_H = 600;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
-    
+
+    static final Font DEFAULT_FONT = new Font("Dialog",Font.PLAIN,10);
+
     static int ANIM_MOVE_LENGTH = 300;
 
     /*dimensions of zoomable panel*/
@@ -53,14 +56,14 @@ public class ZLAbstractTask implements PostAnimationAction {
     AbstractTaskEventHandler eh;
     /* log manager (trials) */
     AbstractTaskLogManager logm;
-    /* abstract world manager */
-    AbstractWorldManager wm;
 
     /* main view*/
     View demoView;
     Camera demoCamera;
     VirtualSpace mainVS;
     static String mainVSname = "mainSpace";
+
+    static final float START_ALTITUDE = 10000000000.0f;
 
     /* misc. lens settings */
     Lens lens;
@@ -104,13 +107,15 @@ public class ZLAbstractTask implements PostAnimationAction {
     
     static java.awt.Robot robot;
 
-    final static short ZL_TECHNIQUE = 0;  // Zoom + Lens
+    final static short ZL_TECHNIQUE = 0;  // Probing Lenses
     final static short PZ_TECHNIQUE = 1;  // Pan Zoom centered on view
-    final static short PZL_TECHNIQUE = 2;  // Pan Zoom centered on view
+    final static short RZ_TECHNIQUE = 2;  // region zooming
+    final static short PZL_TECHNIQUE = 3;  // Pan Zoom + Probing Lenses
 
-    final static String PZ_TECHNIQUE_NAME = "Pan-Zoom (centered on view)";
+    final static String PZ_TECHNIQUE_NAME = "Pan-Zoom";
     final static String ZL_TECHNIQUE_NAME = "Probing Lens";
-    final static String PZL_TECHNIQUE_NAME = "Region Zoom (animated transitions)";
+    final static String RZ_TECHNIQUE_NAME = "Region Zoom";
+    final static String PZL_TECHNIQUE_NAME = "Pan Zoom + Probing Lenses";
     short technique = ZL_TECHNIQUE;
     String techniqueName;
 
@@ -136,6 +141,10 @@ public class ZLAbstractTask implements PostAnimationAction {
  	    eh = new AbstractTaskPZEventHandler(this);
 	    techniqueName = PZ_TECHNIQUE_NAME;
 	}
+	else if (this.technique == RZ_TECHNIQUE){
+ 	    eh = new AbstractTaskRZEventHandler(this);
+	    techniqueName = RZ_TECHNIQUE_NAME;
+	}
 	else if (this.technique == PZL_TECHNIQUE){
  	    eh = new AbstractTaskPZLEventHandler(this);
 	    techniqueName = PZL_TECHNIQUE_NAME;
@@ -157,11 +166,9 @@ public class ZLAbstractTask implements PostAnimationAction {
 	demoView.setNotifyMouseMoved(true);
 //  	demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 // 	demoCamera.setAltitude(START_ALTITUDE);
-	wm = new AbstractWorldManager(this);
-	wm.generateWorld();
- 	buildGrid();
+//  	buildGrid();
 	logm = new AbstractTaskLogManager(this);
-	getGlobalView();
+// 	getGlobalView();
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
     }
@@ -278,33 +285,33 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     /*incremental display of the grid*/
     void showGridLevel(int level){
-	if (level > GRID_DEPTH || level < -1 || level == currentLevel){
-	    return;
-	}
-	if (level < currentLevel){
-	    for (int i=level+1;i<=currentLevel;i++){
-		for (int j=0;j<hGridLevels[i].length;j++){
-		    hGridLevels[i][j].setVisible(false);
-		}
-	    }
-	    for (int i=level+1;i<=currentLevel;i++){
-		for (int j=0;j<vGridLevels[i].length;j++){
-		    vGridLevels[i][j].setVisible(false);
-		}
-	    }
-	}
-	else if (level > currentLevel){
-	    for (int i=currentLevel+1;i<=level;i++){
-		for (int j=0;j<hGridLevels[i].length;j++){
-		    hGridLevels[i][j].setVisible(true);
-		}
-	    }
-	    for (int i=currentLevel+1;i<=level;i++){
-		for (int j=0;j<vGridLevels[i].length;j++){
-		    vGridLevels[i][j].setVisible(true);
-		}
-	    }
-	}
+// 	if (level > GRID_DEPTH || level < -1 || level == currentLevel){
+// 	    return;
+// 	}
+// 	if (level < currentLevel){
+// 	    for (int i=level+1;i<=currentLevel;i++){
+// 		for (int j=0;j<hGridLevels[i].length;j++){
+// 		    hGridLevels[i][j].setVisible(false);
+// 		}
+// 	    }
+// 	    for (int i=level+1;i<=currentLevel;i++){
+// 		for (int j=0;j<vGridLevels[i].length;j++){
+// 		    vGridLevels[i][j].setVisible(false);
+// 		}
+// 	    }
+// 	}
+// 	else if (level > currentLevel){
+// 	    for (int i=currentLevel+1;i<=level;i++){
+// 		for (int j=0;j<hGridLevels[i].length;j++){
+// 		    hGridLevels[i][j].setVisible(true);
+// 		}
+// 	    }
+// 	    for (int i=currentLevel+1;i<=level;i++){
+// 		for (int j=0;j<vGridLevels[i].length;j++){
+// 		    vGridLevels[i][j].setVisible(true);
+// 		}
+// 	    }
+// 	}
 	currentLevel = level;
     }
 
@@ -600,7 +607,7 @@ public class ZLAbstractTask implements PostAnimationAction {
     }
 
     public static void main(String[] args){
-	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZA_TECHNIQUE, PZL_TECHNIQUE or SS_TECHNIQUE for appropriate values
+	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE or RZ_TECHNIQUE for appropriate values
 	   Second argument is either 1 (show console for messages) or 0 (don't show it)
 	   Third argument is either 1 (show map manager monitor) or 0 (don't show it) */
 	short tech = (args.length > 0) ? Short.parseShort(args[0]) : ZL_TECHNIQUE;

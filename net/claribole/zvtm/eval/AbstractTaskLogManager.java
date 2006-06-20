@@ -28,7 +28,8 @@ import java.io.OutputStreamWriter;
 
 import java.util.Vector;
 
-import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.VRoundRect;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 class AbstractTaskLogManager implements Java2DPainter {
@@ -41,20 +42,18 @@ class AbstractTaskLogManager implements Java2DPainter {
     static final String TRIAL_DIR_FULL = System.getProperty("user.dir") + File.separator + TRIAL_DIR;
 
     static final String PSBTC = "PRESS SPACE BAR TO CONTINUE";
+    static final String PSTS = "PRESS S TO START";
     static final String EOS = "END OF SESSION";
-    static final String IFST = "INITIALIZING FIRST TRIAL...  (PLEASE WAIT)";
-    static final String INXT = "INITIALIZING NEXT TRIAL...  (PLEASE WAIT)";
-    String msg = IFST;
+    String msg = PSBTC;
 
     static final int WARN_MSG_DELAY = 500;
     static final String TARGET_ERR = "ERROR: Target is not within selection region";
 
-    static final double MAX_D = Math.sqrt(Math.pow(64000,2) + Math.pow(32000,2));
-
     /* codes for technique */
-    static final String ZL = "ZL";     // Zoom + Lens
+    static final String ZL = "ZL";     // Probing lenses
     static final String PZ = "PZVC";   // Pan + Zoom centered on view
-    static final String PZL = "PZL";     // Region zooming
+    static final String RZ = "RZ";    // Region zooming
+    static final String PZL = "PZL";   // Pan + Zoom + Probing Lenses
 
     /* codes for lens status */
     static final String NO_LENS = "0";
@@ -67,8 +66,6 @@ class AbstractTaskLogManager implements Java2DPainter {
     String lensyS = NaN;
     String lensmmS = TrialInfo.doubleFormatter(ZLAbstractTask.DEFAULT_MAG_FACTOR);
 
-    static final double TARGET_WIDTH = (new Long(GeoDataStore.TARGET_WIDTH)).doubleValue();
-
     static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f);
 
     ZLAbstractTask application;
@@ -79,13 +76,12 @@ class AbstractTaskLogManager implements Java2DPainter {
     String blockNumber;
     int trialCount;
     String trialCountStr;
-    double distance; // distance from start location to target
-    String distanceStr;
     int nbZIOswitches;
     int nbErrors;
 
     long trialStartTime;
     long trialDuration;
+    int trialDensity;
 
     String lineStart;
     File logFile;
@@ -95,12 +91,9 @@ class AbstractTaskLogManager implements Java2DPainter {
     boolean sessionStarted = false;
     boolean trialStarted = false;
 
-    boolean trialInitInProgress = false;
-
-    TrialInfo[] trials;
+    AbstractTrialInfo[] trials;
 
     AbstractTaskInstructionsManager im;
-    String[] instructionText = {"", "", "", ""};
 
     AbstractTaskLogManager(ZLAbstractTask app){
 	this.application = app;
@@ -110,7 +103,21 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     void startSession(){
 	im.say(" ");
-	JFileChooser fc = new JFileChooser(new File(TRIAL_DIR_FULL));
+	init(application.technique);
+	sessionStarted = true;
+    }
+
+    void init(short technique){
+	trialCount = -1;
+	techniqueName = getTechniqueName(technique);
+	subjectName = JOptionPane.showInputDialog("Subject Name");
+	if (subjectName == null){im.say(PSTS);return;}
+	subjectID = JOptionPane.showInputDialog("Subject ID");
+	if (subjectID == null){im.say(PSTS);return;}
+ 	blockNumber = JOptionPane.showInputDialog("Block number");
+ 	if (blockNumber == null){im.say(PSTS);return;}
+	initLineStart();
+	JFileChooser fc = new JFileChooser(new File(LogManager.TRIAL_DIR_FULL));
 	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	fc.setDialogTitle("Select Trial File");
 	int returnVal= fc.showOpenDialog(application.demoView.getFrame());
@@ -119,17 +126,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    trialFile = fc.getSelectedFile();
 	}
 	else {
-	    im.say(LocateTask.PSTS);
+	    im.say(PSTS);
 	    return;
 	}
-	init(application.technique, trialFile);
-	sessionStarted = true;
-    }
-
-    void init(short technique, File tf){
-	trialCount = -1;
-	techniqueName = getTechniqueName(technique);
-	parseTrialFile(tf);
+	generateTrials(trialFile);
 	try {
 	    logFile = initLogFile(subjectID+"-"+techniqueName+"-trial-block"+blockNumber, LOG_DIR);
 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
@@ -139,29 +139,50 @@ class AbstractTaskLogManager implements Java2DPainter {
 	catch (IOException ex){ex.printStackTrace();}
 	writeHeaders();
 	trialStarted = false;
-	trialInitInProgress = true;
 	System.gc();
 	application.demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 	initNextTrial();
     }
 
-    // returns block number
-    void parseTrialFile(File f){
+    void generateTrials(File f){
 	try {
 	    FileInputStream fis = new FileInputStream(f);
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
 	    Vector v = new Vector();
+
+
 	    String line = br.readLine();
-	    line = br.readLine(); // ignore first line (column headers)
-	    initLineStart(line);
+	    Vector trialLines = new Vector();
+	    boolean firstTrial = true;
+	    String[] info = null;
 	    while (line != null){
-		v.add(new TrialInfo(line));
+		if (line.startsWith("# Trial")){
+		    if (!firstTrial){
+			// store trial for previous lines
+			v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
+						    Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
+						    trialLines));
+			trialLines.clear();
+		    }
+		    else {
+			firstTrial = false;
+		    }
+		    info = line.split(AbstractWorldGenerator.CSV_SEP);
+		}
+		else {
+		    trialLines.add(line);
+		}
 		line = br.readLine();
 	    }
-	    trials = new TrialInfo[v.size()];
+	    // store last trial
+	    v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
+					Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
+					trialLines));
+
+	    trials = new AbstractTrialInfo[v.size()];
 	    for (int i=0;i<trials.length;i++){
-		trials[i] = (TrialInfo)v.elementAt(i);
+		trials[i] = (AbstractTrialInfo)v.elementAt(i);
 	    }
 	    v.clear();
 	}
@@ -169,11 +190,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     // init first columns of each line in output trials file
-    void initLineStart(String anInputTrialLine){
-	String[] items = anInputTrialLine.split(GeoDataStore.CSV_SEP);
-	subjectName = items[0];
-	subjectID = items[1];
-	blockNumber = items[2];
+    void initLineStart(){
 	lineStart = subjectName + OUTPUT_CSV_SEP +
 	    subjectID + OUTPUT_CSV_SEP +
 	    techniqueName + OUTPUT_CSV_SEP +
@@ -202,22 +219,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Technique" + OUTPUT_CSV_SEP +
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
-		      "ID" + OUTPUT_CSV_SEP +
-		      "Distance" + OUTPUT_CSV_SEP +
+		      "Density" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
-		      "Nb Errors" + OUTPUT_CSV_SEP +
-		      "City" + OUTPUT_CSV_SEP +
-		      "Region" + OUTPUT_CSV_SEP +
-		      "Country" + OUTPUT_CSV_SEP +
-		      "TLat" + OUTPUT_CSV_SEP +
-		      "TLon" + OUTPUT_CSV_SEP +
-		      "IC" + OUTPUT_CSV_SEP +
-		      "Area" + OUTPUT_CSV_SEP +
-		      "NWLat" + OUTPUT_CSV_SEP +
-		      "NWLon" + OUTPUT_CSV_SEP +
-		      "SELat" + OUTPUT_CSV_SEP +
-		      "SELon");
+		      "Nb Errors");
 	    bwt.newLine();
 	    bwt.flush();
 	    // cinematic file header (misc. info)
@@ -235,7 +240,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    bwc.newLine();
 	    // cinematic column headers
 	    bwc.write("Trial" + OUTPUT_CSV_SEP +
-		      "Distance" + OUTPUT_CSV_SEP +
 		      "Lens" + OUTPUT_CSV_SEP +
 		      "cx" + OUTPUT_CSV_SEP +
 		      "cy" + OUTPUT_CSV_SEP +
@@ -261,16 +265,14 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     void initNextTrial(){
 	trialCount++;
-	distance = Math.sqrt(Math.pow(trials[trialCount].targetLatitude - trials[trialCount].startLatitude, 2) +
-			     Math.pow(trials[trialCount].targetLongitude - trials[trialCount].startLongitude, 2));
-	distanceStr = TrialInfo.doubleFormatter(distance);
-	application.demoCamera.posx = trials[trialCount].startLongitude;
-	application.demoCamera.posy = trials[trialCount].startLatitude;
+	trialDensity = trials[trialCount].density;
+	application.demoCamera.posx = 0;
+	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();
-	application.demoCamera.altitude = trials[trialCount].startAltitude;
+	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
 	application.eh.cameraMoved();
+	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
 	application.vsm.repaintNow();
-	showNextTrialInfo();
     }
 
     void endTrial(){
@@ -281,16 +283,14 @@ class AbstractTaskLogManager implements Java2DPainter {
 	if (trialCount +1 >= trials.length){
 	    endSession();
 	}
-	else {// there it at least one trila left
+	else {// there it at least one trial left
 	    System.gc();
-	    trialInitInProgress = true;
-	    msg = INXT;
 	    application.demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 	}
     }
 
     void nextStep(){
-	if (!sessionStarted || trialInitInProgress){return;}
+	if (!sessionStarted){return;}
 	if (trialStarted){// subject wants to end the trial
 	    if (targetWithinRange()){
 		endTrial();
@@ -314,34 +314,15 @@ class AbstractTaskLogManager implements Java2DPainter {
 	// test whether target is within bounding box
 	// defined by SELECTION_RECT or not
 	// return true only if camera is at lowest altitude possible
-	return (application.cameraOnFloor &&
-		(Math.abs(application.demoCamera.posx - trials[trialCount].targetLongitude) < application.SELECTION_RECT_HW) &&
-		(Math.abs(application.demoCamera.posy - trials[trialCount].targetLatitude) < application.SELECTION_RECT_HH));
+	return false; 
+	// (application.cameraOnFloor &&
+// 		(Math.abs(application.demoCamera.posx - trials[trialCount].targetLongitude) < application.SELECTION_RECT_HW) &&
+// 		(Math.abs(application.demoCamera.posy - trials[trialCount].targetLatitude) < application.SELECTION_RECT_HH));
     }
 
     void wrongTarget(){
 	nbErrors++;
- 	im.warn(TARGET_ERR, instructionText, WARN_MSG_DELAY);
-    }
-
-    static final String GTIP1 = "Go to:";
-    static final String GTIP2 = "In:";
-    static final String GTIP3 = ", ";
-
-    void showNextTrialInfo(){
-	if (trials[trialCount].targetRegion == null){
-	    instructionText[0] = GTIP1;
-	    instructionText[1] = trials[trialCount].targetName;
-	    instructionText[2] = GTIP2;
-	    instructionText[3] = trials[trialCount].targetCountry;
-	}
-	else {
-	    instructionText[0] = GTIP1;
-	    instructionText[1] = trials[trialCount].targetName + GTIP3 + trials[trialCount].targetRegion;
-	    instructionText[2] = GTIP2;
-	    instructionText[3] = trials[trialCount].targetCountry;
-	}
-	im.say(instructionText);
+ 	im.warn(TARGET_ERR, "", WARN_MSG_DELAY);
     }
 
     void writeTrial(){
@@ -350,12 +331,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    bwt.write(lineStart);
 	    // trial + D + time + nb switches + nb errors
 	    bwt.write(trialCountStr + OUTPUT_CSV_SEP +
-		      Math.round(Math.log(1+distance/TARGET_WIDTH)/Math.log(2)) + OUTPUT_CSV_SEP +
-		      distanceStr + OUTPUT_CSV_SEP +
+		      trialDensity + OUTPUT_CSV_SEP +
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
-		      Integer.toString(nbErrors) + OUTPUT_CSV_SEP +		      
-		      trials[trialCount].cityInfo);
+		      Integer.toString(nbErrors));
 	    bwt.newLine();
 	    bwt.flush();
 	}
@@ -368,7 +347,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 // 	    bwc.write(lineStart);
 	    // trial + D + time + nb switches + nb errors
 	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
-		      distanceStr + OUTPUT_CSV_SEP +
 		      lensStatus + OUTPUT_CSV_SEP +
 		      Long.toString(application.demoCamera.posx) + OUTPUT_CSV_SEP +
 		      Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
@@ -426,6 +404,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	switch (t){
 	case ZLAbstractTask.ZL_TECHNIQUE:{return "ZL";}
 	case ZLAbstractTask.PZ_TECHNIQUE:{return "PZVC";}
+	case ZLAbstractTask.RZ_TECHNIQUE:{return "RZ";}
 	case ZLAbstractTask.PZL_TECHNIQUE:{return "PZL";}
 	}
 	return "";

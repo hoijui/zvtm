@@ -25,15 +25,13 @@ class AbstractTaskInstructionsManager implements Java2DPainter {
     static final Color WARN_FRG_COLOR = Color.RED;
 
     static final Font MESSAGE_FONT = new Font("Arial", Font.PLAIN, 16);
-    static final Font MESSAGE_FONT_BOLD = new Font("Arial", Font.BOLD, 16);
 
     ZLAbstractTask application;
 
     Color messageColor, messageBkgColor;
-    String[] message = {"", "", "", ""};
-    Font[] fonts = {MESSAGE_FONT, MESSAGE_FONT_BOLD, MESSAGE_FONT, MESSAGE_FONT_BOLD};
-    int[] hoffsets = {100, 150, 100, 150};
-    int[] voffsets = {40,40,20,20};
+    String message = "";
+    int hoffset = 100;
+    int voffset = 40;
 
     AbstractTaskInstructionsManager(ZLAbstractTask app){
 	this.application = app;
@@ -42,34 +40,18 @@ class AbstractTaskInstructionsManager implements Java2DPainter {
     void say(String s){
 	messageColor = SAY_FRG_COLOR;
 	messageBkgColor = SAY_BKG_COLOR;
-	message[0] = s;
-	message[1] = null;
-	message[2] = null;
-	message[3] = null;
+	message = s;
 	application.vsm.repaintNow();
     }
 
-    void say(String[] s){
-	messageColor = SAY_FRG_COLOR;
-	messageBkgColor = SAY_BKG_COLOR;
-	message[0] = s[0];
-	message[1] = s[1];
-	message[2] = s[2];
-	message[3] = s[3];
-	application.vsm.repaintNow();
-    }
-
-    void warn(final String s1, final String[] s2, final int delay){
+    void warn(final String s1, final String s2, final int delay){
 	messageColor = WARN_FRG_COLOR;
 	messageBkgColor = WARN_BKG_COLOR;
 	/* display error message for delay ms
 	   and revert back to previous message */
 	final SwingWorker worker=new SwingWorker(){
 		public Object construct(){
-		    message[0] = s1;
-		    message[1] = null;
-		    message[2] = null;
-		    message[3] = null;
+		    message = s1;
 		    application.vsm.repaintNow();
 		    sleep(delay);
 		    AbstractTaskInstructionsManager.this.say(s2);
@@ -104,16 +86,9 @@ class AbstractTaskInstructionsManager implements Java2DPainter {
     
     void writeInstructions(Graphics2D g2d, int viewWidth, int viewHeight){
 	g2d.setColor(messageColor);
-	for (int i=0;i<message.length;i++){
-	    if (message[i] != null){
-		g2d.setFont(fonts[i]);
-		g2d.drawString(message[i], hoffsets[i] , viewHeight - voffsets[i]);
-	    }
-	    else {
-		break;
-	    }
-	}
-	g2d.setFont(GeoDataStore.CITY_FONT);
+	g2d.setFont(MESSAGE_FONT);
+	g2d.drawString(message, hoffset, viewHeight - voffset);
+	g2d.setFont(ZLAbstractTask.DEFAULT_FONT);
     }
 
 }

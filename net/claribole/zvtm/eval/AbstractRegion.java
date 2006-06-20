@@ -20,11 +20,11 @@ class AbstractRegion {
     VRoundRect target;
     VRectangle[] distractors;
     
-    AbstractRegion[] children;
+    // null if none
+    AbstractRegion childRegion;
     
     AbstractRegion(int l){
 	this.level = l;
-	
     }
     
     void setTarget(VRoundRect g){
@@ -33,6 +33,10 @@ class AbstractRegion {
 
     void setDistractors(VRectangle[] gl){
 	this.distractors = gl;
+    }
+
+    void setChildRegion(AbstractRegion cr){
+	childRegion = cr;
     }
 
 }
