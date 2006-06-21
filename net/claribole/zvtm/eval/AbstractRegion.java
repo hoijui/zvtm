@@ -75,7 +75,8 @@ class AbstractRegion {
 	return (childRegion != null) ? childRegion.getDeepestTarget() : target;
     }
 
-    void updateWorld(long[] visibleRegion, short altChange){
+    int updateWorld(long[] visibleRegion, short altChange){
+	int res = level;
 	if (containsVisibleRegion(visibleRegion)){
 	    if (!visibleChildren){
 		target.setVisible(true);
@@ -83,6 +84,12 @@ class AbstractRegion {
 		    distractors[i].setVisible(true);
 		}		
 		visibleChildren = true;		
+	    }
+	    if (childRegion != null){
+		return childRegion.updateWorld(visibleRegion, altChange);
+	    }
+	    else {
+		return level;
 	    }
 	}
 	else {
@@ -93,9 +100,10 @@ class AbstractRegion {
 		}
 		visibleChildren = false;
 	    }
-	}
-	if (childRegion != null){
-	    childRegion.updateWorld(visibleRegion, altChange);
+	    if (childRegion != null){
+		childRegion.updateWorld(visibleRegion, altChange);
+	    }
+	    return level-1;
 	}
     }
 

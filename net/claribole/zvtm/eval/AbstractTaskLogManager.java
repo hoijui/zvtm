@@ -187,9 +187,11 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
 	catch (IOException ex){ex.printStackTrace();}
     }
-
+    
+    int currentDepth;
+    
     void updateWorld(long[] visibleRegion, short altChange){
-	trials[trialCount].root.updateWorld(visibleRegion, altChange);
+	currentDepth = trials[trialCount].root.updateWorld(visibleRegion, altChange);
     }
 
     // init first columns of each line in output trials file
@@ -250,7 +252,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "lx" + OUTPUT_CSV_SEP +
 		      "ly" + OUTPUT_CSV_SEP +
 		      "mm" + OUTPUT_CSV_SEP +
-		      "time");
+		      "time" + OUTPUT_CSV_SEP +
+		      "currentRegion");
 	    bwc.newLine();
 	    bwc.flush();
 	}
@@ -355,7 +358,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
 		      TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 		      lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
-		      OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime));
+		      OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
+		       + OUTPUT_CSV_SEP + currentDepth);
 	    bwc.newLine();
 	}
 	catch (IOException ex){ex.printStackTrace();}
