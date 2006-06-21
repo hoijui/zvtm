@@ -16,7 +16,6 @@ import java.awt.BasicStroke;
 import java.awt.Image;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.awt.Graphics2D;
 import javax.swing.text.Style;
 
 import java.util.Vector;

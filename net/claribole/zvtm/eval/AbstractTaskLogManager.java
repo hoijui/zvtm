@@ -150,8 +150,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
 	    Vector v = new Vector();
-
-
 	    String line = br.readLine();
 	    Vector trialLines = new Vector();
 	    boolean firstTrial = true;
@@ -211,6 +209,12 @@ class AbstractTaskLogManager implements Java2DPainter {
 	im.say(" ");
     }
 
+    void buildNextWorld(){
+	
+	
+	
+    }
+
     void writeHeaders(){
 	try {
 	    // trial column headers
@@ -265,7 +269,9 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     void initNextTrial(){
 	trialCount++;
+	if (trialCount > 0){trials[trialCount-1].removeFromVirtualSpace(application.mainVS);}
 	trialDensity = trials[trialCount].density;
+	trials[trialCount].addToVirtualSpace(application.vsm, application.mainVS);
 	application.demoCamera.posx = 0;
 	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();

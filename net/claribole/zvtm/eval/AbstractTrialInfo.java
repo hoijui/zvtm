@@ -16,6 +16,8 @@ import java.util.Vector;
 
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRoundRect;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.VirtualSpace;
 
 class AbstractTrialInfo {
     
@@ -79,8 +81,17 @@ class AbstractTrialInfo {
 	}
 	ar.setDistractors(ds);
 	target.setColor(AbstractWorldGenerator.COLOR_BY_LEVEL[depth]);
+	target.setPaintBorder(false);
 	ar.setChildRegion(cr);
 	return ar;
+    }
+
+    void addToVirtualSpace(VirtualSpaceManager vsm, VirtualSpace vs){
+	root.addToVirtualSpace(vsm, vs);
+    }
+
+    void removeFromVirtualSpace(VirtualSpace vs){
+	root.removeFromVirtualSpace(vs);
     }
 
     public String toString(){
