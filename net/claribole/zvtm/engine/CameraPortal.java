@@ -163,6 +163,8 @@ public class CameraPortal extends Portal {
 	int hvh = c.getOwningView().getFrame().getHeight() / 2;
 	// get the region seen through the portal from the View's camera
 	float uncoef = (float)((c.focal+c.altitude) / (float)c.focal);
+	//XXX: FIXME works only when portal right under mouse cursor
+	//     fix by taking the portal's visible region bounds in virtual space
 	long[] wnes = {(long) (c.getOwningView().mouse.vx - w/2*uncoef),
 		       (long) (c.getOwningView().mouse.vy + h/2*uncoef),
 		       (long) (c.getOwningView().mouse.vx + w/2*uncoef),
