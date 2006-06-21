@@ -104,7 +104,7 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
-	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep();}
+	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy);}
 	else if (code==KeyEvent.VK_G){application.gc();}
     }
 

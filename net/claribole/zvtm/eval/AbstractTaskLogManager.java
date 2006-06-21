@@ -297,10 +297,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    void nextStep(){
+    void nextStep(long vx, long vy){
 	if (!sessionStarted){return;}
 	if (trialStarted){// subject wants to end the trial
-	    if (targetWithinRange()){
+	    if (targetWithinRange(vx, vy)){
 		endTrial();
 		if (trialCount+1 < trials.length){// there is at least one trial left
 		    initNextTrial();
@@ -318,11 +318,11 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    boolean targetWithinRange(){
-	return (application.demoCamera.posx >= deepestTarget.vx - deepestTarget.getWidth() &&
-		application.demoCamera.posx <= deepestTarget.vx + deepestTarget.getWidth() &&
-		application.demoCamera.posy >= deepestTarget.vy - deepestTarget.getHeight() &&
-		application.demoCamera.posy <= deepestTarget.vy + deepestTarget.getHeight());
+    boolean targetWithinRange(long vx, long vy){
+	return (vx >= deepestTarget.vx - deepestTarget.getWidth() &&
+		vx <= deepestTarget.vx + deepestTarget.getWidth() &&
+		vy >= deepestTarget.vy - deepestTarget.getHeight() &&
+		vy <= deepestTarget.vy + deepestTarget.getHeight());
     }
 
     void wrongTarget(){
@@ -348,8 +348,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     void writeCinematic(){
 	try {
-// 	    // subject name + subject ID + technique
-// 	    bwc.write(lineStart);
 	    // trial + D + time + nb switches + nb errors
 	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
 		      lensStatus + OUTPUT_CSV_SEP +

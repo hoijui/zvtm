@@ -99,13 +99,9 @@ class AbstractRegion {
 	}
     }
 
-    double visFactor = 1.2;
+    static final double visFactor = 1.4;
     
     boolean containsVisibleRegion(long[] wnes){
-// 	return (wnes[0] > bounds.vx-Math.round(bounds.getWidth()*visFactor) &&
-// 		wnes[2] < bounds.vx+Math.round(bounds.getWidth()*visFactor) &&
-// 		wnes[1] < bounds.vy+Math.round(bounds.getHeight()*visFactor) &&
-// 		wnes[3] > bounds.vy-Math.round(bounds.getHeight()*visFactor));
 	return ((wnes[2]-wnes[0]) < Math.round(2 * bounds.getWidth() * visFactor) ||
 		(wnes[1]-wnes[3]) < Math.round(2 * bounds.getHeight() * visFactor));
     }

@@ -22,8 +22,8 @@ class AbstractWorldGenerator {
     
     static final String CSV_SEP = ";";
 
-    static int TREE_DEPTH = 6; // we want subjects to navigate through 5 levels, includes root
-    static final long SMALLEST_ELEMENT_WIDTH = 50;
+    static int TREE_DEPTH = 4; // we want subjects to navigate through 5 levels, includes root
+    static final long SMALLEST_ELEMENT_WIDTH = 500;
     static final long MUL_FACTOR = 50;
 
     static long WORLD_WIDTH;

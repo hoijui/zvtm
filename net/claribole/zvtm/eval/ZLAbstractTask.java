@@ -88,7 +88,7 @@ public class ZLAbstractTask implements PostAnimationAction {
     static final int GRID_DEPTH = 12;
     int currentLevel = -1;
 
-    static final float START_ALTITUDE = 4000000000.0f;
+    static final float START_ALTITUDE = 18100000.0f;
     static final float FLOOR_ALTITUDE = 100.0f;
 
     boolean cameraOnFloor = false;
@@ -100,7 +100,7 @@ public class ZLAbstractTask implements PostAnimationAction {
     int SELECTION_RECT_HW = SELECTION_RECT_W / 2;
     int SELECTION_RECT_HH = SELECTION_RECT_H / 2;
     boolean SHOW_SELECTION_RECT = true;
-    final static Color SELECTION_RECT_COLOR = Color.BLUE;
+    final static Color SELECTION_RECT_COLOR = Color.RED;
     
     static java.awt.Robot robot;
 
@@ -117,6 +117,9 @@ public class ZLAbstractTask implements PostAnimationAction {
     String techniqueName;
 
     static final int[] vispad = {100,100,100,100};
+
+    static final String GLYPH_TYPE_GRID = "G";
+    static final String GLYPH_TYPE_WORLD = "W";
 
     ZLAbstractTask(short t){
 	vsm = new VirtualSpaceManager();
@@ -161,11 +164,8 @@ public class ZLAbstractTask implements PostAnimationAction {
 	demoView.setEventHandler(eh);
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
-//  	demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
-// 	demoCamera.setAltitude(START_ALTITUDE);
-//  	buildGrid();
+//   	buildGrid();
 	logm = new AbstractTaskLogManager(this);
-// 	getGlobalView();
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
     }
@@ -187,12 +187,16 @@ public class ZLAbstractTask implements PostAnimationAction {
     void buildGrid(){
 	// frame
 	ZSegment s = new ZSegment(-AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
+	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
 	s = new ZSegment(AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
+	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
 	s = new ZSegment(0, -AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
 	s = new ZSegment(0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
 	// grid (built recursively, max. rec depth control by GRID_DEPTH)
 	tmpHGrid = new Vector();
@@ -208,6 +212,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 	ZSegment s = new ZSegment(0, c, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	storeSegmentInHGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
+	s.setType(GLYPH_TYPE_GRID);
 	s.setVisible(false);
 	if (depth < GRID_DEPTH){
 	    buildHorizontalGridLevel(c1, c, depth+1);
@@ -220,8 +225,9 @@ public class ZLAbstractTask implements PostAnimationAction {
 	ZSegment s = new ZSegment(c, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
 	storeSegmentInVGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
+	s.setType(GLYPH_TYPE_GRID);
 	s.setVisible(false);
-	if (depth < GRID_DEPTH+1){// not GRID_DEPTH because we want to maintain the same spacing between parallels
+	if (depth < GRID_DEPTH){// not GRID_DEPTH because we want to maintain the same spacing between parallels
 	    buildVerticalGridLevel(c1, c, depth+1);// and meridians and map is twice as large as it is high
 	    buildVerticalGridLevel(c, c2, depth+1);
 	}
@@ -262,22 +268,14 @@ public class ZLAbstractTask implements PostAnimationAction {
 		hGridLevels[i][j] = (ZSegment)v.elementAt(j);
 	    }
 	}
-	/* levels 0 and 1 are merged in a single level to keep a 1:1 ratio
-	   between parallels and meridians */
-	for (int i=1;i<tmpVGrid.size();i++){
+	for (int i=0;i<tmpVGrid.size();i++){
 	    v = (Vector)tmpVGrid.elementAt(i);
 	    levelSize = v.size();
-	    vGridLevels[i-1] = new ZSegment[levelSize];
+	    vGridLevels[i] = new ZSegment[levelSize];
 	    for (int j=0;j<v.size();j++){
-		vGridLevels[i-1][j] = (ZSegment)v.elementAt(j);
+		vGridLevels[i][j] = (ZSegment)v.elementAt(j);
 	    }
 	}
-	/* putting top-level meridian as first element of level just below,
-	   which then becomes the top level for meridians*/ 
-	ZSegment[] level0 = new ZSegment[vGridLevels[0].length+1];
-	System.arraycopy(vGridLevels[0], 0, level0, 1, vGridLevels[0].length);
-	level0[0] = (ZSegment)((Vector)tmpVGrid.elementAt(0)).elementAt(0);
-	vGridLevels[0] = level0;
     }
 
     /*incremental display of the grid*/
@@ -309,7 +307,46 @@ public class ZLAbstractTask implements PostAnimationAction {
 // 		}
 // 	    }
 // 	}
-	currentLevel = level;
+// 	currentLevel = level;
+    }
+
+    void updateGridLevel(long visibleSize){
+	if (visibleSize < 195312.0f){
+	    showGridLevel(12);
+	}
+	else if (visibleSize < 390625.0f){
+	    showGridLevel(11);
+	}
+	else if (visibleSize < 781250.0f){
+	    showGridLevel(10);
+	}
+	else if (visibleSize < 1562500.0f){
+	    showGridLevel(9);
+	}
+	else if (visibleSize < 3125000.0f){
+	    showGridLevel(8);
+	}
+	else if (visibleSize < 6250000.0f){
+	    showGridLevel(7);
+	}
+	else if (visibleSize < 12500000.0f){
+	    showGridLevel(6);
+	}
+	else if (visibleSize < 25000000.0f){
+	    showGridLevel(5);
+	}
+	else if (visibleSize < 50000000.0f){
+	    showGridLevel(4);
+	}
+	else if (visibleSize < 100000000.0f){
+	    showGridLevel(3);
+	}
+	else if (visibleSize < 200000000.0f){
+	    showGridLevel(2);
+	}
+	else {
+	    showGridLevel(1);
+	}
     }
 
     void setLens(int t){
@@ -527,45 +564,6 @@ public class ZLAbstractTask implements PostAnimationAction {
     void altitudeChanged(){
 	long[] wnes = demoView.getVisibleRegion(demoCamera);
 	updateGridLevel(Math.max(wnes[2]-wnes[0], wnes[1]-wnes[3]));
-    }
-
-    void updateGridLevel(long visibleSize){
-	if (visibleSize < 9765625.0f){
-	    showGridLevel(12);
-	}
-	else if (visibleSize < 19531250.0f){
-	    showGridLevel(11);
-	}
-	else if (visibleSize < 39062500.0f){
-	    showGridLevel(10);
-	}
-	else if (visibleSize < 78125000.0f){
-	    showGridLevel(9);
-	}
-	else if (visibleSize < 156250000.0f){
-	    showGridLevel(8);
-	}
-	else if (visibleSize < 312500000.0f){
-	    showGridLevel(7);
-	}
-	else if (visibleSize < 625000000.0f){
-	    showGridLevel(6);
-	}
-	else if (visibleSize < 1250000000.0f){
-	    showGridLevel(5);
-	}
-	else if (visibleSize < 2500000000.0f){
-	    showGridLevel(4);
-	}
-	else if (visibleSize < 5000000000.0f){
-	    showGridLevel(3);
-	}
-	else if (visibleSize < 10000000000.0f){
-	    showGridLevel(2);
-	}
-	else {
-	    showGridLevel(1);
-	}
     }
 
     void getGlobalView(){

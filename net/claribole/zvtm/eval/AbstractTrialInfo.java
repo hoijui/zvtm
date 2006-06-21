@@ -14,6 +14,7 @@ import java.awt.Color;
 
 import java.util.Vector;
 
+import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -32,6 +33,7 @@ class AbstractTrialInfo {
 	String line = null;
 	Vector distractors = new Vector();
 	VRoundRect target = null;
+	VRectangle distractor = null;
 	String[] info;
 	long vx, vy, vw, vh;
 	AbstractRegion lastRegion = null;
@@ -51,9 +53,12 @@ class AbstractTrialInfo {
 		    int rcw = Integer.parseInt(info[4]);
 		    int rch = Integer.parseInt(info[5]);
 		    target = new VRoundRect(vx, vy, 0, vw, vh, Color.WHITE, rcw, rch);
+		    target.setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
 		}
 		else {// info.length == 4
-		    distractors.add(new VRectangle(vx, vy, 0, vw, vh, Color.WHITE));
+		    distractor = new VRectangle(vx, vy, 0, vw, vh, Color.WHITE);
+		    distractor.setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
+		    distractors.add(distractor);
 		}
 	    }
 	}
@@ -91,6 +96,10 @@ class AbstractTrialInfo {
 
     void addToVirtualSpace(VirtualSpaceManager vsm, VirtualSpace vs){
 	root.addToVirtualSpace(vsm, vs);
+	Vector v = vs.getGlyphsOfType(ZLAbstractTask.GLYPH_TYPE_GRID);
+	for (int i=0;i<v.size();i++){
+	    vs.onTop((Glyph)v.elementAt(i));
+	}
     }
 
     void removeFromVirtualSpace(VirtualSpace vs){
