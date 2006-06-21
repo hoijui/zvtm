@@ -58,6 +58,9 @@ class AbstractTrialInfo {
 	    }
 	}
 	root = lastRegion;
+	root.setBounds(new VRoundRect(root.target.vx, root.target.vy, 0,
+				      root.target.getWidth()*10, root.target.getHeight()*10,
+				      Color.RED, 1, 1));
     }
 
     AbstractRegion buildLevel(int depth, VRoundRect target, Vector distractors, AbstractRegion cr){

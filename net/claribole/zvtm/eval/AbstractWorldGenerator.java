@@ -39,10 +39,10 @@ class AbstractWorldGenerator {
 	COLOR_BY_LEVEL = new Color[TREE_DEPTH];
 	for (int i=0;i<TREE_DEPTH;i++){
 	    widthByLevel[i] = SMALLEST_ELEMENT_WIDTH * Math.round(Math.pow(MUL_FACTOR, (TREE_DEPTH-i-1)));
-	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, (i)/((float)TREE_DEPTH));
+	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, (i+1)/((float)TREE_DEPTH));
 	}
 	WORLD_WIDTH = widthByLevel[0] * 2;
-	WORLD_HEIGHT = WORLD_WIDTH / 2;
+	WORLD_HEIGHT = WORLD_WIDTH;
 	HALF_WORLD_WIDTH = WORLD_WIDTH / 2;
 	HALF_WORLD_HEIGHT = WORLD_HEIGHT / 2;
     }
@@ -51,7 +51,7 @@ class AbstractWorldGenerator {
     int[] DENSITIES = {5, 10, 20, 10, 5, 20, 5, 20 ,10};
     int trialCount;
 
-    static final int ROUND_CORNER_RATIO = 5;
+    static final int ROUND_CORNER_RATIO = 4;
 
     AbstractRegion root; // region at level 0
 
@@ -76,11 +76,11 @@ class AbstractWorldGenerator {
 		bwt.write("0" + CSV_SEP +
 			  "0" + CSV_SEP +
 			  (widthByLevel[0]) + CSV_SEP +
-			  (widthByLevel[0]/2) + CSV_SEP +
+			  (widthByLevel[0]) + CSV_SEP +
 			  ((int)widthByLevel[0]/ROUND_CORNER_RATIO) + CSV_SEP +
 			  ((int)widthByLevel[0]/ROUND_CORNER_RATIO));
 		bwt.newLine();
-		populateRegion(0, 0, widthByLevel[0], widthByLevel[0]/2, depth+1);
+		populateRegion(0, 0, widthByLevel[0], widthByLevel[0], depth+1);
 	    }
 	    bwt.flush();
 	    bwt.close();

@@ -33,8 +33,8 @@ public class ZLAbstractTask implements PostAnimationAction {
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
 
     /* max dimensions of ZVTM view */
-    static final int VIEW_MAX_W = 800;
-    static final int VIEW_MAX_H = 600;
+    static final int VIEW_MAX_W = 1280;
+    static final int VIEW_MAX_H = 1024;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
@@ -62,8 +62,6 @@ public class ZLAbstractTask implements PostAnimationAction {
     VirtualSpace mainVS;
     static String mainVSname = "mainSpace";
 
-    static final float START_ALTITUDE = 10000000000.0f;
-
     /* misc. lens settings */
     Lens lens;
     static int LENS_R1 = 100;
@@ -90,7 +88,7 @@ public class ZLAbstractTask implements PostAnimationAction {
     static final int GRID_DEPTH = 12;
     int currentLevel = -1;
 
-//     static final float START_ALTITUDE = 100000000000.0f;
+    static final float START_ALTITUDE = 4000000000.0f;
     static final float FLOOR_ALTITUDE = 100.0f;
 
     boolean cameraOnFloor = false;
@@ -188,26 +186,26 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     void buildGrid(){
 	// frame
-	ZSegment s = new ZSegment(-AbstractWorldManager.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldManager.HALF_WORLD_HEIGHT, GRID_COLOR);
+	ZSegment s = new ZSegment(-AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(AbstractWorldManager.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldManager.HALF_WORLD_HEIGHT, GRID_COLOR);
+	s = new ZSegment(AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(0, -AbstractWorldManager.HALF_WORLD_HEIGHT, 0, AbstractWorldManager.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s = new ZSegment(0, -AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(0, AbstractWorldManager.HALF_WORLD_HEIGHT, 0, AbstractWorldManager.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s = new ZSegment(0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	vsm.addGlyph(s, mainVSname);
 	// grid (built recursively, max. rec depth control by GRID_DEPTH)
 	tmpHGrid = new Vector();
 	tmpVGrid = new Vector();
-	buildHorizontalGridLevel(-AbstractWorldManager.HALF_WORLD_HEIGHT, AbstractWorldManager.HALF_WORLD_HEIGHT, 0);
-	buildVerticalGridLevel(-AbstractWorldManager.HALF_WORLD_WIDTH, AbstractWorldManager.HALF_WORLD_WIDTH, 0);
+	buildHorizontalGridLevel(-AbstractWorldGenerator.HALF_WORLD_HEIGHT, AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0);
+	buildVerticalGridLevel(-AbstractWorldGenerator.HALF_WORLD_WIDTH, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0);
 	storeGrid();
 	showGridLevel(1);
     }
 
     void buildHorizontalGridLevel(long c1, long c2, int depth){
 	long c = (c1+c2)/2;
-	ZSegment s = new ZSegment(0, c, 0, AbstractWorldManager.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	ZSegment s = new ZSegment(0, c, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	storeSegmentInHGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
 	s.setVisible(false);
@@ -219,7 +217,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 
     void buildVerticalGridLevel(long c1, long c2, int depth){
 	long c = (c1+c2)/2;
-	ZSegment s = new ZSegment(c, 0, 0, 0, AbstractWorldManager.HALF_WORLD_HEIGHT, GRID_COLOR);
+	ZSegment s = new ZSegment(c, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
 	storeSegmentInVGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
 	s.setVisible(false);
@@ -402,7 +400,7 @@ public class ZLAbstractTask implements PostAnimationAction {
  	    lens = demoView.setLens(new FSGaussianLens(1.0f, LENS_R1, LENS_R2,
 						       x - d.width/2,
 						       y - d.height/2));
-	    lens.setBufferThreshold(1.5f);
+	    lens.setBufferThreshold(1);
 	}
 	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
 					 lens.getID(), null);
@@ -454,7 +452,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 	    lens = demoView.setLens(new FSGaussianLens(1.0f, LENS_R1, LENS_R2,
 						       x - d.width/2,
 						       y - d.height/2));
-	    lens.setBufferThreshold(1.5f);
+	    lens.setBufferThreshold(1);
 	}
 	// animate lens and camera simultaneously
 	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),

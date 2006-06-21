@@ -34,8 +34,8 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
     static final float MAIN_SPEED_FACTOR = 50.0f;
     static final float LENS_SPEED_FACTOR = 5.0f;
 
-    static final float WHEEL_ZOOMIN_FACTOR = 8.0f;
-    static final float WHEEL_ZOOMOUT_FACTOR = 9.0f;
+    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
     float oldCameraAltitude = 0;
 
@@ -124,18 +124,21 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	// update grid depth
 	float alt = application.demoCamera.getAltitude();
 	if (alt != oldCameraAltitude){
+ 	    System.err.println(alt);
 	    if (lensType == NO_LENS){
 		// grid
 		application.updateGridLevel(Math.max(wnes[2]-wnes[0], wnes[1]-wnes[3]));
 	    }
 	    if (application.logm.trialStarted){
 		if (alt < oldCameraAltitude){
+		    application.logm.updateWorld(wnes, LOWER_ALTITUDE);
 		    if (zoomDirection != ZOOMING_IN){
 			application.logm.switchedZoomDirection();
 		    }
 		    zoomDirection = ZOOMING_IN;
 		}
 		else {// alt > oldCameraAltitude
+		    application.logm.updateWorld(wnes, HIGHER_ALTITUDE);
 		    if (zoomDirection != ZOOMING_OUT){
 			application.logm.switchedZoomDirection();
 		    }
@@ -145,9 +148,16 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	    oldCameraAltitude = alt;
 	    application.cameraIsOnFloor(alt == 0.0);
 	}
+	else {
+	    application.logm.updateWorld(wnes, SAME_ALTITUDE);
+	}
 	if (application.logm.trialStarted){
 	    application.logm.writeCinematic();
 	}
     }
+
+    static final short LOWER_ALTITUDE = -1;
+    static final short SAME_ALTITUDE = 0;
+    static final short HIGHER_ALTITUDE = 1;
 
 }

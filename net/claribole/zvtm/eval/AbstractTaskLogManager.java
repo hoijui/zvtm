@@ -92,6 +92,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     boolean trialStarted = false;
 
     AbstractTrialInfo[] trials;
+    VRoundRect deepestTarget;
 
     AbstractTaskInstructionsManager im;
 
@@ -187,6 +188,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 	catch (IOException ex){ex.printStackTrace();}
     }
 
+    void updateWorld(long[] visibleRegion, short altChange){
+	trials[trialCount].root.updateWorld(visibleRegion, altChange);
+    }
+
     // init first columns of each line in output trials file
     void initLineStart(){
 	lineStart = subjectName + OUTPUT_CSV_SEP +
@@ -207,12 +212,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
 	catch (IOException ex){ex.printStackTrace();}
 	im.say(" ");
-    }
-
-    void buildNextWorld(){
-	
-	
-	
     }
 
     void writeHeaders(){
@@ -272,13 +271,16 @@ class AbstractTaskLogManager implements Java2DPainter {
 	if (trialCount > 0){trials[trialCount-1].removeFromVirtualSpace(application.mainVS);}
 	trialDensity = trials[trialCount].density;
 	trials[trialCount].addToVirtualSpace(application.vsm, application.mainVS);
+	deepestTarget = trials[trialCount].root.getDeepestTarget();
 	application.demoCamera.posx = 0;
 	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();
 	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
-	application.eh.cameraMoved();
 	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
+	application.eh.cameraMoved();
 	application.vsm.repaintNow();
+	// need to call it twice because of visibleRegion update issue
+	application.eh.cameraMoved();
     }
 
     void endTrial(){
@@ -317,13 +319,10 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     boolean targetWithinRange(){
-	// test whether target is within bounding box
-	// defined by SELECTION_RECT or not
-	// return true only if camera is at lowest altitude possible
-	return false; 
-	// (application.cameraOnFloor &&
-// 		(Math.abs(application.demoCamera.posx - trials[trialCount].targetLongitude) < application.SELECTION_RECT_HW) &&
-// 		(Math.abs(application.demoCamera.posy - trials[trialCount].targetLatitude) < application.SELECTION_RECT_HH));
+	return (application.demoCamera.posx >= deepestTarget.vx - deepestTarget.getWidth() &&
+		application.demoCamera.posx <= deepestTarget.vx + deepestTarget.getWidth() &&
+		application.demoCamera.posy >= deepestTarget.vy - deepestTarget.getHeight() &&
+		application.demoCamera.posy <= deepestTarget.vy + deepestTarget.getHeight());
     }
 
     void wrongTarget(){
