@@ -89,23 +89,50 @@ class AbstractWorldGenerator {
 	System.out.println(" done");
     }
 
+    static long[][] addForbiddenRegion(long[][] wnes, long w, long n, long e, long s){
+	long[][] tmpL = new long[wnes.length+1][4];
+	System.arraycopy(wnes, 0, tmpL, 0, wnes.length);
+	long[] nwnes = new long[4];
+	nwnes[0] = w;
+	nwnes[1] = n;
+	nwnes[2] = e;
+	nwnes[3] = s;
+	tmpL[tmpL.length-1] = nwnes; 
+	return tmpL;
+    }
+
+    static boolean inForbiddenRegion(long[][] wnes, long x, long y){
+	for (int i=0;i<wnes.length;i++){
+	    if (x >= wnes[i][0] && x <= wnes[i][2] && y >= wnes[i][3] && y <= wnes[i][1]){
+		return true;
+	    }
+	}
+	return false;
+    }
+
     void populateRegion(long parentX, long parentY, long parentW, long parentH, int depth) throws IOException {
+	long[][] fr = new long[0][4];
 	bwt.write("# Level "+depth);
 	bwt.newLine();
 	// generate NB_CHILDREN-1 false targets
 	long vx,vy;
 	for (int i=0;i<DENSITIES[trialCount]-1;i++){
-	    vx = Math.round(parentX + Math.random()*(parentW-widthByLevel[depth])*2-(parentW-widthByLevel[depth]));
-	    vy = Math.round(parentY + Math.random()*(parentH-widthByLevel[depth])*2-(parentH-widthByLevel[depth]));
+	    do {
+		vx = Math.round(parentX + Math.random()*(parentW-widthByLevel[depth])*2-(parentW-widthByLevel[depth]));
+		vy = Math.round(parentY + Math.random()*(parentH-widthByLevel[depth])*2-(parentH-widthByLevel[depth]));
+	    } while(inForbiddenRegion(fr, vx, vy));
 	    bwt.write(vx + CSV_SEP +
 		      vy + CSV_SEP +
 		      widthByLevel[depth] + CSV_SEP +
 		      widthByLevel[depth]);
 	    bwt.newLine();
+	    fr = addForbiddenRegion(fr, vx-4*widthByLevel[depth], vy+4*widthByLevel[depth], vx+4*widthByLevel[depth], vy-4*widthByLevel[depth]);
 	}
 	// generate 1 target
-	vx = Math.round(parentX + Math.random()*(parentW-widthByLevel[depth])*2-(parentW-widthByLevel[depth]));
-	vy = Math.round(parentY + Math.random()*(parentH-widthByLevel[depth])*2-(parentH-widthByLevel[depth]));
+	do {
+	    vx = Math.round(parentX + Math.random()*(parentW-widthByLevel[depth])*2-(parentW-widthByLevel[depth]));
+	    vy = Math.round(parentY + Math.random()*(parentH-widthByLevel[depth])*2-(parentH-widthByLevel[depth]));
+	} while (inForbiddenRegion(fr, vx, vy));
 	bwt.write(vx + CSV_SEP +
 		  vy + CSV_SEP +
 		  widthByLevel[depth] + CSV_SEP +
