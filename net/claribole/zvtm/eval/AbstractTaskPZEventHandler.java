@@ -32,19 +32,19 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	cameraStickedToMouse = true;
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	cameraStickedToMouse = false;
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	lastVX = v.getMouse().vx;
@@ -52,19 +52,19 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	cameraStickedToMouse = true;
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	cameraStickedToMouse = false;
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	lastVX = v.getMouse().vx;
@@ -72,7 +72,7 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
  	if (buttonNumber != 2){
 	    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
 	    synchronized(application.demoCamera){
@@ -88,7 +88,7 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-//	if (!application.logm.trialStarted){return;}
+	if (!application.logm.trialStarted){return;}
 	float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
 	if (wheelDirection  == WHEEL_UP){// zooming in
 	    application.demoCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
