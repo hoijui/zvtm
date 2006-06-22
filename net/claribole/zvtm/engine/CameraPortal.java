@@ -188,7 +188,6 @@ public class CameraPortal extends Portal {
 	    g2d.setColor(bkgColor);
 	    g2d.fillRect(x, y, w, h);
 	}
-	g2d.translate(x, y);
 	standardStroke = g2d.getStroke();
 	// be sure to call the translate instruction before getting the standard transform
 	// as the latter's matrix is preconcatenated to the translation matrix of glyphs
@@ -211,14 +210,13 @@ public class CameraPortal extends Portal {
 			    //if glyph is at least partially visible in the reg. seen from this view, display
 			    gll[i].project(camera, size); // an invisible glyph should still be projected
 			    if (gll[i].isVisible()){      // as it can be sensitive
-				gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform);
+				gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
 			    }
 			}
 		    }
 		}
 	    }
 	}
-	g2d.translate(-x, -y);
 	g2d.setClip(0, 0, viewWidth, viewHeight);
 	if (borderColor != null){
 	    g2d.setColor(borderColor);
