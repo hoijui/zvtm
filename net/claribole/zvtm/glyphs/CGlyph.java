@@ -215,7 +215,7 @@ public class CGlyph extends Glyph implements Cloneable {
     /**draw glyph - does not do anything each component paints itself independently
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){}
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){}
 
     /**draw this glyph through the lens
      *@param g graphic context in which the glyph should be drawn 
@@ -224,7 +224,7 @@ public class CGlyph extends Glyph implements Cloneable {
      * right now only VRectangle and VRectangleOr(/Or=0) use this
      *@param i camera index in the virtual space
      */
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){}
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){}
 
     /**set sensitivity of this glyph - use either PRIMARY_GLYPH_ONLY or ALL_GLYPHS - this does not override the setSensitivity(boolean) setting - Note: the glyph sent as a parameter of the event triggering is the component, not the CGlyph ; the CGlyph can be retrieved by calling Glyph.getCGlyph()*/
     public void setSensitivity(short s){
