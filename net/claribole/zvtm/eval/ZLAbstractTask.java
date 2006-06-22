@@ -551,7 +551,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 		       JPanel coordinates w.r.t the view's center - see Lens.java)
 		    */
 		    demoCamera.move(Math.round((a1-demoCamera.getAltitude())/demoCamera.getFocal()*lens.lx),
-				    -Math.round((a1-demoCamera.getAltitude())/demoCamera.getFocal()*lens.ly));
+				    -Math.round((a1-demoCamera.getAltitude())/demoCamera.getFocal()*lens.ly));		    
 		}
 		else {
 		    vsm.animator.createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
@@ -570,9 +570,10 @@ public class ZLAbstractTask implements PostAnimationAction {
 	Location l=vsm.getGlobalView(demoCamera,ANIM_MOVE_LENGTH);
     }
 
-    int CENTER_CROSS_SIZE = 15;
-    int CENTER_W = 0;
-    int CENTER_N = 0;
+//     static final int CENTER_CROSS_SIZE = 15;
+//     static final int H_CENTER_CROSS_SIZE = CENTER_CROSS_SIZE / 2;
+//     int CENTER_W = 0;
+//     int CENTER_N = 0;
  
     void updatePanelSize(){
 	Dimension d = demoView.getPanel().getSize();
@@ -582,8 +583,8 @@ public class ZLAbstractTask implements PostAnimationAction {
 	hpanelHeight = panelHeight / 2;
 	SELECTION_RECT_X = panelWidth/2 - SELECTION_RECT_W / 2;
 	SELECTION_RECT_Y = panelHeight/2 - SELECTION_RECT_H / 2;
-	CENTER_W = hpanelWidth - CENTER_CROSS_SIZE / 2;
-	CENTER_N = hpanelHeight - CENTER_CROSS_SIZE / 2;
+// 	CENTER_W = hpanelWidth - CENTER_CROSS_SIZE / 2;
+// 	CENTER_N = hpanelHeight - CENTER_CROSS_SIZE / 2;
     }
 
     void cameraIsOnFloor(boolean b){
