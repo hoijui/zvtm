@@ -86,7 +86,7 @@ public class OffscreenViewPanel extends ViewPanel {
 			    synchronized(gll[i]){
 				gll[i].project(cams[nbcam], size);
 				if (gll[i].isVisible()){
-				    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform);
+				    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
 				    cams[nbcam].parentSpace.drewGlyph(gll[i],camIndex);
 				}
 			    }

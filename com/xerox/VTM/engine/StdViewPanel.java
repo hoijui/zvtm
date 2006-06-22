@@ -250,7 +250,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							for (int j=beginAt;j<drawnGlyphs.size();j++){
 							    gl=(Glyph)drawnGlyphs.elementAt(j);
 							    if (gl.isVisible()){
-								gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform);
+								gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
 							    }
 							    cams[nbcam].parentSpace.drewGlyph(gl, camIndex);
 							}
@@ -267,7 +267,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 									gll[i].project(cams[nbcam], size);
 									if (gll[i].isVisible()){
 									    gll[i].draw(g2d, size.width, size.height, cams[nbcam].getIndex(),
-											standardStroke, standardTransform);
+											standardStroke, standardTransform, 0, 0);
 									}
 									if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
 									    /* partially within the region seen through the lens
@@ -275,7 +275,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 									    gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
 									    if (gll[i].isVisibleThroughLens()){
 										gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
-												   standardStroke, standardTransform);
+												   standardStroke, standardTransform, 0, 0);
 									    }
 									}
 									/* notifying outside of above test because glyph sensitivity is not
@@ -341,7 +341,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 						    for (int j=beginAt;j<drawnGlyphs.size();j++){
 							gl=(Glyph)drawnGlyphs.elementAt(j);
 							if (gl.isVisible()){
-							    gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform);
+							    gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
 							}
 							cams[nbcam].parentSpace.drewGlyph(gl, camIndex);
 						    }
@@ -355,7 +355,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 								    //if glyph is at least partially visible in the reg. seen from this view, display
 								    gll[i].project(cams[nbcam], size); // an invisible glyph should still be projected
 								    if (gll[i].isVisible()){          // as it can be sensitive
-									gll[i].draw(g2d, size.width, size.height, camIndex, standardStroke, standardTransform);
+									gll[i].draw(g2d, size.width, size.height, camIndex, standardStroke, standardTransform, 0, 0);
 								    }
 								    // notifying outside if branch because glyph sensitivity is not
 								    // affected by glyph visibility when managed through Glyph.setVisible()

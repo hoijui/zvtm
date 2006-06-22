@@ -173,7 +173,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 				    synchronized(gll[i]){
 					gll[i].project(cams[nbcam], size);
 					if (gll[i].isVisible()){
-					    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform);
+					    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
 					}
 					// notifying outside if branch because glyph sensitivity is not
 					// affected by glyph visibility when managed through Glyph.setVisible()
