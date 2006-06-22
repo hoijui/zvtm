@@ -64,13 +64,18 @@ class AbstractTaskInstructionsManager implements Java2DPainter {
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	g2d.setColor(application.SELECTION_RECT_COLOR);
-// // 	if (application.cameraOnFloor && application.SHOW_SELECTION_RECT){
-// 	    g2d.drawRect(application.SELECTION_RECT_X, application.SELECTION_RECT_Y,
-// 			 application.SELECTION_RECT_W, application.SELECTION_RECT_H);
+// 	if (application.lens != null){
+// 	    g2d.fillRect(application.hpanelWidth+application.lens.lx,
+// 			 application.hpanelHeight+application.lens.ly-ZLAbstractTask.H_CENTER_CROSS_SIZE,
+// 			 1, application.CENTER_CROSS_SIZE);
+// 	    g2d.fillRect(application.hpanelWidth+application.lens.lx-ZLAbstractTask.H_CENTER_CROSS_SIZE,
+// 			 application.hpanelHeight+application.lens.ly,
+// 			 application.CENTER_CROSS_SIZE, 1);
 // 	}
-	// uncomment to draw a cross at the window center
-	g2d.fillRect(application.hpanelWidth, application.CENTER_N, 1, application.CENTER_CROSS_SIZE);
-	g2d.fillRect(application.CENTER_W, application.hpanelHeight, application.CENTER_CROSS_SIZE, 1);
+// 	else {
+// 	    g2d.fillRect(application.hpanelWidth, application.CENTER_N, 1, application.CENTER_CROSS_SIZE);
+// 	    g2d.fillRect(application.CENTER_W, application.hpanelHeight, application.CENTER_CROSS_SIZE, 1);	    
+// 	}
 	drawFrame(g2d, viewWidth, viewHeight);
 	writeInstructions(g2d, viewWidth, viewHeight);
     }
