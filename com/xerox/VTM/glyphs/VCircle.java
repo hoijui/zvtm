@@ -212,51 +212,51 @@ public class VCircle extends Glyph implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr>1){
 	    if (filled){
 		g.setColor(this.color);
-		g.fillOval(pc[i].cx-pc[i].cr,pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+		g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    g.setStroke(stroke);
-		    g.drawOval(pc[i].cx-pc[i].cr,pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+		    g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawOval(pc[i].cx-pc[i].cr,pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+		    g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].lcr>1){
 	    if (filled){
 		g.setColor(this.color);
-		g.fillOval(pc[i].lcx-pc[i].lcr,pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+		g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    g.setStroke(stroke);
-		    g.drawOval(pc[i].lcx-pc[i].lcr,pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+		    g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawOval(pc[i].lcx-pc[i].lcr,pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+		    g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

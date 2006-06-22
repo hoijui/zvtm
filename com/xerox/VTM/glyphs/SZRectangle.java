@@ -56,47 +56,47 @@ public class SZRectangle extends VRectangle {
      *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
      *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw >= minSize) && (pc[i].ch >= minSize)
 	    && (pc[i].cw <= maxSize) && (pc[i].ch <= maxSize)) {//repaint only if object is visible
 	    if (filled) {
 		g.setColor(this.color);
-		g.fillRect(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    if (((pc[i].cx-pc[i].cw)>0) || ((pc[i].cy-pc[i].ch)>0) || ((2*pc[i].cw-1)<vW) || ((2*pc[i].ch-1)<vH)){
 			g.setStroke(stroke);  //change stroke there
-			g.drawRect(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
 			g.setStroke(stdS);  //original stroke restored here
 		    }
 		}
 		else {
-		    g.drawRect(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
 		}
 	    }
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lcw >= minSize) && (pc[i].lch >= minSize)
 	    && (pc[i].lcw <= maxSize) && (pc[i].lch <= maxSize)) {//repaint only if object is visible
 	    if (filled) {
 		g.setColor(this.color);
-		g.fillRect(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
-		    if (((pc[i].lcx-pc[i].lcw)>0) || ((pc[i].lcy-pc[i].lch)>0) || ((2*pc[i].lcw-1)<vW) || ((2*pc[i].lch-1)<vH)){
+		    if (((pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) || ((2*pc[i].lcw-1)<vW) || ((2*pc[i].lch-1)<vH)){
 			g.setStroke(stroke);  //change stroke there
-			g.drawRect(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
+			g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
 			g.setStroke(stdS);  //original stroke restored here
 		    }
 		}
 		else {
-		    g.drawRect(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
+		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
 		}
 	    }
 	}

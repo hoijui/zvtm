@@ -89,7 +89,7 @@ public class VTextOr extends VText implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font != null){
@@ -100,9 +100,9 @@ public class VTextOr extends VText implements Cloneable {
 		    pc[i].ch = (int)Math.abs(Math.round(r.getHeight() * Math.sin(orient)));
 		    pc[i].valid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef*Math.cos(-orient)/2.0,pc[i].cy-pc[i].ch*Math.sin(-orient)*coef/2.0);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy-pc[i].ch*coef);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,pc[i].cy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef*Math.cos(-orient)/2.0,pc[i].cy-pc[i].ch*Math.sin(-orient)*coef/2.0);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,pc[i].cy-pc[i].ch*coef);}
 		at.preConcatenate(stdT);
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
@@ -123,9 +123,9 @@ public class VTextOr extends VText implements Cloneable {
 		    pc[i].ch = (int)Math.abs(Math.round(r.getHeight() * Math.sin(orient)));
 		    pc[i].valid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef*Math.cos(-orient)/2.0,pc[i].cy-pc[i].ch*Math.sin(-orient)*coef/2.0);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy-pc[i].ch*coef);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,pc[i].cy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef*Math.cos(-orient)/2.0,pc[i].cy-pc[i].ch*Math.sin(-orient)*coef/2.0);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,pc[i].cy-pc[i].ch*coef);}
 		at.preConcatenate(stdT);
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
@@ -139,17 +139,17 @@ public class VTextOr extends VText implements Cloneable {
 		g.setTransform(stdT);
 	    }
 	}
-	else {g.fillRect(pc[i].cx,pc[i].cy,1,1);}
+	else {g.fillRect(dx+pc[i].cx,pc[i].cy,1,1);}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font != null){
 		g.setFont(font);
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef*Math.cos(-orient)/2.0,pc[i].lcy-pc[i].lch*Math.sin(-orient)*coef/2.0);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef,pc[i].lcy-pc[i].lch*coef);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef*Math.cos(-orient)/2.0,dy+pc[i].lcy-pc[i].lch*Math.sin(-orient)*coef/2.0);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy-pc[i].lch*coef);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		g.setTransform(at);
@@ -163,9 +163,9 @@ public class VTextOr extends VText implements Cloneable {
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef*Math.cos(-orient)/2.0,pc[i].lcy-pc[i].lch*Math.sin(-orient)*coef/2.0);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef,pc[i].lcy-pc[i].lch*coef);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef*Math.cos(-orient)/2.0,dy+pc[i].lcy-pc[i].lch*Math.sin(-orient)*coef/2.0);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy-pc[i].lch*coef);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		g.setTransform(at);
@@ -178,7 +178,7 @@ public class VTextOr extends VText implements Cloneable {
 		g.setTransform(stdT);
 	    }
 	}
-	else {g.fillRect(pc[i].lcx,pc[i].lcy,1,1);}
+	else {g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);}
     }
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/

@@ -245,55 +245,67 @@ public class VCbCurve extends Glyph implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
 	    if (filled) {
 		g.setColor(this.color);
+		g.translate(dx,dy);
 		g.fill(pc[i].quad);
 		g.setColor(borderColor);
 		g.drawLine((int)pc[i].start.x,(int)pc[i].start.y,(int)pc[i].end.x,(int)pc[i].end.y);
+		g.translate(-dx,-dy);
 	    }
 	    else {//if not filled (common case), paint curve with main color, not border color
 		g.setColor(this.color);
 	    }
 	    if (stroke!=null) {
 		g.setStroke(stroke);
+		g.translate(dx,dy);
 		g.draw(pc[i].quad);
+		g.translate(-dx,-dy);
 		g.setStroke(stdS);
 	    }
 	    else {
+		g.translate(dx,dy);
 		g.draw(pc[i].quad);
+		g.translate(-dx,-dy);
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].lcr >1){//repaint only if object is visible
 	    if (filled) {
 		g.setColor(this.color);
+		g.translate(dx,dy);
 		g.fill(pc[i].lquad);
 		g.setColor(borderColor);
 		g.drawLine((int)pc[i].lstart.x,(int)pc[i].lstart.y,(int)pc[i].lend.x,(int)pc[i].lend.y);
+		g.translate(-dx,-dy);
 	    }
 	    else {//if not filled (common case), paint curve with main color, not border color
 		g.setColor(this.color);
 	    }
 	    if (stroke!=null) {
 		g.setStroke(stroke);
+		g.translate(dx,dy);
 		g.draw(pc[i].lquad);
+		g.translate(-dx,-dy);
 		g.setStroke(stdS);
 	    }
 	    else {
+		g.translate(dx,dy);
 		g.draw(pc[i].lquad);
+		g.translate(-dx,-dy);
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

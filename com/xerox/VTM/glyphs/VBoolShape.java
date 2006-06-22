@@ -281,51 +281,63 @@ public class VBoolShape extends Glyph implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].mainArea.getBounds().width>2) && (pc[i].mainArea.getBounds().height>2)){
 	    if (filled){
 		g.setColor(this.color);
+		g.translate(dx,dy);
 		g.fill(pc[i].mainArea);
+		g.translate(-dx,-dy);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null){
 		    g.setStroke(stroke);
+		    g.translate(dx,dy);
 		    g.draw(pc[i].mainArea);
+		    g.translate(-dx,-dy);
 		    g.setStroke(stdS);
 		}
 		else {
+		    g.translate(dx,dy);
 		    g.draw(pc[i].mainArea);
+		    g.translate(-dx,-dy);
 		}		   
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lmainArea.getBounds().width>2) && (pc[i].lmainArea.getBounds().height>2)){
 	    if (filled){
 		g.setColor(this.color);
+		g.translate(dx,dy);
 		g.fill(pc[i].lmainArea);
+		g.translate(-dx,-dy);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null){
 		    g.setStroke(stroke);
+		    g.translate(dx,dy);
 		    g.draw(pc[i].lmainArea);
+		    g.translate(-dx,-dy);
 		    g.setStroke(stdS);
 		}
 		else {
+		    g.translate(dx,dy);
 		    g.draw(pc[i].lmainArea);
+		    g.translate(-dx,-dy);
 		}		   
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

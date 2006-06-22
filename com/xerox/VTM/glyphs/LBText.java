@@ -100,7 +100,7 @@ public class LBText extends LText {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
 		g.setFont(font);
@@ -110,15 +110,14 @@ public class LBText extends LText {
 		    pc[i].ch = (int)bounds.getHeight();
 		    pc[i].valid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef/2.0f,pc[i].cy);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy);}
-		at.preConcatenate(stdT);
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		if (borderColor != null){
 		    g.setColor(borderColor);
-		    g.fillRect(-2, -pc[i].lch+1, pc[i].lcw+4, pc[i].lch+1);
+		    g.fillRect(dx-2, dy-pc[i].lch+1, pc[i].lcw+4, pc[i].lch+1);
 		}
 		g.setColor(this.color);
 		try {g.drawString(text,0.0f,0.0f);}
@@ -132,15 +131,14 @@ public class LBText extends LText {
 		    pc[i].ch = (int)bounds.getHeight();
 		    pc[i].valid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef/2.0f,pc[i].cy);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw*coef,pc[i].cy);}
-		at.preConcatenate(stdT);
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		if (borderColor != null){
 		    g.setColor(borderColor);
-		    g.fillRect(-2, -pc[i].ch+1, pc[i].cw+4, pc[i].ch+1);
+		    g.fillRect(dx-2, dy-pc[i].ch+1, pc[i].cw+4, pc[i].ch+1);
 		}
 		g.setColor(this.color);
 		try {g.drawString(text,0.0f,0.0f);}
@@ -149,11 +147,11 @@ public class LBText extends LText {
 	    g.setTransform(stdT);
 	}
 	else {
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
 		g.setFont(font);
@@ -163,14 +161,14 @@ public class LBText extends LText {
 		    pc[i].lch = (int)bounds.getHeight();
 		    pc[i].lvalid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef/2.0f,pc[i].lcy);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef,pc[i].lcy);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		if (borderColor != null){
 		    g.setColor(borderColor);
-		    g.fillRect(-2, -pc[i].lch + 1, pc[i].lcw+4, pc[i].lch+1);
+		    g.fillRect(dx-2, dy-pc[i].lch + 1, pc[i].lcw+4, pc[i].lch+1);
 		}
 		g.setColor(this.fillColorThroughLens);
 		try {g.drawString(text,0.0f,0.0f);}
@@ -184,14 +182,14 @@ public class LBText extends LText {
 		    pc[i].lch = (int)bounds.getHeight();
 		    pc[i].lvalid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef/2.0f,pc[i].lcy);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef,pc[i].lcy);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		if (borderColor != null){
 		    g.setColor(borderColor);
-		    g.fillRect(-2, -pc[i].lch + 1, pc[i].lcw+4, pc[i].lch+1);
+		    g.fillRect(dx-2, dy-pc[i].lch + 1, pc[i].lcw+4, pc[i].lch+1);
 		}
 		g.setColor(this.fillColorThroughLens);
 		try {g.drawString(text,0.0f,0.0f);}
@@ -200,7 +198,7 @@ public class LBText extends LText {
 	    g.setTransform(stdT);
 	}
 	else {
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

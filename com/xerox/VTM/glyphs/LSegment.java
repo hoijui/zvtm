@@ -73,29 +73,29 @@ public class LSegment extends VSegment {
 	super(x, y, z, lgth, angle, c);
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    g.setStroke(stroke);
-	    g.drawLine(pc[i].lcx-pc[i].lcw,
-		       pc[i].lcy-pc[i].lch,
-		       pc[i].lcx+pc[i].lcw,
-		       pc[i].lcy+pc[i].lch);
-	    g.drawLine(pc[i].lcx-pc[i].lcw+1,
-		       pc[i].lcy-pc[i].lch+1,
-		       pc[i].lcx+pc[i].lcw+1,
-		       pc[i].lcy+pc[i].lch+1);
+	    g.drawLine(dx+-pc[i].lcw,
+		       dy+pc[i].lcy-pc[i].lch,
+		       dx+pc[i].lcw,
+		       dy+pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+-pc[i].lcw+1,
+		       dy+pc[i].lcy-pc[i].lch+1,
+		       dx+pc[i].lcw+1,
+		       dy+pc[i].lcy+pc[i].lch+1);
 	    g.setStroke(stdS);
 	}
 	else {
-	    g.drawLine(pc[i].lcx-pc[i].lcw,
-		       pc[i].lcy-pc[i].lch,
-		       pc[i].lcx+pc[i].lcw,
-		       pc[i].lcy+pc[i].lch);
-	    g.drawLine(pc[i].lcx-pc[i].lcw+1,
-		       pc[i].lcy-pc[i].lch+1,
-		       pc[i].lcx+pc[i].lcw+1,
-		       pc[i].lcy+pc[i].lch+1);
+	    g.drawLine(dx+-pc[i].lcw,
+		       dy+pc[i].lcy-pc[i].lch,
+		       dx+pc[i].lcw,
+		       dy+pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+-pc[i].lcw+1,
+		       dy+pc[i].lcy-pc[i].lch+1,
+		       dx+pc[i].lcw+1,
+		       dy+pc[i].lcy+pc[i].lch+1);
 	}
     }
 

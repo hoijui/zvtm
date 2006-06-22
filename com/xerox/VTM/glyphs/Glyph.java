@@ -578,7 +578,7 @@ public abstract class Glyph implements Cloneable {
      * right now only VRectangle and VRectangleOr(/Or=0) use this
      *@param i camera index in the virtual space
      */
-    public abstract void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT);
+    public abstract void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy);
 
     /**draw this glyph through the lens
      *@param g graphic context in which the glyph should be drawn 
@@ -587,7 +587,7 @@ public abstract class Glyph implements Cloneable {
      * right now only VRectangle and VRectangleOr(/Or=0) use this
      *@param i camera index in the virtual space
      */
-    public abstract void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT);
+    public abstract void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy);
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
      *@param nbCam current number of cameras in the virtual space

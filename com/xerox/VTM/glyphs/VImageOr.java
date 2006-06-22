@@ -141,13 +141,12 @@ public class VImageOr extends VImage implements Cloneable {
      *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
      *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)){
 	    if (zoomSensitive){trueCoef=scaleFactor*coef;}else{trueCoef=scaleFactor;}
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (trueCoef!=1.0f){
-		at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
-		at.concatenate(stdT);
+		at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));}
 		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
 		g.drawImage(image,at,null);
@@ -155,10 +154,9 @@ public class VImageOr extends VImage implements Cloneable {
 		else if (drawBorder==2){g.setColor(borderColor);g.drawPolygon(pc[i].p);}
 	    }
 	    else {
-		if (orient==0){g.drawImage(image,pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,null);}
+		if (orient==0){g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);}
 		else {
-		    at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
-		    at.preConcatenate(stdT);
+		    at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
 		    g.drawImage(image,at,null);
 		}
@@ -172,12 +170,12 @@ public class VImageOr extends VImage implements Cloneable {
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lcw>1) && (pc[i].lch>1)){
 	    if (zoomSensitive){trueCoef=scaleFactor*coef;}else{trueCoef=scaleFactor;}
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (trueCoef!=1.0f){
-		at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch);
+		at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));}
 		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
 		g.drawImage(image,at,null);
@@ -185,9 +183,9 @@ public class VImageOr extends VImage implements Cloneable {
 		else if (drawBorder==2){g.setColor(borderColor);g.drawPolygon(pc[i].lp);}
 	    }
 	    else {
-		if (orient==0){g.drawImage(image,pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,null);}
+		if (orient==0){g.drawImage(image,dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,null);}
 		else {
-		    at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch);
+		    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));
 		    if (trueCoef!=1.0f){at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));}
 		    g.drawImage(image,at,null);
@@ -198,7 +196,7 @@ public class VImageOr extends VImage implements Cloneable {
 	}
 	else {
 	    g.setColor(this.borderColor);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

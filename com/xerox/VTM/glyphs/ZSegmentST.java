@@ -70,16 +70,16 @@ public class ZSegmentST extends ZSegment implements Transparent {
      *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
      *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    g.setColor(this.color);
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.drawRect(pc[i].cx, pc[i].cy, pc[i].cw, pc[i].ch);
+		g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, pc[i].ch);
 		g.setComposite(acO);
 	    }
 	    else {
-		g.drawRect(pc[i].cx, pc[i].cy, pc[i].cw, pc[i].ch);
+		g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, pc[i].ch);
 	    }
 	}
 	else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {//repaint only if object is visible  (^ means xor)
@@ -87,36 +87,36 @@ public class ZSegmentST extends ZSegment implements Transparent {
 	    if (pc[i].cw<=1){
 		if (alpha < 1.0f){
 		    g.setComposite(acST);
-		    g.drawRect(pc[i].cx, pc[i].cy, 0, pc[i].ch);
+		    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, 0, pc[i].ch);
 		    g.setComposite(acO);
 		}
 		else {
-		    g.drawRect(pc[i].cx, pc[i].cy, 0, pc[i].ch);
+		    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, 0, pc[i].ch);
 		}
 	    }
 	    else if (pc[i].ch<=1){
 		if (alpha < 1.0f){
 		    g.setComposite(acST);
-		    g.drawRect(pc[i].cx, pc[i].cy, pc[i].cw, 0);
+		    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, 0);
 		    g.setComposite(acO);
 		}
 		else {
-		    g.drawRect(pc[i].cx, pc[i].cy, pc[i].cw, 0);
+		    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, 0);
 		}
 	    }
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].lch>1)) {//repaint only if object is visible
 	    g.setColor(this.color);
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.drawRect(pc[i].lcx, pc[i].lcy, pc[i].lcw, pc[i].lch);
+		g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, pc[i].lch);
 		g.setComposite(acO);
 	    }
 	    else {
-		g.drawRect(pc[i].lcx, pc[i].lcy, pc[i].lcw, pc[i].lch);
+		g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, pc[i].lch);
 	    }
 	}
 	else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {//repaint only if object is visible  (^ means xor)
@@ -124,21 +124,21 @@ public class ZSegmentST extends ZSegment implements Transparent {
 	    if (pc[i].lcw<=1){
 		if (alpha < 1.0f){
 		    g.setComposite(acST);
-		    g.drawRect(pc[i].lcx, pc[i].lcy, 0, pc[i].lch);
+		    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, 0, pc[i].lch);
 		    g.setComposite(acO);
 		}
 		else {
-		    g.drawRect(pc[i].lcx, pc[i].lcy, 0, pc[i].lch);
+		    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, 0, pc[i].lch);
 		}
 	    }
 	    else if (pc[i].lch<=1){
 		if (alpha < 1.0f){
 		    g.setComposite(acST);
-		    g.drawRect(pc[i].lcx, pc[i].lcy, pc[i].lcw, 0);
+		    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, 0);
 		    g.setComposite(acO);
 		}
 		else {
-		    g.drawRect(pc[i].lcx, pc[i].lcy, pc[i].lcw, 0);
+		    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, 0);
 		}
 	    }
 	}

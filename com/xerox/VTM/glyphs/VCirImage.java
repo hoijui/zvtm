@@ -260,37 +260,35 @@ public class VCirImage extends Glyph implements Cloneable {
      *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
      *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cs>1){
 	    if (filled) {
 		g.setColor(this.color);
-		g.fillOval(pc[i].cx-pc[i].cs,pc[i].cy-pc[i].cs,2*pc[i].cs,2*pc[i].cs);
+		g.fillOval(dx+pc[i].cx-pc[i].cs,dy+pc[i].cy-pc[i].cs,2*pc[i].cs,2*pc[i].cs);
 	    }
 	    if (paintBorder){
 		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
-		    g.drawOval(pc[i].cx-pc[i].cs,pc[i].cy-pc[i].cs,2*pc[i].cs,2*pc[i].cs);
+		    g.drawOval(dx+pc[i].cx-pc[i].cs,dy+pc[i].cy-pc[i].cs,2*pc[i].cs,2*pc[i].cs);
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawOval(pc[i].cx-pc[i].cs,pc[i].cy-pc[i].cs,2*pc[i].cs,2*pc[i].cs);
+		    g.drawOval(dx+pc[i].cx-pc[i].cs,dy+pc[i].cy-pc[i].cs,2*pc[i].cs,2*pc[i].cs);
 		}
 	    }
 	    trueCoef=scaleFactor*coef*relCoef;
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (trueCoef!=1.0f){
-		at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
-		at.preConcatenate(stdT);
+		at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));}
 		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
 		g.drawImage(image,at,null);
 	    }
 	    else {
-		if (orient==0){g.drawImage(image,pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,null);}
+		if (orient==0){g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);}
 		else {
-		    at=AffineTransform.getTranslateInstance(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch);
-		    at.preConcatenate(stdT);
+		    at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
 		    if (trueCoef!=1.0f){at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));}
 		    g.drawImage(image,at,null);
@@ -299,39 +297,39 @@ public class VCirImage extends Glyph implements Cloneable {
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].lcs>1){
 	    if (filled) {
 		g.setColor(this.color);
-		g.fillOval(pc[i].lcx-pc[i].lcs,pc[i].lcy-pc[i].lcs,2*pc[i].lcs,2*pc[i].lcs);
+		g.fillOval(dx+pc[i].lcx-pc[i].lcs,dy+pc[i].cy-pc[i].lcs,2*pc[i].lcs,2*pc[i].lcs);
 	    }
 	    if (paintBorder){
 		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
-		    g.drawOval(pc[i].lcx-pc[i].lcs,pc[i].lcy-pc[i].lcs,2*pc[i].lcs,2*pc[i].lcs);
+		    g.drawOval(dx+pc[i].lcx-pc[i].lcs,dy+pc[i].cy-pc[i].lcs,2*pc[i].lcs,2*pc[i].lcs);
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawOval(pc[i].lcx-pc[i].lcs,pc[i].lcy-pc[i].lcs,2*pc[i].lcs,2*pc[i].lcs);
+		    g.drawOval(dx+pc[i].lcx-pc[i].lcs,dy+pc[i].cy-pc[i].lcs,2*pc[i].lcs,2*pc[i].lcs);
 		}
 	    }
 	    trueCoef=scaleFactor*coef*relCoef;
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (trueCoef!=1.0f){
-		at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch);
+		at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].cy-pc[i].lch);
 		if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));}
 		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
 		g.drawImage(image,at,null);
 	    }
 	    else {
-		if (orient==0){g.drawImage(image,pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,null);}
+		if (orient==0){g.drawImage(image,dx+pc[i].lcx-pc[i].lcw,dy+pc[i].cy-pc[i].lch,null);}
 		else {
-		    at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch);
+		    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].cy-pc[i].lch);
 		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));
 		    if (trueCoef!=1.0f){at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));}
 		    g.drawImage(image,at,null);
@@ -340,7 +338,7 @@ public class VCirImage extends Glyph implements Cloneable {
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].cy,1,1);
 	}
     }
 

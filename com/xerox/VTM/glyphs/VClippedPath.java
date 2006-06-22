@@ -169,12 +169,11 @@ public class VClippedPath extends VPath implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (visibilityHasChanged()){constructVisiblePath();}
 	g.setColor(this.color);
 	if (true){//replace by something using projected size (so that we do not paint it if too small)
- 	    at=AffineTransform.getTranslateInstance(pc[i].cx,pc[i].cy);
-	    at.preConcatenate(stdT);
+ 	    at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
  	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
 	    g.setTransform(at);
 	    if (stroke!=null){
@@ -189,11 +188,11 @@ public class VClippedPath extends VPath implements Cloneable {
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (visibilityHasChanged()){constructVisiblePath();}
 	g.setColor(this.color);
 	if (true){//replace by something using projected size (so that we do not paint it if too small)
- 	    at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);
+ 	    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);
  	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
 	    g.setTransform(at);
 	    if (stroke!=null){

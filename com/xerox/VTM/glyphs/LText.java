@@ -94,7 +94,7 @@ public class LText extends VText implements LensRendering, Cloneable {
 	return borderColorThroughLens;
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.fillColorThroughLens);
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
@@ -105,9 +105,9 @@ public class LText extends VText implements LensRendering, Cloneable {
 		    pc[i].lch = (int)bounds.getHeight();
 		    pc[i].lvalid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef/2.0f,pc[i].lcy);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef,pc[i].lcy);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		try {g.drawString(text,0.0f,0.0f);}
@@ -121,9 +121,9 @@ public class LText extends VText implements LensRendering, Cloneable {
 		    pc[i].lch = (int)bounds.getHeight();
 		    pc[i].lvalid=true;
 		}
-		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(pc[i].lcx,pc[i].lcy);}
-		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef/2.0f,pc[i].lcy);}
-		else {at=AffineTransform.getTranslateInstance(pc[i].lcx-pc[i].lcw*coef,pc[i].lcy);}
+		if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+		else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
+		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
 		try {g.drawString(text,0.0f,0.0f);}
@@ -132,7 +132,7 @@ public class LText extends VText implements LensRendering, Cloneable {
 	    g.setTransform(stdT);
 	}
 	else {
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

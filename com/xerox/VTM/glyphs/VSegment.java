@@ -349,27 +349,27 @@ public class VSegment extends Glyph implements RectangularShape,Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    g.setStroke(stroke);
-	    g.drawLine(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,pc[i].cx+pc[i].cw,pc[i].cy+pc[i].ch);
+	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
 	    g.setStroke(stdS);
 	}
 	else {
-	    g.drawLine(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,pc[i].cx+pc[i].cw,pc[i].cy+pc[i].ch);
+	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    g.setStroke(stroke);
-	    g.drawLine(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,pc[i].lcx+pc[i].lcw,pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
 	    g.setStroke(stdS);
 	}
 	else {
-	    g.drawLine(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,pc[i].lcx+pc[i].lcw,pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
 	}
     }
 

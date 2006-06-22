@@ -79,58 +79,58 @@ public class VRectangleST extends VRectangle implements Transparent,Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)){//repaint only if object is visible
 	    if (filled){
 		g.setColor(this.color);  
 		g.setComposite(acST);
-		g.fillRect(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 		g.setComposite(acO);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    g.setStroke(stroke);
-		    g.drawRect(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
+		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawRect(pc[i].cx-pc[i].cw,pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
+		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
 	    g.setComposite(acST);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	    g.setComposite(acO);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lcw>1) && (pc[i].lch>1)){//repaint only if object is visible
 	    if (filled){
 		g.setColor(this.color);  
 		g.setComposite(acST);
-		g.fillRect(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
 		g.setComposite(acO);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    g.setStroke(stroke);
-		    g.drawRect(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
+		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawRect(pc[i].lcx-pc[i].lcw,pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
+		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
 	    g.setComposite(acST);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	    g.setComposite(acO);
 	}
     }

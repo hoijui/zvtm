@@ -235,51 +235,63 @@ public class VTriangle extends Glyph implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
-	if (pc[i].cr >1){
-	    if (filled){
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	if (pc[i].cr>1){//repaint only if object is visible
+	    if (filled) {
 		g.setColor(this.color);
+		g.translate(dx, dy);
 		g.fillPolygon(pc[i].p);
+		g.translate(-dx, -dy);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    g.setStroke(stroke);
+		    g.translate(dx, dy);
 		    g.drawPolygon(pc[i].p);
+		    g.translate(-dx, -dy);
 		    g.setStroke(stdS);
 		}
 		else {
+		    g.translate(dx, dy);
 		    g.drawPolygon(pc[i].p);
+		    g.translate(-dx, -dy);
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
-	if (pc[i].lcr >1){
-	    if (filled){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	if (pc[i].lcr > 1){//repaint only if object is visible
+	    if (filled) {
 		g.setColor(this.color);
+		g.translate(dx, dy);
 		g.fillPolygon(pc[i].lp);
+		g.translate(-dx, -dy);
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
 		    g.setStroke(stroke);
+		    g.translate(dx, dy);
 		    g.drawPolygon(pc[i].lp);
+		    g.translate(-dx, -dy);
 		    g.setStroke(stdS);
 		}
 		else {
+		    g.translate(dx, dy);
 		    g.drawPolygon(pc[i].lp);
+		    g.translate(-dx, -dy);
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }
 

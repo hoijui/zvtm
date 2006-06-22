@@ -174,14 +174,14 @@ public class VPoint extends Glyph implements Cloneable {
     /**draw glyph 
      *@param i camera index in the virtual space
      */
-    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){  //no text for now
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);  
-	g.fillRect(pc[i].cx,pc[i].cy,1,1);
+	g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
     }
 
-    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);  
-	g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+	g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
     }
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
