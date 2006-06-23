@@ -184,7 +184,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
 	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
-//   	buildGrid();
+   	buildGrid();
 	logm = new AbstractTaskLogManager(this);
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
@@ -311,34 +311,34 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     /*incremental display of the grid*/
     void showGridLevel(int level){
-// 	if (level > GRID_DEPTH || level < -1 || level == currentLevel){
-// 	    return;
-// 	}
-// 	if (level < currentLevel){
-// 	    for (int i=level+1;i<=currentLevel;i++){
-// 		for (int j=0;j<hGridLevels[i].length;j++){
-// 		    hGridLevels[i][j].setVisible(false);
-// 		}
-// 	    }
-// 	    for (int i=level+1;i<=currentLevel;i++){
-// 		for (int j=0;j<vGridLevels[i].length;j++){
-// 		    vGridLevels[i][j].setVisible(false);
-// 		}
-// 	    }
-// 	}
-// 	else if (level > currentLevel){
-// 	    for (int i=currentLevel+1;i<=level;i++){
-// 		for (int j=0;j<hGridLevels[i].length;j++){
-// 		    hGridLevels[i][j].setVisible(true);
-// 		}
-// 	    }
-// 	    for (int i=currentLevel+1;i<=level;i++){
-// 		for (int j=0;j<vGridLevels[i].length;j++){
-// 		    vGridLevels[i][j].setVisible(true);
-// 		}
-// 	    }
-// 	}
-// 	currentLevel = level;
+	if (level > GRID_DEPTH || level < -1 || level == currentLevel){
+	    return;
+	}
+	if (level < currentLevel){
+	    for (int i=level+1;i<=currentLevel;i++){
+		for (int j=0;j<hGridLevels[i].length;j++){
+		    hGridLevels[i][j].setVisible(false);
+		}
+	    }
+	    for (int i=level+1;i<=currentLevel;i++){
+		for (int j=0;j<vGridLevels[i].length;j++){
+		    vGridLevels[i][j].setVisible(false);
+		}
+	    }
+	}
+	else if (level > currentLevel){
+	    for (int i=currentLevel+1;i<=level;i++){
+		for (int j=0;j<hGridLevels[i].length;j++){
+		    hGridLevels[i][j].setVisible(true);
+		}
+	    }
+	    for (int i=currentLevel+1;i<=level;i++){
+		for (int j=0;j<vGridLevels[i].length;j++){
+		    vGridLevels[i][j].setVisible(true);
+		}
+	    }
+	}
+	currentLevel = level;
     }
 
     void updateGridLevel(long visibleSize){
@@ -594,42 +594,50 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     void triggerDM(int x, int y){
 	if (dmPortal != null){// portal is active, destroy it it
+	    killDM();
+	}
+	else {// portal not active, create it
+	    createDM(x, y);
+	}
+    }
+
+    void createDM(int x, int y){
+	dmPortal = new DraggableCameraPortal(x-DM_PORTAL_WIDTH/2, y-DM_PORTAL_HEIGHT/2, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
+	dmPortal.setPortalEventHandler((PortalEventHandler)eh);
+	dmPortal.setBackgroundColor(Color.LIGHT_GRAY);
+	vsm.addPortal(dmPortal, demoView);
+	dmPortal.setBorder(Color.RED);
+	Location l = dmPortal.getSeamlessView(demoCamera);
+	portalCamera.moveTo(l.vx, l.vy);
+	portalCamera.setAltitude(l.alt-3*(l.alt+portalCamera.getFocal())/4.0f);
+	updateDMRegion();
+	mainVS.show(dmRegion);
+	paintLinks = true;
+    }
+
+    void killDM(){
+	vsm.destroyPortal(dmPortal);
+	dmPortal = null;
+	mainVS.hide(dmRegion);
+	paintLinks = false;
+	((AbstractTaskDMEventHandler)eh).inPortal = false;	
+    }
+    
+    void meetDM(){
+	if (dmPortal != null){
+	    Vector data = new Vector();
+	    data.add(new Float(portalCamera.getAltitude()-demoCamera.getAltitude()));
+	    // take dragmag's center as the context's center
+	    data.add(new LongPoint(portalCamera.posx-demoCamera.posx, portalCamera.posy-demoCamera.posy)); 
+	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,data,demoCamera.getID());
 	    vsm.destroyPortal(dmPortal);
 	    dmPortal = null;
 	    mainVS.hide(dmRegion);
 	    paintLinks = false;
 	    ((AbstractTaskDMEventHandler)eh).inPortal = false;
 	}
-	else {// portal not active, create it
-	    dmPortal = new DraggableCameraPortal(x-DM_PORTAL_WIDTH/2, y-DM_PORTAL_HEIGHT/2, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
-	    dmPortal.setPortalEventHandler((PortalEventHandler)eh);
-	    dmPortal.setBackgroundColor(Color.LIGHT_GRAY);
-	    vsm.addPortal(dmPortal, demoView);
- 	    dmPortal.setBorder(Color.RED);
-	    Location l = dmPortal.getSeamlessView(demoCamera);
-	    portalCamera.moveTo(l.vx, l.vy);
-	    portalCamera.setAltitude(l.alt-3*(l.alt+portalCamera.getFocal())/4.0f);
-	    updateDMRegion();
-	    mainVS.show(dmRegion);
-	    paintLinks = true;
-	}
     }
     
-   void meetDM(){
-       if (dmPortal != null){
-	   Vector data = new Vector();
-	   data.add(new Float(portalCamera.getAltitude()-demoCamera.getAltitude()));
-	   // take dragmag's center as the context's center
-	   data.add(new LongPoint(portalCamera.posx-demoCamera.posx, portalCamera.posy-demoCamera.posy)); 
-	   vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,data,demoCamera.getID());
-	   vsm.destroyPortal(dmPortal);
-	   dmPortal = null;
-	   mainVS.hide(dmRegion);
-	   paintLinks = false;
-	   ((AbstractTaskDMEventHandler)eh).inPortal = false;
-       }
-    }
-
     void altitudeChanged(){
 	long[] wnes = demoView.getVisibleRegion(demoCamera);
 	updateGridLevel(Math.max(wnes[2]-wnes[0], wnes[1]-wnes[3]));

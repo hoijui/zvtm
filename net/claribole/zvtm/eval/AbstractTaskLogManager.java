@@ -43,6 +43,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     static final String PSBTC = "PRESS SPACE BAR TO CONTINUE";
     static final String PSTS = "PRESS S TO START";
+    static final String INTPW = "Initializing next trial. Please wait...";
     static final String EOS = "END OF SESSION";
     String msg = PSBTC;
 
@@ -299,8 +300,11 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    endSession();
 	}
 	else {// there it at least one trial left
-	    System.gc();
+	    if (application.dmPortal != null){application.killDM();}
+	    msg = INTPW;
 	    application.demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
+	    application.demoView.repaintNow();
+	    System.gc();
 	}
     }
 
