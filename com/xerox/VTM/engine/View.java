@@ -122,8 +122,8 @@ public abstract class View {
     /**triggers the mouseMoved method in ViewEventHandler when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
     boolean notifyMouseMoved=false;
 
-    /**hooks for Java2D painting in ZVTM views*/
-    Java2DPainter[] painters = new Java2DPainter[3];
+    /**hooks for Java2D painting in ZVTM views (BACKGROUND, FOREGROUND, AFTER_DISTORTION, AFTER_PORTALS)*/
+    Java2DPainter[] painters = new Java2DPainter[4];
 
     /**
      * get the ViewPanel associated with this view
@@ -496,7 +496,7 @@ public abstract class View {
 
     /** set a paint method (containing Java2D paint instructions) that will be called each time the view is repainted
      *@param p the paint method encapsulated in an object implementing the Java2DPainter interface (pass null to unset an existing one)
-     *@param g one of Java2DPainter.BACKGROUND, Java2DPainter.FOREGROUND, Java2DPainter.AFTER_DISTORTION depending on whether the method should be called before or after ZVTM glyphs have been painted, or after distortion by a lens (FOREGROUND and AFTER_DISTORTION are equivalent in the absence of lens)
+     *@param g one of Java2DPainter.BACKGROUND, Java2DPainter.FOREGROUND, Java2DPainter.AFTER_DISTORTION, Java2DPainter.AFTER_PORTALS depending on whether the method should be called before or after ZVTM glyphs have been painted, after distortion by a lens (FOREGROUND and AFTER_DISTORTION are equivalent in the absence of lens), or after portals have been painted
      */
     public void setJava2DPainter(Java2DPainter p, short g){
 	painters[g] = p;
@@ -504,7 +504,7 @@ public abstract class View {
     }
 
     /** get the paint method (containing Java2D paint instructions) that will be called each time the view is repainted
-     *@param g one of Java2DPainter.BACKGROUND, Java2DPainter.FOREGROUND, Java2DPainter.AFTER_DISTORTION depending on whether the method should be called before or after ZVTM glyphs have been painted, or after distortion by a lens (FOREGROUND and AFTER_DISTORTION are equivalent in the absence of lens)
+     *@param g one of Java2DPainter.BACKGROUND, Java2DPainter.FOREGROUND, Java2DPainter.AFTER_DISTORTION, Java2DPainter.AFTER_PORTALS depending on whether the method should be called before or after ZVTM glyphs have been painted, after distortion by a lens (FOREGROUND and AFTER_DISTORTION are equivalent in the absence of lens), or after portals have been painted
      *@return p the paint method encapsulated in an object implementing the Java2DPainter interface (null if not set)
      */
     public Java2DPainter getJava2DPainter(short g){

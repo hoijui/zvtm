@@ -306,6 +306,14 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
 					    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
 					}
+					// paint portals associated with this view
+					for (int i=0;i<parent.portals.length;i++){
+					    parent.portals[i].paint(g2d, size.width, size.height);
+					}
+					// call to after-portals java2d painting hook
+					if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+					    parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
+					}
 				    }
 				}
 				else {// standard drawing, with no lens
@@ -368,16 +376,21 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					    }
 					}
 				    }
-				    // paint portals associated with this view
-				    for (int i=0;i<parent.portals.length;i++){
-					parent.portals[i].paint(g2d, size.width, size.height);
-				    }
 				    // call to foreground java2d painting hook
 				    if (parent.painters[Java2DPainter.FOREGROUND] != null){
 					parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
 				    }
+				    // call to after-distortion java2d painting hook
 				    if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
 					parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
+				    }
+				    // paint portals associated with this view
+				    for (int i=0;i<parent.portals.length;i++){
+					parent.portals[i].paint(g2d, size.width, size.height);
+				    }
+				    // call to after-portals java2d painting hook
+				    if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+					parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
 				    }
 				}
 				if (inside){//deal with mouse glyph only if mouse cursor is inside this window

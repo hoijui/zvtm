@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.lens.Lens;
 
 /**
@@ -194,7 +195,9 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 				g2d.setBackground(backColor);
 				g2d.clearRect(0,0,getWidth(),getHeight());
 				// call to background java2d painting hook
-				if (parent.painters[0] != null){parent.painters[0].paint(g2d, size.width, size.height);}
+				if (parent.painters[Java2DPainter.BACKGROUND] != null){
+				    parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
+				}
 				//begin actual drawing here
 				if (lens != null){// drawing with a lens
  				    synchronized(lens){// prevents flickering when the lens parameters are being animated (caused by concurent access)
@@ -276,6 +279,10 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 						}
 					    }
 					}
+					// call to foreground java2d painting hook
+					if (parent.painters[Java2DPainter.FOREGROUND] != null){
+					    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
+					}
 					try {
 					    lens.transform(buffImg);
 					}
@@ -285,6 +292,17 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 					catch (NullPointerException ex2){
 					    // this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
 					    if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
+					}
+					if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
+					    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
+					}
+					// paint portals associated with this view
+					for (int i=0;i<parent.portals.length;i++){
+					    parent.portals[i].paint(g2d, size.width, size.height);
+					}
+					// call to after-portals java2d painting hook
+					if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+					    parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
 					}
 				    }
 				}
@@ -343,14 +361,26 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 							}
 						    }
 						}
-						// call to foreground java2d painting hook
-						if (parent.painters[1] != null){parent.painters[1].paint(g2d, size.width, size.height);}
 					    }
 					}
 				    }
+				    // call to foreground java2d painting hook
+				    if (parent.painters[Java2DPainter.FOREGROUND] != null){
+					parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
+				    }
+				    // call to after-distortion java2d painting hook
+				    if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
+					parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
+				    }
+				    // paint portals associated with this view
+				    for (int i=0;i<parent.portals.length;i++){
+					parent.portals[i].paint(g2d, size.width, size.height);
+				    }
+				    // call to after-portals java2d painting hook
+				    if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+					parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
+				    }
 				}
-				// call to foreground java2d painting hook
-				if (parent.painters[1] != null){parent.painters[1].paint(g2d, size.width, size.height);}
 				if (inside){//deal with mouse glyph only if mouse cursor is inside this window
 				    try {
 					parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys

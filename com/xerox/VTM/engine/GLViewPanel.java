@@ -20,6 +20,8 @@ import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
+import net.claribole.zvtm.engine.Java2DPainter;
+
 /**
  * Each view runs in its own thread - uses OpenGL acceletation provided by J2SE 5.0<br>
  * The use of GLViewPanel requires the following Java property: -Dsun.java2d.opengl=true
@@ -150,7 +152,9 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		g2d.setBackground(backColor);
 		g2d.clearRect(0,0,getWidth(),getHeight());
 		// call to background java2d painting hook
-		if (parent.painters[0] != null){parent.painters[0].paint(g2d, (int)viewW, (int)viewH);}
+		if (parent.painters[Java2DPainter.BACKGROUND] != null){
+		    parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
+		}
 		//begin actual drawing here
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
 		    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
@@ -185,7 +189,21 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    }
 		}
 		// call to foreground java2d painting hook
-		if (parent.painters[1] != null){parent.painters[1].paint(g2d, (int)viewW, (int)viewH);}
+		if (parent.painters[Java2DPainter.FOREGROUND] != null){
+		    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
+		}
+		// call to after-distortion java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
+		    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
+		}
+		// paint portals associated with this view
+		for (int i=0;i<parent.portals.length;i++){
+		    parent.portals[i].paint(g2d, size.width, size.height);
+		}
+		// call to after-portals java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
+		}
 		if (inside){//deal with mouse glyph only if mouse cursor is inside this window
 		    try {
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
