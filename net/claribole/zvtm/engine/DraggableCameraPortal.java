@@ -33,7 +33,7 @@ import com.xerox.VTM.glyphs.Glyph;
 public class DraggableCameraPortal extends CameraPortal {
 
     /**Color of horizontal bar used to drag the portal.*/
-    Color barColor = Color.YELLOW;
+    Color barColor = Color.RED;
     
     /**Height of horizontal bar used to drag the portal.*/
     int barHeight = 10;
