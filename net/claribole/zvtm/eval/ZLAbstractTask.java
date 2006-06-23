@@ -85,8 +85,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     /* DragMag */
     static final int DM_PORTAL_WIDTH = 200;
     static final int DM_PORTAL_HEIGHT = 200;
-    static final int DM_PORTAL_INITIAL_X_OFFSET = 100;
-    static final int DM_PORTAL_INITIAL_Y_OFFSET = 100;
+    static final int DM_PORTAL_INITIAL_X_OFFSET = 200;
+    static final int DM_PORTAL_INITIAL_Y_OFFSET = 200;
     DraggableCameraPortal dmPortal;
     Camera portalCamera;
     VRectangle dmRegion;
@@ -598,6 +598,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	    dmPortal = null;
 	    mainVS.hide(dmRegion);
 	    paintLinks = false;
+	    ((AbstractTaskDMEventHandler)eh).inPortal = false;
 	}
 	else {// portal not active, create it
 	    dmPortal = new DraggableCameraPortal(x-DM_PORTAL_WIDTH/2, y-DM_PORTAL_HEIGHT/2, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
@@ -607,13 +608,27 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
  	    dmPortal.setBorder(Color.RED);
 	    Location l = dmPortal.getSeamlessView(demoCamera);
 	    portalCamera.moveTo(l.vx, l.vy);
-	    portalCamera.setAltitude(l.alt-2*(l.alt+portalCamera.getFocal())/3.0f);
+	    portalCamera.setAltitude(l.alt-3*(l.alt+portalCamera.getFocal())/4.0f);
 	    updateDMRegion();
 	    mainVS.show(dmRegion);
 	    paintLinks = true;
 	}
     }
-
+    
+   void meetDM(){
+       if (dmPortal != null){
+	   Vector data = new Vector();
+	   data.add(new Float(portalCamera.getAltitude()-demoCamera.getAltitude()));
+	   // take dragmag's center as the context's center
+	   data.add(new LongPoint(portalCamera.posx-demoCamera.posx, portalCamera.posy-demoCamera.posy)); 
+	   vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,data,demoCamera.getID());
+	   vsm.destroyPortal(dmPortal);
+	   dmPortal = null;
+	   mainVS.hide(dmRegion);
+	   paintLinks = false;
+	   ((AbstractTaskDMEventHandler)eh).inPortal = false;
+       }
+    }
 
     void altitudeChanged(){
 	long[] wnes = demoView.getVisibleRegion(demoCamera);
