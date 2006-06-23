@@ -119,10 +119,6 @@ public class DragMagDemo implements Java2DPainter {
     }
 
     VRectangle dmRegion;
-    VSegment dmLinkNW;
-    VSegment dmLinkNE;
-    VSegment dmLinkSW;
-    VSegment dmLinkSE;
 
     void initDM(){
 	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
@@ -162,9 +158,9 @@ public class DragMagDemo implements Java2DPainter {
  	    portal.setBorder(Color.RED);
 	    Location l = portal.getSeamlessView(demoCamera);
 	    portalCamera.moveTo(l.vx, l.vy);
-	    portalCamera.setAltitude(l.alt);
-	    Float alt=new Float(-2*(portalCamera.getAltitude()+portalCamera.getFocal())/3.0f);
-	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,portalCamera.getID());
+	    portalCamera.setAltitude(l.alt-2*(l.alt+portalCamera.getFocal())/3.0f);
+// 	    Float alt=new Float(-2*(portalCamera.getAltitude()+portalCamera.getFocal())/3.0f);
+// 	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,portalCamera.getID());
 	    updateDMRegion();
 	    mainVS.show(dmRegion);
 	    paintLinks = true;
