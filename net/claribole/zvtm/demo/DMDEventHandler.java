@@ -73,8 +73,10 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler, Animation
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	lastJPX = jpx;
-	lastJPY = jpy;
+	if (inPortal || v.lastGlyphEntered() == application.dmRegion){
+	    application.meetDM();
+	    dmRegionStickedToMouse = false;
+	}
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}

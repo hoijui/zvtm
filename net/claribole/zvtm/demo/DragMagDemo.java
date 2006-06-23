@@ -149,6 +149,7 @@ public class DragMagDemo implements Java2DPainter {
 	    portal = null;
 	    mainVS.hide(dmRegion);
 	    paintLinks = false;
+	    eh.inPortal = false;
 	}
 	else {// portal not active, create it
 	    portal = new DraggableCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
@@ -177,6 +178,21 @@ public class DragMagDemo implements Java2DPainter {
 
     void updateDMWindow(){
 	portalCamera.moveTo(dmRegion.vx, dmRegion.vy);
+    }
+
+   void meetDM(){
+       if (portal != null){
+	   Vector data = new Vector();
+	   data.add(new Float(portalCamera.getAltitude()-demoCamera.getAltitude()));
+	   // take dragmag's center as the context's center
+	   data.add(new LongPoint(portalCamera.posx-demoCamera.posx, portalCamera.posy-demoCamera.posy)); 
+	   vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,data,demoCamera.getID());
+	   vsm.destroyPortal(portal);
+	   portal = null;
+	   mainVS.hide(dmRegion);
+	   paintLinks = false;
+	   eh.inPortal = false;
+       }
     }
 
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
