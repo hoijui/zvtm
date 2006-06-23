@@ -11,7 +11,7 @@
 package net.claribole.zvtm.eval;
 
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRoundRect;
+import com.xerox.VTM.glyphs.ZRoundRect;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 
@@ -19,8 +19,8 @@ class AbstractRegion {
     
     int level;
     
-    VRoundRect bounds;  // rectangle representing the region itself (same Glyph as the target of parent region)
-    VRoundRect target;  // rectangle representing the target within this region (same Glyph as the bounds of the child region)
+    ZRoundRect bounds;  // rectangle representing the region itself (same Glyph as the target of parent region)
+    ZRoundRect target;  // rectangle representing the target within this region (same Glyph as the bounds of the child region)
     VRectangle[] distractors; // false targets populating the region
     
     // null if none
@@ -32,7 +32,7 @@ class AbstractRegion {
 	this.level = l;
     }
     
-    void setTarget(VRoundRect g){
+    void setTarget(ZRoundRect g){
 	this.target = g;
     }
 
@@ -40,7 +40,7 @@ class AbstractRegion {
 	this.distractors = gl;
     }
 
-    void setBounds(VRoundRect b){
+    void setBounds(ZRoundRect b){
 	bounds = b;
 	if (childRegion != null){
 	    childRegion.setBounds(target);
@@ -71,7 +71,7 @@ class AbstractRegion {
 	}
     }
 
-    VRoundRect getDeepestTarget(){
+    ZRoundRect getDeepestTarget(){
 	return (childRegion != null) ? childRegion.getDeepestTarget() : target;
     }
 

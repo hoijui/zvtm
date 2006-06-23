@@ -51,7 +51,7 @@ class AbstractWorldGenerator {
     int[] DENSITIES = {5, 10, 20, 10, 5, 20, 5, 20 ,10};
     int trialCount;
 
-    static final int ROUND_CORNER_RATIO = 4;
+    static final double ROUND_CORNER_RATIO = 5;
 
     AbstractRegion root; // region at level 0
 
@@ -77,8 +77,8 @@ class AbstractWorldGenerator {
 			  "0" + CSV_SEP +
 			  (widthByLevel[0]) + CSV_SEP +
 			  (widthByLevel[0]) + CSV_SEP +
-			  ((int)widthByLevel[0]/ROUND_CORNER_RATIO) + CSV_SEP +
-			  ((int)widthByLevel[0]/ROUND_CORNER_RATIO));
+			  ((int)Math.round(widthByLevel[0]/ROUND_CORNER_RATIO)) + CSV_SEP +
+			  ((int)Math.round(widthByLevel[0]/ROUND_CORNER_RATIO)));
 		bwt.newLine();
 		populateRegion(0, 0, widthByLevel[0], widthByLevel[0], depth+1);
 	    }
@@ -137,8 +137,8 @@ class AbstractWorldGenerator {
 		  vy + CSV_SEP +
 		  widthByLevel[depth] + CSV_SEP +
 		  widthByLevel[depth] + CSV_SEP +
-		  ((int)widthByLevel[depth]/ROUND_CORNER_RATIO) + CSV_SEP +
-		  ((int)widthByLevel[depth]/ROUND_CORNER_RATIO));
+		  ((int)Math.round(widthByLevel[depth]/ROUND_CORNER_RATIO)) + CSV_SEP +
+		  ((int)Math.round(widthByLevel[depth]/ROUND_CORNER_RATIO)));
 	bwt.newLine();
 	// populate target
 	// (unless we have reached TREE_DEPTH)

@@ -16,7 +16,7 @@ import java.util.Vector;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRoundRect;
+import com.xerox.VTM.glyphs.ZRoundRect;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 
@@ -32,7 +32,7 @@ class AbstractTrialInfo {
 	density = d;
 	String line = null;
 	Vector distractors = new Vector();
-	VRoundRect target = null;
+	ZRoundRect target = null;
 	VRectangle distractor = null;
 	String[] info;
 	long vx, vy, vw, vh;
@@ -52,7 +52,7 @@ class AbstractTrialInfo {
 		if (info.length == 6){
 		    int rcw = Integer.parseInt(info[4]);
 		    int rch = Integer.parseInt(info[5]);
-		    target = new VRoundRect(vx, vy, 0, vw, vh, Color.WHITE, rcw, rch);
+		    target = new ZRoundRect(vx, vy, 0, vw, vh, Color.WHITE, rcw, rch);
 		    target.setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
 		}
 		else {// info.length == 4
@@ -63,12 +63,12 @@ class AbstractTrialInfo {
 	    }
 	}
 	root = lastRegion;
-	root.setBounds(new VRoundRect(root.target.vx, root.target.vy, 0,
+	root.setBounds(new ZRoundRect(root.target.vx, root.target.vy, 0,
 				      root.target.getWidth()*10, root.target.getHeight()*10,
 				      Color.RED, 1, 1));
     }
 
-    AbstractRegion buildLevel(int depth, VRoundRect target, Vector distractors, AbstractRegion cr){
+    AbstractRegion buildLevel(int depth, ZRoundRect target, Vector distractors, AbstractRegion cr){
 	if (depth == 0){
 	    if (!distractors.isEmpty()){
 		System.err.println("Error building level "+depth+" for trial "+trial+": "+distractors.size()+" distractors instead of "+(density-1));

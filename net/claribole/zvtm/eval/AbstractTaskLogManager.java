@@ -29,7 +29,7 @@ import java.io.OutputStreamWriter;
 import java.util.Vector;
 
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRoundRect;
+import com.xerox.VTM.glyphs.ZRoundRect;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 class AbstractTaskLogManager implements Java2DPainter {
@@ -94,7 +94,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     boolean trialStarted = false;
 
     AbstractTrialInfo[] trials;
-    VRoundRect deepestTarget;
+    ZRoundRect deepestTarget;
 
     AbstractTaskInstructionsManager im;
 
