@@ -100,6 +100,7 @@ public class DragMagDemo implements Java2DPainter {
 	demoView.setNotifyMouseMoved(true);
 	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 	portalCamera = vsm.addCamera(mainVSname);
+	vsm.animator.setAnimationListener(eh);
 	initMap();
 	initDM();
 	getGlobalView(false);
@@ -156,6 +157,7 @@ public class DragMagDemo implements Java2DPainter {
 	else {// portal not active, create it
 	    portal = new DraggableCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
 	    portal.setPortalEventHandler(eh);
+	    portal.setBackgroundColor(Color.LIGHT_GRAY);
 	    vsm.addPortal(portal, demoView);
  	    portal.setBorder(Color.RED);
 	    Location l = portal.getSeamlessView(demoCamera);
@@ -170,10 +172,15 @@ public class DragMagDemo implements Java2DPainter {
     }
 
     void updateDMRegion(){
+	if (portal == null){return;}
 	long[] wnes = portal.getVisibleRegion();
-	dmRegion.moveTo((wnes[0]+wnes[2]) / 2, (wnes[1]+wnes[3]) / 2);
-	dmRegion.setWidth((wnes[2]-wnes[0]) / 2);
-	dmRegion.setHeight((wnes[1]-wnes[3]) / 2);
+	dmRegion.moveTo(portalCamera.posx, portalCamera.posy);
+	dmRegion.setWidth((wnes[2]-wnes[0]) / 2 + 1);
+	dmRegion.setHeight((wnes[1]-wnes[3]) / 2 + 1);
+    }
+
+    void updateDMWindow(){
+	portalCamera.moveTo(dmRegion.vx, dmRegion.vy);
     }
 
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;

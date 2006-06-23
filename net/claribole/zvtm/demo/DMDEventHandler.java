@@ -21,13 +21,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-class DMDEventHandler implements ViewEventHandler, PortalEventHandler {
+class DMDEventHandler implements ViewEventHandler, PortalEventHandler, AnimationListener {
 
     DragMagDemo application;
 
     boolean dcamStickedToMouse = false;
     boolean pcamStickedToMouse = false;
     boolean portalStickedToMouse = false;
+    boolean dmRegionStickedToMouse = false;
 
     static final int PORTAL_INITIAL_X_OFFSET = 200;
     static final int PORTAL_INITIAL_Y_OFFSET = 200;
@@ -51,7 +52,13 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler {
 	    }
 	}
 	else {
-	    dcamStickedToMouse = true;
+	    if (v.lastGlyphEntered() == application.dmRegion){
+		dmRegionStickedToMouse = true;
+		application.vsm.stickToMouse(application.dmRegion);
+	    }
+	    else {
+		dcamStickedToMouse = true;
+	    }
 	}
     }
 
@@ -59,6 +66,10 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler {
 	portalStickedToMouse = false;
 	dcamStickedToMouse = false;
 	pcamStickedToMouse = false;
+	if (dmRegionStickedToMouse){
+	    application.vsm.unstickFromMouse();
+	    dmRegionStickedToMouse = false;
+	}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -102,6 +113,7 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler {
 						      Math.round(a*(jpy-lastJPY)));
 			lastJPX = jpx;
 			lastJPY = jpy;
+			cameraMoved();
 		    }
 		}
 	    }
@@ -117,26 +129,40 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler {
 			lastJPY = jpy;
 		    }
 		}
+		else if (dmRegionStickedToMouse){
+		    application.updateDMWindow();
+		}
 	    }
 	}
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-	Camera c = application.demoCamera;
+	Camera c = (inPortal) ? application.portalCamera : application.demoCamera;
 	float a = (c.focal+Math.abs(c.altitude)) / c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
 	}
+	application.updateDMRegion();
+	application.vsm.repaintNow();
     }
 
-    public void enterGlyph(Glyph g){}
-    
-    public void exitGlyph(Glyph g){}
+    public void enterGlyph(Glyph g){
+	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+    }
+
+    public void exitGlyph(Glyph g){
+	if (g.isSelected()){
+	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
+	}
+	else {
+	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	}
+    }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
@@ -176,6 +202,10 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler {
 	inPortal = false;
 	((CameraPortal)p).setBorder(Color.RED);
 	application.vsm.repaintNow();
+    }
+
+    public void cameraMoved(){
+	application.updateDMRegion();
     }
 
 }
