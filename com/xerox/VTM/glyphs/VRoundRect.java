@@ -281,7 +281,12 @@ public class VRoundRect extends Glyph implements RectangularShape  {
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    if (filled) {
 		g.setColor(this.color);
-		g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
+		if (pc[i].aw > 4 || pc[i].ah > 4){
+		    g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
+		}
+		else {
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		}
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
