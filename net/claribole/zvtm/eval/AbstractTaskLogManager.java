@@ -301,6 +301,9 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
 	else {// there it at least one trial left
 	    if (application.dmPortal != null){application.killDM();}
+	    if (application.lens != null){
+		application.killLens();
+	    }
 	    msg = INTPW;
 	    application.demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 	    application.demoView.repaintNow();
@@ -385,11 +388,14 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     void lensPositionChanged(boolean write){
-	lensxS = Integer.toString(application.lens.lx);
-	lensyS = Integer.toString(application.lens.ly);
-	if (write && trialStarted){
-	    writeCinematic();
+	try {
+	    lensxS = Integer.toString(application.lens.lx);
+	    lensyS = Integer.toString(application.lens.ly);
+	    if (write && trialStarted){
+		writeCinematic();
+	    }
 	}
+	catch (NullPointerException ex){System.err.println("Did not write cienmatic info");ex.printStackTrace();}
     }
 
     /*Java2DPainter interface*/

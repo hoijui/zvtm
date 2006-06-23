@@ -31,6 +31,7 @@ class AbstractWorldGenerator {
     static long HALF_WORLD_WIDTH;
     static long HALF_WORLD_HEIGHT;
 
+    static final Color DEEPEST_LEVEL_COLOR = Color.BLUE;
     static long[] widthByLevel;
     static Color[] COLOR_BY_LEVEL;
     static {
@@ -41,6 +42,7 @@ class AbstractWorldGenerator {
 	    widthByLevel[i] = SMALLEST_ELEMENT_WIDTH * Math.round(Math.pow(MUL_FACTOR, (TREE_DEPTH-i-1)));
 	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, (i+1)/((float)TREE_DEPTH));
 	}
+	COLOR_BY_LEVEL[COLOR_BY_LEVEL.length-1] = DEEPEST_LEVEL_COLOR;
 	WORLD_WIDTH = widthByLevel[0] * 2;
 	WORLD_HEIGHT = WORLD_WIDTH;
 	HALF_WORLD_WIDTH = WORLD_WIDTH / 2;

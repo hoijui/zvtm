@@ -23,11 +23,7 @@ public class AbstractTaskZOP2LensAction implements PostAnimationAction {
     
     public void animationEnded(Object target, short type, String dimension){
 	if (type == PostAnimationAction.LENS){
-	    application.vsm.getOwningView(((Lens)target).getID()).setLens(null);
-	    ((Lens)target).dispose();
-	    application.setMagFactor(ZLAbstractTask.DEFAULT_MAG_FACTOR);
-	    application.lens = null;
-	    application.setLens(WorldTaskEventHandler.NO_LENS);
+	    application.killLens();
 	    application.altitudeChanged();
 	}
     }

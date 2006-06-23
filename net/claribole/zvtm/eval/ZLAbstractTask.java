@@ -35,7 +35,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     /* max dimensions of ZVTM view */
     static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 800;
+    static final int VIEW_MAX_H = 1024;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
@@ -175,17 +175,17 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	cameras.add(demoCamera);
 	portalCamera = vsm.addCamera(mainVSname);
 	demoView = vsm.addExternalView(cameras, techniqueName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
+	logm = new AbstractTaskLogManager(this);
+	demoView.setEventHandler(eh);
 	demoView.setVisibilityPadding(vispad);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
 	demoView.setLocation(VIEW_X, VIEW_Y);
 	robot.mouseMove(VIEW_X+VIEW_W/2, VIEW_Y+VIEW_H/2);
 	updatePanelSize();
-	demoView.setEventHandler(eh);
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
 	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
    	buildGrid();
-	logm = new AbstractTaskLogManager(this);
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
@@ -534,6 +534,14 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	// make lens disappear (killing anim)
 	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
 					 lens.getID(), new AbstractTaskZOP2LensAction(this));
+    }
+
+    void killLens(){
+	vsm.getOwningView(lens.getID()).setLens(null);
+	lens.dispose();
+	setMagFactor(ZLAbstractTask.DEFAULT_MAG_FACTOR);
+	lens = null;
+	setLens(WorldTaskEventHandler.NO_LENS);
     }
 
     void setMagFactor(double m){
