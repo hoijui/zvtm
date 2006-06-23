@@ -300,6 +300,10 @@ public class VirtualSpace {
      *@see #show(Glyph g)*/
     public void hide(Glyph g){
 	removeGlyphFromDrawingList(g);
+	View v;
+	for (int i=0;i<vsm.allViews.length;i++){
+	    vsm.allViews[i].mouse.removeGlyphFromList(g);
+	}
 	vsm.repaintNow();
     }
 
