@@ -49,7 +49,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	    }
 	}
 	else {
-	    if (v.lastGlyphEntered() == application.dmRegion){
+	    if (inDMRegion(v.getGlyphsUnderMouseList())){
 		dmRegionStickedToMouse = true;
 		application.vsm.stickToMouse(application.dmRegion);
 	    }
@@ -72,7 +72,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
-	if (inPortal || v.lastGlyphEntered() == application.dmRegion){
+	if (inPortal || inDMRegion(v.getGlyphsUnderMouseList())){
 	    application.meetDM();
 	    dmRegionStickedToMouse = false;
 	}
@@ -187,6 +187,13 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	inPortal = false;
 	((CameraPortal)p).setBorder(Color.RED);
 	application.vsm.repaintNow();
+    }
+
+    boolean inDMRegion(Glyph[] guml){
+	for (int i=0;i<guml.length;i++){
+	    if (guml[i] == application.dmRegion){return true;}
+	}
+	return false;
     }
 
 }
