@@ -145,7 +145,7 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler, Animation
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
 	}
-	application.updateDMRegion();
+	cameraMoved();
 	application.vsm.repaintNow();
     }
 
