@@ -59,8 +59,11 @@ public class ZLAbstractTask implements PostAnimationAction {
     /* main view*/
     View demoView;
     Camera demoCamera;
+    Camera portalCamera;
     VirtualSpace mainVS;
     static String mainVSname = "mainSpace";
+
+    CameraPortal portal;
 
     /* misc. lens settings */
     Lens lens;
@@ -80,6 +83,10 @@ public class ZLAbstractTask implements PostAnimationAction {
     ZSegment[][] vGridLevels = new ZSegment[GRID_DEPTH+1][];
     Vector tmpHGrid;
     Vector tmpVGrid;
+
+    /* Portal */
+    static final int PORTAL_WIDTH = 100;
+    static final int PORTAL_HEIGHT = 100;
 
     static final Color HCURSOR_COLOR = new Color(200,48,48);
 
@@ -108,11 +115,13 @@ public class ZLAbstractTask implements PostAnimationAction {
     final static short PZ_TECHNIQUE = 1;  // Pan Zoom centered on view
     final static short RZ_TECHNIQUE = 2;  // region zooming
     final static short PZL_TECHNIQUE = 3;  // Pan Zoom + Probing Lenses
+    final static short DM_TECHNIQUE = 4;  // Drag Mag
 
     final static String PZ_TECHNIQUE_NAME = "Pan-Zoom";
     final static String ZL_TECHNIQUE_NAME = "Probing Lens";
     final static String RZ_TECHNIQUE_NAME = "Region Zoom";
     final static String PZL_TECHNIQUE_NAME = "Pan Zoom + Probing Lenses";
+    final static String DM_TECHNIQUE_NAME = "Drag Mag";
     short technique = ZL_TECHNIQUE;
     String techniqueName;
 
@@ -149,12 +158,17 @@ public class ZLAbstractTask implements PostAnimationAction {
  	    eh = new AbstractTaskPZLEventHandler(this);
 	    techniqueName = PZL_TECHNIQUE_NAME;
 	}
+	else if (this.technique == DM_TECHNIQUE){
+ 	    eh = new AbstractTaskDMEventHandler(this);
+	    techniqueName = DM_TECHNIQUE_NAME;
+	}
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
 	vsm.setZoomLimit(0);
 	demoCamera = vsm.addCamera(mainVSname);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
+	portalCamera = vsm.addCamera(mainVSname);
 	demoView = vsm.addExternalView(cameras, techniqueName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 	demoView.setVisibilityPadding(vispad);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
@@ -561,6 +575,27 @@ public class ZLAbstractTask implements PostAnimationAction {
 	}
     }
 
+    void switchPortal(int x, int y){
+	if (portal != null){// portal is active, destroy it it
+	    //XXX:animate its disappearance (use a postanimaction to call following lines)
+	    vsm.destroyPortal(portal);
+	    portal = null;
+	    vsm.repaintNow();
+	}
+	else {// portal not active, create it
+	    portal = new CameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
+	    portal.setPortalEventHandler(eh);
+	    vsm.addPortal(portal, demoView);
+ 	    portal.setBorder(Color.RED);
+	    Location l = portal.getSeamlessView(demoCamera);
+	    portalCamera.moveTo(l.vx, l.vy);
+	    portalCamera.setAltitude(l.alt);
+	    Float alt=new Float(-(portalCamera.getAltitude()+portalCamera.getFocal())/2.0f);
+	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,portalCamera.getID());
+	}
+    }
+
+
     void altitudeChanged(){
 	long[] wnes = demoView.getVisibleRegion(demoCamera);
 	updateGridLevel(Math.max(wnes[2]-wnes[0], wnes[1]-wnes[3]));
@@ -603,7 +638,7 @@ public class ZLAbstractTask implements PostAnimationAction {
     }
 
     public static void main(String[] args){
-	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE or RZ_TECHNIQUE for appropriate values
+	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE or RZ_TECHNIQUE for appropriate values
 	   Second argument is either 1 (show console for messages) or 0 (don't show it)
 	   Third argument is either 1 (show map manager monitor) or 0 (don't show it) */
 	short tech = (args.length > 0) ? Short.parseShort(args[0]) : ZL_TECHNIQUE;

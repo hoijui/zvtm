@@ -52,8 +52,9 @@ class AbstractTaskLogManager implements Java2DPainter {
     /* codes for technique */
     static final String ZL = "ZL";     // Probing lenses
     static final String PZ = "PZVC";   // Pan + Zoom centered on view
-    static final String RZ = "RZ";    // Region zooming
+    static final String RZ = "RZ";     // Region zooming
     static final String PZL = "PZL";   // Pan + Zoom + Probing Lenses
+    static final String DM = "DM";     // Drag mag
 
     /* codes for lens status */
     static final String NO_LENS = "0";
@@ -412,10 +413,11 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     static String getTechniqueName(short t){
 	switch (t){
-	case ZLAbstractTask.ZL_TECHNIQUE:{return "ZL";}
-	case ZLAbstractTask.PZ_TECHNIQUE:{return "PZVC";}
-	case ZLAbstractTask.RZ_TECHNIQUE:{return "RZ";}
-	case ZLAbstractTask.PZL_TECHNIQUE:{return "PZL";}
+	case ZLAbstractTask.ZL_TECHNIQUE:{return ZL;}
+	case ZLAbstractTask.PZ_TECHNIQUE:{return PZ;}
+	case ZLAbstractTask.RZ_TECHNIQUE:{return RZ;}
+	case ZLAbstractTask.PZL_TECHNIQUE:{return PZL;}
+	case ZLAbstractTask.DM_TECHNIQUE:{return DM;}
 	}
 	return "";
     }

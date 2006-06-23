@@ -11,22 +11,23 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 import java.util.Hashtable;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.*;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 
-class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
+class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, ComponentListener, PortalEventHandler {
 
     static final String DOT = ".";
     static final int NB_DEC = 3;
@@ -159,5 +160,13 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
     static final short LOWER_ALTITUDE = -1;
     static final short SAME_ALTITUDE = 0;
     static final short HIGHER_ALTITUDE = 1;
+
+
+    /**cursor enters portal*/
+    public void enterPortal(Portal p){((CameraPortal)p).setBorder(Color.WHITE);application.vsm.repaintNow();}
+
+    /**cursor exits portal*/
+    public void exitPortal(Portal p){((CameraPortal)p).setBorder(Color.RED);application.vsm.repaintNow();}
+
 
 }
