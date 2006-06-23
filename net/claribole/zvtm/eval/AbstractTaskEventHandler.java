@@ -27,7 +27,7 @@ import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
 
-class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, ComponentListener, PortalEventHandler {
+class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
 
     static final String DOT = ".";
     static final int NB_DEC = 3;
@@ -54,6 +54,10 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
     static final short ZOOMING_OUT = 1;
     static final short NOT_ZOOMING = 0;
     short zoomDirection = NOT_ZOOMING;
+
+    static final short LOWER_ALTITUDE = -1;
+    static final short SAME_ALTITUDE = 0;
+    static final short HIGHER_ALTITUDE = 1;
 
     long[] wnes; //region seen through camera
 
@@ -155,18 +159,8 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	if (application.logm.trialStarted){
 	    application.logm.writeCinematic();
 	}
+	application.updateDMRegion();
     }
-
-    static final short LOWER_ALTITUDE = -1;
-    static final short SAME_ALTITUDE = 0;
-    static final short HIGHER_ALTITUDE = 1;
-
-
-    /**cursor enters portal*/
-    public void enterPortal(Portal p){((CameraPortal)p).setBorder(Color.WHITE);application.vsm.repaintNow();}
-
-    /**cursor exits portal*/
-    public void exitPortal(Portal p){((CameraPortal)p).setBorder(Color.RED);application.vsm.repaintNow();}
 
 
 }

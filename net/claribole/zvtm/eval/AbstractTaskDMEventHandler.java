@@ -10,6 +10,7 @@
 
 package net.claribole.zvtm.eval;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
@@ -23,14 +24,13 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
-class AbstractTaskDMEventHandler extends AbstractTaskEventHandler {
+class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements PortalEventHandler, AnimationListener {
 
-    boolean cameraStickedToMouse = false;
-
-    int prevJPX,prevJPY;
-
-    static final int PORTAL_INITIAL_X_OFFSET = 100;
-    static final int PORTAL_INITIAL_Y_OFFSET = 100;
+    boolean dcamStickedToMouse = false;
+    boolean pcamStickedToMouse = false;
+    boolean portalStickedToMouse = false;
+    boolean dmRegionStickedToMouse = false;
+    boolean inPortal = false;
 
     AbstractTaskDMEventHandler(ZLAbstractTask appli){
 	super(appli);
@@ -40,12 +40,34 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	cameraStickedToMouse = true;
+	if (inPortal){
+	    if (application.dmPortal.coordInsideBar(jpx, jpy)){
+		portalStickedToMouse = true;
+	    }
+	    else {
+		pcamStickedToMouse = true;
+	    }
+	}
+	else {
+	    if (v.lastGlyphEntered() == application.dmRegion){
+		dmRegionStickedToMouse = true;
+		application.vsm.stickToMouse(application.dmRegion);
+	    }
+	    else {
+		dcamStickedToMouse = true;
+	    }
+	}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
-	cameraStickedToMouse = false;
+	portalStickedToMouse = false;
+	dcamStickedToMouse = false;
+	pcamStickedToMouse = false;
+	if (dmRegionStickedToMouse){
+	    application.vsm.unstickFromMouse();
+	    dmRegionStickedToMouse = false;
+	}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -60,12 +82,6 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	cameraStickedToMouse = true;
-    }
-
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	cameraStickedToMouse = false;
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -74,48 +90,78 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler {
 	lastJPY = jpy;
 	lastVX = v.getMouse().vx;
 	lastVY = v.getMouse().vy;
-	application.switchPortal(jpx+PORTAL_INITIAL_X_OFFSET, jpy+PORTAL_INITIAL_Y_OFFSET);
-	prevJPX = jpx;
-	prevJPY = jpy;
+	application.triggerDM(jpx+ZLAbstractTask.DM_PORTAL_INITIAL_X_OFFSET, jpy+ZLAbstractTask.DM_PORTAL_INITIAL_Y_OFFSET);
     }
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-	if (application.portal != null){
-	    application.portal.move(jpx-prevJPX, jpy-prevJPY);
-	    application.vsm.repaintNow();
-	    prevJPX = jpx;
-	    prevJPY = jpy;
-	}
-    }
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
- 	if (buttonNumber != 2){
-	    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
-	    synchronized(application.demoCamera){
-		if (cameraStickedToMouse){
-		    application.demoCamera.move(Math.round(a*(lastJPX-jpx)),
-						Math.round(a*(jpy-lastJPY)));
+	if (inPortal){
+	    if (buttonNumber == 1){
+		if (portalStickedToMouse){
+		    application.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
 		    lastJPX = jpx;
 		    lastJPY = jpy;
-		    cameraMoved();
+		    application.vsm.repaintNow();
+		}
+		else if (pcamStickedToMouse){
+		    float a = (application.portalCamera.focal+Math.abs(application.portalCamera.altitude))/application.portalCamera.focal;
+		    synchronized(application.portalCamera){
+			application.portalCamera.move(Math.round(a*(lastJPX-jpx)),
+						      Math.round(a*(jpy-lastJPY)));
+			lastJPX = jpx;
+			lastJPY = jpy;
+			cameraMoved();
+		    }
 		}
 	    }
- 	}
+	}
+	else {
+	    if (buttonNumber == 1){
+		if (dcamStickedToMouse){
+		    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
+		    synchronized(application.demoCamera){
+			application.demoCamera.move(Math.round(a*(lastJPX-jpx)),
+						    Math.round(a*(jpy-lastJPY)));
+			lastJPX = jpx;
+			lastJPY = jpy;
+			cameraMoved();
+		    }
+		}
+		else if (dmRegionStickedToMouse){
+		    application.updateDMWindow();
+		}
+	    }
+	}
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	if (!application.logm.trialStarted){return;}
-	float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
+	Camera c = (inPortal) ? application.portalCamera : application.demoCamera;
+	float a = (c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection  == WHEEL_UP){// zooming in
-	    application.demoCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-	    cameraMoved();
-	    application.vsm.repaintNow();
+	    c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
 	}
 	else {//wheelDirection == WHEEL_DOWN, zooming out
-	    application.demoCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-	    cameraMoved();
-	    application.vsm.repaintNow();
+	    c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+	}
+	cameraMoved();
+	application.vsm.repaintNow();
+    }
+
+    public void enterGlyph(Glyph g){
+	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+    }
+
+    public void exitGlyph(Glyph g){
+	if (g.isSelected()){
+	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
+	}
+	else {
+	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
 	}
     }
 
@@ -123,6 +169,20 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler {
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
 	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy);}
 	else if (code==KeyEvent.VK_G){application.gc();}
+    }
+
+    /**cursor enters portal*/
+    public void enterPortal(Portal p){
+	inPortal = true;
+	((CameraPortal)p).setBorder(Color.WHITE);
+	application.vsm.repaintNow();
+    }
+
+    /**cursor exits portal*/
+    public void exitPortal(Portal p){
+	inPortal = false;
+	((CameraPortal)p).setBorder(Color.RED);
+	application.vsm.repaintNow();
     }
 
 }

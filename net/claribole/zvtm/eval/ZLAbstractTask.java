@@ -11,6 +11,7 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.BasicStroke;
 import java.awt.Image;
@@ -26,7 +27,7 @@ import net.claribole.zvtm.engine.*;
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 
-public class ZLAbstractTask implements PostAnimationAction {
+public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     /* screen dimensions */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -59,11 +60,8 @@ public class ZLAbstractTask implements PostAnimationAction {
     /* main view*/
     View demoView;
     Camera demoCamera;
-    Camera portalCamera;
     VirtualSpace mainVS;
     static String mainVSname = "mainSpace";
-
-    CameraPortal portal;
 
     /* misc. lens settings */
     Lens lens;
@@ -84,9 +82,16 @@ public class ZLAbstractTask implements PostAnimationAction {
     Vector tmpHGrid;
     Vector tmpVGrid;
 
-    /* Portal */
-    static final int PORTAL_WIDTH = 100;
-    static final int PORTAL_HEIGHT = 100;
+    /* DragMag */
+    static final int DM_PORTAL_WIDTH = 200;
+    static final int DM_PORTAL_HEIGHT = 200;
+    static final int DM_PORTAL_INITIAL_X_OFFSET = 100;
+    static final int DM_PORTAL_INITIAL_Y_OFFSET = 100;
+    DraggableCameraPortal dmPortal;
+    Camera portalCamera;
+    VRectangle dmRegion;
+    int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
+    boolean paintLinks = false;
 
     static final Color HCURSOR_COLOR = new Color(200,48,48);
 
@@ -141,6 +146,7 @@ public class ZLAbstractTask implements PostAnimationAction {
 	    robot = new java.awt.Robot();
 	}
 	catch(java.awt.AWTException ex){ex.printStackTrace();}
+	windowLayout();
 	this.technique = t;
 	if (this.technique == ZL_TECHNIQUE){
  	    eh = new AbstractTaskZLEventHandler(this);
@@ -162,7 +168,6 @@ public class ZLAbstractTask implements PostAnimationAction {
  	    eh = new AbstractTaskDMEventHandler(this);
 	    techniqueName = DM_TECHNIQUE_NAME;
 	}
-	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
 	vsm.setZoomLimit(0);
 	demoCamera = vsm.addCamera(mainVSname);
@@ -178,10 +183,22 @@ public class ZLAbstractTask implements PostAnimationAction {
 	demoView.setEventHandler(eh);
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
+	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 //   	buildGrid();
 	logm = new AbstractTaskLogManager(this);
+	if (this.technique == DM_TECHNIQUE){
+	    initDM();
+	}
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
+    }
+
+    void initDM(){
+	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
+	dmRegion.setFill(false);
+	dmRegion.setBorderColor(Color.RED);
+	vsm.addGlyph(dmRegion, mainVS);
+	mainVS.hide(dmRegion);
     }
 
     void windowLayout(){
@@ -575,23 +592,25 @@ public class ZLAbstractTask implements PostAnimationAction {
 	}
     }
 
-    void switchPortal(int x, int y){
-	if (portal != null){// portal is active, destroy it it
-	    //XXX:animate its disappearance (use a postanimaction to call following lines)
-	    vsm.destroyPortal(portal);
-	    portal = null;
-	    vsm.repaintNow();
+    void triggerDM(int x, int y){
+	if (dmPortal != null){// portal is active, destroy it it
+	    vsm.destroyPortal(dmPortal);
+	    dmPortal = null;
+	    mainVS.hide(dmRegion);
+	    paintLinks = false;
 	}
 	else {// portal not active, create it
-	    portal = new CameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
-	    portal.setPortalEventHandler(eh);
-	    vsm.addPortal(portal, demoView);
- 	    portal.setBorder(Color.RED);
-	    Location l = portal.getSeamlessView(demoCamera);
+	    dmPortal = new DraggableCameraPortal(x-DM_PORTAL_WIDTH/2, y-DM_PORTAL_HEIGHT/2, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
+	    dmPortal.setPortalEventHandler((PortalEventHandler)eh);
+	    dmPortal.setBackgroundColor(Color.LIGHT_GRAY);
+	    vsm.addPortal(dmPortal, demoView);
+ 	    dmPortal.setBorder(Color.RED);
+	    Location l = dmPortal.getSeamlessView(demoCamera);
 	    portalCamera.moveTo(l.vx, l.vy);
-	    portalCamera.setAltitude(l.alt);
-	    Float alt=new Float(-(portalCamera.getAltitude()+portalCamera.getFocal())/2.0f);
-	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,portalCamera.getID());
+	    portalCamera.setAltitude(l.alt-2*(l.alt+portalCamera.getFocal())/3.0f);
+	    updateDMRegion();
+	    mainVS.show(dmRegion);
+	    paintLinks = true;
 	}
     }
 
@@ -604,6 +623,36 @@ public class ZLAbstractTask implements PostAnimationAction {
     void getGlobalView(){
 	Location l=vsm.getGlobalView(demoCamera,ANIM_MOVE_LENGTH);
     }
+
+    void updateDMRegion(){
+	if (dmPortal == null){return;}
+	long[] wnes = dmPortal.getVisibleRegion();
+	dmRegion.moveTo(portalCamera.posx, portalCamera.posy);
+	dmRegion.setWidth((wnes[2]-wnes[0]) / 2 + 1);
+	dmRegion.setHeight((wnes[1]-wnes[3]) / 2 + 1);
+    }
+
+    void updateDMWindow(){
+	portalCamera.moveTo(dmRegion.vx, dmRegion.vy);
+    }
+
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	if (paintLinks){
+	    float coef=(float)(demoCamera.focal/(demoCamera.focal+demoCamera.altitude));
+	    int dmRegionX = (viewWidth/2) + Math.round((dmRegion.vx-demoCamera.posx)*coef);
+	    int dmRegionY = (viewHeight/2) - Math.round((dmRegion.vy-demoCamera.posy)*coef);
+	    int dmRegionW = Math.round(dmRegion.getWidth()*coef);
+	    int dmRegionH = Math.round(dmRegion.getHeight()*coef);
+	    g2d.setColor(Color.RED);
+	    g2d.drawLine(dmRegionX-dmRegionW, dmRegionY-dmRegionH, dmPortal.x, dmPortal.y);
+	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY-dmRegionH, dmPortal.x+dmPortal.w, dmPortal.y);
+	    g2d.drawLine(dmRegionX-dmRegionW, dmRegionY+dmRegionH, dmPortal.x, dmPortal.y+dmPortal.h);
+	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY+dmRegionH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
+	}
+    }
+
+
 
 //     static final int CENTER_CROSS_SIZE = 15;
 //     static final int H_CENTER_CROSS_SIZE = CENTER_CROSS_SIZE / 2;
