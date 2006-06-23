@@ -12,6 +12,7 @@ package net.claribole.zvtm.demo;
 
 import java.awt.Toolkit;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Font;
 import javax.swing.ImageIcon;
 
@@ -21,7 +22,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
-public class DragMagDemo {
+public class DragMagDemo implements Java2DPainter {
 
     /* screen dimensions */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -97,8 +98,10 @@ public class DragMagDemo {
 	demoView.setLocation(VIEW_X, VIEW_Y);
 	demoView.setEventHandler(eh);
 	demoView.setNotifyMouseMoved(true);
+	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 	portalCamera = vsm.addCamera(mainVSname);
 	initMap();
+	initDM();
 	getGlobalView(false);
 	System.gc();
     }
@@ -111,8 +114,21 @@ public class DragMagDemo {
 	mainMap.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vsm.addGlyph(mainMap, mainVS);
 	mainVS.atBottom(mainMap);
-	vsm.addGlyph(new VCircle(0,0,0,200,Color.RED), mainVS);
 	System.out.println("OK");
+    }
+
+    VRectangle dmRegion;
+    VSegment dmLinkNW;
+    VSegment dmLinkNE;
+    VSegment dmLinkSW;
+    VSegment dmLinkSE;
+
+    void initDM(){
+	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
+	dmRegion.setFill(false);
+	dmRegion.setBorderColor(Color.RED);
+	vsm.addGlyph(dmRegion, mainVS);
+	mainVS.hide(dmRegion);
     }
 
     void windowLayout(){
@@ -128,12 +144,14 @@ public class DragMagDemo {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
+    
     void switchPortal(int x, int y){
 	if (portal != null){// portal is active, destroy it it
 	    //XXX:animate its disappearance (use a postanimaction to call following lines)
 	    vsm.destroyPortal(portal);
 	    portal = null;
-	    vsm.repaintNow();
+	    mainVS.hide(dmRegion);
+	    paintLinks = false;
 	}
 	else {// portal not active, create it
 	    portal = new DraggableCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);
@@ -145,6 +163,36 @@ public class DragMagDemo {
 	    portalCamera.setAltitude(l.alt);
 	    Float alt=new Float(-2*(portalCamera.getAltitude()+portalCamera.getFocal())/3.0f);
 	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,portalCamera.getID());
+	    updateDMRegion();
+	    mainVS.show(dmRegion);
+	    paintLinks = true;
+	}
+    }
+
+    void updateDMRegion(){
+	long[] wnes = portal.getVisibleRegion();
+	dmRegion.moveTo((wnes[0]+wnes[2]) / 2, (wnes[1]+wnes[3]) / 2);
+	dmRegion.setWidth((wnes[2]-wnes[0]) / 2);
+	dmRegion.setHeight((wnes[1]-wnes[3]) / 2);
+    }
+
+    int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
+
+    boolean paintLinks = false;
+
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	if (paintLinks){
+	    float coef=(float)(demoCamera.focal/(demoCamera.focal+demoCamera.altitude));
+	    int dmRegionX = (viewWidth/2) + Math.round((dmRegion.vx-demoCamera.posx)*coef);
+	    int dmRegionY = (viewHeight/2) - Math.round((dmRegion.vy-demoCamera.posy)*coef);
+	    int dmRegionW = Math.round(dmRegion.getWidth()*coef);
+	    int dmRegionH = Math.round(dmRegion.getHeight()*coef);
+	    g2d.setColor(Color.RED);
+	    g2d.drawLine(dmRegionX-dmRegionW, dmRegionY-dmRegionH, portal.x, portal.y);
+	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY-dmRegionH, portal.x+portal.w, portal.y);
+	    g2d.drawLine(dmRegionX-dmRegionW, dmRegionY+dmRegionH, portal.x, portal.y+portal.h);
+	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY+dmRegionH, portal.x+portal.w, portal.y+portal.h);
 	}
     }
 
