@@ -42,6 +42,8 @@ import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
 
+import sm.BasicInputStateMachine;
+
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>
    * A view is repainted on a regular basis when active - for inactive views, the default is to repaint only if the mouse is inside the view (but the frame is not selected) - this can be changed to repaint the view automatically even if it is not selected and if the mouse is not inside, using setRepaintPolicy()
@@ -528,6 +530,24 @@ public abstract class View {
     */
     public int[] getVisibilityPadding(){
 	return panel.getVisibilityPadding();
+    }
+
+    /**Add a state machine that listens to mouse and keyboard events in this view.
+     *@param sm the state machine to be dissociated from this view
+     */
+    public void addSMEventHandler(BasicInputStateMachine sm){
+	panel.addMouseListener(sm);
+	panel.addMouseMotionListener(sm);
+	panel.addMouseWheelListener(sm);
+    }
+
+    /**Remove a state machine that was listening to mouse and keyboard events in this view.
+     *@param sm the state machine to be dissociated from this view
+     */
+    public void removeSMEventHandler(BasicInputStateMachine sm){
+	panel.removeMouseListener(sm);
+	panel.removeMouseMotionListener(sm);
+	panel.removeMouseWheelListener(sm);
     }
 
     void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){

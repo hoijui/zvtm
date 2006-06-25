@@ -39,6 +39,8 @@ import javax.swing.event.InternalFrameListener;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 
+import sm.BasicInputStateMachine;
+
   /**
    * An internal view is a window and can be composed of one or several cameras superimposed (uses a JInternalFrame) - <br>
    * this one is hardware accelerated (at least under Win32) using VolatileImage available since JDK 1.4.0 (does not accelerate bitmaps)
@@ -262,6 +264,22 @@ public class AccIView extends View implements InternalFrameListener,KeyListener/
      *(NO LONGER called automatically when the mouse enters the IView)*/
     public void requestFocus(){
 	frame.requestFocus();
+    }
+
+    /**Add a state machine that listens to mouse and keyboard events in this view.
+     *@param sm the state machine in charge of handling mouse and keyboard events
+     */
+    public void addSMEventHandler(BasicInputStateMachine sm){
+	super.addSMEventHandler(sm);
+	frame.addKeyListener(sm);
+    }
+
+    /**Remove a state machine that was listening to mouse and keyboard events in this view.
+     *@param sm the state machine to be dissociated from this view
+     */
+    public void removeSMEventHandler(BasicInputStateMachine sm){
+	super.removeSMEventHandler(sm);
+	frame.removeKeyListener(sm);
     }
 
 }
