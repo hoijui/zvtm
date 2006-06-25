@@ -62,7 +62,7 @@ public class DraggableCameraPortal extends CameraPortal {
     }
 
     /**Set height of horizontal bar used to drag the portal.
-     *@param bc height of the bar*/    
+     *@param bh height of the bar*/    
     public void setDragBarHeight(int bh){
 	this.barHeight = bh;
     }
