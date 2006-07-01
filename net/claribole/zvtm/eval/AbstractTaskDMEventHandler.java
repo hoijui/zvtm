@@ -41,7 +41,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (inPortal){
-	    if (application.dmPortal.coordInsideBar(jpx, jpy)){
+	    if (((DraggableCameraPortal)application.dmPortal).coordInsideBar(jpx, jpy)){
 		portalStickedToMouse = true;
 	    }
 	    else {

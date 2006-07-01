@@ -52,9 +52,9 @@ class AbstractTaskLogManager implements Java2DPainter {
     static final String TARGET_ERR = "ERROR: Target is not within selection region";
 
     /* codes for technique */
-    static final String ZL = "ZL";     // Probing lenses
+//     static final String ZL = "ZL";     // Probing lenses
     static final String PZ = "PZVC";   // Pan + Zoom centered on view
-    static final String RZ = "RZ";     // Region zooming
+//     static final String RZ = "RZ";     // Region zooming
     static final String PZL = "PZL";   // Pan + Zoom + Probing Lenses
     static final String DM = "DM";     // Drag mag
 
@@ -430,9 +430,9 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     static String getTechniqueName(short t){
 	switch (t){
-	case ZLAbstractTask.ZL_TECHNIQUE:{return ZL;}
+// 	case ZLAbstractTask.ZL_TECHNIQUE:{return ZL;}
 	case ZLAbstractTask.PZ_TECHNIQUE:{return PZ;}
-	case ZLAbstractTask.RZ_TECHNIQUE:{return RZ;}
+// 	case ZLAbstractTask.RZ_TECHNIQUE:{return RZ;}
 	case ZLAbstractTask.PZL_TECHNIQUE:{return PZL;}
 	case ZLAbstractTask.DM_TECHNIQUE:{return DM;}
 	}

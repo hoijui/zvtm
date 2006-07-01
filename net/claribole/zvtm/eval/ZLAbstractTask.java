@@ -66,7 +66,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     /* misc. lens settings */
     Lens lens;
     static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
+    static int LENS_R2 = 60;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static final int GRID_ANIM_TIME = 500;
@@ -87,7 +87,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static final int DM_PORTAL_HEIGHT = 200;
     static final int DM_PORTAL_INITIAL_X_OFFSET = 200;
     static final int DM_PORTAL_INITIAL_Y_OFFSET = 200;
-    DraggableCameraPortal dmPortal;
+    CameraPortal dmPortal;
     Camera portalCamera;
     VRectangle dmRegion;
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
@@ -116,18 +116,18 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     
     static java.awt.Robot robot;
 
-    final static short ZL_TECHNIQUE = 0;  // Probing Lenses
+//     final static short ZL_TECHNIQUE = 0;  // Probing Lenses
     final static short PZ_TECHNIQUE = 1;  // Pan Zoom centered on view
-    final static short RZ_TECHNIQUE = 2;  // region zooming
+//     final static short RZ_TECHNIQUE = 2;  // region zooming
     final static short PZL_TECHNIQUE = 3;  // Pan Zoom + Probing Lenses
     final static short DM_TECHNIQUE = 4;  // Drag Mag
 
     final static String PZ_TECHNIQUE_NAME = "Pan-Zoom";
-    final static String ZL_TECHNIQUE_NAME = "Probing Lens";
-    final static String RZ_TECHNIQUE_NAME = "Region Zoom";
+//     final static String ZL_TECHNIQUE_NAME = "Probing Lens";
+//     final static String RZ_TECHNIQUE_NAME = "Region Zoom";
     final static String PZL_TECHNIQUE_NAME = "Pan Zoom + Probing Lenses";
     final static String DM_TECHNIQUE_NAME = "Drag Mag";
-    short technique = ZL_TECHNIQUE;
+    short technique = PZL_TECHNIQUE;
     String techniqueName;
 
     static final int[] vispad = {100,100,100,100};
@@ -148,17 +148,9 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	catch(java.awt.AWTException ex){ex.printStackTrace();}
 	windowLayout();
 	this.technique = t;
-	if (this.technique == ZL_TECHNIQUE){
- 	    eh = new AbstractTaskZLEventHandler(this);
-	    techniqueName = ZL_TECHNIQUE_NAME;
-	}
-	else if (this.technique == PZ_TECHNIQUE){
+	if (this.technique == PZ_TECHNIQUE){
  	    eh = new AbstractTaskPZEventHandler(this);
 	    techniqueName = PZ_TECHNIQUE_NAME;
-	}
-	else if (this.technique == RZ_TECHNIQUE){
- 	    eh = new AbstractTaskRZEventHandler(this);
-	    techniqueName = RZ_TECHNIQUE_NAME;
 	}
 	else if (this.technique == PZL_TECHNIQUE){
  	    eh = new AbstractTaskPZLEventHandler(this);
@@ -189,6 +181,9 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
+	else if (this.technique == PZ_TECHNIQUE){
+	    initOverview();
+	}
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
     }
@@ -199,6 +194,14 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	dmRegion.setBorderColor(Color.RED);
 	vsm.addGlyph(dmRegion, mainVS);
 	mainVS.hide(dmRegion);
+    }
+
+    void initOverview(){
+// 	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
+// 	dmRegion.setFill(false);
+// 	dmRegion.setBorderColor(Color.RED);
+// 	vsm.addGlyph(dmRegion, mainVS);
+// 	mainVS.hide(dmRegion);
     }
 
     void windowLayout(){
@@ -721,7 +724,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE or RZ_TECHNIQUE for appropriate values
 	   Second argument is either 1 (show console for messages) or 0 (don't show it)
 	   Third argument is either 1 (show map manager monitor) or 0 (don't show it) */
-	short tech = (args.length > 0) ? Short.parseShort(args[0]) : ZL_TECHNIQUE;
+	short tech = (args.length > 0) ? Short.parseShort(args[0]) : PZL_TECHNIQUE;
 	new ZLAbstractTask(tech);
     }
     
