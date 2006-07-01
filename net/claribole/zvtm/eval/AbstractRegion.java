@@ -12,6 +12,7 @@ package net.claribole.zvtm.eval;
 
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.ZRoundRect;
+import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 
@@ -51,13 +52,16 @@ class AbstractRegion {
 	childRegion = cr;
     }
 
-    void addToVirtualSpace(VirtualSpaceManager vsm, VirtualSpace vs){
+    void addToVirtualSpace(VirtualSpaceManager vsm, VirtualSpace vs, Glyph parent){
 	vsm.addGlyph(target, vs);
+	if (parent != null){vs.above(target, parent);}
+	else {vs.atBottom(target);}
 	for (int i=0;i<distractors.length;i++){
-	    vsm.addGlyph(distractors[i],vs);
+	    vsm.addGlyph(distractors[i], vs);
+	    if (parent != null){vs.above(distractors[i], parent);}
 	}
 	if (childRegion != null){
-	    childRegion.addToVirtualSpace(vsm, vs);
+	    childRegion.addToVirtualSpace(vsm, vs, target);
 	}
     }
 

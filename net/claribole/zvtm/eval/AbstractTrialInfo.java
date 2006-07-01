@@ -95,11 +95,7 @@ class AbstractTrialInfo {
     }
 
     void addToVirtualSpace(VirtualSpaceManager vsm, VirtualSpace vs){
-	root.addToVirtualSpace(vsm, vs);
-	Vector v = vs.getGlyphsOfType(ZLAbstractTask.GLYPH_TYPE_GRID);
-	for (int i=0;i<v.size();i++){
-	    vs.onTop((Glyph)v.elementAt(i));
-	}
+	root.addToVirtualSpace(vsm, vs, null);
     }
 
     void removeFromVirtualSpace(VirtualSpace vs){

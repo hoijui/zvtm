@@ -30,6 +30,7 @@ import java.util.Vector;
 
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.ZRoundRect;
+import com.xerox.VTM.engine.SwingWorker;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 class AbstractTaskLogManager implements Java2DPainter {
@@ -317,7 +318,13 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    if (targetWithinRange(vx, vy)){
 		endTrial();
 		if (trialCount+1 < trials.length){// there is at least one trial left
-		    initNextTrial();
+		    final SwingWorker worker=new SwingWorker(){
+			    public Object construct(){
+				initNextTrial();
+				return null; 
+			    }
+			};
+		    worker.start();
 		}
 	    }
 	    else {
