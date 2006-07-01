@@ -498,8 +498,6 @@ public class VCursor {
 			    }
 			}
 		    }
-
-		    printList();
 		}
 		catch (java.util.NoSuchElementException e){
 		    if (owningView.parent.debug){
