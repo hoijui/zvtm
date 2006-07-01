@@ -609,6 +609,9 @@ public abstract class Glyph implements Cloneable {
     public abstract boolean coordInside(int x,int y,int camIndex);
 
     /**reset prevMouseIn for projected coordinates nb i*/
+    public abstract void resetMouseIn();
+
+    /**reset prevMouseIn for projected coordinates nb i*/
     public abstract void resetMouseIn(int i);
     
     /**used to find out if it is necessary to project and draw the glyph in the current view

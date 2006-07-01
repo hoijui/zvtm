@@ -78,6 +78,9 @@ public class CGlyph extends Glyph implements Cloneable {
     /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){}
 
+    /**reset prevMouseIn for all projected coordinates*/
+    public void resetMouseIn(){}
+
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){}
 

@@ -54,11 +54,6 @@ public class VRectangleOr extends VRectangle implements Cloneable {
 	orient=or;
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
-    public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-    }
-
     /**get orientation*/
     public float getOrient(){return orient;}
 

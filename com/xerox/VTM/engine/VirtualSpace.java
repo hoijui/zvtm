@@ -274,8 +274,8 @@ public class VirtualSpace {
 		}
 	    }
 	    View v;
-	    for (int i=0;i<vsm.allViews.length;i++){
-		vsm.allViews[i].mouse.removeGlyphFromList(g);
+	    for (int i=0;i<cm.cameraList.length;i++){
+		cm.cameraList[i].view.mouse.removeGlyphFromList(g);
 	    }
 	    visualEnts.remove(g);
 	    removeGlyphFromDrawingList(g);
@@ -300,9 +300,10 @@ public class VirtualSpace {
      *@see #show(Glyph g)*/
     public void hide(Glyph g){
 	removeGlyphFromDrawingList(g);
+	g.resetMouseIn();
 	View v;
-	for (int i=0;i<vsm.allViews.length;i++){
-	    vsm.allViews[i].mouse.removeGlyphFromList(g);
+	for (int i=0;i<cm.cameraList.length;i++){
+	    cm.cameraList[i].view.mouse.removeGlyphFromList(g);
 	}
 	vsm.repaintNow();
     }

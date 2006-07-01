@@ -99,6 +99,13 @@ public class VPoint extends Glyph implements Cloneable {
 	pc[index]=null;
     }
 
+    /**reset prevMouseIn for all projected coordinates*/
+    public void resetMouseIn(){
+	for (int i=0;i<pc.length;i++){
+	    resetMouseIn(i);
+	}
+    }
+
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
