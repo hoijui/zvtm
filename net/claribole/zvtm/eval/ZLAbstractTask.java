@@ -82,13 +82,13 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     Vector tmpHGrid;
     Vector tmpVGrid;
 
+    Camera portalCamera;
     /* DragMag */
     static final int DM_PORTAL_WIDTH = 200;
     static final int DM_PORTAL_HEIGHT = 200;
     static final int DM_PORTAL_INITIAL_X_OFFSET = 200;
     static final int DM_PORTAL_INITIAL_Y_OFFSET = 200;
-    CameraPortal dmPortal;
-    Camera portalCamera;
+    DraggableCameraPortal dmPortal;
     VRectangle dmRegion;
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
     boolean paintLinks = false;
@@ -101,6 +101,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     int currentLevel = -1;
 
     static final float START_ALTITUDE = 18100000.0f;
+    static final float PORTAL_OVERVIEW_ALTITUDE = 65000000.0f;
     static final float FLOOR_ALTITUDE = 100.0f;
 
     boolean cameraOnFloor = false;
@@ -181,9 +182,6 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
-	else if (this.technique == PZ_TECHNIQUE){
-	    initOverview();
-	}
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
     }
@@ -194,14 +192,6 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	dmRegion.setBorderColor(Color.RED);
 	vsm.addGlyph(dmRegion, mainVS);
 	mainVS.hide(dmRegion);
-    }
-
-    void initOverview(){
-// 	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
-// 	dmRegion.setFill(false);
-// 	dmRegion.setBorderColor(Color.RED);
-// 	vsm.addGlyph(dmRegion, mainVS);
-// 	mainVS.hide(dmRegion);
     }
 
     void windowLayout(){
@@ -624,6 +614,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	updateDMRegion();
 	mainVS.show(dmRegion);
 	paintLinks = true;
+	((AbstractTaskDMEventHandler)eh).justCreatedDM = true;
     }
 
     void killDM(){
@@ -632,6 +623,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	mainVS.hide(dmRegion);
 	paintLinks = false;
 	((AbstractTaskDMEventHandler)eh).inPortal = false;	
+	((AbstractTaskDMEventHandler)eh).justCreatedDM = false;
     }
     
     void meetDM(){
@@ -685,13 +677,6 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY+dmRegionH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
 	}
     }
-
-
-
-//     static final int CENTER_CROSS_SIZE = 15;
-//     static final int H_CENTER_CROSS_SIZE = CENTER_CROSS_SIZE / 2;
-//     int CENTER_W = 0;
-//     int CENTER_N = 0;
  
     void updatePanelSize(){
 	Dimension d = demoView.getPanel().getSize();
@@ -701,8 +686,6 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	hpanelHeight = panelHeight / 2;
 	SELECTION_RECT_X = panelWidth/2 - SELECTION_RECT_W / 2;
 	SELECTION_RECT_Y = panelHeight/2 - SELECTION_RECT_H / 2;
-// 	CENTER_W = hpanelWidth - CENTER_CROSS_SIZE / 2;
-// 	CENTER_N = hpanelHeight - CENTER_CROSS_SIZE / 2;
     }
 
     void cameraIsOnFloor(boolean b){

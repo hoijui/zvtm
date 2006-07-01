@@ -31,6 +31,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
     boolean portalStickedToMouse = false;
     boolean dmRegionStickedToMouse = false;
     boolean inPortal = false;
+    boolean justCreatedDM = false;
 
     AbstractTaskDMEventHandler(ZLAbstractTask appli){
 	super(appli);
@@ -41,7 +42,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (inPortal){
-	    if (((DraggableCameraPortal)application.dmPortal).coordInsideBar(jpx, jpy)){
+	    if ((application.dmPortal).coordInsideBar(jpx, jpy)){
 		portalStickedToMouse = true;
 	    }
 	    else {
@@ -49,7 +50,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	    }
 	}
 	else {
-	    if (inDMRegion(v.getGlyphsUnderMouseList())){
+	    if (justCreatedDM || inDMRegion(v.getGlyphsUnderMouseList())){
 		dmRegionStickedToMouse = true;
 		application.vsm.stickToMouse(application.dmRegion);
 	    }
@@ -97,7 +98,9 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	application.triggerDM(jpx+ZLAbstractTask.DM_PORTAL_INITIAL_X_OFFSET, jpy+ZLAbstractTask.DM_PORTAL_INITIAL_Y_OFFSET);
     }
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+	justCreatedDM = false;
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
