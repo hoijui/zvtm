@@ -610,7 +610,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	dmPortal.setBorder(Color.RED);
 	Location l = dmPortal.getSeamlessView(demoCamera);
 	portalCamera.moveTo(l.vx, l.vy);
-	portalCamera.setAltitude(l.alt-3*(l.alt+portalCamera.getFocal())/4.0f);
+	portalCamera.setAltitude((float) ((demoCamera.getAltitude()+demoCamera.getFocal())/(DEFAULT_MAG_FACTOR)-demoCamera.getFocal()));
 	updateDMRegion();
 	mainVS.show(dmRegion);
 	paintLinks = true;
