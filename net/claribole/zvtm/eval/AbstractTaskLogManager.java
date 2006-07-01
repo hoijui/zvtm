@@ -102,7 +102,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     AbstractTaskLogManager(ZLAbstractTask app){
 	this.application = app;
 	im = new AbstractTaskInstructionsManager(app);
-	this.application.demoView.setJava2DPainter(im, Java2DPainter.AFTER_DISTORTION);
+	this.application.demoView.setJava2DPainter(im, Java2DPainter.AFTER_PORTALS);
     }
 
     void startSession(){
