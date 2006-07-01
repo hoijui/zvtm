@@ -80,13 +80,17 @@ class AbstractTaskInstructionsManager implements Java2DPainter {
 	writeInstructions(g2d, viewWidth, viewHeight);
     }
 
+    static final int PADDING = 100;
+    static final int PADDINGM1 = PADDING - 1;
+    static final int DPADDINGM1 = 2 * PADDING - 1;
+
     void drawFrame(Graphics2D g2d, int viewWidth, int viewHeight){
 	g2d.setColor(SAY_BKG_COLOR);
-	g2d.fillRect(0,0,viewWidth,100);
-	g2d.fillRect(0,100,100,viewHeight-199);
-	g2d.fillRect(viewWidth-99,100,100,viewHeight-199);
+	g2d.fillRect(0,0,viewWidth,PADDING);
+	g2d.fillRect(0,PADDING,PADDING,viewHeight-DPADDINGM1);
+	g2d.fillRect(viewWidth-PADDINGM1,PADDING,PADDING,viewHeight-DPADDINGM1);
 	g2d.setColor(messageBkgColor);
-	g2d.fillRect(0,viewHeight-99,viewWidth,100);
+	g2d.fillRect(0,viewHeight-PADDINGM1,viewWidth,PADDING);
     }
     
     void writeInstructions(Graphics2D g2d, int viewWidth, int viewHeight){
