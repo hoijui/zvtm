@@ -110,6 +110,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 		    application.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
 		    lastJPX = jpx;
 		    lastJPY = jpy;
+		    dragMagMoved();
 		    application.vsm.repaintNow();
 		}
 		else if (pcamStickedToMouse){
@@ -119,6 +120,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 						      Math.round(a*(jpy-lastJPY)));
 			lastJPX = jpx;
 			lastJPY = jpy;
+			dragMagMoved();
 			cameraMoved();
 		    }
 		}
@@ -145,13 +147,29 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	if (!application.logm.trialStarted){return;}
-	Camera c = (inPortal) ? application.portalCamera : application.demoCamera;
-	float a = (c.focal+Math.abs(c.altitude))/c.focal;
-	if (wheelDirection  == WHEEL_UP){// zooming in
-	    c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+	if (inPortal){
+	    Camera c = application.portalCamera;
+	    float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	    if (wheelDirection  == WHEEL_UP){// zooming in
+		c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+	    }
+	    else {//wheelDirection == WHEEL_DOWN, zooming out
+		c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+	    }
 	}
-	else {//wheelDirection == WHEEL_DOWN, zooming out
-	    c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+	else {
+	    Camera c1 = application.demoCamera;
+	    Camera c2 = application.portalCamera;
+	    float a1 = (c1.focal+Math.abs(c1.altitude))/c1.focal;
+	    float a2 = (c2.focal+Math.abs(c2.altitude))/c2.focal;
+	    if (wheelDirection  == WHEEL_UP){// zooming in
+		c1.altitudeOffset(-a1*WHEEL_ZOOMIN_FACTOR);
+		c2.altitudeOffset(-a2*WHEEL_ZOOMIN_FACTOR);
+	    }
+	    else {//wheelDirection == WHEEL_DOWN, zooming out
+		c1.altitudeOffset(a1*WHEEL_ZOOMOUT_FACTOR);
+		c2.altitudeOffset(a2*WHEEL_ZOOMOUT_FACTOR);
+	    }
 	}
 	cameraMoved();
 	application.vsm.repaintNow();

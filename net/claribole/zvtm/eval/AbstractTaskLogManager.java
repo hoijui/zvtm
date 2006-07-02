@@ -62,6 +62,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     static final String NO_LENS = "0";
     static final String ZOOMIN_LENS = "1";
     static final String ZOOMOUT_LENS = "2";
+    static final String DM_LENS = "3";
     String lensStatus = NO_LENS;
 
     static final String NaN = "NaN";
@@ -260,6 +261,12 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "mm" + OUTPUT_CSV_SEP +
 		      "time" + OUTPUT_CSV_SEP +
 		      "currentRegion");
+	    // additional info only for dragmag
+	    if (application.technique == ZLAbstractTask.DM_TECHNIQUE){
+		bwc.write(OUTPUT_CSV_SEP + "pcx" +
+			  OUTPUT_CSV_SEP + "pcy" +
+			  OUTPUT_CSV_SEP + "pcz");		
+	    }
 	    bwc.newLine();
 	    bwc.flush();
 	}
@@ -369,15 +376,29 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     void writeCinematic(){
 	try {
-	    // trial + D + time + nb switches + nb errors
-	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
-		      lensStatus + OUTPUT_CSV_SEP +
-		      Long.toString(application.demoCamera.posx) + OUTPUT_CSV_SEP +
-		      Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
-		      TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
-		      lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
-		      OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
-		       + OUTPUT_CSV_SEP + currentDepth);
+	    if (application.technique == ZLAbstractTask.DM_TECHNIQUE){
+		bwc.write(trialCountStr + OUTPUT_CSV_SEP +
+			  lensStatus + OUTPUT_CSV_SEP +
+			  Long.toString(application.demoCamera.posx) + OUTPUT_CSV_SEP +
+			  Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
+			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
+			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
+			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
+			  + OUTPUT_CSV_SEP + currentDepth + OUTPUT_CSV_SEP + 
+			  Long.toString(application.portalCamera.posx) + OUTPUT_CSV_SEP +
+			  Long.toString(application.portalCamera.posy) + OUTPUT_CSV_SEP +
+			  TrialInfo.floatFormatter(application.portalCamera.altitude));
+	    }
+	    else {
+		bwc.write(trialCountStr + OUTPUT_CSV_SEP +
+			  lensStatus + OUTPUT_CSV_SEP +
+			  Long.toString(application.demoCamera.posx) + OUTPUT_CSV_SEP +
+			  Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
+			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
+			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
+			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
+			  + OUTPUT_CSV_SEP + currentDepth);
+	    }
 	    bwc.newLine();
 	}
 	catch (IOException ex){ex.printStackTrace();}
@@ -402,7 +423,21 @@ class AbstractTaskLogManager implements Java2DPainter {
 		writeCinematic();
 	    }
 	}
-	catch (NullPointerException ex){System.err.println("Did not write cienmatic info");ex.printStackTrace();}
+	catch (NullPointerException ex){System.err.println("Did not write cinematic info");ex.printStackTrace();}
+    }
+
+    void portalPositionChanged(boolean write){
+	if (application.dmPortal != null){
+	    lensxS = Integer.toString(application.dmPortal.x);
+	    lensyS = Integer.toString(application.dmPortal.y);
+	}
+	else {
+	    lensxS = AbstractTaskLogManager.NaN;
+	    lensyS = AbstractTaskLogManager.NaN;	    
+	}
+	if (write && trialStarted){
+	    writeCinematic();
+	}
     }
 
     /*Java2DPainter interface*/

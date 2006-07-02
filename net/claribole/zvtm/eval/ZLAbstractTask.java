@@ -596,10 +596,13 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     void triggerDM(int x, int y){
 	if (dmPortal != null){// portal is active, destroy it it
 	    killDM();
+	    logm.lensStatus = AbstractTaskLogManager.NO_LENS;
 	}
 	else {// portal not active, create it
 	    createDM(x, y);
+	    logm.lensStatus = AbstractTaskLogManager.DM_LENS;
 	}
+	logm.portalPositionChanged(true);
     }
 
     void createDM(int x, int y){
@@ -660,6 +663,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     void updateDMWindow(){
 	portalCamera.moveTo(dmRegion.vx, dmRegion.vy);
+	logm.portalPositionChanged(true);
     }
 
     /*Java2DPainter interface*/

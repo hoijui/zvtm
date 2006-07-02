@@ -162,5 +162,10 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	application.updateDMRegion();
     }
 
+    void dragMagMoved(){
+	if (application.logm.trialStarted){
+	    application.logm.portalPositionChanged(true);
+	}
+    }
 
 }
