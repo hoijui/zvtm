@@ -173,7 +173,7 @@ public class CameraPortal extends Portal {
 	return new Location((wnes[2]+wnes[0]) / 2, (wnes[1]+wnes[3]) / 2, camera.focal * ((wnes[2]-wnes[0])/((float)w)));
     }
 
-    /**detects whether the given point is inside this portal or not 
+    /**Detects whether the given point is inside this portal or not.
      *@param cx horizontal cursor coordinate (JPanel)
      *@param cy vertical cursor coordinate (JPanel)
      */

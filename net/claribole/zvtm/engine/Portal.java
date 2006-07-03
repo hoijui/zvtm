@@ -131,6 +131,29 @@ public abstract class Portal {
 	}
     }
 
+    /**Computes the distance between a given point (typically the mouse cursor) and each of the four portal borders.
+     * The returned array contains the following for distances:
+     * <ul>
+     *   <li>Horizontal distance from left border</li>
+     *   <li>Vertical distance from top border</li>
+     *   <li>Horizontal distance from right border</li>
+     *   <li>Vertical distance from bottom border</li>
+     * </ul>
+     * <p>In all four cases, the value is positive if the point is on the side of the border that potentially makes it belong to the inside of the portal (<em>potentially</em> because the point has to meet the requirement for all four borders to actually <em>be</em> inside the portal). The value is zero when the point is exactly above the border, and negative otherwise.</p>
+     * <p>This method usually makes the hypothesis that the portal's shape is rectangular. If it is not, the portal's bounding box is considered. Subclasses willing to change this behaviour should be free to override this method.</p>
+     *@param cx horizontal cursor coordinate (JPanel)
+     *@param cy vertical cursor coordinate (JPanel)
+     *@param res the array to fill with information (to be initialized by client application)
+     *@return the projected distance between the provided coordinates and the portal's borders
+     */
+    public int[] getDistanceFromBorders(int cx, int cy, int[] res){
+	res[0] = cx - x;
+	res[1] = cy - y;
+	res[2] = x + w - cx;
+	res[3] = y + h - cy;	
+	return res;
+    }
+
     public abstract void paint(Graphics2D g2d, int viewWidth, int viewHeight);
 
 }
