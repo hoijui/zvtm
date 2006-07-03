@@ -195,10 +195,10 @@ class AbstractTaskLogManager implements Java2DPainter {
     int currentDepth;
     
     void updateWorld(long[] visibleRegion, short altChange){
-	if (lensStatus == NO_LENS){
+  	if (lensStatus == NO_LENS || lensStatus == DM_LENS){
 	    currentDepth = trials[trialCount].root.updateWorld(visibleRegion, altChange);
 	    application.vsm.repaintNow();
-	}
+  	}
     }
 
     // init first columns of each line in output trials file
