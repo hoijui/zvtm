@@ -131,7 +131,7 @@ public class PortalWorldDemo {
     static final short SQUARE_ST = 1;
     static final short CIRCLE = 2;
     static final short CIRCLE_ST = 3;
-    short portalType = SQUARE;
+    short portalType = SQUARE_ST;
 
     CameraPortal getPortal(int x, int y){
 	switch(portalType){
@@ -143,27 +143,36 @@ public class PortalWorldDemo {
 	}
     }
 
+    void killPortal(){
+	vsm.destroyPortal(portal);
+	portal = null;
+	vsm.repaintNow();
+    }
 
     void switchPortal(int x, int y){
 	if (portal != null){// portal is active, destroy it it
 	    //XXX:animate its disappearance (use a postanimaction to call following lines)
-	    vsm.destroyPortal(portal);
-	    portal = null;
-	    vsm.repaintNow();
+ 	    if (portalType == SQUARE_ST || portalType == CIRCLE_ST){
+		vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(-0.7f),
+						   portal.getID(), new PortalKiller(this));
+	    }
+	    else {
+		killPortal();
+	    }
 	}
 	else {// portal not active, create it
 	    portal = getPortal(x, y);
+	    portal.setBackgroundColor(Color.LIGHT_GRAY);
 	    portal.setPortalEventHandler(eh);
 	    vsm.addPortal(portal, demoView);
  	    portal.setBorder(Color.RED);
  	    if (portalType == SQUARE_ST || portalType == CIRCLE_ST){
-		vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(1.0f), portal.getID(), null);
+		vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.7f),
+						   portal.getID(), null);
 	    }
-	    else {
-		Location l = portal.getSeamlessView(demoCamera);
-		portalCamera.moveTo(l.vx, l.vy);
-		portalCamera.setAltitude(l.alt);
-	    }
+	    Location l = portal.getSeamlessView(demoCamera);
+	    portalCamera.moveTo(l.vx, l.vy);
+	    portalCamera.setAltitude(l.alt);
 	    getHigherView(true);
 	}
     }

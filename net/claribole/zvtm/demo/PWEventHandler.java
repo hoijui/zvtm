@@ -62,8 +62,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     }
 
-    static final int PORTAL_INITIAL_X_OFFSET = 0;
-    static final int PORTAL_INITIAL_Y_OFFSET = 0;
+    static final int PORTAL_INITIAL_X_OFFSET = -100;
+    static final int PORTAL_INITIAL_Y_OFFSET = 100;
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	application.switchPortal(jpx+PORTAL_INITIAL_X_OFFSET, jpy+PORTAL_INITIAL_Y_OFFSET);
@@ -132,6 +132,9 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	else if (code == KeyEvent.VK_F2){application.portalType = PortalWorldDemo.SQUARE_ST;}
 	else if (code == KeyEvent.VK_F3){application.portalType = PortalWorldDemo.CIRCLE;}
 	else if (code == KeyEvent.VK_F4){application.portalType = PortalWorldDemo.CIRCLE_ST;}
+	else if (code == KeyEvent.VK_SPACE){
+	    application.switchPortal(prevJPX+PORTAL_INITIAL_X_OFFSET, prevJPY+PORTAL_INITIAL_Y_OFFSET);
+	}
     }
 
     public void viewActivated(View v){}
