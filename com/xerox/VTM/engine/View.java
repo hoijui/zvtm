@@ -42,7 +42,7 @@ import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
 
-import sm.BasicInputStateMachine;
+import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>

@@ -43,7 +43,7 @@ import javax.swing.WindowConstants;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 
-import sm.BasicInputStateMachine;
+import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**
    * An external view is a window and can be composed of one or several cameras superimposed (uses a standard JFrame)

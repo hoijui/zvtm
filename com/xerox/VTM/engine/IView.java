@@ -38,7 +38,7 @@ import javax.swing.event.InternalFrameListener;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 
-import sm.BasicInputStateMachine;
+import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**
    * An internal view is a window and can be composed of one or several cameras superimposed (uses a JInternalFrame)
