@@ -75,7 +75,7 @@ public class PortalWorldDemo {
     /* Portal */
     static int PORTAL_WIDTH = 100;
     static int PORTAL_HEIGHT = 100;
-    CameraPortal portal;
+    TrailingCameraPortalST portal;
     Camera portalCamera;
 
     PortalWorldDemo(){
@@ -127,20 +127,12 @@ public class PortalWorldDemo {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    static final short SQUARE = 0;
-    static final short SQUARE_ST = 1;
-    static final short CIRCLE = 2;
-    static final short CIRCLE_ST = 3;
-    short portalType = SQUARE_ST;
+    static final int PORTAL_INITIAL_X_OFFSET = -120;
+    static final int PORTAL_INITIAL_Y_OFFSET = 120;
 
-    CameraPortal getPortal(int x, int y){
-	switch(portalType){
-	case SQUARE:{return new CameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);}
-	case SQUARE_ST:{return new CameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);}
-	case CIRCLE:{return new RoundCameraPortal(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera);}
-	case CIRCLE_ST:{return new RoundCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);}
-	default:{return new RoundCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT, portalCamera, 0.0f);}
-	}
+    TrailingCameraPortalST getPortal(int x, int y){
+	return new TrailingCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,
+					  portalCamera, 0.0f, PORTAL_INITIAL_X_OFFSET, PORTAL_INITIAL_Y_OFFSET);
     }
 
     void killPortal(){
@@ -151,14 +143,8 @@ public class PortalWorldDemo {
 
     void switchPortal(int x, int y){
 	if (portal != null){// portal is active, destroy it it
-	    //XXX:animate its disappearance (use a postanimaction to call following lines)
- 	    if (portalType == SQUARE_ST || portalType == CIRCLE_ST){
-		vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(-0.7f),
-						   portal.getID(), new PortalKiller(this));
-	    }
-	    else {
-		killPortal();
-	    }
+	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(-0.7f),
+					       portal.getID(), new PortalKiller(this));
 	}
 	else {// portal not active, create it
 	    portal = getPortal(x, y);
@@ -166,10 +152,8 @@ public class PortalWorldDemo {
 	    portal.setPortalEventHandler(eh);
 	    vsm.addPortal(portal, demoView);
  	    portal.setBorder(Color.RED);
- 	    if (portalType == SQUARE_ST || portalType == CIRCLE_ST){
-		vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.7f),
-						   portal.getID(), null);
-	    }
+	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.7f),
+					       portal.getID(), null);
 	    Location l = portal.getSeamlessView(demoCamera);
 	    portalCamera.moveTo(l.vx, l.vy);
 	    portalCamera.setAltitude(l.alt);

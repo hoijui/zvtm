@@ -62,19 +62,18 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     }
 
-    static final int PORTAL_INITIAL_X_OFFSET = -100;
-    static final int PORTAL_INITIAL_Y_OFFSET = 100;
+
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	application.switchPortal(jpx+PORTAL_INITIAL_X_OFFSET, jpy+PORTAL_INITIAL_Y_OFFSET);
+	application.switchPortal(jpx, jpy);
 	prevJPX = jpx;
 	prevJPY = jpy;
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 	if (application.portal != null){
-	    application.portal.move(jpx-prevJPX, jpy-prevJPY);
-	    application.vsm.repaintNow();
+	    application.portal.updateFrequency(e.getWhen());
+	    application.portal.updateWidgetLocation(jpx, jpy);	    
 	    prevJPX = jpx;
 	    prevJPY = jpy;
 	}
@@ -128,12 +127,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	else if (code == KeyEvent.VK_DOWN){application.translateView(PortalWorldDemo.MOVE_DOWN, mod == CTRL_MOD);}
 	else if (code == KeyEvent.VK_LEFT){application.translateView(PortalWorldDemo.MOVE_LEFT, mod == CTRL_MOD);}
 	else if (code == KeyEvent.VK_RIGHT){application.translateView(PortalWorldDemo.MOVE_RIGHT, mod == CTRL_MOD);}
-	else if (code == KeyEvent.VK_F1){application.portalType = PortalWorldDemo.SQUARE;}
-	else if (code == KeyEvent.VK_F2){application.portalType = PortalWorldDemo.SQUARE_ST;}
-	else if (code == KeyEvent.VK_F3){application.portalType = PortalWorldDemo.CIRCLE;}
-	else if (code == KeyEvent.VK_F4){application.portalType = PortalWorldDemo.CIRCLE_ST;}
 	else if (code == KeyEvent.VK_SPACE){
-	    application.switchPortal(prevJPX+PORTAL_INITIAL_X_OFFSET, prevJPY+PORTAL_INITIAL_Y_OFFSET);
+	    application.switchPortal(prevJPX, prevJPY);
 	}
     }
 
