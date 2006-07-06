@@ -42,7 +42,7 @@ public abstract class Portal {
 	y += dy;
     }
 
-    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    /**move the portal to x,y inside the view (JPanel coordinates)*/
     public void moveTo(int x, int y){
 	this.x = x;
 	this.y = y;
