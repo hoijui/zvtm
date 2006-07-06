@@ -57,11 +57,13 @@ public class TrailingCameraPortalST extends CameraPortalST {
     }
 
     public void updateFrequency(long currentTime) {
-	if (frequency == -1)
+	if (frequency == -1){
 	    frequency = 1;
+	}
 	else {
-	    double ds = (currentTime - mLastSampleTime) / 1000.0;
-	    frequency = 1 / ds;
+	    if (currentTime != mLastSampleTime){
+		frequency = 1000.0 / ((double)(currentTime - mLastSampleTime));
+	    }
 	}
 	mLastSampleTime = currentTime;
     }
@@ -85,6 +87,8 @@ public class TrailingCameraPortalST extends CameraPortalST {
  	ty = Math.min(ty, owningView.getPanelSize().height - h/2);
 	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
 	    this.moveTo(tx-w/2, ty-h/2);
+	    // make the widget almost disappear when making big moves
+	    setTransparencyValue((float)opacity);
 	    owningView.repaintNow();
 	}
     }
