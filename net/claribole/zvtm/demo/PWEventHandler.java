@@ -66,6 +66,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	application.switchPortal(jpx, jpy);
+	application.portal.updateFrequency(e.getWhen());
+	application.portal.updateWidgetLocation(jpx, jpy);
 	prevJPX = jpx;
 	prevJPY = jpy;
     }
@@ -73,10 +75,10 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 	if (application.portal != null){
 	    application.portal.updateFrequency(e.getWhen());
-	    application.portal.updateWidgetLocation(jpx, jpy);	    
-	    prevJPX = jpx;
-	    prevJPY = jpy;
+	    application.portal.updateWidgetLocation(jpx, jpy);
 	}
+	prevJPX = jpx;
+	prevJPY = jpy;
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -129,6 +131,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	else if (code == KeyEvent.VK_RIGHT){application.translateView(PortalWorldDemo.MOVE_RIGHT, mod == CTRL_MOD);}
 	else if (code == KeyEvent.VK_SPACE){
 	    application.switchPortal(prevJPX, prevJPY);
+	    application.portal.updateFrequency(e.getWhen());
+	    application.portal.updateWidgetLocation(prevJPX, prevJPY);
 	}
     }
 
