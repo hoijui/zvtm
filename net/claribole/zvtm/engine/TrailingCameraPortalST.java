@@ -1,0 +1,105 @@
+/*   FILE: TrailingCameraPortalST.java
+ *   DATE OF CREATION:  Wed Jul 05 15:00:06 2006
+ *   AUTHOR :           Caroline Appert (appert@lri.fr)
+ *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2006. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id: $
+ */
+
+package net.claribole.zvtm.engine;
+
+import java.awt.geom.Point2D;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Transparent;
+
+/**A portal showing what is seen through a camera, with parameterable alpha channel (translucency).
+   The portal behaves like a trailing widget.
+   The Camera should not be used in any other View or Portal.*/
+
+public class TrailingCameraPortalST extends CameraPortalST {
+
+    double frequency = -1;
+    long mLastSampleTime = -1;
+    int xOffset = -120;
+    int yOffset = 120;
+    LowPassFilter filter = new LowPassFilter();
+    Point2D currentPos = new Point2D.Double(0, 0);
+    Point2D parentPos = new Point2D.Double(0, 0);
+    Point2D targetPos = new Point2D.Double(0, 0);
+    Timer timer;
+
+    /** Builds a new possibly translucent portal displaying what is seen through a camera
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param c camera associated with the portal
+     *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
+     *@param xo horizontal offset (in pixels) between cursor and portal (trailing widget)
+     *@param yo vertical offset (in pixels) between cursor and portal (trailing widget)
+     */
+    public TrailingCameraPortalST(int x, int y, int w, int h, Camera c, float a, int xo, int yo){
+	super(x, y, w, h, c, a);
+	xOffset = xo;
+	yOffset = yo;
+	timer = new Timer();
+	timer.scheduleAtFixedRate(new TrailingTimer(this), 40, 40);
+    }
+
+    public void updateFrequency() {
+	updateFrequency(System.currentTimeMillis());
+    }
+
+    public void updateFrequency(long currentTime) {
+	if (frequency == -1)
+	    frequency = 1;
+	else {
+	    double ds = (currentTime - mLastSampleTime) / 1000.0;
+	    frequency = 1 / ds;
+	}
+	mLastSampleTime = currentTime;
+    }
+
+    public void updateWidgetLocation(int cx, int cy){
+	parentPos.setLocation(cx, cy);
+	updateWidgetLocation();
+    }
+
+    public void updateWidgetLocation(){
+	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+	double distAway = targetPos.distance(currentPos);
+	//XXX: maxDist needs to be tuned
+	double maxDist = 2 * Math.abs(xOffset);
+	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.01);
+	currentPos = filter.apply(targetPos, frequency);
+	int tx = (int)Math.round(currentPos.getX());
+	int ty = (int)Math.round(currentPos.getY());
+	tx = Math.max(tx, 0);
+ 	ty = Math.min(ty, owningView.getPanelSize().height - h);
+ 	this.moveTo(tx-w/2, ty-h/2);
+	owningView.repaintNow();
+    }
+
+}
+
+class TrailingTimer extends TimerTask {
+
+    TrailingCameraPortalST portal;
+
+    TrailingTimer(TrailingCameraPortalST p){
+	super();
+	this.portal = p;
+    }
+
+    public void run(){
+	portal.updateWidgetLocation();
+    }
+
+}
