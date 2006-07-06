@@ -201,12 +201,19 @@ public abstract class View {
 
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
     public long[] getVisibleRegion(Camera c){
+	return getVisibleRegion(c, new long[4]);
+    }
+
+    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]
+     *@param c camera
+     *@param res array which will contain the result */
+    public long[] getVisibleRegion(Camera c, long[] res){
 	if (cameras.contains(c)){
 	    float uncoef=(float)((c.focal+c.altitude)/c.focal);  //compute region seen from this view through camera
-	    long[] res = {(long)(c.posx-(panel.viewW/2-panel.visibilityPadding[0])*uncoef),
-			  (long)(c.posy+(panel.viewH/2-panel.visibilityPadding[1])*uncoef),
-			  (long)(c.posx+(panel.viewW/2-panel.visibilityPadding[2])*uncoef),
-			  (long)(c.posy-(panel.viewH/2-panel.visibilityPadding[3])*uncoef)};
+	    res[0] = (long)(c.posx-(panel.viewW/2-panel.visibilityPadding[0])*uncoef);
+	    res[1] = (long)(c.posy+(panel.viewH/2-panel.visibilityPadding[1])*uncoef);
+	    res[2] = (long)(c.posx+(panel.viewW/2-panel.visibilityPadding[2])*uncoef);
+	    res[3] = (long)(c.posy-(panel.viewH/2-panel.visibilityPadding[3])*uncoef);
 	    return res;
 	}
 	return null;
