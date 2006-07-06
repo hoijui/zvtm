@@ -11,6 +11,7 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -21,11 +22,13 @@ import java.util.Hashtable;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.*;
 
-class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
+class AbstractTaskPZEventHandler extends AbstractTaskEventHandler implements PortalEventHandler {
 
     boolean cameraStickedToMouse = false;
+    boolean regionStickedToMouse = false;
+    boolean inPortal = false;
 
     AbstractTaskPZEventHandler(ZLAbstractTask appli){
 	super(appli);
@@ -35,53 +38,78 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	cameraStickedToMouse = true;
+	if (inPortal){
+	    regionStickedToMouse = true;
+	}
+	else {
+	    cameraStickedToMouse = true;
+	}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
-	cameraStickedToMouse = false;
+	if (cameraStickedToMouse){
+	    cameraStickedToMouse = false;
+	    application.centerOverview();
+	}
+	if (regionStickedToMouse){
+	    regionStickedToMouse = false;
+	}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	lastVX = v.getMouse().vx;
-	lastVY = v.getMouse().vy;
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	cameraStickedToMouse = true;
+	if (inPortal){
+	    regionStickedToMouse = true;
+	}
+	else {
+	    cameraStickedToMouse = true;
+	}
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
-	cameraStickedToMouse = false;
+	if (cameraStickedToMouse){
+	    cameraStickedToMouse = false;
+	    application.centerOverview();
+	}
+	if (regionStickedToMouse){
+	    regionStickedToMouse = false;
+	}
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	lastVX = v.getMouse().vx;
-	lastVY = v.getMouse().vy;
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
  	if (buttonNumber != 2){
-	    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
 	    synchronized(application.demoCamera){
 		if (cameraStickedToMouse){
+		    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
 		    application.demoCamera.move(Math.round(a*(lastJPX-jpx)),
 						Math.round(a*(jpy-lastJPY)));
 		    lastJPX = jpx;
 		    lastJPY = jpy;
 		    cameraMoved();
+		}
+		else if (regionStickedToMouse){
+		    float a = (application.portalCamera.focal+Math.abs(application.portalCamera.altitude))/application.portalCamera.focal;
+		    application.demoCamera.move(Math.round(a*(jpx-lastJPX)),
+						Math.round(a*(lastJPY-jpy)));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
 		}
 	    }
  	}
@@ -106,6 +134,20 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
 	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy);}
 	else if (code==KeyEvent.VK_G){application.gc();}
+    }
+
+    /**cursor enters portal*/
+    public void enterPortal(Portal p){
+	inPortal = true;
+	((CameraPortal)p).setBorder(Color.WHITE);
+	application.vsm.repaintNow();
+    }
+
+    /**cursor exits portal*/
+    public void exitPortal(Portal p){
+	inPortal = false;
+	((CameraPortal)p).setBorder(Color.RED);
+	application.vsm.repaintNow();
     }
 
 }

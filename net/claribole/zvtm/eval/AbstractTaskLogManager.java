@@ -297,6 +297,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	application.vsm.repaintNow();
 	// need to call it twice because of visibleRegion update issue
 	application.eh.cameraMoved();
+	application.centerOverview();
     }
 
     void endTrial(){
@@ -419,11 +420,14 @@ class AbstractTaskLogManager implements Java2DPainter {
 	try {
 	    lensxS = Integer.toString(application.lens.lx);
 	    lensyS = Integer.toString(application.lens.ly);
-	    if (write && trialStarted){
-		writeCinematic();
-	    }
 	}
-	catch (NullPointerException ex){System.err.println("Did not write cinematic info");ex.printStackTrace();}
+	catch (NullPointerException ex){
+	    lensxS = AbstractTaskLogManager.NaN;
+	    lensyS = AbstractTaskLogManager.NaN;
+	}
+	if (write && trialStarted){
+	    writeCinematic();
+	}
     }
 
     void portalPositionChanged(boolean write){

@@ -93,6 +93,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
     boolean paintLinks = false;
 
+    OverviewPortal ovPortal;
+
     static final Color HCURSOR_COLOR = new Color(200,48,48);
 
     /* GRID */
@@ -182,6 +184,9 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
+	else if (this.technique == PZ_TECHNIQUE){
+	    initOverview();
+	}
 	System.gc();
 	logm.im.say(LocateTask.PSTS);
     }
@@ -194,6 +199,29 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	mainVS.hide(dmRegion);
     }
 
+    void initOverview(){
+	ovPortal = new OverviewPortal(VIEW_W-AbstractTaskInstructionsManager.PADDING-DM_PORTAL_WIDTH,
+				      VIEW_H-AbstractTaskInstructionsManager.PADDING-DM_PORTAL_HEIGHT,
+				      DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera, demoCamera);
+	ovPortal.setPortalEventHandler((PortalEventHandler)eh);
+	ovPortal.setBackgroundColor(Color.LIGHT_GRAY);
+	vsm.addPortal(ovPortal, demoView);
+	ovPortal.setBorder(Color.BLACK);
+	updateOverview();
+    }
+    
+    void updateOverview(){
+	// update overview's altitude
+	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*12-demoCamera.getFocal()));
+    }
+
+    void centerOverview(){
+	vsm.animator.createCameraAnimation(300, AnimManager.CA_TRANS_SIG,
+					   new LongPoint(demoCamera.posx-portalCamera.posx, demoCamera.posy-portalCamera.posy),
+					   portalCamera.getID(), null);
+// 	portalCamera.moveTo(demoCamera.posx, demoCamera.posy);
+    }
+    
     void windowLayout(){
 	if (Utilities.osIsWindows()){
 	    VIEW_X = VIEW_Y = 0;
