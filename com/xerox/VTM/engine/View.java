@@ -331,6 +331,11 @@ public abstract class View {
     /**set the window size*/
     public abstract void setSize(int x,int y);
 
+    /**get the dimensions of the ZVTM panel embedded in this view*/
+    public Dimension getPanelSize(){
+	return panel.size;
+    }
+
     /**can the window be resized or not*/
     public abstract void setResizable(boolean b);
 
