@@ -81,10 +81,12 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	currentPos = filter.apply(targetPos, frequency);
 	int tx = (int)Math.round(currentPos.getX());
 	int ty = (int)Math.round(currentPos.getY());
-	tx = Math.max(tx, 0);
- 	ty = Math.min(ty, owningView.getPanelSize().height - h);
- 	this.moveTo(tx-w/2, ty-h/2);
-	owningView.repaintNow();
+	tx = Math.max(tx, w/2);
+ 	ty = Math.min(ty, owningView.getPanelSize().height - h/2);
+	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
+	    this.moveTo(tx-w/2, ty-h/2);
+	    owningView.repaintNow();
+	}
     }
 
 }
