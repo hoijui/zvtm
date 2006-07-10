@@ -535,6 +535,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
  		parent.mouse.moveTo(e.getX(), e.getY());
  		parent.mouse.unProject(cams[activeLayer],this);  //we project the mouse cursor wrt the appropriate coord sys
  		parent.mouse.propagateMove();  //translate glyphs sticked to mouse
+		// find out is the cursor is inside one (or more) portals
+		updateCursorInsidePortals(e.getX(), e.getY());
 		if (evH != null){
 		    if ((whichButton & InputEvent.BUTTON1_MASK)==InputEvent.BUTTON1_MASK){buttonNumber=1;}
 		    else {
