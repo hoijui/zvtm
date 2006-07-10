@@ -79,7 +79,7 @@ public class PortalWorldDemo {
     static int PORTAL_HEIGHT_EXPANSION_OFFSET = 50;
     static final int PORTAL_X_OFFSET = -120;
     static final int PORTAL_Y_OFFSET = 120;
-    TrailingCameraPortalST portal;
+    TrailingOverview portal;
     Camera portalCamera;
     static  float PORTAL_OVERVIEW_ALTITUDE;
 
@@ -133,9 +133,9 @@ public class PortalWorldDemo {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    TrailingCameraPortalST getPortal(int x, int y){
-	return new TrailingCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,
-					  portalCamera, 0.0f, PORTAL_X_OFFSET, PORTAL_Y_OFFSET);
+    TrailingOverview getPortal(int x, int y){
+	return new TrailingOverview(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,
+				    portalCamera, demoCamera, 0.0f, PORTAL_X_OFFSET, PORTAL_Y_OFFSET);
     }
 
     void killPortal(){

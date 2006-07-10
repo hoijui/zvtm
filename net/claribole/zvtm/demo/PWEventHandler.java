@@ -168,13 +168,11 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	application.portal.resize(PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
 	application.portal.move(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET/2, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET/2);
 	application.portal.setTransparencyValue(1.0f);
-	application.portal.setBorder(Color.WHITE);
     }
 
     void unstickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(false);
 	application.portal.resize(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
-	application.portal.setBorder(Color.RED);
     }
 
 }
