@@ -34,6 +34,8 @@ public class TrailingOverview extends TrailingCameraPortalST {
     long[] observedRegion;
     float orcoef;
 
+    Timer borderTimer;
+
     /** Builds a new possibly translucent portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -50,6 +52,8 @@ public class TrailingOverview extends TrailingCameraPortalST {
 	this.observedRegionCamera = orc;
 	this.observedRegionView = orc.getOwningView();
 	observedRegion = new long[4];
+	borderTimer = new Timer();
+	borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
     }
 
     /**
@@ -57,13 +61,14 @@ public class TrailingOverview extends TrailingCameraPortalST {
      *@param a [0;1.0] 0 is fully transparent, 1 is opaque
      */
     public void setTransparencyValue(float a){
+	if (a < 0){a = 0;}
 	try {
 	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
 	    alpha = a;
 	    orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a/2.0f);  //transparency set to alpha
 	}
 	catch (IllegalArgumentException ex){
-	    if (VirtualSpaceManager.debugModeON()){System.err.println("Error animating translucency of "+this.toString());}
+	    if (VirtualSpaceManager.debugModeON()){System.err.println("Error animating translucency of "+this.toString()+": "+a);}
 	}
     }
 
@@ -76,6 +81,34 @@ public class TrailingOverview extends TrailingCameraPortalST {
 		cy >= y+h/2 + Math.round((camera.posy-observedRegion[1])*orcoef) &&
 		cx <= x+w/2 + Math.round((observedRegion[2]-camera.posx)*orcoef) &&
 		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
+    }
+
+    int wbv = 0;
+    int nbv = 0;
+    int ebv = 0;
+    int sbv = 0;
+
+    public void resetInsideBorders(){
+	wbv = 0;
+	nbv = 0;
+	ebv = 0;
+	sbv = 0;
+    }
+
+    public void insideWestBorder(int v){
+	wbv = v;
+    }
+
+    public void insideNorthBorder(int v){
+	nbv = v;
+    }
+    
+    public void insideEastBorder(int v){
+	ebv = v;
+    }
+    
+    public void insideSouthBorder(int v){
+	sbv = v;
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
@@ -135,6 +168,32 @@ public class TrailingOverview extends TrailingCameraPortalST {
 	    g2d.drawRect(x, y, w, h);
 	}
 	g2d.setComposite(acO);
+    }
+
+}
+
+class BorderTimer extends TimerTask {
+
+    TrailingOverview portal;
+
+    BorderTimer(TrailingOverview p){
+	super();
+	this.portal = p;
+    }
+
+    public void run(){
+	if (portal.wbv > 0){
+	    portal.camera.move(-Math.round(portal.wbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);
+	}
+	else if (portal.ebv > 0){
+	    portal.camera.move(Math.round(portal.ebv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);	    
+	}
+	if (portal.nbv > 0){
+	    portal.camera.move(0, Math.round(portal.nbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
+	}
+	else if (portal.sbv > 0){
+	    portal.camera.move(0, -Math.round(portal.sbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
+	}
     }
 
 }

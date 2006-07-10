@@ -53,6 +53,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
  	application.vsm.activeView.mouse.setSensitivity(true);
 	regionStickedToMouse = false;
+	application.portal.resetInsideBorders();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -83,6 +84,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     }
 
     Camera handledCamera;
+    static final int PORTAL_MARGIN = 20;
+    int[] dfb = new int[4];
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!inPortal && application.portal != null){
@@ -99,6 +102,33 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 		    handledCamera.move(Math.round(a*(jpx-lastJPX)),
 				       Math.round(a*(lastJPY-jpy)));
 		}
+		else {
+		    application.portal.getDistanceFromBorders(jpx, jpy, dfb);
+		    if (dfb[0] > 0 && dfb[0] < PORTAL_MARGIN){// inside west margin
+			application.portal.insideWestBorder((PORTAL_MARGIN-dfb[0])/2);
+			application.portal.insideEastBorder(0);
+		    }
+		    else if (dfb[2] > 0 && dfb[2] < PORTAL_MARGIN){// inside east margin 
+			application.portal.insideWestBorder(0);
+			application.portal.insideEastBorder((PORTAL_MARGIN-dfb[2])/2);
+		    }
+		    else {
+			application.portal.insideWestBorder(0);
+			application.portal.insideEastBorder(0);
+		    }
+		    if (dfb[1] > 0 && dfb[1] < PORTAL_MARGIN){// inside north margin
+			application.portal.insideNorthBorder((PORTAL_MARGIN-dfb[1])/2);
+			application.portal.insideSouthBorder(0);			
+		    }
+		    else if (dfb[3] > 0 && dfb[3] < PORTAL_MARGIN){// inside south margin
+			application.portal.insideNorthBorder(0);
+			application.portal.insideSouthBorder((PORTAL_MARGIN-dfb[3])/2);
+		    }
+		    else {
+			application.portal.insideNorthBorder(0);
+			application.portal.insideSouthBorder(0);
+		    }
+		}
 	    }
 	    else {
 		handledCamera = application.demoCamera;
@@ -112,7 +142,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-	handledCamera = (inPortal) ? application.portalCamera : application.demoCamera;
+// 	handledCamera = (inPortal) ? application.portalCamera : application.demoCamera;
+	handledCamera = application.demoCamera;
 	float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
 	if (wheelDirection == WHEEL_UP){
 	    handledCamera.altitudeOffset(-a*5);
@@ -130,9 +161,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-
-    }
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code == KeyEvent.VK_PAGE_UP){application.getHigherView(mod == CTRL_MOD);}
