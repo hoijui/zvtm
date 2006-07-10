@@ -33,6 +33,7 @@ public class TrailingCameraPortalST extends CameraPortalST {
     Point2D parentPos = new Point2D.Double(0, 0);
     Point2D targetPos = new Point2D.Double(0, 0);
     Timer timer;
+    TrailingTimer mouseStillUpdater;
 
     /** Builds a new possibly translucent portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
@@ -49,7 +50,8 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	xOffset = xo;
 	yOffset = yo;
 	timer = new Timer();
-	timer.scheduleAtFixedRate(new TrailingTimer(this), 40, 40);
+	mouseStillUpdater = new TrailingTimer(this);
+	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
     }
 
     public void updateFrequency() {
@@ -93,19 +95,34 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	}
     }
 
+    public void setNoUpdateWhenMouseStill(boolean b){
+	mouseStillUpdater.setEnabled(!b);
+    }
+
 }
 
 class TrailingTimer extends TimerTask {
 
     TrailingCameraPortalST portal;
+    private boolean enabled = true;
 
     TrailingTimer(TrailingCameraPortalST p){
 	super();
 	this.portal = p;
     }
 
+    public void setEnabled(boolean b){
+	enabled = b;
+    }
+
+    public boolean isEnabled(){
+	return enabled;
+    }
+
     public void run(){
-	portal.updateWidgetLocation();
+	if (enabled){
+	    portal.updateWidgetLocation();
+	}
     }
 
 }
