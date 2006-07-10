@@ -33,19 +33,26 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     int prevJPX,prevJPY;
 
     boolean inPortal = false;
+    boolean regionStickedToMouse = false;
 
     PWEventHandler(PortalWorldDemo appli){
 	application = appli;
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
- 	application.vsm.activeView.mouse.setSensitivity(false);
 	lastJPX = jpx;
 	lastJPY = jpy;
+	if (inPortal && application.portal.coordInsideObservedRegion(jpx, jpy)){
+	    regionStickedToMouse = true;
+	}
+	else {
+	    application.vsm.activeView.mouse.setSensitivity(false);
+	}
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
  	application.vsm.activeView.mouse.setSensitivity(true);
+	regionStickedToMouse = false;
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -86,16 +93,21 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	prevJPY = jpy;
 	if (buttonNumber == 1){
 	    if (inPortal){
-
+		if (regionStickedToMouse){
+		    handledCamera = application.demoCamera;
+		    float a = (application.portalCamera.focal+Math.abs(application.portalCamera.altitude)) / application.portalCamera.focal;
+		    handledCamera.move(Math.round(a*(jpx-lastJPX)),
+				       Math.round(a*(lastJPY-jpy)));
+		}
 	    }
 	    else {
 		handledCamera = application.demoCamera;
 		float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
 		handledCamera.move(Math.round(a*(lastJPX-jpx)),
 				   Math.round(a*(jpy-lastJPY)));
-		lastJPX = jpx;
-		lastJPY = jpy;
 	    }
+	    lastJPX = jpx;
+	    lastJPY = jpy;
 	}
     }
 
