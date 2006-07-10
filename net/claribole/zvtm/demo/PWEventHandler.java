@@ -22,6 +22,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import java.util.Vector;
+
 class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     PortalWorldDemo application;
@@ -140,36 +142,55 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     public void viewClosing(View v){System.exit(0);}
 
+//     boolean expanded = false;
+//     boolean expanding = false;
+//     boolean contracting = false;
+
     /**cursor enters portal*/
     public void enterPortal(Portal p){
 	inPortal = true;
-	stickPortal();
+// 	if (!expanding && !expanded){
+	    stickPortal();
+// 	}
 	application.vsm.repaintNow();
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
 	inPortal = false;
-	unstickPortal();
+// 	if (!contracting && expanded){
+	    unstickPortal();
+// 	}
 	application.vsm.repaintNow();
     }
+
     
     static final int PORTAL_EXPANSION_TIME = 200;
+    static Point[] PORTAL_EXPANSION_PARAMS = {new Point(100, 100), new Point(-50, -50)};
+    static Point PORTAL_CONTRACTION_PARAMS = new Point(-100, -100);
 
     void stickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(true);
-	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
-						       new Point(50,50), application.portal.getID(), null);
+// 	expanding = true;
+// 	expanded = true;
+// 	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_TRANS_LIN,
+// 						       PORTAL_EXPANSION_PARAMS, application.portal.getID(),
+// 						       new PWTrailingWidgetExpansion(this));
+	application.portal.resize(100,100);
+	application.portal.move(-50,-50);
 	application.portal.setTransparencyValue(1.0f);
 	application.portal.setBorder(Color.WHITE);
     }
 
     void unstickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(false);
-	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
-						       new Point(-50,-50), application.portal.getID(), null);
+// 	contracting = true;
+// 	expanded = false;
+// 	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
+// 						       PORTAL_CONTRACTION_PARAMS, application.portal.getID(),
+// 						       new PWTrailingWidgetContraction(this));
+	application.portal.resize(-100,-100);
 	application.portal.setBorder(Color.RED);
-	
     }
 
 }

@@ -73,8 +73,8 @@ public class PortalWorldDemo {
     static int ANIM_MOVE_LENGTH = 500;
 
     /* Portal */
-    static int PORTAL_WIDTH = 100;
-    static int PORTAL_HEIGHT = 100;
+    static int PORTAL_WIDTH = 50;
+    static int PORTAL_HEIGHT = 50;
     TrailingCameraPortalST portal;
     Camera portalCamera;
 
