@@ -75,8 +75,13 @@ public class PortalWorldDemo {
     /* Portal */
     static int PORTAL_WIDTH = 50;
     static int PORTAL_HEIGHT = 50;
+    static int PORTAL_WIDTH_EXPANSION_OFFSET = 150;
+    static int PORTAL_HEIGHT_EXPANSION_OFFSET = 50;
+    static final int PORTAL_X_OFFSET = -120;
+    static final int PORTAL_Y_OFFSET = 120;
     TrailingCameraPortalST portal;
     Camera portalCamera;
+    static  float PORTAL_OVERVIEW_ALTITUDE;
 
     PortalWorldDemo(){
 	vsm = new VirtualSpaceManager();
@@ -99,6 +104,7 @@ public class PortalWorldDemo {
 	demoView.setNotifyMouseMoved(true);
 	portalCamera = vsm.addCamera(mainVSname);
 	initMap();
+	PORTAL_OVERVIEW_ALTITUDE = mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL ;
 	getGlobalView(false);
 	System.gc();
     }
@@ -127,12 +133,9 @@ public class PortalWorldDemo {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    static final int PORTAL_INITIAL_X_OFFSET = -120;
-    static final int PORTAL_INITIAL_Y_OFFSET = 120;
-
     TrailingCameraPortalST getPortal(int x, int y){
 	return new TrailingCameraPortalST(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,
-					  portalCamera, 0.0f, PORTAL_INITIAL_X_OFFSET, PORTAL_INITIAL_Y_OFFSET);
+					  portalCamera, 0.0f, PORTAL_X_OFFSET, PORTAL_Y_OFFSET);
     }
 
     void killPortal(){
@@ -143,7 +146,7 @@ public class PortalWorldDemo {
 
     void switchPortal(int x, int y){
 	if (portal != null){// portal is active, destroy it it
-	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(-0.7f),
+	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(-0.5f),
 					       portal.getID(), new PortalKiller(this));
 	}
 	else {// portal not active, create it
@@ -152,12 +155,10 @@ public class PortalWorldDemo {
 	    portal.setPortalEventHandler(eh);
 	    vsm.addPortal(portal, demoView);
  	    portal.setBorder(Color.RED);
-	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.7f),
+	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       portal.getID(), null);
-	    Location l = portal.getSeamlessView(demoCamera);
-	    portalCamera.moveTo(l.vx, l.vy);
-	    portalCamera.setAltitude(l.alt);
-	    getHigherView(true);
+	    portalCamera.moveTo(0, 0);
+	    portalCamera.setAltitude(PORTAL_OVERVIEW_ALTITUDE);
 	}
     }
 
