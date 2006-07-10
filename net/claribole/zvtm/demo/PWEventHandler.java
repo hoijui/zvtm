@@ -54,17 +54,17 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	application.switchPortal(jpx, jpy);
 	application.portal.updateFrequency(e.getWhen());
 	application.portal.updateWidgetLocation(jpx, jpy);
 	prevJPX = jpx;
 	prevJPY = jpy;
     }
+
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 	if (!inPortal && application.portal != null){
@@ -176,8 +176,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 // 	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_TRANS_LIN,
 // 						       PORTAL_EXPANSION_PARAMS, application.portal.getID(),
 // 						       new PWTrailingWidgetExpansion(this));
-	application.portal.resize(100,100);
-	application.portal.move(-50,-50);
+	application.portal.resize(150,50);
+	application.portal.move(-75,-50);
 	application.portal.setTransparencyValue(1.0f);
 	application.portal.setBorder(Color.WHITE);
     }
@@ -189,7 +189,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 // 	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
 // 						       PORTAL_CONTRACTION_PARAMS, application.portal.getID(),
 // 						       new PWTrailingWidgetContraction(this));
-	application.portal.resize(-100,-100);
+	application.portal.resize(-150,-50);
 	application.portal.setBorder(Color.RED);
     }
 
