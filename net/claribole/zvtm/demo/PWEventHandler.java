@@ -85,12 +85,17 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	prevJPX = jpx;
 	prevJPY = jpy;
 	if (buttonNumber == 1){
-	    handledCamera = (inPortal) ? application.portalCamera : application.demoCamera;
-	    float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
-	    handledCamera.move(Math.round(a*(lastJPX-jpx)),
-			       Math.round(a*(jpy-lastJPY)));
-	    lastJPX = jpx;
-	    lastJPY = jpy;
+	    if (inPortal){
+
+	    }
+	    else {
+		handledCamera = application.demoCamera;
+		float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
+		handledCamera.move(Math.round(a*(lastJPX-jpx)),
+				   Math.round(a*(jpy-lastJPY)));
+		lastJPX = jpx;
+		lastJPY = jpy;
+	    }
 	}
     }
 
@@ -142,54 +147,33 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     public void viewClosing(View v){System.exit(0);}
 
-//     boolean expanded = false;
-//     boolean expanding = false;
-//     boolean contracting = false;
-
     /**cursor enters portal*/
     public void enterPortal(Portal p){
 	inPortal = true;
-// 	if (!expanding && !expanded){
-	    stickPortal();
-// 	}
+	stickPortal();
 	application.vsm.repaintNow();
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
 	inPortal = false;
-// 	if (!contracting && expanded){
-	    unstickPortal();
-// 	}
+	unstickPortal();
 	application.vsm.repaintNow();
     }
 
-    
     static final int PORTAL_EXPANSION_TIME = 200;
-    static Point[] PORTAL_EXPANSION_PARAMS = {new Point(100, 100), new Point(-50, -50)};
-    static Point PORTAL_CONTRACTION_PARAMS = new Point(-100, -100);
 
     void stickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(true);
-// 	expanding = true;
-// 	expanded = true;
-// 	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_TRANS_LIN,
-// 						       PORTAL_EXPANSION_PARAMS, application.portal.getID(),
-// 						       new PWTrailingWidgetExpansion(this));
-	application.portal.resize(150,50);
-	application.portal.move(-75,-50);
+	application.portal.resize(PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
+	application.portal.move(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET/2, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET/2);
 	application.portal.setTransparencyValue(1.0f);
 	application.portal.setBorder(Color.WHITE);
     }
 
     void unstickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(false);
-// 	contracting = true;
-// 	expanded = false;
-// 	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
-// 						       PORTAL_CONTRACTION_PARAMS, application.portal.getID(),
-// 						       new PWTrailingWidgetContraction(this));
-	application.portal.resize(-150,-50);
+	application.portal.resize(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
 	application.portal.setBorder(Color.RED);
     }
 
