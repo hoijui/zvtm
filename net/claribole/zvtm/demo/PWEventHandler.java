@@ -17,6 +17,7 @@ import com.xerox.VTM.glyphs.VRectangle;
 import net.claribole.zvtm.engine.*;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -29,23 +30,20 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     int prevJPX,prevJPY;
 
+    boolean inPortal = false;
+
     PWEventHandler(PortalWorldDemo appli){
 	application = appli;
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);
+ 	application.vsm.activeView.mouse.setSensitivity(false);
 	lastJPX = jpx;
 	lastJPY = jpy;
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed=0;
-	application.vsm.animator.Yspeed=0;
-	application.vsm.animator.Aspeed=0;
-	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+ 	application.vsm.activeView.mouse.setSensitivity(true);
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -54,15 +52,9 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    }
-
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-
-    }
-
-
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	application.switchPortal(jpx, jpy);
@@ -73,7 +65,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-	if (application.portal != null){
+	if (!inPortal && application.portal != null){
 	    application.portal.updateFrequency(e.getWhen());
 	    application.portal.updateWidgetLocation(jpx, jpy);
 	}
@@ -81,32 +73,34 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	prevJPY = jpy;
     }
 
+    Camera handledCamera;
+
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+	if (!inPortal && application.portal != null){
+	    application.portal.updateFrequency(e.getWhen());
+	    application.portal.updateWidgetLocation(jpx, jpy);
+	}
+	prevJPX = jpx;
+	prevJPY = jpy;
 	if (buttonNumber == 1){
-	    Camera c = application.demoCamera;
-	    float a = (c.focal+Math.abs(c.altitude)) / c.focal;
-	    if (mod == META_SHIFT_MOD) {
-		application.vsm.animator.Xspeed = 0;
-		application.vsm.animator.Yspeed = 0;
-		application.vsm.animator.Aspeed = (c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
-	    }
-	    else {
-		application.vsm.animator.Xspeed = (c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50));
-		application.vsm.animator.Yspeed = (c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
-		application.vsm.animator.Aspeed = 0;
-	    }
+	    handledCamera = (inPortal) ? application.portalCamera : application.demoCamera;
+	    float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
+	    handledCamera.move(Math.round(a*(lastJPX-jpx)),
+			       Math.round(a*(jpy-lastJPY)));
+	    lastJPX = jpx;
+	    lastJPY = jpy;
 	}
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-	Camera c = application.demoCamera;
-	float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+	handledCamera = (inPortal) ? application.portalCamera : application.demoCamera;
+	float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
 	if (wheelDirection == WHEEL_UP){
-	    c.altitudeOffset(-a*5);
+	    handledCamera.altitudeOffset(-a*5);
 	    application.vsm.repaintNow();
 	}
 	else {//wheelDirection == WHEEL_DOWN
-	    c.altitudeOffset(a*5);
+	    handledCamera.altitudeOffset(a*5);
 	    application.vsm.repaintNow();
 	}
     }
@@ -147,9 +141,35 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void viewClosing(View v){System.exit(0);}
 
     /**cursor enters portal*/
-    public void enterPortal(Portal p){((CameraPortal)p).setBorder(Color.WHITE);application.vsm.repaintNow();}
+    public void enterPortal(Portal p){
+	inPortal = true;
+	stickPortal();
+	application.vsm.repaintNow();
+    }
 
     /**cursor exits portal*/
-    public void exitPortal(Portal p){((CameraPortal)p).setBorder(Color.RED);application.vsm.repaintNow();}
+    public void exitPortal(Portal p){
+	inPortal = false;
+	unstickPortal();
+	application.vsm.repaintNow();
+    }
+    
+    static final int PORTAL_EXPANSION_TIME = 200;
+
+    void stickPortal(){
+	application.portal.setNoUpdateWhenMouseStill(true);
+	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
+						       new Point(50,50), application.portal.getID(), null);
+	application.portal.setTransparencyValue(1.0f);
+	application.portal.setBorder(Color.WHITE);
+    }
+
+    void unstickPortal(){
+	application.portal.setNoUpdateWhenMouseStill(false);
+	application.vsm.animator.createPortalAnimation(PORTAL_EXPANSION_TIME, AnimManager.PT_SZ_LIN,
+						       new Point(-50,-50), application.portal.getID(), null);
+	application.portal.setBorder(Color.RED);
+	
+    }
 
 }
