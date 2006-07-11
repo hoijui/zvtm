@@ -14,6 +14,8 @@ import java.awt.geom.Point2D;
 
 public class LowPassFilter {
 
+    static final double TWO_PI = 2 * Math.PI;
+
     double cutOffFrequency = 0;
     double tau;
     boolean firstTime = true;
@@ -24,7 +26,7 @@ public class LowPassFilter {
 
     public void setCutOffFrequency(double cOffFrequency) {
 	cutOffFrequency = cOffFrequency;
-	tau = 1.0 / (6.2831853 * cutOffFrequency);
+	tau = 1.0 / (LowPassFilter.TWO_PI * cutOffFrequency);
     }
 	
     public double apply(double newValue, double frequency) {
