@@ -178,7 +178,7 @@ public class MapManager implements Runnable {
 
     void switchAdaptMaps(){
 	adaptMaps = !adaptMaps;
-// 	if (ZLWorldTask.SHOW_CONSOLE){application.writeOnConsole("Adapt maps: "+((adaptMaps) ? "On\n" : "Off\n"));}
+	System.out.println("Adapt maps: "+((adaptMaps) ? "On\n" : "Off\n"));
     }
 
     /*called by thread on a regular basis ; pops request from queue in a FIFO manner*/
@@ -295,10 +295,10 @@ public class MapManager implements Runnable {
     }
 
     /* load main map (called once at init time) */
-    void initMap(){
+    void initMap(String mainMapPath){
 // 	if (ZLWorldTask.SHOW_CONSOLE){application.writeOnConsole(ZLWorldTask.LOADING_WORLDMAP_TEXT);}
 	mainMap = new VImage(MapData.M1000x, MapData.M1000y, 0,
- 			     (new ImageIcon(MapData.M1000path)).getImage(),
+ 			     (new ImageIcon((mainMapPath != null) ? mainMapPath : MapData.M1000path)).getImage(),
 			     MapData.MN000factor.doubleValue());
 	mainMap.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vsm.addGlyph(mainMap, vs);
