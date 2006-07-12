@@ -28,7 +28,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 
     PortalWorldDemo application;
 
-    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    int lastJPX,lastJPY;
+    int lastpJPX,lastpJPY;
 
     int prevJPX,prevJPY;
 
@@ -43,6 +44,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 	lastJPX = jpx;
 	lastJPY = jpy;
+	lastpJPX = jpx;
+	lastpJPY = jpy;
 	if (inPortal && application.portal.coordInsideObservedRegion(jpx, jpy)){
 	    regionStickedToMouse = true;
 	}
@@ -52,6 +55,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	application.vsm.animator.Aspeed = 0;
  	application.vsm.activeView.mouse.setSensitivity(true);
 	regionStickedToMouse = false;
 	if (delayedPortalExit){portalExitActions();}
@@ -88,6 +92,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     Camera handledCamera;
     static final int PORTAL_MARGIN = 20;
     int[] dfb = new int[4];
+
+    float cfactor = 40.0f;
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!inPortal && application.portal != null){
@@ -135,8 +141,13 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	    else {
 		handledCamera = application.demoCamera;
 		float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
-		handledCamera.move(Math.round(a*(lastJPX-jpx)),
-				   Math.round(a*(jpy-lastJPY)));
+		if (mod == SHIFT_MOD){
+		    application.vsm.animator.Aspeed = (handledCamera.altitude>0) ? (long)((lastpJPY-jpy)*(a/cfactor)) : (long)((lastpJPY-jpy)/(a*cfactor));
+		}
+		else {
+		    handledCamera.move(Math.round(a*(lastJPX-jpx)),
+				       Math.round(a*(jpy-lastJPY)));
+		}
 	    }
 	    lastJPX = jpx;
 	    lastJPY = jpy;
@@ -170,6 +181,12 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code == KeyEvent.VK_PAGE_UP){application.getHigherView(mod == CTRL_MOD);}
 	else if (code == KeyEvent.VK_PAGE_DOWN){application.getLowerView(mod == CTRL_MOD);}
+
+	else if (code == KeyEvent.VK_OPEN_BRACKET){application.getFastHigherView();}
+	else if (code == KeyEvent.VK_CLOSE_BRACKET){application.getFastLowerView();}
+
+
+
 	else if (code == KeyEvent.VK_HOME){application.getGlobalView(mod == CTRL_MOD);}
 	else if (code == KeyEvent.VK_UP){application.translateView(PortalWorldDemo.MOVE_UP, mod == CTRL_MOD);}
 	else if (code == KeyEvent.VK_DOWN){application.translateView(PortalWorldDemo.MOVE_DOWN, mod == CTRL_MOD);}

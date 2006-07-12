@@ -176,7 +176,19 @@ public class PortalWorldDemo {
 	}
     }
 
-    /*higher view (multiply altitude by altitudeFactor)*/
+    /*higher view*/
+    void getFastHigherView(){
+	demoCamera.altitudeOffset((demoCamera.getAltitude()+demoCamera.getFocal())/2.0f);
+	vsm.repaintNow();
+    }
+
+    /*higher view*/
+    void getFastLowerView(){
+	demoCamera.altitudeOffset(-(demoCamera.getAltitude()+demoCamera.getFocal())/4.0f);
+	vsm.repaintNow();
+    }
+
+    /*higher view*/
     void getHigherView(boolean inPortal){
 	Camera c;
 	if (inPortal){
@@ -189,7 +201,7 @@ public class PortalWorldDemo {
 	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
     }
 
-    /*higher view (multiply altitude by altitudeFactor)*/
+    /*higher view*/
     void getLowerView(boolean inPortal){
 	Camera c;
 	if (inPortal){
