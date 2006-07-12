@@ -79,15 +79,17 @@ public class PortalWorldDemo {
 
     boolean dynamicOverview = true;
 
+    static final short DO_NOT_ADAPT_MAPS = 0;
+    static final short ADAPT_MAPS = 1;
     MapManager mm;
 
-    PortalWorldDemo(){
+    PortalWorldDemo(short am){
 	vsm = new VirtualSpaceManager();
  	vsm.setDebug(true);
-	init();
+	init(am);
     }
 
-    public void init(){
+    public void init(short am){
 	eh = new PWEventHandler(this);
 	vsm.animator.setAnimationListener(eh);
 	windowLayout();
@@ -103,7 +105,13 @@ public class PortalWorldDemo {
 	demoView.setNotifyMouseMoved(true);
 	portalCamera = vsm.addCamera(mainVSname);
 	mm = new MapManager(vsm, mainVS, demoCamera, demoView);
-	mm.initMap();
+	if (am == ADAPT_MAPS){
+	    mm.initMap(null);
+	}
+	else {
+	    mm.initMap("images/world/0000.png");
+	    mm.switchAdaptMaps(); // true by default, make it false
+	}
 	PORTAL_CEILING_ALTITUDE = mm.mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL;
 	getGlobalView(false);
 	System.gc();
@@ -240,7 +248,8 @@ public class PortalWorldDemo {
     }
 
     public static void main(String[] args){
- 	new PortalWorldDemo();
+	short am = (args.length > 0) ? Short.parseShort(args[0]) : ADAPT_MAPS;
+ 	new PortalWorldDemo(am);
     }
 
 }
