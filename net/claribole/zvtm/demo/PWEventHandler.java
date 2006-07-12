@@ -24,7 +24,7 @@ import java.awt.event.MouseWheelEvent;
 
 import java.util.Vector;
 
-class PWEventHandler implements ViewEventHandler, PortalEventHandler {
+class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationListener, ObservedRegionListener {
 
     PortalWorldDemo application;
 
@@ -34,6 +34,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     boolean inPortal = false;
     boolean regionStickedToMouse = false;
+    boolean delayedPortalExit = false;
 
     PWEventHandler(PortalWorldDemo appli){
 	application = appli;
@@ -53,7 +54,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
  	application.vsm.activeView.mouse.setSensitivity(true);
 	regionStickedToMouse = false;
-	application.portal.resetInsideBorders();
+	if (delayedPortalExit){portalExitActions();}
+// 	application.portal.resetInsideBorders();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -102,33 +104,33 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 		    handledCamera.move(Math.round(a*(jpx-lastJPX)),
 				       Math.round(a*(lastJPY-jpy)));
 		}
-		else {
-		    application.portal.getDistanceFromBorders(jpx, jpy, dfb);
-		    if (dfb[0] > 0 && dfb[0] < PORTAL_MARGIN){// inside west margin
-			application.portal.insideWestBorder((PORTAL_MARGIN-dfb[0])/2);
-			application.portal.insideEastBorder(0);
-		    }
-		    else if (dfb[2] > 0 && dfb[2] < PORTAL_MARGIN){// inside east margin 
-			application.portal.insideWestBorder(0);
-			application.portal.insideEastBorder((PORTAL_MARGIN-dfb[2])/2);
-		    }
-		    else {
-			application.portal.insideWestBorder(0);
-			application.portal.insideEastBorder(0);
-		    }
-		    if (dfb[1] > 0 && dfb[1] < PORTAL_MARGIN){// inside north margin
-			application.portal.insideNorthBorder((PORTAL_MARGIN-dfb[1])/2);
-			application.portal.insideSouthBorder(0);			
-		    }
-		    else if (dfb[3] > 0 && dfb[3] < PORTAL_MARGIN){// inside south margin
-			application.portal.insideNorthBorder(0);
-			application.portal.insideSouthBorder((PORTAL_MARGIN-dfb[3])/2);
-		    }
-		    else {
-			application.portal.insideNorthBorder(0);
-			application.portal.insideSouthBorder(0);
-		    }
-		}
+// 		else {
+// 		    application.portal.getDistanceFromBorders(jpx, jpy, dfb);
+// 		    if (dfb[0] > 0 && dfb[0] < PORTAL_MARGIN){// inside west margin
+// 			application.portal.insideWestBorder((PORTAL_MARGIN-dfb[0])/2);
+// 			application.portal.insideEastBorder(0);
+// 		    }
+// 		    else if (dfb[2] > 0 && dfb[2] < PORTAL_MARGIN){// inside east margin 
+// 			application.portal.insideWestBorder(0);
+// 			application.portal.insideEastBorder((PORTAL_MARGIN-dfb[2])/2);
+// 		    }
+// 		    else {
+// 			application.portal.insideWestBorder(0);
+// 			application.portal.insideEastBorder(0);
+// 		    }
+// 		    if (dfb[1] > 0 && dfb[1] < PORTAL_MARGIN){// inside north margin
+// 			application.portal.insideNorthBorder((PORTAL_MARGIN-dfb[1])/2);
+// 			application.portal.insideSouthBorder(0);			
+// 		    }
+// 		    else if (dfb[3] > 0 && dfb[3] < PORTAL_MARGIN){// inside south margin
+// 			application.portal.insideNorthBorder(0);
+// 			application.portal.insideSouthBorder((PORTAL_MARGIN-dfb[3])/2);
+// 		    }
+// 		    else {
+// 			application.portal.insideNorthBorder(0);
+// 			application.portal.insideSouthBorder(0);
+// 		    }
+// 		}
 	    }
 	    else {
 		handledCamera = application.demoCamera;
@@ -148,10 +150,12 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 	if (wheelDirection == WHEEL_UP){
 	    handledCamera.altitudeOffset(-a*5);
 	    application.vsm.repaintNow();
+	    cameraMoved();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    handledCamera.altitudeOffset(a*5);
 	    application.vsm.repaintNow();
+	    cameraMoved();
 	}
     }
 
@@ -190,6 +194,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
+	if (delayedPortalExit){delayedPortalExit = false;return;}
 	inPortal = true;
 	stickPortal();
 	application.vsm.repaintNow();
@@ -197,7 +202,17 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
+	if (regionStickedToMouse){
+	    delayedPortalExit = true;
+	}
+	else {
+	    portalExitActions();
+	}
+    }
+
+    void portalExitActions(){
 	inPortal = false;
+	delayedPortalExit = false;
 	unstickPortal();
 	application.vsm.repaintNow();
     }
@@ -214,6 +229,56 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler {
     void unstickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(false);
 	application.portal.resize(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
+    }
+
+    float oldDemoCameraAltitude = 0;
+
+    public void cameraMoved(){
+	float alt = application.demoCamera.getAltitude();
+	if (alt != oldDemoCameraAltitude){
+	    float palt = alt * 50;
+	    if (palt > PortalWorldDemo.PORTAL_CEILING_ALTITUDE){
+		application.portalCamera.setAltitude(PortalWorldDemo.PORTAL_CEILING_ALTITUDE);
+		if (application.portalCamera.posx != 0 || application.portalCamera.posy != 0){
+		    application.portalCamera.moveTo(0, 0);
+		}
+	    }
+	    else {
+		application.portalCamera.setAltitude(palt);
+	    }
+	    oldDemoCameraAltitude = alt;
+	}
+	if (application.portal != null){
+	    long[] wnes = application.portal.getVisibleRegion();
+	    if (application.demoCamera.posx < wnes[0] ||
+		application.demoCamera.posx > wnes[2] ||
+		application.demoCamera.posy < wnes[3] ||
+		application.demoCamera.posy > wnes[1]){
+		application.portalCamera.moveTo(application.demoCamera.posx, application.demoCamera.posy);
+	    }
+	}
+    }
+
+    public void intersectsParentRegion(long[] wnes){
+	if (regionStickedToMouse && application.portalCamera.getAltitude() < PortalWorldDemo.PORTAL_CEILING_ALTITUDE){
+	    long disp = Math.round((application.portalCamera.altitude+application.portalCamera.focal)/application.portalCamera.focal);
+	    if (wnes[0] < 0 && wnes[2] < 0){// intersection west border
+		application.portalCamera.move(-disp, 0);
+ 		application.demoCamera.move(-disp, 0);
+	    }
+	    else if (wnes[0] > 0 && wnes[2] > 0){// intersection east border
+		application.portalCamera.move(disp, 0);
+		application.demoCamera.move(disp, 0);
+	    }
+	    if (wnes[1] > 0 && wnes[3] > 0){// intersection north border
+		application.portalCamera.move(0, disp);
+		application.demoCamera.move(0, disp);
+	    }
+	    else if (wnes[1] < 0 && wnes[3] < 0){// intersection south border
+		application.portalCamera.move(0, -disp);
+		application.demoCamera.move(0, -disp);
+	    }
+	}
     }
 
 }

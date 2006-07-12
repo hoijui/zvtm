@@ -36,7 +36,7 @@ public class PortalWorldDemo {
     int VIEW_X, VIEW_Y;
 
     /* World map */
-    static final Double MN000factor = new Double(8.0);
+    static final Double MN000factor = new Double(32.0);
     static final String M1000 = "1000";
     static final String M1000path = "images/world/0000.png";
     static final long M1000x = 0;
@@ -81,7 +81,9 @@ public class PortalWorldDemo {
     static final int PORTAL_Y_OFFSET = 120;
     TrailingOverview portal;
     Camera portalCamera;
-    static  float PORTAL_OVERVIEW_ALTITUDE;
+    static  float PORTAL_CEILING_ALTITUDE;
+
+    boolean dynamicOverview = true;
 
     PortalWorldDemo(){
 	vsm = new VirtualSpaceManager();
@@ -91,6 +93,7 @@ public class PortalWorldDemo {
 
     public void init(){
 	eh = new PWEventHandler(this);
+	vsm.animator.setAnimationListener(eh);
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
 	vsm.setZoomLimit(0);
@@ -104,7 +107,7 @@ public class PortalWorldDemo {
 	demoView.setNotifyMouseMoved(true);
 	portalCamera = vsm.addCamera(mainVSname);
 	initMap();
-	PORTAL_OVERVIEW_ALTITUDE = mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL ;
+	PORTAL_CEILING_ALTITUDE = mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL ;
 	getGlobalView(false);
 	System.gc();
     }
@@ -140,6 +143,7 @@ public class PortalWorldDemo {
 
     void killPortal(){
 	vsm.destroyPortal(portal);
+	portal.dispose();
 	portal = null;
 	vsm.repaintNow();
     }
@@ -153,12 +157,13 @@ public class PortalWorldDemo {
 	    portal = getPortal(x, y);
 	    portal.setBackgroundColor(Color.LIGHT_GRAY);
 	    portal.setPortalEventHandler(eh);
+	    portal.setObservedRegionListener(eh);
 	    vsm.addPortal(portal, demoView);
  	    portal.setBorder(Color.RED);
 	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       portal.getID(), null);
 	    portalCamera.moveTo(0, 0);
-	    portalCamera.setAltitude(PORTAL_OVERVIEW_ALTITUDE);
+	    portalCamera.setAltitude(PORTAL_CEILING_ALTITUDE);
 	}
     }
 
