@@ -35,17 +35,11 @@ public class PortalWorldDemo {
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
 
-    /* World map */
-    static final Double MN000factor = new Double(32.0);
-    static final String M1000 = "1000";
-    static final String M1000path = "images/world/0000.png";
-    static final long M1000x = 0;
-    static final long M1000y = 0;
-    VImage mainMap;
+    /* Main World map */
     static final int MAIN_MAP_WIDTH = 8000;
     static final int MAIN_MAP_HEIGHT = 4000;
-    static final long MAP_WIDTH = Math.round(MAIN_MAP_WIDTH * MN000factor.doubleValue());
-    static final long MAP_HEIGHT = Math.round(MAIN_MAP_HEIGHT * MN000factor.doubleValue());
+    static final long MAP_WIDTH = Math.round(MAIN_MAP_WIDTH * MapData.MN000factor.doubleValue());
+    static final long MAP_HEIGHT = Math.round(MAIN_MAP_HEIGHT * MapData.MN000factor.doubleValue());
     static final long HALF_MAP_WIDTH = Math.round(MAP_WIDTH/2.0);
     static final long HALF_MAP_HEIGHT = Math.round(MAP_HEIGHT/2.0);
 
@@ -85,6 +79,8 @@ public class PortalWorldDemo {
 
     boolean dynamicOverview = true;
 
+    MapManager mm;
+
     PortalWorldDemo(){
 	vsm = new VirtualSpaceManager();
  	vsm.setDebug(true);
@@ -106,21 +102,11 @@ public class PortalWorldDemo {
 	demoView.setEventHandler(eh);
 	demoView.setNotifyMouseMoved(true);
 	portalCamera = vsm.addCamera(mainVSname);
-	initMap();
-	PORTAL_CEILING_ALTITUDE = mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL ;
+	mm = new MapManager(vsm, mainVS, demoCamera, demoView);
+	mm.initMap();
+	PORTAL_CEILING_ALTITUDE = mm.mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL;
 	getGlobalView(false);
 	System.gc();
-    }
-
-    void initMap(){
-	System.out.print("Loading World Map...");
-	mainMap = new VImage(M1000x, M1000y, 0,
-			     (new ImageIcon(M1000path)).getImage(),
-			     MN000factor.doubleValue());
-	mainMap.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(mainMap, mainVS);
-	mainVS.atBottom(mainMap);
-	System.out.println("OK");
     }
 
     void windowLayout(){
@@ -135,6 +121,13 @@ public class PortalWorldDemo {
 	VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
+
+    void altitudeChanged(){
+	// update  map level, visible maps and grid level as it
+	// was prevented between zoom{int,out} phases 1 and 2
+	mm.updateMapLevel(demoCamera.getAltitude());
+    }
+
 
     TrailingOverview getPortal(int x, int y){
 	return new TrailingOverview(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,

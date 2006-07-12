@@ -37,6 +37,9 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     boolean regionStickedToMouse = false;
     boolean delayedPortalExit = false;
 
+    long[] rstc = new long[4]; //region seen through camera
+
+
     PWEventHandler(PortalWorldDemo appli){
 	application = appli;
     }
@@ -263,7 +266,12 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	    else {
 		application.portalCamera.setAltitude(palt);
 	    }
+	    application.altitudeChanged();
 	    oldDemoCameraAltitude = alt;
+	}
+	else {
+	    application.demoView.getVisibleRegion(application.demoCamera, rstc);
+	    application.mm.updateVisibleMaps(rstc, true, application.mm.getMapLevel(alt));
 	}
 	if (application.portal != null){
 	    long[] wnes = application.portal.getVisibleRegion();
