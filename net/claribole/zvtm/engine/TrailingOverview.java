@@ -83,32 +83,44 @@ public class TrailingOverview extends TrailingCameraPortalST {
 		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
     }
 
-    int wbv = 0;
-    int nbv = 0;
-    int ebv = 0;
-    int sbv = 0;
+//     int wbv = 0;
+//     int nbv = 0;
+//     int ebv = 0;
+//     int sbv = 0;
 
-    public void resetInsideBorders(){
-	wbv = 0;
-	nbv = 0;
-	ebv = 0;
-	sbv = 0;
-    }
+//     public void resetInsideBorders(){
+// 	wbv = 0;
+// 	nbv = 0;
+// 	ebv = 0;
+// 	sbv = 0;
+//     }
 
-    public void insideWestBorder(int v){
-	wbv = v;
-    }
+//     public void insideWestBorder(int v){
+// 	wbv = v;
+//     }
 
-    public void insideNorthBorder(int v){
-	nbv = v;
-    }
+//     public void insideNorthBorder(int v){
+// 	nbv = v;
+//     }
     
-    public void insideEastBorder(int v){
-	ebv = v;
-    }
+//     public void insideEastBorder(int v){
+// 	ebv = v;
+//     }
     
-    public void insideSouthBorder(int v){
-	sbv = v;
+//     public void insideSouthBorder(int v){
+// 	sbv = v;
+//     }
+
+    ObservedRegionListener observedRegionListener;
+
+    public void setObservedRegionListener(ObservedRegionListener orl){
+	this.observedRegionListener = orl;
+    }
+
+    void observedRegionIntersects(long[] wnes){
+	if (observedRegionListener != null){
+	    observedRegionListener.intersectsParentRegion(wnes);
+	}
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
@@ -170,11 +182,18 @@ public class TrailingOverview extends TrailingCameraPortalST {
 	g2d.setComposite(acO);
     }
 
+    public void dispose(){
+	super.dispose();
+	borderTimer.cancel();
+    }
+
 }
 
 class BorderTimer extends TimerTask {
 
     TrailingOverview portal;
+    long[] portalRegion = new long[4];
+    long[] intersection = new long[4];
 
     BorderTimer(TrailingOverview p){
 	super();
@@ -182,18 +201,26 @@ class BorderTimer extends TimerTask {
     }
 
     public void run(){
-	if (portal.wbv > 0){
-	    portal.camera.move(-Math.round(portal.wbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);
-	}
-	else if (portal.ebv > 0){
-	    portal.camera.move(Math.round(portal.ebv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);	    
-	}
-	if (portal.nbv > 0){
-	    portal.camera.move(0, Math.round(portal.nbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
-	}
-	else if (portal.sbv > 0){
-	    portal.camera.move(0, -Math.round(portal.sbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
-	}
+	portal.getVisibleRegion(portalRegion);
+	intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
+	intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
+	intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
+	intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
+	portal.observedRegionIntersects(intersection);
+
+
+// 	if (portal.wbv > 0){
+// 	    portal.camera.move(-Math.round(portal.wbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);
+// 	}
+// 	else if (portal.ebv > 0){
+// 	    portal.camera.move(Math.round(portal.ebv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);
+// 	}
+// 	if (portal.nbv > 0){
+// 	    portal.camera.move(0, Math.round(portal.nbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
+// 	}
+// 	else if (portal.sbv > 0){
+// 	    portal.camera.move(0, -Math.round(portal.sbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
+// 	}
     }
 
 }

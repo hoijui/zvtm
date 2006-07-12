@@ -99,6 +99,10 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	mouseStillUpdater.setEnabled(!b);
     }
 
+    public void dispose(){
+	timer.cancel();
+    }
+
 }
 
 class TrailingTimer extends TimerTask {
