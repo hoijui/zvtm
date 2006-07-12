@@ -109,13 +109,18 @@ public class CameraPortal extends Portal {
     }
 
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
-    public long[] getVisibleRegion(){
+    public long[] getVisibleRegion(long[] res){
 	float uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
-	long[] res = {(long)(camera.posx - (w/2)*uncoef),
-		      (long)(camera.posy + (h/2)*uncoef),
-		      (long)(camera.posx + (w/2)*uncoef),
-		      (long)(camera.posy - (h/2)*uncoef)};
+	res[0] = (long)(camera.posx - (w/2)*uncoef);
+	res[1] = (long)(camera.posy + (h/2)*uncoef);
+	res[2] = (long)(camera.posx + (w/2)*uncoef);
+	res[3] = (long)(camera.posy - (h/2)*uncoef);
 	return res;
+    }
+
+    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
+    public long[] getVisibleRegion(){
+	return getVisibleRegion(new long[4]);
     }
 
     /**returns the location from which this portal's camera will see everything visible in the associated virtual space
