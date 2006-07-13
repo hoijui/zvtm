@@ -295,11 +295,11 @@ public class MapManager implements Runnable {
     }
 
     /* load main map (called once at init time) */
-    void initMap(String mainMapPath){
+    void initMap(String mainMapPath, Double mulFactor){
 // 	if (ZLWorldTask.SHOW_CONSOLE){application.writeOnConsole(ZLWorldTask.LOADING_WORLDMAP_TEXT);}
 	mainMap = new VImage(MapData.M1000x, MapData.M1000y, 0,
  			     (new ImageIcon((mainMapPath != null) ? mainMapPath : MapData.M1000path)).getImage(),
-			     MapData.MN000factor.doubleValue());
+			     (mulFactor != null) ? mulFactor.doubleValue() : MapData.MN000factor.doubleValue());
 	mainMap.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vsm.addGlyph(mainMap, vs);
 	vs.atBottom(mainMap);
