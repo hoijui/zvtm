@@ -40,6 +40,12 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 
     long[] rstc = new long[4]; //region seen through camera
 
+    Camera handledCamera;
+    static final int PORTAL_MARGIN = 20;
+    int[] dfb = new int[4];
+
+    float zfactor = 40.0f;
+    float pfactor = 15.0f;
 
     PWEventHandler(PortalWorldDemo appli){
 	application = appli;
@@ -50,8 +56,10 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	lastJPY = jpy;
 	lastpJPX = jpx;
 	lastpJPY = jpy;
-	if (inPortal && application.portal.coordInsideObservedRegion(jpx, jpy)){
-	    regionStickedToMouse = true;
+	if (inPortal){
+	    if (application.portal.coordInsideObservedRegion(jpx, jpy)){
+		regionStickedToMouse = true;
+	    }
 	}
 	else {
 	    v.setDrawDrag(true);
@@ -96,12 +104,6 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	prevJPX = jpx;
 	prevJPY = jpy;
     }
-
-    Camera handledCamera;
-    static final int PORTAL_MARGIN = 20;
-    int[] dfb = new int[4];
-
-    float cfactor = 40.0f;
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!inPortal && application.portal != null){
@@ -152,7 +154,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 		handledCamera = application.demoCamera;
 		float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
 		if (mod == SHIFT_MOD){// zoom
-		    application.vsm.animator.Aspeed = (handledCamera.altitude>0) ? (long)((lastpJPY-jpy)*(a/cfactor)) : (long)((lastpJPY-jpy)/(a*cfactor));
+		    application.vsm.animator.Aspeed = (handledCamera.altitude>0) ? (long)((lastpJPY-jpy)*(a/zfactor)) : (long)((lastpJPY-jpy)/(a*zfactor));
 		    lastJPX = jpx;
 		    lastJPY = jpy;
 		}
@@ -165,8 +167,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 		    // 1st-order control
 		    jpxD = jpx-lastJPX;
 		    jpyD = lastJPY-jpy;
-		    application.vsm.animator.Xspeed = (handledCamera.altitude>0) ? (long)(jpxD*(a/cfactor)) : (long)(jpxD/(a*cfactor));
-		    application.vsm.animator.Yspeed = (handledCamera.altitude>0) ? (long)(jpyD*(a/cfactor)) : (long)(jpyD/(a*cfactor));
+		    application.vsm.animator.Xspeed = (handledCamera.altitude>0) ? (long)(jpxD*(a/pfactor)) : (long)(jpxD/(a*pfactor));
+		    application.vsm.animator.Yspeed = (handledCamera.altitude>0) ? (long)(jpyD*(a/pfactor)) : (long)(jpyD/(a*pfactor));
 		    application.vsm.animator.Aspeed = 0;
 		}
 	    }
@@ -270,7 +272,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     public void cameraMoved(){
 	float alt = application.demoCamera.getAltitude();
 	if (alt != oldDemoCameraAltitude){
-	    float palt = alt * 50;
+	    float palt = alt * 200;
 	    if (palt > PortalWorldDemo.PORTAL_CEILING_ALTITUDE){
 		application.portalCamera.setAltitude(PortalWorldDemo.PORTAL_CEILING_ALTITUDE);
 		if (application.portalCamera.posx != 0 || application.portalCamera.posy != 0){
