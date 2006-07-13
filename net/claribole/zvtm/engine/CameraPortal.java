@@ -108,6 +108,16 @@ public class CameraPortal extends Portal {
 	return bkgColor;
     }
 
+    /**Returns the (unprojected) coordinates of point (jpx,jpy) in the virtual space to which the camera associated with this ortal belongs.
+     *@param cx horizontal cursor coordinate (JPanel)
+     *@param cy vertical cursor coordinate (JPanel) 
+     */
+    public LongPoint getVSCoordinates(int cx, int cy){
+	float uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
+	return new LongPoint((long)(camera.posx + (cx-x-w/2)*uncoef),
+			     (long)(camera.posy - (cy-y-h/2)*uncoef));
+    }
+    
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
     public long[] getVisibleRegion(long[] res){
 	float uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
