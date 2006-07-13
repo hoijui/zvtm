@@ -60,6 +60,9 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	    if (application.portal.coordInsideObservedRegion(jpx, jpy)){
 		regionStickedToMouse = true;
 	    }
+	    else {
+		application.getTo(jpx, jpy);
+	    }
 	}
 	else {
 	    v.setDrawDrag(true);

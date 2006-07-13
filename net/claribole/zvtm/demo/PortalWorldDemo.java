@@ -168,6 +168,13 @@ public class PortalWorldDemo {
 	}
     }
 
+    void getTo(int jpx, int jpy){
+	LongPoint res = portal.getVSCoordinates(jpx, jpy);
+	vsm.animator.createCameraAnimation(200, AnimManager.CA_TRANS_SIG,
+					   new LongPoint(res.x-demoCamera.posx, res.y-demoCamera.posy),
+					   demoCamera.getID(), null);
+    }
+
     void getGlobalView(boolean inPortal){
 	if (inPortal){
 	    portal.getGlobalView(ANIM_MOVE_LENGTH, vsm);
