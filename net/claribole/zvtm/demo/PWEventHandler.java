@@ -29,6 +29,7 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
     PortalWorldDemo application;
 
     int lastJPX,lastJPY;
+    int jpxD, jpyD;
     int lastpJPX,lastpJPY;
 
     int prevJPX,prevJPY;
@@ -53,13 +54,17 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	    regionStickedToMouse = true;
 	}
 	else {
+	    v.setDrawDrag(true);
 	    application.vsm.activeView.mouse.setSensitivity(false);
 	}
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	application.vsm.animator.Xspeed = 0;
+	application.vsm.animator.Yspeed = 0;
 	application.vsm.animator.Aspeed = 0;
  	application.vsm.activeView.mouse.setSensitivity(true);
+	v.setDrawDrag(false);
 	regionStickedToMouse = false;
 	if (delayedPortalExit){portalExitActions();}
 // 	application.portal.resetInsideBorders();
@@ -140,20 +145,32 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 // 			application.portal.insideSouthBorder(0);
 // 		    }
 // 		}
+		lastJPX = jpx;
+		lastJPY = jpy;
 	    }
 	    else {
 		handledCamera = application.demoCamera;
 		float a = (handledCamera.focal+Math.abs(handledCamera.altitude)) / handledCamera.focal;
-		if (mod == SHIFT_MOD){
+		if (mod == SHIFT_MOD){// zoom
 		    application.vsm.animator.Aspeed = (handledCamera.altitude>0) ? (long)((lastpJPY-jpy)*(a/cfactor)) : (long)((lastpJPY-jpy)/(a*cfactor));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
 		}
-		else {
-		    handledCamera.move(Math.round(a*(lastJPX-jpx)),
-				       Math.round(a*(jpy-lastJPY)));
+		else {// pan
+		    // 0-order control
+// 		    handledCamera.move(Math.round(a*(lastJPX-jpx)),
+// 				       Math.round(a*(jpy-lastJPY)));
+// 		    lastJPX = jpx;
+// 		    lastJPY = jpy;
+		    // 1st-order control
+		    jpxD = jpx-lastJPX;
+		    jpyD = lastJPY-jpy;
+		    application.vsm.animator.Xspeed = (handledCamera.altitude>0) ? (long)(jpxD*(a/cfactor)) : (long)(jpxD/(a*cfactor));
+		    application.vsm.animator.Yspeed = (handledCamera.altitude>0) ? (long)(jpyD*(a/cfactor)) : (long)(jpyD/(a*cfactor));
+		    application.vsm.animator.Aspeed = 0;
 		}
 	    }
-	    lastJPX = jpx;
-	    lastJPY = jpy;
+
 	}
     }
 

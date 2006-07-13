@@ -106,10 +106,10 @@ public class PortalWorldDemo {
 	portalCamera = vsm.addCamera(mainVSname);
 	mm = new MapManager(vsm, mainVS, demoCamera, demoView);
 	if (am == ADAPT_MAPS){
-	    mm.initMap(null);
+	    mm.initMap(null, null);
 	}
 	else {
-	    mm.initMap("images/world/0000.png");
+	    mm.initMap("images/world/0000.png", new Double(32.0));
 	    mm.switchAdaptMaps(); // true by default, make it false
 	}
 	PORTAL_CEILING_ALTITUDE = mm.mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL;
@@ -248,7 +248,7 @@ public class PortalWorldDemo {
     }
 
     public static void main(String[] args){
-	short am = (args.length > 0) ? Short.parseShort(args[0]) : ADAPT_MAPS;
+	short am = (args.length > 0) ? Short.parseShort(args[0]) : DO_NOT_ADAPT_MAPS;
  	new PortalWorldDemo(am);
     }
 
