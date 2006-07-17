@@ -68,14 +68,15 @@ public class PortalWorldDemo {
 
     /* Portal */
     static int PORTAL_WIDTH = 50;
-    static int PORTAL_HEIGHT = 50;
+    static int PORTAL_HEIGHT = 25;
     static int PORTAL_WIDTH_EXPANSION_OFFSET = 150;
-    static int PORTAL_HEIGHT_EXPANSION_OFFSET = 50;
+    static int PORTAL_HEIGHT_EXPANSION_OFFSET = 75;
     static final int PORTAL_X_OFFSET = -120;
     static final int PORTAL_Y_OFFSET = 120;
     TrailingOverview portal;
     Camera portalCamera;
     static  float PORTAL_CEILING_ALTITUDE;
+    static  float CONTRACTED_PORTAL_CEILING_ALTITUDE;
 
     boolean dynamicOverview = true;
 
@@ -113,6 +114,7 @@ public class PortalWorldDemo {
 	    mm.switchAdaptMaps(); // true by default, make it false
 	}
 	PORTAL_CEILING_ALTITUDE = mm.mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT + PORTAL_HEIGHT_EXPANSION_OFFSET) - Camera.DEFAULT_FOCAL;
+	CONTRACTED_PORTAL_CEILING_ALTITUDE = mm.mainMap.getHeight() * 2 * Camera.DEFAULT_FOCAL / (PORTAL_HEIGHT) - Camera.DEFAULT_FOCAL;
 	getGlobalView(false);
 	System.gc();
     }
@@ -164,7 +166,7 @@ public class PortalWorldDemo {
 	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       portal.getID(), null);
 	    portalCamera.moveTo(0, 0);
-	    portalCamera.setAltitude(PORTAL_CEILING_ALTITUDE);
+	    portalCamera.setAltitude(CONTRACTED_PORTAL_CEILING_ALTITUDE);
 	}
     }
 

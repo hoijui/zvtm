@@ -258,8 +258,22 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 
     static final int PORTAL_EXPANSION_TIME = 200;
 
+    void updateOverviewAltitude(float alt){
+	float palt = alt * 200;
+	if (palt > PortalWorldDemo.PORTAL_CEILING_ALTITUDE){
+	    application.portalCamera.setAltitude(PortalWorldDemo.PORTAL_CEILING_ALTITUDE);
+	    if (application.portalCamera.posx != 0 || application.portalCamera.posy != 0){
+		application.portalCamera.moveTo(0, 0);
+	    }
+	}
+	else {
+	    application.portalCamera.setAltitude(palt);
+	}
+    }
+
     void stickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(true);
+	updateOverviewAltitude(application.demoCamera.getAltitude());
 	application.portal.resize(PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
 	application.portal.move(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET/2, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET/2);
 	application.portal.setTransparencyValue(1.0f);
@@ -267,6 +281,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 
     void unstickPortal(){
 	application.portal.setNoUpdateWhenMouseStill(false);
+	application.portalCamera.moveTo(0, 0);
+	application.portalCamera.setAltitude(PortalWorldDemo.CONTRACTED_PORTAL_CEILING_ALTITUDE);
 	application.portal.resize(-PortalWorldDemo.PORTAL_WIDTH_EXPANSION_OFFSET, -PortalWorldDemo.PORTAL_HEIGHT_EXPANSION_OFFSET);
     }
 
@@ -276,14 +292,8 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	float alt = application.demoCamera.getAltitude();
 	if (alt != oldDemoCameraAltitude){
 	    float palt = alt * 200;
-	    if (palt > PortalWorldDemo.PORTAL_CEILING_ALTITUDE){
-		application.portalCamera.setAltitude(PortalWorldDemo.PORTAL_CEILING_ALTITUDE);
-		if (application.portalCamera.posx != 0 || application.portalCamera.posy != 0){
-		    application.portalCamera.moveTo(0, 0);
-		}
-	    }
-	    else {
-		application.portalCamera.setAltitude(palt);
+	    if (inPortal){// only update overview's altitude if inside portal
+		updateOverviewAltitude(alt);
 	    }
 	    application.altitudeChanged();
 	    oldDemoCameraAltitude = alt;
