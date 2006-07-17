@@ -27,6 +27,7 @@ import net.claribole.zvtm.engine.*;
 class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements PortalEventHandler {
 
     boolean cameraStickedToMouse = false;
+    boolean pcameraStickedToMouse = false;
     boolean regionStickedToMouse = false;
     boolean inPortal = false;
 
@@ -42,6 +43,9 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
 	    if (application.ovPortal.coordInsideObservedRegion(jpx, jpy)){
 		regionStickedToMouse = true;
 	    }
+	    else {
+		pcameraStickedToMouse = true;
+	    }
 	}
 	else {
 	    cameraStickedToMouse = true;
@@ -56,6 +60,9 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
 	}
 	if (regionStickedToMouse){
 	    regionStickedToMouse = false;
+	}
+	if (pcameraStickedToMouse){
+	    pcameraStickedToMouse = false;
 	}
     }
 
@@ -81,7 +88,7 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
- 	if (buttonNumber != 2){
+ 	if (buttonNumber == 1){
 	    synchronized(application.demoCamera){
 		if (cameraStickedToMouse){
 		    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
@@ -97,6 +104,16 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
 						Math.round(a*(lastJPY-jpy)));
 		    lastJPX = jpx;
 		    lastJPY = jpy;
+		}
+		else if (pcameraStickedToMouse){
+		    float a = (application.portalCamera.focal+Math.abs(application.portalCamera.altitude))/application.portalCamera.focal;
+		    application.portalCamera.move(Math.round(a*(lastJPX-jpx)),
+						  Math.round(a*(jpy-lastJPY)));
+		    application.demoCamera.move(Math.round(a*(lastJPX-jpx)),
+						Math.round(a*(jpy-lastJPY)));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
+		    cameraMoved();
 		}
 	    }
  	}
