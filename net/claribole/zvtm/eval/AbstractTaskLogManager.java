@@ -297,7 +297,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	application.vsm.repaintNow();
 	// need to call it twice because of visibleRegion update issue
 	application.eh.cameraMoved();
-	application.centerOverview();
+	if (application.technique == ZLAbstractTask.PZ_TECHNIQUE){application.centerOverview();}
     }
 
     void endTrial(){
