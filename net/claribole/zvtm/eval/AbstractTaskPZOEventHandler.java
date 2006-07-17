@@ -1,11 +1,11 @@
-/*   FILE: AbstractTaskPZEventHandler.java
+/*   FILE: AbstractTaskPZOEventHandler.java
  *   DATE OF CREATION:  Tue Nov 22 09:51:19 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AbstractTaskPZEventHandler.java,v 1.13 2006/06/06 09:00:33 epietrig Exp $
+ * $Id: AbstractTaskPZOEventHandler.java,v 1.13 2006/06/06 09:00:33 epietrig Exp $
  */
 
 package net.claribole.zvtm.eval;
@@ -24,11 +24,13 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
-class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
+class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements PortalEventHandler {
 
     boolean cameraStickedToMouse = false;
+    boolean regionStickedToMouse = false;
+    boolean inPortal = false;
 
-    AbstractTaskPZEventHandler(ZLAbstractTask appli){
+    AbstractTaskPZOEventHandler(ZLAbstractTask appli){
 	super(appli);
     }
 
@@ -36,13 +38,22 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	cameraStickedToMouse = true;
+	if (inPortal){
+	    regionStickedToMouse = true;
+	}
+	else {
+	    cameraStickedToMouse = true;
+	}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
 	if (cameraStickedToMouse){
 	    cameraStickedToMouse = false;
+	    application.centerOverview();
+	}
+	if (regionStickedToMouse){
+	    regionStickedToMouse = false;
 	}
     }
 
@@ -56,13 +67,22 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
-	cameraStickedToMouse = true;
+	if (inPortal){
+	    regionStickedToMouse = true;
+	}
+	else {
+	    cameraStickedToMouse = true;
+	}
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
 	if (cameraStickedToMouse){
 	    cameraStickedToMouse = false;
+	    application.centerOverview();
+	}
+	if (regionStickedToMouse){
+	    regionStickedToMouse = false;
 	}
     }
 
@@ -83,6 +103,13 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 		    lastJPX = jpx;
 		    lastJPY = jpy;
 		    cameraMoved();
+		}
+		else if (regionStickedToMouse){
+		    float a = (application.portalCamera.focal+Math.abs(application.portalCamera.altitude))/application.portalCamera.focal;
+		    application.demoCamera.move(Math.round(a*(jpx-lastJPX)),
+						Math.round(a*(lastJPY-jpy)));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
 		}
 	    }
  	}
@@ -107,6 +134,20 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
 	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy);}
 	else if (code==KeyEvent.VK_G){application.gc();}
+    }
+
+    /**cursor enters portal*/
+    public void enterPortal(Portal p){
+	inPortal = true;
+	((CameraPortal)p).setBorder(Color.WHITE);
+	application.vsm.repaintNow();
+    }
+
+    /**cursor exits portal*/
+    public void exitPortal(Portal p){
+	inPortal = false;
+	((CameraPortal)p).setBorder(Color.RED);
+	application.vsm.repaintNow();
     }
 
 }

@@ -156,7 +156,7 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	else {
 	    application.logm.updateWorld(wnes, SAME_ALTITUDE);
 	}
-	if (application.technique == ZLAbstractTask.PZ_TECHNIQUE){application.updateOverview();}
+	if (application.technique == ZLAbstractTask.PZO_TECHNIQUE){application.updateOverview();}
 	if (application.logm.trialStarted){
 	    application.logm.writeCinematic();
 	}

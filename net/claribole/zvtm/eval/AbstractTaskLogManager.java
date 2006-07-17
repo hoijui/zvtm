@@ -54,7 +54,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     /* codes for technique */
 //     static final String ZL = "ZL";     // Probing lenses
     static final String PZ = "PZVC";   // Pan + Zoom centered on view
-//     static final String RZ = "RZ";     // Region zooming
+    static final String PZO = "PZO";     // Pan + Zoom centered on view + Overview
     static final String PZL = "PZL";   // Pan + Zoom + Probing Lenses
     static final String DM = "DM";     // Drag mag
 
@@ -297,7 +297,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	application.vsm.repaintNow();
 	// need to call it twice because of visibleRegion update issue
 	application.eh.cameraMoved();
-	if (application.technique == ZLAbstractTask.PZ_TECHNIQUE){application.centerOverview();}
+	if (application.technique == ZLAbstractTask.PZO_TECHNIQUE){application.centerOverview();}
     }
 
     void endTrial(){
@@ -471,7 +471,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	switch (t){
 // 	case ZLAbstractTask.ZL_TECHNIQUE:{return ZL;}
 	case ZLAbstractTask.PZ_TECHNIQUE:{return PZ;}
-// 	case ZLAbstractTask.RZ_TECHNIQUE:{return RZ;}
+ 	case ZLAbstractTask.PZO_TECHNIQUE:{return PZO;}
 	case ZLAbstractTask.PZL_TECHNIQUE:{return PZL;}
 	case ZLAbstractTask.DM_TECHNIQUE:{return DM;}
 	}

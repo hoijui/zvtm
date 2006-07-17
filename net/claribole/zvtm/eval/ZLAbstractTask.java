@@ -34,7 +34,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
 
     /* max dimensions of ZVTM view */
-    static final int VIEW_MAX_W = 1600;
+    static final int VIEW_MAX_W = 1300;
     static final int VIEW_MAX_H = 1200;
 
     /* actual dimensions of windows on screen */
@@ -121,16 +121,17 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
 //     final static short ZL_TECHNIQUE = 0;  // Probing Lenses
     final static short PZ_TECHNIQUE = 1;  // Pan Zoom centered on view
-//     final static short RZ_TECHNIQUE = 2;  // region zooming
+    final static short PZO_TECHNIQUE = 2;  // Pan Zoom centered on view + overview
     final static short PZL_TECHNIQUE = 3;  // Pan Zoom + Probing Lenses
     final static short DM_TECHNIQUE = 4;  // Drag Mag
 
     final static String PZ_TECHNIQUE_NAME = "Pan-Zoom";
+    final static String PZO_TECHNIQUE_NAME = "Pan-Zoom + Overview";
 //     final static String ZL_TECHNIQUE_NAME = "Probing Lens";
 //     final static String RZ_TECHNIQUE_NAME = "Region Zoom";
     final static String PZL_TECHNIQUE_NAME = "Pan Zoom + Probing Lenses";
     final static String DM_TECHNIQUE_NAME = "Drag Mag";
-    short technique = PZL_TECHNIQUE;
+    short technique = PZ_TECHNIQUE;
     String techniqueName;
 
     static final int[] vispad = {100,100,100,100};
@@ -154,6 +155,10 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	if (this.technique == PZ_TECHNIQUE){
  	    eh = new AbstractTaskPZEventHandler(this);
 	    techniqueName = PZ_TECHNIQUE_NAME;
+	}
+	if (this.technique == PZO_TECHNIQUE){
+ 	    eh = new AbstractTaskPZOEventHandler(this);
+	    techniqueName = PZO_TECHNIQUE_NAME;
 	}
 	else if (this.technique == PZL_TECHNIQUE){
  	    eh = new AbstractTaskPZLEventHandler(this);
@@ -184,7 +189,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
-	else if (this.technique == PZ_TECHNIQUE){
+	else if (this.technique == PZO_TECHNIQUE){
 	    initOverview();
 	}
 	System.gc();
@@ -212,7 +217,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     
     void updateOverview(){
 	// update overview's altitude
-	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*12-demoCamera.getFocal()));
+	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*16-demoCamera.getFocal()));
     }
 
     void centerOverview(){
@@ -736,10 +741,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     }
 
     public static void main(String[] args){
-	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE or RZ_TECHNIQUE for appropriate values
-	   Second argument is either 1 (show console for messages) or 0 (don't show it)
-	   Third argument is either 1 (show map manager monitor) or 0 (don't show it) */
-	short tech = (args.length > 0) ? Short.parseShort(args[0]) : PZL_TECHNIQUE;
+	/* First argument is the technique: see PZO_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE for appropriate values*/
+	short tech = (args.length > 0) ? Short.parseShort(args[0]) : PZ_TECHNIQUE;
 	new ZLAbstractTask(tech);
     }
     
