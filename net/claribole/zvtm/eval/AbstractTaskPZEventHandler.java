@@ -53,17 +53,11 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	lastJPX = jpx;
-	lastJPY = jpy;
-	cameraStickedToMouse = true;
+
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	if (cameraStickedToMouse){
-	    cameraStickedToMouse = false;
-	}
+
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){

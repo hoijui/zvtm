@@ -39,7 +39,9 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (inPortal){
-	    regionStickedToMouse = true;
+	    if (application.ovPortal.coordInsideObservedRegion(jpx, jpy)){
+		regionStickedToMouse = true;
+	    }
 	}
 	else {
 	    cameraStickedToMouse = true;
@@ -64,26 +66,11 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	lastJPX = jpx;
-	lastJPY = jpy;
-	if (inPortal){
-	    regionStickedToMouse = true;
-	}
-	else {
-	    cameraStickedToMouse = true;
-	}
+
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	if (cameraStickedToMouse){
-	    cameraStickedToMouse = false;
-	    application.centerOverview();
-	}
-	if (regionStickedToMouse){
-	    regionStickedToMouse = false;
-	}
+
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
