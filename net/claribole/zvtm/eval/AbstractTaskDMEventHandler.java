@@ -104,7 +104,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
-	if (inPortal){
+	if (inPortal || portalStickedToMouse){
 	    if (buttonNumber == 1){
 		if (portalStickedToMouse){
 		    application.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
