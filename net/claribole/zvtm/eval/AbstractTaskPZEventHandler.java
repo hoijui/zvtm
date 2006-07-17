@@ -68,7 +68,7 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (!application.logm.trialStarted){return;}
- 	if (buttonNumber != 2){
+ 	if (buttonNumber == 1){
 	    synchronized(application.demoCamera){
 		if (cameraStickedToMouse){
 		    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
