@@ -217,7 +217,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     
     void updateOverview(){
 	// update overview's altitude
-	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*16-demoCamera.getFocal()));
+	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*24-demoCamera.getFocal()));
     }
 
     void centerOverview(){
