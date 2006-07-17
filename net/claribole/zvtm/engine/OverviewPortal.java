@@ -60,7 +60,7 @@ public class OverviewPortal extends CameraPortal {
 	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef) &&
 		cy >= y+h/2 + Math.round((camera.posy-observedRegion[1])*orcoef) &&
 		cx <= x+w/2 + Math.round((observedRegion[2]-camera.posx)*orcoef) &&
-		cy <= y+h/2 + Math.round((camera.posy+observedRegion[3])*orcoef));
+		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
     }
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
