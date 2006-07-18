@@ -34,8 +34,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
 
     /* max dimensions of ZVTM view */
-    static final int VIEW_MAX_W = 1600;
-    static final int VIEW_MAX_H = 1200;
+    static final int VIEW_MAX_W = 1280;
+    static final int VIEW_MAX_H = 1024;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
