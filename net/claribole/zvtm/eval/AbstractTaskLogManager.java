@@ -122,19 +122,19 @@ class AbstractTaskLogManager implements Java2DPainter {
  	blockNumber = JOptionPane.showInputDialog("Block number");
  	if (blockNumber == null){im.say(PSTS);return;}
 	initLineStart();
-	JFileChooser fc = new JFileChooser(new File(LogManager.TRIAL_DIR_FULL));
-	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	fc.setDialogTitle("Select Trial File");
-	int returnVal= fc.showOpenDialog(application.demoView.getFrame());
-	File trialFile = null;
-	if (returnVal == JFileChooser.APPROVE_OPTION){
-	    trialFile = fc.getSelectedFile();
-	}
-	else {
-	    im.say(PSTS);
-	    return;
-	}
-	generateTrials(trialFile);
+// 	JFileChooser fc = new JFileChooser(new File(LogManager.TRIAL_DIR_FULL));
+// 	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+// 	fc.setDialogTitle("Select Trial File");
+// 	int returnVal= fc.showOpenDialog(application.demoView.getFrame());
+// 	File trialFile = null;
+// 	if (returnVal == JFileChooser.APPROVE_OPTION){
+// 	    trialFile = fc.getSelectedFile();
+// 	}
+// 	else {
+// 	    im.say(PSTS);
+// 	    return;
+// 	}
+// 	generateTrials(trialFile);
 	try {
 	    logFile = initLogFile(subjectID+"-"+techniqueName+"-trial-block"+blockNumber, LOG_DIR);
 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
@@ -149,54 +149,52 @@ class AbstractTaskLogManager implements Java2DPainter {
 	initNextTrial();
     }
 
-    void generateTrials(File f){
-	try {
-	    FileInputStream fis = new FileInputStream(f);
-	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-	    BufferedReader br = new BufferedReader(isr);
-	    Vector v = new Vector();
-	    String line = br.readLine();
-	    Vector trialLines = new Vector();
-	    boolean firstTrial = true;
-	    String[] info = null;
-	    while (line != null){
-		if (line.startsWith("# Trial")){
-		    if (!firstTrial){
-			// store trial for previous lines
-			v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
-						    Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
-						    trialLines));
-			trialLines.clear();
-		    }
-		    else {
-			firstTrial = false;
-		    }
-		    info = line.split(AbstractWorldGenerator.CSV_SEP);
-		}
-		else {
-		    trialLines.add(line);
-		}
-		line = br.readLine();
-	    }
-	    // store last trial
-	    v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
-					Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
-					trialLines));
+//     void generateTrials(File f){
+// 	try {
+// 	    FileInputStream fis = new FileInputStream(f);
+// 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+// 	    BufferedReader br = new BufferedReader(isr);
+// 	    Vector v = new Vector();
+// 	    String line = br.readLine();
+// 	    Vector trialLines = new Vector();
+// 	    boolean firstTrial = true;
+// 	    String[] info = null;
+// 	    while (line != null){
+// 		if (line.startsWith("# Trial")){
+// 		    if (!firstTrial){
+// 			// store trial for previous lines
+// 			v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
+// 						    Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
+// 						    trialLines));
+// 			trialLines.clear();
+// 		    }
+// 		    else {
+// 			firstTrial = false;
+// 		    }
+// 		    info = line.split(AbstractWorldGenerator.CSV_SEP);
+// 		}
+// 		else {
+// 		    trialLines.add(line);
+// 		}
+// 		line = br.readLine();
+// 	    }
+// 	    // store last trial
+// 	    v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
+// 					Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
+// 					trialLines));
 
-	    trials = new AbstractTrialInfo[v.size()];
-	    for (int i=0;i<trials.length;i++){
-		trials[i] = (AbstractTrialInfo)v.elementAt(i);
-	    }
-	    v.clear();
-	}
-	catch (IOException ex){ex.printStackTrace();}
-    }
+// 	    trials = new AbstractTrialInfo[v.size()];
+// 	    for (int i=0;i<trials.length;i++){
+// 		trials[i] = (AbstractTrialInfo)v.elementAt(i);
+// 	    }
+// 	    v.clear();
+// 	}
+// 	catch (IOException ex){ex.printStackTrace();}
+//     }
     
-    int currentDepth;
-    
-    void updateWorld(long[] visibleRegion, short altChange){
+    void updateWorld(long[] visibleRegion){
   	if (lensStatus == NO_LENS || lensStatus == DM_LENS){
-	    currentDepth = trials[trialCount].root.updateWorld(visibleRegion, altChange);
+	    application.updateWorldLevel(visibleRegion);
 	    application.vsm.repaintNow();
   	}
     }
@@ -284,15 +282,15 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     void initNextTrial(){
 	trialCount++;
-	if (trialCount > 0){trials[trialCount-1].removeFromVirtualSpace(application.mainVS);}
-	trialDensity = trials[trialCount].density;
-	trials[trialCount].addToVirtualSpace(application.vsm, application.mainVS);
-	deepestTarget = trials[trialCount].root.getDeepestTarget();
+// 	if (trialCount > 0){trials[trialCount-1].removeFromVirtualSpace(application.mainVS);}
+// 	trialDensity = trials[trialCount].density;
+// 	trials[trialCount].addToVirtualSpace(application.vsm, application.mainVS);
+// 	deepestTarget = trials[trialCount].root.getDeepestTarget();
 	application.demoCamera.posx = 0;
 	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();
 	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
-	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
+// 	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
 	application.eh.cameraMoved();
 	application.vsm.repaintNow();
 	// need to call it twice because of visibleRegion update issue
@@ -340,10 +338,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    }
 	}
 	else {// subject is in between two trials
-	    if (trialCount < trials.length){// there is at least one trial left
-		trialCountStr = Integer.toString(trialCount);
+// 	    if (trialCount < trials.length){// there is at least one trial left
+// 		trialCountStr = Integer.toString(trialCount);
 		startTrial();
-	    }
+// 	    }
 	}
     }
 
@@ -385,7 +383,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
 			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
-			  + OUTPUT_CSV_SEP + currentDepth + OUTPUT_CSV_SEP + 
+			  + OUTPUT_CSV_SEP + application.currentDepth + OUTPUT_CSV_SEP + 
 			  Long.toString(application.portalCamera.posx) + OUTPUT_CSV_SEP +
 			  Long.toString(application.portalCamera.posy) + OUTPUT_CSV_SEP +
 			  TrialInfo.floatFormatter(application.portalCamera.altitude));
@@ -398,7 +396,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
 			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
-			  + OUTPUT_CSV_SEP + currentDepth);
+			  + OUTPUT_CSV_SEP + application.currentDepth);
 	    }
 	    bwc.newLine();
 	}

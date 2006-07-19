@@ -104,7 +104,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     static final float START_ALTITUDE = 18100000.0f;
     static final float PORTAL_OVERVIEW_ALTITUDE = 65000000.0f;
-    static final float FLOOR_ALTITUDE = 100.0f;
+    static final float FLOOR_ALTITUDE = 300.0f;
 
     boolean cameraOnFloor = false;
 
@@ -139,6 +139,57 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static final String GLYPH_TYPE_GRID = "G";
     static final String GLYPH_TYPE_WORLD = "W";
 
+    /* world */
+    static int TREE_DEPTH = 4; // we want subjects to navigate through 4 levels, includes root
+    static int DENSITY = 3;
+
+    static final long SMALLEST_ELEMENT_WIDTH = 500;
+    static final long MUL_FACTOR = 50;
+    static final double ROUND_CORNER_RATIO = 5;
+
+    static long WORLD_WIDTH;
+    static long WORLD_HEIGHT;
+    static long HALF_WORLD_WIDTH;
+    static long HALF_WORLD_HEIGHT;
+
+    static final Color DEEPEST_LEVEL_COLOR = Color.BLUE;
+    static long[] widthByLevel;
+    static int[] cornerByLevel;
+    static LongPoint[][] offsetsByLevel;
+    VRectangle[][] elementsByLevel;
+    static Color[] COLOR_BY_LEVEL;
+    static {
+	// compute size of all levels
+	widthByLevel = new long[TREE_DEPTH];
+	cornerByLevel = new int[TREE_DEPTH];
+	COLOR_BY_LEVEL = new Color[TREE_DEPTH];
+	offsetsByLevel = new LongPoint[TREE_DEPTH][DENSITY*DENSITY];
+	for (int i=0;i<TREE_DEPTH;i++){
+	    widthByLevel[i] = SMALLEST_ELEMENT_WIDTH * Math.round(Math.pow(MUL_FACTOR, (TREE_DEPTH-i-1)));
+	    cornerByLevel[i] = ((int)Math.round(widthByLevel[i]/ROUND_CORNER_RATIO));
+	    if (i>0){
+		long step = Math.round(widthByLevel[i-1]/((double)DENSITY)) * 2;
+		long y = widthByLevel[i-1] - step/2;
+		for (int j=0;j<DENSITY;j++){
+		    long x = -widthByLevel[i-1] + step/2;
+		    for (int k=0;k<DENSITY;k++){
+			offsetsByLevel[i][j*DENSITY+k] = new LongPoint(x, y);
+			x += step;
+		    }
+		    y -= step;
+		}
+	    }
+	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, (i+1)/((float)TREE_DEPTH));
+	}
+	COLOR_BY_LEVEL[COLOR_BY_LEVEL.length-1] = DEEPEST_LEVEL_COLOR;
+	WORLD_WIDTH = widthByLevel[0] * 2;
+	WORLD_HEIGHT = WORLD_WIDTH;
+	HALF_WORLD_WIDTH = WORLD_WIDTH / 2;
+	HALF_WORLD_HEIGHT = WORLD_HEIGHT / 2;
+    }
+
+    static final double visFactor = 1.4;
+
     ZLAbstractTask(short t){
 	vsm = new VirtualSpaceManager();
 	vsm.setDebug(true);
@@ -169,7 +220,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	    techniqueName = DM_TECHNIQUE_NAME;
 	}
 	mainVS = vsm.addVirtualSpace(mainVSname);
-	vsm.setZoomLimit(0);
+	vsm.setZoomLimit((int)FLOOR_ALTITUDE);
 	demoCamera = vsm.addCamera(mainVSname);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
@@ -185,7 +236,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
 	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
-   	buildGrid();
+	buildWorld();
+//    	buildGrid();
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
@@ -239,6 +291,68 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	}
 	VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+
+    void buildWorld(){
+	elementsByLevel = new VRectangle[TREE_DEPTH][DENSITY*DENSITY];
+	elementsByLevel[0][0] = new VRectangle(0, 0, 0, widthByLevel[0], widthByLevel[0], COLOR_BY_LEVEL[0]);
+	vsm.addGlyph(elementsByLevel[0][0], mainVS);
+	elementsByLevel[0][0].setPaintBorder(false);
+	for (int i=1;i<TREE_DEPTH;i++){
+	    for (int j=0;j<DENSITY;j++){
+		for (int k=0;k<DENSITY;k++){
+		    elementsByLevel[i][j*DENSITY+k] = new VRectangle(offsetsByLevel[i][j*DENSITY+k].x,
+								     offsetsByLevel[i][j*DENSITY+k].y,
+								     0,
+								     widthByLevel[i],
+								     widthByLevel[i],
+								     COLOR_BY_LEVEL[i]);
+		    vsm.addGlyph(elementsByLevel[i][j*DENSITY+k], mainVS);
+		    elementsByLevel[i][j*DENSITY+k].setPaintBorder(false);
+		    elementsByLevel[i][j*DENSITY+k].setVisible(false);
+		}
+	    }
+	}
+    }
+
+    int currentDepth = 0;
+    int newDepth;
+    long vw, vh;
+
+    void updateWorldLevel(long[] wnes){
+	vw = wnes[2]-wnes[0];
+	vh = wnes[1]-wnes[3];
+	for (int i=TREE_DEPTH-1;i>=0;i--){
+	    if (vw < Math.round(2 * widthByLevel[i] * visFactor) ||
+		vh < Math.round(2 * widthByLevel[i] * visFactor)){
+		newDepth = i+1;
+		break;
+	    }
+	}
+	if (currentDepth != newDepth){updateWorldLevel();}
+    }
+
+    void updateWorldLevel(){
+	if (newDepth > currentDepth){
+	    for (int i=currentDepth+1;i<=newDepth;i++){
+		for (int j=0;j<DENSITY*DENSITY;j++){
+		    elementsByLevel[i][j].setVisible(true);
+		}
+	    }
+	}
+	else {// necessarily newDepth < currentDepth as this method is called only if newDepth != currentDepth
+	    for (int i=newDepth+1;i<=currentDepth;i++){
+		for (int j=0;j<DENSITY*DENSITY;j++){
+		    elementsByLevel[i][j].setVisible(false);
+		}
+	    }
+	}
+	currentDepth = newDepth;
+    }
+
+    void populateTargetAtLevel(int depth){
+	
+	
     }
 
     void buildGrid(){
@@ -368,42 +482,42 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     }
 
     void updateGridLevel(long visibleSize){
-	if (visibleSize < 195312.0f){
-	    showGridLevel(12);
-	}
-	else if (visibleSize < 390625.0f){
-	    showGridLevel(11);
-	}
-	else if (visibleSize < 781250.0f){
-	    showGridLevel(10);
-	}
-	else if (visibleSize < 1562500.0f){
-	    showGridLevel(9);
-	}
-	else if (visibleSize < 3125000.0f){
-	    showGridLevel(8);
-	}
-	else if (visibleSize < 6250000.0f){
-	    showGridLevel(7);
-	}
-	else if (visibleSize < 12500000.0f){
-	    showGridLevel(6);
-	}
-	else if (visibleSize < 25000000.0f){
-	    showGridLevel(5);
-	}
-	else if (visibleSize < 50000000.0f){
-	    showGridLevel(4);
-	}
-	else if (visibleSize < 100000000.0f){
-	    showGridLevel(3);
-	}
-	else if (visibleSize < 200000000.0f){
-	    showGridLevel(2);
-	}
-	else {
-	    showGridLevel(1);
-	}
+// 	if (visibleSize < 195312.0f){
+// 	    showGridLevel(12);
+// 	}
+// 	else if (visibleSize < 390625.0f){
+// 	    showGridLevel(11);
+// 	}
+// 	else if (visibleSize < 781250.0f){
+// 	    showGridLevel(10);
+// 	}
+// 	else if (visibleSize < 1562500.0f){
+// 	    showGridLevel(9);
+// 	}
+// 	else if (visibleSize < 3125000.0f){
+// 	    showGridLevel(8);
+// 	}
+// 	else if (visibleSize < 6250000.0f){
+// 	    showGridLevel(7);
+// 	}
+// 	else if (visibleSize < 12500000.0f){
+// 	    showGridLevel(6);
+// 	}
+// 	else if (visibleSize < 25000000.0f){
+// 	    showGridLevel(5);
+// 	}
+// 	else if (visibleSize < 50000000.0f){
+// 	    showGridLevel(4);
+// 	}
+// 	else if (visibleSize < 100000000.0f){
+// 	    showGridLevel(3);
+// 	}
+// 	else if (visibleSize < 200000000.0f){
+// 	    showGridLevel(2);
+// 	}
+// 	else {
+// 	    showGridLevel(1);
+// 	}
     }
 
     void setLens(int t){

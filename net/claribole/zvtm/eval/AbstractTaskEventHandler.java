@@ -136,14 +136,14 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	    }
 	    if (application.logm.trialStarted){
 		if (alt < oldCameraAltitude){
-		    application.logm.updateWorld(wnes, LOWER_ALTITUDE);
+ 		    application.logm.updateWorld(wnes);
 		    if (zoomDirection != ZOOMING_IN){
 			application.logm.switchedZoomDirection();
 		    }
 		    zoomDirection = ZOOMING_IN;
 		}
 		else {// alt > oldCameraAltitude
-		    application.logm.updateWorld(wnes, HIGHER_ALTITUDE);
+ 		    application.logm.updateWorld(wnes);
 		    if (zoomDirection != ZOOMING_OUT){
 			application.logm.switchedZoomDirection();
 		    }
@@ -154,12 +154,12 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	    application.cameraIsOnFloor(alt == 0.0);
 	}
 	else {
-	    application.logm.updateWorld(wnes, SAME_ALTITUDE);
+ 	    application.logm.updateWorld(wnes);
 	}
 	if (application.technique == ZLAbstractTask.PZO_TECHNIQUE){application.updateOverview();}
-	if (application.logm.trialStarted){
-	    application.logm.writeCinematic();
-	}
+// 	if (application.logm.trialStarted){
+// 	    application.logm.writeCinematic();
+// 	}
 	if (application.technique == ZLAbstractTask.DM_TECHNIQUE){application.updateDMRegion();}
     }
 
