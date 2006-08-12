@@ -44,9 +44,11 @@ public class Utils {
 // 	try {UIManager.setLookAndFeel(currentLookAndFeel);}
 // 	catch(Exception ex){System.err.println("An error occured while trying to change the look and feel\n"+ex);}
 	String key;
+	Object okey;
 	for (Enumeration e=UIManager.getLookAndFeelDefaults().keys();e.hasMoreElements();){
-	    key=(String)e.nextElement();
-	    if (key.endsWith(".font") || key.endsWith("Font")){UIManager.put(key,smallFont);}
+	    okey = e.nextElement(); // depending on JVM (1.5.x and earlier, or 1.6.x or later) and OS,
+	    key = okey.toString();  // keys are respectively String or StringBuffer objects
+	    if (key.endsWith(".font") || key.endsWith("Font")){UIManager.put(okey, smallFont);}
 	}
 	UIManager.put("ProgressBar.foreground",pastelBlue);
 	UIManager.put("ProgressBar.background",java.awt.Color.lightGray);
