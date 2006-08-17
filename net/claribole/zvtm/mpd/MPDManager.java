@@ -14,7 +14,7 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.MutationEvent;
 import org.w3c.dom.xpath.XPathResult;
 
-import com.xerox.VTM.engine.AppEventHandler;
+import net.claribole.zvtm.engine.ViewEventHandler;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 
@@ -23,7 +23,7 @@ import domino.Domino;
 import domino.DominoImplementation;
 import domino.Sensor;
 import domino.Socket;
-import domino.evdev.EventCodes;
+import domino.EventCodes;
 
 /**
  * Manage Multiple Pointing Devices using Domino
@@ -172,7 +172,7 @@ public class MPDManager {
         this.evh = evh;
         if (view != null)
             this.viewPanel = view.getPanel();
-        domino = new DominoImplementation().createDomino(8, true, false);
+        domino = DominoImplementation.getInstance().createDomino(8, true, false);
         domino.initialize();
 
         XPathResult nodeSet;
@@ -211,7 +211,7 @@ public class MPDManager {
      * @return keyboard modifier
      */
     protected int getKeyboardModifiers() {
-        int mod = AppEventHandler.NO_MODIFIER;
+        int mod = ViewEventHandler.NO_MODIFIER;
         boolean control = false, shift = false, alt = false, meta = false;
 
         for (int i = 0; i < this.keyboardDevices.length; i++) {
@@ -282,19 +282,19 @@ public class MPDManager {
             }
         }
         if (!control && shift && !alt && !meta)
-            mod = AppEventHandler.SHIFT_MOD;
+            mod = ViewEventHandler.SHIFT_MOD;
         else if (control && !shift && !alt && !meta)
-            mod = AppEventHandler.CTRL_MOD;
+            mod = ViewEventHandler.CTRL_MOD;
         else if (control && shift && !alt && !meta)
-            mod = AppEventHandler.CTRL_SHIFT_MOD;
+            mod = ViewEventHandler.CTRL_SHIFT_MOD;
         else if (!control && !shift && !alt && meta)
-            mod = AppEventHandler.META_MOD;
+            mod = ViewEventHandler.META_MOD;
         else if (!control && shift && !alt && meta)
-            mod = AppEventHandler.META_SHIFT_MOD;
+            mod = ViewEventHandler.META_SHIFT_MOD;
         else if (!control && !shift && alt && !meta)
-            mod = AppEventHandler.ALT_MOD;
+            mod = ViewEventHandler.ALT_MOD;
         else if (!control && shift && alt && !meta)
-            mod = AppEventHandler.ALT_SHIFT_MOD;
+            mod = ViewEventHandler.ALT_SHIFT_MOD;
         return mod;
     }
 
@@ -456,9 +456,9 @@ public class MPDManager {
             short direction;
             if (dir != 0) {
                 if (dir > 0)
-                    direction = AppEventHandler.WHEEL_UP;
+                    direction = ViewEventHandler.WHEEL_UP;
                 else
-                    direction = AppEventHandler.WHEEL_DOWN;
+                    direction = ViewEventHandler.WHEEL_DOWN;
                 MPDManager.this.evh.mouseWheelMoved(MPDManager.this.viewPanel,
                         direction, 0, 0, ((Sensor) evt.getTarget()).getDevice()
                                 .getSocket());
