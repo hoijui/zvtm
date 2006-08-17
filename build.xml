@@ -24,6 +24,8 @@ Usage:
     <pathelement location="${basedir}/lib/xmlParserAPIs.jar"/>
     <pathelement location="${basedir}/lib/antlr-2.7.5.jar"/>
     <pathelement location="${basedir}/lib/statemachine.jar"/>
+    <pathelement location="${basedir}/lib/domino/domino.jar"/>
+    <pathelement location="${basedir}/lib/domino/xalan.jar"/>
   </path>
 
   <target name="init">
