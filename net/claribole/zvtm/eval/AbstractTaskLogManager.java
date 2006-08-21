@@ -36,6 +36,7 @@ import net.claribole.zvtm.engine.Java2DPainter;
 class AbstractTaskLogManager implements Java2DPainter {
 
     static final String LOG_FILE_EXT = ".csv";
+    static final String INPUT_CSV_SEP = ";";
     static final String OUTPUT_CSV_SEP = "\t";
     static final String LOG_DIR = "logs";
     static final String LOG_DIR_FULL = System.getProperty("user.dir") + File.separator + LOG_DIR;
@@ -83,9 +84,12 @@ class AbstractTaskLogManager implements Java2DPainter {
     int nbZIOswitches;
     int nbErrors;
 
+    AbstractTrialInfo[] trials;
+    int searchingForTargetAtLevel = 1;  // 1, 2 or 3 depending on the user's progress in the trial
+    String searchingForTargetAtLevelS = "";  // text version, for cinematic log
+
     long trialStartTime;
     long trialDuration;
-    int trialDensity;
 
     String lineStart;
     File logFile;
@@ -95,7 +99,6 @@ class AbstractTaskLogManager implements Java2DPainter {
     boolean sessionStarted = false;
     boolean trialStarted = false;
 
-    AbstractTrialInfo[] trials;
     ZRoundRect deepestTarget;
 
     AbstractTaskInstructionsManager im;
@@ -122,19 +125,19 @@ class AbstractTaskLogManager implements Java2DPainter {
  	blockNumber = JOptionPane.showInputDialog("Block number");
  	if (blockNumber == null){im.say(PSTS);return;}
 	initLineStart();
-// 	JFileChooser fc = new JFileChooser(new File(LogManager.TRIAL_DIR_FULL));
-// 	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-// 	fc.setDialogTitle("Select Trial File");
-// 	int returnVal= fc.showOpenDialog(application.demoView.getFrame());
-// 	File trialFile = null;
-// 	if (returnVal == JFileChooser.APPROVE_OPTION){
-// 	    trialFile = fc.getSelectedFile();
-// 	}
-// 	else {
-// 	    im.say(PSTS);
-// 	    return;
-// 	}
-// 	generateTrials(trialFile);
+	JFileChooser fc = new JFileChooser(new File(LogManager.TRIAL_DIR_FULL));
+	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	fc.setDialogTitle("Select Trial File");
+	int returnVal= fc.showOpenDialog(application.demoView.getFrame());
+	File trialFile = null;
+	if (returnVal == JFileChooser.APPROVE_OPTION){
+	    trialFile = fc.getSelectedFile();
+	}
+	else {
+	    im.say(PSTS);
+	    return;
+	}
+	generateTrials(trialFile);
 	try {
 	    logFile = initLogFile(subjectID+"-"+techniqueName+"-trial-block"+blockNumber, LOG_DIR);
 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
@@ -149,52 +152,30 @@ class AbstractTaskLogManager implements Java2DPainter {
 	initNextTrial();
     }
 
-//     void generateTrials(File f){
-// 	try {
-// 	    FileInputStream fis = new FileInputStream(f);
-// 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-// 	    BufferedReader br = new BufferedReader(isr);
-// 	    Vector v = new Vector();
-// 	    String line = br.readLine();
-// 	    Vector trialLines = new Vector();
-// 	    boolean firstTrial = true;
-// 	    String[] info = null;
-// 	    while (line != null){
-// 		if (line.startsWith("# Trial")){
-// 		    if (!firstTrial){
-// 			// store trial for previous lines
-// 			v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
-// 						    Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
-// 						    trialLines));
-// 			trialLines.clear();
-// 		    }
-// 		    else {
-// 			firstTrial = false;
-// 		    }
-// 		    info = line.split(AbstractWorldGenerator.CSV_SEP);
-// 		}
-// 		else {
-// 		    trialLines.add(line);
-// 		}
-// 		line = br.readLine();
-// 	    }
-// 	    // store last trial
-// 	    v.add(new AbstractTrialInfo(Integer.parseInt(info[0].substring(8)), // 8 = card("# Trial=")
-// 					Integer.parseInt(info[1].substring(8)), // 8 = card("Density=")
-// 					trialLines));
-
-// 	    trials = new AbstractTrialInfo[v.size()];
-// 	    for (int i=0;i<trials.length;i++){
-// 		trials[i] = (AbstractTrialInfo)v.elementAt(i);
-// 	    }
-// 	    v.clear();
-// 	}
-// 	catch (IOException ex){ex.printStackTrace();}
-//     }
+    void generateTrials(File f){
+	try {
+	    FileInputStream fis = new FileInputStream(f);
+	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+	    BufferedReader br = new BufferedReader(isr);
+	    String line = br.readLine();
+	    Vector tmpTrials = new Vector();
+	    int nbTrials = 0;
+	    while (line != null){
+		tmpTrials.add(new AbstractTrialInfo(nbTrials++, line.split(INPUT_CSV_SEP)));
+		line = br.readLine();
+	    }
+	    trials = new AbstractTrialInfo[tmpTrials.size()];
+	    for (int i=0;i<trials.length;i++){
+		trials[i] = (AbstractTrialInfo)tmpTrials.elementAt(i);
+	    }
+	    tmpTrials.clear();
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
     
     void updateWorld(long[] visibleRegion){
   	if (lensStatus == NO_LENS || lensStatus == DM_LENS){
-	    application.updateWorldLevel(visibleRegion);
+// 	    application.updateWorldLevel(visibleRegion);
 	    application.vsm.repaintNow();
   	}
     }
@@ -229,7 +210,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Technique" + OUTPUT_CSV_SEP +
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
-		      "Density" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
 		      "Nb Errors");
@@ -257,8 +237,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "lx" + OUTPUT_CSV_SEP +
 		      "ly" + OUTPUT_CSV_SEP +
 		      "mm" + OUTPUT_CSV_SEP +
-		      "time" + OUTPUT_CSV_SEP +
-		      "currentRegion");
+		      "Time" + OUTPUT_CSV_SEP +
+		      "Level");
 	    // additional info only for dragmag
 	    if (application.technique == ZLAbstractTask.DM_TECHNIQUE){
 		bwc.write(OUTPUT_CSV_SEP + "pcx" +
@@ -281,16 +261,15 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     void initNextTrial(){
+	application.resetWorld();
 	trialCount++;
-// 	if (trialCount > 0){trials[trialCount-1].removeFromVirtualSpace(application.mainVS);}
-// 	trialDensity = trials[trialCount].density;
-// 	trials[trialCount].addToVirtualSpace(application.vsm, application.mainVS);
-// 	deepestTarget = trials[trialCount].root.getDeepestTarget();
+	searchingForTargetAtLevel = 1;
+	searchingForTargetAtLevelS = String.valueOf(searchingForTargetAtLevel);
 	application.demoCamera.posx = 0;
 	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();
 	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
-// 	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
+ 	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
 	application.eh.cameraMoved();
 	application.vsm.repaintNow();
 	// need to call it twice because of visibleRegion update issue
@@ -318,38 +297,79 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    void nextStep(long vx, long vy){
+    VRectangle objectToUnveil;
+    static final Color INSPECTED_COLOR = Color.GREEN;
+
+    void nextStep(long vx, long vy, long[] wnes){// wnes represents the boundaries
+	// of the region taken into account to identify the currently observed object,
+	// region which changes depending on the technique (PZ, PZO, PZL, DM)
 	if (!sessionStarted){return;}
-	if (trialStarted){// subject wants to end the trial
-	    if (targetWithinRange(vx, vy)){
-		endTrial();
-		if (trialCount+1 < trials.length){// there is at least one trial left
-		    final SwingWorker worker=new SwingWorker(){
-			    public Object construct(){
-				initNextTrial();
-				return null; 
-			    }
-			};
-		    worker.start();
+	if (trialStarted){// subject wants to unveil an object
+	    objectToUnveil = getClosestTarget(wnes);
+	    if (true){//XXX: the following test will check that the object is actually visible
+		//XXX: we could also check that the object has not yet been visited?
+		objectToUnveil.setColor(INSPECTED_COLOR);
+		trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]++;
+		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
+		    // this object is the target for this level
+		    unveilNextLevel(objectToUnveil.vx, objectToUnveil.vy);
 		}
-	    }
-	    else {
-		wrongTarget();
+		// else this object is not yet the target, nothing to do (already been marked just before the test above)
 	    }
 	}
 	else {// subject is in between two trials
-// 	    if (trialCount < trials.length){// there is at least one trial left
-// 		trialCountStr = Integer.toString(trialCount);
+	    if (trialCount < trials.length){// there is at least one trial left
+		trialCountStr = Integer.toString(trialCount);
 		startTrial();
-// 	    }
+	    }
 	}
     }
 
-    boolean targetWithinRange(long vx, long vy){
-	return (vx >= deepestTarget.vx - deepestTarget.getWidth() &&
-		vx <= deepestTarget.vx + deepestTarget.getWidth() &&
-		vy >= deepestTarget.vy - deepestTarget.getHeight() &&
-		vy <= deepestTarget.vy + deepestTarget.getHeight());
+    void unveilNextLevel(long vx, long vy){
+	searchingForTargetAtLevel++;
+	searchingForTargetAtLevelS = String.valueOf(searchingForTargetAtLevel);
+	if (searchingForTargetAtLevel < ZLAbstractTask.TREE_DEPTH){// unveil next level of objects
+	    // first translate the objects at this level to put them inside the parent target
+	    for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY;i++){
+		// a relative translation is made possible by the fact
+		// that a group of objects at a given level is centered on (0,0)
+		application.elementsByLevel[searchingForTargetAtLevel][i].move(vx, vy);
+	    }
+	    // then make them visible
+	    for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY;i++){
+		application.elementsByLevel[searchingForTargetAtLevel][i].setVisible(true);
+	    }
+	}
+	else {// the subject identified the deepest target, proceed to next trial
+	    endTrial();
+	    if (trialCount+1 < trials.length){// there is at least one trial left
+		final SwingWorker worker=new SwingWorker(){
+			public Object construct(){
+			    initNextTrial();
+			    return null; 
+			}
+		    };
+		worker.start();
+	    }
+	}
+    }
+
+    VRectangle getClosestTarget(long[] wnes){
+	long x = (wnes[0]+wnes[2]) / 2;
+	long y = (wnes[1]+wnes[3]) / 2;
+	VRectangle res = application.elementsByLevel[searchingForTargetAtLevel][0];
+	double smallestDistance = Math.sqrt(Math.pow(res.vx-x, 2) + Math.pow(res.vy-y, 2));
+	VRectangle r;
+	double d;
+	for (int i=1;i<application.elementsByLevel[searchingForTargetAtLevel].length;i++){
+	    r = application.elementsByLevel[searchingForTargetAtLevel][i];
+	    d = Math.sqrt(Math.pow(r.vx-x, 2) + Math.pow(r.vy-y, 2));
+	    if (d < smallestDistance){
+		res = r;
+		smallestDistance = d;
+	    }
+	}
+	return res;
     }
 
     void wrongTarget(){
@@ -363,7 +383,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    bwt.write(lineStart);
 	    // trial + D + time + nb switches + nb errors
 	    bwt.write(trialCountStr + OUTPUT_CSV_SEP +
-		      trialDensity + OUTPUT_CSV_SEP +
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbErrors));
@@ -382,8 +401,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 			  Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
 			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
-			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
-			  + OUTPUT_CSV_SEP + application.currentDepth + OUTPUT_CSV_SEP + 
+			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)+ OUTPUT_CSV_SEP + 
+ 			  searchingForTargetAtLevelS + OUTPUT_CSV_SEP + 
 			  Long.toString(application.portalCamera.posx) + OUTPUT_CSV_SEP +
 			  Long.toString(application.portalCamera.posy) + OUTPUT_CSV_SEP +
 			  TrialInfo.floatFormatter(application.portalCamera.altitude));
@@ -395,8 +414,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 			  Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
 			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
-			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)
-			  + OUTPUT_CSV_SEP + application.currentDepth);
+			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime) + OUTPUT_CSV_SEP +
+			  searchingForTargetAtLevelS);
 	    }
 	    bwc.newLine();
 	}

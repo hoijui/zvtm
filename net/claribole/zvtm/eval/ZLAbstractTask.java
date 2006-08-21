@@ -266,19 +266,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	ovPortal.setBorder(Color.BLACK);
 	updateOverview();
     }
-    
-    void updateOverview(){
-	// update overview's altitude
-	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*24-demoCamera.getFocal()));
-    }
 
-    void centerOverview(){
-	vsm.animator.createCameraAnimation(300, AnimManager.CA_TRANS_SIG,
-					   new LongPoint(demoCamera.posx-portalCamera.posx, demoCamera.posy-portalCamera.posy),
-					   portalCamera.getID(), null);
-// 	portalCamera.moveTo(demoCamera.posx, demoCamera.posy);
-    }
-    
     void windowLayout(){
 	if (Utilities.osIsWindows()){
 	    VIEW_X = VIEW_Y = 0;
@@ -309,78 +297,63 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 								     COLOR_BY_LEVEL[i]);
 		    vsm.addGlyph(elementsByLevel[i][j*DENSITY+k], mainVS);
 		    elementsByLevel[i][j*DENSITY+k].setPaintBorder(false);
-		    elementsByLevel[i][j*DENSITY+k].setVisible(false);
 		}
 	    }
 	}
+	hideAllLevelsBut1st();
     }
 
-    int currentDepth = 0;
-    int newDepth;
-    long vw, vh;
-
-    void updateWorldLevel(long[] wnes){
-	vw = wnes[2]-wnes[0];
-	vh = wnes[1]-wnes[3];
-	for (int i=TREE_DEPTH-1;i>=0;i--){
-	    if (vw < Math.round(2 * widthByLevel[i] * visFactor) ||
-		vh < Math.round(2 * widthByLevel[i] * visFactor)){
-		newDepth = i+1;
-		break;
-	    }
-	}
-	if (currentDepth != newDepth){updateWorldLevel();}
-    }
-
-    void updateWorldLevel(){
-	if (newDepth > currentDepth){
-	    for (int i=currentDepth+1;i<=newDepth;i++){
-		for (int j=0;j<DENSITY*DENSITY;j++){
-		    elementsByLevel[i][j].setVisible(true);
+    void resetWorld(){
+	for (int i=2;i<TREE_DEPTH;i++){
+	    for (int j=0;j<DENSITY;j++){
+		for (int k=0;k<DENSITY;k++){
+		    elementsByLevel[i][j*DENSITY+k].moveTo(offsetsByLevel[i][j*DENSITY+k].x,
+								     offsetsByLevel[i][j*DENSITY+k].y);
 		}
 	    }
 	}
-	else {// necessarily newDepth < currentDepth as this method is called only if newDepth != currentDepth
-	    for (int i=newDepth+1;i<=currentDepth;i++){
-		for (int j=0;j<DENSITY*DENSITY;j++){
-		    elementsByLevel[i][j].setVisible(false);
-		}
+	for (int i=1;i<TREE_DEPTH;i++){
+	    for (int j=0;j<DENSITY*DENSITY;j++){
+		elementsByLevel[i][j].setColor(COLOR_BY_LEVEL[i]);
 	    }
 	}
-	currentDepth = newDepth;
+	hideAllLevelsBut1st();
     }
 
-    void populateTargetAtLevel(int depth){
-	
-	
+    void hideAllLevelsBut1st(){
+	for (int i=2;i<TREE_DEPTH;i++){
+	    for (int j=0;j<DENSITY*DENSITY;j++){
+		elementsByLevel[i][j].setVisible(false);
+	    }
+	}
     }
 
     void buildGrid(){
 	// frame
-	ZSegment s = new ZSegment(-AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
+	ZSegment s = new ZSegment(-HALF_WORLD_WIDTH, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
 	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
+	s = new ZSegment(HALF_WORLD_WIDTH, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
 	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(0, -AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s = new ZSegment(0, -HALF_WORLD_HEIGHT, 0, HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
-	s = new ZSegment(0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	s = new ZSegment(0, HALF_WORLD_HEIGHT, 0, HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	s.setType(GLYPH_TYPE_GRID);
 	vsm.addGlyph(s, mainVSname);
 	// grid (built recursively, max. rec depth control by GRID_DEPTH)
 	tmpHGrid = new Vector();
 	tmpVGrid = new Vector();
-	buildHorizontalGridLevel(-AbstractWorldGenerator.HALF_WORLD_HEIGHT, AbstractWorldGenerator.HALF_WORLD_HEIGHT, 0);
-	buildVerticalGridLevel(-AbstractWorldGenerator.HALF_WORLD_WIDTH, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0);
+	buildHorizontalGridLevel(-HALF_WORLD_HEIGHT, HALF_WORLD_HEIGHT, 0);
+	buildVerticalGridLevel(-HALF_WORLD_WIDTH, HALF_WORLD_WIDTH, 0);
 	storeGrid();
 	showGridLevel(1);
     }
 
     void buildHorizontalGridLevel(long c1, long c2, int depth){
 	long c = (c1+c2)/2;
-	ZSegment s = new ZSegment(0, c, 0, AbstractWorldGenerator.HALF_WORLD_WIDTH, 0, GRID_COLOR);
+	ZSegment s = new ZSegment(0, c, 0, HALF_WORLD_WIDTH, 0, GRID_COLOR);
 	storeSegmentInHGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
 	s.setType(GLYPH_TYPE_GRID);
@@ -393,7 +366,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     void buildVerticalGridLevel(long c1, long c2, int depth){
 	long c = (c1+c2)/2;
-	ZSegment s = new ZSegment(c, 0, 0, 0, AbstractWorldGenerator.HALF_WORLD_HEIGHT, GRID_COLOR);
+	ZSegment s = new ZSegment(c, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
 	storeSegmentInVGrid(s, depth);
 	vsm.addGlyph(s, mainVSname);
 	s.setType(GLYPH_TYPE_GRID);
@@ -520,6 +493,18 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 // 	}
     }
 
+    void updateOverview(){
+	// update overview's altitude
+	portalCamera.setAltitude((float)((demoCamera.getAltitude()+demoCamera.getFocal())*24-demoCamera.getFocal()));
+    }
+
+    void centerOverview(){
+	vsm.animator.createCameraAnimation(300, AnimManager.CA_TRANS_SIG,
+					   new LongPoint(demoCamera.posx-portalCamera.posx, demoCamera.posy-portalCamera.posy),
+					   portalCamera.getID(), null);
+// 	portalCamera.moveTo(demoCamera.posx, demoCamera.posy);
+    }
+    
     void setLens(int t){
 	eh.lensType = t;
 	switch (eh.lensType){
@@ -800,12 +785,14 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	Location l=vsm.getGlobalView(demoCamera,ANIM_MOVE_LENGTH);
     }
 
+    long[] dmwnes = new long[4];
+
     void updateDMRegion(){
 	if (dmPortal == null){return;}
-	long[] wnes = dmPortal.getVisibleRegion();
+	dmPortal.getVisibleRegion(dmwnes);
 	dmRegion.moveTo(portalCamera.posx, portalCamera.posy);
-	dmRegion.setWidth((wnes[2]-wnes[0]) / 2 + 1);
-	dmRegion.setHeight((wnes[1]-wnes[3]) / 2 + 1);
+	dmRegion.setWidth((dmwnes[2]-dmwnes[0]) / 2 + 1);
+	dmRegion.setHeight((dmwnes[1]-dmwnes[3]) / 2 + 1);
     }
 
     void updateDMWindow(){

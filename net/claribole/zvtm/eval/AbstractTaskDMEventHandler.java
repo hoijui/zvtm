@@ -190,9 +190,14 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	}
     }
 
+    long[] dragmagBoundaries = new long[4];
+
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
-	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy);}
+	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy,
+								    (application.logm.lensStatus == AbstractTaskLogManager.DM_LENS) ?
+								    application.dmPortal.getVisibleRegion(dragmagBoundaries):
+								    application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
 	else if (code==KeyEvent.VK_G){application.gc();}
     }
 
