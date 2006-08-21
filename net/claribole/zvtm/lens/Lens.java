@@ -16,6 +16,7 @@ import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.LongPoint;
@@ -361,6 +362,18 @@ public abstract class Lens {
 
     public View getOwningView(){
 	return owningView.parent;
+    }
+
+    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]
+     *@param c camera
+     *@param res array which will contain the result */
+    public long[] getVisibleRegion(Camera c, long[] res){
+	float uncoef = (float)((c.focal+c.altitude)/c.focal);
+	res[0] = (long)(c.posx + (lx-lensWidth/2)*uncoef);
+	res[1] = (long)(c.posy + (-ly+lensHeight/2)*uncoef);
+	res[2] = (long)(c.posx + (lx+lensWidth/2)*uncoef);
+	res[3] = (long)(c.posy + (-ly-lensHeight/2)*uncoef);
+	return res;
     }
 
 }
