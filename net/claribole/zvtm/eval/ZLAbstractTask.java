@@ -189,7 +189,6 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	}
 	for (int i=1;i<UNVEIL_ALT_BY_LEVEL.length;i++){
 	    UNVEIL_ALT_BY_LEVEL[i] = NEXT_LEVEL_VIS_FACTOR * (((Camera.DEFAULT_FOCAL*widthByLevel[i-1]*2) / (VIEW_MAX_W-vispad[0]-vispad[2])) - Camera.DEFAULT_FOCAL);
-	    System.err.println(UNVEIL_ALT_BY_LEVEL[i]);
 	}
 	COLOR_BY_LEVEL[COLOR_BY_LEVEL.length-1] = DEEPEST_LEVEL_COLOR;
 	WORLD_WIDTH = widthByLevel[0] * 2;
