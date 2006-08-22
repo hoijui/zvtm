@@ -28,7 +28,7 @@ import java.io.OutputStreamWriter;
 
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.ZRoundRect;
 import com.xerox.VTM.glyphs.ZRoundRect;
 import com.xerox.VTM.engine.SwingWorker;
 import net.claribole.zvtm.engine.Java2DPainter;
@@ -297,7 +297,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    VRectangle objectToUnveil;
+    ZRoundRect objectToUnveil;
 
     void nextStep(long vx, long vy, long[] wnes){// wnes represents the boundaries
 	// of the region taken into account to identify the currently observed object,
@@ -313,9 +313,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
 		    // this object is the target for this level
 		    // replace rectangle with round rectangle
-		    application.targetsByLevel[searchingForTargetAtLevel].moveTo(objectToUnveil.vx, objectToUnveil.vy);
-		    application.targetsByLevel[searchingForTargetAtLevel].setVisible(true);
-		    objectToUnveil.setVisible(false);
+// 		    application.targetsByLevel[searchingForTargetAtLevel].moveTo(objectToUnveil.vx, objectToUnveil.vy);
+// 		    application.targetsByLevel[searchingForTargetAtLevel].setVisible(true);
+// 		    objectToUnveil.setVisible(false);
+		    objectToUnveil.renderRound(true);
 		    unveilNextLevel(objectToUnveil.vx, objectToUnveil.vy);
 		}
 		// else this object is not yet the target, nothing to do (already been marked just before the test above)
@@ -331,13 +332,12 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     /* Finds out if object o has already been visited or not. In any case, it is marked as visited. */
-    boolean objectNotVisitedYet(VRectangle o, int level){
+    boolean objectNotVisitedYet(ZRoundRect o, int level){
 	boolean res = true;
 	for (int i=0;i<application.elementsByLevel[level].length;i++){
 	    if (application.elementsByLevel[level][i] == o){
 		res = !application.visitsByLevel[level][i];
 		application.visitsByLevel[level][i] = true;
-		System.err.print(" "+res);
 		return res;
 	    }
 	}
@@ -354,8 +354,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 		// that a group of objects at a given level is centered on (0,0)
 		application.elementsByLevel[searchingForTargetAtLevel][i].move(vx, vy);
 	    }
-	    // then make them visible
-	    application.showLevel(searchingForTargetAtLevel, true);
+	    // then say that they can be made visible
+	    application.unveilAllowedByLevel[searchingForTargetAtLevel] = true;
 	}
 	else {// the subject identified the deepest target, proceed to next trial
 	    endTrial();
@@ -371,12 +371,12 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    VRectangle getClosestObject(long[] wnes){
+    ZRoundRect getClosestObject(long[] wnes){
 	long x = (wnes[0]+wnes[2]) / 2;
 	long y = (wnes[1]+wnes[3]) / 2;
-	VRectangle res = application.elementsByLevel[searchingForTargetAtLevel][0];
+	ZRoundRect res = application.elementsByLevel[searchingForTargetAtLevel][0];
 	double smallestDistance = Math.sqrt(Math.pow(res.vx-x, 2) + Math.pow(res.vy-y, 2));
-	VRectangle r;
+	ZRoundRect r;
 	double d;
 	for (int i=1;i<application.elementsByLevel[searchingForTargetAtLevel].length;i++){
 	    r = application.elementsByLevel[searchingForTargetAtLevel][i];
@@ -389,7 +389,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	return res;
     }
 
-    boolean closestObjectInRegion(VRectangle target, long[] wnes){
+    boolean closestObjectInRegion(ZRoundRect target, long[] wnes){
 	return (target.vx+target.getWidth() > wnes[0] &&  target.vx-target.getWidth() < wnes[2] &&
 		target.vy+target.getHeight() > wnes[3] &&  target.vy-target.getHeight() < wnes[1]);
     }
