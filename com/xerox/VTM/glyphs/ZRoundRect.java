@@ -1,12 +1,12 @@
 /*   FILE: ZRoundRect.java
- *   DATE OF CREATION:   Wed May 28 14:27:51 2003
- *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
+ *   DATE OF CREATION:   Aug 22 2006
+ *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: VRoundRect.java,v 1.8 2006/03/17 17:45:23 epietrig Exp $
- */ 
+ * $Id:  $
+ */
 
 package com.xerox.VTM.glyphs;
 
@@ -21,7 +21,7 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Round Rectangle - cannot be reoriented - the corners are approximated to a plain rectangle for some operations like computing mouse enter/exit events (performance reasons)
+ * Round rectangle used in some experiments, not really for use by mainstream client applications (behaviour changes without notice)
  * @author Emmanuel Pietriga
  **/
 
@@ -29,6 +29,8 @@ public class ZRoundRect extends VRoundRect  {
 
     static final int ROUND_CORNER_THRESHOLD = 5;
     static final int L_ROUND_CORNER_THRESHOLD = 1;
+
+    boolean renderRound = false;
 
     public ZRoundRect(){
 	super();
@@ -44,8 +46,14 @@ public class ZRoundRect extends VRoundRect  {
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public ZRoundRect(long x,long y,float z,long w,long h,Color c,int aw,int ah){
+    public ZRoundRect(long x,long y,float z,long w,long h,Color c,int aw,int ah, boolean rr){
 	super(x, y, z, w, h, c, aw, ah);
+	this.renderRound = rr;
+    }
+
+    public void renderRound(boolean b){
+	renderRound = b;
+	vsm.repaintNow();
     }
 
     /**draw glyph 
@@ -54,83 +62,119 @@ public class ZRoundRect extends VRoundRect  {
      *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
      */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		if (pc[i].aw > ROUND_CORNER_THRESHOLD || pc[i].ah > ROUND_CORNER_THRESHOLD){
-		    g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
-		}
-		else {
-		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
-		}
-	    }
-	    g.setColor(borderColor);
-	    if (paintBorder){
-		if (stroke!=null) {
-		    if (((pc[i].cx-pc[i].cw)>0) || ((pc[i].cy-pc[i].ch)>0) || ((2*pc[i].cw-1)<vW) || ((2*pc[i].ch-1)<vH)){
-			g.setStroke(stroke);  //change stroke there
-			g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
-			g.setStroke(stdS);  //original stroke restored here
+	if (renderRound){
+	    if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
+		if (filled) {
+		    g.setColor(this.color);
+		    if (pc[i].aw > ROUND_CORNER_THRESHOLD || pc[i].ah > ROUND_CORNER_THRESHOLD){
+			g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
+		    }
+		    else {
+			g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 		    }
 		}
-		else {
+		if (paintBorder){
+		    g.setColor(borderColor);
 		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
 		}
 	    }
-	}
-	else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {//repaint only if object is visible  (^ means xor)
-	    g.setColor(this.color);
-	    if (pc[i].cw<=1){
-		g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
+	    else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {//repaint only if object is visible  (^ means xor)
+		g.setColor(this.color);
+		if (pc[i].cw<=1){
+		    g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
+		}
+		else if (pc[i].ch<=1){
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
+		}
 	    }
-	    else if (pc[i].ch<=1){
-		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
+	    else {
+		g.setColor(this.color);
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	    }
 	}
 	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
+		if (filled) {
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+		}
+	    }
+	    else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {//repaint only if object is visible  (^ means xor)
+		g.setColor(this.color);
+		if (pc[i].cw<=1){
+		    g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
+		}
+		else if (pc[i].ch<=1){
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
+		}
+	    }
+	    else {
+		g.setColor(this.color);
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    }
 	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lcw>1) && (pc[i].lch>1)) {//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);		
-	    }
-	    g.setColor(borderColor);
-	    if (paintBorder){
-		if (stroke!=null) {
-		    if (((pc[i].lcx-pc[i].lcw)>0) || ((pc[i].lcy-pc[i].lch)>0) || ((2*pc[i].lcw-1)<vW) || ((2*pc[i].lch-1)<vH)){
-			g.setStroke(stroke);  //change stroke there
-			g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
-			g.setStroke(stdS);  //original stroke restored here
-		    }
+	if (renderRound){
+	    if ((pc[i].lcw>1) && (pc[i].lch>1)) {//repaint only if object is visible
+		if (filled) {
+		    g.setColor(this.color);
+		    g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);		
 		}
-		else {
+		if (paintBorder){
+		    g.setColor(borderColor);
 		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
 		}
 	    }
-	}
-	else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {//repaint only if object is visible  (^ means xor)
-	    g.setColor(this.color);
-	    if (pc[i].lcw<=1){
-		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
+	    else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {//repaint only if object is visible  (^ means xor)
+		g.setColor(this.color);
+		if (pc[i].lcw<=1){
+		    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
+		}
+		else if (pc[i].lch<=1){
+		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
+		}
 	    }
-	    else if (pc[i].lch<=1){
-		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
+	    else {
+		g.setColor(this.color);
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	    }
 	}
 	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+	    if ((pc[i].lcw>1) && (pc[i].lch>1)) {//repaint only if object is visible
+		if (filled) {
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
+		}
+	    }
+	    else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {//repaint only if object is visible  (^ means xor)
+		g.setColor(this.color);
+		if (pc[i].lcw<=1){
+		    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
+		}
+		else if (pc[i].lch<=1){
+		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
+		}
+	    }
+	    else {
+		g.setColor(this.color);
+		g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
+	    }
 	}
     }
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	ZRoundRect res=new ZRoundRect(vx,vy,0,vw,vh,color,arcWidth,arcHeight);
+	ZRoundRect res=new ZRoundRect(vx,vy,0,vw,vh,color,arcWidth,arcHeight,renderRound);
 	res.borderColor=this.borderColor;
 	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
