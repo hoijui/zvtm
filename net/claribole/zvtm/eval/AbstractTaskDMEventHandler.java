@@ -175,29 +175,27 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	application.vsm.repaintNow();
     }
 
-    public void enterGlyph(Glyph g){
+    public void enterGlyph(Glyph g){// only highlight drag mag region glyph
+	if (g != application.dmRegion){return;}
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
     }
 
-    public void exitGlyph(Glyph g){
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+    public void exitGlyph(Glyph g){// only highlight drag mag region glyph
+	if (g != application.dmRegion){return;}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     long[] dragmagBoundaries = new long[4];
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
-	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy,
-								    (application.logm.lensStatus == AbstractTaskLogManager.DM_LENS) ?
-								    application.dmPortal.getVisibleRegion(dragmagBoundaries):
-								    application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
+	else if (code==KeyEvent.VK_SPACE){
+	    application.logm.nextStep(v.getMouse().vx, v.getMouse().vy,
+				      (application.dmPortal != null) ?
+				      application.dmPortal.getVisibleRegion(dragmagBoundaries):
+				      application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
 	else if (code==KeyEvent.VK_G){application.gc();}
     }
 

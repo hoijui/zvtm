@@ -145,7 +145,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     static final long SMALLEST_ELEMENT_WIDTH = 500;
     static final long MUL_FACTOR = 50;
-    static final double ROUND_CORNER_RATIO = 5;
+    static final double ROUND_CORNER_RATIO = 5; // this matches ZRoundRect.ROUND_CORNER_THRESHOLD
 
     static long WORLD_WIDTH;
     static long WORLD_HEIGHT;
@@ -153,16 +153,24 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static long HALF_WORLD_HEIGHT;
 
     static final Color DEEPEST_LEVEL_COLOR = Color.BLUE;
+    static final Color DISC_BORDER_COLOR = Color.BLACK;
+    static final Color VISITED_BORDER_COLOR = Color.RED;
+
     static long[] widthByLevel;
     static int[] cornerByLevel;
     static LongPoint[][] offsetsByLevel;
     VRectangle[][] elementsByLevel;
+    ZRoundRect[] targetsByLevel; // value at index 0 is null as their is no need for a target at this level
+    boolean[] showHintsForLevel = {false, false, false, false}; // value at index 0 is irrelevant as their is no need to show hints at this level
+    boolean[][] visitsByLevel = new boolean[TREE_DEPTH][DENSITY*DENSITY];
     static Color[] COLOR_BY_LEVEL;
+    static float[] THRESHOLD_BY_LEVEL;
     static {
 	// compute size of all levels
 	widthByLevel = new long[TREE_DEPTH];
 	cornerByLevel = new int[TREE_DEPTH];
 	COLOR_BY_LEVEL = new Color[TREE_DEPTH];
+	THRESHOLD_BY_LEVEL = new float[TREE_DEPTH];
 	offsetsByLevel = new LongPoint[TREE_DEPTH][DENSITY*DENSITY];
 	for (int i=0;i<TREE_DEPTH;i++){
 	    widthByLevel[i] = SMALLEST_ELEMENT_WIDTH * Math.round(Math.pow(MUL_FACTOR, (TREE_DEPTH-i-1)));
@@ -180,6 +188,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 		}
 	    }
 	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, (i+1)/((float)TREE_DEPTH));
+	    THRESHOLD_BY_LEVEL[i] = (cornerByLevel[i] * Camera.DEFAULT_FOCAL / ((float)ROUND_CORNER_RATIO)) - Camera.DEFAULT_FOCAL;
 	}
 	COLOR_BY_LEVEL[COLOR_BY_LEVEL.length-1] = DEEPEST_LEVEL_COLOR;
 	WORLD_WIDTH = widthByLevel[0] * 2;
@@ -237,7 +246,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	demoView.setNotifyMouseMoved(true);
 	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 	buildWorld();
-//    	buildGrid();
+    	buildGrid();
 	if (this.technique == DM_TECHNIQUE){
 	    initDM();
 	}
@@ -286,6 +295,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	elementsByLevel[0][0] = new VRectangle(0, 0, 0, widthByLevel[0], widthByLevel[0], COLOR_BY_LEVEL[0]);
 	vsm.addGlyph(elementsByLevel[0][0], mainVS);
 	elementsByLevel[0][0].setPaintBorder(false);
+	targetsByLevel = new ZRoundRect[TREE_DEPTH];
 	for (int i=1;i<TREE_DEPTH;i++){
 	    for (int j=0;j<DENSITY;j++){
 		for (int k=0;k<DENSITY;k++){
@@ -297,10 +307,18 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 								     COLOR_BY_LEVEL[i]);
 		    vsm.addGlyph(elementsByLevel[i][j*DENSITY+k], mainVS);
 		    elementsByLevel[i][j*DENSITY+k].setPaintBorder(false);
+		    elementsByLevel[i][j*DENSITY+k].setBorderColor(DISC_BORDER_COLOR);
 		}
 	    }
+	    targetsByLevel[i] = new ZRoundRect(0, 0, 0, widthByLevel[i], widthByLevel[i],
+					       COLOR_BY_LEVEL[i], cornerByLevel[i], cornerByLevel[i]);
+	    vsm.addGlyph(targetsByLevel[i], mainVS);
+	    targetsByLevel[i].setPaintBorder(true);
+	    targetsByLevel[i].setBorderColor(VISITED_BORDER_COLOR);
 	}
+	resetVisits();
 	hideAllLevelsBut1st();
+	hideTargets();
     }
 
     void resetWorld(){
@@ -315,12 +333,29 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	for (int i=1;i<TREE_DEPTH;i++){
 	    for (int j=0;j<DENSITY*DENSITY;j++){
 		elementsByLevel[i][j].setColor(COLOR_BY_LEVEL[i]);
+		elementsByLevel[i][j].setPaintBorder(false);
+		elementsByLevel[i][j].setBorderColor(DISC_BORDER_COLOR);
 	    }
+	    targetsByLevel[i].moveTo(0, 0);
 	}
+	resetVisits();
 	hideAllLevelsBut1st();
+	hideTargets();
+    }
+
+    void resetVisits(){
+	for (int i=1;i<TREE_DEPTH;i++){
+	    for (int j=0;j<DENSITY*DENSITY;j++){
+		visitsByLevel[i][j] = false;
+	    }
+	    targetsByLevel[i].moveTo(0, 0);
+	}
     }
 
     void hideAllLevelsBut1st(){
+	for (int j=0;j<DENSITY*DENSITY;j++){
+	    elementsByLevel[1][j].setVisible(true);
+	}
 	for (int i=2;i<TREE_DEPTH;i++){
 	    for (int j=0;j<DENSITY*DENSITY;j++){
 		elementsByLevel[i][j].setVisible(false);
@@ -328,6 +363,41 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	}
     }
 
+    void hideTargets(){
+	for (int i=1;i<TREE_DEPTH;i++){
+	    targetsByLevel[i].setVisible(false);
+	}
+    }
+
+    void showLevel(int l, boolean b){
+	for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY;i++){
+	    elementsByLevel[l][i].setVisible(b);
+	}
+    }
+
+    void showHints(int l, boolean b){
+	for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY;i++){
+	    elementsByLevel[l][i].setPaintBorder(b);
+	}
+    }
+    
+    void updateHints(float alt){
+	for (int i=1;i<THRESHOLD_BY_LEVEL.length;i++){
+	    if (alt < THRESHOLD_BY_LEVEL[i]){
+		if (!showHintsForLevel[i]){
+		    showHints(i, true);
+		    showHintsForLevel[i] = true;
+		}
+	    }
+	    else {
+		if (showHintsForLevel[i]){
+		    showHints(i, false);
+		    showHintsForLevel[i] = false;
+		}
+	    }
+	}	
+    }
+    
     void buildGrid(){
 	// frame
 	ZSegment s = new ZSegment(-HALF_WORLD_WIDTH, 0, 0, 0, HALF_WORLD_HEIGHT, GRID_COLOR);
@@ -371,8 +441,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	vsm.addGlyph(s, mainVSname);
 	s.setType(GLYPH_TYPE_GRID);
 	s.setVisible(false);
-	if (depth < GRID_DEPTH){// not GRID_DEPTH because we want to maintain the same spacing between parallels
-	    buildVerticalGridLevel(c1, c, depth+1);// and meridians and map is twice as large as it is high
+	if (depth < GRID_DEPTH){
+	    buildVerticalGridLevel(c1, c, depth+1);
 	    buildVerticalGridLevel(c, c2, depth+1);
 	}
     }
@@ -455,42 +525,42 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     }
 
     void updateGridLevel(long visibleSize){
-// 	if (visibleSize < 195312.0f){
-// 	    showGridLevel(12);
-// 	}
-// 	else if (visibleSize < 390625.0f){
-// 	    showGridLevel(11);
-// 	}
-// 	else if (visibleSize < 781250.0f){
-// 	    showGridLevel(10);
-// 	}
-// 	else if (visibleSize < 1562500.0f){
-// 	    showGridLevel(9);
-// 	}
-// 	else if (visibleSize < 3125000.0f){
-// 	    showGridLevel(8);
-// 	}
-// 	else if (visibleSize < 6250000.0f){
-// 	    showGridLevel(7);
-// 	}
-// 	else if (visibleSize < 12500000.0f){
-// 	    showGridLevel(6);
-// 	}
-// 	else if (visibleSize < 25000000.0f){
-// 	    showGridLevel(5);
-// 	}
-// 	else if (visibleSize < 50000000.0f){
-// 	    showGridLevel(4);
-// 	}
-// 	else if (visibleSize < 100000000.0f){
-// 	    showGridLevel(3);
-// 	}
-// 	else if (visibleSize < 200000000.0f){
-// 	    showGridLevel(2);
-// 	}
-// 	else {
-// 	    showGridLevel(1);
-// 	}
+	if (visibleSize < 195312.0f){
+	    showGridLevel(12);
+	}
+	else if (visibleSize < 390625.0f){
+	    showGridLevel(11);
+	}
+	else if (visibleSize < 781250.0f){
+	    showGridLevel(10);
+	}
+	else if (visibleSize < 1562500.0f){
+	    showGridLevel(9);
+	}
+	else if (visibleSize < 3125000.0f){
+	    showGridLevel(8);
+	}
+	else if (visibleSize < 6250000.0f){
+	    showGridLevel(7);
+	}
+	else if (visibleSize < 12500000.0f){
+	    showGridLevel(6);
+	}
+	else if (visibleSize < 25000000.0f){
+	    showGridLevel(5);
+	}
+	else if (visibleSize < 50000000.0f){
+	    showGridLevel(4);
+	}
+	else if (visibleSize < 100000000.0f){
+	    showGridLevel(3);
+	}
+	else if (visibleSize < 200000000.0f){
+	    showGridLevel(2);
+	}
+	else {
+	    showGridLevel(1);
+	}
     }
 
     void updateOverview(){

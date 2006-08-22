@@ -130,6 +130,7 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 	float alt = application.demoCamera.getAltitude();
 	if (alt != oldCameraAltitude){
 //   	    System.err.println(alt);
+	    application.updateHints(alt);
 	    if (lensType == NO_LENS){
 		// grid
 		application.updateGridLevel(Math.max(wnes[2]-wnes[0], wnes[1]-wnes[3]));

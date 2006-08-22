@@ -298,24 +298,29 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     VRectangle objectToUnveil;
-    static final Color INSPECTED_COLOR = Color.GREEN;
 
     void nextStep(long vx, long vy, long[] wnes){// wnes represents the boundaries
 	// of the region taken into account to identify the currently observed object,
 	// region which changes depending on the technique (PZ, PZO, PZL, DM)
 	if (!sessionStarted){return;}
 	if (trialStarted){// subject wants to unveil an object
-	    objectToUnveil = getClosestTarget(wnes);
-	    if (true){//XXX: the following test will check that the object is actually visible
-		//XXX: we could also check that the object has not yet been visited?
-		objectToUnveil.setColor(INSPECTED_COLOR);
+	    objectToUnveil = getClosestObject(wnes);
+	    if (objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel) &&
+		closestObjectInRegion(objectToUnveil, wnes)){
+		//XXX: should we check that the object has not yet been visited?
+		objectToUnveil.setBorderColor(ZLAbstractTask.VISITED_BORDER_COLOR);
 		trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]++;
 		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
 		    // this object is the target for this level
+		    // replace rectangle with round rectangle
+		    application.targetsByLevel[searchingForTargetAtLevel].moveTo(objectToUnveil.vx, objectToUnveil.vy);
+		    application.targetsByLevel[searchingForTargetAtLevel].setVisible(true);
+		    objectToUnveil.setVisible(false);
 		    unveilNextLevel(objectToUnveil.vx, objectToUnveil.vy);
 		}
 		// else this object is not yet the target, nothing to do (already been marked just before the test above)
 	    }
+	    // else consider this as an accidental space bar hit
 	}
 	else {// subject is in between two trials
 	    if (trialCount < trials.length){// there is at least one trial left
@@ -323,6 +328,20 @@ class AbstractTaskLogManager implements Java2DPainter {
 		startTrial();
 	    }
 	}
+    }
+
+    /* Finds out if object o has already been visited or not. In any case, it is marked as visited. */
+    boolean objectNotVisitedYet(VRectangle o, int level){
+	boolean res = true;
+	for (int i=0;i<application.elementsByLevel[level].length;i++){
+	    if (application.elementsByLevel[level][i] == o){
+		res = !application.visitsByLevel[level][i];
+		application.visitsByLevel[level][i] = true;
+		System.err.print(" "+res);
+		return res;
+	    }
+	}
+	return res;
     }
 
     void unveilNextLevel(long vx, long vy){
@@ -336,9 +355,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		application.elementsByLevel[searchingForTargetAtLevel][i].move(vx, vy);
 	    }
 	    // then make them visible
-	    for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY;i++){
-		application.elementsByLevel[searchingForTargetAtLevel][i].setVisible(true);
-	    }
+	    application.showLevel(searchingForTargetAtLevel, true);
 	}
 	else {// the subject identified the deepest target, proceed to next trial
 	    endTrial();
@@ -354,7 +371,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    VRectangle getClosestTarget(long[] wnes){
+    VRectangle getClosestObject(long[] wnes){
 	long x = (wnes[0]+wnes[2]) / 2;
 	long y = (wnes[1]+wnes[3]) / 2;
 	VRectangle res = application.elementsByLevel[searchingForTargetAtLevel][0];
@@ -370,6 +387,11 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    }
 	}
 	return res;
+    }
+
+    boolean closestObjectInRegion(VRectangle target, long[] wnes){
+	return (target.vx+target.getWidth() > wnes[0] &&  target.vx-target.getWidth() < wnes[2] &&
+		target.vy+target.getHeight() > wnes[3] &&  target.vy-target.getHeight() < wnes[1]);
     }
 
     void wrongTarget(){
