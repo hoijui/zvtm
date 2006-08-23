@@ -65,10 +65,8 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	portalStickedToMouse = false;
 	dcamStickedToMouse = false;
 	pcamStickedToMouse = false;
-	if (dmRegionStickedToMouse){
-	    application.vsm.unstickFromMouse();
-	    dmRegionStickedToMouse = false;
-	}
+	application.vsm.unstickFromMouse();
+	dmRegionStickedToMouse = false;
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
