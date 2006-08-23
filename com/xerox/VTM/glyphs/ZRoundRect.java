@@ -73,7 +73,7 @@ public class ZRoundRect extends VRoundRect  {
 			g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 		    }
 		}
-		if (paintBorder){
+		if (paintBorder && (pc[i].aw > ROUND_CORNER_THRESHOLD || pc[i].ah > ROUND_CORNER_THRESHOLD)){
 		    g.setColor(borderColor);
 		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
 		}
@@ -98,7 +98,7 @@ public class ZRoundRect extends VRoundRect  {
 		    g.setColor(this.color);
 		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 		}
-		if (paintBorder){
+		if (paintBorder && (pc[i].aw > ROUND_CORNER_THRESHOLD || pc[i].ah > ROUND_CORNER_THRESHOLD)){
 		    g.setColor(borderColor);
 		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
 		}
