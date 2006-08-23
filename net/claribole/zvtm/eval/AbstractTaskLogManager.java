@@ -305,8 +305,9 @@ class AbstractTaskLogManager implements Java2DPainter {
 	if (!sessionStarted){return;}
 	if (trialStarted){// subject wants to unveil an object
 	    objectToUnveil = getClosestObject(wnes);
-	    if (objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel) &&
-		closestObjectInRegion(objectToUnveil, wnes)){
+	    if (objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel) && // if object has not yet been visited
+		closestObjectInRegion(objectToUnveil, wnes) &&                   // if object is actually visible in viewport
+		visibleCorners(objectToUnveil)){                                 // if object is big enough to identify it as being the target (or not)
 		objectToUnveil.setBorderColor(ZLAbstractTask.VISITED_BORDER_COLOR);
 		trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]++;
 		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
@@ -338,6 +339,18 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    }
 	}
 	return res;
+    }
+
+    boolean visibleCorners(ZRoundRect r){
+	if (application.technique == ZLAbstractTask.PZL_TECHNIQUE){
+	    return objectToUnveil.cornersVisibleInLens(application.demoCamera) || objectToUnveil.cornersVisible(application.demoCamera);
+	}
+	else if (application.technique == ZLAbstractTask.DM_TECHNIQUE){
+	    return objectToUnveil.cornersVisible(application.portalCamera) || objectToUnveil.cornersVisible(application.demoCamera);
+	}
+	else {// PZ, or PZO
+	    return objectToUnveil.cornersVisible(application.demoCamera);
+	}
     }
 
     void unveilNextLevel(long vx, long vy){
