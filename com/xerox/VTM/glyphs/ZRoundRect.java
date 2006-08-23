@@ -126,7 +126,7 @@ public class ZRoundRect extends VRoundRect  {
 		    g.setColor(this.color);
 		    g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);		
 		}
-		if (paintBorder){
+		if (paintBorder && (pc[i].law > ROUND_CORNER_THRESHOLD || pc[i].lah > ROUND_CORNER_THRESHOLD)){
 		    g.setColor(borderColor);
 		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
 		}
@@ -151,7 +151,7 @@ public class ZRoundRect extends VRoundRect  {
 		    g.setColor(this.color);
 		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
 		}
-		if (paintBorder){
+		if (paintBorder && (pc[i].law > ROUND_CORNER_THRESHOLD || pc[i].lah > ROUND_CORNER_THRESHOLD)){
 		    g.setColor(borderColor);
 		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
 		}
@@ -170,6 +170,16 @@ public class ZRoundRect extends VRoundRect  {
 		g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
 	    }
 	}
+    }
+
+    /** tells whether round corners are visible or not (as seen through camera c) */
+    public boolean cornersVisible(Camera c){
+	return (pc[c.getIndex()].aw > ROUND_CORNER_THRESHOLD || pc[c.getIndex()].ah > ROUND_CORNER_THRESHOLD);
+    }
+
+    /** tells whether round corners are visible or not (as seen through camera c and lens) */
+    public boolean cornersVisibleInLens(Camera c){
+	return (pc[c.getIndex()].law > ROUND_CORNER_THRESHOLD || pc[c.getIndex()].lah > ROUND_CORNER_THRESHOLD);	
     }
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
