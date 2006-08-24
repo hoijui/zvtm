@@ -305,10 +305,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 	if (!sessionStarted){return;}
 	if (trialStarted){// subject wants to unveil an object
 	    objectToUnveil = getClosestObject(wnes);
-	    if (objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel) && // if object has not yet been visited
-		closestObjectInRegion(objectToUnveil, wnes) &&                   // if object is actually visible in viewport
-		visibleCorners(objectToUnveil)){                                 // if object is big enough to identify it as being the target (or not)
-		objectToUnveil.setBorderColor(ZLAbstractTask.VISITED_BORDER_COLOR);
+	    if (closestObjectInRegion(objectToUnveil, wnes) &&                  // if object is actually visible in viewport
+		visibleCorners(objectToUnveil) &&                               // if object is big enough to identify it as being the target (or not)
+		objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel)){ // if object has not yet been visited !! do this test last as it 
+		objectToUnveil.setBorderColor(ZLAbstractTask.VISITED_BORDER_COLOR); // marks the object as visited !!
 		trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]++;
 		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
 		    // this object is the target for this level
