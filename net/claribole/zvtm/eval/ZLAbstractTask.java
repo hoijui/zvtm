@@ -142,7 +142,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     static final long SMALLEST_ELEMENT_WIDTH = 500;
     static final long MUL_FACTOR = 50;
-    static final double ROUND_CORNER_RATIO = 5; // this matches ZRoundRect.ROUND_CORNER_THRESHOLD
+    static final double ROUND_CORNER_RATIO = ZRoundRect.ROUND_CORNER_THRESHOLD; // this matches ZRoundRect.ROUND_CORNER_THRESHOLD
 
     static long WORLD_WIDTH;
     static long WORLD_HEIGHT;
@@ -153,8 +153,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static final Color DISC_BORDER_COLOR = Color.BLACK;
     static final Color VISITED_BORDER_COLOR = Color.RED;
 
-    static final float NEXT_LEVEL_VIS_FACTOR = 1.5f;
-
+    static final float NEXT_LEVEL_VIS_FACTOR = 2.0f; /* this controls the minimum size of the parent object for its content to
+							appear (provided all necessary conditions for it to appear are met) */
     static long[] widthByLevel;
     static int[] cornerByLevel;
     static LongPoint[][] offsetsByLevel;
