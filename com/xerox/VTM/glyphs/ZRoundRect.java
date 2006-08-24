@@ -27,8 +27,7 @@ import net.claribole.zvtm.lens.Lens;
 
 public class ZRoundRect extends VRoundRect  {
 
-    static final int ROUND_CORNER_THRESHOLD = 5;
-    static final int L_ROUND_CORNER_THRESHOLD = 1;
+    public static final int ROUND_CORNER_THRESHOLD = 5;
 
     boolean renderRound = false;
 
