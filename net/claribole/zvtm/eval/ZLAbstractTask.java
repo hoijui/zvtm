@@ -142,14 +142,14 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     static final long SMALLEST_ELEMENT_WIDTH = 500;
     static final long MUL_FACTOR = 50;
-    static final double ROUND_CORNER_RATIO = ZRoundRect.ROUND_CORNER_THRESHOLD; // this matches ZRoundRect.ROUND_CORNER_THRESHOLD
+    static final double ROUND_CORNER_RATIO = 5;
 
     static long WORLD_WIDTH;
     static long WORLD_HEIGHT;
     static long HALF_WORLD_WIDTH;
     static long HALF_WORLD_HEIGHT;
 
-    static final Color DEEPEST_LEVEL_COLOR = Color.BLUE;
+    static final Color DEEPEST_LEVEL_COLOR = Color.WHITE;
     static final Color DISC_BORDER_COLOR = Color.BLACK;
     static final Color VISITED_BORDER_COLOR = Color.RED;
 
@@ -190,7 +190,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	for (int i=1;i<UNVEIL_ALT_BY_LEVEL.length;i++){
 	    UNVEIL_ALT_BY_LEVEL[i] = NEXT_LEVEL_VIS_FACTOR * (((Camera.DEFAULT_FOCAL*widthByLevel[i-1]*2) / (VIEW_MAX_W-vispad[0]-vispad[2])) - Camera.DEFAULT_FOCAL);
 	}
-	COLOR_BY_LEVEL[COLOR_BY_LEVEL.length-1] = DEEPEST_LEVEL_COLOR;
+// 	COLOR_BY_LEVEL[COLOR_BY_LEVEL.length-1] = DEEPEST_LEVEL_COLOR;
 	WORLD_WIDTH = widthByLevel[0] * 2;
 	WORLD_HEIGHT = WORLD_WIDTH;
 	HALF_WORLD_WIDTH = WORLD_WIDTH / 2;
