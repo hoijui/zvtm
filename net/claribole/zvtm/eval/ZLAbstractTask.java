@@ -162,6 +162,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     boolean[][] visitsByLevel = new boolean[TREE_DEPTH][DENSITY*DENSITY];
     boolean[] unveilAllowedByLevel = new boolean[TREE_DEPTH];
     static Color[] COLOR_BY_LEVEL;
+    static final float DARKEST_B = 0.4f;   // darkest level HSB color B component value  
+    static final float BRIGHTEST_B = 1.0f; // brightest level HSB color B component value
     static float[] UNVEIL_ALT_BY_LEVEL;
     static {
 	// compute size of all levels
@@ -185,7 +187,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 		    y -= step;
 		}
 	    }
-	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, (i+1)/((float)TREE_DEPTH));
+	    COLOR_BY_LEVEL[i] = Color.getHSBColor(0, 0, i*(BRIGHTEST_B-DARKEST_B)/((float)(TREE_DEPTH-1)) + DARKEST_B);
 	}
 	for (int i=1;i<UNVEIL_ALT_BY_LEVEL.length;i++){
 	    UNVEIL_ALT_BY_LEVEL[i] = NEXT_LEVEL_VIS_FACTOR * (((Camera.DEFAULT_FOCAL*widthByLevel[i-1]*2) / (VIEW_MAX_W-vispad[0]-vispad[2])) - Camera.DEFAULT_FOCAL);
