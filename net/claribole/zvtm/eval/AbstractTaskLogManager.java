@@ -50,7 +50,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     String msg = PSBTC;
 
     static final int WARN_MSG_DELAY = 500;
-    static final String TARGET_ERR = "ERROR: Target is not within selection region";
+    static final String TARGET_ERR = "ERROR: Target already visited";
 
     /* codes for technique */
 //     static final String ZL = "ZL";     // Probing lenses
@@ -82,7 +82,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     int trialCount;
     String trialCountStr;
     int nbZIOswitches;
-    int nbErrors;
+    int nbMulVis;
 
     AbstractTrialInfo[] trials;
     int searchingForTargetAtLevel = 1;  // 1, 2 or 3 depending on the user's progress in the trial
@@ -212,7 +212,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
-		      "Nb Errors");
+		      "Nb Mul Vis");
 	    bwt.newLine();
 	    bwt.flush();
 	    // cinematic file header (misc. info)
@@ -254,7 +254,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     void startTrial(){
 	trialStarted = true;
 	nbZIOswitches = 0;
-	nbErrors = 0;
+	nbMulVis = 0;
 	application.eh.zoomDirection = AbstractTaskEventHandler.NOT_ZOOMING;
  	application.demoView.setJava2DPainter(im, Java2DPainter.AFTER_DISTORTION);
 	trialStartTime = System.currentTimeMillis();
@@ -308,7 +308,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    if (closestObjectInRegion(objectToUnveil, wnes) &&                  // if object is actually visible in viewport
 		visibleCorners(objectToUnveil) &&                               // if object is big enough to identify it as being the target (or not)
 		objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel)){ // if object has not yet been visited !! do this test last as it 
-		objectToUnveil.setBorderColor(ZLAbstractTask.VISITED_BORDER_COLOR); // marks the object as visited !!
+		highlightBriefly(objectToUnveil, 400);
 		trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]++;
 		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
 		    // this object is the target for this level
@@ -328,13 +328,18 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    /* Finds out if object o has already been visited or not. In any case, it is marked as visited. */
+    /* Finds out if object o has already been visited or not. Issues a warning if message has already been visited */
     boolean objectNotVisitedYet(ZRoundRect o, int level){
 	boolean res = true;
 	for (int i=0;i<application.elementsByLevel[level].length;i++){
 	    if (application.elementsByLevel[level][i] == o){
 		res = !application.visitsByLevel[level][i];
-		application.visitsByLevel[level][i] = true;
+		if (res){// this is the first visit to this object
+		    application.visitsByLevel[level][i] = true;
+		}
+		else {// the object was visited in the past
+		    wrongTarget();
+		}
 		return res;
 	    }
 	}
@@ -403,8 +408,21 @@ class AbstractTaskLogManager implements Java2DPainter {
 		target.vy+target.getHeight() > wnes[3] &&  target.vy-target.getHeight() < wnes[1]);
     }
 
+    /* temporarily change r's border color to give a visual feedback about the inscpetion of this object */
+    void highlightBriefly(final ZRoundRect r, final int delay){
+	r.setBorderColor(ZLAbstractTask.VISITED_BORDER_COLOR);
+	final SwingWorker worker=new SwingWorker(){
+		public Object construct(){
+		    sleep(delay);
+		    r.setBorderColor(ZLAbstractTask.DISC_BORDER_COLOR);
+		    return null; 
+		}
+	    };
+	worker.start();
+    }
+
     void wrongTarget(){
-	nbErrors++;
+	nbMulVis++;
  	im.warn(TARGET_ERR, "", WARN_MSG_DELAY);
     }
 
@@ -416,7 +434,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    bwt.write(trialCountStr + OUTPUT_CSV_SEP +
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
-		      Integer.toString(nbErrors));
+		      Integer.toString(nbMulVis));
 	    bwt.newLine();
 	    bwt.flush();
 	}
