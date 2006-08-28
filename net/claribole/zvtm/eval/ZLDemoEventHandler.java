@@ -238,6 +238,18 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.lensFamily = ZLWorldDemo.LInf_Manhattan;
 	    application.demoView.setTitle(ZLWorldDemo.LInf_Manhattan_Title);
 	}
+	else if (code == KeyEvent.VK_7){
+	    application.lensFamily = ZLWorldDemo.L1_Fresnel;
+	    application.demoView.setTitle(ZLWorldDemo.L1_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_8){
+	    application.lensFamily = ZLWorldDemo.L2_Fresnel;
+	    application.demoView.setTitle(ZLWorldDemo.L2_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_9){
+	    application.lensFamily = ZLWorldDemo.LInf_Fresnel;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_Fresnel_Title);
+	}
     }
 
     public void viewActivated(View v){}
