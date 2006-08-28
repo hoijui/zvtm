@@ -30,10 +30,13 @@ class AbstractTrialInfo {
     // incremented each time the subject visits a target,
     // per level (three levels)
     int[] nbTargetsVisited = {0, 0, 0};
+    // times taken to identify target at each level
+    long[] timeToTarget;
 
     AbstractTrialInfo(int tn, String[] tis){
 	trialNumber = tn;
 	targetIndexes = new int[tis.length];
+	timeToTarget = new long[tis.length];
 	for (int i=0;i<targetIndexes.length;i++){
 	    targetIndexes[i] = Integer.parseInt(tis[i]);
 	}

@@ -212,7 +212,10 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
-		      "Nb Mul Vis");
+		      "Nb Mul Vis" + OUTPUT_CSV_SEP +
+		      "tgti1" + OUTPUT_CSV_SEP + "tgtt1" + OUTPUT_CSV_SEP +
+		      "tgti2" + OUTPUT_CSV_SEP + "tgtt2" + OUTPUT_CSV_SEP +
+		      "tgti3" + OUTPUT_CSV_SEP + "tgtt3");
 	    bwt.newLine();
 	    bwt.flush();
 	    // cinematic file header (misc. info)
@@ -280,7 +283,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     void endTrial(){
 	trialDuration = System.currentTimeMillis() - trialStartTime;
 	trialStarted = false;
-	writeTrial();
+	writeTrial(trialStartTime, trialCount);
 	flushCinematic();
 	if (trialCount +1 >= trials.length){
 	    endSession();
@@ -313,6 +316,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
 		    // this object is the target for this level
 		    // replace rectangle with round rectangle
+		    trials[trialCount].timeToTarget[searchingForTargetAtLevel-1] = System.currentTimeMillis();
 		    objectToUnveil.renderRound(true);
 		    unveilNextLevel(objectToUnveil.vx, objectToUnveil.vy);
 		}
@@ -426,7 +430,15 @@ class AbstractTaskLogManager implements Java2DPainter {
  	im.warn(TARGET_ERR, "", WARN_MSG_DELAY);
     }
 
-    void writeTrial(){
+    String getTrialTimes(long tst, int tc){
+	String res = OUTPUT_CSV_SEP + trials[tc].targetIndexes[0] + OUTPUT_CSV_SEP + (trials[tc].timeToTarget[0]-tst);
+	for (int i=1;i<3;i++){
+	    res += OUTPUT_CSV_SEP + trials[tc].targetIndexes[i] + OUTPUT_CSV_SEP + (trials[tc].timeToTarget[i]-trials[tc].timeToTarget[i-1]);
+	}
+	return res;
+    }
+
+    void writeTrial(long tst, int tc){
 	try {
 	    // subject name + subject ID + technique
 	    bwt.write(lineStart);
@@ -434,7 +446,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    bwt.write(trialCountStr + OUTPUT_CSV_SEP +
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
-		      Integer.toString(nbMulVis));
+		      Integer.toString(nbMulVis) + getTrialTimes(tst, trialCount));
 	    bwt.newLine();
 	    bwt.flush();
 	}
