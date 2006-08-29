@@ -807,10 +807,12 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	dmPortal.sizeTo(w, h);
 	mainVS.show(dmRegion);
 	paintLinks = true;
-	((AbstractTaskDMEventHandler)eh).justCreatedDM = true;
+// 	robot.mouseMove(x+1,y);
+// 	((AbstractTaskDMEventHandler)eh).justCreatedDM = true;
 	Point[] data = {new Point(DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h),
 			new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2)};
-	vsm.animator.createPortalAnimation(150, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
+	vsm.animator.createPortalAnimation(150, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), new DMActivator(this, x,y));
+// 	robot.mouseMove(x,y);
     }
 
     void killDM(){
@@ -819,7 +821,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	mainVS.hide(dmRegion);
 	paintLinks = false;
 	((AbstractTaskDMEventHandler)eh).inPortal = false;	
-	((AbstractTaskDMEventHandler)eh).justCreatedDM = false;
+// 	((AbstractTaskDMEventHandler)eh).justCreatedDM = false;
     }
     
     void meetDM(){
