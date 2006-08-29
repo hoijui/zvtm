@@ -103,8 +103,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static final int GRID_DEPTH = 12;
     int currentLevel = -1;
 
-    static final float START_ALTITUDE = 18100000.0f;
-    static final float PORTAL_OVERVIEW_ALTITUDE = 65000000.0f;
+    static final float START_ALTITUDE = 80000000.0f;
     static final float FLOOR_ALTITUDE = 300.0f;
 
     boolean cameraOnFloor = false;
@@ -198,6 +197,9 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	WORLD_HEIGHT = WORLD_WIDTH;
 	HALF_WORLD_WIDTH = WORLD_WIDTH / 2;
 	HALF_WORLD_HEIGHT = WORLD_HEIGHT / 2;
+// 	for (int i=0;i<16;i++){
+// 	    System.err.println(";"+Math.round(Math.random()*8*ZLAbstractTask.widthByLevel[0]-4*ZLAbstractTask.widthByLevel[0])+";"+Math.round(Math.random()*8*ZLAbstractTask.widthByLevel[0]-4*ZLAbstractTask.widthByLevel[0]));
+// 	}
     }
 
     ZLAbstractTask(short t){

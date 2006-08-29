@@ -268,8 +268,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 	trialCount++;
 	searchingForTargetAtLevel = 1;
 	searchingForTargetAtLevelS = String.valueOf(searchingForTargetAtLevel);
-	application.demoCamera.posx = 0;
-	application.demoCamera.posy = 0;
+	application.demoCamera.posx = trials[trialCount].initialCameraPos.x;
+	application.demoCamera.posy = trials[trialCount].initialCameraPos.y;
 	application.demoCamera.updatePrecisePosition();
 	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
  	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;

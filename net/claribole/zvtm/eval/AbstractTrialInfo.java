@@ -19,6 +19,7 @@ import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.ZRoundRect;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.LongPoint;
 
 class AbstractTrialInfo {
     
@@ -32,6 +33,7 @@ class AbstractTrialInfo {
     int[] nbTargetsVisited = {0, 0, 0};
     // times taken to identify target at each level
     long[] timeToTarget;
+    LongPoint initialCameraPos;
 
     AbstractTrialInfo(int tn, String[] tis){
 	trialNumber = tn;
@@ -40,6 +42,7 @@ class AbstractTrialInfo {
 	for (int i=0;i<targetIndexes.length;i++){
 	    targetIndexes[i] = Integer.parseInt(tis[i]);
 	}
+	initialCameraPos = new LongPoint(Long.parseLong(tis[3]), Long.parseLong(tis[4]));
     }
 
 }
