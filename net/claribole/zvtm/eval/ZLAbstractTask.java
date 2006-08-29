@@ -810,7 +810,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	((AbstractTaskDMEventHandler)eh).justCreatedDM = true;
 	Point[] data = {new Point(DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h),
 			new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2)};
-	vsm.animator.createPortalAnimation(300, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
+	vsm.animator.createPortalAnimation(150, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
     }
 
     void killDM(){
