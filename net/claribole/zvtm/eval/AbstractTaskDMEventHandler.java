@@ -32,7 +32,6 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
     boolean dmRegionStickedToMouse = false;
     boolean inPortal = false;
     boolean cursorHasNotMovedYet = false;
-//     boolean justCreatedDM = false;
 
     AbstractTaskDMEventHandler(ZLAbstractTask appli){
 	super(appli);
@@ -51,7 +50,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	    }
 	}
 	else {
-	    if (/*justCreatedDM || */inDMRegion(v.getGlyphsUnderMouseList())){
+	    if (inDMRegion(v.getGlyphsUnderMouseList())){
 		dmRegionStickedToMouse = true;
 		application.vsm.stickToMouse(application.dmRegion);
 	    }
@@ -101,7 +100,6 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 	cursorHasNotMovedYet = false;
-// 	justCreatedDM = false;
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
