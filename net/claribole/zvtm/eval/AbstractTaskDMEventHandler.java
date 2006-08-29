@@ -93,7 +93,8 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	lastJPY = jpy;
 	lastVX = v.getMouse().vx;
 	lastVY = v.getMouse().vy;
-	application.triggerDM(jpx+ZLAbstractTask.DM_PORTAL_INITIAL_X_OFFSET, jpy+ZLAbstractTask.DM_PORTAL_INITIAL_Y_OFFSET);
+// 	application.triggerDM(jpx+ZLAbstractTask.DM_PORTAL_INITIAL_X_OFFSET, jpy+ZLAbstractTask.DM_PORTAL_INITIAL_Y_OFFSET);
+	application.triggerDM(jpx, jpy);
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){

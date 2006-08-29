@@ -17,6 +17,7 @@ import java.awt.BasicStroke;
 import java.awt.Image;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.Point;
 import javax.swing.text.Style;
 
 import java.util.Vector;
@@ -86,8 +87,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     /* DragMag */
     static final int DM_PORTAL_WIDTH = 200;
     static final int DM_PORTAL_HEIGHT = 200;
-    static final int DM_PORTAL_INITIAL_X_OFFSET = 200;
-    static final int DM_PORTAL_INITIAL_Y_OFFSET = 200;
+    static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
+    static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
     DraggableCameraPortal dmPortal;
     VRectangle dmRegion;
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
@@ -792,7 +793,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     }
 
     void createDM(int x, int y){
-	dmPortal = new DraggableCameraPortal(x-DM_PORTAL_WIDTH/2, y-DM_PORTAL_HEIGHT/2, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
+	dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
 	dmPortal.setPortalEventHandler((PortalEventHandler)eh);
 	dmPortal.setBackgroundColor(Color.LIGHT_GRAY);
 	vsm.addPortal(dmPortal, demoView);
@@ -801,9 +802,15 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	portalCamera.moveTo(l.vx, l.vy);
 	portalCamera.setAltitude((float) ((demoCamera.getAltitude()+demoCamera.getFocal())/(DEFAULT_MAG_FACTOR)-demoCamera.getFocal()));
 	updateDMRegion();
+	int w = Math.round(dmRegion.getWidth() * 2 * demoCamera.getFocal() / ((float)(demoCamera.getFocal()+demoCamera.getAltitude())));
+	int h = Math.round(dmRegion.getHeight() * 2 * demoCamera.getFocal() / ((float)(demoCamera.getFocal()+demoCamera.getAltitude())));
+	dmPortal.sizeTo(w, h);
 	mainVS.show(dmRegion);
 	paintLinks = true;
 	((AbstractTaskDMEventHandler)eh).justCreatedDM = true;
+	Point[] data = {new Point(DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h),
+			new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2)};
+	vsm.animator.createPortalAnimation(300, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
     }
 
     void killDM(){
