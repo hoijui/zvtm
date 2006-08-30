@@ -88,6 +88,24 @@ Usage:
     <jar destfile="${lib.dir}/zgrviewer.jar">
       <fileset dir="${classes.dir}"
                includes="net/claribole/zgrviewer/**"/>
+      <fileset dir="${basedir}"
+               includes="images/stdnav24b.png,images/dmnav24b.png,images/plnav24b.png,images/stdnav24g.png,images/dmnav24g.png,images/plnav24g.png"/>
+    </jar>
+  </target>
+
+  <!--zvtm mpd jar-->
+  <target name="zvtmmpdjar" depends="init,zvtmbuild">
+    <jar destfile="${lib.dir}/zvtm-mpd.jar">
+      <fileset dir="${classes.dir}"
+               includes="net/claribole/zvtm/mpd/**"/>
+    </jar>
+  </target>
+
+  <!--zgrviewer mpd jar-->
+  <target name="zgrvmpdjar" depends="init,zvtmbuild">
+    <jar destfile="${lib.dir}/zgrviewer-mpd.jar">
+      <fileset dir="${classes.dir}"
+               includes="net/claribole/zgrviewer/mpd/**"/>
     </jar>
   </target>
 
