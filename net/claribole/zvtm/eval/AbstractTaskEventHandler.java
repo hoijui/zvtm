@@ -91,9 +91,17 @@ class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, C
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
 
-    public void enterGlyph(Glyph g){}
+    public void enterGlyph(Glyph g){
+	if (g.getType() == ZLAbstractTask.GLYPH_TYPE_WORLD){
+	    application.demoView.setCursorIcon(java.awt.Cursor.HAND_CURSOR);
+	}
+    }
     
-    public void exitGlyph(Glyph g){}
+    public void exitGlyph(Glyph g){
+	if (g.getType() == ZLAbstractTask.GLYPH_TYPE_WORLD){
+	    application.demoView.setCursorIcon(java.awt.Cursor.CUSTOM_CURSOR);	    
+	}
+    }
 
     public void viewActivated(View v){}
     

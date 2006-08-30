@@ -302,6 +302,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 		    vsm.addGlyph(elementsByLevel[i][j*DENSITY+k], mainVS);
 		    elementsByLevel[i][j*DENSITY+k].setPaintBorder(true); // actual drawing of the border will depend on the rendering size for each rectangle
 		    elementsByLevel[i][j*DENSITY+k].setBorderColor(DISC_BORDER_COLOR);
+		    elementsByLevel[i][j*DENSITY+k].setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
 		}
 	    }
 	}

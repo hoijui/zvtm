@@ -176,15 +176,27 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
     }
 
     public void enterGlyph(Glyph g){// only highlight drag mag region glyph
-	if (g != application.dmRegion){return;}
-	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	if (g != application.dmRegion){
+	    if (g.getType() == ZLAbstractTask.GLYPH_TYPE_WORLD){
+		application.demoView.setCursorIcon(java.awt.Cursor.HAND_CURSOR);
+	    }
+	}
+	else {
+	    if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
+	    if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	}
     }
 
     public void exitGlyph(Glyph g){// only highlight drag mag region glyph
-	if (g != application.dmRegion){return;}
-	if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	if (g != application.dmRegion){
+	    if (g.getType() == ZLAbstractTask.GLYPH_TYPE_WORLD){
+		application.demoView.setCursorIcon(java.awt.Cursor.CUSTOM_CURSOR);	    
+	    }
+	}
+	else {
+	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	}
     }
 
     long[] dragmagBoundaries = new long[4];
