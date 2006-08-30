@@ -135,7 +135,9 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	Glyph g=v.lastGlyphEntered();
 	if (g!=null){
@@ -194,28 +196,40 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	}
     }
 
+    int lx, ly;
+    
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+	lx = jpx;
+	ly = jpy;
 	if ((jpx-ZGRViewer.LENS_R1) < 0){
-	    jpx = ZGRViewer.LENS_R1;
+	    lx = ZGRViewer.LENS_R1;
 	    cursorNearBorder = true;
 	}
 	else if ((jpx+ZGRViewer.LENS_R1) > application.panelWidth){
-	    jpx = application.panelWidth - ZGRViewer.LENS_R1;
+	    lx = application.panelWidth - ZGRViewer.LENS_R1;
 	    cursorNearBorder = true;
 	}
 	else {
 	    cursorNearBorder = false;
 	}
 	if ((jpy-ZGRViewer.LENS_R1) < 0){
-	    jpy = ZGRViewer.LENS_R1;
+	    ly = ZGRViewer.LENS_R1;
 	    cursorNearBorder = true;
 	}
 	else if ((jpy+ZGRViewer.LENS_R1) > application.panelHeight){
-	    jpy = application.panelHeight - ZGRViewer.LENS_R1;
+	    ly = application.panelHeight - ZGRViewer.LENS_R1;
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true);
+	    application.moveLens(lx, ly, true);
+	}
+	else {
+	    if (application.tp.insidePaletteTriggerZone(jpx, jpy)){
+		if (!application.tp.isShowing()){application.tp.show();}
+	    }
+	    else {
+		if (application.tp.isShowing()){application.tp.hide();}
+	    }
 	}
     }
 
@@ -331,6 +345,12 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	    else {
 		attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
 	    }
+	}
+	else if (code == KeyEvent.VK_R){
+	    application.tp.show();
+	}
+	else if (code == KeyEvent.VK_T){
+	    application.tp.hide();
 	}
     }
 

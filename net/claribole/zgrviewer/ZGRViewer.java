@@ -79,7 +79,9 @@ public class ZGRViewer implements AnimationListener {
 
     static ConfigManager cfgMngr;
     static DOTManager dotMngr;
-    static TooltipManager tpMngr;
+    static TooltipManager tooltipMngr;
+
+    ToolPalette tp;
 
     ZgrvEvtHdlr meh;
     RadarEvtHdlr reh;
@@ -187,9 +189,11 @@ public class ZGRViewer implements AnimationListener {
 	ZGRViewer.vsm.stickToGlyph(seg1,ZGRViewer.observedRegion);
 	ZGRViewer.vsm.stickToGlyph(seg2,ZGRViewer.observedRegion);
 	ZGRViewer.observedRegion.setSensitivity(false);
+	tp = new ToolPalette(this);
 	Vector vc1=new Vector();
 	vc1.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
 	vc1.add(vsm.getVirtualSpace(menuSpace).getCamera(0));
+	vc1.add(tp.getPaletteCamera());
 	JMenuBar jmb=initViewMenu(acc);
  	if (acc == 1){
 	    mainView=vsm.addExternalView(vc1,ConfigManager.MAIN_TITLE, View.VOLATILE_VIEW, ConfigManager.mainViewW,ConfigManager.mainViewH,true,false,jmb);
@@ -211,10 +215,10 @@ public class ZGRViewer implements AnimationListener {
 	mainView.getFrame().addComponentListener(cfgMngr);
 	mainView.setVisible(true);
 	setAntialiasing(ConfigManager.ANTIALIASING);
-	tpMngr = new TooltipManager(this);
-	mainView.getPanel().addMouseMotionListener(tpMngr);
-	tpMngr.start();
-	mainView.setJava2DPainter(tpMngr, Java2DPainter.FOREGROUND);
+	tooltipMngr = new TooltipManager(this);
+	mainView.getPanel().addMouseMotionListener(tooltipMngr);
+	tooltipMngr.start();
+	mainView.setJava2DPainter(tooltipMngr, Java2DPainter.FOREGROUND);
 	updatePanelSize();
     }
 
@@ -922,6 +926,7 @@ public class ZGRViewer implements AnimationListener {
 	Dimension d = mainView.getPanel().getSize();
 	panelWidth = d.width;
 	panelHeight = d.height;
+	tp.updateHiddenPosition(mainView);
     }
 
     /* Web & URL */
@@ -982,7 +987,7 @@ public class ZGRViewer implements AnimationListener {
 
     void exit(){
 	cfgMngr.saveCommandLines();
-	tpMngr.stop();
+	tooltipMngr.stop();
 	cfgMngr.terminatePlugins();
 	System.exit(0);
     }
