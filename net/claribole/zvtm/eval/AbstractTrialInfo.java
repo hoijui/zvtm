@@ -27,19 +27,16 @@ class AbstractTrialInfo {
     int trialNumber;
     // number of objects the subject has to visit before
     // he finds the actual target, per level
-    int[] targetIndexes;
+    int targetIndex;
     // incremented each time the subject visits a target,
     // per level (three levels)
-    int[] nbTargetsVisited = {0, 0, 0};
+    int nbTargetsVisited = 0;
     LongPoint initialCameraPos;
 
     AbstractTrialInfo(int tn, String[] tis){
 	trialNumber = tn;
-	targetIndexes = new int[tis.length];
-	for (int i=0;i<targetIndexes.length;i++){
-	    targetIndexes[i] = Integer.parseInt(tis[i]);
-	}
-	initialCameraPos = new LongPoint(Long.parseLong(tis[3]), Long.parseLong(tis[4]));
+	targetIndex = Integer.parseInt(tis[0]);
+	initialCameraPos = new LongPoint(Long.parseLong(tis[1]), Long.parseLong(tis[2]));
     }
 
 }

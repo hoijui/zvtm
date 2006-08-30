@@ -85,8 +85,6 @@ class AbstractTaskLogManager implements Java2DPainter {
     int nbMulVis;
 
     AbstractTrialInfo[] trials;
-    int searchingForTargetAtLevel = 1;  // 1, 2 or 3 depending on the user's progress in the trial
-    String searchingForTargetAtLevelS = "";  // text version, for cinematic log
 
     long trialStartTime;
     long trialDuration;
@@ -237,8 +235,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "lx" + OUTPUT_CSV_SEP +
 		      "ly" + OUTPUT_CSV_SEP +
 		      "mm" + OUTPUT_CSV_SEP +
-		      "Time" + OUTPUT_CSV_SEP +
-		      "Level");
+		      "Time");
 	    // additional info only for dragmag
 	    if (application.technique == ZLAbstractTask.DM_TECHNIQUE){
 		bwc.write(OUTPUT_CSV_SEP + "pcx" +
@@ -263,10 +260,10 @@ class AbstractTaskLogManager implements Java2DPainter {
     void initNextTrial(){
 	application.resetWorld();
 	trialCount++;
-	searchingForTargetAtLevel = 1;
-	searchingForTargetAtLevelS = String.valueOf(searchingForTargetAtLevel);
-	application.demoCamera.posx = trials[trialCount].initialCameraPos.x;
-	application.demoCamera.posy = trials[trialCount].initialCameraPos.y;
+// 	application.demoCamera.posx = trials[trialCount].initialCameraPos.x;
+// 	application.demoCamera.posy = trials[trialCount].initialCameraPos.y;
+	application.demoCamera.posx = 0;
+	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();
 	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
  	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
@@ -307,14 +304,15 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    objectToUnveil = getClosestObject(wnes);
 	    if (closestObjectInRegion(objectToUnveil, wnes) &&                  // if object is actually visible in viewport
 		visibleCorners(objectToUnveil) &&                               // if object is big enough to identify it as being the target (or not)
-		objectNotVisitedYet(objectToUnveil,searchingForTargetAtLevel)){ // if object has not yet been visited !! do this test last as it 
+		objectNotVisitedYet(objectToUnveil)){ // if object has not yet been visited !! do this test last as it 
 		highlightBriefly(objectToUnveil, 400);
-		trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]++;
-		if (trials[trialCount].targetIndexes[searchingForTargetAtLevel-1] <= trials[trialCount].nbTargetsVisited[searchingForTargetAtLevel-1]){
+		trials[trialCount].nbTargetsVisited++;
+		if (trials[trialCount].targetIndex <= trials[trialCount].nbTargetsVisited){
 		    // this object is the target for this level
 		    // replace rectangle with round rectangle
 		    objectToUnveil.renderRound(true);
-		    unveilNextLevel(objectToUnveil.vx, objectToUnveil.vy);
+		    //XXX: this call will move in the method triggered when user says "this is the target"
+		    validateTarget();
 		}
 		// else this object is not yet the target, nothing to do (already been marked just before the test above)
 	    }
@@ -329,13 +327,13 @@ class AbstractTaskLogManager implements Java2DPainter {
     }
 
     /* Finds out if object o has already been visited or not. Issues a warning if message has already been visited */
-    boolean objectNotVisitedYet(ZRoundRect o, int level){
+    boolean objectNotVisitedYet(ZRoundRect o){
 	boolean res = true;
-	for (int i=0;i<application.elementsByLevel[level].length;i++){
-	    if (application.elementsByLevel[level][i] == o){
-		res = !application.visitsByLevel[level][i];
+	for (int i=0;i<application.elementsByLevel[1].length;i++){
+	    if (application.elementsByLevel[1][i] == o){
+		res = !application.visitsByLevel[1][i];
 		if (res){// this is the first visit to this object
-		    application.visitsByLevel[level][i] = true;
+		    application.visitsByLevel[1][i] = true;
 		}
 		else {// the object was visited in the past
 		    wrongTarget();
@@ -358,42 +356,28 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    void unveilNextLevel(long vx, long vy){
-	searchingForTargetAtLevel++;
-	searchingForTargetAtLevelS = String.valueOf(searchingForTargetAtLevel);
-	if (searchingForTargetAtLevel < ZLAbstractTask.TREE_DEPTH){// unveil next level of objects
-	    // first translate the objects at this level to put them inside the parent target
-	    for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY;i++){
-		// a relative translation is made possible by the fact
-		// that a group of objects at a given level is centered on (0,0)
-		application.elementsByLevel[searchingForTargetAtLevel][i].move(vx, vy);
-	    }
-	    // then say that they can be made visible
-	    application.unveilAllowedByLevel[searchingForTargetAtLevel] = true;
-	}
-	else {// the subject identified the deepest target, proceed to next trial
-	    endTrial();
-	    if (trialCount+1 < trials.length){// there is at least one trial left
-		final SwingWorker worker=new SwingWorker(){
-			public Object construct(){
-			    initNextTrial();
-			    return null; 
-			}
-		    };
-		worker.start();
-	    }
+    void validateTarget(){
+	endTrial();
+	if (trialCount+1 < trials.length){// there is at least one trial left
+	    final SwingWorker worker=new SwingWorker(){
+		    public Object construct(){
+			initNextTrial();
+			return null; 
+		    }
+		};
+	    worker.start();
 	}
     }
 
     ZRoundRect getClosestObject(long[] wnes){
 	long x = (wnes[0]+wnes[2]) / 2;
 	long y = (wnes[1]+wnes[3]) / 2;
-	ZRoundRect res = application.elementsByLevel[searchingForTargetAtLevel][0];
+	ZRoundRect res = application.elementsByLevel[1][0];
 	double smallestDistance = Math.sqrt(Math.pow(res.vx-x, 2) + Math.pow(res.vy-y, 2));
 	ZRoundRect r;
 	double d;
-	for (int i=1;i<application.elementsByLevel[searchingForTargetAtLevel].length;i++){
-	    r = application.elementsByLevel[searchingForTargetAtLevel][i];
+	for (int i=1;i<application.elementsByLevel[1].length;i++){
+	    r = application.elementsByLevel[1][i];
 	    d = Math.sqrt(Math.pow(r.vx-x, 2) + Math.pow(r.vy-y, 2));
 	    if (d < smallestDistance){
 		res = r;
@@ -450,7 +434,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
 			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime)+ OUTPUT_CSV_SEP + 
- 			  searchingForTargetAtLevelS + OUTPUT_CSV_SEP + 
 			  Long.toString(application.portalCamera.posx) + OUTPUT_CSV_SEP +
 			  Long.toString(application.portalCamera.posy) + OUTPUT_CSV_SEP +
 			  TrialInfo.floatFormatter(application.portalCamera.altitude));
@@ -462,8 +445,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 			  Long.toString(application.demoCamera.posy) + OUTPUT_CSV_SEP +
 			  TrialInfo.floatFormatter(application.demoCamera.altitude) + OUTPUT_CSV_SEP +
 			  lensxS + OUTPUT_CSV_SEP + lensyS + OUTPUT_CSV_SEP + lensmmS +
-			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime) + OUTPUT_CSV_SEP +
-			  searchingForTargetAtLevelS);
+			  OUTPUT_CSV_SEP + Long.toString(System.currentTimeMillis()-trialStartTime));
 	    }
 	    bwc.newLine();
 	}
