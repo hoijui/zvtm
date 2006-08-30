@@ -28,7 +28,7 @@ import java.io.OutputStreamWriter;
 
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.ZRoundRect;
+import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ZRoundRect;
 import com.xerox.VTM.engine.SwingWorker;
 import net.claribole.zvtm.engine.Java2DPainter;
@@ -49,8 +49,8 @@ class AbstractTaskLogManager implements Java2DPainter {
     static final String EOS = "END OF SESSION";
     String msg = PSBTC;
 
-    static final int ERR_MSG_DELAY = 500;
-    static final String TARGET_ERR = "ERROR: Target already visited";
+    static final int ERR_MSG_DELAY = 800;
+    static final String TARGET_ERR = "ERROR: Wrong target";
 
     /* codes for technique */
 //     static final String ZL = "ZL";     // Probing lenses
@@ -210,7 +210,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
-		      "Nb Mul Vis");
+		      "Nb Mul Vis" + OUTPUT_CSV_SEP +
+		      "Right target");
 	    bwt.newLine();
 	    bwt.flush();
 	    // cinematic file header (misc. info)
@@ -260,6 +261,8 @@ class AbstractTaskLogManager implements Java2DPainter {
     void initNextTrial(){
 	application.resetWorld();
 	trialCount++;
+	target = null;
+	rightTarget = AbstractTaskLogManager.RIGHT_TARGET;
 // 	application.demoCamera.posx = trials[trialCount].initialCameraPos.x;
 // 	application.demoCamera.posy = trials[trialCount].initialCameraPos.y;
 	application.demoCamera.posx = 0;
@@ -296,6 +299,11 @@ class AbstractTaskLogManager implements Java2DPainter {
 
     ZRoundRect objectToUnveil;
 
+    Glyph target; // null until actual target has been unveiled (for each trial)
+    static final String RIGHT_TARGET = "1";
+    static final String WRONG_TARGET = "0";
+    String rightTarget = AbstractTaskLogManager.RIGHT_TARGET;
+
     void nextStep(long vx, long vy, long[] wnes){// wnes represents the boundaries
 	// of the region taken into account to identify the currently observed object,
 	// region which changes depending on the technique (PZ, PZO, PZL, DM)
@@ -310,9 +318,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 		if (trials[trialCount].targetIndex <= trials[trialCount].nbTargetsVisited){
 		    // this object is the target for this level
 		    // replace rectangle with round rectangle
+		    target = objectToUnveil;
 		    objectToUnveil.renderRound(true);
-		    //XXX: this call will move in the method triggered when user says "this is the target"
-		    validateTarget();
 		}
 		// else this object is not yet the target, nothing to do (already been marked just before the test above)
 	    }
@@ -336,7 +343,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		    application.visitsByLevel[1][i] = true;
 		}
 		else {// the object was visited in the past
-		    wrongTarget();
+		    visitedTarget();
 		}
 		return res;
 	    }
@@ -356,7 +363,16 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    void validateTarget(){
+    void validateTarget(Glyph potentialTarget){
+	if (target == null){// target has not yet been identified
+	    im.warn(TARGET_ERR, "", ERR_MSG_DELAY);
+	    rightTarget = AbstractTaskLogManager.WRONG_TARGET;
+	}
+	else if (potentialTarget != target){// choosing wrong target
+	    im.warn(TARGET_ERR, "", ERR_MSG_DELAY);
+	    rightTarget = AbstractTaskLogManager.WRONG_TARGET;
+	}
+	// else choosing right target
 	endTrial();
 	if (trialCount+1 < trials.length){// there is at least one trial left
 	    final SwingWorker worker=new SwingWorker(){
@@ -405,7 +421,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	worker.start();
     }
 
-    void wrongTarget(){
+    void visitedTarget(){
 	nbMulVis++;
     }
 
@@ -417,7 +433,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    bwt.write(trialCountStr + OUTPUT_CSV_SEP +
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
-		      Integer.toString(nbMulVis));
+		      Integer.toString(nbMulVis) + OUTPUT_CSV_SEP +
+		      rightTarget);
 	    bwt.newLine();
 	    bwt.flush();
 	}

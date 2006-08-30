@@ -50,6 +50,7 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
+	application.logm.validateTarget(v.lastGlyphEntered());
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
