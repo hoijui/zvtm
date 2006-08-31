@@ -149,9 +149,8 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static long HALF_WORLD_WIDTH;
     static long HALF_WORLD_HEIGHT;
 
-    static final Color DEEPEST_LEVEL_COLOR = Color.WHITE;
     static final Color DISC_BORDER_COLOR = Color.BLACK;
-    static final Color VISITED_BORDER_COLOR = Color.RED;
+    static final Color VISITED_BORDER_COLOR = Color.GREEN;
 
     static final float NEXT_LEVEL_VIS_FACTOR = 2.0f; /* this controls the minimum size of the parent object for its content to
 							appear (provided all necessary conditions for it to appear are met) */
@@ -159,7 +158,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static int[] cornerByLevel;
     static LongPoint[][] offsetsByLevel;
     ZRoundRect[][] elementsByLevel;
-    static final Color[] COLOR_BY_LEVEL = {Color.GRAY, Color.WHITE};
+    static final Color[] COLOR_BY_LEVEL = {Color.GRAY, Color.LIGHT_GRAY};
     boolean[][] visitsByLevel = new boolean[TREE_DEPTH][DENSITY*DENSITY];
     static {
 	// compute size of all levels
@@ -815,7 +814,14 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY+dmRegionH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
 	}
     }
- 
+
+    static int START_BUTTON_TL_X = 0;
+    static int START_BUTTON_TL_Y = 0;
+    static int START_BUTTON_BR_X = 0;
+    static int START_BUTTON_BR_Y = 0;
+    static final int START_BUTTON_W = 80;
+    static final int START_BUTTON_H = 20;
+
     void updatePanelSize(){
 	Dimension d = demoView.getPanel().getSize();
 	panelWidth = d.width;
@@ -824,6 +830,15 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	hpanelHeight = panelHeight / 2;
 	SELECTION_RECT_X = panelWidth/2 - SELECTION_RECT_W / 2;
 	SELECTION_RECT_Y = panelHeight/2 - SELECTION_RECT_H / 2;
+	START_BUTTON_TL_X = hpanelWidth - START_BUTTON_W / 2;
+	START_BUTTON_TL_Y = hpanelHeight + START_BUTTON_H / 2;
+	START_BUTTON_BR_X = START_BUTTON_TL_X + START_BUTTON_W;
+	START_BUTTON_BR_Y = START_BUTTON_TL_Y + START_BUTTON_H;
+    }
+
+    static boolean clickOnStartButton(int jpx, int jpy){
+	return (jpx >= START_BUTTON_TL_X && jpy >= START_BUTTON_TL_Y &&
+		jpx <= START_BUTTON_BR_X && jpy <= START_BUTTON_BR_Y);
     }
 
     void cameraIsOnFloor(boolean b){

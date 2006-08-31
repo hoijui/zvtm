@@ -43,11 +43,12 @@ class AbstractTaskLogManager implements Java2DPainter {
     static final String TRIAL_DIR = "trials";
     static final String TRIAL_DIR_FULL = System.getProperty("user.dir") + File.separator + TRIAL_DIR;
 
-    static final String PSBTC = "PRESS SPACE BAR TO CONTINUE";
+    static final String PBTC = "PRESS BUTTON TO CONTINUE";
     static final String PSTS = "PRESS S TO START";
     static final String INTPW = "Initializing next trial. Please wait...";
     static final String EOS = "END OF SESSION";
-    String msg = PSBTC;
+    static final String C_BT = "CONTINUE";  // Continue button displayed between trials
+    String msg = PBTC;
 
     static final int ERR_MSG_DELAY = 800;
     static final String TARGET_ERR = "ERROR: Wrong target";
@@ -249,6 +250,13 @@ class AbstractTaskLogManager implements Java2DPainter {
 	catch (IOException ex){ex.printStackTrace();}
     }
 
+    void start(int jpx, int jpy){// cursor coordinates used to check that subject clicked on button
+	if (sessionStarted && ZLAbstractTask.clickOnStartButton(jpx, jpy) && trialCount < trials.length){
+	    trialCountStr = Integer.toString(trialCount);
+	    startTrial();
+	}
+    }
+
     void startTrial(){
 	trialStarted = true;
 	nbZIOswitches = 0;
@@ -269,7 +277,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	application.demoCamera.posy = 0;
 	application.demoCamera.updatePrecisePosition();
 	application.demoCamera.altitude = ZLAbstractTask.START_ALTITUDE;
- 	msg = PSBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
+ 	msg = PBTC + " - Trial " + (trialCount+1) + " of " + trials.length;
 	application.eh.cameraMoved();
 	application.vsm.repaintNow();
 	// need to call it twice because of visibleRegion update issue
@@ -304,7 +312,7 @@ class AbstractTaskLogManager implements Java2DPainter {
     static final String WRONG_TARGET = "0";
     String rightTarget = AbstractTaskLogManager.RIGHT_TARGET;
 
-    void nextStep(long vx, long vy, long[] wnes){// wnes represents the boundaries
+    void unveil(long[] wnes){// wnes represents the boundaries
 	// of the region taken into account to identify the currently observed object,
 	// region which changes depending on the technique (PZ, PZO, PZL, DM)
 	if (!sessionStarted){return;}
@@ -324,12 +332,6 @@ class AbstractTaskLogManager implements Java2DPainter {
 		// else this object is not yet the target, nothing to do (already been marked just before the test above)
 	    }
 	    // else consider this as an accidental space bar hit
-	}
-	else {// subject is in between two trials
-	    if (trialCount < trials.length){// there is at least one trial left
-		trialCountStr = Integer.toString(trialCount);
-		startTrial();
-	    }
 	}
     }
 
@@ -363,16 +365,17 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
-    void validateTarget(Glyph potentialTarget){
-	if (target == null){// target has not yet been identified
+    void validateTarget(long[] wnes){
+	if (!trialStarted){return;}
+	ZRoundRect potentialTarget = getClosestObject(wnes);
+	if (target == null || !closestObjectInRegion(potentialTarget, wnes) || potentialTarget != target){
+	    // three reasons this could be the wrong choice: - haven't visited enough objects (target not determined yet)
+	    //                                               - no object visible in region
+	    //                                               - wrong object
 	    im.warn(TARGET_ERR, "", ERR_MSG_DELAY);
 	    rightTarget = AbstractTaskLogManager.WRONG_TARGET;
 	}
-	else if (potentialTarget != target){// choosing wrong target
-	    im.warn(TARGET_ERR, "", ERR_MSG_DELAY);
-	    rightTarget = AbstractTaskLogManager.WRONG_TARGET;
-	}
-	// else choosing right target
+	// else choosing right target, nothing specific to do
 	endTrial();
 	if (trialCount+1 < trials.length){// there is at least one trial left
 	    final SwingWorker worker=new SwingWorker(){
@@ -508,16 +511,26 @@ class AbstractTaskLogManager implements Java2DPainter {
 	}
     }
 
+
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	// padding
 	im.drawFrame(g2d, viewWidth, viewHeight);
 	im.writeInstructions(g2d, viewWidth, viewHeight);
+	// message at center of screen (translucent black strip + text)
 	g2d.setColor(Color.BLACK);
 	g2d.setComposite(acST);
 	g2d.fillRect(0, viewHeight / 2 - 100, viewWidth, 220);
 	g2d.setComposite(com.xerox.VTM.glyphs.Transparent.acO);
 	g2d.setColor(Color.WHITE);
-	g2d.drawString(msg, viewWidth/2 - 75, viewHeight/2);
+	g2d.drawString(msg, viewWidth/2 - 105, viewHeight/2);
+	// button
+	g2d.setColor(Color.GRAY);
+	g2d.fillRect(ZLAbstractTask.START_BUTTON_TL_X, ZLAbstractTask.START_BUTTON_TL_Y, ZLAbstractTask.START_BUTTON_W, ZLAbstractTask.START_BUTTON_H);
+	g2d.setColor(Color.RED);
+	g2d.drawRect(ZLAbstractTask.START_BUTTON_TL_X, ZLAbstractTask.START_BUTTON_TL_Y, ZLAbstractTask.START_BUTTON_W, ZLAbstractTask.START_BUTTON_H);
+	g2d.setColor(Color.BLACK);
+	g2d.drawString(C_BT, viewWidth/2-25,viewHeight/2+25);
     }
 
     static File initLogFile(String fileName, String dirName){

@@ -44,19 +44,23 @@ class AbstractTaskPZLEventHandler extends AbstractTaskEventHandler {
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	lastJPX = jpx;
-	lastJPY = jpy;
-	lastVX = v.getMouse().vx;
-	lastVY = v.getMouse().vy;
-	if (lensType != NO_LENS){
-	    application.zoomInPhase2(lastVX, lastVY);
-	}
-	else {
-	    if (cursorNearBorder){// do not activate the lens when cursor is near the border
-		return;
+	if (application.logm.trialStarted){
+	    lastJPX = jpx;
+	    lastJPY = jpy;
+	    lastVX = v.getMouse().vx;
+	    lastVY = v.getMouse().vy;
+	    if (lensType != NO_LENS){
+		application.zoomInPhase2(lastVX, lastVY);
 	    }
-	    application.zoomInPhase1(jpx, jpy);
+	    else {
+		if (cursorNearBorder){// do not activate the lens when cursor is near the border
+		    return;
+		}
+		application.zoomInPhase1(jpx, jpy);
+	    }
+	}
+	else {// subject is in between two trials (provided session started)
+	    application.logm.start(jpx, jpy);
 	}
     }
 
@@ -163,11 +167,12 @@ class AbstractTaskPZLEventHandler extends AbstractTaskEventHandler {
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
-	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy,
-								    (application.lens != null) ?
-								    application.lens.getVisibleRegion(application.demoCamera, lensRegionBoundaries) :
-								    application.demoView.getVisibleRegion(application.demoCamera, lensRegionBoundaries));}
-	else if (code==KeyEvent.VK_G){application.gc();}
+	else if (code==KeyEvent.VK_SPACE){application.logm.unveil((application.lens != null) ?
+								  application.lens.getVisibleRegion(application.demoCamera, lensRegionBoundaries) :
+								  application.demoView.getVisibleRegion(application.demoCamera, lensRegionBoundaries));}
+	else if (code==KeyEvent.VK_ENTER){application.logm.validateTarget((application.lens != null) ?
+									  application.lens.getVisibleRegion(application.demoCamera, lensRegionBoundaries) :
+									  application.demoView.getVisibleRegion(application.demoCamera, lensRegionBoundaries));}
     }
 
 }

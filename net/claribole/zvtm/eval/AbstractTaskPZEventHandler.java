@@ -47,10 +47,13 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	lastJPX = jpx;
-	lastJPY = jpy;
-	application.logm.validateTarget(v.lastGlyphEntered());
+	if (application.logm.trialStarted){
+	    lastJPX = jpx;
+	    lastJPY = jpy;
+	}
+	else {// subject is in between two trials (provided session started)
+	    application.logm.start(jpx, jpy);
+	}
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -102,10 +105,10 @@ class AbstractTaskPZEventHandler extends AbstractTaskEventHandler {
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
-	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep(v.getMouse().vx, v.getMouse().vy,
-								    application.demoView.getVisibleRegion(application.demoCamera,
-													  viewportBoundaries));}
-	else if (code==KeyEvent.VK_G){application.gc();}
+	else if (code==KeyEvent.VK_SPACE){application.logm.unveil(application.demoView.getVisibleRegion(application.demoCamera,
+													viewportBoundaries));}
+	else if (code==KeyEvent.VK_ENTER){application.logm.validateTarget(application.demoView.getVisibleRegion(application.demoCamera,
+														viewportBoundaries));}
     }
 
 }

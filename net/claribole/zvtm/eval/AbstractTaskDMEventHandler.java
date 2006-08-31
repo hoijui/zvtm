@@ -70,15 +70,19 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (!application.logm.trialStarted){return;}
-	if (inPortal || inDMRegion(v.getGlyphsUnderMouseList())){
-	    application.meetDM();
-	    dmRegionStickedToMouse = false;
+	if (application.logm.trialStarted){
+	    if (inPortal || inDMRegion(v.getGlyphsUnderMouseList())){
+		application.meetDM();
+		dmRegionStickedToMouse = false;
+	    }
+	    lastJPX = jpx;
+	    lastJPY = jpy;
+	    lastVX = v.getMouse().vx;
+	    lastVY = v.getMouse().vy;
 	}
-	lastJPX = jpx;
-	lastJPY = jpy;
-	lastVX = v.getMouse().vx;
-	lastVY = v.getMouse().vy;
+	else {// subject is in between two trials (provided session started)
+	    application.logm.start(jpx, jpy);
+	}
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -176,24 +180,14 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
     }
 
     public void enterGlyph(Glyph g){// only highlight drag mag region glyph
-	if (g != application.dmRegion){
-	    if (g.getType() == ZLAbstractTask.GLYPH_TYPE_WORLD){
-		application.demoView.setCursorIcon(java.awt.Cursor.HAND_CURSOR);
-	    }
-	}
-	else {
+	if (g == application.dmRegion){
 	    if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	    if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
 	}
     }
 
     public void exitGlyph(Glyph g){// only highlight drag mag region glyph
-	if (g != application.dmRegion){
-	    if (g.getType() == ZLAbstractTask.GLYPH_TYPE_WORLD){
-		application.demoView.setCursorIcon(java.awt.Cursor.CUSTOM_CURSOR);	    
-	    }
-	}
-	else {
+	if (g == application.dmRegion){
 	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
 	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
 	}
@@ -204,11 +198,13 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
 	else if (code==KeyEvent.VK_SPACE){
-	    application.logm.nextStep(v.getMouse().vx, v.getMouse().vy,
-				      (application.dmPortal != null) ?
-				      application.dmPortal.getVisibleRegion(dragmagBoundaries):
-				      application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
-	else if (code==KeyEvent.VK_G){application.gc();}
+	    application.logm.unveil((application.dmPortal != null) ?
+				    application.dmPortal.getVisibleRegion(dragmagBoundaries):
+				    application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
+	else if (code==KeyEvent.VK_ENTER){
+	    application.logm.validateTarget((application.dmPortal != null) ?
+					    application.dmPortal.getVisibleRegion(dragmagBoundaries):
+					    application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
     }
 
     /**cursor enters portal*/
