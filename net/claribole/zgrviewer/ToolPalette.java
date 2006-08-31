@@ -10,6 +10,7 @@
 
 package net.claribole.zgrviewer;
 
+import java.awt.Cursor;
 import javax.swing.ImageIcon;
 
 import com.xerox.VTM.engine.AnimManager;
@@ -60,6 +61,8 @@ public class ToolPalette {
 				    (new ImageIcon(this.getClass().getResource(ICON_PATHS[i]))).getImage());
 	    selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
 					    (new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
+	    buttons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
+	    selectedButtons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	    application.vsm.addGlyph(buttons[i], paletteSpace);
 	    application.vsm.addGlyph(selectedButtons[i], paletteSpace);
 	}
@@ -67,15 +70,23 @@ public class ToolPalette {
     }
 
     void selectButton(VImage icon){
-	for (int i=0;i<buttons.length;i++){
-	    if (buttons[i] == icon || selectedButtons[i] == icon){
+	boolean newIconSelected = false;
+	for (int i=0;i<buttons.length;i++){// only try to find it in the list of unselected buttons
+	    if (buttons[i] == icon){// this way we are sure it is not the one already selected
 		paletteSpace.show(selectedButtons[i]);
 		paletteSpace.hide(buttons[i]);
 		selectedIconIndex = i;
+		newIconSelected = true;
 	    }
-	    else {
+	}
+	if (newIconSelected){// if a new button has been selected,
+	    for (int i=0;i<selectedIconIndex;i++){// unselect other buttons
 		paletteSpace.hide(selectedButtons[i]);
-		paletteSpace.show(buttons[i]);
+		paletteSpace.show(buttons[i]);		
+	    }
+	    for (int i=selectedIconIndex+1;i<buttons.length;i++){
+		paletteSpace.hide(selectedButtons[i]);
+		paletteSpace.show(buttons[i]);		
 	    }
 	}
     }
@@ -91,16 +102,24 @@ public class ToolPalette {
     void show(){
 	if (!visible){
 	    visible = true;
-	    application.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG, new LongPoint(-2*buttons[0].getWidth()-5, 0),
+	    application.meh.toolPaletteIsActive = true;
+	    application.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
+							   new LongPoint(-2*buttons[0].getWidth()-5, 0),
 							   paletteCamera.getID(), null);
+	    application.mainView.setCursorIcon(Cursor.HAND_CURSOR);
+	    application.mainView.setActiveLayer(2);
 	}
     }
 
     void hide(){
 	if (visible){
 	    visible = false;
-	    application.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG, new LongPoint(2*buttons[0].getWidth()+5, 0),
-							   paletteCamera.getID(), null);	
+	    application.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
+							   new LongPoint(2*buttons[0].getWidth()+5, 0),
+							   paletteCamera.getID(), null);
+	    application.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+	    application.mainView.setActiveLayer(0);	
+	    application.meh.toolPaletteIsActive = false;
 	}
     }
 

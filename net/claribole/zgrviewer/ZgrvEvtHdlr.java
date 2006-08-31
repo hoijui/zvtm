@@ -26,6 +26,7 @@ import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.svg.Metadata;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -66,70 +67,87 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     boolean autoZooming = false;
     double dragValue;
 
+    boolean toolPaletteIsActive = false;
+
     ZgrvEvtHdlr(ZGRViewer app){
 	this.application=app;
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.rememberLocation(v.cams[0].getLocation());
-	if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
-	    manualLeftButtonMove=true;
-	    lastJPX=jpx;
-	    lastJPY=jpy;
-	    //ZGRViewer.vsm.setActiveCamera(v.cams[0]);
-	    v.setDrawDrag(true);
-	    ZGRViewer.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-	    activeCam=application.vsm.getActiveCamera();
+	if (toolPaletteIsActive){
+	    return;
 	}
-	else if (mod == ALT_MOD){
-	    zoomingInRegion=true;
-	    x1=v.getMouse().vx;
-	    y1=v.getMouse().vy;
-	    v.setDrawRect(true);
+	else {
+	    application.rememberLocation(v.cams[0].getLocation());
+	    if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
+		manualLeftButtonMove=true;
+		lastJPX=jpx;
+		lastJPY=jpy;
+		//ZGRViewer.vsm.setActiveCamera(v.cams[0]);
+		v.setDrawDrag(true);
+		ZGRViewer.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+		activeCam=application.vsm.getActiveCamera();
+	    }
+	    else if (mod == ALT_MOD){
+		zoomingInRegion=true;
+		x1=v.getMouse().vx;
+		y1=v.getMouse().vy;
+		v.setDrawRect(true);
+	    }
 	}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (zoomingInRegion){
-	    v.setDrawRect(false);
-	    x2=v.getMouse().vx;
-	    y2=v.getMouse().vy;
-	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-		ZGRViewer.vsm.centerOnRegion(ZGRViewer.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
-	    }
-	    zoomingInRegion=false;
+	if (toolPaletteIsActive){
+	    return;
 	}
-	else if (manualLeftButtonMove){
-	    ZGRViewer.vsm.animator.Xspeed=0;
-	    ZGRViewer.vsm.animator.Yspeed=0;
-	    ZGRViewer.vsm.animator.Aspeed=0;
-	    v.setDrawDrag(false);
-	    ZGRViewer.vsm.activeView.mouse.setSensitivity(true);
-	    if (autoZooming){unzoom(v);}
-	    manualLeftButtonMove=false;
+	else {
+	    if (zoomingInRegion){
+		v.setDrawRect(false);
+		x2=v.getMouse().vx;
+		y2=v.getMouse().vy;
+		if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
+		    ZGRViewer.vsm.centerOnRegion(ZGRViewer.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
+		}
+		zoomingInRegion=false;
+	    }
+	    else if (manualLeftButtonMove){
+		ZGRViewer.vsm.animator.Xspeed=0;
+		ZGRViewer.vsm.animator.Yspeed=0;
+		ZGRViewer.vsm.animator.Aspeed=0;
+		v.setDrawDrag(false);
+		ZGRViewer.vsm.activeView.mouse.setSensitivity(true);
+		if (autoZooming){unzoom(v);}
+		manualLeftButtonMove=false;
+	    }
 	}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (LENS_MODE || lensType != NO_LENS){
-	    lastJPX = jpx;
-	    lastJPY = jpy;
-	    lastVX = v.getMouse().vx;
-	    lastVY = v.getMouse().vy;
-	    if (lensType != NO_LENS){
-		application.zoomInPhase2(lastVX, lastVY);
-	    }
-	    else {
-		if (cursorNearBorder){// do not activate the lens when cursor is near the border
-		    return;
-		}
-		application.zoomInPhase1(jpx, jpy);
-	    }
+	if (toolPaletteIsActive){
+	    if (v.lastGlyphEntered() != null){application.tp.selectButton((VImage)v.lastGlyphEntered());}
 	}
 	else {
-	    Glyph g=v.lastGlyphEntered();
-	    if (g!=null){
-		ZGRViewer.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+	    if (LENS_MODE || lensType != NO_LENS){
+		lastJPX = jpx;
+		lastJPY = jpy;
+		lastVX = v.getMouse().vx;
+		lastVY = v.getMouse().vy;
+		if (lensType != NO_LENS){
+		    application.zoomInPhase2(lastVX, lastVY);
+		}
+		else {
+		    if (cursorNearBorder){// do not activate the lens when cursor is near the border
+			return;
+		    }
+		    application.zoomInPhase1(jpx, jpy);
+		}
+	    }
+	    else {
+		Glyph g=v.lastGlyphEntered();
+		if (g!=null){
+		    ZGRViewer.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		}
 	    }
 	}
     }
@@ -139,6 +157,9 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	if (toolPaletteIsActive){
+	    return;
+	}
 	Glyph g=v.lastGlyphEntered();
 	if (g!=null){
 	    if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
@@ -149,21 +170,26 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (LENS_MODE || lensType != NO_LENS){
-	    lastJPX = jpx;
-	    lastJPY = jpy;
+	if (toolPaletteIsActive){
+	    return;
 	}
 	else {
-	    v.parent.setActiveLayer(1);
-	    application.displayMainPieMenu(true);
+	    if (LENS_MODE || lensType != NO_LENS){
+		lastJPX = jpx;
+		lastJPY = jpy;
+	    }
+	    else {
+		v.parent.setActiveLayer(1);
+		application.displayMainPieMenu(true);
+	    }
 	}
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-// 	if (LENS_MODE || lensType != NO_LENS){
-
-// 	}
-// 	else {
+	if (toolPaletteIsActive){
+	    return;
+	}
+	else {
 	    Glyph g = v.getMouse().lastGlyphEntered;
 	    if (g != null && g.getType() == Messages.PM_ENTRY){
 		application.pieMenuEvent(g);
@@ -175,23 +201,28 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 		application.displaySubMenu(null, false);
 	    }
 	    v.parent.setActiveLayer(0);
-// 	}
+ 	}
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (LENS_MODE || lensType != NO_LENS){
-	    lastJPX = jpx;
-	    lastJPY = jpy;
-	    lastVX = v.getMouse().vx;
-	    lastVY = v.getMouse().vy;
-	    if (lensType != NO_LENS){
-		application.zoomOutPhase2();
-	    }
-	    else {
-		if (cursorNearBorder){// do not activate the lens when cursor is near the border
-		    return;
+	if (toolPaletteIsActive){
+	    return;
+	}
+	else {
+	    if (LENS_MODE || lensType != NO_LENS){
+		lastJPX = jpx;
+		lastJPY = jpy;
+		lastVX = v.getMouse().vx;
+		lastVY = v.getMouse().vy;
+		if (lensType != NO_LENS){
+		    application.zoomOutPhase2();
 		}
-		application.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+		else {
+		    if (cursorNearBorder){// do not activate the lens when cursor is near the border
+			return;
+		    }
+		    application.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+		}
 	    }
 	}
     }
@@ -234,6 +265,9 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+	if (toolPaletteIsActive){
+	    return;
+	}
 	if (mod != ALT_MOD && buttonNumber == 1){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
