@@ -100,7 +100,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     /* GRID */
     static final Color GRID_COLOR = new Color(156,53,53);
-    static final int GRID_DEPTH = 5;
+    static final int GRID_DEPTH = 4;
     int currentLevel = -1;
 
     static final String GLYPH_TYPE_GRID = "G";
@@ -470,15 +470,12 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     void updateGridLevel(long visibleSize){
 	if (visibleSize < 48828.0f){
-	    showGridLevel(5);
-	}
-	else if (visibleSize < 97656.0f){
 	    showGridLevel(4);
 	}
-	else if (visibleSize < 195312.0f){
+	else if (visibleSize < 97656.0f){
 	    showGridLevel(3);
 	}
-	else if (visibleSize < 390625.0f){
+	else if (visibleSize < 195312.0f){
 	    showGridLevel(2);
 	}
 	else {
