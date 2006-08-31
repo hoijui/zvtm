@@ -212,7 +212,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
 		      "Nb Mul Vis" + OUTPUT_CSV_SEP +
-		      "Right target");
+		      "Right target" + AbstractTrialInfo.getHeader());
 	    bwt.newLine();
 	    bwt.flush();
 	    // cinematic file header (misc. info)
@@ -316,16 +316,17 @@ class AbstractTaskLogManager implements Java2DPainter {
 	if (!sessionStarted){return;}
 	if (trialStarted){// subject wants to unveil an object
 	    objectToUnveil = getClosestObject(wnes);
-	    if (closestObjectInRegion(objectToUnveil, wnes) &&                  // if object is actually visible in viewport
-		visibleCorners(objectToUnveil) &&                               // if object is big enough to identify it as being the target (or not)
-		objectNotVisitedYet(objectToUnveil)){ // if object has not yet been visited !! do this test last as it 
-		highlightBriefly(objectToUnveil, 400);
-		trials[trialCount].nbTargetsVisited++;
-		if (trials[trialCount].targetIndex <= trials[trialCount].nbTargetsVisited){
-		    // this object is the target for this level
-		    // replace rectangle with round rectangle
-		    target = objectToUnveil;
-		    objectToUnveil.renderRound(true);
+	    if (closestObjectInRegion(objectToUnveil, wnes) && // if object is actually visible in viewport
+		visibleCorners(objectToUnveil)){               // if object is big enough to identify it as being the target (or not)
+		trials[trialCount].newVisit(System.currentTimeMillis()-trialStartTime, (String)objectToUnveil.getOwner());
+		if (objectNotVisitedYet(objectToUnveil)){
+		    highlightBriefly(objectToUnveil, 400);
+		    if (trials[trialCount].targetIndex <= trials[trialCount].nbTargetsVisited){
+			// this object is the target for this level
+			// replace rectangle with round rectangle
+			target = objectToUnveil;
+			objectToUnveil.renderRound(true);
+		    }
 		}
 		// else this object is not yet the target, nothing to do (already been marked just before the test above)
 	    }
@@ -435,7 +436,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbMulVis) + OUTPUT_CSV_SEP +
-		      rightTarget);
+		      rightTarget + trials[trialCount].getVisitSummary());
 	    bwt.newLine();
 	    bwt.flush();
 	}

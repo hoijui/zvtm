@@ -32,11 +32,32 @@ class AbstractTrialInfo {
     // per level (three levels)
     int nbTargetsVisited = 0;
     LongPoint initialCameraPos;
-
+    
+    String visitSequence;
+    
     AbstractTrialInfo(int tn, String[] tis){
 	trialNumber = tn;
 	targetIndex = Integer.parseInt(tis[0]);
 	initialCameraPos = new LongPoint(Long.parseLong(tis[1]), Long.parseLong(tis[2]));
+	visitSequence = "";
+    }
+
+    void newVisit(long time, String id){
+	nbTargetsVisited++;
+	visitSequence += AbstractTaskLogManager.OUTPUT_CSV_SEP + id + AbstractTaskLogManager.OUTPUT_CSV_SEP + time;
+    }
+
+    static String getHeader(){
+	String res = "";
+	for (int i=0;i<ZLAbstractTask.DENSITY*ZLAbstractTask.DENSITY*2;i++){
+	    res += AbstractTaskLogManager.OUTPUT_CSV_SEP + "Visit " + (i+1) + " (Object)" +
+		AbstractTaskLogManager.OUTPUT_CSV_SEP + "Visit " + (i+1) + " (Time)";
+	}
+	return res;
+    }
+
+    String getVisitSummary(){
+	return visitSequence;
     }
 
 }

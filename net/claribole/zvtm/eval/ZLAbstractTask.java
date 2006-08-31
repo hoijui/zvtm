@@ -185,9 +185,6 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 	WORLD_HEIGHT = WORLD_WIDTH;
 	HALF_WORLD_WIDTH = WORLD_WIDTH / 2;
 	HALF_WORLD_HEIGHT = WORLD_HEIGHT / 2;
-// 	for (int i=0;i<16;i++){
-// 	    System.err.println(";"+Math.round(Math.random()*8*ZLAbstractTask.widthByLevel[0]-4*ZLAbstractTask.widthByLevel[0])+";"+Math.round(Math.random()*8*ZLAbstractTask.widthByLevel[0]-4*ZLAbstractTask.widthByLevel[0]));
-// 	}
     }
 
     ZLAbstractTask(short t){
@@ -302,6 +299,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 		    elementsByLevel[i][j*DENSITY+k].setPaintBorder(true); // actual drawing of the border will depend on the rendering size for each rectangle
 		    elementsByLevel[i][j*DENSITY+k].setBorderColor(DISC_BORDER_COLOR);
 		    elementsByLevel[i][j*DENSITY+k].setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
+		    elementsByLevel[i][j*DENSITY+k].setOwner(String.valueOf(j*DENSITY+k+1));
 		}
 	    }
 	}
