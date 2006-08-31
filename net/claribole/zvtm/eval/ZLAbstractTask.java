@@ -106,7 +106,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     static final String GLYPH_TYPE_GRID = "G";
     static final String GLYPH_TYPE_WORLD = "W";
 
-    static final float START_ALTITUDE = 20000.0f;
+    static final float START_ALTITUDE = 40000.0f;
     static final float FLOOR_ALTITUDE = 300.0f;
 
     boolean cameraOnFloor = false;
