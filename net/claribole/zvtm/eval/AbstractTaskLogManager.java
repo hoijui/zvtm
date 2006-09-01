@@ -321,7 +321,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		trials[trialCount].newVisit(System.currentTimeMillis()-trialStartTime, (String)objectToUnveil.getOwner());
 		if (objectNotVisitedYet(objectToUnveil)){
 		    highlightBriefly(objectToUnveil, 400);
-		    if (trials[trialCount].targetIndex <= trials[trialCount].nbTargetsVisited){
+		    if (trials[trialCount].targetIndex == trials[trialCount].nbTargetsVisited){
 			// this object is the target for this level
 			// replace rectangle with round rectangle
 			target = objectToUnveil;
