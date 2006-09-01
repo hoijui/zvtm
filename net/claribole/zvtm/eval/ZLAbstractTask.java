@@ -142,7 +142,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     static final long SMALLEST_ELEMENT_WIDTH = 500;
     static final long MUL_FACTOR = 50;
-    static final double ROUND_CORNER_RATIO = 5;
+    static final double ROUND_CORNER_RATIO = 4;
 
     static long WORLD_WIDTH;
     static long WORLD_HEIGHT;
