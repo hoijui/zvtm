@@ -160,7 +160,9 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    Vector tmpTrials = new Vector();
 	    int nbTrials = 0;
 	    while (line != null){
-		tmpTrials.add(new AbstractTrialInfo(nbTrials++, line.split(INPUT_CSV_SEP)));
+		if (line.length() > 0){
+		    tmpTrials.add(new AbstractTrialInfo(nbTrials++, line.split(INPUT_CSV_SEP)));
+		}
 		line = br.readLine();
 	    }
 	    trials = new AbstractTrialInfo[tmpTrials.size()];
