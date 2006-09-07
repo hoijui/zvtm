@@ -144,7 +144,7 @@ class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements Po
 	if (code==KeyEvent.VK_S){application.logm.startSession();}
 	else if (code==KeyEvent.VK_SPACE){application.logm.unveil(application.demoView.getVisibleRegion(application.demoCamera,
 													viewportBoundaries));}
-	else if (code==KeyEvent.VK_ENTER){application.logm.validateTarget(application.demoView.getVisibleRegion(application.demoCamera,
+	else if (code==KeyEvent.VK_F1){application.logm.validateTarget(application.demoView.getVisibleRegion(application.demoCamera,
 														viewportBoundaries));}
     }
 

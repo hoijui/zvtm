@@ -170,7 +170,7 @@ class AbstractTaskPZLEventHandler extends AbstractTaskEventHandler {
 	else if (code==KeyEvent.VK_SPACE){application.logm.unveil((application.lens != null) ?
 								  application.lens.getVisibleRegion(application.demoCamera, lensRegionBoundaries) :
 								  application.demoView.getVisibleRegion(application.demoCamera, lensRegionBoundaries));}
-	else if (code==KeyEvent.VK_ENTER){application.logm.validateTarget((application.lens != null) ?
+	else if (code==KeyEvent.VK_F1){application.logm.validateTarget((application.lens != null) ?
 									  application.lens.getVisibleRegion(application.demoCamera, lensRegionBoundaries) :
 									  application.demoView.getVisibleRegion(application.demoCamera, lensRegionBoundaries));}
     }

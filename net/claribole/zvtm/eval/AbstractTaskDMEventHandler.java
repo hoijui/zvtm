@@ -201,7 +201,7 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 	    application.logm.unveil((application.dmPortal != null) ?
 				    application.dmPortal.getVisibleRegion(dragmagBoundaries):
 				    application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
-	else if (code==KeyEvent.VK_ENTER){
+	else if (code==KeyEvent.VK_F1){
 	    application.logm.validateTarget((application.dmPortal != null) ?
 					    application.dmPortal.getVisibleRegion(dragmagBoundaries):
 					    application.demoView.getVisibleRegion(application.demoCamera, dragmagBoundaries));}
