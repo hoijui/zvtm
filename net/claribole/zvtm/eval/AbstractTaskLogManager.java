@@ -214,6 +214,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Nb Switches" + OUTPUT_CSV_SEP +
 		      "Nb Mul Vis" + OUTPUT_CSV_SEP +
+		      "Right Target Index" + OUTPUT_CSV_SEP +
 		      "Right target" + AbstractTrialInfo.getHeader());
 	    bwt.newLine();
 	    bwt.flush();
@@ -438,6 +439,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 		      Long.toString(trialDuration) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbZIOswitches) + OUTPUT_CSV_SEP +
 		      Integer.toString(nbMulVis) + OUTPUT_CSV_SEP +
+		      Integer.toString(trials[trialCount].targetIndex) + OUTPUT_CSV_SEP +
 		      rightTarget + trials[trialCount].getVisitSummary());
 	    bwt.newLine();
 	    bwt.flush();
