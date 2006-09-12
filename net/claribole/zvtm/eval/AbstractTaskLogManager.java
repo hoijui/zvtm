@@ -321,8 +321,8 @@ class AbstractTaskLogManager implements Java2DPainter {
 	    objectToUnveil = getClosestObject(wnes);
 	    if (closestObjectInRegion(objectToUnveil, wnes) && // if object is actually visible in viewport
 		visibleCorners(objectToUnveil)){               // if object is big enough to identify it as being the target (or not)
-		trials[trialCount].newVisit(System.currentTimeMillis()-trialStartTime, (String)objectToUnveil.getOwner());
 		if (objectNotVisitedYet(objectToUnveil)){
+		    trials[trialCount].newVisit(System.currentTimeMillis()-trialStartTime, (String)objectToUnveil.getOwner());
 		    highlightBriefly(objectToUnveil, 400);
 		    if (trials[trialCount].targetIndex == trials[trialCount].nbTargetsVisited){
 			// this object is the target for this level
