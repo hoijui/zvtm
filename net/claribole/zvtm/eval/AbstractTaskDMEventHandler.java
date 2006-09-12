@@ -71,10 +71,10 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (application.logm.trialStarted){
-	    if (inPortal || inDMRegion(v.getGlyphsUnderMouseList())){
-		application.meetDM();
-		dmRegionStickedToMouse = false;
-	    }
+// 	    if (inPortal || inDMRegion(v.getGlyphsUnderMouseList())){
+// 		application.meetDM();
+// 		dmRegionStickedToMouse = false;
+// 	    }
 	    lastJPX = jpx;
 	    lastJPY = jpy;
 	    lastVX = v.getMouse().vx;
