@@ -93,6 +93,21 @@ class InstructionsManager implements Java2DPainter {
 	writeInstructions(g2d, viewWidth, viewHeight);
 	if (ZLWorldTask.SHOW_MEMORY_USAGE){showMemoryUsage(g2d, viewWidth, viewHeight);}
 //  	if (ZLWorldTask.SHOW_COORDS){showLatLong(g2d, viewWidth, viewHeight);}
+
+	if (application.paintLinks){
+	    float coef=(float)(application.demoCamera.focal/(application.demoCamera.focal+application.demoCamera.altitude));
+	    int dmRegionX = (viewWidth/2) + Math.round((application.dmRegion.vx-application.demoCamera.posx)*coef);
+	    int dmRegionY = (viewHeight/2) - Math.round((application.dmRegion.vy-application.demoCamera.posy)*coef);
+	    int dmRegionW = Math.round(application.dmRegion.getWidth()*coef);
+	    int dmRegionH = Math.round(application.dmRegion.getHeight()*coef);
+	    g2d.setColor(Color.RED);
+	    g2d.drawLine(dmRegionX-dmRegionW, dmRegionY-dmRegionH, application.dmPortal.x, application.dmPortal.y);
+	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY-dmRegionH, application.dmPortal.x+application.dmPortal.w, application.dmPortal.y);
+	    g2d.drawLine(dmRegionX-dmRegionW, dmRegionY+dmRegionH, application.dmPortal.x, application.dmPortal.y+application.dmPortal.h);
+	    g2d.drawLine(dmRegionX+dmRegionW, dmRegionY+dmRegionH, application.dmPortal.x+application.dmPortal.w, application.dmPortal.y+application.dmPortal.h);
+	}
+
+
     }
 
     void drawFrame(Graphics2D g2d, int viewWidth, int viewHeight){

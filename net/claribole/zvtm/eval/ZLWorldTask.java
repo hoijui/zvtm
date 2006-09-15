@@ -12,6 +12,7 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.BasicStroke;
 import java.awt.Image;
@@ -114,6 +115,17 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     Vector tmpHGrid;
     Vector tmpVGrid;
 
+    Camera portalCamera;
+    /* DragMag */
+    static final int DM_PORTAL_WIDTH = 200;
+    static final int DM_PORTAL_HEIGHT = 200;
+    static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
+    static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
+    DraggableCameraPortal dmPortal;
+    VRectangle dmRegion;
+    int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
+    boolean paintLinks = false;
+
     static final Color HCURSOR_COLOR = new Color(200,48,48);
 
     /* GRID */
@@ -168,6 +180,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     final static short DZA_TECHNIQUE = 5; // Pan + Discrete zoom with animated transitions
     final static short PZL_TECHNIQUE = 6; // Pan + Zoom (centered on view) & Zoom + Lens
     final static short SS_TECHNIQUE = 7;  // screen saver mode (for test and debugging)
+    final static short DM_TECHNIQUE = 8; // DragMag
 
     final static String PZ_TECHNIQUE_NAME = "Pan-Zoom (centered on view)";
     final static String PZA_TECHNIQUE_NAME = "Pan-Zoom (centered on cursor)";
@@ -177,6 +190,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     final static String DZ_TECHNIQUE_NAME = "Pan-Discrete Zoom";
     final static String DZA_TECHNIQUE_NAME = "Pan-Discrete Zoom (animated transitions)";
     final static String RZ_TECHNIQUE_NAME = "Region Zoom (animated transitions)";
+    final static String DM_TECHNIQUE_NAME = "DragMag";
     short technique = ZL_TECHNIQUE;
     String techniqueName;
 
@@ -227,6 +241,10 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	    eh = new DZAEventHandler(this);
 	    techniqueName = DZA_TECHNIQUE_NAME;
 	}
+	else if (this.technique == DM_TECHNIQUE){
+	    eh = new DMEventHandler(this);
+	    techniqueName = DM_TECHNIQUE_NAME;
+	}
 	else {
 	    eh = new SSEventHandler(this);
 	    techniqueName = SS_TECHNIQUE_NAME;
@@ -239,6 +257,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	demoCamera = vsm.addCamera(mainVSname);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
+	portalCamera = vsm.addCamera(mainVSname);
 	demoView = vsm.addExternalView(cameras, techniqueName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 	demoView.setVisibilityPadding(vispad);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
@@ -271,9 +290,20 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	if (this.technique == SS_TECHNIQUE){
 	    screenSaver = new ZLWorldScreenSaver(this);
 	}
+	else if (this.technique == DM_TECHNIQUE){
+	    initDM();
+	}
 	else {
 	    logm.im.say(LocateTask.PSTS);
 	}
+    }
+
+    void initDM(){
+	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
+	dmRegion.setFill(false);
+	dmRegion.setBorderColor(Color.RED);
+	vsm.addGlyph(dmRegion, mainVS);
+	mainVS.hide(dmRegion);
     }
 
     void windowLayout(){
@@ -769,6 +799,74 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 		}
 	    }
 	}
+    }
+
+    void triggerDM(int x, int y){
+	if (dmPortal != null){// portal is active, destroy it it
+	    killDM();
+	    logm.lensStatus = AbstractTaskLogManager.NO_LENS;
+	}
+	else {// portal not active, create it
+	    createDM(x, y);
+	    logm.lensStatus = AbstractTaskLogManager.DM_LENS;
+	}
+    }
+
+    void createDM(int x, int y){
+	dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
+	dmPortal.setPortalEventHandler((PortalEventHandler)eh);
+	dmPortal.setBackgroundColor(Color.LIGHT_GRAY);
+	vsm.addPortal(dmPortal, demoView);
+	dmPortal.setBorder(Color.RED);
+	Location l = dmPortal.getSeamlessView(demoCamera);
+	portalCamera.moveTo(l.vx, l.vy);
+	portalCamera.setAltitude((float) ((demoCamera.getAltitude()+demoCamera.getFocal())/(DEFAULT_MAG_FACTOR)-demoCamera.getFocal()));
+	updateDMRegion();
+	int w = Math.round(dmRegion.getWidth() * 2 * demoCamera.getFocal() / ((float)(demoCamera.getFocal()+demoCamera.getAltitude())));
+	int h = Math.round(dmRegion.getHeight() * 2 * demoCamera.getFocal() / ((float)(demoCamera.getFocal()+demoCamera.getAltitude())));
+	dmPortal.sizeTo(w, h);
+	mainVS.show(dmRegion);
+	paintLinks = true;
+	Point[] data = {new Point(DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h),
+			new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2)};
+	vsm.animator.createPortalAnimation(150, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
+    }
+
+    void killDM(){
+	vsm.destroyPortal(dmPortal);
+	dmPortal = null;
+	mainVS.hide(dmRegion);
+	paintLinks = false;
+	((DMEventHandler)eh).inPortal = false;
+    }
+    
+    void meetDM(){
+	if (dmPortal != null){
+	    Vector data = new Vector();
+	    data.add(new Float(portalCamera.getAltitude()-demoCamera.getAltitude()));
+	    // take dragmag's center as the context's center
+	    data.add(new LongPoint(portalCamera.posx-demoCamera.posx, portalCamera.posy-demoCamera.posy)); 
+	    vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,data,demoCamera.getID());
+	    vsm.destroyPortal(dmPortal);
+	    dmPortal = null;
+	    mainVS.hide(dmRegion);
+	    paintLinks = false;
+	    ((DMEventHandler)eh).inPortal = false;
+	}
+    }
+
+    long[] dmwnes = new long[4];
+
+    void updateDMRegion(){
+	if (dmPortal == null){return;}
+	dmPortal.getVisibleRegion(dmwnes);
+	dmRegion.moveTo(portalCamera.posx, portalCamera.posy);
+	dmRegion.setWidth((dmwnes[2]-dmwnes[0]) / 2 + 1);
+	dmRegion.setHeight((dmwnes[1]-dmwnes[3]) / 2 + 1);
+    }
+
+    void updateDMWindow(){
+	portalCamera.moveTo(dmRegion.vx, dmRegion.vy);
     }
 
     void updateLabels(float a){
