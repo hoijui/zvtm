@@ -126,6 +126,10 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     int dmRegionW, dmRegionN, dmRegionE, dmRegionS;
     boolean paintLinks = false;
 
+    /* Overview */
+    OverviewPortal ovPortal;
+    Camera overviewCamera;
+
     static final Color HCURSOR_COLOR = new Color(200,48,48);
 
     /* GRID */
@@ -258,6 +262,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
 	portalCamera = vsm.addCamera(mainVSname);
+	overviewCamera = vsm.addCamera(mainVSname);
 	demoView = vsm.addExternalView(cameras, techniqueName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 	demoView.setVisibilityPadding(vispad);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
@@ -283,7 +288,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	else {
 	    ewmm.initMap();
 	}
-	buildGrid();
+// 	buildGrid();
 	gds.buildAll();
 	logm = new LogManager(this);
 	System.gc();
@@ -304,6 +309,19 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	dmRegion.setBorderColor(Color.RED);
 	vsm.addGlyph(dmRegion, mainVS);
 	mainVS.hide(dmRegion);
+    }
+
+    void createOverview(){
+	ovPortal = new OverviewPortal(VIEW_W-AbstractTaskInstructionsManager.PADDING-DM_PORTAL_WIDTH,
+				      VIEW_H-AbstractTaskInstructionsManager.PADDING-DM_PORTAL_HEIGHT/2,
+				      DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT/2, overviewCamera, demoCamera);
+	ovPortal.setPortalEventHandler(new WorldOverviewEventHandler(this));
+	ovPortal.setBackgroundColor(Color.LIGHT_GRAY);
+	ovPortal.setObservedRegionTranslucency(0.5f);
+	vsm.addPortal(ovPortal, demoView);
+	ovPortal.setBorder(Color.RED);
+	updateOverview();
+	vsm.repaintNow();
     }
 
     void windowLayout(){
@@ -837,7 +855,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	dmPortal = null;
 	mainVS.hide(dmRegion);
 	paintLinks = false;
-	((DMEventHandler)eh).inPortal = false;
+	((DMEventHandler)eh).inDMZoomWindow = false;
     }
     
     void meetDM(){
@@ -851,7 +869,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	    dmPortal = null;
 	    mainVS.hide(dmRegion);
 	    paintLinks = false;
-	    ((DMEventHandler)eh).inPortal = false;
+	    ((DMEventHandler)eh).inDMZoomWindow = false;
 	}
     }
 
@@ -884,29 +902,45 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     }
 
     void updateGridLevel(long visibleSize){
-	if (visibleSize < 1200){
-	    showGridLevel(8);
-	}
-	else if (visibleSize < 2400){
-	    showGridLevel(7);
-	}
-	else if (visibleSize < 4800){
-	    showGridLevel(6);
-	}
-	else if (visibleSize < 9600){
-	    showGridLevel(5);
-	}
-	else if (visibleSize < 19200){
-	    showGridLevel(4);
-	}
-	else if (visibleSize < 38400){
-	    showGridLevel(3);
-	}
-	else if (visibleSize < 76800){
-	    showGridLevel(2);
-	}
-	else {
-	    showGridLevel(1);
+// 	if (visibleSize < 1200){
+// 	    showGridLevel(8);
+// 	}
+// 	else if (visibleSize < 2400){
+// 	    showGridLevel(7);
+// 	}
+// 	else if (visibleSize < 4800){
+// 	    showGridLevel(6);
+// 	}
+// 	else if (visibleSize < 9600){
+// 	    showGridLevel(5);
+// 	}
+// 	else if (visibleSize < 19200){
+// 	    showGridLevel(4);
+// 	}
+// 	else if (visibleSize < 38400){
+// 	    showGridLevel(3);
+// 	}
+// 	else if (visibleSize < 76800){
+// 	    showGridLevel(2);
+// 	}
+// 	else {
+// 	    showGridLevel(1);
+// 	}
+    }
+
+    static float MAX_OVERVIEW_ALT = 30000.0f;
+
+    void updateOverview(){
+	// update overview's altitude
+	float newAlt = (float)((demoCamera.getAltitude()+demoCamera.getFocal())*24-demoCamera.getFocal());
+	overviewCamera.setAltitude((newAlt > MAX_OVERVIEW_ALT) ? MAX_OVERVIEW_ALT : newAlt);
+    }
+
+    void centerOverview(){
+	if (overviewCamera.getAltitude() < MAX_OVERVIEW_ALT){
+	    vsm.animator.createCameraAnimation(300, AnimManager.CA_TRANS_SIG,
+					       new LongPoint(demoCamera.posx-overviewCamera.posx, demoCamera.posy-overviewCamera.posy),
+					       overviewCamera.getID(), null);
 	}
     }
 

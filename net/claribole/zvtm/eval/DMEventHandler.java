@@ -34,8 +34,14 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
     boolean pcamStickedToMouse = false;
     boolean portalStickedToMouse = false;
     boolean dmRegionStickedToMouse = false;
-    boolean inPortal = false;
+    boolean inDMZoomWindow = false;
     boolean cursorHasNotMovedYet = false;
+
+    boolean inOvPortal = false;
+    boolean ovCameraStickedToMouse = false;
+    boolean regionStickedToMouse = false;
+
+    boolean draggingMainView = false;
 
     DMEventHandler(ZLWorldTask appli){
 	super(appli);
@@ -46,12 +52,20 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (mode == MODE_DM){
-	    if (inPortal){
+	    if (inDMZoomWindow){
 		if ((application.dmPortal).coordInsideBar(jpx, jpy)){
 		    portalStickedToMouse = true;
 		}
 		else {
 		    pcamStickedToMouse = true;
+		}
+	    }
+	    else if (inOvPortal){
+		if (application.ovPortal.coordInsideObservedRegion(jpx, jpy)){
+		    regionStickedToMouse = true;
+		}
+		else {
+		    ovCameraStickedToMouse = true;
 		}
 	    }
 	    else {
@@ -65,7 +79,18 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	    }
 	}
 	else {
-	    v.setDrawDrag(true);
+	    if (inOvPortal){
+		if (application.ovPortal.coordInsideObservedRegion(jpx, jpy)){
+		    regionStickedToMouse = true;
+		}
+		else {
+		    ovCameraStickedToMouse = true;
+		}
+	    }
+	    else {
+		v.setDrawDrag(true);
+		draggingMainView = true;
+	    }
 	}
     }
 
@@ -77,11 +102,23 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	    application.vsm.unstickFromMouse();
 	    dmRegionStickedToMouse = false;
 	}
+	v.setDrawDrag(false);
+	if (application.ovPortal != null){
+	    if (regionStickedToMouse){
+		regionStickedToMouse = false;
+	    }
+	    if (ovCameraStickedToMouse){
+		ovCameraStickedToMouse = false;
+	    }
+	    if (draggingMainView){
+		application.centerOverview();
+	    }
+	}
 	application.vsm.animator.Xspeed = 0;
 	application.vsm.animator.Yspeed = 0;
 	application.vsm.animator.Aspeed = 0;
 	application.vsm.activeView.mouse.setSensitivity(true);
-	v.setDrawDrag(false);
+	draggingMainView = false;
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -101,7 +138,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	    }
 	}
 	else if (mode == MODE_DM){
-	    if (inPortal || inDMRegion(v.getGlyphsUnderMouseList())){
+	    if (inDMZoomWindow || inDMRegion(v.getGlyphsUnderMouseList())){
 		application.meetDM();
 		dmRegionStickedToMouse = false;
 	    }
@@ -174,7 +211,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (mode == MODE_DM){
-	    if (inPortal || portalStickedToMouse){
+	    if (inDMZoomWindow || portalStickedToMouse){
 		if (buttonNumber == 1){
 		    if (portalStickedToMouse){
 			application.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
@@ -209,18 +246,54 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 		    else if (dmRegionStickedToMouse){
 			application.updateDMWindow();
 		    }
+		    else if (regionStickedToMouse){
+			float a = (application.overviewCamera.focal+Math.abs(application.overviewCamera.altitude))/application.overviewCamera.focal;
+			application.demoCamera.move(Math.round(a*(jpx-lastJPX)),
+						    Math.round(a*(lastJPY-jpy)));
+			lastJPX = jpx;
+			lastJPY = jpy;
+		    }
+		    else if (ovCameraStickedToMouse){
+			float a = (application.overviewCamera.focal+Math.abs(application.overviewCamera.altitude))/application.overviewCamera.focal;
+			application.overviewCamera.move(Math.round(a*(lastJPX-jpx)),
+						      Math.round(a*(jpy-lastJPY)));
+			application.demoCamera.move(Math.round(a*(lastJPX-jpx)),
+						    Math.round(a*(jpy-lastJPY)));
+			lastJPX = jpx;
+			lastJPY = jpy;
+			cameraMoved();
+		    }
 		}
 	    }
 	}
 	else {
-	    if (buttonNumber != 2){
-		float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
-		application.vsm.animator.Xspeed = (jpx-lastJPX)*(a/DRAG_FACTOR);
-		application.vsm.animator.Yspeed = (lastJPY-jpy)*(a/DRAG_FACTOR);
-		application.vsm.animator.Aspeed = 0;
+	    if (regionStickedToMouse){
+		float a = (application.overviewCamera.focal+Math.abs(application.overviewCamera.altitude))/application.overviewCamera.focal;
+		application.demoCamera.move(Math.round(a*(jpx-lastJPX)),
+					    Math.round(a*(lastJPY-jpy)));
+		lastJPX = jpx;
+		lastJPY = jpy;
 	    }
-	    if (mode == MODE_PZL && lensType != 0 && application.lens != null){
-		application.moveLens(jpx, jpy, false);
+	    else if (ovCameraStickedToMouse){
+		float a = (application.overviewCamera.focal+Math.abs(application.overviewCamera.altitude))/application.overviewCamera.focal;
+		application.overviewCamera.move(Math.round(a*(lastJPX-jpx)),
+						Math.round(a*(jpy-lastJPY)));
+		application.demoCamera.move(Math.round(a*(lastJPX-jpx)),
+					    Math.round(a*(jpy-lastJPY)));
+		lastJPX = jpx;
+		lastJPY = jpy;
+		cameraMoved();
+	    }
+	    else {
+		if (buttonNumber != 2){
+		    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
+		    application.vsm.animator.Xspeed = (jpx-lastJPX)*(a/DRAG_FACTOR);
+		    application.vsm.animator.Yspeed = (lastJPY-jpy)*(a/DRAG_FACTOR);
+		    application.vsm.animator.Aspeed = 0;
+		}
+		if (mode == MODE_PZL && lensType != 0 && application.lens != null){
+		    application.moveLens(jpx, jpy, false);
+		}
 	    }
 	}
     }
@@ -250,7 +323,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	    }
 	}
 	else if (mode == MODE_DM){
-	    if (inPortal){
+	    if (inDMZoomWindow){
 		Camera c = application.portalCamera;
 		float a = (c.focal+Math.abs(c.altitude))/c.focal;
 		if (wheelDirection  == WHEEL_UP){// zooming in
@@ -297,6 +370,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	else if (code == KeyEvent.VK_F1){switchMode(MODE_PZ);}
 	else if (code == KeyEvent.VK_F2){switchMode(MODE_PZL);}
 	else if (code == KeyEvent.VK_F3){switchMode(MODE_DM);}
+	else if (code == KeyEvent.VK_F4){application.createOverview();}
 	else if (code==KeyEvent.VK_SPACE){application.logm.nextStep();}
 	else if (code==KeyEvent.VK_PLUS){application.showGridLevel(application.currentLevel+1);}
 	else if (code==KeyEvent.VK_MINUS){application.showGridLevel(application.currentLevel-1);}
@@ -314,14 +388,14 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
-	inPortal = true;
+	inDMZoomWindow = true;
 	((CameraPortal)p).setBorder(Color.WHITE);
 	application.vsm.repaintNow();
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
-	inPortal = false;
+	inDMZoomWindow = false;
 	((CameraPortal)p).setBorder(Color.RED);
 	application.vsm.repaintNow();
     }

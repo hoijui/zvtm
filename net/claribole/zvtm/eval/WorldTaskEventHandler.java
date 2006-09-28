@@ -175,6 +175,7 @@ class WorldTaskEventHandler implements ViewEventHandler, AnimationListener, Comp
 	if (mode == MODE_DM){
 	    application.updateDMRegion();
 	}
+	if (application.ovPortal != null){application.updateOverview();}
     }
 
     boolean cameraFarFromMapH(long[] wnes, boolean goingEast){// false if going west

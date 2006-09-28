@@ -19,8 +19,8 @@ import net.claribole.zvtm.engine.Java2DPainter;
 
 class InstructionsManager implements Java2DPainter {
 
-    static final Color SAY_BKG_COLOR = Color.GRAY;
-    static final Color SAY_FRG_COLOR = Color.BLACK;
+    static final Color SAY_BKG_COLOR = Color.BLACK;
+    static final Color SAY_FRG_COLOR = Color.WHITE;
     static final Color WARN_BKG_COLOR = Color.BLACK;
     static final Color WARN_FRG_COLOR = Color.RED;
 
