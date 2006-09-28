@@ -58,6 +58,11 @@ class WorldTaskEventHandler implements ViewEventHandler, AnimationListener, Comp
 
     boolean cursorNearBorder = false;
 
+    static final short MODE_PZ = 0;
+    static final short MODE_PZL = 1;
+    static final short MODE_DM = 2;
+    short mode = MODE_PZ;
+
     /* coordinates of mouse cursor */
     String latitude = "0.0";
     String longitude = "0.0";
@@ -166,6 +171,9 @@ class WorldTaskEventHandler implements ViewEventHandler, AnimationListener, Comp
 	}
 	if (application.logm.trialStarted){
 	    application.logm.writeCinematic();
+	}
+	if (mode == MODE_DM){
+	    application.updateDMRegion();
 	}
     }
 
