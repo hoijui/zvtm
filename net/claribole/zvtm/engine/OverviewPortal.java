@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Stroke;
+import java.awt.AlphaComposite;
 import java.awt.geom.AffineTransform;
 
 import java.util.Vector;
@@ -26,6 +27,7 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.engine.Location;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.Transparent;
 
 /**A portal showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
@@ -36,6 +38,11 @@ public class OverviewPortal extends CameraPortal {
     View observedRegionView;
     long[] observedRegion;
     float orcoef;
+
+    /** for translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
+    AlphaComposite acST;
+    /** alpha channel*/
+    float alpha = 0.5f;
 
     /** Builds a new portal displaying what is seen through a camera and the region seen through another camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
@@ -63,6 +70,15 @@ public class OverviewPortal extends CameraPortal {
 		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
     }
     
+    public void setObservedRegionTranslucency(float a){
+	if (a == 1.0f){
+	    acST = null;
+	}
+	else {
+	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
+	}
+    }
+
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	g2d.setClip(x, y, w, h);
 	if (bkgColor != null){
@@ -102,6 +118,14 @@ public class OverviewPortal extends CameraPortal {
 	observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
 	g2d.setColor(Color.GREEN);
 	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+	if (acST != null){
+	    g2d.setComposite(acST);
+	    g2d.fillRect(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef),
+			 y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef),
+			 Math.round((observedRegion[2]-observedRegion[0])*orcoef),
+			 Math.round((observedRegion[1]-observedRegion[3])*orcoef));
+	    g2d.setComposite(Transparent.acO);
+	}
 	g2d.drawRect(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef),
 		     y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef),
 		     Math.round((observedRegion[2]-observedRegion[0])*orcoef),
