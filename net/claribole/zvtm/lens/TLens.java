@@ -1,5 +1,5 @@
-/*   FILE: TLinearLens.java
- *   DATE OF CREATION:  Thu Oct 05 09:19:04 2006
+/*   FILE: TLens.java
+ *   DATE OF CREATION:  Thu Oct 05 14:00:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
