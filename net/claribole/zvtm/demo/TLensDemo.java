@@ -72,10 +72,12 @@ public class TLensDemo {
     /* lens distance and drop-off functions */
     static final short L2_Gaussian = 0;
     static final short L2_TGaussian = 1;
+    static final short L2_TFading = 2;
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
     static final String L2_Gaussian_Title = View_Title_Prefix + "L2 / Gaussian";
     static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / TGaussian";
+    static final String L2_TFading_Title = View_Title_Prefix + "L2 / TFading";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -142,6 +144,11 @@ public class TLensDemo {
 
     void moveLens(int x, int y, boolean write){
 	lens.setAbsolutePosition(x, y);
+	vsm.repaintNow();
+    }
+
+    void moveLens(int x, int y, boolean write, long when){
+	((TFadingLens)lens).setAbsolutePosition(x, y, when);
 	vsm.repaintNow();
     }
 
@@ -271,6 +278,7 @@ public class TLensDemo {
 	switch (lensFamily){
 	case L2_Gaussian:{res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
 	case L2_TGaussian:{res = new TGaussianLens(1.0f, 0.0f, 0.9f, 150, 20, x - panelWidth/2, y - panelHeight/2);break;}
+	case L2_TFading:{res = new TFadingLens(1.0f, 1.0f, 100, x - panelWidth/2, y - panelHeight/2);break;}
 	}
 	return res;
     }

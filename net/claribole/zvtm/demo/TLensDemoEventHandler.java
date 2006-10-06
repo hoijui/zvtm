@@ -143,7 +143,7 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true);
+	    application.moveLens(jpx, jpy, true, e.getWhen());
 	}
 	//application.vsm.repaintNow();
     }
@@ -169,6 +169,17 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
 	    }
 	}
+	else {
+	    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
+	    if (wheelDirection  == WHEEL_UP){// zooming in
+		application.demoCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+		application.vsm.repaintNow();
+	    }
+	    else {//wheelDirection == WHEEL_DOWN, zooming out
+		application.demoCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+		application.vsm.repaintNow();
+	    }
+	}
     }
 
     public void enterGlyph(Glyph g){}
@@ -187,6 +198,10 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	else if (code == KeyEvent.VK_F2){
 	    application.lensFamily = TLensDemo.L2_TGaussian;
 	    application.demoView.setTitle(TLensDemo.L2_TGaussian_Title);
+	}
+	else if (code == KeyEvent.VK_F3){
+	    application.lensFamily = TLensDemo.L2_TFading;
+	    application.demoView.setTitle(TLensDemo.L2_TFading_Title);
 	}
     }
 
