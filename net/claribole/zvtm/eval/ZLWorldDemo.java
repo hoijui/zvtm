@@ -104,6 +104,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final short L1_Fresnel = 11;
     static final short L2_Fresnel = 12;
     static final short LInf_Fresnel = 13;
+    static final short L2_TLinear = 14;
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
     static final String L1_Linear_Title = View_Title_Prefix + "L1 / Linear";
@@ -120,6 +121,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String L1_Fresnel_Title = View_Title_Prefix + "L1 / Fresnel";
     static final String L2_Fresnel_Title = View_Title_Prefix + "L2 / Fresnel";
     static final String LInf_Fresnel_Title = View_Title_Prefix + "LInf / Fresnel";
+    static final String L2_TLinear_Title = View_Title_Prefix + "L2 / Translucence Linear";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -319,6 +321,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
  	case L1_Fresnel:{res = new L1FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);break;}
 	case L2_Fresnel:{res = new FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);break;}
 	case LInf_Fresnel:{res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);break;}
+	case L2_TLinear:{res = new LInfTLinearLens(1.0f, 0.0f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
 	}
 	return res;
     }
