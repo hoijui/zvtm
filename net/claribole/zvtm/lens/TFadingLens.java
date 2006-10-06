@@ -26,8 +26,8 @@ public class TFadingLens extends TLens {
 
     double frequency = -1;
     long mLastSampleTime = -1;
-    int xOffset = -20;
-    int yOffset = 20;
+    int xOffset = -10;
+    int yOffset = 10;
     double maxDist = 2 * Math.abs(xOffset);
     LowPassFilter filter = new LowPassFilter();
     Point2D currentPos = new Point2D.Double(0, 0);
@@ -189,7 +189,7 @@ public class TFadingLens extends TLens {
 	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
 	double distAway = targetPos.distance(currentPos);
 	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.05);
+	filter.setCutOffFrequency(((1.0 - opacity) * 0.8) + 0.1);
 	currentPos = filter.apply(targetPos, frequency);
 	int tx = (int)Math.round(currentPos.getX());
 	int ty = (int)Math.round(currentPos.getY());
