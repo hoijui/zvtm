@@ -376,4 +376,8 @@ public abstract class Lens {
 	return res;
     }
 
+    public void drawBoundary(Graphics2D g2d){
+	
+    }
+
 }
