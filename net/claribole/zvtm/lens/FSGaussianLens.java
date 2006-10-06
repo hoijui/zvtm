@@ -175,7 +175,6 @@ public class FSGaussianLens extends FixedSizeLens {
 	    g[0] = g[1] = MM;
 	}
 	else if (d <= LR1){
-	    // g[0] = g[1] = (float)((MM-1)/2*Math.cos((LR1-LR2)*d/Math.PI+LR2) + (1+MM)/2);
 	    g[0] = g[1] = (float)(c * Math.cos(a*d+b) + e);
 	}
 	else {
