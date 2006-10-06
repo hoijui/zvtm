@@ -28,8 +28,7 @@ public class TLinearLens extends TLens {
     public TLinearLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
     /**
@@ -40,8 +39,7 @@ public class TLinearLens extends TLens {
     public TLinearLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
     /**
@@ -60,8 +58,7 @@ public class TLinearLens extends TLens {
 	this.MMTc = tc;
 	this.MMTf = tf;
 	updateMagBufferWorkingDimensions();
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
     /**
@@ -82,8 +79,7 @@ public class TLinearLens extends TLens {
 	this.MMTc = tc;
 	this.MMTf = tf;
 	updateMagBufferWorkingDimensions();
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
 	lx = x;
 	ly = y;
     }
@@ -95,8 +91,7 @@ public class TLinearLens extends TLens {
      */
     public void setOuterRadius(int r){
 	super.setOuterRadius(r);
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
     /**
@@ -106,8 +101,7 @@ public class TLinearLens extends TLens {
      */
     public void setInnerRadius(int r){
 	super.setInnerRadius(r);
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
     /**
@@ -128,8 +122,7 @@ public class TLinearLens extends TLens {
      */
     public void setRadii(int outerRadius, int innerRadius, boolean forceRaster){
 	super.setRadii(outerRadius, innerRadius, forceRaster);
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
 
@@ -153,8 +146,7 @@ public class TLinearLens extends TLens {
      */
     public void setMMandRadii(float mm, int outerRadius, int innerRadius, boolean forceRaster){
 	super.setMMandRadii(mm, outerRadius, innerRadius, forceRaster);
-	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+	computeDropoffFactors();
     }
 
     public void setMaximumMagnification(float mm){
@@ -163,6 +155,10 @@ public class TLinearLens extends TLens {
 
     public void setMaximumMagnification(float mm, boolean forceRaster){
 	super.setMaximumMagnification(mm, forceRaster);
+	computeDropoffFactors();
+    }
+
+    void computeDropoffFactors(){
 	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
 	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
     }

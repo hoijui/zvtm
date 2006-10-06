@@ -30,10 +30,7 @@ public class TGaussianLens extends TLens {
     public TGaussianLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
     /**
@@ -44,10 +41,7 @@ public class TGaussianLens extends TLens {
     public TGaussianLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
     /**
@@ -66,10 +60,7 @@ public class TGaussianLens extends TLens {
 	this.MMTc = tc;
 	this.MMTf = tf;
 	updateMagBufferWorkingDimensions();
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
     /**
@@ -90,10 +81,7 @@ public class TGaussianLens extends TLens {
 	this.MMTc = tc;
 	this.MMTf = tf;
 	updateMagBufferWorkingDimensions();
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
 	lx = x;
 	ly = y;
     }
@@ -105,10 +93,7 @@ public class TGaussianLens extends TLens {
      */
     public void setOuterRadius(int r){
 	super.setOuterRadius(r);
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
     /**
@@ -118,10 +103,7 @@ public class TGaussianLens extends TLens {
      */
     public void setInnerRadius(int r){
 	super.setInnerRadius(r);
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
     /**
@@ -142,10 +124,7 @@ public class TGaussianLens extends TLens {
      */
     public void setRadii(int outerRadius, int innerRadius, boolean forceRaster){
 	super.setRadii(outerRadius, innerRadius, forceRaster);
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
 
@@ -169,10 +148,7 @@ public class TGaussianLens extends TLens {
      */
     public void setMMandRadii(float mm, int outerRadius, int innerRadius, boolean forceRaster){
 	super.setMMandRadii(mm, outerRadius, innerRadius, forceRaster);
-	aT = Math.PI/(LR1-LR2);
-	bT = - Math.PI*LR2/(LR1-LR2);
-	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	computeDropoffFactors();
     }
 
     public void setMaximumMagnification(float mm){
@@ -181,10 +157,14 @@ public class TGaussianLens extends TLens {
 
     public void setMaximumMagnification(float mm, boolean forceRaster){
 	super.setMaximumMagnification(mm, forceRaster);
+	computeDropoffFactors();
+    }
+
+    void computeDropoffFactors(){
 	aT = Math.PI/(LR1-LR2);
 	bT = - Math.PI*LR2/(LR1-LR2);
 	cT = (MMTf-MMTc)/2;
-	eT = (MMTf+MMTc)/2;
+	eT = (MMTf+MMTc)/2;	
     }
 
     public void gfT(float x, float y, float[] g){

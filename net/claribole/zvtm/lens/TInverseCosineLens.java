@@ -29,9 +29,7 @@ public class TInverseCosineLens extends TLens {
     public TInverseCosineLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
     /**
@@ -42,9 +40,7 @@ public class TInverseCosineLens extends TLens {
     public TInverseCosineLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
     /**
@@ -63,9 +59,7 @@ public class TInverseCosineLens extends TLens {
 	this.MMTc = tc;
 	this.MMTf = tf;
 	updateMagBufferWorkingDimensions();
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
     /**
@@ -86,9 +80,7 @@ public class TInverseCosineLens extends TLens {
 	this.MMTc = tc;
 	this.MMTf = tf;
 	updateMagBufferWorkingDimensions();
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
 	lx = x;
 	ly = y;
     }
@@ -100,9 +92,7 @@ public class TInverseCosineLens extends TLens {
      */
     public void setOuterRadius(int r){
 	super.setOuterRadius(r);
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
     /**
@@ -112,9 +102,7 @@ public class TInverseCosineLens extends TLens {
      */
     public void setInnerRadius(int r){
 	super.setInnerRadius(r);
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
     /**
@@ -135,9 +123,7 @@ public class TInverseCosineLens extends TLens {
      */
     public void setRadii(int outerRadius, int innerRadius, boolean forceRaster){
 	super.setRadii(outerRadius, innerRadius, forceRaster);
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
 
@@ -161,9 +147,7 @@ public class TInverseCosineLens extends TLens {
      */
     public void setMMandRadii(float mm, int outerRadius, int innerRadius, boolean forceRaster){
 	super.setMMandRadii(mm, outerRadius, innerRadius, forceRaster);
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	computeDropoffFactors();
     }
 
     public void setMaximumMagnification(float mm){
@@ -172,6 +156,10 @@ public class TInverseCosineLens extends TLens {
 
     public void setMaximumMagnification(float mm, boolean forceRaster){
 	super.setMaximumMagnification(mm, forceRaster);
+	computeDropoffFactors();
+    }
+    
+    void computeDropoffFactors(){
 	aT = 1/(float)(LR1-LR2);
 	bT = (float)LR2/(float)(LR2-LR1);
 	cT = (2/(float)Math.PI)*(MMTf-MMTc);
