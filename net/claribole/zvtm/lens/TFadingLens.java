@@ -224,6 +224,7 @@ public class TFadingLens extends TLens {
     }
 
     public void dispose(){
+	super.dispose();
 	timer.cancel();
     }
 
