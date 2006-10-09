@@ -30,13 +30,12 @@ import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.svg.Metadata;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.Java2DPainter;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DPainter {
+public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
 
     ZGRViewer application;
 
@@ -45,8 +44,6 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     static final int ZOOMOUT_LENS = -1;
     int lensType = NO_LENS;
     boolean cursorNearBorder = false;
-
-    boolean LENS_MODE = false;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
@@ -74,9 +71,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	else {
 	    application.rememberLocation(v.cams[0].getLocation());
 	    if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
@@ -98,9 +93,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	else {
 	    if (zoomingInRegion){
 		v.setDrawRect(false);
@@ -128,7 +121,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	    if (v.lastGlyphEntered() != null){application.tp.selectButton((VImage)v.lastGlyphEntered());}
 	}
 	else {
-	    if (LENS_MODE || lensType != NO_LENS){
+	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 		lastVX = v.getMouse().vx;
@@ -142,6 +135,9 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 		    }
 		    application.zoomInPhase1(jpx, jpy);
 		}
+	    }
+	    else if (application.tp.isDragMagNavMode()){
+		/*XXX: TBW*/
 	    }
 	    else {
 		Glyph g=v.lastGlyphEntered();
@@ -157,9 +153,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	Glyph g=v.lastGlyphEntered();
 	if (g!=null){
 	    if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
@@ -170,11 +164,9 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	else {
-	    if (LENS_MODE || lensType != NO_LENS){
+	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 	    }
@@ -186,9 +178,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	else {
 	    Glyph g = v.getMouse().lastGlyphEntered;
 	    if (g != null && g.getType() == Messages.PM_ENTRY){
@@ -205,11 +195,9 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	else {
-	    if (LENS_MODE || lensType != NO_LENS){
+	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 		lastVX = v.getMouse().vx;
@@ -252,7 +240,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(lx, ly, true);
+	    application.moveLens(lx, ly, e.getWhen());
 	}
 	else {
 	    if (application.tp.insidePaletteTriggerZone(jpx, jpy)){
@@ -265,9 +253,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){
-	    return;
-	}
+	if (toolPaletteIsActive){return;}
 	if (mod != ALT_MOD && buttonNumber == 1){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
@@ -292,7 +278,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	    }
 	}
 	if (lensType != NO_LENS && application.lens != null){
-	    application.moveLens(jpx, jpy, false);
+	    application.moveLens(jpx, jpy, e.getWhen());
 	}
     }
 
@@ -363,8 +349,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code == KeyEvent.VK_CONTROL){enterLensMode();}
-	else if(code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
+	if(code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
 	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
 	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
 	else if (code==KeyEvent.VK_UP){application.translateView(ZGRViewer.MOVE_UP);}
@@ -388,9 +373,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	}
     }
 
-    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code == KeyEvent.VK_CONTROL){exitLensMode();}
-    }
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
 
@@ -432,16 +415,6 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
 	autoZooming = false;
     }
 
-    void enterLensMode(){
-	LENS_MODE = true;
-	application.vsm.repaintNow();
-    }
-    
-    void exitLensMode(){
-	LENS_MODE = false;
-	application.vsm.repaintNow();
-    }
-
     /*ComponentListener*/
     public void componentHidden(ComponentEvent e){}
     public void componentMoved(ComponentEvent e){}
@@ -451,15 +424,5 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, Java2DP
     public void componentShown(ComponentEvent e){}
 
     static final Font J2DPainter_FONT = new Font("Dialog",0,12);
-
-    /*Java2DPainter interface*/
-    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	if (LENS_MODE){
-	    g2d.setColor(Color.BLACK);
-	    g2d.setFont(J2DPainter_FONT);
-	    g2d.drawString("Lens", 10, 15);
-	    g2d.setFont(ConfigManager.defaultFont);
-	}
-    }
 
 }

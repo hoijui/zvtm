@@ -38,6 +38,9 @@ import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
 import net.claribole.zvtm.lens.*;
 
+import com.xerox.VTM.glyphs.*;
+import javax.swing.ImageIcon;
+
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.Document;
 
@@ -107,6 +110,7 @@ public class ZGRViewer implements AnimationListener {
 
     /* misc. lens settings */
     Lens lens;
+    TFadingLens fLens;
     static int LENS_R1 = 100;
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
@@ -210,7 +214,6 @@ public class ZGRViewer implements AnimationListener {
 	mainView.setEventHandler(meh);
 	mainView.getPanel().addComponentListener(meh);
 	mainView.setNotifyMouseMoved(true);
-	mainView.setJava2DPainter(meh, Java2DPainter.AFTER_DISTORTION);
 	vsm.animator.setAnimationListener(this);
 	mainView.getFrame().addComponentListener(cfgMngr);
 	mainView.setVisible(true);
@@ -777,8 +780,13 @@ public class ZGRViewer implements AnimationListener {
 	meh.lensType = t;
     }
 
-    void moveLens(int x, int y, boolean write){
-	lens.setAbsolutePosition(x, y);
+    void moveLens(int x, int y, long absTime){
+	if (fLens != null){// dealing with a fading lens
+	    fLens.setAbsolutePosition(x, y, absTime);
+	}
+	else {// dealing with a probing lens
+	    lens.setAbsolutePosition(x, y);
+	}
 	vsm.repaintNow();
     }
 
@@ -904,21 +912,15 @@ public class ZGRViewer implements AnimationListener {
     }
 
     Lens getLensDefinition(int x, int y){
-	Lens res = null;
-	res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-// 	switch (lensFamily){
-// 	case L1_Linear:{res = new L1FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L1_InverseCosine:{res = new L1FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L1_Manhattan:{res = new L1FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L2_Gaussian:{res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L2_Linear:{res = new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L2_InverseCosine:{res = new FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L2_Manhattan:{res = new FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case L2_Scrambling:{res = new FSScramblingLens(1.0f, LENS_R1, 1, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case LInf_Linear:{res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case LInf_InverseCosine:{res = new LInfFSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-// 	case LInf_Manhattan:{res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);break;}
-// 	}
+	Lens res;
+	if (tp.isFadingLensNavMode()){
+	    fLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, 100, x - panelWidth/2, y - panelHeight/2);
+	    res = fLens;
+	}
+	else {// isProbingLensNavMode()
+	    res = new FSGaussianLens(1.0f, 100, 50, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null; // unset an previous fading lens to make sure it gets garbage collected
+	}
 	return res;
     }
 

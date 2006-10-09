@@ -28,10 +28,18 @@ public class ToolPalette {
     VirtualSpace paletteSpace;
     Camera paletteCamera;
 
+    // these correpond to values of selectedIconIndex, (vertically ordered icons)
+    static final short STD_NAV_MODE = 0;
+    static final short FL_NAV_MODE = 1;
+    static final short DM_NAV_MODE = 2;
+    static final short PL_NAV_MODE = 3;
+
     static final String[] ICON_PATHS = {"/images/stdnav24b.png",
+					"/images/flnav24b.png",
 					"/images/dmnav24b.png",
 					"/images/plnav24b.png"};
     static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
+						 "/images/flnav24g.png",
 						 "/images/dmnav24g.png",
 						 "/images/plnav24g.png"};
     VImage[] buttons;
@@ -67,6 +75,22 @@ public class ToolPalette {
 	    application.vsm.addGlyph(selectedButtons[i], paletteSpace);
 	}
 	selectButton(buttons[0]);
+    }
+
+    boolean isStdNavMode(){
+	return selectedIconIndex == STD_NAV_MODE;
+    }
+
+    boolean isFadingLensNavMode(){
+	return selectedIconIndex == FL_NAV_MODE;
+    }
+
+    boolean isDragMagNavMode(){
+	return selectedIconIndex == DM_NAV_MODE;
+    }
+
+    boolean isProbingLensNavMode(){
+	return selectedIconIndex == PL_NAV_MODE;
     }
 
     void selectButton(VImage icon){

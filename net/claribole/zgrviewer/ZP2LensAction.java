@@ -26,6 +26,7 @@ public class ZP2LensAction implements PostAnimationAction {
 	    application.vsm.getOwningView(((Lens)target).getID()).setLens(null);
 	    ((Lens)target).dispose();
 	    application.setMagFactor(ZGRViewer.DEFAULT_MAG_FACTOR);
+	    application.lens.dispose();
 	    application.lens = null;
 	    application.setLens(ZgrvEvtHdlr.NO_LENS);
 	}
