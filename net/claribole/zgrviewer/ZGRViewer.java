@@ -13,6 +13,8 @@ package net.claribole.zgrviewer;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Point;
+import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -36,6 +38,7 @@ import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
+import net.claribole.zvtm.engine.DraggableCameraPortal;
 import net.claribole.zvtm.lens.*;
 
 import com.xerox.VTM.glyphs.*;
@@ -60,7 +63,7 @@ import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.svg.SVGReader;
 
 
-public class ZGRViewer implements AnimationListener {
+public class ZGRViewer implements AnimationListener, Java2DPainter {
 
     static String zgrvURI="http://zvtm.sourceforge.net/zgrviewer";
 
@@ -121,6 +124,19 @@ public class ZGRViewer implements AnimationListener {
     static float WHEEL_MM_STEP = 1.0f;
     static final float MAX_MAG_FACTOR = 12.0f;
 
+    /* DragMag */
+    static final int DM_PORTAL_WIDTH = 200;
+    static final int DM_PORTAL_HEIGHT = 200;
+    static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
+    static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
+    static final int DM_PORTAL_ANIM_TIME = 150;
+    static final Color DM_COLOR = Color.RED;
+    Camera dmCamera;
+    DraggableCameraPortal dmPortal;
+    VRectangle magWindow;
+    int magWindowW, magWindowN, magWindowE, magWindowS;
+    boolean paintLinks = false;
+
     static final float FLOOR_ALTITUDE = -90.0f;
 
     /*dimensions of zoomable panel*/
@@ -172,12 +188,16 @@ public class ZGRViewer implements AnimationListener {
 	vsm.setMouseInsideGlyphColor(Color.red);
 	//vsm.setDebug(true);
 	mSpace = vsm.addVirtualSpace(mainSpace);
-	mainCamera = vsm.addCamera(mainSpace); //camera 0 for main view
-	vsm.addCamera(mainSpace); //camera 1 for radar view
+	mainCamera = vsm.addCamera(mainSpace); // camera #0 for main view
+	vsm.addCamera(mainSpace); // camera #1 for radar view
 	mnSpace = vsm.addVirtualSpace(menuSpace);
+	// camera for pie menu
 	vsm.addCamera(menuSpace).setAltitude(10);
 	rSpace = vsm.addVirtualSpace(rdRegionVirtualSpace);
+	// camera for rectangle representing region seen in main viewport (in overview)
 	vsm.addCamera(rdRegionVirtualSpace);
+	// DragMag portal camera (camera #2)
+	dmCamera = vsm.addCamera(mainSpace);
 	RectangleNR seg1;
 	RectangleNR seg2;
 	ZGRViewer.observedRegion=new VRectangleST(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR);
@@ -221,7 +241,9 @@ public class ZGRViewer implements AnimationListener {
 	tooltipMngr = new TooltipManager(this);
 	mainView.getPanel().addMouseMotionListener(tooltipMngr);
 	tooltipMngr.start();
-	mainView.setJava2DPainter(tooltipMngr, Java2DPainter.FOREGROUND);
+	mainView.setJava2DPainter(tooltipMngr, Java2DPainter.AFTER_PORTALS);
+	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
+	initDM();
 	updatePanelSize();
     }
 
@@ -338,6 +360,14 @@ public class ZGRViewer implements AnimationListener {
 	aboutI.addActionListener(a0);
 	if (accelerationMode == 2){printI.setEnabled(false);}
 	return jmb;
+    }
+
+    void initDM(){
+	magWindow = new VRectangle(0, 0, 0, 1, 1, DM_COLOR);
+	magWindow.setFill(false);
+	magWindow.setBorderColor(DM_COLOR);
+	vsm.addGlyph(magWindow, mSpace);
+	mSpace.hide(magWindow);
     }
 
     void reset(){
@@ -775,7 +805,6 @@ public class ZGRViewer implements AnimationListener {
 
     /*--------------------------- Lens management --------------------------*/
 
-    
     void setLens(int t){
 	meh.lensType = t;
     }
@@ -923,6 +952,78 @@ public class ZGRViewer implements AnimationListener {
 	}
 	return res;
     }
+    
+    /*-------------        DragMag        -----------------*/
+
+    void triggerDM(int x, int y){
+	if (dmPortal != null){// portal is active, destroy it
+	    killDM();
+	}
+	else {// portal not active, create it
+	    createDM(x, y);
+	}	
+    }
+
+    void createDM(int x, int y){
+	dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, dmCamera);
+	dmPortal.setPortalEventHandler(meh);
+	dmPortal.setBackgroundColor(mainView.getBackgroundColor());
+	vsm.addPortal(dmPortal, mainView);
+	dmPortal.setBorder(DM_COLOR);
+	Location l = dmPortal.getSeamlessView(mainCamera);
+	dmCamera.moveTo(l.vx, l.vy);
+	dmCamera.setAltitude((float)((mainCamera.getAltitude()+mainCamera.getFocal())/(DEFAULT_MAG_FACTOR)-mainCamera.getFocal()));
+	updateMagWindow();
+	int w = Math.round(magWindow.getWidth() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
+	int h = Math.round(magWindow.getHeight() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
+	dmPortal.sizeTo(w, h);
+	mSpace.onTop(magWindow);
+	mSpace.show(magWindow);
+	paintLinks = true;
+	Point[] data = {new Point(DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h),
+			new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2)};
+	vsm.animator.createPortalAnimation(DM_PORTAL_ANIM_TIME, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
+    }
+
+    void killDM(){
+	vsm.destroyPortal(dmPortal);
+	dmPortal = null;
+	mSpace.hide(magWindow);
+	paintLinks = false;
+	meh.inPortal = false;
+    }
+
+    long[] dmwnes = new long[4];
+
+    void updateMagWindow(){
+	if (dmPortal == null){return;}
+	dmPortal.getVisibleRegion(dmwnes);
+	magWindow.moveTo(dmCamera.posx, dmCamera.posy);
+	magWindow.setWidth((dmwnes[2]-dmwnes[0]) / 2 + 1);
+	magWindow.setHeight((dmwnes[1]-dmwnes[3]) / 2 + 1);
+    }
+
+    void updateZoomWindow(){
+	dmCamera.moveTo(magWindow.vx, magWindow.vy);
+    }
+
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	if (paintLinks){
+	    float coef=(float)(mainCamera.focal/(mainCamera.focal+mainCamera.altitude));
+	    int magWindowX = (viewWidth/2) + Math.round((magWindow.vx-mainCamera.posx)*coef);
+	    int magWindowY = (viewHeight/2) - Math.round((magWindow.vy-mainCamera.posy)*coef);
+	    int magWindowW = Math.round(magWindow.getWidth()*coef);
+	    int magWindowH = Math.round(magWindow.getHeight()*coef);
+	    g2d.setColor(DM_COLOR);
+	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
+	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
+	    g2d.drawLine(magWindowX-magWindowW, magWindowY+magWindowH, dmPortal.x, dmPortal.y+dmPortal.h);
+	    g2d.drawLine(magWindowX+magWindowW, magWindowY+magWindowH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
+	}
+    }
+
+    /*-------------     Window resizing     -----------------*/
 
     void updatePanelSize(){
 	Dimension d = mainView.getPanel().getSize();

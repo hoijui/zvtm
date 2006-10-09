@@ -30,12 +30,17 @@ import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.svg.Metadata;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.Portal;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
+public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalEventHandler {
+
+    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
     ZGRViewer application;
 
@@ -66,6 +71,10 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
 
     boolean toolPaletteIsActive = false;
 
+    boolean inPortal = false;
+    boolean draggingZoomWindow = false;
+    boolean draggingZoomWindowContent = false;
+
     ZgrvEvtHdlr(ZGRViewer app){
 	this.application=app;
     }
@@ -73,21 +82,34 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	else {
-	    application.rememberLocation(v.cams[0].getLocation());
-	    if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
-		manualLeftButtonMove=true;
-		lastJPX=jpx;
-		lastJPY=jpy;
-		//ZGRViewer.vsm.setActiveCamera(v.cams[0]);
-		v.setDrawDrag(true);
-		ZGRViewer.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-		activeCam=application.vsm.getActiveCamera();
+	    lastJPX = jpx;
+	    lastJPY = jpy;
+	    if (inPortal){
+		if (application.dmPortal.coordInsideBar(jpx, jpy)){
+		    draggingZoomWindow = true;
+		}
+		else {
+		    draggingZoomWindowContent = true;
+		}
 	    }
-	    else if (mod == ALT_MOD){
-		zoomingInRegion=true;
-		x1=v.getMouse().vx;
-		y1=v.getMouse().vy;
-		v.setDrawRect(true);
+	    else {
+		
+		application.rememberLocation(v.cams[0].getLocation());
+		if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
+		    manualLeftButtonMove=true;
+		    lastJPX=jpx;
+		    lastJPY=jpy;
+		    //ZGRViewer.vsm.setActiveCamera(v.cams[0]);
+		    v.setDrawDrag(true);
+		    ZGRViewer.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+		    activeCam=application.vsm.getActiveCamera();
+		}
+		else if (mod == ALT_MOD){
+		    zoomingInRegion=true;
+		    x1=v.getMouse().vx;
+		    y1=v.getMouse().vy;
+		    v.setDrawRect(true);
+		}
 	    }
 	}
     }
@@ -95,6 +117,8 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	else {
+	    draggingZoomWindow = false;
+	    draggingZoomWindowContent = false;
 	    if (zoomingInRegion){
 		v.setDrawRect(false);
 		x2=v.getMouse().vx;
@@ -137,7 +161,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
 		}
 	    }
 	    else if (application.tp.isDragMagNavMode()){
-		/*XXX: TBW*/
+		application.triggerDM(jpx, jpy);
 	    }
 	    else {
 		Glyph g=v.lastGlyphEntered();
@@ -255,24 +279,41 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	if (mod != ALT_MOD && buttonNumber == 1){
-	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
-	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-		application.vsm.animator.Xspeed=0;
-		application.vsm.animator.Yspeed=0;
-		application.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
-		//50 is just a speed factor (too fast otherwise)
+	    if (draggingZoomWindow){
+		application.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
+		lastJPX = jpx;
+		lastJPY = jpy;
+		application.vsm.repaintNow();
+	    }
+	    else if (draggingZoomWindowContent){
+		tfactor = (application.dmCamera.focal+(application.dmCamera.altitude))/application.dmCamera.focal;
+		synchronized(application.dmCamera){
+		    application.dmCamera.move(Math.round(tfactor*(lastJPX-jpx)),
+					      Math.round(tfactor*(jpy-lastJPY)));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
+		}
 	    }
 	    else {
-		jpxD = jpx-lastJPX;
-		jpyD = lastJPY-jpy;
-		application.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor));
-		application.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor));
-		application.vsm.animator.Aspeed=0;
-		if (application.cfgMngr.isSDZoomEnabled()){
-		    dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
-		    if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
-			autoZooming = true;
-			application.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
+		tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
+		if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
+		    application.vsm.animator.Xspeed=0;
+		    application.vsm.animator.Yspeed=0;
+		    application.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
+		    //50 is just a speed factor (too fast otherwise)
+		}
+		else {
+		    jpxD = jpx-lastJPX;
+		    jpyD = lastJPY-jpy;
+		    application.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor));
+		    application.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor));
+		    application.vsm.animator.Aspeed=0;
+		    if (application.cfgMngr.isSDZoomEnabled()){
+			dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
+			if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
+			    autoZooming = true;
+			    application.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
+			}
 		    }
 		}
 	    }
@@ -291,14 +332,25 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.mainCamera);
 	    }
 	}
+	else if (inPortal){
+	    tfactor = (application.dmCamera.focal+Math.abs(application.dmCamera.altitude))/application.dmCamera.focal;
+	    if (wheelDirection  == WHEEL_UP){// zooming in
+		application.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
+	    }
+	    else {// wheelDirection == WHEEL_DOWN, zooming out
+		application.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
+	    }
+	    application.updateMagWindow();
+	    application.vsm.repaintNow();
+	}
 	else {
-	    float a=(application.mainCamera.focal+Math.abs(application.mainCamera.altitude))/application.mainCamera.focal;
-	    if (wheelDirection == WHEEL_UP){
-		application.mainCamera.altitudeOffset(a*10);
+	    tfactor = (application.mainCamera.focal+Math.abs(application.mainCamera.altitude))/application.mainCamera.focal;
+	    if (wheelDirection == WHEEL_UP){// zooming in
+		application.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
 		application.cameraMoved();
 	    }
-	    else {//wheelDirection == WHEEL_DOWN
-		application.mainCamera.altitudeOffset(-a*10);
+	    else {// wheelDirection == WHEEL_DOWN, zooming out
+		application.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
 		application.cameraMoved();
 	    }
 	}
@@ -423,6 +475,14 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener {
     }
     public void componentShown(ComponentEvent e){}
 
-    static final Font J2DPainter_FONT = new Font("Dialog",0,12);
+    /**cursor enters portal*/
+    public void enterPortal(Portal p){
+	inPortal = true;
+    }
+
+    /**cursor exits portal*/
+    public void exitPortal(Portal p){
+	inPortal = false;
+    }
 
 }
