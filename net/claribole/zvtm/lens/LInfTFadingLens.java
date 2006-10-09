@@ -22,7 +22,7 @@ import java.util.TimerTask;
 
 import net.claribole.zvtm.engine.LowPassFilter;
 
-/**Translucent lens. Profile: inverse cosine - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
+/**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class LInfTFadingLens extends TFadingLens {
 
@@ -46,24 +46,26 @@ public class LInfTFadingLens extends TFadingLens {
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
      *@param mm magnification factor, mm in [0,+inf[
-     *@param tf translucency value (at junction between transition and focus), tf in [0,1.0]
+     *@param minT translucency value (at junction between transition and focus), in [0,1.0]
+     *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public LInfTFadingLens(float mm, float tf, int innerRadius){
-	super(mm, tf, innerRadius);
+    public LInfTFadingLens(float mm, float minT, float maxT, int innerRadius){
+	super(mm, minT, maxT, innerRadius);
     }
 
     /**
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
      *@param mm magnification factor, mm in [0,+inf[
-     *@param tf translucency value (at junction between transition and focus), tf in [0,1.0]
+     *@param minT translucency value (at junction between transition and focus), in [0,1.0]
+     *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public LInfTFadingLens(float mm, float tf, int innerRadius, int x, int y){
-	super(mm, tf, innerRadius, x, y);
+    public LInfTFadingLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
+	super(mm, minT, maxT, innerRadius, x, y);
     }
 
     public void gfT(float x, float y, float[] g){

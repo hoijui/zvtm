@@ -20,7 +20,7 @@ import java.util.TimerTask;
 
 import net.claribole.zvtm.engine.LowPassFilter;
 
-/**Translucent lens. Profile: inverse cosine - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
+/**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class TFadingLens extends TLens {
 
@@ -36,12 +36,18 @@ public class TFadingLens extends TLens {
     Timer timer;
     TrailingTimer mouseStillUpdater;
 
+    // MMTf is used to hold the current translucence
+    // a and b are used to convert the filter's opacity to values in the [minT, maxT] range
+    float a = 1;
+    float b = 0;
+
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
     public TFadingLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
+	computeOpacityFactors(0, 1);
 	initTimer();
     }
 
@@ -53,6 +59,7 @@ public class TFadingLens extends TLens {
     public TFadingLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
+	computeOpacityFactors(0, 1);
 	initTimer();
     }
 
@@ -60,14 +67,16 @@ public class TFadingLens extends TLens {
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
      *@param mm magnification factor, mm in [0,+inf[
-     *@param tf translucency value (at junction between transition and focus), tf in [0,1.0]
+     *@param minT translucency value (at junction between transition and focus), in [0,1.0]
+     *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public TFadingLens(float mm, float tf, int innerRadius){
+    public TFadingLens(float mm, float minT, float maxT, int innerRadius){
 	this.MM = mm;
 	this.LR2 = innerRadius;
-	this.MMTf = tf;
+	this.MMTf = maxT;
 	updateMagBufferWorkingDimensions();
+	computeOpacityFactors(minT, maxT);
 	initTimer();
     }
 
@@ -75,19 +84,26 @@ public class TFadingLens extends TLens {
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
      *@param mm magnification factor, mm in [0,+inf[
-     *@param tf translucency value (at junction between transition and focus), tf in [0,1.0]
+     *@param minT translucency value (at junction between transition and focus), in [0,1.0]
+     *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public TFadingLens(float mm, float tf, int innerRadius, int x, int y){
+    public TFadingLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
 	this.MM = mm;
 	this.LR2 = innerRadius;
-	this.MMTf = tf;
+	this.MMTf = maxT;
 	updateMagBufferWorkingDimensions();
+	computeOpacityFactors(minT, maxT);
 	lx = x;
 	ly = y;
 	initTimer();
+    }
+
+    void computeOpacityFactors(float minT, float maxT){
+	a = maxT - minT;
+	b = minT;
     }
 
     void initTimer(){
@@ -195,7 +211,7 @@ public class TFadingLens extends TLens {
 	int ty = (int)Math.round(currentPos.getY());
 	tx = Math.max(tx, w/2);
  	ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
-	float nMMTf = (float)opacity;
+	float nMMTf = ((float)opacity) * a + b;
 	if (Math.abs(MMTf - nMMTf) > 0.01f){// avoid unnecesarry repaint requests
 	    // make the lens almost disappear when making big moves
 	    MMTf = nMMTf;
