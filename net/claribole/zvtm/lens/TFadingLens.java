@@ -230,13 +230,13 @@ public class TFadingLens extends TLens {
     /**set the position of the lens inside the view
      *@param ax lens's center horizontal coordinate expressed as an absolute position within the view (JPanel coordinate system)
      *@param ay lens's center vertical coordinate expressed as an absolute position within the view (JPanel coordinate system)
+     *@param absTime time at which this event is occuring (in ms, as can be obtained e.g. by System.currentTimeMillis())
      */
-    public synchronized void setAbsolutePosition(int ax, int ay, long when){
+    public synchronized void setAbsolutePosition(int ax, int ay, long absTime){
 	super.setAbsolutePosition(ax, ay);
-	updateFrequency(when);
+	updateFrequency(absTime);
 	updateAlpha(ax, ay);
     }
-
 
 }
 
