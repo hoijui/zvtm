@@ -71,7 +71,10 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 
     boolean toolPaletteIsActive = false;
 
-    boolean inPortal = false;
+    /* DragMag interaction */
+    boolean inZoomWindow = false;
+    boolean inMagWindow = false;
+    boolean draggingMagWindow = false;
     boolean draggingZoomWindow = false;
     boolean draggingZoomWindowContent = false;
 
@@ -84,7 +87,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 	else {
 	    lastJPX = jpx;
 	    lastJPY = jpy;
-	    if (inPortal){
+	    if (inZoomWindow){
 		if (application.dmPortal.coordInsideBar(jpx, jpy)){
 		    draggingZoomWindow = true;
 		}
@@ -92,8 +95,11 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 		    draggingZoomWindowContent = true;
 		}
 	    }
+	    else if (inMagWindow){
+		application.vsm.stickToMouse(application.magWindow);
+		draggingMagWindow = true;
+	    }
 	    else {
-		
 		application.rememberLocation(v.cams[0].getLocation());
 		if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
 		    manualLeftButtonMove=true;
@@ -119,6 +125,10 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 	else {
 	    draggingZoomWindow = false;
 	    draggingZoomWindowContent = false;
+	    if (draggingMagWindow){
+		draggingMagWindow = false;
+		application.vsm.unstickFromMouse();
+	    }
 	    if (zoomingInRegion){
 		v.setDrawRect(false);
 		x2=v.getMouse().vx;
@@ -292,7 +302,11 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 					      Math.round(tfactor*(jpy-lastJPY)));
 		    lastJPX = jpx;
 		    lastJPY = jpy;
+		    application.updateMagWindow();
 		}
+	    }
+	    else if (draggingMagWindow){
+		application.updateZoomWindow();
 	    }
 	    else {
 		tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
@@ -332,7 +346,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.mainCamera);
 	    }
 	}
-	else if (inPortal){
+	else if (inZoomWindow){
 	    tfactor = (application.dmCamera.focal+Math.abs(application.dmCamera.altitude))/application.dmCamera.focal;
 	    if (wheelDirection  == WHEEL_UP){// zooming in
 		application.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
@@ -357,6 +371,10 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
     }
 
     public void enterGlyph(Glyph g){
+	if (g == application.magWindow){
+	    inMagWindow = true;
+	    return;
+	}
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
 	if (application.vsm.getActiveView().getActiveLayer() == 1){
@@ -376,6 +394,10 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
     }
 
     public void exitGlyph(Glyph g){
+	if (g == application.magWindow){
+	    inMagWindow = false;
+	    return;
+	}
 	if (g.isSelected()){
 	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
 	}
@@ -477,12 +499,19 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
-	inPortal = true;
+	inZoomWindow = true;
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
-	inPortal = false;
+	inZoomWindow = false;
+    }
+
+    void resetDragMagInteraction(){
+	inMagWindow = false;
+	inZoomWindow = false;
+	draggingZoomWindow = false;
+	draggingZoomWindowContent = false;
     }
 
 }

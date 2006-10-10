@@ -372,6 +372,8 @@ public class ZGRViewer implements AnimationListener, Java2DPainter {
 
     void reset(){
 	vsm.destroyGlyphsInSpace(mainSpace);
+	vsm.addGlyph(magWindow, mSpace);
+	mSpace.hide(magWindow);
 	previousLocations.removeAllElements();
     }
 
@@ -986,11 +988,13 @@ public class ZGRViewer implements AnimationListener, Java2DPainter {
     }
 
     void killDM(){
-	vsm.destroyPortal(dmPortal);
-	dmPortal = null;
-	mSpace.hide(magWindow);
-	paintLinks = false;
-	meh.inPortal = false;
+	if (dmPortal != null){
+	    vsm.destroyPortal(dmPortal);
+	    dmPortal = null;
+	    mSpace.hide(magWindow);
+	    paintLinks = false;
+	}
+	meh.resetDragMagInteraction();
     }
 
     long[] dmwnes = new long[4];

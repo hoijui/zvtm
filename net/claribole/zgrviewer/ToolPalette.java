@@ -95,6 +95,7 @@ public class ToolPalette {
 
     void selectButton(VImage icon){
 	boolean newIconSelected = false;
+	int oldSelectedIconIndex = selectedIconIndex;
 	for (int i=0;i<buttons.length;i++){// only try to find it in the list of unselected buttons
 	    if (buttons[i] == icon){// this way we are sure it is not the one already selected
 		paletteSpace.show(selectedButtons[i]);
@@ -106,11 +107,14 @@ public class ToolPalette {
 	if (newIconSelected){// if a new button has been selected,
 	    for (int i=0;i<selectedIconIndex;i++){// unselect other buttons
 		paletteSpace.hide(selectedButtons[i]);
-		paletteSpace.show(buttons[i]);		
+		paletteSpace.show(buttons[i]);
 	    }
 	    for (int i=selectedIconIndex+1;i<buttons.length;i++){
 		paletteSpace.hide(selectedButtons[i]);
-		paletteSpace.show(buttons[i]);		
+		paletteSpace.show(buttons[i]);
+	    }
+	    if (oldSelectedIconIndex == DM_NAV_MODE){
+		application.killDM();
 	    }
 	}
     }
