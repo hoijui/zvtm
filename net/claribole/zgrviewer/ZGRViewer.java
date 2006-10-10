@@ -948,9 +948,13 @@ public class ZGRViewer implements AnimationListener, Java2DPainter {
 	    fLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, 100, x - panelWidth/2, y - panelHeight/2);
 	    res = fLens;
 	}
+	else if (tp.isMeltingLensNavMode()){
+	    res = new TGaussianLens(1.0f, 0.0f, 0.90f, 150, 50, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	}
 	else {// isProbingLensNavMode()
 	    res = new FSGaussianLens(1.0f, 100, 50, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null; // unset an previous fading lens to make sure it gets garbage collected
+	    fLens = null; // unset any previous fading lens to make sure it gets garbage collected
 	}
 	return res;
     }

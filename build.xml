@@ -89,7 +89,7 @@ Usage:
       <fileset dir="${classes.dir}"
                includes="net/claribole/zgrviewer/**"/>
       <fileset dir="${basedir}"
-               includes="images/stdnav24b.png,images/dmnav24b.png,images/plnav24b.png,images/stdnav24g.png,images/dmnav24g.png,images/plnav24g.png,images/flnav24b.png,images/flnav24g.png"/>
+               includes="images/stdnav24b.png,images/dmnav24b.png,images/plnav24b.png,images/stdnav24g.png,images/dmnav24g.png,images/plnav24g.png,images/flnav24b.png,images/flnav24g.png,images/mlnav24b.png,images/mlnav24g.png"/>
     </jar>
   </target>
 

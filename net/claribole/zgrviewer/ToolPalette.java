@@ -33,15 +33,20 @@ public class ToolPalette {
     static final short FL_NAV_MODE = 1;
     static final short DM_NAV_MODE = 2;
     static final short PL_NAV_MODE = 3;
+    static final short ML_NAV_MODE = 4;
 
     static final String[] ICON_PATHS = {"/images/stdnav24b.png",
 					"/images/flnav24b.png",
 					"/images/dmnav24b.png",
-					"/images/plnav24b.png"};
+					"/images/plnav24b.png",
+					"/images/mlnav24b.png"};
+
     static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
 						 "/images/flnav24g.png",
 						 "/images/dmnav24g.png",
-						 "/images/plnav24g.png"};
+						 "/images/plnav24g.png",
+						 "/images/mlnav24g.png"};
+
     VImage[] buttons;
     VImage[] selectedButtons;
     static final int VERTICAL_STEP_BETWEEN_ICONS = 30;
@@ -91,6 +96,10 @@ public class ToolPalette {
 
     boolean isProbingLensNavMode(){
 	return selectedIconIndex == PL_NAV_MODE;
+    }
+
+    boolean isMeltingLensNavMode(){
+	return selectedIconIndex == ML_NAV_MODE;
     }
 
     void selectButton(VImage icon){

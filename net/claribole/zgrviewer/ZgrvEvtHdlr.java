@@ -155,7 +155,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
 	    if (v.lastGlyphEntered() != null){application.tp.selectButton((VImage)v.lastGlyphEntered());}
 	}
 	else {
-	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode()){
+	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode() || application.tp.isMeltingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 		lastVX = v.getMouse().vx;
@@ -200,7 +200,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	else {
-	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode()){
+	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode() || application.tp.isMeltingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 	    }
@@ -231,7 +231,7 @@ public class ZgrvEvtHdlr implements ViewEventHandler, ComponentListener, PortalE
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	else {
-	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode()){
+	    if (application.tp.isFadingLensNavMode() || application.tp.isProbingLensNavMode() || application.tp.isMeltingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 		lastVX = v.getMouse().vx;
