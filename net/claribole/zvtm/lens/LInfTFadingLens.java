@@ -11,7 +11,6 @@
 
 package net.claribole.zvtm.lens;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.SinglePixelPackedSampleModel;
@@ -77,8 +76,10 @@ public class LInfTFadingLens extends TFadingLens {
     }
 
     public void drawBoundary(Graphics2D g2d){
-	g2d.setColor(Color.BLACK);
-	g2d.drawRect(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+	if (bColor != null){
+	    g2d.setColor(bColor);
+	    g2d.drawRect(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+	}
     }
 
 }

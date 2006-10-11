@@ -11,6 +11,8 @@
 
 package net.claribole.zvtm.lens;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
@@ -35,6 +37,9 @@ public class TFadingLens extends TLens {
     Point2D targetPos = new Point2D.Double(0, 0);
     Timer timer;
     TrailingTimer mouseStillUpdater;
+
+    /**Lens boundary color (default is black)*/
+    Color bColor = Color.BLACK;
 
     // MMTf is used to hold the current translucence
     // a and b are used to convert the filter's opacity to values in the [minT, maxT] range
@@ -237,6 +242,21 @@ public class TFadingLens extends TLens {
 	super.setAbsolutePosition(ax, ay);
 	updateFrequency(absTime);
 	updateAlpha(ax, ay);
+    }
+
+    /**Set the color used to draw the lens' boundaries (default is black)
+     *@param bc color of the boundary (set to null if you do not want to draw the border)
+     */
+    public void setBoundaryColor(Color bc){
+	bColor = bc;
+    }
+
+    /**for internal use*/
+    public void drawBoundary(Graphics2D g2d){
+	if (bColor != null){
+	    g2d.setColor(bColor);
+	    g2d.drawOval(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+	}
     }
 
 }
