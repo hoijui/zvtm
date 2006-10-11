@@ -148,7 +148,7 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true);
+	    application.moveLens(jpx, jpy, e.getWhen());
 	}
 	//application.vsm.repaintNow();
     }
@@ -161,7 +161,7 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.vsm.animator.Aspeed = 0;
  	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, false);
+	    application.moveLens(jpx, jpy, e.getWhen());
 	}
     }
 
@@ -251,8 +251,16 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.demoView.setTitle(ZLWorldDemo.LInf_Fresnel_Title);
 	}
 	else if (code == KeyEvent.VK_0){
-	    application.lensFamily = ZLWorldDemo.L2_TLinear;
-	    application.demoView.setTitle(ZLWorldDemo.L2_TLinear_Title);
+	    application.lensFamily = ZLWorldDemo.L2_TGaussian;
+	    application.demoView.setTitle(ZLWorldDemo.L2_TGaussian_Title);
+	}
+	else if (code == KeyEvent.VK_Q){
+	    application.lensFamily = ZLWorldDemo.L2_Fading;
+	    application.demoView.setTitle(ZLWorldDemo.L2_Fading_Title);
+	}
+	else if (code == KeyEvent.VK_W){
+	    application.lensFamily = ZLWorldDemo.LInf_Fading;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_Fading_Title);
 	}
     }
 
