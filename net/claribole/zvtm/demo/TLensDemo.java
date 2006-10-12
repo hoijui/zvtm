@@ -278,7 +278,7 @@ public class TLensDemo {
 	switch (lensFamily){
 	case L2_Gaussian:{res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
 	case L2_TGaussian:{res = new TGaussianLens(1.0f, 0.0f, 0.9f, 150, 20, x - panelWidth/2, y - panelHeight/2);break;}
-	case L2_TFading:{res = new TFadingLens(1.0f, 1.0f, 100, x - panelWidth/2, y - panelHeight/2);break;}
+	case L2_TFading:{res = new TFadingLens(1.0f, 0.0f, 1.0f, 100, x - panelWidth/2, y - panelHeight/2);break;}
 	}
 	return res;
     }
