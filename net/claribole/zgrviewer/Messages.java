@@ -22,7 +22,7 @@ public class Messages {
     
     static final String pngOnlyIn140SecondPart="\nDo you want to proceed anyway (this will probably cause an error)?";
 
-    static final String about="ZGRViewer v 0.5.1\n\nA GraphViz (dot/neato) Visualizer based on the ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga (emmanuel.pietriga@inria.fr)";
+    static final String about="ZGRViewer v 0.6.0\n\nA GraphViz (dot/neato) Visualizer based on the ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga (emmanuel.pietriga@inria.fr)";
 
     static final String commands="Under Mac OS X, replace Ctrl by the Command key\n\nMisc. Commands\n"
 	+"* Press right mouse button to display the pie menu\n\n"
