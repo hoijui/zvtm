@@ -9,10 +9,14 @@
 
 package net.claribole.eval.to;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Toolkit;
+
 import java.util.Vector;
 
 import com.xerox.VTM.engine.*;
+import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
 public class Eval {
@@ -31,8 +35,11 @@ public class Eval {
     static final int VIEW_MAX_H = 1024;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
+    /* dimensions of zoomable panel */
+    int panelWidth, panelHeight;
 
     /* ZVTM components */
+    static final Color BACKGROUND_COLOR = Color.WHITE;
     VirtualSpaceManager vsm;
     VirtualSpace mSpace;
     static final String mSpaceName = "mainSpace";
@@ -67,7 +74,9 @@ public class Eval {
 	v.add(mCamera);
 	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true);
 	mView.setEventHandler(eh);
-	
+	mView.getPanel().addComponentListener(eh);
+	mView.setNotifyMouseMoved(true);
+	mView.setBackgroundColor(Eval.BACKGROUND_COLOR);
     }
 
     void windowLayout(){
@@ -84,7 +93,14 @@ public class Eval {
     }
 
     void initWorld(){
-	
+	//XXX: basic stuff for testing
+	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.BLUE), mSpace);
+    }
+
+    void updatePanelSize(){
+	Dimension d = mView.getPanel().getSize();
+	panelWidth = d.width;
+	panelHeight = d.height;
     }
     
     public static void main(String[] args){
