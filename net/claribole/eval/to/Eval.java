@@ -49,18 +49,30 @@ public class Eval {
 
     BaseEventHandler eh;
 
+    /* trailing overview settings */
+    static final int TOW_SWITCH_ANIM_TIME = 500;
+    static int TOW_PORTAL_WIDTH = 50;
+    static int TOW_PORTAL_HEIGHT = 50;
+    static int TOW_PORTAL_WIDTH_EXPANSION_OFFSET = 100;
+    static int TOW_PORTAL_HEIGHT_EXPANSION_OFFSET = 100;
+    static final int TOW_PORTAL_X_OFFSET = -120;
+    static final int TOW_PORTAL_Y_OFFSET = 120;
+    TrailingOverview to;
+
     public Eval(short t){
+	initGUI();
 	if (t == TECHNIQUE_OV){
 	    this.technique = TECHNIQUE_OV;
 	    mViewName = TECHNIQUE_OV_NAME;
 	    eh = new OVEventHandler(this);
+	    initOverview();
 	}
 	else {
 	    this.technique = TECHNIQUE_TOW;
 	    mViewName = TECHNIQUE_TOW_NAME;
 	    eh = new TOWEventHandler(this);
 	}
-	initGUI();
+	mView.setEventHandler(eh);
 	initWorld();
     }
 
@@ -73,7 +85,6 @@ public class Eval {
 	Vector v = new Vector();
 	v.add(mCamera);
 	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true);
-	mView.setEventHandler(eh);
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
 	mView.setBackgroundColor(Eval.BACKGROUND_COLOR);
@@ -92,9 +103,45 @@ public class Eval {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
+    void initOverview(){
+	
+    }
+
     void initWorld(){
 	//XXX: basic stuff for testing
 	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.BLUE), mSpace);
+    }
+
+    void switchPortal(int x, int y){
+	if (to != null){// portal is active, destroy it it
+	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(-0.5f),
+					       to.getID(), new PortalKiller(this));
+	}
+	else {// portal not active, create it
+	    to = getPortal(x, y);
+	    to.setBackgroundColor(BACKGROUND_COLOR);
+	    to.setPortalEventHandler((PortalEventHandler)eh);
+// 	    to.setObservedRegionListener((ObservedRegionListener)eh);
+	    vsm.addPortal(to, mView);
+ 	    to.setBorder(Color.BLACK);
+	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
+					       to.getID(), null);
+	    oCamera.moveTo(0, 0);
+// 	    oCamera.setAltitude(CONTRACTED_PORTAL_CEILING_ALTITUDE);
+	}
+    }
+
+    TrailingOverview getPortal(int x, int y){
+	return new TrailingOverview(x-TOW_PORTAL_WIDTH/2, y-TOW_PORTAL_HEIGHT/2,
+				    TOW_PORTAL_WIDTH, TOW_PORTAL_HEIGHT,
+				    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+    }
+
+    void killPortal(){
+	vsm.destroyPortal(to);
+	to.dispose();
+	to = null;
+	vsm.repaintNow();
     }
 
     void updatePanelSize(){
