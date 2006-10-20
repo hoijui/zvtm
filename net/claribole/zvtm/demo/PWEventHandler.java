@@ -256,8 +256,6 @@ class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationL
 	application.vsm.repaintNow();
     }
 
-    static final int PORTAL_EXPANSION_TIME = 200;
-
     void updateOverviewAltitude(float alt){
 	float palt = alt * 200;
 	if (palt > PortalWorldDemo.PORTAL_CEILING_ALTITUDE){
