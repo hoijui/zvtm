@@ -464,13 +464,13 @@ public class GNBMapManager implements Runnable {
     /* called each time the camera moves - detects what regions are visible depending 
        on the level of details and calls methods to load/unload maps accordingly */
     void updateVisibleMaps(long[] wnes, boolean onlyIfSameLevel, short actualLevel){
-	       if ((onlyIfSameLevel && (actualLevel != lod)) || !adaptMaps){
-	           /* do not update visible maps if the actual level is different from the
-	              level the app believes it is at (happens when a lens is active, as
-	              updateMapLevel call are temporarily freezed)*/
-	           /*do not update them if user disabled updates explicitly either*/
-	           return;
-	       }
+	if ((onlyIfSameLevel && (actualLevel != lod)) || !adaptMaps){
+	    /* do not update visible maps if the actual level is different from the
+	       level the app believes it is at (happens when a lens is active, as
+	       updateMapLevel call are temporarily freezed)*/
+	    /*do not update them if user disabled updates explicitly either*/
+	    return;
+	}
         if (lod == LEVEL_3){// if dealing with maps at level of detail = 1
             updateVisibleMapsL3(wnes);
         }
