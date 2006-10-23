@@ -109,6 +109,14 @@ Usage:
     </jar>
   </target>
 
+  <!--geonames browser jar-->
+  <target name="gnbjar" depends="init,zvtmbuild">
+    <jar destfile="${lib.dir}/gnb.jar">
+      <fileset dir="${classes.dir}"
+               includes="net/claribole/gnb/**"/>
+    </jar>
+  </target>
+
   <!--zimgviewer jar-->
   <target name="zimgjar" depends="init,zvtmbuild">
     <jar destfile="${lib.dir}/zimgviewer.jar">
