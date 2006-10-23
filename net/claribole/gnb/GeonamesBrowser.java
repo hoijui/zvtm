@@ -142,6 +142,7 @@ public class GeonamesBrowser implements Java2DPainter {
 	mm.initMap();
 	gs = new GeonamesRDFStore(this);
 	gs.loadCountries();
+	gs.loadRegions();
  	gs.loadCities();
 	System.gc();
     }

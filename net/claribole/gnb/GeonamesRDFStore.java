@@ -35,8 +35,8 @@ import com.xerox.VTM.glyphs.LBText;
 class GeonamesRDFStore implements RDFErrorHandler {
 
     /* location of geonames RDF files */
-    static final String[] CITIES_DIR = {"GIS/test"};
-    static final String[] STATES_DIR = {"GIS/RDFaustates", "GIS/RDFcaprovinces", "GIS/RDFrufederal", "GIS/RDFusstates"};
+    static final String[] CITIES_DIR = {"GIS/RDFcities"};
+    static final String[] REGIONS_DIR = {"GIS/RDFaustates", "GIS/RDFcaprovinces", "GIS/RDFrufederal", "GIS/RDFusstates"};
     static final String[] COUNTRIES_DIR = {"GIS/RDFcountries"};
 
     /* RDF parser settings */
@@ -49,6 +49,7 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final String FEATURE_CLASS_PROPERTY = "featureClass";
     static final String FEATURE_CODE_PROPERTY = "featureCode";
     static final String CITY_FEATURE_CLASS_URI = GEONAMES_NS + "P";
+    static final String REGION_FEATURE_CODE_URI = GEONAMES_NS + "A.ADM1";
     static final String COUNTRY_FEATURE_CODE_URI = GEONAMES_NS + "A.PCLI";
     static final String WGS84_POS_NS = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     static final String LATITUDE_PROPERTY = "lat";
@@ -63,8 +64,10 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final long CITY_WIDTH = 2 * CITY_HALF_WIDTH;
     static final long CITY_LABEL_VOFFSET = 6; // vertical offset of labels w.r.t square representing the city itself
     static final Color CITY_COLOR = Color.YELLOW;
+    static final Color REGION_COLOR = new Color(255,150,0); // orange
     static final Color COUNTRY_COLOR = Color.WHITE;
     static final Font CITY_FONT = new Font("Dialog", Font.PLAIN, 10);
+    static final Font REGION_FONT = new Font("Dialog",Font.ITALIC,40);
     static final Font COUNTRY_FONT = new Font("Dialog",Font.BOLD,100);
 
     /*various altitudes that trigger changes w.r.t levels of detail*/
@@ -94,22 +97,19 @@ class GeonamesRDFStore implements RDFErrorHandler {
     /* current level of detail (0,1,2,3) depending on observation altitude */
     short lbd = LEVEL_0; // Level of Details
 
-    /*squares representing cities*/
+    /* Glyphs representing cities, regions, countries*/
     VRectangle[] cities;
     /*all city labels*/
     LText[] cityLabels;
-
     /*all country labels*/
     LText[] countryLabels;
     /*all region labels*/
     LText[] regionLabels;
 
 
-
-
     /* Jena RDF models */
     Model citiesRDF;
-    Model statesRDF;
+    Model regionsRDF;
     Model countriesRDF;
 
     /** associates RDF resource representing a feature to corresponding glyph on map */
@@ -186,6 +186,63 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	    data.add(countryL);
 	}
 	storeCountries(data);
+    }
+
+    void loadRegions(){
+	regionsRDF = ModelFactory.createDefaultModel();
+	initRDFParser(regionsRDF);
+	for (int i=0;i<REGIONS_DIR.length;i++){
+	    loadRegionsFromDir(REGIONS_DIR[i]);   
+	}
+	parser = null;
+	processRegionModel();
+    }
+
+    void loadRegionsFromDir(String dirS){
+	File dir = new File(dirS);
+	File[] regionFiles = dir.listFiles(new RDFFileFilter());
+	ProgPanel pp = new ProgPanel(dirS, Messages.LOADING_REGIONS);
+	FileInputStream fis;
+	for (int i=0;i<regionFiles.length;i++){
+	    try {
+		fis = new FileInputStream(regionFiles[i]);
+		parser.read(regionsRDF, fis, regionFiles[i].toURL().toString());
+		pp.setPBValue(i*100/regionFiles.length);
+	    }
+	    catch(Exception ex){System.err.println("Error while processing region file " + regionFiles[i].toString());}
+	}
+	pp.destroy();
+    }
+
+    void processRegionModel(){
+	StmtIterator si = regionsRDF.listStatements(null, regionsRDF.getProperty(GEONAMES_NS, FEATURE_CODE_PROPERTY),
+						   regionsRDF.getResource(REGION_FEATURE_CODE_URI));
+	Vector regions = new Vector();
+	Statement s;
+	while (si.hasNext()){
+	    s = si.nextStatement();
+	    regions.add(s.getSubject());
+	}
+	si.close();
+	Resource r;
+	LText regionL;
+	long lx, ly;
+	Property longP = regionsRDF.getProperty(WGS84_POS_NS, LONGITUDE_PROPERTY);
+	Property latP = regionsRDF.getProperty(WGS84_POS_NS, LATITUDE_PROPERTY);
+	Property nameP = regionsRDF.getProperty(GEONAMES_NS, NAME_PROPERTY);
+	Vector data = new Vector();
+	for (int i=0;i<regions.size();i++){
+	    r = (Resource)regions.elementAt(i);
+	    lx = Math.round(r.getProperty(longP).getDouble() * GeonamesBrowser.HALF_MAP_WIDTH/180.0);
+	    ly = Math.round(r.getProperty(latP).getDouble() * GeonamesBrowser.HALF_MAP_HEIGHT/90.0);
+	    regionL = new LText(lx, ly, 0, REGION_COLOR, r.getProperty(nameP).getString(), LText.TEXT_ANCHOR_MIDDLE);
+	    regionL.setSpecialFont(REGION_FONT);
+	    application.vsm.addGlyph(regionL, application.mapSpace);
+ 	    regionL.setVisible(false);
+ 	    regionL.setVisibleThroughLens(false);
+	    data.add(regionL);
+	}
+	storeRegions(data);
     }
 
     String getPropertyWithLang(Resource r, Property p, String lang, Property fallBack){
@@ -390,10 +447,9 @@ class GeonamesRDFStore implements RDFErrorHandler {
     }
     
      void showRegionLabels(boolean b){
-// 	if (ZLWorldTask.SHOW_CONSOLE && DEBUG){application.console.append("Regions in main view: "+b+"\n", Console.GRAY_STYLE);}
-// 	for (int i=0;i<regionLabels.length;i++){
-// 	    regionLabels[i].setVisible(b);
-// 	}
+	for (int i=0;i<regionLabels.length;i++){
+	    regionLabels[i].setVisible(b);
+	}
      }
     
      void showCountryLabels(boolean b){
@@ -410,9 +466,9 @@ class GeonamesRDFStore implements RDFErrorHandler {
     }
     
      void showRegionLabelsInLens(boolean b){
-// 	for (int i=0;i<regionLabels.length;i++){
-// 	    regionLabels[i].setVisibleThroughLens(b);
-// 	}
+	for (int i=0;i<regionLabels.length;i++){
+	    regionLabels[i].setVisibleThroughLens(b);
+	}
      }
     
      void showCountryLabelsInLens(boolean b){
@@ -432,10 +488,10 @@ class GeonamesRDFStore implements RDFErrorHandler {
     }
     
      void showRegionLabels(boolean b1, boolean b2){
-// 	for (int i=0;i<regionLabels.length;i++){
-// 	    regionLabels[i].setVisible(b1);
-// 	    regionLabels[i].setVisibleThroughLens(b2);
-// 	}
+	for (int i=0;i<regionLabels.length;i++){
+	    regionLabels[i].setVisible(b1);
+	    regionLabels[i].setVisibleThroughLens(b2);
+	}
      }
     
      void showCountryLabels(boolean b1, boolean b2){
