@@ -24,6 +24,8 @@ import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.AnimationListener;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
+import com.hp.hpl.jena.rdf.model.Resource;
+
 class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
@@ -35,6 +37,7 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
     float oldCameraAltitude = GeonamesBrowser.START_ALTITUDE;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    int currentJPX, currentJPY;
     long lastVX, lastVY;
 
     static final double DRAG_FACTOR = 50.0;
@@ -128,6 +131,8 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+	currentJPX = jpx;
+	currentJPY = jpy;
 	if ((jpx-GeonamesBrowser.LENS_R1) < 0){
 	    jpx = GeonamesBrowser.LENS_R1;
 	    cursorNearBorder = true;
@@ -149,11 +154,12 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
 	}
 	if (lensType != 0 && application.lens != null){
 	    application.moveLens(jpx, jpy, e.getWhen());
-	}
-	//application.vsm.repaintNow();
+	}	
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+	currentJPX = jpx;
+	currentJPY = jpy;
  	if (buttonNumber != 2){
 	    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
 	    application.vsm.animator.Xspeed = (jpx-lastJPX)*(a/DRAG_FACTOR);
@@ -189,9 +195,17 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
 	}
     }
 
-    public void enterGlyph(Glyph g){}
+    public void enterGlyph(Glyph g){
+	if (g instanceof BRectangle){
+	    application.fm.showInformationAbout((Resource)g.getOwner(), currentJPX, currentJPY);
+	}
+    }
 
-    public void exitGlyph(Glyph g){}
+    public void exitGlyph(Glyph g){
+	if (g instanceof BRectangle){
+	    application.fm.hideInformationAbout();
+	}
+    }
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

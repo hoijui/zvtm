@@ -465,17 +465,17 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	}
     }
     
-     void showRegionLabelsInLens(boolean b){
+    void showRegionLabelsInLens(boolean b){
 	for (int i=0;i<regionLabels.length;i++){
 	    regionLabels[i].setVisibleThroughLens(b);
 	}
-     }
+    }
     
-     void showCountryLabelsInLens(boolean b){
+    void showCountryLabelsInLens(boolean b){
 	for (int i=0;i<countryLabels.length;i++){
 	    countryLabels[i].setVisibleThroughLens(b);
 	}
-     }
+    }
 
     /* visibility management methods (main view & lens focus) */
     void showCityLabels(boolean b1, boolean b2){
@@ -494,12 +494,14 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	}
      }
     
-     void showCountryLabels(boolean b1, boolean b2){
+    void showCountryLabels(boolean b1, boolean b2){
 	for (int i=0;i<countryLabels.length;i++){
 	    countryLabels[i].setVisible(b1);
 	    countryLabels[i].setVisibleThroughLens(b2);
 	}
-     }
+    }
+    
+    /* RDF error handling (jena parsing) */
 
     public void error(Exception e){
 	System.err.println("RDFErrorHandler:Error: " + format(e));
