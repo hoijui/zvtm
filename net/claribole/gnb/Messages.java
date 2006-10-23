@@ -10,8 +10,15 @@
 
 package net.claribole.gnb;
 
+import java.awt.Font;
+
 class Messages {
 
+    static final Font SMALL_FONT = new Font("Dialog", 0, 10);
+    static final Font TINY_FONT = new Font("Dialog", 0, 9);
+
     static final String MAIN_VIEW_TITLE = "Geonames Browser";
+
+    static final String LOADING_CITIES = "Loading cities";
 
 }

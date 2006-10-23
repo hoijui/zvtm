@@ -174,6 +174,19 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.mCamera);
 	    }
 	}
+	else {
+	    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
+	    if (wheelDirection  == WHEEL_UP){// zooming in
+		application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+		cameraMoved();
+		application.vsm.repaintNow();
+	    }
+	    else {//wheelDirection == WHEEL_DOWN, zooming out
+		application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+		cameraMoved();
+		application.vsm.repaintNow();
+	    }
+	}
     }
 
     public void enterGlyph(Glyph g){}

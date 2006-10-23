@@ -171,6 +171,7 @@ public class GNBMapManager implements Runnable {
 
     void switchAdaptMaps(){
 	adaptMaps = !adaptMaps;
+	System.out.println("Adapt Maps: "+((adaptMaps) ? "ON" : "OFF"));
     }
 
     /*called by thread on a regular basis ; pops request from queue in a FIFO manner*/

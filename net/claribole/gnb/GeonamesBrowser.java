@@ -69,6 +69,8 @@ public class GeonamesBrowser implements Java2DPainter {
     GNBEventHandler eh;
     /* map manager */
     GNBMapManager mm;
+    /* geonames data store (RDF) */
+    GeonamesRDFStore gs;
 
     /* main view*/
     View mView;
@@ -138,6 +140,8 @@ public class GeonamesBrowser implements Java2DPainter {
 	mCamera.setAltitude(START_ALTITUDE);
 	mm = new GNBMapManager(this, vsm, mapSpace, mCamera, mView);
 	mm.initMap();
+	gs = new GeonamesRDFStore(this);
+	gs.loadCities();
 	System.gc();
     }
 
