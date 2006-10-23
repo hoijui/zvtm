@@ -9,6 +9,7 @@
 package net.claribole.gnb;
 
 import java.awt.Color;
+import java.awt.Font;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -27,6 +28,9 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import com.xerox.VTM.glyphs.BRectangle;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.LText;
+import com.xerox.VTM.glyphs.LBText;
 
 class GeonamesRDFStore implements RDFErrorHandler {
 
@@ -47,12 +51,56 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final String WGS84_POS_NS = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     static final String LATITUDE_PROPERTY = "lat";
     static final String LONGITUDE_PROPERTY = "long";
+    static final String NAME_PROPERTY = "name";
     
     /* Geometrical / display settings */
     static final long CITY_HALF_WIDTH = 4;
     static final long CITY_WIDTH = 2 * CITY_HALF_WIDTH;
     static final Color CITY_COLOR = Color.YELLOW;
+    static final Font CITY_FONT = new Font("Dialog", Font.PLAIN, 10);
+    static final long CITY_LABEL_VOFFSET = 6; // vertical offset of labels w.r.t square representing the city itself
 
+    /*various altitudes that trigger changes w.r.t levels of detail*/
+    /* The following table summarizes the visibility
+       of various types of labels, seen through the
+       standard view (S) and through the lens (L)
+       depending on the level (L0, L1, L2, L3).
+      ------------------------------------------------
+      |    |   Country   |   Region    |    City     |
+      |    |  S   |  L   |  S   |  L   |  S   |  L   |
+      ------------------------------------------------
+      | L0 |      |  X   |      |      |      |      |
+      | L1 |  X   |  X   |      |  X   |      |      |
+      | L2 |  X   |  X   |  X   |  X   |      |  X   |
+      | L3 |      |      |  X   |  X   |  X   |  X   |
+      ------------------------------------------------
+    */
+    static final short LEVEL_0 = 0;
+    static final short LEVEL_1 = 1;
+    static final short LEVEL_2 = 2;
+    static final short LEVEL_3 = 3;
+
+    static final float LEVEL_3_ALT = 40;
+    static final float LEVEL_2_ALT = 2000;
+    static final float LEVEL_1_ALT = 7000;
+
+    /* current level of detail (0,1,2,3) depending on observation altitude */
+    short lbd = LEVEL_0; // Level of Details
+
+    /*squares representing cities*/
+    VRectangle[] cities;
+    /*all city labels*/
+    LText[] cityLabels;
+
+    /*all country labels*/
+    LText[] countryLabels;
+    /*all region labels*/
+    LText[] regionLabels;
+
+
+
+
+    /* Jena RDF models */
     Model citiesRDF;
     Model statesRDF;
     Model countriesRDF;
@@ -100,7 +148,6 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	}
 	pp.destroy();
     }
-    
 
     void processCityModel(){
 	StmtIterator si = citiesRDF.listStatements(null, citiesRDF.getProperty(GEONAMES_NS, FEATURE_CLASS_PROPERTY),
@@ -114,19 +161,209 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	si.close();
 	Resource r;
 	BRectangle cityG;
-	long x, y;
+	LBText cityL;
+	long x, y, lx, ly;
 	Property longP = citiesRDF.getProperty(WGS84_POS_NS, LONGITUDE_PROPERTY);
 	Property latP = citiesRDF.getProperty(WGS84_POS_NS, LATITUDE_PROPERTY);
+	Property nameP = citiesRDF.getProperty(GEONAMES_NS, NAME_PROPERTY);
+	Vector data = new Vector();
 	for (int i=0;i<cities.size();i++){
 	    r = (Resource)cities.elementAt(i);
 	    x = Math.round(r.getProperty(longP).getDouble() * GeonamesBrowser.HALF_MAP_WIDTH/180.0);
 	    y = Math.round(r.getProperty(latP).getDouble() * GeonamesBrowser.HALF_MAP_HEIGHT/90.0);
+	    lx = x;
+	    ly = y + CITY_LABEL_VOFFSET;
 	    cityG = new BRectangle(x, y, 0, CITY_HALF_WIDTH, CITY_HALF_WIDTH, CITY_COLOR);
 	    cityG.setOwner(r);
+	    cityL = new LBText(lx, ly, 0, CITY_COLOR, r.getProperty(nameP).getString());
+	    cityL.setBorderColor(Color.BLACK);
 	    application.vsm.addGlyph(cityG, application.mapSpace);
+	    application.vsm.addGlyph(cityL, application.mapSpace);
+ 	    cityL.setVisible(false);
+ 	    cityL.setVisibleThroughLens(false);
 	    resource2glyph.put(r, cityG);
+	    data.add(cityG);
+	    data.add(cityL);
+	}
+	storeCities(data);
+    }
+
+    /*store a set of cities*/
+    void storeCities(Vector data){
+	cityLabels = new LText[data.size()/2];
+	cities = new VRectangle[data.size()/2];
+ 	for (int i=0;i<data.size()/2;i++){
+ 	    cities[i] = (VRectangle)data.elementAt(i*2);
+ 	    cityLabels[i] = (LText)data.elementAt((i*2)+1);
+ 	}
+    }
+
+    /*store a set of regions*/
+    void storeRegions(Vector data){
+	regionLabels = new LText[data.size()];
+	for (int i=0;i<data.size();i++){
+	    regionLabels[i] = (LText)data.elementAt(i);
 	}
     }
+
+    /*store a set of countries*/
+    void storeCountries(Vector data){
+	countryLabels = new LText[data.size()];
+	for (int i=0;i<data.size();i++){
+	    countryLabels[i] = (LText)data.elementAt(i);
+	}
+    }
+
+    /* change level of details (depends on camera altitude) */
+    void updateLabelLevel(float altitude){
+	if (altitude < LEVEL_3_ALT){
+	    updateLabelLevel(LEVEL_3);
+	}
+	else if (altitude < LEVEL_2_ALT){
+	    updateLabelLevel(LEVEL_2);
+	}
+	else if (altitude < LEVEL_1_ALT){
+	    updateLabelLevel(LEVEL_1);
+	}
+	else {
+	    updateLabelLevel(LEVEL_0);
+	}
+    }
+
+    /* change level of details (depends on camera altitude) */
+    void updateLabelLevel(short level){
+	if (level != lbd){
+	    if (level == LEVEL_3){
+		if (lbd == LEVEL_2){// arriving at level 3 from level 2
+		    showCountryLabels(false, false);
+		    showCityLabels(true);
+		}
+		else if (lbd == LEVEL_1){// arriving at level 3 from level 1
+		    showCountryLabels(false, false);
+		    showCityLabels(true, true);
+		    showRegionLabels(true);
+		}
+		else {// arriving at level 3 from level 0
+		    showCountryLabelsInLens(false);
+		    showCityLabels(true, true);
+		    showRegionLabels(true, true);
+		}
+		lbd = LEVEL_3;
+	    }
+	    else if (level == LEVEL_2){
+		if (lbd == LEVEL_3){// arriving at level 2 from level 3
+		    showCountryLabels(true, true);
+		    showCityLabels(false);
+		}
+		else if (lbd == LEVEL_1){// arriving at level 2 from level 1
+		    showRegionLabels(true);
+		    showCityLabelsInLens(true);
+		}
+		else {// arriving at level 2 from level 0
+		    showCountryLabels(true);
+		    showRegionLabels(true, true);
+		    showCityLabelsInLens(true);
+		}
+		lbd = LEVEL_2;
+	    }
+	    else if (level == LEVEL_1){
+		if (lbd == LEVEL_2){// arriving at level 1 from level 2
+		    showCityLabelsInLens(false);
+		    showRegionLabels(false);
+		}
+		else if (lbd == LEVEL_0){// arriving at level 1 from level 0
+		    showCountryLabels(true);
+		    showRegionLabelsInLens(true);
+		}
+		else {// arriving at level 1 from level 3
+		    showCityLabels(false, false);
+		    showRegionLabels(false);
+		    showCountryLabels(true, true);
+		}
+		lbd = LEVEL_1;
+	    }
+	    else {// LEVEL_0
+		if (lbd == LEVEL_1){// arriving at level 0 from level 1
+		    showCountryLabels(false);
+		    showRegionLabelsInLens(false);
+		}
+		else if (lbd == LEVEL_2){// arriving at level 0 from level 2
+		    showCountryLabels(false);
+		    showCityLabelsInLens(false);
+		    showRegionLabels(false, false);
+		}
+		else {// arriving at level 0 from level 3
+		    showCountryLabelsInLens(true);
+		    showCityLabels(false, false);
+		    showRegionLabels(false, false);
+		}
+		lbd = LEVEL_0;
+	    }
+	}
+    }
+
+    /* visibility management methods (main view) */
+    void showCityLabels(boolean b){
+	for (int i=0;i<cityLabels.length;i++){
+	    if (cityLabels[i] != null){cityLabels[i].setVisible(b);}
+	}
+    }
+    
+     void showRegionLabels(boolean b){
+// 	if (ZLWorldTask.SHOW_CONSOLE && DEBUG){application.console.append("Regions in main view: "+b+"\n", Console.GRAY_STYLE);}
+// 	for (int i=0;i<regionLabels.length;i++){
+// 	    regionLabels[i].setVisible(b);
+// 	}
+     }
+    
+     void showCountryLabels(boolean b){
+// 	for (int i=0;i<countryLabels.length;i++){
+// 	    countryLabels[i].setVisible(b);
+// 	}
+     }
+
+    /* visibility management methods (lens focus) */
+    void showCityLabelsInLens(boolean b){
+	for (int i=0;i<cityLabels.length;i++){
+	    if (cityLabels[i] != null){cityLabels[i].setVisibleThroughLens(b);}
+	}
+    }
+    
+     void showRegionLabelsInLens(boolean b){
+// 	for (int i=0;i<regionLabels.length;i++){
+// 	    regionLabels[i].setVisibleThroughLens(b);
+// 	}
+     }
+    
+     void showCountryLabelsInLens(boolean b){
+// 	for (int i=0;i<countryLabels.length;i++){
+// 	    countryLabels[i].setVisibleThroughLens(b);
+// 	}
+     }
+
+    /* visibility management methods (main view & lens focus) */
+    void showCityLabels(boolean b1, boolean b2){
+	for (int i=0;i<cityLabels.length;i++){
+	    if (cityLabels[i] != null){
+		cityLabels[i].setVisible(b1);
+		cityLabels[i].setVisibleThroughLens(b2);
+	    }
+	}
+    }
+    
+     void showRegionLabels(boolean b1, boolean b2){
+// 	for (int i=0;i<regionLabels.length;i++){
+// 	    regionLabels[i].setVisible(b1);
+// 	    regionLabels[i].setVisibleThroughLens(b2);
+// 	}
+     }
+    
+     void showCountryLabels(boolean b1, boolean b2){
+// 	for (int i=0;i<countryLabels.length;i++){
+// 	    countryLabels[i].setVisible(b1);
+// 	    countryLabels[i].setVisibleThroughLens(b2);
+// 	}
+     }
 
     public void error(Exception e){
 	System.err.println("RDFErrorHandler:Error: " + format(e));

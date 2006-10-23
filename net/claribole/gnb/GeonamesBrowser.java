@@ -123,7 +123,7 @@ public class GeonamesBrowser implements Java2DPainter {
     public void init(){
 	eh = new GNBEventHandler(this);
 	windowLayout();
-// 	vsm.setMainFont(GeoDataStore.CITY_FONT);
+ 	vsm.setMainFont(GeonamesRDFStore.CITY_FONT);
 	mapSpace = vsm.addVirtualSpace(mapSpaceName);
 	vsm.setZoomLimit(0);
 	mCamera = vsm.addCamera(mapSpaceName);
@@ -361,10 +361,15 @@ public class GeonamesBrowser implements Java2DPainter {
 	return res;
     }
 
+    void updateLabels(float a){
+	gs.updateLabelLevel(a);
+    }
+
     void altitudeChanged(){
 	// update  map level, visible maps and grid level as it
 	// was prevented between zoom{int,out} phases 1 and 2
 	mm.updateMapLevel(mCamera.getAltitude());
+	updateLabels(mCamera.getAltitude());
     }
 
     void getGlobalView(){
