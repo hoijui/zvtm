@@ -234,9 +234,8 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
 	float alt = application.mCamera.getAltitude();
 	if (alt != oldCameraAltitude){
 	    if (lensType == NO_LENS){
-		//XXX: why did I comment this out?
 		application.updateLabels(alt);
-		//application.mm.updateVisibleMaps(wnes, false, (short)0);
+		application.mm.updateVisibleMaps(wnes, false, (short)0);
 	    }
 	    oldCameraAltitude = alt;
 	}
