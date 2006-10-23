@@ -47,18 +47,25 @@ class GeonamesRDFStore implements RDFErrorHandler {
     /* RDF/OWL geonames URIs */
     static final String GEONAMES_NS = "http://www.geonames.org/ontology#";
     static final String FEATURE_CLASS_PROPERTY = "featureClass";
-    static final String CITY_FEATURE_CLASS_URI = "http://www.geonames.org/ontology#P";
+    static final String FEATURE_CODE_PROPERTY = "featureCode";
+    static final String CITY_FEATURE_CLASS_URI = GEONAMES_NS + "P";
+    static final String COUNTRY_FEATURE_CODE_URI = GEONAMES_NS + "A.PCLI";
     static final String WGS84_POS_NS = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     static final String LATITUDE_PROPERTY = "lat";
     static final String LONGITUDE_PROPERTY = "long";
     static final String NAME_PROPERTY = "name";
+    static final String ALT_NAME_PROPERTY = "alternateName";
+
+    static final String LANG_EN = "en";
     
     /* Geometrical / display settings */
     static final long CITY_HALF_WIDTH = 4;
     static final long CITY_WIDTH = 2 * CITY_HALF_WIDTH;
-    static final Color CITY_COLOR = Color.YELLOW;
-    static final Font CITY_FONT = new Font("Dialog", Font.PLAIN, 10);
     static final long CITY_LABEL_VOFFSET = 6; // vertical offset of labels w.r.t square representing the city itself
+    static final Color CITY_COLOR = Color.YELLOW;
+    static final Color COUNTRY_COLOR = Color.WHITE;
+    static final Font CITY_FONT = new Font("Dialog", Font.PLAIN, 10);
+    static final Font COUNTRY_FONT = new Font("Dialog",Font.BOLD,100);
 
     /*various altitudes that trigger changes w.r.t levels of detail*/
     /* The following table summarizes the visibility
@@ -121,6 +128,79 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	parser = m.getReader(RDFXML_AB);
 	parser.setErrorHandler(this);
 	parser.setProperty(ERROR_MODE_PN, ERROR_MODE_PV);
+    }
+
+    void loadCountries(){
+	countriesRDF = ModelFactory.createDefaultModel();
+	initRDFParser(countriesRDF);
+	for (int i=0;i<COUNTRIES_DIR.length;i++){
+	    loadCountriesFromDir(COUNTRIES_DIR[i]);   
+	}
+	parser = null;
+	processCountryModel();
+    }
+
+    void loadCountriesFromDir(String dirS){
+	File dir = new File(dirS);
+	File[] countryFiles = dir.listFiles(new RDFFileFilter());
+	ProgPanel pp = new ProgPanel(dirS, Messages.LOADING_COUNTRIES);
+	FileInputStream fis;
+	for (int i=0;i<countryFiles.length;i++){
+	    try {
+		fis = new FileInputStream(countryFiles[i]);
+		parser.read(countriesRDF, fis, countryFiles[i].toURL().toString());
+		pp.setPBValue(i*100/countryFiles.length);
+	    }
+	    catch(Exception ex){System.err.println("Error while processing country file " + countryFiles[i].toString());}
+	}
+	pp.destroy();
+    }
+
+    void processCountryModel(){
+	StmtIterator si = countriesRDF.listStatements(null, countriesRDF.getProperty(GEONAMES_NS, FEATURE_CODE_PROPERTY),
+						      countriesRDF.getResource(COUNTRY_FEATURE_CODE_URI));
+	Vector countries = new Vector();
+	Statement s;
+	while (si.hasNext()){
+	    s = si.nextStatement();
+	    countries.add(s.getSubject());
+	}
+	si.close();
+	Resource r;
+	LText countryL;
+	long lx, ly;
+	Property longP = countriesRDF.getProperty(WGS84_POS_NS, LONGITUDE_PROPERTY);
+	Property latP = countriesRDF.getProperty(WGS84_POS_NS, LATITUDE_PROPERTY);
+	Property nameP = countriesRDF.getProperty(GEONAMES_NS, NAME_PROPERTY);
+	Property altNameP = countriesRDF.getProperty(GEONAMES_NS, ALT_NAME_PROPERTY);
+	Vector data = new Vector();
+	for (int i=0;i<countries.size();i++){
+	    r = (Resource)countries.elementAt(i);
+	    lx = Math.round(r.getProperty(longP).getDouble() * GeonamesBrowser.HALF_MAP_WIDTH/180.0);
+	    ly = Math.round(r.getProperty(latP).getDouble() * GeonamesBrowser.HALF_MAP_HEIGHT/90.0);
+	    countryL = new LText(lx, ly, 0, COUNTRY_COLOR, getPropertyWithLang(r, altNameP, LANG_EN, nameP), LText.TEXT_ANCHOR_MIDDLE);
+	    countryL.setSpecialFont(COUNTRY_FONT);
+	    application.vsm.addGlyph(countryL, application.mapSpace);
+ 	    countryL.setVisible(false);
+ 	    countryL.setVisibleThroughLens(false);
+	    data.add(countryL);
+	}
+	storeCountries(data);
+    }
+
+    String getPropertyWithLang(Resource r, Property p, String lang, Property fallBack){
+	String res;
+	StmtIterator si = r.listProperties(p);
+	Statement s;
+	while (si.hasNext()){
+	    s = si.nextStatement();
+	    if (s.getLanguage().equals(lang)){
+		return s.getString();
+	    }
+	}
+	si.close();
+	// return value of property fallBack if a value for p tagged with lang could not be found
+	return r.getProperty(fallBack).getString();
     }
 
     void loadCities(){
@@ -317,9 +397,9 @@ class GeonamesRDFStore implements RDFErrorHandler {
      }
     
      void showCountryLabels(boolean b){
-// 	for (int i=0;i<countryLabels.length;i++){
-// 	    countryLabels[i].setVisible(b);
-// 	}
+	for (int i=0;i<countryLabels.length;i++){
+	    countryLabels[i].setVisible(b);
+	}
      }
 
     /* visibility management methods (lens focus) */
@@ -336,9 +416,9 @@ class GeonamesRDFStore implements RDFErrorHandler {
      }
     
      void showCountryLabelsInLens(boolean b){
-// 	for (int i=0;i<countryLabels.length;i++){
-// 	    countryLabels[i].setVisibleThroughLens(b);
-// 	}
+	for (int i=0;i<countryLabels.length;i++){
+	    countryLabels[i].setVisibleThroughLens(b);
+	}
      }
 
     /* visibility management methods (main view & lens focus) */
@@ -359,10 +439,10 @@ class GeonamesRDFStore implements RDFErrorHandler {
      }
     
      void showCountryLabels(boolean b1, boolean b2){
-// 	for (int i=0;i<countryLabels.length;i++){
-// 	    countryLabels[i].setVisible(b1);
-// 	    countryLabels[i].setVisibleThroughLens(b2);
-// 	}
+	for (int i=0;i<countryLabels.length;i++){
+	    countryLabels[i].setVisible(b1);
+	    countryLabels[i].setVisibleThroughLens(b2);
+	}
      }
 
     public void error(Exception e){

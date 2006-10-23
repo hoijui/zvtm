@@ -20,5 +20,6 @@ class Messages {
     static final String MAIN_VIEW_TITLE = "Geonames Browser";
 
     static final String LOADING_CITIES = "Loading cities";
+    static final String LOADING_COUNTRIES = "Loading countries";
 
 }
