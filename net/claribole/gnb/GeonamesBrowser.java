@@ -36,9 +36,14 @@ public class GeonamesBrowser implements Java2DPainter {
     static final int VIEW_MAX_W = 1280;
     static final int VIEW_MAX_H = 1024;
 
-    /* actual dimensions of windows on screen */
+    static final int CONTROL_PANEL_WIDTH = 300;
+
+    /* actual dimensions of view */
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
+    /* dimensions of control panel */
+    int CP_X, CP_Y;
+    int CP_W, CP_H;
 
     static boolean SHOW_MEMORY_USAGE = false;
 
@@ -73,7 +78,9 @@ public class GeonamesBrowser implements Java2DPainter {
     GeonamesRDFStore gs;
     /* fresnel manager */
     FresnelManager fm;
-    
+    /* control panel */
+    ControlPanel cp;
+
     /* main view*/
     View mView;
     Camera mCamera;
@@ -95,16 +102,12 @@ public class GeonamesBrowser implements Java2DPainter {
     static final short L2_Gaussian = 0;
     static final short L2_Linear = 1;
     static final short L2_InverseCosine = 2;
-    static final short L2_Manhattan = 3;
-    static final short L2_Scrambling = 4;
-    static final short LInf_Linear = 5;
-    static final short LInf_InverseCosine = 6;
-    static final short LInf_Manhattan = 7;
-    static final short L2_Fresnel = 8;
-    static final short LInf_Fresnel = 9;
-    static final short L2_TGaussian = 10;
-    static final short LInf_Fading = 11;
-    
+    static final short LInf_Linear = 3;
+    static final short LInf_InverseCosine = 4;
+    static final short LInf_Manhattan = 5;
+    static final short L2_TGaussian = 6;
+    static final short LInf_TLinear = 7;
+    static final short LInf_Fading = 8;    
     short lensFamily = L2_Gaussian;
 
     /* LENS MAGNIFICATION */
@@ -126,6 +129,7 @@ public class GeonamesBrowser implements Java2DPainter {
 	eh = new GNBEventHandler(this);
 	fm = new FresnelManager(this);
 	windowLayout();
+	cp = new ControlPanel(this, CP_X, CP_Y, CP_W, CP_H);
  	vsm.setMainFont(GeonamesRDFStore.CITY_FONT);
 	mapSpace = vsm.addVirtualSpace(mapSpaceName);
 	fm.infoSpace = vsm.addVirtualSpace(FresnelManager.infoSpaceName);
@@ -161,10 +165,15 @@ public class GeonamesBrowser implements Java2DPainter {
 	}
 	else if (Utilities.osIsMacOS()){
 	    VIEW_X = 80;
+	    VIEW_Y = 0;
 	    SCREEN_WIDTH -= 80;
 	}
 	VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+	CP_X = VIEW_X + VIEW_W + 1;
+	CP_Y = VIEW_Y;
+	CP_W = CONTROL_PANEL_WIDTH;
+	CP_H = VIEW_H;
     }
 
     void setLens(int t){
@@ -320,16 +329,6 @@ public class GeonamesBrowser implements Java2DPainter {
 	    fLens = null;
 	    break;
 	}
-	case L2_Manhattan:{
-	    res = new FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
-	    break;
-	}
-	case L2_Scrambling:{
-	    res = new FSScramblingLens(1.0f, LENS_R1, 1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
-	    break;
-	}
 	case LInf_Linear:{
 	    res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
@@ -345,18 +344,13 @@ public class GeonamesBrowser implements Java2DPainter {
 	    fLens = null;
 	    break;
 	}
-	case L2_Fresnel:{
-	    res = new FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
+	case L2_TGaussian:{
+	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 20, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
 	    break;
 	}
-	case LInf_Fresnel:{
-	    res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
-	    break;
-	} 
-	case L2_TGaussian:{
-	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 20, x - panelWidth/2, y - panelHeight/2);
+	case LInf_TLinear:{
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, 150, 20, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
 	    break;
 	}

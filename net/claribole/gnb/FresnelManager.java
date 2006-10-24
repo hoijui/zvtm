@@ -70,13 +70,18 @@ class FresnelManager implements RDFErrorHandler {
 	//XXX: compute width and height of frame, position of text info
 	long frameHalfWidth = 100;
 	long frameHalfHeight = 150;
-	
+	// adapt frame geometry
 	frame.vx = jpx - application.panelWidth/2 + frameHalfWidth + FRAME_HORIZONTAL_OFFSET;
 	frame.vy = application.panelHeight/2 - jpy - frameHalfHeight - FRAME_VERTICAL_OFFSET;
 	frame.setWidth(frameHalfWidth);
 	frame.setHeight(frameHalfHeight);
 	infoSpace.show(frame);
 	//XXX: add text info
+	VText t = new VText(frame.vx, frame.vy, 0, FRAME_BORDER_COLOR, r.getURI(), VText.TEXT_ANCHOR_MIDDLE);
+	informationItems.add(t);
+	for (int i=0;i<informationItems.size();i++){
+	    application.vsm.addGlyph((Glyph)informationItems.elementAt(i), infoSpace);
+	}
     }
     
     void hideInformationAbout(){

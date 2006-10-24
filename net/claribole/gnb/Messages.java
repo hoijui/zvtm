@@ -23,4 +23,10 @@ class Messages {
     static final String LOADING_REGIONS = "Loading states, provinces, federal subjects";
     static final String LOADING_CITIES = "Loading cities";
 
+    static final String CP_FISHEYE_PANEL_TITLE = "Magnification Lens";
+    /* these should be ordered according to the values of GeonamesBrowser.L{2,Inf}_* */
+    static final String[] MAG_LENS_NAMES = {"Round/Gaussian", "Round/Linear", "Round/InvCosine",
+					    "Square/Linear", "Square/InvCosine", "Square/Manhattan",
+					    "Round/Melting", "Square/Melting", "Square/Fading"};
+
 }
