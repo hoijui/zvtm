@@ -148,6 +148,15 @@ class FresnelLens {
 	}
     }
 
+    void printAssociatedFormats(){
+	System.out.println("Associated formats");
+	if (associatedFormats != null){
+	    for (int i=0;i<associatedFormats.length;i++){
+		System.out.println(associatedFormats[i]);
+	    }
+	}
+    }
+
     public String toString(){
 	return caption;
     }

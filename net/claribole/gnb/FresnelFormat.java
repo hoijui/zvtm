@@ -20,13 +20,23 @@ public class FresnelFormat {
 
     String uri;
 
+    /* holds the format's name/label/caption/whatever (used to denote the lens in the GUI) */
+    String caption;
+
     String[] basicPropertyDomains;
     FSLPath[] fslPropertyDomains;
 
     short value = NOT_SPECIFIED;
 
-    public FresnelFormat(String uri){
+    public FresnelFormat(String uri, String baseURI){
 	this.uri = uri;
+	if (uri.startsWith(baseURI)){
+	    caption = uri.substring(baseURI.length());
+	}
+	else {
+	    caption = uri;
+	}
+	if (caption.startsWith("#")){caption = caption.substring(1);}
     }
 
     // expr is a String for basic selectors, an FSLPath for FSL selectors, and ? for SPARQL selectors
@@ -94,7 +104,7 @@ public class FresnelFormat {
     }
 
     public String toString(){
-	return uri;
+	return caption;
     }
 
 }

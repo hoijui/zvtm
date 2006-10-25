@@ -215,22 +215,23 @@ class FresnelManager implements RDFErrorHandler {
 	si.close();
 	detailFormats = new FresnelFormat[v.size()];
 	for (int i=0;i<detailFormats.length;i++){
-	    detailFormats[i] = buildFormat((Resource)v.elementAt(i), detailRDF);
+	    detailFormats[i] = buildFormat((Resource)v.elementAt(i), detailRDF, baseURL);
 	}
 	v.clear();
 	// groups
 	Property groupProperty = detailRDF.getProperty(FRESNEL_NAMESPACE_URI, _group);
+	si = detailRDF.listStatements(null, _typeProperty, detailRDF.getResource(_Group));
 	while (si.hasNext()){
 	    v.add(si.nextStatement().getSubject());
 	}
 	si.close();
 	detailGroups = new FresnelGroup[v.size()];
 	for (int i=0;i<detailGroups.length;i++){
-	    detailGroups[i] = buildGroup((Resource)v.elementAt(i), groupProperty);
+	    detailGroups[i] = buildGroup((Resource)v.elementAt(i), groupProperty, baseURL);
 	}
 	v.clear();
 	group2lenses.clear();
-	group2formats.clear();	
+	group2formats.clear();
     }
 
     FresnelLens buildLens(Resource lensNode, Model model, String baseURL){
@@ -308,8 +309,8 @@ class FresnelManager implements RDFErrorHandler {
 	return res;
     }
 
-    FresnelFormat buildFormat(Resource formatNode, Model model){
-	FresnelFormat res = new FresnelFormat((formatNode.isAnon()) ? formatNode.getId().toString() : formatNode.getURI());
+    FresnelFormat buildFormat(Resource formatNode, Model model, String baseURL){
+	FresnelFormat res = new FresnelFormat((formatNode.isAnon()) ? formatNode.getId().toString() : formatNode.getURI(), baseURL);
 	/* process propertyFormatDomain properties */
 	StmtIterator si = formatNode.listProperties(model.getProperty(FRESNEL_NAMESPACE_URI, _propertyFormatDomain));
 	RDFNode n;
@@ -357,8 +358,8 @@ class FresnelManager implements RDFErrorHandler {
 	return res;
     }
 
-    FresnelGroup buildGroup(Resource groupNode, Property groupProperty){
-	FresnelGroup res = new FresnelGroup((groupNode.isAnon()) ? groupNode.getId().toString() : groupNode.getURI());
+    FresnelGroup buildGroup(Resource groupNode, Property groupProperty, String baseURL){
+	FresnelGroup res = new FresnelGroup((groupNode.isAnon()) ? groupNode.getId().toString() : groupNode.getURI(), baseURL);
 	if (group2lenses.containsKey(res.uri)){
 	    Vector v = (Vector)group2lenses.get(res.uri);
 	    for (int i=0;i<v.size();i++){
@@ -370,6 +371,9 @@ class FresnelManager implements RDFErrorHandler {
 	    for (int i=0;i<v.size();i++){
 		res.addFormat((FresnelFormat)v.elementAt(i));
 	    }
+	}
+	for (int i=0;i<res.lenses.length;i++){
+	    res.lenses[i].addAssociatedFormats(res.formats);
 	}
 	return res;
     }

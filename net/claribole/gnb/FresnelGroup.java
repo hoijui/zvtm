@@ -12,13 +12,23 @@ public class FresnelGroup {
 
     String uri;
 
+    /* holds the group's name/label/caption/whatever (used to denote the lens in the GUI) */
+    String caption;
+
     FresnelLens[] lenses;
     FresnelFormat[] formats;
 
-    public FresnelGroup(String uri){
+    public FresnelGroup(String uri, String baseURI){
 	this.uri = uri;
+	if (uri.startsWith(baseURI)){
+	    caption = uri.substring(baseURI.length());
+	}
+	else {
+	    caption = uri;
+	}
+	if (caption.startsWith("#")){caption = caption.substring(1);}
     }
-    
+
     void addLens(FresnelLens l){
 	if (lenses == null){
 	    lenses = new FresnelLens[1];
@@ -46,25 +56,25 @@ public class FresnelGroup {
     }
 
     public String toString(){
-	return uri;
+	return caption;
     }
 
     /* debugging */
     
-//     void printItems(){
-// 	System.out.println("---------------------\nGROUP " + uri);
-// 	if (lenses != null){
-// 	    System.out.println("LENSES");
-// 	    for (int i=0;i<lenses.length;i++){
-// 		System.out.println(lenses[i]);
-// 	    }
-// 	}
-// 	if (lenses != null){
-// 	    System.out.println("FORMATS");
-// 	    for (int i=0;i<lenses.length;i++){
-// 		System.out.println(lenses[i]);
-// 	    }
-// 	}	
-//     }
+    void printItems(){
+	System.out.println("---------------------\nGROUP " + uri);
+	if (lenses != null){
+	    System.out.println("LENSES");
+	    for (int i=0;i<lenses.length;i++){
+		System.out.println(lenses[i]);
+	    }
+	}
+	if (lenses != null){
+	    System.out.println("FORMATS");
+	    for (int i=0;i<formats.length;i++){
+		System.out.println(formats[i]);
+	    }
+	}	
+    }
 
 }
