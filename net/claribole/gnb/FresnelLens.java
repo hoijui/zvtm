@@ -8,15 +8,17 @@
 
 package net.claribole.gnb;
 
+import java.util.Vector;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import org.w3c.IsaViz.fresnel.FSLPath;
-
-import java.util.Vector;
+import org.w3c.IsaViz.fresnel.FSLJenaEvaluator;
 
 class FresnelLens {
 
@@ -131,8 +133,68 @@ class FresnelLens {
 	return (associatedFormats != null) ? associatedFormats : new FresnelFormat[0];
     }
 
+    boolean selectsByBIS(Resource r){
+	if (basicInstanceDomains != null){
+	    for (int i=0;i<basicInstanceDomains.length;i++){
+		if (basicInstanceDomains[i].equals(r.toString())){return true;}
+	    }
+	}
+	return false;
+    }
 
-   void printVisibility(){
+    boolean selectsByBCS(Resource r, Model m){
+	if (basicClassDomains != null){
+	    for (int i=0;i<basicClassDomains.length;i++){
+		if (r.hasProperty(m.getProperty(FresnelManager.RDF_NAMESPACE_URI, FresnelManager._type),
+				  m.getResource(basicClassDomains[i]))){
+		    return true;
+		}
+	    }
+	}
+	return false;
+    }
+
+    boolean selectsByFIS(Resource r, FSLJenaEvaluator fje){
+	if (fslInstanceDomains != null){
+	    Vector startSet = new Vector();
+	    startSet.add(r);
+	    for (int i=0;i<fslInstanceDomains.length;i++){
+		if (fje.evaluatePath(fslInstanceDomains[i], startSet).size() > 0){return true;}
+	    }
+	}
+	return false;
+    }
+
+    /* returns a Vector of Statement objects representing the values to actually display for a given property */
+    Vector getValuesToDisplay(Resource r){
+	Vector res = new Vector();
+	if (apIndex != -1){// there is a fresnel:allProperties somewhere in the list
+	    //XXX:TBW
+	}
+	else {
+	    if (p2s != null){
+		for (int i=0;i<p2s.length;i++){
+		    p2s[i].getPropertiesToShow(r, res);
+		}
+	    }
+	}
+	return res;
+    }
+
+    /* applies most appropriate Format to a given property/value pair displayed by this lens for a given resource */
+    String formatValue(Statement s, FSLJenaEvaluator fje){
+	Property p = s.getPredicate();
+	for (int i=0;i<associatedFormats.length;i++){
+	    // XXX: several formats might apply. This crude version takes the first one that matches
+	    // we should actually look for the most specific
+	    if (associatedFormats[i].selectsByBPS(p) || associatedFormats[i].selectsByFPS(s, fje)){
+		return associatedFormats[i].format(s);
+	    }
+	}
+	return (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
+    }
+
+    void printVisibility(){
 	System.out.println("VISIBILITY, allProperties at "+apIndex);
 	if (p2s != null){
 	    System.out.println("-------------------\nShow properties\n-------------------");

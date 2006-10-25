@@ -9,7 +9,10 @@
 
 package net.claribole.gnb;
 
-// import org.w3c.IsaViz.IResource;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.w3c.IsaViz.fresnel.FSLPath;
 
 import java.util.Vector;
@@ -24,9 +27,9 @@ public class FSLVisibility extends PropertyVisibility {
 	constraint = pathToProperty;
     }
 
-//     void getPropertiesToShow(IResource r, Vector propertiesShown, Vector incomingPredicates, Vector outgoingPredicates){
-
-//     }
+    void getPropertiesToShow(Resource r, Vector propertiesShown){
+	
+    }
     
     public String toString(){
 	return FSL + constraint.toString();

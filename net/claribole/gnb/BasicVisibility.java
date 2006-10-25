@@ -9,8 +9,10 @@
 
 package net.claribole.gnb;
 
-// import org.w3c.IsaViz.IResource;
-// import org.w3c.IsaViz.IProperty;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import java.util.Vector;
 
@@ -24,17 +26,18 @@ public class BasicVisibility extends PropertyVisibility {
 	constraint = propertyURI;
     }
 
-//     void getPropertiesToShow(IResource r, Vector propertiesShown, Vector incomingPredicates, Vector outgoingPredicates){
-// 	IProperty p;
-// 	for (int i=0;i<outgoingPredicates.size();i++){
-// 	    p = (IProperty)outgoingPredicates.elementAt(i);
-// 	    if (p.getIdent().equals(constraint) && !propertiesShown.contains(p)){
-// 		propertiesShown.add(p);
-// 	    }
-// 	}
-// 	// incomingPredicates is not used here as basic selectors only look at
-// 	// outgoing properties (from the current node), but is in FSLVisibility
-//     }
+    void getPropertiesToShow(Resource r, Vector propertiesShown){
+	StmtIterator si = r.listProperties();
+	Statement s;
+	while (si.hasNext()){
+	    s = si.nextStatement();
+	    if (s.getPredicate().toString().equals(constraint) && !propertiesShown.contains(s)){
+		propertiesShown.add(s);
+	    }
+	}
+	// incoming properties are not examined here as basic selectors only look at
+	// outgoing properties (from the current node)
+    }
  
     public String toString(){
 	return BASIC + constraint;

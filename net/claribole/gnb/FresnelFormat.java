@@ -8,7 +8,17 @@
 
 package net.claribole.gnb;
 
+import java.util.Vector;
+
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+
 import org.w3c.IsaViz.fresnel.FSLPath;
+import org.w3c.IsaViz.fresnel.FSLJenaEvaluator;
 
 public class FresnelFormat {
 
@@ -27,6 +37,9 @@ public class FresnelFormat {
     FSLPath[] fslPropertyDomains;
 
     short value = NOT_SPECIFIED;
+
+    /* label of the property (prepended to the property value) */
+    String label = null;
 
     public FresnelFormat(String uri, String baseURI){
 	this.uri = uri;
@@ -67,24 +80,27 @@ public class FresnelFormat {
 	}
     }
 
-//     boolean selectsByBPS(IProperty p){
-// 	if (basicPropertyDomains != null){
-// 	    for (int i=0;i<basicPropertyDomains.length;i++){
-// 		if (p.getIdent().equals(basicPropertyDomains[i])){return true;}
-// 	    }
-// 	}
-// 	return false;
-//     }
+    boolean selectsByBPS(Property p){
+	if (basicPropertyDomains != null){
+	    for (int i=0;i<basicPropertyDomains.length;i++){
+		if (p.getURI().equals(basicPropertyDomains[i])){return true;}
+	    }
+	}
+	return false;
+    }
 
-//     boolean selectsByFPS(IProperty p){
-// 	if (fslPropertyDomains != null){
-// 	    for (int i=0;i<fslPropertyDomains.length;i++){
-// 		//XXX: TBW if (){return true;}
-// 	    }
-// 	}
-// 	return false;
-//     }
+    boolean selectsByFPS(Statement s, FSLJenaEvaluator fje){
+	if (fslPropertyDomains != null){
+	    Vector startSet = new Vector();
+	    startSet.add(s);
+	    for (int i=0;i<fslPropertyDomains.length;i++){
+		if (fje.evaluatePath(fslPropertyDomains[i], startSet).size() > 0){return true;}
+	    }
+	}
+	return false;
+    }
 
+    /* how the value will be handled for display */
     void setValue(String expr){
 	if (expr.equals(FresnelManager._image)){
 	    value = VALUE_IMAGE;
@@ -101,6 +117,25 @@ public class FresnelFormat {
 	else {
 	    value = NOT_SPECIFIED;
 	}
+    }
+    
+    /* what label will be used to describe the property (null if none) */
+    void setLabel(RDFNode n){
+	if (n instanceof Literal){
+	    String l = ((Literal)n).getLexicalForm();
+	    label = (l.length() > 0) ? l : null;
+	}
+	else {
+	    String uri = ((Resource)n).toString();
+	    if (uri.equals(FresnelManager._none)){label = null;}
+	    else if (uri.equals(FresnelManager._show)){/*XXX: should get the property's RDFS label*/}
+	}
+    }
+
+    String format(Statement s){
+	String res = (label != null) ? label : "";
+	res += (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
+	return res;
     }
 
     public String toString(){

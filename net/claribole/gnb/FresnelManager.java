@@ -9,6 +9,8 @@
 package net.claribole.gnb;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.FontMetrics;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -39,6 +41,8 @@ import com.xerox.VTM.glyphs.Glyph;
 
 import org.w3c.IsaViz.fresnel.FSLPath;
 import org.w3c.IsaViz.fresnel.FSLNSResolver;
+import org.w3c.IsaViz.fresnel.FSLHierarchyStore;
+import org.w3c.IsaViz.fresnel.FSLJenaEvaluator;
 
 class FresnelManager implements RDFErrorHandler {
 
@@ -98,6 +102,7 @@ class FresnelManager implements RDFErrorHandler {
     public static final String _uri = FRESNEL_NAMESPACE_URI + "uri";
     public static final String _image = FRESNEL_NAMESPACE_URI + "image";
     public static final String _none = FRESNEL_NAMESPACE_URI + "none";
+    public static final String _show = FRESNEL_NAMESPACE_URI + "show";
 
     /* Fresnel selector languages */
     public static final String _fslSelector = FRESNEL_NAMESPACE_URI + "fslSelector";
@@ -129,16 +134,28 @@ class FresnelManager implements RDFErrorHandler {
     VRectangleST frame;
     Vector informationItems = new Vector();
 
+    FSLJenaEvaluator detailFSLEvaluator;
     FSLNSResolver nsr;
+    FSLHierarchyStore fhs;
+    Model detailRDF;
     FresnelLens[] detailLenses;
+    FresnelLens selectedDetailLens;
     FresnelFormat[] detailFormats;
     FresnelGroup[] detailGroups;
     Hashtable group2lenses, group2formats;
 
+    static final int DETAIL_FRAME_MIN_WIDTH = 50;
+    static final int DETAIL_FRAME_MIN_HEIGHT = 10;
+    /* used to get information about font rendering when computing the detail box's layout */
+    Graphics2D gc;
+    FontMetrics fontMetrics;
+    int fontHeight;
 
     FresnelManager(GeonamesBrowser app){
 	this.application = app;
 	initNSResolver();
+	fhs = new FSLHierarchyStore();
+	detailFSLEvaluator = new FSLJenaEvaluator(nsr, fhs);
 	group2lenses = new Hashtable();
 	group2formats = new Hashtable();
 	buildLayoutLenses();
@@ -159,6 +176,9 @@ class FresnelManager implements RDFErrorHandler {
 	application.vsm.addGlyph(frame, infoSpace);
 	infoSpace.hide(frame);
 	iCamera.setAltitude(0);
+	gc = (Graphics2D)application.mView.getGraphicsContext();
+	fontMetrics = gc.getFontMetrics(GeonamesRDFStore.CITY_FONT);
+	fontHeight = fontMetrics.getHeight();
     }
 
     RDFReader initRDFParser(Model m){
@@ -174,7 +194,8 @@ class FresnelManager implements RDFErrorHandler {
 
     void buildDetailLenses(){
 	// parse detail lenses N3 RDF file
-	Model detailRDF = ModelFactory.createDefaultModel();
+	detailRDF = ModelFactory.createDefaultModel();
+	detailFSLEvaluator.setModel(detailRDF);
 	RDFReader parser = initRDFParser(detailRDF);
 	String baseURL;
 	try {
@@ -232,6 +253,10 @@ class FresnelManager implements RDFErrorHandler {
 	v.clear();
 	group2lenses.clear();
 	group2formats.clear();
+	try {
+	    selectedDetailLens = detailLenses[0];
+	}
+	catch (ArrayIndexOutOfBoundsException ex){selectedDetailLens = null;}
     }
 
     FresnelLens buildLens(Resource lensNode, Model model, String baseURL){
@@ -336,10 +361,18 @@ class FresnelManager implements RDFErrorHandler {
 	    }
 	}
 	si.close();
+	// value property
 	si = formatNode.listProperties(model.getProperty(FRESNEL_NAMESPACE_URI, _value));
 	if (si.hasNext()){
 	    // only take the first one, a format is not supposed to declare multiple fresnel:value properties
 	    res.setValue(si.nextStatement().getResource().getURI());
+	}
+	si.close();
+	// label property
+	si = formatNode.listProperties(model.getProperty(FRESNEL_NAMESPACE_URI, _label));
+	if (si.hasNext()){
+	    // only take the first one, a format is not supposed to declare multiple fresnel:label properties
+	    res.setLabel(si.nextStatement().getObject());
 	}
 	si.close();
 	// deal with group declarations (store them temporarily until they get processed by buildGroup())
@@ -413,29 +446,44 @@ class FresnelManager implements RDFErrorHandler {
 	}
     }
 
-
     /* city information display management */
 
-    void showInformationAbout(Resource r, int jpx, int jpy){
-	//XXX: retrieve information items to display according to lens
-	//XXX: compute width and height of frame, position of text info
-	long frameHalfWidth = 100;
-	long frameHalfHeight = 150;
-	// adapt frame geometry
-	frame.vx = jpx - application.panelWidth/2 + frameHalfWidth + FRAME_HORIZONTAL_OFFSET;
-	frame.vy = application.panelHeight/2 - jpy - frameHalfHeight - FRAME_VERTICAL_OFFSET;
-	frame.setWidth(frameHalfWidth);
-	frame.setHeight(frameHalfHeight);
-	infoSpace.show(frame);
-	//XXX: add text info
-	VText t = new VText(frame.vx, frame.vy, 0, FRAME_BORDER_COLOR, r.getURI(), VText.TEXT_ANCHOR_MIDDLE);
-	informationItems.add(t);
-	for (int i=0;i<informationItems.size();i++){
-	    application.vsm.addGlyph((Glyph)informationItems.elementAt(i), infoSpace);
+    synchronized void showInformationAbout(Resource r, int jpx, int jpy){
+	// check that this resource can indeed be handled by the current Fresnel lens
+	if (selectedDetailLens.selectsByBIS(r) || selectedDetailLens.selectsByBCS(r, detailRDF) || selectedDetailLens.selectsByFIS(r, detailFSLEvaluator)){
+	    Vector statementsToDisplay = selectedDetailLens.getValuesToDisplay(r);
+	    long frameHalfWidth = (statementsToDisplay.size() > 0) ? 0 : DETAIL_FRAME_MIN_WIDTH;
+	    long frameHalfHeight = DETAIL_FRAME_MIN_HEIGHT;
+	    Statement s;
+	    String[] values = new String[statementsToDisplay.size()];
+	    long vys[] = new long[values.length]; // relative vertical position of text line inside box
+	    long lineWidth;
+	    for (int i=0;i<statementsToDisplay.size();i++){
+		s = (Statement)statementsToDisplay.elementAt(i);
+		values[i] = selectedDetailLens.formatValue(s, detailFSLEvaluator);
+		vys[i] = (2 * i + 2) * fontHeight;
+		frameHalfHeight += fontHeight;
+		lineWidth = fontMetrics.stringWidth(values[i]);
+		if (lineWidth > frameHalfWidth){
+		    frameHalfWidth = lineWidth;
+		}
+	    }
+	    // adapt frame geometry
+	    frame.vx = jpx - application.panelWidth/2 + frameHalfWidth + FRAME_HORIZONTAL_OFFSET;
+	    frame.vy = application.panelHeight/2 - jpy - frameHalfHeight - FRAME_VERTICAL_OFFSET;
+	    frame.setWidth(frameHalfWidth);
+	    frame.setHeight(frameHalfHeight);
+	    infoSpace.show(frame);
+	    // add text info lines
+	    for (int i=0;i<values.length;i++){
+		VText t = new VText(frame.vx-frame.getWidth()+10, frame.vy+frame.getHeight()-vys[i], 0, FRAME_BORDER_COLOR, values[i]);
+		application.vsm.addGlyph(t, infoSpace);
+		informationItems.add(t);
+	    }
 	}
     }
     
-    void hideInformationAbout(){
+    synchronized void hideInformationAbout(){
 	for (int i=0;i<informationItems.size();i++){
 	    infoSpace.destroyGlyph((Glyph)informationItems.elementAt(i));
 	}

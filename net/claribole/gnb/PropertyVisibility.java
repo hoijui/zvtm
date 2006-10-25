@@ -9,12 +9,12 @@
 
 package net.claribole.gnb;
 
-// import org.w3c.IsaViz.IResource;
-
 import java.util.Vector;
+
+import com.hp.hpl.jena.rdf.model.Resource;
 
 public abstract class PropertyVisibility {
 
-//     abstract void getPropertiesToShow(IResource r, Vector propertiesShown, Vector incomingPredicates, Vector outgoingPredicates);
+    abstract void getPropertiesToShow(Resource r, Vector propertiesShown);
     
 }

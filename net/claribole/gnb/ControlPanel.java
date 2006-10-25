@@ -26,6 +26,7 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
     GeonamesBrowser application;
 
     JComboBox magLensCbb;
+    JComboBox detailLensCbb;
     JCheckBox adaptMapsCb;
 
     ControlPanel(GeonamesBrowser app, int x, int y, int w, int h){
@@ -68,20 +69,29 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 	Container c = new Container();
 	c.setLayout(new GridLayout(2,1));
 	c.add(new JLabel(Messages.CP_DETAIL_PANEL_TITLE));
-// 	magLensCbb = new JComboBox(Messages.MAG_LENS_NAMES);
-// 	magLensCbb.addItemListener(this);
-// 	c.add(magLensCbb);
+	detailLensCbb = new JComboBox(application.fm.detailLenses);
+	detailLensCbb.addItemListener(this);
+	c.add(detailLensCbb);
 	parent.add(c);
     }
 
     void selectMagnificationLens(short lensID){// lensID is one of GeonamesBrowser.L{2,Inf}_*
 	application.lensFamily = lensID;
     }
+    
+    void selectDetailLens(FresnelLens lens){
+	application.fm.selectedDetailLens = lens;
+    }
 
     public void itemStateChanged(ItemEvent e){
 	if (e.getSource() == magLensCbb){
 	    if (e.getStateChange() == ItemEvent.SELECTED){
 		selectMagnificationLens((short)Utils.getItemIndex(Messages.MAG_LENS_NAMES, e.getItem()));
+	    }
+	}
+	else if (e.getSource() == detailLensCbb){
+	    if (e.getStateChange() == ItemEvent.SELECTED){
+		selectDetailLens((FresnelLens)e.getItem());
 	    }
 	}
     }
