@@ -40,9 +40,9 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final String[] COUNTRIES_DIR = {"GIS/RDFcountries"};
 
     /* RDF parser settings */
-    private static final String RDFXML_AB = "RDF/XML-ABBREV";
-    private static final String ERROR_MODE_PN = "http://jena.hpl.hp.com/arp/properties/error-mode";
-    private static final String ERROR_MODE_PV = "lax";
+    static final String RDFXML_AB = "RDF/XML-ABBREV";
+    static final String ERROR_MODE_PN = "http://jena.hpl.hp.com/arp/properties/error-mode";
+    static final String ERROR_MODE_PV = "lax";
 
     /* RDF/OWL geonames URIs */
     static final String GEONAMES_NS = "http://www.geonames.org/ontology#";
@@ -124,23 +124,23 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	resource2glyph = new Hashtable();
     }
 
-    void initRDFParser(Model m){
-	parser = m.getReader(RDFXML_AB);
-	parser.setErrorHandler(this);
-	parser.setProperty(ERROR_MODE_PN, ERROR_MODE_PV);
+    RDFReader initRDFParser(Model m){
+	RDFReader p = m.getReader(RDFXML_AB);
+	p.setErrorHandler(this);
+	p.setProperty(ERROR_MODE_PN, ERROR_MODE_PV);
+	return p;
     }
 
     void loadCountries(){
 	countriesRDF = ModelFactory.createDefaultModel();
-	initRDFParser(countriesRDF);
+	RDFReader parser = initRDFParser(countriesRDF);
 	for (int i=0;i<COUNTRIES_DIR.length;i++){
-	    loadCountriesFromDir(COUNTRIES_DIR[i]);   
+	    loadCountriesFromDir(COUNTRIES_DIR[i], parser);   
 	}
-	parser = null;
 	processCountryModel();
     }
 
-    void loadCountriesFromDir(String dirS){
+    void loadCountriesFromDir(String dirS, RDFReader parser){
 	File dir = new File(dirS);
 	File[] countryFiles = dir.listFiles(new RDFFileFilter());
 	ProgPanel pp = new ProgPanel(dirS, Messages.LOADING_COUNTRIES);
@@ -190,15 +190,14 @@ class GeonamesRDFStore implements RDFErrorHandler {
 
     void loadRegions(){
 	regionsRDF = ModelFactory.createDefaultModel();
-	initRDFParser(regionsRDF);
+	RDFReader parser = initRDFParser(regionsRDF);
 	for (int i=0;i<REGIONS_DIR.length;i++){
-	    loadRegionsFromDir(REGIONS_DIR[i]);   
+	    loadRegionsFromDir(REGIONS_DIR[i], parser);   
 	}
-	parser = null;
 	processRegionModel();
     }
 
-    void loadRegionsFromDir(String dirS){
+    void loadRegionsFromDir(String dirS, RDFReader parser){
 	File dir = new File(dirS);
 	File[] regionFiles = dir.listFiles(new RDFFileFilter());
 	ProgPanel pp = new ProgPanel(dirS, Messages.LOADING_REGIONS);
@@ -262,15 +261,14 @@ class GeonamesRDFStore implements RDFErrorHandler {
 
     void loadCities(){
 	citiesRDF = ModelFactory.createDefaultModel();
-	initRDFParser(citiesRDF);
+	RDFReader parser = initRDFParser(citiesRDF);
 	for (int i=0;i<CITIES_DIR.length;i++){
-	    loadCitiesFromDir(CITIES_DIR[i]);   
+	    loadCitiesFromDir(CITIES_DIR[i], parser);   
 	}
-	parser = null;
 	processCityModel();
     }
 
-    void loadCitiesFromDir(String dirS){
+    void loadCitiesFromDir(String dirS, RDFReader parser){
 	File dir = new File(dirS);
 	File[] cityFiles = dir.listFiles(new RDFFileFilter());
 	ProgPanel pp = new ProgPanel(dirS, Messages.LOADING_CITIES);
