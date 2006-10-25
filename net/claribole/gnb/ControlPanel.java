@@ -14,24 +14,31 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
 
-class ControlPanel extends JFrame implements ItemListener {
+class ControlPanel extends JFrame implements ItemListener, ActionListener {
 
     GeonamesBrowser application;
 
     JComboBox magLensCbb;
+    JCheckBox adaptMapsCb;
 
     ControlPanel(GeonamesBrowser app, int x, int y, int w, int h){
 	super();
 	this.application = app;
 	Container cpane = this.getContentPane();
-	cpane.setLayout(new GridLayout(3,1));
+	cpane.setLayout(new GridLayout(4,1));
 	initFisheyeLensSelector(cpane);
 	initFresnelMapLensSelector(cpane);
 	initFresnelDetailLensSelector(cpane);
+	adaptMapsCb = new JCheckBox(Messages.ADAPT_MAPS_CHECKBOX, true);
+	cpane.add(adaptMapsCb);
+	adaptMapsCb.addActionListener(this);
 	this.setLocation(x,y);
 	this.setSize(w, h);
 	this.setVisible(true);
@@ -48,11 +55,23 @@ class ControlPanel extends JFrame implements ItemListener {
     }
 
     void initFresnelMapLensSelector(Container parent){
-
+	Container c = new Container();
+	c.setLayout(new GridLayout(2,1));
+	c.add(new JLabel(Messages.CP_LAYOUT_PANEL_TITLE));
+// 	magLensCbb = new JComboBox(Messages.MAG_LENS_NAMES);
+// 	magLensCbb.addItemListener(this);
+// 	c.add(magLensCbb);
+	parent.add(c);
     }
 
     void initFresnelDetailLensSelector(Container parent){
-
+	Container c = new Container();
+	c.setLayout(new GridLayout(2,1));
+	c.add(new JLabel(Messages.CP_DETAIL_PANEL_TITLE));
+// 	magLensCbb = new JComboBox(Messages.MAG_LENS_NAMES);
+// 	magLensCbb.addItemListener(this);
+// 	c.add(magLensCbb);
+	parent.add(c);
     }
 
     void selectMagnificationLens(short lensID){// lensID is one of GeonamesBrowser.L{2,Inf}_*
@@ -64,6 +83,12 @@ class ControlPanel extends JFrame implements ItemListener {
 	    if (e.getStateChange() == ItemEvent.SELECTED){
 		selectMagnificationLens((short)Utils.getItemIndex(Messages.MAG_LENS_NAMES, e.getItem()));
 	    }
+	}
+    }
+
+    public void actionPerformed(ActionEvent e){
+	if (e.getSource() == adaptMapsCb){
+	    application.mm.switchAdaptMaps();
 	}
     }
 

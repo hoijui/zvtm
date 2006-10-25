@@ -29,4 +29,10 @@ class Messages {
 					    "Square/Linear", "Square/InvCosine", "Square/Manhattan",
 					    "Round/Melting", "Square/Melting", "Square/Fading"};
 
+    static final String CP_LAYOUT_PANEL_TITLE = "Default Layout";
+
+    static final String CP_DETAIL_PANEL_TITLE = "Details";
+
+    static final String ADAPT_MAPS_CHECKBOX = "Load high-res map tiles";
+
 }
