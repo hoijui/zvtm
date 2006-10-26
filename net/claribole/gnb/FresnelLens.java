@@ -25,8 +25,12 @@ class FresnelLens {
     /* the lens' URI */
     String uri;
 
-    /* holds the lens's name/label/caption/whatever (used to denote the lens in the GUI) */
-    String caption;
+    /* holds the lens's label (used to denote the lens in the GUI).
+       This is the value of the rdfs:label property associated with the lens,
+       or the lens' local name part of its URI if no rdfs:label is associated with it*/
+    String lensLabel;
+    /* holds comments about this lens (declared via an rdfs:comment property) */
+    String lensComment;
 
     /* domains expressed with various selector languages */
     String[] basicInstanceDomains = null;
@@ -47,13 +51,15 @@ class FresnelLens {
 
     public FresnelLens(String uri, String baseURI){
 	this.uri = uri;
+	/* by default set the lens' label using the local name part of the lens' URI
+	   it might eventually be replaced by the value of the associated rdfs:label */
 	if (uri.startsWith(baseURI)){
-	    caption = uri.substring(baseURI.length());
+	    lensLabel = uri.substring(baseURI.length());
 	}
 	else {
-	    caption = uri;
+	    lensLabel = uri;
 	}
-	if (caption.startsWith("#")){caption = caption.substring(1);}
+	if (lensLabel.startsWith("#")){lensLabel = lensLabel.substring(1);}
     }
 
     // expr is a String for basic selectors, an FSLPath for FSL selectors, and ? for SPARQL selectors
@@ -194,33 +200,45 @@ class FresnelLens {
 	return (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
     }
 
-    void printVisibility(){
-	System.out.println("VISIBILITY, allProperties at "+apIndex);
-	if (p2s != null){
-	    System.out.println("-------------------\nShow properties\n-------------------");
-	    for (int i=0;i<p2s.length;i++){
-		System.out.println(p2s[i]);
-	    }
-	}
-	if (p2h != null){
-	    System.out.println("-------------------\nHide properties\n-------------------");
-	    for (int i=0;i<p2h.length;i++){
-		System.out.println(p2h[i]);
-	    }
-	}
+//     void printVisibility(){
+// 	System.out.println("VISIBILITY, allProperties at "+apIndex);
+// 	if (p2s != null){
+// 	    System.out.println("-------------------\nShow properties\n-------------------");
+// 	    for (int i=0;i<p2s.length;i++){
+// 		System.out.println(p2s[i]);
+// 	    }
+// 	}
+// 	if (p2h != null){
+// 	    System.out.println("-------------------\nHide properties\n-------------------");
+// 	    for (int i=0;i<p2h.length;i++){
+// 		System.out.println(p2h[i]);
+// 	    }
+// 	}
+//     }
+
+//     void printAssociatedFormats(){
+// 	System.out.println("Associated formats");
+// 	if (associatedFormats != null){
+// 	    for (int i=0;i<associatedFormats.length;i++){
+// 		System.out.println(associatedFormats[i]);
+// 	    }
+// 	}
+//     }
+
+    void setLabel(String s){
+	this.lensLabel = s;
     }
 
-    void printAssociatedFormats(){
-	System.out.println("Associated formats");
-	if (associatedFormats != null){
-	    for (int i=0;i<associatedFormats.length;i++){
-		System.out.println(associatedFormats[i]);
-	    }
-	}
+    void setComment(String s){
+	this.lensComment = s;
     }
 
     public String toString(){
-	return caption;
+	return lensLabel;
+    }
+
+    String getComment(){
+	return (lensComment != null) ? lensComment : "";
     }
     
 }

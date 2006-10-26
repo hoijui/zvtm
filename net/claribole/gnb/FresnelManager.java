@@ -48,6 +48,7 @@ class FresnelManager implements RDFErrorHandler {
 
     public static final String FRESNEL_NAMESPACE_URI = "http://www.w3.org/2004/09/fresnel#";
     public static final String RDF_NAMESPACE_URI = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    public static final String RDFS_NAMESPACE_URI = "http://www.w3.org/2000/01/rdf-schema#";
 
     /* RDF properties */
     public static final String _type = "type";
@@ -73,6 +74,7 @@ class FresnelManager implements RDFErrorHandler {
     public static final String _resourceStyle = "resourceStyle";
     public static final String _propertyStyle = "propertyStyle";
     public static final String _label = "label";
+    public static final String _comment = "comment";
     public static final String _labelStyle = "labelStyle";
     public static final String _value = "value";
     public static final String _valueStyle = "valueStyle";
@@ -261,8 +263,21 @@ class FresnelManager implements RDFErrorHandler {
 
     FresnelLens buildLens(Resource lensNode, Model model, String baseURL){
 	FresnelLens res = new FresnelLens((lensNode.isAnon()) ? lensNode.getId().toString() : lensNode.getURI(), baseURL);
+	/* process rdfs label and comment */
+	StmtIterator si = lensNode.listProperties(model.getProperty(RDFS_NAMESPACE_URI, _label));
+	if (si.hasNext()){
+	    // only take the first one, a lens is not supposed to declare multiple labels
+	    res.setLabel(si.nextStatement().getLiteral().getLexicalForm());
+	}
+	si.close();
+	si = lensNode.listProperties(model.getProperty(RDFS_NAMESPACE_URI, _comment));
+	if (si.hasNext()){
+	    // only take the first one, a lens is not supposed to declare multiple comments
+	    res.setComment(si.nextStatement().getLiteral().getLexicalForm());
+	}
+	si.close();
 	/* process instanceLensDomain properties */
-	StmtIterator si = lensNode.listProperties(model.getProperty(FRESNEL_NAMESPACE_URI, _instanceLensDomain));
+	si = lensNode.listProperties(model.getProperty(FRESNEL_NAMESPACE_URI, _instanceLensDomain));
 	RDFNode n;
 	while (si.hasNext()){
 	    n = si.nextStatement().getObject();
