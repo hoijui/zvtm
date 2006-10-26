@@ -179,7 +179,7 @@ class FresnelManager implements RDFErrorHandler {
 	infoSpace.hide(frame);
 	iCamera.setAltitude(0);
 	gc = (Graphics2D)application.mView.getGraphicsContext();
-	fontMetrics = gc.getFontMetrics(GeonamesRDFStore.CITY_FONT);
+	fontMetrics = gc.getFontMetrics(Messages.CITY_FONT);
 	fontHeight = fontMetrics.getHeight();
     }
 

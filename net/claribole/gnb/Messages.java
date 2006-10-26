@@ -14,8 +14,14 @@ import java.awt.Font;
 
 class Messages {
 
-    static final Font SMALL_FONT = new Font("Dialog", 0, 10);
-    static final Font TINY_FONT = new Font("Dialog", 0, 9);
+    static final String ARIAL_UNICODE_FONT_NAME = "Arial Unicode MS";
+    static final String DEFAULT_FONT_NAME = "Dialog";
+    static final Font CITY_FONT = new Font((Utils.osIsWindows()) ? ARIAL_UNICODE_FONT_NAME : DEFAULT_FONT_NAME, Font.PLAIN, 10);
+    static final Font REGION_FONT = new Font(DEFAULT_FONT_NAME, Font.ITALIC, 40);
+    static final Font COUNTRY_FONT = new Font(DEFAULT_FONT_NAME, Font.BOLD, 100);
+
+    static final Font SMALL_FONT = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 10);
+    static final Font TINY_FONT = new Font(DEFAULT_FONT_NAME, Font.PLAIN, 9);
 
     static final String MAIN_VIEW_TITLE = "Geonames Browser";
 

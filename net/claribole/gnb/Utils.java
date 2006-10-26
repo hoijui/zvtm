@@ -12,6 +12,20 @@ package net.claribole.gnb;
 
 class Utils {
 
+    /**
+     * tells whether the underlying OS is Windows (Win32) or not
+     */
+    public static boolean osIsWindows(){
+	return com.xerox.VTM.engine.Utilities.osIsWindows();
+    }
+
+    /**
+     * tells whether the underlying OS is Mac OS X or not
+     */
+    public static boolean osIsMacOS(){
+	return com.xerox.VTM.engine.Utilities.osIsMacOS();
+    }
+
     static int getItemIndex(Object[] a, Object o){
 	for (int i=0;i<a.length;i++){
 	    if (a[i] == o){return i;}

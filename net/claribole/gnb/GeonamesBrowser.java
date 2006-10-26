@@ -130,7 +130,7 @@ public class GeonamesBrowser implements Java2DPainter {
 	fm = new FresnelManager(this);
 	windowLayout();
 	cp = new ControlPanel(this, CP_X, CP_Y, CP_W, CP_H);
- 	vsm.setMainFont(GeonamesRDFStore.CITY_FONT);
+ 	vsm.setMainFont(Messages.CITY_FONT);
 	mapSpace = vsm.addVirtualSpace(mapSpaceName);
 	fm.infoSpace = vsm.addVirtualSpace(FresnelManager.infoSpaceName);
 	vsm.setZoomLimit(0);
@@ -149,7 +149,7 @@ public class GeonamesBrowser implements Java2DPainter {
  	mView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 	mCamera.setAltitude(START_ALTITUDE);
 	mm = new GNBMapManager(this, vsm, mapSpace, mCamera, mView);
-	//mm.initMap();
+	mm.initMap();
 	gs = new GeonamesRDFStore(this);
 	gs.loadCountries();
 	gs.loadRegions();

@@ -66,9 +66,6 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final Color CITY_COLOR = Color.YELLOW;
     static final Color REGION_COLOR = new Color(255,150,0); // orange
     static final Color COUNTRY_COLOR = Color.WHITE;
-    static final Font CITY_FONT = new Font("Dialog", Font.PLAIN, 10);
-    static final Font REGION_FONT = new Font("Dialog",Font.ITALIC,40);
-    static final Font COUNTRY_FONT = new Font("Dialog",Font.BOLD,100);
 
     /*various altitudes that trigger changes w.r.t levels of detail*/
     /* The following table summarizes the visibility
@@ -179,7 +176,7 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	    lx = Math.round(r.getProperty(longP).getDouble() * GeonamesBrowser.HALF_MAP_WIDTH/180.0);
 	    ly = Math.round(r.getProperty(latP).getDouble() * GeonamesBrowser.HALF_MAP_HEIGHT/90.0);
 	    countryL = new LText(lx, ly, 0, COUNTRY_COLOR, getPropertyWithLang(r, altNameP, LANG_EN, nameP), LText.TEXT_ANCHOR_MIDDLE);
-	    countryL.setSpecialFont(COUNTRY_FONT);
+	    countryL.setSpecialFont(Messages.COUNTRY_FONT);
 	    application.vsm.addGlyph(countryL, application.mapSpace);
  	    countryL.setVisible(false);
  	    countryL.setVisibleThroughLens(false);
@@ -235,7 +232,7 @@ class GeonamesRDFStore implements RDFErrorHandler {
 	    lx = Math.round(r.getProperty(longP).getDouble() * GeonamesBrowser.HALF_MAP_WIDTH/180.0);
 	    ly = Math.round(r.getProperty(latP).getDouble() * GeonamesBrowser.HALF_MAP_HEIGHT/90.0);
 	    regionL = new LText(lx, ly, 0, REGION_COLOR, r.getProperty(nameP).getString(), LText.TEXT_ANCHOR_MIDDLE);
-	    regionL.setSpecialFont(REGION_FONT);
+	    regionL.setSpecialFont(Messages.REGION_FONT);
 	    application.vsm.addGlyph(regionL, application.mapSpace);
  	    regionL.setVisible(false);
  	    regionL.setVisibleThroughLens(false);
