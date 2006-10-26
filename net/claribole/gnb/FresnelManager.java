@@ -169,6 +169,7 @@ class FresnelManager implements RDFErrorHandler {
 	nsr.addPrefixBinding("rdf", RDF_NAMESPACE_URI);
 	nsr.addPrefixBinding("gn", GeonamesRDFStore.GEONAMES_NS);
 	nsr.addPrefixBinding("wgs84_pos", GeonamesRDFStore.WGS84_POS_NS);
+	nsr.addPrefixBinding("foaf", GeonamesRDFStore.FOAF_NS);
     }
 
     void init(){
@@ -332,7 +333,7 @@ class FresnelManager implements RDFErrorHandler {
 	    }
 	    si.close();
 	}
-	res.setPropertiesVisibility(toShow, toHide, apIndex);
+	res.setPropertiesVisibility(toShow, toHide, apIndex, detailFSLEvaluator);
 	// deal with group declarations (store them temporarily until they get processed by buildGroup())
 	Vector lenses;
 	Resource group;

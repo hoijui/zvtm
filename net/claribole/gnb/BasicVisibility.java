@@ -35,6 +35,7 @@ public class BasicVisibility extends PropertyVisibility {
 		propertiesShown.add(s);
 	    }
 	}
+	si.close();
 	// incoming properties are not examined here as basic selectors only look at
 	// outgoing properties (from the current node)
     }

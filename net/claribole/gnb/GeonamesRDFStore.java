@@ -57,6 +57,8 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final String NAME_PROPERTY = "name";
     static final String ALT_NAME_PROPERTY = "alternateName";
 
+    static final String FOAF_NS = "http://xmlns.com/foaf/0.1/";
+
     static final String LANG_EN = "en";
     
     /* Geometrical / display settings */

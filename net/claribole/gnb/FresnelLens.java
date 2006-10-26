@@ -104,21 +104,31 @@ class FresnelLens {
 	}
     }
 
-    void setPropertiesVisibility(Vector ts, Vector th, int api){
+    void setPropertiesVisibility(Vector ts, Vector th, int api, FSLJenaEvaluator fje){
 	apIndex = api;
 	p2s = new PropertyVisibility[ts.size()];
 	Object o;
 	for (int i=0;i<p2s.length;i++){
 	    o = ts.elementAt(i);
-	    if (o instanceof FSLPath){p2s[i] = new FSLVisibility((FSLPath)o);}
-	    else {p2s[i] = new BasicVisibility((String)o);}
+	    if (o instanceof FSLPath){
+		p2s[i] = new FSLVisibility((FSLPath)o);
+		((FSLVisibility)p2s[i]).setFSLEvaluator(fje);
+	    }
+	    else {
+		p2s[i] = new BasicVisibility((String)o);
+	    }
 	}
 	if (apIndex != -1){
 	    p2h = new PropertyVisibility[th.size()];
 	    for (int i=0;i<p2s.length;i++){
 		o = ts.elementAt(i);
-		if (o instanceof FSLPath){p2s[i] = new FSLVisibility((FSLPath)o);}
-		else {p2s[i] = new BasicVisibility((String)o);}
+		if (o instanceof FSLPath){
+		    p2s[i] = new FSLVisibility((FSLPath)o);
+		    ((FSLVisibility)p2s[i]).setFSLEvaluator(fje);
+		}
+		else {
+		    p2s[i] = new BasicVisibility((String)o);
+		}
 	    }
 	}
     }
@@ -200,21 +210,21 @@ class FresnelLens {
 	return (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
     }
 
-//     void printVisibility(){
-// 	System.out.println("VISIBILITY, allProperties at "+apIndex);
-// 	if (p2s != null){
-// 	    System.out.println("-------------------\nShow properties\n-------------------");
-// 	    for (int i=0;i<p2s.length;i++){
-// 		System.out.println(p2s[i]);
-// 	    }
-// 	}
-// 	if (p2h != null){
-// 	    System.out.println("-------------------\nHide properties\n-------------------");
-// 	    for (int i=0;i<p2h.length;i++){
-// 		System.out.println(p2h[i]);
-// 	    }
-// 	}
-//     }
+    void printVisibility(){
+	System.out.println("VISIBILITY, allProperties at "+apIndex);
+	if (p2s != null){
+	    System.out.println("-------------------\nShow properties\n-------------------");
+	    for (int i=0;i<p2s.length;i++){
+		System.out.println(p2s[i]);
+	    }
+	}
+	if (p2h != null){
+	    System.out.println("-------------------\nHide properties\n-------------------");
+	    for (int i=0;i<p2h.length;i++){
+		System.out.println(p2h[i]);
+	    }
+	}
+    }
 
 //     void printAssociatedFormats(){
 // 	System.out.println("Associated formats");
