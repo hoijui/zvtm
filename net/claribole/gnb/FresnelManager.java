@@ -519,7 +519,7 @@ class FresnelManager implements RDFErrorHandler {
 		    if (f.contentLastV != null){textLines[i] += f.contentLastV;}
 		}
 	    }
-	    long frameHalfWidth = (statementsToDisplay.size() > 0) ? 0 : DETAIL_FRAME_MIN_WIDTH;
+	    long frameWidth = (statementsToDisplay.size() > 0) ? 0 : DETAIL_FRAME_MIN_WIDTH;
 	    long frameHalfHeight = DETAIL_FRAME_MIN_HEIGHT;
  	    long vertCoordOfLines[] = new long[textLines.length]; // relative vertical position of text line inside box
  	    long lineWidth;
@@ -527,14 +527,15 @@ class FresnelManager implements RDFErrorHandler {
 		vertCoordOfLines[i] = (2 * i + 2) * fontHeight;
 		frameHalfHeight += fontHeight;
 		lineWidth = fontMetrics.stringWidth(textLines[i]);
-		if (lineWidth > frameHalfWidth){
-		    frameHalfWidth = lineWidth;
+		if (lineWidth > frameWidth){
+		    frameWidth = lineWidth;
 		}
 	    }
+	    frameWidth *= 1.2;
 	    // adapt frame geometry
-	    frame.vx = jpx - application.panelWidth/2 + frameHalfWidth + FRAME_HORIZONTAL_OFFSET;
+	    frame.vx = jpx - application.panelWidth/2 + frameWidth/2 + FRAME_HORIZONTAL_OFFSET;
 	    frame.vy = application.panelHeight/2 - jpy - frameHalfHeight - FRAME_VERTICAL_OFFSET;
-	    frame.setWidth(frameHalfWidth);
+	    frame.setWidth(frameWidth/2);
 	    frame.setHeight(frameHalfHeight);
 	    infoSpace.show(frame);
 	    // add text info lines
