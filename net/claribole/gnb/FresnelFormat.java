@@ -41,6 +41,10 @@ public class FresnelFormat {
     /* label of the property (prepended to the property value) */
     String label = null;
 
+
+    /* strings to preppend/append to values (null if none) */
+    String contentFirstV, contentBeforeV, contentAfterV, contentLastV;
+
     public FresnelFormat(String uri, String baseURI){
 	this.uri = uri;
 	if (uri.startsWith(baseURI)){
@@ -132,10 +136,42 @@ public class FresnelFormat {
 	}
     }
 
-    String format(Statement s){
-	String res = (label != null) ? label : "";
+    /* process instructions such as contentAfter, contentLast, etc. */
+    void addValueFormattingInstruction(Resource r){
+	StmtIterator si = r.listProperties();
+	Statement s;
+	String pred;
+	while (si.hasNext()){
+	    s = si.nextStatement();
+	    pred = s.getPredicate().getURI();
+	    if (pred.equals(FresnelManager.FRESNEL_NAMESPACE_URI+FresnelManager._contentAfter)){
+		contentAfterV = s.getLiteral().getLexicalForm();
+	    }
+	    else if (pred.equals(FresnelManager.FRESNEL_NAMESPACE_URI+FresnelManager._contentBefore)){
+		contentBeforeV = s.getLiteral().getLexicalForm();
+	    }
+	    else if (pred.equals(FresnelManager.FRESNEL_NAMESPACE_URI+FresnelManager._contentLast)){
+		contentLastV = s.getLiteral().getLexicalForm();
+	    }
+	    else if (pred.equals(FresnelManager.FRESNEL_NAMESPACE_URI+FresnelManager._contentFirst)){
+		contentFirstV = s.getLiteral().getLexicalForm();
+	    }
+	}
+    }
+
+    boolean hasValueFormattingInstructions(){
+	return (contentFirstV != null || contentBeforeV != null || contentAfterV != null || contentLastV != null);
+    }
+
+    String format(Statement s, boolean lastItem){
+	String res = (contentBeforeV != null) ? contentBeforeV : "";
 	res += (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
+	if (!lastItem && contentAfterV != null){res += contentAfterV;}
 	return res;
+    }
+
+    static String defaultFormat(Statement s){
+	return (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
     }
 
     public String toString(){

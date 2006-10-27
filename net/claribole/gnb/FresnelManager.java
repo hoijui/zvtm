@@ -391,6 +391,12 @@ class FresnelManager implements RDFErrorHandler {
 	    res.setLabel(si.nextStatement().getObject());
 	}
 	si.close();
+	// valueFormat instructions
+	si = formatNode.listProperties(model.getProperty(FRESNEL_NAMESPACE_URI, _valueFormat));
+	while (si.hasNext()){
+	    res.addValueFormattingInstruction(si.nextStatement().getResource());
+	}
+	si.close();
 	// deal with group declarations (store them temporarily until they get processed by buildGroup())
 	Vector formats;
 	Resource group;
@@ -462,24 +468,65 @@ class FresnelManager implements RDFErrorHandler {
 	}
     }
 
-    /* city information display management */
+    Hashtable statements2formats = new Hashtable();
 
+    /* city information display management */
     synchronized void showInformationAbout(Resource r, int jpx, int jpy){
 	// check that this resource can indeed be handled by the current Fresnel lens
 	if (selectedDetailLens.selectsByBIS(r) || selectedDetailLens.selectsByBCS(r, detailRDF) || selectedDetailLens.selectsByFIS(r, detailFSLEvaluator)){
 	    Vector statementsToDisplay = selectedDetailLens.getValuesToDisplay(r);
+	    statements2formats.clear();
+	    for (int i=0;i<statementsToDisplay.size();i++){
+		selectedDetailLens.mapStatement2Format((Statement)statementsToDisplay.elementAt(i), statements2formats, detailFSLEvaluator);
+	    }
+	    Vector lines = new Vector();
+	    Vector v = new Vector();
+	    Object currentStatement = statementsToDisplay.firstElement();
+	    v.add(currentStatement);
+	    lines.add(v);
+	    Object previousStatement;
+	    Object formatOfPreviousStatement, formatOfCurrentStatement;
+	    for (int i=1;i<statementsToDisplay.size();i++){
+		previousStatement = currentStatement;
+		currentStatement = statementsToDisplay.elementAt(i);
+		formatOfPreviousStatement = statements2formats.get(previousStatement);
+		formatOfCurrentStatement = statements2formats.get(currentStatement);
+		if (formatOfCurrentStatement != null && formatOfCurrentStatement == formatOfPreviousStatement &&
+		    ((FresnelFormat)formatOfCurrentStatement).hasValueFormattingInstructions()){
+		    // new value goes on same line as previous value
+		    ((Vector)lines.lastElement()).add(currentStatement);
+		}
+		else {// new value goes on a new line
+		    v = new Vector();
+		    v.add(currentStatement);
+		    lines.add(v);
+		}
+	    }
+	    String[] textLines = new String[lines.size()];
+	    for (int i=0;i<textLines.length;i++){
+		v = (Vector)lines.elementAt(i);
+		String text = "";
+		// all statements on a line have the same format (as a result of the previous loop)
+		FresnelFormat f = (FresnelFormat)statements2formats.get(v.firstElement());
+		for (int j=0;j<v.size();j++){// apply contentBefore and contentAfter instructions, if any
+		    text += applyFormattingInstructions((Statement)v.elementAt(j), f, j==v.size()-1);
+		}
+		textLines[i] = text;
+		// apply label, contentFirst and contentLast instructions, if any
+		if (f != null){
+		    if (f.contentFirstV != null){textLines[i] = f.contentFirstV + textLines[i];}
+		    if (f.label != null){textLines[i] = f.label + textLines[i];}
+		    if (f.contentLastV != null){textLines[i] += f.contentLastV;}
+		}
+	    }
 	    long frameHalfWidth = (statementsToDisplay.size() > 0) ? 0 : DETAIL_FRAME_MIN_WIDTH;
 	    long frameHalfHeight = DETAIL_FRAME_MIN_HEIGHT;
-	    Statement s;
-	    String[] values = new String[statementsToDisplay.size()];
-	    long vys[] = new long[values.length]; // relative vertical position of text line inside box
-	    long lineWidth;
-	    for (int i=0;i<statementsToDisplay.size();i++){
-		s = (Statement)statementsToDisplay.elementAt(i);
-		values[i] = selectedDetailLens.formatValue(s, detailFSLEvaluator);
-		vys[i] = (2 * i + 2) * fontHeight;
+ 	    long vertCoordOfLines[] = new long[textLines.length]; // relative vertical position of text line inside box
+ 	    long lineWidth;
+	    for (int i=0;i<vertCoordOfLines.length;i++){
+		vertCoordOfLines[i] = (2 * i + 2) * fontHeight;
 		frameHalfHeight += fontHeight;
-		lineWidth = fontMetrics.stringWidth(values[i]);
+		lineWidth = fontMetrics.stringWidth(textLines[i]);
 		if (lineWidth > frameHalfWidth){
 		    frameHalfWidth = lineWidth;
 		}
@@ -491,12 +538,16 @@ class FresnelManager implements RDFErrorHandler {
 	    frame.setHeight(frameHalfHeight);
 	    infoSpace.show(frame);
 	    // add text info lines
-	    for (int i=0;i<values.length;i++){
-		VText t = new VText(frame.vx-frame.getWidth()+10, frame.vy+frame.getHeight()-vys[i], 0, FRAME_BORDER_COLOR, values[i]);
+	    for (int i=0;i<textLines.length;i++){
+		VText t = new VText(frame.vx-frame.getWidth()+10, frame.vy+frame.getHeight()-vertCoordOfLines[i], 0, FRAME_BORDER_COLOR, textLines[i]);
 		application.vsm.addGlyph(t, infoSpace);
 		informationItems.add(t);
 	    }
 	}
+    }
+
+    String applyFormattingInstructions(Statement s, FresnelFormat f, boolean lastItem){
+	return (f != null) ? f.format(s, lastItem) : FresnelFormat.defaultFormat(s);
     }
     
     synchronized void hideInformationAbout(){

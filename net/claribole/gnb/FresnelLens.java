@@ -8,6 +8,7 @@
 
 package net.claribole.gnb;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -197,17 +198,15 @@ class FresnelLens {
 	return res;
     }
 
-    /* applies most appropriate Format to a given property/value pair displayed by this lens for a given resource */
-    String formatValue(Statement s, FSLJenaEvaluator fje){
+    void mapStatement2Format(Statement s, Hashtable s2f, FSLJenaEvaluator fje){
 	Property p = s.getPredicate();
 	for (int i=0;i<associatedFormats.length;i++){
 	    // XXX: several formats might apply. This crude version takes the first one that matches
-	    // we should actually look for the most specific
+	    // we should actually look for the most specific one
 	    if (associatedFormats[i].selectsByBPS(p) || associatedFormats[i].selectsByFPS(s, fje)){
-		return associatedFormats[i].format(s);
+		s2f.put(s, associatedFormats[i]);
 	    }
 	}
-	return (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
     }
 
     void printVisibility(){
