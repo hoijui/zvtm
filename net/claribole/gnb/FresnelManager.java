@@ -509,7 +509,7 @@ class FresnelManager implements RDFErrorHandler {
 		// all statements on a line have the same format (as a result of the previous loop)
 		FresnelFormat f = (FresnelFormat)statements2formats.get(v.firstElement());
 		for (int j=0;j<v.size();j++){// apply contentBefore and contentAfter instructions, if any
-		    text += applyFormattingInstructions((Statement)v.elementAt(j), f, j==v.size()-1);
+		    text += applyFormattingInstructions((Statement)v.elementAt(j), f, j==0, j==v.size()-1);
 		}
 		textLines[i] = text;
 		// apply label, contentFirst and contentLast instructions, if any
@@ -547,8 +547,8 @@ class FresnelManager implements RDFErrorHandler {
 	}
     }
 
-    String applyFormattingInstructions(Statement s, FresnelFormat f, boolean lastItem){
-	return (f != null) ? f.format(s, lastItem) : FresnelFormat.defaultFormat(s);
+    String applyFormattingInstructions(Statement s, FresnelFormat f, boolean firstItem, boolean lastItem){
+	return (f != null) ? f.format(s, firstItem, lastItem) : FresnelFormat.defaultFormat(s);
     }
     
     synchronized void hideInformationAbout(){

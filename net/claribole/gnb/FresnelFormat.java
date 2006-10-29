@@ -163,8 +163,8 @@ public class FresnelFormat {
 	return (contentFirstV != null || contentBeforeV != null || contentAfterV != null || contentLastV != null);
     }
 
-    String format(Statement s, boolean lastItem){
-	String res = (contentBeforeV != null) ? contentBeforeV : "";
+    String format(Statement s, boolean firstItem, boolean lastItem){
+	String res = (!firstItem && contentBeforeV != null) ? contentBeforeV : "";
 	res += (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();
 	if (!lastItem && contentAfterV != null){res += contentAfterV;}
 	return res;
