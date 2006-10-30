@@ -209,21 +209,21 @@ class FresnelLens {
 	}
     }
 
-    void printVisibility(){
-	System.out.println("VISIBILITY, allProperties at "+apIndex);
-	if (p2s != null){
-	    System.out.println("-------------------\nShow properties\n-------------------");
-	    for (int i=0;i<p2s.length;i++){
-		System.out.println(p2s[i]);
-	    }
-	}
-	if (p2h != null){
-	    System.out.println("-------------------\nHide properties\n-------------------");
-	    for (int i=0;i<p2h.length;i++){
-		System.out.println(p2h[i]);
-	    }
-	}
-    }
+//     void printVisibility(){
+// 	System.out.println("VISIBILITY, allProperties at "+apIndex);
+// 	if (p2s != null){
+// 	    System.out.println("-------------------\nShow properties\n-------------------");
+// 	    for (int i=0;i<p2s.length;i++){
+// 		System.out.println(p2s[i]);
+// 	    }
+// 	}
+// 	if (p2h != null){
+// 	    System.out.println("-------------------\nHide properties\n-------------------");
+// 	    for (int i=0;i<p2h.length;i++){
+// 		System.out.println(p2h[i]);
+// 	    }
+// 	}
+//     }
 
 //     void printAssociatedFormats(){
 // 	System.out.println("Associated formats");

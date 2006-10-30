@@ -89,6 +89,8 @@ class FresnelManager implements RDFErrorHandler {
     public static final String _contentNoValue = "contentNoValue";
     public static final String _alternateProperties = "alternateProperties";
     public static final String _mergeProperties = "mergeProperties";
+
+    /* hook to some very often used properties (for perf. reasons, points to the property in the queried model) */
     Property _restProperty, _firstProperty, _typeProperty;
 
 
@@ -136,14 +138,23 @@ class FresnelManager implements RDFErrorHandler {
     VRectangleST frame;
     Vector informationItems = new Vector();
 
-    FSLJenaEvaluator detailFSLEvaluator;
     FSLNSResolver nsr;
     FSLHierarchyStore fhs;
+
+    FSLJenaEvaluator layoutFSLEvaluator;
+    Model layoutRDF;
+    FresnelLens[] layoutLenses;
+    FresnelLens selectedLayoutLens;
+    FresnelFormat[] layoutFormats;
+    FresnelGroup[] layoutGroups;
+
+    FSLJenaEvaluator detailFSLEvaluator;
     Model detailRDF;
     FresnelLens[] detailLenses;
     FresnelLens selectedDetailLens;
     FresnelFormat[] detailFormats;
     FresnelGroup[] detailGroups;
+
     Hashtable group2lenses, group2formats;
 
     static final int DETAIL_FRAME_MIN_WIDTH = 50;
@@ -157,6 +168,7 @@ class FresnelManager implements RDFErrorHandler {
 	this.application = app;
 	initNSResolver();
 	fhs = new FSLHierarchyStore();
+	layoutFSLEvaluator = new FSLJenaEvaluator(nsr, fhs);
 	detailFSLEvaluator = new FSLJenaEvaluator(nsr, fhs);
 	group2lenses = new Hashtable();
 	group2formats = new Hashtable();
@@ -192,7 +204,70 @@ class FresnelManager implements RDFErrorHandler {
     }
 
     void buildLayoutLenses(){
-	//XXX: TBW
+	// parse layout lenses N3 RDF file
+	layoutRDF = ModelFactory.createDefaultModel();
+	layoutFSLEvaluator.setModel(layoutRDF);
+	RDFReader parser = initRDFParser(layoutRDF);
+	String baseURL;
+	try {
+	    baseURL = LAYOUT_LENS_FILE.toURL().toString();
+	    if (baseURL.startsWith("file:/") && !baseURL.startsWith("file:///")){
+		// ugly hack to address the file:/ vs. file:/// problem
+		baseURL = baseURL.substring(0, 6) + "//" + baseURL.substring(6);
+	    }
+	}
+	catch (MalformedURLException ex){
+	    baseURL = "";
+	}
+	try {
+	    FileInputStream fis = new FileInputStream(LAYOUT_LENS_FILE);
+	    parser.read(layoutRDF, fis, baseURL);
+	}
+	catch(Exception ex){System.err.println("Error while processing country file " + LAYOUT_LENS_FILE.toString());}
+	_firstProperty = layoutRDF.getProperty(RDF_NAMESPACE_URI+_first);
+	_restProperty = layoutRDF.getProperty(RDF_NAMESPACE_URI+_rest);
+	_typeProperty = layoutRDF.getProperty(RDF_NAMESPACE_URI+_type);
+	// lenses
+	StmtIterator si = layoutRDF.listStatements(null, _typeProperty, layoutRDF.getResource(_Lens));
+	Vector v = new Vector();
+	while (si.hasNext()){
+	    v.add(si.nextStatement().getSubject());
+	}
+	si.close();
+	layoutLenses = new FresnelLens[v.size()];
+	for (int i=0;i<v.size();i++){
+	    layoutLenses[i] = buildLens((Resource)v.elementAt(i), layoutRDF, baseURL, layoutFSLEvaluator);
+	}
+	v.clear();
+	// formats
+	si = layoutRDF.listStatements(null, _typeProperty, layoutRDF.getResource(_Format));
+	while (si.hasNext()){
+	    v.add(si.nextStatement().getSubject());
+	}
+	si.close();
+	layoutFormats = new FresnelFormat[v.size()];
+	for (int i=0;i<layoutFormats.length;i++){
+	    layoutFormats[i] = buildFormat((Resource)v.elementAt(i), layoutRDF, baseURL);
+	}
+	v.clear();
+	// groups
+	Property groupProperty = layoutRDF.getProperty(FRESNEL_NAMESPACE_URI, _group);
+	si = layoutRDF.listStatements(null, _typeProperty, layoutRDF.getResource(_Group));
+	while (si.hasNext()){
+	    v.add(si.nextStatement().getSubject());
+	}
+	si.close();
+	layoutGroups = new FresnelGroup[v.size()];
+	for (int i=0;i<layoutGroups.length;i++){
+	    layoutGroups[i] = buildGroup((Resource)v.elementAt(i), groupProperty, baseURL);
+	}
+	v.clear();
+	group2lenses.clear();
+	group2formats.clear();
+	try {
+	    selectedLayoutLens = layoutLenses[0];
+	}
+	catch (ArrayIndexOutOfBoundsException ex){selectedLayoutLens = null;}
     }
 
     void buildDetailLenses(){
@@ -228,7 +303,7 @@ class FresnelManager implements RDFErrorHandler {
 	si.close();
 	detailLenses = new FresnelLens[v.size()];
 	for (int i=0;i<v.size();i++){
-	    detailLenses[i] = buildLens((Resource)v.elementAt(i), detailRDF, baseURL);
+	    detailLenses[i] = buildLens((Resource)v.elementAt(i), detailRDF, baseURL, detailFSLEvaluator);
 	}
 	v.clear();
 	// formats
@@ -262,7 +337,7 @@ class FresnelManager implements RDFErrorHandler {
 	catch (ArrayIndexOutOfBoundsException ex){selectedDetailLens = null;}
     }
 
-    FresnelLens buildLens(Resource lensNode, Model model, String baseURL){
+    FresnelLens buildLens(Resource lensNode, Model model, String baseURL, FSLJenaEvaluator fslEvaluator){
 	FresnelLens res = new FresnelLens((lensNode.isAnon()) ? lensNode.getId().toString() : lensNode.getURI(), baseURL);
 	/* process rdfs label and comment */
 	StmtIterator si = lensNode.listProperties(model.getProperty(RDFS_NAMESPACE_URI, _label));
@@ -333,7 +408,7 @@ class FresnelManager implements RDFErrorHandler {
 	    }
 	    si.close();
 	}
-	res.setPropertiesVisibility(toShow, toHide, apIndex, detailFSLEvaluator);
+	res.setPropertiesVisibility(toShow, toHide, apIndex, fslEvaluator);
 	// deal with group declarations (store them temporarily until they get processed by buildGroup())
 	Vector lenses;
 	Resource group;

@@ -29,6 +29,9 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 
     JComboBox magLensCbb;
     
+    JComboBox layoutLensCbb;
+    JTextArea layoutLensTa;
+
     JComboBox detailLensCbb;
     JTextArea detailLensTa;
     
@@ -65,11 +68,15 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 
     void initFresnelMapLensSelector(Container parent){
 	Container c = new Container();
-	c.setLayout(new GridLayout(2,1));
+	c.setLayout(new GridLayout(3,1));
 	c.add(new JLabel(Messages.CP_LAYOUT_PANEL_TITLE));
-// 	magLensCbb = new JComboBox(Messages.MAG_LENS_NAMES);
-// 	magLensCbb.addItemListener(this);
-// 	c.add(magLensCbb);
+	layoutLensCbb = new JComboBox(application.fm.layoutLenses);
+	layoutLensCbb.addItemListener(this);
+	c.add(layoutLensCbb);
+	layoutLensTa = new JTextArea(application.fm.layoutLenses[0].getComment());
+	layoutLensTa.setLineWrap(true);
+	layoutLensTa.setWrapStyleWord(true);
+	c.add(layoutLensTa);
 	parent.add(c);
     }
 
@@ -91,6 +98,11 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 	application.lensFamily = lensID;
     }
     
+    void selectLayoutLens(FresnelLens lens){
+	application.fm.selectedLayoutLens = lens;
+	layoutLensTa.setText(lens.getComment());
+    }
+
     void selectDetailLens(FresnelLens lens){
 	application.fm.selectedDetailLens = lens;
 	detailLensTa.setText(lens.getComment());
@@ -105,6 +117,11 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 	else if (e.getSource() == detailLensCbb){
 	    if (e.getStateChange() == ItemEvent.SELECTED){
 		selectDetailLens((FresnelLens)e.getItem());
+	    }
+	}
+	else if (e.getSource() == layoutLensCbb){
+	    if (e.getStateChange() == ItemEvent.SELECTED){
+		selectLayoutLens((FresnelLens)e.getItem());
 	    }
 	}
     }
