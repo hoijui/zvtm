@@ -149,7 +149,7 @@ public class GeonamesBrowser implements Java2DPainter {
  	mView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 	mCamera.setAltitude(START_ALTITUDE);
 	mm = new GNBMapManager(this, vsm, mapSpace, mCamera, mView);
-	//mm.initMap();
+	mm.initMap();
 	gs = new GeonamesRDFStore(this);
 	gs.loadCountries();
 	gs.loadRegions();
