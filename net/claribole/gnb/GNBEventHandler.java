@@ -218,6 +218,7 @@ class GNBEventHandler implements ViewEventHandler, AnimationListener, ComponentL
 	    application.vsm.repaintNow();
 	}
 	else if (code==KeyEvent.VK_G){application.gc();}
+	else if (code == KeyEvent.VK_D){application.fm.switchShowDetails();}
     }
 
     public void viewActivated(View v){}

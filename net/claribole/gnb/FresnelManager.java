@@ -164,6 +164,9 @@ class FresnelManager implements RDFErrorHandler {
     FontMetrics fontMetrics;
     int fontHeight;
 
+    /* true means that mouse entering a city glyph will give information about that city */
+    boolean ssd = true;
+
     FresnelManager(GeonamesBrowser app){
 	this.application = app;
 	initNSResolver();
@@ -547,6 +550,7 @@ class FresnelManager implements RDFErrorHandler {
 
     /* city information display management */
     synchronized void showInformationAbout(Resource r, int jpx, int jpy){
+	if (!ssd){return;}
 	// check that this resource can indeed be handled by the current Fresnel lens
 	if (selectedDetailLens.selectsByBIS(r) || selectedDetailLens.selectsByBCS(r, detailRDF) || selectedDetailLens.selectsByFIS(r, detailFSLEvaluator)){
 	    Vector statementsToDisplay = selectedDetailLens.getValuesToDisplay(r);
@@ -632,6 +636,10 @@ class FresnelManager implements RDFErrorHandler {
 	}
 	informationItems.clear();
 	infoSpace.hide(frame);
+    }
+
+    void switchShowDetails(){
+	ssd = !ssd;
     }
 
     /* RDF error handling (jena parsing) */
