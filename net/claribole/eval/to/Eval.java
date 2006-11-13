@@ -54,6 +54,7 @@ public class Eval {
     static int OVERVIEW_HEIGHT = 150;
     static final Color DEFAULT_PORTAL_BORDER_COLOR = Color.BLACK;
     static final Color INSIDE_PORTAL_BORDER_COLOR = Color.RED;
+    static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 24.0f;
     
     /* trailing overview settings */
     static final int TOW_SWITCH_ANIM_TIME = 500;
@@ -122,11 +123,17 @@ public class Eval {
 	vsm.addPortal(op, mView);
 	op.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	op.setObservedRegionTranslucency(0.5f);
+	updateOverview();
     }
 
     void initWorld(){
 	//XXX: basic stuff for testing
 	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.BLUE), mSpace);
+    }
+
+    void updateOverview(){
+	// update overview's altitude
+	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
     }
 
     void switchPortal(int x, int y){

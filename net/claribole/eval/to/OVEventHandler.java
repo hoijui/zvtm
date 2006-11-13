@@ -29,7 +29,12 @@ class OVEventHandler extends BaseEventHandler implements PortalEventHandler {
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (mouseInsideOverview){
-	    oCameraStickedToMouse = true;
+	    if (application.op.coordInsideObservedRegion(jpx, jpy)){
+		orStickedToMouse = true;
+	    }
+	    else {
+		oCameraStickedToMouse = true;
+	    }
 	}
 	else{
 	    mCameraStickedToMouse = true;
@@ -39,25 +44,40 @@ class OVEventHandler extends BaseEventHandler implements PortalEventHandler {
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 	mCameraStickedToMouse = false;
 	oCameraStickedToMouse = false;
+	orStickedToMouse = false;
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
 	if (buttonNumber == 1){
 	    if (mCameraStickedToMouse){
 		synchronized(application.mCamera){
-		    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
-		    application.mCamera.move(Math.round(a*(lastJPX-jpx)),
-					     Math.round(a*(jpy-lastJPY)));
+		    projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
+		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+					     Math.round(projCoef*(jpy-lastJPY)));
 		    lastJPX = jpx;
 		    lastJPY = jpy;
 		    cameraMoved();
 		}
 	    }
 	    else if (oCameraStickedToMouse){
+		synchronized(application.mCamera){
 		synchronized(application.oCamera){
-		    float a = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
-		    application.oCamera.move(Math.round(a*(lastJPX-jpx)),
-					     Math.round(a*(jpy-lastJPY)));
+		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
+		    application.oCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+					     Math.round(projCoef*(jpy-lastJPY)));
+		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+					     Math.round(projCoef*(jpy-lastJPY)));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
+		    cameraMoved();
+		}
+		}
+	    }
+	    else if (orStickedToMouse){
+		synchronized(application.oCamera){
+		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
+		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
+					     Math.round(projCoef*(lastJPY-jpy)));
 		    lastJPX = jpx;
 		    lastJPY = jpy;
 		    cameraMoved();

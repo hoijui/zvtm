@@ -35,8 +35,14 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
 
+    float projCoef, alt, oldCameraAltitude; // for efficiency
+
+    /* main camera is being dragged */
     boolean mCameraStickedToMouse = false;
+    /* overview camera is being dragged */
     boolean oCameraStickedToMouse = false;
+    /* observed region in overview is being dragged */
+    boolean orStickedToMouse = false;
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
@@ -58,14 +64,14 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){}
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
-	float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
+	projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
 	if (wheelDirection  == WHEEL_UP){// zooming in
-	    application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+	    application.mCamera.altitudeOffset(-projCoef*WHEEL_ZOOMIN_FACTOR);
 	    cameraMoved();
 	    application.vsm.repaintNow();
 	}
 	else {//wheelDirection == WHEEL_DOWN, zooming out
-	    application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+	    application.mCamera.altitudeOffset(projCoef*WHEEL_ZOOMOUT_FACTOR);
 	    cameraMoved();
 	    application.vsm.repaintNow();
 	}
@@ -102,7 +108,11 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
     public void componentShown(ComponentEvent e){}
 
     void cameraMoved(){
-	
+	alt = application.mCamera.getAltitude();
+	if (alt != oldCameraAltitude){
+	    oldCameraAltitude = alt;
+	    application.updateOverview();
+	}
     }
     
 }
