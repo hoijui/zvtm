@@ -49,16 +49,25 @@ public class Eval {
 
     BaseEventHandler eh;
 
+    /* generic overview settings */
+    static int OVERVIEW_WIDTH = 150;
+    static int OVERVIEW_HEIGHT = 150;
+    static final Color DEFAULT_PORTAL_BORDER_COLOR = Color.BLACK;
+    static final Color INSIDE_PORTAL_BORDER_COLOR = Color.RED;
+    
     /* trailing overview settings */
     static final int TOW_SWITCH_ANIM_TIME = 500;
-    static int TOW_PORTAL_WIDTH = 50;
-    static int TOW_PORTAL_HEIGHT = 50;
-    static int TOW_PORTAL_WIDTH_EXPANSION_OFFSET = 100;
-    static int TOW_PORTAL_HEIGHT_EXPANSION_OFFSET = 100;
+    static final int TOW_CONTRACTED_WIDTH = 50;
+    static final int TOW_CONTRACTED_HEIGHT = 50;
+    static final int TOW_HORIZONTAL_EXPANSION_OFFSET = OVERVIEW_WIDTH - TOW_CONTRACTED_WIDTH;
+    static final int TOW_VERTICAL_EXPANSION_OFFSET = OVERVIEW_HEIGHT - TOW_CONTRACTED_HEIGHT;
     static final int TOW_PORTAL_X_OFFSET = -120;
     static final int TOW_PORTAL_Y_OFFSET = 120;
     TrailingOverview to;
 
+    /* standard overview settings */
+    OverviewPortal op;
+    
     public Eval(short t){
 	initGUI();
 	if (t == TECHNIQUE_OV){
@@ -88,6 +97,7 @@ public class Eval {
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
 	mView.setBackgroundColor(Eval.BACKGROUND_COLOR);
+	updatePanelSize();
     }
 
     void windowLayout(){
@@ -104,7 +114,14 @@ public class Eval {
     }
 
     void initOverview(){
-	
+	op = new OverviewPortal(panelWidth-OVERVIEW_WIDTH-1,
+				panelHeight-OVERVIEW_HEIGHT-1,
+				OVERVIEW_WIDTH, OVERVIEW_HEIGHT, oCamera, mCamera);
+	op.setPortalEventHandler((PortalEventHandler)eh);
+	op.setBackgroundColor(Eval.BACKGROUND_COLOR);
+	vsm.addPortal(op, mView);
+	op.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
+	op.setObservedRegionTranslucency(0.5f);
     }
 
     void initWorld(){
@@ -123,7 +140,7 @@ public class Eval {
 	    to.setPortalEventHandler((PortalEventHandler)eh);
 // 	    to.setObservedRegionListener((ObservedRegionListener)eh);
 	    vsm.addPortal(to, mView);
- 	    to.setBorder(Color.BLACK);
+ 	    to.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       to.getID(), null);
 	    oCamera.moveTo(0, 0);
@@ -132,8 +149,8 @@ public class Eval {
     }
 
     TrailingOverview getPortal(int x, int y){
-	return new TrailingOverview(x-TOW_PORTAL_WIDTH/2, y-TOW_PORTAL_HEIGHT/2,
-				    TOW_PORTAL_WIDTH, TOW_PORTAL_HEIGHT,
+	return new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+				    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
 				    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
     }
 

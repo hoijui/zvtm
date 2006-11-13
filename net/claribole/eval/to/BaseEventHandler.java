@@ -35,17 +35,12 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
 
-    boolean cameraStickedToMouse = false;
+    boolean mCameraStickedToMouse = false;
+    boolean oCameraStickedToMouse = false;
 
-    public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	lastJPX = jpx;
-	lastJPY = jpy;
-	cameraStickedToMouse = true;
-    }
+    public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	cameraStickedToMouse = false;
-    }
+    public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
     public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
@@ -60,20 +55,7 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){}
 
-    public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
-	if (buttonNumber == 1){
-	    synchronized(application.mCamera){
-		if (cameraStickedToMouse){
-		    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
-		    application.mCamera.move(Math.round(a*(lastJPX-jpx)),
-					     Math.round(a*(jpy-lastJPY)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		    cameraMoved();
-		}
-	    }
- 	}
-    }
+    public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){}
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
 	float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
