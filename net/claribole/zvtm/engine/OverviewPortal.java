@@ -39,6 +39,8 @@ public class OverviewPortal extends CameraPortal {
     long[] observedRegion;
     float orcoef;
 
+    Color observedRegionColor = Color.GREEN;
+
     /** for translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
     AlphaComposite acST;
     /** alpha channel*/
@@ -70,6 +72,14 @@ public class OverviewPortal extends CameraPortal {
 		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
     }
     
+    public void setObservedRegionColor(Color c){
+	observedRegionColor = c;
+    }
+
+    public Color getObservedRegionColor(){
+	return observedRegionColor;
+    }
+
     public void setObservedRegionTranslucency(float a){
 	if (a == 1.0f){
 	    acST = null;
@@ -77,6 +87,11 @@ public class OverviewPortal extends CameraPortal {
 	else {
 	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
 	}
+    }
+
+    /**returns null if translucency is 1.0f*/
+    public AlphaComposite getObservedRegionTranslucency(){
+	return acST;
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
@@ -116,7 +131,7 @@ public class OverviewPortal extends CameraPortal {
 	}
 	// paint region observed through observedRegionCamera
 	observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
-	g2d.setColor(Color.GREEN);
+	g2d.setColor(observedRegionColor);
 	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
 	if (acST != null){
 	    g2d.setComposite(acST);
