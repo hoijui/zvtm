@@ -95,10 +95,12 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	}
     }
 
+    /**true -> do not update trailing widget position when mouse does not move at all*/
     public void setNoUpdateWhenMouseStill(boolean b){
 	mouseStillUpdater.setEnabled(!b);
     }
 
+    /**Dispose of resources associated with this portal*/
     public void dispose(){
 	timer.cancel();
     }
