@@ -124,6 +124,7 @@ public class Eval {
 	vsm.addPortal(op, mView);
 	op.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	op.setObservedRegionTranslucency(0.5f);
+	op.setObservedRegionListener((ObservedRegionListener)eh);
 	updateOverview();
     }
 
@@ -155,7 +156,7 @@ public class Eval {
 	    to = getPortal(x, y);
 	    to.setBackgroundColor(BACKGROUND_COLOR);
 	    to.setPortalEventHandler((PortalEventHandler)eh);
-// 	    to.setObservedRegionListener((ObservedRegionListener)eh);
+ 	    to.setObservedRegionListener((ObservedRegionListener)eh);
 	    vsm.addPortal(to, mView);
  	    to.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
@@ -183,12 +184,19 @@ public class Eval {
 	panelWidth = d.width;
 	panelHeight = d.height;
     }
+
+    void exit(){
+	if (to != null){to.dispose();}
+	if (op != null){op.dispose();}
+	System.exit(0);
+    }
     
     public static void main(String[] args){
 	try {
 	    new Eval(Short.parseShort(args[0]));
 	}
 	catch (Exception ex){
+	    ex.printStackTrace();
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Trailing Overview");
 	    new Eval(Eval.TECHNIQUE_TOW);
 	}

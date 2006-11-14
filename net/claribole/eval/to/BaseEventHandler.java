@@ -22,7 +22,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.*;
 
 
-abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
+abstract class BaseEventHandler implements ViewEventHandler, ComponentListener, ObservedRegionListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
     static final float LENS_SPEED_FACTOR = 5.0f;
@@ -88,7 +88,7 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
 
     public void viewActivated(View v){}
     
-    public void viewClosing(View v){System.exit(0);}
+    public void viewClosing(View v){application.exit();}
            
     public void viewDeactivated(View v){}
            
@@ -114,5 +114,29 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
 	    application.updateOverview();
 	}
     }
-    
+
+    long translationSpeed;
+
+    public void intersectsParentRegion(long[] wnes){
+	if (orStickedToMouse){
+	    translationSpeed = Math.round((application.oCamera.altitude+application.oCamera.focal)/application.oCamera.focal);
+	    if (wnes[0] < 0 && wnes[2] < 0){// intersection west border
+		application.oCamera.move(-translationSpeed, 0);
+ 		application.mCamera.move(-translationSpeed, 0);
+	    }
+	    else if (wnes[0] > 0 && wnes[2] > 0){// intersection east border
+		application.oCamera.move(translationSpeed, 0);
+		application.mCamera.move(translationSpeed, 0);
+	    }
+	    if (wnes[1] > 0 && wnes[3] > 0){// intersection north border
+		application.oCamera.move(0, translationSpeed);
+		application.mCamera.move(0, translationSpeed);
+	    }
+	    else if (wnes[1] < 0 && wnes[3] < 0){// intersection south border
+		application.oCamera.move(0, -translationSpeed);
+		application.mCamera.move(0, -translationSpeed);
+	    }
+	}
+    }
+   
 }
