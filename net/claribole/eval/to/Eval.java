@@ -31,8 +31,8 @@ public class Eval {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 1024;
+    static int VIEW_MAX_W = 1280;
+    static int VIEW_MAX_H = 1024;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -228,6 +228,10 @@ public class Eval {
     
     public static void main(String[] args){
 	try {
+	    if (args.length >= 3){
+		Eval.VIEW_MAX_W = Integer.parseInt(args[1]);
+		Eval.VIEW_MAX_H = Integer.parseInt(args[2]);
+	    }
 	    new Eval(Short.parseShort(args[0]));
 	}
 	catch (Exception ex){
