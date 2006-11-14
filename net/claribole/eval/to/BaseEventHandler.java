@@ -88,7 +88,7 @@ abstract class BaseEventHandler implements ViewEventHandler, ComponentListener {
 
     public void viewActivated(View v){}
     
-    public void viewClosing(View v){}
+    public void viewClosing(View v){System.exit(0);}
            
     public void viewDeactivated(View v){}
            
