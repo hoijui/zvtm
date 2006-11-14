@@ -131,8 +131,7 @@ public class Eval {
 	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.BLUE), mSpace);
     }
 
-    void updateOverview(){
-	// update overview's altitude
+    void updateOverview(){// update overview camera's altitude
 	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
     }
 
@@ -151,7 +150,7 @@ public class Eval {
 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       to.getID(), null);
 	    oCamera.moveTo(0, 0);
-// 	    oCamera.setAltitude(CONTRACTED_PORTAL_CEILING_ALTITUDE);
+	    updateOverview();
 	}
     }
 
