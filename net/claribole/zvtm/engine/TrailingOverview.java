@@ -187,40 +187,27 @@ public class TrailingOverview extends TrailingCameraPortalST {
 	borderTimer.cancel();
     }
 
-}
 
-class BorderTimer extends TimerTask {
+    private class BorderTimer extends TimerTask {
+	
+	TrailingOverview portal;
+	long[] portalRegion = new long[4];
+	long[] intersection = new long[4];
+	
+	BorderTimer(TrailingOverview p){
+	    super();
+	    this.portal = p;
+	}
+	
+	public void run(){
+	    portal.getVisibleRegion(portalRegion);
+	    intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
+	    intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
+	    intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
+	    intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
+	    portal.observedRegionIntersects(intersection);
+	}
 
-    TrailingOverview portal;
-    long[] portalRegion = new long[4];
-    long[] intersection = new long[4];
-
-    BorderTimer(TrailingOverview p){
-	super();
-	this.portal = p;
-    }
-
-    public void run(){
-	portal.getVisibleRegion(portalRegion);
-	intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
-	intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
-	intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
-	intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
-	portal.observedRegionIntersects(intersection);
-
-
-// 	if (portal.wbv > 0){
-// 	    portal.camera.move(-Math.round(portal.wbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);
-// 	}
-// 	else if (portal.ebv > 0){
-// 	    portal.camera.move(Math.round(portal.ebv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal), 0);
-// 	}
-// 	if (portal.nbv > 0){
-// 	    portal.camera.move(0, Math.round(portal.nbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
-// 	}
-// 	else if (portal.sbv > 0){
-// 	    portal.camera.move(0, -Math.round(portal.sbv * (portal.camera.altitude+portal.camera.focal)/portal.camera.focal));
-// 	}
     }
 
 }

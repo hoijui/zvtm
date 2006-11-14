@@ -17,7 +17,8 @@ import java.awt.Stroke;
 import java.awt.AlphaComposite;
 import java.awt.geom.AffineTransform;
 
-import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.AnimManager;
@@ -46,6 +47,8 @@ public class OverviewPortal extends CameraPortal {
     /** alpha channel*/
     float alpha = 0.5f;
 
+    Timer borderTimer;
+
     /** Builds a new portal displaying what is seen through a camera and the region seen through another camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -59,6 +62,30 @@ public class OverviewPortal extends CameraPortal {
 	this.observedRegionCamera = orc;
 	this.observedRegionView = orc.getOwningView();
 	observedRegion = new long[4];
+	borderTimer = new Timer();
+	borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
+    }
+
+    private class BorderTimer extends TimerTask {
+
+	OverviewPortal portal;
+	long[] portalRegion = new long[4];
+	long[] intersection = new long[4];
+	
+	BorderTimer(OverviewPortal p){
+	    super();
+	    this.portal = p;
+	}
+	
+	public void run(){
+	    portal.getVisibleRegion(portalRegion);
+	    intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
+	    intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
+	    intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
+	    intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
+	    portal.observedRegionIntersects(intersection);
+	}
+	
     }
 
     /**detects whether the given point is inside the observed region rectangle depicting what is seen through the main camera 
@@ -150,6 +177,22 @@ public class OverviewPortal extends CameraPortal {
 	if (borderColor != null){
 	    g2d.setColor(borderColor);
 	    g2d.drawRect(x, y, w, h);
+	}
+    }
+
+    public void dispose(){
+	borderTimer.cancel();
+    }
+
+    ObservedRegionListener observedRegionListener;
+
+    public void setObservedRegionListener(ObservedRegionListener orl){
+	this.observedRegionListener = orl;
+    }
+
+    void observedRegionIntersects(long[] wnes){
+	if (observedRegionListener != null){
+	    observedRegionListener.intersectsParentRegion(wnes);
 	}
     }
 
