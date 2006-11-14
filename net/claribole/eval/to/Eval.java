@@ -198,6 +198,7 @@ public class Eval {
 					       to.getID(), null);
 	    oCamera.moveTo(0, 0);
 	    updateOverview();
+	    centerOverview(false);
 	}
     }
 
