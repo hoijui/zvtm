@@ -85,6 +85,11 @@ public class Eval {
 	}
 	mView.setEventHandler(eh);
 	initWorld();
+	Location l = vsm.getGlobalView(mCamera);
+	mCamera.moveTo(l.vx, l.vy);
+	mCamera.setAltitude(l.alt);
+	centerOverview(false);
+	updateOverview();
     }
 
     void initGUI(){
@@ -125,12 +130,42 @@ public class Eval {
 	op.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	op.setObservedRegionTranslucency(0.5f);
 	op.setObservedRegionListener((ObservedRegionListener)eh);
-	updateOverview();
     }
 
     void initWorld(){
-	//XXX: basic stuff for testing
-	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.BLUE), mSpace);
+	float h = 0.8f;float s = 1.0f;float v = 1.0f;
+	long randomX = 0;
+	long randomY = 0;
+	long randomS = 0;
+	float randomO = 0;
+	float randomSat = 0;
+	double shapeType = 0;
+	Glyph g;
+	float[] vertices = {1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f};
+	for (int i=0;i<200;i++){
+	    randomX = Math.round(Math.random()*6000);
+	    randomY = Math.round(Math.random()*6000);
+	    randomS = Math.round(Math.random()*199)+20;
+	    randomO = (float)(Math.random()*2*Math.PI);
+	    randomSat = (float)Math.random();
+	    shapeType = Math.random();
+	    if (shapeType<0.2){
+		g = new VTriangleOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
+	    }
+	    else if (shapeType<0.4){
+		g = new VDiamondOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
+	    }
+	    else if (shapeType<0.6){
+		g = new VOctagonOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
+	    }
+	    else if (shapeType<0.8){
+		g = new VRectangleOr(randomX, randomY, 0, randomS, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
+	    }
+	    else {
+		g = new VShape(randomX, randomY, 0, randomS, vertices, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
+	    }
+	    vsm.addGlyph(g, mSpace);
+	}
     }
 
     void centerOverview(boolean animate){
