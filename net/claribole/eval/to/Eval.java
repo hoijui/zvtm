@@ -54,7 +54,8 @@ public class Eval {
     static int OVERVIEW_HEIGHT = 150;
     static final Color DEFAULT_PORTAL_BORDER_COLOR = Color.BLACK;
     static final Color INSIDE_PORTAL_BORDER_COLOR = Color.RED;
-    static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 24.0f;
+    static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 48.0f;
+    static final int OVERVIEW_CENTERING_TRANSLATE_TIME = 300;
     
     /* trailing overview settings */
     static final int TOW_SWITCH_ANIM_TIME = 500;
@@ -131,6 +132,16 @@ public class Eval {
 	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.BLUE), mSpace);
     }
 
+    void centerOverview(boolean animate){
+	if (animate){
+	    vsm.animator.createCameraAnimation(OVERVIEW_CENTERING_TRANSLATE_TIME, AnimManager.CA_TRANS_SIG,
+					       new LongPoint(mCamera.posx-oCamera.posx, mCamera.posy-oCamera.posy), oCamera.getID());
+	}
+	else {
+	    oCamera.moveTo(mCamera.posx, mCamera.posy);
+	}
+    }
+    
     void updateOverview(){// update overview camera's altitude
 	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
     }

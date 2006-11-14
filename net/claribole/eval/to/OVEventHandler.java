@@ -20,6 +20,7 @@ import net.claribole.zvtm.engine.*;
 class OVEventHandler extends BaseEventHandler implements PortalEventHandler {
 
     boolean mouseInsideOverview = false;
+    boolean delayedOverviewExit = false;
 
     OVEventHandler(Eval app){
 	this.application = app;
@@ -42,7 +43,14 @@ class OVEventHandler extends BaseEventHandler implements PortalEventHandler {
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	mCameraStickedToMouse = false;
+	if (delayedOverviewExit){
+	    portalExitActions();
+	    delayedOverviewExit = false;
+	}
+	if (mCameraStickedToMouse){
+	    application.centerOverview(true);
+	    mCameraStickedToMouse = false;
+	}
 	oCameraStickedToMouse = false;
 	orStickedToMouse = false;
     }
@@ -89,14 +97,29 @@ class OVEventHandler extends BaseEventHandler implements PortalEventHandler {
     /**cursor enters portal*/
     public void enterPortal(Portal p){
 	mouseInsideOverview = true;
+	if (delayedOverviewExit){
+	    delayedOverviewExit = false;
+	    return;
+	}
 	((CameraPortal)p).setBorder(Eval.INSIDE_PORTAL_BORDER_COLOR);
 	application.vsm.repaintNow();
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
+	if (orStickedToMouse){
+	    delayedOverviewExit = true;
+	}
+	else {
+	    portalExitActions();
+	}
+    }
+
+    void portalExitActions(){
 	mouseInsideOverview = false;
-	((CameraPortal)p).setBorder(Eval.DEFAULT_PORTAL_BORDER_COLOR);
+	delayedOverviewExit = false;
+	application.centerOverview(true);
+	application.op.setBorder(Eval.DEFAULT_PORTAL_BORDER_COLOR);
 	application.vsm.repaintNow();
     }
     

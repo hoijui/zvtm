@@ -47,7 +47,14 @@ class TOWEventHandler extends BaseEventHandler implements PortalEventHandler {
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	mCameraStickedToMouse = false;
+	if (delayedTOWExit){
+	    portalExitActions();
+	    delayedTOWExit = false;
+	}
+	if (mCameraStickedToMouse){
+	    application.centerOverview(false);
+	    mCameraStickedToMouse = false;
+	}
 	oCameraStickedToMouse = false;
 	orStickedToMouse = false;
     }
@@ -133,18 +140,19 @@ class TOWEventHandler extends BaseEventHandler implements PortalEventHandler {
 	if (!mouseInsideTOW){// do not exec exit actions if enter actions
 	    return;          // were not executed at entry time
 	}
-// 	if (regionStickedToMouse){
-// 	    delayedTOWExit = true;
-// 	}
-// 	else {
+	if (orStickedToMouse){
+	    delayedTOWExit = true;
+	}
+	else {
 	    portalExitActions();
-// 	}
+	}
     }
 
     void portalExitActions(){
 	mouseInsideTOW = false;
 	delayedTOWExit = false;
  	unstickPortal();
+	application.centerOverview(false);
 	application.vsm.repaintNow();
     }
 
