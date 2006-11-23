@@ -119,8 +119,8 @@ class FresnelManager implements RDFErrorHandler {
 
 
     static final String N3 = "N3";
-    static final File LAYOUT_LENS_FILE = new File("GIS/fresnel/gnb-layout.n3");
-    static final File DETAIL_LENS_FILE = new File("GIS/fresnel/gnb-detail.n3");
+    static final File LAYOUT_LENS_FILE = new File("data/GIS/RDF/fresnel/gnb-layout.n3");
+    static final File DETAIL_LENS_FILE = new File("data/GIS/RDF/fresnel/gnb-detail.n3");
 
     static final Color FRAME_FILL_COLOR = Color.BLACK;
     static final Color FRAME_BORDER_COLOR = Color.WHITE;

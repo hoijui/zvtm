@@ -153,17 +153,17 @@ public class GeoDataStore {
     void buildCities(){
 	Vector data = new Vector();
 // 	// capitales
-// 	processFile("data/capitals_f224_xy.csv", CITIES, data);
+// 	processFile("data/GIS/capitals_f224_xy.csv", CITIES, data);
 // 	// world cities
-//  	processFile("data/world_cities_f2058_xy.csv", CITIES, data);
+//  	processFile("data/GIS/world_cities_f2058_xy.csv", CITIES, data);
 // 	// US cities
-// 	processFile("data/us_cities_f80000_xy.csv", CITIES, data);
+// 	processFile("data/GIS/us_cities_f80000_xy.csv", CITIES, data);
 // 	// Canadian cities
-// 	processFile("data/ca_cities_f40000_xy.csv", CITIES, data);
+// 	processFile("data/GIS/ca_cities_f40000_xy.csv", CITIES, data);
 // 	// Mexican cities
-//  	processFile("data/mx_cities_f80000_xy.csv", CITIES, data);
+//  	processFile("data/GIS/mx_cities_f80000_xy.csv", CITIES, data);
  	// filtered data
- 	processFile((trainingData) ? "data/training_cities.csv" : "data/finalCitySet.csv", CITIES, data);
+ 	processFile((trainingData) ? "data/GIS/training_cities.csv" : "data/GIS/finalCitySet.csv", CITIES, data);
 	storeCities(data);
 	if (ZLWorldTask.SHOW_CONSOLE){application.console.append("Loaded "+(data.size()/2)+" cities total\n", Console.GRAY_STYLE);}
     }
@@ -171,7 +171,7 @@ public class GeoDataStore {
     /*process all files containing country data*/
     void buildCountries(){
 	Vector data = new Vector();
-	processFile((trainingData) ? "data/training_countries.csv" : "data/countries_f192_xy.csv", COUNTRIES, data);
+	processFile((trainingData) ? "data/GIS/training_countries.csv" : "data/GIS/countries_f192_xy.csv", COUNTRIES, data);
 	storeCountries(data);
     }
 
@@ -179,13 +179,13 @@ public class GeoDataStore {
     void buildRegions(){
 	Vector data = new Vector();
 	if (trainingData){
-	    processFile("data/training_states.csv", REGIONS, data);
+	    processFile("data/GIS/training_states.csv", REGIONS, data);
 	}
 	else {
 	    // US states
-	    processFile("data/us_states_f50_xy.csv", REGIONS, data);
+	    processFile("data/GIS/us_states_f50_xy.csv", REGIONS, data);
 	    // Canadian provinces
-	    processFile("data/ca_provinces_13_xy.csv", REGIONS, data);
+	    processFile("data/GIS/ca_provinces_13_xy.csv", REGIONS, data);
 	}
 	storeRegions(data);
 	if (ZLWorldTask.SHOW_CONSOLE){application.console.append("Loaded "+data.size()+" regions total\n", Console.GRAY_STYLE);}
