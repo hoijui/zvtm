@@ -22,6 +22,9 @@ import java.awt.event.MouseWheelEvent;
 
 public class ZgrAppletEvtHdlr implements ViewEventHandler {
 
+    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
+
     ZGRApplet application;
 
     long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
@@ -42,7 +45,7 @@ public class ZgrAppletEvtHdlr implements ViewEventHandler {
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.rememberLocation(v.cams[0].getLocation());
+// 	application.rememberLocation(v.cams[0].getLocation());
 	if (mod==NO_MODIFIER || mod==SHIFT_MOD){
 	    manualLeftButtonMove=true;
 	    lastJPX=jpx;
@@ -92,7 +95,7 @@ public class ZgrAppletEvtHdlr implements ViewEventHandler {
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.rememberLocation(v.cams[0].getLocation());
+// 	application.rememberLocation(v.cams[0].getLocation());
 	lastJPX=jpx;
 	lastJPY=jpy;
 	//application.vsm.setActiveCamera(v.cams[0]);
@@ -134,7 +137,16 @@ public class ZgrAppletEvtHdlr implements ViewEventHandler {
 	}
     }
 
-    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+	tfactor = (application.mainCamera.focal+Math.abs(application.mainCamera.altitude))/application.mainCamera.focal;
+	if (wheelDirection == WHEEL_UP){// zooming in
+	    application.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
+	}
+	else {// wheelDirection == WHEEL_DOWN, zooming out
+	    application.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
+	}
+	application.vsm.repaintNow();
+    }
 
     public void enterGlyph(Glyph g){
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}

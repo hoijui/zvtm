@@ -8,123 +8,117 @@
 
 package net.claribole.zgrviewer;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.io.File;
-import java.io.InputStream;
+import java.awt.*;
 import java.util.Vector;
 
-import javax.swing.JFrame;
+import javax.swing.JApplet;
 import javax.swing.JPanel;
 
 import net.claribole.zvtm.engine.Location;
 
 import org.w3c.dom.Document;
 
-import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.*;
 import com.xerox.VTM.svg.SVGReader;
 
 
-public class ZGRApplet {
+public class ZGRApplet extends JApplet {
 
-    static String zgrvURI="http://zvtm.sourceforge.net/zgrviewer";
+    static final int DEFAULT_VIEW_WIDTH = 640;
+    static final int DEFAULT_VIEW_HEIGHT = 480;
+    static final String WIDTH_APPLET_PARAM = "width";
+    static final String HEIGHT_APPLET_PARAM = "height";
+    static final String SVG_FILE_URL_PARAM = "svgURL";
 
     VirtualSpaceManager vsm;
-    String mainSpace="graphSpace";
-
+    static final String mainSpace = "graphSpace";
+    VirtualSpace mSpace;
     View mainView;
-    String viewName="dotView";
-    JPanel viewPanel;
-    int mainViewWidth=640;
-    int mainViewHeight=480;
+    static final String mainViewName = "gvView";
+    JPanel mViewPanel;
+    Camera mainCamera;
+    int appletWindowWidth = DEFAULT_VIEW_WIDTH;
+    int appletWindowHeight = DEFAULT_VIEW_HEIGHT;
 
     ZgrAppletEvtHdlr meh;
 
-    Font font=ConfigManager.defaultFont;
-
-    /*remember previous camera locations so that we can get back*/
-    static final int MAX_PREV_LOC=10;
-    Vector previousLocations;
-
-    ZGRApplet(int viewWidth,int viewHeight){
-	initConfig(viewWidth,viewHeight);
-	initGUI(false);
+    public ZGRApplet(){
+	getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
     }
 
-    ZGRApplet(int viewWidth,int viewHeight,boolean antiAliased){
-	initConfig(viewWidth,viewHeight);
-	initGUI(antiAliased);
-    }
+    public void init(){
+	try {appletWindowWidth = Integer.parseInt(getParameter(WIDTH_APPLET_PARAM));}
+	catch(NumberFormatException ex){appletWindowWidth = DEFAULT_VIEW_WIDTH;}
+	try {appletWindowHeight = Integer.parseInt(getParameter(HEIGHT_APPLET_PARAM));}
+	catch(NumberFormatException ex){appletWindowHeight = DEFAULT_VIEW_HEIGHT;}
+	Container cpane = getContentPane();
+	cpane.setBackground(Color.WHITE);
+	cpane.setLayout(new FlowLayout());
 
-    void initConfig(int viewWidth,int viewHeight){
-	previousLocations=new Vector();
-	if (viewWidth>0){mainViewWidth=viewWidth;}
-	if (viewHeight>0){mainViewHeight=viewHeight;}
-    }
-
-    void initGUI(boolean antialias){
-	vsm=new VirtualSpaceManager();
+	AppletUtils.initLookAndFeel();
+	vsm = new VirtualSpaceManager(true);
 	vsm.setMainFont(ConfigManager.defaultFont);
 	vsm.setZoomLimit(-90);
-	vsm.setMouseInsideGlyphColor(Color.red);
-	//vsm.setDebug(true);
-	vsm.addVirtualSpace(mainSpace);
-	vsm.addCamera(mainSpace);
-	Vector vc1=new Vector();
+	vsm.setMouseInsideGlyphColor(Color.RED);
+	mSpace = vsm.addVirtualSpace(mainSpace);
+	mainCamera = vsm.addCamera(mainSpace); // camera #0 for main view
+	Vector vc1 = new Vector();
 	vc1.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
- 	viewPanel=vsm.addPanelView(vc1,viewName,mainViewWidth,mainViewHeight);
+
+	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
+	cpane.setSize(appletWindowWidth, appletWindowHeight);
+
+	
+
+
+ 	mViewPanel = vsm.addPanelView(vc1, ConfigManager.MAIN_TITLE, appletWindowWidth, appletWindowHeight);
+
+	mViewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-60));
+
+	cpane.add(mViewPanel);
+
+	mainView = vsm.getView(ConfigManager.MAIN_TITLE);
 	mainView.setBackgroundColor(ConfigManager.backgroundColor);
-	meh=new ZgrAppletEvtHdlr(this);
+	meh = new ZgrAppletEvtHdlr(this);
 	mainView.setEventHandler(meh);
-	setAntialiasing(antialias);
+
+	setVisible(true);
+	validate();
+
+	final SwingWorker worker = new SwingWorker(){
+		public Object construct(){
+		    loadSVG();
+		    return null; 
+		}
+	    };
+	worker.start();
     }
+
+    void loadSVG(){
+	try {
+	    String svgFileURL = getParameter(SVG_FILE_URL_PARAM);
+	    Document svgDoc = AppletUtils.parse(svgFileURL, false);
+	    if (svgDoc != null){
+		SVGReader.load(svgDoc, vsm, ZGRApplet.mainSpace, true);
+ 		getGlobalView();
+	    }
+	    else {
+		System.err.println("An error occured while loading file " + svgFileURL);
+	    }
+	}
+	catch (Exception ex){ex.printStackTrace();}
+    }
+
+    void getGlobalView(){
+	vsm.getGlobalView(mSpace.getCamera(0),ConfigManager.ANIM_MOVE_LENGTH);
+    }
+
 
     /**
      * Use this method to get the ZVTM view as JPanel that can be embedded in your JApplet
      */
     public JPanel getPanel(){
-	return viewPanel;
-    }
-
-    public void reset(){
-	vsm.destroyGlyphsInSpace(mainSpace);
-	previousLocations.removeAllElements();
-    }
-
-    /**
-     *load the SVG file generated by GraphViz from a java.io.File (probably won't work with applets - use loadSVG(InputStream) )
-     */
-    public void loadSVG(File f){
-	try {
-	    Document svgDoc=Utils.parse(f,false);
-	    SVGReader.load(svgDoc,vsm,mainSpace);
-	    font=vsm.getMainFont();
-	    getGlobalView();
-	    if (previousLocations.size()==1){previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	}
-	catch (Exception ex){
-	    System.err.println(Messages.loadError+f.toString());
-	}
-    }
-
-    /**
-     *load the SVG file generated by GraphViz from a java.io.InputStream
-     */
-    public void loadSVG(InputStream is){
-	try {
-	    Document svgDoc=Utils.parse(is,false);
-	    SVGReader.load(svgDoc,vsm,mainSpace);
-	    font=vsm.getMainFont();
-	    getGlobalView();
-	    if (previousLocations.size()==1){previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	}
-	catch (Exception ex){
-	    System.err.println(Messages.loadError+is.toString());
-	}
+	return mViewPanel;
     }
 
     /**
@@ -132,132 +126,15 @@ public class ZGRApplet {
      */
     public void loadSVG(String uri){
 	try {
-	    Document svgDoc=Utils.parse(uri,false);
+	    Document svgDoc=AppletUtils.parse(uri,false);
 	    SVGReader.load(svgDoc,vsm,mainSpace);
-	    font=vsm.getMainFont();
-	    getGlobalView();
-	    if (previousLocations.size()==1){previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
+	    //font=vsm.getMainFont();
+	    //getGlobalView();
+// 	    if (previousLocations.size()==1){previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	}
 	catch (Exception ex){
 	    System.err.println(Messages.loadError+uri);
 	}
-    }
-
-    public void getGlobalView(){
-	Location l=vsm.getGlobalView(vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH);
-	rememberLocation(vsm.getActiveCamera().getLocation());
-    }
-
-
-    /*higher view (multiply altitude by altitudeFactor)*/
-    void getHigherView(){
-	Camera c=mainView.getCameraNumber(0);
-	rememberLocation(c.getLocation());
-	Float alt=new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
-    }
-
-    /*higher view (multiply altitude by altitudeFactor)*/
-    void getLowerView(){
-	Camera c=mainView.getCameraNumber(0);
-	rememberLocation(c.getLocation());
-	Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
-    }
-
-    /*direction should be one of ZGRViewer.MOVE_* - can be bound to keyboard arrow keys (for instance)*/
-    void translateView(short direction){
-	Camera c=mainView.getCameraNumber(0);
-	rememberLocation(c.getLocation());
-	LongPoint trans;
-	long[] rb=mainView.getVisibleRegion(c);
-	if (direction==ZGRViewer.MOVE_UP){
-	    long qt=Math.round((rb[1]-rb[3])/2.4);
-	    trans=new LongPoint(0,qt);
-	}
-	else if (direction==ZGRViewer.MOVE_DOWN){
-	    long qt=Math.round((rb[3]-rb[1])/2.4);
-	    trans=new LongPoint(0,qt);
-	}
-	else if (direction==ZGRViewer.MOVE_RIGHT){
-	    long qt=Math.round((rb[2]-rb[0])/2.4);
-	    trans=new LongPoint(qt,0);
-	}
-	else if (direction==ZGRViewer.MOVE_LEFT){
-	    long qt=Math.round((rb[0]-rb[2])/2.4);
-	    trans=new LongPoint(qt,0);
-	}
-	else if (direction==ZGRViewer.MOVE_UP_LEFT){
-	    long qt=Math.round((rb[3]-rb[1])/2.4);
-	    long qt2=Math.round((rb[2]-rb[0])/2.4);
-	    trans=new LongPoint(qt,qt2);
-	}
-	else if (direction==ZGRViewer.MOVE_UP_RIGHT){
-	    long qt=Math.round((rb[1]-rb[3])/2.4);
-	    long qt2=Math.round((rb[2]-rb[0])/2.4);
-	    trans=new LongPoint(qt,qt2);
-	}
-	else if (direction==ZGRViewer.MOVE_DOWN_RIGHT){
-	    long qt=Math.round((rb[1]-rb[3])/2.4);
-	    long qt2=Math.round((rb[0]-rb[2])/2.4);
-	    trans=new LongPoint(qt,qt2);
-	}
-	else {//direction==DOWN_LEFT
-	    long qt=Math.round((rb[3]-rb[1])/2.4);
-	    long qt2=Math.round((rb[0]-rb[2])/2.4);
-	    trans=new LongPoint(qt,qt2);
-	}
-	vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
-    }
-
-    protected void rememberLocation(Location l){
-	if (previousLocations.size()>=MAX_PREV_LOC){// as a result of release/click being undifferentiated)
-	    previousLocations.removeElementAt(0);
-	}
-	if (previousLocations.size()>0){
-	    if (!Location.equals((Location)previousLocations.lastElement(),l)){
-		previousLocations.add(l);
-	    }
-	}
-	else {previousLocations.add(l);}
-    }
-
-    public void moveBack(){
-	if (previousLocations.size()>0){
-	    Location newlc=(Location)previousLocations.lastElement();
-	    Location currentlc=vsm.getActiveCamera().getLocation();
-	    Vector animParams=Location.getDifference(currentlc,newlc);
-	    vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,animParams,vsm.getActiveCamera().getID());
-	    previousLocations.removeElementAt(previousLocations.size()-1);
-	}
-    }
-
-    /**
-     *prompts a dialog box for choosing a new font (among the ones available on the system) and assign it to all labels in the graph 
-     */
-    public void assignFontToGraph(){
-	Font f=net.claribole.zvtm.fonts.FontDialog.getFontDialog((JFrame)mainView.getFrame(),this.font);
-	if (f!=null){
-	    this.font=f;
-	    vsm.setMainFont(this.font);
-	}
-    }
-
-    /**
-     *entry point to the ZVTM library components
-     */
-    public VirtualSpaceManager getVSM(){
-	return vsm;
-    }
-
-    /*antialias ON/OFF for zvtm views*/
-    public void setAntialiasing(boolean b){
-	mainView.setAntialiasing(b);
-    }
-
-    /*set the zvtm view's background color*/
-    public void setBackground(Color c){
-	mainView.setBackgroundColor(c);
     }
 
 }
