@@ -48,6 +48,7 @@ import javax.swing.event.ChangeListener;
 class PrefWindow extends JFrame implements ActionListener {
 
     ZGRViewer application;
+    GraphicsManager grMngr;
     
     JTabbedPane tabbedPane;
 
@@ -78,9 +79,9 @@ class PrefWindow extends JFrame implements ActionListener {
     JTextField proxyHostTf,proxyPortTf;
     JButton proxyHelpBt;
 
-    PrefWindow(ZGRViewer app){
+    PrefWindow(ZGRViewer app, GraphicsManager gm){
 	this.application=app;
-
+	this.grMngr = gm;
 	tabbedPane = new JTabbedPane();
 
 	//misc panel
@@ -643,7 +644,7 @@ class PrefWindow extends JFrame implements ActionListener {
 	else if (o==savePrefs){updateVars();application.saveConfiguration();}
 	else if (o==antialiascb){
 	    if (antialiascb.isSelected()){javax.swing.JOptionPane.showMessageDialog(this,Messages.antialiasingWarning);}
-	    application.setAntialiasing(antialiascb.isSelected());
+	    grMngr.setAntialiasing(antialiascb.isSelected());
 	}
     }
 

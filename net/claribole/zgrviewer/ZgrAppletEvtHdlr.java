@@ -20,7 +20,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-public class ZgrAppletEvtHdlr implements ViewEventHandler {
+public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;

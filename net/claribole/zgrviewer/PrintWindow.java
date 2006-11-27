@@ -82,14 +82,18 @@ public class PrintWindow
     
     private int dpi = last_dpi;
     
+    GraphicsManager grMngr;
+
     /**
      * Constructor for objects of class PrintWindow
      * @param   w   starting pixel width
      * @param   h   starting pixel height
+     *@param gm GraphicsManager instantiated by the parent ZGRViewer/ZGRApplet
      */
-    public PrintWindow(long w, long h){   
+    public PrintWindow(long w, long h, GraphicsManager gm){
+	this.grMngr = gm;
 	if ( w < 1 || h < 1){
-	    JOptionPane.showMessageDialog(ZGRViewer.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
+	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
 	    return;
 	}
 	
@@ -174,19 +178,19 @@ public class PrintWindow
         class ExportActionListener implements ActionListener{
 	    public void actionPerformed(ActionEvent e){
 		hide();
-		ZGRViewer.mainView.setStatusBarText("Sending image to printer ... (This operation can take some time)");
+		grMngr.mainView.setStatusBarText("Sending image to printer ... (This operation can take some time)");
 		
 		realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
 		realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
 		
-		java.awt.image.BufferedImage bi = ZGRViewer.mainView.rasterize((int)realWidth, (int)realHeight, ZGRViewer.vsm);
+		java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm);
 
 		if (bi!=null){
 		    PrintUtilities pu=new PrintUtilities(bi);
 		    pu.print();
 		}
 
-		ZGRViewer.mainView.setStatusBarText("Sending image to printer ...done");
+		grMngr.mainView.setStatusBarText("Sending image to printer ...done");
 	    }
         }
         
@@ -207,7 +211,7 @@ public class PrintWindow
         frame.getRootPane().setDefaultButton(export);
         content.setPreferredSize(new Dimension(400,200));
         frame.pack();
-	frame.setLocationRelativeTo(ZGRViewer.mainView.getFrame());
+	frame.setLocationRelativeTo(grMngr.mainView.getFrame());
         frame.setVisible(true);
     }
     

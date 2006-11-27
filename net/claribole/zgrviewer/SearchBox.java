@@ -44,7 +44,7 @@ class SearchBox extends JFrame implements ActionListener, KeyListener {
 
     static Color FIND_COLOR = Color.red;
 
-    ZGRViewer application;
+    GraphicsManager grMngr;
     
     JButton prevBt, nextBt;
     JTextField searchText;
@@ -56,9 +56,9 @@ class SearchBox extends JFrame implements ActionListener, KeyListener {
 //     Glyph lastMatchingEntity = null;  //remember it so that its color can be reset after the search ends
 //     Color lastMatchingColor = null;
 
-    SearchBox(ZGRViewer app){
+    SearchBox(GraphicsManager gm){
 	super();
-	this.application = app;
+	this.grMngr = gm;
 	Container cp = this.getContentPane();
 	cp.setLayout(new GridLayout(2,1));
 	JPanel p1 = new JPanel();
@@ -109,7 +109,7 @@ class SearchBox extends JFrame implements ActionListener, KeyListener {
 	if (s.length()>0){
 	    if (!s.toLowerCase().equals(lastSearchedString)){//searching a new string - reinitialize everything
 		resetSearch(s);
-		Glyph[] gl = application.mSpace.getVisibleGlyphList();
+		Glyph[] gl = grMngr.mSpace.getVisibleGlyphList();
 		for (int i=0;i<gl.length;i++){
 		    if (gl[i] instanceof VText){
 			if ((((VText)gl[i]).getText() != null) &&
@@ -131,10 +131,10 @@ class SearchBox extends JFrame implements ActionListener, KeyListener {
 		    searchIndex = 0;
 		}
 		if (matchSize > 1){
-		    application.mainView.setStatusBarText(Utils.rankString(searchIndex+1) + " of " + matchSize + " matches");
+		    grMngr.mainView.setStatusBarText(Utils.rankString(searchIndex+1) + " of " + matchSize + " matches");
 		}
 		else {
-		    application.mainView.setStatusBarText(matchSize + " match");
+		    grMngr.mainView.setStatusBarText(matchSize + " match");
 		}
 		//center on the entity
 		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
@@ -142,7 +142,7 @@ class SearchBox extends JFrame implements ActionListener, KeyListener {
 // 		lastMatchingEntity = g;
 // 		lastMatchingColor = g.getColor();
 // 		lastMatchingEntity.setColor(FIND_COLOR);
-		application.vsm.centerOnGlyph(g /*lastMatchingEntity*/, application.mSpace.getCamera(0), 400);
+		grMngr.vsm.centerOnGlyph(g /*lastMatchingEntity*/, grMngr.mSpace.getCamera(0), 400);
 	    }
 	}
     }

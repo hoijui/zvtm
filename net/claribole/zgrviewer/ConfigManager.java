@@ -14,8 +14,6 @@ package net.claribole.zgrviewer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -36,9 +34,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-class ConfigManager implements ComponentListener{
+class ConfigManager {
 
-    static String MAIN_TITLE="ZGRViewer";
+    static final String zgrvURI = "http://zvtm.sourceforge.net/zgrviewer";
+
+    static final String MAIN_TITLE = "ZGRViewer";
 
     static int mainViewW=800;
     static int mainViewH=600;
@@ -70,6 +70,10 @@ class ConfigManager implements ComponentListener{
 	}
     }
 
+  
+
+
+    /* Misc. Prefs */
     static boolean SAVE_WINDOW_LAYOUT=false;
     static boolean DELETE_TEMP_FILES=true;
     static boolean ANTIALIASING=false;
@@ -136,10 +140,10 @@ class ConfigManager implements ComponentListener{
     static Vector LAST_COMMANDS;
     static int COMMAND_LIMIT = 5;
 
-    ZGRViewer application;
+    GraphicsManager grMngr;
 
-    ConfigManager(ZGRViewer app){
-	application=app;
+    ConfigManager(GraphicsManager gm){
+	this.grMngr = gm;
 	cfgFile=new File(System.getProperty("user.home")+"/"+PREFS_FILE_NAME);
 	LAST_COMMANDS = new Vector();
     }
@@ -153,23 +157,23 @@ class ConfigManager implements ComponentListener{
 		Document d=Utils.parse(cfgFile,false);
 		d.normalize();
 		Element rt=d.getDocumentElement();
-		Element e=(Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI,"directories")).item(0);
+		Element e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"directories")).item(0);
 		try {
-		    ConfigManager.m_TmpDir=new File(e.getElementsByTagNameNS(ZGRViewer.zgrvURI,"tmpDir").item(0).getFirstChild().getNodeValue());
-		    ConfigManager.DELETE_TEMP_FILES=(new Boolean(((Element)e.getElementsByTagNameNS(ZGRViewer.zgrvURI,"tmpDir").item(0)).getAttribute("value"))).booleanValue();
+		    ConfigManager.m_TmpDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"tmpDir").item(0).getFirstChild().getNodeValue());
+		    ConfigManager.DELETE_TEMP_FILES=(new Boolean(((Element)e.getElementsByTagNameNS(ConfigManager.zgrvURI,"tmpDir").item(0)).getAttribute("value"))).booleanValue();
 		}
 		catch (Exception ex){}
-		try {ConfigManager.m_PrjDir=new File(e.getElementsByTagNameNS(ZGRViewer.zgrvURI,"graphDir").item(0).getFirstChild().getNodeValue());}
+		try {ConfigManager.m_PrjDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphDir").item(0).getFirstChild().getNodeValue());}
 		catch (Exception ex){}
-		try {ConfigManager.m_DotPath=new File(e.getElementsByTagNameNS(ZGRViewer.zgrvURI,"dot").item(0).getFirstChild().getNodeValue());}
+		try {ConfigManager.m_DotPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"dot").item(0).getFirstChild().getNodeValue());}
 		catch (Exception ex){}
-		try {ConfigManager.m_NeatoPath=new File(e.getElementsByTagNameNS(ZGRViewer.zgrvURI,"neato").item(0).getFirstChild().getNodeValue());}
+		try {ConfigManager.m_NeatoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"neato").item(0).getFirstChild().getNodeValue());}
 		catch (Exception ex){}
-		try {ConfigManager.m_GraphVizFontDir=new File(e.getElementsByTagNameNS(ZGRViewer.zgrvURI,"graphvizFontDir").item(0).getFirstChild().getNodeValue());}
+		try {ConfigManager.m_GraphVizFontDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphvizFontDir").item(0).getFirstChild().getNodeValue());}
 		catch (Exception ex){}
 		//web browser settings
 		try {
-		    e=(Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI,"webBrowser")).item(0);
+		    e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"webBrowser")).item(0);
 		    ConfigManager.autoDetectBrowser=(new Boolean(e.getAttribute("autoDetect"))).booleanValue();
 		    ConfigManager.browserPath=new File(e.getAttribute("path"));
 		    ConfigManager.browserOptions=e.getAttribute("options");
@@ -177,14 +181,14 @@ class ConfigManager implements ComponentListener{
 		catch (Exception ex){}
 		//proxy settings
 		try {
-		    e=(Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI,"proxy")).item(0);
+		    e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"proxy")).item(0);
 		    updateProxy((new Boolean(e.getAttribute("enable"))).booleanValue(),
 				e.getAttribute("host"),e.getAttribute("port"));
 		}
 		catch (Exception ex){System.getProperties().put("proxySet","false");}
 		//misc prefs
 		try {
-		    e=(Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI,"preferences")).item(0);
+		    e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"preferences")).item(0);
 		}
 		catch (Exception ex){}
 		try {
@@ -217,7 +221,7 @@ class ConfigManager implements ComponentListener{
 		catch (Exception ex){}
 		try {
 		    if (ConfigManager.SAVE_WINDOW_LAYOUT){//window layout preferences
-			e=(Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI,"windows")).item(0);
+			e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"windows")).item(0);
 			mainViewX=(new Integer(e.getAttribute("mainX"))).intValue();
 			mainViewY=(new Integer(e.getAttribute("mainY"))).intValue();
 			mainViewW=(new Integer(e.getAttribute("mainW"))).intValue();
@@ -227,7 +231,7 @@ class ConfigManager implements ComponentListener{
 		catch (Exception ex){}
 		//plugin settings
 		try {
-		    e = (Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI, "plugins")).item(0);
+		    e = (Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugins")).item(0);
 		    if (e!=null){
 			loadPluginPreferences(e);
 		    }
@@ -236,7 +240,7 @@ class ConfigManager implements ComponentListener{
 		// stored command lines (for programs other than dot/neato)
 		LAST_COMMANDS.removeAllElements();
 		try {
-		    NodeList nl = ((Element)(rt.getElementsByTagNameNS(ZGRViewer.zgrvURI, "commandLines")).item(0)).getElementsByTagNameNS(ZGRViewer.zgrvURI, "li");
+		    NodeList nl = ((Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).item(0)).getElementsByTagNameNS(ConfigManager.zgrvURI, "li");
 		    for (int i=0;i<nl.getLength();i++){
 			if (i < COMMAND_LIMIT){LAST_COMMANDS.add(nl.item(i).getFirstChild().getNodeValue());}
 		    }
@@ -254,7 +258,7 @@ class ConfigManager implements ComponentListener{
     }
 
     void loadPluginPreferences(Element pluginsEL){
-	NodeList nl = pluginsEL.getElementsByTagNameNS(ZGRViewer.zgrvURI, "plugin");
+	NodeList nl = pluginsEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugin");
 	Element pluginEL, settingEL;
 	Node txtVal;
 	String pluginName, settingName, settingValue;
@@ -265,7 +269,7 @@ class ConfigManager implements ComponentListener{
 	    pluginEL = (Element)nl.item(i);
 	    pluginName = pluginEL.getAttribute("name");
 	    ht = new Hashtable();
-	    nl2 = pluginEL.getElementsByTagNameNS(ZGRViewer.zgrvURI, "setting");
+	    nl2 = pluginEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "setting");
 	    for (int j=0;j<nl2.getLength();j++){
 		settingEL = (Element)nl2.item(j);
 		try {
@@ -282,42 +286,42 @@ class ConfigManager implements ComponentListener{
     void saveConfig(){
  	DOMImplementation di=new DOMImplementationImpl();
 	//DocumentType dtd=di.createDocumentType("isv:config",null,"isv.dtd");
-	Document cfg=di.createDocument(ZGRViewer.zgrvURI,"zgrv:config",null);
+	Document cfg=di.createDocument(ConfigManager.zgrvURI,"zgrv:config",null);
 	//generate the XML document
 	Element rt=cfg.getDocumentElement();
-	rt.setAttribute("xmlns:zgrv",ZGRViewer.zgrvURI);
+	rt.setAttribute("xmlns:zgrv",ConfigManager.zgrvURI);
 	//save directory preferences
-	Element dirs=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:directories");
+	Element dirs=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:directories");
 	rt.appendChild(dirs);
-	Element aDir=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:tmpDir");
+	Element aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:tmpDir");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_TmpDir.toString()));
 	aDir.setAttribute("value",String.valueOf(ConfigManager.DELETE_TEMP_FILES));
 	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:graphDir");
+	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphDir");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_PrjDir.toString()));
 	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:dot");
+	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:dot");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_DotPath.toString()));
 	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:neato");
+	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:neato");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_NeatoPath.toString()));
 	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:graphvizFontDir");
+	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphvizFontDir");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_GraphVizFontDir.toString()));
 	dirs.appendChild(aDir);
 	//web settings
-	Element consts=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:webBrowser");
+	Element consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:webBrowser");
 	consts.setAttribute("autoDetect",String.valueOf(ConfigManager.autoDetectBrowser));
 	consts.setAttribute("path",ConfigManager.browserPath.toString());
 	consts.setAttribute("options",ConfigManager.browserOptions);
 	rt.appendChild(consts);
-	consts=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:proxy");
+	consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:proxy");
 	consts.setAttribute("enable",String.valueOf(ConfigManager.useProxy));
 	consts.setAttribute("host",ConfigManager.proxyHost);
 	consts.setAttribute("port",ConfigManager.proxyPort);
 	rt.appendChild(consts);
 	//save misc. constants
-	consts=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:preferences");
+	consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:preferences");
 	rt.appendChild(consts);
 // 	consts.setAttribute("graphOrient",ConfigManager.GRAPH_ORIENTATION);
 	consts.setAttribute("antialiasing",String.valueOf(ConfigManager.ANTIALIASING));
@@ -331,14 +335,14 @@ class ConfigManager implements ComponentListener{
 	if (ConfigManager.SAVE_WINDOW_LAYOUT){
 	    //first update the values
 	    updateWindowVariables();
-	    consts=cfg.createElementNS(ZGRViewer.zgrvURI,"zgrv:windows");
+	    consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:windows");
 	    consts.setAttribute("mainX",String.valueOf(mainViewX));
 	    consts.setAttribute("mainY",String.valueOf(mainViewY));
 	    consts.setAttribute("mainW",String.valueOf(mainViewW));
 	    consts.setAttribute("mainH",String.valueOf(mainViewH));
 	    rt.appendChild(consts);
 	}
-	Element pluginsEL = cfg.createElementNS(ZGRViewer.zgrvURI, "zgrv:plugins");
+	Element pluginsEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:plugins");
 	rt.appendChild(pluginsEL);
 	Hashtable pluginSettings;
 	Element pluginEL, settingEL;
@@ -346,13 +350,13 @@ class ConfigManager implements ComponentListener{
 	for (int i=0;i<plugins.length;i++){
 	    pluginSettings = plugins[i].savePreferences();
 	    if (pluginSettings != null && pluginSettings.size() > 0){
-		pluginEL = cfg.createElementNS(ZGRViewer.zgrvURI, "zgrv:plugin");
+		pluginEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:plugin");
 		pluginsEL.appendChild(pluginEL);
 		pluginEL.setAttribute("name", plugins[i].getName());
 		for (Enumeration e=pluginSettings.keys();e.hasMoreElements();){
 		    settingName = (String)e.nextElement();
 		    settingValue = (String)pluginSettings.get(settingName);
-		    settingEL = cfg.createElementNS(ZGRViewer.zgrvURI, "zgrv:setting");
+		    settingEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:setting");
 		    settingEL.setAttribute("name", settingName);
 		    settingEL.appendChild(cfg.createTextNode(settingValue));
 		    pluginEL.appendChild(settingEL);
@@ -360,11 +364,11 @@ class ConfigManager implements ComponentListener{
 	    }
 	}
 	// command lines
-	consts = cfg.createElementNS(ZGRViewer.zgrvURI, "zgrv:commandLines");
+	consts = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
 	rt.appendChild(consts);
 	if (LAST_COMMANDS != null){
 	    for (int i=0;i<LAST_COMMANDS.size();i++){
-		Element aCommand = cfg.createElementNS(ZGRViewer.zgrvURI, "zgrv:li");
+		Element aCommand = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
 		aCommand.appendChild(cfg.createTextNode((String)LAST_COMMANDS.elementAt(i)));
 		consts.appendChild(aCommand);
 	    }
@@ -383,13 +387,13 @@ class ConfigManager implements ComponentListener{
 		d = Utils.parse(cfgFile, false);
 		d.normalize();
 		rt = d.getDocumentElement();
-		if ((rt.getElementsByTagNameNS(ZGRViewer.zgrvURI, "commandLines")).getLength()>0){
-		    rt.removeChild((rt.getElementsByTagNameNS(ZGRViewer.zgrvURI, "commandLines")).item(0));
+		if ((rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).getLength()>0){
+		    rt.removeChild((rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).item(0));
 		}
-		cLines = d.createElementNS(ZGRViewer.zgrvURI, "zgrv:commandLines");
+		cLines = d.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
 		if (LAST_COMMANDS != null){
 		    for (int i=0;i<LAST_COMMANDS.size();i++){
-			Element aCmdLine = d.createElementNS(ZGRViewer.zgrvURI, "zgrv:li");
+			Element aCmdLine = d.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
 			aCmdLine.appendChild(d.createTextNode((String)LAST_COMMANDS.elementAt(i)));
 			cLines.appendChild(aCmdLine);
 		    }
@@ -397,13 +401,13 @@ class ConfigManager implements ComponentListener{
 	    }
 	    else {
 		DOMImplementation di = new DOMImplementationImpl();
-		d = di.createDocument(ZGRViewer.zgrvURI, "zgrv:config", null);
+		d = di.createDocument(ConfigManager.zgrvURI, "zgrv:config", null);
 		rt = d.getDocumentElement();
-		rt.setAttribute("xmlns:zgrv", ZGRViewer.zgrvURI);
-		cLines = d.createElementNS(ZGRViewer.zgrvURI, "zgrv:commandLines");
+		rt.setAttribute("xmlns:zgrv", ConfigManager.zgrvURI);
+		cLines = d.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
 		if (LAST_COMMANDS != null){
 		    for (int i=0;i<LAST_COMMANDS.size();i++){
-			Element aCmdLine = d.createElementNS(ZGRViewer.zgrvURI, "zgrv:li");
+			Element aCmdLine = d.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
 			aCmdLine.appendChild(d.createTextNode((String)LAST_COMMANDS.elementAt(i)));
 			cLines.appendChild(aCmdLine);
 		    }
@@ -447,10 +451,10 @@ class ConfigManager implements ComponentListener{
 
     /*update window position and size variables prior to saving them in the config file*/
     void updateWindowVariables(){
-	mainViewX=ZGRViewer.mainView.getFrame().getX();
-	mainViewY=ZGRViewer.mainView.getFrame().getY();
-	mainViewW=ZGRViewer.mainView.getFrame().getWidth();
-	mainViewH=ZGRViewer.mainView.getFrame().getHeight();
+	mainViewX = grMngr.mainView.getFrame().getX();
+	mainViewY = grMngr.mainView.getFrame().getY();
+	mainViewW = grMngr.mainView.getFrame().getWidth();
+	mainViewH = grMngr.mainView.getFrame().getHeight();
     }
 
     /*set speed-dependent automatic zooming*/
@@ -520,7 +524,7 @@ class ConfigManager implements ComponentListener{
 	}
     }
 
-    protected void initPlugins(){
+    protected void initPlugins(ZGRViewer application){
 	Vector plgs = new Vector();
 	//list all files in 'plugins' dir
 	File[] jars = ConfigManager.plugInDir.listFiles();
@@ -602,21 +606,5 @@ class ConfigManager implements ComponentListener{
 	    plugins[i].terminate();
 	}
     }
-
-    public void componentResized(ComponentEvent e){
-	if (e.getSource() == ZGRViewer.mainView.getFrame()){
-	    //update rectangle showing observed region in radar view when main view's aspect ratio changes
-	    application.cameraMoved();
-	    //update SD_ZOOM_THRESHOLD
-	    Dimension sz = ZGRViewer.mainView.getFrame().getSize();
-	    setSDZoomThreshold(0.3 * Math.sqrt(Math.pow(sz.width, 2) + Math.pow(sz.height, 2)));
-	}
-    }
-
-    public void componentHidden(ComponentEvent e){}
-
-    public void componentMoved(ComponentEvent e){}
-
-    public void componentShown(ComponentEvent e){}
 
 }

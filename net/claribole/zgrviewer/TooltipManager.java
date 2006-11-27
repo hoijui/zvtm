@@ -40,7 +40,7 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
     static int TP_MARGIN = 15;
     private boolean invalidBounds = true;
 
-    ZGRViewer application;
+    GraphicsManager grMngr;
 
     Thread runTP;
 
@@ -50,8 +50,8 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
     String tipLabel;
     int lX, lY, rX, rY, rW, rH;
 
-    TooltipManager(ZGRViewer app){
-	this.application = app;
+    TooltipManager(GraphicsManager gm){
+	this.grMngr = gm;
 
     }
 
@@ -81,17 +81,17 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
 
     void updateTooltip(){
 	if ((System.currentTimeMillis()-lastMouseMoved) > TOOLTIP_TIME){
-	    Glyph g = application.mainView.getPanel().lastGlyphEntered();
+	    Glyph g = grMngr.mainView.getPanel().lastGlyphEntered();
 	    if (g != null && tippedGlyph != g){
 		tippedGlyph = g;
 		if (tippedGlyph.getOwner() != null && tippedGlyph.getOwner() instanceof Metadata){
 		    tipLabel = ((Metadata)tippedGlyph.getOwner()).getTitle();
 		}
 		if (tipLabel != null && tipLabel.length() > 0){
-		    lX = application.mainView.mouse.getPanelXCoordinate() + TP_MARGIN;
-		    lY = application.mainView.mouse.getPanelYCoordinate() + TP_MARGIN;
+		    lX = grMngr.mainView.mouse.getPanelXCoordinate() + TP_MARGIN;
+		    lY = grMngr.mainView.mouse.getPanelYCoordinate() + TP_MARGIN;
 		    invalidBounds = true;
-		    application.vsm.repaintNow();
+		    grMngr.vsm.repaintNow();
 		}
 	    }
 	}
@@ -101,7 +101,7 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
 	tipLabel = null;
 	tippedGlyph = null;
 	invalidBounds = true;
-	application.vsm.repaintNow();
+	grMngr.vsm.repaintNow();
     }
 
     void computeTipRectangle(int labelWidth, int labelHeight){

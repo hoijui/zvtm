@@ -35,7 +35,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class PNGExportWindow{
+public class PNGExportWindow {
+
     private final static String units[] = { "pixels", "inches", "cm", "mm" };
     private final static int PIXEL = 0;
     private final static int INCH = 1;
@@ -85,15 +86,19 @@ public class PNGExportWindow{
     boolean stateLock = false;
     
     private int dpi = last_dpi;
+
+    GraphicsManager grMngr;
     
     /**
      * Constructor for objects of class PNGExportWindow
      * @param   w   starting pixel width
      * @param   h   starting pixel height
+     *@param gm GraphicsManager instantiated by the parent ZGRViewer/ZGRApplet
      */
-    public PNGExportWindow(long w, long h){   
+    public PNGExportWindow(long w, long h, GraphicsManager gm){
+	this.grMngr = gm;
 	if ( w < 1 || h < 1){
-	    JOptionPane.showMessageDialog(ZGRViewer.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
+	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
 	    return;
 	}
 		
@@ -224,13 +229,13 @@ public class PNGExportWindow{
         class ExportActionListener implements ActionListener{
 	    public void actionPerformed(ActionEvent e){
 		hide();
-		ZGRViewer.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ... (This operation can take some time)");
+		grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ... (This operation can take some time)");
 		
 		realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
 		realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
 		
-		ZGRViewer.mainView.rasterize((int)realWidth, (int)realHeight, ZGRViewer.vsm, new File(filePath.getText()));
-		ZGRViewer.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ...done");
+		grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm, new File(filePath.getText()));
+		grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ...done");
 	    }
         }
         
@@ -252,7 +257,7 @@ public class PNGExportWindow{
         frame.getRootPane().setDefaultButton(export);
         content.setPreferredSize(new Dimension(400,200));
         frame.pack();
-	frame.setLocationRelativeTo(ZGRViewer.mainView.getFrame());
+	frame.setLocationRelativeTo(grMngr.mainView.getFrame());
         frame.setVisible(true);
     }
     

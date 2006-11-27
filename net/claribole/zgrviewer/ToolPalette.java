@@ -22,7 +22,7 @@ import com.xerox.VTM.glyphs.VImage;
 
 public class ToolPalette {
     
-    ZGRViewer application;
+    GraphicsManager grMngr;
 
     static final String PALETTE_SPACE_NAME = "tps";
     VirtualSpace paletteSpace;
@@ -58,14 +58,14 @@ public class ToolPalette {
     static final int TRIGGER_ZONE_WIDTH = 48;
     static final int TRIGGER_ZONE_HEIGHT = ICON_PATHS.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
 
-    ToolPalette(ZGRViewer app){
-	this.application = app;
+    ToolPalette(GraphicsManager gm){
+	this.grMngr = gm;
 	initZVTMelements();
     }
     
     void initZVTMelements(){
-	paletteSpace = application.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
-	paletteCamera = application.vsm.addCamera(PALETTE_SPACE_NAME);
+	paletteSpace = grMngr.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
+	paletteCamera = grMngr.vsm.addCamera(PALETTE_SPACE_NAME);
 	paletteCamera.setAltitude(0);
 	buttons = new VImage[ICON_PATHS.length];
 	selectedButtons = new VImage[ICON_PATHS.length];
@@ -76,8 +76,8 @@ public class ToolPalette {
 					    (new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
 	    buttons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	    selectedButtons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
-	    application.vsm.addGlyph(buttons[i], paletteSpace);
-	    application.vsm.addGlyph(selectedButtons[i], paletteSpace);
+	    grMngr.vsm.addGlyph(buttons[i], paletteSpace);
+	    grMngr.vsm.addGlyph(selectedButtons[i], paletteSpace);
 	}
 	selectButton(buttons[0]);
     }
@@ -123,7 +123,7 @@ public class ToolPalette {
 		paletteSpace.show(buttons[i]);
 	    }
 	    if (oldSelectedIconIndex == DM_NAV_MODE){
-		application.killDM();
+		grMngr.killDM();
 	    }
 	}
     }
@@ -139,24 +139,24 @@ public class ToolPalette {
     void show(){
 	if (!visible){
 	    visible = true;
-	    application.meh.toolPaletteIsActive = true;
-	    application.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
+	    grMngr.meh.toolPaletteIsActive = true;
+	    grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
 							   new LongPoint(-2*buttons[0].getWidth()-5, 0),
 							   paletteCamera.getID(), null);
-	    application.mainView.setCursorIcon(Cursor.HAND_CURSOR);
-	    application.mainView.setActiveLayer(2);
+	    grMngr.mainView.setCursorIcon(Cursor.HAND_CURSOR);
+	    grMngr.mainView.setActiveLayer(2);
 	}
     }
 
     void hide(){
 	if (visible){
 	    visible = false;
-	    application.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
+	    grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
 							   new LongPoint(2*buttons[0].getWidth()+5, 0),
 							   paletteCamera.getID(), null);
-	    application.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
-	    application.mainView.setActiveLayer(0);	
-	    application.meh.toolPaletteIsActive = false;
+	    grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+	    grMngr.mainView.setActiveLayer(0);	
+	    grMngr.meh.toolPaletteIsActive = false;
 	}
     }
 

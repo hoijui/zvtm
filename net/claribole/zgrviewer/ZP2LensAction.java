@@ -15,20 +15,20 @@ import net.claribole.zvtm.lens.Lens;
 
 public class ZP2LensAction implements PostAnimationAction {
 
-    ZGRViewer application;
+    GraphicsManager grMngr;
     
-    public ZP2LensAction(ZGRViewer application){
-	this.application = application;
+    public ZP2LensAction(GraphicsManager gm){
+	this.grMngr = gm;
     }
     
     public void animationEnded(Object target, short type, String dimension){
 	if (type == PostAnimationAction.LENS){
-	    application.vsm.getOwningView(((Lens)target).getID()).setLens(null);
+	    grMngr.vsm.getOwningView(((Lens)target).getID()).setLens(null);
 	    ((Lens)target).dispose();
-	    application.setMagFactor(ZGRViewer.DEFAULT_MAG_FACTOR);
-	    application.lens.dispose();
-	    application.lens = null;
-	    application.setLens(ZgrvEvtHdlr.NO_LENS);
+	    grMngr.setMagFactor(GraphicsManager.DEFAULT_MAG_FACTOR);
+	    grMngr.lens.dispose();
+	    grMngr.lens = null;
+	    grMngr.setLens(GraphicsManager.NO_LENS);
 	}
     }
     

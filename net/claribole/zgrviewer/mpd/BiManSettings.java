@@ -85,7 +85,7 @@ public class BiManSettings extends JFrame implements ChangeListener {
 	this.setTitle("Bi-manual Interaction Plug-in Preferences");
 	this.pack();
 	this.setSize(400, 190);
-	this.setLocation(((JFrame)plugin.application.mainView.getFrame()).getLocation());
+	this.setLocation(((JFrame)plugin.application.grMngr.mainView.getFrame()).getLocation());
 	this.setVisible(true);
     }
     

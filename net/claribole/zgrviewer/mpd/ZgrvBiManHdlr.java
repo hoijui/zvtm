@@ -11,6 +11,7 @@
 package net.claribole.zgrviewer.mpd;
 
 import net.claribole.zgrviewer.ZGRViewer;
+import net.claribole.zgrviewer.GraphicsManager;
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 
@@ -20,18 +21,18 @@ import domino.Socket;
 
 public class ZgrvBiManHdlr implements MPDAppEventHandler {
 
-    ZGRViewer application;
+    GraphicsManager grMngr;
     private BiManPlugin plugin;
 
-    public ZgrvBiManHdlr(ZGRViewer app, BiManPlugin plugin){
-	this.application = app;
-    this.plugin = plugin;
+    public ZgrvBiManHdlr(GraphicsManager gm, BiManPlugin plugin){
+	this.grMngr = gm;
+	this.plugin = plugin;
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, Socket pd){}
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, Socket pd){
-        ZGRViewer.vsm.getGlobalView(ZGRViewer.vsm.getActiveCamera(), 300);
+        grMngr.vsm.getGlobalView(grMngr.vsm.getActiveCamera(), 300);
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, Socket pd){}
@@ -49,10 +50,10 @@ public class ZgrvBiManHdlr implements MPDAppEventHandler {
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, Socket pd){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, Socket pd){
-        Camera c=ZGRViewer.vsm.getActiveCamera();
+        Camera c = grMngr.vsm.getActiveCamera();
         float a=(c.focal+Math.abs(c.altitude))/c.focal;
             c.altitudeOffset(Math.signum(jpy)*a*10*plugin.NON_DOMINANT_HAND_DEVICE_SENSITIVITY);
-            application.cameraMoved();
+            grMngr.cameraMoved();
         
     }
 

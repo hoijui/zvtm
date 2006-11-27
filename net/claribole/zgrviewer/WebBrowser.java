@@ -16,7 +16,7 @@ class WebBrowser {
 
     WebBrowser(){}
 
-    public void show(String url){
+    public void show(String url, GraphicsManager gm){
 	if (url!=null && url.length()>0){   //perhaps we should try to convert it to a URL, or make the param a URL
 	    String command=null;            //instead of a string
 	    if (ConfigManager.autoDetectBrowser){  //try to autodetect browser
@@ -39,18 +39,18 @@ class WebBrowser {
 				proc=Runtime.getRuntime().exec(command);
 			    }
 			}
-			catch (InterruptedException ex1){javax.swing.JOptionPane.showMessageDialog(ZGRViewer.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex1);}
+			catch (InterruptedException ex1){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex1);}
 		    }
 		    
 		}
-		catch (IOException ex2){javax.swing.JOptionPane.showMessageDialog(ZGRViewer.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex2);}
+		catch (IOException ex2){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex2);}
 	    }
 	    else {
 		try {
 		    command=ConfigManager.browserPath+" "+ConfigManager.browserOptions+" "+url;
 		    Process proc=Runtime.getRuntime().exec(command);
 		}
-		catch (Exception ex3){javax.swing.JOptionPane.showMessageDialog(ZGRViewer.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex3);}
+		catch (Exception ex3){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex3);}
 	    }
 	}
     }

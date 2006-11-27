@@ -31,15 +31,17 @@ import com.xerox.VTM.svg.SVGReader;
 
 class DOTManager {
 
-    ZGRViewer application;
+    ConfigManager cfgMngr;
+    GraphicsManager grMngr;
 
     File dotF;
     File svgF;
     
     Graph graph;
 
-    DOTManager(ZGRViewer app){
-	application=app;
+    DOTManager(GraphicsManager gm, ConfigManager cm){
+	this.grMngr = gm;
+	this.cfgMngr = cm;
     }
 
     void load(File f,String prg, boolean parser){//prg="dot" or "neato"
@@ -54,7 +56,7 @@ class DOTManager {
 	}
 	catch (Exception ex){
 	    pp.destroy();
-	    javax.swing.JOptionPane.showMessageDialog(ZGRViewer.mainView.getFrame(),Messages.loadError+f.toString());
+	    javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
 	}
     }
     
@@ -98,11 +100,11 @@ class DOTManager {
     }
     
     private boolean generateDOTFile(String dotFilePath,String tmpFilePath,ProgPanel pp,String prg){
-        String[] cmdArray = new String[(application.cfgMngr.FORCE_SILENT) ? 7 : 6];
+        String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
     cmdArray[0] = (prg.equals("dot")) ? ConfigManager.m_DotPath.toString() : ConfigManager.m_NeatoPath.toString();
     cmdArray[1] = "-Tdot";
 
-    if (application.cfgMngr.FORCE_SILENT){
+    if (cfgMngr.FORCE_SILENT){
         cmdArray[2] = "-q";
         cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
         cmdArray[4] = "-o";
@@ -137,11 +139,11 @@ class DOTManager {
      *@return true if success; false if any failure occurs
      */
     private boolean generateSVGFile(String dotFilePath,String svgFilePath,ProgPanel pp,String prg){
-        String[] cmdArray = new String[(application.cfgMngr.FORCE_SILENT) ? 7 : 6];
+        String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
 	cmdArray[0] = (prg.equals("dot")) ? ConfigManager.m_DotPath.toString() : ConfigManager.m_NeatoPath.toString();
 	cmdArray[1] = "-Tsvg";
 
-	if (application.cfgMngr.FORCE_SILENT){
+	if (cfgMngr.FORCE_SILENT){
 	    cmdArray[2] = "-q";
 	    cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
 	    cmdArray[4] = "-o";
@@ -185,7 +187,7 @@ class DOTManager {
 	}
 	catch (Exception ex){
 	    pp.destroy();
-	    javax.swing.JOptionPane.showMessageDialog(ZGRViewer.mainView.getFrame(),Messages.loadError+srcFile);
+	    javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+srcFile);
 	}
     }
     
@@ -211,7 +213,7 @@ class DOTManager {
 	    p.waitFor();
 	}
  	catch (Exception e){
-	    JOptionPane.showMessageDialog(application.mainView.getFrame(), Messages.customCallExprError2 + Utils.join(cmdArray, " "),
+	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.customCallExprError2 + Utils.join(cmdArray, " "),
 					  "Command line call error", JOptionPane.ERROR_MESSAGE);
 	    System.err.println("Error generating output SVG file.\n");
 	    return false;
@@ -225,7 +227,7 @@ class DOTManager {
 	Document svgDoc=Utils.parse(svgF,false);
 	pp.setLabel("Displaying...");
 	pp.setPBValue(80);
-	SVGReader.load(svgDoc,ZGRViewer.vsm,ZGRViewer.mainSpace,true);
+	SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true);
     }
 
     void displayDOT(ProgPanel pp) throws Exception {
@@ -245,7 +247,7 @@ class DOTManager {
 
         pp.setLabel("Displaying...");
         pp.setPBValue(80);
-        ZgrReader.load(graph, ZGRViewer.vsm, ZGRViewer.mainSpace, true);
+        ZgrReader.load(graph, grMngr.vsm, grMngr.mainSpace, true);
     }
 
 

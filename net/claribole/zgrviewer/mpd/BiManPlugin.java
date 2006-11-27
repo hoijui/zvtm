@@ -40,7 +40,6 @@ public class BiManPlugin implements Plugin {
     MPDManager mpdMngr;
     Socket nonDominantSocket;
 
-
     static String NON_DOMINANT_HAND_DEVICE_NAME_LABEL = "NonDominantHandDeviceName";
     static String NON_DOMINANT_HAND_DEVICE_SENSITIVITY_LABEL = "NonDominantHandDeviceSensitivity";
     String NON_DOMINANT_HAND_DEVICE_NAME = null;
@@ -50,9 +49,8 @@ public class BiManPlugin implements Plugin {
     
     public void setApplication(ZGRViewer app){
 	this.application = app;
-	evH = new ZgrvBiManHdlr(this.application, this);
-	mpdMngr = new MPDManager(evH, this.application.mainView);
-	
+	evH = new ZgrvBiManHdlr(application.grMngr, this);
+	mpdMngr = new MPDManager(evH, application.grMngr.mainView);
     }
 
     protected void listenTo(String deviceName){

@@ -48,14 +48,16 @@ class CallBox extends JDialog implements ActionListener {
     static String CMD_LINE = "";
 
     ZGRViewer application;
+    GraphicsManager grMngr;
 
     JComboBox cmdLineCbb;
     JTextField srcFileTf;
     JButton brwBt, openBt, cancelBt;
 
-    CallBox(ZGRViewer app){
-	super((Frame)app.mainView.getFrame());
+    CallBox(ZGRViewer app, GraphicsManager gm){
+	super((Frame)gm.mainView.getFrame());
 	this.application = app;
+	this.grMngr = gm;
 	Container cpane = this.getContentPane();
 	GridBagLayout gridBag = new GridBagLayout();
 	GridBagConstraints constraints = new GridBagConstraints();
@@ -121,7 +123,7 @@ class CallBox extends JDialog implements ActionListener {
 	this.addWindowListener(w0);
 	this.setTitle("Open");
 	this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
-	this.setLocationRelativeTo(application.mainView.getFrame());
+	this.setLocationRelativeTo(grMngr.mainView.getFrame());
 	this.setResizable(false);
 	this.setVisible(true);
 	cmdLineCbb.getEditor().getEditorComponent().requestFocus();
@@ -164,17 +166,17 @@ class CallBox extends JDialog implements ActionListener {
 
     void load(String commandLine, String sourceFile){
 	setVisible(false);
-	application.reset();
+	grMngr.reset();
 	application.dotMngr.loadCustom(srcFileTf.getText(), commandLine);
 	dispose();
 	//in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	ConfigManager.defaultFont = application.vsm.getMainFont();
-	application.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
-	application.getGlobalView();
-	if (application.previousLocations.size()==1){application.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	if (ZGRViewer.rView != null){
-	    application.vsm.getGlobalView(application.mSpace.getCamera(1),100);
-	    application.cameraMoved();
+	ConfigManager.defaultFont = grMngr.vsm.getMainFont();
+	grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
+	grMngr.getGlobalView();
+	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
+	if (grMngr.rView != null){
+	    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+	    grMngr.cameraMoved();
 	}
     }
 

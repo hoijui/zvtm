@@ -25,24 +25,24 @@ import java.awt.event.MouseWheelEvent;
 
 public class RadarEvtHdlr implements ViewEventHandler {
 
-    ZGRViewer application;
+    GraphicsManager grMngr;
 
     private boolean draggingRegionRect=false;
 
-    RadarEvtHdlr(ZGRViewer app){
-	this.application=app;
+    RadarEvtHdlr(GraphicsManager gm){
+	this.grMngr = gm;
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    ZGRViewer.vsm.stickToMouse(application.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
-	    ZGRViewer.vsm.activeView.mouse.setSensitivity(false);
+	    grMngr.vsm.stickToMouse(grMngr.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
+	    grMngr.vsm.activeView.mouse.setSensitivity(false);
 	    draggingRegionRect=true;
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (draggingRegionRect){
-	    ZGRViewer.vsm.activeView.mouse.setSensitivity(true);
-	    ZGRViewer.vsm.unstickFromMouse();
+	    grMngr.vsm.activeView.mouse.setSensitivity(true);
+	    grMngr.vsm.unstickFromMouse();
 	    draggingRegionRect=false;
 	}
     }
@@ -50,22 +50,22 @@ public class RadarEvtHdlr implements ViewEventHandler {
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	ZGRViewer.vsm.getGlobalView(ZGRViewer.vsm.getVirtualSpace(ZGRViewer.mainSpace).getCamera(1),500);
-	application.cameraMoved();
+	grMngr.vsm.getGlobalView(grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(1),500);
+	grMngr.cameraMoved();
     }
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	ZGRViewer.vsm.stickToMouse(application.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
-	ZGRViewer.vsm.activeView.mouse.setSensitivity(false);
+	grMngr.vsm.stickToMouse(grMngr.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
+	grMngr.vsm.activeView.mouse.setSensitivity(false);
 	draggingRegionRect=true;
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (draggingRegionRect){
-	    ZGRViewer.vsm.activeView.mouse.setSensitivity(true);
-	    ZGRViewer.vsm.unstickFromMouse();
+	    grMngr.vsm.activeView.mouse.setSensitivity(true);
+	    grMngr.vsm.unstickFromMouse();
 	    draggingRegionRect=false;
 	}
     }
@@ -76,20 +76,20 @@ public class RadarEvtHdlr implements ViewEventHandler {
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (draggingRegionRect){
-	    application.updateMainViewFromRadar();
+	    grMngr.updateMainViewFromRadar();
 	}
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-	Camera c=application.mSpace.getCamera(0);
+	Camera c=grMngr.mSpace.getCamera(0);
 	float a=(c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(a*10);
-	    application.cameraMoved();
+	    grMngr.cameraMoved();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(-a*10);
-	    application.cameraMoved();
+	    grMngr.cameraMoved();
 	}
     }
 
@@ -100,13 +100,13 @@ public class RadarEvtHdlr implements ViewEventHandler {
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code == KeyEvent.VK_PAGE_UP){application.getHigherView();}
-	else if (code == KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
-	else if (code == KeyEvent.VK_HOME){application.getGlobalView();}
-	else if (code == KeyEvent.VK_UP){application.translateView(ZGRViewer.MOVE_UP);}
-	else if (code == KeyEvent.VK_DOWN){application.translateView(ZGRViewer.MOVE_DOWN);}
-	else if (code == KeyEvent.VK_LEFT){application.translateView(ZGRViewer.MOVE_LEFT);}
-	else if (code == KeyEvent.VK_RIGHT){application.translateView(ZGRViewer.MOVE_RIGHT);}
+	if (code == KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
+	else if (code == KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
+	else if (code == KeyEvent.VK_HOME){grMngr.getGlobalView();}
+	else if (code == KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_UP);}
+	else if (code == KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
+	else if (code == KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
+	else if (code == KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
     }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -120,8 +120,8 @@ public class RadarEvtHdlr implements ViewEventHandler {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){
-	ZGRViewer.vsm.getView(ZGRViewer.radarView).destroyView();
-	ZGRViewer.rView=null;
+	grMngr.vsm.getView(grMngr.radarView).destroyView();
+	grMngr.rView=null;
     }
 
 }
