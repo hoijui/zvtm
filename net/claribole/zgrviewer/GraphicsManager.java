@@ -133,8 +133,8 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     GraphicsManager(){}
 
-    void init(BaseEventHandler eh, int acc, JMenuBar jmb){
-	vsm=new VirtualSpaceManager();
+    Vector createZVTMelements(boolean applet){
+	vsm = new VirtualSpaceManager(applet);
 	vsm.setMainFont(ConfigManager.defaultFont);
 	vsm.setZoomLimit(-90);
 	vsm.setMouseInsideGlyphColor(Color.red);
@@ -166,25 +166,43 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	vsm.stickToGlyph(seg2,observedRegion);
 	observedRegion.setSensitivity(false);
 	tp = new ToolPalette(this);
-	Vector vc1=new Vector();
-	vc1.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
-	vc1.add(vsm.getVirtualSpace(menuSpace).getCamera(0));
-	vc1.add(tp.getPaletteCamera());
- 	if (acc == 1){
-	    mainView = vsm.addExternalView(vc1,ConfigManager.MAIN_TITLE, View.VOLATILE_VIEW, ConfigManager.mainViewW,ConfigManager.mainViewH,true,false,jmb);
+	Vector cameras = new Vector();
+	cameras.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
+	cameras.add(vsm.getVirtualSpace(menuSpace).getCamera(0));
+	cameras.add(tp.getPaletteCamera());
+	return cameras;
+    }
+
+    void createFrameView(Vector cameras, int acc, JMenuBar jmb){
+	if (acc == 1){
+	    mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, View.VOLATILE_VIEW,
+					   ConfigManager.mainViewW, ConfigManager.mainViewH,
+					   true, false, jmb);
 	}
 	else if (acc == 2){
-	    mainView = vsm.addExternalView(vc1,ConfigManager.MAIN_TITLE, View.OPENGL_VIEW, ConfigManager.mainViewW,ConfigManager.mainViewH,true,false,jmb);
+	    mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, View.OPENGL_VIEW,
+					   ConfigManager.mainViewW, ConfigManager.mainViewH,
+					   true, false, jmb);
 	}
- 	else {
-	    mainView = vsm.addExternalView(vc1,ConfigManager.MAIN_TITLE, View.STD_VIEW, ConfigManager.mainViewW,ConfigManager.mainViewH,true,false,jmb);
+	else {
+	    mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, View.STD_VIEW,
+					   ConfigManager.mainViewW, ConfigManager.mainViewH,
+					   true, false, jmb);
 	}
 	mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
-	mainView.setBackgroundColor(ConfigManager.backgroundColor);
+	mainView.getFrame().addComponentListener(this);
+    }
 
+    JPanel createPanelView(Vector cameras, int w, int h){
+	vsm.addPanelView(cameras, ConfigManager.MAIN_TITLE, w, h);
+	mainView = vsm.getView(ConfigManager.MAIN_TITLE);
+	return mainView.getPanel();
+    }
+
+    void parameterizeView(BaseEventHandler eh){
+	mainView.setBackgroundColor(ConfigManager.backgroundColor);
 	meh = eh;
 	mainView.setEventHandler((ViewEventHandler)eh);
-
 	mainView.setNotifyMouseMoved(true);
 	vsm.animator.setAnimationListener(this);
 	mainView.setVisible(true);
@@ -194,7 +212,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	mainView.setJava2DPainter(paMngr, Java2DPainter.AFTER_PORTALS);
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
-	mainView.getFrame().addComponentListener(this);
 	mainViewPanel = mainView.getPanel();
 	setAntialiasing(ConfigManager.ANTIALIASING);
 

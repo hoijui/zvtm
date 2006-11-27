@@ -88,7 +88,7 @@ public class ZGRViewer {
 
     void initConfig(){
 	grMngr = new GraphicsManager();
-	cfgMngr = new ConfigManager(grMngr);
+	cfgMngr = new ConfigManager(grMngr, false);
 	dotMngr=new DOTManager(grMngr, cfgMngr);
 	grMngr.setConfigManager(cfgMngr);
 	gvLdr = new GVLoader(this, grMngr, cfgMngr, dotMngr);
@@ -99,7 +99,8 @@ public class ZGRViewer {
     void initGUI(int acc){
 	Utils.initLookAndFeel();
 	JMenuBar jmb = initViewMenu(acc);
-	grMngr.init(new ZgrvEvtHdlr(this, this.grMngr), acc, jmb);
+	grMngr.createFrameView(grMngr.createZVTMelements(false), acc, jmb);
+	grMngr.parameterizeView(new ZgrvEvtHdlr(this, this.grMngr));
     }
 
     JMenuBar initViewMenu(int accelerationMode){

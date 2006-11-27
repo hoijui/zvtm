@@ -55,7 +55,6 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
 
     PeriodicActionManager(GraphicsManager gm){
 	this.grMngr = gm;
-
     }
 
     public void start(){

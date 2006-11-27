@@ -142,9 +142,9 @@ class ConfigManager {
 
     GraphicsManager grMngr;
 
-    ConfigManager(GraphicsManager gm){
+    ConfigManager(GraphicsManager gm, boolean applet){
 	this.grMngr = gm;
-	cfgFile=new File(System.getProperty("user.home")+"/"+PREFS_FILE_NAME);
+	if (!applet){cfgFile = new File(System.getProperty("user.home")+"/"+PREFS_FILE_NAME);}
 	LAST_COMMANDS = new Vector();
     }
 

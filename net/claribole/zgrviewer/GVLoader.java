@@ -162,6 +162,28 @@ class GVLoader {
 	}
     }
 
+    /* method used by ZGRViewer - Applet to get the server-side generated SVG file */
+    void loadSVG(String svgFileURL){
+	try {
+	    Document svgDoc = AppletUtils.parse(svgFileURL, false);
+	    if (svgDoc != null){
+		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true);
+		ConfigManager.defaultFont = grMngr.vsm.getMainFont();
+ 		grMngr.getGlobalView();
+		//do not remember camera's initial location (before global view)
+		if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
+		if (grMngr.rView != null){
+		    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+		    grMngr.cameraMoved();
+		}
+	    }
+	    else {
+		System.err.println("An error occured while loading file " + svgFileURL);
+	    }
+	}
+	catch (Exception ex){ex.printStackTrace();}
+    }
+
     void reloadFile(){
         // TODO: support integrated parser during reload
 	if (cfgMngr.lastFileOpened != null){

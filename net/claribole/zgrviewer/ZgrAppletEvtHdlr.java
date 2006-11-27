@@ -26,6 +26,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
     ZGRApplet application;
+    GraphicsManager grMngr;
 
     long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     float tfactor;
@@ -40,20 +41,21 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     boolean manualLeftButtonMove=false;
     boolean manualRightButtonMove=false;
 
-    ZgrAppletEvtHdlr(ZGRApplet app){
+    ZgrAppletEvtHdlr(ZGRApplet app, GraphicsManager gm){
 	this.application=app;
+	this.grMngr = gm;
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-// 	application.rememberLocation(v.cams[0].getLocation());
+// 	grMngr.rememberLocation(v.cams[0].getLocation());
 	if (mod==NO_MODIFIER || mod==SHIFT_MOD){
 	    manualLeftButtonMove=true;
 	    lastJPX=jpx;
 	    lastJPY=jpy;
-	    //application.vsm.setActiveCamera(v.cams[0]);
+	    //grMngr.vsm.setActiveCamera(v.cams[0]);
 	    v.setDrawDrag(true);
-	    application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-	    activeCam=application.vsm.getActiveCamera();
+	    grMngr.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	    activeCam=grMngr.vsm.getActiveCamera();
 	}
 	else if (mod==CTRL_MOD){
 	    zoomingInRegion=true;
@@ -69,16 +71,16 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    x2=v.getMouse().vx;
 	    y2=v.getMouse().vy;
 	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-		application.vsm.centerOnRegion(application.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
+		grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 	    }
 	    zoomingInRegion=false;
 	}
 	else if (manualLeftButtonMove){
-	    application.vsm.animator.Xspeed=0;
-	    application.vsm.animator.Yspeed=0;
-	    application.vsm.animator.Aspeed=0;
+	    grMngr.vsm.animator.Xspeed=0;
+	    grMngr.vsm.animator.Yspeed=0;
+	    grMngr.vsm.animator.Aspeed=0;
 	    v.setDrawDrag(false);
-	    application.vsm.activeView.mouse.setSensitivity(true);
+	    grMngr.vsm.activeView.mouse.setSensitivity(true);
 	    manualLeftButtonMove=false;
 	}
     }
@@ -86,7 +88,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	Glyph g=v.lastGlyphEntered();
 	if (g!=null){
-	    application.vsm.centerOnGlyph(g,v.cams[0],ConfigManager.ANIM_MOVE_LENGTH);
+	    grMngr.vsm.centerOnGlyph(g,v.cams[0],ConfigManager.ANIM_MOVE_LENGTH);
 	}
     }
 
@@ -95,27 +97,27 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-// 	application.rememberLocation(v.cams[0].getLocation());
+// 	grMngr.rememberLocation(v.cams[0].getLocation());
 	lastJPX=jpx;
 	lastJPY=jpy;
-	//application.vsm.setActiveCamera(v.cams[0]);
+	//grMngr.vsm.setActiveCamera(v.cams[0]);
 	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-	activeCam=application.vsm.getActiveCamera();
+	grMngr.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	activeCam=grMngr.vsm.getActiveCamera();
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed=0;
-	application.vsm.animator.Yspeed=0;
-	application.vsm.animator.Aspeed=0;
+	grMngr.vsm.animator.Xspeed=0;
+	grMngr.vsm.animator.Yspeed=0;
+	grMngr.vsm.animator.Aspeed=0;
 	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	grMngr.vsm.activeView.mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	Glyph g=v.lastGlyphEntered();
 	if (g!=null){
-	    application.vsm.centerOnGlyph(g,v.cams[0],ConfigManager.ANIM_MOVE_LENGTH);
+	    grMngr.vsm.centerOnGlyph(g,v.cams[0],ConfigManager.ANIM_MOVE_LENGTH);
 	}
     }
 
@@ -125,27 +127,27 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	if (buttonNumber==3 || (buttonNumber==1 && (mod==NO_MODIFIER || mod==SHIFT_MOD))){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod==SHIFT_MOD) {
-		application.vsm.animator.Xspeed=0;
-		application.vsm.animator.Yspeed=0;
- 		application.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
+		grMngr.vsm.animator.Xspeed=0;
+		grMngr.vsm.animator.Yspeed=0;
+ 		grMngr.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)((jpx-lastJPX)*(tfactor/cfactor)) : (long)((jpx-lastJPX)/(tfactor*cfactor));
-		application.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
-		application.vsm.animator.Aspeed=0;
+		grMngr.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)((jpx-lastJPX)*(tfactor/cfactor)) : (long)((jpx-lastJPX)/(tfactor*cfactor));
+		grMngr.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
+		grMngr.vsm.animator.Aspeed=0;
 	    }
 	}
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-	tfactor = (application.mainCamera.focal+Math.abs(application.mainCamera.altitude))/application.mainCamera.focal;
+	tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
 	if (wheelDirection == WHEEL_UP){// zooming in
-	    application.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
+	    grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
 	}
 	else {// wheelDirection == WHEEL_DOWN, zooming out
-	    application.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
+	    grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
 	}
-	application.vsm.repaintNow();
+	grMngr.vsm.repaintNow();
     }
 
     public void enterGlyph(Glyph g){
