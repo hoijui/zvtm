@@ -395,7 +395,7 @@ public class ZGRViewer {
 
     void exit(){
 	cfgMngr.saveCommandLines();
-	grMngr.tooltipMngr.stop();
+	grMngr.paMngr.stop();
 	cfgMngr.terminatePlugins();
 	System.exit(0);
     }

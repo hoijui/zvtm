@@ -17,6 +17,7 @@ import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import java.awt.event.ComponentListener;
 
@@ -66,8 +67,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     View rView;
     static final String radarView = "Overview";
     Camera mainCamera;
+    JPanel mainViewPanel;
 
-    TooltipManager tooltipMngr;
+    PeriodicActionManager paMngr;
 
 
     /*dimensions of zoomable panel*/
@@ -186,19 +188,20 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	mainView.setNotifyMouseMoved(true);
 	vsm.animator.setAnimationListener(this);
 	mainView.setVisible(true);
-	tooltipMngr = new TooltipManager(this);
-	mainView.getPanel().addMouseMotionListener(tooltipMngr);
-	tooltipMngr.start();
-	mainView.setJava2DPainter(tooltipMngr, Java2DPainter.AFTER_PORTALS);
+	paMngr = new PeriodicActionManager(this);
+	mainView.getPanel().addMouseMotionListener(paMngr);
+	paMngr.start();
+	mainView.setJava2DPainter(paMngr, Java2DPainter.AFTER_PORTALS);
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
 	mainView.getFrame().addComponentListener(this);
-
+	mainViewPanel = mainView.getPanel();
 	setAntialiasing(ConfigManager.ANTIALIASING);
 
 	initDM();
 	updatePanelSize();
 	previousLocations=new Vector();
+
     }
 
     void setConfigManager(ConfigManager cm){
@@ -229,13 +232,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     /*-------------     Window resizing     -----------------*/
 
     void updatePanelSize(){
-	Dimension d = mainView.getPanel().getSize();
-	panelWidth = d.width;
-	panelHeight = d.height;
-	tp.updateHiddenPosition(mainView);
+	tp.displayPalette(false);
+	panelWidth = mainViewPanel.getWidth();
+	panelHeight = mainViewPanel.getHeight();
+	paMngr.requestToolPaletteRelocation();
     }
 
-    /* navigation */
+    /*-------------     Navigation              -------------*/
 
     void getGlobalView(){
 	Location l=vsm.getGlobalView(mSpace.getCamera(0),ConfigManager.ANIM_MOVE_LENGTH);

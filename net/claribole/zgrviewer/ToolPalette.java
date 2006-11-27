@@ -53,6 +53,7 @@ public class ToolPalette {
     int selectedIconIndex = -1; // -1 means no button selected
 
     boolean visible = false;
+    boolean paintPalette = true; // set to false temporarily during panel resizing operations ; used as an optimization indicator
 
     static final int ANIM_TIME = 200;
     static final int TRIGGER_ZONE_WIDTH = 48;
@@ -128,12 +129,25 @@ public class ToolPalette {
 	}
     }
 
-    void updateHiddenPosition(View v){
-	long[] wnes = v.getVisibleRegion(paletteCamera);
+    /* Called with false when resizing the main view to temprarily hide the palette
+       until it actually gets relocated to the top-left corner of that window.
+       It is then called with true.*/
+    void displayPalette(boolean b){
+	if (paintPalette == b){return;}
+	for (int i=0;i<buttons.length;i++){
+	    buttons[i].setVisible(b);
+	    selectedButtons[i].setVisible(b);
+	}
+	paintPalette = b;
+    }
+
+    void updateHiddenPosition(){
+	long[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
 	for (int i=0;i<buttons.length;i++){
 	    buttons[i].moveTo(wnes[0]-buttons[i].getWidth()+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
 	    selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
 	}
+	displayPalette(true);
     }
 
     void show(){

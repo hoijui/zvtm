@@ -1,4 +1,4 @@
-/*   FILE: TooltipManager.java
+/*   FILE: PeriodicActionManager.java
  *   DATE OF CREATION:   Thu Jan 09 14:14:35 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -6,7 +6,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: TooltipManager.java,v 1.2 2005/10/12 13:46:45 epietrig Exp $
+ * $Id: PeriodicActionManager.java,v 1.2 2005/10/12 13:46:45 epietrig Exp $
  */ 
 
 package net.claribole.zgrviewer;
@@ -28,7 +28,7 @@ import com.xerox.VTM.svg.Metadata;
 import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.engine.Java2DPainter;
 
-class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
+class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPainter {
 
     static int SLEEP_TIME = 500;  // check for tooltip changes every 1.0s
     static int TOOLTIP_TIME = 1000; // tooltip info should appear only if mouse is idle for at least 1.5s
@@ -50,7 +50,7 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
     String tipLabel;
     int lX, lY, rX, rY, rW, rH;
 
-    TooltipManager(GraphicsManager gm){
+    PeriodicActionManager(GraphicsManager gm){
 	this.grMngr = gm;
 
     }
@@ -70,6 +70,7 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
 	Thread me = Thread.currentThread();
 	while (runTP == me) {
 	    updateTooltip();
+	    checkToolPalette();
  	    try {
  		runTP.sleep(SLEEP_TIME);   //sleep ... ms  
  	    } 
@@ -137,6 +138,19 @@ class TooltipManager implements Runnable, MouseMotionListener, Java2DPainter {
     public void mouseMoved(MouseEvent e){
 	lastMouseMoved = System.currentTimeMillis();
 	removeTooltip();
+    }
+
+    boolean updatePalette = false;
+    
+    void requestToolPaletteRelocation(){
+	updatePalette = true;
+    }
+
+    void checkToolPalette(){
+	if (updatePalette){
+	    grMngr.tp.updateHiddenPosition();
+	    updatePalette = false;
+	}
     }
     
 }
