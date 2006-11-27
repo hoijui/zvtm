@@ -9,12 +9,32 @@
 
 package net.claribole.zgrviewer;
 
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.glyphs.VSegment;
+
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.PortalEventHandler;
 
-public class BaseEventHandler implements PortalEventHandler {
+public abstract class BaseEventHandler implements PortalEventHandler {
 
+    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
+
+    Camera activeCam;
+    VSegment navSeg;
+
+    boolean cursorNearBorder = false;
+
+    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    long lastVX, lastVY;
+    long jpxD, jpyD;
+    float tfactor;
+    float cfactor=50.0f;
+    long x1,y1,x2,y2;                     //remember last mouse coords to display selection rectangle (dragging)
     
+    // lens optimization
+    int lx, ly;    
+
     boolean zoomingInRegion=false;
     boolean manualLeftButtonMove=false;
     boolean manualRightButtonMove=false;
@@ -49,5 +69,7 @@ public class BaseEventHandler implements PortalEventHandler {
 	draggingZoomWindow = false;
 	draggingZoomWindowContent = false;
     }
+
+
 
 }

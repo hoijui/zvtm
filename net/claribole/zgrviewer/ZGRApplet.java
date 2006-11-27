@@ -71,7 +71,7 @@ public class ZGRApplet extends JApplet {
 	grMngr.parameterizeView(new ZgrAppletEvtHdlr(this, this.grMngr));
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
 	cpane.setSize(appletWindowWidth, appletWindowHeight);
-	viewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-60));
+	viewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-20));
 	cpane.add(viewPanel);
 	setVisible(true);
 	validate();

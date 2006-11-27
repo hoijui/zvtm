@@ -36,24 +36,8 @@ import java.awt.event.MouseWheelEvent;
 
 public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 
-    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
-    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
-
     ZGRViewer application;
     GraphicsManager grMngr;
-
-    boolean cursorNearBorder = false;
-
-    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    long lastVX, lastVY;
-    long jpxD, jpyD;
-    float tfactor;
-    float cfactor=50.0f;
-    long x1,y1,x2,y2;                     //remember last mouse coords to display selection rectangle (dragging)
-
-    VSegment navSeg;
-
-    Camera activeCam;
 
     ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 	this.application = app;
@@ -227,8 +211,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
     }
 
-    int lx, ly;
-    
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 	lx = jpx;
 	ly = jpy;
@@ -459,7 +441,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    application.displayURLinBrowser(url);
 	}
     }
-
 
     /*cancel a speed-dependant autozoom*/
     protected void unzoom(ViewPanel v){

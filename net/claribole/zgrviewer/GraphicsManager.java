@@ -200,13 +200,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     }
 
     void parameterizeView(BaseEventHandler eh){
+	paMngr = new PeriodicActionManager(this);
 	mainView.setBackgroundColor(ConfigManager.backgroundColor);
 	meh = eh;
 	mainView.setEventHandler((ViewEventHandler)eh);
 	mainView.setNotifyMouseMoved(true);
 	vsm.animator.setAnimationListener(this);
 	mainView.setVisible(true);
-	paMngr = new PeriodicActionManager(this);
 	mainView.getPanel().addMouseMotionListener(paMngr);
 	paMngr.start();
 	mainView.setJava2DPainter(paMngr, Java2DPainter.AFTER_PORTALS);
@@ -250,9 +250,12 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     void updatePanelSize(){
 	tp.displayPalette(false);
-	panelWidth = mainViewPanel.getWidth();
-	panelHeight = mainViewPanel.getHeight();
-	paMngr.requestToolPaletteRelocation();
+	try {
+	    panelWidth = mainViewPanel.getWidth();
+	    panelHeight = mainViewPanel.getHeight();
+	    paMngr.requestToolPaletteRelocation();
+	}
+	catch(NullPointerException ex){}
     }
 
     /*-------------     Navigation              -------------*/
