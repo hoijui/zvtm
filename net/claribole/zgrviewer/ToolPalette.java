@@ -175,7 +175,8 @@ public class ToolPalette {
     }
 
     boolean insidePaletteTriggerZone(int jpx, int jpy){
-	return (jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
+	// return false if palette is temporarily disabled
+	return (paintPalette && jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
     }
 
     boolean isShowing(){

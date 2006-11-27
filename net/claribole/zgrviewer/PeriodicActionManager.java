@@ -50,6 +50,9 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
     String tipLabel;
     int lX, lY, rX, rY, rW, rH;
 
+
+    boolean updatePalette = false;
+
     PeriodicActionManager(GraphicsManager gm){
 	this.grMngr = gm;
 
@@ -140,8 +143,6 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
 	removeTooltip();
     }
 
-    boolean updatePalette = false;
-    
     void requestToolPaletteRelocation(){
 	updatePalette = true;
     }
