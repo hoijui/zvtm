@@ -68,7 +68,7 @@ Usage:
 
   <!--zvtmjar-->
   <target name="zvtmjar" depends="init,zvtmbuild">
-    <jar destfile="${lib.dir}/zvtm.jar" compress="true">
+    <jar destfile="${lib.dir}/zvtm.jar">
       <fileset dir="${classes.dir}"
                includes="com/xerox/VTM/engine/**,com/xerox/VTM/glyphs/**,com/xerox/VTM/svg/**,net/claribole/zvtm/engine/**,net/claribole/zvtm/fonts/**,net/claribole/zvtm/glyphs/**,net/claribole/zvtm/lens/**,net/claribole/zvtm/xml/**"/>
     </jar>
@@ -77,7 +77,7 @@ Usage:
   <!--zdemojar-->
   <target name="zdemojar" depends="init,zvtmbuild">
     <jar destfile="${lib.dir}/zvtm-demos.jar"
-         manifest="zvtm-manifest.mf" compress="true">
+         manifest="zvtm-manifest.mf">
       <fileset dir="${classes.dir}"
                includes="com/xerox/VTM/demo/**,com/xerox/VTM/tests/**,net/claribole/zvtm/demo/**"/>
       <fileset dir="${basedir}"
@@ -87,17 +87,19 @@ Usage:
 
   <!--zgrviewer jar-->
   <target name="zgrvjar" depends="init,zvtmbuild">
-    <jar destfile="${lib.dir}/zgrviewer.jar" compress="true">
+    <jar destfile="${lib.dir}/zgrviewer.jar">
       <fileset dir="${classes.dir}"
                includes="net/claribole/zgrviewer/**"/>
       <fileset dir="${basedir}"
                includes="images/stdnav24b.png,images/dmnav24b.png,images/plnav24b.png,images/stdnav24g.png,images/dmnav24g.png,images/plnav24g.png,images/flnav24b.png,images/flnav24g.png,images/mlnav24b.png,images/mlnav24g.png"/>
+      <fileset dir="${basedir}"
+               includes="images/zgrv/*"/>
     </jar>
   </target>
 
   <!--zvtm mpd jar-->
   <target name="zvtmmpdjar" depends="init,zvtmbuild">
-    <jar destfile="${lib.dir}/zvtm-mpd.jar" compress="true">
+    <jar destfile="${lib.dir}/zvtm-mpd.jar">
       <fileset dir="${classes.dir}"
                includes="net/claribole/zvtm/mpd/**"/>
     </jar>
@@ -105,7 +107,7 @@ Usage:
 
   <!--zgrviewer mpd jar-->
   <target name="zgrvmpdjar" depends="init,zvtmbuild">
-    <jar destfile="${lib.dir}/zgrviewer-mpd.jar" compress="true">
+    <jar destfile="${lib.dir}/zgrviewer-mpd.jar">
       <fileset dir="${classes.dir}"
                includes="net/claribole/zgrviewer/mpd/**"/>
     </jar>
@@ -113,7 +115,7 @@ Usage:
 
   <!--geonames browser jar-->
   <target name="gnbjar" depends="init,zvtmbuild">
-    <jar destfile="${lib.dir}/gnb.jar" compress="true">
+    <jar destfile="${lib.dir}/gnb.jar">
       <fileset dir="${classes.dir}"
                includes="net/claribole/gnb/**"/>
     </jar>
@@ -121,7 +123,7 @@ Usage:
 
   <!--zimgviewer jar-->
   <target name="zimgjar" depends="init,zvtmbuild">
-    <jar destfile="${lib.dir}/zimgviewer.jar" compress="true">
+    <jar destfile="${lib.dir}/zimgviewer.jar">
       <fileset dir="${classes.dir}"
                includes="net/claribole/zimgviewer/**"/>
     </jar>
