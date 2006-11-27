@@ -27,29 +27,29 @@ class NavPanel extends JPanel implements ActionListener, KeyListener {
     // pan buttons: NW, N, NE, W, H, E, SW, S, SE
     JButton[] panBts = new JButton[9];
     // icons for these buttons
-    final ImageIcon[] icons = {new ImageIcon(this.getClass().getResource("/images/zgrv/m_nw.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_n.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_ne.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_w.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_home.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_e.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_sw.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_s.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_se.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/zm_i.gif")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/zm_i_h.gif"))};
+    final ImageIcon[] icons = {new ImageIcon(this.getClass().getResource("/images/zgrv/m_nw.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_n.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_ne.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_w.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_home.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_e.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_sw.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_s.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_se.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/zm_i.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zgrv/zm_i_h.png"))};
     // rollover icons for these buttons
-    final ImageIcon[] r_icons = {new ImageIcon(this.getClass().getResource("/images/zgrv/m_nw_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_n_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_ne_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_w_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_home_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_e_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_sw_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_s_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_se_h.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o.gif")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o_h.gif"))};
+    final ImageIcon[] r_icons = {new ImageIcon(this.getClass().getResource("/images/zgrv/m_nw_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_n_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_ne_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_w_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_home_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_e_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_sw_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_s_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_se_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o_h.png"))};
     // zoom buttons: zoom in, zoom out
     JButton[] zoomBts = new JButton[2];
 
