@@ -366,7 +366,7 @@ public class SVGReader {
 	}
     }
 
-    /**
+    /** Get the Java Color instance corresponding to an SVG string representation of that color. The SVG string representation of the color can be any of the values defined in <a href="http://www.w3.org/TR/SVG11/types.html#DataTypeColor">Scalable Vector Graphics (SVG) 1.1 Specification, section 4.1: Basic data types</a>.
      *@param s string representation of a color  (as an SVG style attribute)
      */
     public static Color getColor(String s){
