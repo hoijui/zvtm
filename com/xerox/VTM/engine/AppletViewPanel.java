@@ -285,6 +285,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 					}
 					try {
 					    lens.transform(buffImg);
+					    lens.drawBoundary(g2d);
 					}
 					catch (ArrayIndexOutOfBoundsException ex){
 					    if (VirtualSpaceManager.debugModeON()){ex.printStackTrace();}
