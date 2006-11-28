@@ -35,17 +35,17 @@ public class ToolPalette {
     static final short PL_NAV_MODE = 3;
     static final short ML_NAV_MODE = 4;
 
-    static final String[] ICON_PATHS = {"/images/stdnav24b.png",
-					"/images/flnav24b.png",
-					"/images/dmnav24b.png",
-					"/images/plnav24b.png",
-					"/images/mlnav24b.png"};
+    static final String[] ICON_PATHS = {"/images/zgrv/stdnav24b.png",
+					"/images/zgrv/flnav24b.png",
+					"/images/zgrv/dmnav24b.png",
+					"/images/zgrv/plnav24b.png",
+					"/images/zgrv/mlnav24b.png"};
 
-    static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
-						 "/images/flnav24g.png",
-						 "/images/dmnav24g.png",
-						 "/images/plnav24g.png",
-						 "/images/mlnav24g.png"};
+    static final String[] SELECTED_ICON_PATHS = {"/images/zgrv/stdnav24g.png",
+						 "/images/zgrv/flnav24g.png",
+						 "/images/zgrv/dmnav24g.png",
+						 "/images/zgrv/plnav24g.png",
+						 "/images/zgrv/mlnav24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
