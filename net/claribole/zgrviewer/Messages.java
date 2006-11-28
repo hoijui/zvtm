@@ -100,4 +100,8 @@ public class Messages {
 
     static final String[] exportMenuLabels = {PM_EXPSVG, PM_EXPPNG, PM_EXPPRINT};
 
+    static final String LOADING_SVG = "Loading Graphviz/SVG...";
+
+    static final String EMPTY_STRING = " ";
+
 }
