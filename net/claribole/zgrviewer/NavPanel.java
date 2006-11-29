@@ -11,8 +11,6 @@ package net.claribole.zgrviewer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.ImageIcon;
@@ -20,7 +18,7 @@ import javax.swing.BorderFactory;
 
 /* Navigation Panel (directional arrows, plus zoom) */
 
-class NavPanel extends JPanel implements ActionListener, KeyListener {
+class NavPanel extends JPanel implements ActionListener {
 
     GraphicsManager grMngr;
 
@@ -123,21 +121,6 @@ class NavPanel extends JPanel implements ActionListener, KeyListener {
 	else if (o==panBts[6]){grMngr.translateView(GraphicsManager.MOVE_DOWN_LEFT);}
 	else if (o==panBts[8]){grMngr.translateView(GraphicsManager.MOVE_DOWN_RIGHT);}
     }
-
-    public void keyPressed(KeyEvent e){
-	int code = e.getKeyCode();
-	if (code==KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
-	else if (code==KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
-	else if (code==KeyEvent.VK_HOME || (code==KeyEvent.VK_G && e.isControlDown())){grMngr.getGlobalView();}
-	else if (code==KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_UP);}
-	else if (code==KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
-	else if (code==KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
-	else if (code==KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
-	else if (code==KeyEvent.VK_B && e.isControlDown()){grMngr.moveBack();}
-    }
-
-    public void keyReleased(KeyEvent e){}
-    public void keyTyped(KeyEvent e){}
 
     static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
 	gbc.gridx = gx;

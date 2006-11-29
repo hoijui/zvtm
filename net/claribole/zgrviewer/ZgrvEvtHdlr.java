@@ -399,12 +399,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
 	    }
 	}
-	else if (code == KeyEvent.VK_R){
-	    grMngr.tp.show();
-	}
-	else if (code == KeyEvent.VK_T){
-	    grMngr.tp.hide();
-	}
     }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}

@@ -336,30 +336,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if(code==KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
-	else if (code==KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
-	else if (code==KeyEvent.VK_HOME){grMngr.getGlobalView();}
-	else if (code==KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_UP);}
-	else if (code==KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
-	else if (code==KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
-	else if (code==KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
-	else if (code==KeyEvent.VK_L || code==KeyEvent.VK_SPACE){
-	    Glyph g=v.lastGlyphEntered();
-	    if (g!=null){
-		if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
-	    }
-	    else {
-		attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
-	    }
-	}
-	else if (code == KeyEvent.VK_R){
-	    grMngr.tp.show();
-	}
-	else if (code == KeyEvent.VK_T){
-	    grMngr.tp.hide();
-	}
-    }
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

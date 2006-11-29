@@ -9,13 +9,16 @@
 package net.claribole.zgrviewer;
 
 import java.awt.*;
-
-import java.util.Vector;
-
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JApplet;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
+
+import java.util.Vector;
 
 import net.claribole.zvtm.engine.Location;
 
@@ -25,7 +28,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.svg.SVGReader;
 
 
-public class ZGRApplet extends JApplet {
+public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
 
     static final int DEFAULT_VIEW_WIDTH = 640;
     static final int DEFAULT_VIEW_HEIGHT = 480;
@@ -70,6 +73,8 @@ public class ZGRApplet extends JApplet {
     }
 
     void initGUI(){
+	this.addKeyListener(this);
+	this.addMouseListener(this);
 	// get width and height of applet panel
 	try {appletWindowWidth = Integer.parseInt(getParameter(WIDTH_APPLET_PARAM));}
 	catch(NumberFormatException ex){appletWindowWidth = DEFAULT_VIEW_WIDTH;}
@@ -143,6 +148,33 @@ public class ZGRApplet extends JApplet {
     void setStatusBarText(String s){
 	statusBar.setText(s);
     }
+
+    /* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */
+    
+    public void keyPressed(KeyEvent e){
+	int code = e.getKeyCode();
+	if(code == KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
+	else if (code == KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
+	else if (code == KeyEvent.VK_HOME){grMngr.getGlobalView();}
+	else if (code == KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_UP);}
+	else if (code == KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
+	else if (code == KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
+	else if (code == KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
+    }
+
+    public void keyReleased(KeyEvent e){}
+
+    public void keyTyped(KeyEvent e){}
+
+    public void mouseClicked(MouseEvent e){}
+
+    public void mouseEntered(MouseEvent e){requestFocus();}
+
+    public void mouseExited(MouseEvent e){}
+
+    public void mousePressed(MouseEvent e){}
+
+    public void mouseReleased(MouseEvent e){}
 
     static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
 	gbc.gridx = gx;
