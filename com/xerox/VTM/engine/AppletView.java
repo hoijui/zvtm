@@ -34,9 +34,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
    * @author Emmanuel Pietriga
    **/
 
-public class AppletView extends View implements KeyListener{
-
-    //JFrame frame;
+public class AppletView extends View implements KeyListener {
 
     /**
      *@param v list of cameras
@@ -46,36 +44,15 @@ public class AppletView extends View implements KeyListener{
      *@param vsm root VTM class
      */
     protected AppletView(Vector v,String t,int panelWidth,int panelHeight,VirtualSpaceManager vsm){
-	//frame=new JFrame();
-	//frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	mouse=new VCursor(this);
 	name=t;
 	parent=vsm;
-	detectMultipleFullFills=vsm.defaultMultiFill;
+	detectMultipleFullFills = vsm.defaultMultiFill;
 	initCameras(v);   //vector -> cast elements as "Camera"
-// 	GridBagLayout gridBag=new GridBagLayout();
-// 	GridBagConstraints constraints=new GridBagConstraints();
-// 	Container cpane=ja.getContentPane();
-// 	cpane.setLayout(gridBag);
-// 	buildConstraints(constraints,0,0,1,1,100,90);
-// 	constraints.fill=GridBagConstraints.BOTH;
-// 	constraints.anchor=GridBagConstraints.CENTER;
 	panel=new AppletViewPanel(v,this);
 	panel.setSize(panelWidth,panelHeight);
-// 	gridBag.setConstraints(panel,constraints);
-// 	cpane.add(panel);
-// 	WindowListener l=new WindowAdapter(){
-// 		public void windowClosing(WindowEvent e){close();}
-// 		public void windowActivated(WindowEvent e){activate();}
-// 		public void windowDeactivated(WindowEvent e){deactivate();}
-// 		public void windowIconified(WindowEvent e){iconify();}
-// 		public void windowDeiconified(WindowEvent e){deiconify();}
-// 	    };
-// 	frame.addWindowListener(l);
-// 	frame.addKeyListener(this);
-// 	frame.pack();
-// 	frame.setSize(panelWidth,panelHeight);
-// 	if (visible){frame.setVisible(true);}
+	// following line does not work (no event sent)
+//  	panel.addKeyListener(this);
     }
 
 
