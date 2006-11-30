@@ -57,7 +57,7 @@ public class AppletView extends View implements KeyListener {
 
 
     /**get the java.awt.Container for this view*/
-    public Container getFrame(){return null;}
+    public Container getFrame(){return panel;}
 
     /**tells whether this frame is selected or not - not used*/
     public boolean isSelected(){
