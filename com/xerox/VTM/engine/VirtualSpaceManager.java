@@ -1119,7 +1119,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 		    long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};  //region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ; we only take left and down because ratios are equals for left and right, up and down
 		    float ratio=0;
 		    //compute the mult factor for altitude to see glyph g entirely
-		    if (trRegBounds[0]!=0){ratio=(g.getSize())/((float)(g.vx-trRegBounds[0]));}
+		    if (trRegBounds[0]!=0){ratio=((g instanceof VText) ? (float) (((VText)g).getBounds(0).x) : g.getSize())/((float)(g.vx-trRegBounds[0]));}
 		    //same for Y ; take the max of both
 		    if (trRegBounds[1]!=0){
 			float tmpRatio=(g.getSize())/((float)(g.vy-trRegBounds[1]));
