@@ -40,7 +40,7 @@ import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.Document;
 
 
-public class ZGRViewer {
+public class ZGRViewer implements StatusBar {
 
     static ConfigManager cfgMngr;
     static DOTManager dotMngr;
@@ -87,7 +87,7 @@ public class ZGRViewer {
     }
 
     void initConfig(){
-	grMngr = new GraphicsManager();
+	grMngr = new GraphicsManager(this);
 	cfgMngr = new ConfigManager(grMngr, false);
 	dotMngr=new DOTManager(grMngr, cfgMngr);
 	grMngr.setConfigManager(cfgMngr);
@@ -249,14 +249,18 @@ public class ZGRViewer {
 	if (f!=null){
 	    grMngr.mainView.setCursorIcon(java.awt.Cursor.WAIT_CURSOR);
 	    ConfigManager.m_LastExportDir=f.getParentFile();
-	    grMngr.mainView.setStatusBarText("Exporting to SVG "+f.toString()+" ...");
+	    setStatusBarText("Exporting to SVG "+f.toString()+" ...");
 	    if (f.exists()){f.delete();}
 	    com.xerox.VTM.svg.SVGWriter svgw=new com.xerox.VTM.svg.SVGWriter();
 	    Document d = svgw.exportVirtualSpace(grMngr.vsm.getVirtualSpace(grMngr.mainSpace), new DOMImplementationImpl(), f);
 	    Utils.serialize(d,f);
-	    grMngr.mainView.setStatusBarText("Exporting to SVG "+f.toString()+" ...done");
+	    setStatusBarText("Exporting to SVG "+f.toString()+" ...done");
 	    grMngr.mainView.setCursorIcon(java.awt.Cursor.CUSTOM_CURSOR);
 	}
+    }
+
+    public void setStatusBarText(String s){
+	grMngr.mainView.setStatusBarText(s);
     }
 
     void print(){

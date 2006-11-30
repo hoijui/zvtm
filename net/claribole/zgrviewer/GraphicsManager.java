@@ -131,7 +131,16 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     static final int ZOOMOUT_LENS = -1;
     int lensType = NO_LENS;
 
-    GraphicsManager(){}
+    /*quick search variables*/
+    int searchIndex = 0;
+    String lastSearchedString = "";
+    Vector matchingList = new Vector();
+
+    StatusBar statusBar;
+
+    GraphicsManager(StatusBar sb){
+	this.statusBar = sb;
+    }
 
     Vector createZVTMelements(boolean applet){
 	vsm = new VirtualSpaceManager(applet);
@@ -613,6 +622,70 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	dmCamera.moveTo(magWindow.vx, magWindow.vy);
     }
 
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	if (paintLinks){
+	    float coef=(float)(mainCamera.focal/(mainCamera.focal+mainCamera.altitude));
+	    int magWindowX = (viewWidth/2) + Math.round((magWindow.vx-mainCamera.posx)*coef);
+	    int magWindowY = (viewHeight/2) - Math.round((magWindow.vy-mainCamera.posy)*coef);
+	    int magWindowW = Math.round(magWindow.getWidth()*coef);
+	    int magWindowH = Math.round(magWindow.getHeight()*coef);
+	    g2d.setColor(GraphicsManager.DM_COLOR);
+	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
+	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
+	    g2d.drawLine(magWindowX-magWindowW, magWindowY+magWindowH, dmPortal.x, dmPortal.y+dmPortal.h);
+	    g2d.drawLine(magWindowX+magWindowW, magWindowY+magWindowH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
+	}
+    }
+
+    /* ---------- search -----------*/
+
+    /*given a string, centers on a VText with this string in it*/
+    void search(String s, int direction){
+	if (s.length()>0){
+	    if (!s.toLowerCase().equals(lastSearchedString)){//searching a new string - reinitialize everything
+		resetSearch(s);
+		Glyph[] gl = mSpace.getVisibleGlyphList();
+		for (int i=0;i<gl.length;i++){
+		    if (gl[i] instanceof VText){
+			if ((((VText)gl[i]).getText() != null) &&
+			    (((VText)gl[i]).getText().toLowerCase().indexOf(lastSearchedString)!=-1)){
+			    matchingList.add(gl[i]);
+			}
+		    }
+		}
+	    }
+	    int matchSize = matchingList.size();
+	    if (matchSize > 0){
+		//get prev/next entry in the list of matching elements
+		searchIndex = searchIndex + direction;
+		if (searchIndex < 0){// if reached start/end of list, go to end/start (loop)
+		    searchIndex = matchSize - 1;
+		}
+		else if (searchIndex >= matchSize){
+		    searchIndex = 0;
+		}
+		if (matchSize > 1){
+		    statusBar.setStatusBarText(AppletUtils.rankString(searchIndex+1) + " of " + matchSize + " matches");
+		}
+		else {
+		    statusBar.setStatusBarText(matchSize + " match");
+		}
+		//center on the entity
+		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
+		vsm.centerOnGlyph(g /*lastMatchingEntity*/, mSpace.getCamera(0), 400);
+	    }
+	}
+    }
+
+    /*reset the search variables after it is finished*/
+    void resetSearch(String s){
+	searchIndex = -1;
+	lastSearchedString = s.toLowerCase();
+	matchingList.removeAllElements();
+    }
+
+    /* -------------- Font management ----------------*/
 
     void assignFontToGraph(){
 	Font f = net.claribole.zvtm.fonts.FontDialog.getFontDialog((JFrame)mainView.getFrame(), ConfigManager.defaultFont);
@@ -627,23 +700,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		}
 	    }
 	    vsm.setMainFont(ConfigManager.defaultFont);
-	}
-    }
-
-
-    /*Java2DPainter interface*/
-    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	if (paintLinks){
-	    float coef=(float)(mainCamera.focal/(mainCamera.focal+mainCamera.altitude));
-	    int magWindowX = (viewWidth/2) + Math.round((magWindow.vx-mainCamera.posx)*coef);
-	    int magWindowY = (viewHeight/2) - Math.round((magWindow.vy-mainCamera.posy)*coef);
-	    int magWindowW = Math.round(magWindow.getWidth()*coef);
-	    int magWindowH = Math.round(magWindow.getHeight()*coef);
-	    g2d.setColor(GraphicsManager.DM_COLOR);
-	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
-	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
-	    g2d.drawLine(magWindowX-magWindowW, magWindowY+magWindowH, dmPortal.x, dmPortal.y+dmPortal.h);
-	    g2d.drawLine(magWindowX+magWindowW, magWindowY+magWindowH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
 	}
     }
     

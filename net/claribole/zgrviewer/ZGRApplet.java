@@ -28,7 +28,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.svg.SVGReader;
 
 
-public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
+public class ZGRApplet extends JApplet implements MouseListener, KeyListener, StatusBar {
 
     static final int DEFAULT_VIEW_WIDTH = 640;
     static final int DEFAULT_VIEW_HEIGHT = 480;
@@ -68,7 +68,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
     }
 
     void initConfig(){
-	grMngr = new GraphicsManager();
+	grMngr = new GraphicsManager(this);
 	cfgMngr = new ConfigManager(grMngr, true);
 	grMngr.setConfigManager(cfgMngr);
 	gvLdr = new GVLoader(this, grMngr, cfgMngr, null);
@@ -154,7 +154,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
 	worker.start();
     }
 
-    void setStatusBarText(String s){
+    public void setStatusBarText(String s){
 	statusBar.setText(s);
     }
 

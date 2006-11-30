@@ -11,7 +11,10 @@ package net.claribole.zgrviewer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.JButton;
+import javax.swing.JTextField;
 import javax.swing.JPanel;
 import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
@@ -55,14 +58,11 @@ class NavPanel extends JPanel implements ActionListener {
 	super();
 	this.setOpaque(false);
 	this.grMngr = gm;
-
-
 	GridBagLayout gridBag = new GridBagLayout();
 	GridBagConstraints constraints = new GridBagConstraints();
 	constraints.fill = GridBagConstraints.NONE;
 	constraints.anchor = GridBagConstraints.CENTER;
 	this.setLayout(gridBag);
-
 	//translation buttons in a 3x3 grid
 	JPanel p1 = new JPanel();
 	p1.setLayout(new GridLayout(3,3));
@@ -77,11 +77,9 @@ class NavPanel extends JPanel implements ActionListener {
 	    panBts[i].addActionListener(this);
 	    p1.add(panBts[i]);
 	}
-
 	buildConstraints(constraints,0,0,1,1,100,1);
 	gridBag.setConstraints(p1, constraints);
 	this.add(p1);
-
 	//zoom buttons
 	JPanel p2 = new JPanel();
 	p2.setLayout(new GridLayout(2,1));
@@ -100,11 +98,16 @@ class NavPanel extends JPanel implements ActionListener {
 	gridBag.setConstraints(p2, constraints);
 	this.add(p2);
 
-	JPanel p3 = new JPanel();
-	p3.setOpaque(false);
-	buildConstraints(constraints,0,2,1,1,0,98);
+	SearchPanel p3 = new SearchPanel(grMngr);
+	buildConstraints(constraints,0,2,1,1,0,30);
 	gridBag.setConstraints(p3, constraints);
 	this.add(p3);
+
+	JPanel p4 = new JPanel();
+	p4.setOpaque(false);
+	buildConstraints(constraints,0,3,1,1,0,68);
+	gridBag.setConstraints(p4, constraints);
+	this.add(p4);
     }
 
     public void actionPerformed(ActionEvent e){
@@ -130,5 +133,56 @@ class NavPanel extends JPanel implements ActionListener {
 	gbc.weightx = wx;
 	gbc.weighty = wy;
     }
+
+}
+
+class SearchPanel extends JPanel implements ActionListener, KeyListener {
+
+    GraphicsManager grMngr;
+    JTextField findTf;
+    JButton prevBt, nextBt;
+    
+    SearchPanel(GraphicsManager gm){
+	this.setOpaque(false);
+	this.grMngr = gm;
+	GridBagLayout gridBag = new GridBagLayout();
+	GridBagConstraints constraints = new GridBagConstraints();
+	constraints.fill = GridBagConstraints.HORIZONTAL;
+	constraints.anchor = GridBagConstraints.CENTER;
+	this.setLayout(gridBag);
+
+	findTf = new JTextField();
+	NavPanel.buildConstraints(constraints,0,0,2,1,100,50);
+	gridBag.setConstraints(findTf, constraints);
+	this.add(findTf);
+	findTf.addKeyListener(this);
+	prevBt = new JButton("Previous");
+	prevBt.setOpaque(false);
+	NavPanel.buildConstraints(constraints,0,1,1,1,50,50);
+	gridBag.setConstraints(prevBt, constraints);
+	this.add(prevBt);
+	prevBt.addActionListener(this);
+	nextBt = new JButton("Next");
+	nextBt.setOpaque(false);
+	NavPanel.buildConstraints(constraints,1,1,1,1,50,50);
+	gridBag.setConstraints(nextBt, constraints);
+	this.add(nextBt);
+	nextBt.addActionListener(this);
+    }
+    
+    public void actionPerformed(ActionEvent e){
+	if (e.getSource() == prevBt){grMngr.search(findTf.getText(), -1);}
+	else {grMngr.search(findTf.getText(), 1);}
+    }
+
+    public void keyPressed(KeyEvent e){
+	if (e.getKeyCode()==KeyEvent.VK_ENTER){
+	    grMngr.search(findTf.getText(), 1);
+	}
+    }
+
+    public void keyReleased(KeyEvent e){}
+
+    public void keyTyped(KeyEvent e){}
 
 }
