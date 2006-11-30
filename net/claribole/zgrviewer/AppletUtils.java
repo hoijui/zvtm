@@ -184,9 +184,9 @@ public class AppletUtils {
 
     public static String rankString(int number){
 	String res = Integer.toString(number);
-	if (res.endsWith("1")){return res + "st";}
-	else if (res.endsWith("2")){return res + "nd";}
-	else if (res.endsWith("3")){return res + "rd";}
+	if (res.endsWith("1")){return (res.endsWith("11")) ? res + "th" : res + "st";}
+	else if (res.endsWith("2")){return (res.endsWith("12")) ? res + "th" : res + "nd";}
+	else if (res.endsWith("3")){return (res.endsWith("13")) ? res + "th" : res + "rd";}
 	else {return res + "th";}
     }
 
