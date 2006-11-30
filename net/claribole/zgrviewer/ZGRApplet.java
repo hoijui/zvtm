@@ -32,13 +32,15 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
 
     static final int DEFAULT_VIEW_WIDTH = 640;
     static final int DEFAULT_VIEW_HEIGHT = 480;
-    static final String WIDTH_APPLET_PARAM = "width";
-    static final String HEIGHT_APPLET_PARAM = "height";
+    static final String APPLET_WIDTH_PARAM = "width";
+    static final String APPLET_HEIGHT_PARAM = "height";
     static final String SVG_FILE_URL_PARAM = "svgURL";
     static final String SHOW_NAVIGATION_CONTROLS_PARAM = "showNavControls";
-    static final String APPLET_TITLE_PARAM = "appletTitle";
+    static final String APPLET_TITLE_PARAM = "title";
     static final String APPLET_BKG_COLOR_PARAM = "appletBackgroundColor";
     static final String GRAPH_BKG_COLOR_PARAM = "graphBackgroundColor";
+    static final String CURSOR_COLOR_PARAM = "cursorColor";
+
 
     String APPLET_TITLE = "ZGRViewer - Applet";
 
@@ -76,9 +78,9 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
 	this.addKeyListener(this);
 	this.addMouseListener(this);
 	// get width and height of applet panel
-	try {appletWindowWidth = Integer.parseInt(getParameter(WIDTH_APPLET_PARAM));}
+	try {appletWindowWidth = Integer.parseInt(getParameter(APPLET_WIDTH_PARAM));}
 	catch(NumberFormatException ex){appletWindowWidth = DEFAULT_VIEW_WIDTH;}
-	try {appletWindowHeight = Integer.parseInt(getParameter(HEIGHT_APPLET_PARAM));}
+	try {appletWindowHeight = Integer.parseInt(getParameter(APPLET_HEIGHT_PARAM));}
 	catch(NumberFormatException ex){appletWindowHeight = DEFAULT_VIEW_HEIGHT;}
 	// should the navigation control panel be displayed or not
 	boolean showNavControl = false;
@@ -90,21 +92,26 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
 	    APPLET_TITLE = getParameter(APPLET_TITLE_PARAM);
 	}
 	catch(Exception ex){APPLET_TITLE = "ZGRViewer - Applet";}
-	Color APPLET_BKG_COLOR = Color.WHITE;
+	Color APPLET_BKG_COLOR = null;
 	try {
 	    APPLET_BKG_COLOR = SVGReader.getColor(getParameter(APPLET_BKG_COLOR_PARAM));
 	}
 	catch(Exception ex){}
+	boolean graphBkgColorSpecified = false;
 	try {
 	    ConfigManager.backgroundColor = SVGReader.getColor(getParameter(GRAPH_BKG_COLOR_PARAM));
+	    graphBkgColorSpecified = true;
 	}
-	catch(Exception ex){ConfigManager.backgroundColor = Color.WHITE;}
+	catch(Exception ex){
+	    ConfigManager.backgroundColor = Color.WHITE;
+	    graphBkgColorSpecified = false;
+	}
+	final boolean graphBkgColorSpecifiedF = graphBkgColorSpecified;
 	AppletUtils.initLookAndFeel();
 	Container cpane = getContentPane();
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
 	cpane.setSize(appletWindowWidth, appletWindowHeight);
 	cpane.setBackground(APPLET_BKG_COLOR);
-
 	viewPanel = grMngr.createPanelView(grMngr.createZVTMelements(true), appletWindowWidth, appletWindowHeight-40);
 	meh = new ZgrAppletEvtHdlr(this, this.grMngr);
 	grMngr.parameterizeView(meh);
@@ -136,6 +143,8 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener {
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
 		    gvLdr.loadSVG(getParameter(SVG_FILE_URL_PARAM));
+		    // override SVG's background color if background color is specified in applet params
+		    if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(ConfigManager.backgroundColor);}
 		    grMngr.vsm.repaintNow();
 		    setStatusBarText(Messages.EMPTY_STRING);
 		    grMngr.tp.updateHiddenPosition();
