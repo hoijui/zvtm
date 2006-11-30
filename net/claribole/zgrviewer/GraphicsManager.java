@@ -669,11 +669,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    statusBar.setStatusBarText(AppletUtils.rankString(searchIndex+1) + " of " + matchSize + " matches");
 		}
 		else {
-		    statusBar.setStatusBarText(matchSize + " match");
+		    statusBar.setStatusBarText("1 match");
 		}
 		//center on the entity
 		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
-		vsm.centerOnGlyph(g /*lastMatchingEntity*/, mSpace.getCamera(0), 400);
+		vsm.centerOnGlyph(g/*lastMatchingEntity*/, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
+	    }
+	    else {
+		statusBar.setStatusBarText("No match");
 	    }
 	}
     }
