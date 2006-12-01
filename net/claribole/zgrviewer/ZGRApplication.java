@@ -9,7 +9,9 @@
 
 package net.claribole.zgrviewer;
 
-public interface StatusBar {
+public interface ZGRApplication {
+
+    public void about();
 
     public void setStatusBarText(String s);
     

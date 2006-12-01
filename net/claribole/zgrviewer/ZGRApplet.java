@@ -16,11 +16,16 @@ import java.awt.event.MouseListener;
 import javax.swing.JApplet;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 
 import java.util.Vector;
 
+import java.net.URL;
+import java.net.MalformedURLException;
+
 import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.engine.RepaintListener;
 
 import org.w3c.dom.Document;
 
@@ -28,7 +33,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.svg.SVGReader;
 
 
-public class ZGRApplet extends JApplet implements MouseListener, KeyListener, StatusBar {
+public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZGRApplication, RepaintListener {
 
     static final int DEFAULT_VIEW_WIDTH = 640;
     static final int DEFAULT_VIEW_HEIGHT = 480;
@@ -40,6 +45,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, St
     static final String APPLET_BKG_COLOR_PARAM = "appletBackgroundColor";
     static final String GRAPH_BKG_COLOR_PARAM = "graphBackgroundColor";
     static final String CURSOR_COLOR_PARAM = "cursorColor";
+    static final String CENTER_ON_LABEL_PARAM = "centerOnLabel";
 
 
     String APPLET_TITLE = "ZGRViewer - Applet";
@@ -107,6 +113,14 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, St
 	    graphBkgColorSpecified = false;
 	}
 	final boolean graphBkgColorSpecifiedF = graphBkgColorSpecified;
+	String centerOnLabel = null;
+	try {
+	    centerOnLabel = getParameter(CENTER_ON_LABEL_PARAM);
+	}
+	catch (Exception ex){
+	    centerOnLabel = null;
+	}
+	final String centerOnLabelF = centerOnLabel;
 	AppletUtils.initLookAndFeel();
 	Container cpane = getContentPane();
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
@@ -142,20 +156,49 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, St
 	}
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
+		    sleep(1000);
+		    requestFocus();
+		    grMngr.vsm.repaintNow();
 		    gvLdr.loadSVG(getParameter(SVG_FILE_URL_PARAM));
 		    // override SVG's background color if background color is specified in applet params
 		    if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(ConfigManager.backgroundColor);}
-		    grMngr.vsm.repaintNow();
 		    setStatusBarText(Messages.EMPTY_STRING);
 		    grMngr.tp.updateHiddenPosition();
+		    grMngr.vsm.repaintNow(grMngr.mainView, ZGRApplet.this);
+		    while (!ZGRApplet.this.paintedAtLeastOnce){
+			sleep(500);
+		    }
+		    if (centerOnLabelF != null){
+			grMngr.search(centerOnLabelF, 1);
+		    }
+		    grMngr.vsm.repaintNow();
 		    return null; 
 		}
 	    };
 	worker.start();
     }
 
+    boolean paintedAtLeastOnce = false;
+
+    public void viewRepainted(View v){
+	paintedAtLeastOnce = true;
+	v.removeRepaintListener();
+    }
+
     public void setStatusBarText(String s){
 	statusBar.setText(s);
+    }
+
+    //open up the default or user-specified browser (netscape, ie,...) and try to display the content uri
+    void displayURLinBrowser(String uri){
+	try {
+	    getAppletContext().showDocument(new URL(uri), ConfigManager._BLANK);
+	}
+	catch(MalformedURLException ex){System.out.println("Error: could not load "+uri);}
+    }
+
+    public void about(){
+	JOptionPane.showMessageDialog(this, Messages.about);
     }
 
     /* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */

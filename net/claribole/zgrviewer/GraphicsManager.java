@@ -136,10 +136,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     String lastSearchedString = "";
     Vector matchingList = new Vector();
 
-    StatusBar statusBar;
+    ZGRApplication zapp;
 
-    GraphicsManager(StatusBar sb){
-	this.statusBar = sb;
+    GraphicsManager(ZGRApplication za){
+	this.zapp = za;
     }
 
     Vector createZVTMelements(boolean applet){
@@ -666,17 +666,17 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    searchIndex = 0;
 		}
 		if (matchSize > 1){
-		    statusBar.setStatusBarText(AppletUtils.rankString(searchIndex+1) + " of " + matchSize + " matches");
+		    zapp.setStatusBarText(AppletUtils.rankString(searchIndex+1) + " of " + matchSize + " matches");
 		}
 		else {
-		    statusBar.setStatusBarText("1 match");
+		    zapp.setStatusBarText("1 match");
 		}
 		//center on the entity
 		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
 		vsm.centerOnGlyph(g/*lastMatchingEntity*/, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
 	    }
 	    else {
-		statusBar.setStatusBarText("No match");
+		zapp.setStatusBarText("No match");
 	    }
 	}
     }

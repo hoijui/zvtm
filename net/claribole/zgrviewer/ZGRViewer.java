@@ -40,7 +40,7 @@ import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.Document;
 
 
-public class ZGRViewer implements StatusBar {
+public class ZGRViewer implements ZGRApplication {
 
     static ConfigManager cfgMngr;
     static DOTManager dotMngr;
@@ -394,7 +394,7 @@ public class ZGRViewer implements StatusBar {
 	tv.setVisible(true);
     }
 
-    void about(){
+    public void about(){
 	JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.about);
     }
 

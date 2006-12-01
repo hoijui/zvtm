@@ -134,9 +134,12 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 		grMngr.triggerDM(jpx, jpy);
 	    }
 	    else {
-		Glyph g=v.lastGlyphEntered();
-		if (g!=null){
-		    grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
+		else {
+		    Glyph g=v.lastGlyphEntered();
+		    if (g!=null){
+			grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		    }
 		}
 	    }
 	}
@@ -367,11 +370,10 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     void getAndDisplayURL(Metadata md){
-	//XXX: TBW
-// 	String url=md.getURL();
-// 	if (url!=null && url.length()>0){
-// 	    application.displayURLinBrowser(url);
-// 	}
+	String url=md.getURL();
+	if (url!=null && url.length()>0){
+	    application.displayURLinBrowser(url);
+	}
     }
 
     /*cancel a speed-dependant autozoom*/

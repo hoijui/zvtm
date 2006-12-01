@@ -136,9 +136,12 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		grMngr.triggerDM(jpx, jpy);
 	    }
 	    else {
-		Glyph g=v.lastGlyphEntered();
-		if (g!=null){
-		    grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
+		else {
+		    Glyph g=v.lastGlyphEntered();
+		    if (g!=null){
+			grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		    }
 		}
 	    }
 	}

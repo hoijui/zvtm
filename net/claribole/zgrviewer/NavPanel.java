@@ -55,6 +55,8 @@ class NavPanel extends JPanel implements ActionListener {
     // zoom buttons: zoom in, zoom out
     JButton[] zoomBts = new JButton[2];
 
+    JButton aboutBt;
+
     NavPanel(GraphicsManager gm){
 	super();
 	this.setOpaque(false);
@@ -98,14 +100,18 @@ class NavPanel extends JPanel implements ActionListener {
 	buildConstraints(constraints,0,1,1,1,0,1);
 	gridBag.setConstraints(p2, constraints);
 	this.add(p2);
-
+	// search widgets
 	SearchPanel p3 = new SearchPanel(grMngr);
 	buildConstraints(constraints,0,2,1,1,0,30);
 	gridBag.setConstraints(p3, constraints);
 	this.add(p3);
-
+	// misc. widgets
 	JPanel p4 = new JPanel();
 	p4.setOpaque(false);
+	aboutBt = new JButton("About...");
+	aboutBt.setOpaque(false);
+	aboutBt.addActionListener(this);
+	p4.add(aboutBt);
 	buildConstraints(constraints,0,3,1,1,0,68);
 	gridBag.setConstraints(p4, constraints);
 	this.add(p4);
@@ -124,6 +130,7 @@ class NavPanel extends JPanel implements ActionListener {
 	else if (o==panBts[2]){grMngr.translateView(GraphicsManager.MOVE_UP_RIGHT);}
 	else if (o==panBts[6]){grMngr.translateView(GraphicsManager.MOVE_DOWN_LEFT);}
 	else if (o==panBts[8]){grMngr.translateView(GraphicsManager.MOVE_DOWN_RIGHT);}
+	else if (o==aboutBt){grMngr.zapp.about();}
     }
 
     static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
@@ -162,14 +169,12 @@ class SearchPanel extends JPanel implements ActionListener, KeyListener {
 	this.add(findTf);
 	findTf.addKeyListener(this);
 	prevBt = new JButton("Previous");
-	prevBt.setFont(ConfigManager.TINY_FONT);
 	prevBt.setOpaque(false);
 	NavPanel.buildConstraints(constraints,0,2,1,1,100,25);
 	gridBag.setConstraints(prevBt, constraints);
 	this.add(prevBt);
 	prevBt.addActionListener(this);
 	nextBt = new JButton("Next");
-	nextBt.setFont(ConfigManager.TINY_FONT);
 	nextBt.setOpaque(false);
 	NavPanel.buildConstraints(constraints,0,3,1,1,100,25);
 	gridBag.setConstraints(nextBt, constraints);

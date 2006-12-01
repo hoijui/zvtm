@@ -48,7 +48,9 @@ class ConfigManager {
     static int rdW = 300;
     static int rdH = 200;
 
-    static Font defaultFont=new Font("Dialog",0,12);
+    static Font defaultFont = new Font("Dialog", 0, 12);
+
+    static final String _BLANK = "_blank";
 
     static Font PIEMENU_FONT = defaultFont;
 
