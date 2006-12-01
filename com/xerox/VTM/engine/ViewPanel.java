@@ -44,6 +44,7 @@ import javax.swing.JPanel;
 
 import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.engine.RepaintListener;
 
 import com.xerox.VTM.glyphs.Glyph;
 
@@ -82,6 +83,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     /**repaint only if necessary (when there are animations, when the mouse moves...)*/
     boolean repaintNow=true;
+    RepaintListener repaintListener;
 
     /**only repaint mouse cursor (using XOR mode)*/
     boolean updateMouseOnly=false;

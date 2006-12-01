@@ -39,6 +39,7 @@ import javax.swing.JFrame;
 
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.lens.Lens;
 
@@ -873,6 +874,15 @@ public class VirtualSpaceManager implements AWTEventListener {
 	v.repaintNow();
     }
 
+    /**Call this if you want to repaint a given view at once.
+     * In some cases it is not possible to detect graphical changes so repaint
+     * calls have to be issued manually (unless you are willing to wait for
+     * another event to trigger repaint).
+     */
+    public void repaintNow(View v, RepaintListener rl){
+	v.repaintNow(rl);
+    }
+
     /**Call this if you want to repaint a given view at once. Internal use.
      * In some cases it is not possible to detect graphical changes so repaint
      * calls have to be issued manually (unless you are willing to wait for
@@ -1126,6 +1136,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 			if (tmpRatio>ratio){ratio=tmpRatio;}
 		    }
 		    ratio *= mFactor;
+		    System.out.println("ratio= "+ratio);
 		    float newAlt=currentAlt*Math.abs(ratio);
 		    float dAlt=newAlt-currentAlt;
 		    Vector prms=new Vector();

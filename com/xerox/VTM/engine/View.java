@@ -41,6 +41,7 @@ import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.engine.RepaintListener;
 
 import fr.lri.swingstates.sm.BasicInputStateMachine;
 
@@ -432,6 +433,16 @@ public abstract class View {
     /**call this method if the view should be repainted at once*/
     public void repaintNow(){
 	panel.repaintNow=true;
+    }
+
+    /**call this method if the view should be repainted at once*/
+    public void repaintNow(RepaintListener rl){
+	panel.repaintListener = rl;
+	panel.repaintNow = true;
+    }
+
+    public void removeRepaintListener(){
+	panel.repaintListener = null;
     }
 
     /**gives access to the panel's Graphics object - can be useful in some cases, for instance to compute the bounds of a text string that has not yet been added to any virtual space. SHOULD NOT BE TAMPERED WITH. USE AT YOUR OWN RISKS!*/

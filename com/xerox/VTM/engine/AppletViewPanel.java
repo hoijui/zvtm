@@ -434,6 +434,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 			}
 			//or this   both seem to work well (have to test on several config) - BETTER UNDER SOLARIS
 			//Thread.yield();
+			if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 		    }
 		    else if (updateMouseOnly){
 			updateMouseOnly=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
