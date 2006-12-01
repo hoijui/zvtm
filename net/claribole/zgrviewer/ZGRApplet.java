@@ -103,6 +103,11 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    APPLET_BKG_COLOR = SVGReader.getColor(getParameter(APPLET_BKG_COLOR_PARAM));
 	}
 	catch(Exception ex){}
+	Color CURSOR_COLOR = null;
+	try {
+	    CURSOR_COLOR = SVGReader.getColor(getParameter(CURSOR_COLOR_PARAM));
+	}
+	catch(Exception ex){}
 	boolean graphBkgColorSpecified = false;
 	try {
 	    ConfigManager.backgroundColor = SVGReader.getColor(getParameter(GRAPH_BKG_COLOR_PARAM));
@@ -153,6 +158,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	}
 	else {
 	    cpane.add(borderPanel);
+	}
+	if (CURSOR_COLOR != null){
+	    grMngr.mainView.mouse.setColor(CURSOR_COLOR);
+	    grMngr.mainView.mouse.setHintColor(CURSOR_COLOR);
 	}
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
