@@ -94,6 +94,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	    if (active){
 		if (repaintNow || updateMouseOnly){
 		    repaint();
+		    if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 		    // time to sleep = wanted refresh rate minus time needed to do the actual repaint operations
 		    timeToSleep = frameTime - loopTotalTime;
 		    try {// sleep at least minimumSleepTime ms so that other

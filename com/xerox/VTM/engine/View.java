@@ -430,17 +430,25 @@ public abstract class View {
 	if (panel.evH!=null){panel.evH.viewClosing(this);}
     }
 
-    /**call this method if the view should be repainted at once*/
+    /**Call this if you want to repaint this view at once.
+     *@see #repaintNow(RepaintListener rl)
+     */
     public void repaintNow(){
 	panel.repaintNow=true;
     }
 
-    /**call this method if the view should be repainted at once*/
+    /**Call this if you want to repaint this view at once.
+     *@param rl a repaint listener to be notified when this repaint cycle is completed (it must be removed manually if you are not interested in being notified about following repaint cycles)
+     *@see #repaintNow()
+     *@see #removeRepaintListener()     */
     public void repaintNow(RepaintListener rl){
 	panel.repaintListener = rl;
 	panel.repaintNow = true;
     }
 
+    /**Remove the repaint listener associated with this view.
+     *@see #repaintNow(RepaintListener rl)
+     */
     public void removeRepaintListener(){
 	panel.repaintListener = null;
     }
