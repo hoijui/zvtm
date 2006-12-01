@@ -368,8 +368,10 @@ public class SVGReader {
 
     /** Get the Java Color instance corresponding to an SVG string representation of that color. The SVG string representation of the color can be any of the values defined in <a href="http://www.w3.org/TR/SVG11/types.html#DataTypeColor">Scalable Vector Graphics (SVG) 1.1 Specification, section 4.1: Basic data types</a>.
      *@param s string representation of a color  (as an SVG style attribute)
+     *@return null if s is null or not a syntactically well-formed color
      */
     public static Color getColor(String s){
+	if (s == null){return null;}
 	try {
 	    if (s.startsWith("rgb(")){//color expressed as rgb(R,G,B)
 		//ar should be of length 3
