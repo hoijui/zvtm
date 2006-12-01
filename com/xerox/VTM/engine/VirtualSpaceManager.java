@@ -1136,7 +1136,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 			if (tmpRatio>ratio){ratio=tmpRatio;}
 		    }
 		    ratio *= mFactor;
-		    System.out.println("ratio= "+ratio);
 		    float newAlt=currentAlt*Math.abs(ratio);
 		    float dAlt=newAlt-currentAlt;
 		    Vector prms=new Vector();
