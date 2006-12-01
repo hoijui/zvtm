@@ -89,11 +89,11 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	try {appletWindowHeight = Integer.parseInt(getParameter(APPLET_HEIGHT_PARAM));}
 	catch(NumberFormatException ex){appletWindowHeight = DEFAULT_VIEW_HEIGHT;}
 	// should the navigation control panel be displayed or not
-	boolean showNavControl = false;
+	boolean showNavControl = true;
 	try {
 	    showNavControl = (new Boolean(getParameter(SHOW_NAVIGATION_CONTROLS_PARAM))).booleanValue();
 	}
-	catch(Exception ex){}
+	catch(Exception ex){showNavControl = true;}
 	try {
 	    APPLET_TITLE = getParameter(APPLET_TITLE_PARAM);
 	}

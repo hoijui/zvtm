@@ -16,6 +16,7 @@ import java.io.File;
 
 import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.svg.SVGReader;
+import net.claribole.zvtm.engine.Location;
 
 import org.w3c.dom.Document;
 
@@ -169,13 +170,15 @@ class GVLoader {
 	    if (svgDoc != null){
 		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true);
 		ConfigManager.defaultFont = grMngr.vsm.getMainFont();
- 		grMngr.getGlobalView();
+		Location l = grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(0));
+		grMngr.mainCamera.moveTo(l.vx, l.vy);
+		grMngr.mainCamera.setAltitude(l.alt);
 		//do not remember camera's initial location (before global view)
 		if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
 		if (grMngr.rView != null){
-		    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
-		    grMngr.cameraMoved();
+		    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1), 100);
 		}
+		grMngr.cameraMoved();
 	    }
 	    else {
 		System.err.println("An error occured while loading file " + svgFileURL);
