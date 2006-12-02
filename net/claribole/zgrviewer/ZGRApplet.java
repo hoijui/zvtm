@@ -47,6 +47,9 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String CURSOR_COLOR_PARAM = "cursorColor";
     static final String CENTER_ON_LABEL_PARAM = "centerOnLabel";
 
+    static final String HTTP_PROTOCOL = "http://";
+    static final String FTP_PROTOCOL = "ftp:/";
+    static final String FILE_PROTOCOL = "file:/";
 
     String APPLET_TITLE = "ZGRViewer - Applet";
 
@@ -64,6 +67,8 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     int appletWindowWidth = DEFAULT_VIEW_WIDTH;
     int appletWindowHeight = DEFAULT_VIEW_HEIGHT;
 
+    String docURL;
+
     public ZGRApplet(){
 	getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
     }
@@ -78,6 +83,8 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	cfgMngr = new ConfigManager(grMngr, true);
 	grMngr.setConfigManager(cfgMngr);
 	gvLdr = new GVLoader(this, grMngr, cfgMngr, null);
+	URL docBase = getDocumentBase();
+	docURL = docBase.getProtocol() + "://" + docBase.getHost() + docBase.getPath();
     }
 
     void initGUI(){
@@ -200,6 +207,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
     //open up the default or user-specified browser (netscape, ie,...) and try to display the content uri
     void displayURLinBrowser(String uri){
+	if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
+	    // relative URL, prepend document base
+	    uri = docURL + uri;
+	}
 	try {
 	    getAppletContext().showDocument(new URL(uri), ConfigManager._BLANK);
 	}
