@@ -13,16 +13,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JPanel;
+import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
 
 /* Navigation Panel (directional arrows, plus zoom) */
 
-class NavPanel extends JPanel implements ActionListener {
+class NavPanel extends JPanel implements ActionListener, ChangeListener {
 
     GraphicsManager grMngr;
 
@@ -54,7 +57,9 @@ class NavPanel extends JPanel implements ActionListener {
 				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o_h.png"))};
     // zoom buttons: zoom in, zoom out
     JButton[] zoomBts = new JButton[2];
-
+    
+    JCheckBox aaCb;
+    
     JButton aboutBt;
 
     NavPanel(GraphicsManager gm){
@@ -105,6 +110,13 @@ class NavPanel extends JPanel implements ActionListener {
 	buildConstraints(constraints,0,2,1,1,0,30);
 	gridBag.setConstraints(p3, constraints);
 	this.add(p3);
+	// antialiasing checkbox
+	aaCb = new JCheckBox("Antialiasing", grMngr.mainView.getAntialiasing());
+	aaCb.setOpaque(false);
+	buildConstraints(constraints,0,3,1,1,0,30);
+	gridBag.setConstraints(aaCb, constraints);
+	this.add(aaCb);
+	aaCb.addChangeListener(this);
 	// misc. widgets
 	JPanel p4 = new JPanel();
 	p4.setOpaque(false);
@@ -112,7 +124,7 @@ class NavPanel extends JPanel implements ActionListener {
 	aboutBt.setOpaque(false);
 	aboutBt.addActionListener(this);
 	p4.add(aboutBt);
-	buildConstraints(constraints,0,3,1,1,0,68);
+	buildConstraints(constraints,0,4,1,1,0,38);
 	gridBag.setConstraints(p4, constraints);
 	this.add(p4);
     }
@@ -131,6 +143,13 @@ class NavPanel extends JPanel implements ActionListener {
 	else if (o==panBts[6]){grMngr.translateView(GraphicsManager.MOVE_DOWN_LEFT);}
 	else if (o==panBts[8]){grMngr.translateView(GraphicsManager.MOVE_DOWN_RIGHT);}
 	else if (o==aboutBt){grMngr.zapp.about();}
+    }
+
+    public void stateChanged(ChangeEvent e){
+	Object o = e.getSource();
+	if (o==aaCb){
+	    grMngr.setAntialiasing(aaCb.isSelected());
+	}
     }
 
     static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){

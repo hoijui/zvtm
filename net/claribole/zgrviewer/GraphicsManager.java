@@ -673,7 +673,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		}
 		//center on the entity
 		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
-		System.out.println("Centering on "+g.getID());
 		vsm.centerOnGlyph(g/*lastMatchingEntity*/, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
 		vsm.repaintNow();
 	    }

@@ -46,6 +46,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String GRAPH_BKG_COLOR_PARAM = "graphBackgroundColor";
     static final String CURSOR_COLOR_PARAM = "cursorColor";
     static final String CENTER_ON_LABEL_PARAM = "centerOnLabel";
+    static final String ANTIALIASING_PARAM = "antialiased";
 
     static final String HTTP_PROTOCOL = "http://";
     static final String FTP_PROTOCOL = "ftp:/";
@@ -98,7 +99,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	// should the navigation control panel be displayed or not
 	boolean showNavControl = true;
 	try {
-	    showNavControl = (new Boolean(getParameter(SHOW_NAVIGATION_CONTROLS_PARAM))).booleanValue();
+	    String s = getParameter(SHOW_NAVIGATION_CONTROLS_PARAM);
+	    if (s != null){
+		showNavControl = (new Boolean(s)).booleanValue();
+	    }
 	}
 	catch(Exception ex){showNavControl = true;}
 	try {
@@ -133,6 +137,14 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    centerOnLabel = null;
 	}
 	final String centerOnLabelF = centerOnLabel;
+	boolean antialiased = true;
+	try {
+	    String s = getParameter(ANTIALIASING_PARAM);
+	    if (s != null){
+		antialiased = (new Boolean(s)).booleanValue();
+	    }
+	}
+	catch(Exception ex){antialiased = true;}
 	AppletUtils.initLookAndFeel();
 	Container cpane = getContentPane();
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
@@ -142,6 +154,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	meh = new ZgrAppletEvtHdlr(this, this.grMngr);
 	grMngr.parameterizeView(meh);
  	viewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-40));
+	grMngr.mainView.setAntialiasing(antialiased);
 	statusBar = new JLabel(Messages.LOADING_SVG);
 	JPanel borderPanel = new JPanel();
 	borderPanel.setLayout(new BorderLayout());
