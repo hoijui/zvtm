@@ -273,6 +273,7 @@ public abstract class View {
 	if (b!=panel.antialias){
 	    panel.antialias=b;
 	    panel.updateAntialias=true;
+	    repaintNow();
 	}
     }
 
