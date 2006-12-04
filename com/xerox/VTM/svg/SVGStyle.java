@@ -199,6 +199,7 @@ public class SVGStyle {
 
     public void setFontSize(String size){
 	this.font_size = size;
+	if (font_size != null && font_size.endsWith(SVGReader._pt)){font_size = font_size.substring(0, font_size.length()-2);}
     }
 
     public void setFontWeight(String weight){

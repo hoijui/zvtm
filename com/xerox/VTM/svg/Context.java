@@ -56,13 +56,16 @@ public class Context {
 	}
 	if (ar!=null){
 	    for (int i=0;i<ar.length;i++){
-		if (ar[i].startsWith(SVGReader._fill)){fill=SVGReader.getColor(ar[i].substring(SVGReader._fill.length(),ar[i].length()));}
-		else if (ar[i].startsWith(SVGReader._stroke)){SVGReader.getColor(ar[i].substring(SVGReader._stroke.length(),ar[i].length()));}
-		else if (ar[i].startsWith(SVGReader._fillopacity)){fill_opacity=new Float(ar[i].substring(SVGReader._fillopacity.length(),ar[i].length()));}
-		else if (ar[i].startsWith(SVGReader._fontfamily)){font_family=ar[i].substring(SVGReader._fontfamily.length(),ar[i].length());}
-		else if (ar[i].startsWith(SVGReader._fontsize)){font_size=ar[i].substring(SVGReader._fontsize.length(),ar[i].length());}
-		else if (ar[i].startsWith(SVGReader._fontweight)){font_weight=ar[i].substring(SVGReader._fontweight.length(),ar[i].length());}
-		else if (ar[i].startsWith(SVGReader._fontstyle)){font_style=ar[i].substring(SVGReader._fontstyle.length(),ar[i].length());}
+		if (ar[i].startsWith(SVGReader._fill)){fill=SVGReader.getColor(ar[i].substring(SVGReader._fill.length()));}
+		else if (ar[i].startsWith(SVGReader._stroke)){SVGReader.getColor(ar[i].substring(SVGReader._stroke.length()));}
+		else if (ar[i].startsWith(SVGReader._fillopacity)){fill_opacity=new Float(ar[i].substring(SVGReader._fillopacity.length()));}
+		else if (ar[i].startsWith(SVGReader._fontfamily)){font_family=ar[i].substring(SVGReader._fontfamily.length());}
+		else if (ar[i].startsWith(SVGReader._fontsize)){
+		    font_size=ar[i].substring(SVGReader._fontsize.length());
+		    if (font_size.endsWith(SVGReader._pt)){font_size = font_size.substring(0, font_size.length()-2);}
+		}
+		else if (ar[i].startsWith(SVGReader._fontweight)){font_weight=ar[i].substring(SVGReader._fontweight.length());}
+		else if (ar[i].startsWith(SVGReader._fontstyle)){font_style=ar[i].substring(SVGReader._fontstyle.length());}
 	    }
 	}
     }
