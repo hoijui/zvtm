@@ -210,7 +210,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     void parameterizeView(BaseEventHandler eh){
 	paMngr = new PeriodicActionManager(this);
-	mainView.setBackgroundColor(ConfigManager.backgroundColor);
+	mainView.setBackgroundColor(cfgMngr.backgroundColor);
 	meh = eh;
 	mainView.setEventHandler((ViewEventHandler)eh);
 	mainView.setNotifyMouseMoved(true);
@@ -368,7 +368,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		vsm.addExternalView(cameras, radarView, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
 		reh = new RadarEvtHdlr(this);
 		rView = vsm.getView(radarView);
-		rView.setBackgroundColor(ConfigManager.backgroundColor);
+		rView.setBackgroundColor(cfgMngr.backgroundColor);
 		rView.setEventHandler(reh);
 		rView.setResizable(false);
 		rView.setActiveLayer(1);
@@ -640,6 +640,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /* ---------- search -----------*/
 
+    Glyph highlightedLabel;
+    Color originalHighlightedLabelColor;
+
     /*given a string, centers on a VText with this string in it*/
     void search(String s, int direction){
 	if (s.length()>0){
@@ -674,6 +677,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		//center on the entity
 		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
 		vsm.centerOnGlyph(g/*lastMatchingEntity*/, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
+		highlight(g);
 		vsm.repaintNow();
 	    }
 	    else {
@@ -687,6 +691,22 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	searchIndex = -1;
 	lastSearchedString = s.toLowerCase();
 	matchingList.removeAllElements();
+	if (cfgMngr.highlightColor != null && highlightedLabel != null){
+	    highlightedLabel.setColor(originalHighlightedLabelColor);
+	    highlightedLabel = null;
+	}
+    }
+
+    /* color the label found by search */
+    void highlight(Glyph g){
+	if (cfgMngr.highlightColor == null){return;}
+	// de-highlight previous label (if any)
+	if (highlightedLabel != null){
+	    highlightedLabel.setColor(originalHighlightedLabelColor);
+	}
+	highlightedLabel = g;
+	originalHighlightedLabelColor = highlightedLabel.getColor();
+	highlightedLabel.setColor(cfgMngr.highlightColor);
     }
 
     /* -------------- Font management ----------------*/

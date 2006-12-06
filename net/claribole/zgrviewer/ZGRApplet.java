@@ -44,6 +44,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String APPLET_TITLE_PARAM = "title";
     static final String APPLET_BKG_COLOR_PARAM = "appletBackgroundColor";
     static final String GRAPH_BKG_COLOR_PARAM = "graphBackgroundColor";
+    static final String HIGHLIGHT_COLOR_PARAM = "highlightColor";
     static final String CURSOR_COLOR_PARAM = "cursorColor";
     static final String CENTER_ON_LABEL_PARAM = "centerOnLabel";
     static final String ANTIALIASING_PARAM = "antialiased";
@@ -121,11 +122,11 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	catch(Exception ex){}
 	boolean graphBkgColorSpecified = false;
 	try {
-	    ConfigManager.backgroundColor = SVGReader.getColor(getParameter(GRAPH_BKG_COLOR_PARAM));
+	    cfgMngr.backgroundColor = SVGReader.getColor(getParameter(GRAPH_BKG_COLOR_PARAM));
 	    graphBkgColorSpecified = true;
 	}
 	catch(Exception ex){
-	    ConfigManager.backgroundColor = Color.WHITE;
+	    cfgMngr.backgroundColor = Color.WHITE;
 	    graphBkgColorSpecified = false;
 	}
 	final boolean graphBkgColorSpecifiedF = graphBkgColorSpecified;
@@ -145,6 +146,13 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    }
 	}
 	catch(Exception ex){antialiased = true;}
+	try {
+	    String s = getParameter(HIGHLIGHT_COLOR_PARAM);
+	    if (s != null){
+		cfgMngr.highlightColor = SVGReader.getColor(s);
+	    }
+	}
+	catch(Exception ex){cfgMngr.highlightColor = null;}
 	AppletUtils.initLookAndFeel();
 	Container cpane = getContentPane();
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
@@ -190,7 +198,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 		    grMngr.vsm.repaintNow();
 		    gvLdr.loadSVG(getParameter(SVG_FILE_URL_PARAM));
 		    // override SVG's background color if background color is specified in applet params
-		    if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(ConfigManager.backgroundColor);}
+		    if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(cfgMngr.backgroundColor);}
 		    setStatusBarText(Messages.EMPTY_STRING);
 		    grMngr.tp.updateHiddenPosition();
 		    grMngr.vsm.repaintNow(grMngr.mainView, ZGRApplet.this);

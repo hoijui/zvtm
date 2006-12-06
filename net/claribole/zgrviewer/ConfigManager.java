@@ -54,7 +54,10 @@ class ConfigManager {
 
     static Font PIEMENU_FONT = defaultFont;
 
-    static Color backgroundColor=Color.white;
+    Color backgroundColor = Color.WHITE;
+
+    // null means don't highlight
+    Color highlightColor = null;
 
     static Color OBSERVED_REGION_COLOR;
     static Color PIEMENU_INSIDE_COLOR;
