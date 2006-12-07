@@ -986,14 +986,25 @@ public class SVGReader {
 	if (width.endsWith("px")){width = width.substring(0,width.length()-2);}
 	String height = e.getAttribute(_height);
 	if (height.endsWith("px")){height = height.substring(0,height.length()-2);}
-	long w = (Long.valueOf(width)).longValue()/2;
-	long h = (Long.valueOf(height)).longValue()/2;
+	long w = (Long.valueOf(width)).longValue();
+	long h = (Long.valueOf(height)).longValue();
+	long hw = w / 2;
+	long hh = h / 2;
 	if (e.hasAttributeNS(xlinkURI, _href)){
 	    String imagePath = documentParentURL + e.getAttributeNS(xlinkURI, _href);
 	    if (imagePath.length() > 0){
 		ImageIcon ii = getImage(imagePath, imageStore);
 		if (ii != null){
-		    return new VImage(x+w, -y-h, 0, ii.getImage());
+		    int aw = ii.getIconWidth();
+		    int ah = ii.getIconHeight();
+		    double wr = w/((double)aw);
+		    double hr = h/((double)ah);
+		    if (wr != 1.0 || hr != 1.0){
+			return new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr));
+		    }
+		    else {
+			return new VImage(x+hw, -y-hh, 0, ii.getImage());
+		    }
 		}
 	    }
 	}
