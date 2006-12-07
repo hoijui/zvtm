@@ -26,6 +26,10 @@ package com.xerox.VTM.svg;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import javax.swing.ImageIcon;
+
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -53,6 +57,7 @@ import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.glyphs.VRoundRectST;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.VImage;
 
 /**
  *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz/Dot SVG output (Ellipse, Text, Path and Rectangle + limited support for Polygon)).
@@ -966,6 +971,35 @@ public class SVGReader {
 	return res;
     }
 
+
+
+
+    /**create a VImage from an SVG image element
+     *@param e an SVG image as a DOM element (org.w3c.dom.Element)
+     *@param ctx used to propagate contextual style information (put null if none)
+     *@param meta store metadata associated with this node (URL, title) in glyph's associated object
+     */
+    public static Glyph createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL){
+	long x = (Long.valueOf(e.getAttribute(_x))).longValue()+xoffset;
+	long y = (Long.valueOf(e.getAttribute(_y))).longValue()+yoffset;
+	String width = e.getAttribute(_width);
+	if (width.endsWith("px")){width = width.substring(0,width.length()-2);}
+	String height = e.getAttribute(_height);
+	if (height.endsWith("px")){height = height.substring(0,height.length()-2);}
+	long w = (Long.valueOf(width)).longValue()/2;
+	long h = (Long.valueOf(height)).longValue()/2;
+	if (e.hasAttributeNS(xlinkURI, _href)){
+	    String imagePath = documentParentURL + e.getAttributeNS(xlinkURI, _href);
+	    if (imagePath.length() > 0){
+		ImageIcon ii = getImage(imagePath, imageStore);
+		if (ii != null){
+		    return new VImage(x+w, -y-h, 0, ii.getImage());
+		}
+	    }
+	}
+	return null;
+    }
+
     /**create a VPolygon from an SVG polygon element
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
@@ -1182,12 +1216,7 @@ public class SVGReader {
      *@param vs name of the virtual space
      */
     public static void load(Document d,VirtualSpaceManager vsm,String vs){
-	Element svgRoot=d.getDocumentElement();
-	NodeList objects=svgRoot.getChildNodes();
-	for (int i=0;i<objects.getLength();i++){
-	    Node obj=objects.item(i);
-	    if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,false);}
-	}
+	load(d, vsm, vs, false);
     }
 
     /**
@@ -1198,17 +1227,21 @@ public class SVGReader {
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
      */
     public static void load(Document d,VirtualSpaceManager vsm,String vs,boolean meta){
+	String documentURL = d.getDocumentURI();
+	String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
+	System.out.println(documentParentURL);
 	Element svgRoot=d.getDocumentElement();
 	NodeList objects=svgRoot.getChildNodes();
+	Hashtable imageStore = new Hashtable();
 	for (int i=0;i<objects.getLength();i++){
 	    Node obj=objects.item(i);
-	    if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,meta);}
+	    if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,meta, documentParentURL, imageStore);}
 	}
     }
 
     /*e is a DOM element, vs is the name of the virtual space where the new glyph(s) is(are) put*/
     private static void processNode(Element e,VirtualSpaceManager vsm,String vs,
-				    Context ctx,boolean mainFontSet,boolean meta){
+				    Context ctx,boolean mainFontSet,boolean meta, String documentParentURL, Hashtable imageStore){
 	String tagName=e.getTagName();
 	if (tagName.equals(_rect)){
 	    vsm.addGlyph(createRectangle(e,ctx,meta),vs);
@@ -1236,6 +1269,12 @@ public class SVGReader {
 		vsm.addGlyph(segments[i],vs);
 	    }
 	}
+	else if (tagName.equals(_image)){
+	    Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL);
+	    if (g != null){
+		vsm.addGlyph(g, vs);
+	    }
+	}
 	else if (tagName.equals(_g)){
 	    NodeList objects=e.getChildNodes();
 	    boolean setAFont=false;
@@ -1261,7 +1300,7 @@ public class SVGReader {
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta);}
+		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, imageStore);}
 	    }
 	}
 	else if (tagName.equals(_a)){
@@ -1289,7 +1328,7 @@ public class SVGReader {
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta);}
+		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, imageStore);}
 	    }
 	}
 	else if (tagName.equals(_title)){
@@ -1345,6 +1384,28 @@ public class SVGReader {
     private static boolean specialFont(Font cFont,Font mFont){//context font, main font
 	if (!cFont.getFamily().equals(mFont.getFamily()) || cFont.getSize()!=mFont.getSize() || cFont.getStyle()!=mFont.getStyle()){return true;}
 	else {return false;}
+    }
+
+    /*get the in-memory ImageIcon of icon at iconURL*/
+    static ImageIcon getImage(String imagePath, Hashtable imageStore){
+	ImageIcon res = null;
+	URL imageURL = null;
+	try {
+	    imageURL = new URL(imagePath);
+	}
+	catch (MalformedURLException ex){System.err.println("Failed to identify image location: "+imagePath);res = null;}
+	
+	if (imageStore.containsKey(imageURL)){
+	    res = (ImageIcon)imageStore.get(imageURL);
+	}
+	else {
+	    try {
+		res = new ImageIcon(imageURL);
+		imageStore.put(imageURL, res);
+	    }
+	    catch (Exception ex){System.err.println("Failed to load image from: "+imageURL.toString());res = null;}
+	}
+	return res;
     }
 
 }
