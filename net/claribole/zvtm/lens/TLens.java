@@ -18,6 +18,10 @@ import java.awt.image.WritableRaster;
 
 public abstract class TLens extends FixedSizeLens {
 
+    // half the width and height of region seen through lens in virtual space, depending on MM, for perf optim (used in drawBoundary)
+    int lensProjectedWidth = 0;
+    int lensProjectedHeight = 0;
+
     double d = 0;
 
     /* gain function parameters (transition in translucence space) */

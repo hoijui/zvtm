@@ -12,6 +12,7 @@
 package net.claribole.zvtm.lens;
 
 import java.awt.Color;
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.image.SinglePixelPackedSampleModel;
@@ -21,10 +22,25 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.claribole.zvtm.engine.LowPassFilter;
+import com.xerox.VTM.glyphs.Transparent;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class TFadingLens extends TLens {
+
+    /** Controls the granularity of translucency values for rColor.
+     *  The higher the number, the smoother the transition from opaque to transparent.
+     *  The higher the number, the more memory is consumed by these values (should not be that memory hungry though).
+     *  10 seems to be a minimum, while 100 is definitely too high for most needs.
+     */
+    static final int ACS_ACCURACY = 20;
+    
+    static final AlphaComposite[] acs;
+    static {acs = new AlphaComposite[ACS_ACCURACY+1];
+	for (int i=0;i<acs.length;i++){
+	    acs[i] = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, i/((float)ACS_ACCURACY));
+	}
+    }
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -38,8 +54,14 @@ public class TFadingLens extends TLens {
     Timer timer;
     TrailingTimer mouseStillUpdater;
 
-    /**Lens boundary color (default is black)*/
+    /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
+
+    /**Color of shape indicating what region of the virtual space is seen through the lens (default is black, null if none).
+     * The shape will be rendered with a translucency factor. The value of this factor is inversely proportional to the
+     * opacity factor of the lens' content (so the shape will disappear as the lens slows down).
+     */
+    Color rColor = Color.BLACK;
 
     // MMTf is used to hold the current translucence
     // a and b are used to convert the filter's opacity to values in the [minT, maxT] range
@@ -251,11 +273,29 @@ public class TFadingLens extends TLens {
 	bColor = bc;
     }
 
+    /**Set the color used to draw the boundaries of the region observed through the lens (default is black)
+     *@param bc color of the boundary (set to null if you do not want to draw that region)
+     */
+    public void setObservedRegionColor(Color bc){
+	rColor = bc;
+    }
+
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
 	if (bColor != null){
 	    g2d.setColor(bColor);
 	    g2d.drawOval(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+	}
+	if (rColor != null){
+	    //XXX: the following two values could actually be computed less frequently, just when MM of lens{Width,Height} change
+	    lensProjectedWidth = Math.round(lensWidth/MM);
+	    lensProjectedHeight = Math.round(lensHeight/MM);
+	    g2d.setColor(rColor);
+	    // get the alpha composite from a precomputed list of values
+	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
+	    g2d.setComposite(acs[Math.round((1.0f-MMTf)*ACS_ACCURACY)-1]);  
+	    g2d.drawOval(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
+	    g2d.setComposite(Transparent.acO);
 	}
     }
 

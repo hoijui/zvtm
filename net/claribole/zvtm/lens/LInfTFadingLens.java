@@ -12,6 +12,7 @@
 package net.claribole.zvtm.lens;
 
 import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
 import java.awt.geom.Point2D;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
@@ -19,9 +20,9 @@ import java.awt.image.WritableRaster;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import net.claribole.zvtm.engine.LowPassFilter;
+import com.xerox.VTM.glyphs.Transparent;
 
-/**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
+/**Translucent lens. Lens that fades away when moving fast - Distance metric: L(Inf) (rectangular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class LInfTFadingLens extends TFadingLens {
 
@@ -79,6 +80,17 @@ public class LInfTFadingLens extends TFadingLens {
 	if (bColor != null){
 	    g2d.setColor(bColor);
 	    g2d.drawRect(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+	}
+	if (rColor != null){
+	    //XXX: the following two values could actually be computed less frequently, just when MM of lens{Width,Height} change
+	    lensProjectedWidth = Math.round(lensWidth/MM);
+	    lensProjectedHeight = Math.round(lensHeight/MM);
+	    g2d.setColor(rColor);
+	    // get the alpha composite from a precomputed list of values
+	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
+	    g2d.setComposite(acs[Math.round((1.0f-MMTf)*ACS_ACCURACY)-1]);  
+	    g2d.drawRect(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
+	    g2d.setComposite(Transparent.acO);
 	}
     }
 
