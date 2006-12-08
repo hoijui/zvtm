@@ -179,7 +179,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    buildConstraints(constraints,0,0,1,1,90,100);
 	    gridBag.setConstraints(borderPanel, constraints);
 	    cpane.add(borderPanel);
-	    navPanel = new NavPanel(grMngr);
+	    navPanel = new NavPanel(grMngr, centerOnLabelF);
 	    buildConstraints(constraints,1,0,1,1,10,0);
 	    gridBag.setConstraints(navPanel, constraints);
 	    cpane.add(navPanel);

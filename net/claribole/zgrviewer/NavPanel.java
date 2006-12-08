@@ -62,7 +62,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
     
     JButton aboutBt;
 
-    NavPanel(GraphicsManager gm){
+    NavPanel(GraphicsManager gm, String initialSearchString){
 	super();
 	this.setOpaque(false);
 	this.grMngr = gm;
@@ -106,7 +106,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 	gridBag.setConstraints(p2, constraints);
 	this.add(p2);
 	// search widgets
-	SearchPanel p3 = new SearchPanel(grMngr);
+	SearchPanel p3 = new SearchPanel(grMngr, initialSearchString);
 	buildConstraints(constraints,0,2,1,1,0,30);
 	gridBag.setConstraints(p3, constraints);
 	this.add(p3);
@@ -169,7 +169,7 @@ class SearchPanel extends JPanel implements ActionListener, KeyListener {
     JTextField findTf;
     JButton prevBt, nextBt;
     
-    SearchPanel(GraphicsManager gm){
+    SearchPanel(GraphicsManager gm, String initialSearchString){
 	this.setOpaque(false);
 	this.grMngr = gm;
 	GridBagLayout gridBag = new GridBagLayout();
@@ -177,12 +177,11 @@ class SearchPanel extends JPanel implements ActionListener, KeyListener {
 	constraints.fill = GridBagConstraints.HORIZONTAL;
 	constraints.anchor = GridBagConstraints.CENTER;
 	this.setLayout(gridBag);
-
 	JLabel findLb = new JLabel("Find");
 	NavPanel.buildConstraints(constraints,0,0,1,1,100,25);
 	gridBag.setConstraints(findLb, constraints);
 	this.add(findLb);
-	findTf = new JTextField();
+	findTf = new JTextField(initialSearchString);
 	NavPanel.buildConstraints(constraints,0,1,1,1,100,25);
 	gridBag.setConstraints(findTf, constraints);
 	this.add(findTf);
