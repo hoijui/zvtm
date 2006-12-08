@@ -39,6 +39,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
     ZGRViewer application;
     GraphicsManager grMngr;
 
+    long mvx, mvy;
+
     ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 	this.application = app;
 	this.grMngr = gm;
@@ -322,11 +324,21 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 	else {
 	    tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
+	    mvx = v.getMouse().vx;
+	    mvy = v.getMouse().vy;
 	    if (wheelDirection == WHEEL_UP){// zooming in
+		grMngr.mainCamera.posx -= Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
+		grMngr.mainCamera.posy -= Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
+		grMngr.mainCamera.updatePrecisePosition();
 		grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
 		grMngr.cameraMoved();
 	    }
 	    else {// wheelDirection == WHEEL_DOWN, zooming out
+		if (grMngr.mainCamera.getAltitude() > -90){
+		    grMngr.mainCamera.posx += Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
+		    grMngr.mainCamera.posy += Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
+		    grMngr.mainCamera.updatePrecisePosition();
+		}
 		grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
 		grMngr.cameraMoved();
 	    }
