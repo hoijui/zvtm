@@ -148,6 +148,10 @@ public class SVGReader {
 	return res;
     }
 
+    public static long getLong(String s){
+	return Math.round(Double.parseDouble(s));
+    }
+
     private static void processNextSVGPathCommand(StringBuffer svg,VPath ph,StringBuffer lastCommand){
 	if (svg.length()>0) {
 	    switch (svg.charAt(0)){
@@ -488,16 +492,16 @@ public class SVGReader {
     }
 
     //utility method used by processNextSVGCoords()
-    static int getNextNumber(StringBuffer sb){
-	int res=0;
+    static long getNextNumber(StringBuffer sb){
+	long res=0;
 	//Utilities.delLeadingSpaces(sb);
 	seekSecondCoord(sb);
 	StringBuffer dgb=new StringBuffer();
-	while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-'))){
+	while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-') || (sb.charAt(0)=='.'))){
 	    dgb.append(sb.charAt(0));
 	    sb.deleteCharAt(0);
 	}
-	if (dgb.length()>0){res=(Integer.valueOf(dgb.toString())).intValue();}
+	if (dgb.length()>0){res = getLong(dgb.toString());}
 	return res;
     }
 
@@ -586,10 +590,10 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VEllipse createEllipse(Element e,Context ctx,boolean meta){
-	long x=(Long.valueOf(e.getAttribute(_cx))).longValue()+xoffset;
-	long y=(Long.valueOf(e.getAttribute(_cy))).longValue()+yoffset;
-	long w=(Long.valueOf(e.getAttribute(_rx))).longValue();
-	long h=(Long.valueOf(e.getAttribute(_ry))).longValue();
+	long x = getLong(e.getAttribute(_cx)) + xoffset;
+	long y = getLong(e.getAttribute(_cy)) + yoffset;
+	long w = getLong(e.getAttribute(_rx));
+	long h = getLong(e.getAttribute(_ry));
 	VEllipse res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
@@ -653,9 +657,9 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VCircle createCircle(Element e,Context ctx,boolean meta){
-	long x=(Long.valueOf(e.getAttribute(_cx))).longValue()+xoffset;
-	long y=(Long.valueOf(e.getAttribute(_cy))).longValue()+yoffset;
-	long r=(Long.valueOf(e.getAttribute(_r))).longValue();
+	long x = getLong(e.getAttribute(_cx)) + xoffset;
+	long y = getLong(e.getAttribute(_cy)) + yoffset;
+	long r = getLong(e.getAttribute(_r));
 	VCircle res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
@@ -705,8 +709,8 @@ public class SVGReader {
      */
     public static VText createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
 	String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
-	long x=(Integer.valueOf(e.getAttribute(_x))).longValue()+xoffset;
-	long y=(Integer.valueOf(e.getAttribute(_y))).longValue()+yoffset;
+	long x = getLong(e.getAttribute(_x)) + xoffset;
+	long y = getLong(e.getAttribute(_y)) + yoffset;
 	VText res;
 	short ta=VText.TEXT_ANCHOR_START;
 	if (e.hasAttribute(_textanchor)){
@@ -927,10 +931,10 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VRectangleOr createRectangle(Element e,Context ctx,boolean meta){
-	long x=(Long.valueOf(e.getAttribute(_x))).longValue()+xoffset;
-	long y=(Long.valueOf(e.getAttribute(_y))).longValue()+yoffset;
-	long w=(Long.valueOf(e.getAttribute(_width))).longValue()/2;
-	long h=(Long.valueOf(e.getAttribute(_height))).longValue()/2;
+	long x = getLong(e.getAttribute(_x)) + xoffset;
+	long y = getLong(e.getAttribute(_y)) + yoffset;
+	long w = getLong(e.getAttribute(_width))/2;
+	long h = getLong(e.getAttribute(_height))/2;
 	VRectangleOr res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
@@ -971,17 +975,14 @@ public class SVGReader {
 	return res;
     }
 
-
-
-
     /**create a VImage from an SVG image element
      *@param e an SVG image as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static Glyph createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL){
-	long x = (Long.valueOf(e.getAttribute(_x))).longValue()+xoffset;
-	long y = (Long.valueOf(e.getAttribute(_y))).longValue()+yoffset;
+	long x = getLong(e.getAttribute(_x)) + xoffset;
+	long y = getLong(e.getAttribute(_y)) + yoffset;
 	String width = e.getAttribute(_width);
 	if (width.endsWith("px")){width = width.substring(0,width.length()-2);}
 	String height = e.getAttribute(_height);
@@ -1240,7 +1241,6 @@ public class SVGReader {
     public static void load(Document d,VirtualSpaceManager vsm,String vs,boolean meta){
 	String documentURL = d.getDocumentURI();
 	String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
-	System.out.println(documentParentURL);
 	Element svgRoot=d.getDocumentElement();
 	NodeList objects=svgRoot.getChildNodes();
 	Hashtable imageStore = new Hashtable();
