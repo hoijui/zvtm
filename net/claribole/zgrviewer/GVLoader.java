@@ -159,6 +159,7 @@ class GVLoader {
 	}
 	catch (Exception ex){
 	    pp.destroy();
+	    ex.printStackTrace();
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
 	}
     }
