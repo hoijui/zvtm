@@ -60,7 +60,7 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VImage;
 
 /**
- *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz/Dot SVG output (Ellipse, Text, Path and Rectangle + limited support for Polygon)).
+ *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz/Dot SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
  *@author Emmanuel Pietriga
  */
 
