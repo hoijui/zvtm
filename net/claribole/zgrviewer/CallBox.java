@@ -149,7 +149,9 @@ class CallBox extends JDialog implements ActionListener {
 	    if (srcFileTf.getText() != null && srcFileTf.getText().length() > 0){
 		final SwingWorker worker=new SwingWorker(){
 			public Object construct(){
-			    load(cmd, srcFileTf.getText());
+			    setVisible(false);
+			    application.gvLdr.load(cmd, srcFileTf.getText());
+			    dispose();
 			    return null; 
 			}
 		    };
@@ -161,22 +163,6 @@ class CallBox extends JDialog implements ActionListener {
 	}
 	else {
 	    JOptionPane.showMessageDialog(this, Messages.customCallExprError, "Ill-formed command line", JOptionPane.ERROR_MESSAGE);
-	}
-    }
-
-    void load(String commandLine, String sourceFile){
-	setVisible(false);
-	grMngr.reset();
-	application.dotMngr.loadCustom(srcFileTf.getText(), commandLine);
-	dispose();
-	//in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	ConfigManager.defaultFont = grMngr.vsm.getMainFont();
-	grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
-	grMngr.getGlobalView();
-	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	if (grMngr.rView != null){
-	    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
-	    grMngr.cameraMoved();
 	}
     }
 

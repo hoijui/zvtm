@@ -188,6 +188,21 @@ class GVLoader {
 	catch (Exception ex){ex.printStackTrace();}
     }
 
+
+    void load(String commandLine, String sourceFile){
+	grMngr.reset();
+	dotMngr.loadCustom(sourceFile, commandLine);
+	//in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
+	ConfigManager.defaultFont = grMngr.vsm.getMainFont();
+	grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
+	grMngr.getGlobalView();
+	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
+	if (grMngr.rView != null){
+	    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+	    grMngr.cameraMoved();
+	}
+    }
+
     void reloadFile(){
         // TODO: support integrated parser during reload
 	if (cfgMngr.lastFileOpened != null){
