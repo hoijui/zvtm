@@ -1226,9 +1226,11 @@ public class SVGReader {
      *@param d SVG document as a DOM tree
      *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
+     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
+     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
      */
     public static void load(Document d,VirtualSpaceManager vsm,String vs){
-	load(d, vsm, vs, false);
+	load(d, vsm, vs, false, "");
     }
 
     /**
@@ -1237,10 +1239,30 @@ public class SVGReader {
      *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
+     *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
+     * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
+     * is expressed relative to the document's location.
+     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
+     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
      */
-    public static void load(Document d,VirtualSpaceManager vsm,String vs,boolean meta){
-	String documentURL = d.getDocumentURI();
-	String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
+    public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta){
+	load(d, vsm, vs, meta, "");
+    }
+
+    /**
+     *Load a DOM-parsed SVG document d in VirtualSpace vs
+     *@param d SVG document as a DOM tree
+     *@param vsm VTM virtual space manager owning the virtual space
+     *@param vs name of the virtual space
+     *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
+     *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
+     * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
+     * is expressed relative to the document's location.
+     */
+    public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL){
+	// The following way of retrieving the Document's URL is disabled because it requires Java 1.5/DOM Level 3 support
+// 	String documentURL = d.getDocumentURI();
+ 	String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
 	Element svgRoot=d.getDocumentElement();
 	NodeList objects=svgRoot.getChildNodes();
 	Hashtable imageStore = new Hashtable();
