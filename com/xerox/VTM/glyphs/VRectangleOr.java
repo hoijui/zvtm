@@ -36,6 +36,11 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VRectangleOr extends VRectangle implements Cloneable {
 
+    /**vertex x coords*/
+    int[] xcoords = new int[4];
+    /**vertex y coords*/
+    int[] ycoords = new int[4];
+
     public VRectangleOr(){
 	super();
     }
@@ -106,9 +111,24 @@ public class VRectangleOr extends VRectangle implements Cloneable {
 	    float y1=-pc[i].ch;
 	    float x2=pc[i].cw;
 	    float y2=pc[i].ch;
-	    int[] xcoords={(int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx),(int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx),(int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx),(int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx)};
-	    int[] ycoords={(int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy),(int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy),(int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy),(int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy)};	
-	    pc[i].p=new Polygon(xcoords,ycoords,4);
+	    xcoords[0] = (int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx);
+	    ycoords[0] = (int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy);
+	    xcoords[1] = (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx);
+	    ycoords[1] = (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy);
+	    xcoords[2] = (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx);
+	    ycoords[2] = (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy);
+	    xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx);
+	    ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy);
+	    if (pc[i].p == null){
+		pc[i].p = new Polygon(xcoords, ycoords, 4);
+	    }
+	    else {
+		for (int j=0;j<xcoords.length;j++){
+		    pc[i].p.xpoints[j] = xcoords[j];
+		    pc[i].p.ypoints[j] = ycoords[j];
+		}
+		pc[i].p.invalidate();
+	    }
 	}
     }
 
@@ -128,15 +148,24 @@ public class VRectangleOr extends VRectangle implements Cloneable {
 	    float y1=-pc[i].lch;
 	    float x2=pc[i].lcw;
 	    float y2=pc[i].lch;
-	    int[] xcoords={(int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx),
-			   (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx),
-			   (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx),
-			   (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx)};
-	    int[] ycoords={(int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy),
-			   (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy),
-			   (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy),
-			   (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy)};	
-	    pc[i].lp=new Polygon(xcoords,ycoords,4);
+	    xcoords[0] = (int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx);
+	    ycoords[0] = (int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
+	    xcoords[1] = (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx);
+	    ycoords[1] = (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy);
+	    xcoords[2] = (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
+	    ycoords[2] = (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy);
+	    xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
+	    ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
+	    if (pc[i].lp == null){
+		pc[i].lp = new Polygon(xcoords, ycoords, 8);
+	    }
+	    else {
+		for (int j=0;j<xcoords.length;j++){
+		    pc[i].lp.xpoints[j] = xcoords[j];
+		    pc[i].lp.ypoints[j] = ycoords[j];
+		}
+		pc[i].lp.invalidate();
+	    }
 	}
     }
 
@@ -165,7 +194,10 @@ public class VRectangleOr extends VRectangle implements Cloneable {
 		}
 	    }
 	    else {
-		if (filled){g.fillPolygon(pc[i].p);}
+		g.translate(dx, dy);
+		if (filled){
+		    g.fillPolygon(pc[i].p);
+		}
 		g.setColor(borderColor);
 		if (paintBorder){
 		    if (stroke!=null) {
@@ -177,6 +209,7 @@ public class VRectangleOr extends VRectangle implements Cloneable {
 			g.drawPolygon(pc[i].p);
 		    }
 		}
+		g.translate(-dx, -dy);
 	    }
 	}
 	else {
