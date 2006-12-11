@@ -53,9 +53,9 @@ import net.claribole.zvtm.engine.PortalEventHandler;
 public class GraphicsManager implements ComponentListener, AnimationListener, Java2DPainter {
 
     public VirtualSpaceManager vsm;
-    VirtualSpace mSpace;
-    VirtualSpace mnSpace;
-    VirtualSpace rSpace;
+    VirtualSpace mSpace;   // virtual space containing graph
+    VirtualSpace mnSpace;  // virtual space containing pie menu
+    VirtualSpace rSpace;   // virtual space containing rectangle representing region seen through main camera (used in overview)
     static final String mainSpace = "graphSpace";
     static final String menuSpace = "menuSpace";
     /*name of the VTM virtual space holding the rectangle delimiting the region seen by main view in radar view*/
@@ -135,6 +135,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     int searchIndex = 0;
     String lastSearchedString = "";
     Vector matchingList = new Vector();
+
+    /* Some versions of GraphViz generate a rectangle representing the graph's bounding box.
+     * We don't want this rectangle neither to be highlighted nor sensitive to zoom clicks,
+     * so we try to find it after the SVG has been parsed, and we give it special treatment.
+     * null if no bounding box was found in the SVG.
+     */
+    VRectangleOr boundingBox;
 
     ZGRApplication zapp;
 
@@ -247,6 +254,56 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	magWindow.setBorderColor(GraphicsManager.DM_COLOR);
 	vsm.addGlyph(magWindow, mSpace);
 	mSpace.hide(magWindow);
+    }
+
+    /* Starting at version ? (somewhere between 1.16 and 2.8), GraphViz programs generate a polygon that bounds the entire graph.
+     * Attempt to identify it so that when clicking in what appears to be empty space (but is actually the bounding box),
+     * the view does not get unzoomed. Also prevent border highlighting when the cursor enters this bounding box.
+     */
+    void seekBoundingBox(){
+	Vector v = mSpace.getAllGlyphs();
+	VRectangleOr largestRectangle = null;
+	VRectangleOr r;
+	int lri = -1; // largest rectangle's index
+	// First identify the largest rectangle
+	for (int i=0;i<v.size();i++){
+	    if (v.elementAt(i) instanceof VRectangleOr){
+		r = (VRectangleOr)v.elementAt(i);
+		if (largestRectangle == null || bigger(r, largestRectangle)){
+		    // first rectangle encountered in the list, or compare this rectangle to biggest rectangle at this time
+		    largestRectangle = r;
+		    lri = i;
+		}
+	    }
+	}
+	if (lri == -1){return;}
+	// Then check that all other nodes are contained within that rectangle.
+	for (int i=0;i<lri;i++){
+	    if (!containedIn((Glyph)v.elementAt(i), largestRectangle)){
+ 		return;
+	    }
+	}
+	for (int i=lri+1;i<v.size();i++){
+	    if (!containedIn((Glyph)v.elementAt(i), largestRectangle)){
+ 		return;
+	    }
+	}
+	// If they are, then it is very likely that the rectangle is a bounding box.
+	boundingBox = largestRectangle;
+    }
+
+    boolean bigger(VRectangleOr r1, VRectangleOr r2){// returns true if r1 bigger than r2
+	return (r1.getWidth()*r1.getHeight() > r2.getWidth()*r2.getHeight());
+    }
+
+    boolean containedIn(Glyph g, VRectangle r){
+	if (g instanceof VPath || g instanceof VText){
+	    return true;// don't take edges and text into accout, would be too costly (and would require one repaint for text)
+	}
+	else {// just get geometrical center for other glyphs ; this is an approximation, but it should work 
+	    return g.vx > r.vx-r.getWidth() && g.vx < r.vx+r.getWidth()
+		&& g.vy > r.vy-r.getHeight() && g.vy < r.vy+r.getHeight();
+	}
     }
 
     /*antialias ON/OFF for views*/

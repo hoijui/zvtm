@@ -228,6 +228,7 @@ class DOTManager {
 	pp.setLabel("Displaying...");
 	pp.setPBValue(80);
 	SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true);
+	grMngr.seekBoundingBox();
     }
 
     void displayDOT(ProgPanel pp) throws Exception {

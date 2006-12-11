@@ -85,7 +85,7 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
     void updateTooltip(){
 	if ((System.currentTimeMillis()-lastMouseMoved) > TOOLTIP_TIME){
 	    Glyph g = grMngr.mainView.getPanel().lastGlyphEntered();
-	    if (g != null && tippedGlyph != g){
+	    if (g != null && g != grMngr.boundingBox && tippedGlyph != g){
 		tippedGlyph = g;
 		if (tippedGlyph.getOwner() != null && tippedGlyph.getOwner() instanceof Metadata){
 		    tipLabel = ((Metadata)tippedGlyph.getOwner()).getTitle();

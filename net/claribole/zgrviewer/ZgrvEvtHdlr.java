@@ -141,7 +141,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
 		else {
 		    Glyph g=v.lastGlyphEntered();
-		    if (g!=null){
+		    if (g != null && g != grMngr.boundingBox){
 			grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
 		    }
 		}
@@ -350,6 +350,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    inMagWindow = true;
 	    return;
 	}
+	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
 	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){
@@ -373,6 +374,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    inMagWindow = false;
 	    return;
 	}
+	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
 	if (g.isSelected()){
 	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
 	}
