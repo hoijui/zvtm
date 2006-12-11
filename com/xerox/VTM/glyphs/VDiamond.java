@@ -39,6 +39,11 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VDiamond extends Glyph implements Cloneable {
 
+    /**vertex x coords*/
+    int[] xcoords = new int[4];
+    /**vertex y coords*/
+    int[] ycoords = new int[4];
+
     /**height=width in virtual space*/
     long vs;
 
@@ -196,14 +201,22 @@ public class VDiamond extends Glyph implements Cloneable {
 	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
 	//project height and construct polygon
 	pc[i].cr=Math.round(vs*coef);
-	int[] xcoords={pc[i].cx+pc[i].cr,pc[i].cx,pc[i].cx-pc[i].cr,pc[i].cx};
-	int[] ycoords={pc[i].cy,pc[i].cy+pc[i].cr,pc[i].cy,pc[i].cy-pc[i].cr};
+	xcoords[0] = pc[i].cx+pc[i].cr;
+	ycoords[0] = pc[i].cy;
+	xcoords[1] = pc[i].cx;
+	ycoords[1] = pc[i].cy+pc[i].cr;
+	xcoords[2] = pc[i].cx-pc[i].cr;
+	ycoords[2] = pc[i].cy;
+	xcoords[3] = pc[i].cx;
+	ycoords[3] = pc[i].cy-pc[i].cr;
 	if (pc[i].p == null){
 	    pc[i].p = new Polygon(xcoords, ycoords, 4);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -218,14 +231,22 @@ public class VDiamond extends Glyph implements Cloneable {
 	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
 	//project height and construct polygon
 	pc[i].lcr=Math.round(vs*coef);
-	int[] xcoords={pc[i].lcx+pc[i].lcr,pc[i].lcx,pc[i].lcx-pc[i].lcr,pc[i].lcx};
-	int[] ycoords={pc[i].lcy,pc[i].lcy+pc[i].lcr,pc[i].lcy,pc[i].lcy-pc[i].lcr};
+	xcoords[0] = pc[i].lcx+pc[i].lcr;
+	ycoords[0] = pc[i].lcy;
+	xcoords[1] = pc[i].lcx;
+	ycoords[1] = pc[i].lcy+pc[i].lcr;
+	xcoords[2] = pc[i].lcx-pc[i].lcr;
+	ycoords[2] = pc[i].lcy;
+	xcoords[3] = pc[i].lcx;
+	ycoords[3] = pc[i].lcy-pc[i].lcr;
 	if (pc[i].lp == null){
 	    pc[i].lp = new Polygon(xcoords, ycoords, 4);
 	}
 	else {
-	    pc[i].lp.xpoints = xcoords;
-	    pc[i].lp.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

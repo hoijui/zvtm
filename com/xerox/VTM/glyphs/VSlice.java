@@ -30,6 +30,11 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VSlice extends Glyph implements Cloneable {
 
+    /**vertex x coords*/
+    int[] xpcoords = new int[3];
+    /**vertex y coords*/
+    int[] ypcoords = new int[3];
+
     public static final double RAD2DEG_FACTOR = 360 / Utilities.TWO_PI;
     public static final double DEG2RAD_FACTOR = Utilities.TWO_PI / 360.0;
 
@@ -340,15 +345,20 @@ public class VSlice extends Glyph implements Cloneable {
 	pc[i].p1y = hh - Math.round((p1.y-c.posy) * coef);
 	pc[i].p2x = hw + Math.round((p2.x-c.posx) * coef);
 	pc[i].p2y = hh - Math.round((p2.y-c.posy) * coef);
-	int[] xpcoords = {pc[i].cx, hw + Math.round((p3.x-c.posx) * coef), hw + Math.round((p4.x-c.posx) * coef)};
-	int[] ypcoords = {pc[i].cy, hh - Math.round((p3.y-c.posy) * coef), hh - Math.round((p4.y-c.posy) * coef)};
+	xpcoords[0] = pc[i].cx;
+	ypcoords[0] = pc[i].cy;
+	xpcoords[1] = hw + Math.round((p3.x-c.posx) * coef);
+	ypcoords[1] = hh - Math.round((p3.y-c.posy) * coef);
+	xpcoords[2] = hw + Math.round((p4.x-c.posx) * coef);
+	ypcoords[2] = hh - Math.round((p4.y-c.posy) * coef);
 	if (pc[i].boundingPolygon == null){
 	    pc[i].boundingPolygon = new Polygon(xpcoords, ypcoords, 3);
 	}
 	else {
-	    pc[i].boundingPolygon.xpoints = xpcoords;
-	    pc[i].boundingPolygon.ypoints = ypcoords;
-	    pc[i].boundingPolygon.npoints = 3;
+	    for (int j=0;j<xpcoords.length;j++){
+		pc[i].boundingPolygon.xpoints[j] = xpcoords[j];
+		pc[i].boundingPolygon.ypoints[j] = ypcoords[j];
+	    }
 	    pc[i].boundingPolygon.invalidate();
 	}
 	pc[i].innerCircleRadius = Math.round(size * coef);
@@ -369,15 +379,20 @@ public class VSlice extends Glyph implements Cloneable {
 	pc[i].lp1y = hh - Math.round((p1.y-lensy) * coef);
 	pc[i].lp2x = hw + Math.round((p2.x-lensx) * coef);
 	pc[i].lp2y = hh - Math.round((p2.y-lensy) * coef);
-	int[] xpcoords = {pc[i].lcx, hw + Math.round((p3.x-lensx) * coef), hw + Math.round((p4.x-lensx) * coef)};
-	int[] ypcoords = {pc[i].lcy, hh - Math.round((p3.y-lensy) * coef), hh - Math.round((p4.y-lensy) * coef)};
+	xpcoords[0] = pc[i].lcx;
+	ypcoords[0] = pc[i].lcy;
+	xpcoords[1] = hw + Math.round((p3.x-lensx) * coef);
+	ypcoords[1] = hh - Math.round((p3.y-lensy) * coef);
+	xpcoords[2] = hw + Math.round((p4.x-lensx) * coef);
+	ypcoords[2] = hh - Math.round((p4.y-lensy) * coef);
 	if (pc[i].lboundingPolygon == null){
 	    pc[i].lboundingPolygon = new Polygon(xpcoords, ypcoords, 3);
 	}
 	else {
-	    pc[i].lboundingPolygon.xpoints = xpcoords;
-	    pc[i].lboundingPolygon.ypoints = ypcoords;
-	    pc[i].lboundingPolygon.npoints = 3;
+	    for (int j=0;j<xpcoords.length;j++){
+		pc[i].lboundingPolygon.xpoints[j] = xpcoords[j];
+		pc[i].lboundingPolygon.ypoints[j] = ypcoords[j];
+	    }
 	    pc[i].lboundingPolygon.invalidate();
 	}
 	pc[i].linnerCircleRadius = Math.round(size * coef);

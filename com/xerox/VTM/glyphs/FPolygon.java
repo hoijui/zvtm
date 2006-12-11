@@ -226,9 +226,11 @@ public class FPolygon extends Glyph implements Cloneable {
 	    pc[i].p = new Polygon(pc[i].xpcoords, pc[i].ypcoords, xcoords.length);
 	}
 	else {
-	    pc[i].p.xpoints = pc[i].xpcoords;
-	    pc[i].p.ypoints = pc[i].ypcoords;
 	    pc[i].p.npoints = xcoords.length;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = pc[i].xpcoords[j];
+		pc[i].p.ypoints[j] = pc[i].ypcoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -251,9 +253,11 @@ public class FPolygon extends Glyph implements Cloneable {
 	    pc[i].lp = new Polygon(pc[i].lxpcoords, pc[i].lypcoords, xcoords.length);
 	}
 	else {
-	    pc[i].lp.xpoints = pc[i].lxpcoords;
-	    pc[i].lp.ypoints = pc[i].lypcoords;
 	    pc[i].lp.npoints = xcoords.length;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = pc[i].lxpcoords[j];
+		pc[i].lp.ypoints[j] = pc[i].lypcoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

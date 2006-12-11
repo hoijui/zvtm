@@ -38,11 +38,6 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VOctagonOr extends VOctagon implements Cloneable {
 
-    /**vertex x coords*/
-    int[] xcoords=new int[8];
-    /**vertex y coords*/
-    int[] ycoords=new int[8];
-
     public VOctagonOr(){super();}
 
     /**
@@ -105,8 +100,10 @@ public class VOctagonOr extends VOctagon implements Cloneable {
 	    pc[i].p = new Polygon(xcoords, ycoords, 8);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -142,8 +139,10 @@ public class VOctagonOr extends VOctagon implements Cloneable {
 	    pc[i].lp = new Polygon(xcoords, ycoords, 8);
 	}
 	else {
-	    pc[i].lp.xpoints = xcoords;
-	    pc[i].lp.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

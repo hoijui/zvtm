@@ -39,6 +39,11 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VTriangle extends Glyph implements Cloneable {
 
+    /**vertex x coords*/
+    int[] xcoords = new int[3];
+    /**vertex y coords*/
+    int[] ycoords = new int[3];
+
     protected static final float halfEdgeFactor=0.866f;
     protected static final float thirdHeightFactor=0.5f;
 
@@ -189,8 +194,6 @@ public class VTriangle extends Glyph implements Cloneable {
 	}
     }
 
-
-
     /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
@@ -203,14 +206,20 @@ public class VTriangle extends Glyph implements Cloneable {
 	pc[i].cr=Math.round(vh*coef);
 	pc[i].halfEdge=Math.round(halfEdgeFactor*pc[i].cr);
 	pc[i].thirdHeight=Math.round(thirdHeightFactor*pc[i].cr);
-	int[] xcoords={pc[i].cx,pc[i].cx-pc[i].halfEdge,pc[i].cx+pc[i].halfEdge};
-	int[] ycoords={pc[i].cy-pc[i].cr,pc[i].cy+pc[i].thirdHeight,pc[i].cy+pc[i].thirdHeight};
+	xcoords[0] = pc[i].cx;
+	ycoords[0] = pc[i].cy-pc[i].cr;
+	xcoords[1] = pc[i].cx-pc[i].halfEdge;
+	ycoords[1] = pc[i].cy+pc[i].thirdHeight;
+	xcoords[2] = pc[i].cx+pc[i].halfEdge;
+	ycoords[2] = pc[i].cy+pc[i].thirdHeight;
 	if (pc[i].p == null){
 	    pc[i].p = new Polygon(xcoords, ycoords, 3);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -227,14 +236,20 @@ public class VTriangle extends Glyph implements Cloneable {
 	pc[i].lcr=Math.round(vh*coef);
 	pc[i].lhalfEdge=Math.round(halfEdgeFactor*pc[i].lcr);
 	pc[i].lthirdHeight=Math.round(thirdHeightFactor*pc[i].lcr);
-	int[] xcoords={pc[i].lcx,pc[i].lcx-pc[i].lhalfEdge,pc[i].lcx+pc[i].lhalfEdge};
-	int[] ycoords={pc[i].lcy-pc[i].lcr,pc[i].lcy+pc[i].lthirdHeight,pc[i].lcy+pc[i].lthirdHeight};
+	xcoords[0] = pc[i].lcx;
+	ycoords[0] = pc[i].lcy-pc[i].lcr;
+	xcoords[1] = pc[i].lcx-pc[i].lhalfEdge;
+	ycoords[1] = pc[i].lcy+pc[i].lthirdHeight;
+	xcoords[2] = pc[i].lcx+pc[i].lhalfEdge;
+	ycoords[2] = pc[i].lcy+pc[i].lthirdHeight;
 	if (pc[i].lp == null){
 	    pc[i].lp = new Polygon(xcoords, ycoords, 3);
 	}
 	else {
-	    pc[i].lp.xpoints = xcoords;
-	    pc[i].lp.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

@@ -39,6 +39,11 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VOctagon extends Glyph implements Cloneable {
 
+    /**vertex x coords*/
+    int[] xcoords = new int[8];
+    /**vertex y coords*/
+    int[] ycoords = new int[8];
+
     /**height=width in virtual space*/
     long vs;
 
@@ -196,14 +201,30 @@ public class VOctagon extends Glyph implements Cloneable {
 	//project height and construct polygon
 	pc[i].cr=Math.round(vs*coef);
 	pc[i].halfcr=pc[i].cr/2;
-	int[] xcoords={pc[i].cx+pc[i].cr,pc[i].cx+pc[i].halfcr,pc[i].cx-pc[i].halfcr,pc[i].cx-pc[i].cr,pc[i].cx-pc[i].cr,pc[i].cx-pc[i].halfcr,pc[i].cx+pc[i].halfcr,pc[i].cx+pc[i].cr};
-	int[] ycoords={pc[i].cy-pc[i].halfcr,pc[i].cy-pc[i].cr,pc[i].cy-pc[i].cr,pc[i].cy-pc[i].halfcr,pc[i].cy+pc[i].halfcr,pc[i].cy+pc[i].cr,pc[i].cy+pc[i].cr,pc[i].cy+pc[i].halfcr};
+	xcoords[0] = pc[i].cx+pc[i].cr;
+	ycoords[0] = pc[i].cy-pc[i].halfcr;
+	xcoords[1] = pc[i].cx+pc[i].halfcr;
+	ycoords[1] = pc[i].cy-pc[i].cr;
+	xcoords[2] = pc[i].cx-pc[i].halfcr;
+	ycoords[2] = pc[i].cy-pc[i].cr;
+	xcoords[3] = pc[i].cx-pc[i].cr;
+	ycoords[3] = pc[i].cy-pc[i].halfcr;
+	xcoords[4] = pc[i].cx-pc[i].cr;
+	ycoords[4] = pc[i].cy+pc[i].halfcr;
+	xcoords[5] = pc[i].cx-pc[i].halfcr;
+	ycoords[5] = pc[i].cy+pc[i].cr;
+	xcoords[6] = pc[i].cx+pc[i].halfcr;
+	ycoords[6] = pc[i].cy+pc[i].cr;
+	xcoords[7] = pc[i].cx+pc[i].cr;
+	ycoords[7] = pc[i].cy+pc[i].halfcr;
 	if (pc[i].p == null){
 	    pc[i].p = new Polygon(xcoords, ycoords, 8);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -219,28 +240,30 @@ public class VOctagon extends Glyph implements Cloneable {
 	//project height and construct polygon
 	pc[i].lcr=Math.round(vs*coef);
 	pc[i].lhalfcr=pc[i].cr/2;
-	int[] xcoords={pc[i].lcx+pc[i].lcr,
-		       pc[i].lcx+pc[i].lhalfcr,
-		       pc[i].lcx-pc[i].lhalfcr,
-		       pc[i].lcx-pc[i].lcr,
-		       pc[i].lcx-pc[i].lcr,
-		       pc[i].lcx-pc[i].lhalfcr,
-		       pc[i].lcx+pc[i].lhalfcr,
-		       pc[i].lcx+pc[i].lcr};
-	int[] ycoords={pc[i].lcy-pc[i].lhalfcr,
-		       pc[i].lcy-pc[i].lcr,
-		       pc[i].lcy-pc[i].lcr,
-		       pc[i].lcy-pc[i].lhalfcr,
-		       pc[i].lcy+pc[i].lhalfcr,
-		       pc[i].lcy+pc[i].lcr,
-		       pc[i].lcy+pc[i].lcr,
-		       pc[i].lcy+pc[i].lhalfcr};
+	xcoords[0] = pc[i].lcx+pc[i].lcr;
+	ycoords[0] = pc[i].lcy-pc[i].lhalfcr;
+	xcoords[1] = pc[i].lcx+pc[i].lhalfcr;
+	ycoords[1] = pc[i].lcy-pc[i].lcr;
+	xcoords[2] = pc[i].lcx-pc[i].lhalfcr;
+	ycoords[2] = pc[i].lcy-pc[i].lcr;
+	xcoords[3] = pc[i].lcx-pc[i].lcr;
+	ycoords[3] = pc[i].lcy-pc[i].lhalfcr;
+	xcoords[4] = pc[i].lcx-pc[i].lcr;
+	ycoords[4] = pc[i].lcy+pc[i].lhalfcr;
+	xcoords[5] = pc[i].lcx-pc[i].lhalfcr;
+	ycoords[5] = pc[i].lcy+pc[i].lcr;
+	xcoords[6] = pc[i].lcx+pc[i].lhalfcr;
+	ycoords[6] = pc[i].lcy+pc[i].lcr;
+	xcoords[7] = pc[i].lcx+pc[i].lcr;
+	ycoords[7] = pc[i].lcy+pc[i].lhalfcr;
 	if (pc[i].lp == null){
 	    pc[i].lp = new Polygon(xcoords, ycoords, 8);
 	}
 	else {
-	    pc[i].lp.xpoints = xcoords;
-	    pc[i].lp.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

@@ -250,8 +250,10 @@ public class VCirShape extends Glyph implements Cloneable {
 	    pc[i].p = new Polygon(xcoords, ycoords, vertices.length);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -280,8 +282,10 @@ public class VCirShape extends Glyph implements Cloneable {
 	    pc[i].lp = new Polygon(xcoords, ycoords, vertices.length);
 	}
 	else {
-	    pc[i].lp.xpoints = xcoords;
-	    pc[i].lp.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

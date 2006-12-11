@@ -252,8 +252,11 @@ public class VShape extends Glyph implements Cloneable {
 	    pc[i].p = new Polygon(xcoords, ycoords, vertices.length);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    pc[i].p.npoints = xcoords.length;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -280,8 +283,11 @@ public class VShape extends Glyph implements Cloneable {
 	    pc[i].lp = new Polygon(lxcoords, lycoords, vertices.length);
 	}
 	else {
-	    pc[i].lp.xpoints = lxcoords;
-	    pc[i].lp.ypoints = lycoords;
+	    pc[i].lp.npoints = xcoords.length;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }

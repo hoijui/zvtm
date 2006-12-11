@@ -38,11 +38,6 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VTriangleOr extends VTriangle implements Cloneable {
 
-    /**vertex x coords*/
-    int[] xcoords=new int[3];
-    /**vertex y coords*/
-    int[] ycoords=new int[3];
-
     public VTriangleOr(){super();}
 
     /**
@@ -95,8 +90,10 @@ public class VTriangleOr extends VTriangle implements Cloneable {
 	    pc[i].p = new Polygon(xcoords, ycoords, 3);
 	}
 	else {
-	    pc[i].p.xpoints = xcoords;
-	    pc[i].p.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].p.xpoints[j] = xcoords[j];
+		pc[i].p.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].p.invalidate();
 	}
     }
@@ -123,8 +120,10 @@ public class VTriangleOr extends VTriangle implements Cloneable {
 	    pc[i].lp = new Polygon(xcoords, ycoords, 3);
 	}
 	else {
-	    pc[i].lp.xpoints = xcoords;
-	    pc[i].lp.ypoints = ycoords;
+	    for (int j=0;j<xcoords.length;j++){
+		pc[i].lp.xpoints[j] = xcoords[j];
+		pc[i].lp.ypoints[j] = ycoords[j];
+	    }
 	    pc[i].lp.invalidate();
 	}
     }
