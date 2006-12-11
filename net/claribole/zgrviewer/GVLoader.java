@@ -146,7 +146,7 @@ class GVLoader {
 	    Document svgDoc=Utils.parse(f,false);
 	    pp.setLabel("Displaying...");
 	    pp.setPBValue(80);
-	    SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true);
+	    SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, f.toURL().toString());
 	    grMngr.seekBoundingBox();
 	    ConfigManager.defaultFont=grMngr.vsm.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
@@ -170,7 +170,7 @@ class GVLoader {
 	try {
 	    Document svgDoc = AppletUtils.parse(svgFileURL, false);
 	    if (svgDoc != null){
-		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true);
+		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, svgFileURL);
 		grMngr.seekBoundingBox();
 		ConfigManager.defaultFont = grMngr.vsm.getMainFont();
 		Location l = grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(0));

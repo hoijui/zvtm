@@ -14,6 +14,7 @@ package net.claribole.zgrviewer;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.MalformedURLException;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
@@ -227,7 +228,14 @@ class DOTManager {
 	Document svgDoc=Utils.parse(svgF,false);
 	pp.setLabel("Displaying...");
 	pp.setPBValue(80);
-	SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true);
+	try {
+	    SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString());
+	}
+	catch (MalformedURLException ex){
+	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), svgF.getAbsolutePath(),
+					  "SVG parsing error", JOptionPane.ERROR_MESSAGE);
+	    System.err.println("Error loading SVG file.\n");
+	}
 	grMngr.seekBoundingBox();
     }
 
