@@ -494,10 +494,9 @@ public class SVGReader {
     //utility method used by processNextSVGCoords()
     static long getNextNumber(StringBuffer sb){
 	long res=0;
-	//Utilities.delLeadingSpaces(sb);
 	seekSecondCoord(sb);
 	StringBuffer dgb=new StringBuffer();
-	while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-') || (sb.charAt(0)=='.'))){
+	while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-') || (sb.charAt(0)=='.') || (sb.charAt(0)=='e') || (sb.charAt(0)=='E'))){
 	    dgb.append(sb.charAt(0));
 	    sb.deleteCharAt(0);
 	}
