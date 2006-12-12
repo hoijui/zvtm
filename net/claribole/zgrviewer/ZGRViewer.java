@@ -81,8 +81,12 @@ public class ZGRViewer implements ZGRApplication {
 	    }
 	}
 	else {
-	    System.err.println("No flag specifying what program to use (-Pdot, -Pneato or -Psvg), dot will be used");
-	    gvLdr.loadFile(cmdLineDOTFile,"dot", false);
+	    if (cmdLineDOTFile.toString().endsWith(".svg")){
+		gvLdr.loadSVG(cmdLineDOTFile);
+	    }
+	    else {
+		gvLdr.loadFile(cmdLineDOTFile, "dot", false);
+	    }
 	}
     }
 
