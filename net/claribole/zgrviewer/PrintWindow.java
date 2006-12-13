@@ -17,6 +17,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -182,8 +183,11 @@ public class PrintWindow
 		
 		realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
 		realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
-		
-		java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm);
+
+		Vector layers = new Vector();
+		layers.add(grMngr.mainCamera);
+
+		java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm, layers);
 
 		if (bi!=null){
 		    PrintUtilities pu=new PrintUtilities(bi);

@@ -18,6 +18,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -234,7 +235,9 @@ public class PNGExportWindow {
 		realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
 		realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
 		
-		grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm, new File(filePath.getText()));
+		Vector layers = new Vector();
+		layers.add(grMngr.mainCamera);
+		grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm, new File(filePath.getText()), layers);
 		grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ...done");
 	    }
         }
