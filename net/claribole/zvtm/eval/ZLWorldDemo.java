@@ -389,19 +389,21 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    break;
 	} 
 	case L2_TGaussian:{
-	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 20, x - panelWidth/2, y - panelHeight/2);
+	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
 	    break;
 	}
 	case L2_Fading:{
 	    fLens = new TFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
 	    fLens.setBoundaryColor(Color.RED);
+	    fLens.setObservedRegionColor(Color.RED);
 	    res = fLens;
 	    break;
 	}
 	case LInf_Fading:{
 	    fLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
 	    fLens.setBoundaryColor(Color.RED);
+	    fLens.setObservedRegionColor(Color.RED);
 	    res = fLens;
 	    break;
 	}
