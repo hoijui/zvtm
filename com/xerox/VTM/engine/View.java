@@ -475,12 +475,29 @@ public abstract class View {
      *@param h height of rendered image
      *@param vsm the current VirtualSpaceManager
      *@param f the location of the resulting PNG file
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers)
      */
     public void rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f){
+	rasterize(w, h, vsm, f, null);
+    }
+
+    /**ask for a bitmap rendering of this view and encode it in a PNG file
+     *@param w width of rendered image
+     *@param h height of rendered image
+     *@param vsm the current VirtualSpaceManager
+     *@param f the location of the resulting PNG file
+     *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers)
+     */
+    public void rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers){
 	javax.imageio.ImageWriter writer = (javax.imageio.ImageWriter)javax.imageio.ImageIO.getImageWritersByFormatName("png").next();
 	try {
 	    writer.setOutput(javax.imageio.ImageIO.createImageOutputStream(f));
-	    java.awt.image.BufferedImage bi = this.rasterize(w, h, vsm);
+	    BufferedImage bi = this.rasterize(w, h, vsm, layers);
 	    if (bi != null){
 		writer.write(bi);
 		writer.dispose();
@@ -494,15 +511,33 @@ public abstract class View {
      *@param h height of rendered image
      *@param vsm the current VirtualSpaceManager
      *@return the resulting buffered image which can then be manipulated and serialized
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers)
      */
     public BufferedImage rasterize(int w, int h, VirtualSpaceManager vsm){
+	return rasterize(w, h, vsm, (Vector)null);
+    }
+
+    /**ask for a bitmap rendering of this view and return the resulting BufferedImage
+     *@param w width of rendered image
+     *@param h height of rendered image
+     *@param vsm the current VirtualSpaceManager
+     *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
+     *@return the resulting buffered image which can then be manipulated and serialized
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers)
+     *@see #rasterize(int w, int h, VirtualSpaceManager vsm)
+     */
+    public BufferedImage rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers){
 	Dimension panelSize = panel.getSize();
 	float mFactor = 1/Math.min(w / ((float)panelSize.getWidth()),
 				   h / ((float)panelSize.getHeight()));
 	Camera c, nc;
 	Vector clones= new Vector();
-	for (int i=0;i<cameras.size();i++){
-	    c = (Camera)cameras.elementAt(i);
+	Vector cams = (layers != null) ? layers : cameras;
+	for (int i=0;i<cams.size();i++){
+	    c = (Camera)cams.elementAt(i);
 	    nc = vsm.addCamera(c.parentSpace.spaceName);
 	    nc.posx = c.posx;
 	    nc.posy = c.posy;
@@ -512,7 +547,7 @@ public abstract class View {
 	    nc.altitude = (c.altitude + c.focal) * mFactor - c.focal;
 	    clones.add(nc);
 	}
-	BufferedImage img = (new OffscreenViewPanel(clones)).rasterize(w, h);
+	BufferedImage img = (new OffscreenViewPanel(clones)).rasterize(w, h, panel.backColor);
 	for (int i=0;i<clones.size();i++){
 	    nc = (Camera)clones.elementAt(i);
 	    vsm.getVirtualSpace(nc.parentSpace.spaceName).removeCamera(nc.index);

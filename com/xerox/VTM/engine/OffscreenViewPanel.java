@@ -38,7 +38,6 @@ public class OffscreenViewPanel extends ViewPanel {
 	}
 	//init other stuff
 	setBackground(Color.white);
-
     }
 
     public synchronized void stop(){}
@@ -48,6 +47,11 @@ public class OffscreenViewPanel extends ViewPanel {
     }
 
     public BufferedImage rasterize(int w, int h){
+	return rasterize(w, h, backColor);
+    }
+
+    public BufferedImage rasterize(int w, int h, Color backgroundColor){
+	backColor = backgroundColor;
 	size = new Dimension(w, h);
 	Graphics2D BufferG2D = null;
 	Graphics2D g2d = null;
