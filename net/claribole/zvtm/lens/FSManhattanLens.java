@@ -11,11 +11,17 @@
 
 package net.claribole.zvtm.lens;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+
 /**Profile: manhattan - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class FSManhattanLens extends FixedSizeLens {
 
     double d = 0;
+
+    /**Lens boundary color (default is black, null if none)*/
+    Color bColor = Color.BLACK;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -73,6 +79,20 @@ public class FSManhattanLens extends FixedSizeLens {
 
     public int getRadius(){
 	return LR2;
+    }
+
+    /**Set the color used to draw the lens' boundaries (default is black)
+     *@param bc color of the boundary (set to null if you do not want to draw the border)
+     */
+    public void setBoundaryColor(Color bc){
+	bColor = bc;
+    }
+
+    public void drawBoundary(Graphics2D g2d){
+	if (bColor != null){
+	    g2d.setColor(bColor);
+	    g2d.drawOval(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+	}
     }
 
 }
