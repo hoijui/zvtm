@@ -44,6 +44,9 @@ public abstract class EvalPointing implements Java2DPainter {
 
     BaseEventHandlerPointing eh;
 
+    /* cursor */
+    static final Color CURSOR_COLOR = Color.RED;
+
     /* padding for lenses */
     static final int[] vispad = {100, 100, 100, 100};
     static final Color PADDING_COLOR = Color.BLACK;
@@ -52,8 +55,8 @@ public abstract class EvalPointing implements Java2DPainter {
     static final Color LENS_BOUNDARY_COLOR = Color.RED;
     static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
     float MAGNIFICATION_FACTOR = 4.0f;
-    static final int INNER_RADIUS = 50;
-    static final int OUTER_RADIUS = 100;
+    static final int LENS_INNER_RADIUS = 50;
+    static final int LENS_OUTER_RADIUS = 100;
     Lens lens;
     TFadingLens flens;
 
@@ -70,6 +73,8 @@ public abstract class EvalPointing implements Java2DPainter {
 	mView.setNotifyMouseMoved(true);
 	mView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
 	mView.setAntialiasing(true);
+	mView.mouse.setColor(CURSOR_COLOR);
+	mView.mouse.setSize(5);
 	updatePanelSize();
     }
 
@@ -89,24 +94,24 @@ public abstract class EvalPointing implements Java2DPainter {
     void setLens(int x, int y){
 	switch(technique){
 	case TECHNIQUE_FL:{
-	    flens = new TFadingLens(MAGNIFICATION_FACTOR, 0.0f, 0.95f, OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    flens = new TFadingLens(MAGNIFICATION_FACTOR, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    flens.setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    flens.setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
 	    lens = flens;
 	    break;
 	}
 	case TECHNIQUE_ML:{
-	    lens = new TLinearLens(MAGNIFICATION_FACTOR, 0.0f, 0.90f, OUTER_RADIUS, INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new TLinearLens(MAGNIFICATION_FACTOR, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    flens = null;
 	    break;
 	}
 	case TECHNIQUE_DL:{
-	    lens = new FSGaussianLens(MAGNIFICATION_FACTOR, OUTER_RADIUS, INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new FSGaussianLens(MAGNIFICATION_FACTOR, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    flens = null;
 	    break;
 	}
 	case TECHNIQUE_HL:{
-	    lens = new FSManhattanLens(MAGNIFICATION_FACTOR, OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new FSManhattanLens(MAGNIFICATION_FACTOR, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    ((FSManhattanLens)lens).setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    flens = null;
 	    break;

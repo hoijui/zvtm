@@ -30,6 +30,8 @@ class BaseEventHandlerPointing implements ViewEventHandler, ComponentListener {
 
     float projCoef, alt, oldCameraAltitude; // for efficiency
 
+    boolean cursorNearBorder = false;
+
     BaseEventHandlerPointing(EvalPointing app){
 	this.application = app;
     }
@@ -52,9 +54,28 @@ class BaseEventHandlerPointing implements ViewEventHandler, ComponentListener {
     public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
-	application.moveLens(jpx, jpy, System.currentTimeMillis());
-// 	cjpx = jpx;
-// 	cjpy = jpy;
+	if ((jpx-EvalPointing.LENS_OUTER_RADIUS) < 0){
+	    jpx = EvalPointing.LENS_OUTER_RADIUS;
+	    cursorNearBorder = true;
+	}
+	else if ((jpx+EvalPointing.LENS_OUTER_RADIUS) > application.panelWidth){
+	    jpx = application.panelWidth - EvalPointing.LENS_OUTER_RADIUS;
+	    cursorNearBorder = true;
+	}
+	else {
+	    cursorNearBorder = false;
+	}
+	if ((jpy-EvalPointing.LENS_OUTER_RADIUS) < 0){
+	    jpy = EvalPointing.LENS_OUTER_RADIUS;
+	    cursorNearBorder = true;
+	}
+	else if ((jpy+EvalPointing.LENS_OUTER_RADIUS) > application.panelHeight){
+	    jpy = application.panelHeight - EvalPointing.LENS_OUTER_RADIUS;
+	    cursorNearBorder = true;
+	}
+	if (application.lens != null){
+	    application.moveLens(jpx, jpy, System.currentTimeMillis());
+	}
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
