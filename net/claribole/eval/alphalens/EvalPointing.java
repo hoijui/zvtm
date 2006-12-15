@@ -69,6 +69,7 @@ public abstract class EvalPointing implements Java2DPainter {
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
 	mView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
+	mView.setAntialiasing(true);
 	updatePanelSize();
     }
 
