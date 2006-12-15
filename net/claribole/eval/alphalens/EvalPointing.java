@@ -48,6 +48,15 @@ public abstract class EvalPointing implements Java2DPainter {
     static final int[] vispad = {100, 100, 100, 100};
     static final Color PADDING_COLOR = Color.BLACK;
 
+    /* lens */
+    static final Color LENS_BOUNDARY_COLOR = Color.RED;
+    static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
+    float MAGNIFICATION_FACTOR = 4.0f;
+    static final int INNER_RADIUS = 50;
+    static final int OUTER_RADIUS = 100;
+    Lens lens;
+    TFadingLens flens;
+
     void initGUI(){
 	windowLayout();
 	vsm = new VirtualSpaceManager();
@@ -76,16 +85,12 @@ public abstract class EvalPointing implements Java2DPainter {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    float MAGNIFICATION_FACTOR = 4.0f;
-    static final int INNER_RADIUS = 50;
-    static final int OUTER_RADIUS = 100;
-    Lens lens;
-    TFadingLens flens;
-
     void setLens(int x, int y){
 	switch(technique){
 	case TECHNIQUE_FL:{
-	    flens = new LInfTFadingLens(MAGNIFICATION_FACTOR, 0.0f, 0.95f, OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    flens = new TFadingLens(MAGNIFICATION_FACTOR, 0.0f, 0.95f, OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    flens.setBoundaryColor(LENS_BOUNDARY_COLOR);
+	    flens.setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
 	    lens = flens;
 	    break;
 	}
@@ -100,7 +105,8 @@ public abstract class EvalPointing implements Java2DPainter {
 	    break;
 	}
 	case TECHNIQUE_HL:{
-	    lens = new LInfFSManhattanLens(MAGNIFICATION_FACTOR, OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new FSManhattanLens(MAGNIFICATION_FACTOR, OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    ((FSManhattanLens)lens).setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    flens = null;
 	    break;
 	}
