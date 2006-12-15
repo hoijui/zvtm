@@ -88,6 +88,9 @@ public class VCursor {
     /**view to which this cursor belongs*/
     View owningView;
 
+    /* crosshair size */
+    int size = 10;
+
     VCursor(View v){
 	this.owningView=v;
 	vx=0;pvx=0;
@@ -100,6 +103,16 @@ public class VCursor {
 	hcolor = Color.black;
 	stickedGlyphs = new Glyph[0];
 	sync=true;
+    }
+
+    /**Set size of cursor (crosshair length).*/
+    public void setSize(int s){
+	this.size = s;
+    }
+
+    /**Get size of cursor (crosshair length).*/
+    public int getSize(){
+	return size;
     }
 
     /**get mouse cursor ID*/
@@ -590,8 +603,8 @@ public class VCursor {
     public void draw(Graphics2D g){
 	if (isVisible){
 	    g.setColor(this.color);
-	    g.drawLine(mx-10,my,mx+10,my);
-	    g.drawLine(mx,my-10,mx,my+10);
+	    g.drawLine(mx-size,my,mx+size,my);
+	    g.drawLine(mx,my-size,mx,my+size);
 	}
     }
 

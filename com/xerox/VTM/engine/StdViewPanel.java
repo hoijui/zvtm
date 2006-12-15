@@ -462,10 +462,10 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				try {
 				    g2d.setXORMode(backColor);
 				    g2d.setColor(parent.mouse.color);
-				    g2d.drawLine(oldX-10,oldY,oldX+10,oldY);
-				    g2d.drawLine(oldX,oldY-10,oldX,oldY+10);
-				    g2d.drawLine(parent.mouse.mx-10,parent.mouse.my,parent.mouse.mx+10,parent.mouse.my);
-				    g2d.drawLine(parent.mouse.mx,parent.mouse.my-10,parent.mouse.mx,parent.mouse.my+10);
+				    g2d.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
+				    g2d.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
+				    g2d.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+				    g2d.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
 				    oldX=parent.mouse.mx;
 				    oldY=parent.mouse.my;
 				}
