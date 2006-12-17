@@ -74,7 +74,6 @@ public class EvalGraphPointing extends EvalPointing {
 	    new EvalGraphPointing(Short.parseShort(args[0]));
 	}
 	catch (Exception ex){
-	    ex.printStackTrace();
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
 	    new EvalGraphPointing(EvalPointing.TECHNIQUE_FL);
 	}

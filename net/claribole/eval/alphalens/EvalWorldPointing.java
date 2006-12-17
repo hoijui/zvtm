@@ -46,7 +46,6 @@ public class EvalWorldPointing extends EvalPointing {
 	    new EvalWorldPointing(Short.parseShort(args[0]));
 	}
 	catch (Exception ex){
-	    ex.printStackTrace();
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
 	    new EvalWorldPointing(EvalPointing.TECHNIQUE_FL);
 	}
