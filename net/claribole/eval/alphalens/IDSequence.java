@@ -3,7 +3,7 @@ package net.claribole.eval.alphalens;
 
 class IDSequence {
 
-    static final long D = 12000;
+    static final long D = 12600;
 
     int[] IDs;
     long[] Ws;
@@ -28,20 +28,20 @@ class IDSequence {
     void computeWs(){
 	Ws = new long[IDs.length];
 	for (int i=0;i<Ws.length;i++){
-	    if (IDs[i] == 4){
-		Ws[i] = D/16;
-	    }
-	    else if (IDs[i] == 6){
+	    if (IDs[i] == 6){
 		Ws[i] = D/64;
+	    }
+	    else if (IDs[i] == 7){
+		Ws[i] = D/128;
 	    }
 	    else if (IDs[i] == 8){
 		Ws[i] = D/256;
 	    }
+	    else if (IDs[i] == 9){
+		Ws[i] = D/512;
+	    }
 	    else if (IDs[i] == 10){
 		Ws[i] = D/1024;
-	    }
-	    else if (IDs[i] == 12){
-		Ws[i] = D/4096;
 	    }
 	    else {
 		System.err.println("Error: ID value not supported: "+IDs[i]);

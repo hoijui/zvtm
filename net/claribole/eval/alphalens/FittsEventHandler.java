@@ -36,14 +36,14 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
 	this.application = app;
     }
 
-    public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
-
-    public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
-
-    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
+    public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 	if (!application.trialStarted){return;}
 	application.selectTarget(v.lastGlyphEntered());
     }
+
+    public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
+
+    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
     public void release2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}

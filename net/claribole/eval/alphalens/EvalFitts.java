@@ -68,7 +68,7 @@ public class EvalFitts implements Java2DPainter {
     /* lens */
     static final Color LENS_BOUNDARY_COLOR = Color.RED;
     static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
-    float MAGNIFICATION_FACTOR = 4.0f;
+    float magFactor = 8.0f;
     static final int LENS_INNER_RADIUS = 50;
     static final int LENS_OUTER_RADIUS = 100;
     Lens lens;
@@ -77,12 +77,12 @@ public class EvalFitts implements Java2DPainter {
     /* target */
     static final Color TARGET_COLOR = Color.BLACK;
     VRectangle target;
-    static final long TARGET_X_POS = 6000;
+    static final long TARGET_X_POS = 6300;
     static final long TARGET_Y_POS = 0;
-    static final long TARGET_HEIGHT = 2000;
+    static final long TARGET_HEIGHT = 400;
 
     /* grid color */
-    static final Color GRID_COLOR = Color.GRAY;
+    static final Color GRID_COLOR = Color.LIGHT_GRAY;
     static final long GRID_STEP = 1000;
     static final long GRID_W = 16000;
     static final long GRID_H = 12000;
@@ -111,9 +111,10 @@ public class EvalFitts implements Java2DPainter {
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
     
-    public EvalFitts(short t){
+    public EvalFitts(short t, float mf){
 	initGUI();
 	this.technique = t;
+	this.magFactor = mf;
 	mViewName = TECHNIQUE_NAMES[this.technique];
 	eh = new FittsEventHandler(this);
 	mView.setEventHandler(eh);
@@ -262,6 +263,7 @@ public class EvalFitts implements Java2DPainter {
 	nbErrors = 0;
 	hitCount = 0;
 	target.vx = -TARGET_X_POS;
+	System.err.println(idSeq.Ws[trialCount]);
 	target.setWidth(idSeq.Ws[trialCount]);
 	showStartButton(true);
 	say(Messages.PSBTC);
@@ -280,6 +282,7 @@ public class EvalFitts implements Java2DPainter {
 	hitCount++;
 	if (hitCount < NB_TARGETS_PER_TRIAL){
 	    target.vx = -target.vx;
+	    vsm.repaintNow();
 	}
 	else {
 	    endTrial();
@@ -291,24 +294,24 @@ public class EvalFitts implements Java2DPainter {
     void setLens(int x, int y){
 	switch(technique){
 	case TECHNIQUE_FL:{
-	    flens = new TFadingLens(MAGNIFICATION_FACTOR, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    flens = new TFadingLens(magFactor, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    flens.setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    flens.setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
 	    lens = flens;
 	    break;
 	}
 	case TECHNIQUE_ML:{
-	    lens = new TLinearLens(MAGNIFICATION_FACTOR, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new TLinearLens(magFactor, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    flens = null;
 	    break;
 	}
 	case TECHNIQUE_DL:{
-	    lens = new FSGaussianLens(MAGNIFICATION_FACTOR, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new FSGaussianLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    flens = null;
 	    break;
 	}
 	case TECHNIQUE_HL:{
-	    lens = new FSManhattanLens(MAGNIFICATION_FACTOR, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new FSManhattanLens(magFactor, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    ((FSManhattanLens)lens).setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    flens = null;
 	    break;
@@ -388,15 +391,15 @@ public class EvalFitts implements Java2DPainter {
 
     public static void main(String[] args){
 	try {
-	    if (args.length >= 3){
-		EvalFitts.VIEW_MAX_W = Integer.parseInt(args[1]);
-		EvalFitts.VIEW_MAX_H = Integer.parseInt(args[2]);
+	    if (args.length >= 4){
+		EvalFitts.VIEW_MAX_W = Integer.parseInt(args[2]);
+		EvalFitts.VIEW_MAX_H = Integer.parseInt(args[3]);
 	    }
-	    new EvalFitts(Short.parseShort(args[0]));
+	    new EvalFitts(Short.parseShort(args[0]), Float.parseFloat(args[1]));
 	}
 	catch (Exception ex){
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
-	    new EvalFitts(EvalFitts.TECHNIQUE_FL);
+	    new EvalFitts(EvalFitts.TECHNIQUE_FL, 8.0f);
 	}
     }
 
