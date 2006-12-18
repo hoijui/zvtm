@@ -93,6 +93,7 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
 
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
 	if (code == KeyEvent.VK_SPACE){if (application.cursorInsideStartButton(cjpx, cjpy)){application.startTrial(cjpx, cjpy);}}
+	else if (code == KeyEvent.VK_Q && mod== CTRL_MOD){application.exit();}
     }
            
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
@@ -103,7 +104,7 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
 
     public void viewActivated(View v){}
     
-    public void viewClosing(View v){application.exit();}
+    public void viewClosing(View v){}
            
     public void viewDeactivated(View v){}
            

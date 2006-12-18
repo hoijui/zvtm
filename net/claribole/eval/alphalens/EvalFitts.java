@@ -132,7 +132,7 @@ public class EvalFitts implements Java2DPainter {
 	mCamera = vsm.addCamera(mSpaceName);
 	Vector v = new Vector();
 	v.add(mCamera);
-	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true);
+	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 	mView.setVisibilityPadding(vispad);
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
@@ -238,6 +238,15 @@ public class EvalFitts implements Java2DPainter {
 	initNextTrial();
     }
 
+    void endSession(){
+	try {
+	    bwt.flush();
+	    bwt.close();
+	    say(Messages.EOS);
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
+
     void startTrial(int jpx, int jpy){
 	if (trialStarted){return;}
 	setLens(jpx, jpy);
@@ -250,11 +259,12 @@ public class EvalFitts implements Java2DPainter {
     void endTrial(){
 	trialStarted = false;
 	unsetLens();
+	flushTrial();
 	if (trialCount+1 < idSeq.length()){
 	    initNextTrial();
 	}
 	else {
-	    say(Messages.EOS);
+	    endSession();
 	}
     }
 
@@ -263,10 +273,9 @@ public class EvalFitts implements Java2DPainter {
 	nbErrors = 0;
 	hitCount = 0;
 	target.vx = -TARGET_X_POS;
-	System.err.println(idSeq.Ws[trialCount]);
 	target.setWidth(idSeq.Ws[trialCount]);
 	showStartButton(true);
-	say(Messages.PSBTC);
+	say("Trial " + (trialCount+1) + " / " + idSeq.length() + " - " + Messages.PSBTC);
     }
 
     void selectTarget(Glyph g){
@@ -279,6 +288,7 @@ public class EvalFitts implements Java2DPainter {
     }
 
     void hitTarget(){
+	timeToTarget[hitCount] = System.currentTimeMillis() - startTime;
 	hitCount++;
 	if (hitCount < NB_TARGETS_PER_TRIAL){
 	    target.vx = -target.vx;
@@ -289,6 +299,15 @@ public class EvalFitts implements Java2DPainter {
 	}
     }
 
+    void flushTrial(){
+	try {
+	    bwt.write("");
+	    bwt.newLine();
+	    bwt.flush();
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
+    
     /* -------------- lenses ----------------- */
 
     void setLens(int x, int y){
