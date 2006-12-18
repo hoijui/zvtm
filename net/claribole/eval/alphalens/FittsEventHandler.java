@@ -25,7 +25,7 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
     EvalFitts application;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-//     int cjpx, cjpy;
+    int cjpx, cjpy;
     long lastVX, lastVY;
 
     float projCoef, alt, oldCameraAltitude; // for efficiency
@@ -41,8 +41,8 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
     public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
-	//application.selectTarget(v.lastGlyphEntered());
-	application.setLens(jpx, jpy);
+	if (!application.trialStarted){return;}
+	application.selectTarget(v.lastGlyphEntered());
     }
 
     public void press2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
@@ -54,6 +54,8 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
     public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
+	cjpx = jpx;
+	cjpy = jpy;
 	if ((jpx-EvalPointing.LENS_OUTER_RADIUS) < 0){
 	    jpx = EvalPointing.LENS_OUTER_RADIUS;
 	    cursorNearBorder = true;
@@ -79,8 +81,9 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
-// 	cjpx = jpx;
-// 	cjpy = jpy;
+	if (!application.trialStarted){return;}
+	cjpx = jpx;
+	cjpy = jpy;
     }
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
@@ -88,9 +91,13 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
     public void enterGlyph(Glyph g){}
     public void exitGlyph(Glyph g){}
 
-    public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
+	if (code == KeyEvent.VK_SPACE){if (application.cursorInsideStartButton(cjpx, cjpy)){application.startTrial(cjpx, cjpy);}}
+    }
            
-    public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
+	if (code == KeyEvent.VK_S){application.startSession();}
+    }
            
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
 
