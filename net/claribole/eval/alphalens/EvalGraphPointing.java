@@ -35,6 +35,7 @@ public class EvalGraphPointing extends EvalPointing {
 	mViewName = TECHNIQUE_NAMES[this.technique];
 	eh = new BaseEventHandlerPointing(this);
 	mView.setEventHandler(eh);
+	mView.setAntialiasing(false);
 	initScene();
 // 	mCamera.moveTo(0, 0);
 // 	mCamera.setAltitude(100.0f);

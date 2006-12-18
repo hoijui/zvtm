@@ -25,6 +25,7 @@ public class EvalWorldPointing extends EvalPointing {
 	mViewName = TECHNIQUE_NAMES[this.technique];
 	eh = new BaseEventHandlerPointing(this);
 	mView.setEventHandler(eh);
+	mView.setAntialiasing(true);
 	initScene();
 	mCamera.moveTo(0, 0);
 	mCamera.setAltitude(100.0f);
