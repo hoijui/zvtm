@@ -31,6 +31,7 @@ public class EvalFitts implements Java2DPainter {
     static final short TECHNIQUE_DL = 2; // distortion lens
     static final short TECHNIQUE_HL = 3; // manhattan lens
     static final String[] TECHNIQUE_NAMES = {"Fading_Lens", "Melting_Lens", "Distortion_Lens", "Manhattan_Lens"}; 
+    static final String[] TECHNIQUE_NAMES_ABBR = {"FL", "ML", "DL", "HL"}; 
     short technique = TECHNIQUE_FL;
 
     /* screen dimensions, actual dimensions of windows */
@@ -175,7 +176,7 @@ public class EvalFitts implements Java2DPainter {
 
     void loadTrials(){
 	try {
-	    File trialFile = new File(TRIAL_DIR_FULL + File.separator + "fitts_test.csv");
+	    File trialFile = new File(TRIAL_DIR_FULL + File.separator + "fitts.csv");
 	    FileInputStream fis = new FileInputStream(trialFile);
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
@@ -197,7 +198,7 @@ public class EvalFitts implements Java2DPainter {
 	subjectName = JOptionPane.showInputDialog("Subject Name");
 	subjectID = JOptionPane.showInputDialog("Subject ID");
 	blockNumber = JOptionPane.showInputDialog("Block");
-	logFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES[technique]+"-trial-block"+blockNumber, LOG_DIR);
+	logFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+magFactor+"-block"+blockNumber, LOG_DIR);
 	try {
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile), "UTF-8"));
 	    writeHeaders();
@@ -222,8 +223,11 @@ public class EvalFitts implements Java2DPainter {
 	    bwt.write("Name" + OUTPUT_CSV_SEP +
 		      "SID" + OUTPUT_CSV_SEP +
 		      "Technique" + OUTPUT_CSV_SEP +
+		      "MM" + OUTPUT_CSV_SEP +
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
+		      "ID" + OUTPUT_CSV_SEP +
+		      "Hit" + OUTPUT_CSV_SEP +
 		      "Time");
 	    bwt.newLine();
 	    bwt.flush();
@@ -301,8 +305,18 @@ public class EvalFitts implements Java2DPainter {
 
     void flushTrial(){
 	try {
-	    bwt.write("");
-	    bwt.newLine();
+	    for (int i=0;i<timeToTarget.length;i++){
+		bwt.write(subjectName + OUTPUT_CSV_SEP +
+			  subjectID + OUTPUT_CSV_SEP +
+			  TECHNIQUE_NAMES_ABBR[technique] + OUTPUT_CSV_SEP +
+			  magFactor + OUTPUT_CSV_SEP +
+			  blockNumber + OUTPUT_CSV_SEP +
+			  trialCount + OUTPUT_CSV_SEP +
+			  idSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
+			  i + OUTPUT_CSV_SEP +  // hit index
+			  timeToTarget[i]);
+		bwt.newLine();
+	    }
 	    bwt.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
