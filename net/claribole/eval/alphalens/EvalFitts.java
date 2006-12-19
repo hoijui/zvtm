@@ -108,7 +108,7 @@ public class EvalFitts implements Java2DPainter {
     long startTime = 0;
     int nbErrors = 0;
 
-    static final int NB_TARGETS_PER_TRIAL = 8;
+    static final int NB_TARGETS_PER_TRIAL = 6;
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
     
@@ -138,7 +138,7 @@ public class EvalFitts implements Java2DPainter {
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
 	mView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
-	mView.setAntialiasing(true);
+	//mView.setAntialiasing(true);
 	mView.mouse.setColor(CURSOR_COLOR);
 	mView.mouse.setSize(5);
 	updatePanelSize();
