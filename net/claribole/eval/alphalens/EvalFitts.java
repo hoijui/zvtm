@@ -108,7 +108,7 @@ public class EvalFitts implements Java2DPainter {
     long startTime = 0;
     int nbErrors = 0;
 
-    static final int NB_TARGETS_PER_TRIAL = 4;
+    static final int NB_TARGETS_PER_TRIAL = 8;
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
     
@@ -147,7 +147,7 @@ public class EvalFitts implements Java2DPainter {
     void windowLayout(){
 	if (Utilities.osIsWindows()){
 	    VIEW_X = VIEW_Y = 0;
-	    SCREEN_HEIGHT -= 30;
+	    //SCREEN_HEIGHT -= 30;
 	}
 	else if (Utilities.osIsMacOS()){
 	    VIEW_X = 80;
@@ -228,7 +228,8 @@ public class EvalFitts implements Java2DPainter {
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
 		      "Hit" + OUTPUT_CSV_SEP +
-		      "Time");
+		      "Time" + OUTPUT_CSV_SEP +
+		      "Errors");
 	    bwt.newLine();
 	    bwt.flush();
 	}
@@ -314,7 +315,8 @@ public class EvalFitts implements Java2DPainter {
 			  trialCount + OUTPUT_CSV_SEP +
 			  idSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
 			  i + OUTPUT_CSV_SEP +  // hit index
-			  timeToTarget[i]);
+			  timeToTarget[i] + OUTPUT_CSV_SEP +
+			  nbErrors);
 		bwt.newLine();
 	    }
 	    bwt.flush();
