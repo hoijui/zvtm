@@ -23,6 +23,8 @@ import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
 import javax.swing.JTextArea;
 
+import fr.inria.jfresnel.jena.JenaLens;
+
 class ControlPanel extends JFrame implements ItemListener, ActionListener {
 
     GeonamesBrowser application;
@@ -98,12 +100,12 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 	application.lensFamily = lensID;
     }
     
-    void selectLayoutLens(FresnelLens lens){
+    void selectLayoutLens(JenaLens lens){
 	application.fm.selectedLayoutLens = lens;
 	layoutLensTa.setText(lens.getComment());
     }
 
-    void selectDetailLens(FresnelLens lens){
+    void selectDetailLens(JenaLens lens){
 	application.fm.selectedDetailLens = lens;
 	detailLensTa.setText(lens.getComment());
     }
@@ -116,12 +118,12 @@ class ControlPanel extends JFrame implements ItemListener, ActionListener {
 	}
 	else if (e.getSource() == detailLensCbb){
 	    if (e.getStateChange() == ItemEvent.SELECTED){
-		selectDetailLens((FresnelLens)e.getItem());
+		selectDetailLens((JenaLens)e.getItem());
 	    }
 	}
 	else if (e.getSource() == layoutLensCbb){
 	    if (e.getStateChange() == ItemEvent.SELECTED){
-		selectLayoutLens((FresnelLens)e.getItem());
+		selectLayoutLens((JenaLens)e.getItem());
 	    }
 	}
     }

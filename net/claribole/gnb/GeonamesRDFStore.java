@@ -43,6 +43,7 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final String RDFXML_AB = "RDF/XML-ABBREV";
     static final String ERROR_MODE_PN = "http://jena.hpl.hp.com/arp/properties/error-mode";
     static final String ERROR_MODE_PV = "lax";
+    static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
     /* RDF/OWL geonames URIs */
     static final String GEONAMES_NS = "http://www.geonames.org/ontology#";
