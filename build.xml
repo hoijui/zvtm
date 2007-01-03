@@ -27,7 +27,7 @@ Usage:
     <pathelement location="${basedir}/lib/domino/domino.jar"/>
     <pathelement location="${basedir}/lib/domino/xalan.jar"/>
     <pathelement location="${basedir}/lib/jena/jena.jar"/>
-    <pathelement location="${basedir}/lib/fresnel/isaviz-fsl.jar"/>
+    <pathelement location="${basedir}/lib/fresnel/jfresnel.jar"/>
   </path>
 
   <target name="init">
