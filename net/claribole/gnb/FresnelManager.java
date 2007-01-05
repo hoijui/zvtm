@@ -164,12 +164,16 @@ class FresnelManager {
 	if (!ssd){return;}
 	// check that this resource can indeed be handled by the current Fresnel lens
 	if (selectedDetailLens.selects(r, detailFSLEvaluator)){
-	    Vector statementsToDisplay = selectedDetailLens.getPropertyValuesToDisplay(r);
+	    Vector statementsToDisplay = selectedDetailLens.getPropertyValuesToDisplay(r, detailFSLEvaluator);
 	    statements2formats.clear();
 	    Statement s;
+	    Format f;
 	    for (int i=0;i<statementsToDisplay.size();i++){
 		s = (Statement)statementsToDisplay.elementAt(i);
-		statements2formats.put(s, selectedDetailLens.getBestFormatForProperty(s, detailFSLEvaluator));
+		f = selectedDetailLens.getBestFormatForProperty(s, detailFSLEvaluator);
+		if (f != null){
+		    statements2formats.put(s, f);
+		}
 	    }
 	    Vector lines = new Vector();
 	    Vector v = new Vector();
@@ -195,20 +199,21 @@ class FresnelManager {
 		}
 	    }
 	    String[] textLines = new String[lines.size()];
+	    JenaFormat jf;
 	    for (int i=0;i<textLines.length;i++){
 		v = (Vector)lines.elementAt(i);
 		String text = "";
 		// all statements on a line have the same format (as a result of the previous loop)
-		Format f = (Format)statements2formats.get(v.firstElement());
+		jf = (JenaFormat)statements2formats.get(v.firstElement());
 		for (int j=0;j<v.size();j++){// apply contentBefore and contentAfter instructions, if any
-		    text += applyFormattingInstructions((Statement)v.elementAt(j), f, j==0, j==v.size()-1);
+		    text += applyFormattingInstructions((Statement)v.elementAt(j), jf, j==0, j==v.size()-1);
 		}
 		textLines[i] = text;
 		// apply label, contentFirst and contentLast instructions, if any
-		if (f != null){
-		    if (f.contentFirstV != null){textLines[i] = f.contentFirstV + textLines[i];}
-		    if (f.valueLabel != null){textLines[i] = f.valueLabel + textLines[i];}
-		    if (f.contentLastV != null){textLines[i] += f.contentLastV;}
+		if (jf != null){
+		    if (jf.getContentFirst() != null){textLines[i] = jf.getContentFirst() + textLines[i];}
+		    if (jf.getValueLabel() != null){textLines[i] = jf.getValueLabel() + textLines[i];}
+		    if (jf.getContentLast() != null){textLines[i] += jf.getContentLast();}
 		}
 	    }
 	    long frameWidth = (statementsToDisplay.size() > 0) ? 0 : DETAIL_FRAME_MIN_WIDTH;
@@ -239,9 +244,8 @@ class FresnelManager {
 	}
     }
 
-    String applyFormattingInstructions(Statement s, Format f, boolean firstItem, boolean lastItem){
-	return "XXX";
-// 	return (f != null) ? f.format(s, firstItem, lastItem) : Format.defaultFormat(s);
+    String applyFormattingInstructions(Statement s, JenaFormat f, boolean firstItem, boolean lastItem){
+ 	return (f != null) ? f.apply(s, firstItem, lastItem) : JenaFormat.defaultFormat(s);
     }
     
     synchronized void hideInformationAbout(){
