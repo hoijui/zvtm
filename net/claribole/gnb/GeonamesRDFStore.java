@@ -35,7 +35,7 @@ import com.xerox.VTM.glyphs.LBText;
 class GeonamesRDFStore implements RDFErrorHandler {
 
     /* location of geonames RDF files */
-    static final String[] CITIES_DIR = {"data/GIS/RDF/RDFcities"};
+    static final String[] CITIES_DIR = {"data/GIS/RDF/tests"};
     static final String[] REGIONS_DIR = {"data/GIS/RDF/RDFaustates", "data/GIS/RDF/RDFcaprovinces", "data/GIS/RDF/RDFrufederal", "data/GIS/RDF/RDFusstates"};
     static final String[] COUNTRIES_DIR = {"data/GIS/RDF/RDFcountries"};
 
@@ -43,7 +43,9 @@ class GeonamesRDFStore implements RDFErrorHandler {
     static final String RDFXML_AB = "RDF/XML-ABBREV";
     static final String ERROR_MODE_PN = "http://jena.hpl.hp.com/arp/properties/error-mode";
     static final String ERROR_MODE_PV = "lax";
+
     static final String RDF_NS = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    static final String RDFS_NS = "http://www.w3.org/2000/01/rdf-schema#";
 
     /* RDF/OWL geonames URIs */
     static final String GEONAMES_NS = "http://www.geonames.org/ontology#";

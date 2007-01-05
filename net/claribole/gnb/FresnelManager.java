@@ -108,6 +108,7 @@ class FresnelManager {
     void initNSResolver(){
 	nsr = new FSLNSResolver();
 	nsr.addPrefixBinding("rdf", GeonamesRDFStore.RDF_NS);
+	nsr.addPrefixBinding("rdfs", GeonamesRDFStore.RDF_NS);
 	nsr.addPrefixBinding("gn", GeonamesRDFStore.GEONAMES_NS);
 	nsr.addPrefixBinding("wgs84_pos", GeonamesRDFStore.WGS84_POS_NS);
 	nsr.addPrefixBinding("foaf", GeonamesRDFStore.FOAF_NS);
