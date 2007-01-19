@@ -1,11 +1,11 @@
-/*   FILE: Eval.java
- *   DATE OF CREATION:  Thu Oct 12 12:08:06 2006
+/*   FILE: TOWApplication.java
+ *   DATE OF CREATION:  Fri Jan 19 15:35:06 2007
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007. All Rights Reserved
  *
  * $Id:  $
- */ 
+ */
 
 package net.claribole.eval.to;
 
@@ -19,7 +19,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
-public class Eval implements TOWApplication {
+public class AcquireEval implements TOWApplication {
 
     /* techniques */
     static final short TECHNIQUE_OV = 0;
@@ -39,7 +39,7 @@ public class Eval implements TOWApplication {
     int panelWidth, panelHeight;
 
     /* ZVTM components */
-    static final Color BACKGROUND_COLOR = Color.WHITE;
+    static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
     VirtualSpaceManager vsm;
     VirtualSpace mSpace;
     static final String mSpaceName = "mainSpace";
@@ -47,7 +47,7 @@ public class Eval implements TOWApplication {
     String mViewName = "Evaluation";
     Camera mCamera, oCamera;
 
-    BaseEventHandler eh;
+    AcquireBaseEventHandler eh;
 
     /* generic overview settings */
     static int OVERVIEW_WIDTH = 150;
@@ -69,19 +69,24 @@ public class Eval implements TOWApplication {
 
     /* standard overview settings */
     OverviewPortal op;
+
+    /* target to acquire */
+    static final Color TARGET_COLOR = Color.BLUE;
+    static final Color INSIDE_TARGET_COLOR = Color.RED;
+    VCircle target;
     
-    public Eval(short t){
+    public AcquireEval(short t){
 	initGUI();
 	if (t == TECHNIQUE_OV){
 	    this.technique = TECHNIQUE_OV;
 	    mViewName = TECHNIQUE_OV_NAME;
-	    eh = new OVEventHandler(this);
+	    eh = new AcquireOVEventHandler(this);
 	    initOverview();
 	}
 	else {
 	    this.technique = TECHNIQUE_TOW;
 	    mViewName = TECHNIQUE_TOW_NAME;
-	    eh = new TOWEventHandler(this);
+	    eh = new AcquireTOWEventHandler(this);
 	}
 	mView.setEventHandler(eh);
 	initWorld();
@@ -103,7 +108,7 @@ public class Eval implements TOWApplication {
 	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true);
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
-	mView.setBackgroundColor(Eval.BACKGROUND_COLOR);
+	mView.setBackgroundColor(AcquireEval.BACKGROUND_COLOR);
 	updatePanelSize();
     }
 
@@ -125,7 +130,7 @@ public class Eval implements TOWApplication {
 				panelHeight-OVERVIEW_HEIGHT-1,
 				OVERVIEW_WIDTH, OVERVIEW_HEIGHT, oCamera, mCamera);
 	op.setPortalEventHandler((PortalEventHandler)eh);
-	op.setBackgroundColor(Eval.BACKGROUND_COLOR);
+	op.setBackgroundColor(AcquireEval.BACKGROUND_COLOR);
 	vsm.addPortal(op, mView);
 	op.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	op.setObservedRegionTranslucency(0.5f);
@@ -133,39 +138,9 @@ public class Eval implements TOWApplication {
     }
 
     void initWorld(){
-	float h = 0.8f;float s = 1.0f;float v = 1.0f;
-	long randomX = 0;
-	long randomY = 0;
-	long randomS = 0;
-	float randomO = 0;
-	float randomSat = 0;
-	double shapeType = 0;
-	Glyph g;
-	float[] vertices = {1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f, 1.0f, 0.8f};
-	for (int i=0;i<200;i++){
-	    randomX = Math.round(Math.random()*6000);
-	    randomY = Math.round(Math.random()*6000);
-	    randomS = Math.round(Math.random()*199)+20;
-	    randomO = (float)(Math.random()*2*Math.PI);
-	    randomSat = (float)Math.random();
-	    shapeType = Math.random();
-	    if (shapeType<0.2){
-		g = new VTriangleOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
-	    }
-	    else if (shapeType<0.4){
-		g = new VDiamondOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
-	    }
-	    else if (shapeType<0.6){
-		g = new VOctagonOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
-	    }
-	    else if (shapeType<0.8){
-		g = new VRectangleOr(randomX, randomY, 0, randomS, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
-	    }
-	    else {
-		g = new VShape(randomX, randomY, 0, randomS, vertices, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
-	    }
-	    vsm.addGlyph(g, mSpace);
-	}
+	target = new VCircle(0, 0, 0, 100, TARGET_COLOR);
+	vsm.addGlyph(target, mSpace);
+	target.setMouseInsideColor(INSIDE_TARGET_COLOR);
     }
 
     void centerOverview(boolean animate){
@@ -230,15 +205,14 @@ public class Eval implements TOWApplication {
     public static void main(String[] args){
 	try {
 	    if (args.length >= 3){
-		Eval.VIEW_MAX_W = Integer.parseInt(args[1]);
-		Eval.VIEW_MAX_H = Integer.parseInt(args[2]);
+		AcquireEval.VIEW_MAX_W = Integer.parseInt(args[1]);
+		AcquireEval.VIEW_MAX_H = Integer.parseInt(args[2]);
 	    }
-	    new Eval(Short.parseShort(args[0]));
+	    new AcquireEval(Short.parseShort(args[0]));
 	}
 	catch (Exception ex){
-	    ex.printStackTrace();
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Trailing Overview");
-	    new Eval(Eval.TECHNIQUE_TOW);
+	    new AcquireEval(AcquireEval.TECHNIQUE_TOW);
 	}
     }
 
