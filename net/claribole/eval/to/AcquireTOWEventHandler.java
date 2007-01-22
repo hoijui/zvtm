@@ -31,7 +31,14 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	if (!application.alm.trialStarted){return;}
+	if (!application.alm.trialStarted){
+	    if (application.alm.sessionStarted && AcquireInstructionsManager.clickOnStartButton(jpx, jpy)){
+		application.alm.startTrial();
+	    }
+	    else {
+		return;
+	    }
+	}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (mouseInsideTOW){
@@ -62,7 +69,6 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
-	if (!application.alm.trialStarted){return;}
 	if (!mouseInsideTOW && application.to != null){
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(jpx, jpy);

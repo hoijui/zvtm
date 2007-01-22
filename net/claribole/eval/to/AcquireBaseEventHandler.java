@@ -48,11 +48,7 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
-	if (application.alm.sessionStarted && !application.alm.trialStarted && AcquireInstructionsManager.clickOnStartButton(jpx, jpy)){
-	    application.alm.startTrial();
-	}
-    }
+    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
     public void release2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}

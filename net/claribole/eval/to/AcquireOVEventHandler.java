@@ -27,7 +27,14 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	if (!application.alm.trialStarted){return;}
+	if (!application.alm.trialStarted){
+	    if (application.alm.sessionStarted && AcquireInstructionsManager.clickOnStartButton(jpx, jpy)){
+		application.alm.startTrial();
+	    }
+	    else {
+		return;
+	    }
+	}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (mouseInsideOverview){
