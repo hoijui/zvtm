@@ -119,7 +119,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	oCamera = vsm.addCamera(mSpaceName);
 	Vector v = new Vector();
 	v.add(mCamera);
-	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true);
+	mView = vsm.addExternalView(v, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
 	mView.setBackgroundColor(AcquireEval.BACKGROUND_COLOR);
