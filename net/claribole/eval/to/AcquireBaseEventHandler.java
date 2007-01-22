@@ -48,8 +48,11 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
-
+    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
+	if (application.alm.sessionStarted && !application.alm.trialStarted && AcquireInstructionsManager.clickOnStartButton(jpx, jpy)){
+	    application.alm.startTrial();
+	}
+    }
 
     public void press2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
     public void release2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
@@ -64,6 +67,7 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){}
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
+	if (!application.alm.trialStarted){return;}
 	projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
 	if (wheelDirection  == WHEEL_UP){// zooming in
 	    application.mCamera.altitudeOffset(-projCoef*WHEEL_ZOOMIN_FACTOR);
@@ -78,11 +82,13 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
     }
 
     public void enterGlyph(Glyph g){
+	if (!application.alm.trialStarted){return;}
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
     }
 
     public void exitGlyph(Glyph g){
+	if (!application.alm.trialStarted){return;}
 	if (g.isSelected()){
 	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
 	}
@@ -94,7 +100,9 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
 
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){}
            
-    public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
+	if (code == KeyEvent.VK_S){application.alm.startSession();}
+    }
            
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
 

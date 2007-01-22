@@ -31,6 +31,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (mouseInsideTOW){
@@ -47,6 +48,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	if (delayedTOWExit){
 	    portalExitActions();
 	    delayedTOWExit = false;
@@ -60,6 +62,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	if (!mouseInsideTOW && application.to != null){
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(jpx, jpy);
@@ -69,6 +72,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	if (!mouseInsideTOW && application.to != null){
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(jpx, jpy);
@@ -123,6 +127,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
+	if (!application.alm.trialStarted){return;}
 	if (mCameraStickedToMouse){// do not exec actions associated with entering portal when the user is
 	    return;                // panning the main viewport (most likely entered portal by accident)
 	}
@@ -137,6 +142,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
+	if (!application.alm.trialStarted){return;}
 	if (!mouseInsideTOW){// do not exec exit actions if enter actions
 	    return;          // were not executed at entry time
 	}

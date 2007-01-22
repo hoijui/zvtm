@@ -27,6 +27,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (mouseInsideOverview){
@@ -43,6 +44,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	if (delayedOverviewExit){
 	    portalExitActions();
 	    delayedOverviewExit = false;
@@ -56,6 +58,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
+	if (!application.alm.trialStarted){return;}
 	if (buttonNumber == 1){
 	    if (mCameraStickedToMouse){
 		synchronized(application.mCamera){
@@ -96,6 +99,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     
     /**cursor enters portal*/
     public void enterPortal(Portal p){
+	if (!application.alm.trialStarted){return;}
 	mouseInsideOverview = true;
 	if (delayedOverviewExit){
 	    delayedOverviewExit = false;
@@ -107,6 +111,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
+	if (!application.alm.trialStarted){return;}
 	if (orStickedToMouse){
 	    delayedOverviewExit = true;
 	}

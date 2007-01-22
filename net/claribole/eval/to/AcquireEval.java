@@ -14,25 +14,27 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 
 import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
-public class AcquireEval implements TOWApplication {
+public class AcquireEval implements TOWApplication, RepaintListener {
 
     /* techniques */
     static final short TECHNIQUE_OV = 0;
-    static final String TECHNIQUE_OV_NAME = "Overview + Detail"; 
+    static final String TECHNIQUE_OV_NAME = "OD"; 
     static final short TECHNIQUE_TOW = 1;
-    static final String TECHNIQUE_TOW_NAME = "Trailing Overview";
+    static final String TECHNIQUE_TOW_NAME = "TO";
     short technique = TECHNIQUE_TOW;
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1280;
-    static int VIEW_MAX_H = 1024;
+    static int VIEW_MAX_W = 1600;
+    static int VIEW_MAX_H = 1200;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -74,6 +76,11 @@ public class AcquireEval implements TOWApplication {
     static final Color TARGET_COLOR = Color.BLUE;
     static final Color INSIDE_TARGET_COLOR = Color.RED;
     VCircle target;
+
+    /* logs */
+    AcquireLogManager alm;
+
+    Timer waitForFirstRepaint;
     
     public AcquireEval(short t){
 	initGUI();
@@ -89,12 +96,19 @@ public class AcquireEval implements TOWApplication {
 	    eh = new AcquireTOWEventHandler(this);
 	}
 	mView.setEventHandler(eh);
+	alm = new AcquireLogManager(this);
 	initWorld();
 	Location l = vsm.getGlobalView(mCamera);
 	mCamera.moveTo(l.vx, l.vy);
 	mCamera.setAltitude(l.alt);
 	centerOverview(false);
 	updateOverview();
+	vsm.repaintNow(mView, this);
+    }
+
+    public void viewRepainted(View v){
+	alm.im.say(AcquireLogManager.PSTS);
+	v.removeRepaintListener();
     }
 
     void initGUI(){
@@ -194,6 +208,10 @@ public class AcquireEval implements TOWApplication {
 	Dimension d = mView.getPanel().getSize();
 	panelWidth = d.width;
 	panelHeight = d.height;
+	AcquireInstructionsManager.START_BUTTON_TL_X = panelWidth/2 - AcquireInstructionsManager.START_BUTTON_W / 2;
+	AcquireInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + AcquireInstructionsManager.START_BUTTON_H / 2;
+	AcquireInstructionsManager.START_BUTTON_BR_X = AcquireInstructionsManager.START_BUTTON_TL_X + AcquireInstructionsManager.START_BUTTON_W;
+	AcquireInstructionsManager.START_BUTTON_BR_Y = AcquireInstructionsManager.START_BUTTON_TL_Y + AcquireInstructionsManager.START_BUTTON_H;
     }
 
     void exit(){
