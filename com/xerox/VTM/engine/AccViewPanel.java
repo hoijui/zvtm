@@ -285,7 +285,6 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			}
 			//or this   both seem to work well (have to test on several config) - BETTER UNDER SOLARIS
 			//Thread.yield();
-			if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 		    }
 		    else if (updateMouseOnly){
 			updateMouseOnly=false;
@@ -401,6 +400,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	    g2 = (Graphics2D) g;
 	    if (vImg != null) {
 		g2.drawImage(vImg, 0, 0, this);
+		if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 	    }
         }
     }

@@ -100,6 +100,7 @@ public class OffscreenViewPanel extends ViewPanel {
 	    }
 	}
 	//end drawing here
+	if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 	return buffImg;
     }
 

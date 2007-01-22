@@ -447,7 +447,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			}
 			//or this   both seem to work well (have to test on several config) - BETTER UNDER SOLARIS
 			//Thread.yield();
-			if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 		    }
 		    else if (updateMouseOnly){
 			updateMouseOnly=false; // do this first as the thread can be interrupted inside this
@@ -578,6 +577,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	    g2 = (Graphics2D) g;
 	    if (buffImg != null){
 		g2.drawImage(buffImg, null, 0, 0);
+		if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 	    }
         }
     }
