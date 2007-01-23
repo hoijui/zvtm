@@ -31,16 +31,17 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	lastJPX = jpx;
+	lastJPY = jpy;
 	if (!application.alm.trialStarted){
 	    if (application.alm.sessionStarted && AcquireInstructionsManager.clickOnStartButton(jpx, jpy)){
 		application.alm.startTrial();
+		return;
 	    }
 	    else {
 		return;
 	    }
 	}
-	lastJPX = jpx;
-	lastJPY = jpy;
 	if (mouseInsideTOW){
 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
 		orStickedToMouse = true;
@@ -48,6 +49,9 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	    else {
 		oCameraStickedToMouse = true;
 	    }
+	}
+	else if (v.lastGlyphEntered() == application.target){// user is clicking on target
+	    application.alm.nextTarget();
 	}
 	else {
 	    mCameraStickedToMouse = true;

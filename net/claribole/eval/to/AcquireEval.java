@@ -74,14 +74,13 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 
     /* target to acquire */
     static final Color TARGET_COLOR = Color.BLUE;
-    static final Color INSIDE_TARGET_COLOR = Color.RED;
+    static final Color INSIDE_TARGET_COLOR = Color.WHITE;
+    static final long TARGET_SIZE = 100;
     VCircle target;
 
     /* logs */
     AcquireLogManager alm;
 
-    Timer waitForFirstRepaint;
-    
     public AcquireEval(short t){
 	initGUI();
 	if (t == TECHNIQUE_OV){
@@ -123,6 +122,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	mView.getPanel().addComponentListener(eh);
 	mView.setNotifyMouseMoved(true);
 	mView.setBackgroundColor(AcquireEval.BACKGROUND_COLOR);
+	mView.setAntialiasing(true);
 	updatePanelSize();
     }
 
@@ -152,7 +152,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     }
 
     void initWorld(){
-	target = new VCircle(0, 0, 0, 100, TARGET_COLOR);
+	target = new VCircle(0, 0, 0, TARGET_SIZE, TARGET_COLOR);
 	vsm.addGlyph(target, mSpace);
 	target.setMouseInsideColor(INSIDE_TARGET_COLOR);
     }

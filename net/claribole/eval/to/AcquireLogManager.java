@@ -44,6 +44,8 @@ public class AcquireLogManager {
 
     AcquireBlock block;
 
+
+
     String subjectID;
     String subjectName;
     String techniqueName;
@@ -176,6 +178,10 @@ public class AcquireLogManager {
     void initNextTrial(){
 	incTrialCount();
 	resetTargetCount();
+	// reset camera to (0,0) in virtual space
+	resetCamera();
+	// reinitialize target at first location in right direction and distance
+	block.initTarget(application.target, trialCount);
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
     }
 
@@ -194,22 +200,46 @@ public class AcquireLogManager {
 	trialCountStr = String.valueOf(trialCount);
     }
 
+    void resetCamera(){
+	application.mCamera.moveTo(0, 0);
+	application.centerOverview(false);
+    }
+
+    static final int NB_TARGETS_PER_TRIAL = 5;
     long trialStartTime;
+    long[] intermediateTimes = new long[NB_TARGETS_PER_TRIAL];
 
     void startTrial(){
 	im.say(null);
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
-	
     }
 
     void nextTarget(){
-	//XXX:TBW
+	intermediateTimes[targetCount] = System.currentTimeMillis() - trialStartTime;
+	incTargetCount();
+	if (targetCount < NB_TARGETS_PER_TRIAL){
+	    // move target to next location (offset)
+	    block.moveTarget(application.target, trialCount, application.mCamera);
+	}
+	else {// this was the last target, end the trial
+	    endTrial();
+	}
     }
 
     void endTrial(){
 	trialStarted = false;
-	//XXX:TBW
+	//XXX:TBW flush trial data
+	if (trialCount < block.nbTrials-1){
+	    initNextTrial();
+	}
+	else {
+	    endSession();
+	}
+    }
+
+    void endSession(){
+	im.say(EOS);
     }
 
     static File initLogFile(String fileName, String dirName){
