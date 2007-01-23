@@ -148,13 +148,13 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	vsm.addPortal(op, mView);
 	op.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	op.setObservedRegionTranslucency(0.5f);
-	op.setObservedRegionListener((ObservedRegionListener)eh);
+// 	op.setObservedRegionListener((ObservedRegionListener)eh);
     }
 
     void initWorld(){
 	target = new VCircle(0, 0, 0, TARGET_SIZE, TARGET_COLOR);
 	vsm.addGlyph(target, mSpace);
-	target.setMouseInsideColor(INSIDE_TARGET_COLOR);
+	target.setMouseInsideBorderColor(INSIDE_TARGET_COLOR);
     }
 
     void centerOverview(boolean animate){
@@ -180,7 +180,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	    to = getPortal(x, y);
 	    to.setBackgroundColor(BACKGROUND_COLOR);
 	    to.setPortalEventHandler((PortalEventHandler)eh);
- 	    to.setObservedRegionListener((ObservedRegionListener)eh);
+ 	    //to.setObservedRegionListener((ObservedRegionListener)eh);
 	    vsm.addPortal(to, mView);
  	    to.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),

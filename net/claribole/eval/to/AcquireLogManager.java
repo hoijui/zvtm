@@ -60,8 +60,8 @@ public class AcquireLogManager {
 
     String lineStart;
     File logFile;
-    File cinematicFile;
-    BufferedWriter bwt, bwc;
+//     File cinematicFile;
+    BufferedWriter bwt;//, bwc;
 
     AcquireInstructionsManager im;
 
@@ -102,9 +102,9 @@ public class AcquireLogManager {
 	}
 	try {
 	    logFile = initLogFile(subjectID+"-"+techniqueName+"-trial-block"+blockNumber, LOG_DIR);
-	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
+// 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile), "UTF-8"));
-	    bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cinematicFile), "UTF-8"));
+// 	    bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cinematicFile), "UTF-8"));
 	}
 	catch (IOException ex){ex.printStackTrace();}
 	writeHeaders();
@@ -141,28 +141,28 @@ public class AcquireLogManager {
 		      "Time" + OUTPUT_CSV_SEP);
 	    bwt.newLine();
 	    bwt.flush();
-	    // cinematic file header (misc. info)
-	    bwc.write("# Name" + OUTPUT_CSV_SEP + subjectName);
-	    bwc.newLine();
-	    bwc.write("# SID" + OUTPUT_CSV_SEP + subjectID);
-	    bwc.newLine();
-	    bwc.write("# Technique" + OUTPUT_CSV_SEP + techniqueName);
-	    bwc.newLine();
-	    bwc.write("# Block" + OUTPUT_CSV_SEP + blockNumber);
-	    bwc.newLine();
-	    bwc.write("# vw" + OUTPUT_CSV_SEP + application.panelWidth);
-	    bwc.newLine();
-	    bwc.write("# vh" + OUTPUT_CSV_SEP + application.panelHeight);
-	    bwc.newLine();
-	    // cinematic column headers
-	    bwc.write("Trial" + OUTPUT_CSV_SEP +
-		      "Target" + OUTPUT_CSV_SEP +
-		      "cx" + OUTPUT_CSV_SEP +
-		      "cy" + OUTPUT_CSV_SEP +
-		      "cz" + OUTPUT_CSV_SEP +
-		      "Time");
-	    bwc.newLine();
-	    bwc.flush();
+// 	    // cinematic file header (misc. info)
+// 	    bwc.write("# Name" + OUTPUT_CSV_SEP + subjectName);
+// 	    bwc.newLine();
+// 	    bwc.write("# SID" + OUTPUT_CSV_SEP + subjectID);
+// 	    bwc.newLine();
+// 	    bwc.write("# Technique" + OUTPUT_CSV_SEP + techniqueName);
+// 	    bwc.newLine();
+// 	    bwc.write("# Block" + OUTPUT_CSV_SEP + blockNumber);
+// 	    bwc.newLine();
+// 	    bwc.write("# vw" + OUTPUT_CSV_SEP + application.panelWidth);
+// 	    bwc.newLine();
+// 	    bwc.write("# vh" + OUTPUT_CSV_SEP + application.panelHeight);
+// 	    bwc.newLine();
+// 	    // cinematic column headers
+// 	    bwc.write("Trial" + OUTPUT_CSV_SEP +
+// 		      "Target" + OUTPUT_CSV_SEP +
+// 		      "cx" + OUTPUT_CSV_SEP +
+// 		      "cy" + OUTPUT_CSV_SEP +
+// 		      "cz" + OUTPUT_CSV_SEP +
+// 		      "Time");
+// 	    bwc.newLine();
+// 	    bwc.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
     }
@@ -229,7 +229,16 @@ public class AcquireLogManager {
 
     void endTrial(){
 	trialStarted = false;
-	//XXX:TBW flush trial data
+	try {
+	    for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
+		bwt.write(lineStart + trialCountStr + OUTPUT_CSV_SEP +
+			  String.valueOf(i) + OUTPUT_CSV_SEP +
+			  intermediateTimes[i]);
+		bwt.newLine();
+	    }
+	    bwt.flush();
+	}
+	catch (IOException ex){ex.printStackTrace();}
 	if (trialCount < block.nbTrials-1){
 	    initNextTrial();
 	}
@@ -239,6 +248,11 @@ public class AcquireLogManager {
     }
 
     void endSession(){
+	sessionStarted = false;
+	try {
+	    bwt.close();
+	}
+	catch (IOException ex){ex.printStackTrace();}
 	im.say(EOS);
     }
 

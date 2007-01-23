@@ -22,7 +22,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.*;
 
 
-abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentListener, ObservedRegionListener {
+abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentListener {//, ObservedRegionListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
     static final float LENS_SPEED_FACTOR = 5.0f;
@@ -63,18 +63,19 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){}
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
-	if (!application.alm.trialStarted){return;}
-	projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
-	if (wheelDirection  == WHEEL_UP){// zooming in
-	    application.mCamera.altitudeOffset(-projCoef*WHEEL_ZOOMIN_FACTOR);
-	    cameraMoved();
-	    application.vsm.repaintNow();
-	}
-	else {//wheelDirection == WHEEL_DOWN, zooming out
-	    application.mCamera.altitudeOffset(projCoef*WHEEL_ZOOMOUT_FACTOR);
-	    cameraMoved();
-	    application.vsm.repaintNow();
-	}
+	// DO NOT ALLOW ALTITUDE CHANGES, IT DOES NOT MAKE SENSE WITH A STYLUS
+// 	if (!application.alm.trialStarted){return;}
+// 	projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
+// 	if (wheelDirection  == WHEEL_UP){// zooming in
+// 	    application.mCamera.altitudeOffset(-projCoef*WHEEL_ZOOMIN_FACTOR);
+// 	    cameraMoved();
+// 	    application.vsm.repaintNow();
+// 	}
+// 	else {//wheelDirection == WHEEL_DOWN, zooming out
+// 	    application.mCamera.altitudeOffset(projCoef*WHEEL_ZOOMOUT_FACTOR);
+// 	    cameraMoved();
+// 	    application.vsm.repaintNow();
+// 	}
     }
 
     public void enterGlyph(Glyph g){
@@ -132,28 +133,28 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
 	}
     }
 
-    long translationSpeed;
+//     long translationSpeed;
 
-    public void intersectsParentRegion(long[] wnes){
-	if (orStickedToMouse){
-	    translationSpeed = Math.round((application.oCamera.altitude+application.oCamera.focal)/application.oCamera.focal);
-	    if (wnes[0] < 0 && wnes[2] < 0){// intersection west border
-		application.oCamera.move(-translationSpeed, 0);
- 		application.mCamera.move(-translationSpeed, 0);
-	    }
-	    else if (wnes[0] > 0 && wnes[2] > 0){// intersection east border
-		application.oCamera.move(translationSpeed, 0);
-		application.mCamera.move(translationSpeed, 0);
-	    }
-	    if (wnes[1] > 0 && wnes[3] > 0){// intersection north border
-		application.oCamera.move(0, translationSpeed);
-		application.mCamera.move(0, translationSpeed);
-	    }
-	    else if (wnes[1] < 0 && wnes[3] < 0){// intersection south border
-		application.oCamera.move(0, -translationSpeed);
-		application.mCamera.move(0, -translationSpeed);
-	    }
-	}
-    }
+//     public void intersectsParentRegion(long[] wnes){
+// 	if (orStickedToMouse){
+// 	    translationSpeed = Math.round((application.oCamera.altitude+application.oCamera.focal)/application.oCamera.focal);
+// 	    if (wnes[0] < 0 && wnes[2] < 0){// intersection west border
+// 		application.oCamera.move(-translationSpeed, 0);
+//  		application.mCamera.move(-translationSpeed, 0);
+// 	    }
+// 	    else if (wnes[0] > 0 && wnes[2] > 0){// intersection east border
+// 		application.oCamera.move(translationSpeed, 0);
+// 		application.mCamera.move(translationSpeed, 0);
+// 	    }
+// 	    if (wnes[1] > 0 && wnes[3] > 0){// intersection north border
+// 		application.oCamera.move(0, translationSpeed);
+// 		application.mCamera.move(0, translationSpeed);
+// 	    }
+// 	    else if (wnes[1] < 0 && wnes[3] < 0){// intersection south border
+// 		application.oCamera.move(0, -translationSpeed);
+// 		application.mCamera.move(0, -translationSpeed);
+// 	    }
+// 	}
+//     }
    
 }
