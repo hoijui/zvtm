@@ -148,6 +148,12 @@ public class VCircle extends Glyph implements Cloneable {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
+    /**set absolute size by setting bounding circle radius*/
+    public void sizeTo(long radius){
+	size = (float)radius;
+	vr = radius;
+	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+    }
 
     /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
