@@ -42,9 +42,10 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	    if (application.op.coordInsideObservedRegion(jpx, jpy)){
 		orStickedToMouse = true;
 	    }
-	    else {
-		oCameraStickedToMouse = true;
-	    }
+	    // do not allow grabbing the overview's content, it creates irrelevant noise in the experiment
+// 	    else {
+// 		oCameraStickedToMouse = true;
+// 	    }
 	}
 	else if (v.lastGlyphEntered() == application.target){// user is clicking on target
 	    application.alm.nextTarget();
@@ -64,7 +65,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	    application.centerOverview(true);
 	    mCameraStickedToMouse = false;
 	}
-	oCameraStickedToMouse = false;
+// 	oCameraStickedToMouse = false;
 	orStickedToMouse = false;
     }
 
@@ -81,20 +82,20 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 		    cameraMoved();
 		}
 	    }
-	    else if (oCameraStickedToMouse){
-		synchronized(application.mCamera){
-		synchronized(application.oCamera){
-		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
-		    application.oCamera.move(Math.round(projCoef*(lastJPX-jpx)),
-					     Math.round(projCoef*(jpy-lastJPY)));
-		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
-					     Math.round(projCoef*(jpy-lastJPY)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		    cameraMoved();
-		}
-		}
-	    }
+// 	    else if (oCameraStickedToMouse){
+// 		synchronized(application.mCamera){
+// 		synchronized(application.oCamera){
+// 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
+// 		    application.oCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+// 					     Math.round(projCoef*(jpy-lastJPY)));
+// 		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+// 					     Math.round(projCoef*(jpy-lastJPY)));
+// 		    lastJPX = jpx;
+// 		    lastJPY = jpy;
+// 		    cameraMoved();
+// 		}
+// 		}
+// 	    }
 	    else if (orStickedToMouse){
 		synchronized(application.oCamera){
 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
