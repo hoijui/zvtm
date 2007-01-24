@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import com.xerox.VTM.engine.AnimManager;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 public class AcquireLogManager {
@@ -43,8 +44,6 @@ public class AcquireLogManager {
     AcquireEval application;
 
     AcquireBlock block;
-
-
 
     String subjectID;
     String subjectName;
@@ -181,7 +180,10 @@ public class AcquireLogManager {
 	// reset camera to (0,0) in virtual space
 	resetCamera();
 	// reinitialize target at first location in right direction and distance
-	block.initTarget(application.target, trialCount);
+	application.mSpace.destroyGlyph(application.target);  // destroy target and create new one instead of moving existing one
+	application.target = block.moveTarget(trialCount, application.mCamera.posx, application.mCamera.posy);
+	application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism 
+                                                              // that does not detect cursor exiting a glyph that is not in the viewport
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
     }
 
@@ -220,8 +222,10 @@ public class AcquireLogManager {
 	incTargetCount();
 	if (targetCount < NB_TARGETS_PER_TRIAL){
 	    // move target to next location (offset)
-	    block.moveTarget(application.target, trialCount, application.mCamera);
-	}
+	    application.mSpace.destroyGlyph(application.target);  // destroy target and create new one instead of moving existing one
+	    application.target = block.moveTarget(trialCount, application.mCamera.posx, application.mCamera.posy);
+	    application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism
+	}                                                         // that does not detect cursor exiting a glyph that is not in the viewport
 	else {// this was the last target, end the trial
 	    endTrial();
 	}

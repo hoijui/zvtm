@@ -10,7 +10,7 @@
 package net.claribole.eval.to;
 
 import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.ZCircle;
 
 public class AcquireBlock {
 
@@ -44,40 +44,32 @@ public class AcquireBlock {
     int nbTrials = 0;
     short[] direction;
     int[] ID;
-    float[] size;
+    long[] size;
     
     AcquireBlock(String blockLine){
 	String[] data = blockLine.split(AcquireLogManager.INPUT_CSV_SEP);
 	nbTrials = data.length;
 	direction = new short[nbTrials];
 	ID = new int[nbTrials];
-	size = new float[nbTrials];
+	size = new long[nbTrials];
 	for (int i=0;i<nbTrials;i++){
 	    direction[i] = getDirection(data[i].substring(0,2));
 	    ID[i] = Integer.parseInt(data[i].substring(2));
-	    size[i] = (float)(AcquireEval.TARGET_DISTANCE / (Math.pow(2, ID[i]) - 1));
+	    size[i] = Math.round((AcquireEval.TARGET_DISTANCE / (Math.pow(2, ID[i]) - 1)));
 	}
     }
 
-    void initTarget(Glyph g, int trialNumber){
-	switch(direction[trialNumber]){// camera is at (0,0) at the start of a trial
-	case DIRECTION_NW:{g.moveTo(-AcquireEval.TARGET_DISTANCE, AcquireEval.TARGET_DISTANCE);break;}
-	case DIRECTION_NE:{g.moveTo(AcquireEval.TARGET_DISTANCE, AcquireEval.TARGET_DISTANCE);break;}
-	case DIRECTION_SW:{g.moveTo(-AcquireEval.TARGET_DISTANCE, -AcquireEval.TARGET_DISTANCE);break;}
-	case DIRECTION_SE:{g.moveTo(AcquireEval.TARGET_DISTANCE, -AcquireEval.TARGET_DISTANCE);break;}
-	default:{System.err.println("Error: initializing target: unknown direction: "+direction[trialNumber]);}
-	}
-	g.sizeTo(size[trialNumber]);
-    }
-
-    void moveTarget(Glyph g, int trialNumber, Camera c){
+    ZCircle moveTarget(int trialNumber, long origX, long origY){
+	ZCircle res;
 	switch(direction[trialNumber]){
-	case DIRECTION_NW:{g.moveTo(c.posx-AcquireEval.TARGET_DISTANCE, c.posy+AcquireEval.TARGET_DISTANCE);break;}
-	case DIRECTION_NE:{g.moveTo(c.posx+AcquireEval.TARGET_DISTANCE, c.posy+AcquireEval.TARGET_DISTANCE);break;}
-	case DIRECTION_SW:{g.moveTo(c.posx-AcquireEval.TARGET_DISTANCE, c.posy-AcquireEval.TARGET_DISTANCE);break;}
-	case DIRECTION_SE:{g.moveTo(c.posx+AcquireEval.TARGET_DISTANCE, c.posy-AcquireEval.TARGET_DISTANCE);break;}
-	default:{System.err.println("Error: moving target: unknown direction: "+direction[trialNumber]);}
+	case DIRECTION_NW:{res = new ZCircle(origX-AcquireEval.TARGET_DISTANCE, origY+AcquireEval.TARGET_DISTANCE, 0, size[trialNumber], AcquireEval.TARGET_COLOR);break;}
+	case DIRECTION_NE:{res = new ZCircle(origX+AcquireEval.TARGET_DISTANCE, origY+AcquireEval.TARGET_DISTANCE, 0, size[trialNumber], AcquireEval.TARGET_COLOR);break;}
+	case DIRECTION_SW:{res = new ZCircle(origX-AcquireEval.TARGET_DISTANCE, origY-AcquireEval.TARGET_DISTANCE, 0, size[trialNumber], AcquireEval.TARGET_COLOR);break;}
+	case DIRECTION_SE:{res = new ZCircle(origX+AcquireEval.TARGET_DISTANCE, origY-AcquireEval.TARGET_DISTANCE, 0, size[trialNumber], AcquireEval.TARGET_COLOR);break;}
+	default:{System.err.println("Error: moving target: unknown direction: "+direction[trialNumber]);res = null;}
 	}
+	res.setMinimumProjectedSize(AcquireEval.TARGET_MIN_PROJ_SIZE);
+	return res;
     }
     
 }

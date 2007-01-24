@@ -80,7 +80,8 @@ public class AcquireEval implements TOWApplication, RepaintListener {
        for convenience (hence the sqrt(2) division) */
     static final long TARGET_DISTANCE = Math.round(3000 / Math.sqrt(2));
     static final long TARGET_DEFAULT_SIZE = 100;
-    VCircle target;
+    static final int TARGET_MIN_PROJ_SIZE = 4;
+    ZCircle target;
 
     /* logs */
     AcquireLogManager alm;
@@ -155,7 +156,8 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     }
 
     void initWorld(){
-	target = new VCircle(0, 0, 0, TARGET_DEFAULT_SIZE, TARGET_COLOR);
+	target = new ZCircle(0, 0, 0, TARGET_DEFAULT_SIZE, TARGET_COLOR);
+	target.setMinimumProjectedSize(TARGET_MIN_PROJ_SIZE);
 	vsm.addGlyph(target, mSpace);
 	target.setMouseInsideBorderColor(INSIDE_TARGET_COLOR);
     }
@@ -189,7 +191,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       to.getID(), null);
 	    oCamera.moveTo(0, 0);
-	    updateOverview();
+// 	    updateOverview();
 	    centerOverview(false);
 	}
     }

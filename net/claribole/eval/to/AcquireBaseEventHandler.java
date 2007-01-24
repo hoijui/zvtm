@@ -126,11 +126,11 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
     public void componentShown(ComponentEvent e){}
 
     void cameraMoved(){
-	alt = application.mCamera.getAltitude();
-	if (alt != oldCameraAltitude){
-	    oldCameraAltitude = alt;
-	    application.updateOverview();
-	}
+// 	alt = application.mCamera.getAltitude();
+// 	if (alt != oldCameraAltitude){
+// 	    oldCameraAltitude = alt;
+// 	    application.updateOverview();
+// 	}
     }
 
 //     long translationSpeed;
