@@ -83,6 +83,9 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     static final int TARGET_MIN_PROJ_SIZE = 4;
     ZCircle target;
 
+    static final Color SELECTION_REGION_COLOR = Color.BLACK;
+    static final float SELECTION_REGION_SIZE_FACTOR = 2.0f;
+
     /* logs */
     AcquireLogManager alm;
 

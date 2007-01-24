@@ -76,6 +76,11 @@ public class AcquireInstructionsManager implements Java2DPainter {
 		g2d.drawString(C_BT, viewWidth/2-25,AcquireInstructionsManager.START_BUTTON_TL_Y+15);
 	    }
 	}
+	else {
+	    g2d.setColor(AcquireEval.SELECTION_REGION_COLOR);
+	    g2d.drawOval(viewWidth/2 - application.alm.selectionRegionHSize, viewHeight/2 - application.alm.selectionRegionHSize,
+			 application.alm.selectionRegionSize, application.alm.selectionRegionSize);
+	}
     }
 
 }

@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 public class AcquireLogManager {
@@ -174,6 +175,16 @@ public class AcquireLogManager {
 	    blockNumber + OUTPUT_CSV_SEP;
     }
 
+    int selectionRegionSize, selectionRegionHSize;
+
+    boolean validTarget(Glyph g){
+	return (g==application.target) &&
+	    (g.vx-block.size[trialCount] > application.mCamera.posx-selectionRegionHSize) &&
+	    (g.vx+block.size[trialCount] < application.mCamera.posx+selectionRegionHSize) &&
+	    (g.vy-block.size[trialCount] > application.mCamera.posy-selectionRegionHSize) &&
+	    (g.vy+block.size[trialCount] < application.mCamera.posy+selectionRegionHSize);
+    }
+    
     void initNextTrial(){
 	incTrialCount();
 	resetTargetCount();
@@ -184,6 +195,8 @@ public class AcquireLogManager {
 	application.target = block.moveTarget(trialCount, application.mCamera.posx, application.mCamera.posy);
 	application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism 
                                                               // that does not detect cursor exiting a glyph that is not in the viewport
+	selectionRegionSize = Math.round(block.size[trialCount] * AcquireEval.SELECTION_REGION_SIZE_FACTOR * 2);
+	selectionRegionHSize = selectionRegionSize / 2;
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
     }
 

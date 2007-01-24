@@ -47,7 +47,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 // 		oCameraStickedToMouse = true;
 // 	    }
 	}
-	else if (v.lastGlyphEntered() == application.target){// user is clicking on target
+	else if (application.alm.validTarget(v.lastGlyphEntered())){// user is clicking on target
 	    application.alm.nextTarget();
 	}
 	else {
