@@ -44,40 +44,38 @@ public class AcquireBlock {
     int nbTrials = 0;
     short[] direction;
     int[] ID;
-    long[] distance;
+    float[] size;
     
     AcquireBlock(String blockLine){
 	String[] data = blockLine.split(AcquireLogManager.INPUT_CSV_SEP);
 	nbTrials = data.length;
 	direction = new short[nbTrials];
 	ID = new int[nbTrials];
-	distance = new long[nbTrials];
+	size = new float[nbTrials];
 	for (int i=0;i<nbTrials;i++){
 	    direction[i] = getDirection(data[i].substring(0,2));
 	    ID[i] = Integer.parseInt(data[i].substring(2));
-	    /* targets are always in NW, NE, SW or SE directions
-	       distance computed is the projected distance on X and Y axes
-	       for convenience (hence the sqrt(2) division) */
-	    distance[i] = Math.round(AcquireEval.TARGET_SIZE * (Math.pow(2, ID[i]) - 1) / Math.sqrt(2));
+	    size[i] = (float)(AcquireEval.TARGET_DISTANCE / (Math.pow(2, ID[i]) - 1));
 	}
     }
 
     void initTarget(Glyph g, int trialNumber){
 	switch(direction[trialNumber]){// camera is at (0,0) at the start of a trial
-	case DIRECTION_NW:{g.moveTo(-distance[trialNumber], distance[trialNumber]);break;}
-	case DIRECTION_NE:{g.moveTo(distance[trialNumber], distance[trialNumber]);break;}
-	case DIRECTION_SW:{g.moveTo(-distance[trialNumber], -distance[trialNumber]);break;}
-	case DIRECTION_SE:{g.moveTo(distance[trialNumber], -distance[trialNumber]);break;}
+	case DIRECTION_NW:{g.moveTo(-AcquireEval.TARGET_DISTANCE, AcquireEval.TARGET_DISTANCE);break;}
+	case DIRECTION_NE:{g.moveTo(AcquireEval.TARGET_DISTANCE, AcquireEval.TARGET_DISTANCE);break;}
+	case DIRECTION_SW:{g.moveTo(-AcquireEval.TARGET_DISTANCE, -AcquireEval.TARGET_DISTANCE);break;}
+	case DIRECTION_SE:{g.moveTo(AcquireEval.TARGET_DISTANCE, -AcquireEval.TARGET_DISTANCE);break;}
 	default:{System.err.println("Error: initializing target: unknown direction: "+direction[trialNumber]);}
 	}
+	g.sizeTo(size[trialNumber]);
     }
 
     void moveTarget(Glyph g, int trialNumber, Camera c){
 	switch(direction[trialNumber]){
-	case DIRECTION_NW:{g.moveTo(c.posx-distance[trialNumber], c.posy+distance[trialNumber]);break;}
-	case DIRECTION_NE:{g.moveTo(c.posx+distance[trialNumber], c.posy+distance[trialNumber]);break;}
-	case DIRECTION_SW:{g.moveTo(c.posx-distance[trialNumber], c.posy-distance[trialNumber]);break;}
-	case DIRECTION_SE:{g.moveTo(c.posx+distance[trialNumber], c.posy-distance[trialNumber]);break;}
+	case DIRECTION_NW:{g.moveTo(c.posx-AcquireEval.TARGET_DISTANCE, c.posy+AcquireEval.TARGET_DISTANCE);break;}
+	case DIRECTION_NE:{g.moveTo(c.posx+AcquireEval.TARGET_DISTANCE, c.posy+AcquireEval.TARGET_DISTANCE);break;}
+	case DIRECTION_SW:{g.moveTo(c.posx-AcquireEval.TARGET_DISTANCE, c.posy-AcquireEval.TARGET_DISTANCE);break;}
+	case DIRECTION_SE:{g.moveTo(c.posx+AcquireEval.TARGET_DISTANCE, c.posy-AcquireEval.TARGET_DISTANCE);break;}
 	default:{System.err.println("Error: moving target: unknown direction: "+direction[trialNumber]);}
 	}
     }

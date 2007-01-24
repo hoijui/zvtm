@@ -56,7 +56,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     static int OVERVIEW_HEIGHT = 150;
     static final Color DEFAULT_PORTAL_BORDER_COLOR = Color.BLACK;
     static final Color INSIDE_PORTAL_BORDER_COLOR = Color.RED;
-    static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 48.0f;
+    static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 36.0f;
     static final int OVERVIEW_CENTERING_TRANSLATE_TIME = 300;
     
     /* trailing overview settings */
@@ -75,7 +75,11 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     /* target to acquire */
     static final Color TARGET_COLOR = Color.BLUE;
     static final Color INSIDE_TARGET_COLOR = Color.WHITE;
-    static final long TARGET_SIZE = 100;
+    /* targets are always in NW, NE, SW or SE directions
+       distance computed is the projected distance on X and Y axes
+       for convenience (hence the sqrt(2) division) */
+    static final long TARGET_DISTANCE = Math.round(3000 / Math.sqrt(2));
+    static final long TARGET_DEFAULT_SIZE = 100;
     VCircle target;
 
     /* logs */
@@ -97,9 +101,8 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	mView.setEventHandler(eh);
 	alm = new AcquireLogManager(this);
 	initWorld();
-	Location l = vsm.getGlobalView(mCamera);
-	mCamera.moveTo(l.vx, l.vy);
-	mCamera.setAltitude(l.alt);
+	mCamera.moveTo(0, 0);
+	mCamera.setAltitude(0);
 	centerOverview(false);
 	updateOverview();
 	vsm.repaintNow(mView, this);
@@ -152,7 +155,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     }
 
     void initWorld(){
-	target = new VCircle(0, 0, 0, TARGET_SIZE, TARGET_COLOR);
+	target = new VCircle(0, 0, 0, TARGET_DEFAULT_SIZE, TARGET_COLOR);
 	vsm.addGlyph(target, mSpace);
 	target.setMouseInsideBorderColor(INSIDE_TARGET_COLOR);
     }
