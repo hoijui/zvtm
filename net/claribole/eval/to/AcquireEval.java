@@ -133,7 +133,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     void windowLayout(){
 	if (Utilities.osIsWindows()){
 	    VIEW_X = VIEW_Y = 0;
-	    SCREEN_HEIGHT -= 30;
+// 	    SCREEN_HEIGHT -= 30;
 	}
 	else if (Utilities.osIsMacOS()){
 	    VIEW_X = 80;
