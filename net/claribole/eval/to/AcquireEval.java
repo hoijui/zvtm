@@ -144,7 +144,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     }
 
     void initOverview(){
-	op = new OverviewPortal(panelWidth-OVERVIEW_WIDTH-1,
+	op = new OverviewPortal(0,
 				panelHeight-OVERVIEW_HEIGHT-1,
 				OVERVIEW_WIDTH, OVERVIEW_HEIGHT, oCamera, mCamera);
 	op.setPortalEventHandler((PortalEventHandler)eh);
