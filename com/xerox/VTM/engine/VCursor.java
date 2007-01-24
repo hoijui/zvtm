@@ -477,37 +477,15 @@ public class VCursor {
     /**compute list of glyphs currently overlapped by the mouse*/
     boolean computeMouseOverList(ViewEventHandler eh,Camera c, int x, int y){
 	boolean res=false;
- 	synchronized(c.getOwningSpace().getDrawnGlyphs(c.getIndex())){
+	Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+ 	synchronized(drawnGlyphs){
 	    synchronized(this.glyphsUnderMouse){
 		try {
-		    for (int i=0;i<c.getOwningSpace().getDrawnGlyphs(c.getIndex()).size();i++){
-			tmpGlyph=(Glyph)(c.getOwningSpace().getDrawnGlyphs(c.getIndex()).elementAt(i));
+		    for (int i=0;i<drawnGlyphs.size();i++){
+			tmpGlyph = (Glyph)drawnGlyphs.elementAt(i);
 			if (tmpGlyph.isSensitive()){
-			    tmpRes=tmpGlyph.mouseInOut(x,y,c.getIndex());
-			    if (tmpRes==1){//we've entered this glyph
-				tmpID=tmpGlyph.getID();
-				maxIndex = maxIndex + 1;
-				if (maxIndex>=glyphsUnderMouse.length){doubleCapacity();}
-				glyphsUnderMouse[maxIndex]=tmpGlyph;
-				lastGlyphEntered=tmpGlyph;
-				eh.enterGlyph(tmpGlyph);
-				res=true;
-			    }
-			    else if (tmpRes==-1){//we've exited it
-				tmpID=tmpGlyph.getID();
-				int j=0;
-				while (j<=maxIndex){
-				    if (glyphsUnderMouse[j++]==tmpGlyph){break;}
-				}
-				while (j<=maxIndex){
-				    glyphsUnderMouse[j-1]=glyphsUnderMouse[j];
-				    j++;
-				}
-				maxIndex = maxIndex - 1;
-				if (maxIndex<0){lastGlyphEntered=null;maxIndex=-1;/*required because list can be reset because we change layer and then we exit a glyph*/}
-				else {lastGlyphEntered=glyphsUnderMouse[maxIndex];}
-				eh.exitGlyph(tmpGlyph);
-				res=true;
+			    if (checkGlyph(eh, c, x, y)){
+				res = true;
 			    }
 			}
 		    }
@@ -529,6 +507,38 @@ public class VCursor {
  	}
 	return res;
     }
+
+    boolean checkGlyph(ViewEventHandler eh,Camera c, int x, int y){
+	tmpRes = tmpGlyph.mouseInOut(x, y, c.getIndex());
+	if (tmpRes == 1){//we've entered this glyph
+	    tmpID = tmpGlyph.getID();
+	    maxIndex = maxIndex + 1;
+	    if (maxIndex >= glyphsUnderMouse.length){doubleCapacity();}
+	    glyphsUnderMouse[maxIndex] = tmpGlyph;
+	    lastGlyphEntered = tmpGlyph;
+	    eh.enterGlyph(tmpGlyph);
+	    return true;
+	}
+	else if (tmpRes == -1){//we've exited it
+	    tmpID = tmpGlyph.getID();
+	    int j = 0;
+	    while (j <= maxIndex){
+		if (glyphsUnderMouse[j++] == tmpGlyph){break;}
+	    }
+	    while (j <= maxIndex){
+		glyphsUnderMouse[j-1] = glyphsUnderMouse[j];
+		j++;
+	    }
+	    maxIndex = maxIndex - 1;
+	    /*required because list can be reset because we change layer and then we exit a glyph*/
+	    if (maxIndex<0){lastGlyphEntered = null;maxIndex = -1;}
+	    else {lastGlyphEntered = glyphsUnderMouse[maxIndex];}
+	    eh.exitGlyph(tmpGlyph);
+	    return true;
+	}
+	return false;
+    }
+
 
     //for debug purpose
     public void printList(){
