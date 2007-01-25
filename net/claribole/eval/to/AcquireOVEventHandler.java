@@ -22,8 +22,10 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     boolean mouseInsideOverview = false;
     boolean delayedOverviewExit = false;
 
+
     AcquireOVEventHandler(AcquireEval app){
 	this.application = app;
+	cursor = application.mView.mouse;
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
@@ -47,7 +49,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 // 		oCameraStickedToMouse = true;
 // 	    }
 	}
-	else if (application.alm.validTarget(v.lastGlyphEntered())){// user is clicking on target
+	else if (application.alm.validTarget(cursor.vx, cursor.vy)){// user is clicking on target
 	    application.alm.nextTarget();
 	}
 	else {

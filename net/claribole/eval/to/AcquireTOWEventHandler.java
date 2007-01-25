@@ -26,8 +26,11 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     boolean mouseInsideTOW = false;
     boolean delayedTOWExit = false;
 
+    VCursor cursor;
+
     AcquireTOWEventHandler(AcquireEval app){
 	this.application = app;
+	cursor = application.mView.mouse;
     }
 
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
@@ -51,7 +54,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 // 		oCameraStickedToMouse = true;
 // 	    }
 	}
-	else if (application.alm.validTarget(v.lastGlyphEntered())){// user is clicking on target
+	else if (application.alm.validTarget(cursor.vx, cursor.vy)){// user is clicking on target
 	    application.alm.nextTarget();
 	}
 	else {
