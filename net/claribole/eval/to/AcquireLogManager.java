@@ -232,7 +232,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	application.centerOverview(false);
     }
 
-    static final int NB_TARGETS_PER_TRIAL = 5;
+    static final int NB_TARGETS_PER_TRIAL = 1;
     long previousTime, currentTime;
     long[] intermediateTimes = new long[NB_TARGETS_PER_TRIAL];
 
