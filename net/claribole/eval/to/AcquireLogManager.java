@@ -198,6 +198,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	application.target = block.moveTarget(trialCount, 0, 0);
 	application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism 
                                                               // that does not detect cursor exiting a glyph that is not in the viewport
+	application.target.setVisible(false);
 	selectionRegionSize = Math.round(block.size[trialCount] * AcquireEval.SELECTION_REGION_SIZE_FACTOR * 2);
 	selectionRegionHSize = selectionRegionSize / 2;
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
@@ -238,6 +239,7 @@ public class AcquireLogManager implements PostAnimationAction {
 
     void startTrial(){
 	im.say(null);
+	application.target.setVisible(true);
 	trialStarted = true;
 	previousTime = System.currentTimeMillis();
 	resetRequest = false; // make sure there is no orphan camera reset request
@@ -253,7 +255,8 @@ public class AcquireLogManager implements PostAnimationAction {
 	    application.mSpace.destroyGlyph(application.target);  // destroy target and create new one instead of moving existing one
 	    application.target = block.moveTarget(trialCount, application.mCamera.posx, application.mCamera.posy);
 	    application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism
-	}                                                         // that does not detect cursor exiting a glyph that is not in the viewport
+	    application.target.setVisible(false);                 // that does not detect cursor exiting a glyph that is not in the viewport
+	}
 	else {// this was the last target, end the trial
 	    endTrial();
 	}
