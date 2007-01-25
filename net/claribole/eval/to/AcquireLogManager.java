@@ -191,7 +191,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	resetTargetCount();
 	// reset camera to (0,0) in virtual space
 	resetCamera();
-	if (trialCount != 0){// ask for a postponed camera reset in case the camera is in the
+	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the
 	    resetRequest = true; // middle of an animation at the time of the first reset
 	}
 	// reinitialize target at first location in right direction and distance
@@ -241,6 +241,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	im.say(null);
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
+	resetRequest = false; // make sure there is no orphan camera reset request
     }
 
     void nextTarget(){
