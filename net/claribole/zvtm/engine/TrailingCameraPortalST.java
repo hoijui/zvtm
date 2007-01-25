@@ -80,8 +80,8 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	double distAway = targetPos.distance(currentPos);
 	double maxDist = 2 * Math.abs(xOffset);
 	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-// 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.01);
-	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.1);
+ 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.01);
+// 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.1);
 	currentPos = filter.apply(targetPos, frequency);
 	int tx = (int)Math.round(currentPos.getX());
 	int ty = (int)Math.round(currentPos.getY());
