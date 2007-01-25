@@ -139,6 +139,8 @@ public class AcquireLogManager implements PostAnimationAction {
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Target" + OUTPUT_CSV_SEP +
+		      "Direction" + OUTPUT_CSV_SEP +
+		      "ID" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP);
 	    bwt.newLine();
 	    bwt.flush();
@@ -231,18 +233,20 @@ public class AcquireLogManager implements PostAnimationAction {
     }
 
     static final int NB_TARGETS_PER_TRIAL = 5;
-    long trialStartTime;
+    long previousTime, currentTime;
     long[] intermediateTimes = new long[NB_TARGETS_PER_TRIAL];
 
     void startTrial(){
 	im.say(null);
 	trialStarted = true;
-	trialStartTime = System.currentTimeMillis();
+	previousTime = System.currentTimeMillis();
 	resetRequest = false; // make sure there is no orphan camera reset request
     }
 
     void nextTarget(){
-	intermediateTimes[targetCount] = System.currentTimeMillis() - trialStartTime;
+	currentTime = System.currentTimeMillis();
+	intermediateTimes[targetCount] = currentTime - previousTime;
+	previousTime = currentTime;
 	incTargetCount();
 	if (targetCount < NB_TARGETS_PER_TRIAL){
 	    // move target to next location (offset)
@@ -259,8 +263,11 @@ public class AcquireLogManager implements PostAnimationAction {
 	trialStarted = false;
 	try {
 	    for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
-		bwt.write(lineStart + trialCountStr + OUTPUT_CSV_SEP +
+		bwt.write(lineStart +
+			  trialCountStr + OUTPUT_CSV_SEP +
 			  String.valueOf(i) + OUTPUT_CSV_SEP +
+			  AcquireBlock.getDirection(block.direction[trialCount]) + OUTPUT_CSV_SEP +
+			  String.valueOf(block.ID[trialCount]) + OUTPUT_CSV_SEP +
 			  intermediateTimes[i]);
 		bwt.newLine();
 	    }
