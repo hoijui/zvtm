@@ -180,10 +180,7 @@ public class AcquireLogManager implements PostAnimationAction {
 
     boolean validTarget(Glyph g){
 	return (g==application.target) &&
-	    (g.vx-block.size[trialCount] > application.mCamera.posx-selectionRegionHSize) &&
-	    (g.vx+block.size[trialCount] < application.mCamera.posx+selectionRegionHSize) &&
-	    (g.vy-block.size[trialCount] > application.mCamera.posy-selectionRegionHSize) &&
-	    (g.vy+block.size[trialCount] < application.mCamera.posy+selectionRegionHSize);
+	    (Math.sqrt(Math.pow(g.vx-application.mCamera.posx,2)+Math.pow(g.vy-application.mCamera.posy,2)) + block.size[trialCount] <= selectionRegionHSize);
     }
     
     void initNextTrial(){
