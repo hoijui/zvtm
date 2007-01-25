@@ -168,7 +168,8 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     void centerOverview(boolean animate){
 	if (animate){
 	    vsm.animator.createCameraAnimation(OVERVIEW_CENTERING_TRANSLATE_TIME, AnimManager.CA_TRANS_SIG,
-					       new LongPoint(mCamera.posx-oCamera.posx, mCamera.posy-oCamera.posy), oCamera.getID());
+					       new LongPoint(mCamera.posx-oCamera.posx, mCamera.posy-oCamera.posy),
+					       oCamera.getID(), alm);
 	}
 	else {
 	    oCamera.moveTo(mCamera.posx, mCamera.posy);

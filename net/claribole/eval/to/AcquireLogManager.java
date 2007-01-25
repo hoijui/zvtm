@@ -24,8 +24,9 @@ import java.io.OutputStreamWriter;
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.PostAnimationAction;
 
-public class AcquireLogManager {
+public class AcquireLogManager implements PostAnimationAction {
 
     static final String LOG_FILE_EXT = ".csv";
     static final String INPUT_CSV_SEP = ";";
@@ -190,9 +191,12 @@ public class AcquireLogManager {
 	resetTargetCount();
 	// reset camera to (0,0) in virtual space
 	resetCamera();
+	if (trialCount != 0){// ask for a postponed camera reset in case the camera is in the
+	    resetRequest = true; // middle of an animation at the time of the first reset
+	}
 	// reinitialize target at first location in right direction and distance
 	application.mSpace.destroyGlyph(application.target);  // destroy target and create new one instead of moving existing one
-	application.target = block.moveTarget(trialCount, application.mCamera.posx, application.mCamera.posy);
+	application.target = block.moveTarget(trialCount, 0, 0);
 	application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism 
                                                               // that does not detect cursor exiting a glyph that is not in the viewport
 	selectionRegionSize = Math.round(block.size[trialCount] * AcquireEval.SELECTION_REGION_SIZE_FACTOR * 2);
@@ -213,6 +217,15 @@ public class AcquireLogManager {
     void incTrialCount(){
 	trialCount++;
 	trialCountStr = String.valueOf(trialCount);
+    }
+
+    boolean resetRequest = false;
+
+    public void animationEnded(Object target, short type, String dimension){
+	if (resetRequest){
+	    resetRequest = false;
+	    resetCamera();
+	}
     }
 
     void resetCamera(){
