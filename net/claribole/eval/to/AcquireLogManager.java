@@ -56,13 +56,16 @@ public class AcquireLogManager implements PostAnimationAction {
     int targetCount;
     String targetCountStr;
 
+    String directionStr;
+    String IDStr;
+
     boolean sessionStarted = false;
     boolean trialStarted = false;
 
     String lineStart;
     File logFile;
-//     File cinematicFile;
-    BufferedWriter bwt;//, bwc;
+    File cinematicFile;
+    BufferedWriter bwt, bwc;
 
     AcquireInstructionsManager im;
 
@@ -103,9 +106,9 @@ public class AcquireLogManager implements PostAnimationAction {
 	}
 	try {
 	    logFile = initLogFile(subjectID+"-"+techniqueName+"-trial-block"+blockNumber, LOG_DIR);
-// 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
+ 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile), "UTF-8"));
-// 	    bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cinematicFile), "UTF-8"));
+ 	    bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cinematicFile), "UTF-8"));
 	}
 	catch (IOException ex){ex.printStackTrace();}
 	writeHeaders();
@@ -144,28 +147,36 @@ public class AcquireLogManager implements PostAnimationAction {
 		      "Time" + OUTPUT_CSV_SEP);
 	    bwt.newLine();
 	    bwt.flush();
-// 	    // cinematic file header (misc. info)
-// 	    bwc.write("# Name" + OUTPUT_CSV_SEP + subjectName);
-// 	    bwc.newLine();
-// 	    bwc.write("# SID" + OUTPUT_CSV_SEP + subjectID);
-// 	    bwc.newLine();
-// 	    bwc.write("# Technique" + OUTPUT_CSV_SEP + techniqueName);
-// 	    bwc.newLine();
-// 	    bwc.write("# Block" + OUTPUT_CSV_SEP + blockNumber);
-// 	    bwc.newLine();
-// 	    bwc.write("# vw" + OUTPUT_CSV_SEP + application.panelWidth);
-// 	    bwc.newLine();
-// 	    bwc.write("# vh" + OUTPUT_CSV_SEP + application.panelHeight);
-// 	    bwc.newLine();
-// 	    // cinematic column headers
-// 	    bwc.write("Trial" + OUTPUT_CSV_SEP +
-// 		      "Target" + OUTPUT_CSV_SEP +
-// 		      "cx" + OUTPUT_CSV_SEP +
-// 		      "cy" + OUTPUT_CSV_SEP +
-// 		      "cz" + OUTPUT_CSV_SEP +
-// 		      "Time");
-// 	    bwc.newLine();
-// 	    bwc.flush();
+	    // cinematic file header (misc. info)
+	    bwc.write("# Name" + OUTPUT_CSV_SEP + subjectName);
+	    bwc.newLine();
+	    bwc.write("# SID" + OUTPUT_CSV_SEP + subjectID);
+	    bwc.newLine();
+	    bwc.write("# Technique" + OUTPUT_CSV_SEP + techniqueName);
+	    bwc.newLine();
+	    bwc.write("# Block" + OUTPUT_CSV_SEP + blockNumber);
+	    bwc.newLine();
+	    bwc.write("# vw" + OUTPUT_CSV_SEP + application.panelWidth);
+	    bwc.newLine();
+	    bwc.write("# vh" + OUTPUT_CSV_SEP + application.panelHeight);
+	    bwc.newLine();
+	    // cinematic column headers
+	    bwc.write("Trial" + OUTPUT_CSV_SEP +
+		      "Target" + OUTPUT_CSV_SEP +
+		      "Direction" + OUTPUT_CSV_SEP +
+		      "ID" + OUTPUT_CSV_SEP +
+		      "mx" + OUTPUT_CSV_SEP +
+		      "my" + OUTPUT_CSV_SEP +
+		      "cx" + OUTPUT_CSV_SEP +
+		      "cy" + OUTPUT_CSV_SEP +
+		      "ox" + OUTPUT_CSV_SEP +
+		      "oy" + OUTPUT_CSV_SEP +
+		      "px" + OUTPUT_CSV_SEP +
+		      "py" + OUTPUT_CSV_SEP +
+		      "inPortal" + OUTPUT_CSV_SEP +
+		      "Time");
+	    bwc.newLine();
+	    bwc.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
     }
@@ -203,6 +214,8 @@ public class AcquireLogManager implements PostAnimationAction {
 	application.target.setVisible(false);
 	selectionRegionSize = Math.round(block.size[trialCount] * AcquireEval.SELECTION_REGION_SIZE_FACTOR * 2);
 	selectionRegionHSize = selectionRegionSize / 2;
+	directionStr = AcquireBlock.getDirection(block.direction[trialCount]);
+	IDStr = String.valueOf(block.ID[trialCount]);
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
     }
 
@@ -236,14 +249,15 @@ public class AcquireLogManager implements PostAnimationAction {
     }
 
     static final int NB_TARGETS_PER_TRIAL = 1;
-    long previousTime, currentTime;
+    long previousTime, currentTime, trialStartTime;
     long[] intermediateTimes = new long[NB_TARGETS_PER_TRIAL];
 
     void startTrial(){
 	im.say(null);
 	application.target.setVisible(true);
 	trialStarted = true;
-	previousTime = System.currentTimeMillis();
+	trialStartTime = System.currentTimeMillis();
+	previousTime = trialStartTime;
 	resetRequest = false; // make sure there is no orphan camera reset request
     }
 
@@ -271,12 +285,13 @@ public class AcquireLogManager implements PostAnimationAction {
 		bwt.write(lineStart +
 			  trialCountStr + OUTPUT_CSV_SEP +
 			  String.valueOf(i) + OUTPUT_CSV_SEP +
-			  AcquireBlock.getDirection(block.direction[trialCount]) + OUTPUT_CSV_SEP +
-			  String.valueOf(block.ID[trialCount]) + OUTPUT_CSV_SEP +
+			  directionStr + OUTPUT_CSV_SEP +
+			  IDStr + OUTPUT_CSV_SEP +
 			  intermediateTimes[i]);
 		bwt.newLine();
 	    }
 	    bwt.flush();
+	    bwc.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
 	if (trialCount < block.nbTrials-1){
@@ -294,6 +309,32 @@ public class AcquireLogManager implements PostAnimationAction {
 	}
 	catch (IOException ex){ex.printStackTrace();}
 	im.say(EOS);
+    }
+
+    static final String CURSOR_INSIDE_PORTAL_STR = "1";
+    static final String CURSOR_OUTSIDE_PORTAL_STR = "0";
+    long cinematicTime = 0;
+
+    void writeCinematic(int jpx, int jpy, int px, int py){
+	cinematicTime = System.currentTimeMillis() - trialStartTime;
+	try {
+	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
+		      targetCountStr + OUTPUT_CSV_SEP +
+		      directionStr + OUTPUT_CSV_SEP +
+		      IDStr + OUTPUT_CSV_SEP +
+		      String.valueOf(jpx) + OUTPUT_CSV_SEP +
+		      String.valueOf(jpy) + OUTPUT_CSV_SEP +
+		      String.valueOf(application.mCamera.posx) + OUTPUT_CSV_SEP +
+		      String.valueOf(application.mCamera.posy) + OUTPUT_CSV_SEP +
+		      String.valueOf(application.oCamera.posx) + OUTPUT_CSV_SEP +
+		      String.valueOf(application.oCamera.posy) + OUTPUT_CSV_SEP +
+		      String.valueOf(px) + OUTPUT_CSV_SEP +
+		      String.valueOf(py) + OUTPUT_CSV_SEP +
+		      ((application.eh.mouseInsideOverview) ? CURSOR_INSIDE_PORTAL_STR : CURSOR_OUTSIDE_PORTAL_STR) + OUTPUT_CSV_SEP +
+		      String.valueOf(cinematicTime));
+	    bwc.newLine();
+	}
+	catch(IOException ex){ex.printStackTrace();}
     }
 
     static File initLogFile(String fileName, String dirName){

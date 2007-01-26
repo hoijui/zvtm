@@ -19,9 +19,7 @@ import net.claribole.zvtm.engine.*;
 
 class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEventHandler {
 
-    boolean mouseInsideOverview = false;
     boolean delayedOverviewExit = false;
-
 
     AcquireOVEventHandler(AcquireEval app){
 	this.application = app;
@@ -69,6 +67,12 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	}
 // 	oCameraStickedToMouse = false;
 	orStickedToMouse = false;
+    }
+
+    public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
+	if (application.alm.trialStarted){
+	    application.alm.writeCinematic(jpx, jpy, application.op.x, application.op.y);
+	}
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){

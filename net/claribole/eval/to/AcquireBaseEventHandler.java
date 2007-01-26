@@ -32,6 +32,8 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
 
     AcquireEval application;
 
+    boolean mouseInsideOverview = false;
+
     VCursor cursor;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)

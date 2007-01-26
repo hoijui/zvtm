@@ -23,7 +23,6 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 
     int currentJPX, currentJPY;
 
-    boolean mouseInsideTOW = false;
     boolean delayedTOWExit = false;
 
     VCursor cursor;
@@ -45,7 +44,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 		return;
 	    }
 	}
-	if (mouseInsideTOW){
+	if (mouseInsideOverview){
 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
 		orStickedToMouse = true;
 	    }
@@ -77,17 +76,20 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
-	if (!mouseInsideTOW && application.to != null){
+	if (!mouseInsideOverview && application.to != null){
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(jpx, jpy);
 	}
 	currentJPX = jpx;
 	currentJPY = jpy;
+	if (application.alm.trialStarted){
+	    application.alm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
+	}
     }
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
 	if (!application.alm.trialStarted){return;}
-	if (!mouseInsideTOW && application.to != null){
+	if (!mouseInsideOverview && application.to != null){
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(jpx, jpy);
 	}
@@ -129,6 +131,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 		}
 	    }
  	}
+	application.alm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
     }
 
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
@@ -149,7 +152,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	    delayedTOWExit = false;
 	    return;
 	}
-	mouseInsideTOW = true;
+	mouseInsideOverview = true;
  	stickPortal();
 	application.vsm.repaintNow();
     }
@@ -157,7 +160,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     /**cursor exits portal*/
     public void exitPortal(Portal p){
 	if (!application.alm.trialStarted){return;}
-	if (!mouseInsideTOW){// do not exec exit actions if enter actions
+	if (!mouseInsideOverview){// do not exec exit actions if enter actions
 	    return;          // were not executed at entry time
 	}
 	if (orStickedToMouse){
@@ -169,7 +172,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     void portalExitActions(){
-	mouseInsideTOW = false;
+	mouseInsideOverview = false;
 	delayedTOWExit = false;
  	unstickPortal();
 	application.centerOverview(false);
