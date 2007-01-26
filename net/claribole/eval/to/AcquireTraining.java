@@ -12,6 +12,7 @@ package net.claribole.eval.to;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.Graphics2D;
 
 import java.util.Vector;
 
@@ -19,7 +20,7 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
-public class AcquireTraining implements TOWApplication {
+public class AcquireTraining implements TOWApplication, Java2DPainter {
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -60,6 +61,9 @@ public class AcquireTraining implements TOWApplication {
     static final int TOW_PORTAL_Y_OFFSET = 120;
     TrailingOverview to;
 
+    int acquisitionCount = 0;
+    String acquisitionCountStr = String.valueOf(acquisitionCount);
+
     public AcquireTraining(){
 	initGUI();
 	eh = new AcquireTrainingEventHandler(this);
@@ -85,6 +89,7 @@ public class AcquireTraining implements TOWApplication {
 	mView.setNotifyMouseMoved(true);
 	mView.setBackgroundColor(AcquireTraining.BACKGROUND_COLOR);
 	mView.setAntialiasing(true);
+	mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
 	updatePanelSize();
     }
 
@@ -151,6 +156,17 @@ public class AcquireTraining implements TOWApplication {
 	to.dispose();
 	to = null;
 	vsm.repaintNow();
+    }
+
+    void incAcquisitionCount(){
+	acquisitionCount++;
+	acquisitionCountStr = String.valueOf(acquisitionCount);
+    }
+
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	g2d.setColor(Color.BLACK);
+	g2d.drawString(acquisitionCountStr, 20, 30);
     }
 
     void updatePanelSize(){
