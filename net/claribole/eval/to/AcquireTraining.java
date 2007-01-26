@@ -67,8 +67,8 @@ public class AcquireTraining implements TOWApplication {
 	mCamera.moveTo(0, 0);
 	mCamera.setAltitude(0);
 	initWorld();
-	centerOverview(false);
-	updateOverview();
+// 	centerOverview(false);
+// 	updateOverview();
 	vsm.repaintNow(mView);
     }
 
@@ -89,7 +89,7 @@ public class AcquireTraining implements TOWApplication {
     }
 
     void initWorld(){
-	vsm.addGlyph(new ZCircle(100, 100, 0, 40, Color.BLUE), mSpace);
+// 	vsm.addGlyph(new ZCircle(100, 100, 0, 40, Color.BLUE), mSpace);
     }
 
     void windowLayout(){
@@ -104,20 +104,23 @@ public class AcquireTraining implements TOWApplication {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    void centerOverview(boolean animate){
-	if (animate){
-	    vsm.animator.createCameraAnimation(OVERVIEW_CENTERING_TRANSLATE_TIME, AnimManager.CA_TRANS_SIG,
-					       new LongPoint(mCamera.posx-oCamera.posx, mCamera.posy-oCamera.posy),
-					       oCamera.getID(), null);
-	}
-	else {
-	    oCamera.moveTo(mCamera.posx, mCamera.posy);
-	}
-    }
+//     void centerOverview(boolean animate){
+// 	if (animate){
+// 	    vsm.animator.createCameraAnimation(OVERVIEW_CENTERING_TRANSLATE_TIME, AnimManager.CA_TRANS_SIG,
+// 					       new LongPoint(mCamera.posx-oCamera.posx, mCamera.posy-oCamera.posy),
+// 					       oCamera.getID(), null);
+// 	}
+// 	else {
+// 	    oCamera.moveTo(mCamera.posx, mCamera.posy);
+// 	}
+//     }
     
-    void updateOverview(){// update overview camera's altitude
-	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
-    }
+//     void updateOverview(){// update overview camera's altitude
+// 	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
+//     }
+
+    static final Color INSIDE_TOW_BACKGROUND_COLOR = Color.GREEN;
+    static final Color OUTSIDE_TOW_BACKGROUND_COLOR = BACKGROUND_COLOR;
 
     void switchPortal(int x, int y){
 	if (to != null){// portal is active, destroy it it
@@ -126,14 +129,14 @@ public class AcquireTraining implements TOWApplication {
 	}
 	else {// portal not active, create it
 	    to = getPortal(x, y);
-	    to.setBackgroundColor(BACKGROUND_COLOR);
+	    to.setBackgroundColor(OUTSIDE_TOW_BACKGROUND_COLOR);
 	    to.setPortalEventHandler((PortalEventHandler)eh);
 	    vsm.addPortal(to, mView);
  	    to.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
 					       to.getID(), null);
-	    oCamera.moveTo(0, 0);
-	    centerOverview(false);
+	    oCamera.moveTo(5000, 5000);
+// 	    centerOverview(false);
 	}
     }
 

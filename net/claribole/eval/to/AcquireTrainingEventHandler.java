@@ -59,14 +59,14 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 	lastJPX = jpx;
 	lastJPY = jpy;
-	if (mouseInsideOverview){
-	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
-		orStickedToMouse = true;
-	    }
-	}
-	else {
-	    mCameraStickedToMouse = true;
-	}
+// 	if (mouseInsideOverview){
+// 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
+// 		orStickedToMouse = true;
+// 	    }
+// 	}
+// 	else {
+// 	    mCameraStickedToMouse = true;
+// 	}
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
@@ -74,11 +74,11 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
 	    portalExitActions();
 	    delayedTOWExit = false;
 	}
-	if (mCameraStickedToMouse){
-	    application.centerOverview(false);
-	    mCameraStickedToMouse = false;
-	}
-	orStickedToMouse = false;
+// 	if (mCameraStickedToMouse){
+// 	    application.centerOverview(false);
+// 	    mCameraStickedToMouse = false;
+// 	}
+// 	orStickedToMouse = false;
     }
 
     public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
@@ -107,26 +107,26 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
 	}
 	currentJPX = jpx;
 	currentJPY = jpy;
-	if (buttonNumber == 1){
-	    if (mCameraStickedToMouse){
-		synchronized(application.mCamera){
-		    projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
-		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
-					     Math.round(projCoef*(jpy-lastJPY)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		}
-	    }
-	    else if (orStickedToMouse){
-		synchronized(application.oCamera){
-		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
-		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
-					     Math.round(projCoef*(lastJPY-jpy)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		}
-	    }
- 	}
+// 	if (buttonNumber == 1){
+// // 	    if (mCameraStickedToMouse){
+// // 		synchronized(application.mCamera){
+// // 		    projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
+// // 		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+// // 					     Math.round(projCoef*(jpy-lastJPY)));
+// // 		    lastJPX = jpx;
+// // 		    lastJPY = jpy;
+// // 		}
+// // 	    }
+// // 	    else if (orStickedToMouse){
+// // 		synchronized(application.oCamera){
+// // 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
+// // 		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
+// // 					     Math.round(projCoef*(lastJPY-jpy)));
+// // 		    lastJPX = jpx;
+// // 		    lastJPY = jpy;
+// // 		}
+// // 	    }
+//  	}
     }
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
@@ -192,6 +192,7 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
 	}
 	mouseInsideOverview = true;
  	stickPortal();
+	application.to.setBackgroundColor(AcquireTraining.INSIDE_TOW_BACKGROUND_COLOR);
 	application.vsm.repaintNow();
     }
 
@@ -212,7 +213,8 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
 	mouseInsideOverview = false;
 	delayedTOWExit = false;
  	unstickPortal();
-	application.centerOverview(false);
+// 	application.centerOverview(false);
+	application.to.setBackgroundColor(AcquireTraining.OUTSIDE_TOW_BACKGROUND_COLOR);
 	application.vsm.repaintNow();
     }
 
