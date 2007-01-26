@@ -306,6 +306,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	sessionStarted = false;
 	try {
 	    bwt.close();
+	    bwc.close();
 	}
 	catch (IOException ex){ex.printStackTrace();}
 	im.say(EOS);
