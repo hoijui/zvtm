@@ -25,8 +25,6 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 
     boolean delayedTOWExit = false;
 
-    VCursor cursor;
-
     AcquireTOWEventHandler(AcquireEval app){
 	this.application = app;
 	cursor = application.mView.mouse;
