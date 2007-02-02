@@ -13,6 +13,7 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.AlphaComposite;
 
+import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.glyphs.Transparent;
 import net.claribole.zvtm.engine.Java2DPainter;
 
@@ -35,9 +36,24 @@ public class AcquireInstructionsManager implements Java2DPainter {
     String message = null;
     int halfMessageWidth = 0;
 
+    boolean showButton = false;
+
     AcquireInstructionsManager(AcquireEval app, AcquireLogManager alm){
 	this.application = app;
 	this.alm = alm;
+    }
+
+    void say(String msg, final int delay){
+	showButton(false);
+	say(msg);
+	final SwingWorker worker=new SwingWorker(){
+		public Object construct(){
+		    sleep(delay);
+		    AcquireInstructionsManager.this.showButton(true);
+		    return null; 
+		}
+	    };
+	worker.start();
     }
 
     void say(String msg){
@@ -49,8 +65,14 @@ public class AcquireInstructionsManager implements Java2DPainter {
 	application.vsm.repaintNow();
     }
 
-    static boolean clickOnStartButton(int jpx, int jpy){
-	return (jpx >= START_BUTTON_TL_X && jpy >= START_BUTTON_TL_Y &&
+    void showButton(boolean b){
+	showButton = b;
+	application.vsm.repaintNow();
+    }
+
+    boolean clickOnStartButton(int jpx, int jpy){
+	return (showButton &&
+		jpx >= START_BUTTON_TL_X && jpy >= START_BUTTON_TL_Y &&
 		jpx <= START_BUTTON_BR_X && jpy <= START_BUTTON_BR_Y);
     }
 
@@ -64,7 +86,7 @@ public class AcquireInstructionsManager implements Java2DPainter {
 	    g2d.setComposite(Transparent.acO);
 	    g2d.setColor(Color.WHITE);
 	    g2d.drawString(message, viewWidth/2 - halfMessageWidth, viewHeight/2);
-	    if (alm.sessionStarted && !alm.trialStarted){
+	    if (alm.sessionStarted && !alm.trialStarted && showButton){
 		// button
 		g2d.setColor(Color.GRAY);
 		g2d.fillRect(AcquireInstructionsManager.START_BUTTON_TL_X, AcquireInstructionsManager.START_BUTTON_TL_Y,

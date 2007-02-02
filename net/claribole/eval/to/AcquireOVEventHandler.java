@@ -30,7 +30,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	lastJPX = jpx;
 	lastJPY = jpy;
 	if (!application.alm.trialStarted){
-	    if (application.alm.sessionStarted && AcquireInstructionsManager.clickOnStartButton(jpx, jpy)){
+	    if (application.alm.sessionStarted && application.alm.im.clickOnStartButton(jpx, jpy)){
 		application.alm.startTrial();
 		return;
 	    }

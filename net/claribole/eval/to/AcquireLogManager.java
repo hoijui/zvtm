@@ -43,6 +43,8 @@ public class AcquireLogManager implements PostAnimationAction {
     static final String TRIAL_STR = "Trial ";
     static final String OF_STR = " of ";
 
+    static final int MIN_DELAY_BETWEEN_TRIALS = 500;
+
     AcquireEval application;
 
     AcquireBlock block;
@@ -216,7 +218,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	selectionRegionHSize = selectionRegionSize / 2;
 	directionStr = AcquireBlock.getDirection(block.direction[trialCount]);
 	IDStr = String.valueOf(block.ID[trialCount]);
-	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
+	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length), MIN_DELAY_BETWEEN_TRIALS);
     }
 
     void resetTargetCount(){
