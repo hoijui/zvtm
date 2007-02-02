@@ -43,7 +43,7 @@ public class AcquireLogManager implements PostAnimationAction {
     static final String TRIAL_STR = "Trial ";
     static final String OF_STR = " of ";
 
-    static final int MIN_DELAY_BETWEEN_TRIALS = 500;
+    static final int MIN_DELAY_BETWEEN_TRIALS = 1000;
 
     AcquireEval application;
 
