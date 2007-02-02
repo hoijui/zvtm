@@ -104,6 +104,7 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
 	if (code == KeyEvent.VK_S){application.alm.startSession();}
 	else if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
+	else if (code == KeyEvent.VK_F12){application.alm.nextTarget();}
     }
            
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
