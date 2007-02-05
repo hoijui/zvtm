@@ -97,7 +97,7 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
 	    this.moveTo(tx-w/2, ty-h/2);
 	    // make the widget almost disappear when making big moves
-	    setTransparencyValue((float)opacity/2.0f);
+	    setTransparencyValue((float)opacity*1.66666f-0.66666f);
 	    owningView.repaintNow();
 	}
     }
