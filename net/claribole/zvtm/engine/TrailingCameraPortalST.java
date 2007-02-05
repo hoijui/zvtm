@@ -35,6 +35,9 @@ public class TrailingCameraPortalST extends CameraPortalST {
     Timer timer;
     TrailingTimer mouseStillUpdater;
 
+    double cutoffParamA = 0.4;
+    double cutoffParamB = 0.01;  // 0.1 to make it more difficult to acquire
+
     /** Builds a new possibly translucent portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -52,6 +55,11 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	timer = new Timer();
 	mouseStillUpdater = new TrailingTimer(this);
 	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
+    }
+
+    public void setCutoffFrequencyParameters(double a, double b){
+	cutoffParamA = a;
+	cutoffParamB = b;
     }
 
     public void updateFrequency() {
@@ -80,8 +88,7 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	double distAway = targetPos.distance(currentPos);
 	double maxDist = 2 * Math.abs(xOffset);
 	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
- 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.01);
-// 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.1);
+ 	filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
 	currentPos = filter.apply(targetPos, frequency);
 	int tx = (int)Math.round(currentPos.getX());
 	int ty = (int)Math.round(currentPos.getY());
