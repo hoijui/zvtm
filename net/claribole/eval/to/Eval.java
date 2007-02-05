@@ -225,11 +225,13 @@ public class Eval implements TOWApplication {
 					       TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
 	    }
 	    else {
-		return new TrailingOverviewInv(x-OVERVIEW_WIDTH/2, y-OVERVIEW_HEIGHT/2,
-					       OVERVIEW_WIDTH, OVERVIEW_HEIGHT,
-					       oCamera, mCamera, 0.0f,
-					       TOW_PORTAL_X_OFFSET,
-					       TOW_PORTAL_Y_OFFSET);
+		TrailingOverview res = new TrailingOverviewInv(x-OVERVIEW_WIDTH/2, y-OVERVIEW_HEIGHT/2,
+							       OVERVIEW_WIDTH, OVERVIEW_HEIGHT,
+							       oCamera, mCamera, 0.0f,
+							       TOW_PORTAL_X_OFFSET,
+							       TOW_PORTAL_Y_OFFSET);
+		res.setCutoffFrequencyParameters(0.4, 0.3);
+		return res;
 	    }
 	}
 	else {
