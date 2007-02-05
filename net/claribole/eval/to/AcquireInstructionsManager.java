@@ -36,6 +36,9 @@ public class AcquireInstructionsManager implements Java2DPainter {
     String message = null;
     int halfMessageWidth = 0;
 
+    static final int WARN_DELAY = 1000;
+    String error = null;
+
     boolean showButton = false;
 
     AcquireInstructionsManager(AcquireEval app, AcquireLogManager alm){
@@ -65,6 +68,19 @@ public class AcquireInstructionsManager implements Java2DPainter {
 	application.vsm.repaintNow();
     }
 
+    void warn(String msg){
+	error = msg;
+	application.vsm.repaintNow();
+	final SwingWorker worker = new SwingWorker(){
+		public Object construct(){
+		    sleep(WARN_DELAY);
+		    AcquireInstructionsManager.this.warn(null);
+		    return null; 
+		}
+	    };
+	worker.start();
+    }
+
     void showButton(boolean b){
 	showButton = b;
 	application.vsm.repaintNow();
@@ -78,7 +94,13 @@ public class AcquireInstructionsManager implements Java2DPainter {
 
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	if (message != null){
+	if (error != null){
+	    g2d.setColor(Color.BLACK);
+	    g2d.fillRect(0, viewHeight/2-50, viewWidth, 100);
+	    g2d.setColor(Color.RED);
+	    g2d.drawString(error, viewWidth/2, viewHeight/2);
+	}
+	else if (message != null){
 	    // message at center of screen (translucent black strip + text)
 	    g2d.setColor(Color.BLACK);
 	    g2d.setComposite(acST);

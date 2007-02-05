@@ -43,6 +43,8 @@ public class AcquireLogManager implements PostAnimationAction {
     static final String TRIAL_STR = "Trial ";
     static final String OF_STR = " of ";
 
+    static final String ERR_MSG = "ERROR";
+
     static final int MIN_DELAY_BETWEEN_TRIALS = 1000;
 
     AcquireEval application;
@@ -57,6 +59,7 @@ public class AcquireLogManager implements PostAnimationAction {
     String trialCountStr;
     int targetCount;
     String targetCountStr;
+    int errorCount = 0;
 
     String directionStr;
     String IDStr;
@@ -146,7 +149,8 @@ public class AcquireLogManager implements PostAnimationAction {
 		      "Target" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
-		      "Time" + OUTPUT_CSV_SEP);
+		      "Time" + OUTPUT_CSV_SEP +
+		      "Errors");
 	    bwt.newLine();
 	    bwt.flush();
 	    // cinematic file header (misc. info)
@@ -193,16 +197,24 @@ public class AcquireLogManager implements PostAnimationAction {
 
     int selectionRegionSize, selectionRegionHSize;
 
-    boolean validTarget(long cursorx, long cursory, Glyph g){
-	return (g == application.target
-		//|| Math.sqrt(Math.pow(cursorx-application.mCamera.posx,2)+Math.pow(cursory-application.mCamera.posy,2)) <= selectionRegionHSize
-		)
-	    && (Math.sqrt(Math.pow(application.target.vx-application.mCamera.posx,2)+Math.pow(application.target.vy-application.mCamera.posy,2)) + block.size[trialCount] <= selectionRegionHSize);
+    void validateTarget(){
+	if (Math.sqrt(Math.pow(application.target.vx-application.mCamera.posx,2)+Math.pow(application.target.vy-application.mCamera.posy,2)) + block.size[trialCount] <= selectionRegionHSize){
+	    nextTarget();
+	}
+	else {
+	    error();
+	}
+    }
+
+    void error(){
+	errorCount++;
+	im.warn(ERR_MSG);
     }
     
     void initNextTrial(){
 	incTrialCount();
 	resetTargetCount();
+	errorCount = 0;
 	// reset camera to (0,0) in virtual space
 	resetCamera();
 	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the
@@ -289,7 +301,8 @@ public class AcquireLogManager implements PostAnimationAction {
 			  String.valueOf(i) + OUTPUT_CSV_SEP +
 			  directionStr + OUTPUT_CSV_SEP +
 			  IDStr + OUTPUT_CSV_SEP +
-			  intermediateTimes[i]);
+			  intermediateTimes[i] + OUTPUT_CSV_SEP +
+			  String.valueOf(errorCount));
 		bwt.newLine();
 	    }
 	    bwt.flush();

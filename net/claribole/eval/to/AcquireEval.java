@@ -201,9 +201,9 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     }
 
     TrailingOverview getPortal(int x, int y){
-	return new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-				    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
-				    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	return new TrailingOverviewInv(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+				       TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+				       oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
     }
 
     public void killPortal(){
