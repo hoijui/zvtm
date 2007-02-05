@@ -70,7 +70,6 @@ public class TrailingOverviewInv extends TrailingCameraPortalSTInv {
 	catch (IllegalArgumentException ex){
 	    if (VirtualSpaceManager.debugModeON()){System.err.println("Error animating translucency of "+this.toString()+": "+a);}
 	}
-	System.out.println(alpha);
     }
 
     /**detects whether the given point is inside the observed region rectangle depicting what is seen through the main camera 
