@@ -188,7 +188,7 @@ public class TrailingOverview extends TrailingCameraPortalST {
     }
 
 
-    private class BorderTimer extends TimerTask {
+    protected class BorderTimer extends TimerTask {
 	
 	TrailingOverview portal;
 	long[] portalRegion = new long[4];

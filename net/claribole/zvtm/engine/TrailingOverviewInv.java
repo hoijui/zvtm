@@ -25,16 +25,7 @@ import com.xerox.VTM.glyphs.Transparent;
 /**A portal behaving as a trailing widget and showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
 
-public class TrailingOverviewInv extends TrailingCameraPortalSTInv {
-
-    AlphaComposite orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-
-    Camera observedRegionCamera;
-    View observedRegionView;
-    long[] observedRegion;
-    float orcoef;
-
-    Timer borderTimer;
+public class TrailingOverviewInv extends TrailingOverview {
 
     /** Builds a new possibly translucent portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
@@ -48,50 +39,26 @@ public class TrailingOverviewInv extends TrailingCameraPortalSTInv {
      *@param yo vertical offset (in pixels) between cursor and portal (trailing widget)
      */
     public TrailingOverviewInv(int x, int y, int w, int h, Camera pc, Camera orc, float a, int xo, int yo){
-	super(x, y, w, h, pc, a, xo, yo);
-	this.observedRegionCamera = orc;
-	this.observedRegionView = orc.getOwningView();
-	observedRegion = new long[4];
-	borderTimer = new Timer();
-	borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
+	super(x, y, w, h, pc, orc, a, xo, yo);
     }
 
-    /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
-     */
-    public void setTransparencyValue(float a){
-	if (a < 0){a = 0;}
-	try {
-	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
-	    alpha = a;
-	    orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a/2.0f);  //transparency set to alpha
-	}
-	catch (IllegalArgumentException ex){
-	    if (VirtualSpaceManager.debugModeON()){System.err.println("Error animating translucency of "+this.toString()+": "+a);}
-	}
-    }
-
-    /**detects whether the given point is inside the observed region rectangle depicting what is seen through the main camera 
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
-     */
-    public boolean coordInsideObservedRegion(int cx, int cy){
-	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef) &&
-		cy >= y+h/2 + Math.round((camera.posy-observedRegion[1])*orcoef) &&
-		cx <= x+w/2 + Math.round((observedRegion[2]-camera.posx)*orcoef) &&
-		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
-    }
-
-    ObservedRegionListener observedRegionListener;
-
-    public void setObservedRegionListener(ObservedRegionListener orl){
-	this.observedRegionListener = orl;
-    }
-
-    void observedRegionIntersects(long[] wnes){
-	if (observedRegionListener != null){
-	    observedRegionListener.intersectsParentRegion(wnes);
+    public void updateWidgetLocation(){
+	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+	double distAway = targetPos.distance(currentPos);
+	double maxDist = 2 * Math.abs(xOffset);
+	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+ 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.01);
+// 	filter.setCutOffFrequency(((1.0 - opacity) * 0.4) + 0.1);
+	currentPos = filter.apply(targetPos, frequency);
+	int tx = (int)Math.round(currentPos.getX());
+	int ty = (int)Math.round(currentPos.getY());
+	tx = Math.max(tx, w/2);
+ 	ty = Math.min(ty, owningView.getPanelSize().height - h/2);
+	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
+	    this.moveTo(tx-w/2, ty-h/2);
+	    // make the widget almost disappear when making big moves
+	    setTransparencyValue(0.5f-(float)opacity/2.0f);
+	    owningView.repaintNow();
 	}
     }
 
@@ -152,34 +119,6 @@ public class TrailingOverviewInv extends TrailingCameraPortalSTInv {
 	    g2d.drawRect(x, y, w, h);
 	}
 	g2d.setComposite(acO);
-    }
-
-    public void dispose(){
-	super.dispose();
-	borderTimer.cancel();
-    }
-
-
-    private class BorderTimer extends TimerTask {
-	
-	TrailingOverviewInv portal;
-	long[] portalRegion = new long[4];
-	long[] intersection = new long[4];
-	
-	BorderTimer(TrailingOverviewInv p){
-	    super();
-	    this.portal = p;
-	}
-	
-	public void run(){
-	    portal.getVisibleRegion(portalRegion);
-	    intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
-	    intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
-	    intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
-	    intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
-	    portal.observedRegionIntersects(intersection);
-	}
-
     }
 
 }
