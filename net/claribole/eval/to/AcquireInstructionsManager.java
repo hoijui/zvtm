@@ -110,14 +110,17 @@ public class AcquireInstructionsManager implements Java2DPainter {
 	    g2d.drawString(message, viewWidth/2 - halfMessageWidth, viewHeight/2);
 	    if (alm.sessionStarted && !alm.trialStarted && showButton){
 		// button
-		g2d.setColor(Color.GRAY);
+// 		g2d.setColor(Color.BLACK);
+// 		g2d.fillRect(AcquireInstructionsManager.START_BUTTON_TL_X-10, AcquireInstructionsManager.START_BUTTON_TL_Y-10,
+// 			     AcquireInstructionsManager.START_BUTTON_W+20, AcquireInstructionsManager.START_BUTTON_H+20);
+		g2d.setColor(Color.WHITE);
 		g2d.fillRect(AcquireInstructionsManager.START_BUTTON_TL_X, AcquireInstructionsManager.START_BUTTON_TL_Y,
 			     AcquireInstructionsManager.START_BUTTON_W, AcquireInstructionsManager.START_BUTTON_H);
 		g2d.setColor(Color.RED);
 		g2d.drawRect(AcquireInstructionsManager.START_BUTTON_TL_X, AcquireInstructionsManager.START_BUTTON_TL_Y,
 			     AcquireInstructionsManager.START_BUTTON_W, AcquireInstructionsManager.START_BUTTON_H);
 		g2d.setColor(Color.BLACK);
-		g2d.drawString(C_BT, viewWidth/2-25,AcquireInstructionsManager.START_BUTTON_TL_Y+15);
+		g2d.drawString(C_BT, AcquireInstructionsManager.START_BUTTON_TL_X+15, AcquireInstructionsManager.START_BUTTON_TL_Y+15);
 	    }
 	}
 	else {

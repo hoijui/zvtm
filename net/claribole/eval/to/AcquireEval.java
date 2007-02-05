@@ -217,10 +217,45 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	Dimension d = mView.getPanel().getSize();
 	panelWidth = d.width;
 	panelHeight = d.height;
+	updateStartButton((short)-1);
+    }
+
+    void updateStartButton(short sl){
 	AcquireInstructionsManager.START_BUTTON_TL_X = panelWidth/2 - AcquireInstructionsManager.START_BUTTON_W / 2;
 	AcquireInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + AcquireInstructionsManager.START_BUTTON_H / 2;
 	AcquireInstructionsManager.START_BUTTON_BR_X = AcquireInstructionsManager.START_BUTTON_TL_X + AcquireInstructionsManager.START_BUTTON_W;
 	AcquireInstructionsManager.START_BUTTON_BR_Y = AcquireInstructionsManager.START_BUTTON_TL_Y + AcquireInstructionsManager.START_BUTTON_H;
+	switch(sl){
+	case AcquireBlock.START_LOC_TL:{
+	    AcquireInstructionsManager.START_BUTTON_TL_X -= panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_TL_Y -= panelHeight / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_X -= panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_Y -= panelHeight / 4;
+	    break;
+	}
+	case AcquireBlock.START_LOC_TR:{
+	    AcquireInstructionsManager.START_BUTTON_TL_X += panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_TL_Y -= panelHeight / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_X += panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_Y -= panelHeight / 4;
+	    break;
+	}
+	case AcquireBlock.START_LOC_BL:{
+	    AcquireInstructionsManager.START_BUTTON_TL_X -= panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_TL_Y += panelHeight / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_X -= panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_Y += panelHeight / 4;
+	    break;
+	}
+	case AcquireBlock.START_LOC_BR:{
+	    AcquireInstructionsManager.START_BUTTON_TL_X += panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_TL_Y += panelHeight / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_X += panelWidth / 4;
+	    AcquireInstructionsManager.START_BUTTON_BR_Y += panelHeight / 4;
+	    break;
+	}
+	default:{break;}
+	}
     }
 
     void exit(){

@@ -61,6 +61,7 @@ public class AcquireLogManager implements PostAnimationAction {
     String targetCountStr;
     int errorCount = 0;
 
+    String startLocationStr;
     String directionStr;
     String IDStr;
 
@@ -147,6 +148,7 @@ public class AcquireLogManager implements PostAnimationAction {
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Target" + OUTPUT_CSV_SEP +
+		      "Start Location" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
@@ -169,6 +171,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	    // cinematic column headers
 	    bwc.write("Trial" + OUTPUT_CSV_SEP +
 		      "Target" + OUTPUT_CSV_SEP +
+		      "Start Location" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
 		      "mx" + OUTPUT_CSV_SEP +
@@ -229,7 +232,9 @@ public class AcquireLogManager implements PostAnimationAction {
 	selectionRegionSize = Math.round(block.size[trialCount] * AcquireEval.SELECTION_REGION_SIZE_FACTOR * 2);
 	selectionRegionHSize = selectionRegionSize / 2;
 	directionStr = AcquireBlock.getDirection(block.direction[trialCount]);
+	startLocationStr = AcquireBlock.getStartLocation(block.startlocation[trialCount]);
 	IDStr = String.valueOf(block.ID[trialCount]);
+	application.updateStartButton(block.startlocation[trialCount]);
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length), MIN_DELAY_BETWEEN_TRIALS);
     }
 
@@ -299,6 +304,7 @@ public class AcquireLogManager implements PostAnimationAction {
 		bwt.write(lineStart +
 			  trialCountStr + OUTPUT_CSV_SEP +
 			  String.valueOf(i) + OUTPUT_CSV_SEP +
+			  startLocationStr + OUTPUT_CSV_SEP +
 			  directionStr + OUTPUT_CSV_SEP +
 			  IDStr + OUTPUT_CSV_SEP +
 			  intermediateTimes[i] + OUTPUT_CSV_SEP +
@@ -336,6 +342,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	try {
 	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
 		      targetCountStr + OUTPUT_CSV_SEP +
+		      startLocationStr + OUTPUT_CSV_SEP +
 		      directionStr + OUTPUT_CSV_SEP +
 		      IDStr + OUTPUT_CSV_SEP +
 		      String.valueOf(jpx) + OUTPUT_CSV_SEP +
