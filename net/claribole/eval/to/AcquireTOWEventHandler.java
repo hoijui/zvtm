@@ -135,7 +135,10 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(currentJPX, currentJPY);
 	}
-	else if (code == KeyEvent.VK_SPACE){application.alm.validateTarget();}
+	else if (code == KeyEvent.VK_SPACE){
+	    if (!application.alm.trialStarted){return;}
+	    application.alm.validateTarget();
+	}
     }
 
     /**cursor enters portal*/
