@@ -26,6 +26,10 @@ public class Eval implements TOWApplication {
     static final String TECHNIQUE_OV_NAME = "Overview + Detail"; 
     static final short TECHNIQUE_TOW = 1;
     static final String TECHNIQUE_TOW_NAME = "Trailing Overview";
+    static final short TECHNIQUE_TOWINV = 2;
+    static final String TECHNIQUE_TOWINV_NAME = "Trailing Overview Inv";
+    static final short TECHNIQUE_TOWINVNOEXP = 3;
+    static final String TECHNIQUE_TOWINVNOEXP_NAME = "Trailing Overview Inv No Exp";
     short technique = TECHNIQUE_TOW;
 
     /* screen dimensions, actual dimensions of windows */
@@ -65,23 +69,33 @@ public class Eval implements TOWApplication {
     static final int TOW_VERTICAL_EXPANSION_OFFSET = OVERVIEW_HEIGHT - TOW_CONTRACTED_HEIGHT;
     static final int TOW_PORTAL_X_OFFSET = -120;
     static final int TOW_PORTAL_Y_OFFSET = 120;
-    TrailingOverviewInv to;
+    TrailingOverview to;
 
     /* standard overview settings */
     OverviewPortal op;
     
     public Eval(short t){
 	initGUI();
-	if (t == TECHNIQUE_OV){
+	if (t == TECHNIQUE_TOW){
+	    this.technique = TECHNIQUE_TOW;
+	    mViewName = TECHNIQUE_TOW_NAME;
+	    eh = new TOWEventHandler(this);
+	}
+	else if (t == TECHNIQUE_TOWINV){
+	    this.technique = TECHNIQUE_TOWINV;
+	    mViewName = TECHNIQUE_TOWINV_NAME;
+	    eh = new TOWEventHandler(this);
+	}
+	else if (t == TECHNIQUE_TOWINVNOEXP){
+	    this.technique = TECHNIQUE_TOWINVNOEXP;
+	    mViewName = TECHNIQUE_TOWINVNOEXP_NAME;
+	    eh = new TOWInvNoExpEventHandler(this);
+	}
+	else {
 	    this.technique = TECHNIQUE_OV;
 	    mViewName = TECHNIQUE_OV_NAME;
 	    eh = new OVEventHandler(this);
 	    initOverview();
-	}
-	else {
-	    this.technique = TECHNIQUE_TOW;
-	    mViewName = TECHNIQUE_TOW_NAME;
-	    eh = new TOWEventHandler(this);
 	}
 	mView.setEventHandler(eh);
 	initWorld();
@@ -188,7 +202,7 @@ public class Eval implements TOWApplication {
 					       to.getID(), new PortalKiller(this));
 	}
 	else {// portal not active, create it
-	    to = getPortal(x, y);
+	    to = getPortal(x, y, technique != TECHNIQUE_TOWINVNOEXP, technique != TECHNIQUE_TOW);
 	    to.setBackgroundColor(BACKGROUND_COLOR);
 	    to.setPortalEventHandler((PortalEventHandler)eh);
  	    to.setObservedRegionListener((ObservedRegionListener)eh);
@@ -202,10 +216,28 @@ public class Eval implements TOWApplication {
 	}
     }
 
-    TrailingOverviewInv getPortal(int x, int y){
-	return new TrailingOverviewInv(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-				       TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
-				       oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+    TrailingOverview getPortal(int x, int y, boolean shrinked, boolean inv){
+	if (inv){
+	    if (shrinked){
+		return new TrailingOverviewInv(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+					       TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+					       oCamera, mCamera, 0.0f,
+					       TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	    }
+	    else {
+		return new TrailingOverviewInv(x-OVERVIEW_WIDTH/2, y-OVERVIEW_HEIGHT/2,
+					       OVERVIEW_WIDTH, OVERVIEW_HEIGHT,
+					       oCamera, mCamera, 0.0f,
+					       TOW_PORTAL_X_OFFSET,
+					       TOW_PORTAL_Y_OFFSET);
+	    }
+	}
+	else {
+	    return new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+					TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+					oCamera, mCamera, 0.0f,
+					TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	}
     }
 
     public void killPortal(){
