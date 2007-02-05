@@ -179,6 +179,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     void stickPortal(){
+	application.alm.acquiredTOW(System.currentTimeMillis());
 	application.to.setNoUpdateWhenMouseStill(true); // prevent tow from moving
 	application.to.resize(Eval.TOW_HORIZONTAL_EXPANSION_OFFSET, Eval.TOW_VERTICAL_EXPANSION_OFFSET);
 	application.to.move(-Eval.TOW_HORIZONTAL_EXPANSION_OFFSET/2, -Eval.TOW_VERTICAL_EXPANSION_OFFSET/2);
