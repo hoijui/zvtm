@@ -154,6 +154,7 @@ public class AcquireLogManager implements PostAnimationAction {
 		      "Start Location" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
+		      "AcqTime" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Errors");
 	    bwt.newLine();
@@ -319,6 +320,7 @@ public class AcquireLogManager implements PostAnimationAction {
 			  startLocationStr + OUTPUT_CSV_SEP +
 			  directionStr + OUTPUT_CSV_SEP +
 			  IDStr + OUTPUT_CSV_SEP +
+			  String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
 			  intermediateTimes[i] + OUTPUT_CSV_SEP +
 			  String.valueOf(errorCount));
 		bwt.newLine();
