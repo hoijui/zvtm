@@ -86,10 +86,12 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     static final Color SELECTION_REGION_COLOR = Color.BLACK;
     static final float SELECTION_REGION_SIZE_FACTOR = 2.0f;
 
+    float TOWtranslucencyA, TOWtranslucencyB;
+
     /* logs */
     AcquireLogManager alm;
 
-    public AcquireEval(short t){
+    public AcquireEval(short t, float ta, float tb){
 	initGUI();
 	if (t == TECHNIQUE_OV){
 	    this.technique = TECHNIQUE_OV;
@@ -102,6 +104,8 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	    mViewName = TECHNIQUE_TOW_NAME;
 	    eh = new AcquireTOWEventHandler(this);
 	}
+	TOWtranslucencyA = ta;
+	TOWtranslucencyB = tb;
 	mView.setEventHandler(eh);
 	alm = new AcquireLogManager(this);
 	initWorld();
@@ -182,8 +186,9 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 
     void switchPortal(int x, int y){
 	if (to != null){// portal is active, destroy it it
-	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(-0.5f),
-					       to.getID(), new PortalKiller(this));
+// 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(-0.5f),
+// 					       to.getID(), new PortalKiller(this));
+	    killPortal();
 	}
 	else {// portal not active, create it
 	    to = getPortal(x, y);
@@ -192,8 +197,8 @@ public class AcquireEval implements TOWApplication, RepaintListener {
  	    //to.setObservedRegionListener((ObservedRegionListener)eh);
 	    vsm.addPortal(to, mView);
  	    to.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
-	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
-					       to.getID(), null);
+// 	    vsm.animator.createPortalAnimation(TOW_SWITCH_ANIM_TIME, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
+// 					       to.getID(), null);
 	    oCamera.moveTo(0, 0);
 // 	    updateOverview();
 	    centerOverview(false);
@@ -201,9 +206,11 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     }
 
     TrailingOverview getPortal(int x, int y){
-	return new TrailingOverviewInv(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-				       TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
-				       oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	TrailingOverview res = new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+						    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+						    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	res.setTranslucencyParameters(TOWtranslucencyA, TOWtranslucencyB);
+	return res;
     }
 
     public void killPortal(){
@@ -267,14 +274,20 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     public static void main(String[] args){
 	try {
 	    if (args.length >= 3){
-		AcquireEval.VIEW_MAX_W = Integer.parseInt(args[1]);
-		AcquireEval.VIEW_MAX_H = Integer.parseInt(args[2]);
+		float a = Float.parseFloat(args[1]);
+		float b = Float.parseFloat(args[2]);
+		if (args.length >= 5){
+		    AcquireEval.VIEW_MAX_W = Integer.parseInt(args[3]);
+		    AcquireEval.VIEW_MAX_H = Integer.parseInt(args[4]);
+		}
+		new AcquireEval(Short.parseShort(args[0]), a, b);
 	    }
-	    new AcquireEval(Short.parseShort(args[0]));
+	    else {
+		new AcquireEval(Short.parseShort(args[0]), -0.5f, 0.5f);
+	    }
 	}
 	catch (Exception ex){
-	    System.err.println("No cmd line parameter to indicate technique, defaulting to Trailing Overview");
-	    new AcquireEval(AcquireEval.TECHNIQUE_TOW);
+	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.AcquireEval <technique> [<translucencyA> <translucencyB>] [<window width> <window height>]");
 	}
     }
 

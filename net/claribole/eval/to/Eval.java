@@ -219,26 +219,28 @@ public class Eval implements TOWApplication {
     TrailingOverview getPortal(int x, int y, boolean shrinked, boolean inv){
 	if (inv){
 	    if (shrinked){
-		return new TrailingOverviewInv(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-					       TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
-					       oCamera, mCamera, 0.0f,
-					       TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+		return new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+					    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+					    oCamera, mCamera, 0.0f,
+					    TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
 	    }
 	    else {
-		TrailingOverview res = new TrailingOverviewInv(x-OVERVIEW_WIDTH/2, y-OVERVIEW_HEIGHT/2,
-							       OVERVIEW_WIDTH, OVERVIEW_HEIGHT,
-							       oCamera, mCamera, 0.0f,
-							       TOW_PORTAL_X_OFFSET,
-							       TOW_PORTAL_Y_OFFSET);
-		res.setCutoffFrequencyParameters(0.4, 0.3);
+		TrailingOverview res = new TrailingOverview(x-OVERVIEW_WIDTH/2, y-OVERVIEW_HEIGHT/2,
+							    OVERVIEW_WIDTH, OVERVIEW_HEIGHT,
+							    oCamera, mCamera, 0.0f,
+							    TOW_PORTAL_X_OFFSET,
+							    TOW_PORTAL_Y_OFFSET);
+		res.setTranslucencyParameters(5.0f/3.0f, -2.0f/3.0f);
 		return res;
 	    }
 	}
 	else {
-	    return new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-					TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
-					oCamera, mCamera, 0.0f,
-					TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	    TrailingOverview res = new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
+							TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+							oCamera, mCamera, 0.0f,
+							TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	    res.setCutoffFrequencyParameters(0.4, 0.3);
+	    return res;
 	}
     }
 
