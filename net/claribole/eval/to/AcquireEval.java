@@ -87,11 +87,15 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     static final float SELECTION_REGION_SIZE_FACTOR = 2.0f;
 
     float TOWtranslucencyA, TOWtranslucencyB;
+    boolean fixedSizeTOW = false;
 
     /* logs */
     AcquireLogManager alm;
 
-    public AcquireEval(short t, float ta, float tb){
+    public AcquireEval(short t, float ta, float tb, boolean ts){
+	TOWtranslucencyA = ta;
+	TOWtranslucencyB = tb;
+	fixedSizeTOW = ts;
 	initGUI();
 	if (t == TECHNIQUE_OV){
 	    this.technique = TECHNIQUE_OV;
@@ -104,8 +108,6 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	    mViewName = TECHNIQUE_TOW_NAME;
 	    eh = new AcquireTOWEventHandler(this);
 	}
-	TOWtranslucencyA = ta;
-	TOWtranslucencyB = tb;
 	mView.setEventHandler(eh);
 	alm = new AcquireLogManager(this);
 	initWorld();
@@ -207,9 +209,13 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 
     TrailingOverview getPortal(int x, int y){
 	TrailingOverview res = new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-						    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
+						    (fixedSizeTOW) ? OVERVIEW_WIDTH : TOW_CONTRACTED_WIDTH,
+						    (fixedSizeTOW) ? OVERVIEW_HEIGHT : TOW_CONTRACTED_HEIGHT,
 						    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
 	res.setTranslucencyParameters(TOWtranslucencyA, TOWtranslucencyB);
+	if (fixedSizeTOW){// make it harder to acquire when big
+	    res.setCutoffFrequencyParameters(0.4, 3);
+	}
 	return res;
     }
 
@@ -273,21 +279,25 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     
     public static void main(String[] args){
 	try {
+	    float a = -0.5f;
+	    float b = 0.5f;
+	    boolean s = false;
 	    if (args.length >= 3){
-		float a = Float.parseFloat(args[1]);
-		float b = Float.parseFloat(args[2]);
-		if (args.length >= 5){
-		    AcquireEval.VIEW_MAX_W = Integer.parseInt(args[3]);
-		    AcquireEval.VIEW_MAX_H = Integer.parseInt(args[4]);
+		a = Float.parseFloat(args[1]);
+		b = Float.parseFloat(args[2]);
+		if (args.length >= 4){
+		    s = args[3].equals("1");
+		    if (args.length >= 5){
+			AcquireEval.VIEW_MAX_W = Integer.parseInt(args[4]);
+			AcquireEval.VIEW_MAX_H = Integer.parseInt(args[5]);
+		    }
 		}
-		new AcquireEval(Short.parseShort(args[0]), a, b);
-	    }
-	    else {
-		new AcquireEval(Short.parseShort(args[0]), -0.5f, 0.5f);
+		new AcquireEval(Short.parseShort(args[0]), a, b, s);
 	    }
 	}
 	catch (Exception ex){
 	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.AcquireEval <technique> [<translucencyA> <translucencyB>] [<window width> <window height>]");
+	    System.exit(0);
 	}
     }
 
