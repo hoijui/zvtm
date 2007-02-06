@@ -292,11 +292,11 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 			AcquireEval.VIEW_MAX_H = Integer.parseInt(args[5]);
 		    }
 		}
-		new AcquireEval(Short.parseShort(args[0]), a, b, s);
 	    }
+	    new AcquireEval(Short.parseShort(args[0]), a, b, s);
 	}
 	catch (Exception ex){
-	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.AcquireEval <technique> [<translucencyA> <translucencyB>] [<window width> <window height>]");
+	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.AcquireEval <technique> [<translucencyA> <translucencyB>] [<fixedSize>] [<window width> <window height>]");
 	    System.exit(0);
 	}
     }
