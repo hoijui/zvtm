@@ -39,6 +39,8 @@ public class AcquireInstructionsManager implements Java2DPainter {
     static final int WARN_DELAY = 1000;
     String error = null;
 
+    String indication = null;
+
     boolean showButton = false;
 
     AcquireInstructionsManager(AcquireEval app, AcquireLogManager alm){
@@ -81,6 +83,16 @@ public class AcquireInstructionsManager implements Java2DPainter {
 	worker.start();
     }
 
+    boolean showIndications = false;
+    
+    void toggleIndications(){
+	showIndications = !showIndications;
+    }
+
+    void indicate(String s){
+	indication = s;
+    }
+
     void showButton(boolean b){
 	showButton = b;
 	application.vsm.repaintNow();
@@ -94,6 +106,10 @@ public class AcquireInstructionsManager implements Java2DPainter {
 
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	if (showIndications && indication != null){
+	    g2d.setColor(Color.DARK_GRAY);
+	    g2d.drawString(indication, 10, 10);
+	}
 	if (error != null){
 	    g2d.setColor(Color.BLACK);
 	    g2d.fillRect(0, viewHeight/2-50, viewWidth, 100);

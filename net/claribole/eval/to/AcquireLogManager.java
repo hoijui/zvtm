@@ -327,6 +327,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	    bwc.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
+ 	im.indicate(String.valueOf(Math.round(block.getStdDeviationOfTimeToAcquireForLastTrials(trialCount, 10))));
 	if (trialCount < block.nbTrials-1){
 	    initNextTrial();
 	}

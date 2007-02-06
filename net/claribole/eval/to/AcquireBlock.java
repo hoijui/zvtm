@@ -103,5 +103,22 @@ public class AcquireBlock {
 	res.setMinimumProjectedSize(AcquireEval.TARGET_MIN_PROJ_SIZE);
 	return res;
     }
+
+    double getStdDeviationOfTimeToAcquireForLastTrials(int lastTrialIndex, int notttia){// number of trials to take into account
+	double N = (notttia < lastTrialIndex) ? notttia : lastTrialIndex+1;
+	int firstTrialIndex = (lastTrialIndex != notttia) ? lastTrialIndex-(int)N+1 : lastTrialIndex-(int)N+2;
+	// compute variance and get standard deviation from it (sqrt)
+	double sum = 0;
+	for (int i=firstTrialIndex;i<=lastTrialIndex;i++){
+	    sum += timeToAcquire[i];
+	}
+	double mean = sum/N;
+	sum = 0;
+	for (int i=firstTrialIndex;i<=lastTrialIndex;i++){
+	    sum += Math.pow(timeToAcquire[i]-mean,2);
+	}
+	double res = Math.sqrt(sum / N);
+	return res;
+    }
     
 }
