@@ -38,6 +38,9 @@ public class TrailingCameraPortalST extends CameraPortalST {
     double cutoffParamA = 0.4;
     double cutoffParamB = 0.01;  // 0.1 to make it more difficult to acquire
 
+    float translucencyParamA = -0.5f; // 5.0f / 3.0f
+    float translucencyParamB = 0.5f;  // -2.0f / 3.0f
+
     /** Builds a new possibly translucent portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -60,6 +63,11 @@ public class TrailingCameraPortalST extends CameraPortalST {
     public void setCutoffFrequencyParameters(double a, double b){
 	cutoffParamA = a;
 	cutoffParamB = b;
+    }
+
+    public void setTranslucencyParameters(float a, float b){
+	translucencyParamA = a;
+	translucencyParamB = b;
     }
 
     public void updateFrequency() {
@@ -96,8 +104,8 @@ public class TrailingCameraPortalST extends CameraPortalST {
  	ty = Math.min(ty, owningView.getPanelSize().height - h/2);
 	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
 	    this.moveTo(tx-w/2, ty-h/2);
-	    // make the widget almost disappear when making big moves
-	    setTransparencyValue((float)opacity*1.66666f-0.66666f);
+	    // update portal's translucency as a function of its speed
+	    setTransparencyValue((float)opacity*translucencyParamA + translucencyParamB);
 	    owningView.repaintNow();
 	}
     }

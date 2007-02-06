@@ -83,34 +83,6 @@ public class TrailingOverview extends TrailingCameraPortalST {
 		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
     }
 
-//     int wbv = 0;
-//     int nbv = 0;
-//     int ebv = 0;
-//     int sbv = 0;
-
-//     public void resetInsideBorders(){
-// 	wbv = 0;
-// 	nbv = 0;
-// 	ebv = 0;
-// 	sbv = 0;
-//     }
-
-//     public void insideWestBorder(int v){
-// 	wbv = v;
-//     }
-
-//     public void insideNorthBorder(int v){
-// 	nbv = v;
-//     }
-    
-//     public void insideEastBorder(int v){
-// 	ebv = v;
-//     }
-    
-//     public void insideSouthBorder(int v){
-// 	sbv = v;
-//     }
-
     ObservedRegionListener observedRegionListener;
 
     public void setObservedRegionListener(ObservedRegionListener orl){
