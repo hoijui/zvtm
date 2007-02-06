@@ -214,7 +214,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 						    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
 	res.setTranslucencyParameters(TOWtranslucencyA, TOWtranslucencyB);
 	if (fixedSizeTOW){// make it harder to acquire when big
-	    res.setCutoffFrequencyParameters(0.4, 3);
+	    res.setCutoffFrequencyParameters(0.4, 1.9);
 	}
 	return res;
     }
