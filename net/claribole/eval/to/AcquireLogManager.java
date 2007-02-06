@@ -81,7 +81,7 @@ public class AcquireLogManager implements PostAnimationAction {
     AcquireLogManager(AcquireEval app){
 	this.application = app;
 	im = new AcquireInstructionsManager(this.application, this);
-	application.mView.setJava2DPainter(im, Java2DPainter.AFTER_PORTALS);
+	application.mView.setJava2DPainter(im, Java2DPainter.FOREGROUND);
     }
     
     void startSession(){
