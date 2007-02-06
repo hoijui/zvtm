@@ -63,7 +63,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	    delayedTOWExit = false;
 	}
 	if (mCameraStickedToMouse){
-	    application.centerOverview(false);
+// 	    application.centerOverview(false);
 	    mCameraStickedToMouse = false;
 	}
 // 	oCameraStickedToMouse = false;
@@ -115,7 +115,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 // 		}
 // 		}
 // 	    }
-	    else if (orStickedToMouse){
+	    else if (orStickedToMouse && mouseActuallyInsideOverview){
 		synchronized(application.oCamera){
 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
 		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
@@ -147,11 +147,12 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	if (mCameraStickedToMouse){// do not exec actions associated with entering portal when the user is
 	    return;                // panning the main viewport (most likely entered portal by accident)
 	}
+	mouseInsideOverview = true;
+	mouseActuallyInsideOverview = true;
 	if (delayedTOWExit){
 	    delayedTOWExit = false;
 	    return;
 	}
-	mouseInsideOverview = true;
  	stickPortal();
 	application.vsm.repaintNow();
     }
@@ -159,6 +160,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     /**cursor exits portal*/
     public void exitPortal(Portal p){
 	if (!application.alm.trialStarted){return;}
+	mouseActuallyInsideOverview = false;
 	if (!mouseInsideOverview){// do not exec exit actions if enter actions
 	    return;          // were not executed at entry time
 	}
@@ -174,7 +176,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	mouseInsideOverview = false;
 	delayedTOWExit = false;
  	unstickPortal();
-	application.centerOverview(false);
+// 	application.centerOverview(false);
 	application.vsm.repaintNow();
     }
 

@@ -59,7 +59,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	    delayedOverviewExit = false;
 	}
 	if (mCameraStickedToMouse){
-	    application.centerOverview(true);
+// 	    application.centerOverview(true);
 	    mCameraStickedToMouse = false;
 	}
 // 	oCameraStickedToMouse = false;
@@ -99,7 +99,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 // 		}
 // 		}
 // 	    }
-	    else if (orStickedToMouse){
+	    else if (orStickedToMouse && mouseActuallyInsideOverview){
 		synchronized(application.oCamera){
 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
 		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
@@ -116,17 +116,19 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     public void enterPortal(Portal p){
 	if (!application.alm.trialStarted){return;}
 	mouseInsideOverview = true;
+	mouseActuallyInsideOverview = true;
 	if (delayedOverviewExit){
 	    delayedOverviewExit = false;
 	    return;
 	}
-	((CameraPortal)p).setBorder(Eval.INSIDE_PORTAL_BORDER_COLOR);
+// 	((CameraPortal)p).setBorder(Eval.INSIDE_PORTAL_BORDER_COLOR);
 	application.vsm.repaintNow();
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
 	if (!application.alm.trialStarted){return;}
+	mouseActuallyInsideOverview = false;
 	if (orStickedToMouse){
 	    delayedOverviewExit = true;
 	}
@@ -138,8 +140,8 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     void portalExitActions(){
 	mouseInsideOverview = false;
 	delayedOverviewExit = false;
-	application.centerOverview(true);
-	application.op.setBorder(Eval.DEFAULT_PORTAL_BORDER_COLOR);
+// 	application.centerOverview(true);
+// 	application.op.setBorder(Eval.DEFAULT_PORTAL_BORDER_COLOR);
 	application.vsm.repaintNow();
     }
     

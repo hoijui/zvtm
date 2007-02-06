@@ -33,6 +33,7 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
     AcquireEval application;
 
     boolean mouseInsideOverview = false;
+    boolean mouseActuallyInsideOverview = false;
 
     VCursor cursor;
 
