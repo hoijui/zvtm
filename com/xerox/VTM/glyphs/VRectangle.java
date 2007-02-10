@@ -255,15 +255,20 @@ public class VRectangle extends Glyph implements RectangularShape,Cloneable {
 	    }
 	    g.setColor(borderColor);
 	    if (paintBorder){
-		if (stroke!=null) {
-		    if (((pc[i].cx-pc[i].cw)>0) || ((pc[i].cy-pc[i].ch)>0) || ((2*pc[i].cw-1)<vW) || ((2*pc[i].ch-1)<vH)){
-			g.setStroke(stroke);  //change stroke there
-			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-			g.setStroke(stdS);  //original stroke restored here
+		if (stroke!=null) {	
+		    if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
+			((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
+			// [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
+			// the rectangle, in which case the border would not be visible;
+			// the fact that the rectangle intersects the viewport has already been tested by the main
+			// clipping algorithm
+			g.setStroke(stroke);
+			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);   //outline rectangle
+			g.setStroke(stdS);
 		    }
 		}
 		else {
-		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);   //outline rectangle
 		}
 	    }
 	}
@@ -291,14 +296,16 @@ public class VRectangle extends Glyph implements RectangularShape,Cloneable {
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
-		    if (((pc[i].lcx-pc[i].lcw)>0) || ((pc[i].lcy-pc[i].lch)>0) || ((2*pc[i].lcw-1)<vW) || ((2*pc[i].lch-1)<vH)){
-			g.setStroke(stroke);  //change stroke there
-			g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
-			g.setStroke(stdS);  //original stroke restored here
+		    if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
+			((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
+			// see [C1] above for explanations about this test
+			g.setStroke(stroke);
+			g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);   //outline rectangle
+			g.setStroke(stdS);
 		    }
 		}
 		else {
-		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
+		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);   //outline rectangle
 		}
 	    }
 	}

@@ -298,11 +298,9 @@ public class VRoundRect extends Glyph implements RectangularShape  {
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
-		    if (((pc[i].cx-pc[i].cw)>0) || ((pc[i].cy-pc[i].ch)>0) || ((2*pc[i].cw-1)<vW) || ((2*pc[i].ch-1)<vH)){
-			g.setStroke(stroke);  //change stroke there
-			g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
-			g.setStroke(stdS);  //original stroke restored here
-		    }
+		    g.setStroke(stroke);  //change stroke there
+		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
+		    g.setStroke(stdS);  //original stroke restored here
 		}
 		else {
 		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
@@ -333,11 +331,9 @@ public class VRoundRect extends Glyph implements RectangularShape  {
 	    g.setColor(borderColor);
 	    if (paintBorder){
 		if (stroke!=null) {
-		    if (((pc[i].lcx-pc[i].lcw)>0) || ((pc[i].lcy-pc[i].lch)>0) || ((2*pc[i].lcw-1)<vW) || ((2*pc[i].lch-1)<vH)){
-			g.setStroke(stroke);  //change stroke there
-			g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
-			g.setStroke(stdS);  //original stroke restored here
-		    }
+		    g.setStroke(stroke);  //change stroke there
+		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
+		    g.setStroke(stdS);  //original stroke restored here
 		}
 		else {
 		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
