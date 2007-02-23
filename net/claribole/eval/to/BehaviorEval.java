@@ -34,7 +34,8 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-    static final String MAP_PATH = "images/world/1000_1600x1200.png";
+    static final String REGION_MAP_PATH = "images/world/europe_1600x1200.png";
+    static final String WHOLE_MAP_PATH = "images/world/0000_400x200.png";
 
     /* ZVTM components */
     static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
@@ -50,7 +51,7 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     /* generic overview settings */
     static int OVERVIEW_WIDTH = 150;
     static int OVERVIEW_HEIGHT = 150;
-    static final Color DEFAULT_PORTAL_BORDER_COLOR = Color.BLACK;
+    static final Color DEFAULT_PORTAL_BORDER_COLOR = Color.WHITE;
     static final Color INSIDE_PORTAL_BORDER_COLOR = Color.RED;
     static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 36.0f;
     static final int OVERVIEW_CENTERING_TRANSLATE_TIME = 300;
@@ -75,7 +76,6 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 //     static final long TARGET_DEFAULT_SIZE = 100;
 //     static final int TARGET_MIN_PROJ_SIZE = 4;
 //     ZCircle target;
-    VImage map;
 
     float TOWtranslucencyA, TOWtranslucencyB;
     String TOWtranslucencyAstr, TOWtranslucencyBstr;
@@ -97,8 +97,6 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	initWorld();
 	mCamera.moveTo(0, 0);
 	mCamera.setAltitude(0);
-	centerOverview(false);
-	updateOverview();
 	vsm.repaintNow(mView, this);
     }
 
@@ -155,31 +153,21 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
+    static final long WM_ORIG_X = -310;
+    static final long WM_ORIG_Y = -2123;
 
     void initWorld(){
 	if (backgroundType == BACKGROUND_WORLDMAP){
-	    map = new VImage(0, 0, 0, (new ImageIcon(MAP_PATH)).getImage());
-	    map.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	    vsm.addGlyph(map, mSpace);
+	    VImage im = new VImage(WM_ORIG_X, WM_ORIG_Y, 0, (new ImageIcon(WHOLE_MAP_PATH)).getImage(), 40);
+	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+	    vsm.addGlyph(im, mSpace);
+	    im = new VImage(0, 0, 0, (new ImageIcon(REGION_MAP_PATH)).getImage());
+	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+	    vsm.addGlyph(im, mSpace);
 	}
 	else {
 	    //XXX: TBW graph
 	}
-    }
-
-    void centerOverview(boolean animate){
-	if (animate){
-	    vsm.animator.createCameraAnimation(OVERVIEW_CENTERING_TRANSLATE_TIME, AnimManager.CA_TRANS_SIG,
-					       new LongPoint(mCamera.posx-oCamera.posx, mCamera.posy-oCamera.posy),
-					       oCamera.getID(), blm);
-	}
-	else {
-	    oCamera.moveTo(mCamera.posx, mCamera.posy);
-	}
-    }
-    
-    void updateOverview(){// update overview camera's altitude
-	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
     }
 
     void switchPortal(int x, int y){
@@ -192,8 +180,8 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    to.setPortalEventHandler((PortalEventHandler)eh);
 	    vsm.addPortal(to, mView);
  	    to.setBorder(DEFAULT_PORTAL_BORDER_COLOR);
-	    oCamera.moveTo(0, 0);
-	    centerOverview(false);
+	    oCamera.moveTo(WM_ORIG_X, WM_ORIG_Y);
+	    oCamera.setAltitude(5200);
 	}
     }
 
@@ -220,7 +208,6 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	BehaviorInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + BehaviorInstructionsManager.START_BUTTON_H / 2;
 	BehaviorInstructionsManager.START_BUTTON_BR_X = BehaviorInstructionsManager.START_BUTTON_TL_X + BehaviorInstructionsManager.START_BUTTON_W;
 	BehaviorInstructionsManager.START_BUTTON_BR_Y = BehaviorInstructionsManager.START_BUTTON_TL_Y + BehaviorInstructionsManager.START_BUTTON_H;
-	System.err.println(BehaviorInstructionsManager.START_BUTTON_TL_X+" "+BehaviorInstructionsManager.START_BUTTON_TL_Y+" "+BehaviorInstructionsManager.START_BUTTON_BR_X+" "+BehaviorInstructionsManager.START_BUTTON_BR_Y);
     }
 
     void exit(){

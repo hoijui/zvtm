@@ -72,7 +72,7 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	if (mouseInsideOverview){
 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
-		orStickedToMouse = true;
+// 		orStickedToMouse = true;
 	    }
 	}
 	else {
@@ -123,24 +123,24 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	currentJPX = jpx;
 	currentJPY = jpy;
 	if (buttonNumber == 1){
-	    if (mCameraStickedToMouse){
-		synchronized(application.mCamera){
-		    projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
-		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
-					     Math.round(projCoef*(jpy-lastJPY)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		}
-	    }
-	    else if (orStickedToMouse && mouseActuallyInsideOverview){
-		synchronized(application.oCamera){
-		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
-		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
-					     Math.round(projCoef*(lastJPY-jpy)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		}
-	    }
+// 	    if (mCameraStickedToMouse){
+// 		synchronized(application.mCamera){
+// 		    projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
+// 		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
+// 					     Math.round(projCoef*(jpy-lastJPY)));
+// 		    lastJPX = jpx;
+// 		    lastJPY = jpy;
+// 		}
+// 	    }
+// 	    else if (orStickedToMouse && mouseActuallyInsideOverview){
+// 		synchronized(application.oCamera){
+// 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
+// 		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
+// 					     Math.round(projCoef*(lastJPY-jpy)));
+// 		    lastJPX = jpx;
+// 		    lastJPY = jpy;
+// 		}
+// 	    }
  	}
 	application.blm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
     }

@@ -193,12 +193,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
 
     void validateTarget(){
-	if (true){//XXX: TBW condition to end trial
-	    endTrial();
-	}
-	else {
-	    error();
-	}
+	endTrial();
     }
 
     void error(){
@@ -218,8 +213,6 @@ public class BehaviorLogManager implements PostAnimationAction {
 	incTrialCount();
 	errorCount = 0;
 	firstTOWAcquisition = true;
-	// reset camera to (0,0) in virtual space
-	resetCamera();
 	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the
 	    resetRequest = true; // middle of an animation at the time of the first reset
 	}
@@ -244,13 +237,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     public void animationEnded(Object target, short type, String dimension){
 	if (resetRequest){
 	    resetRequest = false;
-	    resetCamera();
 	}
-    }
-
-    void resetCamera(){
-	application.mCamera.moveTo(0, 0);
-	application.centerOverview(false);
     }
 
     void startTrial(){
