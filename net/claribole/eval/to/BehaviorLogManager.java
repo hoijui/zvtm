@@ -53,13 +53,15 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     String subjectID;
     String subjectName;
-    String techniqueName;
+    String behaviorName;
     String blockNumber;
     int trialCount;
     String trialCountStr;
     int errorCount = 0;
 
     String directionStr;
+
+    long trialEndTime, trialStartTime;
 
     boolean sessionStarted = false;
     boolean trialStarted = false;
@@ -108,8 +110,8 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    return;
 	}
 	try {
-	    logFile = initLogFile(subjectID+"-"+techniqueName+"-trial-block"+blockNumber, LOG_DIR);
- 	    cinematicFile = initLogFile(subjectID+"-"+techniqueName+"-cinematic-block"+blockNumber, LOG_DIR);
+	    logFile = initLogFile(subjectID+"-"+behaviorName+"-trial-block"+blockNumber, LOG_DIR);
+ 	    cinematicFile = initLogFile(subjectID+"-"+behaviorName+"-cinematic-block"+blockNumber, LOG_DIR);
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile), "UTF-8"));
  	    bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cinematicFile), "UTF-8"));
 	}
@@ -155,7 +157,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    bwc.newLine();
 	    bwc.write("# SID" + OUTPUT_CSV_SEP + subjectID);
 	    bwc.newLine();
-	    bwc.write("# Technique" + OUTPUT_CSV_SEP + techniqueName);
+	    bwc.write("# Technique" + OUTPUT_CSV_SEP + behaviorName);
 	    bwc.newLine();
 	    bwc.write("# Block" + OUTPUT_CSV_SEP + blockNumber);
 	    bwc.newLine();
@@ -186,7 +188,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     void initLineStart(){
 	lineStart = subjectName + OUTPUT_CSV_SEP +
 	    subjectID + OUTPUT_CSV_SEP +
-	    techniqueName + OUTPUT_CSV_SEP +
+	    behaviorName + OUTPUT_CSV_SEP +
 	    blockNumber + OUTPUT_CSV_SEP;
     }
 
@@ -250,9 +252,6 @@ public class BehaviorLogManager implements PostAnimationAction {
 	application.mCamera.moveTo(0, 0);
 	application.centerOverview(false);
     }
-
-    static final int NB_TARGETS_PER_TRIAL = 1;
-    long trialEndTime, trialStartTime;
 
     void startTrial(){
 	im.say(null);

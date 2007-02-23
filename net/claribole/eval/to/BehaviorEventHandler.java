@@ -175,7 +175,7 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
 	if (code == KeyEvent.VK_S){application.blm.startSession();}
 	else if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
-	else if (code == KeyEvent.VK_F12){application.blm.nextTarget();}
+	else if (code == KeyEvent.VK_F12){application.blm.endTrial();}
 	else if (code == KeyEvent.VK_V){application.blm.im.toggleIndications();}
     }
            

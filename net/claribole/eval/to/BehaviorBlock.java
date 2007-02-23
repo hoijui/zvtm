@@ -14,6 +14,16 @@ import com.xerox.VTM.glyphs.ZCircle;
 
 public class BehaviorBlock {
 
+    static final String BEHAVIOR_FT_STR = "FT";
+    static final String BEHAVIOR_IT_STR = "IT";
+    static final String BEHAVIOR_DT_STR = "DT";
+    static final float BEHAVIOR_FT_A = 0;
+    static final float BEHAVIOR_FT_B = 0.3f;
+    static final float BEHAVIOR_IT_A = 1.666f;
+    static final float BEHAVIOR_IT_B = -0.666f;
+    static final float BEHAVIOR_DT_A = -0.5f;
+    static final float BEHAVIOR_DT_B = 0.5f;
+
     static final String DIRECTION_NW_STR = "NW";   // north west
     static final String DIRECTION_NE_STR = "NE";   // north east
     static final String DIRECTION_SE_STR = "SE";   // south east
@@ -47,18 +57,12 @@ public class BehaviorBlock {
     
     BehaviorBlock(String blockLine){
 	String[] data = blockLine.split(BehaviorLogManager.INPUT_CSV_SEP);
-// 	nbTrials = data.length;
-// 	startlocation = new short[nbTrials];
-// 	direction = new short[nbTrials];
-// 	timeToAcquire = new long[nbTrials];
-// 	ID = new int[nbTrials];
-// 	size = new long[nbTrials];
-// 	for (int i=0;i<nbTrials;i++){
-// 	    startlocation[i] = getStartLocation(data[i].substring(0,2));
-// 	    direction[i] = getDirection(data[i].substring(2,4));
-// 	    ID[i] = Integer.parseInt(data[i].substring(4));
-// 	    size[i] = Math.round((BehaviorEval.TARGET_DISTANCE / (Math.pow(2, ID[i]) - 1)));
-// 	}
+	nbTrials = data.length;
+	direction = new short[nbTrials];
+	timeToAcquire = new long[nbTrials];
+	for (int i=0;i<nbTrials;i++){
+	    direction[i] = getDirection(data[i].substring(0,2));
+	}
     }
-   
+    
 }

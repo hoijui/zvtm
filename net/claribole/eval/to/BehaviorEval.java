@@ -87,16 +87,13 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     /* logs */
     BehaviorLogManager blm;
 
-    public BehaviorEval(short bt, float ta, float tb){
+    public BehaviorEval(short bt, String bv){
 	backgroundType = bt;
-	TOWtranslucencyA = ta;
-	TOWtranslucencyB = tb;
-	TOWtranslucencyAstr = String.valueOf(ta);
-	TOWtranslucencyBstr = String.valueOf(tb);
 	initGUI();
 	eh = new BehaviorEventHandler(this);
 	mView.setEventHandler(eh);
 	blm = new BehaviorLogManager(this);
+	initBehavior(bv);
 	initWorld();
 	mCamera.moveTo(0, 0);
 	mCamera.setAltitude(0);
@@ -108,6 +105,26 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     public void viewRepainted(View v){
 	blm.im.say(AcquireLogManager.PSTS);
 	v.removeRepaintListener();
+    }
+
+    void initBehavior(String t){
+	if (t.equals(BehaviorBlock.BEHAVIOR_FT_STR)){
+	    TOWtranslucencyA = BehaviorBlock.BEHAVIOR_FT_A;
+	    TOWtranslucencyB = BehaviorBlock.BEHAVIOR_FT_B;
+	    blm.behaviorName = BehaviorBlock.BEHAVIOR_FT_STR;
+	}
+	else if (t.equals(BehaviorBlock.BEHAVIOR_IT_STR)){
+	    TOWtranslucencyA = BehaviorBlock.BEHAVIOR_IT_A;
+	    TOWtranslucencyB = BehaviorBlock.BEHAVIOR_IT_B;
+	    blm.behaviorName = BehaviorBlock.BEHAVIOR_IT_STR;
+	}
+	else if (t.equals(BehaviorBlock.BEHAVIOR_DT_STR)){
+	    TOWtranslucencyA = BehaviorBlock.BEHAVIOR_DT_A;
+	    TOWtranslucencyB = BehaviorBlock.BEHAVIOR_DT_B;
+	    blm.behaviorName = BehaviorBlock.BEHAVIOR_DT_STR;
+	}
+	TOWtranslucencyAstr = String.valueOf(TOWtranslucencyA);
+	TOWtranslucencyBstr = String.valueOf(TOWtranslucencyB);
     }
 
     void initGUI(){
@@ -212,21 +229,18 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     
     public static void main(String[] args){
 	try {
-	    float a = -0.5f;
-	    float b = 0.5f;
-	    boolean s = false;
-	    if (args.length >= 3){
-		a = Float.parseFloat(args[1]);
-		b = Float.parseFloat(args[2]);
+	    String t = BehaviorBlock.BEHAVIOR_FT_STR;
+	    if (args.length >= 2){
+		t = args[1];
 		if (args.length >= 4){
-		    BehaviorEval.VIEW_MAX_W = Integer.parseInt(args[3]);
-		    BehaviorEval.VIEW_MAX_H = Integer.parseInt(args[4]);
+		    BehaviorEval.VIEW_MAX_W = Integer.parseInt(args[2]);
+		    BehaviorEval.VIEW_MAX_H = Integer.parseInt(args[3]);
 		}
 	    }
-	    new BehaviorEval(Short.parseShort(args[0]), a, b);
+	    new BehaviorEval(Short.parseShort(args[0]), t);
 	}
 	catch (Exception ex){
-	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.BehaviorEval <backgroundType> [<translucencyA> <translucencyB>] [<window width> <window height>]");
+	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.BehaviorEval <backgroundType> <FT>|<IT>|<DT> [<window width> <window height>]");
 	    System.exit(0);
 	}
     }
