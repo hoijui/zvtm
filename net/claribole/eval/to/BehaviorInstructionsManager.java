@@ -126,7 +126,7 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	    g2d.drawString(message, viewWidth/2 - halfMessageWidth, viewHeight/2);
 	    if (blm.sessionStarted && !blm.trialStarted && showButton){
 		// button
-		g2d.setColor(Color.WHITE);
+		g2d.setColor(Color.YELLOW);
 		g2d.fillRect(BehaviorInstructionsManager.START_BUTTON_TL_X, BehaviorInstructionsManager.START_BUTTON_TL_Y,
 			     BehaviorInstructionsManager.START_BUTTON_W, BehaviorInstructionsManager.START_BUTTON_H);
 		g2d.setColor(Color.RED);

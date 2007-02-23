@@ -216,10 +216,11 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	Dimension d = mView.getPanel().getSize();
 	panelWidth = d.width;
 	panelHeight = d.height;
-	AcquireInstructionsManager.START_BUTTON_TL_X = panelWidth/2 - AcquireInstructionsManager.START_BUTTON_W / 2;
-	AcquireInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + AcquireInstructionsManager.START_BUTTON_H / 2;
-	AcquireInstructionsManager.START_BUTTON_BR_X = AcquireInstructionsManager.START_BUTTON_TL_X + AcquireInstructionsManager.START_BUTTON_W;
-	AcquireInstructionsManager.START_BUTTON_BR_Y = AcquireInstructionsManager.START_BUTTON_TL_Y + AcquireInstructionsManager.START_BUTTON_H;
+	BehaviorInstructionsManager.START_BUTTON_TL_X = panelWidth/2 - BehaviorInstructionsManager.START_BUTTON_W / 2;
+	BehaviorInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + BehaviorInstructionsManager.START_BUTTON_H / 2;
+	BehaviorInstructionsManager.START_BUTTON_BR_X = BehaviorInstructionsManager.START_BUTTON_TL_X + BehaviorInstructionsManager.START_BUTTON_W;
+	BehaviorInstructionsManager.START_BUTTON_BR_Y = BehaviorInstructionsManager.START_BUTTON_TL_Y + BehaviorInstructionsManager.START_BUTTON_H;
+	System.err.println(BehaviorInstructionsManager.START_BUTTON_TL_X+" "+BehaviorInstructionsManager.START_BUTTON_TL_Y+" "+BehaviorInstructionsManager.START_BUTTON_BR_X+" "+BehaviorInstructionsManager.START_BUTTON_BR_Y);
     }
 
     void exit(){
