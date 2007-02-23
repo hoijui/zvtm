@@ -57,13 +57,9 @@ public class BehaviorLogManager implements PostAnimationAction {
     String blockNumber;
     int trialCount;
     String trialCountStr;
-    int targetCount;
-    String targetCountStr;
     int errorCount = 0;
 
-    String startLocationStr;
     String directionStr;
-    String IDStr;
 
     boolean sessionStarted = false;
     boolean trialStarted = false;
@@ -91,7 +87,6 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     void init(){
 	trialCount = -1;
-	targetCount = -1;
 	subjectName = JOptionPane.showInputDialog("Subject Name");
  	if (subjectName == null){im.say(PSTS);return;}
 	subjectID = JOptionPane.showInputDialog("Subject ID");
@@ -149,10 +144,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 		      "Technique" + OUTPUT_CSV_SEP +
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
-		      "Target" + OUTPUT_CSV_SEP +
-		      "Start Location" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
-		      "ID" + OUTPUT_CSV_SEP +
 		      "AcqTime" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Errors");
@@ -173,10 +165,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    bwc.newLine();
 	    // cinematic column headers
 	    bwc.write("Trial" + OUTPUT_CSV_SEP +
-		      "Target" + OUTPUT_CSV_SEP +
-		      "Start Location" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
-		      "ID" + OUTPUT_CSV_SEP +
 		      "mx" + OUTPUT_CSV_SEP +
 		      "my" + OUTPUT_CSV_SEP +
 		      "cx" + OUTPUT_CSV_SEP +
@@ -202,12 +191,12 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
 
     void validateTarget(){
-// 	if (Math.sqrt(Math.pow(application.target.vx-application.mCamera.posx,2)+Math.pow(application.target.vy-application.mCamera.posy,2)) + block.size[trialCount] <= selectionRegionHSize){
-// 	    nextTarget();
-// 	}
-// 	else {
-// 	    error();
-// 	}
+	if (true){//XXX: TBW condition to end trial
+	    endTrial();
+	}
+	else {
+	    error();
+	}
     }
 
     void error(){
@@ -225,7 +214,6 @@ public class BehaviorLogManager implements PostAnimationAction {
     
     void initNextTrial(){
 	incTrialCount();
-	resetTargetCount();
 	errorCount = 0;
 	firstTOWAcquisition = true;
 	// reset camera to (0,0) in virtual space
@@ -240,20 +228,8 @@ public class BehaviorLogManager implements PostAnimationAction {
 //                                                               // that does not detect cursor exiting a glyph that is not in the viewport
 // 	application.target.setVisible(false);
 	directionStr = BehaviorBlock.getDirection(block.direction[trialCount]);
-	startLocationStr = BehaviorBlock.getStartLocation(block.startlocation[trialCount]);
-	IDStr = String.valueOf(block.ID[trialCount]);
 // 	application.updateStartButton(block.startlocation[trialCount]);
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length), MIN_DELAY_BETWEEN_TRIALS);
-    }
-
-    void resetTargetCount(){
-	targetCount = 0;
-	targetCountStr = "0";
-    }
-
-    void incTargetCount(){
-	targetCount++;
-	targetCountStr = String.valueOf(targetCount);
     }
 
     void incTrialCount(){
@@ -276,41 +252,27 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
 
     static final int NB_TARGETS_PER_TRIAL = 1;
-    long previousTime, currentTime, trialStartTime;
-    long[] intermediateTimes = new long[NB_TARGETS_PER_TRIAL];
+    long trialEndTime, trialStartTime;
 
     void startTrial(){
 	im.say(null);
 // 	application.target.setVisible(true);
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
-	previousTime = trialStartTime;
 	resetRequest = false; // make sure there is no orphan camera reset request
     }
 
-    void nextTarget(){
-	currentTime = System.currentTimeMillis();
-	intermediateTimes[targetCount] = currentTime - previousTime;
-	previousTime = currentTime;
-	incTargetCount();
-	endTrial();
-    }
-
     void endTrial(){
+	trialEndTime = System.currentTimeMillis() - trialStartTime;
 	trialStarted = false;
 	try {
-	    for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
-		bwt.write(lineStart +
-			  trialCountStr + OUTPUT_CSV_SEP +
-			  String.valueOf(i) + OUTPUT_CSV_SEP +
-			  startLocationStr + OUTPUT_CSV_SEP +
-			  directionStr + OUTPUT_CSV_SEP +
-			  IDStr + OUTPUT_CSV_SEP +
-			  String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
-			  intermediateTimes[i] + OUTPUT_CSV_SEP +
-			  String.valueOf(errorCount));
-		bwt.newLine();
-	    }
+	    bwt.write(lineStart +
+		      trialCountStr + OUTPUT_CSV_SEP +
+		      directionStr + OUTPUT_CSV_SEP +
+		      String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
+		      String.valueOf(trialEndTime) + OUTPUT_CSV_SEP +
+		      String.valueOf(errorCount));
+	    bwt.newLine();
 	    bwt.flush();
 	    bwc.flush();
 	}
@@ -341,10 +303,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	cinematicTime = System.currentTimeMillis() - trialStartTime;
 	try {
 	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
-		      targetCountStr + OUTPUT_CSV_SEP +
-		      startLocationStr + OUTPUT_CSV_SEP +
 		      directionStr + OUTPUT_CSV_SEP +
-		      IDStr + OUTPUT_CSV_SEP +
 		      String.valueOf(jpx) + OUTPUT_CSV_SEP +
 		      String.valueOf(jpy) + OUTPUT_CSV_SEP +
 		      String.valueOf(application.mCamera.posx) + OUTPUT_CSV_SEP +

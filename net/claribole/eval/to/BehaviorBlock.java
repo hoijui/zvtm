@@ -14,33 +14,6 @@ import com.xerox.VTM.glyphs.ZCircle;
 
 public class BehaviorBlock {
 
-    static final String START_LOC_TL_STR = "TL";   // top left
-    static final String START_LOC_TR_STR = "TR";   // top right
-    static final String START_LOC_BL_STR = "BL";   // bottom left
-    static final String START_LOC_BR_STR = "BR";   // bottom right
-    static final short START_LOC_TL = 0;
-    static final short START_LOC_TR = 1;
-    static final short START_LOC_BL = 2;
-    static final short START_LOC_BR = 3;
-
-    static short getStartLocation(String d){
-	if (d.equals(START_LOC_TL_STR)){return START_LOC_TL;}
-	else if (d.equals(START_LOC_TR_STR)){return START_LOC_TR;}
-	else if (d.equals(START_LOC_BL_STR)){return START_LOC_BL;}
-	else if (d.equals(START_LOC_BR_STR)){return START_LOC_BR;}
-	else {System.err.println("Error parsing input trials: unknown start location: "+d);return -1;}
-    }
-
-    static String getStartLocation(short s){
-	switch (s){
-	case START_LOC_TL:{return START_LOC_TL_STR;}
-	case START_LOC_TR:{return START_LOC_TR_STR;}
-	case START_LOC_BL:{return START_LOC_BL_STR;}
-	case START_LOC_BR:{return START_LOC_BR_STR;}
-	default:{return "";}
-	}
-    }
-
     static final String DIRECTION_NW_STR = "NW";   // north west
     static final String DIRECTION_NE_STR = "NE";   // north east
     static final String DIRECTION_SE_STR = "SE";   // south east
@@ -69,14 +42,11 @@ public class BehaviorBlock {
     }
 
     int nbTrials = 0;
-    short[] startlocation;
     short[] direction;
-    int[] ID;
-    long[] size;
     long[] timeToAcquire;
     
     BehaviorBlock(String blockLine){
-// 	String[] data = blockLine.split(BehaviorLogManager.INPUT_CSV_SEP);
+	String[] data = blockLine.split(BehaviorLogManager.INPUT_CSV_SEP);
 // 	nbTrials = data.length;
 // 	startlocation = new short[nbTrials];
 // 	direction = new short[nbTrials];
