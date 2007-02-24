@@ -88,13 +88,12 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     BehaviorLogManager blm;
 
     public BehaviorEval(short bt, String bv){
-	backgroundType = bt;
 	initGUI();
 	eh = new BehaviorEventHandler(this);
 	mView.setEventHandler(eh);
 	blm = new BehaviorLogManager(this);
 	initBehavior(bv);
-	initWorld();
+	initWorld(bt);
 	mCamera.moveTo(0, 0);
 	mCamera.setAltitude(0);
 	vsm.repaintNow(mView, this);
@@ -156,7 +155,12 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     static final long WM_ORIG_X = -310;
     static final long WM_ORIG_Y = -2123;
 
-    void initWorld(){
+    Glyph NW_TARGET, NE_TARGET, SE_TARGET, SW_TARGET;
+    static final Color TARGET_COLOR = Color.RED;
+    static final Color DISTRACTOR_COLOR = Color.YELLOW;
+
+    void initWorld(short bt){
+	backgroundType = bt;
 	if (backgroundType == BACKGROUND_WORLDMAP){
 	    VImage im = new VImage(WM_ORIG_X, WM_ORIG_Y, 0, (new ImageIcon(WHOLE_MAP_PATH)).getImage(), 40);
 	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
@@ -164,8 +168,18 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    im = new VImage(0, 0, 0, (new ImageIcon(REGION_MAP_PATH)).getImage());
 	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	    vsm.addGlyph(im, mSpace);
+	    NW_TARGET = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET, mSpace);
+	    vsm.addGlyph(NE_TARGET, mSpace);
+	    vsm.addGlyph(SE_TARGET, mSpace);
+	    vsm.addGlyph(SW_TARGET, mSpace);
+// 	    vsm.addGlyph(new VSegment(-20,0,0,500,(float)(45*2*Math.PI/360.0), Color.RED), mSpace);
+// 	    vsm.addGlyph(new VSegment(-20,0,0,500,(float)(135*2*Math.PI/360.0), Color.RED), mSpace);
 	}
-	else {
+	else {// backgroundType == BACKGROUND_GRAPH
 	    //XXX: TBW graph
 	}
     }
@@ -200,12 +214,15 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	vsm.repaintNow();
     }
 
+    static final int C_OFFSET_X = -20;
+    static final int C_OFFSET_Y = -20;
+
     void updatePanelSize(){
 	Dimension d = mView.getPanel().getSize();
 	panelWidth = d.width;
 	panelHeight = d.height;
-	BehaviorInstructionsManager.START_BUTTON_TL_X = panelWidth/2 - BehaviorInstructionsManager.START_BUTTON_W / 2;
-	BehaviorInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + BehaviorInstructionsManager.START_BUTTON_H / 2;
+	BehaviorInstructionsManager.START_BUTTON_TL_X = panelWidth/2 - BehaviorInstructionsManager.START_BUTTON_W / 2 + C_OFFSET_X;
+	BehaviorInstructionsManager.START_BUTTON_TL_Y = panelHeight/2 + BehaviorInstructionsManager.START_BUTTON_H / 2 + C_OFFSET_Y;
 	BehaviorInstructionsManager.START_BUTTON_BR_X = BehaviorInstructionsManager.START_BUTTON_TL_X + BehaviorInstructionsManager.START_BUTTON_W;
 	BehaviorInstructionsManager.START_BUTTON_BR_Y = BehaviorInstructionsManager.START_BUTTON_TL_Y + BehaviorInstructionsManager.START_BUTTON_H;
     }

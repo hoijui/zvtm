@@ -25,10 +25,10 @@ public class BehaviorInstructionsManager implements Java2DPainter {
     static int START_BUTTON_TL_Y = 0;
     static int START_BUTTON_BR_X = 0;
     static int START_BUTTON_BR_Y = 0;
-    static final int START_BUTTON_W = 80;
+    static final int START_BUTTON_W = 40;
     static final int START_BUTTON_H = 20;
 
-    static final String C_BT = "CONTINUE";  // Continue button displayed between trials
+    static final String C_BT = "NEXT";  // Continue button displayed between trials
 
     BehaviorEval application;
     BehaviorLogManager blm;
@@ -120,10 +120,10 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	    // message at center of screen (translucent black strip + text)
 	    g2d.setColor(Color.BLACK);
 	    g2d.setComposite(acST);
-	    g2d.fillRect(0, viewHeight / 2 - 100, viewWidth, 220);
+	    g2d.fillRect(0, viewHeight / 2 - 100, viewWidth, 180);
 	    g2d.setComposite(Transparent.acO);
 	    g2d.setColor(Color.WHITE);
-	    g2d.drawString(message, viewWidth/2 - halfMessageWidth, viewHeight/2);
+	    g2d.drawString(message, viewWidth/2 - halfMessageWidth + BehaviorEval.C_OFFSET_X, viewHeight/2 + BehaviorEval.C_OFFSET_Y);
 	    if (blm.sessionStarted && !blm.trialStarted && showButton){
 		// button
 		g2d.setColor(Color.YELLOW);
@@ -133,7 +133,7 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 		g2d.drawRect(BehaviorInstructionsManager.START_BUTTON_TL_X, BehaviorInstructionsManager.START_BUTTON_TL_Y,
 			     BehaviorInstructionsManager.START_BUTTON_W, BehaviorInstructionsManager.START_BUTTON_H);
 		g2d.setColor(Color.BLACK);
-		g2d.drawString(C_BT, BehaviorInstructionsManager.START_BUTTON_TL_X+15, BehaviorInstructionsManager.START_BUTTON_TL_Y+15);
+		g2d.drawString(C_BT, BehaviorInstructionsManager.START_BUTTON_TL_X+8, BehaviorInstructionsManager.START_BUTTON_TL_Y+15);
 	    }
 	}
     }

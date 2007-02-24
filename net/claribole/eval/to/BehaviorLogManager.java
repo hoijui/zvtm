@@ -61,6 +61,8 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     String directionStr;
 
+    Glyph target;
+
     long trialEndTime, trialStartTime;
 
     boolean sessionStarted = false;
@@ -210,21 +212,42 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
     
     void initNextTrial(){
+	resetTargets();
 	incTrialCount();
 	errorCount = 0;
 	firstTOWAcquisition = true;
 	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the
 	    resetRequest = true; // middle of an animation at the time of the first reset
 	}
-	// reinitialize target at first location in right direction and distance
-// 	application.mSpace.destroyGlyph(application.target);  // destroy target and create new one instead of moving existing one
-// 	application.target = block.moveTarget(trialCount, 0, 0);
-// 	application.vsm.addGlyph(application.target, application.mSpace); // to circumvent a problem in ZVTM's picking mechanism 
-//                                                               // that does not detect cursor exiting a glyph that is not in the viewport
-// 	application.target.setVisible(false);
-	directionStr = BehaviorBlock.getDirection(block.direction[trialCount]);
-// 	application.updateStartButton(block.startlocation[trialCount]);
+	directionStr = block.direction[trialCount];
+	target = getTarget(directionStr);
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length), MIN_DELAY_BETWEEN_TRIALS);
+    }
+
+    void resetTargets(){
+	application.NW_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
+	application.NE_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
+	application.SE_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
+	application.SW_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
+    }
+
+    Glyph getTarget(String direction){
+	if (direction.equals(BehaviorBlock.DIRECTION_NW_STR)){
+	    return application.NW_TARGET;
+	}
+	else if (direction.equals(BehaviorBlock.DIRECTION_NE_STR)){
+	    return application.NE_TARGET;
+	}
+	else if (direction.equals(BehaviorBlock.DIRECTION_SE_STR)){
+	    return application.SE_TARGET;
+	}
+	else if (direction.equals(BehaviorBlock.DIRECTION_SW_STR)){
+	    return application.SW_TARGET;
+	}
+	else {
+	    System.err.println("Error: bad target direction: "+direction);
+	    return null;
+	}
     }
 
     void incTrialCount(){
@@ -242,7 +265,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     void startTrial(){
 	im.say(null);
-// 	application.target.setVisible(true);
+	target.setColor(BehaviorEval.TARGET_COLOR);
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
 	resetRequest = false; // make sure there is no orphan camera reset request

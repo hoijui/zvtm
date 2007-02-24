@@ -72,11 +72,14 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	if (mouseInsideOverview){
 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
-// 		orStickedToMouse = true;
+ 		orStickedToMouse = true;
 	    }
 	}
 	else {
 	    mCameraStickedToMouse = true;
+	    if (v.lastGlyphEntered() == application.blm.target){
+		application.blm.endTrial();
+	    }
 	}
     }
 
@@ -109,6 +112,7 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	currentJPX = jpx;
 	currentJPY = jpy;
+	application.blm.im.indicate(v.getMouse().vx+" "+v.getMouse().vy);
 	if (application.blm.trialStarted){
 	    application.blm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
 	}
@@ -122,39 +126,19 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	currentJPX = jpx;
 	currentJPY = jpy;
-	if (buttonNumber == 1){
-// 	    if (mCameraStickedToMouse){
-// 		synchronized(application.mCamera){
-// 		    projCoef = (application.mCamera.focal+Math.abs(application.mCamera.altitude))/application.mCamera.focal;
-// 		    application.mCamera.move(Math.round(projCoef*(lastJPX-jpx)),
-// 					     Math.round(projCoef*(jpy-lastJPY)));
-// 		    lastJPX = jpx;
-// 		    lastJPY = jpy;
-// 		}
-// 	    }
-// 	    else if (orStickedToMouse && mouseActuallyInsideOverview){
-// 		synchronized(application.oCamera){
-// 		    projCoef = (application.oCamera.focal+Math.abs(application.oCamera.altitude))/application.oCamera.focal;
-// 		    application.mCamera.move(Math.round(projCoef*(jpx-lastJPX)),
-// 					     Math.round(projCoef*(lastJPY-jpy)));
-// 		    lastJPX = jpx;
-// 		    lastJPY = jpy;
-// 		}
-// 	    }
- 	}
 	application.blm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
     }
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
     public void enterGlyph(Glyph g){
-	if (!application.blm.trialStarted){return;}
+// 	if (!application.blm.trialStarted){return;}
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
     }
 
     public void exitGlyph(Glyph g){
-	if (!application.blm.trialStarted){return;}
+// 	if (!application.blm.trialStarted){return;}
 	if (g.isSelected()){
 	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
 	}
@@ -170,13 +154,13 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(currentJPX, currentJPY);
 	}
+	else if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
     }
            
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
 	if (code == KeyEvent.VK_S){application.blm.startSession();}
-	else if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
 	else if (code == KeyEvent.VK_F12){application.blm.endTrial();}
-	else if (code == KeyEvent.VK_V){application.blm.im.toggleIndications();}
+	else if (code == KeyEvent.VK_I){application.blm.im.toggleIndications();}
     }
            
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
