@@ -41,6 +41,7 @@ class BehaviorTWEventHandler extends BehaviorEventHandler {
 	}
 	if (mouseInsideOverview){
 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
+		exitPortal(application.to);
 		application.blm.endTrial();
 	    }
 	    else {
