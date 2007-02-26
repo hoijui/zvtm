@@ -17,7 +17,7 @@ import java.awt.event.KeyEvent;
 import java.util.Vector;
 
 import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 
 
@@ -77,9 +77,6 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	else {
 	    mCameraStickedToMouse = true;
-	    if (v.lastGlyphEntered() == application.blm.target){
-		application.blm.endTrial();
-	    }
 	}
     }
 
@@ -112,7 +109,6 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	currentJPX = jpx;
 	currentJPY = jpy;
-	application.blm.im.indicate(v.getMouse().vx+" "+v.getMouse().vy);
 	if (application.blm.trialStarted){
 	    application.blm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
 	}

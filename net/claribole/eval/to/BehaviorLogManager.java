@@ -54,6 +54,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     String subjectID;
     String subjectName;
     String behaviorName;
+    String abstractTargetLocation;
     String blockNumber;
     int trialCount;
     String trialCountStr;
@@ -130,11 +131,15 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
 	    String line = br.readLine();
-	    if (line != null && line.length() > 0){
-		block = new BehaviorBlock(line);
+	    if (abstractTargetLocation == BehaviorBlock.TARGET_MAIN_VIEWPORT){
+		if (line != null && line.length() > 0){
+		    block = new BehaviorBlock(line);
+		}
 	    }
 	    else {
-		im.say(PSTS);
+		if (line != null && line.length() > 0){
+		    block = new BehaviorBlock(Integer.parseInt(line));
+		}
 	    }
 	}
 	catch (IOException ex){ex.printStackTrace();}
@@ -146,6 +151,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    bwt.write("Name" + OUTPUT_CSV_SEP +
 		      "SID" + OUTPUT_CSV_SEP +
 		      "Technique" + OUTPUT_CSV_SEP +
+		      "Background" + OUTPUT_CSV_SEP +
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
@@ -160,6 +166,8 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    bwc.write("# SID" + OUTPUT_CSV_SEP + subjectID);
 	    bwc.newLine();
 	    bwc.write("# Technique" + OUTPUT_CSV_SEP + behaviorName);
+	    bwc.newLine();
+	    bwc.write("# Background" + OUTPUT_CSV_SEP + BehaviorEval.getBackgroundType(application.backgroundType));
 	    bwc.newLine();
 	    bwc.write("# Block" + OUTPUT_CSV_SEP + blockNumber);
 	    bwc.newLine();
@@ -191,6 +199,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	lineStart = subjectName + OUTPUT_CSV_SEP +
 	    subjectID + OUTPUT_CSV_SEP +
 	    behaviorName + OUTPUT_CSV_SEP +
+	    BehaviorEval.getBackgroundType(application.backgroundType) + OUTPUT_CSV_SEP +
 	    blockNumber + OUTPUT_CSV_SEP;
     }
 
@@ -244,8 +253,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	else if (direction.equals(BehaviorBlock.DIRECTION_SW_STR)){
 	    return application.SW_TARGET;
 	}
-	else {
-	    System.err.println("Error: bad target direction: "+direction);
+	else {// DIRECTION_TW_STR: target is observed region inside trailing widget 
 	    return null;
 	}
     }
@@ -265,7 +273,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     void startTrial(){
 	im.say(null);
-	target.setColor(BehaviorEval.TARGET_COLOR);
+	if (target != null){target.setColor(BehaviorEval.TARGET_COLOR);}
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
 	resetRequest = false; // make sure there is no orphan camera reset request

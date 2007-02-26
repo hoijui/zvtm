@@ -66,32 +66,67 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     static final int TOW_PORTAL_Y_OFFSET = 120;
     TrailingOverview to;
 
-//     /* target to acquire */
-//     static final Color TARGET_COLOR = Color.BLUE;
-//     static final Color INSIDE_TARGET_COLOR = Color.WHITE;
-//     /* targets are always in NW, NE, SW or SE directions
-//        distance computed is the projected distance on X and Y axes
-//        for convenience (hence the sqrt(2) division) */
-//     static final long TARGET_DISTANCE = Math.round(3000 / Math.sqrt(2));
-//     static final long TARGET_DEFAULT_SIZE = 100;
-//     static final int TARGET_MIN_PROJ_SIZE = 4;
-//     ZCircle target;
-
     float TOWtranslucencyA, TOWtranslucencyB;
     String TOWtranslucencyAstr, TOWtranslucencyBstr;
 
     static final short BACKGROUND_WORLDMAP = 0;
     static final short BACKGROUND_GRAPH = 1;
+    static final String BACKGROUND_WORLDMAP_STR = "WL";
+    static final String BACKGROUND_GRAPH_STR = "GR";
     short backgroundType = BACKGROUND_WORLDMAP;
+    static String getBackgroundType(short bt){
+	if (bt == BACKGROUND_GRAPH){
+	    return BACKGROUND_GRAPH_STR;
+	}
+	else if (bt == BACKGROUND_WORLDMAP){
+	    return BACKGROUND_WORLDMAP_STR;
+	}
+	else {
+	    return "";
+	}
+    }
+
+    static final LongPoint[] WORLD_DISTRACTORS = {new LongPoint(-471, 111),
+						  new LongPoint(-357, 264),
+						  new LongPoint(167, 340),
+						  new LongPoint(373, 148),
+						  new LongPoint(356, 481),
+						  new LongPoint(-208, 51),
+						  new LongPoint(-287, 170),
+						  new LongPoint(-587, 250),
+						  new LongPoint(-602, 471),
+						  new LongPoint(282, 77),
+						  new LongPoint(227, -257),
+						  new LongPoint(409, -131),
+						  new LongPoint(-340, -108),
+						  new LongPoint(-47, 37),
+						  new LongPoint(18, 16),
+						  new LongPoint(-36, -68),
+						  new LongPoint(38, -36),
+						  new LongPoint(-101, -74),
+						  new LongPoint(-175, -230),
+						  new LongPoint(-326, -369),
+						  new LongPoint(-417, -277),
+						  new LongPoint(-721, -401),
+						  new LongPoint(-710, 246),
+						  new LongPoint(-568, -202),
+						  new LongPoint(570, -341),
+						  new LongPoint(308, -128),
+						  new LongPoint(359, -458),
+						  new LongPoint(271, -49),
+						  new LongPoint(618, -69),
+						  new LongPoint(47, 266),
+						  new LongPoint(490, 245),
+						  new LongPoint(270, 252)};
 
     /* logs */
     BehaviorLogManager blm;
 
-    public BehaviorEval(short bt, String bv){
+    public BehaviorEval(short bt, String bv, String tl){
 	initGUI();
-	eh = new BehaviorEventHandler(this);
-	mView.setEventHandler(eh);
 	blm = new BehaviorLogManager(this);
+	initTargetAbstractLocation(tl);
+	mView.setEventHandler(eh);
 	initBehavior(bv);
 	initWorld(bt);
 	mCamera.moveTo(0, 0);
@@ -99,26 +134,36 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	vsm.repaintNow(mView, this);
     }
 
-    public void viewRepainted(View v){
-	blm.im.say(AcquireLogManager.PSTS);
-	v.removeRepaintListener();
+    void initTargetAbstractLocation(String tl){
+	if (tl.equals(BehaviorBlock.TARGET_MAIN_VIEWPORT)){
+	    eh = new BehaviorMVEventHandler(this);
+	    blm.abstractTargetLocation = BehaviorBlock.TARGET_MAIN_VIEWPORT;
+	}
+	else if (tl.equals(BehaviorBlock.TARGET_TRAILING_WIDGET)){
+	    eh = new BehaviorTWEventHandler(this);
+	    blm.abstractTargetLocation = BehaviorBlock.TARGET_TRAILING_WIDGET;
+	}
+	else {
+	    System.err.println("Error: unknown abstract target location: "+tl);
+	    exit();
+	}
     }
 
     void initBehavior(String t){
-	if (t.equals(BehaviorBlock.BEHAVIOR_FT_STR)){
+	if (t.equals(BehaviorBlock.BEHAVIOR_FT)){
 	    TOWtranslucencyA = BehaviorBlock.BEHAVIOR_FT_A;
 	    TOWtranslucencyB = BehaviorBlock.BEHAVIOR_FT_B;
-	    blm.behaviorName = BehaviorBlock.BEHAVIOR_FT_STR;
+	    blm.behaviorName = BehaviorBlock.BEHAVIOR_FT;
 	}
-	else if (t.equals(BehaviorBlock.BEHAVIOR_IT_STR)){
+	else if (t.equals(BehaviorBlock.BEHAVIOR_IT)){
 	    TOWtranslucencyA = BehaviorBlock.BEHAVIOR_IT_A;
 	    TOWtranslucencyB = BehaviorBlock.BEHAVIOR_IT_B;
-	    blm.behaviorName = BehaviorBlock.BEHAVIOR_IT_STR;
+	    blm.behaviorName = BehaviorBlock.BEHAVIOR_IT;
 	}
-	else if (t.equals(BehaviorBlock.BEHAVIOR_DT_STR)){
+	else if (t.equals(BehaviorBlock.BEHAVIOR_DT)){
 	    TOWtranslucencyA = BehaviorBlock.BEHAVIOR_DT_A;
 	    TOWtranslucencyB = BehaviorBlock.BEHAVIOR_DT_B;
-	    blm.behaviorName = BehaviorBlock.BEHAVIOR_DT_STR;
+	    blm.behaviorName = BehaviorBlock.BEHAVIOR_DT;
 	}
 	TOWtranslucencyAstr = String.valueOf(TOWtranslucencyA);
 	TOWtranslucencyBstr = String.valueOf(TOWtranslucencyB);
@@ -168,6 +213,11 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    im = new VImage(0, 0, 0, (new ImageIcon(REGION_MAP_PATH)).getImage());
 	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	    vsm.addGlyph(im, mSpace);
+	    // distractors
+	    for (int i=0;i<WORLD_DISTRACTORS.length;i++){
+		vsm.addGlyph(new VRectangle(WORLD_DISTRACTORS[i].x, WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
+	    }
+	    // potential targets
 	    NW_TARGET = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
 	    NE_TARGET = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
 	    SE_TARGET = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
@@ -176,8 +226,6 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    vsm.addGlyph(NE_TARGET, mSpace);
 	    vsm.addGlyph(SE_TARGET, mSpace);
 	    vsm.addGlyph(SW_TARGET, mSpace);
-// 	    vsm.addGlyph(new VSegment(-20,0,0,500,(float)(45*2*Math.PI/360.0), Color.RED), mSpace);
-// 	    vsm.addGlyph(new VSegment(-20,0,0,500,(float)(135*2*Math.PI/360.0), Color.RED), mSpace);
 	}
 	else {// backgroundType == BACKGROUND_GRAPH
 	    //XXX: TBW graph
@@ -227,6 +275,11 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	BehaviorInstructionsManager.START_BUTTON_BR_Y = BehaviorInstructionsManager.START_BUTTON_TL_Y + BehaviorInstructionsManager.START_BUTTON_H;
     }
 
+    public void viewRepainted(View v){
+	blm.im.say(AcquireLogManager.PSTS);
+	v.removeRepaintListener();
+    }
+
     void exit(){
 	if (to != null){to.dispose();}
 	System.exit(0);
@@ -234,18 +287,20 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     
     public static void main(String[] args){
 	try {
-	    String t = BehaviorBlock.BEHAVIOR_FT_STR;
-	    if (args.length >= 2){
-		t = args[1];
-		if (args.length >= 4){
-		    BehaviorEval.VIEW_MAX_W = Integer.parseInt(args[2]);
-		    BehaviorEval.VIEW_MAX_H = Integer.parseInt(args[3]);
+	    String beh = BehaviorBlock.BEHAVIOR_FT;
+	    String tar = BehaviorBlock.TARGET_MAIN_VIEWPORT;
+	    if (args.length >= 3){
+		beh = args[1];
+		tar = args[2];
+		if (args.length >= 5){
+		    BehaviorEval.VIEW_MAX_W = Integer.parseInt(args[3]);
+		    BehaviorEval.VIEW_MAX_H = Integer.parseInt(args[4]);
 		}
 	    }
-	    new BehaviorEval(Short.parseShort(args[0]), t);
+	    new BehaviorEval(Short.parseShort(args[0]), beh, tar);
 	}
 	catch (Exception ex){
-	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.BehaviorEval <backgroundType> <FT>|<IT>|<DT> [<window width> <window height>]");
+	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.BehaviorEval <backgroundType> <FT>|<IT>|<DT> <MV>|<TW> [<window width> <window height>]");
 	    System.exit(0);
 	}
     }
