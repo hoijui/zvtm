@@ -89,6 +89,8 @@ public class EvalFitts implements Java2DPainter {
     static final long GRID_H = 12000;
 
     /* logs */
+    static final boolean WRITE_CINEMATIC = true;
+
     static final String LOG_FILE_EXT = ".csv";
     static final String INPUT_CSV_SEP = ";";
     static final String OUTPUT_CSV_SEP = "\t";
@@ -96,8 +98,8 @@ public class EvalFitts implements Java2DPainter {
     static final String LOG_DIR_FULL = System.getProperty("user.dir") + File.separator + LOG_DIR;
     static final String TRIAL_DIR = "trials";
     static final String TRIAL_DIR_FULL = System.getProperty("user.dir") + File.separator + TRIAL_DIR;
-    File logFile;
-    BufferedWriter bwt;
+    File tlogFile, clogFile;
+    BufferedWriter bwt, bwc;
     String subjectID;
     String subjectName;
     String blockNumber;
@@ -198,10 +200,15 @@ public class EvalFitts implements Java2DPainter {
 	subjectName = JOptionPane.showInputDialog("Subject Name");
 	subjectID = JOptionPane.showInputDialog("Subject ID");
 	blockNumber = JOptionPane.showInputDialog("Block");
-	logFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+magFactor+"-block"+blockNumber, LOG_DIR);
+	tlogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+magFactor+"-block"+blockNumber+"-trials", LOG_DIR);
+	clogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+magFactor+"-block"+blockNumber+"-cinematic", LOG_DIR);
 	try {
-	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile), "UTF-8"));
-	    writeHeaders();
+	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tlogFile), "UTF-8"));
+	    writeTrialHeaders();
+	    if (WRITE_CINEMATIC){
+		bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(clogFile), "UTF-8"));
+		writeCinematicHeaders();
+	    }
 	}
 	catch(IOException ex){ex.printStackTrace();}
     }
@@ -217,7 +224,7 @@ public class EvalFitts implements Java2DPainter {
 	return file;
     }
 
-    void writeHeaders(){
+    void writeTrialHeaders(){
 	try {
 	    // trial column headers
 	    bwt.write("Name" + OUTPUT_CSV_SEP +
@@ -230,6 +237,21 @@ public class EvalFitts implements Java2DPainter {
 		      "Hit" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Errors");
+	    bwt.newLine();
+	    bwt.flush();
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
+
+    void writeCinematicHeaders(){
+	try {
+	    // trial column headers
+	    bwt.write("Trial" + OUTPUT_CSV_SEP +
+		      "Hit" + OUTPUT_CSV_SEP +
+		      "Time" + OUTPUT_CSV_SEP +
+		      "lx" + OUTPUT_CSV_SEP +
+		      "ly" + OUTPUT_CSV_SEP +
+		      "tx");
 	    bwt.newLine();
 	    bwt.flush();
 	}
@@ -254,10 +276,10 @@ public class EvalFitts implements Java2DPainter {
 
     void startTrial(int jpx, int jpy){
 	if (trialStarted){return;}
+	trialStarted = true;
 	setLens(jpx, jpy);
 	showStartButton(false);
 	say(null);
-	trialStarted = true;
 	startTime = System.currentTimeMillis();
     }
 
@@ -265,6 +287,7 @@ public class EvalFitts implements Java2DPainter {
 	trialStarted = false;
 	unsetLens();
 	flushTrial();
+	flushCinematic();
 	if (trialCount+1 < idSeq.length()){
 	    initNextTrial();
 	}
@@ -323,6 +346,26 @@ public class EvalFitts implements Java2DPainter {
 	}
 	catch (IOException ex){ex.printStackTrace();}
     }
+
+    void writeCinematic(){
+	try {
+	    bwc.write(trialCount + OUTPUT_CSV_SEP +
+		      hitCount + OUTPUT_CSV_SEP +
+		      (System.currentTimeMillis()-startTime) + OUTPUT_CSV_SEP +
+		      lens.lx + OUTPUT_CSV_SEP +
+		      lens.ly + OUTPUT_CSV_SEP +
+		      target.vx);
+	    bwc.newLine();
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
+
+    void flushCinematic(){
+	try {
+	    bwc.flush();
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
     
     /* -------------- lenses ----------------- */
 
@@ -368,6 +411,9 @@ public class EvalFitts implements Java2DPainter {
 	    lens.setAbsolutePosition(x, y);
 	}
 	vsm.repaintNow();
+	if (WRITE_CINEMATIC && trialStarted){
+	    writeCinematic();
+	}
     }
 
 
