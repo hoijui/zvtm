@@ -40,8 +40,9 @@ public class BehaviorInstructionsManager implements Java2DPainter {
     String error = null;
 
     String indication = null;
-
-    boolean showButton = false;
+    boolean showIndications = false;
+    
+    boolean buttonEnabled = false;
 
     BehaviorInstructionsManager(BehaviorEval app, BehaviorLogManager blm){
 	this.application = app;
@@ -49,12 +50,12 @@ public class BehaviorInstructionsManager implements Java2DPainter {
     }
 
     void say(String msg, final int delay){
-	showButton(false);
+	enableButton(false);
 	say(msg);
 	final SwingWorker worker=new SwingWorker(){
 		public Object construct(){
 		    sleep(delay);
-		    BehaviorInstructionsManager.this.showButton(true);
+		    BehaviorInstructionsManager.this.enableButton(true);
 		    return null; 
 		}
 	    };
@@ -83,8 +84,6 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	worker.start();
     }
 
-    boolean showIndications = false;
-    
     void toggleIndications(){
 	showIndications = !showIndications;
     }
@@ -93,16 +92,23 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	indication = s;
     }
 
-    void showButton(boolean b){
-	showButton = b;
+    void enableButton(boolean b){
+	buttonEnabled = b;
 	application.vsm.repaintNow();
     }
 
     boolean clickOnStartButton(int jpx, int jpy){
-	return (showButton &&
+	return (buttonEnabled &&
 		jpx >= START_BUTTON_TL_X && jpy >= START_BUTTON_TL_Y &&
 		jpx <= START_BUTTON_BR_X && jpy <= START_BUTTON_BR_Y);
     }
+
+    static final Color ENABLED_BUTTON_FOREGROUND = Color.BLACK;
+    static final Color ENABLED_BUTTON_BACKGROUND = Color.YELLOW;
+    static final Color DISABLED_BUTTON_FOREGROUND = Color.GRAY;
+    static final Color DISABLED_BUTTON_BACKGROUND = Color.LIGHT_GRAY;
+    static final Color ENABLED_BUTTON_BORDER = Color.RED;
+    static final Color DISABLED_BUTTON_BORDER = Color.GRAY;
 
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
@@ -124,15 +130,15 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	    g2d.setComposite(Transparent.acO);
 	    g2d.setColor(Color.WHITE);
 	    g2d.drawString(message, viewWidth/2 - halfMessageWidth + BehaviorEval.C_OFFSET_X, viewHeight/2 + BehaviorEval.C_OFFSET_Y);
-	    if (blm.sessionStarted && !blm.trialStarted && showButton){
+	    if (blm.sessionStarted && !blm.trialStarted){
 		// button
-		g2d.setColor(Color.YELLOW);
+		g2d.setColor((buttonEnabled) ? ENABLED_BUTTON_BACKGROUND : DISABLED_BUTTON_BACKGROUND);
 		g2d.fillRect(BehaviorInstructionsManager.START_BUTTON_TL_X, BehaviorInstructionsManager.START_BUTTON_TL_Y,
 			     BehaviorInstructionsManager.START_BUTTON_W, BehaviorInstructionsManager.START_BUTTON_H);
-		g2d.setColor(Color.RED);
+		g2d.setColor((buttonEnabled) ? ENABLED_BUTTON_BORDER : DISABLED_BUTTON_BORDER);
 		g2d.drawRect(BehaviorInstructionsManager.START_BUTTON_TL_X, BehaviorInstructionsManager.START_BUTTON_TL_Y,
 			     BehaviorInstructionsManager.START_BUTTON_W, BehaviorInstructionsManager.START_BUTTON_H);
-		g2d.setColor(Color.BLACK);
+		g2d.setColor((buttonEnabled) ? ENABLED_BUTTON_FOREGROUND : DISABLED_BUTTON_FOREGROUND);
 		g2d.drawString(C_BT, BehaviorInstructionsManager.START_BUTTON_TL_X+8, BehaviorInstructionsManager.START_BUTTON_TL_Y+15);
 	    }
 	}

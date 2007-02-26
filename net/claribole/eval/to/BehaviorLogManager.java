@@ -45,7 +45,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     static final String ERR_MSG = "ERROR";
 
-    static final int MIN_DELAY_BETWEEN_TRIALS = 1000;
+    static final int MIN_DELAY_BETWEEN_TRIALS = 2000;
 
     BehaviorEval application;
 
