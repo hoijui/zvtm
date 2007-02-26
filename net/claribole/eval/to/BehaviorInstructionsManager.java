@@ -28,7 +28,7 @@ public class BehaviorInstructionsManager implements Java2DPainter {
     static final int START_BUTTON_W = 40;
     static final int START_BUTTON_H = 20;
 
-    static final String C_BT = "NEXT";  // Continue button displayed between trials
+    static final String C_BT = "Next";  // Continue button displayed between trials
 
     BehaviorEval application;
     BehaviorLogManager blm;

@@ -245,10 +245,6 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		    g.setMouseInsideBorderColor(MOUSE_INSIDE_DISTRACTOR_COLOR);
 		}
 	    }
-
-
-	    vsm.addGlyph(new VSegment(0,0,0,1000,0,Color.BLUE), mSpace);
-	    vsm.addGlyph(new VSegment(0,0,0,1000,(float)Math.PI/2.0f,Color.BLUE), mSpace);
 	}
     }
 
