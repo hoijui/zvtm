@@ -52,5 +52,36 @@ class BehaviorTWEventHandler extends BehaviorEventHandler {
 	    mCameraStickedToMouse = true;
 	}
     }
-   
+
+    public void press3(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+	sx = v.getMouse().vx;
+	sy = v.getMouse().vy;
+	VRectangle r = new VRectangle(sx, sy, 0, 5, 5, BehaviorEval.DISTRACTOR_COLOR);
+	application.vsm.addGlyph(r, application.mSpace);
+	r.setMouseInsideBorderColor(java.awt.Color.RED);
+	System.err.println(sx+" "+sy);
+    }
+
+    long sx,sy;
+    long sx1,sy1;
+    long sx2,sy2;
+
+    public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
+	if (code == KeyEvent.VK_F1){
+	    application.switchPortal(currentJPX, currentJPY);
+	    application.to.updateFrequency(e.getWhen());
+	    application.to.updateWidgetLocation(currentJPX, currentJPY);
+	}
+	else if (code == KeyEvent.VK_T){
+	    sx1 = v.getMouse().vx;
+	    sy1 = v.getMouse().vy;
+	}
+	else if (code == KeyEvent.VK_H){
+	    sx2 = v.getMouse().vx;
+	    sy2 = v.getMouse().vy;
+	    application.vsm.addGlyph(new VSegment(sx1, sy1, 0, java.awt.Color.BLACK, sx2, sy2), application.mSpace);
+	    System.err.println(sx1+" "+sy1+" "+sx2+" "+sy2);
+	}
+    }
+
 }
