@@ -49,18 +49,18 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	this.blm = blm;
     }
 
-    void say(String msg, final int delay){
-	enableButton(false);
-	say(msg);
-	final SwingWorker worker=new SwingWorker(){
-		public Object construct(){
-		    sleep(delay);
-		    BehaviorInstructionsManager.this.enableButton(true);
-		    return null; 
-		}
-	    };
-	worker.start();
-    }
+//     void say(String msg, final int delay){
+// 	enableButton(false);
+// 	say(msg);
+// 	final SwingWorker worker=new SwingWorker(){
+// 		public Object construct(){
+// 		    sleep(delay);
+// 		    //BehaviorInstructionsManager.this.enableButton(true);
+// 		    return null; 
+// 		}
+// 	    };
+// 	worker.start();
+//     }
 
     void say(String msg){
 	if (msg != null && msg.length() == 0){msg = null;}
@@ -68,6 +68,7 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 	if (message != null){
 	    halfMessageWidth = application.mView.getGraphicsContext().getFontMetrics().stringWidth(message) / 2;
 	}
+	enableButton(false);
 	application.vsm.repaintNow();
     }
 
@@ -90,6 +91,35 @@ public class BehaviorInstructionsManager implements Java2DPainter {
 
     void indicate(String s){
 	indication = s;
+    }
+
+    /* tells whether cursor is currently in button or not
+       (set or unset by cursorAt(), checked by enableButton(delay) before actually enabling the button
+       because cursor might have exited button during the BehaviorLogManager.MIN_TIME_INSIDE_NEXT_TRIAL_BUTTON delay) */
+    boolean cursorCurrentlyInButton = false;
+
+    void cursorAt(int jpx, int jpy){
+	if (jpx >= START_BUTTON_TL_X && jpy >= START_BUTTON_TL_Y &&
+	    jpx <= START_BUTTON_BR_X && jpy <= START_BUTTON_BR_Y){
+	    if (!cursorCurrentlyInButton){
+		enableButton(BehaviorLogManager.MIN_TIME_INSIDE_NEXT_TRIAL_BUTTON);
+		cursorCurrentlyInButton = true;
+	    }
+	}
+	else {
+	    cursorCurrentlyInButton = false;
+	}
+    }
+
+    void enableButton(final int delay){
+	final SwingWorker worker = new SwingWorker(){
+		public Object construct(){
+		    sleep(delay);
+		    if (cursorCurrentlyInButton){enableButton(true);}
+		    return null; 
+		}
+	    };
+	worker.start();
     }
 
     void enableButton(boolean b){

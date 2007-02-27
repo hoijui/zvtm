@@ -124,8 +124,18 @@ class Distractors {
 							    new LongPoint(-17, -219),
 							    new LongPoint(-790, -467),
 							    new LongPoint(-565, -147),
-							    new LongPoint(-665, -273)
-    };
+							    new LongPoint(-665, -273),
+							    new LongPoint(-609, 444),
+							    new LongPoint(-441, 425),
+							    new LongPoint(180, 293),
+							    new LongPoint(205, 223),
+							    new LongPoint(406, -428),
+							    new LongPoint(405, -419),
+							    new LongPoint(126, -255),
+							    new LongPoint(209, -225),
+							    new LongPoint(-245, -221),
+							    new LongPoint(-245, -230),
+							    new LongPoint(-245, -230)};
     
     static final LongPoint[] GRAPH_DISTRACTOR_EDGES_HEAD = {new LongPoint(3, 74),
 							    new LongPoint(390, 353),
@@ -184,6 +194,17 @@ class Distractors {
 							    new LongPoint(-102, -293),
 							    new LongPoint(-596, -455),
 							    new LongPoint(-666, -264),
-							    new LongPoint(-795, -463)};
+							    new LongPoint(-795, -463),
+							    new LongPoint(-450, 425),
+							    new LongPoint(-268, 395),
+							    new LongPoint(205, 231),
+							    new LongPoint(99, 122),
+							    new LongPoint(466, -515),
+							    new LongPoint(308, -310),
+							    new LongPoint(200, -225),
+							    new LongPoint(258, -202),
+							    new LongPoint(-259, -143),
+							    new LongPoint(-255, -310),
+							    new LongPoint(-106, -289)};
 
 }

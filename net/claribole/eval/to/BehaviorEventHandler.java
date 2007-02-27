@@ -109,6 +109,7 @@ class BehaviorEventHandler implements ViewEventHandler, PortalEventHandler, Comp
 	}
 	currentJPX = jpx;
 	currentJPY = jpy;
+	if (application.blm.waitingForCursorToEnterButton){application.blm.im.cursorAt(currentJPX, currentJPY);}
 	if (application.blm.trialStarted){
 	    application.blm.writeCinematic(jpx, jpy, application.to.x, application.to.y);
 	}

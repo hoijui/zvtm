@@ -45,7 +45,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     static final String ERR_MSG = "ERROR";
 
-    static final int MIN_DELAY_BETWEEN_TRIALS = 2000;
+    static final int MIN_TIME_INSIDE_NEXT_TRIAL_BUTTON = 2000;
 
     BehaviorEval application;
 
@@ -61,6 +61,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     int errorCount = 0;
 
     String directionStr;
+    String radiusStr;
 
     Glyph target;
 
@@ -78,6 +79,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     BufferedWriter bwt, bwc;
 
     BehaviorInstructionsManager im;
+    boolean waitingForCursorToEnterButton = false;
 
     BehaviorLogManager(BehaviorEval app){
 	this.application = app;
@@ -155,6 +157,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
+		      "Radius" + OUTPUT_CSV_SEP +
 		      "AcqTime" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Errors");
@@ -178,6 +181,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    // cinematic column headers
 	    bwc.write("Trial" + OUTPUT_CSV_SEP +
 		      "Direction" + OUTPUT_CSV_SEP +
+		      "Radius" + OUTPUT_CSV_SEP +
 		      "mx" + OUTPUT_CSV_SEP +
 		      "my" + OUTPUT_CSV_SEP +
 		      "cx" + OUTPUT_CSV_SEP +
@@ -221,7 +225,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
     
     void initNextTrial(){
-	resetTargets();
+	if (target != null){target.setColor(BehaviorEval.DISTRACTOR_COLOR);}
 	incTrialCount();
 	errorCount = 0;
 	firstTOWAcquisition = true;
@@ -229,31 +233,65 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    resetRequest = true; // middle of an animation at the time of the first reset
 	}
 	directionStr = block.direction[trialCount];
-	target = getTarget(directionStr);
-	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length), MIN_DELAY_BETWEEN_TRIALS);
+	radiusStr = block.radius[trialCount];
+	target = getTarget(directionStr, radiusStr);
+	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
+	waitingForCursorToEnterButton = true;
     }
 
-    void resetTargets(){
-	application.NW_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
-	application.NE_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
-	application.SE_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
-	application.SW_TARGET.setColor(BehaviorEval.DISTRACTOR_COLOR);
-    }
-
-    Glyph getTarget(String direction){
-	if (direction.equals(BehaviorBlock.DIRECTION_NW_STR)){
-	    return application.NW_TARGET;
+    Glyph getTarget(String direction, String radius){
+	if (radius.equals(BehaviorBlock.RADIUS_R1)){
+	    if (direction.equals(BehaviorBlock.DIRECTION_NW_STR)){
+		return application.NW_TARGET_R1;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_NE_STR)){
+		return application.NE_TARGET_R1;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_SE_STR)){
+		return application.SE_TARGET_R1;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_SW_STR)){
+		return application.SW_TARGET_R1;
+	    }
+	    else {// DIRECTION_TW_STR: target is observed region inside trailing widget 
+		return null;
+	    }
 	}
-	else if (direction.equals(BehaviorBlock.DIRECTION_NE_STR)){
-	    return application.NE_TARGET;
+	else if (radius.equals(BehaviorBlock.RADIUS_R2)){
+	    if (direction.equals(BehaviorBlock.DIRECTION_NW_STR)){
+		return application.NW_TARGET_R2;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_NE_STR)){
+		return application.NE_TARGET_R2;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_SE_STR)){
+		return application.SE_TARGET_R2;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_SW_STR)){
+		return application.SW_TARGET_R2;
+	    }
+	    else {// DIRECTION_TW_STR: target is observed region inside trailing widget 
+		return null;
+	    }
 	}
-	else if (direction.equals(BehaviorBlock.DIRECTION_SE_STR)){
-	    return application.SE_TARGET;
+	else if (radius.equals(BehaviorBlock.RADIUS_R3)){
+	    if (direction.equals(BehaviorBlock.DIRECTION_NW_STR)){
+		return application.NW_TARGET_R3;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_NE_STR)){
+		return application.NE_TARGET_R3;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_SE_STR)){
+		return application.SE_TARGET_R3;
+	    }
+	    else if (direction.equals(BehaviorBlock.DIRECTION_SW_STR)){
+		return application.SW_TARGET_R3;
+	    }
+	    else {// DIRECTION_TW_STR: target is observed region inside trailing widget 
+		return null;
+	    }
 	}
-	else if (direction.equals(BehaviorBlock.DIRECTION_SW_STR)){
-	    return application.SW_TARGET;
-	}
-	else {// DIRECTION_TW_STR: target is observed region inside trailing widget 
+	else {// DIRECTION_TW_STR: target is observed region inside trailing widget, no radius specified
 	    return null;
 	}
     }
@@ -272,6 +310,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
 
     void startTrial(){
+	waitingForCursorToEnterButton = false;
 	im.say(null);
 	if (target != null){target.setColor(BehaviorEval.TARGET_COLOR);}
 	trialStarted = true;
@@ -286,6 +325,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    bwt.write(lineStart +
 		      trialCountStr + OUTPUT_CSV_SEP +
 		      directionStr + OUTPUT_CSV_SEP +
+		      radiusStr + OUTPUT_CSV_SEP +
 		      String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
 		      String.valueOf(trialEndTime) + OUTPUT_CSV_SEP +
 		      String.valueOf(errorCount));
@@ -321,6 +361,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 	try {
 	    bwc.write(trialCountStr + OUTPUT_CSV_SEP +
 		      directionStr + OUTPUT_CSV_SEP +
+		      radiusStr + OUTPUT_CSV_SEP +
 		      String.valueOf(jpx) + OUTPUT_CSV_SEP +
 		      String.valueOf(jpy) + OUTPUT_CSV_SEP +
 		      String.valueOf(application.mCamera.posx) + OUTPUT_CSV_SEP +

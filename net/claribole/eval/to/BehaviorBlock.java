@@ -33,8 +33,14 @@ public class BehaviorBlock {
     static final String DIRECTION_SW_STR = "SW";   // south west
     static final String DIRECTION_TW_STR = "TW";   // in trailing widget
 
+    static final String RADIUS_R1 = "R1";   // radius 1 
+    static final String RADIUS_R2 = "R2";   // radius 2
+    static final String RADIUS_R3 = "R3";   // radius 3
+    static final String RADIUS_RW = "RT";   // no radius, trailing widget
+
     int nbTrials = 0;
     String[] direction;
+    String[] radius;
     long[] timeToAcquire;
     
     /* trials when target is in main viewport, either NW, NE, SE or SW */
@@ -42,9 +48,11 @@ public class BehaviorBlock {
 	String[] data = blockLine.split(BehaviorLogManager.INPUT_CSV_SEP);
 	nbTrials = data.length;
 	direction = new String[nbTrials];
+	radius = new String[nbTrials];
 	timeToAcquire = new long[nbTrials];
 	for (int i=0;i<nbTrials;i++){
 	    direction[i] = data[i].substring(0,2);
+	    radius[i] = data[i].substring(2,4);
 	}
     }
     
@@ -52,9 +60,11 @@ public class BehaviorBlock {
     BehaviorBlock(int trialCount){
 	nbTrials = trialCount;
 	direction = new String[nbTrials];
+	radius = new String[nbTrials];
 	timeToAcquire = new long[nbTrials];
 	for (int i=0;i<nbTrials;i++){
 	    direction[i] = DIRECTION_TW_STR;
+	    radius[i] = RADIUS_RW;
 	}
     }
 

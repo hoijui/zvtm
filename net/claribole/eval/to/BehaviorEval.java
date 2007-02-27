@@ -175,7 +175,9 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     static final long WM_ORIG_X = -310;
     static final long WM_ORIG_Y = -2123;
 
-    Glyph NW_TARGET, NE_TARGET, SE_TARGET, SW_TARGET;
+    Glyph NW_TARGET_R1, NE_TARGET_R1, SE_TARGET_R1, SW_TARGET_R1;
+    Glyph NW_TARGET_R2, NE_TARGET_R2, SE_TARGET_R2, SW_TARGET_R2;
+    Glyph NW_TARGET_R3, NE_TARGET_R3, SE_TARGET_R3, SW_TARGET_R3;
     static final Color TARGET_COLOR = Color.RED;
     static final Color DISTRACTOR_COLOR = Color.YELLOW;
     static final Color MOUSE_INSIDE_DISTRACTOR_COLOR = Color.RED;
@@ -194,15 +196,47 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    for (int i=0;i<Distractors.WORLD_DISTRACTORS.length;i++){
 		vsm.addGlyph(new VRectangle(Distractors.WORLD_DISTRACTORS[i].x, Distractors.WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
 	    }
-	    // potential targets
-	    NW_TARGET = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
-	    NE_TARGET = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
-	    SE_TARGET = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
-	    SW_TARGET = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
-	    vsm.addGlyph(NW_TARGET, mSpace);
-	    vsm.addGlyph(NE_TARGET, mSpace);
-	    vsm.addGlyph(SE_TARGET, mSpace);
-	    vsm.addGlyph(SW_TARGET, mSpace);
+	    // potential targets R1
+	    NW_TARGET_R1 = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET_R1 = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET_R1 = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET_R1 = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET_R1, mSpace);
+	    vsm.addGlyph(NE_TARGET_R1, mSpace);
+	    vsm.addGlyph(SE_TARGET_R1, mSpace);
+	    vsm.addGlyph(SW_TARGET_R1, mSpace);
+	    // potential targets R2
+	    NW_TARGET_R2 = new VRectangle(-245,226,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET_R2 = new VRectangle(205,226,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET_R2 = new VRectangle(205,-226,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET_R2 = new VRectangle(-245,-226,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET_R2, mSpace);
+	    vsm.addGlyph(NE_TARGET_R2, mSpace);
+	    vsm.addGlyph(SE_TARGET_R2, mSpace);
+	    vsm.addGlyph(SW_TARGET_R2, mSpace);
+	    // potential targets R3
+	    NW_TARGET_R3 = new VRectangle(-445,424,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET_R3 = new VRectangle(405,424,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET_R3 = new VRectangle(405,-424,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET_R3 = new VRectangle(-445,-424,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET_R3, mSpace);
+	    vsm.addGlyph(NE_TARGET_R3, mSpace);
+	    vsm.addGlyph(SE_TARGET_R3, mSpace);
+	    vsm.addGlyph(SW_TARGET_R3, mSpace);
+// 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(45*2*Math.PI/360.0),Color.BLUE), mSpace);
+// 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(135*2*Math.PI/360.0),Color.BLUE), mSpace);
+// 	    VCircle c = new VCircle(-20,0,0,160,Color.BLUE);
+// 	    c.setFill(false);
+// 	    c.setBorderColor(Color.BLUE);
+// 	    vsm.addGlyph(c, mSpace);
+// 	    c = new VCircle(-20,0,0,320,Color.BLUE);
+// 	    c.setFill(false);
+// 	    c.setBorderColor(Color.BLUE);
+// 	    vsm.addGlyph(c, mSpace);
+// 	    c = new VCircle(-20,0,0,600,Color.BLUE);
+// 	    c.setFill(false);
+// 	    c.setBorderColor(Color.BLUE);
+// 	    vsm.addGlyph(c, mSpace);
 	}
 	else {// backgroundType == BACKGROUND_GRAPH
 	    DEFAULT_PORTAL_BORDER_COLOR = Color.BLACK;
@@ -225,14 +259,33 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 			     mSpace);
 	    }
 	    // potential targets
-	    NW_TARGET = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
-	    NE_TARGET = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
-	    SE_TARGET = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
-	    SW_TARGET = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
-	    vsm.addGlyph(NW_TARGET, mSpace);
-	    vsm.addGlyph(NE_TARGET, mSpace);
-	    vsm.addGlyph(SE_TARGET, mSpace);
-	    vsm.addGlyph(SW_TARGET, mSpace);
+	    // potential targets R1
+	    NW_TARGET_R1 = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET_R1 = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET_R1 = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET_R1 = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET_R1, mSpace);
+	    vsm.addGlyph(NE_TARGET_R1, mSpace);
+	    vsm.addGlyph(SE_TARGET_R1, mSpace);
+	    vsm.addGlyph(SW_TARGET_R1, mSpace);
+	    // potential targets R2
+	    NW_TARGET_R2 = new VRectangle(-245,234,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET_R2 = new VRectangle(205,226,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET_R2 = new VRectangle(205,-226,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET_R2 = new VRectangle(-245,-226,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET_R2, mSpace);
+	    vsm.addGlyph(NE_TARGET_R2, mSpace);
+	    vsm.addGlyph(SE_TARGET_R2, mSpace);
+	    vsm.addGlyph(SW_TARGET_R2, mSpace);
+	    // potential targets R3
+	    NW_TARGET_R3 = new VRectangle(-445,424,0,5,5,DISTRACTOR_COLOR);
+	    NE_TARGET_R3 = new VRectangle(413,424,0,5,5,DISTRACTOR_COLOR);
+	    SE_TARGET_R3 = new VRectangle(405,-424,0,5,5,DISTRACTOR_COLOR);
+	    SW_TARGET_R3 = new VRectangle(-445,-430,0,5,5,DISTRACTOR_COLOR);
+	    vsm.addGlyph(NW_TARGET_R3, mSpace);
+	    vsm.addGlyph(NE_TARGET_R3, mSpace);
+	    vsm.addGlyph(SE_TARGET_R3, mSpace);
+	    vsm.addGlyph(SW_TARGET_R3, mSpace);
 	    Vector v = mSpace.getAllGlyphs();
 	    Object o;
 	    Glyph g;
@@ -245,6 +298,20 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		    g.setMouseInsideBorderColor(MOUSE_INSIDE_DISTRACTOR_COLOR);
 		}
 	    }
+// 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(45*2*Math.PI/360.0),Color.BLUE), mSpace);
+// 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(135*2*Math.PI/360.0),Color.BLUE), mSpace);
+// 	    VCircle c = new VCircle(-20,0,0,160,Color.BLUE);
+// 	    c.setFill(false);
+// 	    c.setBorderColor(Color.BLUE);
+// 	    vsm.addGlyph(c, mSpace);
+// 	    c = new VCircle(-20,0,0,320,Color.BLUE);
+// 	    c.setFill(false);
+// 	    c.setBorderColor(Color.BLUE);
+// 	    vsm.addGlyph(c, mSpace);
+// 	    c = new VCircle(-20,0,0,600,Color.BLUE);
+// 	    c.setFill(false);
+// 	    c.setBorderColor(Color.BLUE);
+// 	    vsm.addGlyph(c, mSpace);
 	}
     }
 
