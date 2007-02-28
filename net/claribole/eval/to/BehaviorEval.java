@@ -210,10 +210,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	    vsm.addGlyph(im, mSpace);
 	    if (blm.abstractTargetLocation.equals(BehaviorBlock.TARGET_MAIN_VIEWPORT)){
-		// distractors
-		for (int i=0;i<Distractors.WORLD_DISTRACTORS.length;i++){
-		    vsm.addGlyph(new VRectangle(Distractors.WORLD_DISTRACTORS[i].x, Distractors.WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
-		}
+// 		// distractors
+// 		for (int i=0;i<Distractors.WORLD_DISTRACTORS.length;i++){
+// 		    vsm.addGlyph(new VRectangle(Distractors.WORLD_DISTRACTORS[i].x, Distractors.WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
+// 		}
 		// potential targets R1
 		NW_TARGET_R1 = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
 		NE_TARGET_R1 = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
