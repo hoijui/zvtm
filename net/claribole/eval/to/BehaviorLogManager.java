@@ -115,8 +115,8 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    return;
 	}
 	try {
-	    logFile = initLogFile(subjectID+"-"+behaviorName+"-trial-block"+blockNumber, LOG_DIR);
- 	    cinematicFile = initLogFile(subjectID+"-"+behaviorName+"-cinematic-block"+blockNumber, LOG_DIR);
+	    logFile = initLogFile(subjectID+"-"+behaviorName+"-"+abstractTargetLocation+"-trial-block"+blockNumber, LOG_DIR);
+ 	    cinematicFile = initLogFile(subjectID+"-"+behaviorName+"-"+abstractTargetLocation+"-cinematic-block"+blockNumber, LOG_DIR);
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(logFile), "UTF-8"));
  	    bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cinematicFile), "UTF-8"));
 	}
