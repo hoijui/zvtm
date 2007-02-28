@@ -147,16 +147,15 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
     }
 
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
-	if (code == KeyEvent.VK_SPACE){
+	if (code == KeyEvent.VK_F1){
 	    application.switchPortal(currentJPX, currentJPY);
 	    application.to.updateFrequency(e.getWhen());
 	    application.to.updateWidgetLocation(currentJPX, currentJPY);
 	}
+	else if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
     }
            
-    public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
-	if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
-    }
+    public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){}
            
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
     
