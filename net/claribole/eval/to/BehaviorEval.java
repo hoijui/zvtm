@@ -215,32 +215,57 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 // 		    vsm.addGlyph(new VRectangle(Distractors.WORLD_DISTRACTORS[i].x, Distractors.WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
 // 		}
 		// potential targets R1
-		NW_TARGET_R1 = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
-		NE_TARGET_R1 = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
-		SE_TARGET_R1 = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
-		SW_TARGET_R1 = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
+		float transp = 0.4f;
+		NW_TARGET_R1 = new VRectangleST(-135,120,0,5,5,DISTRACTOR_COLOR);
+		NE_TARGET_R1 = new VRectangleST(95,120,0,5,5,DISTRACTOR_COLOR);
+		SE_TARGET_R1 = new VRectangleST(95,-120,0,5,5,DISTRACTOR_COLOR);
+		SW_TARGET_R1 = new VRectangleST(-135,-120,0,5,5,DISTRACTOR_COLOR);
 		vsm.addGlyph(NW_TARGET_R1, mSpace);
 		vsm.addGlyph(NE_TARGET_R1, mSpace);
 		vsm.addGlyph(SE_TARGET_R1, mSpace);
 		vsm.addGlyph(SW_TARGET_R1, mSpace);
+		((Transparent)NW_TARGET_R1).setTransparencyValue(transp);
+		((Transparent)NE_TARGET_R1).setTransparencyValue(transp);
+		((Transparent)SE_TARGET_R1).setTransparencyValue(transp);
+		((Transparent)SW_TARGET_R1).setTransparencyValue(transp);
+		NW_TARGET_R1.setVisible(false);
+		NE_TARGET_R1.setVisible(false);
+		SE_TARGET_R1.setVisible(false);
+		SW_TARGET_R1.setVisible(false);
 		// potential targets R2
-		NW_TARGET_R2 = new VRectangle(-245,226,0,5,5,DISTRACTOR_COLOR);
-		NE_TARGET_R2 = new VRectangle(205,226,0,5,5,DISTRACTOR_COLOR);
-		SE_TARGET_R2 = new VRectangle(205,-226,0,5,5,DISTRACTOR_COLOR);
-		SW_TARGET_R2 = new VRectangle(-245,-226,0,5,5,DISTRACTOR_COLOR);
+		NW_TARGET_R2 = new VRectangleST(-245,226,0,5,5,DISTRACTOR_COLOR);
+		NE_TARGET_R2 = new VRectangleST(205,226,0,5,5,DISTRACTOR_COLOR);
+		SE_TARGET_R2 = new VRectangleST(205,-226,0,5,5,DISTRACTOR_COLOR);
+		SW_TARGET_R2 = new VRectangleST(-245,-226,0,5,5,DISTRACTOR_COLOR);
 		vsm.addGlyph(NW_TARGET_R2, mSpace);
 		vsm.addGlyph(NE_TARGET_R2, mSpace);
 		vsm.addGlyph(SE_TARGET_R2, mSpace);
 		vsm.addGlyph(SW_TARGET_R2, mSpace);
+		((Transparent)NW_TARGET_R2).setTransparencyValue(transp);
+		((Transparent)NE_TARGET_R2).setTransparencyValue(transp);
+		((Transparent)SE_TARGET_R2).setTransparencyValue(transp);
+		((Transparent)SW_TARGET_R2).setTransparencyValue(transp);
+		NW_TARGET_R2.setVisible(false);
+		NE_TARGET_R2.setVisible(false);
+		SE_TARGET_R2.setVisible(false);
+		SW_TARGET_R2.setVisible(false);
 		// potential targets R3
-		NW_TARGET_R3 = new VRectangle(-445,424,0,5,5,DISTRACTOR_COLOR);
-		NE_TARGET_R3 = new VRectangle(405,424,0,5,5,DISTRACTOR_COLOR);
-		SE_TARGET_R3 = new VRectangle(405,-424,0,5,5,DISTRACTOR_COLOR);
-		SW_TARGET_R3 = new VRectangle(-445,-424,0,5,5,DISTRACTOR_COLOR);
+		NW_TARGET_R3 = new VRectangleST(-445,424,0,5,5,DISTRACTOR_COLOR);
+		NE_TARGET_R3 = new VRectangleST(405,424,0,5,5,DISTRACTOR_COLOR);
+		SE_TARGET_R3 = new VRectangleST(405,-424,0,5,5,DISTRACTOR_COLOR);
+		SW_TARGET_R3 = new VRectangleST(-445,-424,0,5,5,DISTRACTOR_COLOR);
 		vsm.addGlyph(NW_TARGET_R3, mSpace);
 		vsm.addGlyph(NE_TARGET_R3, mSpace);
 		vsm.addGlyph(SE_TARGET_R3, mSpace);
 		vsm.addGlyph(SW_TARGET_R3, mSpace);
+		((Transparent)NW_TARGET_R3).setTransparencyValue(transp);
+		((Transparent)NE_TARGET_R3).setTransparencyValue(transp);
+		((Transparent)SE_TARGET_R3).setTransparencyValue(transp);
+		((Transparent)SW_TARGET_R3).setTransparencyValue(transp);
+		NW_TARGET_R3.setVisible(false);
+		NE_TARGET_R3.setVisible(false);
+		SE_TARGET_R3.setVisible(false);
+		SW_TARGET_R3.setVisible(false);
 	    }
 // 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(45*2*Math.PI/360.0),Color.BLUE), mSpace);
 // 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(135*2*Math.PI/360.0),Color.BLUE), mSpace);
@@ -364,6 +389,7 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	TrailingOverview res = new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
 						    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
 						    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
+	res.setCutoffFrequencyParameters(0.4,0.2);
 	res.setTranslucencyParameters(TOWtranslucencyA, TOWtranslucencyB);
 	return res;
     }

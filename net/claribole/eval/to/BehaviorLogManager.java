@@ -218,7 +218,8 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
     
     void initNextTrial(){
-	if (target != null){target.setColor(BehaviorEval.DISTRACTOR_COLOR);}
+// 	if (target != null){target.setColor(BehaviorEval.DISTRACTOR_COLOR);}
+	if (target != null){target.setVisible(false);}
 	incTrialCount();
 	errorCount = 0;
 	firstTOWAcquisition = true;
@@ -310,7 +311,8 @@ public class BehaviorLogManager implements PostAnimationAction {
     void startTrial(){
 	waitingForCursorToEnterButton = false;
 	im.say(null);
-	if (target != null){target.setColor(BehaviorEval.TARGET_COLOR);}
+// 	if (target != null){target.setColor(BehaviorEval.TARGET_COLOR);}
+	if (target != null){target.setVisible(true);}
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
 	resetRequest = false; // make sure there is no orphan camera reset request
