@@ -114,7 +114,10 @@ public class BehaviorInstructionsManager implements Java2DPainter {
     void enableButton(final int delay){
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
-		    sleep(delay);
+		    while (BehaviorInstructionsManager.this.application.to.getDistance() > 10){
+			sleep(200);
+		    }
+// 		    sleep(delay);
 		    if (cursorCurrentlyInButton){enableButton(true);}
 		    return null; 
 		}

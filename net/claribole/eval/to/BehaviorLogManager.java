@@ -45,7 +45,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     static final String ERR_MSG = "ERROR";
 
-    static final int MIN_TIME_INSIDE_NEXT_TRIAL_BUTTON = 2000;
+    static final int MIN_TIME_INSIDE_NEXT_TRIAL_BUTTON = 1500;
 
     BehaviorEval application;
 
