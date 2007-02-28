@@ -209,13 +209,10 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 
     TrailingOverview getPortal(int x, int y){
 	TrailingOverview res = new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
-						    (fixedSizeTOW) ? OVERVIEW_WIDTH : TOW_CONTRACTED_WIDTH,
-						    (fixedSizeTOW) ? OVERVIEW_HEIGHT : TOW_CONTRACTED_HEIGHT,
+						    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
 						    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
-	res.setTranslucencyParameters(TOWtranslucencyA, TOWtranslucencyB);
-	if (fixedSizeTOW){// make it harder to acquire when big
-	    res.setCutoffFrequencyParameters(0.4, 1.9);
-	}
+	res.setCutoffFrequencyParameters(0.5,0.25);
+	res.setTranslucencyParameters(0, 0.3f);
 	return res;
     }
 

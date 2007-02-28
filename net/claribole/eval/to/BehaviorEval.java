@@ -389,7 +389,7 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	TrailingOverview res = new TrailingOverview(x-TOW_CONTRACTED_WIDTH/2, y-TOW_CONTRACTED_HEIGHT/2,
 						    TOW_CONTRACTED_WIDTH, TOW_CONTRACTED_HEIGHT,
 						    oCamera, mCamera, 0.0f, TOW_PORTAL_X_OFFSET, TOW_PORTAL_Y_OFFSET);
-	res.setCutoffFrequencyParameters(0.4,0.2);
+	res.setCutoffFrequencyParameters(0.5,0.25);
 	res.setTranslucencyParameters(TOWtranslucencyA, TOWtranslucencyB);
 	return res;
     }

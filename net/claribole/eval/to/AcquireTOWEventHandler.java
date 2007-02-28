@@ -139,6 +139,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	    if (!application.alm.trialStarted){return;}
 	    application.alm.validateTarget();
 	}
+	else if (mod == CTRL_MOD && code == KeyEvent.VK_Q){application.exit();}
     }
 
     /**cursor enters portal*/
