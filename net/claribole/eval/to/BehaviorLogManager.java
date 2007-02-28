@@ -133,15 +133,8 @@ public class BehaviorLogManager implements PostAnimationAction {
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
 	    String line = br.readLine();
-	    if (abstractTargetLocation == BehaviorBlock.TARGET_MAIN_VIEWPORT){
-		if (line != null && line.length() > 0){
-		    block = new BehaviorBlock(line);
-		}
-	    }
-	    else {
-		if (line != null && line.length() > 0){
-		    block = new BehaviorBlock(Integer.parseInt(line));
-		}
+	    if (line != null && line.length() > 0){
+		block = new BehaviorBlock(line, abstractTargetLocation);
 	    }
 	}
 	catch (IOException ex){ex.printStackTrace();}
@@ -234,7 +227,12 @@ public class BehaviorLogManager implements PostAnimationAction {
 	}
 	directionStr = block.direction[trialCount];
 	radiusStr = block.radius[trialCount];
-	target = getTarget(directionStr, radiusStr);
+	if (abstractTargetLocation.equals(BehaviorBlock.TARGET_MAIN_VIEWPORT)){
+	    target = getTarget(directionStr, radiusStr);
+	}
+	else {// abstractTargetLocation.equals(BehaviorBlock.TARGET_TRAILING_WIDGET)
+	    block.moveCamera(trialCount, application.mCamera);
+	}
 	im.say(TRIAL_STR + String.valueOf(trialCount+1) + OF_STR + String.valueOf(block.direction.length));
 	waitingForCursorToEnterButton = true;
     }

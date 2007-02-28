@@ -38,34 +38,47 @@ public class BehaviorBlock {
     static final String RADIUS_R3 = "R3";   // radius 3
     static final String RADIUS_RW = "RT";   // no radius, trailing widget
 
+    static final long C_NE_X = 0;
+    static final long C_NE_Y = 0;
+    static final long C_SW_X = -620;
+    static final long C_SW_Y = -4246;
+    static final long C_SE_X = 2800;
+    static final long C_SE_Y = -3600;
+    static final long C_NW_X = -3420;
+    static final long C_NW_Y = -646;
+
     int nbTrials = 0;
     String[] direction;
     String[] radius;
     long[] timeToAcquire;
     
     /* trials when target is in main viewport, either NW, NE, SE or SW */
-    BehaviorBlock(String blockLine){
+    BehaviorBlock(String blockLine, String tl){
 	String[] data = blockLine.split(BehaviorLogManager.INPUT_CSV_SEP);
 	nbTrials = data.length;
 	direction = new String[nbTrials];
 	radius = new String[nbTrials];
 	timeToAcquire = new long[nbTrials];
-	for (int i=0;i<nbTrials;i++){
-	    direction[i] = data[i].substring(0,2);
-	    radius[i] = data[i].substring(2,4);
+	if (tl.equals(TARGET_MAIN_VIEWPORT)){
+	    for (int i=0;i<nbTrials;i++){
+		direction[i] = data[i].substring(0,2);
+		radius[i] = data[i].substring(2,4);
+	    }
 	}
-    }
-    
-    /* trials when target is in trailing widget */
-    BehaviorBlock(int trialCount){
-	nbTrials = trialCount;
-	direction = new String[nbTrials];
-	radius = new String[nbTrials];
-	timeToAcquire = new long[nbTrials];
-	for (int i=0;i<nbTrials;i++){
-	    direction[i] = DIRECTION_TW_STR;
-	    radius[i] = RADIUS_RW;
+	else {// tl.equals(TARGET_TRAILING_WIDGET)
+	    for (int i=0;i<nbTrials;i++){
+		direction[i] = data[i].substring(0,2);
+		radius[i] = RADIUS_RW;
+	    }
 	}
     }
 
+    void moveCamera(int trial, Camera c){
+	if (direction[trial].equals(DIRECTION_NW_STR)){c.moveTo(C_NW_X, C_NW_Y);}
+	else if (direction[trial].equals(DIRECTION_NE_STR)){c.moveTo(C_NE_X, C_NE_Y);}
+	else if (direction[trial].equals(DIRECTION_SE_STR)){c.moveTo(C_SE_X, C_SE_Y);}
+	else if (direction[trial].equals(DIRECTION_SW_STR)){c.moveTo(C_SW_X, C_SW_Y);}
+	else {System.err.println("Error: unknown direction: "+direction[trial]);}
+    }
+    
 }
