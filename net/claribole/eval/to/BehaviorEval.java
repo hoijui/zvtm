@@ -40,7 +40,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-    static final String REGION_MAP_PATH = "images/world/europe_1600x1200.png";
+    static final String NE_REGION_MAP_PATH = "images/world/europe_1600x1200.png";
+    static final String SE_REGION_MAP_PATH = "images/world/india_1600x1200.png";
+    static final String NW_REGION_MAP_PATH = "images/world/peru_1600x1200.png";
+    static final String SW_REGION_MAP_PATH = "images/world/patagonia_1600x1200.png";
     static final String WHOLE_MAP_PATH = "images/world/0000_400x200.png";
     static final String GRAPH_PATH = "data/graphs/tw.svg";
 
@@ -189,40 +192,51 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    VImage im = new VImage(WM_ORIG_X, WM_ORIG_Y, 0, (new ImageIcon(WHOLE_MAP_PATH)).getImage(), 40);
 	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	    vsm.addGlyph(im, mSpace);
-	    im = new VImage(0, 0, 0, (new ImageIcon(REGION_MAP_PATH)).getImage());
+	    im = new VImage(BehaviorBlock.C_NE_X, BehaviorBlock.C_NE_Y, 0, (new ImageIcon(NE_REGION_MAP_PATH)).getImage());
 	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	    vsm.addGlyph(im, mSpace);
-	    // distractors
-	    for (int i=0;i<Distractors.WORLD_DISTRACTORS.length;i++){
-		vsm.addGlyph(new VRectangle(Distractors.WORLD_DISTRACTORS[i].x, Distractors.WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
+	    im = new VImage(BehaviorBlock.C_SE_X, BehaviorBlock.C_SE_Y, 0, (new ImageIcon(SE_REGION_MAP_PATH)).getImage());
+	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+	    vsm.addGlyph(im, mSpace);
+	    im = new VImage(BehaviorBlock.C_NW_X, BehaviorBlock.C_NW_Y, 0, (new ImageIcon(NW_REGION_MAP_PATH)).getImage());
+	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+	    vsm.addGlyph(im, mSpace);
+	    im = new VImage(BehaviorBlock.C_SW_X, BehaviorBlock.C_SW_Y, 0, (new ImageIcon(SW_REGION_MAP_PATH)).getImage());
+	    im.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+	    vsm.addGlyph(im, mSpace);
+	    if (blm.abstractTargetLocation.equals(BehaviorBlock.TARGET_MAIN_VIEWPORT)){
+		// distractors
+		for (int i=0;i<Distractors.WORLD_DISTRACTORS.length;i++){
+		    vsm.addGlyph(new VRectangle(Distractors.WORLD_DISTRACTORS[i].x, Distractors.WORLD_DISTRACTORS[i].y, 0, 5, 5, DISTRACTOR_COLOR), mSpace);
+		}
+		// potential targets R1
+		NW_TARGET_R1 = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
+		NE_TARGET_R1 = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
+		SE_TARGET_R1 = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
+		SW_TARGET_R1 = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
+		vsm.addGlyph(NW_TARGET_R1, mSpace);
+		vsm.addGlyph(NE_TARGET_R1, mSpace);
+		vsm.addGlyph(SE_TARGET_R1, mSpace);
+		vsm.addGlyph(SW_TARGET_R1, mSpace);
+		// potential targets R2
+		NW_TARGET_R2 = new VRectangle(-245,226,0,5,5,DISTRACTOR_COLOR);
+		NE_TARGET_R2 = new VRectangle(205,226,0,5,5,DISTRACTOR_COLOR);
+		SE_TARGET_R2 = new VRectangle(205,-226,0,5,5,DISTRACTOR_COLOR);
+		SW_TARGET_R2 = new VRectangle(-245,-226,0,5,5,DISTRACTOR_COLOR);
+		vsm.addGlyph(NW_TARGET_R2, mSpace);
+		vsm.addGlyph(NE_TARGET_R2, mSpace);
+		vsm.addGlyph(SE_TARGET_R2, mSpace);
+		vsm.addGlyph(SW_TARGET_R2, mSpace);
+		// potential targets R3
+		NW_TARGET_R3 = new VRectangle(-445,424,0,5,5,DISTRACTOR_COLOR);
+		NE_TARGET_R3 = new VRectangle(405,424,0,5,5,DISTRACTOR_COLOR);
+		SE_TARGET_R3 = new VRectangle(405,-424,0,5,5,DISTRACTOR_COLOR);
+		SW_TARGET_R3 = new VRectangle(-445,-424,0,5,5,DISTRACTOR_COLOR);
+		vsm.addGlyph(NW_TARGET_R3, mSpace);
+		vsm.addGlyph(NE_TARGET_R3, mSpace);
+		vsm.addGlyph(SE_TARGET_R3, mSpace);
+		vsm.addGlyph(SW_TARGET_R3, mSpace);
 	    }
-	    // potential targets R1
-	    NW_TARGET_R1 = new VRectangle(-135,120,0,5,5,DISTRACTOR_COLOR);
-	    NE_TARGET_R1 = new VRectangle(95,120,0,5,5,DISTRACTOR_COLOR);
-	    SE_TARGET_R1 = new VRectangle(95,-120,0,5,5,DISTRACTOR_COLOR);
-	    SW_TARGET_R1 = new VRectangle(-135,-120,0,5,5,DISTRACTOR_COLOR);
-	    vsm.addGlyph(NW_TARGET_R1, mSpace);
-	    vsm.addGlyph(NE_TARGET_R1, mSpace);
-	    vsm.addGlyph(SE_TARGET_R1, mSpace);
-	    vsm.addGlyph(SW_TARGET_R1, mSpace);
-	    // potential targets R2
-	    NW_TARGET_R2 = new VRectangle(-245,226,0,5,5,DISTRACTOR_COLOR);
-	    NE_TARGET_R2 = new VRectangle(205,226,0,5,5,DISTRACTOR_COLOR);
-	    SE_TARGET_R2 = new VRectangle(205,-226,0,5,5,DISTRACTOR_COLOR);
-	    SW_TARGET_R2 = new VRectangle(-245,-226,0,5,5,DISTRACTOR_COLOR);
-	    vsm.addGlyph(NW_TARGET_R2, mSpace);
-	    vsm.addGlyph(NE_TARGET_R2, mSpace);
-	    vsm.addGlyph(SE_TARGET_R2, mSpace);
-	    vsm.addGlyph(SW_TARGET_R2, mSpace);
-	    // potential targets R3
-	    NW_TARGET_R3 = new VRectangle(-445,424,0,5,5,DISTRACTOR_COLOR);
-	    NE_TARGET_R3 = new VRectangle(405,424,0,5,5,DISTRACTOR_COLOR);
-	    SE_TARGET_R3 = new VRectangle(405,-424,0,5,5,DISTRACTOR_COLOR);
-	    SW_TARGET_R3 = new VRectangle(-445,-424,0,5,5,DISTRACTOR_COLOR);
-	    vsm.addGlyph(NW_TARGET_R3, mSpace);
-	    vsm.addGlyph(NE_TARGET_R3, mSpace);
-	    vsm.addGlyph(SE_TARGET_R3, mSpace);
-	    vsm.addGlyph(SW_TARGET_R3, mSpace);
 // 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(45*2*Math.PI/360.0),Color.BLUE), mSpace);
 // 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(135*2*Math.PI/360.0),Color.BLUE), mSpace);
 // 	    VCircle c = new VCircle(-20,0,0,160,Color.BLUE);

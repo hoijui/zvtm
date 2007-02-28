@@ -40,12 +40,12 @@ public class BehaviorBlock {
 
     static final long C_NE_X = 0;
     static final long C_NE_Y = 0;
-    static final long C_SW_X = -620;
-    static final long C_SW_Y = -4246;
+    static final long C_SW_X = -3000;
+    static final long C_SW_Y = -4600;
     static final long C_SE_X = 2800;
-    static final long C_SE_Y = -3600;
+    static final long C_SE_Y = -1300;
     static final long C_NW_X = -3420;
-    static final long C_NW_Y = -646;
+    static final long C_NW_Y = -2500;
 
     int nbTrials = 0;
     String[] direction;
