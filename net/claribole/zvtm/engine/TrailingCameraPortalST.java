@@ -91,9 +91,15 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	updateWidgetLocation();
     }
 
+    double distAway = 0;
+
+    public double getDistance(){
+	return distAway;
+    }
+
     public void updateWidgetLocation(){
 	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-	double distAway = targetPos.distance(currentPos);
+	distAway = targetPos.distance(currentPos);
 	double maxDist = 2 * Math.abs(xOffset);
 	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
  	filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
