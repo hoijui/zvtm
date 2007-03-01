@@ -186,8 +186,8 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
     Glyph NW_TARGET_R1, NE_TARGET_R1, SE_TARGET_R1, SW_TARGET_R1;
     Glyph NW_TARGET_R2, NE_TARGET_R2, SE_TARGET_R2, SW_TARGET_R2;
     Glyph NW_TARGET_R3, NE_TARGET_R3, SE_TARGET_R3, SW_TARGET_R3;
-    static final Color TARGET_COLOR = Color.RED;
-    static final Color DISTRACTOR_COLOR = Color.YELLOW;
+    static final Color TARGET_COLOR = Color.YELLOW;
+    static final Color DISTRACTOR_COLOR = Color.WHITE;
     static final Color MOUSE_INSIDE_DISTRACTOR_COLOR = Color.RED;
 
     void initWorld(short bt){
@@ -216,10 +216,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 // 		}
 		// potential targets R1
 		float transp = 0.4f;
-		NW_TARGET_R1 = new VRectangleST(-135,120,0,5,5,DISTRACTOR_COLOR);
-		NE_TARGET_R1 = new VRectangleST(95,120,0,5,5,DISTRACTOR_COLOR);
-		SE_TARGET_R1 = new VRectangleST(95,-120,0,5,5,DISTRACTOR_COLOR);
-		SW_TARGET_R1 = new VRectangleST(-135,-120,0,5,5,DISTRACTOR_COLOR);
+		NW_TARGET_R1 = new VRectangleST(-135,120,0,5,5,TARGET_COLOR);
+		NE_TARGET_R1 = new VRectangleST(95,120,0,5,5,TARGET_COLOR);
+		SE_TARGET_R1 = new VRectangleST(95,-120,0,5,5,TARGET_COLOR);
+		SW_TARGET_R1 = new VRectangleST(-135,-120,0,5,5,TARGET_COLOR);
 		vsm.addGlyph(NW_TARGET_R1, mSpace);
 		vsm.addGlyph(NE_TARGET_R1, mSpace);
 		vsm.addGlyph(SE_TARGET_R1, mSpace);
@@ -233,10 +233,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		SE_TARGET_R1.setVisible(false);
 		SW_TARGET_R1.setVisible(false);
 		// potential targets R2
-		NW_TARGET_R2 = new VRectangleST(-245,226,0,5,5,DISTRACTOR_COLOR);
-		NE_TARGET_R2 = new VRectangleST(205,226,0,5,5,DISTRACTOR_COLOR);
-		SE_TARGET_R2 = new VRectangleST(205,-226,0,5,5,DISTRACTOR_COLOR);
-		SW_TARGET_R2 = new VRectangleST(-245,-226,0,5,5,DISTRACTOR_COLOR);
+		NW_TARGET_R2 = new VRectangleST(-245,226,0,5,5,TARGET_COLOR);
+		NE_TARGET_R2 = new VRectangleST(205,226,0,5,5,TARGET_COLOR);
+		SE_TARGET_R2 = new VRectangleST(205,-226,0,5,5,TARGET_COLOR);
+		SW_TARGET_R2 = new VRectangleST(-245,-226,0,5,5,TARGET_COLOR);
 		vsm.addGlyph(NW_TARGET_R2, mSpace);
 		vsm.addGlyph(NE_TARGET_R2, mSpace);
 		vsm.addGlyph(SE_TARGET_R2, mSpace);
@@ -250,10 +250,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		SE_TARGET_R2.setVisible(false);
 		SW_TARGET_R2.setVisible(false);
 		// potential targets R3
-		NW_TARGET_R3 = new VRectangleST(-445,424,0,5,5,DISTRACTOR_COLOR);
-		NE_TARGET_R3 = new VRectangleST(405,424,0,5,5,DISTRACTOR_COLOR);
-		SE_TARGET_R3 = new VRectangleST(405,-424,0,5,5,DISTRACTOR_COLOR);
-		SW_TARGET_R3 = new VRectangleST(-445,-424,0,5,5,DISTRACTOR_COLOR);
+		NW_TARGET_R3 = new VRectangleST(-445,424,0,5,5,TARGET_COLOR);
+		NE_TARGET_R3 = new VRectangleST(405,424,0,5,5,TARGET_COLOR);
+		SE_TARGET_R3 = new VRectangleST(405,-424,0,5,5,TARGET_COLOR);
+		SW_TARGET_R3 = new VRectangleST(-445,-424,0,5,5,TARGET_COLOR);
 		vsm.addGlyph(NW_TARGET_R3, mSpace);
 		vsm.addGlyph(NE_TARGET_R3, mSpace);
 		vsm.addGlyph(SE_TARGET_R3, mSpace);
