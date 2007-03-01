@@ -19,8 +19,8 @@ public class BehaviorBlock {
     static final String BEHAVIOR_DT = "DT";
     static final float BEHAVIOR_FT_A = 0;
     static final float BEHAVIOR_FT_B = 0.3f;
-    static final float BEHAVIOR_IT_A = 1.666f;
-    static final float BEHAVIOR_IT_B = -0.666f;
+    static final float BEHAVIOR_IT_A = 2.0f;
+    static final float BEHAVIOR_IT_B = -1.3f;
     static final float BEHAVIOR_DT_A = -0.5f;
     static final float BEHAVIOR_DT_B = 0.5f;
 
