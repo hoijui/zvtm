@@ -92,6 +92,7 @@ public class TrailingCameraPortalST extends CameraPortalST {
     }
 
     double distAway = 0;
+    float alpha = 0;
 
     public double getDistance(){
 	return distAway;
@@ -111,7 +112,10 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
 	    this.moveTo(tx-w/2, ty-h/2);
 	    // update portal's translucency as a function of its speed
-	    setTransparencyValue((float)opacity*translucencyParamA + translucencyParamB);
+	    alpha = (float)opacity*translucencyParamA + translucencyParamB;
+	    if (alpha < 0){alpha = 0;}
+	    else if (alpha > 1){alpha = 1.0f;}
+	    setTransparencyValue(alpha);
 	    owningView.repaintNow();
 	}
     }
