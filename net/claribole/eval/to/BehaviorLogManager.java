@@ -72,6 +72,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 
     boolean firstTOWAcquisition = true;
     long timeToAcquire = 0;
+    int acquisitionCount = 0;
 
     String lineStart;
     File logFile;
@@ -152,6 +153,7 @@ public class BehaviorLogManager implements PostAnimationAction {
 		      "Direction" + OUTPUT_CSV_SEP +
 		      "Radius" + OUTPUT_CSV_SEP +
 		      "AcqTime" + OUTPUT_CSV_SEP +
+		      "AcqCount" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Errors");
 	    bwt.newLine();
@@ -179,8 +181,6 @@ public class BehaviorLogManager implements PostAnimationAction {
 		      "my" + OUTPUT_CSV_SEP +
 		      "cx" + OUTPUT_CSV_SEP +
 		      "cy" + OUTPUT_CSV_SEP +
-		      "ox" + OUTPUT_CSV_SEP +
-		      "oy" + OUTPUT_CSV_SEP +
 		      "px" + OUTPUT_CSV_SEP +
 		      "py" + OUTPUT_CSV_SEP +
 		      "inPortal" + OUTPUT_CSV_SEP +
@@ -210,6 +210,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
 
     void acquiredTOW(long time){
+	acquisitionCount++;
 	if (firstTOWAcquisition){
 	    timeToAcquire = time-trialStartTime; 
 	    firstTOWAcquisition = false;
@@ -218,11 +219,14 @@ public class BehaviorLogManager implements PostAnimationAction {
     }
     
     void initNextTrial(){
-// 	if (target != null){target.setColor(BehaviorEval.DISTRACTOR_COLOR);}
-	if (target != null){target.setVisible(false);}
+	if (target != null){
+	    if (application.backgroundType == BehaviorEval.BACKGROUND_WORLDMAP){target.setVisible(false);}
+	    else {target.setColor(BehaviorEval.DISTRACTOR_COLOR);}
+	}
 	incTrialCount();
 	errorCount = 0;
 	firstTOWAcquisition = true;
+	acquisitionCount = 0;
 	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the
 	    resetRequest = true; // middle of an animation at the time of the first reset
 	}
@@ -311,8 +315,10 @@ public class BehaviorLogManager implements PostAnimationAction {
     void startTrial(){
 	waitingForCursorToEnterButton = false;
 	im.say(null);
-// 	if (target != null){target.setColor(BehaviorEval.TARGET_COLOR);}
-	if (target != null){target.setVisible(true);}
+	if (target != null){
+	    if (application.backgroundType == BehaviorEval.BACKGROUND_WORLDMAP){target.setVisible(true);}
+	    else {target.setColor(BehaviorEval.TARGET_COLOR);}
+	}
 	trialStarted = true;
 	trialStartTime = System.currentTimeMillis();
 	resetRequest = false; // make sure there is no orphan camera reset request
@@ -321,19 +327,7 @@ public class BehaviorLogManager implements PostAnimationAction {
     void endTrial(){
 	trialEndTime = System.currentTimeMillis() - trialStartTime;
 	trialStarted = false;
-	try {
-	    bwt.write(lineStart +
-		      trialCountStr + OUTPUT_CSV_SEP +
-		      directionStr + OUTPUT_CSV_SEP +
-		      radiusStr + OUTPUT_CSV_SEP +
-		      String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
-		      String.valueOf(trialEndTime) + OUTPUT_CSV_SEP +
-		      String.valueOf(errorCount));
-	    bwt.newLine();
-	    bwt.flush();
-	    bwc.flush();
-	}
-	catch (IOException ex){ex.printStackTrace();}
+	writeTrial();
 	if (trialCount < block.nbTrials-1){
 	    initNextTrial();
 	}
@@ -352,6 +346,23 @@ public class BehaviorLogManager implements PostAnimationAction {
 	im.say(EOS);
     }
 
+    void writeTrial(){
+	try {
+	    bwt.write(lineStart +
+		      trialCountStr + OUTPUT_CSV_SEP +
+		      directionStr + OUTPUT_CSV_SEP +
+		      radiusStr + OUTPUT_CSV_SEP +
+		      String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
+		      String.valueOf(acquisitionCount) + OUTPUT_CSV_SEP +
+		      String.valueOf(trialEndTime) + OUTPUT_CSV_SEP +
+		      String.valueOf(errorCount));
+	    bwt.newLine();
+	    bwt.flush();
+	    bwc.flush();
+	}
+	catch (IOException ex){ex.printStackTrace();}
+    }
+
     static final String CURSOR_INSIDE_PORTAL_STR = "1";
     static final String CURSOR_OUTSIDE_PORTAL_STR = "0";
     long cinematicTime = 0;
@@ -366,8 +377,6 @@ public class BehaviorLogManager implements PostAnimationAction {
 		      String.valueOf(jpy) + OUTPUT_CSV_SEP +
 		      String.valueOf(application.mCamera.posx) + OUTPUT_CSV_SEP +
 		      String.valueOf(application.mCamera.posy) + OUTPUT_CSV_SEP +
-		      String.valueOf(application.oCamera.posx) + OUTPUT_CSV_SEP +
-		      String.valueOf(application.oCamera.posy) + OUTPUT_CSV_SEP +
 		      String.valueOf(px) + OUTPUT_CSV_SEP +
 		      String.valueOf(py) + OUTPUT_CSV_SEP +
 		      ((application.eh.mouseInsideOverview) ? CURSOR_INSIDE_PORTAL_STR : CURSOR_OUTSIDE_PORTAL_STR) + OUTPUT_CSV_SEP +
