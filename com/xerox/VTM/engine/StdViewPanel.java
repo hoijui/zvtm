@@ -49,18 +49,12 @@ import net.claribole.zvtm.engine.Java2DPainter;
  */
 public class StdViewPanel extends ViewPanel implements Runnable {
 
+    /** Double Buffering uses a BufferedImage as the back buffer. */
+    BufferedImage backBuffer;
+
     /*coordinates of lens center in virtual space for each camera*/
     long lensVx, lensVy;
     long lviewWC, lviewNC, lviewEC, lviewSC;
-
-    /**for Double Buffering*/
-    BufferedImage buffImg;
-
-    //get the BufferedImage or VolatileImage for this view
-    public BufferedImage getImage(){
-	return this.buffImg;
-    }
-
 
     public StdViewPanel(Vector cameras,View v) {
 	addHierarchyListener(
@@ -118,7 +112,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	Graphics2D BufferG2D = null;
 	Graphics2D lensG2D = null;
 	Dimension oldSize=getSize();
-	//clipRect=new Rectangle(0,0,oldSize.width,oldSize.height);
 	while (runView==me) {
 	    loopStartTime = System.currentTimeMillis();
  	    if (notBlank){
@@ -133,7 +126,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			    viewH = size.height;
 			    if (size.width != oldSize.width || size.height != oldSize.height) {
 				//each time the parent window is resized, adapt the buffer image size
-				buffImg=null;
+				backBuffer=null;
 				if (BufferG2D!=null) {
 				    BufferG2D.dispose();
 				    BufferG2D=null;
@@ -153,13 +146,13 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				updateAntialias=true;
 				updateFont=true;
 			    }
-			    if (buffImg==null){
-				buffImg=(BufferedImage)createImage(size.width, size.height);
+			    if (backBuffer==null){
+				backBuffer=(BufferedImage)createImage(size.width, size.height);
 				updateAntialias=true;
 				updateFont=true;
 			    }
 			    if (BufferG2D == null) {
-				BufferG2D = buffImg.createGraphics();
+				BufferG2D = backBuffer.createGraphics();
 				updateAntialias=true;
 				updateFont=true;
 			    }
@@ -294,7 +287,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
 					}
 					try {
-					    lens.transform(buffImg);
+					    lens.transform(backBuffer);
 					    lens.drawBoundary(g2d);
 					}
 					catch (ArrayIndexOutOfBoundsException ex){
@@ -433,7 +426,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			}
 			catch (NullPointerException ex0){
 			    if (parent.parent.debug){
-				System.err.println("viewpanel.run (probably due to buffImg.createGraphics()) "+ex0);
+				System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
 				ex0.printStackTrace();
 			    }
 			}
@@ -509,7 +502,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		size=getSize();
 		if (size.width != oldSize.width || size.height != oldSize.height) {
 		    //each time the parent window is resized, adapt the buffer image size
-		    buffImg=null;
+		    backBuffer=null;
 		    if (BufferG2D!=null) {
 			BufferG2D.dispose();
 			BufferG2D=null;
@@ -519,13 +512,13 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		    updateAntialias=true;
 		    updateFont=true;
 		}
-		if (buffImg==null) {
-		    buffImg=(BufferedImage) createImage(size.width,size.height);
+		if (backBuffer==null) {
+		    backBuffer=(BufferedImage) createImage(size.width,size.height);
 		    updateAntialias=true;
 		    updateFont=true;
 		}
 		if (BufferG2D == null) {
-		    BufferG2D = buffImg.createGraphics();
+		    BufferG2D = backBuffer.createGraphics();
 		    updateAntialias=true;
 		    updateFont=true;
 		}
@@ -574,12 +567,16 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 
     public void paint(Graphics g) {
 	synchronized (this) {
-	    g2 = (Graphics2D) g;
-	    if (buffImg != null){
-		g2.drawImage(buffImg, null, 0, 0);
+	    if (backBuffer != null){
+		g.drawImage(backBuffer, 0, 0, this);
 		if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 	    }
         }
+    }
+
+    /** Get a snapshot of this view.*/
+    public BufferedImage getImage(){
+	return this.backBuffer;
     }
 
 }
