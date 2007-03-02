@@ -44,17 +44,12 @@ import net.claribole.zvtm.lens.Lens;
  */
 public class AppletViewPanel extends ViewPanel implements Runnable {
 
+    /** Double Buffering uses a BufferedImage as the back buffer. */
+    BufferedImage backBuffer;
+
     /*coordinates of lens center in virtual space for each camera*/
     long lensVx, lensVy;
     long lviewWC, lviewNC, lviewEC, lviewSC;
-
-    /**for Double Buffering*/
-    BufferedImage buffImg;
-
-    //get the BufferedImage or VolatileImage for this view
-    public BufferedImage getImage(){
-	return this.buffImg;
-    }
 
     public AppletViewPanel(Vector cameras,View v) {
 	addHierarchyListener(
@@ -112,24 +107,24 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 	backBufferGraphics = null;
 	Graphics2D lensG2D = null;
 	Dimension oldSize=getSize();
-	//clipRect=new Rectangle(0,0,oldSize.width,oldSize.height);
 	while (runView==me) {
-	    loopStartTime=System.currentTimeMillis();
+	    loopStartTime = System.currentTimeMillis();
  	    if (notBlank){
 		if (active){
 		    if (repaintNow){
 			try {
-			    repaintNow=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
+			    repaintNow=false; //do this first as the thread can be interrupted inside
+			                      //this branch and we want to catch new requests for repaint
 			    updateMouseOnly=false;
 			    size = this.getSize();
 			    viewW = size.width;//compute region's width and height
 			    viewH = size.height;
 			    if (size.width != oldSize.width || size.height != oldSize.height) {
 				//each time the parent window is resized, adapt the buffer image size
-				buffImg=null;
-				if (backBufferGraphics!=null) {
+				backBuffer = null;
+				if (backBufferGraphics != null) {
 				    backBufferGraphics.dispose();
-				    backBufferGraphics=null;
+				    backBufferGraphics = null;
 				}
 				if (lens != null){
 				    lens.resetMagnificationBuffer();
@@ -138,7 +133,6 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 					lensG2D = null;
 				    }
 				}
-				//clipRect=new Rectangle(0,0,size.width,size.height);
 				if (parent.parent.debug){
 				    System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
 				}
@@ -146,13 +140,15 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 				updateAntialias=true;
 				updateFont=true;
 			    }
-			    if (buffImg==null){
-				buffImg=(BufferedImage)createImage(size.width, size.height);
-				updateAntialias=true;
-				updateFont=true;
+			    if (backBuffer == null){
+				backBuffer = (BufferedImage)createImage(size.width, size.height);
+				if (backBufferGraphics != null){
+				    backBufferGraphics.dispose();
+				    backBufferGraphics = null;
+				}
 			    }
 			    if (backBufferGraphics == null) {
-				backBufferGraphics = buffImg.createGraphics();
+				backBufferGraphics = backBuffer.createGraphics();
 				updateAntialias=true;
 				updateFont=true;
 			    }
@@ -171,7 +167,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 				if (lensG2D != null){
 				    lensG2D.setFont(VirtualSpaceManager.mainFont);
 				}
-				updateFont=false;
+				updateFont = false;
 			    }
 			    if (updateAntialias){
 				if (antialias){
@@ -224,33 +220,8 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 						    lensVx = (lviewWC+lviewEC)/2;
 						    lensVy = (lviewSC+lviewNC)/2;
 						    gll = cams[nbcam].parentSpace.getVisibleGlyphList();
-						    if (parent.detectMultipleFullFills){// if detect multiple fills option is ON
-							for (int i=0;i<gll.length;i++){ // (usually not the case)
-							    if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-								cams[nbcam].parentSpace.drewGlyph(gll[i],camIndex);
-								gll[i].project(cams[nbcam], size);
-							    }
-							}
-							// XXX: looks like this part of the code has not been updated for some time
-							//drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-							beginAt=0;
-							for (int j=drawnGlyphs.size()-1;j>=0;j--){//glyphs must have been projected because fillsView uses
-							    if (((Glyph)drawnGlyphs.elementAt(j)).fillsView(viewW,viewH,cams[nbcam].getIndex())){//projected coords
-								beginAt=j;
-								break;
-							    }
-							}
-							for (int j=beginAt;j<drawnGlyphs.size();j++){
-							    gl=(Glyph)drawnGlyphs.elementAt(j);
-							    if (gl.isVisible()){
-								gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
-							    }
-							    cams[nbcam].parentSpace.drewGlyph(gl, camIndex);
-							}
-							// EOXXX
-						    }
-						    else {//if detect multiple fills option is OFF
-							for (int i=0;i<gll.length;i++){
+						    for (int i=0;i<gll.length;i++){
+							if (gll[i] != null){
 							    synchronized(gll[i]){
 								if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
 								    /* if glyph is at least partially visible in the reg. seen from this view,
@@ -265,9 +236,9 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 									/* partially within the region seen through the lens
 									   draw it in both buffers */
 									gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
-									if (gll[i].isVisible()){
+									if (gll[i].isVisibleThroughLens()){
 									    gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
-											       standardStroke, standardTransform, 0 , 0);
+											       standardStroke, standardTransform, 0, 0);
 									}
 								    }
 								    /* notifying outside of above test because glyph sensitivity is not
@@ -285,7 +256,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 					    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
 					}
 					try {
-					    lens.transform(buffImg);
+					    lens.transform(backBuffer);
 					    lens.drawBoundary(g2d);
 					}
 					catch (ArrayIndexOutOfBoundsException ex){
@@ -322,39 +293,14 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 						viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
 						viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
 						gll = cams[nbcam].parentSpace.getVisibleGlyphList();
-						if (parent.detectMultipleFullFills){// if detect multiple fills option is ON
-						    for (int i=0;i<gll.length;i++){ // (usually not the case)
-							if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-							    cams[nbcam].parentSpace.drewGlyph(gll[i],camIndex);
-							    gll[i].project(cams[nbcam], size);
-							}
-						    }
-						    // XXX: looks like this part of the code has not been updated for some time
-						    //drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-						    beginAt=0;
-						    for (int j=drawnGlyphs.size()-1;j>=0;j--){//glyphs must have been projected because fillsView uses
-							if (((Glyph)drawnGlyphs.elementAt(j)).fillsView(viewW,viewH,cams[nbcam].getIndex())){//projected coords
-							    beginAt=j;
-							    break;
-							}
-						    }
-						    for (int j=beginAt;j<drawnGlyphs.size();j++){
-							gl=(Glyph)drawnGlyphs.elementAt(j);
-							if (gl.isVisible()){
-							    gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
-							}
-							cams[nbcam].parentSpace.drewGlyph(gl, camIndex);
-						    }
-						    // EOXXX
-						}
-						else {//if detect multiple fills option is OFF
-						    for (int i=0;i<gll.length;i++){
-							if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-							    //if glyph is at least partially visible in the reg. seen from this view, display
-							    synchronized(gll[i]){
+						for (int i=0;i<gll.length;i++){
+						    if (gll[i] != null){
+							synchronized(gll[i]){
+							    if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+								//if glyph is at least partially visible in the reg. seen from this view, display
 								gll[i].project(cams[nbcam], size); // an invisible glyph should still be projected
 								if (gll[i].isVisible()){          // as it can be sensitive
-								    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+								    gll[i].draw(g2d, size.width, size.height, camIndex, standardStroke, standardTransform, 0, 0);
 								}
 								// notifying outside if branch because glyph sensitivity is not
 								// affected by glyph visibility when managed through Glyph.setVisible()
@@ -393,13 +339,23 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 				    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
 				    g2d.setColor(parent.mouse.hcolor);
 				    if (drawDrag){g2d.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
-				    if (drawRect){g2d.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
+				    if (drawRect){
+					g2d.drawRect(Math.min(origDragx,parent.mouse.mx),
+						     Math.min(origDragy,parent.mouse.my),
+						     Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),
+						     Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
 				    if (drawOval){
 					if (circleOnly){
-					    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx));
+					    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
+							 origDragy-Math.abs(origDragx-parent.mouse.mx),
+							 2*Math.abs(origDragx-parent.mouse.mx),
+							 2*Math.abs(origDragx-parent.mouse.mx));
 					}
 					else {
-					    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragy-parent.mouse.my),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragy-parent.mouse.my));
+					    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
+							 origDragy-Math.abs(origDragy-parent.mouse.my),
+							 2*Math.abs(origDragx-parent.mouse.mx),
+							 2*Math.abs(origDragy-parent.mouse.my));
 					}
 				    }
 				    if (drawVTMcursor){
@@ -422,10 +378,10 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 			}
 			catch (NullPointerException ex0){
 			    if (parent.parent.debug){
-				System.err.println("viewpanel.run (probably due to buffImg.createGraphics()) "+ex0);
+				System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
+				ex0.printStackTrace();
 			    }
 			}
-			//either we do - BETTER UNDER Win32
 			try {
 			    runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
 			} 
@@ -433,12 +389,10 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 			    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep2 "+e);}
 			    return;
 			}
-			//or this   both seem to work well (have to test on several config) - BETTER UNDER SOLARIS
-			//Thread.yield();
 		    }
 		    else if (updateMouseOnly){
-			updateMouseOnly=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
-			try {
+			updateMouseOnly=false; // do this first as the thread can be interrupted inside this
+			try {                  // branch and we want to catch new requests for repaint
 			    parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
 			    if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evH,cams[activeLayer],this.lens);}
 			}
@@ -454,7 +408,9 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 				    g2d.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
 				    oldX=parent.mouse.mx;
 				    oldY=parent.mouse.my;
-				}//a nullpointerex on g2d seems to occur from time to time when going in or exiting from blank mode - just catch it and wait for next loop until we find out what's causing this
+				}
+				//XXX: a nullpointerex on g2d seems to occur from time to time when going in or exiting from blank mode
+				//     just catch it and wait for next loop until we find out what's causing this
 				catch (NullPointerException ex47){if (parent.parent.debug){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
 			    }
 			}
@@ -491,50 +447,73 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 		}
 	    }
 	    else {
-		size=getSize();
+		size = this.getSize();
+		viewW = size.width;//compute region's width and height
+		viewH = size.height;
 		if (size.width != oldSize.width || size.height != oldSize.height) {
 		    //each time the parent window is resized, adapt the buffer image size
-		    buffImg=null;
-		    if (backBufferGraphics!=null) {
+		    backBuffer = null;
+		    if (backBufferGraphics != null) {
 			backBufferGraphics.dispose();
-			backBufferGraphics=null;
+			backBufferGraphics = null;
 		    }
-		    if (parent.parent.debug){System.out.println("Resizing JPanel in blank mode: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
+		    if (lens != null){
+			lens.resetMagnificationBuffer();
+			if (lensG2D != null) {
+			    lensG2D.dispose();
+			    lensG2D = null;
+			}
+		    }
+		    if (parent.parent.debug){
+			System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
+		    }
 		    oldSize=size;
 		    updateAntialias=true;
 		    updateFont=true;
 		}
-		if (buffImg==null) {
-		    buffImg=(BufferedImage) createImage(size.width,size.height);
+		if (backBuffer == null){
+		    backBuffer = (BufferedImage)createImage(size.width, size.height);
+		    if (backBufferGraphics != null){
+			backBufferGraphics.dispose();
+			backBufferGraphics = null;
+		    }
+		}
+		if (backBufferGraphics == null) {
+		    backBufferGraphics = backBuffer.createGraphics();
 		    updateAntialias=true;
 		    updateFont=true;
 		}
-		if (backBufferGraphics == null) {
-		    backBufferGraphics = buffImg.createGraphics();
-		    updateAntialias=true;
-		    updateFont=true;
+		if (lens != null){
+		    lensG2D = lens.getMagnificationGraphics();
+		    lensG2D.setFont(VirtualSpaceManager.mainFont);
+		    if (antialias){
+			lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		    }
+		    else {
+			lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		    }
 		}
 		if (updateFont){
 		    backBufferGraphics.setFont(VirtualSpaceManager.mainFont);
 		    if (lensG2D != null){
 			lensG2D.setFont(VirtualSpaceManager.mainFont);
 		    }
-		    updateFont=false;
+		    updateFont = false;
 		}
 		if (updateAntialias){
 		    if (antialias){
-			backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+			backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			if (lensG2D != null){
-			    lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+			    lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			}
 		    }
 		    else {
-			backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+			backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 			if (lensG2D != null){
-			    lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+			    lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 			}
 		    }
-		    updateAntialias=false;
+		    updateAntialias = false;
 		}
 		g2d = backBufferGraphics;
 		standardStroke=g2d.getStroke();
@@ -559,11 +538,16 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 
     public void paint(Graphics g) {
 	synchronized (this) {
-	    if (buffImg != null){
-		g.drawImage(buffImg, 0, 0, this);
+	    if (backBuffer != null){
+		g.drawImage(backBuffer, 0, 0, this);
 		if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 	    }
         }
+    }
+
+    /** Get a snapshot of this view.*/
+    public BufferedImage getImage(){
+	return this.backBuffer;
     }
 
 }
