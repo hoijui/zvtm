@@ -105,7 +105,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	    }
         }
 	Graphics2D g2d = null;
-	Graphics2D BufferG2D = null;
+	backBufferGraphics = null;
 	Dimension oldSize=getSize();
 	while (runView == me) {
 	    loopStartTime=System.currentTimeMillis();
@@ -123,9 +123,9 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 				backBuffer.flush();
 				backBuffer = null;
 			    }
-			    if (BufferG2D != null){
-				BufferG2D.dispose();
-				BufferG2D = null;
+			    if (backBufferGraphics != null){
+				backBufferGraphics.dispose();
+				backBufferGraphics = null;
 			    }
 			    //clipRect=new Rectangle(0,0,size.width,size.height);
 			    if (parent.parent.debug){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
@@ -136,30 +136,30 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			if (backBuffer == null) {
 			    gconf = getGraphicsConfiguration();
 			    backBuffer = gconf.createCompatibleVolatileImage(size.width,size.height);
-			    if (BufferG2D != null){
-				BufferG2D.dispose();
-				BufferG2D = null;
+			    if (backBufferGraphics != null){
+				backBufferGraphics.dispose();
+				backBufferGraphics = null;
 			    }
 			}
-			if (BufferG2D == null) {
-			    BufferG2D = backBuffer.createGraphics();
+			if (backBufferGraphics == null) {
+			    backBufferGraphics = backBuffer.createGraphics();
 			    updateAntialias = true;
 			    updateFont = true;
 			}
 			if (updateFont){
-			    BufferG2D.setFont(VirtualSpaceManager.mainFont);
+			    backBufferGraphics.setFont(VirtualSpaceManager.mainFont);
 			    updateFont = false;
 			}
 			if (updateAntialias){
 			    if (antialias){
-				BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+				backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 			    }
 			    else {
-				BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+				backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
 			    }
 			    updateAntialias=false;
 			}
-			g2d = BufferG2D;
+			g2d = backBufferGraphics;
 			gconf = this.getGraphicsConfiguration();
 			valCode = backBuffer.validate(gconf);
 			if (valCode == VolatileImage.IMAGE_INCOMPATIBLE){
@@ -284,7 +284,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			    }
 			    while (backBuffer.contentsLost());
 			    //end drawing here
-			    if (g2d == BufferG2D) {
+			    if (g2d == backBufferGraphics) {
 				repaint();
 			    }
 			    loopTotalTime = System.currentTimeMillis() - loopStartTime;
@@ -364,9 +364,9 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			backBuffer.flush();
 			backBuffer = null;
 		    }
-		    if (BufferG2D != null){
-			BufferG2D.dispose();
-			BufferG2D = null;
+		    if (backBufferGraphics != null){
+			backBufferGraphics.dispose();
+			backBufferGraphics = null;
 		    }
 		    //clipRect=new Rectangle(0,0,size.width,size.height);
 		    if (parent.parent.debug){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
@@ -377,30 +377,30 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 		if (backBuffer == null) {
 		    gconf = getGraphicsConfiguration();
 		    backBuffer = gconf.createCompatibleVolatileImage(size.width,size.height);
-		    if (BufferG2D != null){
-			BufferG2D.dispose();
-			BufferG2D = null;
+		    if (backBufferGraphics != null){
+			backBufferGraphics.dispose();
+			backBufferGraphics = null;
 		    }
 		}
-		if (BufferG2D == null) {
-		    BufferG2D = backBuffer.createGraphics();
+		if (backBufferGraphics == null) {
+		    backBufferGraphics = backBuffer.createGraphics();
 		    updateAntialias = true;
 		    updateFont = true;
 		}
 		if (updateFont){
-		    BufferG2D.setFont(VirtualSpaceManager.mainFont);
+		    backBufferGraphics.setFont(VirtualSpaceManager.mainFont);
 		    updateFont = false;
 		}
 		if (updateAntialias){
 		    if (antialias){
-			BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+			backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 		    }
 		    else {
-			BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+			backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
 		    }
 		    updateAntialias=false;
 		}
-		g2d = BufferG2D;
+		g2d = backBufferGraphics;
 		gconf = this.getGraphicsConfiguration();
 		valCode = backBuffer.validate(gconf);
 		if (valCode == VolatileImage.IMAGE_INCOMPATIBLE){

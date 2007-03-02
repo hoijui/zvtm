@@ -30,13 +30,7 @@ import net.claribole.zvtm.engine.Java2DPainter;
 
 public class GLViewPanel extends ViewPanel implements Runnable {
     
-    //XXX:not yet implemented
-    public BufferedImage getImage(){
-	return null;
-    }
-
     Dimension oldSize;
-    Graphics2D g2d;
 
     public GLViewPanel(Vector cameras,View v) {
 	addHierarchyListener(
@@ -130,7 +124,9 @@ public class GLViewPanel extends ViewPanel implements Runnable {
     public void paint(Graphics g) {
 	loopStartTime = System.currentTimeMillis();
 	super.paint(g);
-	g2d = (Graphics2D)g;
+	// backBufferGraphics is used here not as a Graphics from a back buffer image, but directly as the OpenGL graphics context
+	// (simply reusing an already declared var instead of creating a new one for nothing)
+	backBufferGraphics = (Graphics2D)g;
 	try {
 	    repaintNow=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
 	    updateMouseOnly = false;
@@ -143,17 +139,17 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		updateAntialias=true;
 		updateFont=true;
 	    }
-	    if (updateFont){g2d.setFont(VirtualSpaceManager.mainFont);updateFont=false;}
-	    if (updateAntialias){if (antialias){g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
-	    standardStroke=g2d.getStroke();
-	    standardTransform=g2d.getTransform();
+	    if (updateFont){backBufferGraphics.setFont(VirtualSpaceManager.mainFont);updateFont=false;}
+	    if (updateAntialias){if (antialias){backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
+	    standardStroke=backBufferGraphics.getStroke();
+	    standardTransform=backBufferGraphics.getTransform();
 	    //synchronized(this){
-		g2d.setPaintMode();
-		g2d.setBackground(backColor);
-		g2d.clearRect(0,0,getWidth(),getHeight());
+		backBufferGraphics.setPaintMode();
+		backBufferGraphics.setBackground(backColor);
+		backBufferGraphics.clearRect(0,0,getWidth(),getHeight());
 		// call to background java2d painting hook
 		if (parent.painters[Java2DPainter.BACKGROUND] != null){
-		    parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
+		    parent.painters[Java2DPainter.BACKGROUND].paint(backBufferGraphics, size.width, size.height);
 		}
 		//begin actual drawing here
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
@@ -177,7 +173,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 				    synchronized(gll[i]){
 					gll[i].project(cams[nbcam], size);
 					if (gll[i].isVisible()){
-					    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+					    gll[i].draw(backBufferGraphics,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
 					}
 					// notifying outside if branch because glyph sensitivity is not
 					// affected by glyph visibility when managed through Glyph.setVisible()
@@ -190,19 +186,19 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		}
 		// call to foreground java2d painting hook
 		if (parent.painters[Java2DPainter.FOREGROUND] != null){
-		    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
+		    parent.painters[Java2DPainter.FOREGROUND].paint(backBufferGraphics, size.width, size.height);
 		}
 		// call to after-distortion java2d painting hook
 		if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
-		    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
+		    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(backBufferGraphics, size.width, size.height);
 		}
 		// paint portals associated with this view
 		for (int i=0;i<parent.portals.length;i++){
-		    parent.portals[i].paint(g2d, size.width, size.height);
+		    parent.portals[i].paint(backBufferGraphics, size.width, size.height);
 		}
 		// call to after-portals java2d painting hook
 		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
+		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(backBufferGraphics, size.width, size.height);
 		}
 		if (inside){//deal with mouse glyph only if mouse cursor is inside this window
 		    try {
@@ -212,21 +208,21 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			}
 		    }
 		    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
-		    g2d.setColor(parent.mouse.hcolor);
-		    if (drawDrag){g2d.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
-		    if (drawRect){g2d.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
+		    backBufferGraphics.setColor(parent.mouse.hcolor);
+		    if (drawDrag){backBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
+		    if (drawRect){backBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
 		    if (drawOval){
 			if (circleOnly){
-			    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx));
+			    backBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx));
 			}
 			else {
-			    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragy-parent.mouse.my),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragy-parent.mouse.my));
+			    backBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragy-parent.mouse.my),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragy-parent.mouse.my));
 			}
 		    }
 		    if (drawVTMcursor){
 			synchronized(this){
-			    //g2d.setXORMode(Color.white);
-			    parent.mouse.draw(g2d);
+			    //backBufferGraphics.setXORMode(Color.white);
+			    parent.mouse.draw(backBufferGraphics);
 			    oldX=parent.mouse.mx;
 			    oldY=parent.mouse.my;
 			}
@@ -238,6 +234,11 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	catch (NullPointerException ex0){if (parent.parent.debug){System.err.println("GLViewPanel.paint "+ex0);}}
 	loopTotalTime = System.currentTimeMillis() - loopStartTime;
 	if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
+    }
+
+    //XXX: TBW
+    public BufferedImage getImage(){
+	return null;
     }
 
 }

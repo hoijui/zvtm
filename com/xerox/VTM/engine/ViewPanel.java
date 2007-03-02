@@ -61,6 +61,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**should a circle between point where we started dragging the mouse and current point*/
     public final static short CIRCLE=2;
 
+    /**Graphics in which objects are drawn*/
+    Graphics2D backBufferGraphics = null;
+
     Thread runView;
 
     /**list of cameras used in this view*/
@@ -186,9 +189,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     public abstract void stop();
     
-    //graphics context used to draw the offscreen image
-    Graphics2D g2;
-
     /**set application class to which events should be sent*/
     void setEventHandler(ViewEventHandler eh){
 	evH = eh;
