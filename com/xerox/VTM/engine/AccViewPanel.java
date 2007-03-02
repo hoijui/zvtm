@@ -40,19 +40,17 @@ import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 /**
- * Each view runs in its own thread - uses double buffering - 
- * this one is hardware accelerated (at least under Win32) using VolatileImage available since JDK 1.4.0 (does not accelerate bitmaps)
+ * Each view runs in its own thread - uses double buffering - Hhardware accelerated using the VolatileImage API.
  * @author Emmanuel Pietriga
  */
 public class AccViewPanel extends ViewPanel implements Runnable {
 
-    /**for Double Buffering*/
-    VolatileImage vImg;
+    /** Double Buffering uses a VolatileImage as the back buffer. */
+    VolatileImage backBuffer;
 
-    //get the BufferedImage for this view
-    public BufferedImage getImage(){
-	return this.vImg.getSnapshot();
-    }
+    /** Used for VolatileImage validation. */
+    GraphicsConfiguration gconf;
+    int valCode;
 
     public AccViewPanel(Vector cameras,View v) {
 	addHierarchyListener(
@@ -109,7 +107,6 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	Graphics2D g2d = null;
 	Graphics2D BufferG2D = null;
 	Dimension oldSize=getSize();
-	//clipRect=new Rectangle(0,0,oldSize.width,oldSize.height);
 	while (runView == me) {
 	    loopStartTime=System.currentTimeMillis();
 	    if (notBlank){
@@ -121,9 +118,12 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			viewW = size.width;//compute region's width and height
 			viewH = size.height;
 			if (size.width != oldSize.width || size.height != oldSize.height) {
-			    //each time the parent window is resized, adapt the buffer image size
-			    vImg=null;
-			    if (BufferG2D != null) {
+			    //each time the parent window is resized, adapt the VolatileImage that serves as a back buffer
+			    if (backBuffer != null){
+				backBuffer.flush();
+				backBuffer = null;
+			    }
+			    if (BufferG2D != null){
 				BufferG2D.dispose();
 				BufferG2D = null;
 			    }
@@ -133,140 +133,156 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			    updateAntialias=true;
 			    updateFont=true;
 			}
-			if (vImg==null) {
-			    GraphicsConfiguration gc=getGraphicsConfiguration();
-			    vImg=gc.createCompatibleVolatileImage(size.width,size.height);
-			    updateAntialias=true;
-			    updateFont=true;
+			if (backBuffer == null) {
+			    gconf = getGraphicsConfiguration();
+			    backBuffer = gconf.createCompatibleVolatileImage(size.width,size.height);
+			    if (BufferG2D != null){
+				BufferG2D.dispose();
+				BufferG2D = null;
+			    }
 			}
 			if (BufferG2D == null) {
-			    BufferG2D = vImg.createGraphics();
+			    BufferG2D = backBuffer.createGraphics();
+			    updateAntialias = true;
+			    updateFont = true;
+			}
+			if (updateFont){
 			    BufferG2D.setFont(VirtualSpaceManager.mainFont);
-			    updateAntialias=true;
-			    updateFont=true;
+			    updateFont = false;
 			}
-			if (updateFont) {BufferG2D.setFont(VirtualSpaceManager.mainFont);updateFont=false;}
-			if (updateAntialias){if (antialias){BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
-			g2d = BufferG2D;
-			//g2d.setClip(clipRect);
-			GraphicsConfiguration gc=this.getGraphicsConfiguration();
-			int valCode=vImg.validate(gc);
-			if (valCode==VolatileImage.IMAGE_INCOMPATIBLE){
-			    vImg=gc.createCompatibleVolatileImage(size.width,size.height);
-			}
-			standardStroke=g2d.getStroke();
-			standardTransform=g2d.getTransform();
-			//parent.parent.constMgr.updateAttribsFromMvars();
-			synchronized(this){
-			    g2d.setPaintMode();
-			    g2d.setBackground(backColor);
-			    g2d.clearRect(0, 0, getWidth(), getHeight());
-			    // call to background java2d painting hook
-			    if (parent.painters[Java2DPainter.BACKGROUND] != null){
-				parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
+			if (updateAntialias){
+			    if (antialias){
+				BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 			    }
-			    //begin actual drawing here
-			    for (int nbcam=0;nbcam<cams.length;nbcam++){
-				if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
-				    camIndex=cams[nbcam].getIndex();
-				    drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-				    synchronized(drawnGlyphs){
-					drawnGlyphs.removeAllElements();
-					uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
-					//compute region seen from this view through camera
-					viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
-					viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
-					viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
-					viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-					gll = cams[nbcam].parentSpace.getVisibleGlyphList();
-					if (parent.detectMultipleFullFills){//if detect multiple fills option is ON
-					    for (int i=0;i<gll.length;i++){
-						if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-						    cams[nbcam].parentSpace.drewGlyph(gll[i],camIndex);
-						    gll[i].project(cams[nbcam], size);
-						}
-					    }
-					    // XXX: looks like this part of the code has not been updated for some time
-					    //drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-					    beginAt=0;
-					    for (int j=drawnGlyphs.size()-1;j>=0;j--){//glyphs must have been projected because fillsView uses
-						if (((Glyph)drawnGlyphs.elementAt(j)).fillsView(viewW,viewH,cams[nbcam].getIndex())){//projected coords
-						    beginAt=j;
-						    break;
-						}
-					    }
-					    for (int j=beginAt;j<drawnGlyphs.size();j++){
-						gl=(Glyph)drawnGlyphs.elementAt(j);
-						if (gl.isVisible()){
-						    gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
-						}
-						cams[nbcam].parentSpace.drewGlyph(gl, camIndex);
-					    }
-					    // EOXXX
-					}
-					else {//if detect multiple fills option is OFF
-					    for (int i=0;i<gll.length;i++){
-						if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-						    //if glyph is al least partially visible in the reg. seen from this view, display
-						    synchronized(gll[i]){
+			    else {
+				BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+			    }
+			    updateAntialias=false;
+			}
+			g2d = BufferG2D;
+			gconf = this.getGraphicsConfiguration();
+			valCode = backBuffer.validate(gconf);
+			if (valCode == VolatileImage.IMAGE_INCOMPATIBLE){
+			    backBuffer = gconf.createCompatibleVolatileImage(size.width, size.height);
+			}
+			// case of IMAGE_RESTORED is not handled since we are
+			// only drawing to the image not copying from it
+			standardStroke = g2d.getStroke();
+			standardTransform = g2d.getTransform();
+			synchronized(this){
+			    do {
+				System.err.print(".");
+				g2d.setPaintMode();
+				g2d.setBackground(backColor);
+				g2d.clearRect(0, 0, getWidth(), getHeight());
+				// call to background java2d painting hook
+				if (parent.painters[Java2DPainter.BACKGROUND] != null){
+				    parent.painters[Java2DPainter.BACKGROUND].paint(g2d, size.width, size.height);
+				}
+				//begin actual drawing here
+				for (int nbcam=0;nbcam<cams.length;nbcam++){
+				    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
+					camIndex=cams[nbcam].getIndex();
+					drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+					synchronized(drawnGlyphs){
+					    drawnGlyphs.removeAllElements();
+					    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+					    //compute region seen from this view through camera
+					    viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
+					    viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
+					    viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
+					    viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
+					    gll = cams[nbcam].parentSpace.getVisibleGlyphList();
+					    if (parent.detectMultipleFullFills){//if detect multiple fills option is ON
+						for (int i=0;i<gll.length;i++){
+						    if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+							cams[nbcam].parentSpace.drewGlyph(gll[i],camIndex);
 							gll[i].project(cams[nbcam], size);
-							if (gll[i].isVisible()){
-							    gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+						    }
+						}
+						// XXX: looks like this part of the code has not been updated for some time
+						//drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+						beginAt=0;
+						for (int j=drawnGlyphs.size()-1;j>=0;j--){//glyphs must have been projected because fillsView uses
+						    if (((Glyph)drawnGlyphs.elementAt(j)).fillsView(viewW,viewH,cams[nbcam].getIndex())){//projected coords
+							beginAt=j;
+							break;
+						    }
+						}
+						for (int j=beginAt;j<drawnGlyphs.size();j++){
+						    gl=(Glyph)drawnGlyphs.elementAt(j);
+						    if (gl.isVisible()){
+							gl.draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+						    }
+						    cams[nbcam].parentSpace.drewGlyph(gl, camIndex);
+						}
+						// EOXXX
+					    }
+					    else {//if detect multiple fills option is OFF
+						for (int i=0;i<gll.length;i++){
+						    if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+							//if glyph is al least partially visible in the reg. seen from this view, display
+							synchronized(gll[i]){
+							    gll[i].project(cams[nbcam], size);
+							    if (gll[i].isVisible()){
+								gll[i].draw(g2d,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+							    }
+							    // notifying outside if branch because glyph sensitivity is not
+							    // affected by glyph visibility when managed through Glyph.setVisible()
+							    cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
 							}
-							// notifying outside if branch because glyph sensitivity is not
-							// affected by glyph visibility when managed through Glyph.setVisible()
-							cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
 						    }
 						}
 					    }
 					}
 				    }
 				}
-			    }
-			    // call to foreground java2d painting hook
-			    if (parent.painters[Java2DPainter.FOREGROUND] != null){
-				parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
-			    }
-			    // call to after-distortion java2d painting hook
-			    if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
-				parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
-			    }
-			    // paint portals associated with this view
-			    for (int i=0;i<parent.portals.length;i++){
-				parent.portals[i].paint(g2d, size.width, size.height);
-			    }
-			    // call to after-portals java2d painting hook
-			    if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-				parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
-			    }
-			    if (inside){//deal with mouse glyph only if mouse cursor is inside this window
-				try {
-				    parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-				    if (computeListAtEachRepaint && parent.mouse.isSensitive()){
-					parent.mouse.computeMouseOverList(evH,cams[activeLayer]);
+				// call to foreground java2d painting hook
+				if (parent.painters[Java2DPainter.FOREGROUND] != null){
+				    parent.painters[Java2DPainter.FOREGROUND].paint(g2d, size.width, size.height);
+				}
+				// call to after-distortion java2d painting hook
+				if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
+				    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(g2d, size.width, size.height);
+				}
+				// paint portals associated with this view
+				for (int i=0;i<parent.portals.length;i++){
+				    parent.portals[i].paint(g2d, size.width, size.height);
+				}
+				// call to after-portals java2d painting hook
+				if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+				    parent.painters[Java2DPainter.AFTER_PORTALS].paint(g2d, size.width, size.height);
+				}
+				if (inside){//deal with mouse glyph only if mouse cursor is inside this window
+				    try {
+					parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
+					if (computeListAtEachRepaint && parent.mouse.isSensitive()){
+					    parent.mouse.computeMouseOverList(evH,cams[activeLayer]);
+					}
+				    }
+				    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
+				    g2d.setColor(parent.mouse.hcolor);
+				    if (drawDrag){g2d.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
+				    if (drawRect){g2d.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
+				    if (drawOval){
+					if (circleOnly){
+					    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx));
+					}
+					else {
+					    g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragy-parent.mouse.my),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragy-parent.mouse.my));
+					}
+				    }
+				    if (drawVTMcursor){
+					synchronized(this){
+					    g2d.setXORMode(backColor);
+					    parent.mouse.draw(g2d);
+					    oldX=parent.mouse.mx;
+					    oldY=parent.mouse.my;
+					}
 				    }
 				}
-				catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
-				g2d.setColor(parent.mouse.hcolor);
-				if (drawDrag){g2d.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
-				if (drawRect){g2d.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
-				if (drawOval){
-				    if (circleOnly){
-					g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx));
-				    }
-				    else {
-					g2d.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragy-parent.mouse.my),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragy-parent.mouse.my));
-				    }
-				}
-				if (drawVTMcursor){
-				    synchronized(this){
-					g2d.setXORMode(backColor);
-					parent.mouse.draw(g2d);
-					oldX=parent.mouse.mx;
-					oldY=parent.mouse.my;
-				    }
-				}
 			    }
+			    while (backBuffer.contentsLost());
 			    //end drawing here
 			    if (g2d == BufferG2D) {
 				repaint();
@@ -275,7 +291,6 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			    // time to sleep = wanted refresh rate minus time needed to do the actual repaint operations
 			    timeToSleep = frameTime - loopTotalTime;
 			}
-			//either we do - BETTER UNDER Win32
 			try {
 			    runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
 			} 
@@ -283,8 +298,6 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep2 "+e);}
 			    return;
 			}
-			//or this   both seem to work well (have to test on several config) - BETTER UNDER SOLARIS
-			//Thread.yield();
 		    }
 		    else if (updateMouseOnly){
 			updateMouseOnly=false;
@@ -304,7 +317,8 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 				    g2d.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
 				    oldX=parent.mouse.mx;
 				    oldY=parent.mouse.my;
-				}//a nullpointerex on g2d seems to occur from time to time when going in or exiting from blank mode - just catch it and wait for next loop until we find out what's causing this
+				}// a nullpointerex on g2d seems to occur from time to time when going in or exiting from blank mode
+				//  just catch it and wait for next loop until we find out what's causing this
 				catch (NullPointerException ex47){if (parent.parent.debug){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
 			    }
 			}
@@ -341,45 +355,67 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 		}
 	    }
 	    else {
-		size=getSize();
+		size = this.getSize();
+		viewW = size.width;//compute region's width and height
+		viewH = size.height;
 		if (size.width != oldSize.width || size.height != oldSize.height) {
-		    //each time the parent window is resized, adapt the buffer image size
-		    vImg=null;
-		    if (BufferG2D != null) {
+		    //each time the parent window is resized, adapt the VolatileImage that serves as a back buffer
+		    if (backBuffer != null){
+			backBuffer.flush();
+			backBuffer = null;
+		    }
+		    if (BufferG2D != null){
 			BufferG2D.dispose();
 			BufferG2D = null;
 		    }
+		    //clipRect=new Rectangle(0,0,size.width,size.height);
 		    if (parent.parent.debug){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
 		    oldSize=size;
 		    updateAntialias=true;
 		    updateFont=true;
 		}
-		if (vImg==null) {
-		    GraphicsConfiguration gc=getGraphicsConfiguration();
-		    vImg=gc.createCompatibleVolatileImage(size.width,size.height);
-		    updateAntialias=true;
-		    updateFont=true;
+		if (backBuffer == null) {
+		    gconf = getGraphicsConfiguration();
+		    backBuffer = gconf.createCompatibleVolatileImage(size.width,size.height);
+		    if (BufferG2D != null){
+			BufferG2D.dispose();
+			BufferG2D = null;
+		    }
 		}
 		if (BufferG2D == null) {
-		    BufferG2D = vImg.createGraphics();
+		    BufferG2D = backBuffer.createGraphics();
+		    updateAntialias = true;
+		    updateFont = true;
+		}
+		if (updateFont){
 		    BufferG2D.setFont(VirtualSpaceManager.mainFont);
-		    updateAntialias=true;
-		    updateFont=true;
+		    updateFont = false;
 		}
-		if (updateFont) {BufferG2D.setFont(VirtualSpaceManager.mainFont);updateFont=false;}
-		if (updateAntialias){if (antialias){BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
+		if (updateAntialias){
+		    if (antialias){
+			BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		    }
+		    else {
+			BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+		    }
+		    updateAntialias=false;
+		}
 		g2d = BufferG2D;
-		//g2d.setClip(clipRect);
-		GraphicsConfiguration gc=this.getGraphicsConfiguration();
-		int valCode=vImg.validate(gc);
-		if (valCode==VolatileImage.IMAGE_INCOMPATIBLE){
-		    vImg=gc.createCompatibleVolatileImage(size.width,size.height);
+		gconf = this.getGraphicsConfiguration();
+		valCode = backBuffer.validate(gconf);
+		if (valCode == VolatileImage.IMAGE_INCOMPATIBLE){
+		    backBuffer = gconf.createCompatibleVolatileImage(size.width,size.height);
 		}
+		// case of IMAGE_RESTORED is not handled since we are
+		// only drawing to the image not copying from it
 		standardStroke=g2d.getStroke();
 		standardTransform=g2d.getTransform();
-		g2d.setPaintMode();
-		g2d.setColor(blankColor);
-		g2d.fillRect(0,0,getWidth(),getHeight());
+		do {
+		    g2d.setPaintMode();
+		    g2d.setColor(blankColor);
+		    g2d.fillRect(0, 0, size.width, size.height);
+		}
+		while (backBuffer.contentsLost());
 		repaint();
 		try {
 		    runView.sleep(deactiveTime);   //sleep ... ms
@@ -390,19 +426,23 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 		}
 	    }
 	}
-	if (g2d != null) {	
+	if (g2d != null) {
 	    g2d.dispose();
 	}
     }
     
     public void paint(Graphics g) {
 	synchronized (this) {
-	    g2 = (Graphics2D) g;
-	    if (vImg != null) {
-		g2.drawImage(vImg, 0, 0, this);
+	    if (backBuffer != null) {
+		g.drawImage(backBuffer, 0, 0, this);
 		if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
 	    }
         }
+    }
+
+    /** Get a snapshot of this VolatileImage-based accelerated view.*/
+    public BufferedImage getImage(){
+	return this.backBuffer.getSnapshot();
     }
 
 }
