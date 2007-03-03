@@ -49,7 +49,6 @@ public class AccViewPanel extends ViewPanel implements Runnable {
     VolatileImage backBuffer;
 
     /** Used for VolatileImage validation. */
-    GraphicsConfiguration gconf;
     int valCode;
 
     public AccViewPanel(Vector cameras,View v) {

@@ -27,6 +27,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.Toolkit;
@@ -63,6 +64,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     /**Graphics in which objects are drawn*/
     Graphics2D backBufferGraphics = null;
+    GraphicsConfiguration gconf;
 
     Thread runView;
 

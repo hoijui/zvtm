@@ -29,6 +29,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.GraphicsConfiguration;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
@@ -146,7 +147,8 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				updateFont=true;
 			    }
 			    if (backBuffer == null){
-				backBuffer = (BufferedImage)createImage(size.width, size.height);
+				gconf = getGraphicsConfiguration();
+				backBuffer = gconf.createCompatibleImage(size.width,size.height);
 				if (backBufferGraphics != null){
 				    backBufferGraphics.dispose();
 				    backBufferGraphics = null;
@@ -477,7 +479,8 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		    updateFont=true;
 		}
 		if (backBuffer == null){
-		    backBuffer = (BufferedImage)createImage(size.width, size.height);
+		    gconf = getGraphicsConfiguration();
+		    backBuffer = gconf.createCompatibleImage(size.width,size.height);
 		    if (backBufferGraphics != null){
 			backBufferGraphics.dispose();
 			backBufferGraphics = null;
