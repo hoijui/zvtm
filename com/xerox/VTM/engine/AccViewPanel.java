@@ -170,7 +170,6 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			standardTransform = g2d.getTransform();
 			synchronized(this){
 			    do {
-				System.err.print(".");
 				g2d.setPaintMode();
 				g2d.setBackground(backColor);
 				g2d.clearRect(0, 0, getWidth(), getHeight());
