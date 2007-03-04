@@ -58,6 +58,21 @@ public class VRectangleST extends VRectangle implements Transparent,Cloneable {
     }
 
     /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param a alpha channel value
+     */
+    public VRectangleST(long x, long y, float z, long w, long h, Color c, float a){
+	super(x, y, z, w, h, c);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to 0.5
+    }
+
+    /**
      *set alpha channel value (transparency)
      *@param a [0;1.0] 0 is fully transparent, 1 is opaque
      */
