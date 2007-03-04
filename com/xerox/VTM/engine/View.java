@@ -641,15 +641,15 @@ public abstract class View {
     /**Get how much time the view goes to sleep between to consecutive repaints when the view is not active.
      *@return time sleeping, in milliseconds (default is 500)
      */
-    public void getInactiveSleepTime(int t){
-	panel.inactiveSleepTime = t;
+    public int getInactiveSleepTime(){
+	return panel.inactiveSleepTime;
     }
 
     /**Get how much time the view goes to sleep between to consecutive repaints when the view is blank.
      *@return time sleeping, in milliseconds (default is 100)
      */
-    public void getBlankSleepTime(int t){
-	panel.blankSleepTime = t;
+    public int getBlankSleepTime(){
+	return panel.blankSleepTime;
     }
 
     void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
