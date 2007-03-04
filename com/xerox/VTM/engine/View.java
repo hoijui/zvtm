@@ -261,7 +261,12 @@ public abstract class View {
     public int getActiveLayer(){
 	return panel.activeLayer;
     }
-
+    
+    /**Get the number of layers in this view.*/
+    public int getLayerCount(){
+	return cameras.size();
+    }
+    
     /**update font used in this view (for all cameras) (should be automatically called when changing the VSM's main font)*/
     public void updateFont(){panel.updateFont=true;}
 
