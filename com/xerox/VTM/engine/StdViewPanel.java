@@ -102,7 +102,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	Thread me = Thread.currentThread();
 	while (getSize().width <= 0) {  //Wait until the window actually exists
 	    try {
-		runView.sleep(deactiveTime);
+		runView.sleep(inactiveSleepTime);
 	    } 
 	    catch (InterruptedException e) {
 		if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep "+e);}
@@ -445,7 +445,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 		else {
 		    try {
-			runView.sleep(deactiveTime);   //sleep ... ms  
+			runView.sleep(inactiveSleepTime);   //sleep ... ms  
 		    } 
 		    catch (InterruptedException e) {
 			if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep5 "+e);}
@@ -531,7 +531,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		g2d.fillRect(0,0,getWidth(),getHeight());
 		repaint();
 		try {
-		    runView.sleep(deactiveTime);   //sleep ... ms  
+		    runView.sleep(blankSleepTime);   //sleep ... ms  
 		} 
 		catch (InterruptedException e) {
 		    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep5 "+e);}

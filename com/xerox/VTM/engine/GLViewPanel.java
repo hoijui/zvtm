@@ -76,7 +76,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	Thread me = Thread.currentThread();
 	while (getSize().width <= 0) {  //Wait until the window actually exists
 	    try {
-		runView.sleep(deactiveTime);
+		runView.sleep(inactiveSleepTime);
 	    } 
 	    catch (InterruptedException e) {
 		if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep "+e);}
@@ -111,7 +111,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	    }
 	    else {
 		try {
-		    runView.sleep(deactiveTime);
+		    runView.sleep(inactiveSleepTime);
 		} 
 		catch (InterruptedException e) {
 		    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep5 "+e);}

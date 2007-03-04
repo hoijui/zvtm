@@ -621,6 +621,36 @@ public abstract class View {
 	panel.removeMouseMotionListener(sm);
 	panel.removeMouseWheelListener(sm);
     }
+    
+    /**Set how much time should the view go to sleep between to consecutive repaints when the view is not active.
+     *@param t time to sleep, in milliseconds (default is 500)
+     */
+    public void setInactiveSleepTime(int t){
+	panel.inactiveSleepTime = t;
+    }
+
+    /**Set how much time should the view go to sleep between to consecutive repaints when the view is blank.
+     * Do not set too short if using fade in/fade out transitions
+     * (a too long time can cause lags at the beginning of a fade in transition).
+     *@param t time to sleep, in milliseconds (default is 100)
+     */
+    public void setBlankSleepTime(int t){
+	panel.blankSleepTime = t;
+    }
+
+    /**Get how much time the view goes to sleep between to consecutive repaints when the view is not active.
+     *@return time sleeping, in milliseconds (default is 500)
+     */
+    public void getInactiveSleepTime(int t){
+	panel.inactiveSleepTime = t;
+    }
+
+    /**Get how much time the view goes to sleep between to consecutive repaints when the view is blank.
+     *@return time sleeping, in milliseconds (default is 100)
+     */
+    public void getBlankSleepTime(int t){
+	panel.blankSleepTime = t;
+    }
 
     void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
 	gbc.gridx=gx;
