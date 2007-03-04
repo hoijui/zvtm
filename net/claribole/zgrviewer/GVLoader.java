@@ -9,6 +9,7 @@
 
 package net.claribole.zgrviewer;
 
+import java.awt.Color;
 import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
 
@@ -124,11 +125,12 @@ class GVLoader {
 	    ConfigManager.m_LastDir=f.getParentFile();
 	    cfgMngr.lastFileOpened = f;
 	    cfgMngr.lastProgramUsed = (prg.equals("neato")) ? ConfigManager.NEATO_PROGRAM : ConfigManager.DOT_PROGRAM;
+	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 	    dotMngr.load(f,prg, parser);
 	    //in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
 	    ConfigManager.defaultFont = grMngr.vsm.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
-	    grMngr.getGlobalView();
+	    grMngr.reveal();
 	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	    if (grMngr.rView != null){
 		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
@@ -146,11 +148,13 @@ class GVLoader {
 	    Document svgDoc=Utils.parse(f,false);
 	    pp.setLabel("Displaying...");
 	    pp.setPBValue(80);
+	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 	    SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, f.toURL().toString());
 	    grMngr.seekBoundingBox();
 	    ConfigManager.defaultFont=grMngr.vsm.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
-	    grMngr.getGlobalView();
+// 	    grMngr.getGlobalView();
+	    grMngr.reveal();
 	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	    if (grMngr.rView != null){
 		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
@@ -159,6 +163,7 @@ class GVLoader {
 	    pp.destroy();
 	}
 	catch (Exception ex){
+	    grMngr.reveal();
 	    pp.destroy();
 	    ex.printStackTrace();
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
@@ -170,12 +175,11 @@ class GVLoader {
 	try {
 	    Document svgDoc = AppletUtils.parse(svgFileURL, false);
 	    if (svgDoc != null){
+		if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, svgFileURL);
 		grMngr.seekBoundingBox();
 		ConfigManager.defaultFont = grMngr.vsm.getMainFont();
-		Location l = grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(0));
-		grMngr.mainCamera.moveTo(l.vx, l.vy);
-		grMngr.mainCamera.setAltitude(l.alt);
+		grMngr.reveal();
 		//do not remember camera's initial location (before global view)
 		if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
 		if (grMngr.rView != null){
@@ -187,7 +191,7 @@ class GVLoader {
 		System.err.println("An error occured while loading file " + svgFileURL);
 	    }
 	}
-	catch (Exception ex){ex.printStackTrace();}
+	catch (Exception ex){grMngr.reveal();ex.printStackTrace();}
     }
 
 
@@ -197,7 +201,8 @@ class GVLoader {
 	//in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
 	ConfigManager.defaultFont = grMngr.vsm.getMainFont();
 	grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
-	grMngr.getGlobalView();
+// 	grMngr.getGlobalView();
+	grMngr.reveal();
 	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	if (grMngr.rView != null){
 	    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);

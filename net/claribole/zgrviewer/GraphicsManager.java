@@ -46,11 +46,14 @@ import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.TransitionManager;
 
 
 /* Multiscale feature manager */
 
 public class GraphicsManager implements ComponentListener, AnimationListener, Java2DPainter {
+
+    static final Color FADE_COLOR = Color.WHITE;
 
     public VirtualSpaceManager vsm;
     VirtualSpace mSpace;   // virtual space containing graph
@@ -70,7 +73,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     JPanel mainViewPanel;
 
     PeriodicActionManager paMngr;
-
 
     /*dimensions of zoomable panel*/
     int panelWidth, panelHeight;
@@ -322,6 +324,18 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	    paMngr.requestToolPaletteRelocation();
 	}
 	catch(NullPointerException ex){}
+    }
+
+    /*----------  Reveal graph (after loading) --------------*/
+
+    void reveal(){
+	Camera c = mSpace.getCamera(0);
+	Location l = vsm.getGlobalView(c);
+	c.posx = l.vx;
+	c.posy = l.vy;
+	c.setAltitude(l.alt-c.getFocal());
+	rememberLocation(mSpace.getCamera(0).getLocation());
+	TransitionManager.fadeIn(mainView, 500, vsm);
     }
 
     /*-------------     Navigation              -------------*/
