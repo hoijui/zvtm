@@ -461,7 +461,7 @@ public abstract class View {
 
     /**gives access to the panel's Graphics object - can be useful in some cases, for instance to compute the bounds of a text string that has not yet been added to any virtual space. SHOULD NOT BE TAMPERED WITH. USE AT YOUR OWN RISKS!*/
     public Graphics getGraphicsContext(){
-	return panel.backBufferGraphics;
+	return panel.stableRefToBackBufferGraphics;
     }
 
     /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>

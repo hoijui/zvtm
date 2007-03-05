@@ -66,6 +66,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     Graphics2D backBufferGraphics = null;
     GraphicsConfiguration gconf;
 
+    Graphics2D stableRefToBackBufferGraphics = null;
+
     Thread runView;
 
     /**list of cameras used in this view*/
