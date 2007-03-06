@@ -52,8 +52,10 @@ public class SVGStyle {
     public static short CSS_FONT_STYLE_ITALIC=1;
     public static short CSS_FONT_STYLE_OBLIQUE=2;
 
-    protected Color fillColor;   //fill color in ZVTM
-    protected Color strokeColor; //corresponds to the border color in ZVTM
+    protected Color fillColor;   // fill color in ZVTM
+    protected Color strokeColor; // border color in ZVTM
+    protected boolean fillColorDefined = false;   // fillColor == null could have two meanings : it is not defined, or it is none
+    protected boolean strokeColorDefined = false; // the boolean helps disambiguate these situations ; same thing for strokeColor
     protected Float strokeWidth;
     protected float[] strokeDashArray;
     protected Float alphaValue;  //transparency
@@ -68,6 +70,8 @@ public class SVGStyle {
     SVGStyle(Color c1,Color c2){
 	fillColor=c1;
 	strokeColor=c2;
+	fillColorDefined = true;
+	strokeColorDefined = true;
     }
 
     /**fill color, border color, transparency*/
@@ -75,6 +79,8 @@ public class SVGStyle {
 	fillColor=c1;
 	strokeColor=c2;
 	alphaValue=a;
+	fillColorDefined = true;
+	strokeColorDefined = true;
     }
 
     /**returns true if there is transparency information (the value does not matter)*/
@@ -86,6 +92,7 @@ public class SVGStyle {
     /**set the fill (interior) color*/
     public void setFillColor(Color c){
 	fillColor=c;
+	fillColorDefined = true;
     }
 
     /**returns the fill (interior) color*/
@@ -93,14 +100,25 @@ public class SVGStyle {
 	return fillColor;
     }
 
+    /**Tells whether there is stroke color information or not.*/
+    public boolean hasFillColorInformation(){
+	return fillColorDefined;
+    }
+
     /**set the stroke (border) color*/
     public void setBorderColor(Color c){
 	strokeColor=c;
+	strokeColorDefined = true;
     }
 
     /**returns the stroke (border) color*/
     public Color getBorderColor(){
 	return strokeColor;
+    }
+
+    /**Tells whether there is stroke color information or not.*/
+    public boolean hasBorderColorInformation(){
+	return strokeColorDefined;
     }
 
     /**set the transparency value (between 0 (fully transparent) and 1.0 (opaque))*/

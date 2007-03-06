@@ -24,6 +24,8 @@ public class Context {
     String font_style;
     Color fill;
     Color stroke;
+    boolean fillColorDefined = false;   // fill == null could have two meanings : it is not defined, or it is none
+    boolean strokeColorDefined = false; // the boolean helps disambiguate these situations ; same thing for stroke
 //     int stroke_width;
     Float fill_opacity;
 
@@ -56,8 +58,14 @@ public class Context {
 	}
 	if (ar!=null){
 	    for (int i=0;i<ar.length;i++){
-		if (ar[i].startsWith(SVGReader._fill)){fill=SVGReader.getColor(ar[i].substring(SVGReader._fill.length()));}
-		else if (ar[i].startsWith(SVGReader._stroke)){SVGReader.getColor(ar[i].substring(SVGReader._stroke.length()));}
+		if (ar[i].startsWith(SVGReader._fill)){
+		    fill = SVGReader.getColor(ar[i].substring(SVGReader._fill.length()));
+		    fillColorDefined = true;
+		}
+		else if (ar[i].startsWith(SVGReader._stroke)){
+		    SVGReader.getColor(ar[i].substring(SVGReader._stroke.length()));
+		    strokeColorDefined = true;
+		}
 		else if (ar[i].startsWith(SVGReader._fillopacity)){fill_opacity=new Float(ar[i].substring(SVGReader._fillopacity.length()));}
 		else if (ar[i].startsWith(SVGReader._fontfamily)){font_family=ar[i].substring(SVGReader._fontfamily.length());}
 		else if (ar[i].startsWith(SVGReader._fontsize)){
@@ -81,9 +89,19 @@ public class Context {
 	return fill;
     }
 
+    /**Tells whether there is stroke color information or not.*/
+    public boolean hasFillColorInformation(){
+	return fillColorDefined;
+    }
+
     /**returns the stroke (border) color*/
     public Color getBorderColor(){
 	return stroke;
+    }
+
+    /**Tells whether there is stroke color information or not.*/
+    public boolean hasBorderColorInformation(){
+	return strokeColorDefined;
     }
 
     /**returns the alpha transparency value (1.0 if opaque, 0 is fully transparent)*/
