@@ -21,12 +21,12 @@ package com.xerox.VTM.tests;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Dimension;
+import java.awt.*;
 import java.awt.geom.QuadCurve2D;
 
 import java.util.Vector;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.lens.*;
@@ -35,44 +35,85 @@ import net.claribole.zvtm.engine.*;
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 
-public class Test {
+public class Test extends JFrame {
 
     VirtualSpaceManager vsm;
 
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewEventHandler eh1,eh2;   //class that receives the events sent from views (include mouse click, entering object,...)
 
-    View testView;
+    View v1,v2;
 
     Test(short ogl){
+	super();
 	vsm=new VirtualSpaceManager();
 	vsm.setDebug(true);
 	//vsm.setDefaultMultiFills(true);
 	initTest(ogl);
     }
 
+    JTabbedPane tp;
+
     public void initTest(short ogl){
 
-	eh=new EventHandlerTest(this);
-	vsm.addVirtualSpace("src");
-	vsm.setZoomLimit(-90);
-	vsm.addCamera("src");
+	eh1=new EventHandlerTest(this);
+	eh2=new EventHandlerTest(this);
+	vsm.addVirtualSpace("vs1");
+	vsm.addVirtualSpace("vs2");
+	vsm.addCamera("vs1");
+	vsm.addCamera("vs2");
 	Vector cameras=new Vector();
-	cameras.add(vsm.getVirtualSpace("src").getCamera(0));
-	short vt = View.STD_VIEW;
-	switch(ogl){
-	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
+	cameras.add(vsm.getVirtualSpace("vs1").getCamera(0));
+
+
+
+
+	Container c = this.getContentPane();
+	tp = new JTabbedPane();
+	tp.add("Test1", vsm.addPanelView(cameras, "v1", 700, 500));
+	cameras.clear();
+	cameras.add(vsm.getVirtualSpace("vs2").getCamera(0));
+	tp.add("Test2", vsm.addPanelView(cameras, "v2", 700, 500));
+
+	c.add(tp);
+
+	v1 = vsm.getView("v1");
+	v2 = vsm.getView("v2");
+	v1.setEventHandler(eh1);
+	v2.setEventHandler(eh2);
+
+	setSize(800,600);
+	setVisible(true);
+
+
+
+// 	short vt = View.STD_VIEW;
+// 	switch(ogl){
+// 	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
+// 	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
+// 	}
+// 	testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
+// 	testView.setEventHandler(eh);
+// 	testView.setNotifyMouseMoved(true);
+// 	vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
+// 	vsm.getVirtualSpace("src").getCamera(0).moveTo(50,50);
+	
+	for (int i=0;i<10;i++){
+	    for (int j=0;j<5;j++){
+		vsm.addGlyph(new VRectangle(i*20,j*20,0,10,10,Color.getHSBColor(i/10.0f,j/10.0f,1)), "vs1");
+	    }
 	}
-	testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
-	testView.setEventHandler(eh);
-	testView.setNotifyMouseMoved(true);
-	vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
+
+	for (int i=0;i<5;i++){
+	    for (int j=0;j<10;j++){
+		vsm.addGlyph(new VRectangle(i*20,j*20,0,10,10,Color.getHSBColor(i/10.0f,1,1)), "vs2");
+	    }
+	}
 
 	
-	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.white),"src");
 
-	vsm.repaintNow();
+// 	vsm.repaintNow();
     }
+
 
     public static void main(String[] args){
 	System.out.println("-----------------");

@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Thu Jan 20 09:06:13 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: OffscreenViewPanel.java,v 1.3 2005/12/05 15:25:26 epietrig Exp $
