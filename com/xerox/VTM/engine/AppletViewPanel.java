@@ -52,6 +52,9 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
     long lensVx, lensVy;
     long lviewWC, lviewNC, lviewEC, lviewSC;
 
+    int backBufferW = 0;
+    int backBufferH = 0;
+
     public AppletViewPanel(Vector cameras,View v) {
 	addHierarchyListener(
 	    new HierarchyListener() {
@@ -119,7 +122,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 			    size = this.getSize();
 			    viewW = size.width;//compute region's width and height
 			    viewH = size.height;
-			    if (size.width != oldSize.width || size.height != oldSize.height) {
+			    if (size.width != oldSize.width || size.height != oldSize.height || backBufferW != size.width || backBufferH != size.height){
 				//each time the parent window is resized, adapt the buffer image size
 				backBuffer = null;
 				if (backBufferGraphics != null) {
@@ -143,6 +146,8 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 			    if (backBuffer == null){
 				gconf = getGraphicsConfiguration();
 				backBuffer = gconf.createCompatibleImage(size.width,size.height);
+				backBufferW = backBuffer.getWidth();
+				backBufferH = backBuffer.getHeight();
 				if (backBufferGraphics != null){
 				    backBufferGraphics.dispose();
 				    backBufferGraphics = null;
@@ -451,7 +456,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 		size = this.getSize();
 		viewW = size.width;//compute region's width and height
 		viewH = size.height;
-		if (size.width != oldSize.width || size.height != oldSize.height) {
+		if (size.width != oldSize.width || size.height != oldSize.height || backBufferW != size.width || backBufferH != size.height){
 		    //each time the parent window is resized, adapt the buffer image size
 		    backBuffer = null;
 		    if (backBufferGraphics != null) {
@@ -475,6 +480,8 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 		if (backBuffer == null){
 		    gconf = getGraphicsConfiguration();
 		    backBuffer = gconf.createCompatibleImage(size.width,size.height);
+		    backBufferW = backBuffer.getWidth();
+		    backBufferH = backBuffer.getHeight();
 		    if (backBufferGraphics != null){
 			backBufferGraphics.dispose();
 			backBufferGraphics = null;
