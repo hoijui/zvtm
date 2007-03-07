@@ -1,7 +1,7 @@
 /*   FILE: GraphicsManager.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id:  $
@@ -333,6 +333,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	Location l = vsm.getGlobalView(c);
 	c.posx = l.vx;
 	c.posy = l.vy;
+	c.updatePrecisePosition();
 	c.setAltitude(l.alt-c.getFocal());
 	rememberLocation(mSpace.getCamera(0).getLocation());
 	TransitionManager.fadeIn(mainView, 500, vsm);
@@ -461,6 +462,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	    c1.posy=c0.posy;
 	    c1.focal=c0.focal;
 	    c1.altitude=c0.altitude;
+	    c1.updatePrecisePosition();
 	    long[] wnes=mainView.getVisibleRegion(mSpace.getCamera(0));
 	    observedRegion.moveTo((wnes[0]+wnes[2])/2,(wnes[3]+wnes[1])/2);
 	    observedRegion.setWidth((wnes[2]-wnes[0])/2);
