@@ -739,11 +739,15 @@ public class SVGReader {
 	}
 	else {res=new VText(x,-y,0,Color.black,tx,ta);}
 	Font f;
-	if (ss != null && specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
-	    res.setSpecialFont(f);
+	if (ss != null){
+	    if (specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
+		res.setSpecialFont(f);
+	    }
 	}
-	else if (ctx != null && specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
-	    res.setSpecialFont(f);
+	else if (ctx != null){
+	    if (specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
+		res.setSpecialFont(f);
+	    }
 	}
 	if (meta){setMetadata(res,ctx);}
 	return res;
