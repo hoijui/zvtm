@@ -44,8 +44,6 @@ public class EventHandlerTest implements ViewEventHandler{
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 
-	System.err.println("repainting "+v.parent.getName());
-	application.vsm.repaintNow();
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -137,8 +135,10 @@ public class EventHandlerTest implements ViewEventHandler{
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+
     }
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+
     }
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 
