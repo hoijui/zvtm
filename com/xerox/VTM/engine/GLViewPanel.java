@@ -143,7 +143,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	    if (updateAntialias){if (antialias){backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
 	    standardStroke=backBufferGraphics.getStroke();
 	    standardTransform=backBufferGraphics.getTransform();
-	    //synchronized(this){
+	    if (notBlank){
 		backBufferGraphics.setPaintMode();
 		backBufferGraphics.setBackground(backColor);
 		backBufferGraphics.clearRect(0,0,getWidth(),getHeight());
@@ -229,7 +229,12 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    }
 		}
 		//end drawing here
-		//}
+	    }
+	    else {
+		backBufferGraphics.setPaintMode();
+		backBufferGraphics.setColor(blankColor);
+		backBufferGraphics.fillRect(0, 0, getWidth(), getHeight());
+	    }
 	}
 	catch (NullPointerException ex0){if (parent.parent.debug){System.err.println("GLViewPanel.paint "+ex0);}}
 	loopTotalTime = System.currentTimeMillis() - loopStartTime;
