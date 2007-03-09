@@ -17,6 +17,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Vector;
 
 import javax.swing.JCheckBoxMenuItem;
@@ -138,6 +140,7 @@ public class ZGRViewer implements ZGRApplication {
 	final JMenuItem fontI=new JMenuItem("Set Font...");
 	final JMenuItem prefsI=new JMenuItem("Preferences...");
 	final JMenuItem helpI=new JMenuItem("Commands...");
+	final JMenuItem versionI=new JMenuItem("Check for updates...");
 	final JMenuItem aboutI=new JMenuItem("About...");
 	exitI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	ActionListener a0=new ActionListener(){
@@ -160,6 +163,7 @@ public class ZGRViewer implements ZGRApplication {
 		    else if (e.getSource()==prefsI){showPreferences();}
 		    else if (e.getSource()==exitI){exit();}
 		    else if (e.getSource()==helpI){help();}
+		    else if (e.getSource()==versionI){checkVersion();}
 		    else if (e.getSource()==aboutI){about();}
 		}
 	    };
@@ -198,6 +202,7 @@ public class ZGRViewer implements ZGRApplication {
 	jm2.addSeparator();
 	jm2.add(prefsI);
 	jm3.add(helpI);
+	jm3.add(versionI);
 	jm3.add(aboutI);
 	openDG.addActionListener(a0);
 	openDI.addActionListener(a0);
@@ -217,6 +222,7 @@ public class ZGRViewer implements ZGRApplication {
 	fontI.addActionListener(a0);
 	prefsI.addActionListener(a0);
 	helpI.addActionListener(a0);
+	versionI.addActionListener(a0);
 	aboutI.addActionListener(a0);
 	if (accelerationMode == 2){printI.setEnabled(false);}
 	return jmb;
@@ -400,6 +406,28 @@ public class ZGRViewer implements ZGRApplication {
 
     public void about(){
 	JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.about);
+    }
+
+    static final String CURRENT_VERSION_URL = "http://zvtm.sourceforge.net/zgrviewer/currentVersion";
+
+    public void checkVersion(){
+	try {
+	    String version = Utils.getTextContent(new URL(CURRENT_VERSION_URL), 10);
+	    if (version != null){
+		if (version.equals(Messages.VERSION)){
+		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.YOU_HAVE_THE_MOST_RECENT_VERSION);
+		}
+		else {
+		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.NEW_VERSION_AVAILABLE+version);
+		}
+	    }
+	    else {
+		JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.COULD_NOT_GET_VERSION_INFO, "Error", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
+	catch (Exception ex){
+	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.COULD_NOT_GET_VERSION_INFO, "Error", JOptionPane.ERROR_MESSAGE);
+	}
     }
 
     void exit(){

@@ -22,6 +22,8 @@ public class Messages {
     
     static final String pngOnlyIn140SecondPart="\nDo you want to proceed anyway (this will probably cause an error)?";
 
+    static final String VERSION = "0.7.1";
+
     static final String about="ZGRViewer v0.7.2-devel\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
 
     static final String commands="Under Mac OS X, replace Ctrl by the Command key\n\nMisc. Commands\n"
@@ -103,5 +105,11 @@ public class Messages {
     static final String LOADING_SVG = "Loading Graphviz/SVG...";
 
     static final String EMPTY_STRING = " ";
+
+    static final String YOU_HAVE_THE_MOST_RECENT_VERSION = "You have the most recent version of ZGRViewer (" + VERSION + ")";
+    
+    static final String NEW_VERSION_AVAILABLE = "A new version of ZGRViewer is available: ";
+
+    static final String COULD_NOT_GET_VERSION_INFO = "Failed to get version information";
 
 }

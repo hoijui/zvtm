@@ -13,6 +13,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+import java.net.URL;
 import java.util.Enumeration;
 
 import javax.swing.UIManager;
@@ -204,6 +209,44 @@ public class Utils {
 	else {
 	    return "";
 	}
+    }
+
+    public static String getTextContent(URL url, int maxBufferSize) throws IOException {
+	Object content = url.getContent();
+	String text = null;
+	if (content instanceof String){
+	    text = (String)content;
+	}
+	else if (content instanceof InputStream || content instanceof Reader){
+	    BufferedReader in;
+	    if (content instanceof InputStream){
+		in = new BufferedReader(new InputStreamReader((InputStream)content));
+	    }
+	    else if (content instanceof BufferedReader){
+		in = (BufferedReader)content;
+	    }
+	    else {
+		in = new BufferedReader((Reader)content);
+	    }
+	    char[] data = new char[maxBufferSize];
+	    int index = 0;
+	    int ch;
+	    while (true) {
+		if (index == maxBufferSize){break;}
+		ch = in.read();
+		if (ch == -1){break;}
+		data[index] = (char)ch;
+		index++;
+	    }
+	    if (index == 0){
+		text = null;
+	    }
+	    else {
+		text = new String(data,0,index);
+	    }
+	    in.close();
+	}
+	return text;
     }
 
 }
