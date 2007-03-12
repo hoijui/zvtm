@@ -41,6 +41,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	if (mouseInsideOverview){
 	    if (application.op.coordInsideObservedRegion(jpx, jpy)){
 		orStickedToMouse = true;
+		application.alm.acquiredObservedRegion(System.currentTimeMillis());
 	    }
 	    // do not allow grabbing the overview's content, it creates irrelevant noise in the experiment
 // 	    else {
@@ -139,10 +140,9 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
     }
 
     void portalExitActions(){
+	application.alm.coarselyCentered(System.currentTimeMillis());
 	mouseInsideOverview = false;
 	delayedOverviewExit = false;
-// 	application.centerOverview(true);
-// 	application.op.setBorder(Eval.DEFAULT_PORTAL_BORDER_COLOR);
 	application.vsm.repaintNow();
     }
     

@@ -45,6 +45,7 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
 	if (mouseInsideOverview){
 	    if (application.to.coordInsideObservedRegion(jpx, jpy)){
 		orStickedToMouse = true;
+		application.alm.acquiredObservedRegion(System.currentTimeMillis());
 	    }
 	    // do not allow grabbing the overview's content, it creates irrelevant noise in the experiment
 // 	    else {
@@ -174,10 +175,10 @@ class AcquireTOWEventHandler extends AcquireBaseEventHandler implements PortalEv
     }
 
     void portalExitActions(){
+	application.alm.coarselyCentered(System.currentTimeMillis());
 	mouseInsideOverview = false;
 	delayedTOWExit = false;
  	unstickPortal();
-// 	application.centerOverview(false);
 	application.vsm.repaintNow();
     }
 

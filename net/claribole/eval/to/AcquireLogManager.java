@@ -70,6 +70,8 @@ public class AcquireLogManager implements PostAnimationAction {
 
     boolean firstOverviewAcquisition = true;
     long timeToAcquire = 0;
+    boolean firstObservedRegionAcquisition = true;
+    long timeToAcquireOR = 0;
 
     String lineStart;
     File logFile;
@@ -155,6 +157,8 @@ public class AcquireLogManager implements PostAnimationAction {
 		      "Direction" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
 		      "AcqTime" + OUTPUT_CSV_SEP +
+		      "AcqTimeOR" + OUTPUT_CSV_SEP +
+		      "OvTime" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "Errors");
 	    bwt.newLine();
@@ -225,12 +229,27 @@ public class AcquireLogManager implements PostAnimationAction {
 	    block.timeToAcquire[trialCount] = timeToAcquire;
 	}
     }
+
+    void acquiredObservedRegion(long time){
+	if (firstObservedRegionAcquisition){
+	    timeToAcquireOR = time-trialStartTime; 
+	    firstObservedRegionAcquisition = false;
+	    block.timeToAcquireOR[trialCount] = timeToAcquireOR;
+	}
+    }
     
+    void coarselyCentered(long time){
+	block.timeToCoarseCentering[trialCount] = time - trialStartTime;
+    }
+
     void initNextTrial(){
 	incTrialCount();
 	resetTargetCount();
 	errorCount = 0;
 	firstOverviewAcquisition = true;
+	firstObservedRegionAcquisition = true;
+	timeToAcquire = 0;
+	timeToAcquireOR = 0;
 	// reset camera to (0,0) in virtual space
 	resetCamera();
 	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the
@@ -321,6 +340,8 @@ public class AcquireLogManager implements PostAnimationAction {
 			  directionStr + OUTPUT_CSV_SEP +
 			  IDStr + OUTPUT_CSV_SEP +
 			  String.valueOf(block.timeToAcquire[trialCount]) + OUTPUT_CSV_SEP +
+			  String.valueOf(block.timeToAcquireOR[trialCount]) + OUTPUT_CSV_SEP +
+			  String.valueOf(block.timeToCoarseCentering[trialCount]) + OUTPUT_CSV_SEP +
 			  intermediateTimes[i] + OUTPUT_CSV_SEP +
 			  String.valueOf(errorCount));
 		bwt.newLine();

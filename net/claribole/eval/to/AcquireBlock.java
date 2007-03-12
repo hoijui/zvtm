@@ -74,6 +74,8 @@ public class AcquireBlock {
     int[] ID;
     long[] size;
     long[] timeToAcquire;
+    long[] timeToAcquireOR;
+    long[] timeToCoarseCentering;
     
     AcquireBlock(String blockLine){
 	String[] data = blockLine.split(AcquireLogManager.INPUT_CSV_SEP);
@@ -81,6 +83,8 @@ public class AcquireBlock {
 	startlocation = new short[nbTrials];
 	direction = new short[nbTrials];
 	timeToAcquire = new long[nbTrials];
+	timeToAcquireOR = new long[nbTrials];
+	timeToCoarseCentering = new long[nbTrials];
 	ID = new int[nbTrials];
 	size = new long[nbTrials];
 	for (int i=0;i<nbTrials;i++){
