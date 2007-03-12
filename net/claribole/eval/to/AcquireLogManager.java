@@ -68,7 +68,7 @@ public class AcquireLogManager implements PostAnimationAction {
     boolean sessionStarted = false;
     boolean trialStarted = false;
 
-    boolean firstTOWAcquisition = true;
+    boolean firstOverviewAcquisition = true;
     long timeToAcquire = 0;
 
     String lineStart;
@@ -218,10 +218,10 @@ public class AcquireLogManager implements PostAnimationAction {
 	im.warn(ERR_MSG);
     }
 
-    void acquiredTOW(long time){
-	if (firstTOWAcquisition){
+    void acquiredOverview(long time){
+	if (firstOverviewAcquisition){
 	    timeToAcquire = time-trialStartTime; 
-	    firstTOWAcquisition = false;
+	    firstOverviewAcquisition = false;
 	    block.timeToAcquire[trialCount] = timeToAcquire;
 	}
     }
@@ -230,7 +230,7 @@ public class AcquireLogManager implements PostAnimationAction {
 	incTrialCount();
 	resetTargetCount();
 	errorCount = 0;
-	firstTOWAcquisition = true;
+	firstOverviewAcquisition = true;
 	// reset camera to (0,0) in virtual space
 	resetCamera();
 	if (trialCount > 0){// ask for a postponed camera reset in case the camera is in the

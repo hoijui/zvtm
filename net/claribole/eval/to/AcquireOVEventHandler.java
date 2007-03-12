@@ -122,6 +122,7 @@ class AcquireOVEventHandler extends AcquireBaseEventHandler implements PortalEve
 	    return;
 	}
 // 	((CameraPortal)p).setBorder(Eval.INSIDE_PORTAL_BORDER_COLOR);
+	application.alm.acquiredOverview(System.currentTimeMillis());
 	application.vsm.repaintNow();
     }
 
