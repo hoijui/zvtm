@@ -58,7 +58,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     static final Color INSIDE_PORTAL_BORDER_COLOR = Color.RED;
     static final float OVERVIEW_CAMERA_ALTITUDE_FACTOR = 36.0f;
     static final int OVERVIEW_CENTERING_TRANSLATE_TIME = 300;
-    
+
     /* trailing overview settings */
     static final int TOW_SWITCH_ANIM_TIME = 500;
     static final int TOW_CONTRACTED_WIDTH = 50;
@@ -86,16 +86,18 @@ public class AcquireEval implements TOWApplication, RepaintListener {
     static final Color SELECTION_REGION_COLOR = Color.BLACK;
     static final float SELECTION_REGION_SIZE_FACTOR = 2.0f;
 
+    /* overview altitudes */
+    static float FULL_SIZE_OVERVIEW_ALTITUDE = TARGET_DISTANCE * 2.5f * Camera.DEFAULT_FOCAL / (OVERVIEW_WIDTH) - Camera.DEFAULT_FOCAL;
+    static float CONTRACTED_OVERVIEW_ALTITUDE = TARGET_DISTANCE * 2.5f * Camera.DEFAULT_FOCAL / (TOW_CONTRACTED_WIDTH) - Camera.DEFAULT_FOCAL;
+
     float TOWtranslucencyA, TOWtranslucencyB;
-    boolean fixedSizeTOW = false;
 
     /* logs */
     AcquireLogManager alm;
 
-    public AcquireEval(short t, float ta, float tb, boolean ts){
+    public AcquireEval(short t, float ta, float tb){
 	TOWtranslucencyA = ta;
 	TOWtranslucencyB = tb;
-	fixedSizeTOW = ts;
 	initGUI();
 	if (t == TECHNIQUE_OV){
 	    this.technique = TECHNIQUE_OV;
@@ -114,7 +116,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	mCamera.moveTo(0, 0);
 	mCamera.setAltitude(0);
 	centerOverview(false);
-	updateOverview();
+ 	initOverviewAltitudes();
 	vsm.repaintNow(mView, this);
     }
 
@@ -181,9 +183,9 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	    oCamera.moveTo(mCamera.posx, mCamera.posy);
 	}
     }
-    
-    void updateOverview(){// update overview camera's altitude
-	oCamera.setAltitude((float)((mCamera.getAltitude()+mCamera.getFocal())*OVERVIEW_CAMERA_ALTITUDE_FACTOR-mCamera.getFocal()));
+
+    void initOverviewAltitudes(){// set overview camera's altitude (contracted and expanded states)
+	oCamera.setAltitude((this.technique == TECHNIQUE_OV) ? FULL_SIZE_OVERVIEW_ALTITUDE : CONTRACTED_OVERVIEW_ALTITUDE);
     }
 
     void switchPortal(int x, int y){
@@ -278,22 +280,15 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	try {
 	    float a = -0.5f;
 	    float b = 0.5f;
-	    boolean s = false;
 	    if (args.length >= 3){
-		a = Float.parseFloat(args[1]);
-		b = Float.parseFloat(args[2]);
-		if (args.length >= 4){
-		    s = args[3].equals("1");
-		    if (args.length >= 5){
-			AcquireEval.VIEW_MAX_W = Integer.parseInt(args[4]);
-			AcquireEval.VIEW_MAX_H = Integer.parseInt(args[5]);
-		    }
-		}
+		AcquireEval.VIEW_MAX_W = Integer.parseInt(args[1]);
+		AcquireEval.VIEW_MAX_H = Integer.parseInt(args[2]);
 	    }
-	    new AcquireEval(Short.parseShort(args[0]), a, b, s);
+	    new AcquireEval(Short.parseShort(args[0]), a, b);
 	}
 	catch (Exception ex){
-	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.AcquireEval <technique> [<translucencyA> <translucencyB>] [<fixedSize>] [<window width> <window height>]");
+	    ex.printStackTrace();
+	    System.err.println("Usage:\n\tjava -cp [...] net.claribole.eval.to.AcquireEval <technique> [<window width> <window height>]");
 	    System.exit(0);
 	}
     }
