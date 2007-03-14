@@ -21,7 +21,7 @@ Usage:
   <path id="project.class.path">
     <pathelement location="${basedir}/lib/zvtm.jar"/>
     <pathelement location="${basedir}/lib/xercesImpl.jar"/>
-    <pathelement location="${basedir}/lib/xmlParserAPIs.jar"/>
+    <pathelement location="${basedir}/lib/xml-apis.jar"/>
     <pathelement location="${basedir}/lib/antlr-2.7.5.jar"/>
     <pathelement location="${basedir}/lib/statemachine.jar"/>
     <pathelement location="${basedir}/lib/domino/domino.jar"/>
