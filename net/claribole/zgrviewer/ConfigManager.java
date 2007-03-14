@@ -172,6 +172,10 @@ class ConfigManager {
 		catch (Exception ex){}
 		try {ConfigManager.m_NeatoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"neato").item(0).getFirstChild().getNodeValue());}
 		catch (Exception ex){}
+		try {ConfigManager.m_CircoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"circo").item(0).getFirstChild().getNodeValue());}
+		catch (Exception ex){}
+		try {ConfigManager.m_TwopiPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"twopi").item(0).getFirstChild().getNodeValue());}
+		catch (Exception ex){}
 		try {ConfigManager.m_GraphVizFontDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphvizFontDir").item(0).getFirstChild().getNodeValue());}
 		catch (Exception ex){}
 		//web browser settings
@@ -309,6 +313,12 @@ class ConfigManager {
 	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:neato");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_NeatoPath.toString()));
 	dirs.appendChild(aDir);
+	aDir = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:circo");
+	aDir.appendChild(cfg.createTextNode(ConfigManager.m_CircoPath.toString()));
+	dirs.appendChild(aDir);
+	aDir = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:twopi");
+	aDir.appendChild(cfg.createTextNode(ConfigManager.m_TwopiPath.toString()));
+	dirs.appendChild(aDir);
 	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphvizFontDir");
 	aDir.appendChild(cfg.createTextNode(ConfigManager.m_GraphVizFontDir.toString()));
 	dirs.appendChild(aDir);
@@ -435,16 +445,22 @@ class ConfigManager {
     static String getDirStatus(){
 	StringBuffer sb=new StringBuffer();
 	sb.append("Temp Directory (required): ");
-	sb.append((m_TmpDir.exists()) ? m_TmpDir.toString() : "null");
+	sb.append((m_TmpDir.exists()) ? m_TmpDir.toString() : Messages.PATH_NOT_SET);
 	sb.append("\n");
 	sb.append("Absolute Path to dot (required if using dot): ");
-	sb.append((m_DotPath.exists()) ? m_DotPath.toString() : "null");
+	sb.append((m_DotPath.exists()) ? m_DotPath.toString() : Messages.PATH_NOT_SET);
 	sb.append("\n");
 	sb.append("Absolute Path to neato (required if using neato): ");
-	sb.append((m_NeatoPath.exists()) ? m_NeatoPath.toString() : "null");
+	sb.append((m_NeatoPath.exists()) ? m_NeatoPath.toString() : Messages.PATH_NOT_SET);
+	sb.append("\n");
+	sb.append("Absolute Path to circo (required if using circo): ");
+	sb.append((m_CircoPath.exists()) ? m_CircoPath.toString() : Messages.PATH_NOT_SET);
+	sb.append("\n");
+	sb.append("Absolute Path to twopi (required if using twopi): ");
+	sb.append((m_TwopiPath.exists()) ? m_TwopiPath.toString() : Messages.PATH_NOT_SET);
 	sb.append("\n");
 	sb.append("GraphViz Font Directory (optional): ");
-	sb.append((m_GraphVizFontDir.exists()) ? m_GraphVizFontDir.toString() : "null");
+	sb.append((m_GraphVizFontDir.exists()) ? m_GraphVizFontDir.toString() : Messages.PATH_NOT_SET);
 	sb.append("\n");
 	sb.append("Are you sure you want to continue?");
 	return sb.toString();

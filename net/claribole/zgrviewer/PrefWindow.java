@@ -63,8 +63,8 @@ class PrefWindow extends JFrame implements ActionListener {
     JSpinner mFactorSpinner;
 
     //directory panel
-    JButton brw1,brw2,brw3,brw4,brw5;
-    JTextField tf1,tf2,tf3,tf4,tf5;
+    JButton brw1,brw2,brw3,brw3b,brw3c,brw4,brw5;
+    JTextField tf1,tf2,tf3,tf3b,tf3c,tf4,tf5;
     JCheckBox cb1;
 
     //web browser panel
@@ -211,6 +211,34 @@ class PrefWindow extends JFrame implements ActionListener {
 			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tf3.getText());
 			}
 		    }
+		    else if (src == tf3b){
+			File fl = new File(tf3b.getText().trim());
+			if (fl.exists()){
+			    if (fl.isFile()){
+				ConfigManager.m_CircoPath = fl;
+			    }
+			    else {
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.notADirectory + tf3b.getText());
+			    }
+			}
+			else {
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.fileDoesNotExist + tf3b.getText());
+			}
+		    }
+		    else if (src == tf3c){
+			File fl = new File(tf3c.getText().trim());
+			if (fl.exists()){
+			    if (fl.isFile()){
+				ConfigManager.m_TwopiPath = fl;
+			    }
+			    else {
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.notADirectory + tf3c.getText());
+			    }
+			}
+			else {
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.fileDoesNotExist + tf3c.getText());
+			}
+		    }
 		    else if (src == tf4){
 			File fl = new File(tf4.getText().trim());
 			if (fl.exists()){
@@ -241,7 +269,6 @@ class PrefWindow extends JFrame implements ActionListener {
 		    }
 		}
 	    };
-
 	JPanel dirPane=new JPanel();
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
@@ -310,22 +337,52 @@ class PrefWindow extends JFrame implements ActionListener {
 	gridBag.setConstraints(tf3,constraints);
 	dirPane.add(tf3);
 	tf3.addFocusListener(fl0);
-	JLabel l5=new JLabel("GraphViz font directory (optional)");
+	JLabel l3b=new JLabel("GraphViz/circo executable");
 	buildConstraints(constraints,0,8,2,1,90,10);
+	gridBag.setConstraints(l3b,constraints);
+	dirPane.add(l3b);
+	brw3b=new JButton("Browse...");
+	buildConstraints(constraints,2,8,1,1,10,0);
+	gridBag.setConstraints(brw3b,constraints);
+	brw3b.addActionListener(this);
+	dirPane.add(brw3b);
+	tf3b=new JTextField(ConfigManager.m_CircoPath.toString());
+	buildConstraints(constraints,0,9,3,1,100,10);
+	gridBag.setConstraints(tf3b,constraints);
+	dirPane.add(tf3b);
+	tf3b.addFocusListener(fl0);
+	JLabel l3c=new JLabel("GraphViz/twopi executable");
+	buildConstraints(constraints,0,10,2,1,90,10);
+	gridBag.setConstraints(l3c,constraints);
+	dirPane.add(l3c);
+	brw3c=new JButton("Browse...");
+	buildConstraints(constraints,2,10,1,1,10,0);
+	gridBag.setConstraints(brw3c,constraints);
+	brw3c.addActionListener(this);
+	dirPane.add(brw3c);
+	tf3c=new JTextField(ConfigManager.m_TwopiPath.toString());
+	buildConstraints(constraints,0,11,3,1,100,10);
+	gridBag.setConstraints(tf3c,constraints);
+	dirPane.add(tf3c);
+	tf3c.addFocusListener(fl0);
+	JLabel l5=new JLabel("GraphViz font directory (optional)");
+	buildConstraints(constraints,0,12,2,1,90,10);
 	gridBag.setConstraints(l5,constraints);
 	dirPane.add(l5);
 	brw5=new JButton("Browse...");
-	buildConstraints(constraints,2,8,1,1,10,0);
+	buildConstraints(constraints,2,12,1,1,10,0);
 	gridBag.setConstraints(brw5,constraints);
 	brw5.addActionListener(this);
 	dirPane.add(brw5);
 	tf5=new JTextField(ConfigManager.m_GraphVizFontDir.toString());
-	buildConstraints(constraints,0,9,3,1,100,10);
+	buildConstraints(constraints,0,13,3,1,100,10);
 	gridBag.setConstraints(tf5,constraints);
 	dirPane.add(tf5);
 	tf5.addFocusListener(fl0);
-	tabbedPane.addTab("Directories",dirPane);
-
+	JScrollPane dirSP = new JScrollPane(dirPane);
+	dirSP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+	dirSP.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	tabbedPane.addTab("Directories", dirSP);
 	//web browser panel
 	JPanel webPane=new JPanel();
 	GridBagLayout gridBag2=new GridBagLayout();
@@ -582,6 +639,24 @@ class PrefWindow extends JFrame implements ActionListener {
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_NeatoPath=fc.getSelectedFile();
 		tf3.setText(ConfigManager.m_NeatoPath.toString());
+	    }
+	}
+	else if (o == brw3b){
+	    fc = new JFileChooser(ConfigManager.m_CircoPath);
+	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	    returnVal = fc.showOpenDialog(this);
+	    if (returnVal == JFileChooser.APPROVE_OPTION){
+		ConfigManager.m_CircoPath = fc.getSelectedFile();
+		tf3b.setText(ConfigManager.m_CircoPath.toString());
+	    }
+	}
+	else if (o==brw3c){
+	    fc = new JFileChooser(ConfigManager.m_TwopiPath);
+	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	    returnVal = fc.showOpenDialog(this);
+	    if (returnVal == JFileChooser.APPROVE_OPTION){
+		ConfigManager.m_TwopiPath = fc.getSelectedFile();
+		tf3c.setText(ConfigManager.m_TwopiPath.toString());
 	    }
 	}
 	else if (o==brw5){

@@ -22,9 +22,9 @@ public class Messages {
     
     static final String pngOnlyIn140SecondPart="\nDo you want to proceed anyway (this will probably cause an error)?";
 
-    static final String VERSION = "0.7.1";
+    static final String VERSION = "0.7.2";
 
-    static final String about="ZGRViewer v0.7.2-devel\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
+    static final String about="ZGRViewer v0.7.2\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
 
     static final String commands="Under Mac OS X, replace Ctrl by the Command key\n\nMisc. Commands\n"
 	+"* Press right mouse button to display the pie menu\n\n"
@@ -84,15 +84,15 @@ public class Messages {
 						     new LongPoint(0, 0), new LongPoint(0, -10)};
 
     static final String PM_OPENDOTSVG = "Dot (SVG)...";
-    static final String PM_OPENDOTDOT = "Dot (DOT)...";
+    static final String PM_OPENCIRCOSVG = "Circo (SVG)...";
     static final String PM_OPENNEATOSVG = "Neato (SVG)...";
-    static final String PM_OPENNEATODOT = "Neato (DOT)...";
+    static final String PM_OPENTWOPISVG = "Twopi (SVG)...";
     static final String PM_OPENSVG = "SVG...";
     static final String PM_OPENOTHER = "Other (SVG)...";
 
-    static final String[] fileMenuLabels = {PM_OPENSVG, PM_OPENDOTDOT, PM_OPENDOTSVG, PM_OPENNEATOSVG,
-					    PM_OPENNEATODOT, PM_OPENOTHER};
-    static final LongPoint[] fileMenuLabelOffsets = {new LongPoint(30, 0), new LongPoint(10, 0),
+    static final String[] fileMenuLabels = {PM_OPENSVG, PM_OPENCIRCOSVG, PM_OPENDOTSVG,
+					    PM_OPENNEATOSVG, PM_OPENTWOPISVG, PM_OPENOTHER};
+    static final LongPoint[] fileMenuLabelOffsets = {new LongPoint(30, 0), new LongPoint(20, 0),
 						     new LongPoint(0, 10), new LongPoint(-10, 0),
 						     new LongPoint(-10, 0), new LongPoint(0, -30)};
 
@@ -113,5 +113,7 @@ public class Messages {
     static final String COULD_NOT_GET_VERSION_INFO = "Failed to get version information";
 
     static final String CMD_LINE_ERROR = "Only -Pdot, -Pneato, -Pcirco, -Ptwopi and -Psvg are allowed";
+
+    static final String PATH_NOT_SET = "NOT SET";
 
 }
