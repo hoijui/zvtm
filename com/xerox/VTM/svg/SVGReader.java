@@ -28,6 +28,7 @@ import java.awt.Color;
 import java.awt.Font;
 import javax.swing.ImageIcon;
 
+import java.io.File;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Hashtable;
@@ -60,7 +61,7 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VImage;
 
 /**
- *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz/Dot SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
+ *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
  *@author Emmanuel Pietriga
  */
 
@@ -109,6 +110,10 @@ public class SVGReader {
     public static final String xlinkURI="http://www.w3.org/1999/xlink";
     public static final String _href="href";
 
+    public static final String HTTP_SCHEME = "http://";
+    public static final String FILE_SCHEME = "file:/";
+    public static final String FILE_PROTOCOL = "file";
+
     static Hashtable fontCache = new Hashtable();
 
     static long xoffset=0;
@@ -127,18 +132,20 @@ public class SVGReader {
     protected static Hashtable strokes = new Hashtable();
     protected static String SOLID_DASH_PATTERN = "solid";
 
-    /**When this is set to something different than 0, all SVG objects will be translated by (dx,dy) in their VTM virtual space. This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space (SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t VTM's coordinate system)*/
+    /** When this is set to something different than 0, all SVG objects will be translated by (dx,dy) in their VTM virtual space.
+     * This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space (SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t VTM's coordinate system)*/
     public static void setPositionOffset(long dx,long dy){
 	xoffset=dx;
 	yoffset=dy;
     }
 
-    /**get the position offset (0,0 means no offset)*/
+    /** Get the position offset (0,0 means no offset).*/
     public static LongPoint getPositionOffset(){
 	return new LongPoint(xoffset,yoffset);
     }
 
-    /**check that an SVG path value is supported by the VTM. This does not test for well-formedness of the expression. It just verifies that all SVG commands are actually supported by the VTM (M,m,L,l,H,h,V,v,C,c,Q,q)*/
+    /** Check that an SVG path value is supported by ZVTM.
+     * This does not test for well-formedness of the expression. It just verifies that all SVG commands are actually supported by ZVTM (M,m,L,l,H,h,V,v,C,c,Q,q)*/
     public static boolean checkSVGPath(String svg){
 	boolean res=true;
 	byte[] chrs=svg.getBytes();
@@ -376,7 +383,8 @@ public class SVGReader {
 	}
     }
 
-    /** Get the Java Color instance corresponding to an SVG string representation of that color. The SVG string representation of the color can be any of the values defined in <a href="http://www.w3.org/TR/SVG11/types.html#DataTypeColor">Scalable Vector Graphics (SVG) 1.1 Specification, section 4.1: Basic data types</a>.
+    /** Get the Java Color instance corresponding to an SVG string representation of that color.
+     * The SVG string representation of the color can be any of the values defined in <a href="http://www.w3.org/TR/SVG11/types.html#DataTypeColor">Scalable Vector Graphics (SVG) 1.1 Specification, section 4.1: Basic data types</a>.
      *@param s string representation of a color  (as an SVG style attribute)
      *@return null if s is null or not a syntactically well-formed color
      */
@@ -428,7 +436,7 @@ public class SVGReader {
 	catch (Exception ex){System.err.println("Error: SVGReader.getColor(): "+ex);return Color.white;}
     }
 
-    /**
+    /** Parse style information.
      *@param s the value of an SVG style attribute
      *@return styling attributes which can be interpreted by the VTM (color, transparency)
      */
@@ -461,7 +469,7 @@ public class SVGReader {
 	else return null;
     }
 
-    /**Translate an SVG polygon coordinates from the SVG space to the VTM space, taking position offset into account
+    /** Translate an SVG polygon coordinates from the SVG space to the VTM space, taking position offset into account.
      *@param s the SVG list of coordinates (value of attribute <i>points</i> in <i>polygon</i> elements)
      *@param res a Vector in which the result will be stored (this will be a vector of VTM LongPoint)
      */
@@ -553,7 +561,7 @@ public class SVGReader {
 	g.setStroke(bs);
     }
 
-    /**
+    /** Tells whether the 4 LongPoint values contained in a Vector form a rectangle or not.
      *@param v a vector of 4 LongPoint. For this to return true, points 2 &amp; 3 and points 1 &amp; 4 have to be horizontally aligned. Moreother, points 1 &amp; 2 and points 3 &amp; 4 have to be vertically aligned.
      */
     public static boolean isRectangle(Vector v){
@@ -568,14 +576,14 @@ public class SVGReader {
  	else return false;
     }
 
-    /**create a VEllipse from an SVG ellipse element
+    /** Create a VEllipse from an SVG ellipse element.
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      */
     public static VEllipse createEllipse(Element e){
 	return createEllipse(e,null,false);
     }
 
-    /**create a VEllipse from an SVG ellipse element
+    /** Create a VEllipse from an SVG ellipse element.
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -583,7 +591,7 @@ public class SVGReader {
 	return createEllipse(e,ctx,false);
     }
 
-    /**create a VEllipse from an SVG ellipse element
+    /** Create a VEllipse from an SVG ellipse element.
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -638,14 +646,14 @@ public class SVGReader {
 	return res;
     }
 
-    /**create a VCircle from an SVG circle element
+    /** Create a VCircle from an SVG circle element.
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      */
     public static VCircle createCircle(Element e){
 	return createCircle(e,null,false);
     }
 
-    /**create a VCircle from an SVG circle element
+    /** Create a VCircle from an SVG circle element.
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -653,7 +661,7 @@ public class SVGReader {
 	return createCircle(e,ctx,false);
     }
 
-    /**create a VCircle from an SVG circle element
+    /** Create a VCircle from an SVG circle element.
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -691,7 +699,8 @@ public class SVGReader {
 	return res;
     }
 
-    /**create a VText from an SVG text element - warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's GraphicsContext to compute the string's width/height)
+    /** Create a VText from an SVG text element.
+     * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      *@param vsm the virtual space manager (to get some font information)
      */
@@ -699,7 +708,8 @@ public class SVGReader {
 	return createText(e,null,vsm,false);
     }
 
-    /**create a VText from an SVG text element - warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height)
+    /** Create a VText from an SVG text element.
+     * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param vsm the virtual space manager (to get some font information)
@@ -708,7 +718,8 @@ public class SVGReader {
 	return createText(e,ctx,vsm,false);
     }
 
-    /**create a VText from an SVG text element - warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height)
+    /** Create a VText from an SVG text element.
+     * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param vsm the virtual space manager (to get some font information)
@@ -753,14 +764,16 @@ public class SVGReader {
 	return res;
     }
  
-    /**create a VRectangle from an SVG polygon element (after checking this is actually a rectangle - returns null if not)
+    /** Create a VRectangle from an SVG polygon element.
+     * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
     public static VRectangleOr createRectangleFromPolygon(Element e){
 	return createRectangleFromPolygon(e,null,false);
     }
 
-    /**create a VRectangle from an SVG polygon element (after checking this is actually a rectangle - returns null if not)
+    /** Create a VRectangle from an SVG polygon element.
+     * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -768,7 +781,8 @@ public class SVGReader {
 	return createRectangleFromPolygon(e,ctx,false);
     }
 
-    /**create a VRectangle from an SVG polygon element (after checking this is actually a rectangle - returns null if not)
+    /** Create a VRectangle from an SVG polygon element.
+     * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -845,14 +859,16 @@ public class SVGReader {
 	else return null;
     }
 
-    /**create a VRoundRect from an SVG polygon element (after checking this is actually a rectangle - returns null if not)
+    /** Create a VRoundRect from an SVG polygon element.
+     * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
     public static VRoundRect createRoundRectFromPolygon(Element e){
 	return createRoundRectFromPolygon(e,null,false);
     }
 
-    /**create a VRoundRect from an SVG polygon element (after checking this is actually a rectangle - returns null if not)
+    /** Create a VRoundRect from an SVG polygon element.
+     * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -860,7 +876,8 @@ public class SVGReader {
 	return createRoundRectFromPolygon(e,ctx,false);
     }
 
-    /**create a VRoundRect from an SVG polygon element (after checking this is actually a rectangle - returns null if not)
+    /** Create a VRoundRect from an SVG polygon element.
+     * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -937,14 +954,14 @@ public class SVGReader {
 	else return null;
     }
 
-    /**create a VRectangle from an SVG rect element
+    /** Create a VRectangle from an SVG rect element.
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      */
     public static VRectangleOr createRectangle(Element e){
 	return createRectangle(e,null,false);
     }
 
-    /**create a VRectangle from an SVG rect element
+    /** Create a VRectangle from an SVG rect element.
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -952,7 +969,7 @@ public class SVGReader {
 	return createRectangle(e,ctx,false);
     }
 
-    /**create a VRectangle from an SVG rect element
+    /** Create a VRectangle from an SVG rect element.
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -1010,12 +1027,37 @@ public class SVGReader {
 	return res;
     }
 
-    /**create a VImage from an SVG image element
+    /** Create a VImage from an SVG image element.
+     * This is a convenience method. An invocation of the form createImage(e, ctx, meta, imageStore, documentParentURL) behaves in exactly the same way as the invocation createImage(e, ctx, meta, imageStore, documentParentURL, null).
      *@param e an SVG image as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
+     *@param imageStore a simple hashtable (possibly empty at first) in which bitmap images will be stored so that they
+     * do not get loaded in memory multiple times.
+     *@param documentParentURL the URL of the parent directory containing the SVG/XML document. Provide an empty String if it is not know.
+     * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
+     * is expressed relative to the document's location.
+     *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL)
      */
     public static Glyph createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL){
+	return SVGReader.createImage(e, ctx, meta, imageStore, documentParentURL, null);
+    }
+
+    /** Create a VImage from an SVG image element.
+     *@param e an SVG image as a DOM element (org.w3c.dom.Element)
+     *@param ctx used to propagate contextual style information (put null if none)
+     *@param meta store metadata associated with this node (URL, title) in glyph's associated object
+     *@param imageStore a simple hashtable (possibly empty at first) in which bitmap images will be stored so that they
+     * do not get loaded in memory multiple times.
+     *@param documentParentURL the URL of the parent directory containing the SVG/XML document. Provide an empty String if it is not know.
+     * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
+     * is expressed relative to the document's location.
+     *@param fallbackParentURL used to indicate a possible fallback directory from which to interpret relative paths in case documentParentURL
+     * is not the right place where to look for those images (this can happen e.g. if a file was generated somewhere and then moved alone, 
+     * associated images staying in the original directory) ; set to null if no fallback directory is known.
+     *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL)
+     */
+    public static Glyph createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
 	long x = getLong(e.getAttribute(_x)) + xoffset;
 	long y = getLong(e.getAttribute(_y)) + yoffset;
 	String width = e.getAttribute(_width);
@@ -1027,9 +1069,9 @@ public class SVGReader {
 	long hw = w / 2;
 	long hh = h / 2;
 	if (e.hasAttributeNS(xlinkURI, _href)){
-	    String imagePath = documentParentURL + e.getAttributeNS(xlinkURI, _href);
+	    String imagePath = e.getAttributeNS(xlinkURI, _href);
 	    if (imagePath.length() > 0){
-		ImageIcon ii = getImage(imagePath, imageStore);
+		ImageIcon ii = getImage(imagePath, documentParentURL, fallbackParentURL, imageStore);
 		if (ii != null){
 		    int aw = ii.getIconWidth();
 		    int ah = ii.getIconHeight();
@@ -1047,14 +1089,14 @@ public class SVGReader {
 	return null;
     }
 
-    /**create a VPolygon from an SVG polygon element
+    /** Create a VPolygon from an SVG polygon element.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
     public static VPolygon createPolygon(Element e){
 	return createPolygon(e,null,false);
     }
 
-    /**create a VPolygon from an SVG polygon element
+    /** Create a VPolygon from an SVG polygon element.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -1062,7 +1104,7 @@ public class SVGReader {
 	return createPolygon(e,ctx,false);
     }
 
-    /**create a VPolygon from an SVG polygon element
+    /** Create a VPolygon from an SVG polygon element.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -1124,14 +1166,14 @@ public class SVGReader {
 	return res;
     }
 
-    /**create a set of VSegments from an SVG polyline element
+    /** Create a set of VSegments from an SVG polyline element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      */
     public static VSegment[] createPolyline(Element e){
 	return createPolyline(e,null,false);
     }
 
-    /**create a set of VSegments from an SVG polyline element
+    /** Create a set of VSegments from an SVG polyline element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
@@ -1139,7 +1181,7 @@ public class SVGReader {
 	return createPolyline(e,ctx,false);
     }
 
-    /**create a set of VSegments from an SVG polyline element
+    /** Create a set of VSegments from an SVG polyline element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
@@ -1174,7 +1216,7 @@ public class SVGReader {
 	return res;
     }
 
-    /**create a VPath from an SVG text element
+    /** Create a VPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
      *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new VPath()</i>)
      */
@@ -1182,7 +1224,7 @@ public class SVGReader {
 	return createPath(e,ph,null,false);
     }
 
-    /**create a VPath from an SVG text element
+    /** Create a VPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
      *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new VPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
@@ -1191,7 +1233,7 @@ public class SVGReader {
 	return createPath(e,ph,ctx,false);
     }
 
-    /**create a VPath from an SVG text element
+    /** Create a VPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
      *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new VPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
@@ -1229,7 +1271,7 @@ public class SVGReader {
 	else return null;
     }
 
-    /**create a VPath from an SVG text element
+    /** Create a VPath from an SVG text element.
      *@param d the <i>d</i> attribute value of an SVG path
      *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new VPath()</i>)
      */
@@ -1237,7 +1279,7 @@ public class SVGReader {
 	return createPath(d,ph,null,false);
     }
 
-    /**create a VPath from an SVG text element
+    /** Create a VPath from an SVG text element.
      *@param d the <i>d</i> attribute value of an SVG path
      *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new VPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
@@ -1246,7 +1288,7 @@ public class SVGReader {
 	return createPath(d,ph,ctx,false);
     }
 
-    /**create a VPath from an SVG text element
+    /** Create a VPath from an SVG text element.
      *@param d the <i>d</i> attribute value of an SVG path
      *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new VPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
@@ -1267,7 +1309,7 @@ public class SVGReader {
     }
 
     /**
-     *Load a DOM-parsed SVG document d in VirtualSpace vs
+     *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
      *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
@@ -1279,7 +1321,7 @@ public class SVGReader {
     }
 
     /**
-     *Load a DOM-parsed SVG document d in VirtualSpace vs
+     *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
      *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
@@ -1292,7 +1334,8 @@ public class SVGReader {
     }
 
     /**
-     *Load a DOM-parsed SVG document d in VirtualSpace vs
+     *Load a DOM-parsed SVG document d in VirtualSpace vs.
+     * This is a convenience method. An invocation of the form load(d, vsm, vs, meta, documentURL) behaves in exactly the same way as the invocation load(d, vsm, vs, meta, documentURL, null).
      *@param d SVG document as a DOM tree
      *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
@@ -1300,8 +1343,27 @@ public class SVGReader {
      *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
      * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
      * is expressed relative to the document's location.
+     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL, String fallbackParentURL)
      */
     public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL){
+	SVGReader.load(d, vsm, vs, meta, documentURL, null);
+    }
+
+    /**
+     *Load a DOM-parsed SVG document d in VirtualSpace vs.
+     *@param d SVG document as a DOM tree
+     *@param vsm VTM virtual space manager owning the virtual space
+     *@param vs name of the virtual space
+     *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
+     *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
+     * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
+     * is expressed relative to the document's location.
+     *@param fallbackParentURL used to indicate a possible fallback directory from which to interpret relative paths in case the parent of
+     * documentURL is not the right place where to look for those images (this can happen e.g. if a file was generated somewhere and then
+     * moved alone, associated images staying in the original directory) ; set to null if no fallback directory is known.
+     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
+     */
+    public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL, String fallbackParentURL){
 	// The following way of retrieving the Document's URL is disabled because it requires Java 1.5/DOM Level 3 support
 // 	String documentURL = d.getDocumentURI();
  	String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
@@ -1310,13 +1372,15 @@ public class SVGReader {
 	Hashtable imageStore = new Hashtable();
 	for (int i=0;i<objects.getLength();i++){
 	    Node obj=objects.item(i);
-	    if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,meta, documentParentURL, imageStore);}
+	    if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,meta, documentParentURL, fallbackParentURL, imageStore);}
 	}
     }
 
     /*e is a DOM element, vs is the name of the virtual space where the new glyph(s) is(are) put*/
     private static void processNode(Element e,VirtualSpaceManager vsm,String vs,
-				    Context ctx,boolean mainFontSet,boolean meta, String documentParentURL, Hashtable imageStore){
+				    Context ctx,boolean mainFontSet,boolean meta,
+				    String documentParentURL, String fallbackParentURL,
+				    Hashtable imageStore){
 	String tagName=e.getTagName();
 	if (tagName.equals(_rect)){
 	    vsm.addGlyph(createRectangle(e,ctx,meta),vs);
@@ -1345,7 +1409,7 @@ public class SVGReader {
 	    }
 	}
 	else if (tagName.equals(_image)){
-	    Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL);
+	    Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
 	    if (g != null){
 		vsm.addGlyph(g, vs);
 	    }
@@ -1375,7 +1439,7 @@ public class SVGReader {
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, imageStore);}
+		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, fallbackParentURL, imageStore);}
 	    }
 	}
 	else if (tagName.equals(_a)){
@@ -1403,7 +1467,7 @@ public class SVGReader {
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, imageStore);}
+		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, fallbackParentURL, imageStore);}
 	    }
 	}
 	else if (tagName.equals(_title)){
@@ -1461,15 +1525,63 @@ public class SVGReader {
 	else {return false;}
     }
 
-    /*get the in-memory ImageIcon of icon at iconURL*/
-    static ImageIcon getImage(String imagePath, Hashtable imageStore){
-	ImageIcon res = null;
+    /*get the in-memory ImageIcon of icon at imageLocation*/
+    static ImageIcon getImage(String imagePath, String documentParentURL, String fallbackParentURL, Hashtable imageStore){
 	URL imageURL = null;
-	try {
-	    imageURL = new URL(imagePath);
+	// deal with absolute vs. relative paths
+	if (imagePath.startsWith(FILE_SCHEME) || imagePath.startsWith(HTTP_SCHEME)){
+	    // test file:/XXX, http://XXX, absolute URL with scheme, nothing to do
+	    try {
+		imageURL = new URL(imagePath);
+	    }
+	    catch (MalformedURLException ex){System.err.println("Failed to identify image location: "+imagePath);}
 	}
-	catch (MalformedURLException ex){System.err.println("Failed to identify image location: "+imagePath);res = null;}
-	
+	else if (imagePath.charAt(0) == '/'){
+	    // /XXX => absolute path without a scheme, prepend it: /XXX => file:///XXX
+	    imagePath = FILE_SCHEME + "/" + imagePath;
+	    try {
+		imageURL = new URL(imagePath);
+	    }
+	    catch (MalformedURLException ex){System.err.println("Failed to identify image location: "+imagePath);}
+	}
+	else if (imagePath.substring(1,3).equals(":\\")){
+	    // C:\XXX (Windows logical drive) => absolute path without a scheme, prepend it
+	    // and replace \ by / and : by | as follows C:\XXX\YYY => file:///C|/XXX/YYY
+	    imagePath = FILE_SCHEME + "//" + imagePath.replace('\\', '/').replace(':', '|');
+	    try {
+		imageURL = new URL(imagePath);
+	    }
+	    catch (MalformedURLException ex){System.err.println("Failed to identify image location: "+imagePath);}
+	}
+	else {
+	    // if none of the above, relative path, prepend parent URL
+	    String absImagePath = documentParentURL + imagePath;
+	    try {
+		imageURL = new URL(absImagePath);
+	    }
+	    catch (MalformedURLException ex){System.err.println("Failed to identify image location: "+imagePath);}
+	    if (imageURL.getProtocol().equals(FILE_PROTOCOL)){
+		// check that the image exists (if local), and if not attempt to fall back
+		// on another directory that might contain the image (if defined)
+ 		if (fallbackParentURL != null){
+		    try {
+			if (!(new File(imageURL.toURI())).exists()){
+			    // if it does not, attempt to load it using the fallback parent directory, if set
+			    absImagePath = fallbackParentURL + imagePath;
+			    try {
+				imageURL = new URL(absImagePath);
+			    }
+			catch (MalformedURLException ex){}
+			}
+		    }
+		    catch (Exception ex){System.err.println("Image icon was found neither at\n"+
+							    documentParentURL+imagePath+
+							    "nor at\n"+
+							    fallbackParentURL + imagePath);}
+ 		}
+	    }
+	}
+	ImageIcon res = null;
 	if (imageStore.containsKey(imageURL)){
 	    res = (ImageIcon)imageStore.get(imageURL);
 	}
