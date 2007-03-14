@@ -30,6 +30,7 @@ import javax.swing.ImageIcon;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URI;
 import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
@@ -1565,7 +1566,7 @@ public class SVGReader {
 		// on another directory that might contain the image (if defined)
  		if (fallbackParentURL != null){
 		    try {
-			if (!(new File(imageURL.toURI())).exists()){
+			if (!(new File(new URI(imageURL.toString()))).exists()){
 			    // if it does not, attempt to load it using the fallback parent directory, if set
 			    absImagePath = fallbackParentURL + imagePath;
 			    try {
