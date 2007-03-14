@@ -33,6 +33,13 @@ import com.xerox.VTM.svg.SVGReader;
 
 class DOTManager {
 
+    static final short DOT_PROGRAM = 0;
+    static final short NEATO_PROGRAM = 1;
+    static final short CIRCO_PROGRAM = 2;
+    static final short TWOPI_PROGRAM = 3;
+    static final short SVG_FILE = 4;
+    short lastProgramUsed = DOT_PROGRAM;
+
     ConfigManager cfgMngr;
     GraphicsManager grMngr;
 
@@ -46,12 +53,12 @@ class DOTManager {
 	this.cfgMngr = cm;
     }
 
-    void load(File f,String prg, boolean parser){//prg="dot" or "neato"
+    void load(File f, short prg, boolean parser){// prg is the program to use DOTManager.*_PROGRAM
 	ProgPanel pp=new ProgPanel("Resetting...","Loading DOT File");
 	try {
 	    svgF=Utils.createTempFile(ConfigManager.m_TmpDir.toString(),"zgrv",(parser?".dot":".svg"));
 	    dotF=f;
-	    callGraphViz(pp,prg, parser);
+	    callGraphViz(pp, prg, parser);
 	    pp.setLabel("Deleting Temp File...");
 	    pp.setPBValue(100);
 	    pp.destroy();
@@ -62,8 +69,8 @@ class DOTManager {
 	}
     }
     
-    private void callGraphViz(ProgPanel pp, String prg, boolean parser)
-            throws Exception {
+    private void callGraphViz(ProgPanel pp, short prg, boolean parser)
+            throws Exception {// prg is the program to use DOTManager.*_PROGRAM
         try {
             pp.setLabel("Preparing " + (parser ? "Augmented DOT" : "SVG")
                     + " Temp File");
@@ -100,12 +107,22 @@ class DOTManager {
     void deleteTempFiles(){
 	if (svgF!=null){svgF.delete();}	
     }
-    
-    private boolean generateDOTFile(String dotFilePath,String tmpFilePath,ProgPanel pp,String prg){
-        String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
-	cmdArray[0] = (prg.equals("dot")) ? ConfigManager.m_DotPath.toString() : ConfigManager.m_NeatoPath.toString();
-	cmdArray[1] = "-Tdot";
 
+    protected String getProgram(short prg){
+	// prg is the program to use DOTManager.*_PROGRAM
+	switch (prg){
+	case DOT_PROGRAM:{return ConfigManager.m_DotPath.toString();}
+	case NEATO_PROGRAM:{return ConfigManager.m_NeatoPath.toString();}
+	case TWOPI_PROGRAM:{return ConfigManager.m_TwopiPath.toString();}
+	case CIRCO_PROGRAM:{return ConfigManager.m_CircoPath.toString();}
+	default:{return ConfigManager.m_DotPath.toString();}
+	}
+    }
+    
+    private boolean generateDOTFile(String dotFilePath, String tmpFilePath, ProgPanel pp, short prg){
+        String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
+	cmdArray[0] = getProgram(prg);
+	cmdArray[1] = "-Tdot";
 	if (cfgMngr.FORCE_SILENT){
 	    cmdArray[2] = "-q";
 	    cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
@@ -146,11 +163,10 @@ class DOTManager {
      
      *@return true if success; false if any failure occurs
      */
-    private boolean generateSVGFile(String dotFilePath,String svgFilePath,ProgPanel pp,String prg){
+    private boolean generateSVGFile(String dotFilePath, String svgFilePath, ProgPanel pp, short prg){
         String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
-	cmdArray[0] = (prg.equals("dot")) ? ConfigManager.m_DotPath.toString() : ConfigManager.m_NeatoPath.toString();
+	cmdArray[0] = getProgram(prg);
 	cmdArray[1] = "-Tsvg";
-
 	if (cfgMngr.FORCE_SILENT){
 	    cmdArray[2] = "-q";
 	    cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);

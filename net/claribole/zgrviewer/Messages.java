@@ -112,4 +112,6 @@ public class Messages {
 
     static final String COULD_NOT_GET_VERSION_INFO = "Failed to get version information";
 
+    static final String CMD_LINE_ERROR = "Only -Pdot, -Pneato, -Pcirco, -Ptwopi and -Psvg are allowed";
+
 }

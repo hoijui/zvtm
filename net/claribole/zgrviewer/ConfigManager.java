@@ -93,7 +93,9 @@ class ConfigManager {
     static File m_PrjDir=new File("graphs");
     static File m_DotPath=new File("C:\\Tools\\ATT\\Graphviz\\bin\\dot.exe");
     static File m_NeatoPath=new File("C:\\Tools\\ATT\\Graphviz\\bin\\neato.exe");
-    static File m_GraphVizFontDir=new File("C:\\Tools\\ATT\\Graphviz");
+    static File m_CircoPath = new File("C:\\Tools\\ATT\\Graphviz\\bin\\circo.exe");
+    static File m_TwopiPath = new File("C:\\Tools\\ATT\\Graphviz\\bin\\twopi.exe");
+    static File m_GraphVizFontDir = new File("C:\\WINDOWS\\Fonts");
     static File m_LastDir=null;
     static File m_LastExportDir=null;
     /*Plug in directory*/
@@ -102,10 +104,6 @@ class ConfigManager {
     private Hashtable tmpPluginSettings;
 
     File lastFileOpened = null;
-    static final short DOT_PROGRAM = 0;
-    static final short NEATO_PROGRAM = 1;
-    static final short SVG_FILE = 2;
-    short lastProgramUsed = DOT_PROGRAM;
 
     /*location of the configuration file - at init time, we look for it in the user's home dir.
      If it is not there, we take the one in ZGRViewer dir.*/
@@ -424,16 +422,14 @@ class ConfigManager {
 	catch (Exception ex){}
     }
 
-    static boolean checkDot(){
-	boolean res=true;
-	if (!((m_TmpDir.exists()) && (m_DotPath.exists()))){res=false;}
-	return res;
-    }
-
-    static boolean checkNeato(){
-	boolean res=true;
-	if (!((m_TmpDir.exists()) && (m_NeatoPath.exists()))){res=false;}
-	return res;
+    static boolean checkProgram(short prg){
+	switch (prg){
+	case DOTManager.DOT_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_DotPath.exists());}
+	case DOTManager.NEATO_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_NeatoPath.exists());}
+	case DOTManager.TWOPI_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_TwopiPath.exists());}
+	case DOTManager.CIRCO_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_CircoPath.exists());}
+	default:{return false;}
+	}
     }
 
     static String getDirStatus(){

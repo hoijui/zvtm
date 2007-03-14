@@ -38,60 +38,32 @@ class GVLoader {
 	this.dotMngr = dm;
     }
 
-    void open(int dotOrNeato, boolean parser){//0=dot 1=neato, use the integrated parser or not
-	if (dotOrNeato==0){
-	    if (ConfigManager.checkDot()){
-		openDotFile(parser);
-	    }
-	    else {
-		Object[] options={"Yes","No"};
-		int option=JOptionPane.showOptionDialog(null,ConfigManager.getDirStatus(),"Warning",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,options,options[0]);
-		if (option==JOptionPane.OK_OPTION){
-		    openDotFile(parser);
-		}
-	    }
+    void open(short prg, boolean parser){// prg is the program to use DOTManager.*_PROGRAM, use the integrated parser or not
+	if (ConfigManager.checkProgram(prg)){
+	    openDOTFile(prg, parser);
 	}
 	else {
-	    if (ConfigManager.checkNeato()){
-		openNeatoFile(parser);
-	    }
-	    else {
-		Object[] options={"Yes","No"};
-		int option=JOptionPane.showOptionDialog(null,ConfigManager.getDirStatus(),"Warning",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,options,options[0]);
-		if (option==JOptionPane.OK_OPTION){
-		    openNeatoFile(parser);
-		}
+	    Object[] options = {"Yes", "No"};
+	    int option = JOptionPane.showOptionDialog(null, ConfigManager.getDirStatus(),
+						      "Warning", JOptionPane.DEFAULT_OPTION,
+						      JOptionPane.WARNING_MESSAGE, null,
+						      options, options[0]);
+	    if (option == JOptionPane.OK_OPTION){
+		openDOTFile(prg, parser);
 	    }
 	}
     }
-
-    void openDotFile(final boolean parser){
+    
+    void openDOTFile(final short prg, final boolean parser){
 	final JFileChooser fc = new JFileChooser(ConfigManager.m_LastDir!=null ? ConfigManager.m_LastDir : ConfigManager.m_PrjDir);
 	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	fc.setDialogTitle("Find DOT File (dot)");
+	fc.setDialogTitle("Find DOT File");
 	int returnVal= fc.showOpenDialog(grMngr.mainView.getFrame());
 	if (returnVal == JFileChooser.APPROVE_OPTION) {
 	    final SwingWorker worker=new SwingWorker(){
 		    public Object construct(){
 			grMngr.reset();
-			loadFile(fc.getSelectedFile(),"dot", parser);
-			return null; 
-		    }
-		};
-	    worker.start();
-	}
-    }
-
-    void openNeatoFile(final boolean parser){
-	final JFileChooser fc = new JFileChooser(ConfigManager.m_LastDir!=null ? ConfigManager.m_LastDir : ConfigManager.m_PrjDir);
-	fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	fc.setDialogTitle("Find DOT File (neato)");
-	int returnVal= fc.showOpenDialog(grMngr.mainView.getFrame());
-	if (returnVal == JFileChooser.APPROVE_OPTION) {
-	    final SwingWorker worker=new SwingWorker(){
-		    public Object construct(){
-			grMngr.reset();
-			loadFile(fc.getSelectedFile(),"neato", parser);
+			loadFile(fc.getSelectedFile(), prg, parser);
 			return null; 
 		    }
 		};
@@ -120,13 +92,13 @@ class GVLoader {
 	new CallBox((ZGRViewer)application, grMngr);
     }
 
-    void loadFile(File f,String prg, boolean parser){//f=DOT file to load, prg=program to use ("dot" or "neato")
+    void loadFile(File f, short prg, boolean parser){//f is the DOT file to load, prg is the program to use DOTManager.*_PROGRAM
 	if (f.exists()){
 	    ConfigManager.m_LastDir=f.getParentFile();
 	    cfgMngr.lastFileOpened = f;
-	    cfgMngr.lastProgramUsed = (prg.equals("neato")) ? ConfigManager.NEATO_PROGRAM : ConfigManager.DOT_PROGRAM;
+	    dotMngr.lastProgramUsed = prg;
 	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-	    dotMngr.load(f,prg, parser);
+	    dotMngr.load(f, prg, parser);
 	    //in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
 	    ConfigManager.defaultFont = grMngr.vsm.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
@@ -144,7 +116,7 @@ class GVLoader {
 	try {
 	    pp.setPBValue(30);
 	    cfgMngr.lastFileOpened = f;
-	    cfgMngr.lastProgramUsed = ConfigManager.SVG_FILE;
+	    dotMngr.lastProgramUsed = DOTManager.SVG_FILE;
 	    Document svgDoc=Utils.parse(f,false);
 	    pp.setLabel("Displaying...");
 	    pp.setPBValue(80);
@@ -211,22 +183,14 @@ class GVLoader {
     }
 
     void reloadFile(){
-        // TODO: support integrated parser during reload
+        //XXX: TODO: support integrated parser during reload
 	if (cfgMngr.lastFileOpened != null){
 	    grMngr.reset();
-	    switch (cfgMngr.lastProgramUsed){
-	    case ConfigManager.NEATO_PROGRAM: {
-		this.loadFile(cfgMngr.lastFileOpened, "neato", false);
-		break;
-	    }
-	    case ConfigManager.SVG_FILE: {
+	    if (dotMngr.lastProgramUsed == DOTManager.SVG_FILE){
 		this.loadSVG(cfgMngr.lastFileOpened);
-		break;
 	    }
-	    default: {//ConfigManager.DOT_PROGRAM
-		this.loadFile(cfgMngr.lastFileOpened, "dot", false);
-		break;
-	    }
+	    else {
+		this.loadFile(cfgMngr.lastFileOpened, dotMngr.lastProgramUsed, false);
 	    }
 	}
     }

@@ -68,17 +68,22 @@ public class ZGRViewer implements ZGRApplication {
     void loadCmdLineFile(){
 	if (cmdLinePrg!=null){
 	    if (cmdLinePrg.equals("-Pneato")){
-		gvLdr.loadFile(cmdLineDOTFile,"neato", false);
+		gvLdr.loadFile(cmdLineDOTFile, DOTManager.NEATO_PROGRAM, false);
 	    }
 	    else if (cmdLinePrg.equals("-Pdot")){
-		gvLdr.loadFile(cmdLineDOTFile,"dot", false);
+		gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
+	    }
+	    else if (cmdLinePrg.equals("-Pcirco")){
+		gvLdr.loadFile(cmdLineDOTFile, DOTManager.CIRCO_PROGRAM, false);
+	    }
+	    else if (cmdLinePrg.equals("-Ptwopi")){
+		gvLdr.loadFile(cmdLineDOTFile, DOTManager.TWOPI_PROGRAM, false);
 	    }
 	    else if (cmdLinePrg.equals("-Psvg")){
 		gvLdr.loadSVG(cmdLineDOTFile);
 	    }
 	    else {
-		System.err.println("Bad option: "+cmdLinePrg);
-		System.err.println("Only -Pdot, -Pneato and -Psvg are allowed");
+		System.err.println("Bad option: " + cmdLinePrg + "\n\t" + Messages.CMD_LINE_ERROR);
 		System.exit(0);
 	    }
 	}
@@ -87,7 +92,7 @@ public class ZGRViewer implements ZGRApplication {
 		gvLdr.loadSVG(cmdLineDOTFile);
 	    }
 	    else {
-		gvLdr.loadFile(cmdLineDOTFile, "dot", false);
+		gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
 	    }
 	}
     }
@@ -145,10 +150,10 @@ public class ZGRViewer implements ZGRApplication {
 	exitI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 	ActionListener a0=new ActionListener(){
 		public void actionPerformed(ActionEvent e){
-		    if (e.getSource()==openDG){gvLdr.open(0, false);}
-		    else if (e.getSource()==openNG){gvLdr.open(1, false);}
-		    else if (e.getSource()==openDI){gvLdr.open(0, true);}
-		    else if (e.getSource()==openNI){gvLdr.open(1, true);}
+		    if (e.getSource()==openDG){gvLdr.open(DOTManager.DOT_PROGRAM, false);}
+		    else if (e.getSource()==openNG){gvLdr.open(DOTManager.NEATO_PROGRAM, false);}
+		    else if (e.getSource()==openDI){gvLdr.open(DOTManager.DOT_PROGRAM, true);}
+		    else if (e.getSource()==openNI){gvLdr.open(DOTManager.NEATO_PROGRAM, true);}
 		    else if (e.getSource()==openS){gvLdr.openSVGFile();}
 		    else if (e.getSource()==openO){gvLdr.openOther();}
 		    else if (e.getSource()==reloadI){gvLdr.reloadFile();}
@@ -358,10 +363,10 @@ public class ZGRViewer implements ZGRApplication {
 	    index = subPieMenu.getItemIndex(menuItem);
 	    if (index != -1){
 		label = subPieMenu.getLabels()[index].getText();
-		if (label == Messages.PM_OPENDOTSVG){gvLdr.open(0, false);}
-		else if (label == Messages.PM_OPENDOTDOT){gvLdr.open(0, true);}
-		else if (label == Messages.PM_OPENNEATOSVG){gvLdr.open(1, false);}
-		else if (label == Messages.PM_OPENNEATODOT){gvLdr.open(1, true);}
+		if (label == Messages.PM_OPENDOTSVG){gvLdr.open(DOTManager.DOT_PROGRAM, false);}
+		else if (label == Messages.PM_OPENDOTDOT){gvLdr.open(DOTManager.DOT_PROGRAM, true);}
+		else if (label == Messages.PM_OPENNEATOSVG){gvLdr.open(DOTManager.NEATO_PROGRAM, false);}
+		else if (label == Messages.PM_OPENNEATODOT){gvLdr.open(DOTManager.NEATO_PROGRAM, true);}
 		else if (label == Messages.PM_OPENSVG){gvLdr.openSVGFile();}
 		else if (label == Messages.PM_OPENOTHER){gvLdr.openOther();}
 		else if (label == Messages.PM_EXPSVG){saveSVG();}
