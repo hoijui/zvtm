@@ -63,8 +63,8 @@ class PrefWindow extends JFrame implements ActionListener {
     JSpinner mFactorSpinner;
 
     //directory panel
-    JButton brw1,brw2,brw3,brw3b,brw3c,brw4,brw5;
-    JTextField tf1,tf2,tf3,tf3b,tf3c,tf4,tf5;
+    JButton browseTmpDirBt,browseGraphDirBt,browseNeatoBt,browseCircoBt,browseTwopiBt,browseDotBt,browseFontDirBt;
+    JTextField tmpDirTF,graphDirTF,neatoPathTF,circoPathTF,twopiPathTF,dotPathTF,fontDirTF;
     JCheckBox cb1;
 
     //web browser panel
@@ -169,102 +169,102 @@ class PrefWindow extends JFrame implements ActionListener {
 		public void focusGained(FocusEvent e){}
 		public void focusLost(FocusEvent e){
 		    Object src = e.getSource();
-		    if (src == tf1){
-			File fl = new File(tf1.getText().trim());
+		    if (src == tmpDirTF){
+			File fl = new File(tmpDirTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isDirectory()){
 				ConfigManager.m_TmpDir = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + tf1.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + tmpDirTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tf1.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tmpDirTF.getText());
 			}
 		    }
-		    else if (src == tf2){
-			File fl = new File(tf2.getText().trim());
+		    else if (src == graphDirTF){
+			File fl = new File(graphDirTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isDirectory()){
 				ConfigManager.m_PrjDir = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + tf2.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + graphDirTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tf2.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + graphDirTF.getText());
 			}
 		    }
-		    else if (src == tf3){
-			File fl = new File(tf3.getText().trim());
+		    else if (src == neatoPathTF){
+			File fl = new File(neatoPathTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isFile()){
 				ConfigManager.m_NeatoPath = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + tf3.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + neatoPathTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tf3.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + neatoPathTF.getText());
 			}
 		    }
-		    else if (src == tf3b){
-			File fl = new File(tf3b.getText().trim());
+		    else if (src == circoPathTF){
+			File fl = new File(circoPathTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isFile()){
 				ConfigManager.m_CircoPath = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.notADirectory + tf3b.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.notADirectory + circoPathTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.fileDoesNotExist + tf3b.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.fileDoesNotExist + circoPathTF.getText());
 			}
 		    }
-		    else if (src == tf3c){
-			File fl = new File(tf3c.getText().trim());
+		    else if (src == twopiPathTF){
+			File fl = new File(twopiPathTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isFile()){
 				ConfigManager.m_TwopiPath = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.notADirectory + tf3c.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.notADirectory + twopiPathTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.fileDoesNotExist + tf3c.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this, Messages.fileDoesNotExist + twopiPathTF.getText());
 			}
 		    }
-		    else if (src == tf4){
-			File fl = new File(tf4.getText().trim());
+		    else if (src == dotPathTF){
+			File fl = new File(dotPathTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isFile()){
 				ConfigManager.m_DotPath = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notAFile + tf4.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notAFile + dotPathTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tf4.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + dotPathTF.getText());
 			}
 		    }
-		    else if (src == tf5){
-			File fl = new File(tf5.getText().trim());
+		    else if (src == fontDirTF){
+			File fl = new File(fontDirTF.getText().trim());
 			if (fl.exists()){
 			    if (fl.isDirectory()){
 				ConfigManager.m_GraphVizFontDir = fl;
 			    }
 			    else {
-				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + tf5.getText());
+				javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.notADirectory + fontDirTF.getText());
 			    }
 			}
 			else {
-			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + tf5.getText());
+			    javax.swing.JOptionPane.showMessageDialog(PrefWindow.this,Messages.fileDoesNotExist + fontDirTF.getText());
 			}
 		    }
 		}
@@ -285,100 +285,100 @@ class PrefWindow extends JFrame implements ActionListener {
 	if (ConfigManager.DELETE_TEMP_FILES){cb1.setSelected(true);} else {cb1.setSelected(false);}
 	cb1.addActionListener(this);
 	dirPane.add(cb1);
-	brw1=new JButton("Browse...");
+	browseTmpDirBt=new JButton("Browse...");
 	buildConstraints(constraints,2,0,1,1,10,0);
-	gridBag.setConstraints(brw1,constraints);
-	brw1.addActionListener(this);
-	dirPane.add(brw1);
-	tf1=new JTextField(ConfigManager.m_TmpDir.toString());
+	gridBag.setConstraints(browseTmpDirBt,constraints);
+	browseTmpDirBt.addActionListener(this);
+	dirPane.add(browseTmpDirBt);
+	tmpDirTF=new JTextField(ConfigManager.m_TmpDir.toString());
 	buildConstraints(constraints,0,1,3,1,100,10);
-	gridBag.setConstraints(tf1,constraints);
-	dirPane.add(tf1);
-	tf1.addFocusListener(fl0);
+	gridBag.setConstraints(tmpDirTF,constraints);
+	dirPane.add(tmpDirTF);
+	tmpDirTF.addFocusListener(fl0);
 	JLabel l2=new JLabel("DOT files directory");
 	buildConstraints(constraints,0,2,2,1,90,10);
 	gridBag.setConstraints(l2,constraints);
 	dirPane.add(l2);
-	brw2=new JButton("Browse...");
+	browseGraphDirBt=new JButton("Browse...");
 	buildConstraints(constraints,2,2,1,1,10,0);
-	gridBag.setConstraints(brw2,constraints);
-	brw2.addActionListener(this);
-	dirPane.add(brw2);
-	tf2=new JTextField(ConfigManager.m_PrjDir.toString());
+	gridBag.setConstraints(browseGraphDirBt,constraints);
+	browseGraphDirBt.addActionListener(this);
+	dirPane.add(browseGraphDirBt);
+	graphDirTF=new JTextField(ConfigManager.m_PrjDir.toString());
 	buildConstraints(constraints,0,3,3,1,100,10);
-	gridBag.setConstraints(tf2,constraints);
-	dirPane.add(tf2);
-	tf2.addFocusListener(fl0);
+	gridBag.setConstraints(graphDirTF,constraints);
+	dirPane.add(graphDirTF);
+	graphDirTF.addFocusListener(fl0);
 	JLabel l4=new JLabel("GraphViz/dot executable");
 	buildConstraints(constraints,0,4,2,1,90,10);
 	gridBag.setConstraints(l4,constraints);
 	dirPane.add(l4);
-	brw4=new JButton("Browse...");
+	browseDotBt=new JButton("Browse...");
 	buildConstraints(constraints,2,4,1,1,10,0);
-	gridBag.setConstraints(brw4,constraints);
-	brw4.addActionListener(this);
-	dirPane.add(brw4);
-	tf4=new JTextField(ConfigManager.m_DotPath.toString());
+	gridBag.setConstraints(browseDotBt,constraints);
+	browseDotBt.addActionListener(this);
+	dirPane.add(browseDotBt);
+	dotPathTF=new JTextField(ConfigManager.m_DotPath.toString());
 	buildConstraints(constraints,0,5,3,1,100,10);
-	gridBag.setConstraints(tf4,constraints);
-	dirPane.add(tf4);
-	tf4.addFocusListener(fl0);
+	gridBag.setConstraints(dotPathTF,constraints);
+	dirPane.add(dotPathTF);
+	dotPathTF.addFocusListener(fl0);
 	JLabel l3=new JLabel("GraphViz/neato executable");
 	buildConstraints(constraints,0,6,2,1,90,10);
 	gridBag.setConstraints(l3,constraints);
 	dirPane.add(l3);
-	brw3=new JButton("Browse...");
+	browseNeatoBt=new JButton("Browse...");
 	buildConstraints(constraints,2,6,1,1,10,0);
-	gridBag.setConstraints(brw3,constraints);
-	brw3.addActionListener(this);
-	dirPane.add(brw3);
-	tf3=new JTextField(ConfigManager.m_NeatoPath.toString());
+	gridBag.setConstraints(browseNeatoBt,constraints);
+	browseNeatoBt.addActionListener(this);
+	dirPane.add(browseNeatoBt);
+	neatoPathTF=new JTextField(ConfigManager.m_NeatoPath.toString());
 	buildConstraints(constraints,0,7,3,1,100,10);
-	gridBag.setConstraints(tf3,constraints);
-	dirPane.add(tf3);
-	tf3.addFocusListener(fl0);
+	gridBag.setConstraints(neatoPathTF,constraints);
+	dirPane.add(neatoPathTF);
+	neatoPathTF.addFocusListener(fl0);
 	JLabel l3b=new JLabel("GraphViz/circo executable");
 	buildConstraints(constraints,0,8,2,1,90,10);
 	gridBag.setConstraints(l3b,constraints);
 	dirPane.add(l3b);
-	brw3b=new JButton("Browse...");
+	browseCircoBt=new JButton("Browse...");
 	buildConstraints(constraints,2,8,1,1,10,0);
-	gridBag.setConstraints(brw3b,constraints);
-	brw3b.addActionListener(this);
-	dirPane.add(brw3b);
-	tf3b=new JTextField(ConfigManager.m_CircoPath.toString());
+	gridBag.setConstraints(browseCircoBt,constraints);
+	browseCircoBt.addActionListener(this);
+	dirPane.add(browseCircoBt);
+	circoPathTF=new JTextField(ConfigManager.m_CircoPath.toString());
 	buildConstraints(constraints,0,9,3,1,100,10);
-	gridBag.setConstraints(tf3b,constraints);
-	dirPane.add(tf3b);
-	tf3b.addFocusListener(fl0);
+	gridBag.setConstraints(circoPathTF,constraints);
+	dirPane.add(circoPathTF);
+	circoPathTF.addFocusListener(fl0);
 	JLabel l3c=new JLabel("GraphViz/twopi executable");
 	buildConstraints(constraints,0,10,2,1,90,10);
 	gridBag.setConstraints(l3c,constraints);
 	dirPane.add(l3c);
-	brw3c=new JButton("Browse...");
+	browseTwopiBt=new JButton("Browse...");
 	buildConstraints(constraints,2,10,1,1,10,0);
-	gridBag.setConstraints(brw3c,constraints);
-	brw3c.addActionListener(this);
-	dirPane.add(brw3c);
-	tf3c=new JTextField(ConfigManager.m_TwopiPath.toString());
+	gridBag.setConstraints(browseTwopiBt,constraints);
+	browseTwopiBt.addActionListener(this);
+	dirPane.add(browseTwopiBt);
+	twopiPathTF=new JTextField(ConfigManager.m_TwopiPath.toString());
 	buildConstraints(constraints,0,11,3,1,100,10);
-	gridBag.setConstraints(tf3c,constraints);
-	dirPane.add(tf3c);
-	tf3c.addFocusListener(fl0);
+	gridBag.setConstraints(twopiPathTF,constraints);
+	dirPane.add(twopiPathTF);
+	twopiPathTF.addFocusListener(fl0);
 	JLabel l5=new JLabel("GraphViz font directory (optional)");
 	buildConstraints(constraints,0,12,2,1,90,10);
 	gridBag.setConstraints(l5,constraints);
 	dirPane.add(l5);
-	brw5=new JButton("Browse...");
+	browseFontDirBt=new JButton("Browse...");
 	buildConstraints(constraints,2,12,1,1,10,0);
-	gridBag.setConstraints(brw5,constraints);
-	brw5.addActionListener(this);
-	dirPane.add(brw5);
-	tf5=new JTextField(ConfigManager.m_GraphVizFontDir.toString());
+	gridBag.setConstraints(browseFontDirBt,constraints);
+	browseFontDirBt.addActionListener(this);
+	dirPane.add(browseFontDirBt);
+	fontDirTF=new JTextField(ConfigManager.m_GraphVizFontDir.toString());
 	buildConstraints(constraints,0,13,3,1,100,10);
-	gridBag.setConstraints(tf5,constraints);
-	dirPane.add(tf5);
-	tf5.addFocusListener(fl0);
+	gridBag.setConstraints(fontDirTF,constraints);
+	dirPane.add(fontDirTF);
+	fontDirTF.addFocusListener(fl0);
 	JScrollPane dirSP = new JScrollPane(dirPane);
 	dirSP.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 	dirSP.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -605,67 +605,67 @@ class PrefWindow extends JFrame implements ActionListener {
 	JFileChooser fc;
 	int returnVal;
 	Object o=e.getSource();
-	if (o==brw1){//tmp directory browse button
+	if (o==browseTmpDirBt){//tmp directory browse button
 	    fc=new JFileChooser(ConfigManager.m_TmpDir);
  	    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //does not work well with JVM 1.3.x (works fine in 1.4)
 	    returnVal= fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_TmpDir=fc.getSelectedFile();
-		tf1.setText(ConfigManager.m_TmpDir.toString());
+		tmpDirTF.setText(ConfigManager.m_TmpDir.toString());
 	    }
 	}
-	else if (o==brw2){
+	else if (o==browseGraphDirBt){
 	    fc=new JFileChooser(ConfigManager.m_PrjDir);
  	    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //does not work well with JVM 1.3.x (works fine in 1.4)
 	    returnVal= fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_PrjDir=fc.getSelectedFile();
-		tf2.setText(ConfigManager.m_PrjDir.toString());
+		graphDirTF.setText(ConfigManager.m_PrjDir.toString());
 	    }
 	}
-	else if (o==brw4){
+	else if (o==browseDotBt){
 	    fc=new JFileChooser(ConfigManager.m_DotPath);
 	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	    returnVal= fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_DotPath=fc.getSelectedFile();
-		tf4.setText(ConfigManager.m_DotPath.toString());
+		dotPathTF.setText(ConfigManager.m_DotPath.toString());
 	    }
 	}
-	else if (o==brw3){
+	else if (o==browseNeatoBt){
 	    fc=new JFileChooser(ConfigManager.m_NeatoPath);
 	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	    returnVal= fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_NeatoPath=fc.getSelectedFile();
-		tf3.setText(ConfigManager.m_NeatoPath.toString());
+		neatoPathTF.setText(ConfigManager.m_NeatoPath.toString());
 	    }
 	}
-	else if (o == brw3b){
+	else if (o == browseCircoBt){
 	    fc = new JFileChooser(ConfigManager.m_CircoPath);
 	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	    returnVal = fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_CircoPath = fc.getSelectedFile();
-		tf3b.setText(ConfigManager.m_CircoPath.toString());
+		circoPathTF.setText(ConfigManager.m_CircoPath.toString());
 	    }
 	}
-	else if (o==brw3c){
+	else if (o==browseTwopiBt){
 	    fc = new JFileChooser(ConfigManager.m_TwopiPath);
 	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	    returnVal = fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_TwopiPath = fc.getSelectedFile();
-		tf3c.setText(ConfigManager.m_TwopiPath.toString());
+		twopiPathTF.setText(ConfigManager.m_TwopiPath.toString());
 	    }
 	}
-	else if (o==brw5){
+	else if (o==browseFontDirBt){
 	    fc=new JFileChooser(ConfigManager.m_GraphVizFontDir);
  	    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //does not work well with JVM 1.3.x (works fine in 1.4)
 	    returnVal= fc.showOpenDialog(this);
 	    if (returnVal == JFileChooser.APPROVE_OPTION){
 		ConfigManager.m_GraphVizFontDir=fc.getSelectedFile();
-		tf5.setText(ConfigManager.m_GraphVizFontDir.toString());
+		fontDirTF.setText(ConfigManager.m_GraphVizFontDir.toString());
 	    }
 	}
 	else if (o==cb1){
