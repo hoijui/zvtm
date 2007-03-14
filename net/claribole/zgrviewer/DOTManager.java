@@ -84,7 +84,7 @@ class DOTManager {
                     deleteTempFiles();
                     return;
                 }
-                displaySVG(pp);
+                displaySVG(pp, dotF.getParentFile());
                 if (ConfigManager.DELETE_TEMP_FILES) {
                     deleteTempFiles();
                 }
@@ -191,7 +191,7 @@ class DOTManager {
 		deleteTempFiles();
 		return;
 	    }
-	    displaySVG(pp);
+	    displaySVG(pp, (new File(srcFile)).getParentFile());
 	    if (ConfigManager.DELETE_TEMP_FILES) {
 		deleteTempFiles();
 	    }
@@ -242,14 +242,14 @@ class DOTManager {
         return true;
     }
 
-    void displaySVG(ProgPanel pp){
+    void displaySVG(ProgPanel pp, File sourceDotFileParentDir){
 	pp.setLabel("Parsing SVG...");
 	pp.setPBValue(60);
 	Document svgDoc=Utils.parse(svgF,false);
 	pp.setLabel("Displaying...");
 	pp.setPBValue(80);
 	try {
-	    SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString());
+	    SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
 	}
 	catch (MalformedURLException ex){
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), svgF.getAbsolutePath(),
