@@ -102,31 +102,31 @@ class DOTManager {
     
     private boolean generateDOTFile(String dotFilePath,String tmpFilePath,ProgPanel pp,String prg){
         String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
-    cmdArray[0] = (prg.equals("dot")) ? ConfigManager.m_DotPath.toString() : ConfigManager.m_NeatoPath.toString();
-    cmdArray[1] = "-Tdot";
+	cmdArray[0] = (prg.equals("dot")) ? ConfigManager.m_DotPath.toString() : ConfigManager.m_NeatoPath.toString();
+	cmdArray[1] = "-Tdot";
 
-    if (cfgMngr.FORCE_SILENT){
-        cmdArray[2] = "-q";
-        cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
-        cmdArray[4] = "-o";
-        cmdArray[5] = tmpFilePath;
-        cmdArray[6] = dotFilePath;
-    }
-    else {
-        cmdArray[2] = checkOptions(ConfigManager.CMD_LINE_OPTS);
-        cmdArray[3] = "-o";
-        cmdArray[4] = tmpFilePath;
-        cmdArray[5] = dotFilePath;
-    }
+	if (cfgMngr.FORCE_SILENT){
+	    cmdArray[2] = "-q";
+	    cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
+	    cmdArray[4] = "-o";
+	    cmdArray[5] = tmpFilePath;
+	    cmdArray[6] = dotFilePath;
+	}
+	else {
+	    cmdArray[2] = checkOptions(ConfigManager.CMD_LINE_OPTS);
+	    cmdArray[3] = "-o";
+	    cmdArray[4] = tmpFilePath;
+	    cmdArray[5] = dotFilePath;
+	}
         Runtime rt=Runtime.getRuntime();
-    pp.setLabel("Computing Graph Layout (GraphViz)...");
-    pp.setPBValue(40);
+	pp.setLabel("Computing Graph Layout (GraphViz)...");
+	pp.setPBValue(40);
         try {
             //Process p = rt.exec(cmdArray, environment);
             Process p = rt.exec(cmdArray);
             p.waitFor();
         }
-    catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
+	catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
     }
 
