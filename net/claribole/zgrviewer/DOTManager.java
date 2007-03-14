@@ -14,6 +14,7 @@ package net.claribole.zgrviewer;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
@@ -122,9 +123,15 @@ class DOTManager {
 	pp.setLabel("Computing Graph Layout (GraphViz)...");
 	pp.setPBValue(40);
         try {
-            //Process p = rt.exec(cmdArray, environment);
-            Process p = rt.exec(cmdArray);
-            p.waitFor();
+	    try {
+		File execDir = (new File(dotFilePath)).getParentFile();
+		Process p = rt.exec(cmdArray, null, execDir);
+		p.waitFor();
+	    }
+	    catch (IOException ex){
+		Process p = rt.exec(cmdArray);
+		p.waitFor();
+	    }
         }
 	catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
@@ -161,9 +168,15 @@ class DOTManager {
 	pp.setLabel("Computing Graph Layout (GraphViz)...");
 	pp.setPBValue(40);
         try {
-            //Process p = rt.exec(cmdArray, environment);
-            Process p = rt.exec(cmdArray);
-            p.waitFor();
+	    try {
+		File execDir = (new File(dotFilePath)).getParentFile();
+		Process p = rt.exec(cmdArray, null, execDir);
+		p.waitFor();
+	    }
+	    catch (IOException ex){
+		Process p = rt.exec(cmdArray);
+		p.waitFor();
+	    }
         }
 	catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
@@ -210,8 +223,15 @@ class DOTManager {
  	pp.setLabel("Computing layout...");
  	pp.setPBValue(40);
 	try {
-	    Process p = rt.exec(cmdArray);
-	    p.waitFor();
+	    try {
+		File execDir = (new File(srcFilePath)).getParentFile();
+		Process p = rt.exec(cmdArray, null, execDir);
+		p.waitFor();
+	    }
+	    catch (IOException ex){
+		Process p = rt.exec(cmdArray);
+		p.waitFor();
+	    }
 	}
  	catch (Exception e){
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.customCallExprError2 + Utils.join(cmdArray, " "),
