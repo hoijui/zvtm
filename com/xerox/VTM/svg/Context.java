@@ -141,4 +141,20 @@ public class Context {
     /**null if none*/
     public String getTitle(){return title;}
 
+    public Context duplicate(){
+	Context copy = new Context(null);
+	copy.font_family = this.font_family;
+	copy.font_size = this.font_size;
+	copy.font_weight = this.font_weight;
+	copy.font_style = this.font_style;
+	copy.fill = this.fill;
+	copy.stroke = this.stroke;
+	copy.fillColorDefined = this.fillColorDefined;
+	copy.strokeColorDefined = this.strokeColorDefined;
+	copy.fill_opacity = this.fill_opacity;
+	copy.url = this.url;
+	copy.title = this.title;
+	return copy;
+    }
+
 }

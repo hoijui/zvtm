@@ -1058,7 +1058,7 @@ public class SVGReader {
      * associated images staying in the original directory) ; set to null if no fallback directory is known.
      *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL)
      */
-    public static Glyph createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
+    public static VImage createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
 	long x = getLong(e.getAttribute(_x)) + xoffset;
 	long y = getLong(e.getAttribute(_y)) + yoffset;
 	String width = e.getAttribute(_width);
@@ -1069,6 +1069,7 @@ public class SVGReader {
 	long h = (Long.valueOf(height)).longValue();
 	long hw = w / 2;
 	long hh = h / 2;
+	VImage res = null;
 	if (e.hasAttributeNS(xlinkURI, _href)){
 	    String imagePath = e.getAttributeNS(xlinkURI, _href);
 	    if (imagePath.length() > 0){
@@ -1079,15 +1080,16 @@ public class SVGReader {
 		    double wr = w/((double)aw);
 		    double hr = h/((double)ah);
 		    if (wr != 1.0 || hr != 1.0){
-			return new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr));
+			res = new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr));
 		    }
 		    else {
-			return new VImage(x+hw, -y-hh, 0, ii.getImage());
+			res = new VImage(x+hw, -y-hh, 0, ii.getImage());
 		    }
 		}
 	    }
 	}
-	return null;
+	if (meta && res != null){setMetadata(res, ctx);}
+	return res;
     }
 
     /** Create a VPolygon from an SVG polygon element.
@@ -1440,7 +1442,12 @@ public class SVGReader {
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, fallbackParentURL, imageStore);}
+		if (obj.getNodeType()==Node.ELEMENT_NODE){
+		    processNode((Element)obj, vsm, vs,
+				(ctx != null) ? ctx.duplicate() : null,
+				setAFont, meta,
+				documentParentURL, fallbackParentURL, imageStore);
+		}
 	    }
 	}
 	else if (tagName.equals(_a)){
@@ -1468,7 +1475,12 @@ public class SVGReader {
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,ctx,setAFont,meta, documentParentURL, fallbackParentURL, imageStore);}
+		if (obj.getNodeType()==Node.ELEMENT_NODE){
+		    processNode((Element)obj, vsm, vs,
+				(ctx != null) ? ctx.duplicate() : null,
+				setAFont, meta,
+				documentParentURL, fallbackParentURL, imageStore);
+		}
 	    }
 	}
 	else if (tagName.equals(_title)){
