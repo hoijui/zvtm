@@ -123,6 +123,7 @@ class GVLoader {
 	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 	    SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, f.toURL().toString());
 	    grMngr.seekBoundingBox();
+	    grMngr.buildLogicalStructure();
 	    ConfigManager.defaultFont=grMngr.vsm.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
 // 	    grMngr.getGlobalView();
@@ -150,6 +151,7 @@ class GVLoader {
 		if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, svgFileURL);
 		grMngr.seekBoundingBox();
+		grMngr.buildLogicalStructure();
 		ConfigManager.defaultFont = grMngr.vsm.getMainFont();
 		grMngr.reveal();
 		//do not remember camera's initial location (before global view)

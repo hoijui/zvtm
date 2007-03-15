@@ -266,13 +266,14 @@ class DOTManager {
 	pp.setPBValue(80);
 	try {
 	    SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
+	    grMngr.seekBoundingBox();
+	    grMngr.buildLogicalStructure();
 	}
 	catch (MalformedURLException ex){
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), svgF.getAbsolutePath(),
 					  "SVG parsing error", JOptionPane.ERROR_MESSAGE);
 	    System.err.println("Error loading SVG file.\n");
 	}
-	grMngr.seekBoundingBox();
     }
 
     void displayDOT(ProgPanel pp) throws Exception {

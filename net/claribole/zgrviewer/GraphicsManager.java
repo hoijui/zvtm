@@ -147,6 +147,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     ZGRApplication zapp;
 
+    /* logical structure available only if a recent version of GraphViz
+       was used to generate the SVG file (e.g. 2.13, maybe earlier) */
+    LogicalStructure lstruct = null;
+
     GraphicsManager(ZGRApplication za){
 	this.zapp = za;
     }
@@ -816,5 +820,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     public void componentMoved(ComponentEvent e){}
 
     public void componentShown(ComponentEvent e){}
+
+    /* ------------- Logical structure ----------------- */
+    void buildLogicalStructure(){
+	Vector glyphs = mSpace.getAllGlyphs();
+	glyphs.remove(magWindow);
+	glyphs.remove(boundingBox);
+	lstruct = LogicalStructure.build(glyphs);
+    }
 
 }
