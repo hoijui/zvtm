@@ -140,8 +140,10 @@ public class PortalWorldDemo {
 
 
     TrailingOverview getPortal(int x, int y){
-	return new TrailingOverview(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,
-				    portalCamera, demoCamera, 0.0f, PORTAL_X_OFFSET, PORTAL_Y_OFFSET);
+	TrailingOverview res =  new TrailingOverview(x-PORTAL_WIDTH/2, y-PORTAL_HEIGHT/2, PORTAL_WIDTH, PORTAL_HEIGHT,
+						     portalCamera, demoCamera, 0.0f, PORTAL_X_OFFSET, PORTAL_Y_OFFSET);
+	res.setTranslucencyParameters(0, 0.3f);
+	return res;
     }
 
     void killPortal(){
