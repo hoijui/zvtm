@@ -162,7 +162,10 @@ public class VirtualSpace {
 	addGlyphToDrawingList(g);
     }
 
-    /**get all glyphs in this space, visible or not, sensitive or not*/
+    /** Get all glyphs in this space, visible or not, sensitive or not.
+     * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
+     * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
+     */
     public Vector getAllGlyphs(){
 	return visualEnts;
     }
