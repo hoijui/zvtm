@@ -1469,10 +1469,6 @@ public class SVGReader {
 		if (ctx==null){ctx=new Context();}
 		ctx.setURL(e.getAttributeNS(xlinkURI,_href));
 	    }
-	    if (e.hasAttributeNS(xlinkURI,_title)){
-		if (ctx==null){ctx=new Context();}
-		ctx.setTitle(e.getAttributeNS(xlinkURI,_title));
-	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
 		if (obj.getNodeType()==Node.ELEMENT_NODE){
