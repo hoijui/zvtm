@@ -25,7 +25,6 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.svg.Metadata;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.Portal;
@@ -157,7 +156,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	if (toolPaletteIsActive){return;}
 	Glyph g=v.lastGlyphEntered();
 	if (g!=null){
-	    if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
+	    if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
 	}
 	else {
 	    attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
@@ -410,7 +409,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	else if (code==KeyEvent.VK_L || code==KeyEvent.VK_SPACE){
 	    Glyph g=v.lastGlyphEntered();
 	    if (g!=null){
-		if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
+		if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
 	    }
 	    else {
 		attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
@@ -435,19 +434,19 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	Vector otherGlyphs=mouse.getIntersectingTexts(cam);
 	if (otherGlyphs!=null && otherGlyphs.size()>0){
 	    g=(Glyph)otherGlyphs.firstElement();
-	    if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
+	    if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
 	}
 	else {
 	    otherGlyphs=mouse.getIntersectingPaths(cam);
 	    if (otherGlyphs!=null && otherGlyphs.size()>0){
 		g=(Glyph)otherGlyphs.firstElement();
-		if (g.getOwner()!=null){getAndDisplayURL((Metadata)g.getOwner());}
+		if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
 	    }
 	}
     }
 
-    void getAndDisplayURL(Metadata md){
-	String url=md.getURL();
+    void getAndDisplayURL(LElem noa){
+	String url = noa.getURL();
 	if (url!=null && url.length()>0){
 	    application.displayURLinBrowser(url);
 	}

@@ -44,6 +44,7 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.RectangleNR;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.svg.Metadata;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.TransitionManager;
@@ -823,10 +824,25 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /* ------------- Logical structure ----------------- */
     void buildLogicalStructure(){
-	Vector glyphs = mSpace.getAllGlyphs();
+	// clone the structure as we are about to remove elements from it for convenience (it is supposed to be read-only)
+	Vector glyphs = (Vector)mSpace.getAllGlyphs().clone();
 	glyphs.remove(magWindow);
 	glyphs.remove(boundingBox);
 	lstruct = LogicalStructure.build(glyphs);
+	if (lstruct == null){// building the logical structure failed
+	    System.err.println("WARNING: failed to build structure");
+	}
+	/* take care of converting the owner of glyphs that were not processed as structural elements
+	   (which should have remained Metadata instances). Convert these old owners into LElem instances
+	   (as this is what ZGRViewer now expects to get when calling Glyph.getOwner()) */
+	glyphs = mSpace.getAllGlyphs(); // not cloning here because we are just reading the structure
+	Glyph g;
+	for (int i=0;i<glyphs.size();i++){
+	    g = (Glyph)glyphs.elementAt(i);
+	    if (g.getOwner() != null && g.getOwner() instanceof Metadata){
+		g.setOwner(new LElem((Metadata)g.getOwner()));
+	    }
+	}
     }
 
 }
