@@ -22,24 +22,44 @@ class LogicalStructure {
     public static LogicalStructure build(Vector glyphs){
 	Glyph g;
 	Metadata md;
-	Hashtable title2edge = new Hashtable();
-	Hashtable title2node = new Hashtable();
+	Hashtable title2node = new Hashtable(); // key = node title, value = vector of glyphs associated with this node
+	Hashtable title2edgeGroup = new Hashtable(); // key = edge title, value = hashtable in which:
+	//                                                                     key = closest ancestor group ID,
+	//                                                                     value = vector of glyphs associated with the
+	//                                                                             edge whose id is key
+	// this is necessary to avoid all glyphs of different edges linking the same nodes being associated with the same single LEdge
 	String title;
 	Vector v;
+	Hashtable t;
+	String cagid;
+	int edgeCount = 0;
 	for (int i=0;i<glyphs.size();i++){
 	    g = (Glyph)glyphs.elementAt(i);
 	    md = (Metadata)g.getOwner();
 	    if (md != null && (title=md.getTitle()) != null){
 		if (title.contains(LEdge.DIRECTED_STR) || title.contains(LEdge.UNDIRECTED_STR)){
 		    // dealing with a glyph that is part of an edge
-		    if (title2edge.containsKey(title)){
-			v = (Vector)title2edge.get(title);
-			v.add(g);
+		    cagid = md.getClosestAncestorGroupID();
+		    if (title2edgeGroup.containsKey(title)){
+			t = (Hashtable)title2edgeGroup.get(title);
+			if (t.containsKey(cagid)){
+			    v = (Vector)t.get(cagid);
+			    v.add(g);
+			}
+			else {
+			    v = new Vector();
+			    v.add(g);
+			    t.put(cagid, v);
+			    edgeCount++;
+			}
 		    }
 		    else {
 			v = new Vector();
 			v.add(g);
-			title2edge.put(title, v);
+			t = new Hashtable(3); // initial capacity set to 3 (path, arrow head, label)
+			t.put(cagid, v);
+			title2edgeGroup.put(title, t);
+			edgeCount++;
 		    }
 		}
 		else {
@@ -57,8 +77,8 @@ class LogicalStructure {
 	    }
 	    // remain silent if structural information could not be extracted
 	}
-	LogicalStructure res = new LogicalStructure(title2node, title2edge);
-	title2edge.clear();
+	LogicalStructure res = new LogicalStructure(title2node, title2edgeGroup, edgeCount);
+	title2edgeGroup.clear();
 	title2node.clear();
 	return (res.isEmpty()) ? null : res;
     }
@@ -68,7 +88,7 @@ class LogicalStructure {
     LNode[] nodes;
     LEdge[] edges;
     
-    LogicalStructure(Hashtable title2node, Hashtable title2edge){
+    LogicalStructure(Hashtable title2node, Hashtable title2edgeGroup, int edgeCount){
 	String title;
 	// construct nodes
 	nodes= new LNode[title2node.size()];
@@ -80,11 +100,18 @@ class LogicalStructure {
 	}
 	// construct edges
 	i = 0;
-	edges = new LEdge[title2edge.size()];
-	for (Enumeration e=title2edge.keys();e.hasMoreElements();){
+	edges = new LEdge[edgeCount];
+	Hashtable group2edge;
+	for (Enumeration e=title2edgeGroup.keys();e.hasMoreElements();){
 	    title = (String)e.nextElement();
-	    edges[i] = new LEdge(title, (Vector)title2edge.get(title));
-	    i++;
+ 	    group2edge = (Hashtable)title2edgeGroup.get(title);
+	    for (Enumeration e2=group2edge.elements();e2.hasMoreElements();){
+		// we do not save the group/edge's ID, not relevant for now
+		// but we could if it prove to be useful (group ID is just the key)
+		// and could be given to the LEdge constructor
+		edges[i] = new LEdge(title, (Vector)e2.nextElement());
+		i++;
+	    }
 	}
 	// link nodes and edges
 	for (int j=0;j<edges.length;j++){
