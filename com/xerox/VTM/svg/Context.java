@@ -32,6 +32,7 @@ public class Context {
     /*metadata associated with a group/link*/
     String url;
     String title;
+    String closestAncestorGroupID;
 
     /*give it the value of a style attribute*/
     Context(){}
@@ -141,6 +142,11 @@ public class Context {
     /**null if none*/
     public String getTitle(){return title;}
 
+    public void setClosestAncestorGroupID(String s){closestAncestorGroupID = s;}
+    
+    /**null if none*/
+    public String getClosestAncestorGroupID(){return closestAncestorGroupID;}
+
     public Context duplicate(){
 	Context copy = new Context(null);
 	copy.font_family = this.font_family;
@@ -154,6 +160,7 @@ public class Context {
 	copy.fill_opacity = this.fill_opacity;
 	copy.url = this.url;
 	copy.title = this.title;
+	copy.closestAncestorGroupID = this.closestAncestorGroupID;
 	return copy;
     }
 

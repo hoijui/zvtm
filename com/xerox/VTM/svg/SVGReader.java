@@ -107,6 +107,7 @@ public class SVGReader {
     public static final String _end="end";
     public static final String _inherit="inherit";
     public static final String _pt = "pt";
+    public static final String _id = "id";
 
     public static final String xlinkURI="http://www.w3.org/1999/xlink";
     public static final String _href="href";
@@ -1439,6 +1440,12 @@ public class SVGReader {
 		    ctx.setTitle(((Element)titles.item(0)).getFirstChild().getNodeValue());
 		}
 		catch(Exception ex){}
+		if (e.hasAttribute(SVGReader._id)){
+		    try {//try to get the group's id, be quiet if anything goes wrong
+			ctx.setClosestAncestorGroupID(e.getAttribute(SVGReader._id));
+		    }
+		    catch(Exception ex){}
+		}
 	    }
 	    for (int i=0;i<objects.getLength();i++){
 		Node obj=objects.item(i);
@@ -1524,8 +1531,8 @@ public class SVGReader {
     }
 
     private static void setMetadata(Glyph g,Context ctx){
-	if (ctx!=null && (ctx.getURL()!=null || ctx.getTitle()!=null)){
-	    g.setOwner(new Metadata(ctx.getURL(),ctx.getTitle()));
+	if (ctx!=null && (ctx.getURL()!=null || ctx.getTitle()!=null || ctx.getClosestAncestorGroupID() != null)){
+	    g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getClosestAncestorGroupID()));
 	}
     }
 

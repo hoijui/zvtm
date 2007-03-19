@@ -14,10 +14,12 @@ public class Metadata {
 
     String url;
     String title;
+    String closestGroupID;
 
-    public Metadata(String url,String title){
+    public Metadata(String url, String title, String cagid){
 	this.url=url;
 	this.title=title;
+	this.closestGroupID = cagid;
     }
 
     public void setURL(String s){url=s;}
@@ -30,8 +32,13 @@ public class Metadata {
     /**null if none*/
     public String getTitle(){return title;}
 
+    public void setClosestAncestorGroupID(String s){closestGroupID = s;}
+    
+    /**null if none*/
+    public String getClosestAncestorGroupID(){return closestGroupID;}
+
     public String toString(){
-	return "url=" + ((url != null) ? url : "") + " title=" + ((title != null) ? title : "");
+	return "url=" + ((url != null) ? url : "") + " title=" + ((title != null) ? title : "") + " group ID=" + ((closestGroupID != null) ? closestGroupID : "");
     }
     
 }
