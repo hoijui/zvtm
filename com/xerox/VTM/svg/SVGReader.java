@@ -152,7 +152,25 @@ public class SVGReader {
 	boolean res=true;
 	byte[] chrs=svg.getBytes();
 	for (int i=0;i<chrs.length;i++){
-	    if (!((chrs[i]==32) || (chrs[i]==45) || ((chrs[i]>=48) && (chrs[i]<=57)) || (chrs[i]==67) || (chrs[i]==72) || (chrs[i]==76) || (chrs[i]==77) || (chrs[i]==81) || (chrs[i]==86) || (chrs[i]==99) || (chrs[i]==104) || (chrs[i]==108) || (chrs[i]==109) || (chrs[i]==113) || (chrs[i]==118) || (chrs[i]==44))){res=false;System.err.println("SVG Path: char '"+svg.substring(i,i+1)+"' not supported");break;}
+	    if (!((chrs[i] == 32) ||                     // space
+		  (chrs[i] == 45) ||                     // minus
+		  ((chrs[i] >= 48) && (chrs[i] <= 57)) ||// 0-9
+		  (chrs[i] == 67) ||                     // C
+		  (chrs[i] == 72) ||                     // H
+		  (chrs[i] == 76) ||                     // L
+		  (chrs[i] == 77) ||                     // M
+		  (chrs[i] == 81) ||                     // Q
+		  (chrs[i] == 86) ||                     // V
+		  (chrs[i] == 99) ||                     // c
+		  (chrs[i] == 104) ||                    // h
+		  (chrs[i] == 108) ||                    // l
+		  (chrs[i] == 109) ||                    // m
+		  (chrs[i] == 113) ||                    // q
+		  (chrs[i] == 118) ||                    // v
+		  (chrs[i] == 44) ||                     // comma
+		  (chrs[i] == 46))){                     // point
+		res=false;System.err.println("SVG Path: char '"+svg.substring(i,i+1)+"' not supported");break;
+	    }
 	}
 	return res;
     }
