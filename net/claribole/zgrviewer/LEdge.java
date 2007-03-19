@@ -54,12 +54,16 @@ class LEdge extends LElem {
 
     void setTail(LNode n){
 	tail = n;
-	tail.addArc(this, (directed) ? LEdge.OUTGOING : LEdge.UNDIRECTED);
+	if (tail != null){
+	    tail.addArc(this, (directed) ? LEdge.OUTGOING : LEdge.UNDIRECTED);
+	}
     }
 
     void setHead(LNode n){
 	head = n;
-	head.addArc(this, (directed) ? LEdge.INCOMING : LEdge.UNDIRECTED);
+	if (head != null){
+	    head.addArc(this, (directed) ? LEdge.INCOMING : LEdge.UNDIRECTED);
+	}
     }
 
     LNode getTail(){
@@ -75,7 +79,11 @@ class LEdge extends LElem {
     }
 
     public String toString(){
-	return title + "@" + hashCode() + " [" + tail.getTitle() + "@" + tail.hashCode() + ((directed) ? LEdge.DIRECTED_STR : LEdge.UNDIRECTED_STR) + head.getTitle() + "@" + head.hashCode() + "]";
+	return title + "@" + hashCode() + " [" + 
+	    ((tail != null) ? tail.getTitle() + "@" + tail.hashCode() : "NULL")+
+	    ((directed) ? LEdge.DIRECTED_STR : LEdge.UNDIRECTED_STR) +
+	    ((head != null) ? head.getTitle() + "@" + head.hashCode() : "NULL") +
+	    "]";
     }
 
 }

@@ -55,7 +55,7 @@ class LNode extends LElem {
     public String toString(){
 	String res = title + "[";
 	for (int i=0;i<edges.length;i++){
-	    res += edges[i].title + "@" + edges[i].hashCode() + "(" + edgeDirections[i] + ") ";
+	    res += ((edges[i] != null) ? edges[i].title + "@" + edges[i].hashCode() : "NULL") + "(" + edgeDirections[i] + ") ";
 	}
 	res += "]";
 	return res;
