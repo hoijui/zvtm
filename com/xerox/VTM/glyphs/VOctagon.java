@@ -173,21 +173,23 @@ public class VOctagon extends Glyph implements Cloneable {
 	else {return false;}
     }
 
-    /**returns 1 if mouse has entered the glyph, -1 if it has exited the glyph, 0 if nothing has changed (meaning it was already inside or outside it)*/
-    public int mouseInOut(int x,int y,int camIndex){
+    /** Method used internally for firing picking-related events.
+     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
+     */
+    public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
 		pc[camIndex].prevMouseIn=true;
-		return 1;
+		return Glyph.ENTERED_GLYPH;
 	    }
-	    else {return 0;}  //if it was inside last time, nothing has changed
+	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was inside last time, nothing has changed
 	}
 	else{//if the mouse is not inside the glyph
 	    if (pc[camIndex].prevMouseIn){//if it was inside it last time, mouse has exited the glyph
 		pc[camIndex].prevMouseIn=false;
-		return -1;
+		return Glyph.EXITED_GLYPH;
 	    }
-	    else {return 0;}  //if it was not inside last time, nothing has changed
+	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was not inside last time, nothing has changed
 	}
     }
 

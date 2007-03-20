@@ -275,9 +275,11 @@ public class VText extends Glyph implements Cloneable {
 	return false;
     }
 
-    /**returns 1 if mouse has entered the glyph, -1 if it has exited the glyph, 0 if nothing has changed (meaning it was already inside or outside it)*/
-    public int mouseInOut(int x,int y,int camIndex){
-	return 0;
+    /** Method used internally for firing picking-related events.
+     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
+     */
+    public short mouseInOut(int x,int y,int camIndex){
+	return Glyph.NO_CURSOR_EVENT;
     }
 
     /**project shape in camera coord sys prior to actual painting*/

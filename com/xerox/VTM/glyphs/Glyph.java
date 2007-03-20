@@ -46,124 +46,151 @@ public abstract class Glyph implements Cloneable {
 
     /*------------Misc. Info-------------------------------------*/
 
-    /**Glyph ID*/
+    /** Glyph ID. */
     Long ID;
 
-    /**ref to the object this glyph represents*/
+    /** Object this glyph represents in the client application.
+     * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
+     * Set by client application. Null if not set.
+     */
     Object owner;
 
-    /**type of object (can be any string)*/
-    String type = "";
+    /** Type of object.
+     * Arbitrary String, set by client application. Null if not set.
+     */
+    String type;
 
-    /**get glyph ID*/
+    /** Get this glyph's ID. */
     public Long getID(){
 	return ID;
     }
 
-    /**set glyph ID (make sure there is no conflict)*/
+    /** Set this glyph's ID.
+     * Set internally by ZVTM. If tampering, make sure there is no conflict.
+     */
     public void setID(Long ident){
 	ID = ident;
     }
 
-    /**get object this glyph represents*/
+    /** Get the object this glyph represents in the client application.
+     * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
+     *@return null if not associated with anything.
+     */
     public Object getOwner(){
 	return owner;
     }
    
-    /**associate an application object with this glyph*/
+     /** Set the object this glyph represents in the client application.
+     * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
+     *@param o provided by client application, null by default.
+     */
     public void setOwner(Object o){
 	this.owner = o;
     }
 
-    /**get glyph type*/
+    /** Get the type of this glyph.
+     * Arbitrary String, set by client application. Null if not set. This is somewhat equivalent to tagging an object, but it only one type can be associated with a glyph.
+     *@return null if not set
+     */
     public String getType(){
 	return type;
     }
    
-    /**
-     *set glyph type
-     *@param t any string
+    /** Set the type of this glyph.
+     * This is somewhat equivalent to tagging an object, but it only one type can be associated with a glyph.
+     *@param t arbitrary string, set by client application. Null if not set. 
      */
     public void setType(String t){
 	this.type = t;
     }
 
-    /**
-     * returns a String with ID, position, and altitude
+    /** Get a string representation of this glyph.
      */
     public String toString(){
-	return new String(super.toString()+" Glyph ID "+ID+" pos ("+vx+","+vy+","+vz+") "+type);
+	return new String(super.toString()+" Glyph ID "+ID+" pos ("+vx+","+vy+","+vz+") type="+type);
     }
 
 
     /*------------Geometry---------------------------------------*/
 
-    /**coordinate in virtual space (geometric center of object)*/
+    /** Coordinates in virtual space (geometric center of object). */
     public long vx,vy;
 
-    /**altitude (in virtual space)*/
+    /** Altitude (in virtual space). Not used yet. */
     public float vz;
 
-    /**radius of bounding circle*/
+    /** Radius of bounding circle. */
     float size;
 
-    /**object orientation [0:2Pi[ */
+    /** Glyph's orientation in [0:2Pi[. */
     float orient=0.0f;
 
-    /**relative translation (offset)*/
-    public void move(long x,long y){
+    /** Translate the glyph by (x,y) - relative translation.
+     *@see #moveTo(long x, long y)
+     */
+    public void move(long x, long y){
 	vx+=x;
 	vy+=y;
 	propagateMove(x,y);  //take care of sticked glyphs
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**absolute translation*/
-    public void moveTo(long x,long y){
+    /** Translate the glyph to (x,y) - absolute translation.
+     *@see #move(long x, long y)
+     */
+    public void moveTo(long x, long y){
 	propagateMove(x-vx,y-vy);  //take care of sticked glyphs
 	vx=x;
 	vy=y;
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**returns coordinates of the glyph's geom center as a LongPoint*/
+    /** Get the coordinates of the glyph's geometrical center. */
     public LongPoint getLocation(){return new LongPoint(vx,vy);}
 
-    /**get size of object (radius of bounding circle)*/
+    /** Get glyph's size (radius of bounding circle). */
     public abstract float getSize();    
 
-    /**set size of object by setting its bounding circle's radius*/
+    /** Set glyph's size by setting its bounding circle's radius.
+     *@see #reSize(float factor)
+     */
     public abstract void sizeTo(float radius);
 
-    /**multiply bounding circle radius by factor*/
+    /** Set glyph's size by multiplying its bounding circle radius by a factor. 
+     *@see #sizeTo(float radius)
+     */
     public abstract void reSize(float factor);
 
-    /**get orientation*/
+    /** Get the glyph's orientation. */
     public abstract float getOrient();
 
-    /**set absolute orientation*/
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public abstract void orientTo(float angle);
 
 
     /*---Visibility and sensitivity------------------------------*/
 
-    /**tells whether this glyph is visible or not (default is true)<br>does not affect sensitivity*/
+    /** Indicates whether this glyph is visible or not (default is true)<br>Does not affect its sensitivity.*/
     boolean visible=true;
 
-    /**tells whether we should detect entry/exit in this glyph*/
+    /** Indicates whether we should detect entry/exit in this glyph (i.e., is it sensitive). */
     boolean sensit=true;
 
-    /**set sensitivity of this glyph*/
+    /** Make this glyph sensitive (or not). */
     public void setSensitivity(boolean b){
 	sensit=b;
     }
 
-    /**tells whether mouse sends events related to entry/exit in this glyph or not*/
+    /** Indicates whether ZVTM sends events related to cursor entry/exit in/from this glyph or not. */
     public boolean isSensitive(){return sensit;}
 
-    /**make this glyph (in)visible (the glyph remains sensitive to cursor in/out events)<br>
-     * use methods VirtualSpace.show(Glyph g) and VirtualSpace.hide(Glyph g) to make a glyph both (in)visible and (in)sensitive
+    /** Make this glyph (in)visible (the glyph remains sensitive to cursor in/out events).<br>
+     * Use methods VirtualSpace.show(Glyph g) and VirtualSpace.hide(Glyph g) to make a glyph both (in)visible and (in)sensitive.
      *@param b true to make glyph visible, false to make it invisible
+     *@see com.xerox.VTM.engine.VirtualSpace#show(Glyph g)
+     *@see com.xerox.VTM.engine.VirtualSpace#hide(Glyph g)
      */
     public void setVisible(boolean b){
 	if (b!=visible){
@@ -172,12 +199,17 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-    /**get this glyph's visibility state (returns true if visible)*/
+    /** Get this glyph's visibility status.
+     *@return true if visible
+     */
     public boolean isVisible(){
 	return visible;
     }
 
-    /**get this glyph's visibility state when seen through the lens (returns true if visible)<br>This is equivalent to isVisible() for most glyphs, except LText*/
+    /** Get this glyph's visibility status when seen through a lens.
+     * This is equivalent to isVisible() for most glyphs, except LText.
+     *@return true if visible
+     */
     public boolean isVisibleThroughLens(){
 	return visible;
     }
@@ -185,28 +217,46 @@ public abstract class Glyph implements Cloneable {
 
     /*------------Color------------------------------------------*/
 
-    /**current fill color*/
+    /** Current main color (read only, use access methods for all modification purposes).
+     * Fill color for closed shapes, stroke color for glyphs which use just one color, such as text, paths, segments.
+     */
     public Color color;
-    /**current border color*/
+    
+    /** Current border color (read only, use access methods for all modification purposes).
+     * Border color for closed shapes.
+     */
     public Color borderColor;
-    /**HSV coordinates of fill color in range 0.0-1.0*/
+
+    /** Coordinates of main color in HSV color space. */
     protected float[] HSV=new float[3];
-    /**HSV coordinates of border color in range 0.0-1.0*/
+
+    /** Coordinates of border color in HSV color space. */
     protected float[] HSVb=new float[3];
 
-    /** Main fill color. */
+    /** Fill color of this glyph when it is in its default state. */
     public Color fColor = Color.white;
-    /** Main border color. */
+
+    /** Border color of this glyph when it is in its default state. */
     public Color bColor = Color.black;
-    /**color of border when cursor is inside glyph*/
+
+    /** Border color of this glyph when cursor is inside it. Null if same as default border color. */
     public Color mouseInsideColor;
-    /**color of interior when cursor is inside glyph*/
+
+    /** Fill color of this glyph when cursor is inside it. Null if same as default fill color. */
     public Color mouseInsideFColor;
 
+    /** Indicates whether this glyph's interior is filled or not.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     */
     boolean filled=true;
 
-    /** Set whether the glyph should be filled with the fill color or not.
-     *@param b false -&gt; do not paint interior of glyph
+    /** Indicates whether this glyph's border is drawn or not.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     */
+    boolean paintBorder = true;
+
+    /** Set whether this glyph's interior should be filled or not.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      */
     public void setFilled(boolean b){
 	if (b!=filled){
@@ -215,11 +265,13 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-    /** Indicates whether this glyph is filled or not. */
+    /** Indicates whether this glyph's interior is filled or not.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     */
     public boolean isFilled(){return filled;}
 
-    /** Set whether the glyph's border should be painted with the border color or not.
-     *@param b false -&gt; do not paint border of glyph
+    /** Set whether the glyph's border should be drawn or not.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      */
     public void setDrawBorder(boolean b){
 	if (b!=paintBorder){
@@ -228,16 +280,22 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-    /** Indicates whether the glyph's border is painted with the border color or not. */
+    /** Indicates whether the glyph's border is drawn or not.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     */
     public boolean isBorderDrawn(){return paintBorder;}
 
-    /**set border color when cursor is inside glyph (null to keep the original color)
+    /** Set the glyph's border color when cursor is inside it.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     *@param c set to null to keep the original color.
      */
     public void setMouseInsideBorderColor(Color c){
 	this.mouseInsideColor = c;
     }
 
-    /**set fill color when cursor is inside glyph (null to keep the original color)
+    /** Set the glyph's fill color when cursor is inside it.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     *@param c set to null to keep the original color.
      */
     public void setMouseInsideFillColor(Color c){
 	this.mouseInsideFColor = c;
@@ -359,17 +417,19 @@ public abstract class Glyph implements Cloneable {
 
     /*------------Selection--------------------------------------*/
 
-    /**tells whether this glyph is selected or not (default is false)*/
+    /** Indicates whether this glyph is selected or not (default is false)*/
     boolean selected = false;
 
-    /**select this glyph
+    /** Select this glyph. This just flags the glyph as selected.
      *@param b true to select glyph, false to unselect it
      */
     public void select(boolean b){
 	selected=b;
     }
 
-    /**get this glyph's selection state (returns true if selected)*/
+    /** Get this glyph's selection status.
+     *@return true if selected. 
+     */
     public boolean isSelected(){
 	return selected;
     }
@@ -381,7 +441,6 @@ public abstract class Glyph implements Cloneable {
     BasicStroke stroke = null;  
     boolean dashedContour = false;
     float strokeWidth = DEFAULT_STROKE_WIDTH;
-    boolean paintBorder = true;
 
     /** Convenience method for painting the glyph's border with an predefined dashed stroke.
      *@param b true -&gt; draw a discontinuous contour for this glyph
@@ -468,13 +527,15 @@ public abstract class Glyph implements Cloneable {
 
     /*---------Sticked glyphs----------------------------------*/
 
-    /**glyphs sticked to this one*/
+    /** Glyphs sticked to this one. */
     Glyph[] stickedGlyphs;
 
-    /**object to which this glyph is sticked to (could be a VCursor, a Camera or a Glyph)*/
+    /** Object to which this glyph is sticked (could be a VCursor, a Camera or a Glyph). */
     public Object stickedTo;
 
-    /**propagate this glyph's movement to all glyphs constrained by this one (pos)*/
+    /** Propagate this glyph's movement to all glyphs constrained by this one.
+     * Called automatically by ZVTM when translating this glyph. 
+     */
     public void propagateMove(long x,long y){
 	if (stickedGlyphs != null){
 	    for (int i=0;i<stickedGlyphs.length;i++){
@@ -483,8 +544,7 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-    /**
-     *attach glyph to this one
+    /** Attach a glyph to this one. Translations of this glyph will be propagated to g.
      *@param g glyph to be attached to this one
      */
     public void stick(Glyph g){
@@ -514,9 +574,8 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-    /**
-     *detach glyph from this one
-     *@param g glyph to be detached
+    /** Unattach a glyph from this one. Translations of this glyph will no longer be propagated to g.
+     *@param g glyph to be unattached from this one
      */
     public void unstick(Glyph g){
 	if (stickedGlyphs != null){
@@ -535,8 +594,7 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-   /**
-    *detach all glyphs attached to this one
+   /** Unattach all glyphs attached to this one. Translations of this glyph will no longer be propagated to them.
     */
     public void unstickAllGlyphs(){
 	if (stickedGlyphs != null){
@@ -548,73 +606,113 @@ public abstract class Glyph implements Cloneable {
 	}
     }
 
-    /**return the list of glyphs sticked to this one (null if none)*/
+    /** Get the list of glyphs sticked to this one.
+     *@return null if no glyph is attached to this one
+     */
     public Glyph[] getStickedGlyphArray(){
 	return stickedGlyphs;
     }
 
     /*----Projecting and Drawing--------------------------------*/
 
-    /**projection coef*/
+    /** Value sent to cursor when it enters this glyph. For internal use. */
+    public static final short ENTERED_GLYPH = 1;
+    /** Value sent to cursor when it exits this glyph. For internal use. */
+    public static final short EXITED_GLYPH = -1;
+    /** Value sent to cursor when it neither enters nor exit this glyph. For internal use. */
+    public static final short NO_CURSOR_EVENT = 0;
+
+    /** Projection coefficient. Computed internally. Do not tamper with. */
     public float coef=1.0f;
 
-    /**project shape in camera coord sys prior to actual painting*/
+    /** Project glyph w.r.t a given camera's coordinate system, prior to actual painting. Called internally.
+     *@param c camera
+     *@param d dimension of View using camera c
+     */
     public abstract void project(Camera c,Dimension d);
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
+    /** Project glyph w.r.t a given camera's coordinate system, prior to actual painting through a lens. Called internally.
+     *@param c camera
+     *@param lensWidth width of lens activated in View using this camera
+     *@param lensHeight height of lens activated in View using this camera
+     *@param lensMag magnification factor of lens activated in View using this camera
+     *@param lensx horizontal coordinateof lens activated in View using this camera
+     *@param lensy vertical coordinate of lens activated in View using this camera
+     */
     public abstract void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy);
 
-    /**draw this glyph
-     *@param g graphic context in which the glyph should be drawn 
-     *@param vW associated view width (used to determine if border should be drawn)
-     *@param vH associated view height (used to determine if border should be drawn)
-     * right now only VRectangle and VRectangleOr(/Or=0) use this
-     *@param i camera index in the virtual space
+    /** Draw this glyph.
+     *@param g graphics context in which the glyph should be drawn 
+     *@param vW associated View width (used by some closed shapes to determine if it is worth painting the glyph's border)
+     *@param vH associated View height (used by some closed shapes to determine if it is worth painting the glyph's border)
+     *@param i camera index in the virtual space containing the glyph
+     *@param stdS default stroke
+     *@param stdT identity transform
+     *@param dx horizontal offset
+     *@param dy vertical offset
      */
     public abstract void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy);
 
-    /**draw this glyph through the lens
-     *@param g graphic context in which the glyph should be drawn 
-     *@param vW associated view width (used to determine if border should be drawn)
-     *@param vH associated view height (used to determine if border should be drawn)
-     * right now only VRectangle and VRectangleOr(/Or=0) use this
-     *@param i camera index in the virtual space
+    /** Draw this glyph through a lens.
+     *@param g graphics context in which the glyph should be drawn 
+     *@param vW associated View width (used by some closed shapes to determine if it is worth painting the glyph's border)
+     *@param vH associated View height (used by some closed shapes to determine if it is worth painting the glyph's border)
+     *@param i camera index in the virtual space containing the glyph
+     *@param stdS default stroke
+     *@param stdT identity transform
+     *@param dx horizontal offset
+     *@param dy vertical offset
      */
     public abstract void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy);
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
+    /** Initialize projected coordinates.
+	Called internally when glyph is created in order to create the initial set of projected coordinates w.r.t the number of cameras in the virtual space.
      *@param nbCam current number of cameras in the virtual space
+     *@see #addCamera(int verifIndex)
+     *@see #removeCamera(int index)
      */
     public abstract void initCams(int nbCam);
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
+    /** Create new projected coordinates.
+     * Called internally to create new projected coordinates to use with the new camera.
+     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras.
+     *@see #initCams(int nbCam)
+     *@see #removeCamera(int index)
      */
     public abstract void addCamera(int verifIndex);
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
+    /** Dispose of projected coordinates.
+     * If a camera is removed from the virtual space to which this glyphs belongs, the corresponding projected coordinates should be deleted. the array of projected coordinates should not be modified however, because other cameras' index remain the same. The corresponding index in the array should just be set to null.
+     *@see #initCams(int nbCam)
+     *@see #addCamera(int verifIndex)
+     */
     public abstract void removeCamera(int index);
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
+    /** Detect whether the given point is inside this glyph or not. 
+     *@param x provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param y provide projected JPanel coordinates of the associated view, not virtual space coordinates
      */
     public abstract boolean coordInside(int x,int y,int camIndex);
 
-    /**reset prevMouseIn for projected coordinates nb i*/
+    /** Reset memory of cursor being inside the glyph. */
     public abstract void resetMouseIn();
 
-    /**reset prevMouseIn for projected coordinates nb i*/
+    /** Reset memory of cursor being inside the glyph for projected coordinates associated with camera at index i. */
     public abstract void resetMouseIn(int i);
     
-    /**used to find out if it is necessary to project and draw the glyph in the current view or through the lens in the current view
+    /** Method used internally for firing picking-related events.
+     *@return VCurcor.ENTERED_GLYPH if cursor has entered the glyph, VCurcor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
+     */
+    public abstract short mouseInOut(int x,int y,int camIndex);
+
+    /** Method used internally to find out if it is necessary to project and draw this glyph for a given camera.
+     *@return true if the glyph is currently visible in the region delimited by wb, nb, eb, sb, symbolising the region seen through a camera
      *@param wb west region boundary (virtual space coordinates)
      *@param nb north region boundary (virtual space coordinates)
      *@param eb east region boundary (virtual space coordinates)
      *@param sb south region boundary (virtual space coordinates)
      *@param i camera index (useuful only for some glyph classes redefining this method)
      */
-    /**used to find out if it is necessary to project and draw the glyph in the current view*/
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -631,7 +729,7 @@ public abstract class Glyph implements Cloneable {
 	return false;
     }
 
-    /** Find out if it is necessary to project and draw the glyph through the lens in the current view.
+    /** Method used internally to find out if it is necessary to project and draw the glyph through a lens for a given camera.
      *@param wb west region boundary (virtual space coordinates)
      *@param nb north region boundary (virtual space coordinates)
      *@param eb east region boundary (virtual space coordinates)
@@ -652,14 +750,13 @@ public abstract class Glyph implements Cloneable {
 	return false;
     }
 
-    /** Find out if glyph completely fills the view. (In which case it
-       is not necessary to repaint objects below it in the drawing stack). */
-    public abstract boolean fillsView(long w,long h,int camIndex);
-
-    /** Method used internally for picking.
-     *@return 1 if mouse has entered the glyph, -1 if it has exited the glyph, 0 if nothing has changed (meaning it was already inside or outside it)
+    /** Find out if this glyph completely fills a view. (In which case it is not necessary to repaint objects below it in the drawing stack).
+     * If implemented, this method should be very efficient, as it is used by an optional top-down clipping algorithm.
+     * Otherwise it might cost more time than it can potentially save.
+     * Until now it has only been implemented for non-reorientable rectangles and was activated only for 
+     * treemap-like representations in which a lot of rectangles can potentially overlap each other.
      */
-    public abstract int mouseInOut(int x,int y,int camIndex);
+    public abstract boolean fillsView(long w,long h,int camIndex);
 
 
     /*-------Internal use only----------------------------------*/
@@ -668,12 +765,11 @@ public abstract class Glyph implements Cloneable {
     //     virtual space as this information could be more useful
     //     and we can get the VSM from it
 
-    /** Reference to the owvning VSM. */
+    /** Reference to owning VSM. */
     public VirtualSpaceManager vsm;
 
-    /** Set a reference to the virtual space manager (called internally). */
+    /** Set a reference to the virtual space manager. Called internally. */
     public void setVSM(VirtualSpaceManager v){this.vsm=v;}
-
 
     /*-------------Cloning--------------------------------------*/
 

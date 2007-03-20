@@ -71,7 +71,7 @@ public class VCursor {
     float[] gain = new float[2];
 
     Glyph tmpGlyph;  //used in computeMouseOverGlyph
-    int tmpRes;      //used in computeMouseOverGlyph
+    short tmpRes;      //used in computeMouseOverGlyph
     Long tmpID;      //used in computeMouseOverGlyph
 
     int maxIndex=-1;  //used in computeMouseOverGlyph
@@ -510,7 +510,7 @@ public class VCursor {
 
     boolean checkGlyph(ViewEventHandler eh,Camera c, int x, int y){
 	tmpRes = tmpGlyph.mouseInOut(x, y, c.getIndex());
-	if (tmpRes == 1){//we've entered this glyph
+	if (tmpRes == Glyph.ENTERED_GLYPH){//we've entered this glyph
 	    tmpID = tmpGlyph.getID();
 	    maxIndex = maxIndex + 1;
 	    if (maxIndex >= glyphsUnderMouse.length){doubleCapacity();}
@@ -519,7 +519,7 @@ public class VCursor {
 	    eh.enterGlyph(tmpGlyph);
 	    return true;
 	}
-	else if (tmpRes == -1){//we've exited it
+	else if (tmpRes == Glyph.EXITED_GLYPH){//we've exited it
 	    tmpID = tmpGlyph.getID();
 	    int j = 0;
 	    while (j <= maxIndex){
