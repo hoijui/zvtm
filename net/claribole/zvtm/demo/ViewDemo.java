@@ -99,7 +99,7 @@ public class ViewDemo {
 		else {
 		    r = new VRectangle(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/10000.0), 1.0f,1.0f));
 		}
-		r.setPaintBorder(false);
+		r.setDrawBorder(false);
 		vsm.addGlyph(r, mainSpaceName, false);
 		pf.setPBValue(i+j/100);
 	    }

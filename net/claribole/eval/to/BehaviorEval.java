@@ -348,7 +348,7 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		o = v.elementAt(i);
 		if (o instanceof VRectangle){
 		    g = (Glyph)o;
-		    g.setFill(true);
+		    g.setFilled(true);
 		    g.setColor(DISTRACTOR_COLOR);
 		    g.setMouseInsideBorderColor(MOUSE_INSIDE_DISTRACTOR_COLOR);
 		}

@@ -305,7 +305,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 
     void initDM(){
 	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
-	dmRegion.setFill(false);
+	dmRegion.setFilled(false);
 	dmRegion.setBorderColor(Color.RED);
 	vsm.addGlyph(dmRegion, mainVS);
 	mainVS.hide(dmRegion);

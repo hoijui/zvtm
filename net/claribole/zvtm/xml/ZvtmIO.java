@@ -297,9 +297,9 @@ public class ZvtmIO {
 	    res.setAttribute(_height,Long.toString(((RectangularShape)gl).getHeight()));
 	}
 	res.setAttribute(_color,Integer.toString(gl.getColor().getRGB()));
-	res.setAttribute(_filled,Boolean.toString(gl.getFillStatus()));
-	res.setAttribute(_bcolor,Integer.toString(gl.getColorb().getRGB()));
-	res.setAttribute(_border,Boolean.toString(gl.getPaintBorderStatus()));
+	res.setAttribute(_filled, Boolean.toString(gl.isFilled()));
+	res.setAttribute(_bcolor, Integer.toString(gl.getBorderColor().getRGB()));
+	res.setAttribute(_border, Boolean.toString(gl.isBorderDrawn()));
 	res.setAttribute(_selected,Boolean.toString(gl.isSelected()));
 	res.setAttribute(_sensitive,Boolean.toString(gl.isSensitive()));
 	res.setAttribute(_visible,Boolean.toString(gl.isVisible()));
@@ -431,12 +431,12 @@ public class ZvtmIO {
 		else if (name.equals(_cirshape)){
 		    
 		}
-		res.setFill((new Boolean(el.getAttribute(_filled))).booleanValue());
+		res.setFilled((new Boolean(el.getAttribute(_filled))).booleanValue());
 		float[] hsvb=new float[3];
 		Color bc=new Color((new Integer(el.getAttribute(_bcolor))).intValue());
 		Color.RGBtoHSB(bc.getRed(),bc.getGreen(),bc.getBlue(),hsvb);
 		res.setHSVbColor(hsvb[0],hsvb[1],hsvb[2]);
-		res.setPaintBorder((new Boolean(el.getAttribute(_border))).booleanValue());
+		res.setDrawBorder((new Boolean(el.getAttribute(_border))).booleanValue());
 		res.select((new Boolean(el.getAttribute(_selected))).booleanValue());
 		res.setSensitivity((new Boolean(el.getAttribute(_sensitive))).booleanValue());
 		res.setVisible((new Boolean(el.getAttribute(_visible))).booleanValue());

@@ -294,10 +294,10 @@ public class SVGWriter {
     private String shapeColors(Glyph g){//returns style attributes for fill color and stroke color
 	String res;
 	Color fill=g.getColor();
-	Color border=g.getColorb();
-	if (g.getFillStatus()){res="fill:rgb("+fill.getRed()+","+fill.getGreen()+","+fill.getBlue()+")";}
+	Color border = g.getBorderColor();
+	if (g.isFilled()){res="fill:rgb("+fill.getRed()+","+fill.getGreen()+","+fill.getBlue()+")";}
 	else {res="fill:none";}
-	if (g.getPaintBorderStatus()){res+=";stroke:rgb("+border.getRed()+","+border.getGreen()+","+border.getBlue()+")";}
+	if (g.isBorderDrawn()){res+=";stroke:rgb("+border.getRed()+","+border.getGreen()+","+border.getBlue()+")";}
 	else {res+=";stroke:none";}
 	if (g instanceof Transparent){res+=";fill-opacity:"+String.valueOf(((Transparent)g).getTransparencyValue());}
 	return res;

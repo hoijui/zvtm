@@ -136,11 +136,11 @@ class IcShape extends GlyphIcon implements Icon {
 	cWidth=c.getWidth()/2;
 	cHeight=c.getHeight()/2;
 	computePolygon();
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillPolygon(p);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawPolygon(p);
     }
 
@@ -207,11 +207,11 @@ class IcRectangle extends GlyphIcon implements Icon {
 	factor=Math.max(rW/(double)width,rH/(double)height);
 	trW=(int)Math.round(rW/(factor*2))-2;  //-2 so that it leaves a 1 pixel border blank
 	trH=(int)Math.round(rH/(factor*2))-2;  //around it and the component's border
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillRect(cWidth-trW,cHeight-trH,2*trW,2*trH);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawRect(cWidth-trW,cHeight-trH,2*trW,2*trH);
     }
     
@@ -262,11 +262,11 @@ class IcRoundRect extends GlyphIcon implements Icon {
 	factor=Math.max(rW/(double)width,rH/(double)height);
 	trW=(int)Math.round(rW/(factor*2))-2;  //-2 so that it leaves a 1 pixel border blank
 	trH=(int)Math.round(rH/(factor*2))-2;  //around it and the component's border
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillRoundRect(cWidth-trW,cHeight-trH,2*trW,2*trH,trW,trH);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawRoundRect(cWidth-trW,cHeight-trH,2*trW,2*trH,trW,trH);
     }
     
@@ -311,11 +311,11 @@ class IcCircle extends GlyphIcon implements Icon {
 	cWidth=c.getWidth()/2;
 	cHeight=c.getHeight()/2;
 	trS=Math.min(width,height)/2-2;
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillOval(cWidth-trS,cHeight-trS,2*trS,2*trS);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawOval(cWidth-trS,cHeight-trS,2*trS,2*trS);
     }
     
@@ -367,11 +367,11 @@ class IcEllipse extends GlyphIcon implements Icon {
 	factor=Math.max(rW/(double)width,rH/(double)height);
 	trW=(int)Math.round(rW/(factor*2))-2;  //-2 so that it leaves a 1 pixel border blank
 	trH=(int)Math.round(rH/(factor*2))-2;  //around it and the component's border
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillOval(cWidth-trW,cHeight-trH,2*trW,2*trH);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawOval(cWidth-trW,cHeight-trH,2*trW,2*trH);
     }
     
@@ -421,11 +421,11 @@ class IcTriangle extends GlyphIcon implements Icon {
 	cWidth=c.getWidth()/2;
 	cHeight=c.getHeight()/2;
 	computePolygon();
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillPolygon(p);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawPolygon(p);
     }
 
@@ -488,11 +488,11 @@ class IcDiamond extends GlyphIcon implements Icon {
 	cWidth=c.getWidth()/2;
 	cHeight=c.getHeight()/2;
 	computePolygon();
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillPolygon(p);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawPolygon(p);
     }
 
@@ -556,11 +556,11 @@ class IcOctagon extends GlyphIcon implements Icon {
 	cWidth=c.getWidth()/2;
 	cHeight=c.getHeight()/2;
 	computePolygon();
-	if (glyph.getFillStatus()){
+	if (glyph.isFilled()){
 	    g.setColor(glyph.getColor());
 	    g.fillPolygon(p);
 	}
-	g.setColor(glyph.getColorb());
+	g.setColor(glyph.getBorderColor());
 	g.drawPolygon(p);
     }
 

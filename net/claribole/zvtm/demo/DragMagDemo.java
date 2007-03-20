@@ -122,7 +122,7 @@ public class DragMagDemo implements Java2DPainter {
 
     void initDM(){
 	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
-	dmRegion.setFill(false);
+	dmRegion.setFilled(false);
 	dmRegion.setBorderColor(Color.RED);
 	vsm.addGlyph(dmRegion, mainVS);
 	mainVS.hide(dmRegion);

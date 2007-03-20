@@ -128,13 +128,13 @@ public class TrajectoryPlayer2D implements Runnable {
 		    application.trajectory[i].setColor(Color.GREEN);
 		}
 		lastFrame = new VRectangle(ci[progress].cx, ci[progress].cy, 0, ci[progress].viewHW, ci[progress].viewHH, Color.GREEN);
-		lastFrame.setFill(false);
+		lastFrame.setFilled(false);
 		lastFrame.setBorderColor(Color.GREEN);
 		application.vsm.addGlyph(lastFrame, application.mainVS);
 	    }
 	    if (ci[progress].lensStatus != CinematicInfo.NO_LENS){
 		lastLens = new VCircle(ci[progress].lensVX, ci[progress].lensVY, 0, ci[progress].lensVR, Color.GREEN);
-		lastLens.setFill(false);
+		lastLens.setFilled(false);
 		lastLens.setBorderColor((ci[progress].lensStatus == CinematicInfo.ZOOMIN_LENS) ? Color.GREEN : Color.RED);
 		application.vsm.addGlyph(lastLens, application.mainVS);
 	    }

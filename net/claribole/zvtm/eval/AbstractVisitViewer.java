@@ -151,7 +151,7 @@ public class AbstractVisitViewer implements Java2DPainter {
 					       ZLAbstractTask.COLOR_BY_LEVEL[0],
 					       cornerByLevel[0], cornerByLevel[0], false);
 	vsm.addGlyph(elementsByLevel[0][0], mainVS);
-	elementsByLevel[0][0].setPaintBorder(false);
+	elementsByLevel[0][0].setDrawBorder(false);
 	for (int i=1;i<ZLAbstractTask.TREE_DEPTH;i++){
 	    for (int j=0;j<ZLAbstractTask.DENSITY;j++){
 		for (int k=0;k<ZLAbstractTask.DENSITY;k++){
@@ -162,7 +162,7 @@ public class AbstractVisitViewer implements Java2DPainter {
 								     ZLAbstractTask.COLOR_BY_LEVEL[1],
 								     cornerByLevel[i], cornerByLevel[i], false);
 		    vsm.addGlyph(elementsByLevel[i][j*ZLAbstractTask.DENSITY+k], mainVS);
-		    elementsByLevel[i][j*ZLAbstractTask.DENSITY+k].setPaintBorder(true); // actual drawing of the border will depend on the rendering size for each rectangle
+		    elementsByLevel[i][j*ZLAbstractTask.DENSITY+k].setDrawBorder(true); // actual drawing of the border will depend on the rendering size for each rectangle
 		    elementsByLevel[i][j*ZLAbstractTask.DENSITY+k].setBorderColor(ZLAbstractTask.DISC_BORDER_COLOR);
 		    elementsByLevel[i][j*ZLAbstractTask.DENSITY+k].setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
 		    id2element.put(String.valueOf(j*ZLAbstractTask.DENSITY+k+1), elementsByLevel[i][j*ZLAbstractTask.DENSITY+k]);

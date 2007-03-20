@@ -246,7 +246,7 @@ public class TrajectoryViewer2D implements Java2DPainter {
 	trajectory = new VRectangle[ci.length];
 	for (int i=0;i<ci.length;i++){
 	    trajectory[i] = new VRectangle(ci[i].cx,ci[i].cy,0,5,5,Color.RED);
-	    trajectory[i].setPaintBorder(false);
+	    trajectory[i].setDrawBorder(false);
 	    vsm.addGlyph(trajectory[i], mainVS);
 	}
     }
@@ -268,7 +268,7 @@ public class TrajectoryViewer2D implements Java2DPainter {
 		    long sey = Long.parseLong(items[19]);
 		    VRectangle r = new VRectangle((nwx+sex)/2, (nwy+sey)/2, 0, (sex-nwx)/2, (nwy-sey)/2, Color.YELLOW);
 		    r.setBorderColor(Color.YELLOW);
-		    r.setFill(false);
+		    r.setFilled(false);
 		    vsm.addGlyph(r, mainVS);
 		    break;
 		}

@@ -36,7 +36,7 @@ class LocateTask2EventHandler implements ViewEventHandler {
 	selectionRect = new VRectangle(0, 0, 0, 1, 1, Color.RED);
 	application.vsm.addGlyph(selectionRect, application.mainVS);
 	selectionRect.setVisible(false);
-	selectionRect.setFill(false);
+	selectionRect.setFilled(false);
 	selectionRect.setBorderColor(Color.RED);
     }
 

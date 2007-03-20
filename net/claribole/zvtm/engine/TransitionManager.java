@@ -74,7 +74,7 @@ public class TransitionManager {
 	VRectangleST fadeRect = new VRectangleST((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
 						 (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
 						 fadeColor, 0);
-	fadeRect.setPaintBorder(false);
+	fadeRect.setDrawBorder(false);
 	vsm.addGlyph(fadeRect, c.getOwningSpace());
 	vsm.animator.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, fadeOutData,
 					  fadeRect.getID(), new FadeOut(v, fadeColor, c.getOwningSpace()));
@@ -98,7 +98,7 @@ public class TransitionManager {
 	VRectangleST fadeRect = new VRectangleST((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
 						 (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
 						 fadeColor, 1);
-	fadeRect.setPaintBorder(false);
+	fadeRect.setDrawBorder(false);
 	vsm.addGlyph(fadeRect, c.getOwningSpace());
 	v.setBlank(null);
 	vsm.repaintNow();

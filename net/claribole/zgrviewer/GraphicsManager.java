@@ -181,7 +181,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	seg1=new RectangleNR(0,0,0,0,500,new Color(115,83,115));  //500 should be sufficient as the radar window is
 	seg2=new RectangleNR(0,0,0,500,0,new Color(115,83,115));  //not resizable and is 300x200 (see rdW,rdH below)
 	if (!(Utilities.osIsWindows() || Utilities.osIsMacOS())){
-	    observedRegion.setFill(false);
+	    observedRegion.setFilled(false);
 	}
 	vsm.addGlyph(observedRegion,rdRegionVirtualSpace);
 	vsm.addGlyph(seg1,rdRegionVirtualSpace);
@@ -259,7 +259,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     void initDM(){
 	magWindow = new VRectangle(0, 0, 0, 1, 1, GraphicsManager.DM_COLOR);
-	magWindow.setFill(false);
+	magWindow.setFilled(false);
 	magWindow.setBorderColor(GraphicsManager.DM_COLOR);
 	vsm.addGlyph(magWindow, mSpace);
 	mSpace.hide(magWindow);
@@ -894,11 +894,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    g = n.edges[i].glyphs[j];
 		    highlightedElements.add(g);
 		    originalFillColor.add(g.getColor());
-		    if (g.getFillStatus()){
+		    if (g.isFilled()){
 			g.setColor(HIGHLIGHT_BORDER_COLOR); // use border color to fill arrow heads
 		    }
-		    originalBorderColor.add(g.getColorb());
-		    if (g.getPaintBorderStatus()){
+		    originalBorderColor.add(g.getBorderColor());
+		    if (g.isBorderDrawn()){
 			g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
 		    }
 		}
@@ -922,10 +922,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	Glyph g;
 	for (int i=0;i<highlightedElements.size();i++){
 	    g = (Glyph)highlightedElements.elementAt(i);
-	    if (g.getFillStatus()){
+	    if (g.isFilled()){
 		g.setColor((Color)originalFillColor.elementAt(i));
 	    }
-	    if (g.getPaintBorderStatus()){
+	    if (g.isBorderDrawn()){
 		g.setBorderColor((Color)originalBorderColor.elementAt(i));
 	    }
 	}

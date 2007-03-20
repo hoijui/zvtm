@@ -247,7 +247,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 
     void initDM(){
 	dmRegion = new VRectangle(0,0,0,1,1,Color.RED);
-	dmRegion.setFill(false);
+	dmRegion.setFilled(false);
 	dmRegion.setBorderColor(Color.RED);
 	vsm.addGlyph(dmRegion, mainVS);
 	mainVS.hide(dmRegion);
@@ -285,7 +285,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 					       COLOR_BY_LEVEL[0],
 					       cornerByLevel[0], cornerByLevel[0], false);
 	vsm.addGlyph(elementsByLevel[0][0], mainVS);
-	elementsByLevel[0][0].setPaintBorder(false);
+	elementsByLevel[0][0].setDrawBorder(false);
 	for (int i=1;i<TREE_DEPTH;i++){
 	    for (int j=0;j<DENSITY;j++){
 		for (int k=0;k<DENSITY;k++){
@@ -296,7 +296,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 								     COLOR_BY_LEVEL[1],
 								     cornerByLevel[i], cornerByLevel[i], false);
 		    vsm.addGlyph(elementsByLevel[i][j*DENSITY+k], mainVS);
-		    elementsByLevel[i][j*DENSITY+k].setPaintBorder(true); // actual drawing of the border will depend on the rendering size for each rectangle
+		    elementsByLevel[i][j*DENSITY+k].setDrawBorder(true); // actual drawing of the border will depend on the rendering size for each rectangle
 		    elementsByLevel[i][j*DENSITY+k].setBorderColor(DISC_BORDER_COLOR);
 		    elementsByLevel[i][j*DENSITY+k].setType(ZLAbstractTask.GLYPH_TYPE_WORLD);
 		    elementsByLevel[i][j*DENSITY+k].setOwner(String.valueOf(j*DENSITY+k+1));
