@@ -231,14 +231,6 @@ public abstract class Glyph implements Cloneable {
     /** Indicates whether the glyph's border is painted with the border color or not. */
     public boolean isBorderDrawn(){return paintBorder;}
 
-    /**set border color when cursor is inside glyph
-     *@deprecated As of zvtm 0.9.3, replaced by setMouseInsideBorderColor
-     *@see #setMouseInsideBorderColor(Color c)
-     */
-    public void setMouseInsideColor(Color c){
-	this.mouseInsideColor = c;
-    }
-
     /**set border color when cursor is inside glyph (null to keep the original color)
      */
     public void setMouseInsideBorderColor(Color c){
@@ -561,23 +553,6 @@ public abstract class Glyph implements Cloneable {
 	return stickedGlyphs;
     }
 
-    /**
-     * return the list of glyphs sticked to this one (empty vector if none)
-     *@deprecated As of zvtm 0.9.2, replaced by getStickedGlyphArray
-     *@see #getStickedGlyphArray()
-     */
-    public Vector getStickedGlyphs(){
-	if (stickedGlyphs==null){return new Vector();}
-	else {
-	    Vector res = new Vector();
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		res.add(stickedGlyphs[i]);
-	    }
-	    return res;
-	}
-    }
-
-
     /*----Projecting and Drawing--------------------------------*/
 
     /**projection coef*/
@@ -632,19 +607,6 @@ public abstract class Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public abstract void resetMouseIn(int i);
     
-    /**used to find out if it is necessary to project and draw the glyph in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     *@deprecated As of zvtm 0.9.4, replace by visibleInRegion()
-     *@see #visibleInRegion(long w1,long h1,long w2,long h2,int i)
-     */
-    public boolean drawMe(long wb, long nb, long eb, long sb, int i){
-	return visibleInRegion(wb, nb, eb, sb, i);
-    }
-
     /**used to find out if it is necessary to project and draw the glyph in the current view or through the lens in the current view
      *@param wb west region boundary (virtual space coordinates)
      *@param nb north region boundary (virtual space coordinates)
