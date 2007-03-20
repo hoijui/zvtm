@@ -34,18 +34,21 @@ public class ToolPalette {
     static final short DM_NAV_MODE = 2;
     static final short PL_NAV_MODE = 3;
     static final short ML_NAV_MODE = 4;
+    static final short HIGHLIGHT_MODE = 5;
 
     static final String[] ICON_PATHS = {"/images/zgrv/stdnav24b.png",
 					"/images/zgrv/flnav24b.png",
 					"/images/zgrv/dmnav24b.png",
 					"/images/zgrv/plnav24b.png",
-					"/images/zgrv/mlnav24b.png"};
+					"/images/zgrv/mlnav24b.png",
+					"/images/zgrv/hl24b.png"};
 
     static final String[] SELECTED_ICON_PATHS = {"/images/zgrv/stdnav24g.png",
 						 "/images/zgrv/flnav24g.png",
 						 "/images/zgrv/dmnav24g.png",
 						 "/images/zgrv/plnav24g.png",
-						 "/images/zgrv/mlnav24g.png"};
+						 "/images/zgrv/mlnav24g.png",
+						 "/images/zgrv/hl24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
@@ -101,6 +104,10 @@ public class ToolPalette {
 
     boolean isMeltingLensNavMode(){
 	return selectedIconIndex == ML_NAV_MODE;
+    }
+
+    boolean isHighlightMode(){
+	return selectedIconIndex == HIGHLIGHT_MODE;
     }
 
     void selectButton(VImage icon){

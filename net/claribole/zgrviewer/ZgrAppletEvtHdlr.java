@@ -135,9 +135,14 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    else {
 		if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
 		else {
-		    Glyph g=v.lastGlyphEntered();
-		    if (g != null && g != grMngr.boundingBox){
-			grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		    Glyph g = v.lastGlyphEntered();
+		    if (mod == SHIFT_MOD){
+			grMngr.highlightElement(g, v.cams[0], v.getMouse(), true);
+		    }
+		    else {
+			if (g != null && g != grMngr.boundingBox){
+			    grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+			}
 		    }
 		}
 	    }
@@ -321,6 +326,9 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	if (grMngr.tp.isHighlightMode()){
+	    grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
+	}
     }
 
     public void exitGlyph(Glyph g){

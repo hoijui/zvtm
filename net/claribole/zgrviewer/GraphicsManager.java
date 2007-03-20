@@ -24,6 +24,7 @@ import java.awt.event.ComponentListener;
 import java.util.Vector;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VCursor;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.DraggableCameraPortal;
@@ -253,6 +254,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	vsm.addGlyph(magWindow, mSpace);
 	mSpace.hide(magWindow);
 	previousLocations.removeAllElements();
+	highlightedElements.removeAllElements();
     }
 
     void initDM(){
@@ -843,6 +845,93 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		g.setOwner(new LElem((Metadata)g.getOwner()));
 	    }
 	}
+    }
+
+
+    void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
+	Object o = null;
+	if (g != null){// clicked inside a node
+	    o = g.getOwner();
+	}
+	else {
+	    // if cursor was not in a shape, try to detect a label
+	    Vector otherGlyphs = cursor.getIntersectingTexts(cam);
+	    if (otherGlyphs != null && otherGlyphs.size() > 0){
+		g = (Glyph)otherGlyphs.firstElement();
+		if (g.getOwner() != null){o = g.getOwner();}
+	    }
+	    // or an edge
+	    else {
+		otherGlyphs = cursor.getIntersectingPaths(cam);
+		if (otherGlyphs != null && otherGlyphs.size() > 0){
+		    g = (Glyph)otherGlyphs.firstElement();
+		    if (g.getOwner() != null){o = g.getOwner();}
+		}
+	    }
+	}
+	if (o != null){
+	    if (o instanceof LNode){
+		highlightNode((LNode)o, highlight);
+	    }
+	    else if (o instanceof LEdge){
+		highlightEdge((LEdge)o, highlight);
+	    }
+	}
+    }
+
+    final static Color HIGHLIGHT_BORDER_COLOR = new Color(255, 0, 0);
+    final static Color HIGHLIGHT_FILL_COLOR = new Color(255, 150, 150);
+
+    Vector highlightedElements = new Vector();
+    Vector originalBorderColor = new Vector();
+    Vector originalFillColor = new Vector();
+
+    synchronized void highlightNode(LNode n, boolean highlight){
+	if (highlight){
+	    Glyph g;
+	    for (int i=0;i<n.edges.length;i++){
+		for (int j=0;j<n.edges[i].glyphs.length;j++){
+		    g = n.edges[i].glyphs[j];
+		    highlightedElements.add(g);
+		    originalFillColor.add(g.getColor());
+		    if (g.getFillStatus()){
+			g.setColor(HIGHLIGHT_BORDER_COLOR); // use border color to fill arrow heads
+		    }
+		    originalBorderColor.add(g.getColorb());
+		    if (g.getPaintBorderStatus()){
+			g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+		    }
+		}
+	    }
+	}
+	else {
+	    unhighlightAll();
+	}
+    }
+
+    synchronized void highlightEdge(LEdge e, boolean highlight){
+	if (highlight){
+	    
+	}
+	else {
+	    unhighlightAll();
+	}
+    }
+
+    synchronized void unhighlightAll(){
+	Glyph g;
+	for (int i=0;i<highlightedElements.size();i++){
+	    g = (Glyph)highlightedElements.elementAt(i);
+	    if (g.getFillStatus()){
+		g.setColor((Color)originalFillColor.elementAt(i));
+	    }
+	    if (g.getPaintBorderStatus()){
+		g.setBorderColor((Color)originalBorderColor.elementAt(i));
+	    }
+	}
+	highlightedElements.removeAllElements();
+	originalFillColor.removeAllElements();
+	originalBorderColor.removeAllElements();
     }
 
 }

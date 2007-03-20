@@ -139,11 +139,17 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    else {
 		if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
 		else {
-		    Glyph g=v.lastGlyphEntered();
-		    if (g != null && g != grMngr.boundingBox){
-			grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+		    Glyph g = v.lastGlyphEntered();
+		    if (mod == SHIFT_MOD){
+			grMngr.highlightElement(g, v.cams[0], v.getMouse(), true);
+		    }
+		    else {
+			if (g != null && g != grMngr.boundingBox){
+			    grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+			}
 		    }
 		}
+
 	    }
 	}
     }
@@ -352,7 +358,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
 	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
 	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
-	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){
+	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){// interacting with pie menu
 	    VirtualSpace vs = grMngr.vsm.getVirtualSpace(grMngr.menuSpace);
 	    vs.onTop(g);
 	    int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
@@ -364,6 +370,11 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		if (i != -1){
 		    vs.onTop(application.subPieMenu.getLabels()[i]);
 		}
+	    }
+	}
+	else {
+	    if (grMngr.tp.isHighlightMode()){
+		grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
 	    }
 	}
     }
@@ -393,6 +404,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		application.displaySubMenu(null, false);
 		application.mainPieMenu.setSensitivity(true);
 	    }
+	}
+	else {
+	    grMngr.unhighlightAll();
 	}
     }
 

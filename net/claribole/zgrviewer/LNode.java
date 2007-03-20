@@ -52,6 +52,51 @@ class LNode extends LElem {
 	edgeDirections = nedgeDirections;
     }
 
+    LEdge[] getOutgoingArcs(){
+	int oaCount = 0;
+	for (int i=0;i<edgeDirections.length;i++){
+	    if (edgeDirections[i] == LEdge.OUTGOING){oaCount++;}
+	}
+	LEdge[] res = new LEdge[oaCount];
+	int j = 0;
+	for (int i=0;i<edges.length;i++){
+	    if (edgeDirections[i] == LEdge.OUTGOING){
+		res[j++] = edges[i];
+	    }
+	}
+	return res;
+    }
+
+    LEdge[] getIncomingArcs(){
+	int oaCount = 0;
+	for (int i=0;i<edgeDirections.length;i++){
+	    if (edgeDirections[i] == LEdge.INCOMING){oaCount++;}
+	}
+	LEdge[] res = new LEdge[oaCount];
+	int j = 0;
+	for (int i=0;i<edges.length;i++){
+	    if (edgeDirections[i] == LEdge.INCOMING){
+		res[j++] = edges[i];
+	    }
+	}
+	return res;
+    }
+
+    LEdge[] getUndirectedArcs(){
+	int oaCount = 0;
+	for (int i=0;i<edgeDirections.length;i++){
+	    if (edgeDirections[i] == LEdge.UNDIRECTED){oaCount++;}
+	}
+	LEdge[] res = new LEdge[oaCount];
+	int j = 0;
+	for (int i=0;i<edges.length;i++){
+	    if (edgeDirections[i] == LEdge.UNDIRECTED){
+		res[j++] = edges[i];
+	    }
+	}
+	return res;
+    }
+
     public String toString(){
 	String res = title + "[";
 	for (int i=0;i<edges.length;i++){
