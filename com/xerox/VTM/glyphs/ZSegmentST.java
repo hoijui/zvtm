@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Jan 19 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: ZSegmentST.java,v 1.1 2006/01/19 15:09:15 epietrig Exp $
@@ -148,7 +148,6 @@ public class ZSegmentST extends ZSegment implements Transparent {
     public Object clone(){
 	ZSegmentST res = new ZSegmentST(vx,vy,0,vw,vh,color);
 	res.borderColor = this.borderColor;
-	res.selectedColor = this.selectedColor;
 	res.mouseInsideColor = this.mouseInsideColor;
 	res.bColor = this.bColor;
 	return res;

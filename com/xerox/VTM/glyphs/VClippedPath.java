@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: VClippedPath.java,v 1.5 2005/12/08 09:08:21 epietrig Exp $
@@ -319,7 +320,6 @@ public class VClippedPath extends VPath implements Cloneable {
     public Object clone(){
 	VClippedPath res=new VClippedPath();
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	return res;

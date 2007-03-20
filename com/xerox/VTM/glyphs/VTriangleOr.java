@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -195,7 +196,6 @@ public class VTriangleOr extends VTriangle implements Cloneable {
     public Object clone(){
 	VTriangleOr res=new VTriangleOr(vx,vy,0,vh,color,orient);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	return res;

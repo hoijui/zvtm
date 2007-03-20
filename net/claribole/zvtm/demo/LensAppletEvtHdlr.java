@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Tue Nov 16 15:56:04 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: LensAppletEvtHdlr.java,v 1.5 2006/05/28 16:19:48 epietrig Exp $
@@ -120,13 +120,8 @@ public class LensAppletEvtHdlr implements ViewEventHandler {
     }
 
     public void exitGlyph(Glyph g){
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){

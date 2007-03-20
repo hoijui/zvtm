@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Wed Oct 20 12:06:34 2004 by Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -116,7 +116,7 @@ public class MultiLayerEvtHdlr implements ViewEventHandler {
 
     public void exitGlyph(Glyph g){
 	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
+	    g.borderColor = Introduction.SELECTED_COLOR;
 	}
 	else {
 	    if (g.mouseInsideFColor != null){g.color = g.fColor;}

@@ -119,7 +119,6 @@ public class ZCircle extends VCircle {
     public Object clone(){
 	ZCircle res = new ZCircle(vx,vy,0,vr,color);
 	res.borderColor = this.borderColor;
-	res.selectedColor = this.selectedColor;
 	res.mouseInsideColor = this.mouseInsideColor;
 	res.bColor = this.bColor;
 	res.setMinimumProjectedSize(minProjSize);

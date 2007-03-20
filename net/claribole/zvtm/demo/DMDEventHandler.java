@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Sat Jun 17 13:58:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -157,13 +157,8 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler, Animation
     }
 
     public void exitGlyph(Glyph g){
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

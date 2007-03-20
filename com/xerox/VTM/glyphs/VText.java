@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -457,7 +457,6 @@ public class VText extends Glyph implements Cloneable {
     public Object clone(){
 	VText res=new VText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	return res;

@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Thu Jul 10 16:45:04 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) Emmanuel Pietriga, 2003. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -149,7 +150,6 @@ public class FPolygonST extends FPolygon implements Transparent,Cloneable {
 	}
 	FPolygonST res=new FPolygonST(lps,color);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	res.setTransparencyValue(alpha);

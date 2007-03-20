@@ -91,13 +91,8 @@ abstract class AcquireBaseEventHandler implements ViewEventHandler, ComponentLis
 
     public void exitGlyph(Glyph g){
 	if (!application.alm.trialStarted){return;}
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){

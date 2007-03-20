@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Tue Mar 21 19:30:23 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: LText.java,v 1.3 2006/05/29 07:28:40 epietrig Exp $
@@ -142,7 +142,6 @@ public class LText extends VText implements LensRendering, Cloneable {
 	res.borderColor=this.borderColor;
 	res.fillColorThroughLens = this.fillColorThroughLens;
 	res.borderColorThroughLens = this.borderColorThroughLens;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	res.setVisibleThroughLens(visibleThroughLens);

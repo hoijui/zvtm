@@ -150,7 +150,6 @@ public class VRoundRectST extends VRoundRect implements Transparent,Cloneable {
     public Object clone(){
 	VRoundRectST res=new VRoundRectST(vx,vy,0,vw,vh,color,arcWidth,arcHeight);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	res.setTransparencyValue(alpha);

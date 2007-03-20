@@ -1,7 +1,6 @@
 /*   FILE: VRectangleST.java
  *   DATE OF CREATION:   Jul 19 2000
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
- *   MODIF:              Thu Jul 10 16:57:04 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
@@ -166,7 +165,6 @@ public class VRectangleST extends VRectangle implements Transparent,Cloneable {
     public Object clone(){
 	VRectangleST res=new VRectangleST(vx,vy,0,vw,vh,color);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	res.setTransparencyValue(alpha);

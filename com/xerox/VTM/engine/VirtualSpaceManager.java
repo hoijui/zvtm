@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -137,7 +137,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**Constraint Manager*/
 //     public ConstraintManager constMgr;
 
-    Color selectColor=Color.yellow;
     Color mouseInsideColor=Color.white;
 
     /**
@@ -241,11 +240,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	mouseSync=b;
 	activeView.mouse.setSync(mouseSync);
     }
-
-    /**set border color of selected glyphs (not propagated to existing glyphs)*/
-    public void setSelectedGlyphColor(Color c){
-	selectColor=c;
-    }
     
     /**set border color of glyphs overlapped by mouse (not propagated to existing glyphs)*/
     public void setMouseInsideGlyphColor(Color c){
@@ -305,7 +299,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    g.setID(new Long(nextID++));
 	    g.setVSM(this);
 	    if (initColors){
-		g.setSelectedColor(this.selectColor);
 		g.setMouseInsideBorderColor(this.mouseInsideColor);
 	    }
 	    allGlyphs.put(g.getID(),g);

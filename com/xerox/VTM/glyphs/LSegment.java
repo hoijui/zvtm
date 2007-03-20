@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Wed Dec  7 15:32:35 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: LSegment.java,v 1.2 2005/12/08 09:08:21 epietrig Exp $
@@ -103,7 +103,6 @@ public class LSegment extends VSegment {
     public Object clone(){
 	LSegment res = new LSegment(vx, vy, 0, vw, vh, color);
 	res.borderColor = this.borderColor;
-	res.selectedColor = this.selectedColor;
 	res.mouseInsideColor = this.mouseInsideColor;
 	res.bColor = this.bColor;
 	return res;

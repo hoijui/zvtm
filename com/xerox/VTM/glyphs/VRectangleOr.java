@@ -270,7 +270,6 @@ public class VRectangleOr extends VRectangle implements Cloneable {
     public Object clone(){
 	VRectangleOr res=new VRectangleOr(vx,vy,0,vw,vh,color,orient);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	return res;

@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Thu Jan 09 15:18:48 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *   $Id: ZgrvEvtHdlr.java,v 1.16 2006/06/15 06:54:24 epietrig Exp $
@@ -385,13 +385,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
 	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){
 	    if (application.mainPieMenu != null && g == application.mainPieMenu.getBoundary()){
 		Glyph lge = grMngr.vsm.getActiveView().mouse.lastGlyphEntered;

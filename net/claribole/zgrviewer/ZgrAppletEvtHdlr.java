@@ -2,7 +2,8 @@
  *   DATE OF CREATION:   Fri May 09 09:54:03 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Fri May 09 10:09:49 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
- *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */ 
 
@@ -337,13 +338,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Aug 22 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:  $
@@ -103,7 +103,6 @@ public class ZRectangle extends VRectangle {
     public Object clone(){
 	ZRectangle res = new ZRectangle(vx,vy,0,vw,vh,color);
 	res.borderColor = this.borderColor;
-	res.selectedColor = this.selectedColor;
 	res.mouseInsideColor = this.mouseInsideColor;
 	res.bColor = this.bColor;
 	return res;

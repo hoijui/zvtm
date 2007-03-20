@@ -85,13 +85,8 @@ public class DefaultEventHandler implements ViewEventHandler {
     }
 
     public void exitGlyph(Glyph g){
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     /**beware: code is always 0 in Ktype (it is the value of KeyEvent.getKeyCode() which is always equal to VK_UNDEFINED according to Sun). If you need to access code, use Kpress or Krelease.*/

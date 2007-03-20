@@ -125,13 +125,8 @@ public class EventHandlerTest implements ViewEventHandler{
     }
 
     public void exitGlyph(Glyph g){
-	if (g.isSelected()){
-	    g.borderColor = (g.selectedColor != null) ? g.selectedColor : g.bColor;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	if (g.mouseInsideFColor != null){g.color = g.fColor;}
+	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){

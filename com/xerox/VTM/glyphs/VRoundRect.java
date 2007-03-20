@@ -360,7 +360,6 @@ public class VRoundRect extends Glyph implements RectangularShape  {
     public Object clone(){
 	VRoundRect res=new VRoundRect(vx,vy,0,vw,vh,color,arcWidth,arcHeight);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	return res;

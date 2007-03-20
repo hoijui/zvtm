@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -38,8 +38,8 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 
-/**glyph - parent class of all graphical objects
- * @author Emmanuel Pietriga
+/** Glyph - parent class of all graphical objects.
+ *@author Emmanuel Pietriga
  */
 
 public abstract class Glyph implements Cloneable {
@@ -196,8 +196,6 @@ public abstract class Glyph implements Cloneable {
     /**HSV coordinates of border color in range 0.0-1.0*/
     protected float[] HSVb=new float[3];
 
-    /**color of border when glyph is selected (can be different fom color when cursor is inside glyph)*/
-    public Color selectedColor;
     /**standard fill color*/
     public Color fColor = Color.white;
     /**standard border color*/
@@ -240,13 +238,6 @@ public abstract class Glyph implements Cloneable {
      */
     public void setMouseInsideFillColor(Color c){
 	this.mouseInsideFColor = c;
-    }
-
-    /**set border color when glyph is selected
-     *@param c color used for selection
-     */
-    public void setSelectedColor(Color c){
-	this.selectedColor=c;
     }
 
     /**used by glyph constructor to initialize color*/
@@ -348,9 +339,6 @@ public abstract class Glyph implements Cloneable {
      */
     public void select(boolean b){
 	selected=b;
-	if (b){if (selectedColor!=null){borderColor=selectedColor;}else{borderColor=color;}}
-	else{borderColor=bColor;}
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
     /**get this glyph's selection state (returns true if selected)*/

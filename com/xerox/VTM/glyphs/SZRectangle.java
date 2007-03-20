@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Mon May 29 08:34:23 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: SZRectangle.java,v 1.2 2006/05/29 07:28:00 epietrig Exp $
@@ -106,7 +106,6 @@ public class SZRectangle extends VRectangle {
     public Object clone(){
 	SZRectangle res = new SZRectangle(vx, vy, 0, vw, vh, color, minSize, maxSize);
 	res.borderColor=this.borderColor;
-	res.selectedColor=this.selectedColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;
 	return res;

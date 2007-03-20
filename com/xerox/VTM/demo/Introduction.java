@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,6 +75,8 @@ public class Introduction {
 
     int viewWidth = PREFERRED_VIEW_WIDTH;
     int viewHeight = PREFERRED_VIEW_HEIGHT;
+
+    static final Color SELECTED_COLOR = Color.WHITE;
 
     VirtualSpaceManager vsm;
 
