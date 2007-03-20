@@ -375,10 +375,10 @@ public class VCirShape extends Glyph implements Cloneable {
 	shapeFilled=b;
     }
 
-    /**
-     *@param b draw shape border with shape border color (default is true)
+    /** Set whether the glyph's border should be painted with the border color or not.
+     *@param b false -&gt; do not paint border of glyph
      */
-    public void setPaintBorder(boolean b){
+    public void setDrawBorder(boolean b){
 	paintShapeBorder=b;
     }
 
