@@ -40,9 +40,9 @@ import net.claribole.zvtm.lens.Lens;
 
 public class VImage extends ClosedShape implements RectangularShape {
 
-    public static short DRAW_BORDER_NEVER=0;
-    public static short DRAW_BORDER_MOUSE_INSIDE=1;
-    public static short DRAW_BORDER_ALWAYS=2;
+    public static final short DRAW_BORDER_NEVER = 0;
+    public static final short DRAW_BORDER_MOUSE_INSIDE = 1;
+    public static final short DRAW_BORDER_ALWAYS = 2;
 
     /**half width and height in virtual space*/
     long vw,vh;
@@ -361,8 +361,10 @@ public class VImage extends ClosedShape implements RectangularShape {
 	    //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
 	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
 	    if (trueCoef!=1.0f){
+		// translate
 		at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		g.setTransform(at);
+		// rescale and draw
 		g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
 		g.setTransform(stdT);
 		if (drawBorder==1){
