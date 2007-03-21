@@ -173,7 +173,7 @@ public class VRectangleOr extends VRectangle {
 	    xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
 	    ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
 	    if (pc[i].lp == null){
-		pc[i].lp = new Polygon(xcoords, ycoords, 8);
+		pc[i].lp = new Polygon(xcoords, ycoords, 4);
 	    }
 	    else {
 		for (int j=0;j<xcoords.length;j++){
