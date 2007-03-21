@@ -159,18 +159,26 @@ public abstract class ClosedShape extends Glyph {
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public void highlight(boolean b, Color selectedColor){
+	boolean update = false;
 	if (b){
-	    if (mouseInsideFColor != null){color = mouseInsideFColor;}
-	    if (mouseInsideColor != null){borderColor = mouseInsideColor;}
+	    if (mouseInsideFColor != null){color = mouseInsideFColor;update = true;}
+	    if (mouseInsideColor != null){borderColor = mouseInsideColor;update = true;}
 	}
 	else {
 	    if (isSelected() && selectedColor != null){
 		borderColor = selectedColor;
+		update = true;
 	    }
 	    else {
-		if (mouseInsideFColor != null){color = fColor;}
-		if (mouseInsideColor != null){borderColor = bColor;}
+		if (mouseInsideFColor != null){color = fColor;update = true;}
+		if (mouseInsideColor != null){borderColor = bColor;update = true;}
 	    }
+	}
+	if (update){
+	    try {
+		vsm.repaintNow();
+	    }
+	    catch(NullPointerException ex){}
 	}
     }
 
