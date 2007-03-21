@@ -222,83 +222,31 @@ public abstract class Glyph implements Cloneable {
      */
     public Color color;
     
-    /** Current border color (read only, use access methods for all modification purposes).
-     * Border color for closed shapes.
-     */
-    public Color borderColor;
-
     /** Coordinates of main color in HSV color space. */
     protected float[] HSV=new float[3];
-
-    /** Coordinates of border color in HSV color space. */
-    protected float[] HSVb=new float[3];
-
-    /** Fill color of this glyph when it is in its default state. */
+    
+    /** Main or Fill color of this glyph when it is in its default state. */
     public Color fColor = Color.white;
 
-    /** Border color of this glyph when it is in its default state. */
-    public Color bColor = Color.black;
-
-    /** Border color of this glyph when cursor is inside it. Null if same as default border color. */
+    /** Highlight color of this glyph when cursor is inside it. Null if same as default border color. */
     public Color mouseInsideColor;
 
-    /** Fill color of this glyph when cursor is inside it. Null if same as default fill color. */
-    public Color mouseInsideFColor;
-
     /** Indicates whether this glyph's interior is filled or not.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments (returns true in those cases).
      */
-    boolean filled=true;
-
-    /** Indicates whether this glyph's border is drawn or not.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
-     */
-    boolean paintBorder = true;
-
-    /** Set whether this glyph's interior should be filled or not.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
-     */
-    public void setFilled(boolean b){
-	if (b!=filled){
-	    filled=b;
-	    try{vsm.repaintNow();}catch(NullPointerException e){}
-	}
-    }
-
-    /** Indicates whether this glyph's interior is filled or not.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
-     */
-    public boolean isFilled(){return filled;}
-
-    /** Set whether the glyph's border should be drawn or not.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
-     */
-    public void setDrawBorder(boolean b){
-	if (b!=paintBorder){
-	    paintBorder=b;
-	    try{vsm.repaintNow();}catch(NullPointerException e){}
-	}
-    }
+    public boolean isFilled(){return true;}
 
     /** Indicates whether the glyph's border is drawn or not.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
+     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments (returns true in those cases).
      */
-    public boolean isBorderDrawn(){return paintBorder;}
+    public boolean isBorderDrawn(){return true;}
 
     /** Set the glyph's border color when cursor is inside it.
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      *@param c set to null to keep the original color.
      */
-    public void setMouseInsideBorderColor(Color c){
+    public void setMouseInsideHighlightColor(Color c){
 	this.mouseInsideColor = c;
-    }
-
-    /** Set the glyph's fill color when cursor is inside it.
-     * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
-     *@param c set to null to keep the original color.
-     */
-    public void setMouseInsideFillColor(Color c){
-	this.mouseInsideFColor = c;
     }
 
     /** Set the glyph's main color. This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.). */
@@ -310,14 +258,10 @@ public abstract class Glyph implements Cloneable {
     }
 
     /** Set the glyph's border color (use setColor for text, paths, segments, etc.).
+     * This will have an effect only for Glyphs that have a border, such as instances of ClosedShape.
      *@see #setColor(Color c)
      */
-    public void setBorderColor(Color c){
-	borderColor = c;
-	bColor = borderColor;
-	HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
-	if (vsm != null){vsm.repaintNow();}
-    }
+    public void setBorderColor(Color c){}
 
     /** Set the glyph's main color (absolute value, HSV color space).
      *@param h hue in [0.0, 1.0]
@@ -343,7 +287,7 @@ public abstract class Glyph implements Cloneable {
      *@param v value so that the final value (brightness) is in [0.0, 1.0]\
      *@see #setHSVColor(float h,float s,float v)
      */
-    public void addHSVColor(float h,float s,float v){ //color  [-1.0,1.0]
+    public void addHSVColor(float h,float s,float v){
 	HSV[0]=HSV[0]+h;
 	if (HSV[0]>1) {HSV[0]=1.0f;} else {if (HSV[0]<0) {HSV[0]=0;}}
 	HSV[1]=HSV[1]+s;
@@ -357,50 +301,35 @@ public abstract class Glyph implements Cloneable {
 
     /** Set the glyph's border color (absolute value, HSV color space).
      * Use setColor for text, paths, segments, etc.
+     * This will have an effect only for Glyphs that have a border, such as instances of ClosedShape.
      *@param h hue in [0.0, 1.0]
      *@param s saturation in [0.0, 1.0]
      *@param v value (brightness) in [0.0, 1.0]
      *@see #addHSVbColor(float h,float s,float v)
      */
-    public void setHSVbColor(float h,float s,float v){//color  [0.0,1.0]
-	HSVb[0]=h;
-	if (HSVb[0]>1) {HSVb[0]=1.0f;} else {if (HSVb[0]<0) {HSVb[0]=0;}}
-	HSVb[1]=s;
-	if (HSVb[1]>1) {HSVb[1]=1.0f;} else {if (HSVb[1]<0) {HSVb[1]=0;}}
-	HSVb[2]=v;
-	if (HSVb[2]>1) {HSVb[2]=1.0f;} else {if (HSVb[2]<0) {HSVb[2]=0;}}
-	borderColor=Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
-	bColor = borderColor;
-	if (vsm != null){vsm.repaintNow();}
-    }
+    public void setHSVbColor(float h,float s,float v){}
     
     /** Set the glyph's border color (absolute value, HSV color space).
      * Use setColor for text, paths, segments, etc.
+     * This will have an effect only for Glyphs that have a border, such as instances of ClosedShape.
      *@param h hue so that the final hue is in [0.0, 1.0]
      *@param s saturation so that the final saturation is in [0.0, 1.0]
      *@param v value so that the final value (brightness) is in [0.0, 1.0]
      *@see #setHSVbColor(float h,float s,float v)
      */
-    public void addHSVbColor(float h,float s,float v){//color  [-1.0,1.0]
-	HSVb[0]=HSVb[0]+h;
-	if (HSVb[0]>1) {HSVb[0]=1.0f;} else {if (HSVb[0]<0) {HSVb[0]=0;}}
-	HSVb[1]=HSVb[1]+s;
-	if (HSVb[1]>1) {HSVb[1]=1.0f;} else {if (HSVb[1]<0) {HSVb[1]=0;}}
-	HSVb[2]=HSVb[2]+v;
-	if (HSVb[2]>1) {HSVb[2]=1.0f;} else {if (HSVb[2]<0) {HSVb[2]=0;}}
-	this.borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
-	bColor = borderColor;
-	if (vsm != null){vsm.repaintNow();}
-    }
+    public void addHSVbColor(float h,float s,float v){}
 
     /** Get main color's HSV components. */
     public float[] getHSVColor(){
 	return this.HSV;
     }
 
-    /** Get border color's HSV components. */
+    /** Get border color's HSV components.
+     *@return {0, 0, 0} if the glyph does not have a border (e.g., is not an instanceof ClosedShape)
+     */
     public float[] getHSVbColor(){
-	return this.HSVb;
+	float[] res = {0.0f, 0.0f, 0.0f};
+	return res;
     }
 
     /** Get the glyph's main color. This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.). */
@@ -409,11 +338,15 @@ public abstract class Glyph implements Cloneable {
     }
 
     /** Get the glyph's border color (use getColor for text, paths, segments, etc.).
+     *@return Color.BLACK if the glyph does not have a border (e.g., is not an instanceof ClosedShape)
      *@see #getColor()
      */
     public Color getBorderColor(){
-	return this.borderColor;
+	return Color.BLACK;
     }
+    
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public abstract void highlight(boolean b, Color selectedColor);
 
     /*------------Selection--------------------------------------*/
 

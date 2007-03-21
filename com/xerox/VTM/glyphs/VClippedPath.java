@@ -24,7 +24,7 @@ import com.xerox.VTM.engine.LongPoint;
  * @author Emmanuel Pietriga
  **/
 
-public class VClippedPath extends VPath implements Cloneable {
+public class VClippedPath extends VPath {
 
     private ClippedPathSeg[] segs;
     LongPoint firstPoint;
@@ -56,7 +56,7 @@ public class VClippedPath extends VPath implements Cloneable {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z altitude
-     *@param c fill color
+     *@param c color
      */
     public VClippedPath(long x,long y,float z,Color c){
 	super(x,y,z,c);
@@ -64,7 +64,7 @@ public class VClippedPath extends VPath implements Cloneable {
 
     /**
      *@param z altitude
-     *@param c fill color
+     *@param c color
      *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
      */
     public VClippedPath(float z,Color c,String svg){
@@ -319,9 +319,7 @@ public class VClippedPath extends VPath implements Cloneable {
     /**returns a clone of this object - not yet implemented for VClippedPath*/
     public Object clone(){
 	VClippedPath res=new VClippedPath();
-	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
     

@@ -299,7 +299,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    g.setID(new Long(nextID++));
 	    g.setVSM(this);
 	    if (initColors){
-		g.setMouseInsideBorderColor(this.mouseInsideColor);
+		g.setMouseInsideHighlightColor(this.mouseInsideColor);
 	    }
 	    allGlyphs.put(g.getID(),g);
 	    if (repaint){repaintNow();}

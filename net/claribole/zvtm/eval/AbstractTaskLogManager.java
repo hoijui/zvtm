@@ -524,7 +524,7 @@ class AbstractTaskLogManager implements Java2DPainter {
 	g2d.setColor(Color.BLACK);
 	g2d.setComposite(acST);
 	g2d.fillRect(0, viewHeight / 2 - 100, viewWidth, 220);
-	g2d.setComposite(com.xerox.VTM.glyphs.Transparent.acO);
+	g2d.setComposite(com.xerox.VTM.glyphs.Translucent.acO);
 	g2d.setColor(Color.WHITE);
 	g2d.drawString(msg, viewWidth/2 - 105, viewHeight/2);
 	// button

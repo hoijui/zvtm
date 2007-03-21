@@ -348,4 +348,6 @@ public class CGlyph extends Glyph implements Cloneable {
     /**not implemented yet*/
     public Object clone(){return null;}
 
+    public void highlight(boolean b, java.awt.Color selectedColor){}
+
 }

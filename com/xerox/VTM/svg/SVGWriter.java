@@ -47,7 +47,7 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.BooleanOps;
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VBoolShape;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VDiamond;
@@ -299,7 +299,7 @@ public class SVGWriter {
 	else {res="fill:none";}
 	if (g.isBorderDrawn()){res+=";stroke:rgb("+border.getRed()+","+border.getGreen()+","+border.getBlue()+")";}
 	else {res+=";stroke:none";}
-	if (g instanceof Transparent){res+=";fill-opacity:"+String.valueOf(((Transparent)g).getTransparencyValue());}
+	if (g instanceof Translucent){res+=";fill-opacity:"+String.valueOf(((Translucent)g).getTranslucencyValue());}
 	return res;
     }
 

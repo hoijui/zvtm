@@ -28,20 +28,20 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 /**
- * Rectangle - can be reoriented - transparency
+ * Rectangle - can be reoriented - translucency
  * @author Emmanuel Pietriga
  **/
 
-public class VRectangleOrST extends VRectangleOr implements Transparent,Cloneable {
+public class VRectangleOrST extends VRectangleOr implements Translucent,Cloneable {
 
-    /**semi transparency (default is 0.5)*/
+    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
     /**alpha channel*/
     float alpha=0.5f;
 
     public VRectangleOrST(){
 	super();
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
@@ -53,23 +53,42 @@ public class VRectangleOrST extends VRectangleOr implements Transparent,Cloneabl
      *@param c fill color
      *@param or orientation
      */
-    public VRectangleOrST(long x,long y,float z,long w,long h,Color c,float or){
-	super(x,y,z,w,h,c,or);
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+    public VRectangleOrST(long x, long y, float z, long w, long h, Color c, float or){
+	super(x, y, z, w, h, c, or);
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     *@param or orientation
      */
-    public void setTransparencyValue(float a){
+    public VRectangleOrST(long x, long y, float z, long w, long h, Color c, Color bc, float a, float or){
+	super(x, y, z, w, h, c, bc, or);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
+
+    /**
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public void setTranslucencyValue(float a){
 	alpha=a;
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to alpha
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){return alpha;}
 
     /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
@@ -197,11 +216,8 @@ public class VRectangleOrST extends VRectangleOr implements Transparent,Cloneabl
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VRectangleOrST res=new VRectangleOrST(vx,vy,0,vw,vh,color,orient);
-	res.borderColor=this.borderColor;
+	VRectangleOrST res=new VRectangleOrST(vx, vy, 0, vw, vh, color, borderColor, alpha, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	res.setTransparencyValue(alpha);
 	return res;
     }
 

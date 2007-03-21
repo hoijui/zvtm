@@ -35,9 +35,10 @@ import net.claribole.zvtm.lens.Lens;
 /**
  * Image (rectangular) - cannot be reoriented
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VImageOr
  **/
 
-public class VImage extends Glyph implements RectangularShape,Cloneable {
+public class VImage extends ClosedShape implements RectangularShape {
 
     public static short DRAW_BORDER_NEVER=0;
     public static short DRAW_BORDER_MOUSE_INSIDE=1;
@@ -171,6 +172,7 @@ public class VImage extends Glyph implements RectangularShape,Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/

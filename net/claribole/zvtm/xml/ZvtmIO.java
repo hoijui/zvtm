@@ -26,8 +26,9 @@ import org.xml.sax.SAXException;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.RectangularShape;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCirImage;
 import com.xerox.VTM.glyphs.VCirShape;
 import com.xerox.VTM.glyphs.VCircle;
@@ -283,8 +284,8 @@ public class ZvtmIO {
 	    res.setAttribute(_orient,Float.toString(gl.getOrient()));
 	    res.setAttribute(_vertices,ZvtmIO.verticesAsString(c.getVertices()));
 	    res.setAttribute(_shpcolor,Integer.toString(c.getShapeColor().getRGB()));
-	    res.setAttribute(_shpfilled,Boolean.toString(c.getShapeFillStatus()));
-	    res.setAttribute(_shpbcolor,Integer.toString(c.getShapebColor().getRGB()));
+	    res.setAttribute(_shpfilled,Boolean.toString(c.isShapeFilled()));
+	    res.setAttribute(_shpbcolor,Integer.toString(c.getShapeBorderColor().getRGB()));
 	}
 	else {System.err.println("ZVTM-I/O: unsupported glyph type (no DOM representation defined): "+gl.toString());return res;}
 	//common attributes
@@ -310,7 +311,7 @@ public class ZvtmIO {
 	    if (tx.usesSpecialFont()){res.setAttribute(_font,tx.getFont().toString());}
 	}
 	if (gl.getType()!=null && gl.getType().length()>0){res.setAttribute(_type,gl.getType());}
-	if (gl instanceof Transparent){res.setAttribute(_alpha,Float.toString(((Transparent)gl).getTransparencyValue()));}
+	if (gl instanceof Translucent){res.setAttribute(_alpha,Float.toString(((Translucent)gl).getTranslucencyValue()));}
 	//ref to composite glyph
 	if (gl.getCGlyph()!=null){res.setAttribute(_cid,gl.getCGlyph().getID().toString());}	
 	return res;
@@ -330,7 +331,7 @@ public class ZvtmIO {
 		if (name.equals(_shape)){
 		    if (el.hasAttribute(_alpha)){
 			res=new VShapeST(vx,vy,0,(long)sz,floatTokenizer(el.getAttribute(_vertices)),fc,(new Float(el.getAttribute(_orient))).floatValue());
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			((Translucent)res).setTranslucencyValue((new Float(el.getAttribute(_alpha))).floatValue());
 		    }
 		    else {res=new VShape(vx,vy,0,(long)sz,floatTokenizer(el.getAttribute(_vertices)),fc,(new Float(el.getAttribute(_orient))).floatValue());}
 		}
@@ -340,7 +341,7 @@ public class ZvtmIO {
 			    res=new VRectangleOrST(vx,vy,0,(new Long(el.getAttribute(_width))).longValue(),(new Long(el.getAttribute(_height))).longValue(),fc,(new Float(el.getAttribute(_orient))).floatValue());
 			}
 			else {res=new VRectangleST(vx,vy,0,(new Long(el.getAttribute(_width))).longValue(),(new Long(el.getAttribute(_height))).longValue(),fc);}
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			((Translucent)res).setTranslucencyValue((new Float(el.getAttribute(_alpha))).floatValue());
 		    }
 		    else {
 			if (el.hasAttribute(_orient)){
@@ -352,24 +353,23 @@ public class ZvtmIO {
 		else if (name.equals(_circle)){
 		    if (el.hasAttribute(_alpha)){
 			res=new VCircleST(vx,vy,0,(long)sz,fc);
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			((Translucent)res).setTranslucencyValue((new Float(el.getAttribute(_alpha))).floatValue());
 		    }
 		    else {res=new VCircle(vx,vy,0,(long)sz,fc);}
 		}
 		else if (name.equals(_ellipse)){
 		    if (el.hasAttribute(_alpha)){
 			res=new VEllipseST(vx,vy,0,(new Long(el.getAttribute(_width))).longValue(),(new Long(el.getAttribute(_height))).longValue(),fc);
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			((Translucent)res).setTranslucencyValue((new Float(el.getAttribute(_alpha))).floatValue());
 		    }
 		    else {res=new VEllipse(vx,vy,0,(new Long(el.getAttribute(_width))).longValue(),(new Long(el.getAttribute(_height))).longValue(),fc);}
 		}
 		else if (name.equals(_triangle)){
 		    if (el.hasAttribute(_alpha)){
 			if (el.hasAttribute(_orient)){
-			    res=new VTriangleOrST(vx,vy,0,(long)sz,fc,(new Float(el.getAttribute(_orient))).floatValue());
+			    res = new VTriangleOrST(vx, vy, 0, (long)sz, fc, Color.BLACK, (new Float(el.getAttribute(_alpha))).floatValue(), (new Float(el.getAttribute(_orient))).floatValue());
 			}
-			else {res=new VTriangleST(vx,vy,0,(long)sz,fc);}
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			else {res = new VTriangleST(vx,vy,0,(long)sz,fc, Color.BLACK, (new Float(el.getAttribute(_alpha))).floatValue());}
 		    }
 		    else {
 			if (el.hasAttribute(_orient)){
@@ -392,10 +392,9 @@ public class ZvtmIO {
 		else if (name.equals(_diamond)){
 		    if (el.hasAttribute(_alpha)){
 			if (el.hasAttribute(_orient)){
-			    res=new VDiamondOrST(vx,vy,0,(long)sz,fc,(new Float(el.getAttribute(_orient))).floatValue());
+			    res = new VDiamondOrST(vx, vy, 0, (long)sz, fc, Color.BLACK, (new Float(el.getAttribute(_alpha))).floatValue(), (new Float(el.getAttribute(_orient))).floatValue());
 			}
-			else {res=new VDiamondST(vx,vy,0,(long)sz,fc);}
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			else {res = new VDiamondST(vx, vy, 0, (long)sz, fc, Color.BLACK, (new Float(el.getAttribute(_alpha))).floatValue());}
 		    }
 		    else {
 			if (el.hasAttribute(_orient)){
@@ -407,14 +406,13 @@ public class ZvtmIO {
 		else if (name.equals(_octagon)){
 		    if (el.hasAttribute(_alpha)){
 			if (el.hasAttribute(_orient)){
-			    res=new VOctagonOrST(vx,vy,0,(long)sz,fc,(new Float(el.getAttribute(_orient))).floatValue());
+			    res = new VOctagonOrST(vx, vy, 0, (long)sz, fc, Color.BLACK, (new Float(el.getAttribute(_alpha))).floatValue(), (new Float(el.getAttribute(_orient))).floatValue());
 			}
-			else {res=new VOctagonST(vx,vy,0,(long)sz,fc);}
-			((Transparent)res).setTransparencyValue((new Float(el.getAttribute(_alpha))).floatValue());
+			else {res = new VOctagonST(vx, vy, 0, (long)sz, fc, Color.BLACK, (new Float(el.getAttribute(_alpha))).floatValue());}
 		    }
 		    else {
 			if (el.hasAttribute(_orient)){
-			    res=new VOctagonOr(vx,vy,0,(long)sz,fc,(new Float(el.getAttribute(_orient))).floatValue());
+			    res = new VOctagonOr(vx, vy, 0, (long)sz, fc, Color.BLACK, (new Float(el.getAttribute(_orient))).floatValue());
 			}
 			else {res=new VOctagon(vx,vy,0,(long)sz,fc);}
 		    }
@@ -431,12 +429,15 @@ public class ZvtmIO {
 		else if (name.equals(_cirshape)){
 		    
 		}
-		res.setFilled((new Boolean(el.getAttribute(_filled))).booleanValue());
-		float[] hsvb=new float[3];
-		Color bc=new Color((new Integer(el.getAttribute(_bcolor))).intValue());
-		Color.RGBtoHSB(bc.getRed(),bc.getGreen(),bc.getBlue(),hsvb);
-		res.setHSVbColor(hsvb[0],hsvb[1],hsvb[2]);
-		res.setDrawBorder((new Boolean(el.getAttribute(_border))).booleanValue());
+		if (res instanceof ClosedShape){
+		    ClosedShape cs = (ClosedShape)res;
+		    cs.setFilled((new Boolean(el.getAttribute(_filled))).booleanValue());
+		    float[] hsvb=new float[3];
+		    Color bc=new Color((new Integer(el.getAttribute(_bcolor))).intValue());
+		    Color.RGBtoHSB(bc.getRed(),bc.getGreen(),bc.getBlue(),hsvb);
+		    cs.setHSVbColor(hsvb[0],hsvb[1],hsvb[2]);
+		    cs.setDrawBorder((new Boolean(el.getAttribute(_border))).booleanValue());
+		}
 		res.select((new Boolean(el.getAttribute(_selected))).booleanValue());
 		res.setSensitivity((new Boolean(el.getAttribute(_sensitive))).booleanValue());
 		res.setVisible((new Boolean(el.getAttribute(_visible))).booleanValue());

@@ -170,7 +170,7 @@ public class Eval implements TOWApplication {
 		g = new VDiamondOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
 	    }
 	    else if (shapeType<0.6){
-		g = new VOctagonOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);
+		g = new VOctagonOr(randomX, randomY, 0, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), Color.BLACK, randomO);
 	    }
 	    else if (shapeType<0.8){
 		g = new VRectangleOr(randomX, randomY, 0, randomS, randomS, Color.getHSBColor(0.66f, randomSat, 0.8f), randomO);

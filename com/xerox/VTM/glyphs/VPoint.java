@@ -36,7 +36,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VPoint extends Glyph implements Cloneable {
+public class VPoint extends Glyph {
 
     ProjectedCoords[] pc;
 
@@ -45,20 +45,18 @@ public class VPoint extends Glyph implements Cloneable {
 	vy=0;	
 	size=1;   //radius of the bounding circle
 	setColor(Color.white);
-	setBorderColor(Color.black);
     }
 
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param c fill color
+     *@param c color
      */
     public VPoint(long x,long y,Color c){
 	vx=x;
 	vy=y;
 	size=1;   //radius of the bounding circle
 	setColor(c);
-	setBorderColor(Color.black);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -197,10 +195,11 @@ public class VPoint extends Glyph implements Cloneable {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VPoint res=new VPoint(vx,vy,color);
-	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
+
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){}
 
 }

@@ -41,7 +41,7 @@ public class LSegment extends VSegment {
      *@param z altitude
      *@param w half width in virtual space (can be negative)
      *@param h half height in virtual space (can be negative)
-     *@param c fill color
+     *@param c color
      */
     public LSegment(long x,long y,float z,long w,long h,Color c){
 	super(x, y, z, w, h, c);
@@ -54,7 +54,7 @@ public class LSegment extends VSegment {
      *@param x2 coordinate of endpoint 2 in virtual space
      *@param y2 coordinate of endpoint 2 in virtual space
      *@param z altitude
-     *@param c fill color
+     *@param c color
      */
     public LSegment(long x1, long y1, float z, Color c, long x2, long y2){
 	super(x1, y1, z, c, x2, y2);
@@ -67,7 +67,7 @@ public class LSegment extends VSegment {
      *@param z altitude
      *@param lgth half length in virtual space
      *@param angle orientation
-     *@param c fill color
+     *@param c color
      */
     public LSegment(long x,long y,float z,float lgth,float angle,Color c){
 	super(x, y, z, lgth, angle, c);
@@ -102,9 +102,7 @@ public class LSegment extends VSegment {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LSegment res = new LSegment(vx, vy, 0, vw, vh, color);
-	res.borderColor = this.borderColor;
 	res.mouseInsideColor = this.mouseInsideColor;
-	res.bColor = this.bColor;
 	return res;
     }
 

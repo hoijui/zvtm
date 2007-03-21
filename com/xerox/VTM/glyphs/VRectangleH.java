@@ -32,16 +32,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 /**
- * Rectangle - cannot be reoriented - hatched
+ * Rectangle - cannot be reoriented - hatched fill pattern
  * @author Emmanuel Pietriga
  **/
 
-public class VRectangleH extends VRectangle implements Cloneable{
+public class VRectangleH extends VRectangle {
 
     Paint stdPaint;   //for the pattern
-    Rectangle r;
-    BufferedImage bi;
-
+    TexturePaint tp;
+    
     public VRectangleH(){
 	super();
 	initPattern();
@@ -54,20 +53,21 @@ public class VRectangleH extends VRectangle implements Cloneable{
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
+     *@param bc border color
      */
-    public VRectangleH(long x,long y,float z,long w,long h,Color c){
-	super(x,y,z,w,h,c);
+    public VRectangleH(long x, long y, float z, long w, long h, Color c, Color bc){
+	super(x, y, z, w, h, c, bc);
 	initPattern();
     }
 
-    private void initPattern(){
-	bi=new BufferedImage(5,5,BufferedImage.TYPE_INT_RGB);
-	Graphics2D big=bi.createGraphics();
+    void initPattern(){
+	BufferedImage bi = new BufferedImage(5,5,BufferedImage.TYPE_INT_RGB);
+	Graphics2D big = bi.createGraphics();
 	big.setColor(this.color);
-	big.fillRect(0,0,5,5);
+	big.fillRect(0, 0,5,5);
 	big.setColor(this.borderColor);
 	big.drawLine(0,0,5,5);
-	r=new Rectangle(0,0,5,5);
+	tp = new TexturePaint(bi, new Rectangle(0,0,5,5));
     }
 
 
@@ -81,7 +81,7 @@ public class VRectangleH extends VRectangle implements Cloneable{
 	    if (filled) {
 		stdPaint=g.getPaint();
 		//g.setColor(this.color);
-		g.setPaint(new TexturePaint(bi, r));
+		g.setPaint(tp);
 		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 		g.setPaint(stdPaint);
 	    }
@@ -124,7 +124,7 @@ public class VRectangleH extends VRectangle implements Cloneable{
 	    if (filled) {
 		stdPaint=g.getPaint();
 		//g.setColor(this.color);
-		g.setPaint(new TexturePaint(bi, r));
+		g.setPaint(tp);
 		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
 		g.setPaint(stdPaint);
 	    }
@@ -189,10 +189,8 @@ public class VRectangleH extends VRectangle implements Cloneable{
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VRectangleH res=new VRectangleH(vx,vy,0,vw,vh,color);
-	res.borderColor=this.borderColor;
+	VRectangleH res=new VRectangleH(vx, vy, 0, vw, vh, color, borderColor);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

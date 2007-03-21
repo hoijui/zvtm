@@ -40,7 +40,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VPath extends Glyph implements Cloneable {
+public class VPath extends Glyph {
 
     //creates a copy of a VPath, with offset (x,y)
     public static VPath duplicateVPath(VPath p,long x,long y){
@@ -102,7 +102,7 @@ public class VPath extends Glyph implements Cloneable {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z altitude
-     *@param c fill color
+     *@param c color
      */
     public VPath(long x,long y,float z,Color c){
 	vx=x;
@@ -119,7 +119,7 @@ public class VPath extends Glyph implements Cloneable {
 
     /**
      *@param z altitude
-     *@param c fill color
+     *@param c color
      *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
      */
     public VPath(float z,Color c,String svg){
@@ -447,12 +447,13 @@ public class VPath extends Glyph implements Cloneable {
 
     /**returns a clone of this object - not yet implemented for VPath*/
     public Object clone(){
-	VClippedPath res=new VClippedPath();
-	res.borderColor=this.borderColor;
+	VPath res=new VPath();
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
+
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){}
     
 }
 

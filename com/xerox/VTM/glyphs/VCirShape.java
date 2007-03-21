@@ -38,7 +38,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VCirShape extends Glyph implements Cloneable {
+public class VCirShape extends ClosedShape {
 
     /**inside shape color (main color is assigned to the circle)*/
     Color shapeColor;
@@ -72,7 +72,7 @@ public class VCirShape extends Glyph implements Cloneable {
 	setColor(Color.white);
 	setBorderColor(Color.black);
 	setShapeColor(Color.red);
-	setShapebColor(Color.black);
+	setShapeBorderColor(Color.black);
     }
 
     /**
@@ -81,10 +81,12 @@ public class VCirShape extends Glyph implements Cloneable {
      *@param z altitude
      *@param s size (width=height) in virtual space
      *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
-     *@param c1 fill color for circle
-     *@param c2 fill color for shape
+     *@param cc fill color for circle
+     *@param sc fill color for shape
+     *@param cbc border color for circle
+     *@param sbc border color for shape
      */
-    public VCirShape(long x,long y,float z,long s,float[] v,Color c1,Color c2,float or){
+    public VCirShape(long x, long y, float z, long s, float[] v, Color cc, Color sc, Color cbc, Color sbc, float or){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -92,10 +94,10 @@ public class VCirShape extends Glyph implements Cloneable {
 	vertices=v;
 	computeSize();
 	orient=or;
-	setColor(c1);
-	setBorderColor(bColor);
-	setShapeColor(c2);
-	setShapebColor(bColor);
+	setColor(cc);
+	setBorderColor(cbc);
+	setShapeColor(sc);
+	setShapeBorderColor(sbc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -147,6 +149,7 @@ public class VCirShape extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/
@@ -179,12 +182,6 @@ public class VCirShape extends Glyph implements Cloneable {
 	vs=(long)Math.round(size);
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
-
-    public Color getShapeColor(){return shapeColor;}
-    public Color getShapebColor(){return shapebColor;}
-    public boolean getShapeFillStatus(){return shapeFilled;}
-
-
 
     /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
@@ -360,20 +357,25 @@ public class VCirShape extends Glyph implements Cloneable {
 	}
     }
 
+
+    public Color getShapeColor(){return shapeColor;}
+    public Color getShapeBorderColor(){return shapebColor;}
+    public boolean isShapeFilled(){return shapeFilled;}
+
     /**set inside shape fill color*/
     public void setShapeColor(Color c){
 	shapeColor=c;
     }
     
     /**Set inside shape border color*/
-    public void setShapebColor(Color c){
+    public void setShapeBorderColor(Color c){
 	shapebColor=c;
     }
 
     /**
      *@param b false -&gt; do not paint interior of inside shape (only paint contour)
      */
-    public void setShapeFill(boolean b){
+    public void setShapeFilled(boolean b){
 	shapeFilled=b;
     }
 
@@ -386,10 +388,8 @@ public class VCirShape extends Glyph implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VCirShape res=new VCirShape(vx,vy,0,vs,vertices,color,shapeColor,orient);
-	res.borderColor=this.borderColor;
+	VCirShape res = new VCirShape(vx,vy,0,vs,vertices,color,shapeColor,bColor,shapebColor,orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

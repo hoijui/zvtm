@@ -37,7 +37,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VOctagonOr extends VOctagon implements Cloneable {
+public class VOctagonOr extends VOctagon {
 
     public VOctagonOr(){super();}
 
@@ -47,12 +47,12 @@ public class VOctagonOr extends VOctagon implements Cloneable {
      *@param z altitude
      *@param s size (width=height) in virtual space
      *@param c fill color
+     *@param bc border color
      *@param or orientation
      */
-    public VOctagonOr(long x,long y,float z,long s,Color c,float or){
-	super(x,y,z,s,c);
+    public VOctagonOr(long x, long y, float z, long s, Color c, Color bc, float or){
+	super(x, y, z, s, c, bc);
 	orient=or;
-	//if (orient!=0){computeOrientCoords();}
     }
 
     /**get orientation*/
@@ -213,10 +213,8 @@ public class VOctagonOr extends VOctagon implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VOctagonOr res=new VOctagonOr(vx,vy,0,vs,color,orient);
-	res.borderColor=this.borderColor;
+	VOctagonOr res=new VOctagonOr(vx, vy, 0, vs, color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

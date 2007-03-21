@@ -107,8 +107,7 @@ public class ZimgEvtHdlr implements ViewEventHandler {
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
 
     public void enterGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	g.highlight(true, null);
 	if (g.getOwner()!=null){
 	    ImageInfo ii=(ImageInfo)g.getOwner();
 	    ZImgViewer.mainView.setStatusBarText(ii.getFileName());
@@ -116,8 +115,7 @@ public class ZimgEvtHdlr implements ViewEventHandler {
     }
 
     public void exitGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	g.highlight(false, null);
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

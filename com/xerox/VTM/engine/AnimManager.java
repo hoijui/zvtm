@@ -47,7 +47,7 @@ import net.claribole.zvtm.lens.LMaximumMagnification;
 import net.claribole.zvtm.lens.Lens;
 
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCbCurve;
 import com.xerox.VTM.glyphs.VQdCurve;
 
@@ -748,9 +748,9 @@ public class AnimManager implements Runnable{
 		    an.bsteps[(int)nbSteps-1][1]=hsv[1]+thsv[1];
 		    an.bsteps[(int)nbSteps-1][2]=hsv[2]+thsv[2];
 		}
-		if (vdata.size() == 7 && g instanceof Transparent){//deal with translucency animation (if specified)
+		if (vdata.size() == 7 && g instanceof Translucent){//deal with translucency animation (if specified)
 		    float tav = ((Float)vdata.elementAt(6)).floatValue();
-		    float sav = ((Transparent)g).getTransparencyValue();
+		    float sav = ((Translucent)g).getTranslucencyValue();
 		    double dt = tav / nbSteps;
 		    an.alphasteps=new float[an.nbSteps];
 		    for (int i=0;i<nbSteps-1;i++){
@@ -804,7 +804,7 @@ public class AnimManager implements Runnable{
      *@param data for translations, data is LongPoint representing X and Y offsets<br>
      *            for resize operations, data is a float representing the resizing factor<br>
      *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively, plus an optional float representing translucency offset (can only be applied to glyphs implementing the Transparent interface)
+     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively, plus an optional float representing translucency offset (can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
      */
     public void createGlyphAnimation(long duration,int refresh,short type,Object data,Long gID) {
@@ -818,7 +818,7 @@ public class AnimManager implements Runnable{
      *@param data for translations, data is LongPoint representing X and Y offsets<br>
      *            for resize operations, data is a float representing the resizing factor<br>
      *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively, plus an optional float representing translucency offset (can only be applied to glyphs implementing the Transparent interface)
+     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively, plus an optional float representing translucency offset (can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
      *@param paa action to perform after animation ends
      */
@@ -854,7 +854,7 @@ public class AnimManager implements Runnable{
      *@param data for translations, data is LongPoint representing X and Y offsets<br>
      *            for resize operations, data is a float representing the resizing factor<br>
      *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets, for fill and border color respectively plus an optional float representing translucency offset (can only be applied to glyphs implementing the Transparent interface)
+     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets, for fill and border color respectively plus an optional float representing translucency offset (can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
      *@param kgaa true -> remove glyph from virtual space after animation ends
      *@deprecated As of zvtm 0.9.4, replaced by the use of a PostAnimationAction such as GlyphKillAction
@@ -2282,7 +2282,7 @@ public class AnimManager implements Runnable{
 		    PTranslucency an=new PTranslucency(p,this,duration);
 		    an.setPostAnimationAction(paa);
 		    float tav = ((Float)data).floatValue();
-		    float sav = ((Transparent)p).getTransparencyValue();
+		    float sav = ((Translucent)p).getTranslucencyValue();
 		    double dt = tav / nbSteps;
 		    an.steps=new float[(int)nbSteps];
 		    for (int i=0;i<nbSteps-1;i++){

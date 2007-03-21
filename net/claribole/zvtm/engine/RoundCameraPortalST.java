@@ -28,12 +28,12 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.engine.Location;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 
 /**A portal showing what is seen through a camera. Shape: circular.
    The Camera should not be used in any other View or Portal.*/
 
-public class RoundCameraPortalST extends RoundCameraPortal implements Transparent {
+public class RoundCameraPortalST extends RoundCameraPortal implements Translucent {
 
     /** for translucency (default is 0.5)*/
     AlphaComposite acST;
@@ -55,10 +55,10 @@ public class RoundCameraPortalST extends RoundCameraPortal implements Transparen
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTransparencyValue(float a){
+    public void setTranslucencyValue(float a){
 	try {
 	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
 	    alpha = a;
@@ -68,8 +68,10 @@ public class RoundCameraPortalST extends RoundCameraPortal implements Transparen
 	}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){
 	return alpha;
     }
 

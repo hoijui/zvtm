@@ -15,12 +15,12 @@ import java.awt.AlphaComposite;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 
 /**A portal showing what is seen through a camera, with parameterable alpha channel (translucency).
    The Camera should not be used in any other View or Portal.*/
 
-public class CameraPortalST extends CameraPortal implements Transparent {
+public class CameraPortalST extends CameraPortal implements Translucent {
 
     /** for translucency (default is 0.5)*/
     AlphaComposite acST;
@@ -43,10 +43,10 @@ public class CameraPortalST extends CameraPortal implements Transparent {
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTransparencyValue(float a){
+    public void setTranslucencyValue(float a){
 	try {
 	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
 	    alpha = a;
@@ -56,8 +56,10 @@ public class CameraPortalST extends CameraPortal implements Transparent {
 	}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){
 	return alpha;
     }
 

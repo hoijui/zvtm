@@ -45,7 +45,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VCircleST;
 import com.xerox.VTM.glyphs.VEllipse;
@@ -627,7 +627,7 @@ public class SVGReader {
 	    if (ss.hasTransparencyInformation()){
 		if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
 		else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor());}
-		((Transparent)res).setTransparencyValue(ss.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ss.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.white);res.setFilled(false);}
@@ -649,7 +649,7 @@ public class SVGReader {
 	    if (ctx.hasTransparencyInformation()){
 		if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
 		else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor());}
-		((Transparent)res).setTransparencyValue(ctx.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ctx.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.white);res.setFilled(false);}
@@ -696,7 +696,7 @@ public class SVGReader {
 	    if (ss.hasTransparencyInformation()){
 		if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.white);res.setFilled(false);}
 		else {res=new VCircleST(x,-y,0,r,ss.getFillColor());}
-		((Transparent)res).setTransparencyValue(ss.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.white);res.setFilled(false);}
@@ -835,7 +835,7 @@ public class SVGReader {
 		if (ss.hasTransparencyInformation()){
 		    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
 		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(),0);}
-		    ((Transparent)res).setTransparencyValue(ss.getAlphaTransparencyValue());
+		    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 		}
 		else {
 		    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
@@ -857,7 +857,7 @@ public class SVGReader {
 		if (ctx.hasTransparencyInformation()){
 		    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
 		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(),0);}
-		    ((Transparent)res).setTransparencyValue(ctx.getAlphaTransparencyValue());
+		    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 		}
 		else {
 		    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
@@ -930,7 +930,7 @@ public class SVGReader {
 		if (ss.hasTransparencyInformation()){
 		    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
 		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
-		    ((Transparent)res).setTransparencyValue(ss.getAlphaTransparencyValue());
+		    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 		}
 		else {
 		    if (ss.getFillColor()==null){res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
@@ -952,7 +952,7 @@ public class SVGReader {
 		if (ctx.hasTransparencyInformation()){
 		    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
 		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
-		    ((Transparent)res).setTransparencyValue(ctx.getAlphaTransparencyValue());
+		    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 		}
 		else {
 		    if (ctx.getFillColor()==null){res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
@@ -1005,7 +1005,7 @@ public class SVGReader {
 	    if (ss.hasTransparencyInformation()){
 	        if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
 		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(),0);}
-		((Transparent)res).setTransparencyValue(ss.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
@@ -1027,7 +1027,7 @@ public class SVGReader {
 	    if (ctx.hasTransparencyInformation()){
 	        if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
 		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(),0);}
-		((Transparent)res).setTransparencyValue(ctx.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
@@ -1146,7 +1146,7 @@ public class SVGReader {
 	    if (ss.hasTransparencyInformation()){
 		if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
 		else {res=new VPolygonST(coords2,ss.getFillColor());}
-		((Transparent)res).setTransparencyValue(ss.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ss.getFillColor()==null){res=new VPolygon(coords2,Color.white);res.setFilled(false);}
@@ -1168,7 +1168,7 @@ public class SVGReader {
 	    if (ctx.hasTransparencyInformation()){
 		if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
 		else {res=new VPolygonST(coords2,ctx.getFillColor());}
-		((Transparent)res).setTransparencyValue(ctx.getAlphaTransparencyValue());
+		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
 		if (ctx.getFillColor()==null){res=new VPolygon(coords2,Color.white);res.setFilled(false);}

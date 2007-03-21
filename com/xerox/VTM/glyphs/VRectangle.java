@@ -37,7 +37,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VRectangle extends Glyph implements RectangularShape,Cloneable {
+public class VRectangle extends ClosedShape implements RectangularShape {
 
     /**half width and height in virtual space*/
     long vw,vh;
@@ -79,6 +79,29 @@ public class VRectangle extends Glyph implements RectangularShape,Cloneable {
 	orient=0;
 	setColor(c);
 	setBorderColor(Color.black);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     */
+    public VRectangle(long x, long y, float z, long w, long h, Color c, Color bc){
+	vx=x;
+	vy=y;
+	vz=z;
+	vw=w;
+	vh=h;
+	computeSize();
+	if (vw==0 && vh==0){ar=1.0f;}
+	else {ar=(float)vw/(float)vh;}
+	orient=0;
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -130,6 +153,7 @@ public class VRectangle extends Glyph implements RectangularShape,Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/
@@ -329,10 +353,8 @@ public class VRectangle extends Glyph implements RectangularShape,Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VRectangle res=new VRectangle(vx,vy,0,vw,vh,color);
-	res.borderColor=this.borderColor;
+	VRectangle res=new VRectangle(vx, vy, 0, vw, vh, color, borderColor);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

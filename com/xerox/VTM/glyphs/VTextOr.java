@@ -32,12 +32,11 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Standalone Text  (font properties are set in the view, but can be changed for each VText using setSpecialFont()) - can be reoriented.
- <br> orientation NOT STABLE  (causes the VTM to hang sometimes)  USE AT YOUR OWN RISK! - things seem to go much better since I've changed the order in which I apply AffineTranforms
- <br> vx and vy are coordinates of lower-left corner of String because it would be too time-consuming to compute the String's center (needs to be computed at each repaint: it requires access to Graphics2D) (besides it makes the VTM unstable)
+ <br> vx and vy are coordinates of lower-left corner of String because it would be too time-consuming to compute the String's center (needs to be computed at each repaint: it requires access to Graphics2D)
  * @author Emmanuel Pietriga
  */
 
-public class VTextOr extends VText implements Cloneable {
+public class VTextOr extends VText {
 
     /**half width and height in virtual space (of String when horizontal)*/
     float vw,vh;
@@ -184,9 +183,7 @@ public class VTextOr extends VText implements Cloneable {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
-	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

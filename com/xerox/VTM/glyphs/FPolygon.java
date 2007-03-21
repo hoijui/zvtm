@@ -26,13 +26,14 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Custom polygon - CANNOT be resized nor reoriented. This is the old implementation of VPolygon, as found in zvtm 0.8.2. The new version of VPolygon can be resized, but at some cost from the efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances (this implementation uses longs instead of doubles for its internal representation of the vertices, see VPolygon for other details) 
- * @author Emmanuel Pietriga
+ * Custom polygon - Cannot be resized nor reoriented.
+ * This is the old implementation of VPolygon, as found in zvtm 0.8.2. The new version of VPolygon can be resized, but at some cost from an efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances (this implementation uses longs instead of doubles for its internal representation of the vertices, see VPolygon for more details). 
+ *@author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VPolygon
  **/
 
-public class FPolygon extends Glyph implements Cloneable {
+public class FPolygon extends ClosedShape {
 
-    /**height=width in virtual space*/
     long vs;
 
     /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
@@ -67,6 +68,34 @@ public class FPolygon extends Glyph implements Cloneable {
 	computeSize();
 	setColor(c);
 	setBorderColor(Color.black);
+    }
+
+    /**
+     *@param v list of x,y vertices ABSOLUTE coordinates
+     *@param c fill color
+     *@param bc border color
+     */
+    public FPolygon(LongPoint[] v, Color c, Color bc){
+	vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
+	vy=0;  //several lines below
+	vz=0;
+	xcoords=new long[v.length];
+	ycoords=new long[v.length];
+	for (int i=0;i<v.length;i++){
+	    xcoords[i]=v[i].x;
+	    ycoords[i]=v[i].y;
+	}
+	orient=0;
+	LongPoint ct=getCentroid();
+	vx=ct.x;
+	vy=ct.y;
+	for (int i=0;i<xcoords.length;i++){//translate to get relative coords w.r.t centroid
+	    xcoords[i]-=vx;
+	    ycoords[i]-=vy;
+	}
+	computeSize();
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -118,6 +147,7 @@ public class FPolygon extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/

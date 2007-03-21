@@ -132,13 +132,11 @@ class AcquireTrainingEventHandler implements ViewEventHandler, ComponentListener
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
     public void enterGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	g.highlight(false, null);
     }
 
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){

@@ -110,18 +110,11 @@ public class MultiLayerEvtHdlr implements ViewEventHandler {
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
     public void enterGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
-	if (g.isSelected()){
-	    g.borderColor = Introduction.SELECTED_COLOR;
-	}
-	else {
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
-	}
+	g.highlight(false, Introduction.SELECTED_COLOR);
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){

@@ -24,7 +24,7 @@ package com.xerox.VTM.engine;
 import java.util.Date;
 
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.engine.PostAnimationAction;
 
 /**glyph animation: coloration (H,S,V) and translucency
@@ -76,7 +76,7 @@ class GColoration extends GAnimation{
 		    target.setHSVColor(steps[step][0],steps[step][1],steps[step][2]);
 		}
 		try {
-		    if (alphasteps != null){((Transparent)target).setTransparencyValue(alphasteps[step]);}
+		    if (alphasteps != null){((Translucent)target).setTranslucencyValue(alphasteps[step]);}
 		}
 		catch (IllegalArgumentException ex){
 		    if (VirtualSpaceManager.debug){System.err.println("Error animating translucency of "+target.toString());}
@@ -90,7 +90,7 @@ class GColoration extends GAnimation{
 		    target.setHSVColor(steps[steps.length-1][0],steps[steps.length-1][1],steps[steps.length-1][2]);
 		}
 		try {
-		    if (alphasteps != null){((Transparent)target).setTransparencyValue(alphasteps[alphasteps.length-1]);}
+		    if (alphasteps != null){((Translucent)target).setTranslucencyValue(alphasteps[alphasteps.length-1]);}
 		}
 		catch (IllegalArgumentException ex){
 		    if (VirtualSpaceManager.debug){System.err.println("Error animating translucency of "+target.toString());}
@@ -111,7 +111,7 @@ class GColoration extends GAnimation{
 	}
 	if (alphasteps != null){
 	    try {
-		((Transparent)target).setTransparencyValue(alphasteps[alphasteps.length-1]);
+		((Translucent)target).setTranslucencyValue(alphasteps[alphasteps.length-1]);
 	    }
 	    catch (IllegalArgumentException ex){
 		if (VirtualSpaceManager.debug){System.err.println("Error animating translucency of "+target.toString());}

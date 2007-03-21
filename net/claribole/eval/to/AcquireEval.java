@@ -170,7 +170,7 @@ public class AcquireEval implements TOWApplication, RepaintListener {
 	target = new ZCircle(0, 0, 0, TARGET_DEFAULT_SIZE, TARGET_COLOR);
 	target.setMinimumProjectedSize(TARGET_MIN_PROJ_SIZE);
 	vsm.addGlyph(target, mSpace);
-	target.setMouseInsideBorderColor(INSIDE_TARGET_COLOR);
+	target.setMouseInsideHighlightColor(INSIDE_TARGET_COLOR);
     }
 
     void centerOverview(boolean animate){

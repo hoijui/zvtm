@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.AlphaComposite;
 
 import com.xerox.VTM.engine.SwingWorker;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 public class AcquireInstructionsManager implements Java2DPainter {
@@ -121,7 +121,7 @@ public class AcquireInstructionsManager implements Java2DPainter {
 	    g2d.setColor(Color.BLACK);
 	    g2d.setComposite(acST);
 	    g2d.fillRect(0, viewHeight / 2 - 100, viewWidth, 220);
-	    g2d.setComposite(Transparent.acO);
+	    g2d.setComposite(Translucent.acO);
 	    g2d.setColor(Color.WHITE);
 	    g2d.drawString(message, viewWidth/2 - halfMessageWidth, viewHeight/2);
 	    if (alm.sessionStarted && !alm.trialStarted && showButton){

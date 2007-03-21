@@ -36,7 +36,7 @@ import net.claribole.zvtm.lens.Lens;
    * @author Emmanuel Pietriga
    */
 
-public class VEllipse extends Glyph implements RectangularShape,Cloneable {
+public class VEllipse extends ClosedShape implements RectangularShape {
 
     /**half width and height in virtual space*/
     long vw,vh;
@@ -66,7 +66,7 @@ public class VEllipse extends Glyph implements RectangularShape,Cloneable {
      *@param z altitude in virtual space
      *@param sx horizontal axis radius in virtual space
      *@param sy vertical axis radius in virtual space
-     *@param c main shape's color
+     *@param c fill color
      */
     public VEllipse(long x,long y,float z,long sx,long sy,Color c){
 	vx=x;
@@ -77,6 +77,27 @@ public class VEllipse extends Glyph implements RectangularShape,Cloneable {
 	orient=0;
 	setColor(c);
 	setBorderColor(Color.black);
+	computeSize();
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude in virtual space
+     *@param sx horizontal axis radius in virtual space
+     *@param sy vertical axis radius in virtual space
+     *@param c fill color
+     *@param bc border color
+     */
+    public VEllipse(long x, long y, float z, long sx, long sy, Color c, Color bc){
+	vx=x;
+	vy=y;
+	vz=z;
+	vw=sx;
+	vh=sy;
+	orient=0;
+	setColor(c);
+	setBorderColor(bc);
 	computeSize();
     }
 
@@ -129,6 +150,7 @@ public class VEllipse extends Glyph implements RectangularShape,Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**orientation is disabled*/

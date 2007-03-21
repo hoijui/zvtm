@@ -29,7 +29,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class LSegmentST extends LSegment implements Transparent {
+public class LSegmentST extends LSegment implements Translucent {
 
     /**semi transparency (default is 0.5)*/
     AlphaComposite acST;
@@ -48,7 +48,7 @@ public class LSegmentST extends LSegment implements Transparent {
      *@param z altitude
      *@param w half width in virtual space (can be negative)
      *@param h half height in virtual space (can be negative)
-     *@param c fill color
+     *@param c color
      */
     public LSegmentST(long x, long y, float z, long w, long h, Color c){
 	super(x, y, z, w, h, c);
@@ -62,7 +62,7 @@ public class LSegmentST extends LSegment implements Transparent {
      *@param x2 coordinate of endpoint 2 in virtual space
      *@param y2 coordinate of endpoint 2 in virtual space
      *@param z altitude
-     *@param c fill color
+     *@param c color
      */
     public LSegmentST(long x1, long y1, float z, Color c, long x2, long y2){
 	super(x1, y1, z, c, x2, y2);
@@ -76,7 +76,7 @@ public class LSegmentST extends LSegment implements Transparent {
      *@param z altitude
      *@param lgth half length in virtual space
      *@param angle orientation
-     *@param c fill color
+     *@param c color
      */
     public LSegmentST(long x,long y,float z,float lgth,float angle,Color c){
 	super(x, y, z, lgth, angle, c);
@@ -84,16 +84,19 @@ public class LSegmentST extends LSegment implements Transparent {
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTransparencyValue(float a){
+    public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to alpha
+	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){return alpha;}
 
     /**draw glyph 
      *@param i camera index in the virtual space
@@ -139,9 +142,7 @@ public class LSegmentST extends LSegment implements Transparent {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LSegmentST res = new LSegmentST(vx, vy, 0, vw, vh, color);
-	res.borderColor = this.borderColor;
 	res.mouseInsideColor = this.mouseInsideColor;
-	res.bColor = this.bColor;
 	return res;
     }
 

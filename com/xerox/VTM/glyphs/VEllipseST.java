@@ -28,20 +28,20 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
   /**
-   * Ellipse - cannot be reoriented - transparency
+   * Ellipse - cannot be reoriented - translucency
    * @author Emmanuel Pietriga
    */
 
-public class VEllipseST extends VEllipse implements Transparent,Cloneable {
+public class VEllipseST extends VEllipse implements Translucent {
 
-    /**semi transparency (default is 0.5)*/
+    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
     /**alpha channel*/
     float alpha=0.5f;
 
     public VEllipseST(){
 	super();
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
@@ -52,23 +52,41 @@ public class VEllipseST extends VEllipse implements Transparent,Cloneable {
      *@param h half height in virtual space
      *@param c fill color
      */
-    public VEllipseST(long x,long y,float z,long w,long h,Color c){
-	super(x,y,z,w,h,c);
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+    public VEllipseST(long x, long y, float z, long w, long h, Color c){
+	super(x, y, z, w, h, c);
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTransparencyValue(float a){
+    public VEllipseST(long x, long y, float z, long w, long h, Color c, Color bc, float a){
+	super(x, y, z, w, h, c, bc);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
+
+    /**
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public void setTranslucencyValue(float a){
 	alpha=a;
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to alpha
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){return alpha;}
 
     /**draw glyph 
      *@param i camera index in the virtual space
@@ -143,11 +161,8 @@ public class VEllipseST extends VEllipse implements Transparent,Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VEllipseST res=new VEllipseST(vx,vy,0,vw,vh,color);
-	res.borderColor=this.borderColor;
+	VEllipseST res=new VEllipseST(vx, vy, 0, vw, vh, color, borderColor, alpha);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	res.setTransparencyValue(alpha);
 	return res;
     }
 

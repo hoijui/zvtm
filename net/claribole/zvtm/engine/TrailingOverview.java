@@ -20,7 +20,6 @@ import java.util.TimerTask;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.Transparent;
 
 /**A portal behaving as a trailing widget and showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/

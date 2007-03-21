@@ -40,7 +40,7 @@ import net.claribole.zvtm.lens.Lens;
    * @author Emmanuel Pietriga
    */
 
-public class VBoolShape extends Glyph implements Cloneable {
+public class VBoolShape extends ClosedShape {
 
     /**list of boolean operations (applied in the order given by the array)*/
     BooleanOps[] booleanShapes;
@@ -72,6 +72,29 @@ public class VBoolShape extends Glyph implements Cloneable {
 	booleanShapes=b;
 	setColor(c);
 	setBorderColor(Color.black);
+    }
+    
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude in virtual space
+     *@param sx horizontal size in virtual space
+     *@param sy vertical size in virtual space
+     *@param st shape type //1=ellipse 2=rectangle
+     *@param b array of boolean operations
+     *@param c main shape's color
+     *@param bc main shape's border color
+     */
+    public VBoolShape(long x, long y, float z, long sx, long sy, int st, BooleanOps[] b, Color c, Color bc){
+	vx=x;
+	vy=y;
+	vz=z;
+	szx=sx;
+	szy=sy;
+	shapeType=st;
+	booleanShapes=b;
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -123,6 +146,7 @@ public class VBoolShape extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**orientation is disabled*/

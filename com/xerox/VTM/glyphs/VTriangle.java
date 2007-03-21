@@ -38,7 +38,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VTriangle extends Glyph implements Cloneable {
+public class VTriangle extends ClosedShape {
 
     /**vertex x coords*/
     int[] xcoords = new int[3];
@@ -81,6 +81,25 @@ public class VTriangle extends Glyph implements Cloneable {
 	orient=0;
 	setColor(c);
 	setBorderColor(Color.black);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param h height in virtual space
+     *@param c fill color
+     *@param bc border color
+     */
+    public VTriangle(long x, long y, float z, long h, Color c, Color bc){
+	vx=x;
+	vy=y;
+	vz=z;
+	vh=h;
+	computeSize();
+	orient=0;
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -132,6 +151,7 @@ public class VTriangle extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/
@@ -322,10 +342,8 @@ public class VTriangle extends Glyph implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VTriangle res=new VTriangle(vx,vy,0,vh,color);
-	res.borderColor=this.borderColor;
+	VTriangle res=new VTriangle(vx, vy, 0, vh, color, borderColor);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

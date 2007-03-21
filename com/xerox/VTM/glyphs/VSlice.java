@@ -28,7 +28,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VSlice extends Glyph implements Cloneable {
+public class VSlice extends ClosedShape {
 
     /**vertex x coords*/
     int[] xpcoords = new int[3];
@@ -59,8 +59,9 @@ public class VSlice extends Glyph implements Cloneable {
     /** Construct a slice by giving its 3 vertices
      *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc
      *@param c fill color
+     *@param bc border color
      */
-    public VSlice(LongPoint[] v, Color c){
+    public VSlice(LongPoint[] v, Color c, Color bc){
 	vx = v[0].x;
 	vy = v[0].y;
 	vz = 0;
@@ -71,7 +72,7 @@ public class VSlice extends Glyph implements Cloneable {
 	computeAngle();
 	computePolygonEdges();
 	setColor(c);
-	setBorderColor(Color.black);
+	setBorderColor(bc);
     }
 
     /** Construct a slice by giving its size, angle and orientation
@@ -81,8 +82,9 @@ public class VSlice extends Glyph implements Cloneable {
      *@param ag arc angle in virtual space (in rad)
      *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
      *@param c fill color
+     *@param bc border color
      */
-    public VSlice(long x, long y, long vs, double ag, double or, Color c){
+    public VSlice(long x, long y, long vs, double ag, double or, Color c, Color bc){
 	vx = x;
 	vy = y;
 	vz = 0;
@@ -95,7 +97,7 @@ public class VSlice extends Glyph implements Cloneable {
 	computeSliceEdges();
 	computePolygonEdges();
 	setColor(c);
-	setBorderColor(Color.black);
+	setBorderColor(bc);
     }
 
     /** Construct a slice by giving its size, angle and orientation
@@ -105,8 +107,9 @@ public class VSlice extends Glyph implements Cloneable {
      *@param ag arc angle in virtual space (in degrees)
      *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
      *@param c fill color
+     *@param bc border color
      */
-    public VSlice(long x, long y, long vs, int ag, int or, Color c){
+    public VSlice(long x, long y, long vs, int ag, int or, Color c, Color bc){
 	vx = x;
 	vy = y;
 	vz = 0;
@@ -119,7 +122,7 @@ public class VSlice extends Glyph implements Cloneable {
 	computeSliceEdges();
 	computePolygonEdges();
 	setColor(c);
-	setBorderColor(Color.black);
+	setBorderColor(bc);
     }
 
     void computeSize(){
@@ -221,6 +224,7 @@ public class VSlice extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i] != null){pc[i].prevMouseIn = false;}
+	borderColor = bColor;
     }
 
     /**set size (absolute)*/

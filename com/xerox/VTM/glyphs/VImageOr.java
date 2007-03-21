@@ -34,7 +34,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VImageOr extends VImage implements Cloneable {
+public class VImageOr extends VImage {
 
     /**vertex x coords*/
     int[] xcoords = new int[4];

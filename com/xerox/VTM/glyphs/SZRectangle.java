@@ -42,11 +42,12 @@ public class SZRectangle extends VRectangle {
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
+     *@param bc border color
      *@param mns minimum width and height in View below which the glyph is no longer displayed  (in pixels)
      *@param mxs maximum width and height in View above which the glyph is no longer displayed  (in pixels)
      */
-    public SZRectangle(long x, long y, float z, long w, long h, Color c, int mns, int mxs){
-	super(x, y, z, w, h, c);
+    public SZRectangle(long x, long y, float z, long w, long h, Color c, Color bc, int mns, int mxs){
+	super(x, y, z, w, h, c, bc);
 	minSize = mns;
 	maxSize = mxs;
     }
@@ -104,7 +105,7 @@ public class SZRectangle extends VRectangle {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	SZRectangle res = new SZRectangle(vx, vy, 0, vw, vh, color, minSize, maxSize);
+	SZRectangle res = new SZRectangle(vx, vy, 0, vw, vh, color, borderColor, minSize, maxSize);
 	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;

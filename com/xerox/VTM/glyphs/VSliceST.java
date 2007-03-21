@@ -19,13 +19,13 @@ import java.awt.geom.AffineTransform;
 import com.xerox.VTM.engine.LongPoint;
 
 /**
- * VSlice - transparency
+ * VSlice - translucency
  * @author Emmanuel Pietriga
  **/
 
-public class VSliceST extends VSlice implements Transparent,Cloneable {
+public class VSliceST extends VSlice implements Translucent {
 
-    /**semi transparency (default is 0.5)*/
+    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
     /**alpha channel*/
     float alpha=0.5f;
@@ -33,10 +33,13 @@ public class VSliceST extends VSlice implements Transparent,Cloneable {
     /** Construct a slice by giving its 3 vertices
      *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc
      *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSliceST(LongPoint[] v, Color c){
-	super(v, c);
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+    public VSliceST(LongPoint[] v, Color c, Color bc, float a){
+	super(v, c, bc);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
     /** Construct a slice by giving its size, angle and orientation
@@ -46,10 +49,13 @@ public class VSliceST extends VSlice implements Transparent,Cloneable {
      *@param ag arc angle in virtual space (in rad)
      *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
      *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSliceST(long x, long y, long vs, double ag, double or, Color c){
-	super(x, y, vs, ag, or, c);
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+    public VSliceST(long x, long y, long vs, double ag, double or, Color c, Color bc, float a){
+	super(x, y, vs, ag, or, c, bc);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
     /** Construct a slice by giving its size, angle and orientation
@@ -59,25 +65,30 @@ public class VSliceST extends VSlice implements Transparent,Cloneable {
      *@param ag arc angle in virtual space (in degrees)
      *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
      *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSliceST(long x, long y, long vs, int ag, int or, Color c){
-	super(x, y, vs, ag, or, c);
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+    public VSliceST(long x, long y, long vs, int ag, int or, Color c, Color bc, float a){
+	super(x, y, vs, ag, or, c, bc);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTransparencyValue(float a){
+    public void setTranslucencyValue(float a){
 	alpha = a;
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to alpha
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}
 	catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){return alpha;}
 
     /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude) - always return false for now*/
     public boolean fillsView(long w,long h,int camIndex){

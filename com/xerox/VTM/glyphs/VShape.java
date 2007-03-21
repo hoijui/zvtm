@@ -36,11 +36,11 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Custom shape implementing Jean-Yves Vion-Dury's model - defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)) - angle between each vertices is 2*Pi/N - can be reoriented
+ * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented
  * @author Emmanuel Pietriga
  **/
 
-public class VShape extends Glyph implements Cloneable {
+public class VShape extends ClosedShape {
 
     /**height=width in virtual space*/
     long vs;
@@ -82,6 +82,7 @@ public class VShape extends Glyph implements Cloneable {
      *@param s size (width=height) in virtual space
      *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
      *@param c fill color
+     *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(long x,long y,float z,long s,float[] v,Color c,float or){
 	vx=x;
@@ -97,6 +98,32 @@ public class VShape extends Glyph implements Cloneable {
 	orient=or;
 	setColor(c);
 	setBorderColor(bColor);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param s size (width=height) in virtual space
+     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
+     *@param c fill color
+     *@param bc border color
+     *@param or shape's orientation in [0, 2Pi[
+     */
+    public VShape(long x, long y, float z, long s, float[] v, Color c, Color bc, float or){
+	vx=x;
+	vy=y;
+	vz=z;
+	vs=s;
+	vertices=v;
+	xcoords=new int[vertices.length];
+	ycoords=new int[vertices.length];
+	lxcoords=new int[vertices.length];
+	lycoords=new int[vertices.length];
+	computeSize();
+	orient=or;
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -148,6 +175,7 @@ public class VShape extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/
@@ -436,10 +464,8 @@ public class VShape extends Glyph implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VShape res=new VShape(vx,vy,0,vs,(float[])vertices.clone(),color,orient);
-	res.borderColor=this.borderColor;
+	VShape res=new VShape(vx, vy, 0, vs, (float[])vertices.clone(), color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

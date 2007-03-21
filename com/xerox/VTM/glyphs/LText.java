@@ -29,10 +29,9 @@ import net.claribole.zvtm.glyphs.LensRendering;
  * @author Emmanuel Pietriga
  */
 
-public class LText extends VText implements LensRendering, Cloneable {
+public class LText extends VText implements LensRendering {
 
     Color fillColorThroughLens;
-    Color borderColorThroughLens;
     boolean visibleThroughLens = visible;
 
     /**
@@ -45,7 +44,6 @@ public class LText extends VText implements LensRendering, Cloneable {
     public LText(long x,long y,float z,Color c,String t){
 	super(x,y,z,c,t);
 	fillColorThroughLens = color;
-	borderColorThroughLens = borderColor;
     }
 
     /**
@@ -59,7 +57,6 @@ public class LText extends VText implements LensRendering, Cloneable {
     public LText(long x,long y,float z,Color c,String t,short ta){
 	super(x,y,z,c,t,ta);
 	fillColorThroughLens = color;
-	borderColorThroughLens = borderColor;
     }
 
     /**make this glyph (in)visible when seen through a lens (the glyph remains sensitive to cursor in/out events)<br>
@@ -79,19 +76,17 @@ public class LText extends VText implements LensRendering, Cloneable {
 	fillColorThroughLens = c;
     }
 
-    /**set the color used to paint the glyph's border*/
-    public void setBorderColorThroughLens(Color c){
-	borderColorThroughLens = c;
-    }
-
     /**get the color used to paint the glyph's interior*/
     public Color getFillColorThroughLens(){
 	return fillColorThroughLens;
     }
-    
+
+    /**set the color used to paint the glyph's border*/
+    public void setBorderColorThroughLens(Color c){}
+
     /**get the color used to paint the glyph's border*/
     public Color getBorderColorThroughLens(){
-	return borderColorThroughLens;
+	return fillColorThroughLens;
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -139,11 +134,8 @@ public class LText extends VText implements LensRendering, Cloneable {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LText res=new LText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
-	res.borderColor=this.borderColor;
 	res.fillColorThroughLens = this.fillColorThroughLens;
-	res.borderColorThroughLens = this.borderColorThroughLens;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	res.setVisibleThroughLens(visibleThroughLens);
 	return res;
     }

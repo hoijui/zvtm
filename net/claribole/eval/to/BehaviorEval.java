@@ -224,10 +224,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		vsm.addGlyph(NE_TARGET_R1, mSpace);
 		vsm.addGlyph(SE_TARGET_R1, mSpace);
 		vsm.addGlyph(SW_TARGET_R1, mSpace);
-		((Transparent)NW_TARGET_R1).setTransparencyValue(transp);
-		((Transparent)NE_TARGET_R1).setTransparencyValue(transp);
-		((Transparent)SE_TARGET_R1).setTransparencyValue(transp);
-		((Transparent)SW_TARGET_R1).setTransparencyValue(transp);
+		((Translucent)NW_TARGET_R1).setTranslucencyValue(transp);
+		((Translucent)NE_TARGET_R1).setTranslucencyValue(transp);
+		((Translucent)SE_TARGET_R1).setTranslucencyValue(transp);
+		((Translucent)SW_TARGET_R1).setTranslucencyValue(transp);
 		NW_TARGET_R1.setVisible(false);
 		NE_TARGET_R1.setVisible(false);
 		SE_TARGET_R1.setVisible(false);
@@ -241,10 +241,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		vsm.addGlyph(NE_TARGET_R2, mSpace);
 		vsm.addGlyph(SE_TARGET_R2, mSpace);
 		vsm.addGlyph(SW_TARGET_R2, mSpace);
-		((Transparent)NW_TARGET_R2).setTransparencyValue(transp);
-		((Transparent)NE_TARGET_R2).setTransparencyValue(transp);
-		((Transparent)SE_TARGET_R2).setTransparencyValue(transp);
-		((Transparent)SW_TARGET_R2).setTransparencyValue(transp);
+		((Translucent)NW_TARGET_R2).setTranslucencyValue(transp);
+		((Translucent)NE_TARGET_R2).setTranslucencyValue(transp);
+		((Translucent)SE_TARGET_R2).setTranslucencyValue(transp);
+		((Translucent)SW_TARGET_R2).setTranslucencyValue(transp);
 		NW_TARGET_R2.setVisible(false);
 		NE_TARGET_R2.setVisible(false);
 		SE_TARGET_R2.setVisible(false);
@@ -258,10 +258,10 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 		vsm.addGlyph(NE_TARGET_R3, mSpace);
 		vsm.addGlyph(SE_TARGET_R3, mSpace);
 		vsm.addGlyph(SW_TARGET_R3, mSpace);
-		((Transparent)NW_TARGET_R3).setTransparencyValue(transp);
-		((Transparent)NE_TARGET_R3).setTransparencyValue(transp);
-		((Transparent)SE_TARGET_R3).setTransparencyValue(transp);
-		((Transparent)SW_TARGET_R3).setTransparencyValue(transp);
+		((Translucent)NW_TARGET_R3).setTranslucencyValue(transp);
+		((Translucent)NE_TARGET_R3).setTranslucencyValue(transp);
+		((Translucent)SE_TARGET_R3).setTranslucencyValue(transp);
+		((Translucent)SW_TARGET_R3).setTranslucencyValue(transp);
 		NW_TARGET_R3.setVisible(false);
 		NE_TARGET_R3.setVisible(false);
 		SE_TARGET_R3.setVisible(false);
@@ -343,14 +343,14 @@ public class BehaviorEval implements TOWApplication, RepaintListener {
 	    vsm.addGlyph(SW_TARGET_R3, mSpace);
 	    Vector v = mSpace.getAllGlyphs();
 	    Object o;
-	    Glyph g;
+	    ClosedShape g;
 	    for (int i=0;i<v.size();i++){
 		o = v.elementAt(i);
 		if (o instanceof VRectangle){
-		    g = (Glyph)o;
+		    g = (ClosedShape)o;
 		    g.setFilled(true);
 		    g.setColor(DISTRACTOR_COLOR);
-		    g.setMouseInsideBorderColor(MOUSE_INSIDE_DISTRACTOR_COLOR);
+		    g.setMouseInsideHighlightColor(MOUSE_INSIDE_DISTRACTOR_COLOR);
 		}
 	    }
 // 	    vsm.addGlyph(new VSegment(-20,0,0,1000,(float)(45*2*Math.PI/360.0),Color.BLUE), mSpace);

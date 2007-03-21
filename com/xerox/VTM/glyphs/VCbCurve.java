@@ -36,7 +36,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VCbCurve extends Glyph implements Cloneable {
+public class VCbCurve extends Glyph {
 
     /**size (distance between start and end point)*/
     long vs;
@@ -55,7 +55,7 @@ public class VCbCurve extends Glyph implements Cloneable {
      *@param y coordinate in virtual space
      *@param z altitude
      *@param s size (distance between start and end points) in virtual space
-     *@param c fill color
+     *@param c color
      *@param or orientation
      *@param ctrlDist1 distance of control point (polar coords origin=start point)
      *@param or1 orientation of control point (polar coords origin=start point)
@@ -74,9 +74,7 @@ public class VCbCurve extends Glyph implements Cloneable {
 	vrad2=ctrlDist2;
 	ang2=or2;
 	computeSize();
-	filled=false;
 	setColor(c);
-	setBorderColor(bColor);
     }
 
     /**set position of control point 1 (polar coords w.r.t start point)*/
@@ -256,17 +254,7 @@ public class VCbCurve extends Glyph implements Cloneable {
      */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx,dy);
-		g.fill(pc[i].quad);
-		g.setColor(borderColor);
-		g.drawLine((int)pc[i].start.x,(int)pc[i].start.y,(int)pc[i].end.x,(int)pc[i].end.y);
-		g.translate(-dx,-dy);
-	    }
-	    else {//if not filled (common case), paint curve with main color, not border color
-		g.setColor(this.color);
-	    }
+	    g.setColor(this.color);
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx,dy);
@@ -288,17 +276,7 @@ public class VCbCurve extends Glyph implements Cloneable {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].lcr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx,dy);
-		g.fill(pc[i].lquad);
-		g.setColor(borderColor);
-		g.drawLine((int)pc[i].lstart.x,(int)pc[i].lstart.y,(int)pc[i].lend.x,(int)pc[i].lend.y);
-		g.translate(-dx,-dy);
-	    }
-	    else {//if not filled (common case), paint curve with main color, not border color
-		g.setColor(this.color);
-	    }
+	    g.setColor(this.color);
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx,dy);
@@ -320,8 +298,13 @@ public class VCbCurve extends Glyph implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	return new VCbCurve(vx,vy,0,vs,color,orient,vrad1,ang1,vrad2,ang2);
+	VCbCurve res = new VCbCurve(vx,vy,0,vs,color,orient,vrad1,ang1,vrad2,ang2);
+	res.mouseInsideColor = this.mouseInsideColor;
+	return res;
     }
+
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){}
 
 }
 

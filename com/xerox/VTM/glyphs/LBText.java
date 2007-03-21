@@ -32,6 +32,11 @@ import net.claribole.zvtm.glyphs.LensRendering;
 
 public class LBText extends LText {
 
+    Color bColor;
+    Color borderColor;
+    /** Coordinates of border color in HSV color space. */
+    protected float[] HSVb=new float[3];
+
     Color fillColorThroughLens;
     Color borderColorThroughLens;
     boolean visibleThroughLens = visible;
@@ -95,6 +100,66 @@ public class LBText extends LText {
     /**get the color used to paint the glyph's border*/
     public Color getBorderColorThroughLens(){
 	return borderColorThroughLens;
+    }
+
+    /** Set the glyph's border color (use setColor for text, paths, segments, etc.).
+     *@see #setColor(Color c)
+     */
+    public void setBorderColor(Color c){
+	borderColor = c;
+	bColor = borderColor;
+	HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
+	if (vsm != null){vsm.repaintNow();}
+    }
+
+    /** Set the glyph's border color (absolute value, HSV color space).
+     * Use setColor for text, paths, segments, etc.
+     *@param h hue in [0.0, 1.0]
+     *@param s saturation in [0.0, 1.0]
+     *@param v value (brightness) in [0.0, 1.0]
+     *@see #addHSVbColor(float h,float s,float v)
+     */
+    public void setHSVbColor(float h, float s, float v){
+	HSVb[0] = h;
+	if (HSVb[0]>1) {HSVb[0] = 1.0f;} else {if (HSVb[0]<0) {HSVb[0] = 0;}}
+	HSVb[1] = s;
+	if (HSVb[1]>1) {HSVb[1] = 1.0f;} else {if (HSVb[1]<0) {HSVb[1] = 0;}}
+	HSVb[2] = v;
+	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
+	borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
+	bColor = borderColor;
+	if (vsm != null){vsm.repaintNow();}
+    }
+    
+    /** Set the glyph's border color (absolute value, HSV color space).
+     * Use setColor for text, paths, segments, etc.
+     *@param h hue so that the final hue is in [0.0, 1.0]
+     *@param s saturation so that the final saturation is in [0.0, 1.0]
+     *@param v value so that the final value (brightness) is in [0.0, 1.0]
+     *@see #setHSVbColor(float h,float s,float v)
+     */
+    public void addHSVbColor(float h, float s, float v){
+	HSVb[0] = HSVb[0]+h;
+	if (HSVb[0]>1) {HSVb[0] = 1.0f;} else {if (HSVb[0]<0) {HSVb[0] = 0;}}
+	HSVb[1] = HSVb[1]+s;
+	if (HSVb[1]>1) {HSVb[1] = 1.0f;} else {if (HSVb[1]<0) {HSVb[1] = 0;}}
+	HSVb[2] = HSVb[2]+v;
+	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
+	this.borderColor = Color.getHSBColor(HSVb[0], HSVb[1], HSVb[2]);
+	bColor = borderColor;
+	if (vsm != null){vsm.repaintNow();}
+    }
+
+    /** Get border color's HSV components. */
+    public float[] getHSVbColor(){
+	return this.HSVb;
+    }
+
+    /** Get the glyph's border color (use getColor for text, paths, segments, etc.).
+     *@see #getColor()
+     */
+    public Color getBorderColor(){
+	return this.borderColor;
     }
 
     /**draw glyph 

@@ -35,7 +35,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VRectangleOr extends VRectangle implements Cloneable {
+public class VRectangleOr extends VRectangle {
 
     /**vertex x coords*/
     int[] xcoords = new int[4];
@@ -57,6 +57,21 @@ public class VRectangleOr extends VRectangle implements Cloneable {
      */
     public VRectangleOr(long x,long y,float z,long w,long h,Color c,float or){
 	super(x,y,z,w,h,c);
+	orient=or;
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param or orientation
+     */
+    public VRectangleOr(long x, long y, float z, long w, long h, Color c, Color bc, float or){
+	super(x, y, z, w, h, c);
 	orient=or;
     }
 
@@ -268,19 +283,9 @@ public class VRectangleOr extends VRectangle implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VRectangleOr res=new VRectangleOr(vx,vy,0,vw,vh,color,orient);
-	res.borderColor=this.borderColor;
+	VRectangleOr res=new VRectangleOr(vx, vy, 0, vw, vh, color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
-
-    /**
-     * returns a String with ID, position, and altitude
-     */
-    public String toString(){
-	return new String(super.toString()+" Glyph ID "+ID+" pos ("+vx+","+vy+","+vz+") "+stroke);
-    }
-
 
 }

@@ -407,7 +407,6 @@ public class VCursor {
 	    Glyph[] gl = vs.getVisibleGlyphList();
 	    for (int i=0;i<gl.length;i++){
 		gl[i].resetMouseIn(camIndex);
-		gl[i].borderColor = gl[i].bColor;
 	    }
 	}
     }

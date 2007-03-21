@@ -32,11 +32,11 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Diamond (losange with height equal to width) - can be reoriented
+ * Diamond (lozenge with height equal to width) - can be reoriented
  * @author Emmanuel Pietriga
  **/
 
-public class VDiamondOr extends VDiamond implements Cloneable {
+public class VDiamondOr extends VDiamond {
 
     public VDiamondOr(){super();}
 
@@ -51,7 +51,20 @@ public class VDiamondOr extends VDiamond implements Cloneable {
     public VDiamondOr(long x,long y,float z,long s,Color c,float or){
 	super(x,y,z,s,c);
 	orient=or;
-	//if (orient!=0){computeOrientCoords();}
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param s size (width=height) in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param or orientation
+     */
+    public VDiamondOr(long x, long y, float z, long s, Color c, Color bc, float or){
+	super(x, y, z, s, c, bc);
+	orient=or;
     }
 
     /**get orientation*/

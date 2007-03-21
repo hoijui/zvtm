@@ -37,7 +37,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VTriangleOr extends VTriangle implements Cloneable {
+public class VTriangleOr extends VTriangle {
 
     public VTriangleOr(){super();}
 
@@ -51,6 +51,20 @@ public class VTriangleOr extends VTriangle implements Cloneable {
      */
     public VTriangleOr(long x,long y,float z,long h,Color c,float or){
 	super(x,y,z,h,c);
+	orient=or;
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param h height in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param or orientation
+     */
+    public VTriangleOr(long x, long y, float z, long h, Color c, Color bc, float or){
+	super(x, y, z, h, c, bc);
 	orient=or;
     }
 
@@ -194,10 +208,8 @@ public class VTriangleOr extends VTriangle implements Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VTriangleOr res=new VTriangleOr(vx,vy,0,vh,color,orient);
-	res.borderColor=this.borderColor;
+	VTriangleOr res=new VTriangleOr(vx, vy, 0, vh, color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

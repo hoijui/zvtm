@@ -37,7 +37,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VCirImage extends Glyph implements Cloneable {
+public class VCirImage extends ClosedShape {
 
 
     /**half width and height in virtual space*/
@@ -79,6 +79,30 @@ public class VCirImage extends Glyph implements Cloneable {
 	orient=or;
 	setColor(c);
 	setBorderColor(Color.black);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param s size (width=height) in virtual space
+     *@param img image to be displayed
+     *@param c fill color of bounding circle
+     *@param bc border color of bounding circle
+     *@param or orientation
+     */
+    public VCirImage(long x, long y, float z, long s, Image img, Color c, Color bc, float or){
+	vx=x;
+	vy=y;
+	vz=z;
+	vs=s;
+	image=img;
+	ar=((float)image.getWidth(null))/((float)image.getHeight(null));
+	size=(float)vs;
+	computeSize();
+	orient=or;
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -130,6 +154,7 @@ public class VCirImage extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/

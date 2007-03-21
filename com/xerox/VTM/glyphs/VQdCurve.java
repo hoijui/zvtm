@@ -37,7 +37,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VQdCurve extends Glyph implements Cloneable {
+public class VQdCurve extends Glyph {
 
     /**size (distance between start and end point)*/
     long vs;
@@ -69,9 +69,7 @@ public class VQdCurve extends Glyph implements Cloneable {
 	vrad=ctrlDist1;
 	ang=or1;
 	computeSize();
-	filled=false;
 	setColor(c);
-	setBorderColor(bColor);
     }
 
     /**set position of control point (polar coords w.r.t center of segment linking start and end points)*/
@@ -232,20 +230,7 @@ public class VQdCurve extends Glyph implements Cloneable {
      */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fill(pc[i].quad);
-		g.setColor(borderColor);
-		g.drawLine((int)pc[i].start.x,(int)pc[i].start.y,(int)pc[i].end.x,(int)pc[i].end.y);
-		g.translate(-dx, -dy);
-	    }
-	    else {//if not filled (common case), paint curve with main color, not border color
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.draw(pc[i].quad);
-		g.translate(-dx, -dy);
-	    }
+	    g.setColor(this.color);
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx, dy);
@@ -267,18 +252,7 @@ public class VQdCurve extends Glyph implements Cloneable {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].lcr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fill(pc[i].lquad);
-		g.setColor(borderColor);
-		g.drawLine((int)pc[i].lstart.x,(int)pc[i].lstart.y,(int)pc[i].lend.x,(int)pc[i].lend.y);
-		g.translate(-dx, -dy);
-	    }
-	    else {//if not filled (common case), paint curve with main color, not border color
-		g.setColor(this.color);
-		g.draw(pc[i].lquad);
-	    }
+	    g.setColor(this.color);
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx, dy);
@@ -301,11 +275,12 @@ public class VQdCurve extends Glyph implements Cloneable {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VQdCurve res=new VQdCurve(vx,vy,0,vs,color,orient,vrad,ang);
-	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
+
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){}
 
 }
 

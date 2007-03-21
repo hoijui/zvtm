@@ -28,7 +28,7 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.engine.Location;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 
 /**A portal showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
@@ -166,7 +166,7 @@ public class OverviewPortal extends CameraPortal {
 			 y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef),
 			 Math.round((observedRegion[2]-observedRegion[0])*orcoef),
 			 Math.round((observedRegion[1]-observedRegion[3])*orcoef));
-	    g2d.setComposite(Transparent.acO);
+	    g2d.setComposite(Translucent.acO);
 	}
 	g2d.drawRect(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef),
 		     y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef),

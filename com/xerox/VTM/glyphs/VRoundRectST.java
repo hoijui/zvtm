@@ -18,21 +18,21 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 /**
- * Round Rectangle - cannot be reoriented - the corners are approximated to a plain rectangle for some operations like computing mouse enter/exit events (performance reasons) - transparency
+ * Round Rectangle - cannot be reoriented - the corners are approximated to a plain rectangle for some operations like computing mouse enter/exit events (performance reasons) - translucency
  * @author Emmanuel Pietriga
  **/
 
 
-public class VRoundRectST extends VRoundRect implements Transparent,Cloneable {
+public class VRoundRectST extends VRoundRect implements Translucent {
 
-    /**semi transparency (default is 0.5)*/
+    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
     /**alpha channel*/
     float alpha=0.5f;
 
     public VRoundRectST(){
 	super();
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
@@ -45,23 +45,41 @@ public class VRoundRectST extends VRoundRect implements Transparent,Cloneable {
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public VRoundRectST(long x,long y,float z,long w,long h,Color c,int aw,int ah){
-	super(x,y,z,w,h,c,aw,ah);
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+    public VRoundRectST(long x, long y, float z, long w, long h, Color c, int aw, int ah){
+	super(x, y, z, w, h, c, aw, ah);
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     *@param aw arc width in virtual space
+     *@param ah arc height in virtual space
      */
-    public void setTransparencyValue(float a){
+    public VRoundRectST(long x, long y, float z, long w, long h, Color c, Color bc, float a, int aw, int ah){
+	super(x, y, z, w, h, c, bc, aw, ah);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
+
+    /**
+     *set alpha channel value (translucency)
+     *@param a [0;1.0] 0 is fully translucent, 1 is opaque
+     */
+    public void setTranslucencyValue(float a){
 	alpha=a;
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to alpha
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /**get alpha value (translucency) for this glyph*/
+    public float getTranslucencyValue(){return alpha;}
 
     /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
@@ -148,11 +166,8 @@ public class VRoundRectST extends VRoundRect implements Transparent,Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VRoundRectST res=new VRoundRectST(vx,vy,0,vw,vh,color,arcWidth,arcHeight);
-	res.borderColor=this.borderColor;
+	VRoundRectST res = new VRoundRectST(vx, vy, 0, vw, vh, color, borderColor, alpha, arcWidth, arcHeight);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	res.setTransparencyValue(alpha);
 	return res;
     }
 

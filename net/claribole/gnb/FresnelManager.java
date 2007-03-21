@@ -117,7 +117,7 @@ class FresnelManager {
     void init(){
 	frame = new VRectangleST(0, 0, 0, 10, 10, FRAME_FILL_COLOR);
 	frame.setBorderColor(FRAME_BORDER_COLOR);
-	frame.setTransparencyValue(FRAME_OPACITY);
+	frame.setTranslucencyValue(FRAME_OPACITY);
 	application.vsm.addGlyph(frame, infoSpace);
 	infoSpace.hide(frame);
 	iCamera.setAltitude(0);

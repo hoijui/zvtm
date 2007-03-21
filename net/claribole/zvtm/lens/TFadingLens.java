@@ -22,7 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import net.claribole.zvtm.engine.LowPassFilter;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
@@ -295,7 +295,7 @@ public class TFadingLens extends TLens {
 	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
 	    g2d.setComposite(acs[Math.round((1.0f-MMTf)*ACS_ACCURACY)-1]);  
 	    g2d.drawOval(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
-	    g2d.setComposite(Transparent.acO);
+	    g2d.setComposite(Translucent.acO);
 	}
     }
 

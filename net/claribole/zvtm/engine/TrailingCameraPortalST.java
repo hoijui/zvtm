@@ -16,7 +16,6 @@ import java.util.TimerTask;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.Transparent;
 
 /**A portal showing what is seen through a camera, with parameterable alpha channel (translucency).
    The portal behaves like a trailing widget.
@@ -115,7 +114,7 @@ public class TrailingCameraPortalST extends CameraPortalST {
 	    alpha = (float)opacity*translucencyParamA + translucencyParamB;
 	    if (alpha < 0){alpha = 0;}
 	    else if (alpha > 1){alpha = 1.0f;}
-	    setTransparencyValue(alpha);
+	    setTranslucencyValue(alpha);
 	    owningView.repaintNow();
 	}
     }

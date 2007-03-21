@@ -26,7 +26,6 @@ import com.xerox.VTM.glyphs.VSliceST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
 import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.Transparent;
 
 public class PieMenuC extends PieMenu {
 
@@ -66,15 +65,13 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
 	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor);
+		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
 	    }
-	    items[i].setBorderColor(borderColor);
 	    items[i].setMouseInsideFillColor(fillSColor);
-	    items[i].setMouseInsideBorderColor(borderSColor);
+	    items[i].setMouseInsideHighlightColor(borderSColor);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){
@@ -147,15 +144,13 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
  	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i]);
+		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i]);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
 	    }
-	    items[i].setBorderColor(borderColors[i]);
 	    items[i].setMouseInsideFillColor(fillSColors[i]);
-	    items[i].setMouseInsideBorderColor(borderSColors[i]);
+	    items[i].setMouseInsideHighlightColor(borderSColors[i]);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){
@@ -229,15 +224,13 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
 	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor);
+		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
 	    }
-	    items[i].setBorderColor(borderColor);
 	    items[i].setMouseInsideFillColor(fillSColor);
-	    items[i].setMouseInsideBorderColor(borderSColor);
+	    items[i].setMouseInsideHighlightColor(borderSColor);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){
@@ -311,15 +304,13 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
  	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i]);
+		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i]);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
 	    }
-	    items[i].setBorderColor(borderColors[i]);
 	    items[i].setMouseInsideFillColor(fillSColors[i]);
-	    items[i].setMouseInsideBorderColor(borderSColors[i]);
+	    items[i].setMouseInsideHighlightColor(borderSColors[i]);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){

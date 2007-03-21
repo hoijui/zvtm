@@ -42,7 +42,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  */
 
-public class VText extends Glyph implements Cloneable {
+public class VText extends Glyph {
 
     /**text alignment (for text anchor) used to align a VText relative to its (vx,vy coordinates coincides with start of String)*/
     public static final short TEXT_ANCHOR_START=0;
@@ -75,7 +75,6 @@ public class VText extends Glyph implements Cloneable {
 	sensit=false;
 	text=t;
 	setColor(Color.white);
-	setBorderColor(Color.black);
     }
 
     /**
@@ -92,7 +91,6 @@ public class VText extends Glyph implements Cloneable {
 	sensit=false;
 	text=t;
 	setColor(c);
-	setBorderColor(Color.black);
     }
 
     /**
@@ -110,7 +108,6 @@ public class VText extends Glyph implements Cloneable {
 	sensit=false;
 	text=t;
 	setColor(c);
-	setBorderColor(Color.black);
 	text_anchor=ta;
     }
 
@@ -458,10 +455,11 @@ public class VText extends Glyph implements Cloneable {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VText res=new VText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
-	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
+
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){}
 
 }

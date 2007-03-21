@@ -144,7 +144,7 @@ public class Introduction {
 		g=new VDiamondOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
 	    }
 	    else if (shapeType<0.6){
-		g=new VOctagonOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
+		g=new VOctagonOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f), Color.BLACK,randomO);
 	    }
 	    else if (shapeType<0.8){
 		g=new VRectangleOr(randomX,randomY,0,randomS,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
@@ -171,14 +171,14 @@ public class Introduction {
 	VTriangleST t1=new VTriangleST(-600,200,0,50,Color.black);
 	VTriangle t2=new VTriangle(-200,200,0,50,Color.black);
 	VTriangle t3=new VTriangle(200,200,0,50,Color.black);
-	VTriangleOrST t4=new VTriangleOrST(600,200,0,75,Color.black,0.707f);
+	VTriangleOrST t4=new VTriangleOrST(600,200,0,75,Color.black, Color.BLACK, 0.5f, 0.707f);
 	t1.setDashed(true);t3.setFilled(false);t3.setDashed(true);
 	vsm.addGlyph(t1,"vs1");vsm.addGlyph(t2,"vs1");vsm.addGlyph(t3,"vs1");vsm.addGlyph(t4,"vs1");
 	t1.setHSVColor(0.66f,0.5f,0.5f);t2.setHSVColor(0.66f,0.5f,0.5f);t3.setHSVColor(0.66f,0.5f,0.5f);t4.setHSVColor(0.66f,0.5f,0.5f);
-	VDiamondST d1=new VDiamondST(-600,0,0,50,Color.black);
+	VDiamondST d1=new VDiamondST(-600,0,0,50,Color.black, Color.BLACK, 0.5f);
 	VDiamond d2=new VDiamond(-200,0,0,45,Color.black);
 	VOctagon o3=new VOctagon(200,0,0,50,Color.black);
-	VOctagonOrST o4=new VOctagonOrST(600,0,0,75,Color.black,0.5f);
+	VOctagonOrST o4=new VOctagonOrST(600,0,0,75,Color.black,Color.BLACK, 0.5f,0.5f);
 	d1.setDashed(true);d2.setFilled(false);o3.setDashed(true);
 	vsm.addGlyph(d1,"vs1");vsm.addGlyph(d2,"vs1");vsm.addGlyph(o3,"vs1");vsm.addGlyph(o4,"vs1");
 	d1.setHSVColor(0.0f,0.8f,0.8f);d2.setHSVColor(0.0f,0.8f,0.8f);o3.setHSVColor(0.0f,0.8f,0.8f);o4.setHSVColor(0.0f,0.8f,0.8f);
@@ -261,7 +261,7 @@ public class Introduction {
 
 	VCircle c1=new VCircle(-400,900,0,100,Color.black);c1.setType("an");	
 	VTriangleOr t1=new VTriangleOr(-400,600,0,100,Color.black,0);t1.setType("an");
-	VOctagonOr o1=new VOctagonOr(-400,300,0,100,Color.black,0);o1.setType("an");
+	VOctagonOr o1=new VOctagonOr(-400,300,0,100,Color.black,Color.BLACK,0);o1.setType("an");
 	VRectangleOr r1=new VRectangleOr(-400,0,0,100,50,Color.black,0);r1.setType("an");
 	VDiamondOr d1=new VDiamondOr(-400,-300,0,100,Color.black,0);d1.setType("an");
 	vsm.addGlyph(c1,"vs1");vsm.addGlyph(t1,"vs1");vsm.addGlyph(o1,"vs1");vsm.addGlyph(r1,"vs1");vsm.addGlyph(d1,"vs1");
@@ -276,8 +276,8 @@ public class Introduction {
 	VRectangleOr cg1=new VRectangleOr(-400,-1200,0,200,100,Color.black,0);
 	//and 4 secondary glyphs (init coordinates of secondary glyphs do not matter as they will be changed to match the position offset defined in the associated SGlyph)
 	VTriangleOr cg2=new VTriangleOr(0,0,0,50,Color.black,0);
-	VRectangleOrST cg3=new VRectangleOrST(0,0,0,50,50,Color.black,0.404f);
-	VTriangleOrST cg4=new VTriangleOrST(0,0,0,50,Color.black,0.404f);
+	VRectangleOrST cg3=new VRectangleOrST(0,0,0,50,50,Color.black,Color.BLACK, 0.5f,0.404f);
+	VTriangleOrST cg4=new VTriangleOrST(0,0,0,50,Color.black,Color.BLACK, 0.5f,0.404f);
 	VRectangleOr cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
 	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
 	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
@@ -339,8 +339,8 @@ public class Introduction {
 	vsm.getView("Demo").setEventHandler(eh);
 	VRectangleST g1=new VRectangleST(-2000,0,0,500,500,Color.blue);
 	VTriangleST g2=new VTriangleST(2000,0,0,500,Color.blue);
-	VDiamondST g3=new VDiamondST(0,-2000,0,500,Color.blue);
-	VOctagonST g4=new VOctagonST(0,2000,0,500,Color.blue);
+	VDiamondST g3=new VDiamondST(0,-2000,0,500,Color.blue, Color.BLACK, 0.5f);
+	VOctagonST g4=new VOctagonST(0,2000,0,500,Color.blue, Color.BLACK, 0.5f);
 	float[] vertices={1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f};
 	VShapeST g5=new VShapeST(0,0,0,200,vertices,Color.blue,0);
 	VCbCurve cb1=new VCbCurve(0,1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);

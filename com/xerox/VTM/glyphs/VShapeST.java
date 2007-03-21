@@ -29,13 +29,13 @@ import java.awt.geom.AffineTransform;
 
 
 /**
- * Custom shape - defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)) - angle between each vertices is 2*Pi/N - can be reoriented - transparency
+ * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented - translucent
  * @author Emmanuel Pietriga
  **/
 
-public class VShapeST extends VShape implements Transparent,Cloneable {
+public class VShapeST extends VShape implements Translucent {
 
-    /**semi transparency (default is 0.5)*/
+    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
     /**alpha channel*/
     float alpha=0.5f;
@@ -45,7 +45,7 @@ public class VShapeST extends VShape implements Transparent,Cloneable {
      */
     public VShapeST(float[] v){
 	super(v);
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
@@ -55,24 +55,44 @@ public class VShapeST extends VShape implements Transparent,Cloneable {
      *@param s size (width=height) in virtual space
      *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
      *@param c fill color
+     *@param or shape's orientation in [0, 2Pi[
      */
     public VShapeST(long x,long y,float z,long s,float[] v,Color c,float or){
 	super(x,y,z,s,v,c,or);
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to 0.5
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param s size (width=height) in virtual space
+     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
+     *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     *@param or shape's orientation in [0, 2Pi[
      */
-    public void setTransparencyValue(float a){
+    public VShapeST(long x, long y, float z, long s, float[] v, Color c, Color bc, float a, float or){
+	super(x, y, z, s, v, c, bc, or);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
+
+    /**
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public void setTranslucencyValue(float a){
 	alpha=a;
-	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to alpha
+	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){return alpha;}
 
     /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
@@ -153,11 +173,8 @@ public class VShapeST extends VShape implements Transparent,Cloneable {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VShapeST res=new VShapeST(vx,vy,0,vs,(float[])vertices.clone(),color,orient);
-	res.borderColor=this.borderColor;
+	VShapeST res = new VShapeST(vx, vy, 0, vs, (float[])vertices.clone(), color, borderColor, alpha, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	res.setTransparencyValue(alpha);
 	return res;
     }
 

@@ -25,7 +25,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class ZSegment extends VRectangle implements Cloneable {
+public class ZSegment extends VRectangle {
 
     public ZSegment(){
 	vx = 0;

@@ -181,15 +181,13 @@ class AbstractTaskDMEventHandler extends AbstractTaskEventHandler implements Por
 
     public void enterGlyph(Glyph g){// only highlight drag mag region glyph
 	if (g == application.dmRegion){
-	    if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	    g.highlight(true, null);
 	}
     }
 
     public void exitGlyph(Glyph g){// only highlight drag mag region glyph
 	if (g == application.dmRegion){
-	    if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	    if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	    g.highlight(false, null);
 	}
     }
 

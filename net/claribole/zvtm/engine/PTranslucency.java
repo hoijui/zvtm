@@ -13,9 +13,9 @@ package net.claribole.zvtm.engine;
 import java.util.Date;
 
 import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 
-/**portal animation: translucency
+/** Portal animation: translucency.
  * @author Emmanuel Pietriga
  */
 
@@ -49,17 +49,17 @@ public class PTranslucency extends PAnimation {
 	    progression = (double)((now.getTime()-startTime)/(double)duration);
 	    step = (int)Math.round(steps.length*progression);
 	    if (step<steps.length) {
-		((Transparent)target).setTransparencyValue(steps[step]);
+		((Translucent)target).setTranslucencyValue(steps[step]);
 	    }
 	    else {
-		((Transparent)target).setTransparencyValue(steps[steps.length-1]);
+		((Translucent)target).setTranslucencyValue(steps[steps.length-1]);
 		parent.killPAnim(this,type);
 	    }
 	}
     }
 
     public void conclude(){
-	((Transparent)target).setTransparencyValue(steps[steps.length-1]);
+	((Translucent)target).setTranslucencyValue(steps[steps.length-1]);
     }
 
     public void postAnimAction(){

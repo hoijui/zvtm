@@ -55,6 +55,19 @@ public class BRectangle extends VRectangle {
 	super(x, y, z, w, h, c);
     }
 
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     */
+    public BRectangle(long x, long y, float z, long w, long h, Color c, Color bc){
+	super(x, y, z, w, h, c, bc);
+    }
+
     /**draw glyph 
      *@param i camera index in the virtual space
      *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)

@@ -80,13 +80,11 @@ public class DefaultEventHandler implements ViewEventHandler {
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
     public void enterGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
-	if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	g.highlight(false, null);
     }
 
     /**beware: code is always 0 in Ktype (it is the value of KeyEvent.getKeyCode() which is always equal to VK_UNDEFINED according to Sun). If you need to access code, use Kpress or Krelease.*/

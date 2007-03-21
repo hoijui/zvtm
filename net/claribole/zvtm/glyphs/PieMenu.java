@@ -24,7 +24,7 @@ import com.xerox.VTM.glyphs.VSliceST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
 import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.ClosedShape;
 import net.claribole.zvtm.engine.GlyphKillAction;
 
 public abstract class PieMenu {
@@ -32,7 +32,7 @@ public abstract class PieMenu {
     boolean orientText = false;
 
     /**glyphs used to represent menu items*/
-    Glyph[] items;
+    ClosedShape[] items;
     /***/
     Glyph boundary;
     /**glyphs to represent the labels of menu items*/

@@ -26,7 +26,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VRoundRect extends Glyph implements RectangularShape  {
+public class VRoundRect extends ClosedShape implements RectangularShape  {
 
     /**half width and height in virtual space*/
     long vw,vh;
@@ -86,6 +86,34 @@ public class VRoundRect extends Glyph implements RectangularShape  {
 	arcHeight=ah;
     }
 
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param aw arc width in virtual space
+     *@param ah arc height in virtual space
+     */
+    public VRoundRect(long x, long y, float z, long w, long h, Color c, Color bc, int aw, int ah){
+	vx=x;
+	vy=y;
+	vz=z;
+	vw=w;
+	vh=h;
+	computeSize();
+	if (vw==0 && vh==0){ar=1.0f;}
+	else {ar=(float)vw/(float)vh;}
+	//if (vh!=0){ar=vw/vh;}else{ar=0;}
+	orient=0;
+	setColor(c);
+	setBorderColor(bc);
+	arcWidth=aw;
+	arcHeight=ah;
+    }
+
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
      *@param nbCam current number of cameras in the virtual space
      */
@@ -135,6 +163,7 @@ public class VRoundRect extends Glyph implements RectangularShape  {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/
@@ -360,10 +389,8 @@ public class VRoundRect extends Glyph implements RectangularShape  {
 
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
-	VRoundRect res=new VRoundRect(vx,vy,0,vw,vh,color,arcWidth,arcHeight);
-	res.borderColor=this.borderColor;
+	VRoundRect res = new VRoundRect(vx, vy, 0, vw, vh, color, borderColor, arcWidth, arcHeight);
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
 

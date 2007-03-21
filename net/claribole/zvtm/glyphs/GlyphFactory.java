@@ -53,7 +53,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Transparent;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VCircleST;
 import com.xerox.VTM.glyphs.VDiamond;
@@ -583,14 +583,10 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	Glyph g=null;
 	if (si.equals(V_Shape)){
 	    if (transpChk.isSelected()){
-		g=new VShapeST(0,0,0,size,doubleToFloatArray(vertices),fillColor,(float)angle);
-		((Transparent)g).setTransparencyValue((float)alpha);
+		g = new VShapeST(0, 0, 0, size, doubleToFloatArray(vertices), fillColor, borderColor, (float)alpha, (float)angle);
 	    }
 	    else {
-		g=new VShape(0,0,0,size,doubleToFloatArray(vertices),fillColor,(float)angle);
-		float[] hsv=new float[3];
-		Color.RGBtoHSB(borderColor.getRed(),borderColor.getGreen(),borderColor.getBlue(),hsv);
-		g.setHSVbColor(hsv[0],hsv[1],hsv[2]);
+		g = new VShape(0, 0, 0, size, doubleToFloatArray(vertices), fillColor, borderColor, (float)angle);
 	    }
 	}
 	else if (si.equals(V_Rectangle)){
@@ -605,17 +601,15 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	    }
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g=new VRectangleOrST(0,0,0,w,h,fillColor,(float)angle);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g = new VRectangleOrST(0, 0, 0, w, h, fillColor, borderColor, (float)alpha, (float)angle);
 		}
-		else {g=new VRectangleOr(0,0,0,w,h,fillColor,(float)angle);}
+		else {g = new VRectangleOr(0, 0, 0, w, h, fillColor, borderColor, (float)angle);}
 	    }
 	    else {
 		if (transpChk.isSelected()){
-		    g=new VRectangleST(0,0,0,w,h,fillColor);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g = new VRectangleST(0, 0, 0, w, h, fillColor, borderColor, (float)alpha);
 		}
-		else {g=new VRectangle(0,0,0,w,h,fillColor);}
+		else {g = new VRectangle(0, 0, 0, w, h, fillColor, borderColor);}
 	    }
 	}
 	else if (si.equals(V_Ellipse)){
@@ -629,70 +623,62 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 		w=Math.round(size*aspectRatio);
 	    }
 	    if (transpChk.isSelected()){
-		g=new VEllipseST(0,0,0,w,h,fillColor);
-		((Transparent)g).setTransparencyValue((float)alpha);
+		g = new VEllipseST(0, 0, 0, w, h, fillColor, borderColor, (float)alpha);
 	    }
-	    else {g=new VEllipse(0,0,0,w,h,fillColor);}
+	    else {g = new VEllipse(0, 0, 0, w, h, fillColor, borderColor);}
 	}
 	else if (si.equals(V_Circle)){
 	    if (transpChk.isSelected()){
-		g=new VCircleST(0,0,0,size,fillColor);
-		((Transparent)g).setTransparencyValue((float)alpha);
+		g=new VCircleST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 	    }
-	    else {g=new VCircle(0,0,0,size,fillColor);}
+	    else {g=new VCircle(0, 0, 0, size, fillColor, borderColor);}
 	}
 	else if (si.equals(V_Triangle)){
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g=new VTriangleOrST(0,0,0,size,fillColor,(float)angle);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g=new VTriangleOrST(0, 0, 0, size, fillColor, borderColor, (float)alpha, (float)angle);
 		}
-		else {g=new VTriangleOr(0,0,0,size,fillColor,(float)angle);}
+		else {g=new VTriangleOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
 	    }
 	    else {
 		if (transpChk.isSelected()){
-		    g=new VTriangleST(0,0,0,size,fillColor);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g=new VTriangleST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 		}
-		else {g=new VTriangle(0,0,0,size,fillColor);}
+		else {g=new VTriangle(0, 0, 0, size, fillColor, borderColor);}
 	    }
 	}
 	else if (si.equals(V_Diamond)){
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g=new VDiamondOrST(0,0,0,size,fillColor,(float)angle);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g=new VDiamondOrST(0, 0, 0, size, fillColor, borderColor, (float)alpha, (float)angle);
 		}
-		else {g=new VDiamondOr(0,0,0,size,fillColor,(float)angle);}
+		else {g=new VDiamondOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
 	    }
 	    else {
 		if (transpChk.isSelected()){
-		    g=new VDiamondST(0,0,0,size,fillColor);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g=new VDiamondST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 		}
-		else {g=new VDiamond(0,0,0,size,fillColor);}
+		else {g=new VDiamond(0, 0, 0, size, fillColor, borderColor);}
 	    }
 	}
 	else if (si.equals(V_Octagon)){
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g=new VOctagonOrST(0,0,0,size,fillColor,(float)angle);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g=new VOctagonOrST(0, 0, 0, size, fillColor, borderColor, (float)alpha, (float)angle);
 		}
-		else {g=new VOctagonOr(0,0,0,size,fillColor,(float)angle);}
+		else {g=new VOctagonOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
 	    }
 	    else {
 		if (transpChk.isSelected()){
-		    g=new VOctagonST(0,0,0,size,fillColor);
-		    ((Transparent)g).setTransparencyValue((float)alpha);
+		    g=new VOctagonST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 		}
-		else {g=new VOctagon(0,0,0,size,fillColor);}
+		else {g=new VOctagon(0, 0, 0, size, fillColor, borderColor);}
 	    }
 	}
-	//border color
-	float[] hsv=new float[3];
-	Color.RGBtoHSB(borderColor.getRed(),borderColor.getGreen(),borderColor.getBlue(),hsv);
-	g.setHSVbColor(hsv[0],hsv[1],hsv[2]);
+// 	//border color
+// 	float[] hsv=new float[3];
+// 	Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(),borderColor.getBlue(),hsv);
+// 	g.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	return g;
     }
 

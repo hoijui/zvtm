@@ -38,7 +38,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VOctagon extends Glyph implements Cloneable {
+public class VOctagon extends ClosedShape {
 
     /**vertex x coords*/
     int[] xcoords = new int[8];
@@ -77,6 +77,25 @@ public class VOctagon extends Glyph implements Cloneable {
 	orient=0;
 	setColor(c);
 	setBorderColor(Color.black);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param s size (width=height) in virtual space
+     *@param c fill color
+     *@param bc border color
+     */
+    public VOctagon(long x, long y, float z, long s, Color c, Color bc){
+	vx=x;
+	vy=y;
+	vz=z;
+	vs=s;
+	computeSize();
+	orient=0;
+	setColor(c);
+	setBorderColor(bc);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -128,6 +147,7 @@ public class VOctagon extends Glyph implements Cloneable {
     /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+	borderColor = bColor;
     }
 
     /**get orientation*/

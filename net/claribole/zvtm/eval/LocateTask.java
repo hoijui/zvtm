@@ -393,7 +393,7 @@ public class LocateTask implements Java2DPainter {
 	g2d.setColor(Color.BLACK);
 	g2d.setComposite(acST);
 	g2d.fillRect(0, 0, viewWidth, viewHeight);
-	g2d.setComposite(com.xerox.VTM.glyphs.Transparent.acO);
+	g2d.setComposite(com.xerox.VTM.glyphs.Translucent.acO);
     }
 
     public static void main(String[] args){

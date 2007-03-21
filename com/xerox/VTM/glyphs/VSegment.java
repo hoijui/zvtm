@@ -39,7 +39,7 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class VSegment extends Glyph implements RectangularShape,Cloneable {
+public class VSegment extends Glyph implements RectangularShape {
 
     /**half width and height in virtual space*/
     long vw,vh;
@@ -54,7 +54,6 @@ public class VSegment extends Glyph implements RectangularShape,Cloneable {
 	size=10;
 	computeEdges();
 	setColor(Color.white);
-	setBorderColor(Color.black);
     }
 
     /**
@@ -74,7 +73,6 @@ public class VSegment extends Glyph implements RectangularShape,Cloneable {
 	vh=h;
 	computeSize();
 	setColor(c);
-	setBorderColor(Color.black);
     }
 
     /**
@@ -94,7 +92,6 @@ public class VSegment extends Glyph implements RectangularShape,Cloneable {
 	vh = (y2 - y1) / 2;
 	computeSize();
 	setColor(c);
-	setBorderColor(Color.black);
     }
 
     /**
@@ -114,7 +111,6 @@ public class VSegment extends Glyph implements RectangularShape,Cloneable {
 	size=lgth;
 	computeEdges();
 	setColor(c);
-	setBorderColor(Color.black);
     }
 
     /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
@@ -385,10 +381,11 @@ public class VSegment extends Glyph implements RectangularShape,Cloneable {
     /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VSegment res=new VSegment(vx,vy,0,vw,vh,color);
-	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
 	return res;
     }
+
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){}
 
 }

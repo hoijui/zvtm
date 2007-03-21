@@ -24,7 +24,6 @@ import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
 import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.Transparent;
 
 public class PieMenuP extends PieMenu {
 
@@ -66,15 +65,13 @@ public class PieMenuP extends PieMenu {
 	    angle += angleDelta;
 	    coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
 	    if (alphaT >= 1.0f){
-		items[i] = new VPolygon(coords, fillColor);
+		items[i] = new VPolygon(coords, fillColor, borderColor);
 	    }
 	    else {
-		items[i] = new VPolygonST(coords, fillColor);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VPolygonST(coords, fillColor, borderColor, alphaT);
 	    }
-	    items[i].setBorderColor(borderColor);
 	    items[i].setMouseInsideFillColor(fillSColor);
-	    items[i].setMouseInsideBorderColor(borderSColor);
+	    items[i].setMouseInsideHighlightColor(borderSColor);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){
@@ -152,15 +149,13 @@ public class PieMenuP extends PieMenu {
  	    angle += angleDelta;
 	    coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
 	    if (alphaT >= 1.0f){
-		items[i] = new VPolygon(coords, fillColors[i]);
+		items[i] = new VPolygon(coords, fillColors[i], borderColors[i]);
 	    }
 	    else {
-		items[i] = new VPolygonST(coords, fillColors[i]);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VPolygonST(coords, fillColors[i], borderColors[i], alphaT);
 	    }
-	    items[i].setBorderColor(borderColors[i]);
 	    items[i].setMouseInsideFillColor(fillSColors[i]);
-	    items[i].setMouseInsideBorderColor(borderSColors[i]);
+	    items[i].setMouseInsideHighlightColor(borderSColors[i]);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){
@@ -232,15 +227,13 @@ public class PieMenuP extends PieMenu {
 	    angle += angleDelta;
 	    coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
 	    if (alphaT >= 1.0f){
-		items[i] = new VPolygon(coords, fillColor);
+		items[i] = new VPolygon(coords, fillColor, borderColor);
 	    }
 	    else {
-		items[i] = new VPolygonST(coords, fillColor);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VPolygonST(coords, fillColor, borderColor, alphaT);
 	    }
-	    items[i].setBorderColor(borderColor);
 	    items[i].setMouseInsideFillColor(fillSColor);
-	    items[i].setMouseInsideBorderColor(borderSColor);
+	    items[i].setMouseInsideHighlightColor(borderSColor);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){
@@ -319,15 +312,13 @@ public class PieMenuP extends PieMenu {
  	    angle += angleDelta;
 	    coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
 	    if (alphaT >= 1.0f){
-		items[i] = new VPolygon(coords, fillColors[i]);
+		items[i] = new VPolygon(coords, fillColors[i], borderColors[i]);
 	    }
 	    else {
-		items[i] = new VPolygonST(coords, fillColors[i]);
-		((Transparent)items[i]).setTransparencyValue(alphaT);
+		items[i] = new VPolygonST(coords, fillColors[i], borderColors[i], alphaT);
 	    }
-	    items[i].setBorderColor(borderColors[i]);
 	    items[i].setMouseInsideFillColor(fillSColors[i]);
-	    items[i].setMouseInsideBorderColor(borderSColors[i]);
+	    items[i].setMouseInsideHighlightColor(borderSColors[i]);
 	    vsm.addGlyph(items[i], vs, false, false);
 	    if (stringLabels[i] != null && stringLabels[i].length() > 0){
 		if (orientText){

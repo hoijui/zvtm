@@ -27,16 +27,16 @@ import net.claribole.zvtm.lens.Lens;
  * @author Emmanuel Pietriga
  **/
 
-public class ZSegmentST extends ZSegment implements Transparent {
+public class ZSegmentST extends ZSegment implements Translucent {
 
-    /**semi transparency (default is 0.5)*/
+    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
     /**alpha channel*/
     float alpha=0.5f;
 
     public ZSegmentST(){
 	super();
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to 0.5
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to 0.5
     }
 
     /**
@@ -49,21 +49,23 @@ public class ZSegmentST extends ZSegment implements Transparent {
      */
     public ZSegmentST(long x,long y,float z,long w,long h,Color c){
 	super(x, y, z, w, h, c);
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to 0.5
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to 0.5
     }
 
 
     /**
-     *set alpha channel value (transparency)
-     *@param a [0;1.0] 0 is fully transparent, 1 is opaque
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTransparencyValue(float a){
+    public void setTranslucencyValue(float a){
 	alpha = a;
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to alpha
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
     }
 
-    /**get alpha value (transparency) for this glyph*/
-    public float getTransparencyValue(){return alpha;}
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){return alpha;}
 
     /**draw glyph 
      *@param i camera index in the virtual space
@@ -150,6 +152,7 @@ public class ZSegmentST extends ZSegment implements Transparent {
 	res.borderColor = this.borderColor;
 	res.mouseInsideColor = this.mouseInsideColor;
 	res.bColor = this.bColor;
+	res.setTranslucencyValue(alpha);
 	return res;
     }
 

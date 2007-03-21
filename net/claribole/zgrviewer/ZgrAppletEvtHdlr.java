@@ -325,8 +325,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (g.mouseInsideFColor != null){g.color = g.mouseInsideFColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.mouseInsideColor;}
+	g.highlight(true, null);
 	if (grMngr.tp.isHighlightMode()){
 	    grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
 	}
@@ -338,8 +337,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (g.mouseInsideFColor != null){g.color = g.fColor;}
-	if (g.mouseInsideColor != null){g.borderColor = g.bColor;}
+	g.highlight(false, null);
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
