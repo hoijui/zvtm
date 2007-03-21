@@ -151,11 +151,6 @@ public class VImageOr extends VImage {
 	}
     }
 
-    /**draw glyph
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)){
 	    if (zoomSensitive){
@@ -278,7 +273,6 @@ public class VImageOr extends VImage {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VImageOr res=new VImageOr(vx,vy,0,image,orient);
 	res.setWidth(vw);

@@ -113,17 +113,35 @@ public abstract class Glyph implements Cloneable {
 
     /*------------Geometry---------------------------------------*/
 
-    /** Coordinates in virtual space (geometric center of object). */
-    public long vx,vy;
+    /** Horizontal coordinate of the glyph's geomatrical center, in virtual space.
+     *@see #moveTo(long x, long y)
+     *@see #move(long x, long y)
+     *@see #getLocation()
+     */
+    public long vx;
+
+    /** Vertical coordinate of the glyph's geomatrical center, in virtual space.
+     *@see #moveTo(long x, long y)
+     *@see #move(long x, long y)
+     *@see #getLocation()
+     */
+    public long vy;
 
     /** Altitude (in virtual space). Not used yet. */
     public float vz;
 
-    /** Radius of bounding circle. */
-    float size;
+    /** Radius of bounding circle (read-only).
+     *@see #sizeTo(float radius)
+     *@see #reSize(float factor)
+     *@see #getSize()
+     */
+    public float size;
 
-    /** Glyph's orientation in [0:2Pi[. */
-    float orient=0.0f;
+    /** Glyph's orientation in [0:2Pi[ (read-only).
+     *@see #getOrient()
+     *@see #orientTo(float angle)
+     */
+    public float orient = 0.0f;
 
     /** Translate the glyph by (x,y) - relative translation.
      *@see #moveTo(long x, long y)
