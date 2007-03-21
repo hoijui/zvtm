@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjPolygon;
 
 /**
  * Custom polygon - can now be resized. This new implementation of VPolygon models vertices as doubles internally to allow resizing without loss of precision (and thus resizing to small sizes does not tamper with the shape aspect). It might be more memory consuming, and less efficient, so the old implementation is still offered (class FPolygon), for people who do not care about resizing VPolygon instances - cannot be reoriented for now

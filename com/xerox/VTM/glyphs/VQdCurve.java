@@ -31,6 +31,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjQdCurve;
 
 /**
  * Quadratic Curve -  can be reoriented -  CANNOT DETECT ENTRY/EXIT in curves, even when filled (they look as, but are not, closed shapes) <br> a quadratic curve is a curved segment that has two endpoints and one control point. The control point determines the shape of the curve by controlling both of the endpoint tangent vectors <br> for this particular glyph, vx and vy correspond to the center of the imaginary segment linking the curve's start and end points <br> the coordinates of the control point are expressed w.r.t this point in polar coordinates (orient=0 on segment linking start and end points, meaning that if orient=0, start control and end points are aligned) 

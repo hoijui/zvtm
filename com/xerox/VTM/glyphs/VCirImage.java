@@ -31,6 +31,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjCirImage;
 
 /**
  * Circle containing an Image (rectangular) - can be reoriented

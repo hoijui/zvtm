@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
 
 /**
  * Circle containing a custom shape - defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)) - angle between each vertices is 2*Pi/N - can be reoriented

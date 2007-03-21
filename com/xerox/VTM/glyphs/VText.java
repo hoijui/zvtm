@@ -35,6 +35,7 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjText;
 
 /**
  * Standalone Text  (font properties are set in the view, but can be changed for each VText using setSpecialFont())

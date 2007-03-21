@@ -34,6 +34,8 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.svg.SVGReader;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
+
 
 /**
  * General path - cannot be resized nor reoriented (for now) - does not follow the standard object model - (vx,vy) are the coordinates of the path's first point - can detect mouse overlapping path by explicitely calling VCursor.interesctsPath(VPath p), but no event is automatically fired by the event handler when the mouse is above a VPath (if you really want to do that, you can call VCursor.getIntersectingPaths() in mouseMoved in your event handler, but this probably will be time consuming)

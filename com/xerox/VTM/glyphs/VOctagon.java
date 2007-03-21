@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjOctagon;
 
 /**
  * Octagon (eight "almost" regular edges) cannot be reoriented

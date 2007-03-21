@@ -33,6 +33,7 @@ import java.awt.geom.Rectangle2D;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjBoolean;
 
   /**
    * Boolean shape - defined by a main glyph and a list of boolean operations (applied according to their order in the constructor's array)

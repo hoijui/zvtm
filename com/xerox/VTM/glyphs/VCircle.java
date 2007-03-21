@@ -31,6 +31,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.BProjectedCoords;
 
 /**
  * Circle - cannot be reoriented (makes no sense) - it makes no sense anyway

@@ -22,6 +22,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.svg.SVGReader;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjSlice;
 
 /**
  * Slice, used e.g. for drawing Pie Menu widgets - can be resized and reoriented

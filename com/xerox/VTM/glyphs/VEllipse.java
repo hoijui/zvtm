@@ -30,6 +30,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjEllipse;
 
   /**
    * Ellipse - cannot be reoriented

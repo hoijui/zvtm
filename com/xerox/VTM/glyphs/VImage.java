@@ -31,6 +31,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.RProjectedCoordsP;
 
 /**
  * Image (rectangular) - cannot be reoriented
@@ -44,27 +45,37 @@ public class VImage extends ClosedShape implements RectangularShape {
     public static final short DRAW_BORDER_MOUSE_INSIDE = 1;
     public static final short DRAW_BORDER_ALWAYS = 2;
 
-    /**half width and height in virtual space*/
-    long vw,vh;
-    /**aspect ratio (width divided by height)*/
-    float ar;
+    /** Half width in virtual space (read-only). */
+    public long vw;
+    /** Half height in virtual space (read-only). */
+    public long vh;
+    /** Aspect ratio: width divided by height (read-only). */
+    public float ar;
 
-    AffineTransform at;
+    /** For internal use. Made public for easier putside package subclassing. */
+    public AffineTransform at;
 
-    /**draw border policy 0=never draw border 1=draw border if cursor inside 2=always draw border*/
-    short drawBorder=DRAW_BORDER_NEVER;
+    /** For internal use. Made public for easier putside package subclassing. */
+    public RProjectedCoordsP[] pc;
 
-    RProjectedCoordsP[] pc;
+    /** For internal use. Made public for easier putside package subclassing. */
+    public Image image;
 
-    Image image;
+    /** Indicates when a border is drawn around the image (read-only).
+     * One of DRAW_BORDER_*
+     */
+    public short drawBorder = DRAW_BORDER_NEVER;
 
-    boolean zoomSensitive=true;
+    /** For internal use. Made public for easier putside package subclassing. */
+    public boolean zoomSensitive = true;
 
-    float scaleFactor=1.0f;
+    /** For internal use. Made public for easier putside package subclassing. */
+    public float scaleFactor = 1.0f;
+    
+    /** For internal use. Made public for easier putside package subclassing. */
+    public float trueCoef = 1.0f;
 
-    float trueCoef=1.0f;
-
-    /**
+    /** Construct an image at (0, 0) with original scale.
      *@param img image to be displayed
      */
     public VImage(Image img){
@@ -81,7 +92,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	setBorderColor(Color.black);
     }
 
-    /**
+    /** Construct an image at (x, y) with original scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z altitude
@@ -101,7 +112,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	setBorderColor(Color.black);
     }
 
-    /**
+    /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z altitude

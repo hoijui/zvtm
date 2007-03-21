@@ -20,6 +20,7 @@ import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.RProjectedCoords;
 
 /**
  * RectangleNR - not sensitive to zoom (will keep its size no matter the camera's altitude) - cannot be reoriented <br> used for instance to create resizing handles

@@ -24,6 +24,7 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjPolygon;
 
 /**
  * Custom polygon - Cannot be resized nor reoriented.
