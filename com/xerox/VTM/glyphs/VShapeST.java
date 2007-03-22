@@ -97,9 +97,9 @@ public class VShapeST extends VShape implements Translucent {
 	    if (filled){
 		g.setColor(this.color);  
 		g.setComposite(acST);
-		    g.translate(dx, dy);
+		g.translate(dx, dy);
 		g.fillPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
+		g.translate(-dx, -dy);
 		g.setComposite(acO);
 	    }
 	    g.setColor(borderColor);
