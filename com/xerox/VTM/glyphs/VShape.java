@@ -294,8 +294,8 @@ public class VShape extends ClosedShape {
 	else {
 	    pc[i].lp.npoints = xcoords.length;
 	    for (int j=0;j<xcoords.length;j++){
-		pc[i].lp.xpoints[j] = xcoords[j];
-		pc[i].lp.ypoints[j] = ycoords[j];
+		pc[i].lp.xpoints[j] = lxcoords[j];
+		pc[i].lp.ypoints[j] = lycoords[j];
 	    }
 	    pc[i].lp.invalidate();
 	}
