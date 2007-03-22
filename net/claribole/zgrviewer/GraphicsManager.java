@@ -892,6 +892,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	    for (int i=0;i<n.edges.length;i++){
 		for (int j=0;j<n.edges[i].glyphs.length;j++){
 		    g = n.edges[i].glyphs[j];
+		    /* prevent elements from being processed more than once
+		       this can happen when a node links to itself, and
+		       this makes the highlightinh mechanism think that
+		       the arc's original color is the selection color */
+		    if (highlightedElements.contains(g)){continue;}
 		    highlightedElements.add(g);
 		    originalFillColor.add(g.getColor());
 		    if (g.isFilled()){
