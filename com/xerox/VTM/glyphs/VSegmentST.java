@@ -25,15 +25,14 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Segment - translucent
+ * Translucent Segment (straight line). This version is less efficient than VSegment, but it can be made translucent.
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VSegment
+ */
 
 public class VSegmentST extends VSegment implements Translucent {
 
-    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     public VSegmentST(){
@@ -89,23 +88,13 @@ public class VSegmentST extends VSegment implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
-    /**
-     * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
     }
 
-    /** Get alpha channel value (translucency).
-     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public float getTranslucencyValue(){return alpha;}
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
@@ -144,7 +133,6 @@ public class VSegmentST extends VSegment implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VSegmentST res=new VSegmentST(vx, vy, 0, vw, vh, color, alpha);
 	res.mouseInsideColor=this.mouseInsideColor;

@@ -32,8 +32,9 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Circle - cannot be reoriented - it makes no sense anyway
+ * Circle. Same as VCircle but with a parameterable minimum apparent size.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VCircle
  **/
 
 public class ZCircle extends VCircle {
@@ -55,17 +56,21 @@ public class ZCircle extends VCircle {
 
     int minProjSize = 1;
 
+    /** Set the minimum projected/apparent size of this circle.
+     * If the actual projected size if less than this value, the glyph will be drawn with this value.
+     *@see #getMimimumProjectedSize()
+     */
     public void setMinimumProjectedSize(int s){
 	minProjSize = s;
     }
 
+    /** Get the minimum projected/apparent size of this circle.
+     *@see #setMinimumProjectedSize(int s)
+     */
     public int getMimimumProjectedSize(){
 	return minProjSize;
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >= minProjSize){
 	    if (filled){
@@ -114,8 +119,6 @@ public class ZCircle extends VCircle {
 	}
     }
 
-
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	ZCircle res = new ZCircle(vx,vy,0,vr,color);
 	res.borderColor = this.borderColor;

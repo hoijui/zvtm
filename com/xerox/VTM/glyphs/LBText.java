@@ -28,13 +28,16 @@ import net.claribole.zvtm.glyphs.LensRendering;
  * Standalone text whose visibility and color can be different depending on whether it is seen through a lens or not.
  * The border color is used to fill the text's background. Set to null if no background should be painted.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VText
+ *@see com.xerox.VTM.glyphs.LText
+ *@see com.xerox.VTM.glyphs.VTextOr
  */
 
 public class LBText extends LText {
 
     Color bColor;
     Color borderColor;
-    /** Coordinates of border color in HSV color space. */
+    /* Coordinates of border (background) color in HSV color space. */
     protected float[] HSVb=new float[3];
 
     Color fillColorThroughLens;
@@ -70,34 +73,26 @@ public class LBText extends LText {
 	borderColorThroughLens = null;
     }
 
-    /**make this glyph (in)visible when seen through a lens (the glyph remains sensitive to cursor in/out events)<br>
-     *@param b true to make glyph visible, false to make it invisible
-     */
     public void setVisibleThroughLens(boolean b){
 	visibleThroughLens = b;
     }
 
-    /**get this glyph's visibility state when seen through the lens (returns true if visible)*/
     public boolean isVisibleThroughLens(){
 	return visibleThroughLens;
     }
 
-    /**set the color used to paint the glyph's interior*/
     public void setFillColorThroughLens(Color c){
 	fillColorThroughLens = c;
     }
 
-    /**set the color used to paint the glyph's border*/
     public void setBorderColorThroughLens(Color c){
 	borderColorThroughLens = c;
     }
 
-    /**get the color used to paint the glyph's interior*/
     public Color getFillColorThroughLens(){
 	return fillColorThroughLens;
     }
     
-    /**get the color used to paint the glyph's border*/
     public Color getBorderColorThroughLens(){
 	return borderColorThroughLens;
     }
@@ -162,9 +157,6 @@ public class LBText extends LText {
 	return this.borderColor;
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
@@ -267,7 +259,6 @@ public class LBText extends LText {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LBText res=new LBText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
 	res.borderColor=this.borderColor;

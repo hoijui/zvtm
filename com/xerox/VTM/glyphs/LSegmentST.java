@@ -27,13 +27,14 @@ import net.claribole.zvtm.lens.Lens;
  * Segment specifically made for being seen through a lens without disappearing too much.
  * Doubles the line when rendering the segment in the lens buffer.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.LSegmentST
+ *@see com.xerox.VTM.glyphs.VSegment
+ *@see com.xerox.VTM.glyphs.VSegmentST
  **/
 
 public class LSegmentST extends LSegment implements Translucent {
 
-    /**semi transparency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     public LSegmentST(){
@@ -83,24 +84,14 @@ public class LSegmentST extends LSegment implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to 0.5
     }
 
-    /**
-     * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //transparency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /** Get alpha channel value (translucency).
-     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public float getTranslucencyValue(){return alpha;}
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT){
 	g.setColor(this.color);
 	if (alpha < 1.0f){
@@ -139,7 +130,6 @@ public class LSegmentST extends LSegment implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LSegmentST res = new LSegmentST(vx, vy, 0, vw, vh, color);
 	res.mouseInsideColor = this.mouseInsideColor;

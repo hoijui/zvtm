@@ -32,9 +32,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 /**
- * Rectangle - cannot be reoriented - hatched fill pattern
+ * Hatched Rectangle. Same as VRectangle, filled with an hatch pattern.
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VRectangle
+ */
 
 public class VRectangleH extends VRectangle {
 
@@ -70,12 +71,6 @@ public class VRectangleH extends VRectangle {
 	tp = new TexturePaint(bi, new Rectangle(0,0,5,5));
     }
 
-
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    if (filled) {
@@ -159,35 +154,30 @@ public class VRectangleH extends VRectangle {
 	}
     }
 
-    /**set absolute fill color in HSV coord sys*/
     public void setHSVColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.setHSVColor(h,s,v);
 	initPattern();
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**set relative fill color in HSV coord sys*/
     public void addHSVColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.addHSVColor(h,s,v);
 	initPattern();
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**set absolute border color in HSV coord sys*/
     public void setHSVbColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.setHSVbColor(h,s,v);
 	initPattern();
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**set relative border color in HSV coord sys*/
     public void addHSVbColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.addHSVbColor(h,s,v);
 	initPattern();
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VRectangleH res=new VRectangleH(vx, vy, 0, vw, vh, color, borderColor);
 	res.mouseInsideColor=this.mouseInsideColor;

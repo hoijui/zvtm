@@ -35,24 +35,27 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjTriangle;
 
 /**
- * Triangle - cannot be reoriented
+ * Equilateral Triangle. This version is the most efficient, but it can neither be reoriented (see VTriangleOr*) nor made translucent (see VTriangle*ST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VTriangleOr
+ *@see com.xerox.VTM.glyphs.VTriangleOrST
+ *@see com.xerox.VTM.glyphs.VTriangleST
+ */
 
 public class VTriangle extends ClosedShape {
 
-    /**vertex x coords*/
+    /*vertex x coords*/
     int[] xcoords = new int[3];
-    /**vertex y coords*/
+    /*vertex y coords*/
     int[] ycoords = new int[3];
 
     protected static final float halfEdgeFactor=0.866f;
     protected static final float thirdHeightFactor=0.5f;
 
-    /**height in virtual space (equal to bounding circle radius)*/
+    /*height in virtual space (equal to bounding circle radius)*/
     long vh;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
+    /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjTriangle[] pc;
 
     public VTriangle(){
@@ -103,9 +106,6 @@ public class VTriangle extends ClosedShape {
 	setBorderColor(bc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjTriangle[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -113,9 +113,6 @@ public class VTriangle extends ClosedShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -137,70 +134,54 @@ public class VTriangle extends ClosedShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute) - has no effect*/
+    /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute size (bounding circle radius)*/
     void computeSize(){
 	size=(float)vh;
     }
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){
 	size=radius;
 	vh=(long)Math.round(size);
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
 	size*=factor;
 	vh=(long)Math.round(size);
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (pc[camIndex].p.contains(x,y)){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -218,7 +199,6 @@ public class VTriangle extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -248,7 +228,6 @@ public class VTriangle extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -278,9 +257,6 @@ public class VTriangle extends ClosedShape {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr>1){//repaint only if object is visible
 	    if (filled) {
@@ -341,7 +317,6 @@ public class VTriangle extends ClosedShape {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VTriangle res=new VTriangle(vx, vy, 0, vh, color, borderColor);
 	res.mouseInsideColor=this.mouseInsideColor;

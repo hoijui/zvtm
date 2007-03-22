@@ -23,9 +23,12 @@ import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Segment specifically made for being seen through a lens without disappearing too much.
+ * Segment specifically designed for being seen through a lens without disappearing too much.
  * Doubles the line when rendering the segment in the lens buffer.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VSegment
+ *@see com.xerox.VTM.glyphs.VSegmentST
+ *@see com.xerox.VTM.glyphs.LSegmentST
  **/
 
 public class LSegment extends VSegment {
@@ -99,7 +102,6 @@ public class LSegment extends VSegment {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LSegment res = new LSegment(vx, vy, 0, vw, vh, color);
 	res.mouseInsideColor = this.mouseInsideColor;

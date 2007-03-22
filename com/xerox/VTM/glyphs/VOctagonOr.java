@@ -33,9 +33,12 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Octagon (eight "almost" regular edges) - can be reoriented
+ * Reorient-able Octagon (eight "almost" regular edges). This version is less efficient than VOctagon, but it can be reoriented. It cannot be made translucent (see VOctagon*ST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VOctagon
+ *@see com.xerox.VTM.glyphs.VOctagonOrST
+ *@see com.xerox.VTM.glyphs.VOctagonST
+ */
 
 public class VOctagonOr extends VOctagon {
 
@@ -55,22 +58,21 @@ public class VOctagonOr extends VOctagon {
 	orient=or;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-   /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){//project glyph wrt camera info and change origin -> JPanel coords
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -109,7 +111,6 @@ public class VOctagonOr extends VOctagon {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -148,9 +149,6 @@ public class VOctagonOr extends VOctagon {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
 	    if (filled) {
@@ -211,7 +209,6 @@ public class VOctagonOr extends VOctagon {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VOctagonOr res=new VOctagonOr(vx, vy, 0, vs, color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;

@@ -68,11 +68,6 @@ public class BRectangle extends VRectangle {
 	super(x, y, z, w, h, c, bc);
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    if (filled) {
@@ -147,7 +142,6 @@ public class BRectangle extends VRectangle {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	BRectangle res=new BRectangle(vx,vy,0,vw,vh,color);
 	res.borderColor=this.borderColor;

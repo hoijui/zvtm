@@ -145,23 +145,21 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
 	borderColor = bColor;
     }
 
-    /** Cannot be reoriented. */
     public float getOrient(){return 0;}
 
     /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /** Cannot be resized. */
     public float getSize(){return 0;}
 
     /** Cannot be resized. */
     public void sizeTo(float radius){}
 
     /** Cannot be resized. */
-    public void setWidth(long w);
+    public void setWidth(long w){}
 
     /** Cannot be resized. */
-    public void setHeight(long h);
+    public void setHeight(long h){}
 
     /** Get half width. */
     public long getWidth(){return szx / 2;}

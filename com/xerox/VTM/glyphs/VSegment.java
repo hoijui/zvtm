@@ -37,13 +37,14 @@ import net.claribole.zvtm.glyphs.projection.RProjectedCoords;
 
 
 /**
- * Segment
+ * Segment (straight line). This version is the most efficient, but it cannot be made translucent (see VSegmentST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VSegmentST
+ */
 
 public class VSegment extends Glyph implements RectangularShape {
 
-    /**half width and height in virtual space*/
+    /*half width and height in virtual space*/
     long vw,vh;
 
     RProjectedCoords[] pc;
@@ -115,9 +116,6 @@ public class VSegment extends Glyph implements RectangularShape {
 	setColor(c);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new RProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -125,9 +123,6 @@ public class VSegment extends Glyph implements RectangularShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -149,27 +144,22 @@ public class VSegment extends Glyph implements RectangularShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
     public void orientTo(float angle){
 	//System.err.println("VSegment orientation is not working properly...");
 	orient=angle;
@@ -177,10 +167,9 @@ public class VSegment extends Glyph implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**change the segment's location, size and orientation by giving its two endpoints*/
+    /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
     public void setEndPoints(long x1, long y1, long x2, long y2){
 	vx = (x1 + x2) / 2;
 	vy = (y1 + y2) / 2;
@@ -190,7 +179,9 @@ public class VSegment extends Glyph implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**get the segment's two endpoints*/
+    /** Get the segment's two endpoints
+     *@return absolute coordinates.
+     */
     public LongPoint[] getEndPoints(){
 	LongPoint[] res = new LongPoint[2];
 	res[0] = new LongPoint(vx+vw, vy-vh);
@@ -198,7 +189,6 @@ public class VSegment extends Glyph implements RectangularShape {
 	return res;
     }
     
-    /**computes size and orientation of segment*/
     void computeSize(){  
 	size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
 	if (vw!=0){orient=(float)Math.atan((vh/(float)vw));}
@@ -216,34 +206,28 @@ public class VSegment extends Glyph implements RectangularShape {
 	else if(orient==0 && vw<0){orient=(float)Math.PI;}	    
     }
 
-    /**get half width*/
     public long getWidth(){return vw;}
 
-    /**get half height*/
     public long getHeight(){return vh;}
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){
 	size=radius;
 	computeEdges();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
 	size*=factor;
 	computeEdges();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**set absolute half width*/
     public void setWidth(long w){ 
 	vw=w;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**set absolute half height*/
     public void setHeight(long h){
 	vh=h;
 	computeSize();
@@ -257,7 +241,6 @@ public class VSegment extends Glyph implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	return false;
     }
@@ -267,14 +250,11 @@ public class VSegment extends Glyph implements RectangularShape {
 	vh=(long)Math.round(size*Math.sin(orient));
     }
 
-    /**
-     *always returns false (can never be inside a segment)
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	return false;
     }
 
-    /**detects whether the given point lies on the segment or not (default tolerance of 2 pixels)
+    /** Detects whether the point (x,y) lies on the segment or not. Default tolerance of 2 pixels.
      *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in AppEventHandler's mouse methods as jpx)
      *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in AppEventHandler's mouse methods as jpy)
      *@param camIndex camera index (obtained through Camera.getIndex())
@@ -283,7 +263,7 @@ public class VSegment extends Glyph implements RectangularShape {
 	return intersects(x, y, 2, camIndex);
     }
 
-    /**detects whether the given point lies on the segment or not
+    /** Detects whether the point (x,y) lies on the segment or not.
      *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in AppEventHandler's mouse methods as jpx)
      *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in AppEventHandler's mouse methods as jpy)
      *@param tolerance the segment's thickness in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
@@ -320,14 +300,10 @@ public class VSegment extends Glyph implements RectangularShape {
 	}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -340,7 +316,6 @@ public class VSegment extends Glyph implements RectangularShape {
 	pc[i].ch=Math.round(vh*coef);
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i = c.getIndex();
 	coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
@@ -353,9 +328,6 @@ public class VSegment extends Glyph implements RectangularShape {
 	pc[i].lch = Math.round(vh*coef);
     }
     
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
@@ -380,14 +352,12 @@ public class VSegment extends Glyph implements RectangularShape {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VSegment res=new VSegment(vx,vy,0,vw,vh,color);
 	res.mouseInsideColor=this.mouseInsideColor;
 	return res;
     }
 
-    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public void highlight(boolean b, Color selectedColor){}
 
 }

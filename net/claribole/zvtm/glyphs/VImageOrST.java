@@ -20,15 +20,17 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 /**
- * Image - can be reoriented - translucency at ZVTM level.
+ * Reorient-able, translucent Bitmap Image. This version is less efficient than all others, but it can be reoriented and made translucent.<br>
  * If the image features its own alpha channel, the rendering will combine both the embedded image's channel and the translucency settings defined through the Translucent interface.
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VImage
+ *@see com.xerox.VTM.glyphs.VImageOr
+ *@see net.claribole.zvtm.glyphs.VImageST
+ */
 
 public class VImageOrST extends VImageOr implements Translucent {
     
     AlphaComposite acST;
-    /** Alpha channel (default is 0.5). */
     float alpha=0.5f;
 
     /**

@@ -6,11 +6,10 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */ 
 
-
 package com.xerox.VTM.glyphs;
 
   /**
-   * Used to decompose VPath in segments
+   * Used to decompose a VClippedPath in segments.
    * @author Emmanuel Pietriga
    **/
 

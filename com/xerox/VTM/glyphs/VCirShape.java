@@ -35,32 +35,33 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
 
 /**
- * Circle containing a custom shape - defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)) - angle between each vertices is 2*Pi/N - can be reoriented
+ * Same as VShape, surrounded by a circle.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VShape
+ *@see com.xerox.VTM.glyphs.VShapeST
  **/
 
 public class VCirShape extends ClosedShape {
 
-    /**inside shape color (main color is assigned to the circle)*/
+    /*inside shape color (main color is assigned to the circle)*/
     Color shapeColor;
 
-    /**inside shape border color (main border color is assigned to the circle)*/
+    /*inside shape border color (main border color is assigned to the circle)*/
     Color shapebColor;
 
     boolean paintShapeBorder=true;
     boolean shapeFilled=true;
 
-    /**height=width in virtual space*/
+    /*height=width in virtual space*/
     long vs;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     BProjectedCoordsP[] pc;
 
-    /**list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)*/
+    /** Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */
     float[] vertices;
 
     /**
-     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle)
+     *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      */
     public VCirShape(float[] v){
 	vx=0;
@@ -81,7 +82,7 @@ public class VCirShape extends ClosedShape {
      *@param y coordinate in virtual space
      *@param z altitude
      *@param s size (width=height) in virtual space
-     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
+     *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param cc fill color for circle
      *@param sc fill color for shape
      *@param cbc border color for circle
@@ -101,9 +102,6 @@ public class VCirShape extends ClosedShape {
 	setShapeBorderColor(sbc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new BProjectedCoordsP[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -111,9 +109,6 @@ public class VCirShape extends ClosedShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -135,56 +130,46 @@ public class VCirShape extends ClosedShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute size (bounding circle radius)*/
     void computeSize(){
 	size=(float)vs;
     }
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){
 	size=radius;
 	vs=Math.round(size);
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
 	    && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
@@ -193,18 +178,11 @@ public class VCirShape extends ClosedShape {
 	else {return false;}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (Math.sqrt(Math.pow(x-pc[camIndex].cx,2)+Math.pow(y-pc[camIndex].cy,2))<=pc[camIndex].cr){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -222,12 +200,11 @@ public class VCirShape extends ClosedShape {
 	}
     }
 
-    /**list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)*/
+    /** Get the list of vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */
     public float[] getVertices(){
 	return vertices;
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -259,7 +236,6 @@ public class VCirShape extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -291,9 +267,6 @@ public class VCirShape extends ClosedShape {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr>1){//repaint only if object is visible
 	    if (filled) {
@@ -363,17 +336,17 @@ public class VCirShape extends ClosedShape {
     public Color getShapeBorderColor(){return shapebColor;}
     public boolean isShapeFilled(){return shapeFilled;}
 
-    /**set inside shape fill color*/
+    /** Set inside shape fill color. */
     public void setShapeColor(Color c){
 	shapeColor=c;
     }
     
-    /**Set inside shape border color*/
+    /** Set inside shape border color. */
     public void setShapeBorderColor(Color c){
 	shapebColor=c;
     }
 
-    /**
+    /** Set whether the glyph's interior should be painted with the fill color or not.
      *@param b false -&gt; do not paint interior of inside shape (only paint contour)
      */
     public void setShapeFilled(boolean b){
@@ -387,7 +360,6 @@ public class VCirShape extends ClosedShape {
 	paintShapeBorder=b;
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VCirShape res = new VCirShape(vx,vy,0,vs,vertices,color,shapeColor,bColor,shapebColor,orient);
 	res.mouseInsideColor=this.mouseInsideColor;

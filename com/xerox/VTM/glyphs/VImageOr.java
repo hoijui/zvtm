@@ -30,18 +30,22 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Image (rectangular) - can be reoriented
+ * Re-orientable Bitmap Image. This version is less efficient than VImage, but it can be reoriented. It cannot be made translucent (see VImage*ST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VImage
+ *@see net.claribole.zvtm.glyphs.VImageOrST
+ *@see net.claribole.zvtm.glyphs.VImageST
+ */
 
 public class VImageOr extends VImage {
 
-    /**vertex x coords*/
+    /*vertex x coords*/
     int[] xcoords = new int[4];
-    /**vertex y coords*/
+    /*vertex y coords*/
     int[] ycoords = new int[4];
 
     /**
+     *@param img image to be displayed
      *@param or orientation
      */
     public VImageOr(Image img,float or){
@@ -61,22 +65,19 @@ public class VImageOr extends VImage {
 	orient=or;
     }
 
-    /**set orientation (absolute) - NOT STABLE  (causes the VTM to hang sometimes) USE AT YOUR OWN RISK!*/
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (pc[camIndex].p.contains(x,y)){return true;}
 	else {return false;}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -110,7 +111,6 @@ public class VImageOr extends VImage {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;

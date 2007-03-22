@@ -37,19 +37,21 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
 
 /**
- * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented
+ * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented.<br>
+ * This version is the most efficient, but it can not be made translucent (see VShapeST).
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VShapeST
+ *@see com.xerox.VTM.glyphs.VCirShape
  **/
 
 public class VShape extends ClosedShape {
 
-    /**height=width in virtual space*/
+    /*height=width in virtual space*/
     long vs;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     BProjectedCoordsP[] pc;
 
-    /**list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)*/
+    /** Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */
     float[] vertices;
 
     int[] xcoords;
@@ -58,7 +60,7 @@ public class VShape extends ClosedShape {
     int[] lycoords;
 
     /**
-     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle)
+     *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      */
     public VShape(float[] v){
 	vx=0;
@@ -81,7 +83,7 @@ public class VShape extends ClosedShape {
      *@param y coordinate in virtual space
      *@param z altitude
      *@param s size (width=height) in virtual space
-     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
+     *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param or shape's orientation in [0, 2Pi[
      */
@@ -106,7 +108,7 @@ public class VShape extends ClosedShape {
      *@param y coordinate in virtual space
      *@param z altitude
      *@param s size (width=height) in virtual space
-     *@param v list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)
+     *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param bc border color
      *@param or shape's orientation in [0, 2Pi[
@@ -127,9 +129,6 @@ public class VShape extends ClosedShape {
 	setBorderColor(bc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new BProjectedCoordsP[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -137,9 +136,6 @@ public class VShape extends ClosedShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -161,73 +157,56 @@ public class VShape extends ClosedShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute size (bounding circle radius)*/
     void computeSize(){
 	size=(float)vs;
     }
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){
 	size=radius;
 	vs=Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (pc[camIndex].p.contains(x,y)){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -245,13 +224,13 @@ public class VShape extends ClosedShape {
 	}
     }
 
-    /**list of vertex distance to the shape's center in the 0-1.0 range (relative to bounding circle) --vertices are layed out counter clockwise, with the first vertex placed at the same Y coord as the shape's center (provided orient=0)*/
+    /** Get the list of vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */
     public float[] getVertices(){
 	return vertices;
     }
 
-    /**
-     *returns a comma-separated string representation of the vertex distance to the shape's center
+    /** Get a serialization of the list of vertex distances to the shape's center in the [0-1.0] range.
+     *@return a comma-separated string representation of the vertex distance to the shape's center.
      */
     public String getVerticesAsText(){
 	StringBuffer res=new StringBuffer();
@@ -262,7 +241,6 @@ public class VShape extends ClosedShape {
 	return res.toString();
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -293,7 +271,6 @@ public class VShape extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -324,9 +301,6 @@ public class VShape extends ClosedShape {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
 	    if (filled) {
@@ -387,9 +361,7 @@ public class VShape extends ClosedShape {
 	}
     }
 
-    /**
-     * returns a given VShape's area
-     */
+    /** Get the shape's area. */
     public double getArea(){
 	long[] xcoordsForArea=new long[vertices.length];
 	long[] ycoordsForArea=new long[vertices.length];
@@ -411,8 +383,8 @@ public class VShape extends ClosedShape {
 	return ((res<0) ? -res : res);
     }
 
-    /**
-     *return the double precision coordinates of this VShape's centroid
+    /** Get the double precision coordinates of this shape's centroid.
+     *@see #getCentroid()
      */
     public Point2D.Double getPreciseCentroid(){
 	//compute polygon vertices
@@ -455,15 +427,14 @@ public class VShape extends ClosedShape {
 	return res;
     }
 
-    /**
-     *return the coordinates of this VShape's centroid in virtual space
+    /** Get the coordinates of this shape's centroid in virtual space.
+     *@see #getPreciseCentroid()
      */
     public LongPoint getCentroid(){
 	Point2D.Double p2dd=this.getPreciseCentroid();
 	return new LongPoint(Math.round(p2dd.getX()),Math.round(p2dd.getY()));
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VShape res=new VShape(vx, vy, 0, vs, (float[])vertices.clone(), color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;

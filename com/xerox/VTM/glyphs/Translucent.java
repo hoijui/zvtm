@@ -27,7 +27,8 @@ import java.awt.AlphaComposite;
 
 
 /**
- * Translucency interface (previously named Transparency) - implemented by all *ST glyphs. Opacity is between 0.0 (fully transparent) and 1.0 (fully opaque).
+ * Translucency interface (previously named Transparency).
+ * Implemented by all *ST glyphs. Translucency is between 0.0 (fully transparent) and 1.0 (fully opaque).
  * @author Emmanuel Pietriga
  **/
 

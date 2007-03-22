@@ -21,7 +21,7 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Round rectangle used in some experiments, not really for use by mainstream client applications (behaviour changes without notice)
+ * Do not use.
  * @author Emmanuel Pietriga
  **/
 
@@ -171,17 +171,16 @@ public class ZRoundRect extends VRoundRect  {
 	}
     }
 
-    /** tells whether round corners are visible or not (as seen through camera c) */
+    /** Indicates whether round corners are visible or not (as seen through camera c). */
     public boolean cornersVisible(Camera c){
 	return (pc[c.getIndex()].aw > ROUND_CORNER_THRESHOLD || pc[c.getIndex()].ah > ROUND_CORNER_THRESHOLD);
     }
 
-    /** tells whether round corners are visible or not (as seen through camera c and lens) */
+    /** Indicates whether round corners are visible or not (as seen through a lens with camera c). */
     public boolean cornersVisibleInLens(Camera c){
 	return (pc[c.getIndex()].law > ROUND_CORNER_THRESHOLD || pc[c.getIndex()].lah > ROUND_CORNER_THRESHOLD);	
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	ZRoundRect res=new ZRoundRect(vx,vy,0,vw,vh,color,arcWidth,arcHeight,renderRound);
 	res.borderColor=this.borderColor;

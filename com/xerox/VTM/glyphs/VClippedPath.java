@@ -20,8 +20,9 @@ import java.awt.geom.GeneralPath;
 import com.xerox.VTM.engine.LongPoint;
 
 /**
- * General path - similar to a VPath, but implements an experimental clipping algorithm that should enhance performances (quicker rendering) when only part of the path is actually seen (draw only curves/segments that are seen)
+ * Experimental variation on VPath. This version implements an experimental clipping algorithm that should enhance performances (quicker rendering) when only part of the path is actually seen (draw only curves/segments that are seen).
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VPath
  **/
 
 public class VClippedPath extends VPath {
@@ -208,13 +209,6 @@ public class VClippedPath extends VPath {
 	}
     }
 
-    /**used to find out if it is necessary to project and draw the glyph in the current view or through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
 	boolean res=false;
 	if (forcedDrawing){return true;}
@@ -237,13 +231,6 @@ public class VClippedPath extends VPath {
 	return res;
     }
 
-    /**used to find out if it is necessary to project and draw the glyph through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
     public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
 	boolean res=false;
 	if (forcedDrawing){return true;}
@@ -316,7 +303,6 @@ public class VClippedPath extends VPath {
 	}	
     }
 
-    /**returns a clone of this object - not yet implemented for VClippedPath*/
     public Object clone(){
 	VClippedPath res=new VClippedPath();
 	res.mouseInsideColor=this.mouseInsideColor;

@@ -38,9 +38,13 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjText;
 
 /**
- * Standalone Text  (font properties are set in the view, but can be changed for each VText using setSpecialFont())
- * vx and vy are coordinates of lower-left corner of String because it would be too time-consuming to compute the String's center (needs to be computed at each repaint: it requires access to Graphics2D) (besides it makes the VTM unstable)
+ * Standalone Text.  This version is the most efficient, but it cannot be reoriented (see VTextOr).<br>
+ * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).<br>
+ * vx and vy are the coordinates of the lower-left corner of the rendered String because it would be too time-consuming to compute the String's center.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VTextOr
+ *@see com.xerox.VTM.glyphs.LText
+ *@see com.xerox.VTM.glyphs.LBText
  */
 
 public class VText extends Glyph {

@@ -34,17 +34,14 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjCirImage;
 
 /**
- * Circle containing an Image (rectangular) - can be reoriented
+ * Circle containing a bitmap.
  * @author Emmanuel Pietriga
  **/
 
 public class VCirImage extends ClosedShape {
 
-
-    /**half width and height in virtual space*/
     long vw,vh;
     long vs;
-    /**aspect ratio (width divided by height)*/
     float ar;
 
     AffineTransform at;
@@ -106,9 +103,6 @@ public class VCirImage extends ClosedShape {
 	setBorderColor(bc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjCirImage[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -116,9 +110,6 @@ public class VCirImage extends ClosedShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -140,40 +131,32 @@ public class VCirImage extends ClosedShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute) - NOT STABLE  (causes the VTM to hang sometimes) USE AT YOUR OWN RISK!*/
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**set orientation (absolute) */
     public void orientToNS(float angle){orient=angle;}
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute size (bounding circle radius)*/
     void computeSize(){
 	//size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
 	//vs=(long)Math.round(size);
@@ -182,7 +165,6 @@ public class VCirImage extends ClosedShape {
 	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
     }
 
-    /**set absolute size by setting bounding circle radius - no effect*/
     public void sizeTo(float radius){
 	size=radius;
 	vs=(long)Math.round(size);
@@ -190,7 +172,6 @@ public class VCirImage extends ClosedShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**multiply bounding circle radius by factor - no effect*/
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
@@ -198,7 +179,7 @@ public class VCirImage extends ClosedShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**set image to be displayed*/
+    /** Set the bitmap image to be displayed inside the circle. */
     public void setImage(Image i){
 	image=i;
 	ar=((float)image.getWidth(null))/((float)image.getHeight(null));
@@ -206,12 +187,12 @@ public class VCirImage extends ClosedShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get the bitmap image to be displayed*/
+    /** Get the bitmap image displayed inside the circle. */
     public Image getImage(){
 	return image;
     }
 
-    /**set the relative size of the image w.r.t the circle
+    /** Set the relative size of the image w.r.t the circle.
      *@param f multiplication factor (positive float &gt; 0) default=1.0
      */
     public void setRelativeImageSize(float f){
@@ -219,12 +200,11 @@ public class VCirImage extends ClosedShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**set the relative size of the image w.r.t the circle*/
+    /** Get the relative size of the image w.r.t the circle. */
     public float getRelativeImageSize(){
 	return relCoef;
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cs) 
 	    && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cs) 
@@ -233,18 +213,11 @@ public class VCirImage extends ClosedShape {
 	else {return false;}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (Math.sqrt(Math.pow(x-pc[camIndex].cx,2)+Math.pow(y-pc[camIndex].cy,2))<=pc[camIndex].cs){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -262,7 +235,6 @@ public class VCirImage extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -276,7 +248,6 @@ public class VCirImage extends ClosedShape {
 	pc[i].ch=Math.round(vh*coef*relCoef);
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -291,11 +262,6 @@ public class VCirImage extends ClosedShape {
 
     }
 
-    /**draw glyph
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cs>1){
 	    if (filled) {
@@ -378,7 +344,6 @@ public class VCirImage extends ClosedShape {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VCirImage res=new VCirImage(vx,vy,0,vs,image,color,orient);
 	res.borderColor=this.borderColor;

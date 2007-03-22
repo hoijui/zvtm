@@ -31,15 +31,16 @@ import com.xerox.VTM.engine.LongPoint;
 
 
 /**
- * Custom  polygon - cannot be reoriented for now - translucency
+ * Translucent Polygon. This version is less efficient than VPolygon, but it can be made translucent.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VPolygon
+ *@see com.xerox.VTM.glyphs.FPolygon
+ *@see com.xerox.VTM.glyphs.FPolygonST
  **/
 
 public class VPolygonST extends VPolygon implements Translucent {
 
-    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     /**
@@ -63,30 +64,19 @@ public class VPolygonST extends VPolygon implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
-    /**
-     * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /** Get alpha channel value (translucency).
-     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public float getTranslucencyValue(){return alpha;}
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((alpha==1.0) && (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr>1){//repaint only if object is visible
 	    if (filled){
@@ -155,7 +145,6 @@ public class VPolygonST extends VPolygon implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LongPoint[] lps=new LongPoint[xcoords.length];
 	for (int i=0;i<lps.length;i++){

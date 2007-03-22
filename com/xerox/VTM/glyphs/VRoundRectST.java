@@ -18,16 +18,15 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 /**
- * Round Rectangle - cannot be reoriented - the corners are approximated to a plain rectangle for some operations like computing mouse enter/exit events (performance reasons) - translucency
+ * Translucent Round Rectangle. This version is less efficient than VRoundRect, but it can be made translucent. It cannot be reoriented.<br>Corners are approximated to right angles for some operations such as cursor entry/exit events.
  * @author Emmanuel Pietriga
- **/
-
+ *@see com.xerox.VTM.glyphs.VRoundRect
+ *@see com.xerox.VTM.glyphs.VRectangle
+ */
 
 public class VRoundRectST extends VRoundRect implements Translucent {
 
-    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     public VRoundRectST(){
@@ -68,28 +67,19 @@ public class VRoundRectST extends VRoundRect implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
-    /**
-     *set alpha channel value (translucency)
-     *@param a [0;1.0] 0 is fully translucent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get alpha value (translucency) for this glyph*/
     public float getTranslucencyValue(){return alpha;}
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((alpha==1.0) && (w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
 	else {return false;}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    if (filled) {
@@ -164,7 +154,6 @@ public class VRoundRectST extends VRoundRect implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VRoundRectST res = new VRoundRectST(vx, vy, 0, vw, vh, color, borderColor, alpha, arcWidth, arcHeight);
 	res.mouseInsideColor=this.mouseInsideColor;

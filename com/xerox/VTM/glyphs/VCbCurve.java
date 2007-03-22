@@ -34,22 +34,23 @@ import net.claribole.zvtm.glyphs.projection.ProjCbCurve;
 
 
 /**
- * Cubic Curve -  can be reoriented -  CANNOT DETECT ENTRY/EXIT in curves, even when filled (they look as, but are not, closed shapes) <br> a cubic curve is a curved segment that has two endpoints and two control points. Each control point determines the shape of the curve by controlling one of the endpoint tangent vectors. <br> for this particular glyph, vx and vy correspond to the center of the imaginary segment linking the curve's start and end points <br> the coordinates of the control points are expressed respectively w.r.t start and end points in polar coordinates (orient=0 on segment linking start and end points, meaning that if orient=0 for both control points, start control1 control2 and end points are aligned) 
+ * Cubic Curve: a curved segment that has two endpoints and two control points.
+ * Each control point determines the shape of the curve by controlling one of the endpoint tangent vectors. <br> For this particular glyph, vx and vy correspond to the center of the imaginary segment linking the curve's start and end points. <br> The coordinates of the control points are expressed respectively w.r.t start and end points in polar coordinates (orient=0 on segment linking start and end points, meaning that if orient=0 for both control points, start control1 control2 and end points are aligned). See <a href="ftp://ftp.inria.fr/INRIA/publication/Theses/TU-0769.pdf">ftp://ftp.inria.fr/INRIA/publication/Theses/TU-0769.pdf</a>, page 147 for a diagramatic explaination.
+ *@see com.xerox.VTM.glyphs.VQdCurve
+ *@see com.xerox.VTM.glyphs.VPath
  * @author Emmanuel Pietriga
  **/
 
 public class VCbCurve extends Glyph {
 
-    /**size (distance between start and end point)*/
     long vs;
 
-    /**control points, polar coordinates - origin is vx,vy - orient=0 on segment linking start and end points*/
+    /*control points, polar coordinates - origin is vx,vy - orient=0 on segment linking start and end points*/
     long vrad1;
     float ang1;
     long vrad2;
     float ang2;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjCbCurve[] pc;
 
     /**
@@ -79,35 +80,32 @@ public class VCbCurve extends Glyph {
 	setColor(c);
     }
 
-    /**set position of control point 1 (polar coords w.r.t start point)*/
+    /** Set position of control point 1 (polar coords w.r.t start point). */
     public void setCtrlPoint1(long d,float o){
 	vrad1=d;
 	ang1=o;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**set position of control point 2 (polar coords w.r.t end point)*/
+    /** Set position of control point 2 (polar coords w.r.t end point). */
     public void setCtrlPoint2(long d,float o){
 	vrad2=d;
 	ang2=o;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**get distance from start point to control point 1 (polar coords)*/
+    /** Get distance from start point to control point 1 (polar coords). */
     public long getCtrlPointRadius1(){return vrad1;}
 
-    /**get orientation of control point 1 (polar coords)*/
+    /** Get orientation of control point 1 (polar coords). */
     public float getCtrlPointAngle1(){return ang1;}
 
-    /**get distance from start point to control point 2 (polar coords)*/
+    /** Get distance from start point to control point 2 (polar coords). */
     public long getCtrlPointRadius2(){return vrad2;}
 
-    /**get orientation of control point 2 (polar coords)*/
+    /** Get orientation of control point 2 (polar coords). */
     public float getCtrlPointAngle2(){return ang2;}
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjCbCurve[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -115,9 +113,6 @@ public class VCbCurve extends Glyph {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -139,79 +134,62 @@ public class VCbCurve extends Glyph {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute curve from VTM object model*/
     void computeSize(){
 	size=(float)vs;
     }
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){
 	vrad1=Math.round(vrad1*radius/size);
 	vrad2=Math.round(vrad2*radius/size);
 	size=radius;
 	vs=Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
 	vrad1=Math.round(vrad1*factor);
 	vrad2=Math.round(vrad2*factor);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	return false;
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	return false;
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return VCurcor.ENTERED_GLYPH if cursor has entered the glyph, VCurcor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
+    /** The cursor is never considered as being inside a cubic curve. Glyph entry/exit are never fired by a VCbCurve. */
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -231,7 +209,6 @@ public class VCbCurve extends Glyph {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -251,9 +228,6 @@ public class VCbCurve extends Glyph {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
 	    g.setColor(this.color);
@@ -298,14 +272,12 @@ public class VCbCurve extends Glyph {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VCbCurve res = new VCbCurve(vx,vy,0,vs,color,orient,vrad1,ang1,vrad2,ang2);
 	res.mouseInsideColor = this.mouseInsideColor;
 	return res;
     }
 
-    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public void highlight(boolean b, Color selectedColor){}
 
 }

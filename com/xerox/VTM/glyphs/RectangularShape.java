@@ -22,22 +22,22 @@
 package com.xerox.VTM.glyphs;
 
 /**
- * Rectangular shape interface - implemented by rectangles and ellipses
+ * Rectangular shape interface. Access and manipulate rectangular glyphs's width and height
  * @author Emmanuel Pietriga
  **/
 
 public interface RectangularShape {
 
-    /**set absolute half width*/
+    /** Set absolute half width. */
     public void setWidth(long w);
 
-    /**set absolute half height*/
+    /** Set absolute half height. */
     public void setHeight(long h);
     
-    /**get absolute half width*/
+    /** Get absolute half width. */
     public long getWidth();
     
-    /**get absolute half width*/
+    /** Get absolute half width. */
     public long getHeight();
 
 }

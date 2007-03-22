@@ -27,16 +27,18 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
-  /**
-   * Ellipse - cannot be reoriented - translucency
-   * @author Emmanuel Pietriga
-   */
+/**
+ * Translucent Ellipse. This version is less efficient than VEllipse, but it can be made translucent.
+ * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VEllipse
+ *@see com.xerox.VTM.glyphs.VCircle
+ *@see com.xerox.VTM.glyphs.VCircleST
+ */
+
 
 public class VEllipseST extends VEllipse implements Translucent {
 
-    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     public VEllipseST(){
@@ -73,24 +75,14 @@ public class VEllipseST extends VEllipse implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
-    /**
-     * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /** Get alpha channel value (translucency).
-     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public float getTranslucencyValue(){return alpha;}
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].ellipse.getBounds().width>2) && (pc[i].ellipse.getBounds().height>2)){
 	    if (filled){
@@ -159,7 +151,6 @@ public class VEllipseST extends VEllipse implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VEllipseST res=new VEllipseST(vx, vy, 0, vw, vh, color, borderColor, alpha);
 	res.mouseInsideColor=this.mouseInsideColor;

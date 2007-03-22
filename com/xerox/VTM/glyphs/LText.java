@@ -25,8 +25,11 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.LensRendering;
 
 /**
- * Standalone Text whose visibility and color can be different depending on whether it is seen through a lens or not
+ * Standalone text whose visibility and color can be different depending on whether it is seen through a lens or not. Cannot be reoriented.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VText
+ *@see com.xerox.VTM.glyphs.VTextOr
+ *@see com.xerox.VTM.glyphs.LBText
  */
 
 public class LText extends VText implements LensRendering {
@@ -59,32 +62,24 @@ public class LText extends VText implements LensRendering {
 	fillColorThroughLens = color;
     }
 
-    /**make this glyph (in)visible when seen through a lens (the glyph remains sensitive to cursor in/out events)<br>
-     *@param b true to make glyph visible, false to make it invisible
-     */
     public void setVisibleThroughLens(boolean b){
 	visibleThroughLens = b;
     }
 
-    /**get this glyph's visibility state when seen through the lens (returns true if visible)*/
     public boolean isVisibleThroughLens(){
 	return visibleThroughLens;
     }
 
-    /**set the color used to paint the glyph's interior*/
     public void setFillColorThroughLens(Color c){
 	fillColorThroughLens = c;
     }
 
-    /**get the color used to paint the glyph's interior*/
     public Color getFillColorThroughLens(){
 	return fillColorThroughLens;
     }
 
-    /**set the color used to paint the glyph's border*/
     public void setBorderColorThroughLens(Color c){}
 
-    /**get the color used to paint the glyph's border*/
     public Color getBorderColorThroughLens(){
 	return fillColorThroughLens;
     }
@@ -131,7 +126,6 @@ public class LText extends VText implements LensRendering {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LText res=new LText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
 	res.fillColorThroughLens = this.fillColorThroughLens;

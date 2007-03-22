@@ -21,9 +21,12 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Rectangle - behaves correctly for a very wide range of altitudes - must be either horizontal or vertical
+ * Alternative to VSegment for very large widths and heights in virtual space (that go beyond 32-bit integers). Can only handle horizontal or vertical segments. In most cases VSegment will be the best solution. This version can be useful e.g. when a virtual space contains a very large grid.
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.ZSegmentST
+ *@see com.xerox.VTM.glyphs.VSegmentST
+ *@see com.xerox.VTM.glyphs.VSegment
+ */
 
 public class ZSegment extends VRectangle {
 
@@ -62,27 +65,14 @@ public class ZSegment extends VRectangle {
 	setBorderColor(Color.black);
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){//width and height of view - pc[i].c? are JPanel coords
 	return false;
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	return false;
     }
 
-    /**used to find out if it is necessary to project and draw the glyph in the current view or through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
-    /**used to find out if it is necessary to project and draw the glyph in the current view*/
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -97,7 +87,6 @@ public class ZSegment extends VRectangle {
 	return false;
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i = c.getIndex();
 	coef = (float)(c.focal/(c.focal+c.altitude));
@@ -155,7 +144,6 @@ public class ZSegment extends VRectangle {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i = c.getIndex();
 	coef = (float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -190,11 +178,6 @@ public class ZSegment extends VRectangle {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    g.setColor(this.color);
@@ -227,7 +210,6 @@ public class ZSegment extends VRectangle {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	ZSegment res = new ZSegment(vx,vy,0,vw,vh,color);
 	res.borderColor = this.borderColor;

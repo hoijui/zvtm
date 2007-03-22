@@ -23,15 +23,14 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.RProjectedCoords;
 
 /**
- * RectangleNR - not sensitive to zoom (will keep its size no matter the camera's altitude) - cannot be reoriented <br> used for instance to create resizing handles
+ * Rectangle with constant apparent width and height, no matter the camera's altitude.
+ * Used for instance to create resizing handles. Cannot be reoriented.
  * @author Emmanuel Pietriga
  **/
 
 public class RectangleNR extends ClosedShape implements RectangularShape {
 
-    /**half width and height in virtual space*/
     long vw,vh;
-    /**aspect ratio (width divided by height)*/
     float ar;
 
     RProjectedCoords[] pc;
@@ -96,9 +95,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	setBorderColor(bc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new RProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -108,9 +104,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -136,45 +129,36 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**get orientation*/
     public float getOrient(){return 0;}
 
-    /**set orientation (absolute) - has no effect*/
+    /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**get half width*/
     public long getWidth(){return vw;}
 
-    /**get half height*/
     public long getHeight(){return vh;}
 
-    /**compute size (bounding circle radius)*/
     void computeSize(){
 	size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){  //new bounding circle radius
 	size=radius;
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
@@ -183,7 +167,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**set absolute half width*/
     public void setWidth(long w){ 
 	vw=w;
 	computeSize();
@@ -191,7 +174,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**set absolute half height*/
     public void setHeight(long h){
 	vh=h;
 	computeSize();
@@ -199,7 +181,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){//resizing factor
 	size*=factor;
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
@@ -220,13 +201,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	}
     }
 
-    /**used to find out if it is necessary to project and draw the glyph in the current view or through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -243,14 +217,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	return false;
     }
 
-    /**used to find out if it is necessary to project and draw the glyph through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
-    /**used to find out if it is necessary to project and draw the glyph in the current view*/
     public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region.
@@ -263,24 +229,16 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	return false;
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){//width and height of view - pc[i].c? are JPanel coords
 	if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
 	else {return false;}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if ((x>=(pc[camIndex].cx-pc[camIndex].cw)) && (x<=(pc[camIndex].cx+pc[camIndex].cw)) && (y>=(pc[camIndex].cy-pc[camIndex].ch)) && (y<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -298,7 +256,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -308,7 +265,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -318,11 +274,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    if (filled) {
@@ -375,7 +326,6 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	RectangleNR res=new RectangleNR(vx,vy,0,vw,vh,color);
 	res.borderColor=this.borderColor;

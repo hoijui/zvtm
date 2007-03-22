@@ -10,17 +10,6 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-// import java.awt.Graphics2D;
-// import java.awt.Stroke;
-// import java.awt.Dimension;
-// import java.awt.geom.AffineTransform;
-// import java.awt.Polygon;
-
-// import com.xerox.VTM.engine.Camera;
-// import com.xerox.VTM.engine.LongPoint;
-// import com.xerox.VTM.engine.Utilities;
-// import com.xerox.VTM.svg.SVGReader;
-// import net.claribole.zvtm.lens.Lens;
 
 /**
  * Super class of all closed shapes (rectangles, circles, diamonds, polygons, etc.)

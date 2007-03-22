@@ -31,14 +31,18 @@ import java.awt.geom.AffineTransform;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
- * Standalone Text  (font properties are set in the view, but can be changed for each VText using setSpecialFont()) - can be reoriented.
- <br> vx and vy are coordinates of lower-left corner of String because it would be too time-consuming to compute the String's center (needs to be computed at each repaint: it requires access to Graphics2D)
+ * Re-orientable Standalone Text.  This version is less efficient than VText, but it can be reoriented.<br>
+ * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).<br>
+ * vx and vy are the coordinates of the lower-left corner of the rendered String because it would be too time-consuming to compute the String's center.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VText
+ *@see com.xerox.VTM.glyphs.LText
+ *@see com.xerox.VTM.glyphs.LBText
  */
 
 public class VTextOr extends VText {
 
-    /**half width and height in virtual space (of String when horizontal)*/
+    /*half width and height in virtual space (of String when horizontal)*/
     float vw,vh;
 
     public VTextOr(String t,float or){
@@ -73,21 +77,16 @@ public class VTextOr extends VText {
 	orient = or;
     }
 
-    /**set orientation (absolute) - NOT STABLE  (causes the VTM to hang sometimes) USE AT YOUR OWN RISK!*/
     public void orientTo(float angle){
 	orient=angle;
 	invalidate();
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	return false;
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
@@ -180,7 +179,6 @@ public class VTextOr extends VText {
 	else {g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
 	res.mouseInsideColor=this.mouseInsideColor;

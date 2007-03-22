@@ -34,20 +34,21 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjQdCurve;
 
 /**
- * Quadratic Curve -  can be reoriented -  CANNOT DETECT ENTRY/EXIT in curves, even when filled (they look as, but are not, closed shapes) <br> a quadratic curve is a curved segment that has two endpoints and one control point. The control point determines the shape of the curve by controlling both of the endpoint tangent vectors <br> for this particular glyph, vx and vy correspond to the center of the imaginary segment linking the curve's start and end points <br> the coordinates of the control point are expressed w.r.t this point in polar coordinates (orient=0 on segment linking start and end points, meaning that if orient=0, start control and end points are aligned) 
+ * Cubic Curve: a curved segment that has two endpoints and one control point.
+ * The control point determines the shape of the curve by controlling both of the endpoint tangent vectors <br> for this particular glyph, vx and vy correspond to the center of the imaginary segment linking the curve's start and end points <br> the coordinates of the control point are expressed w.r.t this point in polar coordinates (orient=0 on segment linking start and end points, meaning that if orient=0, start control and end points are aligned)  See <a href="ftp://ftp.inria.fr/INRIA/publication/Theses/TU-0769.pdf">ftp://ftp.inria.fr/INRIA/publication/Theses/TU-0769.pdf</a>, page 147 for a diagramatic explaination.
+ *@see com.xerox.VTM.glyphs.VCbCurve
+ *@see com.xerox.VTM.glyphs.VPath
  * @author Emmanuel Pietriga
  **/
 
 public class VQdCurve extends Glyph {
 
-    /**size (distance between start and end point)*/
     long vs;
 
-    /**control point, polar coordinates - origin is vx,vy - orient=0 on segment linking start and end points*/
+    /*control point, polar coordinates - origin is vx,vy - orient=0 on segment linking start and end points*/
     long vrad;
     float ang;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjQdCurve[] pc;
 
     /**
@@ -73,22 +74,19 @@ public class VQdCurve extends Glyph {
 	setColor(c);
     }
 
-    /**set position of control point (polar coords w.r.t center of segment linking start and end points)*/
+    /** Set position of control point (polar coords w.r.t center of segment linking start and end points). */
     public void setCtrlPoint(long d,float o){
 	vrad=d;
 	ang=o;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get distance from center of segment linking start and end points to control point (polar coords)*/
+    /** Get distance from center of segment linking start and end points to control point (polar coords). */
     public long getCtrlPointRadius(){return vrad;}
 
-    /**get orientation of control point (polar coords)*/
+    /** Get orientation of control point (polar coords). */
     public float getCtrlPointAngle(){return ang;}
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjQdCurve[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -96,9 +94,6 @@ public class VQdCurve extends Glyph {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -120,41 +115,33 @@ public class VQdCurve extends Glyph {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute curve from VTM object model*/
     void computeSize(){
 	size=(float)vs;
     }
 
-    /**set absolute size by setting bounding circle radius*/
     public void sizeTo(float radius){
 	vrad=Math.round(vrad*radius/size);
 	size=radius;
@@ -162,7 +149,6 @@ public class VQdCurve extends Glyph {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**multiply bounding circle radius by factor*/
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
@@ -170,27 +156,19 @@ public class VQdCurve extends Glyph {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	return false;
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	return false;
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
+    /** The cursor is never considered as being inside a cubic curve. Glyph entry/exit are never fired by a VQdCurve. */
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -208,7 +186,6 @@ public class VQdCurve extends Glyph {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -226,9 +203,6 @@ public class VQdCurve extends Glyph {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr >1){//repaint only if object is visible
 	    g.setColor(this.color);
@@ -273,14 +247,12 @@ public class VQdCurve extends Glyph {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VQdCurve res=new VQdCurve(vx,vy,0,vs,color,orient,vrad,ang);
 	res.mouseInsideColor=this.mouseInsideColor;
 	return res;
     }
 
-    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public void highlight(boolean b, Color selectedColor){}
 
 }

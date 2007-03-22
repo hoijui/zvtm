@@ -33,9 +33,12 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Triangle - can be reoriented
+ * Re-orientable Equilateral Triangle. This version is less efficient than VTriangle, but it can be reoriented. It cannot be made translucent (see VTriangle*ST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VTriangle
+ *@see com.xerox.VTM.glyphs.VTriangleOrST
+ *@see com.xerox.VTM.glyphs.VTriangleST
+ */
 
 public class VTriangleOr extends VTriangle {
 
@@ -68,22 +71,21 @@ public class VTriangleOr extends VTriangle {
 	orient=or;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -113,7 +115,6 @@ public class VTriangleOr extends VTriangle {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -143,9 +144,6 @@ public class VTriangleOr extends VTriangle {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr > 1){//repaint only if object is visible
 	    if (filled) {
@@ -206,7 +204,6 @@ public class VTriangleOr extends VTriangle {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VTriangleOr res=new VTriangleOr(vx, vy, 0, vh, color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;

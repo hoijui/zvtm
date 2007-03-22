@@ -27,17 +27,21 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjPolygon;
 
 /**
- * Custom polygon - Cannot be resized nor reoriented.
- * This is the old implementation of VPolygon, as found in zvtm 0.8.2. The new version of VPolygon can be resized, but at some cost from an efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances (this implementation uses longs instead of doubles for its internal representation of the vertices, see VPolygon for more details). 
+ * Fast Polygon. Can neither be resized nor reoriented (for now).
+ * This is the old implementation of VPolygon, as found in ZVTM 0.8.2.<br>
+ * The new version of VPolygon can be resized, but at some cost from an efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances.<br>
+ * This implementation uses longs instead of doubles for its internal representation of the vertices, see VPolygon for more details. 
  *@author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.FPolygonST
  *@see com.xerox.VTM.glyphs.VPolygon
+ *@see com.xerox.VTM.glyphs.VPolygonST
  **/
 
 public class FPolygon extends ClosedShape {
 
     long vs;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
+    /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjPolygon[] pc;
 
     /*store x,y vertex coords as relative coordinates w.r.t polygon's centroid*/
@@ -99,9 +103,6 @@ public class FPolygon extends ClosedShape {
 	setBorderColor(bc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjPolygon[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -109,9 +110,6 @@ public class FPolygon extends ClosedShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -133,34 +131,29 @@ public class FPolygon extends ClosedShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute) - no effect*/
+    /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /**get size (bounding circle radius)*/
     public float getSize(){return size;}
 
-    /**compute size (bounding circle radius)*/
+    /*compute size (bounding circle radius)*/
     synchronized void computeSize(){
  	size=0;
 	double f;
@@ -171,30 +164,22 @@ public class FPolygon extends ClosedShape {
 	vs=Math.round(size);
     }
 
-    /**set absolute size by setting bounding circle radius (no effect)*/
+    /** Cannot be resized. */
     public synchronized void sizeTo(float radius){}
 
-    /**multiply bounding circle radius by factor (no effect)*/
+    /** Cannot be resized. */
     public synchronized void reSize(float factor){}
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (pc[camIndex].p.contains(x,y)){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -212,7 +197,9 @@ public class FPolygon extends ClosedShape {
 	}
     }
 
-    /**list of vertices in relative coordinates (w.r.t polygon centroid)*/
+    /** Get this polygon's list of vertices (relative coordinates).
+     *@return relative coordinates (w.r.t polygon's centroid)
+     */
     public LongPoint[] getVertices(){
 	LongPoint[] res=new LongPoint[xcoords.length];
 	for (int i=0;i<xcoords.length;i++){
@@ -221,7 +208,9 @@ public class FPolygon extends ClosedShape {
 	return res;
     }
 
-    /**list of vertices in relative coordinates (absolute coordinates)*/
+    /** Get this polygon's list of vertices (absolute coordinates).
+     *@return absolute coordinates
+     */
     public LongPoint[] getAbsoluteVertices(){
 	LongPoint[] res=new LongPoint[xcoords.length];
 	for (int i=0;i<xcoords.length;i++){
@@ -230,8 +219,8 @@ public class FPolygon extends ClosedShape {
 	return res;
     }
 
-    /**
-     *returns a semicolon-separated string representation of the vertex absolute coordinates for this polygon (x and y coordinates seperated by commas, e.g. x1,y1;x2,y2;x3,y3 etc.)
+    /** Get a serialization of this polygon's list of vertices.
+     *@return a semicolon-separated string representation of all vertex absolute coordinates (x and y coordinates seperated by commas, e.g. x1,y1;x2,y2;x3,y3 etc.)
      */
     public String getVerticesAsText(){
 	StringBuffer res=new StringBuffer();
@@ -242,7 +231,6 @@ public class FPolygon extends ClosedShape {
 	return res.toString();
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -269,7 +257,6 @@ public class FPolygon extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -296,9 +283,6 @@ public class FPolygon extends ClosedShape {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
  	if (pc[i].cr >1){//repaint only if object is visible
 	    if (filled) {
@@ -363,9 +347,7 @@ public class FPolygon extends ClosedShape {
 	}
     }
 
-    /**
-     * returns a given FPolygon's area
-     */
+    /** Get the polygon's area. */
     public double getArea(){
 	double[] xcoordsForArea=new double[xcoords.length];
 	double[] ycoordsForArea=new double[ycoords.length];
@@ -383,8 +365,8 @@ public class FPolygon extends ClosedShape {
 	return ((res<0) ? -res : res);
     }
 
-    /**
-     *return the double precision coordinates of this VShape's centroid
+    /** Get the double precision coordinates of this polygon's centroid.
+     *@see #getCentroid()
      */
     public Point2D.Double getPreciseCentroid(){
 	//compute polygon vertices
@@ -423,15 +405,14 @@ public class FPolygon extends ClosedShape {
 	return res;
     }
 
-    /**
-     *return the coordinates of this VShape's centroid in virtual space
+    /** Get the coordinates of this polygon's centroid in virtual space.
+     *@see #getPreciseCentroid()
      */
     public LongPoint getCentroid(){
 	Point2D.Double p2dd=this.getPreciseCentroid();
 	return new LongPoint(Math.round(p2dd.getX()),Math.round(p2dd.getY()));
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LongPoint[] lps=new LongPoint[xcoords.length];
 	for (int i=0;i<lps.length;i++){

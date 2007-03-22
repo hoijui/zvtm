@@ -20,7 +20,7 @@
 package com.xerox.VTM.glyphs;
 
   /**
-   * Used to decompose VPath in segments
+   * Used to decompose VPath in segments.
    * @author Emmanuel Pietriga
    **/
 

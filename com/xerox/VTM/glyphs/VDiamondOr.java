@@ -32,9 +32,12 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Diamond (lozenge with height equal to width) - can be reoriented
+ * Reorient-able Diamond (losange with height equal to width). This version is less efficient than VDiamond, but it can be reoriented. It cannot be made translucent (see VDiamond*ST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VDiamond
+ *@see com.xerox.VTM.glyphs.VDiamondOrST
+ *@see com.xerox.VTM.glyphs.VDiamondST
+ */
 
 public class VDiamondOr extends VDiamond {
 
@@ -67,22 +70,21 @@ public class VDiamondOr extends VDiamond {
 	orient=or;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
 	else {return false;}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -112,7 +114,6 @@ public class VDiamondOr extends VDiamond {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -142,9 +143,6 @@ public class VDiamondOr extends VDiamond {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (pc[i].cr > 1){//repaint only if object is visible
 	    if (filled) {
@@ -205,8 +203,6 @@ public class VDiamondOr extends VDiamond {
 	}
     }
 
-
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VDiamondOr res=new VDiamondOr(vx,vy,0,vs,color,orient);
 	res.borderColor=this.borderColor;
@@ -214,4 +210,5 @@ public class VDiamondOr extends VDiamond {
 	res.bColor=this.bColor;
 	return res;
     }
+
 }

@@ -22,16 +22,16 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Rectangle - behaves correctly for a very wide range of altitudes - must be either horizontal or vertical
- * can be made translucent
+ * Alternative to VSegmentST for very large widths and heights in virtual space (that go beyond 32-bit integers). Can only handle horizontal or vertical segments. In most cases VSegment will be the best solution. This version can be useful e.g. when a virtual space contains a very large grid.
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.ZSegment
+ *@see com.xerox.VTM.glyphs.VSegmentST
+ *@see com.xerox.VTM.glyphs.VSegment
+ */
 
 public class ZSegmentST extends ZSegment implements Translucent {
 
-    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     public ZSegmentST(){
@@ -52,26 +52,13 @@ public class ZSegmentST extends ZSegment implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to 0.5
     }
 
-
-    /**
-     * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
     }
 
-    /** Get alpha channel value (translucency).
-     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public float getTranslucencyValue(){return alpha;}
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
 	    g.setColor(this.color);
@@ -146,7 +133,6 @@ public class ZSegmentST extends ZSegment implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	ZSegmentST res = new ZSegmentST(vx,vy,0,vw,vh,color);
 	res.borderColor = this.borderColor;

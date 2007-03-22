@@ -19,15 +19,15 @@ import java.awt.geom.AffineTransform;
 import com.xerox.VTM.engine.LongPoint;
 
 /**
- * VSlice - translucency
+ * Translucent Slice. This version is less efficient than VSlice, but it can be made translucent.<br>
+ * Slices are useful e.g. to draw pie menus.
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VSlice
+ */
 
 public class VSliceST extends VSlice implements Translucent {
 
-    /**semi translucency (default is 0.5)*/
     AlphaComposite acST;
-    /**alpha channel*/
     float alpha=0.5f;
 
     /** Construct a slice by giving its 3 vertices
@@ -74,10 +74,6 @@ public class VSliceST extends VSlice implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
-    /**
-     * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
@@ -85,20 +81,13 @@ public class VSliceST extends VSlice implements Translucent {
 	catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /** Get alpha channel value (translucency).
-     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
     public float getTranslucencyValue(){return alpha;}
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude) - always return false for now*/
     public boolean fillsView(long w,long h,int camIndex){
 	//XXX: TBW (call coordInside() for the four view corners)
 	return false;
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
  	if (pc[i].innerCircleRadius > 2){//paint a dot if too small
 	    if (filled){
@@ -175,7 +164,7 @@ public class VSliceST extends VSlice implements Translucent {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
+    /** Not implement yet. */
     public Object clone(){
 	//XXX: TBW
 	return null;

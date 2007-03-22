@@ -50,6 +50,8 @@ public class Test {
 	initTest(ogl);
     }
 
+    VImageOrST im;
+
     public void initTest(short ogl){
 
 	eh=new EventHandlerTest(this);
@@ -67,11 +69,25 @@ public class Test {
 	testView.setEventHandler(eh);
 	testView.setNotifyMouseMoved(true);
 	vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-
-	
-	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.white),"src");
+	vsm.addGlyph(new VCircle(0,0,0,50,Color.RED), "src");
+	im = new VImageOrST(0,0,0,(new ImageIcon("images/logo-futurs-small.png")).getImage(), (float)(Math.PI/4.0), 1.0f);
+	vsm.addGlyph(im,"src");
 
 	vsm.repaintNow();
+    }
+
+    void bob(float f){
+	Vector data =new Vector();
+	data.add(new Float(0));
+	data.add(new Float(0));
+	data.add(new Float(0));
+	data.add(new Float(0));
+	data.add(new Float(0));
+	data.add(new Float(0));
+	data.add(new Float(f));
+
+	vsm.animator.createGlyphAnimation(300, AnimManager.GL_COLOR_LIN, data,
+					  im.getID(), null);
     }
 
     public static void main(String[] args){

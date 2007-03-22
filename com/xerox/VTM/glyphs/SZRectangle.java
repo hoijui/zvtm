@@ -21,8 +21,10 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Rectangle implementing semantic zooming (in the sense that it has minSize and maxSize attributes controlling its visibility) - cannot be reoriented
+ * Rectangle implementing basic semantic zooming, in the sense that it has minSize and maxSize attributes controlling its visibility.
+ * Cannot be reoriented.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VRectangle
  **/
 
 public class SZRectangle extends VRectangle {
@@ -52,11 +54,6 @@ public class SZRectangle extends VRectangle {
 	maxSize = mxs;
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw >= minSize) && (pc[i].ch >= minSize)
 	    && (pc[i].cw <= maxSize) && (pc[i].ch <= maxSize)) {//repaint only if object is visible
@@ -103,7 +100,6 @@ public class SZRectangle extends VRectangle {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	SZRectangle res = new SZRectangle(vx, vy, 0, vw, vh, color, borderColor, minSize, maxSize);
 	res.borderColor=this.borderColor;

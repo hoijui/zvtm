@@ -13,29 +13,32 @@ package net.claribole.zvtm.glyphs;
 import java.awt.Color;
 
 /**
- * Lens rendering interface.
+ * Lens rendering interface implemented by some Glyphs.
  * Makes it possible to change some rendering attributes depending on whether the glyph is seen through a distortion lens or not.
  * @author Emmanuel Pietriga
  **/
 
 public interface LensRendering {
 
-    /**make this glyph (in)visible when seen through a lens (the glyph remains sensitive to cursor in/out events)<br>
+    /** Make this glyph (in)visible when seen through a lens.
+     * The glyph remains sensitive to cursor in/out events.
      *@param b true to make glyph visible, false to make it invisible
      */
     public void setVisibleThroughLens(boolean b);
 
-    /**get this glyph's visibility state when seen through the lens (returns true if visible)*/
+    /** Get this glyph's visibility state when seen through the lens. */
     public boolean isVisibleThroughLens();
 
-    /**set the color used to paint the glyph's interior*/
+    /** Set the color used to paint the glyph's interior. */
     public void setFillColorThroughLens(Color c);
-    /**set the color used to paint the glyph's border*/
+
+    /** Set the color used to paint the glyph's border. */
     public void setBorderColorThroughLens(Color c);
 
-    /**get the color used to paint the glyph's interior*/
+    /** Get the color used to paint the glyph's interior. */
     public Color getFillColorThroughLens();
-    /**get the color used to paint the glyph's border*/
+
+    /** Get the color used to paint the glyph's border. */
     public Color getBorderColorThroughLens();
 
 }

@@ -21,8 +21,9 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.LensRendering;
 
 /**
- * Rectangle whose visibility and color can be different depending on whether it is seen through a lens or not
+ * Rectangle whose visibility and color can be different depending on whether it is seen through a lens or not.
  * @author Emmanuel Pietriga
+ *@see com.xerox.VTM.glyphs.VRectangle
  **/
 
 public class LRectangle extends VRectangle implements LensRendering {
@@ -51,34 +52,26 @@ public class LRectangle extends VRectangle implements LensRendering {
 	borderColorThroughLens = borderColor;
     }
 
-    /**make this glyph (in)visible when seen through a lens (the glyph remains sensitive to cursor in/out events)<br>
-     *@param b true to make glyph visible, false to make it invisible
-     */
     public void setVisibleThroughLens(boolean b){
 	visibleThroughLens = b;
     }
 
-    /**get this glyph's visibility state when seen through the lens (returns true if visible)*/
     public boolean isVisibleThroughLens(){
 	return visibleThroughLens;
     }
 
-    /**set the color used to paint the glyph's interior*/
     public void setFillColorThroughLens(Color c){
 	fillColorThroughLens = c;
     }
 
-    /**set the color used to paint the glyph's border*/
     public void setBorderColorThroughLens(Color c){
 	borderColorThroughLens = c;
     }
 
-    /**get the color used to paint the glyph's interior*/
     public Color getFillColorThroughLens(){
 	return fillColorThroughLens;
     }
     
-    /**get the color used to paint the glyph's border*/
     public Color getBorderColorThroughLens(){
 	return borderColorThroughLens;
     }
@@ -118,7 +111,6 @@ public class LRectangle extends VRectangle implements LensRendering {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	LRectangle res = new LRectangle(vx, vy, 0, vw, vh, color);
 	res.borderColor=this.borderColor;

@@ -38,7 +38,7 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 
-/** Glyph - parent class of all graphical objects.
+/** Parent class of all graphical objects.
  *@author Emmanuel Pietriga
  */
 

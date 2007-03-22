@@ -31,15 +31,18 @@ import com.xerox.VTM.engine.Camera;
 import net.claribole.zvtm.lens.Lens;
 
 /**
- * Rectangle - can be reoriented
+ * Rectangle. This version is less efficient than VRectangle, but it can be reoriented. It cannot be made translucent (see VRectangle*ST).
  * @author Emmanuel Pietriga
- **/
+ *@see com.xerox.VTM.glyphs.VRectangle
+ *@see com.xerox.VTM.glyphs.VRectangleOrST
+ *@see com.xerox.VTM.glyphs.VRectangleST
+ */
 
 public class VRectangleOr extends VRectangle {
 
-    /**vertex x coords*/
+    /*vertex x coords*/
     int[] xcoords = new int[4];
-    /**vertex y coords*/
+    /*vertex y coords*/
     int[] ycoords = new int[4];
 
     public VRectangleOr(){
@@ -75,16 +78,16 @@ public class VRectangleOr extends VRectangle {
 	orient=or;
     }
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**set orientation (absolute)*/
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public void orientTo(float angle){
 	orient=angle;
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	if (orient==0){
 	    if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
@@ -96,10 +99,6 @@ public class VRectangleOr extends VRectangle {
 	}
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (orient==0){
 	    if ((x>=(pc[camIndex].cx-pc[camIndex].cw)) && (x<=(pc[camIndex].cx+pc[camIndex].cw)) && (y>=(pc[camIndex].cy-pc[camIndex].ch)) && (y<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
@@ -111,7 +110,6 @@ public class VRectangleOr extends VRectangle {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -148,7 +146,6 @@ public class VRectangleOr extends VRectangle {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -185,11 +182,6 @@ public class VRectangleOr extends VRectangle {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     *@param vW view width - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     *@param vH view height - used to determine if contour should be drawn or not (when it is dashed and object too big)
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)){//repaint only if object is visible
 	    g.setColor(this.color);
@@ -281,7 +273,6 @@ public class VRectangleOr extends VRectangle {
 	}
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VRectangleOr res=new VRectangleOr(vx, vy, 0, vw, vh, color, borderColor, orient);
 	res.mouseInsideColor=this.mouseInsideColor;
