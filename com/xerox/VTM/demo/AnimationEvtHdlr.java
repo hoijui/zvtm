@@ -87,89 +87,89 @@ public class AnimationEvtHdlr implements ViewEventHandler {
 	    else if (t.equals("orient")){
 		if (application.animType.equals("orient")){
 		    application.animType="";
-		    orientation.setHSVColor(0.36f,1.0f,0.6f);
+		    orientation.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animType="orient";
-		    orientation.setHSVColor(0.0f,1.0f,0.7f);
-		    color.setHSVColor(0.36f,1.0f,0.6f);
-		    size.setHSVColor(0.36f,1.0f,0.6f);
-		    translation.setHSVColor(0.36f,1.0f,0.6f);
+		    orientation.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
+		    color.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    size.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    translation.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 	    }
 	    else if (t.equals("size")){
 		if (application.animType.equals("size")){
 		    application.animType="";
-		    size.setHSVColor(0.36f,1.0f,0.6f);
+		    size.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animType="size";
-		    orientation.setHSVColor(0.36f,1.0f,0.6f);
-		    color.setHSVColor(0.36f,1.0f,0.6f);
-		    size.setHSVColor(0.0f,1.0f,0.7f);
-		    translation.setHSVColor(0.36f,1.0f,0.6f);
+		    orientation.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    color.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    size.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
+		    translation.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 	    }
 	    else if (t.equals("col")){
 		if (application.animType.equals("col")){
 		    application.animType="";
-		    a.setHSVColor(0.36f,1.0f,0.6f);
+		    a.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animType="col";
-		    orientation.setHSVColor(0.36f,1.0f,0.6f);
-		    color.setHSVColor(0.0f,1.0f,0.7f);
-		    size.setHSVColor(0.36f,1.0f,0.6f);
-		    translation.setHSVColor(0.36f,1.0f,0.6f);
+		    orientation.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    color.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
+		    size.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    translation.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 	    }
 	    else if (t.equals("pos")){
 		if (application.animType.equals("trans")){
 		    application.animType="";
-		    a.setHSVColor(0.36f,1.0f,0.6f);
+		    a.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animType="trans";
-		    orientation.setHSVColor(0.36f,1.0f,0.6f);
-		    color.setHSVColor(0.36f,1.0f,0.6f);
-		    size.setHSVColor(0.36f,1.0f,0.6f);
-		    translation.setHSVColor(0.0f,1.0f,0.7f);
+		    orientation.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    color.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    size.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    translation.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 		}
 	    }
 	    else if (t.equals("lin")){
 		if (application.animScheme.equals("lin")){
 		    application.animScheme="";
-		    linear.setHSVColor(0.36f,1.0f,0.6f);
+		    linear.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animScheme="lin";
-		    exponential.setHSVColor(0.36f,1.0f,0.6f);
-		    sigmoid.setHSVColor(0.36f,1.0f,0.6f);
-		    linear.setHSVColor(0.0f,1.0f,0.7f);
+		    exponential.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    sigmoid.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    linear.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 		}
 	    }
 	    else if (t.equals("exp")){
 		if (application.animScheme.equals("exp")){
 		    application.animScheme="";
-		    exponential.setHSVColor(0.36f,1.0f,0.6f);
+		    exponential.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animScheme="exp";
-		    linear.setHSVColor(0.36f,1.0f,0.6f);
-		    sigmoid.setHSVColor(0.36f,1.0f,0.6f);
-		    exponential.setHSVColor(0.0f,1.0f,0.7f);
+		    linear.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    sigmoid.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    exponential.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 		}
 	    }
 	    else if (t.equals("sig")){
 		if (application.animScheme.equals("sig")){
 		    application.animScheme="";
-		    sigmoid.setHSVColor(0.36f,1.0f,0.6f);
+		    sigmoid.setColor(Introduction.ANIM_BUTTON_COLOR);
 		}
 		else{
 		    application.animScheme="sig";
-		    exponential.setHSVColor(0.36f,1.0f,0.6f);
-		    linear.setHSVColor(0.36f,1.0f,0.6f);
-		    sigmoid.setHSVColor(0.0f,1.0f,0.7f);
+		    exponential.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    linear.setColor(Introduction.ANIM_BUTTON_COLOR);
+		    sigmoid.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 		}
 	    }
 	    application.vsm.repaintNow();
@@ -217,14 +217,25 @@ public class AnimationEvtHdlr implements ViewEventHandler {
 	}
     }
 
-    public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
+    public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
+	Camera c = application.vsm.getActiveCamera();
+	float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+	if (wheelDirection == WHEEL_UP){
+	    c.altitudeOffset(-a*5);
+	    application.vsm.repaintNow();
+	}
+	else {//wheelDirection == WHEEL_DOWN
+	    c.altitudeOffset(a*5);
+	    application.vsm.repaintNow();
+	}
+    }
 
     public void enterGlyph(Glyph g){
 	g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
-	g.highlight(false, Introduction.SELECTED_COLOR);
+	g.highlight(false, null);
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){

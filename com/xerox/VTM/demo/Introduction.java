@@ -36,8 +36,10 @@ import net.claribole.zvtm.glyphs.SGlyph;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.glyphs.BooleanOps;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VBoolShape;
@@ -67,6 +69,8 @@ import com.xerox.VTM.glyphs.VTriangleOrST;
 import com.xerox.VTM.glyphs.VTriangleST;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.engine.TransitionManager;
+import net.claribole.zvtm.engine.Location;
 
 public class Introduction {
 
@@ -76,8 +80,12 @@ public class Introduction {
     int viewWidth = PREFERRED_VIEW_WIDTH;
     int viewHeight = PREFERRED_VIEW_HEIGHT;
 
-    static final Color SELECTED_COLOR = Color.WHITE;
-
+    static final Color BLANK_COLOR = Color.BLACK;
+    static final Color MULTI_LAYER_BKG_COLOR = Color.WHITE;
+    static final Color ANIM_BKG_COLOR = new Color(255,242,147);
+    static final Color ANIM_BUTTON_COLOR = new Color(234,221,158);
+    static final Color ANIM_SELECTED_BUTTON_COLOR = new Color(255,153,62);
+    static final Color ANIM_OBJECT_COLOR = new Color(255,153,62);
     VirtualSpaceManager vsm;
 
     IntroPanel iPanel;
@@ -108,20 +116,42 @@ public class Introduction {
 	if (screenDimension.height < PREFERRED_VIEW_HEIGHT){
 	    viewHeight = screenDimension.height;
 	}
-	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true);
+	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(Color.BLACK);
 	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
 	iPanel=new IntroPanel(this);
 	//setAutoZoomEnabled(true);
     }
 
+    void reveal(boolean center){
+	if (center){
+	    Camera c = vsm.getView("Demo").getCameraNumber(0);
+	    Location l = vsm.getGlobalView(c);
+	    c.posx = l.vx;
+	    c.posy = l.vy;
+	    c.updatePrecisePosition();
+	    c.setAltitude(l.alt-c.getFocal());
+	}
+	TransitionManager.fadeIn(vsm.getView("Demo"), 500, vsm);
+    }
+
     void cameraDemo(){
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
+	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
+				      public void animationEnded(Object target, short type, String dimension){
+					  super.animationEnded(target, type, dimension);
+					  cameraDemoActions();
+				      }
+				  });
+    }
+
+    void cameraDemoActions(){
+	vsm.getView("Demo").setBlank(BLANK_COLOR);
+	vsm.getView("Demo").setBackgroundColor(Color.WHITE);
 	vsm.destroyGlyphsInSpace("vs1");
 	eh=new CameraDemoEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
 	float h=0.8f;float s=1.0f;float v=1.0f;
-
-
 	long randomX=0;
 	long randomY=0;
 	long randomS=0;
@@ -154,10 +184,22 @@ public class Introduction {
 	    }
 	    vsm.addGlyph(g,"vs1");
 	}
-	vsm.getGlobalView(vsm.getView("Demo").getCameraNumber(0), 200);
+	reveal(true);
     }
 
     void objectFamilies(){
+	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
+				      public void animationEnded(Object target, short type, String dimension){
+					  super.animationEnded(target, type, dimension);
+					  objectFamiliesActions();
+				      }
+				  });
+    }
+
+    void objectFamiliesActions(){
+	vsm.getView("Demo").setBlank(BLANK_COLOR);
+	vsm.getView("Demo").setBackgroundColor(Color.LIGHT_GRAY);
 	vsm.destroyGlyphsInSpace("vs1");
 	eh=new CameraDemoEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
@@ -221,10 +263,22 @@ public class Introduction {
 	};
 	CGlyph cg=new CGlyph(cg1,sgs);
 	vsm.addCGlyph(cg,"vs1");  //use addCGlyph, not addGlyph
-	vsm.getGlobalView(vsm.getView("Demo").getCameraNumber(0), 200);
+	reveal(true);
     }
 
     void objectAnim(){
+	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
+				      public void animationEnded(Object target, short type, String dimension){
+					  super.animationEnded(target, type, dimension);
+					  objectAnimActions();
+				      }
+				  });
+    }
+
+    void objectAnimActions(){
+	vsm.getView("Demo").setBlank(BLANK_COLOR);
+	vsm.getView("Demo").setBackgroundColor(ANIM_BKG_COLOR);
 	vsm.destroyGlyphsInSpace("vs1");
 	vsm.destroyVirtualSpace("vs2");
 	VRectangle orG=new VRectangle(400,300,0,25,25,Color.black);
@@ -241,7 +295,7 @@ public class Introduction {
 	VText trT = new VText(400, -400, 0, Color.black, "Translation", VText.TEXT_ANCHOR_MIDDLE);
 	vsm.addGlyph(orG,"vs1");vsm.addGlyph(szG,"vs1");vsm.addGlyph(clG,"vs1");vsm.addGlyph(trG,"vs1");
 	vsm.addGlyph(orT,"vs1");vsm.addGlyph(szT,"vs1");vsm.addGlyph(clT,"vs1");vsm.addGlyph(trT,"vs1");
-	orG.setHSVColor(0.0f,1.0f,0.7f);szG.setHSVColor(0.3f,1.0f,0.6f);clG.setHSVColor(0.3f,1.0f,0.6f);trG.setHSVColor(0.3f,1.0f,0.6f);
+	orG.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);szG.setColor(Introduction.ANIM_BUTTON_COLOR);clG.setColor(Introduction.ANIM_BUTTON_COLOR);trG.setColor(Introduction.ANIM_BUTTON_COLOR);
 	VSegment sep=new VSegment(700,0,0,1,300,Color.black);
 	vsm.addGlyph(sep,"vs1");
 	VRectangle linG=new VRectangle(1000,200,0,25,25,Color.black);
@@ -255,7 +309,7 @@ public class Introduction {
 	VText sigT = new VText(1000, -300, 0, Color.black, "Slow-in/Slow-out", VText.TEXT_ANCHOR_MIDDLE);
 	vsm.addGlyph(linG,"vs1");vsm.addGlyph(expG,"vs1");vsm.addGlyph(sigG,"vs1");
 	vsm.addGlyph(linT,"vs1");vsm.addGlyph(expT,"vs1");vsm.addGlyph(sigT,"vs1");
-	linG.setHSVColor(0.3f,1.0f,0.6f);expG.setHSVColor(0.3f,1.0f,0.6f);sigG.setHSVColor(0.0f,1.0f,0.7f);
+	linG.setColor(Introduction.ANIM_BUTTON_COLOR);expG.setColor(Introduction.ANIM_BUTTON_COLOR);sigG.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 	eh=new AnimationEvtHdlr(this,orG,szG,clG,trG,linG,expG,sigG);
 	vsm.getView("Demo").setEventHandler(eh);
 
@@ -265,12 +319,12 @@ public class Introduction {
 	VRectangleOr r1=new VRectangleOr(-400,0,0,100,50,Color.black,0);r1.setType("an");
 	VDiamondOr d1=new VDiamondOr(-400,-300,0,100,Color.black,0);d1.setType("an");
 	vsm.addGlyph(c1,"vs1");vsm.addGlyph(t1,"vs1");vsm.addGlyph(o1,"vs1");vsm.addGlyph(r1,"vs1");vsm.addGlyph(d1,"vs1");
-	c1.setHSVColor(0.65f,1.0f,1.0f);t1.setHSVColor(0.65f,0.8f,0.8f);o1.setHSVColor(0.65f,0.6f,0.6f);r1.setHSVColor(0.65f,0.4f,0.4f);d1.setHSVColor(0.65f,0.2f,0.2f);
+	c1.setColor(Introduction.ANIM_OBJECT_COLOR);t1.setColor(Introduction.ANIM_OBJECT_COLOR);o1.setColor(Introduction.ANIM_OBJECT_COLOR);r1.setColor(Introduction.ANIM_OBJECT_COLOR);d1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	VImageOr i1=new VImageOr(-400,-600,0,(new ImageIcon(this.getClass().getResource("/images/xrce.gif"))).getImage(),0.0f);i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	vsm.addGlyph(i1,"vs1");i1.setType("an");
 	i1.sizeTo(200);
 	float[] vs={1.0f,0.4f,1.0f,0.4f,0.8f,0.5f,0.3f,1.0f};
-	VShape s1=new VShape(-400,-900,0,100,vs,Color.blue,0);vsm.addGlyph(s1,"vs1");s1.setType("an");
+	VShape s1=new VShape(-400,-900,0,100,vs,ANIM_OBJECT_COLOR,0);vsm.addGlyph(s1,"vs1");s1.setType("an");
 
 	//will be the primary glyph of a CGlyph
 	VRectangleOr cg1=new VRectangleOr(-400,-1200,0,200,100,Color.black,0);
@@ -281,11 +335,11 @@ public class Introduction {
 	VRectangleOr cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
 	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
 	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
-	cg1.setHSVColor(0.65f,0.4f,0.4f);
-	cg2.setHSVColor(0.65f,0.8f,0.8f);
-	cg3.setHSVColor(0.65f,0.8f,0.8f);
-	cg4.setHSVColor(0.65f,0.8f,0.8f);
-	cg5.setHSVColor(0.65f,0.8f,0.8f);
+	cg1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	cg2.setColor(Introduction.ANIM_OBJECT_COLOR);
+	cg3.setColor(Introduction.ANIM_BUTTON_COLOR);
+	cg4.setColor(Introduction.ANIM_OBJECT_COLOR);
+	cg5.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 	SGlyph[] sgs={
 	    new SGlyph(cg2,200,0,SGlyph.FULL_ROTATION,SGlyph.RESIZE),
 	    new SGlyph(cg3,0,100,SGlyph.FULL_ROTATION,SGlyph.RESIZE),
@@ -294,7 +348,31 @@ public class Introduction {
 	};
 	CGlyph cg=new CGlyph(cg1,sgs);
 	vsm.addCGlyph(cg,"vs1");  //use addCGlyph, not addGlyph
-	vsm.getGlobalView(vsm.getView("Demo").getCameraNumber(0), 200);
+
+
+	//will be the primary glyph of a CGlyph
+	cg1=new VRectangleOr(-400,-1600,0,200,100,Color.black,0);
+	//and 4 secondary glyphs (init coordinates of secondary glyphs do not matter as they will be changed to match the position offset defined in the associated SGlyph)
+	cg2=new VTriangleOr(0,0,0,50,Color.black,0);
+	cg3=new VRectangleOrST(0,0,0,50,50,Color.black,Color.BLACK, 0.5f,0.404f);
+	cg4=new VTriangleOrST(0,0,0,50,Color.black,Color.BLACK, 0.5f,0.404f);
+	cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
+	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
+	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
+	cg1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	cg2.setColor(Introduction.ANIM_OBJECT_COLOR);
+	cg3.setColor(Introduction.ANIM_BUTTON_COLOR);
+	cg4.setColor(Introduction.ANIM_OBJECT_COLOR);
+	cg5.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
+	SGlyph[] sgs2={
+	    new SGlyph(cg2,200,0,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	    new SGlyph(cg3,0,100,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	    new SGlyph(cg4,-200,0,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	    new SGlyph(cg5,0,-100,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
+	};
+	cg=new CGlyph(cg1,sgs2);
+	vsm.addCGlyph(cg,"vs1");  //use addCGlyph, not addGlyph
+	reveal(true);
     }
 
     void animate(Glyph g){
@@ -326,6 +404,17 @@ public class Introduction {
     }
 
     void multiLayer(){
+	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
+				      public void animationEnded(Object target, short type, String dimension){
+					  super.animationEnded(target, type, dimension);
+					  multiLayerActions();
+				      }
+				  });
+    }
+
+    void multiLayerActions(){
+	vsm.getView("Demo").setBlank(BLANK_COLOR);
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
 	vsm.destroyGlyphsInSpace("vs1");
 	vsm.getVirtualSpace("vs1").removeCamera(1);
@@ -333,7 +422,7 @@ public class Introduction {
 	vsm.addVirtualSpace("vs2");
 	vsm.addCamera("vs2");
 	Vector vc1=new Vector();vc1.add(vsm.getVirtualSpace("vs1").getCamera(0));vc1.add(vsm.getVirtualSpace("vs2").getCamera(0));
-	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true);
+	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
 	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
 	eh=new MultiLayerEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
@@ -366,9 +455,22 @@ public class Introduction {
 	vsm.getVirtualSpace("vs2").getCamera(0).posx=0;
 	vsm.getVirtualSpace("vs2").getCamera(0).posy=0;
 	vsm.getVirtualSpace("vs2").getCamera(0).setAltitude(800.0f);
+	reveal(false);
     }
 
     void multiView(){
+	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
+				      public void animationEnded(Object target, short type, String dimension){
+					  super.animationEnded(target, type, dimension);
+					  multiViewActions();
+				      }
+				  });
+    }
+
+    void multiViewActions(){
+	vsm.getView("Demo").setBlank(BLANK_COLOR);
+	vsm.getView("Demo").setBackgroundColor(Color.WHITE);
 	vsm.destroyGlyphsInSpace("vs1");
 	vsm.destroyVirtualSpace("vs2");
 	eh=new CameraDemoEvtHdlr(this);
@@ -381,13 +483,14 @@ public class Introduction {
 	vsm.getView("Demo").setEventHandler(eh);
 	vsm.getView("Demo2").setEventHandler(eh2);
 	vsm.getView("Demo2").setLocation(0,350);
+	vsm.getView("Demo2").setBackgroundColor(Color.WHITE);
 	VRectangle g1=new VRectangle(200,-200,0,100,50,Color.yellow);
 	VRectangle g2=new VRectangle(200,200,0,100,50,Color.green);
 	VRectangle g3=new VRectangle(-200,-200,0,100,50,Color.red);
 	VRectangle g4=new VRectangle(-200,200,0,100,50,Color.blue);
 	vsm.addGlyph(g1,"vs1");vsm.addGlyph(g2,"vs1");vsm.addGlyph(g3,"vs1");vsm.addGlyph(g4,"vs1");
-	vsm.getGlobalView(vsm.getVirtualSpace("vs1").getCamera(0),200);
 	vsm.getGlobalView(vsm.getVirtualSpace("vs1").getCamera(camNb),200);
+	reveal(true);
     }
 
     protected boolean isAutoZoomEnabled(){
@@ -416,4 +519,20 @@ public class Introduction {
 	Introduction appli=new Introduction();
     }
     
+}
+
+class FadeOut extends net.claribole.zvtm.engine.FadeOut {
+    
+    View view;
+    Color blankColor;
+    VirtualSpace spaceOwningFadeRect;
+    
+    FadeOut(View v, Color c, VirtualSpace vs){
+	super(v, c, vs);
+    }
+
+    public void animationEnded(Object target, short type, String dimension){
+	super.animationEnded(target, type, dimension);
+    }
+
 }

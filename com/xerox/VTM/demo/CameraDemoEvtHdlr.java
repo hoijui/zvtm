@@ -130,14 +130,25 @@ public class CameraDemoEvtHdlr implements ViewEventHandler {
 	}
     }
 
-    public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
+    public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
+	Camera c = application.vsm.getActiveCamera();
+	float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+	if (wheelDirection == WHEEL_UP){
+	    c.altitudeOffset(-a*5);
+	    application.vsm.repaintNow();
+	}
+	else {//wheelDirection == WHEEL_DOWN
+	    c.altitudeOffset(a*5);
+	    application.vsm.repaintNow();
+	}
+    }
 
     public void enterGlyph(Glyph g){
 	g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
-	g.highlight(false, Introduction.SELECTED_COLOR);
+	g.highlight(false, null);
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
