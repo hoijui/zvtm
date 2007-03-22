@@ -24,22 +24,37 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * class used to store a boolean operation to be run on an appropriate glyph - right now we only support RectangularShape derivatives (Ellipse, Rectangle)
+ * Class used to store a boolean operation to be made on a VBoolShape. Right now we only support RectangularShape derivatives (Ellipse, Rectangle).
  * @author Emmanuel Pietriga
  */
 
-public class BooleanOps {    
+public class BooleanOps {
 
-    /** virtual distance to main shape's center (vx,vy) */
-    public long ox,oy;
-    /** size along x and y axis */
-    public long szx,szy;
-    /** 1=ellipse 2=rectangle */
+    public static final short BOOLEAN_UNION = 1;
+    public static final short BOOLEAN_SUBTRACTION = 2;
+    public static final short BOOLEAN_INTERSECTION = 3;
+    public static final short BOOLEAN_XOR = 4;
+
+    public static final short SHAPE_TYPE_ELLIPSE = 1;
+    public static final short SHAPE_TYPE_RECTANGLE = 2;
+
+    /** Horizontal distance to main glyph's center in virtual space. */
+    public long ox;
+    /** Vertical distance to main glyph's center in virtual space. */
+    public long oy;
+
+    /** Width. */
+    public long szx;
+    /** Height. */
+    public long szy;
+    
+    /** One of SHAPE_TYPE_*. */
     public int shapeType;
-    /** 1=union 2=subtraction 3=intersection 4=exclusive OR */
+    
+    /** One of  BOOLEAN_*. */
     public int opType;
 
-    /** the actual projected area (used in the boolean operation before drawing, called by project) */
+    /* Actual projected area (used in the boolean operation before drawing, called by project()) */
     Area ar;
     Area lar;
     
@@ -48,8 +63,8 @@ public class BooleanOps {
      *@param y virtual vertical distance to main shape's center in virtual space
      *@param sx size along X axis
      *@param sy size along Y axis
-     *@param t shape type 1=ellipse 2=rectangle
-     *@param o boolean operation type 1=union 2=subtraction 3=intersection 4=exclusive OR
+     *@param t shape type, one of SHAPE_TYPE_*
+     *@param o boolean operation type, one of BOOLEAN_*
      */
     public BooleanOps(long x,long y,long sx,long sy,int t,int o){
 	ox=x;
@@ -62,11 +77,11 @@ public class BooleanOps {
 
     void project(float coef,long cx,long cy){//cx and cy are projected coordinates of main area
 	switch (shapeType) {
-	case 1:{//ellipse
+	case SHAPE_TYPE_ELLIPSE:{//ellipse
 	    ar=new Area(new Ellipse2D.Float(cx+(ox-szx/2)*coef,cy-(oy+szy/2)*coef,szx*coef,szy*coef));
 	    break;
 	}
-	case 2:{//rectangle
+	case SHAPE_TYPE_RECTANGLE:{//rectangle
 	    ar=new Area(new Rectangle2D.Float(cx+(ox-szx/2)*coef,cy-(oy+szy/2)*coef,szx*coef,szy*coef));
 	    break;
 	}
@@ -78,11 +93,11 @@ public class BooleanOps {
 
     void projectForLens(float coef,long cx,long cy){//cx and cy are projected coordinates of main area
 	switch (shapeType) {
-	case 1:{//ellipse
+	case SHAPE_TYPE_ELLIPSE:{//ellipse
 	    lar=new Area(new Ellipse2D.Float(cx+(ox-szx/2)*coef,cy-(oy+szy/2)*coef,szx*coef,szy*coef));
 	    break;
 	}
-	case 2:{//rectangle
+	case SHAPE_TYPE_RECTANGLE:{//rectangle
 	    lar=new Area(new Rectangle2D.Float(cx+(ox-szx/2)*coef,cy-(oy+szy/2)*coef,szx*coef,szy*coef));
 	    break;
 	}

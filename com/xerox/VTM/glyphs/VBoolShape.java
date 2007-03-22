@@ -36,21 +36,25 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjBoolean;
 
   /**
-   * Boolean shape - defined by a main glyph and a list of boolean operations (applied according to their order in the constructor's array)
-   * -right now we only support RectangularShape derivatives (Ellipse, Rectangle)
+   * Glyphs defined as a main shape modified through boolean operations using secondary shapes.
+   * Defined by a main glyph and a list of boolean operations (applied according to their order in the constructor's array).
+   * Right now we only support RectangularShape derivatives (Ellipse, Rectangle)
    * @author Emmanuel Pietriga
    */
 
-public class VBoolShape extends ClosedShape {
+public class VBoolShape extends ClosedShape implements RectangularShape {
 
-    /**list of boolean operations (applied in the order given by the array)*/
+    /** List of boolean operations (applied in the order given by the array). */
     BooleanOps[] booleanShapes;
-    /**main shape size in virtual space*/
-    long szx,szy;
-    /**1=ellipse 2=rectangle*/
+    /** Main shape width in virtual space. */
+    long szx;
+    /** Main shape height in virtual space. */
+    long szy;
+
+
+    /** One of BooleanOps.SHAPE_TYPE_*. */
     int shapeType;
 
-    /**array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjBoolean[] pc;
 
     /**
@@ -59,7 +63,7 @@ public class VBoolShape extends ClosedShape {
      *@param z altitude in virtual space
      *@param sx horizontal size in virtual space
      *@param sy vertical size in virtual space
-     *@param st shape type //1=ellipse 2=rectangle
+     *@param st shape type, one of BooleanOps.SHAPE_TYPE_*
      *@param b array of boolean operations
      *@param c main shape's color
      */
@@ -81,7 +85,7 @@ public class VBoolShape extends ClosedShape {
      *@param z altitude in virtual space
      *@param sx horizontal size in virtual space
      *@param sy vertical size in virtual space
-     *@param st shape type //1=ellipse 2=rectangle
+     *@param st shape type, one of BooleanOps.SHAPE_TYPE_*
      *@param b array of boolean operations
      *@param c main shape's color
      *@param bc main shape's border color
@@ -98,9 +102,6 @@ public class VBoolShape extends ClosedShape {
 	setBorderColor(bc);
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjBoolean[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -108,9 +109,6 @@ public class VBoolShape extends ClosedShape {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -132,68 +130,57 @@ public class VBoolShape extends ClosedShape {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
-    /**orientation is disabled*/
+    /** Cannot be reoriented. */
     public float getOrient(){return 0;}
 
-    /**orientation is disabled*/
+    /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /**orientation is disabled*/
-    public void orientToNS(float angle){}
-
-    /**size is disabled*/
+    /** Cannot be resized. */
     public float getSize(){return 0;}
 
-    /**size is disabled*/
+    /** Cannot be resized. */
     public void sizeTo(float radius){}
 
-    /**size is disabled*/
-    public void sizeToNS(float radius){}
+    /** Cannot be resized. */
+    public void setWidth(long w);
 
-    /**get full width*/
-    public long getWidth(){return szx;}
+    /** Cannot be resized. */
+    public void setHeight(long h);
 
-    /**get full height*/
-    public long getHeight(){return szy;}
+    /** Get half width. */
+    public long getWidth(){return szx / 2;}
 
-    /**size is disabled*/
+    /** Get half height. */
+    public long getHeight(){return szy / 2;}
+
+    /** Cannot be resized. */
     public void reSize(float factor){}
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){//would be too complex: just say no
 	return false;
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	if (pc[camIndex].mainArea.contains(x,y)){return true;}
 	else {return false;}
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
@@ -211,7 +198,6 @@ public class VBoolShape extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -261,7 +247,6 @@ public class VBoolShape extends ClosedShape {
 	}
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
@@ -312,9 +297,6 @@ public class VBoolShape extends ClosedShape {
 	}
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].mainArea.getBounds().width>2) && (pc[i].mainArea.getBounds().height>2)){
 	    if (filled){
@@ -375,18 +357,18 @@ public class VBoolShape extends ClosedShape {
 	}
     }
 
-    /**public only because accessed by svg export module*/
+    /** For internal use. */
     public int getMainShapeType(){
 	return shapeType;
     }
 
-    /**public only because accessed by svg export module*/
+    /** For internal use. */
     public BooleanOps[] getOperations(){
 	return booleanShapes;
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	return new VBoolShape(vx,vy,0,szx,szy,shapeType,booleanShapes,color);
     }
+
 }
