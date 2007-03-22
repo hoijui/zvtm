@@ -43,7 +43,7 @@ public class EventHandlerTest implements ViewEventHandler{
     long x1,x2,y1,y2;
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.bob(-1);
+
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -55,7 +55,7 @@ public class EventHandlerTest implements ViewEventHandler{
     }
     
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.bob(1);
+
     }
     
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
