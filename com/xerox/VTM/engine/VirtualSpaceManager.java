@@ -341,14 +341,28 @@ public class VirtualSpaceManager implements AWTEventListener {
     }
 
     /**add camera to space whose name is vs
-     *@param vs owning virtual space 
+     *@param vs owning virtual space's name
      */
     public Camera addCamera(String vs){
-	VirtualSpace tvs=(VirtualSpace)allVirtualSpaces.get(vs);
-	Camera c=tvs.createCamera();
+	return addCamera((VirtualSpace)allVirtualSpaces.get(vs));
+    }
+
+    /**add camera to space whose name is vs
+     *@param vs owning virtual space 
+     */
+    public Camera addCamera(VirtualSpace vs){
+	Camera c = vs.createCamera();
 	c.setID(new Integer(nextcID++));
-	allCameras.put(c.getID(),c);
+	allCameras.put(c.getID(), c);
 	return c;
+    }
+
+    /**add camera to space whose name is vs
+     *@param vs owning virtual space's name
+     *@param lazy true if this is to be a lazy camera (false otherwise)
+     */
+    public Camera addCamera(String vs, boolean lazy){
+	return addCamera((VirtualSpace)allVirtualSpaces.get(vs), lazy);
     }
 
     /**
@@ -356,9 +370,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param vs owning virtual space
      *@param lazy true if this is to be a lazy camera (false otherwise)
      */
-    public Camera addCamera(String vs,boolean lazy){
-	VirtualSpace tvs=(VirtualSpace)allVirtualSpaces.get(vs);
-	Camera c=tvs.createCamera();
+    public Camera addCamera(VirtualSpace vs, boolean lazy){
+	Camera c = vs.createCamera();
 	c.setLaziness(lazy);
 	c.setID(new Integer(nextcID++));
 	allCameras.put(c.getID(),c);
