@@ -337,12 +337,12 @@ public abstract class Glyph implements Cloneable {
      */
     public void addHSVbColor(float h,float s,float v){}
 
-    /** Get main color's HSV components. */
+    /** Get main color's HSV components. This is the original array, not a copy. */
     public float[] getHSVColor(){
 	return this.HSV;
     }
 
-    /** Get border color's HSV components.
+    /** Get border color's HSV components. This is the original array, not a copy.
      *@return {0, 0, 0} if the glyph does not have a border (e.g., is not an instanceof ClosedShape)
      */
     public float[] getHSVbColor(){
