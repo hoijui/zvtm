@@ -184,11 +184,13 @@ public class VRectangleOr extends VRectangle {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)){//repaint only if object is visible
-	    g.setColor(this.color);
 	    if (orient==0) {
-		if (filled){g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);}
-		g.setColor(borderColor);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		}
 		if (paintBorder){
+		    g.setColor(borderColor);
 		    if (stroke!=null) {	
  			if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
 			    ((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
@@ -209,10 +211,11 @@ public class VRectangleOr extends VRectangle {
 	    else {
 		g.translate(dx, dy);
 		if (filled){
+		    g.setColor(this.color);
 		    g.fillPolygon(pc[i].p);
 		}
-		g.setColor(borderColor);
 		if (paintBorder){
+		    g.setColor(borderColor);
 		    if (stroke!=null) {
 			g.setStroke(stroke);
 			g.drawPolygon(pc[i].p);
@@ -233,11 +236,13 @@ public class VRectangleOr extends VRectangle {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lcw>1) && (pc[i].lch>1)){//repaint only if object is visible
-	    g.setColor(this.color);
 	    if (orient==0) {
-		if (filled){g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);}
-		g.setColor(borderColor);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+		}
 		if (paintBorder){
+		    g.setColor(borderColor);
 		    if (stroke!=null) {
 			if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
 			    ((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
@@ -253,9 +258,12 @@ public class VRectangleOr extends VRectangle {
 		}
 	    }
 	    else {
-		if (filled){g.fillPolygon(pc[i].lp);}
-		g.setColor(borderColor);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillPolygon(pc[i].lp);
+		}
 		if (paintBorder){
+		    g.setColor(borderColor);
 		    if (stroke!=null) {
 			g.setStroke(stroke);
 			g.drawPolygon(pc[i].lp);

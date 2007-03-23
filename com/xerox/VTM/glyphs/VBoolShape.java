@@ -303,8 +303,8 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
 		g.fill(pc[i].mainArea);
 		g.translate(-dx,-dy);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null){
 		    g.setStroke(stroke);
 		    g.translate(dx,dy);
@@ -333,8 +333,8 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
 		g.fill(pc[i].lmainArea);
 		g.translate(-dx,-dy);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null){
 		    g.setStroke(stroke);
 		    g.translate(dx,dy);

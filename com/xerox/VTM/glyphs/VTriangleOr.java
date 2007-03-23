@@ -151,9 +151,9 @@ public class VTriangleOr extends VTriangle {
 		g.translate(dx, dy);
 		g.fillPolygon(pc[i].p);
 		g.translate(-dx, -dy);
-	    }	
-	    g.setColor(borderColor);
+	    }
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
 		    g.translate(dx, dy);
@@ -181,9 +181,9 @@ public class VTriangleOr extends VTriangle {
 		g.translate(dx, dy);
 		g.fillPolygon(pc[i].lp);
 		g.translate(-dx, -dy);
-	    }	
-	    g.setColor(borderColor);
+	    }
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
 		    g.translate(dx, dy);

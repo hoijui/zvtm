@@ -77,8 +77,8 @@ public class ZCircle extends VCircle {
 		g.setColor(this.color);
 		g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
 		    g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
@@ -101,8 +101,8 @@ public class ZCircle extends VCircle {
 		g.setColor(this.color);
 		g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
 		    g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);

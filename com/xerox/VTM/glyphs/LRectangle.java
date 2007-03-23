@@ -82,8 +82,8 @@ public class LRectangle extends VRectangle implements LensRendering {
 		g.setColor(this.fillColorThroughLens);
 		g.fillRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
 	    }
-	    g.setColor(this.borderColorThroughLens);
 	    if (paintBorder){
+		g.setColor(this.borderColorThroughLens);
 		if (stroke!=null) {
 		    if (((pc[i].lcx-pc[i].lcw)>0) || ((pc[i].lcy-pc[i].lch)>0) || ((2*pc[i].lcw-1)<vW) || ((2*pc[i].lch-1)<vH)){
 			g.setStroke(stroke);  //change stroke there

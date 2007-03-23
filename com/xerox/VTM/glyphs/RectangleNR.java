@@ -280,8 +280,8 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 		g.setColor(this.color);
 		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
 	    }
 	}
@@ -306,8 +306,8 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 		g.setColor(this.color);
 		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);
 	    }
 	}

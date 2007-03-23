@@ -252,8 +252,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 		g.setColor(this.color);
 		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {	
 		    if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
 			((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
@@ -292,8 +292,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 		g.setColor(this.color);
 		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
 			((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){

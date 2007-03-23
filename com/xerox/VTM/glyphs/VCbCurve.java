@@ -229,8 +229,8 @@ public class VCbCurve extends Glyph {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	g.setColor(this.color);
 	if (pc[i].cr >1){//repaint only if object is visible
-	    g.setColor(this.color);
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx,dy);
@@ -245,14 +245,13 @@ public class VCbCurve extends Glyph {
 	    }
 	}
 	else {
-	    g.setColor(this.color);
 	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	g.setColor(this.color);
 	if (pc[i].lcr >1){//repaint only if object is visible
-	    g.setColor(this.color);
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx,dy);
@@ -267,7 +266,6 @@ public class VCbCurve extends Glyph {
 	    }
 	}
 	else {
-	    g.setColor(this.color);
 	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
 	}
     }

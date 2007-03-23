@@ -297,8 +297,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
 		}
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);  //change stroke there
 		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
@@ -330,8 +330,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 		g.setColor(this.color);
 		g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);  //change stroke there
 		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);

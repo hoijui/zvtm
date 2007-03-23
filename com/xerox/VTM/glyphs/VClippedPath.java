@@ -174,7 +174,7 @@ public class VClippedPath extends VPath {
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (visibilityHasChanged()){constructVisiblePath();}
 	g.setColor(this.color);
-	if (true){//replace by something using projected size (so that we do not paint it if too small)
+// 	if (true){//replace by something using projected size (so that we do not paint it if too small)
  	    at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
  	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
 	    g.setTransform(at);
@@ -187,13 +187,13 @@ public class VClippedPath extends VPath {
 		g.draw(path);
 	    }
 	    g.setTransform(stdT);
-	}
+// 	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if (visibilityHasChanged()){constructVisiblePath();}
 	g.setColor(this.color);
-	if (true){//replace by something using projected size (so that we do not paint it if too small)
+// 	if (true){//replace by something using projected size (so that we do not paint it if too small)
  	    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);
  	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
 	    g.setTransform(at);
@@ -206,7 +206,7 @@ public class VClippedPath extends VPath {
 		g.draw(path);
 	    }
 	    g.setTransform(stdT);
-	}
+// 	}
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){

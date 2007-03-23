@@ -248,8 +248,8 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 		g.fill(pc[i].ellipse);
 		g.translate(-dx, -dy);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null){
 		    g.setStroke(stroke);
 		    g.translate(dx, dy);
@@ -278,8 +278,8 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 		g.fill(pc[i].lellipse);
 		g.translate(-dx, -dy);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null){
 		    g.setStroke(stroke);
 		    g.translate(dx, dy);

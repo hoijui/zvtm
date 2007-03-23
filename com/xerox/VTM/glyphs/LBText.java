@@ -180,8 +180,7 @@ public class LBText extends LText {
 		    g.fillRect(dx-2, dy-pc[i].lch+1, pc[i].lcw+4, pc[i].lch+1);
 		}
 		g.setColor(this.color);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch (NullPointerException ex){/*text could be null*/}
+		g.drawString(text,0.0f,0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -201,8 +200,7 @@ public class LBText extends LText {
 		    g.fillRect(dx-2, dy-pc[i].ch+1, pc[i].cw+4, pc[i].ch+1);
 		}
 		g.setColor(this.color);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch(NullPointerException ex){/*text could be null*/}
+		g.drawString(text,0.0f,0.0f);
 	    }
 	    g.setTransform(stdT);
 	}
@@ -231,8 +229,7 @@ public class LBText extends LText {
 		    g.fillRect(dx-2, dy-pc[i].lch + 1, pc[i].lcw+4, pc[i].lch+1);
 		}
 		g.setColor(this.fillColorThroughLens);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch (NullPointerException ex){/*text could be null*/}
+		g.drawString(text,0.0f,0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -252,8 +249,7 @@ public class LBText extends LText {
 		    g.fillRect(dx-2, dy-pc[i].lch + 1, pc[i].lcw+4, pc[i].lch+1);
 		}
 		g.setColor(this.fillColorThroughLens);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch(NullPointerException ex){/*text could be null*/}
+		g.drawString(text,0.0f,0.0f);
 	    }
 	    g.setTransform(stdT);
 	}

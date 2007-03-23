@@ -103,8 +103,7 @@ public class LText extends VText implements LensRendering {
 		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch (NullPointerException ex){/*text could be null*/}
+		g.drawString(text,0.0f,0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -119,8 +118,7 @@ public class LText extends VText implements LensRendering {
 		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch(NullPointerException ex){/*text could be null*/}
+		g.drawString(text,0.0f,0.0f);
 	    }
 	    g.setTransform(stdT);
 	}

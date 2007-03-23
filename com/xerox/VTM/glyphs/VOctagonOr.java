@@ -157,8 +157,8 @@ public class VOctagonOr extends VOctagon {
 		g.fillPolygon(pc[i].p);
 		g.translate(-dx, -dy);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
 		    g.translate(dx, dy);
@@ -184,11 +184,11 @@ public class VOctagonOr extends VOctagon {
 	    if (filled) {
 		g.setColor(this.color);
 		g.translate(dx, dy);
-		g.fillPolygon(pc[i].lp);	
+		g.fillPolygon(pc[i].lp);
 		g.translate(-dx, -dy);
 	    }
-	    g.setColor(borderColor);
 	    if (paintBorder){
+		g.setColor(borderColor);
 		if (stroke!=null) {
 		    g.setStroke(stroke);
 		    g.translate(dx, dy);
