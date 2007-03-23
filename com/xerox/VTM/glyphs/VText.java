@@ -40,11 +40,12 @@ import net.claribole.zvtm.glyphs.projection.ProjText;
 /**
  * Standalone Text.  This version is the most efficient, but it cannot be reoriented (see VTextOr).<br>
  * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).<br>
- * vx and vy are the coordinates of the lower-left corner of the rendered String because it would be too time-consuming to compute the String's center.
+ * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VTextOr
  *@see com.xerox.VTM.glyphs.LText
  *@see com.xerox.VTM.glyphs.LBText
+ *@see net.claribole.zvtm.glyphs.VTextST
  */
 
 public class VText extends Glyph {
@@ -56,25 +57,38 @@ public class VText extends Glyph {
     /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with end of String). */
     public static final short TEXT_ANCHOR_END=2;
 
-    short text_anchor = TEXT_ANCHOR_START;
+    /** Text alignment (read-only). Use access methods to change. One of TEXT_ANCHOR_*. */
+    public short text_anchor = TEXT_ANCHOR_START;
 
-    AffineTransform at;
+    /** Affine Transform used when drawing text. For internal use. */
+    public AffineTransform at;
 
-    ProjText[] pc;
+    /** For internal use. */
+    public ProjText[] pc;
 
-    boolean zoomSensitive=true;
+    /** (read-only), use access methods to change.
+     *@see #isZoomSensitive()
+     *@see #setZoomSensitive(boolean b)
+     */
+    public boolean zoomSensitive=true;
 
     /** Font size in pixels (read-only). */
     public static float fontSize=VirtualSpaceManager.getMainFont().getSize2D();
 
-    /*Special font used in this object only (null if default font)*/
-    Font font;
+    /** Special font used in this object only. Null if default font. (read-only), use access methods to change.
+     *@see #setSpecialFont(Font f)
+     *@see #getFont()
+     */
+    public Font font;
 
     /** For internal use. */
-    Rectangle2D bounds;
+    public Rectangle2D bounds;
 
-    /*Text that should be drawn with glyph*/
-    String text;
+    /** Text that should be painted (read-only), use access methods to change.
+     *@see #setText(String t)
+     *@see #getText()
+     */
+    public String text;
 
     public VText(String t){
 	vx=0;
@@ -279,7 +293,8 @@ public class VText extends Glyph {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
-	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+	    //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
 		g.setFont(font);
 		if (!pc[i].valid){
@@ -293,8 +308,7 @@ public class VText extends Glyph {
 		else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch (NullPointerException ex){/*text could be null*/}
+		g.drawString(text, 0.0f, 0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -309,8 +323,7 @@ public class VText extends Glyph {
 		else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch(NullPointerException ex){/*text could be null*/}
+		g.drawString(text, 0.0f, 0.0f);
 	    }
 	    g.setTransform(stdT);
 	}
@@ -321,7 +334,8 @@ public class VText extends Glyph {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
-	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+	    //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
 		g.setFont(font);
 		if (!pc[i].lvalid){
@@ -335,8 +349,7 @@ public class VText extends Glyph {
 		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch (NullPointerException ex){/*text could be null*/}
+		g.drawString(text, 0.0f, 0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -351,8 +364,7 @@ public class VText extends Glyph {
 		else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 		if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef,coef));}
 		g.setTransform(at);
-		try {g.drawString(text,0.0f,0.0f);}
-		catch(NullPointerException ex){/*text could be null*/}
+		g.drawString(text, 0.0f, 0.0f);
 	    }
 	    g.setTransform(stdT);
 	}

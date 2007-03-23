@@ -26,11 +26,14 @@ import net.claribole.zvtm.glyphs.LensRendering;
 
 /**
  * Standalone text whose visibility and color can be different depending on whether it is seen through a lens or not.
- * The border color is used to fill the text's background. Set to null if no background should be painted.
+ * The border color is used to fill the text's background. Set to null if no background should be painted.<br>
+ * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).
+ * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VText
  *@see com.xerox.VTM.glyphs.LText
  *@see com.xerox.VTM.glyphs.VTextOr
+ *@see net.claribole.zvtm.glyphs.VTextST
  */
 
 public class LBText extends LText {
