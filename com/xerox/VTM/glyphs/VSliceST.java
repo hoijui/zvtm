@@ -90,77 +90,145 @@ public class VSliceST extends VSlice implements Translucent {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
  	if (pc[i].innerCircleRadius > 2){//paint a dot if too small
-	    if (filled){
-		g.setColor(this.color);
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.fillArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
-			  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
+			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke != null){
+			g.setStroke(stroke);
+			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
+				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
+				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
+		    }
+		}
 		g.setComposite(acO);
 	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke != null){
-		    g.setStroke(stroke);
-		    g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
+	    else {
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
 			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
-		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
-		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
-		    g.setStroke(stdS);
 		}
-		else {
-		    g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
-			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
-		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
-		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke != null){
+			g.setStroke(stroke);
+			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
+				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
+				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
+			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
+		    }
 		}
 	    }
  	}
 	else {
 	    g.setColor(this.color);
-	    g.setComposite(acST);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	    g.setComposite(acO);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    }
 	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
  	if (pc[i].linnerCircleRadius > 2){//paint a dot if too small
-	    if (filled){
-		g.setColor(this.color);
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.fillArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
-			  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
+			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke != null){
+			g.setStroke(stroke);
+			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
+				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
+				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
+		    }
+		}
 		g.setComposite(acO);
 	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke != null){
-		    g.setStroke(stroke);
-		    g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
+	    else {
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
 			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
-		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
-		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
-		    g.setStroke(stdS);
 		}
-		else {
-		    g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
-			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
-		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
-		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke != null){
+			g.setStroke(stroke);
+			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
+				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
+				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
+			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
+		    }
 		}
 	    }
  	}
 	else {
 	    g.setColor(this.color);
-	    g.setComposite(acST);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	    g.setComposite(acO);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+	    }
 	}
     }
 

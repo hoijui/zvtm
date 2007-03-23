@@ -89,68 +89,127 @@ public class VRectangleST extends VRectangle implements Translucent {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].cw>1) && (pc[i].ch>1)){//repaint only if object is visible
-	    if (filled){
-		g.setColor(this.color);  
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
-		g.setComposite(acO);
-	    }
-	    g.setColor(borderColor);
-	    if (paintBorder){
-		if (stroke!=null) {
-		    if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
-			((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
-			// [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
-			// the rectangle, in which case the border would not be visible;
-			// the fact that the rectangle intersects the viewport has already been tested by the main
-			// clipping algorithm
-			g.setStroke(stroke);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null) {
+			if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
+			    ((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
+			    // [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
+			    // the rectangle, in which case the border would not be visible;
+			    // the fact that the rectangle intersects the viewport has already been tested by the main
+			    // clipping algorithm
+			    g.setStroke(stroke);
+			    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
+			    g.setStroke(stdS);
+			}
+		    }
+		    else {
 			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
-			g.setStroke(stdS);
 		    }
 		}
-		else {
-		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
+		g.setComposite(acO);
+	    }
+	    else {
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null) {
+			if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
+			    ((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
+			    // [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
+			    // the rectangle, in which case the border would not be visible;
+			    // the fact that the rectangle intersects the viewport has already been tested by the main
+			    // clipping algorithm
+			    g.setStroke(stroke);
+			    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
+			    g.setStroke(stdS);
+			}
+		    }
+		    else {
+			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);   //outline rectangle
+		    }
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.setComposite(acST);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	    g.setComposite(acO);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    }
 	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lcw>1) && (pc[i].lch>1)){//repaint only if object is visible
-	    if (filled){
-		g.setColor(this.color);  
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
-		g.setComposite(acO);
-	    }
-	    g.setColor(borderColor);
-	    if (paintBorder){
-		if (stroke!=null) {
-		    if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
-			((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
-			// see [C1] above for explanations about this test
-			g.setStroke(stroke);
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null) {
+			if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
+			    ((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
+			    // see [C1] above for explanations about this test
+			    g.setStroke(stroke);
+			    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
+			    g.setStroke(stdS);
+			}
+		    }
+		    else {
 			g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
-			g.setStroke(stdS);
 		    }
 		}
-		else {
-		    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
+		g.setComposite(acO);
+	    }
+	    else {
+		if (filled){
+		    g.setColor(this.color);
+		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null) {
+			if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
+			    ((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
+			    // see [C1] above for explanations about this test
+			    g.setStroke(stroke);
+			    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
+			    g.setStroke(stdS);
+			}
+		    }
+		    else {
+			g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);   //outline rectangle
+		    }
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.setComposite(acST);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	    g.setComposite(acO);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+	    }
 	}
     }
 

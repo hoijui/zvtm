@@ -98,7 +98,7 @@ public class VSegmentST extends VSegment implements Translucent {
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
-	    if (alpha != 1.0){
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
 		g.setStroke(stroke);
 		g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
@@ -111,7 +111,7 @@ public class VSegmentST extends VSegment implements Translucent {
 		g.setStroke(stdS);
 	    }
 	}
-	else if (alpha != 1.0){
+	else if (alpha < 1.0f){
 	    g.setComposite(acST);
 	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
 	    g.setComposite(acO);
@@ -124,9 +124,23 @@ public class VSegmentST extends VSegment implements Translucent {
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (stroke!=null) {
-	    g.setStroke(stroke);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.setStroke(stroke);
+		g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+		g.setStroke(stdS);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.setStroke(stroke);
+		g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+		g.setStroke(stdS);
+	    }
+	}
+	else if (alpha < 1.0f){
+	    g.setComposite(acST);
 	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
-	    g.setStroke(stdS);
+	    g.setComposite(acO);
 	}
 	else {
 	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);

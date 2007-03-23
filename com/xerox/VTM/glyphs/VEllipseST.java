@@ -85,69 +85,129 @@ public class VEllipseST extends VEllipse implements Translucent {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].ellipse.getBounds().width>2) && (pc[i].ellipse.getBounds().height>2)){
-	    if (filled){
-		g.setColor(this.color);
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.translate(dx, dy);
-		g.fill(pc[i].ellipse);
-		g.translate(-dx, -dy);
+		if (filled){
+		    g.setColor(this.color);
+		    g.translate(dx, dy);
+		    g.fill(pc[i].ellipse);
+		    g.translate(-dx, -dy);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null){
+			g.setStroke(stroke);
+			g.translate(dx, dy);
+			g.draw(pc[i].ellipse);
+			g.translate(-dx, -dy);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.translate(dx, dy);
+			g.draw(pc[i].ellipse);
+			g.translate(-dx, -dy);
+		    }
+		}
 		g.setComposite(acO);
 	    }
-	    g.setColor(borderColor);
-	    if (paintBorder){
-		if (stroke!=null){
-		    g.setStroke(stroke);
+	    else {
+		if (filled){
+		    g.setColor(this.color);
 		    g.translate(dx, dy);
-		    g.draw(pc[i].ellipse);
+		    g.fill(pc[i].ellipse);
 		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
 		}
-		else {
-		    g.translate(dx, dy);
-		    g.draw(pc[i].ellipse);
-		    g.translate(-dx, -dy);
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null){
+			g.setStroke(stroke);
+			g.translate(dx, dy);
+			g.draw(pc[i].ellipse);
+			g.translate(-dx, -dy);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.translate(dx, dy);
+			g.draw(pc[i].ellipse);
+			g.translate(-dx, -dy);
+		    }
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.setComposite(acST);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	    g.setComposite(acO);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    }
 	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	if ((pc[i].lellipse.getBounds().width>2) && (pc[i].lellipse.getBounds().height>2)){
-	    if (filled){
-		g.setColor(this.color);
+	    if (alpha < 1.0f){
 		g.setComposite(acST);
-		g.translate(dx, dy);
-		g.fill(pc[i].lellipse);
-		g.translate(-dx, -dy);
+		if (filled){
+		    g.setColor(this.color);
+		    g.translate(dx, dy);
+		    g.fill(pc[i].lellipse);
+		    g.translate(-dx, -dy);
+		}
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null){
+			g.setStroke(stroke);
+			g.translate(dx, dy);
+			g.draw(pc[i].lellipse);
+			g.translate(-dx, -dy);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.translate(dx, dy);
+			g.draw(pc[i].lellipse);
+			g.translate(-dx, -dy);
+		    }
+		}
 		g.setComposite(acO);
 	    }
-	    g.setColor(borderColor);
-	    if (paintBorder){
-		if (stroke!=null){
-		    g.setStroke(stroke);
+	    else {
+		if (filled){
+		    g.setColor(this.color);
 		    g.translate(dx, dy);
-		    g.draw(pc[i].lellipse);
+		    g.fill(pc[i].lellipse);
 		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
 		}
-		else {
-		    g.translate(dx, dy);
-		    g.draw(pc[i].lellipse);
-		    g.translate(-dx, -dy);
+		if (paintBorder){
+		    g.setColor(borderColor);
+		    if (stroke!=null){
+			g.setStroke(stroke);
+			g.translate(dx, dy);
+			g.draw(pc[i].lellipse);
+			g.translate(-dx, -dy);
+			g.setStroke(stdS);
+		    }
+		    else {
+			g.translate(dx, dy);
+			g.draw(pc[i].lellipse);
+			g.translate(-dx, -dy);
+		    }
 		}
 	    }
 	}
 	else {
 	    g.setColor(this.color);
-	    g.setComposite(acST);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	    g.setComposite(acO);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+	    }
 	}
     }
 
