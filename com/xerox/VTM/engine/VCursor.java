@@ -33,6 +33,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VPath;
+import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
 
 /**
@@ -347,7 +348,8 @@ public class VCursor {
 	return intersectsVText(t, camIndex, vx, vy);
     }
 
-    /**tells if the mouse is above VText t - must provide the camera's index (available through Camera.getIndex())
+    /**tells if the mouse is above VText t.
+     *@param camIndex the camera's index (available through Camera.getIndex())
      *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
      *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
      *@see #intersectsVText(VText t,int camIndex)
@@ -361,7 +363,7 @@ public class VCursor {
 	    break;
 	}
 	case VText.TEXT_ANCHOR_MIDDLE:{
-	    if ((cursorX>=t.vx) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
+	    if ((cursorX>=t.vx-p.x/2) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x/2)) && (cursorY<=(t.vy+p.y))){res=true;}
 	    break;
 	}
 	default:{
@@ -369,6 +371,64 @@ public class VCursor {
 	}
 	}
 	return res;
+    }
+
+    /** Returns a list of all VSegment instances under the mouse cursor.
+     * Mouse cursor coordinates are taken from the active layer's camera space.
+     *@param c camera observing the segments of interest
+     *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
+     *@return null if none
+     *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
+     *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
+     *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
+     */
+    public Vector getIntersectingSegments(Camera c, int tolerance){
+	return getIntersectingSegments(c, mx, my, tolerance);
+    }
+
+    /** Returns a list of all VSegment instances under the mouse cursor.
+     *@param c camera observing the segments of interest
+     *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
+     *@return null if none
+     *@see #getIntersectingSegments(Camera c, int tolerance)
+     *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
+     *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
+     */
+    public Vector getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance){
+	synchronized(this){
+	    Vector res = new Vector();
+	    int index = c.getIndex();
+	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+	    Object glyph;
+	    for (int i=0;i<glyphs.size();i++){
+		glyph = glyphs.elementAt(i);
+		if ((glyph instanceof VSegment) && (intersectsSegment((VSegment)glyph, jpx, jpy, tolerance, index))){res.add(glyph);}
+	    }
+	    if (res.isEmpty()){res = null;}
+	    return res;
+	}
+    }
+
+    /** Indicates if the mouse cursor is above VSegment s.
+     *@param camIndex indes of camera observing the segments of interest (available through Camera.getIndex())
+     *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
+     *@see com.xerox.VTM.engine.Camera#getIndex()
+     *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
+     *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
+     *@see #getIntersectingSegments(Camera c, int tolerance)
+     */
+    public boolean intersectsSegment(VSegment s, int tolerance, int camIndex){
+	return intersectsSegment(s, mx, my, camIndex, tolerance);
+    }
+
+    /** Indicates if the mouse cursor is above VSegment s.
+     *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
+     *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
+     *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
+     *@see #getIntersectingSegments(Camera c, int tolerance)
+     */
+    public boolean intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex){
+	return s.intersects(jpx, jpy, tolerance, camIndex);
     }
 
     /**returns a list of all Glyphs under the mouse cursor - returns null if none<br>
