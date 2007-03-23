@@ -49,11 +49,11 @@ import net.claribole.zvtm.glyphs.projection.ProjText;
 
 public class VText extends Glyph {
 
-    /**text alignment (for text anchor) used to align a VText relative to its (vx,vy coordinates coincides with start of String)*/
+    /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with start of String). */
     public static final short TEXT_ANCHOR_START=0;
-    /**text alignment (for text anchor) used to align a VText relative to its (vx,vy coordinates coincides with middle of String)*/
+    /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with middle of String). */
     public static final short TEXT_ANCHOR_MIDDLE=1;
-    /**text alignment (for text anchor) used to align a VText relative to its (vx,vy coordinates coincides with end of String)*/
+    /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with end of String). */
     public static final short TEXT_ANCHOR_END=2;
 
     short text_anchor = TEXT_ANCHOR_START;
@@ -64,13 +64,16 @@ public class VText extends Glyph {
 
     boolean zoomSensitive=true;
 
-    /**font size in pixels*/
+    /** Font size in pixels (read-only). */
     public static float fontSize=VirtualSpaceManager.getMainFont().getSize2D();
-    /**special font used in this object only (null if default font)*/
+
+    /*Special font used in this object only (null if default font)*/
     Font font;
-    /**do not rely on this - use for optimization and not guaranteed to be consistent*/
+
+    /** For internal use. */
     Rectangle2D bounds;
-    /**text that should be drawn with glyph*/
+
+    /*Text that should be drawn with glyph*/
     String text;
 
     public VText(String t){
@@ -116,9 +119,6 @@ public class VText extends Glyph {
 	text_anchor=ta;
     }
 
-    /**called when glyph is created in order to create the initial set of projected coordinates wrt the number of cameras in the space
-     *@param nbCam current number of cameras in the virtual space
-     */
     public void initCams(int nbCam){
 	pc=new ProjText[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -126,9 +126,6 @@ public class VText extends Glyph {
 	}
     }
 
-    /**used internally to create new projected coordinates to use with the new camera
-     *@param verifIndex camera index, just to be sure that the number of projected coordinates is consistent with the number of cameras
-     */
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -150,39 +147,37 @@ public class VText extends Glyph {
 	}
     }
 
-    /**if a camera is removed from the virtual space, we should delete the corresponding projected coordinates, but do not modify the array it self because we do not want to change other cameras' index - just point to null*/
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
-    /**reset prevMouseIn for all projected coordinates*/
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
-    /**reset prevMouseIn for projected coordinates nb i*/
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
-    /**set size (absolute) - has no effect*/
+    /** Cannot be resized. */
     public void sizeTo(float factor){}
 
-    /**set size (relative) - has no effect*/
+    /** Cannot be resized. */
     public void reSize(float factor){}
 
-    /**set orientation (absolute) - has no effect*/
+    /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /**get size (always =1)*/
+    /** Always returns 1. */
     public float getSize(){return 1.0f;}
 
-    /**get orientation*/
     public float getOrient(){return orient;}
 
-    /**if false, text size is not sensitive to zoom*/
+    /** Set to false if the text should not be scaled according to camera's altitude. Its apparent size will always be the same, no matter the camera's altitude.
+     *@see #isZoomSensitive()
+     */
     public void setZoomSensitive(boolean b){
 	if (zoomSensitive!=b){
 	    zoomSensitive=b;
@@ -190,18 +185,13 @@ public class VText extends Glyph {
 	}
     }
 
-    /**if false, text size is not sensitive to zoom*/
+    /** Indicates whether the text is scaled according to camera's altitude.
+     *@see #setZoomSensitive(boolean b)
+     */
     public boolean isZoomSensitive(){
 	return zoomSensitive;
     }
 
-    /**used to find out if it is necessary to project and draw the glyph in the current view or through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){ //if glyph hotspot is in the region, it is obviously visible
 	    return true;
@@ -231,13 +221,6 @@ public class VText extends Glyph {
 	}
     }
 
-    /**used to find out if it is necessary to project and draw the glyph through the lens in the current view
-     *@param wb west region boundary (virtual space coordinates)
-     *@param nb north region boundary (virtual space coordinates)
-     *@param eb east region boundary (virtual space coordinates)
-     *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
-     */
     public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region.
@@ -264,27 +247,18 @@ public class VText extends Glyph {
 	return false;
     }
 
-    /**used to find out if glyph completely fills the view (in which case it is not necessary to repaint objects at a lower altitude)*/
     public boolean fillsView(long w,long h,int camIndex){
 	return false;
     }
 
-    /**detects whether the given point is inside this glyph or not 
-     *@param x EXPECTS PROJECTED JPanel COORDINATE
-     *@param y EXPECTS PROJECTED JPanel COORDINATE
-     */
     public boolean coordInside(int x,int y,int camIndex){
 	return false;
     }
 
-    /** Method used internally for firing picking-related events.
-     *@return Glyph.ENTERED_GLYPH if cursor has entered the glyph, Glyph.EXITED_GLYPH if it has exited the glyph, Glyph.NO_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
 
-    /**project shape in camera coord sys prior to actual painting*/
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));
@@ -294,7 +268,6 @@ public class VText extends Glyph {
 	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
     }
 
-    /**project shape in camera coord sys prior to actual painting through the lens*/
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
@@ -304,9 +277,6 @@ public class VText extends Glyph {
 	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
     }
 
-    /**draw glyph 
-     *@param i camera index in the virtual space
-     */
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
 	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
@@ -391,14 +361,14 @@ public class VText extends Glyph {
 	}
     }
 
-    /**set text that should be painted with this glyph - override Glyph method to call invalidate*/
+    /** Set text that should be painted. */
     public void setText(String t){
 	text=t;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
 	invalidate();
     }
 
-    /**force computing of text's bounding box at next paint call*/
+    /** Force computation of text's bounding box at next call to draw(). */
     public void invalidate(){
 	try {
 	    for (int i=0;i<pc.length;i++){
@@ -409,38 +379,48 @@ public class VText extends Glyph {
 	catch (NullPointerException ex){}
     }
 
-    /**returns width and height of the bounding box as a Point (so this is not a real Point)
+    /** Get the width and height of the bounding box as a LongPoint.
      *@param i index of camera (Camera.getIndex())
+     *@return the width and height of the text's bounding box
      */
     public LongPoint getBounds(int i){
 	return new LongPoint(pc[i].cw,pc[i].ch);
     }
 
-    /**tells whether the bounds of the text are valid at this time or not (can be invalid if the thread in charge of painting has not dealt with this glyph since invalidate() was called on it) - might be useful to test this before calling getBounds()*/
+    /** Indicates whether the bounds of the text are valid at this time or not.
+     * The bounds can be invalid if the thread in charge of painting has not dealt with this glyph since invalidate() was last called on it.
+     * It is advisable to test this before calling getBounds()
+     */
     public boolean validBounds(int i){
 	return pc[i].valid;
     }
 
-    /**change font for this specific text object - f=null to get back to default font*/
+    /** Change the Font used to display this specific text object.
+     *@param f set to null to use the default font
+     */
     public void setSpecialFont(Font f){
 	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=VirtualSpaceManager.getMainFont().getSize2D();}
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
 	invalidate();
     }
 
-    /**returns the font used for this glyph's text*/
+    /** Get the Font used to display this specific text object.
+     *@return the main ZVTM font if no specific Font is used in this object
+     */
     public Font getFont(){
 	if (font!=null){return font;}
 	else return VirtualSpaceManager.getMainFont();
     }
 
-    /**tells whether this glyph is using a special font or not (note: using a special font does not necessarily means that this font is different from the default font (although it should, but this is at programer's prerogative))*/
+    /** Indicates whether this glyph is using a special font or not.
+     * Using a special font does not necessarily mean that this font is different from the default font.
+     */
     public boolean usesSpecialFont(){
 	if (font==null){return false;}
 	else {return true;}
     }
 
-    /**get text associated with this glyph*/
+    /** Get text painted by this glyph. */
     public String getText(){return text;}
 
     /** Set the text anchor
@@ -450,21 +430,19 @@ public class VText extends Glyph {
 	text_anchor=ta;
     }
 
-    /**
-     *get text anchor (one of TEXT_ANCHOR_START, TEXT_ANCHOR_MIDDLE, TEXT_ANCHOR_END)
+    /** Get text anchor.
+     *@return one of TEXT_ANCHOR_START, TEXT_ANCHOR_MIDDLE, TEXT_ANCHOR_END
      */
     public short getTextAnchor(){
 	return text_anchor;
     }
 
-    /**returns a clone of this object (only basic information is cloned for now: shape, orientation, position, size)*/
     public Object clone(){
 	VText res=new VText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
 	res.mouseInsideColor=this.mouseInsideColor;
 	return res;
     }
 
-    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public void highlight(boolean b, Color selectedColor){}
 
 }
