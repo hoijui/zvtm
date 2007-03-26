@@ -80,7 +80,7 @@ public class VTextOr extends VText {
     }
 
     public void orientTo(float angle){
-	orient=angle;
+	orient = angle;
 	invalidate();
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
@@ -103,22 +103,22 @@ public class VTextOr extends VText {
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, pc[i].cy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/2.0f, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw, 0));
 		}
-		g.drawString(text,0.0f,0.0f);
-		g.setTransform(stdT);
+		g.setTransform(at);
+		g.drawString(text, 0.0f, 0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -131,24 +131,24 @@ public class VTextOr extends VText {
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, pc[i].cy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/2.0f, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw, 0));
 		}
 		g.setTransform(at);
 		g.drawString(text, 0.0f, 0.0f);
-		g.setTransform(stdT);
 	    }
+	    g.setTransform(stdT);
 	}
 	else {g.fillRect(dx+pc[i].cx,pc[i].cy,1,1);}
     }
@@ -167,22 +167,22 @@ public class VTextOr extends VText {
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, pc[i].lcy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/2.0f, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw, 0));
 		}
-		g.drawString(text,0.0f,0.0f);
-		g.setTransform(stdT);
+		g.setTransform(at);
+		g.drawString(text, 0.0f, 0.0f);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
 	    else {
@@ -195,25 +195,26 @@ public class VTextOr extends VText {
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, pc[i].lcy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/2.0f, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
 		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
-		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
+		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw, 0));
 		}
+		g.setTransform(at);
 		g.drawString(text, 0.0f, 0.0f);
-		g.setTransform(stdT);
 	    }
+	    g.setTransform(stdT);
 	}
-	else {g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);}
+	else {g.fillRect(dx+pc[i].lcx, pc[i].lcy, 1, 1);}
     }
 
     public Object clone(){
