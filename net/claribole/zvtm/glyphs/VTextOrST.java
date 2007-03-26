@@ -1,55 +1,50 @@
-/*   FILE: VTextOr.java
- *   DATE OF CREATION:   Jan 11 2001
- *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
- *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
- *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+/*   FILE: AnimationDemo.java
+ *   DATE OF CREATION:   Mon Mar 26 13:36:34 2007
+ *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * For full terms see the file COPYING.
- *
- * $Id: VTextOr.java,v 1.7 2005/12/08 09:08:21 epietrig Exp $
+ * $Id: $
  */
 
-package com.xerox.VTM.glyphs;
+package net.claribole.zvtm.glyphs;
 
+import com.xerox.VTM.glyphs.Translucent;
+import com.xerox.VTM.glyphs.VTextOr;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-
 /**
- * Re-orientable Standalone Text.  This version is less efficient than VText, but it can be reoriented.<br>
+ * Translucent Re-orientable Standalone Text. This version is less efficient than all others, but it can be reoriented and made translucent.<br>
  * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).<br>
  * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VText
+ *@see com.xerox.VTM.glyphs.VTextOr
  *@see com.xerox.VTM.glyphs.LText
  *@see com.xerox.VTM.glyphs.LBText
  *@see net.claribole.zvtm.glyphs.VTextST
- *@see net.claribole.zvtm.glyphs.VTextOrST
  */
 
-public class VTextOr extends VText {
+public class VTextOrST extends VTextOr implements Translucent {
 
-    /*half width and height in virtual space (of String when horizontal)*/
-    float vw,vh;
+    AlphaComposite acST;
+    float alpha=0.5f;
 
-    public VTextOr(String t,float or){
-	super(t);
-	orient=or;
+    /**
+     *@param t text string
+     *@param or orientation
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     */
+    public VTextOrST(String t, float or, float a){
+	super(t, or);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
     }
 
     /**
@@ -59,10 +54,12 @@ public class VTextOr extends VText {
      *@param c fill color
      *@param t text string
      *@param or orientation
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VTextOr(long x,long y,float z,Color c,String t,float or){
-	super(x,y,z,c,t);
-	orient=or;
+    public VTextOrST(long x, long y, float z, Color c, String t, float or, float a){
+	super(x, y, z, c, t, or);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
     }
 
     /**
@@ -73,20 +70,22 @@ public class VTextOr extends VText {
      *@param t text string
      *@param or orientation
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VTextOr(long x,long y,float z,Color c,String t,float or,short ta){
-	super(x, y, z, c, t, ta);
-	orient = or;
+    public VTextOrST(long x, long y, float z, Color c, String t, float or, short ta, float a){
+	super(x, y, z, c, t, or, ta);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
     }
 
-    public void orientTo(float angle){
-	orient=angle;
-	invalidate();
+    public void setTranslucencyValue(float a){
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
-	return false;
+    public float getTranslucencyValue(){
+	return alpha;
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -117,7 +116,14 @@ public class VTextOr extends VText {
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw, 0));
 		}
-		g.drawString(text,0.0f,0.0f);
+		if (alpha < 1.0f){
+		    g.setComposite(acST);
+		    g.drawString(text, 0.0f, 0.0f);
+		    g.setComposite(acO);
+		}
+		else {
+		    g.drawString(text, 0.0f, 0.0f);
+		}
 		g.setTransform(stdT);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
@@ -146,11 +152,27 @@ public class VTextOr extends VText {
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw, 0));
 		}
 		g.setTransform(at);
-		g.drawString(text, 0.0f, 0.0f);
+		if (alpha < 1.0f){
+		    g.setComposite(acST);
+		    g.drawString(text, 0.0f, 0.0f);
+		    g.setComposite(acO);
+		}
+		else {
+		    g.drawString(text, 0.0f, 0.0f);
+		}
 		g.setTransform(stdT);
 	    }
 	}
-	else {g.fillRect(dx+pc[i].cx,pc[i].cy,1,1);}
+	else {
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].cx, dy+pc[i].cy, 1, 1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].cx, dy+pc[i].cy, 1, 1);
+	    }
+	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -181,7 +203,14 @@ public class VTextOr extends VText {
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw, 0));
 		}
-		g.drawString(text,0.0f,0.0f);
+		if (alpha < 1.0f){
+		    g.setComposite(acST);
+		    g.drawString(text, 0.0f, 0.0f);
+		    g.setComposite(acO);
+		}
+		else {
+		    g.drawString(text, 0.0f, 0.0f);
+		}
 		g.setTransform(stdT);
 		g.setFont(VirtualSpaceManager.getMainFont());
 	    }
@@ -209,16 +238,32 @@ public class VTextOr extends VText {
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(orient));}
 		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw, 0));
 		}
-		g.drawString(text, 0.0f, 0.0f);
+		if (alpha < 1.0f){
+		    g.setComposite(acST);
+		    g.drawString(text, 0.0f, 0.0f);
+		    g.setComposite(acO);
+		}
+		else {
+		    g.drawString(text, 0.0f, 0.0f);
+		}
 		g.setTransform(stdT);
 	    }
 	}
-	else {g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);}
+	else {
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
+	    }
+	}
     }
 
     public Object clone(){
-	VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
-	res.mouseInsideColor=this.mouseInsideColor;
+	VTextOrST res = new VTextOrST(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor, alpha);
+	res.mouseInsideColor = this.mouseInsideColor;
 	return res;
     }
 

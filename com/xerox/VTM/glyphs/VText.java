@@ -38,7 +38,7 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjText;
 
 /**
- * Standalone Text.  This version is the most efficient, but it cannot be reoriented (see VTextOr).<br>
+ * Standalone Text.  This version is the most efficient, but it cannot be reoriented (see VTextOr*).<br>
  * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).<br>
  * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
@@ -46,6 +46,7 @@ import net.claribole.zvtm.glyphs.projection.ProjText;
  *@see com.xerox.VTM.glyphs.LText
  *@see com.xerox.VTM.glyphs.LBText
  *@see net.claribole.zvtm.glyphs.VTextST
+ *@see net.claribole.zvtm.glyphs.VTextOrST
  */
 
 public class VText extends Glyph {
@@ -391,9 +392,9 @@ public class VText extends Glyph {
 	catch (NullPointerException ex){}
     }
 
-    /** Get the width and height of the bounding box as a LongPoint.
+    /** Get the width and height of the bounding box in virtual space.
      *@param i index of camera (Camera.getIndex())
-     *@return the width and height of the text's bounding box
+     *@return the width and height of the text's bounding box, as a LongPoint
      */
     public LongPoint getBounds(int i){
 	return new LongPoint(pc[i].cw,pc[i].ch);

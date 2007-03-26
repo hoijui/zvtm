@@ -1,24 +1,10 @@
-/*   FILE: VText.java
- *   DATE OF CREATION:   Nov 23 2000
- *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
- *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
- *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+/*   FILE: AnimationDemo.java
+ *   DATE OF CREATION:   Thu Mar 22 17:20:34 2007
+ *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * For full terms see the file COPYING.
- *
- * $Id: VText.java,v 1.11 2005/12/07 15:29:34 epietrig Exp $
+ * $Id: $
  */
 
 package net.claribole.zvtm.glyphs;
@@ -48,6 +34,7 @@ import net.claribole.zvtm.lens.Lens;
  *@see com.xerox.VTM.glyphs.VTextOr
  *@see com.xerox.VTM.glyphs.LText
  *@see com.xerox.VTM.glyphs.LBText
+ *@see net.claribole.zvtm.glyphs.VTextOrST
  */
 
 public class VTextST extends VText implements Translucent {
@@ -155,7 +142,14 @@ public class VTextST extends VText implements Translucent {
 	    g.setTransform(stdT);
 	}
 	else {
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+	    }
 	}
     }
 
@@ -210,7 +204,14 @@ public class VTextST extends VText implements Translucent {
 	    g.setTransform(stdT);
 	}
 	else {
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+	    if (alpha < 1.0f){
+		g.setComposite(acST);
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+		g.setComposite(acO);
+	    }
+	    else {
+		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+	    }
 	}
     }
 

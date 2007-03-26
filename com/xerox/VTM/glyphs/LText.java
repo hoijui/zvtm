@@ -33,6 +33,7 @@ import net.claribole.zvtm.glyphs.LensRendering;
  *@see com.xerox.VTM.glyphs.VTextOr
  *@see com.xerox.VTM.glyphs.LBText
  *@see net.claribole.zvtm.glyphs.VTextST
+ *@see net.claribole.zvtm.glyphs.VTextOrST
  */
 
 public class LText extends VText implements LensRendering {
