@@ -50,7 +50,7 @@ import com.xerox.VTM.glyphs.VSegmentST;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
 import net.claribole.zvtm.glyphs.VImageOrST;
-import net.claribole.zvtm.glyphs.VTextST;
+import net.claribole.zvtm.glyphs.VTextOrST;
 import net.claribole.zvtm.engine.TransitionManager;
 
 public class AnimationDemo extends JApplet implements MouseListener, KeyListener {
@@ -148,7 +148,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 
     VRectangleOrST rectangle;
     VShapeST irregularShape, star;
-    VTextST text;
+    VTextOrST text;
     VImageOrST image;
     CGlyph composite1, composite2;
     VSegmentST segment;
@@ -172,7 +172,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	star = new VShapeST(COL2_X, ROW1_Y, 0, 80, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
 	triangle = new VTriangleOrST(COL3_X, ROW1_Y, 0, 80, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
 	// 2nd row
-	text = new VTextST(COL1_X, ROW2_Y, 0, ROW2_COLOR, "Text", VTextOr.TEXT_ANCHOR_MIDDLE, 1.0f);
+	text = new VTextOrST(COL1_X, ROW2_Y, 0, ROW2_COLOR, "Text", 0.0f, VText.TEXT_ANCHOR_MIDDLE, 1.0f);
 	text.setSpecialFont(new Font("Arial", Font.PLAIN, 48));
 	image = new VImageOrST(COL2_X, ROW2_Y, 0, (new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage(), 0, 1.0f);
 	image.setBorderColor(GLYPH_BORDER_COLOR);
