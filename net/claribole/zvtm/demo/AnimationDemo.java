@@ -64,7 +64,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     static final String APPLET_HEIGHT_PARAM = "height";
 
     static final String APPLET_TITLE = "ZVTM - Animations";
-    static final Color APPLET_BKG_COLOR = Color.LIGHT_GRAY;
+    static final Color APPLET_BKG_COLOR = new Color(221, 221, 221);
 
     static final short PACING_FUNCTION_LIN = 0;
     static final short PACING_FUNCTION_SIFO = 1;
