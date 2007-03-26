@@ -37,7 +37,7 @@ class LogicalStructure {
 	    g = (Glyph)glyphs.elementAt(i);
 	    md = (Metadata)g.getOwner();
 	    if (md != null && (title=md.getTitle()) != null){
-		if (title.contains(LEdge.DIRECTED_STR) || title.contains(LEdge.UNDIRECTED_STR)){
+		if (title.indexOf(LEdge.DIRECTED_STR) != -1 || title.indexOf(LEdge.UNDIRECTED_STR) != -1){
 		    // dealing with a glyph that is part of an edge
 		    cagid = md.getClosestAncestorGroupID();
 		    if (title2edgeGroup.containsKey(title)){
