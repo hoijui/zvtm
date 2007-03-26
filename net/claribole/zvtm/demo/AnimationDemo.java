@@ -164,13 +164,17 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     static final Color ROW1_COLOR = new Color(110, 253, 55);
     static final Color ROW2_COLOR = new Color(82, 190, 40);
     static final Color ROW3_COLOR = new Color(54, 126, 26);
+    static final float SIZE = 80;
+    static float COMPOSITE_SIZE = 0;
+    static float RECTANGLE_SIZE = 0;
+    static float IMAGE_SIZE = 0;
     
     void initGlyphs(){
 	// 1st row
 	rectangle = new VRectangleOrST(COL1_X, ROW1_Y, 0, 100, 50, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
 	float[] starVertices = {1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f};
-	star = new VShapeST(COL2_X, ROW1_Y, 0, 80, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
-	triangle = new VTriangleOrST(COL3_X, ROW1_Y, 0, 80, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	star = new VShapeST(COL2_X, ROW1_Y, 0, (long)SIZE, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	triangle = new VTriangleOrST(COL3_X, ROW1_Y, 0, (long)SIZE, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
 	// 2nd row
 	text = new VTextOrST(COL1_X, ROW2_Y, 0, ROW2_COLOR, "Text", 0.0f, VText.TEXT_ANCHOR_MIDDLE, 1.0f);
 	text.setSpecialFont(new Font("Arial", Font.PLAIN, 48));
@@ -178,7 +182,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	image.setBorderColor(GLYPH_BORDER_COLOR);
 	image.setDrawBorderPolicy(VImageOrST.DRAW_BORDER_MOUSE_INSIDE);
 	float[] irregVertices = {1.0f, 0.2f, 0.7f, 0.3f, 0.5f, 0.1f, 0.8f, 1.0f, 0.4f, 0.4f, 0.3f, 0.6f};
-	irregularShape = new VShapeST(COL3_X, ROW2_Y, 0, 80, irregVertices, ROW2_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	irregularShape = new VShapeST(COL3_X, ROW2_Y, 0, (long)SIZE, irregVertices, ROW2_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
 	// 3rd row
 	VRectangleOrST c1m = new VRectangleOrST(COL1_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
 	SGlyph[] sgs1 = {
@@ -196,7 +200,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), -80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
 	};
 	composite2 = new CGlyph(c2m, sgs2);
-	segment = new VSegmentST(COL3_X, ROW3_Y, 0, 80, 0.707f, ROW3_COLOR, 1.0f);
+	segment = new VSegmentST(COL3_X, ROW3_Y, 0, SIZE, 0.707f, ROW3_COLOR, 1.0f);
 	vsm.addGlyph(rectangle, mSpace);
 	vsm.addGlyph(star, mSpace);
 	vsm.addGlyph(triangle, mSpace);
@@ -216,10 +220,72 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	vsm.addGlyph(composite2, mSpace);
 	vsm.addGlyph(new VText(COL2_X, ROW3_Y-100, 0, Color.BLACK, "Composite: position rotation", VText.TEXT_ANCHOR_MIDDLE), mSpace);
 	vsm.addGlyph(segment, mSpace);
+	RECTANGLE_SIZE = rectangle.getSize();
+	IMAGE_SIZE = image.getSize();
+	COMPOSITE_SIZE = composite1.getSize();
     }
 
     void reset(){
-
+	// rectangle
+	if (rectangle.vx != COL1_X || rectangle.vy != ROW1_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL1_X-rectangle.vx, ROW1_Y-rectangle.vy), rectangle.getID());
+	}
+	if (rectangle.getSize() != RECTANGLE_SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(RECTANGLE_SIZE/rectangle.getSize()), rectangle.getID());
+	}
+	// star
+	if (star.vx != COL2_X || star.vy != ROW1_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL2_X-star.vx, ROW1_Y-star.vy), star.getID());
+	}
+	if (star.getSize() != SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/star.getSize()), star.getID());
+	}
+	// triangle
+	if (triangle.vx != COL3_X || triangle.vy != ROW1_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL3_X-triangle.vx, ROW1_Y-triangle.vy), triangle.getID());
+	}
+	if (triangle.getSize() != SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/triangle.getSize()), triangle.getID());
+	}
+	// text
+	if (text.vx != COL1_X || text.vy != ROW2_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL1_X-text.vx, ROW2_Y-text.vy), text.getID());
+	}
+	// image
+	if (image.vx != COL2_X || image.vy != ROW2_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL2_X-image.vx, ROW2_Y-image.vy), image.getID());
+	}
+	if (image.getSize() != IMAGE_SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(IMAGE_SIZE/image.getSize()), image.getID());
+	}
+	// shape
+	if (irregularShape.vx != COL3_X || irregularShape.vy != ROW2_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL3_X-irregularShape.vx, ROW2_Y-irregularShape.vy), irregularShape.getID());
+	}
+	if (irregularShape.getSize() != SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/irregularShape.getSize()), irregularShape.getID());
+	}
+	// composite 1
+	if (composite1.vx != COL1_X || composite1.vy != ROW3_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL1_X-composite1.vx, ROW3_Y-composite1.vy), composite1.getID());
+	}
+	if (composite1.getSize() != COMPOSITE_SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(COMPOSITE_SIZE/composite1.getSize()), composite1.getID());
+	}
+	// composite 2
+	if (composite2.vx != COL2_X || composite2.vy != ROW3_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL2_X-composite2.vx, ROW3_Y-composite2.vy), composite2.getID());
+	}
+	if (composite2.getSize() != COMPOSITE_SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(COMPOSITE_SIZE/composite2.getSize()), composite2.getID());
+	}
+	// segment
+	if (segment.vx != COL3_X || segment.vy != ROW3_Y){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL3_X-segment.vx, ROW3_Y-segment.vy), segment.getID());
+	}
+	if (segment.getSize() != SIZE){
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/segment.getSize()), segment.getID());
+	}
     }
 
     void animate(Glyph g){
