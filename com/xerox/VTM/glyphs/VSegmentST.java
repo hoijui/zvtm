@@ -101,23 +101,23 @@ public class VSegmentST extends VSegment implements Translucent {
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
 		g.setStroke(stroke);
-		g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
+		g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		g.setStroke(stdS);
 		g.setComposite(acO);
 	    }
 	    else {
 		g.setStroke(stroke);
-		g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
+		g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
 		g.setStroke(stdS);
 	    }
 	}
 	else if (alpha < 1.0f){
 	    g.setComposite(acST);
-	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
+	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
 	    g.setComposite(acO);
 	}
 	else {
-	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);	    
+	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);	    
 	}
     }
 
@@ -127,23 +127,23 @@ public class VSegmentST extends VSegment implements Translucent {
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
 		g.setStroke(stroke);
-		g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+		g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 		g.setStroke(stdS);
 		g.setComposite(acO);
 	    }
 	    else {
 		g.setStroke(stroke);
-		g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+		g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 		g.setStroke(stdS);
 	    }
 	}
 	else if (alpha < 1.0f){
 	    g.setComposite(acST);
-	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 	    g.setComposite(acO);
 	}
 	else {
-	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 	}
     }
 

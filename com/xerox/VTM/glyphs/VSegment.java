@@ -161,10 +161,9 @@ public class VSegment extends Glyph implements RectangularShape {
     public float getOrient(){return orient;}
 
     public void orientTo(float angle){
-	//System.err.println("VSegment orientation is not working properly...");
 	orient=angle;
 	computeEdges();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
     public float getSize(){return size;}
@@ -184,8 +183,8 @@ public class VSegment extends Glyph implements RectangularShape {
      */
     public LongPoint[] getEndPoints(){
 	LongPoint[] res = new LongPoint[2];
-	res[0] = new LongPoint(vx+vw, vy-vh);
-	res[1] = new LongPoint(vx-vw, vy+vh);
+	res[0] = new LongPoint(vx+vw, vy+vh);
+	res[1] = new LongPoint(vx-vw, vy-vh);
 	return res;
     }
     
@@ -231,14 +230,14 @@ public class VSegment extends Glyph implements RectangularShape {
     public void setHeight(long h){
 	vh=h;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
     public void setWidthHeight(long w,long h){
 	this.vw=w;
 	this.vh=h;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
     public boolean fillsView(long w,long h,int camIndex){
@@ -278,10 +277,10 @@ public class VSegment extends Glyph implements RectangularShape {
 			     pc[camIndex].cx+pc[camIndex].cw+tolerance,
 			     pc[camIndex].cx+pc[camIndex].cw-tolerance,
 			     pc[camIndex].cx-pc[camIndex].cw-tolerance};
-	    int[] ycoords = {pc[camIndex].cy-pc[camIndex].ch,
-			     pc[camIndex].cy+pc[camIndex].ch,
-			     pc[camIndex].cy+pc[camIndex].ch,
-			     pc[camIndex].cy-pc[camIndex].ch};
+	    int[] ycoords = {pc[camIndex].cy+pc[camIndex].ch,
+			     pc[camIndex].cy-pc[camIndex].ch,
+			     pc[camIndex].cy-pc[camIndex].ch,
+			     pc[camIndex].cy+pc[camIndex].ch};
 	    Polygon p = new Polygon(xcoords, ycoords, 4);
 	    return p.contains(x, y);
 	}
@@ -291,10 +290,10 @@ public class VSegment extends Glyph implements RectangularShape {
 			     pc[camIndex].cx+pc[camIndex].cw,
 			     pc[camIndex].cx+pc[camIndex].cw,
 			     pc[camIndex].cx-pc[camIndex].cw};
-	    int[] ycoords = {pc[camIndex].cy-pc[camIndex].ch+tolerance,
-			     pc[camIndex].cy+pc[camIndex].ch+tolerance,
-			     pc[camIndex].cy+pc[camIndex].ch-tolerance,
-			     pc[camIndex].cy-pc[camIndex].ch-tolerance};
+	    int[] ycoords = {pc[camIndex].cy+pc[camIndex].ch+tolerance,
+			     pc[camIndex].cy-pc[camIndex].ch+tolerance,
+			     pc[camIndex].cy-pc[camIndex].ch-tolerance,
+			     pc[camIndex].cy+pc[camIndex].ch-tolerance};
 	    Polygon p = new Polygon(xcoords, ycoords, 4);
 	    return p.contains(x, y);
 	}
@@ -332,11 +331,11 @@ public class VSegment extends Glyph implements RectangularShape {
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    g.setStroke(stroke);
-	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
+	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
 	    g.setStroke(stdS);
 	}
 	else {
-	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy+pc[i].ch);
+	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
 	}
     }
 
@@ -344,11 +343,11 @@ public class VSegment extends Glyph implements RectangularShape {
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    g.setStroke(stroke);
-	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 	    g.setStroke(stdS);
 	}
 	else {
-	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy+pc[i].lch);
+	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
 	}
     }
 
