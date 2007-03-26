@@ -1084,8 +1084,8 @@ public class SVGReader {
 	if (width.endsWith("px")){width = width.substring(0,width.length()-2);}
 	String height = e.getAttribute(_height);
 	if (height.endsWith("px")){height = height.substring(0,height.length()-2);}
-	long w = (Long.valueOf(width)).longValue();
-	long h = (Long.valueOf(height)).longValue();
+	long w = getLong(width);
+	long h = getLong(height);
 	long hw = w / 2;
 	long hh = h / 2;
 	VImage res = null;
