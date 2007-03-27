@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Thu Jan 24 10:21:38 2002 by Emmanuel Pietriga
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,6 +40,11 @@ public class LongPoint{
     public LongPoint(long xc,long yc){
 	x=xc;
 	y=yc;
+    }
+
+    public LongPoint(double xc, double yc){
+	x = Math.round(xc);
+	y = Math.round(yc);
     }
 
     public void setLocation(long xc,long yc){
