@@ -691,15 +691,26 @@ public class AnimManager implements Runnable{
 	    }
 	    break;
 	}
-	case GL_COLOR_LIN:{//color - linear  DATA: a vector composed of 6 Floats representing H,S and V offsets for fill and border colors
-	    //plus an optional Float for alpha channel offset
+	case GL_COLOR_LIN:{//color - linear  DATA: an array of 6 floats (HSV components of fill color, HSV components of border color),
+	    // or 7 floats (same + translucency)
+	    float[] cdata;
+	    // until 0.9.4, data was a vector with of Floats. Still supported for backward compatibility
+	    if (data instanceof Vector){
+		Vector v = (Vector)data;
+		cdata = new float[v.size()];
+		for (int i=0;i<cdata.length;i++){
+		    cdata[i] = ((Float)v.elementAt(i)).floatValue();
+		}
+	    }
+	    else {
+		cdata = (float[])data;
+	    }
 	    if (animatedGlyphs.containsKey(gID) && (((int[])animatedGlyphs.get(gID))[3]==1)){
 		putAsPendingGAnimation(gID,GL_COLOR,duration,type,data, paa);
 	    }
 	    else {
 		if (animatedGlyphs.containsKey(gID)){((int[])animatedGlyphs.get(gID))[3]=1;}
 		else {int [] tmpA={0,0,0,1};animatedGlyphs.put(gID,tmpA);}
-		Vector vdata = (Vector)data;
 		GColoration an = (refresh==0) ? (new GColoration(g,this,duration)) : (new GColorationPRR(g,this,duration,refresh));
 		an.setPostAnimationAction(paa);
 		double nbSteps=Math.round((float)(duration/frameTime));     //number of steps
@@ -707,7 +718,7 @@ public class AnimManager implements Runnable{
 		// fill color
 		float[] thsv=new float[3];
 		for (int i=0;i<3;i++){// init target HSV array
-		    thsv[i]=((Float)vdata.elementAt(i)).floatValue();  //data is a vector of 3 (H,S,V) Float offsets
+		    thsv[i] = cdata[i];
 		}
 		if (thsv[0] != 0 || thsv[1] != 0 || thsv[2] != 0){// fill color is indeed animated
 		    float[] hsv;
@@ -729,7 +740,7 @@ public class AnimManager implements Runnable{
 		// border color
 		thsv=new float[3];
 		for (int i=0;i<3;i++){// init target HSV array
-		    thsv[i]=((Float)vdata.elementAt(i+3)).floatValue();  //data is a vector of 3 (H,S,V) Float offsets
+		    thsv[i] = cdata[i+3];
 		}
 		if (thsv[0] != 0 || thsv[1] != 0 || thsv[2] != 0){// border color is indeed animated
 		    float[] hsv;
@@ -748,8 +759,8 @@ public class AnimManager implements Runnable{
 		    an.bsteps[(int)nbSteps-1][1]=hsv[1]+thsv[1];
 		    an.bsteps[(int)nbSteps-1][2]=hsv[2]+thsv[2];
 		}
-		if (vdata.size() == 7 && g instanceof Translucent){//deal with translucency animation (if specified)
-		    float tav = ((Float)vdata.elementAt(6)).floatValue();
+		if (cdata.length == 7 && g instanceof Translucent){//deal with translucency animation (if specified)
+		    float tav = cdata[6];
 		    float sav = ((Translucent)g).getTranslucencyValue();
 		    double dt = tav / nbSteps;
 		    an.alphasteps=new float[an.nbSteps];
@@ -770,103 +781,72 @@ public class AnimManager implements Runnable{
 	}
     }
 
-    /**animate a glyph
+    /** Animate a glyph.
      *@param duration in milliseconds
      *@param type use one of (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG, GL_SZ_LIN, GL_SZ_PAR, GL_SZ_SIG, GL_ROT_LIN, GL_ROT_PAR, GL_ROT_SIG, GL_COLOR_LIN)
-     *@param data for translations, data is LongPoint representing X and Y offsets<br>
-     *            for resize operations, data is a float representing the resizing factor<br>
-     *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively
+     *@param data <br>- For translations, data is a LongPoint representing X and Y offsets<br>
+     *            - For resize operations, data is a Float representing the resizing factor<br>
+     *            - For rotations, data is a Float representing the rotation angle<br>
+     *            - For coloration, data is a an array of 6 floats representing H,S and V offsets for fill and border color respectively. A 7th float can be appended to animate translucency (in which case the animation can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
+     *@see #createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa)
+     *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID)
+     *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa)
      */
-    public void createGlyphAnimation(long duration,short type,Object data,Long gID) {
+    public void createGlyphAnimation(long duration, short type, Object data, Long gID){
 	newGlyphAnim(duration, type, data, gID, 0, null);
     }
 
-    /**animate a glyph
+    /** Animate a glyph.
      *@param duration in milliseconds
      *@param type use one of (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG, GL_SZ_LIN, GL_SZ_PAR, GL_SZ_SIG, GL_ROT_LIN, GL_ROT_PAR, GL_ROT_SIG, GL_COLOR_LIN)
-     *@param data for translations, data is LongPoint representing X and Y offsets<br>
-     *            for resize operations, data is a float representing the resizing factor<br>
-     *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively
+     *@param data <br>- For translations, data is a LongPoint representing X and Y offsets<br>
+     *            - For resize operations, data is a Float representing the resizing factor<br>
+     *            - For rotations, data is a Float representing the rotation angle<br>
+     *            - For coloration, data is a an array of 6 floats representing H,S and V offsets for fill and border color respectively. A 7th float can be appended to animate translucency (in which case the animation can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
      *@param paa action to perform after animation ends
+     *@see #createGlyphAnimation(long duration, short type, Object data, Long gID)
+     *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID)
+     *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa)
      */
-    public void createGlyphAnimation(long duration,short type,Object data,Long gID, PostAnimationAction paa) {
+    public void createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa){
 	newGlyphAnim(duration, type, data, gID, 0, paa);
     }
 
-    /**animate a glyph
+    /** Animate a glyph.
      *@param duration in milliseconds
      *@param refresh refresh rate division factor. The animator manager runs at a rate as close as possible to 20ms. Some animations do not need to be refreshed that often. By setting a factor of N>1 for this animation, it is possible to tell the animator manager to apply the animation only every N iteration (default is 1). For instance, if the std refresh rate is indeed 20ms, and if refresh=3, then this animation will be executed only every 60 ms. The animation will still last the time indicated by duration.
      *@param type use one of (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG, GL_SZ_LIN, GL_SZ_PAR, GL_SZ_SIG, GL_ROT_LIN, GL_ROT_PAR, GL_ROT_SIG, GL_COLOR_LIN)
-     *@param data for translations, data is LongPoint representing X and Y offsets<br>
-     *            for resize operations, data is a float representing the resizing factor<br>
-     *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively, plus an optional float representing translucency offset (can only be applied to glyphs implementing the Translucent interface)
+     *@param data <br>- For translations, data is a LongPoint representing X and Y offsets<br>
+     *            - For resize operations, data is a Float representing the resizing factor<br>
+     *            - For rotations, data is a Float representing the rotation angle<br>
+     *            - For coloration, data is a an array of 6 floats representing H,S and V offsets for fill and border color respectively. A 7th float can be appended to animate translucency (in which case the animation can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
+     *@see #createGlyphAnimation(long duration, short type, Object data, Long gID)
+     *@see #createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa)
+     *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa)
      */
-    public void createGlyphAnimation(long duration,int refresh,short type,Object data,Long gID) {
+    public void createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID){
 	newGlyphAnim(duration, type, data, gID, refresh, null);
     }
 
-    /**animate a glyph
+    /** Animate a glyph.
      *@param duration in milliseconds
      *@param refresh refresh rate division factor. The animator manager runs at a rate as close as possible to 20ms. Some animations do not need to be refreshed that often. By setting a factor of N>1 for this animation, it is possible to tell the animator manager to apply the animation only every N iteration (default is 1). For instance, if the std refresh rate is indeed 20ms, and if refresh=3, then this animation will be executed only every 60 ms. The animation will still last the time indicated by duration.
      *@param type use one of (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG, GL_SZ_LIN, GL_SZ_PAR, GL_SZ_SIG, GL_ROT_LIN, GL_ROT_PAR, GL_ROT_SIG, GL_COLOR_LIN)
-     *@param data for translations, data is LongPoint representing X and Y offsets<br>
-     *            for resize operations, data is a float representing the resizing factor<br>
-     *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively, plus an optional float representing translucency offset (can only be applied to glyphs implementing the Translucent interface)
+     *@param data <br>- For translations, data is a LongPoint representing X and Y offsets<br>
+     *            - For resize operations, data is a Float representing the resizing factor<br>
+     *            - For rotations, data is a Float representing the rotation angle<br>
+     *            - For coloration, data is a an array of 6 floats representing H,S and V offsets for fill and border color respectively. A 7th float can be appended to animate translucency (in which case the animation can only be applied to glyphs implementing the Translucent interface)
      *@param gID ID of glyph to be animated
      *@param paa action to perform after animation ends
+     *@see #createGlyphAnimation(long duration, short type, Object data, Long gID)
+     *@see #createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa)
+     *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID)
      */
-    public void createGlyphAnimation(long duration,int refresh,short type,Object data,Long gID, PostAnimationAction paa){
+    public void createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa){
 	newGlyphAnim(duration, type, data, gID, refresh, paa);
-    }
-
-    /**animate a glyph
-     *@param duration in milliseconds
-     *@param type use one of (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG, GL_SZ_LIN, GL_SZ_PAR, GL_SZ_SIG, GL_ROT_LIN, GL_ROT_PAR, GL_ROT_SIG, GL_COLOR_LIN)
-     *@param data for translations, data is LongPoint representing X and Y offsets<br>
-     *            for resize operations, data is a float representing the resizing factor<br>
-     *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets for fill and border color respectively
-     *@param gID ID of glyph to be animated
-     *@param kgaa true -> remove glyph from virtual space after animation ends
-     *@deprecated As of zvtm 0.9.4, replaced by the use of a PostAnimationAction such as GlyphKillAction
-     *@see #createGlyphAnimation(long duration,short type,Object data,Long gID, PostAnimationAction paa)
-     */
-    public void createGlyphAnimation(long duration,short type,Object data,Long gID, boolean kgaa) {
-	if (kgaa){
-	    newGlyphAnim(duration, type, data, gID, 0, new GlyphKillAction(vsm));
-	}
-	else {
-	    newGlyphAnim(duration, type, data, gID, 0, null);
-	}
-    }
-
-    /**animate a glyph
-     *@param duration in milliseconds
-     *@param refresh refresh rate division factor. The animator manager runs at a rate as close as possible to 20ms. Some animations do not need to be refreshed that often. By setting a factor of N>1 for this animation, it is possible to tell the animator manager to apply the animation only every N iteration (default is 1). For instance, if the std refresh rate is indeed 20ms, and if refresh=3, then this animation will be executed only every 60 ms. The animation will still last the time indicated by duration.
-     *@param type use one of (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG, GL_SZ_LIN, GL_SZ_PAR, GL_SZ_SIG, GL_ROT_LIN, GL_ROT_PAR, GL_ROT_SIG, GL_COLOR_LIN)
-     *@param data for translations, data is LongPoint representing X and Y offsets<br>
-     *            for resize operations, data is a float representing the resizing factor<br>
-     *            for rotations, data is a float representing the rotation angle<br>
-     *            for coloration, data is a vector composed of 6 Floats representing H,S and V offsets, for fill and border color respectively plus an optional float representing translucency offset (can only be applied to glyphs implementing the Translucent interface)
-     *@param gID ID of glyph to be animated
-     *@param kgaa true -> remove glyph from virtual space after animation ends
-     *@deprecated As of zvtm 0.9.4, replaced by the use of a PostAnimationAction such as GlyphKillAction
-     *@see #createGlyphAnimation(long duration,int refresh,short type,Object data,Long gID, PostAnimationAction paa)
-     */
-    public void createGlyphAnimation(long duration,int refresh,short type,Object data,Long gID, boolean kgaa){
-	if (kgaa){
-	    newGlyphAnim(duration, type, data, gID, refresh, new GlyphKillAction(vsm));
-	}
-	else {
-	    newGlyphAnim(duration, type, data, gID, refresh, null);
-	}
     }
 
     private void putAsPendingGAnimation(Long gID,String dim,long duration,short type,Object data, PostAnimationAction paa){
