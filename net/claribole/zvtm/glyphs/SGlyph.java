@@ -30,23 +30,27 @@ import com.xerox.VTM.glyphs.Glyph;
 
 public class SGlyph {
 
-    /**when rotating the composite glyph, rotate this component and change its position w.r.t the primary glyph to match the rotation (so that it keeps the same relative position inside its parent)*/
+    /** When rotating the composite glyph, rotate this component and change its position w.r.t the primary glyph to match the rotation (so that it keeps the same relative position inside its parent). */
     public static short FULL_ROTATION=3;
-    /**when rotating the composite glyph, do not modify the position or the orientation of this glyph*/
+    
+    /** When rotating the composite glyph, do not modify the position or the orientation of this glyph. */
     public static short NO_ROTATION=0;
-    /**when rotating the composite glyph, change its position w.r.t the primary glyph to match the rotation (so that it keeps the same relative position inside its parent) but do not rotate this component*/
+
+    /** When rotating the composite glyph, change its position w.r.t the primary glyph to match the rotation (so that it keeps the same relative position inside its parent) but do not rotate this component. */
     public static short ROTATION_POSITION_ONLY=2;
-    /**when rotating the composite glyph, rotate this component but do not change its position w.r.t the primary glyph (its relative position inside its parent will change)*/
+
+    /** When rotating the composite glyph, rotate this component but do not change its position w.r.t the primary glyph (its relative position inside its parent will change). */
     public static short ROTATION_ANGLE_ONLY=1;
 
-    /**when resizing the composite glyph, resize this component and change its position w.r.t the primary glyph to keep the same aspect (i.e. the same relative position inside its parent)*/
+    /** When resizing the composite glyph, resize this component and change its position w.r.t the primary glyph to keep the same aspect (i.e. the same relative position inside its parent). */
     public static short RESIZE=0;
-    /**when resizing the composite glyph, do not resize this component but do change its position w.r.t the primary glyph to keep the same aspect (i.e. the same relative position inside its parent)*/
+
+    /** When resizing the composite glyph, do not resize this component but do change its position w.r.t the primary glyph to keep the same aspect (i.e. the same relative position inside its parent). */
     public static short NO_RESIZE=1;
     
     Glyph g;
-    long xoffset;
-    long yoffset;
+    double xoffset;
+    double yoffset;
     short rotationPolicy=FULL_ROTATION;
     float aoffset=0;  //angle offset
     short sizePolicy=RESIZE;
@@ -66,8 +70,8 @@ public class SGlyph {
      *@param gl glyph that will be made a component of the CGlyph (it must manually be added to the virtual space)
      *@param x horizontal distance between the center of the CGlyph's primary glyph and this glyph's center
      *@param y vertical distance between the center of the CGlyph's primary glyph and this glyph's center
-     *@param rotPol rotation policy for this component (should be one of NO_ROTATION, ROTATION_ANGLE_ONLY, FULL_ROTATION, ROTATION_POSITION_ONLY)
-     *@param szPol resizing policy for this component (should be one of NO_RESIZE, RESIZE)
+     *@param rotPol rotation policy for this component (one of NO_ROTATION, ROTATION_ANGLE_ONLY, FULL_ROTATION, ROTATION_POSITION_ONLY)
+     *@param szPol resizing policy for this component (one of NO_RESIZE, RESIZE)
      */
     public SGlyph(Glyph gl,long x,long y,short rotPol,short szPol){
 	this.g=gl;
@@ -78,25 +82,26 @@ public class SGlyph {
 	this.aoffset=gl.getOrient();
     }
 
-    /**change the glyph that constitues this CGlyph component*/
+    /** Set the glyph that constitutes this secondary glyph. */
     public void setGlyph(Glyph gl){this.g=gl;}
     
-    /**get Glyph that constitutes this CGlyph component*/
+    /** Get the glyph that constitutes this secondary glyph. */
     public Glyph getGlyph(){return g;}
 
-    /**change position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates)*/
+    /** Change position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates). */
     public void setOffset(LongPoint p){xoffset=p.x;yoffset=p.y;}
 
-    /**change horizontal position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates)*/
+    /** Change horizontal position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates). */
     public void setHorizontalOffset(long x){xoffset=x;}
     
-    /**change vertical position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates)*/
+    /** Change vertical position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates). */
     public void setVerticalOffset(long y){yoffset=y;}
 
+    /** Get position of this component w.r.t the position of the CGlyph's primary glyph (relative coordinates). */
     public LongPoint getOffset(){return new LongPoint(xoffset,yoffset);}
 
     /**
-     *the angle offset is initialized with the glyph's own orientation at SGlyph creation time, but it can be changed afterwards
+     * Set angle offset. It is initialized with the glyph's own orientation at SGlyph creation time, but it can be changed afterwards.
      */
     public void setAngleOffset(float angle){
 	float newangle=g.getOrient()-aoffset+angle;
@@ -104,6 +109,9 @@ public class SGlyph {
 	g.orientTo(newangle);
     }
 
+    /**
+     * Get angle offset. It is initialized with the glyph's own orientation at SGlyph creation time, but it can be changed afterwards.
+     */
     public float getAngleOffset(){return aoffset;}
 
 }
