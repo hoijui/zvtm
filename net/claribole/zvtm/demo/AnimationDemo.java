@@ -340,51 +340,20 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     /* ------------------    COLOR     ------------------------ */
 
     void colorize(Glyph g, int d){
-	Vector COLOR_DATA = new Vector();
 	float mainColorSaturation = g.getHSVColor()[1];
 	float mainColorBrightness = g.getHSVColor()[2];
 	// animate to black
-	COLOR_DATA.add(new Float(0));
- 	COLOR_DATA.add(new Float(-mainColorSaturation));
- 	COLOR_DATA.add(new Float(-mainColorBrightness));
-	COLOR_DATA.add(new Float(0));
-	COLOR_DATA.add(new Float(0));
-	COLOR_DATA.add(new Float(0));
+	float[] COLOR_DATA = {0, -mainColorSaturation, -mainColorBrightness, 0, 0, 0};
 	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, COLOR_DATA, g.getID());
 	// animate back to original color
-	COLOR_DATA.clear();
-	COLOR_DATA.add(new Float(0));
-	COLOR_DATA.add(new Float(mainColorSaturation));
-	COLOR_DATA.add(new Float(mainColorBrightness));
-	COLOR_DATA.add(new Float(0));
-	COLOR_DATA.add(new Float(0));
-	COLOR_DATA.add(new Float(0));
-	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, COLOR_DATA, g.getID());
+	float[] COLOR_DATA2 = {0, mainColorSaturation, mainColorBrightness, 0, 0, 0};
+	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, COLOR_DATA2, g.getID());
     }
 
     /* ------------------ TRANSLUCENCY ------------------------ */
 
-    static Vector TRANSLUCENCY_DATA_1 = new Vector();
-    static {
-	TRANSLUCENCY_DATA_1.add(new Float(0));
-	TRANSLUCENCY_DATA_1.add(new Float(0));
-	TRANSLUCENCY_DATA_1.add(new Float(0));
-	TRANSLUCENCY_DATA_1.add(new Float(0));
-	TRANSLUCENCY_DATA_1.add(new Float(0));
-	TRANSLUCENCY_DATA_1.add(new Float(0));
-	TRANSLUCENCY_DATA_1.add(new Float(-1));
-    }
-
-    static Vector TRANSLUCENCY_DATA_2 = new Vector();
-    static {
-	TRANSLUCENCY_DATA_2.add(new Float(0));
-	TRANSLUCENCY_DATA_2.add(new Float(0));
-	TRANSLUCENCY_DATA_2.add(new Float(0));
-	TRANSLUCENCY_DATA_2.add(new Float(0));
-	TRANSLUCENCY_DATA_2.add(new Float(0));
-	TRANSLUCENCY_DATA_2.add(new Float(0));
-	TRANSLUCENCY_DATA_2.add(new Float(1));
-    }
+    static float[] TRANSLUCENCY_DATA_1 = {0, 0, 0, 0, 0, 0, -1.0f};
+    static float[] TRANSLUCENCY_DATA_2 = {0, 0, 0, 0, 0, 0, 1.0f};
 
     void translucent(Glyph g, int d){
 	// animate to transparent
@@ -504,7 +473,7 @@ class CommandPanel extends JPanel implements ActionListener {
 	durationSp.setOpaque(false);
 	this.add(durationSp);
 	
-	fadeBt = new JButton("Fade out");
+	fadeBt = new JButton("Fade Out");
 	fadeBt.setOpaque(false);
 	fadeBt.addActionListener(this);
 	this.add(fadeBt);
