@@ -116,4 +116,6 @@ public class Messages {
 
     static final String PATH_NOT_SET = "NOT SET";
 
+    static final String FAILED_TO_BUILD_LOGICAL_STRUCT = "Failed to build logical structure. Some tools are disabled.";
+
 }

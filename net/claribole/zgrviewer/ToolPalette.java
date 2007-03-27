@@ -193,5 +193,23 @@ public class ToolPalette {
     Camera getPaletteCamera(){
 	return paletteCamera;
     }
+
+    void showLogicalTools(){
+	if (!buttons[5].isSensitive()){buttons[5].setSensitivity(true);}
+	if (!buttons[5].isVisible()){buttons[5].setVisible(true);}
+	if (!selectedButtons[5].isSensitive()){selectedButtons[5].setSensitivity(true);}
+	if (!selectedButtons[5].isVisible()){selectedButtons[5].setVisible(true);}
+    }
+
+    void hideLogicalTools(){
+	if (isHighlightMode()){// if a logical tool is selected,
+	    // select something else as they are about to be disabled
+	    selectButton(buttons[0]);
+	}
+	if (buttons[5].isSensitive()){buttons[5].setSensitivity(false);}
+	if (buttons[5].isVisible()){buttons[5].setVisible(false);}
+	if (selectedButtons[5].isSensitive()){selectedButtons[5].setSensitivity(false);}
+	if (selectedButtons[5].isVisible()){selectedButtons[5].setVisible(false);}
+    }
     
 }

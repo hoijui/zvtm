@@ -320,6 +320,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void enterGlyph(Glyph g){
+	grMngr.mainView.setStatusBarText(Messages.EMPTY_STRING);
 	if (g == grMngr.magWindow){
 	    inMagWindow = true;
 	    return;

@@ -832,7 +832,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	glyphs.remove(boundingBox);
 	lstruct = LogicalStructure.build(glyphs);
 	if (lstruct == null){// building the logical structure failed
-	    System.err.println("WARNING: failed to build structure");
+	    tp.hideLogicalTools();
+	    mainView.setStatusBarText(Messages.FAILED_TO_BUILD_LOGICAL_STRUCT);
+	}
+	else {
+	    tp.showLogicalTools();
 	}
 	/* take care of converting the owner of glyphs that were not processed as structural elements
 	   (which should have remained Metadata instances). Convert these old owners into LElem instances
