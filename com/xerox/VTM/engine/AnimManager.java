@@ -441,7 +441,7 @@ public class AnimManager implements Runnable{
 
     /* ----------------------- GLYPH ANIMATION ------------------------- */
 
-    private void newGlyphAnim(long duration,short type,Object data,Long gID,int refresh, PostAnimationAction paa){
+    private void newGlyphAnim(long duration,short type,Object data,Long gID,int refresh, PostAnimationAction paa) throws ClassCastException {
 	Glyph g=vsm.getGlyph(gID);
 	switch(type){
 	case GL_TRANS_LIN:{//translation - linear
@@ -793,7 +793,7 @@ public class AnimManager implements Runnable{
      *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID)
      *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa)
      */
-    public void createGlyphAnimation(long duration, short type, Object data, Long gID){
+    public void createGlyphAnimation(long duration, short type, Object data, Long gID) throws ClassCastException {
 	newGlyphAnim(duration, type, data, gID, 0, null);
     }
 
@@ -810,7 +810,7 @@ public class AnimManager implements Runnable{
      *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID)
      *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa)
      */
-    public void createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa){
+    public void createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa) throws ClassCastException {
 	newGlyphAnim(duration, type, data, gID, 0, paa);
     }
 
@@ -827,7 +827,7 @@ public class AnimManager implements Runnable{
      *@see #createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa)
      *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa)
      */
-    public void createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID){
+    public void createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID) throws ClassCastException {
 	newGlyphAnim(duration, type, data, gID, refresh, null);
     }
 
@@ -845,7 +845,7 @@ public class AnimManager implements Runnable{
      *@see #createGlyphAnimation(long duration, short type, Object data, Long gID, PostAnimationAction paa)
      *@see #createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID)
      */
-    public void createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa){
+    public void createGlyphAnimation(long duration, int refresh, short type, Object data, Long gID, PostAnimationAction paa) throws ClassCastException {
 	newGlyphAnim(duration, type, data, gID, refresh, paa);
     }
 
