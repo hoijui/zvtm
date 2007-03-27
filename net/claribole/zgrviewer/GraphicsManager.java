@@ -851,7 +851,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	}
     }
 
-
     void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
 	Object o = null;
 	if (g != null){// clicked inside a node
@@ -893,12 +892,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     synchronized void highlightNode(LNode n, boolean highlight){
 	if (highlight){
 	    Glyph g;
+	    Glyph[] gs;
 	    for (int i=0;i<n.edges.length;i++){
+		// highlight edge itself
 		for (int j=0;j<n.edges[i].glyphs.length;j++){
 		    g = n.edges[i].glyphs[j];
 		    /* prevent elements from being processed more than once
 		       this can happen when a node links to itself, and
-		       this makes the highlightinh mechanism think that
+		       this makes the highlighting mechanism think that
 		       the arc's original color is the selection color */
 		    if (highlightedElements.contains(g)){continue;}
 		    highlightedElements.add(g);
@@ -911,6 +912,23 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
 		    }
 		}
+		// highlight node at other end of arc
+		// (can't rely on edge direction as edges might be undirected)
+		gs = (n.edges[i].tail == n) ? n.edges[i].head.glyphs : n.edges[i].tail.glyphs;
+		for (int j=0;j<gs.length;j++){
+		    g = gs[j];
+		    /* prevent elements from being processed more than once
+		       this can happen when a node links to itself, and
+		       this makes the highlighting mechanism think that
+		       the arc's original color is the selection color */
+		    if (highlightedElements.contains(g)){continue;}
+		    highlightedElements.add(g);
+		    originalFillColor.add(g.getColor()); // remember this color even if we don't change it
+		    originalBorderColor.add(g.getBorderColor()); // just to keep originalXXXColor vectors
+		    if (g.isBorderDrawn()){              // at the same length/indexes for a given glyph
+			g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+		    }
+		}
 	    }
 	}
 	else {
@@ -920,7 +938,35 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     synchronized void highlightEdge(LEdge e, boolean highlight){
 	if (highlight){
-	    
+	    Glyph g;
+	    for (int i=0;i<e.tail.glyphs.length;i++){
+		g = e.tail.glyphs[i];
+		/* prevent elements from being processed more than once
+		   this can happen when a node links to itself, and
+		   this makes the highlighting mechanism think that
+		   the arc's original color is the selection color */
+		if (highlightedElements.contains(g)){continue;}
+		highlightedElements.add(g);
+		originalFillColor.add(g.getColor()); // remember this color even if we don't change it
+		originalBorderColor.add(g.getBorderColor()); // just to keep originalXXXColor vectors
+		if (g.isBorderDrawn()){              // at the same length/indexes for a given glyph
+		    g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+		}
+	    }
+	    for (int i=0;i<e.head.glyphs.length;i++){
+		g = e.head.glyphs[i];
+		/* prevent elements from being processed more than once
+		   this can happen when a node links to itself, and
+		   this makes the highlighting mechanism think that
+		   the arc's original color is the selection color */
+		if (highlightedElements.contains(g)){continue;}
+		highlightedElements.add(g);
+		originalFillColor.add(g.getColor()); // remember this color even if we don't change it
+		originalBorderColor.add(g.getBorderColor()); // just to keep originalXXXColor vectors
+		if (g.isBorderDrawn()){              // at the same length/indexes for a given glyph
+		    g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+		}
+	    }
 	}
 	else {
 	    unhighlightAll();
