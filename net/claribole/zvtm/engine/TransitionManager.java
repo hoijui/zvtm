@@ -28,33 +28,9 @@ import com.xerox.VTM.glyphs.VRectangleST;
  */
 
 public class TransitionManager {
-    
-    static Float F0 = new Float(0);
-    static Float Fp1 = new Float(1);
-    static Float Fm1 = new Float(-1);
 
-    static Vector fadeOutData;
-    static {
-	fadeOutData = new Vector();
-	fadeOutData.add(F0);
-	fadeOutData.add(F0);
-	fadeOutData.add(F0);
-	fadeOutData.add(F0);
-	fadeOutData.add(F0);
-	fadeOutData.add(F0);
-	fadeOutData.add(Fp1);
-    };
-    static Vector fadeInData;
-    static {
-	fadeInData = new Vector();
-	fadeInData.add(F0);
-	fadeInData.add(F0);
-	fadeInData.add(F0);
-	fadeInData.add(F0);
-	fadeInData.add(F0);
-	fadeInData.add(F0);
-	fadeInData.add(Fm1);
-    };
+    static final float[] fadeOutData = {0, 0, 0, 0, 0, 0, 1.0f};
+    static final float[] fadeInData = {0, 0, 0, 0, 0, 0, -1.0f};
 
     /** Make a view fade out, and eventually be painted blank.
      * The view must not be blank for the fade out to work.

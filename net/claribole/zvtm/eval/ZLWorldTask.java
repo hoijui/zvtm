@@ -137,26 +137,9 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     static final int GRID_DEPTH = 8;
     int currentLevel = -1;
 
-//     static Vector SHOW_GRID_ANIM_PARAMS;
-//     static Vector HIDE_GRID_ANIM_PARAMS;
-//     static {
-// 	SHOW_GRID_ANIM_PARAMS = new Vector();
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(0));
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(0));
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(0));
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(0));
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(0));
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(0));
-// 	SHOW_GRID_ANIM_PARAMS.add(new Float(1.0f));
-// 	HIDE_GRID_ANIM_PARAMS = new Vector();
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(0));
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(0));
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(0));
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(0));
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(0));
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(0));
-// 	HIDE_GRID_ANIM_PARAMS.add(new Float(-1.0f));
-//     }
+
+//     static final float[] SHOW_GRID_ANIM_PARAMS = {0, 0, 0, 0, 0, 0, 1.0f};
+//     static final float[] HIDE_GRID_ANIM_PARAMS = {0, 0, 0, 0, 0, 0, -1.0f};
 
     static final float START_ALTITUDE = 10000;
     static final float FLOOR_ALTITUDE = 100.0f;

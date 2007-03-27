@@ -387,14 +387,10 @@ public class Introduction {
 	    else if (animScheme.equals("sig")){vsm.animator.createGlyphAnimation(3000,AnimManager.GL_SZ_SIG,new Float(2.0f),g.getID());}
 	}
 	else if (animType.equals("col")){
-	    Vector v=new Vector();
-	    v.add(new Float(0));v.add(new Float(-0.8f));v.add(new Float(-0.6f));
-	    v.add(new Float(0));v.add(new Float(0));v.add(new Float(0));
-	    vsm.animator.createGlyphAnimation(2000,AnimManager.GL_COLOR_LIN,v,g.getID());
-	    v=new Vector();
-	    v.add(new Float(0));v.add(new Float(0.8f));v.add(new Float(0.6f));
-	    v.add(new Float(0));v.add(new Float(0));v.add(new Float(0));
-	    vsm.animator.createGlyphAnimation(2000,AnimManager.GL_COLOR_LIN,v,g.getID());
+	    float[] fill = {0, -0.8f, -0.6f, 0, 0, 0};
+	    vsm.animator.createGlyphAnimation(2000, AnimManager.GL_COLOR_LIN, fill, g.getID());
+	    float[] fill2 = {0, 0.8f, 0.6f, 0, 0, 0};
+	    vsm.animator.createGlyphAnimation(2000, AnimManager.GL_COLOR_LIN, fill2, g.getID());
 	}
 	else if (animType.equals("trans")){
 	    if (animScheme.equals("lin")){vsm.animator.createGlyphAnimation(1000,AnimManager.GL_TRANS_LIN,new LongPoint(200,100),g.getID());}
