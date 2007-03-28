@@ -532,10 +532,11 @@ public class SVGWriter {
 
     private Element createLine(VSegment s){
 	Element shape=svgDoc.createElementNS(svgURI,SVGReader._line);
-	shape.setAttribute("x1",String.valueOf(s.vx-s.getWidth()+farWest));
-	shape.setAttribute("y1",String.valueOf(-s.vy-s.getHeight()+farNorth));
-	shape.setAttribute("x2",String.valueOf(s.vx+s.getWidth()+farWest));
-	shape.setAttribute("y2",String.valueOf(-s.vy+s.getHeight()+farNorth));
+	LongPoint[] endPoints = s.getEndPoints();
+	shape.setAttribute("x1", String.valueOf(endPoints[0].x+farWest));
+	shape.setAttribute("y1", String.valueOf(-endPoints[0].y+farNorth));
+	shape.setAttribute("x2", String.valueOf(endPoints[1].x+farWest));
+	shape.setAttribute("y2", String.valueOf(-endPoints[1].y+farNorth));
 	Color c=s.getColor();
 	shape.setAttribute(SVGReader._style,"stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")");
 	if (s.getStroke()!=null){
