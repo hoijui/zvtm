@@ -350,9 +350,22 @@ public abstract class Glyph implements Cloneable {
 	return res;
     }
 
-    /** Get the glyph's main color. This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.). */
+    /** Get the glyph's current main color.
+     * This might be different from the default main color depending on the Glyph's current status.
+     * This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.).
+     *@see #getDefaultColor()
+     */
     public Color getColor(){
 	return this.color;
+    }
+
+     /** Get the glyph's current main color.
+     * This might be different from the current main color depending on the Glyph's current status.
+     * This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.).
+     *@see #getColor()
+     */
+    public Color getDefaultColor(){
+	return this.fColor;
     }
 
     /** Get the glyph's border color (use getColor for text, paths, segments, etc.).

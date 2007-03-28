@@ -139,11 +139,20 @@ public abstract class ClosedShape extends Glyph {
 	return this.HSVb;
     }
 
-    /** Get the glyph's border color (use getColor for text, paths, segments, etc.).
-     *@see #getColor()
+    /** Get the glyph's current border color (use getColor for text, paths, segments, etc.).
+     * This might be different from the default border color depending on the Glyph's current status.
+     *@see #getDefaultBorderColor()
      */
     public Color getBorderColor(){
 	return this.borderColor;
+    }
+
+    /** Get the glyph's default border color (use getColor for text, paths, segments, etc.).
+     * This might be different from the default border color depending on the Glyph's current status.
+     *@see #getBorderColor()
+     */
+    public Color getDefaultBorderColor(){
+	return this.bColor;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
