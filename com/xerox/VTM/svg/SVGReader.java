@@ -98,6 +98,10 @@ public class SVGReader {
     public static final String _d="d";
     public static final String _x="x";
     public static final String _y="y";
+    public static final String _x1="x1";
+    public static final String _y1="y1";
+    public static final String _x2="x2";
+    public static final String _y2="y2";
     public static final String _width="width";
     public static final String _height="height";
     public static final String _points="points";
@@ -1229,12 +1233,58 @@ public class SVGReader {
 	for (int i=0;i<coords.size()-1;i++){
 	    lp1=(LongPoint)coords.elementAt(i);
 	    lp2=(LongPoint)coords.elementAt(i+1);
-	    res[i]=new VSegment((lp1.x+lp2.x)/2,-(lp1.y+lp2.y)/2,0,(lp2.x-lp1.x)/2,(lp2.y-lp1.y)/2,border);
+	    res[i] = new VSegment(lp1.x, -lp1.y, 0, border, lp2.x, -lp2.y);
 	    if (ss != null && ss.requiresSpecialStroke()){
 		assignStroke(res[i], ss);
 	    }
 	    if (meta){setMetadata(res[i],ctx);}
 	}
+	return res;
+    }
+
+    /** Create a VSegment from an SVG line element.
+     *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
+     */
+    public static VSegment createLine(Element e){
+	return createLine(e, null, false);
+    }
+
+    /** Create a VSegment from an SVG line element.
+     *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
+     *@param ctx used to propagate contextual style information (put null if none)
+     */
+    public static VSegment createLine(Element e, Context ctx){
+	return createLine(e, ctx, false);
+    }
+
+    /** Create a VSegment from an SVG line element.
+     *@param e an SVG line as a DOM element (org.w3c.dom.Element)
+     *@param ctx used to propagate contextual style information (put null if none)
+     *@param meta store metadata associated with this node (URL, title) in glyph's associated object
+     */
+    public static VSegment createLine(Element e, Context ctx, boolean meta){
+	SVGStyle ss = null;
+	if (e.hasAttribute(_style)){
+	    ss = getStyle(e.getAttribute(_style));
+	}
+	Color border = Color.black;
+	if (ss != null){
+	    border = ss.getBorderColor();
+	    if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+	}
+	else if (ctx != null){
+	    if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
+	    else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+	}
+	long x1 = getLong(e.getAttribute(_x1)) + xoffset;
+	long y1 = getLong(e.getAttribute(_y1)) + yoffset;
+	long x2 = getLong(e.getAttribute(_x2)) + xoffset;
+	long y2 = getLong(e.getAttribute(_y2)) + yoffset;
+	VSegment res = new VSegment(x1, -y1, 0, border, x2, -y2);
+	if (ss != null && ss.requiresSpecialStroke()){
+	    assignStroke(res, ss);
+	}
+	if (meta){setMetadata(res,ctx);}
 	return res;
     }
 
@@ -1429,6 +1479,9 @@ public class SVGReader {
 	    for (int i=0;i<segments.length;i++){
 		vsm.addGlyph(segments[i],vs);
 	    }
+	}
+	else if (tagName.equals(_line)){
+	    vsm.addGlyph(createLine(e, ctx, meta), vs);
 	}
 	else if (tagName.equals(_image)){
 	    Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
