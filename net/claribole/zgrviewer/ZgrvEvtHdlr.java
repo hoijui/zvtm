@@ -357,7 +357,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	g.highlight(true, null);
+	if (!application.grMngr.tp.isHighlightMode()){// node highlighting is taken care of
+	    g.highlight(true, null);                  // elsewhere when in highlight mode
+	}
 	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){// interacting with pie menu
 	    VirtualSpace vs = grMngr.vsm.getVirtualSpace(grMngr.menuSpace);
 	    vs.onTop(g);
@@ -385,7 +387,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	g.highlight(false, null);
+	if (!application.grMngr.tp.isHighlightMode()){// node highlighting is taken care of
+	    g.highlight(false, null);                 // elsewhere when in highlight mode
+	}
 	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){
 	    if (application.mainPieMenu != null && g == application.mainPieMenu.getBoundary()){
 		Glyph lge = grMngr.vsm.getActiveView().mouse.lastGlyphEntered;

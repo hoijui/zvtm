@@ -161,7 +161,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	vsm = new VirtualSpaceManager(applet);
 	vsm.setMainFont(ConfigManager.defaultFont);
 	vsm.setZoomLimit(-90);
-	vsm.setMouseInsideGlyphColor(Color.red);
+	vsm.setMouseInsideGlyphColor(HIGHLIGHT_BORDER_COLOR);
 	//vsm.setDebug(true);
 	mSpace = vsm.addVirtualSpace(mainSpace);
 	mainCamera = vsm.addCamera(mainSpace); // camera #0 for main view
@@ -254,7 +254,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	vsm.addGlyph(magWindow, mSpace);
 	mSpace.hide(magWindow);
 	previousLocations.removeAllElements();
-	highlightedElements.removeAllElements();
+	highlightedEdges.removeAllElements();
+	highlightedNodes.removeAllElements();
+	originalEdgeColor.removeAllElements();
+	originalNodeFillColor.removeAllElements();
+	originalNodeBorderColor.removeAllElements();
     }
 
     void initDM(){
@@ -851,6 +855,16 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	}
     }
 
+    /* ------------- Highlighting ----------------- */
+
+    final static Color HIGHLIGHT_BORDER_COLOR = new Color(255, 0, 0);
+
+    Vector highlightedEdges = new Vector();
+    Vector originalEdgeColor = new Vector();
+    Vector highlightedNodes = new Vector();
+    Vector originalNodeBorderColor = new Vector();
+    Vector originalNodeFillColor = new Vector();
+
     void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
 	Object o = null;
 	if (g != null){// clicked inside a node
@@ -882,17 +896,18 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	}
     }
 
-    final static Color HIGHLIGHT_BORDER_COLOR = new Color(255, 0, 0);
-    final static Color HIGHLIGHT_FILL_COLOR = new Color(255, 150, 150);
-
-    Vector highlightedElements = new Vector();
-    Vector originalBorderColor = new Vector();
-    Vector originalFillColor = new Vector();
-
     synchronized void highlightNode(LNode n, boolean highlight){
 	if (highlight){
 	    Glyph g;
 	    Glyph[] gs;
+	    // highlight node itself
+	    for (int i=0;i<n.glyphs.length;i++){
+		g = n.glyphs[i];
+		if (highlightedNodes.contains(g)){continue;}
+		highlightedNodes.add(g);
+		highlightNodeGlyph(g);
+	    }
+	    // for all edges linked to this node
 	    for (int i=0;i<n.edges.length;i++){
 		// highlight edge itself
 		for (int j=0;j<n.edges[i].glyphs.length;j++){
@@ -901,16 +916,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		       this can happen when a node links to itself, and
 		       this makes the highlighting mechanism think that
 		       the arc's original color is the selection color */
-		    if (highlightedElements.contains(g)){continue;}
-		    highlightedElements.add(g);
-		    originalFillColor.add(g.getColor());
-		    if (g.isFilled()){
-			g.setColor(HIGHLIGHT_BORDER_COLOR); // use border color to fill arrow heads
-		    }
-		    originalBorderColor.add(g.getBorderColor());
-		    if (g.isBorderDrawn()){
-			g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
-		    }
+		    if (highlightedEdges.contains(g)){continue;}
+		    highlightedEdges.add(g);
+		    highlightEdgeGlyph(g);
 		}
 		// highlight node at other end of arc
 		// (can't rely on edge direction as edges might be undirected)
@@ -921,13 +929,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		       this can happen when a node links to itself, and
 		       this makes the highlighting mechanism think that
 		       the arc's original color is the selection color */
-		    if (highlightedElements.contains(g)){continue;}
-		    highlightedElements.add(g);
-		    originalFillColor.add(g.getColor()); // remember this color even if we don't change it
-		    originalBorderColor.add(g.getBorderColor()); // just to keep originalXXXColor vectors
-		    if (g.isBorderDrawn()){              // at the same length/indexes for a given glyph
-			g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
-		    }
+		    if (highlightedNodes.contains(g)){continue;}
+		    highlightedNodes.add(g);
+		    highlightNodeGlyph(g);
 		}
 	    }
 	}
@@ -939,33 +943,34 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     synchronized void highlightEdge(LEdge e, boolean highlight){
 	if (highlight){
 	    Glyph g;
+	    // highlight edge itself
+	    for (int i=0;i<e.glyphs.length;i++){
+		g = e.glyphs[i];
+		if (highlightedEdges.contains(g)){continue;}
+		highlightedEdges.add(g);
+		highlightEdgeGlyph(g);
+	    }
+	    // highlight tail
 	    for (int i=0;i<e.tail.glyphs.length;i++){
 		g = e.tail.glyphs[i];
 		/* prevent elements from being processed more than once
 		   this can happen when a node links to itself, and
 		   this makes the highlighting mechanism think that
 		   the arc's original color is the selection color */
-		if (highlightedElements.contains(g)){continue;}
-		highlightedElements.add(g);
-		originalFillColor.add(g.getColor()); // remember this color even if we don't change it
-		originalBorderColor.add(g.getBorderColor()); // just to keep originalXXXColor vectors
-		if (g.isBorderDrawn()){              // at the same length/indexes for a given glyph
-		    g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
-		}
+		if (highlightedNodes.contains(g)){continue;}
+		highlightedNodes.add(g);
+		highlightNodeGlyph(g);
 	    }
+	    // highlight head
 	    for (int i=0;i<e.head.glyphs.length;i++){
 		g = e.head.glyphs[i];
 		/* prevent elements from being processed more than once
 		   this can happen when a node links to itself, and
 		   this makes the highlighting mechanism think that
 		   the arc's original color is the selection color */
-		if (highlightedElements.contains(g)){continue;}
-		highlightedElements.add(g);
-		originalFillColor.add(g.getColor()); // remember this color even if we don't change it
-		originalBorderColor.add(g.getBorderColor()); // just to keep originalXXXColor vectors
-		if (g.isBorderDrawn()){              // at the same length/indexes for a given glyph
-		    g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
-		}
+		if (highlightedNodes.contains(g)){continue;}
+		highlightedNodes.add(g);
+		highlightNodeGlyph(g);
 	    }
 	}
 	else {
@@ -973,20 +978,78 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	}
     }
 
-    synchronized void unhighlightAll(){
-	Glyph g;
-	for (int i=0;i<highlightedElements.size();i++){
-	    g = (Glyph)highlightedElements.elementAt(i);
-	    if (g.isFilled()){
-		g.setColor((Color)originalFillColor.elementAt(i));
-	    }
+    void highlightNodeGlyph(Glyph g){
+	if (g instanceof ClosedShape){
+	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
+	    originalNodeBorderColor.add(g.getBorderColor());
 	    if (g.isBorderDrawn()){
-		g.setBorderColor((Color)originalBorderColor.elementAt(i));
+		g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
 	    }
 	}
-	highlightedElements.removeAllElements();
-	originalFillColor.removeAllElements();
-	originalBorderColor.removeAllElements();
+	else {
+	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
+	    originalNodeBorderColor.add(g.getColor());
+	    g.setColor(HIGHLIGHT_BORDER_COLOR);
+	}
+    }
+
+    void highlightEdgeGlyph(Glyph g){
+	originalEdgeColor.add(g.getColor());
+	if (g instanceof ClosedShape){
+	    if (g.isFilled()){
+		g.setColor(HIGHLIGHT_BORDER_COLOR); // use border color to fill arrow head shape
+	    }
+	    if (g.isBorderDrawn()){
+		g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+	    }
+	}
+	else {
+	    g.setColor(HIGHLIGHT_BORDER_COLOR);	    
+	}
+    }
+
+    void unhighlightAll(){
+	unhighlightAllEdges();
+	unhighlightAllNodes();
+    }
+
+    void unhighlightAllNodes(){
+	Glyph g;
+	for (int i=0;i<highlightedNodes.size();i++){
+	    g = (Glyph)highlightedNodes.elementAt(i);
+	    if (g instanceof ClosedShape){
+		if (g.isBorderDrawn()){
+		    g.setBorderColor((Color)originalNodeBorderColor.elementAt(i));
+		}
+	    }
+	    else {
+		g.setColor((Color)originalNodeBorderColor.elementAt(i));
+	    }
+
+	}
+	highlightedNodes.removeAllElements();
+	originalNodeBorderColor.removeAllElements();
+	originalNodeFillColor.removeAllElements();
+    }
+
+    void unhighlightAllEdges(){
+	Glyph g;
+	for (int i=0;i<highlightedEdges.size();i++){
+	    g = (Glyph)highlightedEdges.elementAt(i);
+	    if (g instanceof ClosedShape){
+		if (g.isFilled()){
+		    g.setColor((Color)originalEdgeColor.elementAt(i));
+		}
+		if (g.isBorderDrawn()){
+		    g.setBorderColor((Color)originalEdgeColor.elementAt(i));
+		}
+	    }
+	    else {
+		g.setColor((Color)originalEdgeColor.elementAt(i));
+	    }
+	}
+	highlightedEdges.removeAllElements();
+	originalEdgeColor.removeAllElements();
     }
 
 }
