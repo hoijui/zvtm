@@ -10,6 +10,8 @@
 
 package net.claribole.zgrviewer;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -27,6 +29,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JScrollPane;
 import javax.swing.JComponent;
@@ -40,12 +43,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JColorChooser;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-class PrefWindow extends JFrame implements ActionListener {
+class PrefWindow extends JFrame implements ActionListener, MouseListener {
 
     ZGRViewer application;
     GraphicsManager grMngr;
@@ -61,6 +65,7 @@ class PrefWindow extends JFrame implements ActionListener {
     JCheckBox sdZoomCb;
     JSlider sdZoomSlider;
     JSpinner mFactorSpinner;
+    ColorIndicator highlightColor;
 
     //directory panel
     JButton browseTmpDirBt,browseGraphDirBt,browseNeatoBt,browseCircoBt,browseTwopiBt,browseDotBt,browseFontDirBt;
@@ -155,6 +160,17 @@ class PrefWindow extends JFrame implements ActionListener {
 	buildConstraints(constraints0, 1, 7, 1, 1, 40, 0);
 	gridBag0.setConstraints(mFactorSpinner, constraints0);
 	miscPane.add(mFactorSpinner);
+
+
+	JLabel highlightLb = new JLabel("Color of highlighted elements");
+	buildConstraints(constraints0, 0, 8, 1, 1, 60, 10);
+	gridBag0.setConstraints(highlightLb, constraints0);
+	miscPane.add(highlightLb);
+	highlightColor = new ColorIndicator(ConfigManager.HIGHLIGHT_COLOR);
+	buildConstraints(constraints0, 1, 8, 1, 1, 40, 0);
+	gridBag0.setConstraints(highlightColor, constraints0);
+	miscPane.add(highlightColor);
+	highlightColor.addMouseListener(this);
 
 	//blank panel to fill remaining part of the tab
 	JPanel p1=new JPanel();
@@ -533,7 +549,7 @@ class PrefWindow extends JFrame implements ActionListener {
 	this.addWindowListener(w0);
 	this.setTitle("Preferences");
 	this.pack();
-	this.setSize(400,300);
+	this.setSize(400,340);
     }
 
     private JComponent initPluginPane(){
@@ -723,6 +739,22 @@ class PrefWindow extends JFrame implements ActionListener {
 	}
     }
 
+    public void mouseClicked(MouseEvent e){
+	Object o = e.getSource();
+	if (o == highlightColor){
+	    Color newCol = JColorChooser.showDialog(this, "Highlight Color", highlightColor.getColor());
+	    if (newCol != null){
+		ConfigManager.HIGHLIGHT_COLOR = newCol;
+		highlightColor.setColor(ConfigManager.HIGHLIGHT_COLOR);
+		application.grMngr.vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR, true);
+	    }
+	}
+    }
+    public void mousePressed(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){}
+    public void mouseEntered(MouseEvent e){}
+    public void mouseExited(MouseEvent e){}
+
     void updateVars(){
 	ConfigManager.SAVE_WINDOW_LAYOUT=saveWindowLayoutCb.isSelected();
 	ConfigManager.FORCE_SILENT = silentCb.isSelected();
@@ -740,6 +772,29 @@ class PrefWindow extends JFrame implements ActionListener {
 	gbc.gridheight=gh;
 	gbc.weightx=wx;
 	gbc.weighty=wy;
+    }
+
+}
+
+class ColorIndicator extends JPanel {
+
+    Color color;
+
+    ColorIndicator(Color c){
+	super();
+	color = c;
+	setBorder(BorderFactory.createLineBorder(Color.BLACK));
+	this.setBackground(color);
+    }
+
+    void setColor(Color c){
+	color = c;
+	this.setBackground(color);
+	repaint();
+    }
+
+    Color getColor(){
+	return color;
     }
 
 }

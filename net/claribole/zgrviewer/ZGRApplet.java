@@ -149,10 +149,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	try {
 	    String s = getParameter(HIGHLIGHT_COLOR_PARAM);
 	    if (s != null){
-		cfgMngr.highlightColor = SVGReader.getColor(s);
+		ConfigManager.HIGHLIGHT_COLOR = SVGReader.getColor(s);
 	    }
 	}
-	catch(Exception ex){cfgMngr.highlightColor = null;}
+	catch(Exception ex){ConfigManager.HIGHLIGHT_COLOR = Color.RED;}
 	AppletUtils.initLookAndFeel();
 	Container cpane = getContentPane();
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);

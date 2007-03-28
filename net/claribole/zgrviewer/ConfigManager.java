@@ -55,9 +55,7 @@ class ConfigManager {
     static Font PIEMENU_FONT = defaultFont;
 
     Color backgroundColor = Color.WHITE;
-
-    // null means don't highlight
-    Color highlightColor = null;
+    static Color HIGHLIGHT_COLOR = Color.RED;
 
     static Color OBSERVED_REGION_COLOR;
     static Color PIEMENU_INSIDE_COLOR;
@@ -74,9 +72,6 @@ class ConfigManager {
 	    PIEMENU_INSIDE_COLOR = new Color(230,230,230);
 	}
     }
-
-  
-
 
     /* Misc. Prefs */
     static boolean SAVE_WINDOW_LAYOUT=false;
@@ -200,6 +195,10 @@ class ConfigManager {
 		catch (Exception ex){}
 		try {
 		    ConfigManager.ANTIALIASING=((new Boolean(e.getAttribute("antialiasing"))).booleanValue());
+		}
+		catch (Exception ex){}
+		try {
+		    ConfigManager.HIGHLIGHT_COLOR = new Color((new Integer(e.getAttribute("highlightColor"))).intValue());
 		}
 		catch (Exception ex){}
 		try {
@@ -338,6 +337,7 @@ class ConfigManager {
 	rt.appendChild(consts);
 // 	consts.setAttribute("graphOrient",ConfigManager.GRAPH_ORIENTATION);
 	consts.setAttribute("antialiasing",String.valueOf(ConfigManager.ANTIALIASING));
+	consts.setAttribute("highlightColor", Integer.toString(HIGHLIGHT_COLOR.getRGB()));
 	consts.setAttribute("silent", String.valueOf(ConfigManager.FORCE_SILENT));
 	consts.setAttribute("saveWindowLayout",String.valueOf(ConfigManager.SAVE_WINDOW_LAYOUT));
 	consts.setAttribute("sdZoom",String.valueOf(SD_ZOOM_ENABLED));

@@ -161,7 +161,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	vsm = new VirtualSpaceManager(applet);
 	vsm.setMainFont(ConfigManager.defaultFont);
 	vsm.setZoomLimit(-90);
-	vsm.setMouseInsideGlyphColor(HIGHLIGHT_BORDER_COLOR);
+	vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
 	//vsm.setDebug(true);
 	mSpace = vsm.addVirtualSpace(mainSpace);
 	mainCamera = vsm.addCamera(mainSpace); // camera #0 for main view
@@ -775,7 +775,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	searchIndex = -1;
 	lastSearchedString = s.toLowerCase();
 	matchingList.removeAllElements();
-	if (cfgMngr.highlightColor != null && highlightedLabel != null){
+	if (highlightedLabel != null){
 	    highlightedLabel.setColor(originalHighlightedLabelColor);
 	    highlightedLabel = null;
 	}
@@ -783,14 +783,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /* color the label found by search */
     void highlight(Glyph g){
-	if (cfgMngr.highlightColor == null){return;}
 	// de-highlight previous label (if any)
 	if (highlightedLabel != null){
 	    highlightedLabel.setColor(originalHighlightedLabelColor);
 	}
 	highlightedLabel = g;
 	originalHighlightedLabelColor = highlightedLabel.getColor();
-	highlightedLabel.setColor(cfgMngr.highlightColor);
+	highlightedLabel.setColor(ConfigManager.HIGHLIGHT_COLOR);
     }
 
     /* -------------- Font management ----------------*/
@@ -856,8 +855,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     }
 
     /* ------------- Highlighting ----------------- */
-
-    final static Color HIGHLIGHT_BORDER_COLOR = new Color(255, 0, 0);
 
     Vector highlightedEdges = new Vector();
     Vector originalEdgeColor = new Vector();
@@ -983,13 +980,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
 	    originalNodeBorderColor.add(g.getBorderColor());
 	    if (g.isBorderDrawn()){
-		g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+		g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
 	    }
 	}
 	else {
 	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
 	    originalNodeBorderColor.add(g.getColor());
-	    g.setColor(HIGHLIGHT_BORDER_COLOR);
+	    g.setColor(ConfigManager.HIGHLIGHT_COLOR);
 	}
     }
 
@@ -997,14 +994,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	originalEdgeColor.add(g.getColor());
 	if (g instanceof ClosedShape){
 	    if (g.isFilled()){
-		g.setColor(HIGHLIGHT_BORDER_COLOR); // use border color to fill arrow head shape
+		g.setColor(ConfigManager.HIGHLIGHT_COLOR); // use border color to fill arrow head shape
 	    }
 	    if (g.isBorderDrawn()){
-		g.setBorderColor(HIGHLIGHT_BORDER_COLOR);
+		g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
 	    }
 	}
 	else {
-	    g.setColor(HIGHLIGHT_BORDER_COLOR);	    
+	    g.setColor(ConfigManager.HIGHLIGHT_COLOR);	    
 	}
     }
 
