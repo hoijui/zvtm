@@ -241,9 +241,26 @@ public class VirtualSpaceManager implements AWTEventListener {
 	activeView.mouse.setSync(mouseSync);
     }
     
-    /**set border color of glyphs overlapped by mouse (not propagated to existing glyphs)*/
+    /** Set border color of glyphs overlapped by mouse.
+     * Not propagated to existing glyphs.
+     *@see #setMouseInsideGlyphColor(Color c, boolean propagate)
+     */
     public void setMouseInsideGlyphColor(Color c){
-	mouseInsideColor=c;
+	setMouseInsideGlyphColor(c, false);
+    }
+
+
+    /** Set border color of glyphs overlapped by mouse.
+     *@param propagate propagate changes to existing glyphs
+     *@see #setMouseInsideGlyphColor(Color c)
+     */
+    public void setMouseInsideGlyphColor(Color c, boolean propagate){
+	mouseInsideColor = c;
+	if (propagate){
+	    for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
+		((Glyph)e.nextElement()).setMouseInsideHighlightColor(mouseInsideColor);
+	    }
+	}
     }
 
     /**add glyph g to virtual space whose name is vs
