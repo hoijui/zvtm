@@ -864,7 +864,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
 	Object o = null;
-	if (g != null){// clicked inside a node
+	if (g != null && g != boundingBox){// clicked inside a node
 	    o = g.getOwner();
 	}
 	else {
@@ -880,6 +880,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		if (otherGlyphs != null && otherGlyphs.size() > 0){
 		    g = (Glyph)otherGlyphs.firstElement();
 		    if (g.getOwner() != null){o = g.getOwner();}
+		}
+		else {// could not detect anything, consider that user clicked on background
+		    // unhighlight anything that could have been highlighted
+		    unhighlightAll();
 		}
 	    }
 	}
@@ -978,20 +982,20 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     void highlightNodeGlyph(Glyph g){
 	if (g instanceof ClosedShape){
 	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
-	    originalNodeBorderColor.add(g.getBorderColor());
+	    originalNodeBorderColor.add(((ClosedShape)g).getDefaultBorderColor());
 	    if (g.isBorderDrawn()){
 		g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
 	    }
 	}
 	else {
 	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
-	    originalNodeBorderColor.add(g.getColor());
+	    originalNodeBorderColor.add(g.getDefaultColor());
 	    g.setColor(ConfigManager.HIGHLIGHT_COLOR);
 	}
     }
 
     void highlightEdgeGlyph(Glyph g){
-	originalEdgeColor.add(g.getColor());
+	originalEdgeColor.add(g.getDefaultColor());
 	if (g instanceof ClosedShape){
 	    if (g.isFilled()){
 		g.setColor(ConfigManager.HIGHLIGHT_COLOR); // use border color to fill arrow head shape
