@@ -5,7 +5,7 @@
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- *   $Id: WebBrowser.java,v 1.2 2004/12/17 15:48:12 epietrig Exp $
+ *   $Id$
  */ 
 
 package net.claribole.zgrviewer;

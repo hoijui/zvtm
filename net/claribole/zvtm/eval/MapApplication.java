@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: MapApplication.java,v 1.1 2006/05/13 07:45:23 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

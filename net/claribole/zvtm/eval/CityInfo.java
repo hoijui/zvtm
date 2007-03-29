@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: CityInfo.java,v 1.1 2006/05/23 13:14:57 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: InstructionsPanel.java,v 1.5 2006/05/31 15:34:04 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

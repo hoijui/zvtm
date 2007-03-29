@@ -5,7 +5,7 @@
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- *   $Id: ZgrvEvtHdlr.java,v 1.16 2006/06/15 06:54:24 epietrig Exp $
+ *   $Id$
  */ 
 
 package net.claribole.zgrviewer;

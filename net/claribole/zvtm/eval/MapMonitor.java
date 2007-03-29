@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: MapMonitor.java,v 1.1 2006/04/05 14:52:30 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

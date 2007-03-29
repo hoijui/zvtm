@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: ViewPanel.java,v 1.30 2006/06/01 07:11:56 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

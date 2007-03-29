@@ -16,7 +16,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: VDiamondOrST.java,v 1.7 2006/03/17 17:45:23 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

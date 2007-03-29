@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  * 
- * $Id: MPDAppEventHandler.java,v 1.3 2005/09/03 11:53:40 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.mpd;

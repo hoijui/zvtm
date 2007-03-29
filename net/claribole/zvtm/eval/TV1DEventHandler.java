@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: TV1DEventHandler.java,v 1.2 2006/06/08 12:29:36 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

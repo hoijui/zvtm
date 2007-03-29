@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: Camera.java,v 1.14 2006/05/24 11:23:13 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

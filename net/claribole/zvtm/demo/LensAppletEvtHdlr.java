@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LensAppletEvtHdlr.java,v 1.5 2006/05/28 16:19:48 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.demo;

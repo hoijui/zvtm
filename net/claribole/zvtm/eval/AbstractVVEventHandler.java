@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AbstractVVEventHandler.java,v 1.6 2006/05/27 09:53:04 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

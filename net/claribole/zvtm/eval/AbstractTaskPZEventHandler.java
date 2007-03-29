@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AbstractTaskPZEventHandler.java,v 1.13 2006/06/06 09:00:33 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.eval;

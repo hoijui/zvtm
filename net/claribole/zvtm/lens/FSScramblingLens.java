@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FSScramblingLens.java,v 1.1 2005/12/09 15:56:11 epietrig Exp $
+ * $Id$
  */ 
 
 

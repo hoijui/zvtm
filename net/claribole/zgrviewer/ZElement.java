@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZElement.java,v 1.1 2005/01/10 14:21:34 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zgrviewer;

@@ -6,7 +6,7 @@
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: VRoundRect.java,v 1.8 2006/03/17 17:45:23 epietrig Exp $
+ * $Id$
  */ 
 
 package com.xerox.VTM.glyphs;

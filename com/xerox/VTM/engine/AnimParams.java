@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: AnimParams.java,v 1.5 2005/12/21 12:22:44 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

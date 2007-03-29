@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: GLEView.java,v 1.7 2006/06/14 15:02:06 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

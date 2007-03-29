@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: MotionListener.java,v 1.1 2005/01/31 16:57:55 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.engine;

@@ -3,7 +3,7 @@
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *
- * $Id:  $
+ * $Id$
  */
 
 package net.claribole.eval.to;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: InstructionsManager.java,v 1.3 2006/06/01 07:44:42 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

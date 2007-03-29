@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: CinematicInfo.java,v 1.4 2006/06/02 09:05:42 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

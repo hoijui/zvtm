@@ -4,7 +4,7 @@
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

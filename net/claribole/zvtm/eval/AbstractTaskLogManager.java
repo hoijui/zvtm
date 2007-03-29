@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AbstractTaskLogManager.java,v 1.35 2006/06/01 06:40:01 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.eval;

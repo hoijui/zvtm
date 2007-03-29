@@ -6,7 +6,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- *   $Id: ConfigManager.java,v 1.19 2005/10/21 09:08:53 epietrig Exp $
+ *   $Id$
  */ 
 
 package net.claribole.zgrviewer;

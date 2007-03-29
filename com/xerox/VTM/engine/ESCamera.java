@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ESCamera.java,v 1.2 2005/05/24 12:36:28 skbo Exp $
+ * $Id$
  */ 
 
 package com.xerox.VTM.engine;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Plugin.java,v 1.7 2005/06/02 11:11:38 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer;

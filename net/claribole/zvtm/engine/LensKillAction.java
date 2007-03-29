@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LensKillAction.java,v 1.1 2005/12/22 16:54:41 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.engine;

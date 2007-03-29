@@ -4,7 +4,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  * 
- * $Id: Graph.java,v 1.8 2005/10/13 14:34:46 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer.dot;

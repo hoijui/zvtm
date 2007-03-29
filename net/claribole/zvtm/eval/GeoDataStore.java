@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: GeoDataStore.java,v 1.24 2006/06/02 14:01:42 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

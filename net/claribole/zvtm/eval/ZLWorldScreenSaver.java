@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZLWorldScreenSaver.java,v 1.11 2006/04/11 11:37:19 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

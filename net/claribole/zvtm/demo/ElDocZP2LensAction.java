@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ElDocZP2LensAction.java,v 1.1 2006/06/14 14:02:08 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.demo;

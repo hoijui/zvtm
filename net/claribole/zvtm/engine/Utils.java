@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Utils.java,v 1.2 2006/03/09 08:21:13 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.engine;

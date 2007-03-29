@@ -4,7 +4,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  * 
- * $Id: Spline.java,v 1.4 2005/09/30 13:03:13 skbo Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer.dot;

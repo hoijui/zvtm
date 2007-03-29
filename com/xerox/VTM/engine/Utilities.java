@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: Utilities.java,v 1.10 2005/09/01 13:34:18 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

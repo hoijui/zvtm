@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ViewEventHandler.java,v 1.1 2006/05/26 13:47:17 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.engine;

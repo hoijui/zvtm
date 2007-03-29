@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: Glyph.java,v 1.19 2006/04/05 06:16:14 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LSegmentST.java,v 1.1 2005/12/20 18:23:00 epietrig Exp $
+ * $Id$
  */ 
 
 package com.xerox.VTM.glyphs;

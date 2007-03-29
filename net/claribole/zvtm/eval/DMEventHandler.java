@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: DMEventHandler.java,v 1.13 2006/05/26 14:51:48 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.eval;

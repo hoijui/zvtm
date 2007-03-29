@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: MultiLayerEvtHdlr.java,v 1.6 2006/05/28 16:19:47 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.demo;

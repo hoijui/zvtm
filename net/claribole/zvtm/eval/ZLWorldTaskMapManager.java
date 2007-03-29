@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZLWorldTaskMapManager.java,v 1.31 2006/05/14 15:23:13 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

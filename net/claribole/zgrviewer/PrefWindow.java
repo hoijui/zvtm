@@ -5,7 +5,7 @@
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- *   $Id: PrefWindow.java,v 1.12 2005/10/21 09:08:53 epietrig Exp $
+ *   $Id$
  */
 
 package net.claribole.zgrviewer;

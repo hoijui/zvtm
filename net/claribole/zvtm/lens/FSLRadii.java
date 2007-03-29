@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FSLRadii.java,v 1.6 2005/12/22 16:49:24 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.lens;

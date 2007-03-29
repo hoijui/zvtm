@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LInfFSLinearLens.java,v 1.5 2005/12/05 15:29:08 epietrig Exp $
+ * $Id$
  */ 
 
 

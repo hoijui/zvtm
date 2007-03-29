@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZLWorldZIP2CameraAction.java,v 1.1 2006/03/15 14:52:55 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

@@ -3,7 +3,7 @@
 AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
 Copyright (c) INRIA, 2004-2005. All Rights Reserved
 Licensed under the GNU LGPL. For full terms see the file COPYING.
-$Id: build.xml,v 1.17 2006/05/13 07:37:03 epietrig Exp $
+$Id$
 
 Usage:
 - build bytecode from source code: 'ant', or 'ant zvtmbuild'

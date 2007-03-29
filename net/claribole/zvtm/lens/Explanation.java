@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Explanation.java,v 1.1 2006/04/05 06:23:04 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.lens;

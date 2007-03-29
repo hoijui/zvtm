@@ -4,7 +4,7 @@
  *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- *   $Id:  $
+ *   $Id$
  */ 
 
 package net.claribole.zgrviewer;

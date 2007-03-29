@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: BRectangle.java,v 1.1 2006/05/30 07:18:04 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

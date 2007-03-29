@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FSInverseCosineLens.java,v 1.13 2005/12/09 15:53:48 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.lens;

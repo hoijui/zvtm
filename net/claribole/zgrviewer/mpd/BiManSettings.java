@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: BiManSettings.java,v 1.3 2005/05/31 07:03:56 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer.mpd;

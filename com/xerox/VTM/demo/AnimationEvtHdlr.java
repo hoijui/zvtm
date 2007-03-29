@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: AnimationEvtHdlr.java,v 1.5 2006/05/26 14:51:48 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.demo;

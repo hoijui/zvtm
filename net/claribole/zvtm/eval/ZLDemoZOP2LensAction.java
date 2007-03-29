@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZLDemoZOP2LensAction.java,v 1.2 2006/06/10 16:15:51 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

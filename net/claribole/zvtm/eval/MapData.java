@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: MapData.java,v 1.3 2006/04/05 06:26:55 epietrig Exp $
+ * $Id$
  */ 
 
 

@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: Introduction.java,v 1.17 2006/05/29 08:52:08 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.demo;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FixedSizeLens.java,v 1.22 2006/05/31 12:05:16 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.lens;

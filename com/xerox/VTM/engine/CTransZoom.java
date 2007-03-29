@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: CTransZoom.java,v 1.8 2006/05/03 13:57:28 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

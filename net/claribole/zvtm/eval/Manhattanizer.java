@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Manhattanizer.java,v 1.1 2006/06/15 07:39:47 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

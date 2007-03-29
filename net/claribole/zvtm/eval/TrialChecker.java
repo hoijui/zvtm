@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: TrialChecker.java,v 1.2 2006/06/04 14:23:17 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.eval;

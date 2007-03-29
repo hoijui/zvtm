@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: VirtualSpaceManager.java,v 1.40 2006/05/04 13:24:53 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

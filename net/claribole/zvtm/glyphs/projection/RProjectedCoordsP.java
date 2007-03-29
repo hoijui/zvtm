@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: RProjectedCoordsP.java,v 1.1 2005/12/05 15:22:33 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs.projection;

@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: SVGStyle.java,v 1.6 2005/10/20 14:39:59 epietrig Exp $
+ * $Id$
  */
 
 

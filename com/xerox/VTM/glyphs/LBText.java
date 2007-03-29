@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LBText.java,v 1.1 2006/05/29 07:56:55 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

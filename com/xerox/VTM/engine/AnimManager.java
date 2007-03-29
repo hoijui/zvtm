@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: AnimManager.java,v 1.35 2006/06/15 07:29:00 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

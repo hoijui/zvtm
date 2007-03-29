@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: TrialSeriesGenerator.java,v 1.7 2006/05/26 12:41:24 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

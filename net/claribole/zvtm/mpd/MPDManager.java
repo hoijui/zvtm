@@ -4,7 +4,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  * 
- * $Id: MPDManager.java,v 1.12 2005/06/03 12:58:31 skbo Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.mpd;

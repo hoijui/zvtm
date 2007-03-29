@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AbstractTrajectoryPlayer2D.java,v 1.7 2006/06/02 12:17:21 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

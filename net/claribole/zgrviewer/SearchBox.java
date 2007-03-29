@@ -5,7 +5,7 @@
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- *   $Id: SearchBox.java,v 1.6 2006/01/13 10:36:00 epietrig Exp $
+ *   $Id$
  */
 
 package net.claribole.zgrviewer;

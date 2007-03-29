@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: SVGWriter.java,v 1.11 2005/12/05 16:16:24 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.svg;

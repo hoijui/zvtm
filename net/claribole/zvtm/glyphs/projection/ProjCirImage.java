@@ -16,7 +16,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: ProjCirImage.java,v 1.3 2005/12/08 09:08:21 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs.projection;

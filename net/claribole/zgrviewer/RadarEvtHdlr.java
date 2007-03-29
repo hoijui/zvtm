@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: RadarEvtHdlr.java,v 1.5 2006/05/28 16:19:48 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zgrviewer;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Console.java,v 1.8 2006/04/07 14:32:49 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: View.java,v 1.31 2006/06/01 07:56:30 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

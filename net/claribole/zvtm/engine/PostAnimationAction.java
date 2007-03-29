@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: PostAnimationAction.java,v 1.1 2005/12/21 12:24:31 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.engine;

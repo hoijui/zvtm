@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: IntroPanel.java,v 1.7 2006/04/05 06:21:57 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.demo;

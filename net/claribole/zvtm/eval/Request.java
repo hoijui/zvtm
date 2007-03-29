@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Request.java,v 1.2 2006/03/13 15:52:24 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

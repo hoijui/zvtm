@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: CallBox.java,v 1.3 2005/10/12 13:33:26 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer;

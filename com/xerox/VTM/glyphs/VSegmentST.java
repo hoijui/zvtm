@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: VSegmentST.java,v 1.1 2006/05/16 16:47:47 epietrig Exp $
+ * $Id$
  */ 
 
 

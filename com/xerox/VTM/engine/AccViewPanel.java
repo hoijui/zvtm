@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: AccViewPanel.java,v 1.13 2006/06/01 07:11:56 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

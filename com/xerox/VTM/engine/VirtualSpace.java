@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: VirtualSpace.java,v 1.15 2006/03/29 15:08:01 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

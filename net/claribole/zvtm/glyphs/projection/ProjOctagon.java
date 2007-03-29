@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: ProjOctagon.java,v 1.3 2005/12/05 15:21:15 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs.projection;

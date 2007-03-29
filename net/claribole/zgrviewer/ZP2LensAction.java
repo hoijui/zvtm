@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZP2LensAction.java,v 1.1 2006/06/14 13:23:21 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zgrviewer;

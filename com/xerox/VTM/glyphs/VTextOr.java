@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: VTextOr.java,v 1.7 2005/12/08 09:08:21 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

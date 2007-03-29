@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FractalDemo.java,v 1.3 2006/05/26 14:51:48 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.demo;

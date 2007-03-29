@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZNode.java,v 1.2 2005/05/24 12:36:29 skbo Exp $
+ * $Id$
  */ 
 
 package net.claribole.zgrviewer;

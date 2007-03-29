@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LocateTask2.java,v 1.15 2006/06/08 12:36:23 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

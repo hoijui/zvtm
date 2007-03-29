@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: PrintWindow.java,v 1.3 2005/12/05 14:31:39 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer;

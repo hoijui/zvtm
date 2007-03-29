@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: SVGReader.java,v 1.11 2005/09/24 15:55:40 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.svg;

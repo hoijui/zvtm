@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LMaximumMagnification.java,v 1.7 2006/04/11 06:45:58 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.lens;

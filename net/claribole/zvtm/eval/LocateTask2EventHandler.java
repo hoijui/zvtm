@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LocateTask2EventHandler.java,v 1.6 2006/06/03 11:22:31 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.eval;

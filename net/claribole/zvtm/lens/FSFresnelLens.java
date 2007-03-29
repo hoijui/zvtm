@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FSFresnelLens.java,v 1.12 2005/12/09 15:49:11 epietrig Exp $
+ * $Id$
  */ 
 
 

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: VSliceST.java,v 1.3 2006/03/17 17:45:23 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

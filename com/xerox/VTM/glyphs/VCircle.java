@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id: VCircle.java,v 1.8 2006/01/16 08:37:14 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.glyphs;

@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AnimChoreographer.java,v 1.5 2005/12/21 12:22:44 epietrig Exp $
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

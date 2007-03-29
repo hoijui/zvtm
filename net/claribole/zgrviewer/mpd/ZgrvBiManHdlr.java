@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZgrvBiManHdlr.java,v 1.3 2005/06/02 14:01:02 skbo Exp $
+ * $Id$
  */
 
 package net.claribole.zgrviewer.mpd;

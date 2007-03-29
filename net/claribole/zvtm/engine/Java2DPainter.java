@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Java2DPainter.java,v 1.2 2006/03/04 15:04:07 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.engine;
