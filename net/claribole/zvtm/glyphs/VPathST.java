@@ -1,5 +1,5 @@
 /*   FILE: AnimationDemo.java
- *   DATE OF CREATION:   Thu Mar 22 17:20:34 2007
+ *   DATE OF CREATION:   Thu Mar 29 14:30:34 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
