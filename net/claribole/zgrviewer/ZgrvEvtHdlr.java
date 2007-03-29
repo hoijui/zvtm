@@ -357,10 +357,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (!application.grMngr.tp.isHighlightMode()){// node highlighting is taken care of
-	    g.highlight(true, null);                  // elsewhere when in highlight mode
-	}
 	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){// interacting with pie menu
+	    g.highlight(true, null);
 	    VirtualSpace vs = grMngr.vsm.getVirtualSpace(grMngr.menuSpace);
 	    vs.onTop(g);
 	    int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
@@ -378,6 +376,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    if (grMngr.tp.isHighlightMode()){
 		grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
 	    }
+	    else {// node highlighting is taken care of above (in a slightly different manner)
+		g.highlight(true, null);
+	    }
 	}
     }
 
@@ -387,10 +388,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    return;
 	}
 	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (!application.grMngr.tp.isHighlightMode()){// node highlighting is taken care of
-	    g.highlight(false, null);                 // elsewhere when in highlight mode
-	}
 	if (grMngr.vsm.getActiveView().getActiveLayer() == 1){
+	    g.highlight(false, null);
 	    if (application.mainPieMenu != null && g == application.mainPieMenu.getBoundary()){
 		Glyph lge = grMngr.vsm.getActiveView().mouse.lastGlyphEntered;
 		if (lge != null && lge.getType() == Messages.PM_SUBMN){
@@ -404,7 +403,12 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    }
 	}
 	else {
-	    grMngr.unhighlightAll();
+	    if (application.grMngr.tp.isHighlightMode()){
+		grMngr.unhighlightAll();
+	    }
+	    else {// node highlighting is taken care of above (in a slightly different manner)
+		g.highlight(false, null);
+	    }
 	}
     }
 
