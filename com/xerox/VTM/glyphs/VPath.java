@@ -40,12 +40,12 @@ import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 /**
  * General path: made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. Can neither be resized nor reoriented (for now). This glyph does not follow the standard object model: (vx,vy) are the coordinates of the path's first point. VPaths do not fire cursor entry/exit events, but it is possible to detect that a cursor is overlapping a VPath by explicitely calling VCursor.interesctsPath(VPath p) and related methods.
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VPath
+ *@see net.claribole.zvtm.glyphs.VPathST
  *@see com.xerox.VTM.glyphs.VQdCurve
  *@see com.xerox.VTM.glyphs.VCbCurve
  *@see com.xerox.VTM.glyphs.VSegment
  *@see com.xerox.VTM.engine.VCursor#intersectsVPath(VPath p)
- **/
+ */
 
 public class VPath extends Glyph {
 
@@ -83,11 +83,14 @@ public class VPath extends Glyph {
 	else return null;
     }
     
-    AffineTransform at;
+    /** For internal use. Dot not tamper with. Made public for outside package subclassing. */
+    public AffineTransform at;
     
-    ProjectedCoords[] pc;
+    /** For internal use. Dot not tamper with. Made public for outside package subclassing. */
+    public ProjectedCoords[] pc;
     
-    GeneralPath path;
+    /** For internal use. Dot not tamper with. Made public for outside package subclassing. */
+    public GeneralPath path;
     
     LongPoint lp;  //last point
     
@@ -417,6 +420,7 @@ public class VPath extends Glyph {
     /** Get the underlying Java2D General Path used for actual drawing. */
     public GeneralPath getJava2DGeneralPath(){return path;}
 
+    /** Not implemented yet. */
     public Object clone(){
 	VPath res=new VPath();
 	res.mouseInsideColor=this.mouseInsideColor;
