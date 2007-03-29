@@ -1053,4 +1053,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	originalEdgeColor.removeAllElements();
     }
 
+    /* ----------- Fresnel Highlighting ------------- */
+
+    void enterFresnelMode(){
+	System.out.println("Entering Fresnel Mode");
+    }
+
+    void exitFresnelMode(){
+	System.out.println("Exiting Fresnel Mode");
+    }
+    
 }

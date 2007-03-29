@@ -35,20 +35,23 @@ public class ToolPalette {
     static final short PL_NAV_MODE = 3;
     static final short ML_NAV_MODE = 4;
     static final short HIGHLIGHT_MODE = 5;
+    static final short FRESNEL_MODE = 6;
 
     static final String[] ICON_PATHS = {"/images/zgrv/stdnav24b.png",
 					"/images/zgrv/flnav24b.png",
 					"/images/zgrv/dmnav24b.png",
 					"/images/zgrv/plnav24b.png",
 					"/images/zgrv/mlnav24b.png",
-					"/images/zgrv/hl24b.png"};
+					"/images/zgrv/hl24b.png",
+					"/images/zgrv/fl24b.png"};
 
     static final String[] SELECTED_ICON_PATHS = {"/images/zgrv/stdnav24g.png",
 						 "/images/zgrv/flnav24g.png",
 						 "/images/zgrv/dmnav24g.png",
 						 "/images/zgrv/plnav24g.png",
 						 "/images/zgrv/mlnav24g.png",
-						 "/images/zgrv/hl24g.png"};
+						 "/images/zgrv/hl24g.png",
+						 "/images/zgrv/fl24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
@@ -110,6 +113,10 @@ public class ToolPalette {
 	return selectedIconIndex == HIGHLIGHT_MODE;
     }
 
+    boolean isFresnelMode(){
+	return selectedIconIndex == FRESNEL_MODE;
+    }
+
     void selectButton(VImage icon){
 	boolean newIconSelected = false;
 	int oldSelectedIconIndex = selectedIconIndex;
@@ -132,6 +139,12 @@ public class ToolPalette {
 	    }
 	    if (oldSelectedIconIndex == DM_NAV_MODE){
 		grMngr.killDM();
+	    }
+	    else if (oldSelectedIconIndex == FRESNEL_MODE){
+		grMngr.exitFresnelMode();
+	    }
+	    if (selectedIconIndex == FRESNEL_MODE){
+		grMngr.enterFresnelMode();
 	    }
 	}
     }
@@ -195,21 +208,25 @@ public class ToolPalette {
     }
 
     void showLogicalTools(){
-	if (!buttons[5].isSensitive()){buttons[5].setSensitivity(true);}
-	if (!buttons[5].isVisible()){buttons[5].setVisible(true);}
-	if (!selectedButtons[5].isSensitive()){selectedButtons[5].setSensitivity(true);}
-	if (!selectedButtons[5].isVisible()){selectedButtons[5].setVisible(true);}
+	for (int i=5;i<=6;i++){
+	    if (!buttons[i].isSensitive()){buttons[i].setSensitivity(true);}
+	    if (!buttons[i].isVisible()){buttons[i].setVisible(true);}
+	    if (!selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(true);}
+	    if (!selectedButtons[i].isVisible()){selectedButtons[i].setVisible(true);}
+	}
     }
 
     void hideLogicalTools(){
-	if (isHighlightMode()){// if a logical tool is selected,
+	if (isHighlightMode() || isFresnelMode()){// if a logical tool is selected,
 	    // select something else as they are about to be disabled
 	    selectButton(buttons[0]);
 	}
-	if (buttons[5].isSensitive()){buttons[5].setSensitivity(false);}
-	if (buttons[5].isVisible()){buttons[5].setVisible(false);}
-	if (selectedButtons[5].isSensitive()){selectedButtons[5].setSensitivity(false);}
-	if (selectedButtons[5].isVisible()){selectedButtons[5].setVisible(false);}
+	for (int i=5;i<=6;i++){
+	    if (buttons[i].isSensitive()){buttons[i].setSensitivity(false);}
+	    if (buttons[i].isVisible()){buttons[i].setVisible(false);}
+	    if (selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(false);}
+	    if (selectedButtons[i].isVisible()){selectedButtons[i].setVisible(false);}
+	}
     }
     
 }
