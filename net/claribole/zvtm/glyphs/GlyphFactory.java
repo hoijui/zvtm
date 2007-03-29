@@ -5,7 +5,7 @@
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * $Id: GlyphFactory.java,v 1.7 2005/12/05 14:31:04 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs;

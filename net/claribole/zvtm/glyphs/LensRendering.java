@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2006. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LensRendering.java,v 1.1 2006/05/29 07:29:11 epietrig Exp $
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs;

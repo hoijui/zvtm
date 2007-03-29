@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: PieMenu.java,v 1.9 2005/12/22 17:51:53 epietrig Exp $
+ * $Id$
  */ 
 
 package net.claribole.zvtm.glyphs;
