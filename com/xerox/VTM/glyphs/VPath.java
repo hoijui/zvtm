@@ -373,41 +373,44 @@ public class VPath extends Glyph {
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
-	boolean res;
-	if (forcedDrawing){res=true;}
+	if (forcedDrawing){return true;}
 	else {
 	    if ((realHotSpot.x>=wb) && (realHotSpot.x<=eb) && (realHotSpot.y>=sb) && (realHotSpot.y<=nb)){
 		// if glyph hotspot is in the region, it is obviously visible
-		res=true;
+		return true;
 	    }
-	    else {
-		if (((realHotSpot.x-drawingRadius)<=eb) && ((realHotSpot.x+drawingRadius)>=wb)
-		    && ((realHotSpot.y-drawingRadius)<=nb) && ((realHotSpot.y+drawingRadius)>=sb)){
-		    // if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-		    res=true; // glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-		}
-		else res=false; // otherwise the glyph is not visible
+	    else {// if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning 
+		//   that some glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+		return (((realHotSpot.x-drawingRadius)<=eb) && ((realHotSpot.x+drawingRadius)>=wb)
+			&& ((realHotSpot.y-drawingRadius)<=nb) && ((realHotSpot.y+drawingRadius)>=sb));
 	    }
 	}
-	return res;
     }
 
     public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
-	boolean res;
 	if (forcedDrawing){return true;}
-	else if ((realHotSpot.x>=wb) && (realHotSpot.x<=eb) && (realHotSpot.y>=sb) && (realHotSpot.y<=nb)
-		 && ((realHotSpot.x+drawingRadius)<=eb) && ((realHotSpot.x-drawingRadius)>=wb)
-		 && ((realHotSpot.y+drawingRadius)<=nb) && ((realHotSpot.y-drawingRadius)>=sb)){
-	    return true;
+	else {
+	    return ((realHotSpot.x >= wb) && (realHotSpot.x <= eb) &&
+		    (realHotSpot.y >= sb) && (realHotSpot.y <= nb)
+		    && ((realHotSpot.x+drawingRadius) <= eb) && ((realHotSpot.x-drawingRadius) >= wb)
+		    && ((realHotSpot.y+drawingRadius) <= nb) && ((realHotSpot.y-drawingRadius) >= sb));
 	}
-	return false;
     }
 
 
-    /** Sets a threshold below which the pass should be drawn. Default is 1.5.
+    /** Set the threshold below which the path should be drawn. Default is 1.2.
      *@see #setForcedDrawing(boolean b)
+     *@see #getDrawingFactor()
      */
     public void setDrawingFactor(float f){drawingFactor=f;}
+
+    /** Get the threshold below which the path should be drawn. Default is 1.2.
+     *@see #setDrawingFactor(float f)
+     *@see #setForcedDrawing(boolean b)
+     */
+    public float getDrawingFactor(){
+	return drawingFactor;
+    }
 
     /** Force drawing of path, even if not visible. The algorithm in charge of detecting whether a glyph should be drawn or not is not completely reliable for weird paths.<br>Default is false. Use only if absolutely sure that your path is not displayed whereas it should be. Also try increasing drawing factor before resorting to forced drawing.
      *@see #setDrawingFactor(float f)
