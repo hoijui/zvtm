@@ -14,17 +14,23 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.Dimension;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.QuadCurve2D;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.AlphaComposite;
+
+import java.util.Arrays;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VPath;
-import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 
 /**
  * Dynamic Path.
@@ -39,51 +45,176 @@ import net.claribole.zvtm.lens.Lens;
  */
 
 public class DPath extends Glyph {
-
-    /** For internal use. Dot not tamper with. Made public for outside package subclassing. */
+    
+    /** For internal use. Dot not tamper with. Made public for outside package subclassing. Stores projected start point only. */
     public ProjectedCoords[] pc;
+
+    PathElement[] elements;
+
+    /* vx,vy are the coordinates of the path's start point */
+    /* endPoint contains the coordinates of the last element's endpoint */
+    LongPoint endPoint;
+    /* centerPoint contains the coordinates of the point half way on 
+       the virtual line linking the path's start point and end point. */
+    LongPoint centerPoint;
+    
+    /* Variables used to determine and control the path clipping/drawing */
+    float drawingRadius;
+    float drawingFactor = 1.2f;
+    boolean forcedDrawing = false;
+
+    public DPath(){
+	vx = 0;
+	vy = 0;
+	vz = 0;
+	endPoint = new LongPoint(vx, vy);
+	centerPoint = new LongPoint(vx, vy);
+	elements = new PathElement[0];
+	sensit = false;
+	setColor(Color.BLACK);
+    }
+
+    public DPath(long x, long y, float z, Color c){
+	vx = x;
+	vy = y;
+	vz = z;
+	endPoint = new LongPoint(vx, vy);
+	centerPoint = new LongPoint(vx, vy);
+	elements = new PathElement[0];
+	sensit = false;
+	setColor(c);
+    }
+
+    /** Add a new quadratic curve to the path, from current point to point (x,y), controlled by (x1,y1)
+     *@param x x coordinate of end point in virtual space
+     *@param y y coordinate of end point in virtual space
+     *@param x1 x coordinate of 1st control point in virtual space
+     *@param y1 y coordinate of 1st control point in virtual space
+     *@param x2 x coordinate of 2nd control point in virtual space
+     *@param y2 y coordinate of 2nd control point in virtual space
+     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+     */
+    public void addCbCurve(long x, long y, long x1, long y1, long x2, long y2, boolean abs){
+	CBCElement e;
+	if (abs){
+	    e = new CBCElement(x, y, x1, y1, x2, y2);
+	    endPoint.setLocation(x, y);
+	}
+	else {
+	    e = new CBCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, endPoint.x+x2, endPoint.y+y2);
+	    endPoint.translate(x, y);
+	}
+	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
+	PathElement[] tmp = new PathElement[elements.length+1];
+	System.arraycopy(elements, 0, tmp, 0, elements.length);
+	tmp[elements.length] = e;
+	Arrays.fill(elements, null);
+	elements = tmp;
+	computeSize();
+    }
+
+    /** Add a new quadratic curve to the path, from current point to point (x,y), controlled by (x1,y1)
+     *@param x x coordinate of end point in virtual space
+     *@param y y coordinate of end point in virtual space
+     *@param x1 x coordinate of control point in virtual space
+     *@param y1 y coordinate of control point in virtual space
+     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+     */
+    public void addQdCurve(long x, long y, long x1, long y1, boolean abs){
+	QDCElement e;
+	if (abs){
+	    e = new QDCElement(x, y, x1, y1);
+	    endPoint.setLocation(x, y);
+	}
+	else {
+	    e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1);
+	    endPoint.translate(x, y);
+	}
+	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
+	PathElement[] tmp = new PathElement[elements.length+1];
+	System.arraycopy(elements, 0, tmp, 0, elements.length);
+	tmp[elements.length] = e;
+	Arrays.fill(elements, null);
+	elements = tmp;
+	computeSize();
+    }
+
+    /** Add a new segment to the path, from current point to point (x,y).
+     *@param x x coordinate of end point in virtual space
+     *@param y y coordinate of end point in virtual space
+     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+     */
+    public void addSegment(long x, long y, boolean abs){
+	if (abs){endPoint.setLocation(x, y);}
+	else {endPoint.translate(x, y);}
+	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
+	PathElement[] tmp = new PathElement[elements.length+1];
+	System.arraycopy(elements, 0, tmp, 0, elements.length);
+	tmp[elements.length] = new SEGElement(endPoint.x, endPoint.y);
+	Arrays.fill(elements, null);
+	elements = tmp;
+	computeSize();
+    }
+
+    /** Add a new 'gap' to the path (move without drawing anything), from current point to point (x,y).
+     *@param x x coordinate of end point in virtual space
+     *@param y y coordinate of end point in virtual space
+     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+     */
+    public void jump(long x, long y, boolean abs){
+	if (abs){endPoint.setLocation(x, y);}
+	else {endPoint.translate(x, y);}
+	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
+	PathElement[] tmp = new PathElement[elements.length+1];
+	System.arraycopy(elements, 0, tmp, 0, elements.length);
+	tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y);
+	Arrays.fill(elements, null);
+	elements = tmp;
+	computeSize();
+    }
 
     public void initCams(int nbCam){
 	pc = new ProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
 	    pc[i] = new ProjectedCoords();
 	}
+	for (int i=0;i<elements.length;i++){
+	    elements[i].initCams(nbCam);
+	}
     }
 
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
+	if (pc != null){
+	    if (verifIndex == pc.length){
 		ProjectedCoords[] ta = pc;
 		pc = new ProjectedCoords[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i] = ta[i];
-		}
+		System.arraycopy(ta, 0, pc, 0, ta.length);
 		pc[pc.length-1] = new ProjectedCoords();
 	    }
 	    else {System.err.println("VPath:Error while adding camera "+verifIndex);}
 	}
 	else {
-	    if (verifIndex==0){
+	    if (verifIndex == 0){
 		pc = new ProjectedCoords[1];
 		pc[0] = new ProjectedCoords();
 	    }
 	    else {System.err.println("VPath:Error while adding camera "+verifIndex);}
 	}
-    }
-
-    public void removeCamera(int index){
-	pc[index] = null;
-    }
-
-    public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
+	for (int i=0;i<elements.length;i++){
+	    elements[i].addCamera(verifIndex);
 	}
     }
 
-    public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn = false;}
+    public void removeCamera(int index){
+ 	pc[index] = null;
+	for (int i=0;i<elements.length;i++){
+	    elements[i].removeCamera(index);
+	}
     }
+
+    public void resetMouseIn(){}
+
+    public void resetMouseIn(int i){}
     
     public void sizeTo(float factor){}
 
@@ -93,6 +224,11 @@ public class DPath extends Glyph {
 
     public float getSize(){
 	return size;
+    }
+
+    void computeSize(){
+	size = (float)Math.sqrt(Math.pow((endPoint.x-vx)/2, 2) + Math.pow((endPoint.y-vy)/2, 2));
+	drawingRadius = size * drawingFactor;
     }
 
     public float getOrient(){return orient;}
@@ -108,27 +244,119 @@ public class DPath extends Glyph {
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
+    
+    int hw, hh, lhw, lhh;
 
     public void project(Camera c, Dimension d){
 	int i = c.getIndex();
 	coef = (float)(c.focal / (c.focal+c.altitude));
-	pc[i].cx = (d.width/2) + Math.round((-c.posx)*coef);
-	pc[i].cy = (d.height/2) - Math.round((-c.posy)*coef);
+	hw = d.width/2;
+	hh = d.height/2;
+	pc[i].cx = hw + Math.round((vx-c.posx)*coef);
+	pc[i].cy = hh - Math.round((vy-c.posy)*coef);
+	if (elements.length == 0){return;}
+	elements[0].project(i, hw, hh, c, coef, pc[i].cx, pc[i].cy);
+	for (int j=1;j<elements.length;j++){
+	    elements[j].project(i, hw, hh, c, coef, elements[j-1].getX(i), elements[j-1].getY(i));
+	}
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
 	int i = c.getIndex();
 	coef = (float)(c.focal / (c.focal+c.altitude)) * lensMag;
-	pc[i].lcx = (lensWidth/2) + Math.round((-lensx)*coef);
-	pc[i].lcy = (lensHeight/2) - Math.round((-lensy)*coef);
+	lhw = lensWidth/2;
+	lhh = lensHeight/2;
+	pc[i].lcx = lhw + Math.round((vx-(lensx))*coef);
+	pc[i].lcy = lhh - Math.round((vy-(lensy))*coef);
+	if (elements.length == 0){return;}
+	elements[0].projectForLens(i, lhw, lhh, lensx, lensy, coef, pc[i].lcx, pc[i].lcy);
+	for (int j=1;j<elements.length;j++){
+	    elements[j].projectForLens(i, lhw, lhh, lensx, lensy, coef, elements[j-1].getlX(i), elements[j-1].getlY(i));
+	}
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-
+	g.setColor(this.color);
+	if (stroke!=null) {
+	    g.setStroke(stroke);
+	    g.translate(dx,dy);
+	    for (int j=0;j<elements.length;j++){
+		if (elements[j].type == PathElement.MOV){continue;}
+		g.draw(elements[j].getShape(i));
+	    }
+	    g.translate(-dx,-dy);
+	    g.setStroke(stdS);
+	}
+	else {
+	    g.translate(dx,dy);
+	    for (int j=0;j<elements.length;j++){
+		if (elements[j].type == PathElement.MOV){continue;}
+		g.draw(elements[j].getShape(i));
+	    }
+	    g.translate(-dx,-dy);
+	}
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	g.setColor(this.color);
+	if (stroke!=null) {
+	    g.setStroke(stroke);
+	    g.translate(dx,dy);
+	    for (int j=0;j<elements.length;j++){
+		if (elements[j].type == PathElement.MOV){continue;}
+		g.draw(elements[j].getlShape(i));
+	    }
+	    g.translate(-dx,-dy);
+	    g.setStroke(stdS);
+	}
+	else {
+	    g.translate(dx,dy);
+	    for (int j=0;j<elements.length;j++){
+		if (elements[j].type == PathElement.MOV){continue;}
+		g.draw(elements[j].getlShape(i));
+	    }
+	    g.translate(-dx,-dy);
+	}
+    }
 
+    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+	if (forcedDrawing){return true;}
+	else {
+	    if ((centerPoint.x >= wb) && (centerPoint.x <= eb)
+		&& (centerPoint.y >= sb) && (centerPoint.y <= nb)){
+		// if glyph hotspot is in the region, we consider it is visible
+		return true;
+	    }
+	    else {// if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning 
+		//   that some glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+		return (((centerPoint.x-drawingRadius) <= eb) && ((centerPoint.x+drawingRadius) >= wb)
+			&& ((centerPoint.y-drawingRadius) <= nb) && ((centerPoint.y+drawingRadius) >= sb));
+	    }
+	}
+    }
+
+    public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
+	if (forcedDrawing){return true;}
+	else {
+	    return ((centerPoint.x >= wb) && (centerPoint.x <= eb) &&
+		    (centerPoint.y >= sb) && (centerPoint.y <= nb)
+		    && ((centerPoint.x+drawingRadius) <= eb) && ((centerPoint.x-drawingRadius) >= wb)
+		    && ((centerPoint.y+drawingRadius) <= nb) && ((centerPoint.y-drawingRadius) >= sb));
+	}
+    }
+
+    /** Sets a threshold below which the pass should be drawn. Default is 1.5.
+     *@see #setForcedDrawing(boolean b)
+     */
+    public void setDrawingFactor(float f){
+	drawingFactor = f;
+    }
+
+    /** Force drawing of path, even if not visible. The algorithm in charge of detecting whether a glyph should be drawn or not is not completely reliable for weird paths.<br>Default is false. Use only if absolutely sure that your path is not displayed whereas it should be. Also try increasing drawing factor before resorting to forced drawing.
+     *@see #setDrawingFactor(float f)
+     */
+    public void setForcedDrawing(boolean b){
+	forcedDrawing = b;
     }
 
     /** Not implemented yet. */
@@ -137,5 +365,407 @@ public class DPath extends Glyph {
     }
 
     public void highlight(boolean b, Color selectedColor){}
+
+}
+
+abstract class PathElement {
+
+    static final short MOV = 0;
+    static final short SEG = 1;
+    static final short QDC = 2;
+    static final short CBC = 3;
+    short type;
+
+    long x;
+    long y;
+
+    abstract void initCams(int nbCam);
+
+    abstract void addCamera(int verifIndex);
+
+    abstract void removeCamera(int index);
+    
+    abstract void project(int i, int hw, int hh, Camera c, float coef, double px, double py);
+
+    abstract void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py);
+
+    abstract double getX(int i);
+
+    abstract double getY(int i);
+
+    abstract double getlX(int i);
+
+    abstract double getlY(int i);
+
+    abstract Shape getShape(int i);
+
+    abstract Shape getlShape(int i);
+
+}
+
+class MOVElement extends PathElement {
+
+    /* Move from previous point to (x,y) in virtual space
+       without drawing anything */
+
+    Point2D[] pc;
+    Point2D[] lpc;
+
+    MOVElement(long x, long y){
+	type = MOV;
+	this.x = x;
+	this.y = y;
+    }
+    
+    void initCams(int nbCam){
+	pc = new Point2D[nbCam];
+	lpc = new Point2D[nbCam];
+	for (int i=0;i<nbCam;i++){
+	    pc[i] = new Point2D.Double();
+	    lpc[i] = new Point2D.Double();
+	}
+    }
+
+    void addCamera(int verifIndex){
+	if (pc != null){
+	    if (verifIndex == pc.length){
+		Point2D[] ta = pc;
+		pc = new Point2D[ta.length+1];
+		System.arraycopy(ta, 0, pc, 0, ta.length);
+		pc[pc.length-1] = new Point2D.Double();
+		ta = lpc;
+		lpc = new Point2D[ta.length+1];
+		System.arraycopy(ta, 0, lpc, 0, ta.length);
+		lpc[lpc.length-1] = new Point2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+	else {
+	    if (verifIndex == 0){
+		pc = new Point2D[1];
+		pc[0] = new Point2D.Double();
+		lpc = new Point2D[1];
+		lpc[0] = new Point2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+    }
+
+    void removeCamera(int index){
+ 	pc[index] = null;
+ 	lpc[index] = null;
+    }
+
+    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+	pc[i].setLocation(hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+    }
+
+    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+	lpc[i].setLocation(hw+(x-lx)*coef, hh-(y-ly)*coef);
+    }
+
+    double getX(int i){
+	return pc[i].getX();
+    }
+
+    double getY(int i){
+	return pc[i].getY();
+    }
+
+    double getlX(int i){
+	return lpc[i].getX();
+    }
+
+    double getlY(int i){
+	return lpc[i].getY();
+    }
+
+    Shape getShape(int i){
+	return null;
+    }
+
+    Shape getlShape(int i){
+	return null;
+    }
+
+}
+
+class SEGElement extends PathElement {
+    
+    /* Draw a segment from previous point to (x,y) in virtual space */
+
+    Line2D[] pc;
+    Line2D[] lpc;
+    
+    SEGElement(long x, long y){
+	type = SEG;
+	this.x = x;
+	this.y = y;
+    }
+
+    void initCams(int nbCam){
+	pc = new Line2D[nbCam];
+	lpc = new Line2D[nbCam];
+	for (int i=0;i<nbCam;i++){
+	    pc[i] = new Line2D.Double();
+	    lpc[i] = new Line2D.Double();
+	}
+    }
+
+    void addCamera(int verifIndex){
+	if (pc != null){
+	    if (verifIndex == pc.length){
+		Line2D[] ta = pc;
+		pc = new Line2D[ta.length+1];
+		System.arraycopy(ta, 0, pc, 0, ta.length);
+		pc[pc.length-1] = new Line2D.Double();
+		ta = lpc;
+		lpc = new Line2D[ta.length+1];
+		System.arraycopy(ta, 0, lpc, 0, ta.length);
+		lpc[lpc.length-1] = new Line2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+	else {
+	    if (verifIndex == 0){
+		pc = new Line2D[1];
+		pc[0] = new Line2D.Double();
+		lpc = new Line2D[1];
+		lpc[0] = new Line2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+    }
+
+    void removeCamera(int index){
+ 	pc[index] = null;
+ 	lpc[index] = null;
+    }
+
+    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+	pc[i].setLine(px, py, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+    }
+
+    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+	lpc[i].setLine(px, py, hw+(x-lx)*coef, hh-(y-ly)*coef);
+    }
+
+    double getX(int i){
+	return pc[i].getX2();
+    }
+
+    double getY(int i){
+	return pc[i].getY2();
+    }
+
+    double getlX(int i){
+	return lpc[i].getX2();
+    }
+
+    double getlY(int i){
+	return lpc[i].getY2();
+    }
+
+    Shape getShape(int i){
+	return pc[i];
+    }
+
+    Shape getlShape(int i){
+	return lpc[i];
+    }
+
+}
+
+class QDCElement extends PathElement {
+
+    /* Draw a quadratic curve from previous point to (x,y) in virtual space,
+       controlled by point (ctrlx, ctrly) */
+
+    long ctrlx;
+    long ctrly;
+
+    QuadCurve2D[] pc;
+    QuadCurve2D[] lpc;
+
+    QDCElement(long x, long y, long ctrlx, long ctrly){
+	type = QDC;
+	this.x = x;
+	this.y = y;
+	this.ctrlx = ctrlx;
+	this.ctrly = ctrly;
+    }
+
+    void initCams(int nbCam){
+	pc = new QuadCurve2D[nbCam];
+	lpc = new QuadCurve2D[nbCam];
+	for (int i=0;i<nbCam;i++){
+	    pc[i] = new QuadCurve2D.Double();
+	    lpc[i] = new QuadCurve2D.Double();
+	}
+    }
+
+    void addCamera(int verifIndex){
+	if (pc != null){
+	    if (verifIndex == pc.length){
+		QuadCurve2D[] ta = pc;
+		pc = new QuadCurve2D[ta.length+1];
+		System.arraycopy(ta, 0, pc, 0, ta.length);
+		pc[pc.length-1] = new QuadCurve2D.Double();
+		ta = lpc;
+		lpc = new QuadCurve2D[ta.length+1];
+		System.arraycopy(ta, 0, lpc, 0, ta.length);
+		lpc[lpc.length-1] = new QuadCurve2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+	else {
+	    if (verifIndex == 0){
+		pc = new QuadCurve2D[1];
+		pc[0] = new QuadCurve2D.Double();
+		lpc = new QuadCurve2D[1];
+		lpc[0] = new QuadCurve2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+    }
+
+    void removeCamera(int index){
+ 	pc[index] = null;
+ 	lpc[index] = null;
+    }
+    
+    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+	pc[i].setCurve(px, py, hw+(ctrlx-c.posx)*coef, hh-(ctrly-c.posy)*coef, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+    }
+
+    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+	lpc[i].setCurve(px, py, hw+(ctrlx-lx)*coef, hh-(ctrly-ly)*coef, hw+(x-lx)*coef, hh-(y-ly)*coef);
+    }
+
+    double getX(int i){
+	return pc[i].getX2();
+    }
+
+    double getY(int i){
+	return pc[i].getY2();
+    }
+
+    double getlX(int i){
+	return lpc[i].getX2();
+    }
+
+    double getlY(int i){
+	return lpc[i].getY2();
+    }
+
+    Shape getShape(int i){
+	return pc[i];
+    }
+
+    Shape getlShape(int i){
+	return lpc[i];
+    }
+
+}
+
+class CBCElement extends PathElement {
+
+    /* Draw a cubic curve from previous point to (x,y) in virtual space,
+       controlled by points (ctrlx1, ctrly1) and (ctrlx2, ctrly2) */
+
+    long ctrlx1;
+    long ctrly1;
+    long ctrlx2;
+    long ctrly2;
+
+    CubicCurve2D[] pc;
+    CubicCurve2D[] lpc;
+
+    CBCElement(long x, long y, long ctrlx1, long ctrly1, long ctrlx2, long ctrly2){
+	type = CBC;
+	this.x = x;
+	this.y = y;
+	this.ctrlx1 = ctrlx1;
+	this.ctrly1 = ctrly1;
+	this.ctrlx2 = ctrlx2;
+	this.ctrly2 = ctrly2;
+    }
+
+    void initCams(int nbCam){
+	pc = new CubicCurve2D[nbCam];
+	lpc = new CubicCurve2D[nbCam];
+	for (int i=0;i<nbCam;i++){
+	    pc[i] = new CubicCurve2D.Double();
+	    lpc[i] = new CubicCurve2D.Double();
+	}
+    }
+
+    void addCamera(int verifIndex){
+	if (pc != null){
+	    if (verifIndex == pc.length){
+		CubicCurve2D[] ta = pc;
+		pc = new CubicCurve2D[ta.length+1];
+		System.arraycopy(ta, 0, pc, 0, ta.length);
+		pc[pc.length-1] = new CubicCurve2D.Double();
+		ta = lpc;
+		lpc = new CubicCurve2D[ta.length+1];
+		System.arraycopy(ta, 0, lpc, 0, ta.length);
+		lpc[lpc.length-1] = new CubicCurve2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+	else {
+	    if (verifIndex == 0){
+		pc = new CubicCurve2D[1];
+		pc[0] = new CubicCurve2D.Double();
+		lpc = new CubicCurve2D[1];
+		lpc[0] = new CubicCurve2D.Double();
+	    }
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+	}
+    }
+
+    void removeCamera(int index){
+ 	pc[index] = null;
+ 	lpc[index] = null;
+    }
+
+    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+	pc[i].setCurve(px, py,
+		       hw+(ctrlx1-c.posx)*coef, hh-(ctrly1-c.posy)*coef,
+		       hw+(ctrlx2-c.posx)*coef, hh-(ctrly2-c.posy)*coef,
+		       hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+    }
+
+    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+	lpc[i].setCurve(px, py,
+		       hw+(ctrlx1-lx)*coef, hh-(ctrly1-ly)*coef,
+		       hw+(ctrlx2-lx)*coef, hh-(ctrly2-ly)*coef,
+		       hw+(x-lx)*coef, hh-(y-ly)*coef);
+    }
+
+    double getX(int i){
+	return pc[i].getX2();
+    }
+
+    double getY(int i){
+	return pc[i].getY2();
+    }
+
+    double getlX(int i){
+	return lpc[i].getX2();
+    }
+
+    double getlY(int i){
+	return lpc[i].getY2();
+    }
+
+    Shape getShape(int i){
+	return pc[i];
+    }
+
+    Shape getlShape(int i){
+	return lpc[i];
+    }
 
 }
