@@ -190,11 +190,15 @@ public abstract class Glyph implements Cloneable {
 
     /*---Visibility and sensitivity------------------------------*/
 
-    /** Indicates whether this glyph is visible or not (default is true)<br>Does not affect its sensitivity.*/
-    boolean visible=true;
+    /** Indicates whether this glyph is visible or not (default is true)<br>Does not affect its sensitivity.
+     * Read only, use access methods for all modification purposes.
+     */
+    public boolean visible=true;
 
-    /** Indicates whether we should detect entry/exit in this glyph (i.e., is it sensitive). */
-    boolean sensit=true;
+    /** Indicates whether we should detect entry/exit in this glyph (i.e., is it sensitive).
+     * Read only, use access methods for all modification purposes.
+     */
+    public boolean sensit=true;
 
     /** Make this glyph sensitive (or not). */
     public void setSensitivity(boolean b){
