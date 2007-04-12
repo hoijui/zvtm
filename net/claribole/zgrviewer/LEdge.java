@@ -74,6 +74,10 @@ class LEdge extends LElem {
 	return head;
     }
 
+    LNode getOtherEnd(LNode n){
+	return (n == tail) ? head : tail;
+    }
+
     String getTitle(){
 	return title;
     }
