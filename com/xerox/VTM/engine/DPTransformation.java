@@ -1,3 +1,12 @@
+/*   FILE: DPTransformation.java
+ *   DATE OF CREATION:   Wed Apr 11 15:32 2007
+ *   AUTHOR :            Boris Trofimov (boris.trofimov@lri.fr)
+ *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
 package com.xerox.VTM.engine;
 
 import java.util.Date;
