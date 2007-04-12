@@ -39,6 +39,7 @@ import net.claribole.zvtm.engine.PTransResize;
 import net.claribole.zvtm.engine.PTranslation;
 import net.claribole.zvtm.engine.PTranslucency;
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.lens.FSLMaxMagRadii;
 import net.claribole.zvtm.lens.FSLRadii;
 import net.claribole.zvtm.lens.FixedSizeLens;
@@ -891,7 +892,11 @@ public class AnimManager implements Runnable{
 		    pendingDims.remove(dim);
 		}
 		//create the appropriate animation
-		this.newGlyphAnim(ap.duration, ap.type, ap.data, gID, 0, ap.paa);
+		Glyph g = vsm.getGlyph(gID);
+		if (g instanceof DPath)
+		    this.createDPathAnimation(ap.duration, ap.type, (LongPoint[])ap.data, gID, ap.paa);
+		else
+		    this.newGlyphAnim(ap.duration, ap.type, ap.data, gID, 0, ap.paa);
 		//remove entry for this glyph is there is no more anim in the queue
 		if (pendingDims.isEmpty()){pendingGAnims.remove(gID);}
 	    }
@@ -1163,6 +1168,96 @@ public class AnimManager implements Runnable{
     }
 
 
+    /* ----------------------- DPath ANIMATION ------------------------- */
+    
+    public void createDPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa){
+	Glyph g=vsm.getGlyph(gID);
+	//detect kind of glyph and instanciate appropriate animation class
+	if (g instanceof DPath){
+	    if (animatedGlyphs.containsKey(gID) && (((int[])animatedGlyphs.get(gID))[0]==1)){
+		putAsPendingGAnimation(gID, GL_TRANS, duration, type, data, paa);
+	    }
+	    else {
+		if (animatedGlyphs.containsKey(gID)){((int[])animatedGlyphs.get(gID))[0]=1;}
+		else {int [] tmpA={0,0,0,0,0};tmpA[4]=1;animatedGlyphs.put(gID,tmpA);}
+		
+		DPTransformation an = new DPTransformation(g, this, duration);
+		an.setPostAnimationAction(paa);
+		LongPoint[] currentPoints = ((DPath)g).getAllPointsCoordinates();
+		double nbSteps=Math.round((float)(duration/frameTime));     //number of steps
+		
+		switch(type){
+		case GL_TRANS_LIN:{//linear		    
+		    an.steps = new LongPoint[(int)nbSteps][data.length];
+		    for (int step=0; step < nbSteps - 1; step++){
+			LongPoint[] stepCoordinates = new LongPoint[data.length];
+			for (int i=0; i < data.length; i++){
+			    stepCoordinates[i] = new LongPoint(currentPoints[i].x + (step+1)*data[i].x/nbSteps, currentPoints[i].y + (step+1)*data[i].y/nbSteps);
+			}
+			an.steps[step] = stepCoordinates;
+		    }
+		    LongPoint[] stepCoordinates = new LongPoint[data.length];
+		    for (int i=0; i < data.length; i++){
+			stepCoordinates[i] = new LongPoint(currentPoints[i].x + data[i].x, currentPoints[i].y + data[i].y); //last point is assigned from source value in order to prevent precision error 
+                    }
+		    an.steps[(int)nbSteps - 1] = stepCoordinates;
+		    animGlyphBag.add(an);
+		    an.start();   
+		    break;
+		}	
+		case GL_TRANS_PAR:{//parabolic  (^4)
+		    an.steps = new LongPoint[(int)nbSteps][data.length];
+		    for (int step=0; step < nbSteps - 1; step++){
+			LongPoint[] stepCoordinates = new LongPoint[data.length];
+			double stepValue=Math.pow((step+1)/nbSteps,4);
+                        for (int i=0; i < data.length; i++){
+			    long dx=(long)Math.round(data[i].x*stepValue);
+                            long dy=(long)Math.round(data[i].y*stepValue);
+                            stepCoordinates[i] = new LongPoint(currentPoints[i].x + dx, currentPoints[i].y + dy);
+                        }
+			an.steps[step] = stepCoordinates;
+		    }
+		    LongPoint[] stepCoordinates = new LongPoint[data.length];
+                    for (int i=0; i < data.length; i++){
+                        stepCoordinates[i] = new LongPoint(currentPoints[i].x + data[i].x, currentPoints[i].y + data[i].y);
+                    }
+		    an.steps[(int)nbSteps - 1] = stepCoordinates;
+		    animGlyphBag.add(an);
+		    an.start();		    
+		    break;
+		}
+		case GL_TRANS_SIG:{//sigmoid
+		    an.steps = new LongPoint[(int)nbSteps][data.length];
+		    for (int step=0; step < nbSteps - 1; step++){
+			LongPoint[] stepCoordinates = new LongPoint[data.length];
+			double stepValue=computeSigmoid(sigFactor,(step+1)/nbSteps);
+                        for (int i=0; i < data.length; i++){
+			    long dx=(long)Math.round(data[i].x*stepValue);
+                            long dy=(long)Math.round(data[i].y*stepValue);
+                            stepCoordinates[i] = new LongPoint(currentPoints[i].x + dx, currentPoints[i].y + dy);
+                        }
+			an.steps[step] = stepCoordinates;
+		    }
+		    LongPoint[] stepCoordinates = new LongPoint[data.length];
+                    for (int i=0; i < data.length; i++){
+                        stepCoordinates[i] = new LongPoint(currentPoints[i].x + data[i].x, currentPoints[i].y + data[i].y);
+                    }
+		    an.steps[(int)nbSteps - 1] = stepCoordinates;
+		    animGlyphBag.add(an);
+		    an.start();
+		    
+		    break;
+		}
+		default:{
+		    System.err.println("Error : AnimManager.createCbCurveCtrlPtAnimation : unknown animation type");
+		}
+		}
+	    }
+	}
+	else {System.err.println("Error : AnimManager.createCbCurveCtrlPtAnimation : glyph is not a curve");}
+    }
+    
+    
     /* ----------------------- CAMERA ANIMATION ------------------------- */
 
     /**animate a camera
