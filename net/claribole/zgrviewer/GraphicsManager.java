@@ -1055,12 +1055,152 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /* ----------- Fresnel Highlighting ------------- */
 
+    Vector fresnelizedNodeGlyphs = new Vector();
+
+    /* Called when user selects Fresnel tool */
     void enterFresnelMode(){
 	System.out.println("Entering Fresnel Mode");
     }
 
+    /* Called when Fresnel tool gets unselected */
     void exitFresnelMode(){
 	System.out.println("Exiting Fresnel Mode");
+    }
+
+    void fresnelizeNode(Glyph g){
+	Object o = g.getOwner();
+	if (o != null && o instanceof LNode){
+	    LNode n = (LNode)o;
+	    LEdge[] oa = n.getOutgoingArcs();
+	    LEdge[] ia = n.getIncomingArcs();
+	    LEdge[] ua = n.getUndirectedArcs();
+	    // here we could do some reordering on the sequence
+	    // of arcs based on different criteria
+	    // e.g. grouping edges by label, alphabetical sorting, etc.
+	    long[] wnes = mainView.getVisibleRegion(mainCamera);
+	    double fresnelCircleRadius = g.getSize() * 6;
+	    LongPoint trans;
+	    LongPoint[] xs;
+	    float[] colors;
+	    if (ua.length > 0 && oa.length == 0 && ia.length == 0){
+		// undirected graph
+		xs = new LongPoint[ua.length];
+		if (ua.length == 1){
+		    xs[0] = new LongPoint(g.vx + fresnelCircleRadius, g.vy);
+		}
+		else {
+		    double angleOffset = 2 * Math.PI / ((double)(ua.length));
+		    double angle = 0;
+		    for (int i=0;i<ua.length;i++){
+			xs[i] = new LongPoint(g.vx + fresnelCircleRadius * Math.cos(angle),
+					      g.vy + fresnelCircleRadius * Math.sin(angle));
+			angle += angleOffset;
+		    }
+		}
+		LNode oe;
+		for (int i=0;i<ua.length;i++){
+		    oe = ua[i].getOtherEnd(n);
+		    // compute translation only once, make assumption that
+		    // first glyph is the main node shape (whose center should be in xs[i])
+		    trans = new LongPoint(xs[i].x-oe.glyphs[0].vx,
+					  xs[i].y-oe.glyphs[0].vy);
+		    for (int j=0;j<oe.glyphs.length;j++){
+			fresnelizedNodeGlyphs.add(new FresnelInfo(oe.glyphs[j], trans));
+			mSpace.onTop(oe.glyphs[j]);
+			vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, trans,
+							  oe.glyphs[j].getID());
+		    }
+		}
+	    }
+	    else {// directed graph
+		// in theory undirected edges cannot exist in a directed graph (looks like they are ignored)
+		// outgoing edges
+		xs = new LongPoint[oa.length];
+		if (oa.length == 1){
+		    xs[0] = new LongPoint(g.vx + fresnelCircleRadius, g.vy);
+		}
+		else {
+		    double angleOffset = 2 * Math.PI / (3 * (double)(oa.length-1));
+		    double angle = Math.PI / 3.0;
+		    for (int i=0;i<oa.length;i++){
+			xs[i] = new LongPoint(g.vx + fresnelCircleRadius * Math.cos(angle),
+					      g.vy + fresnelCircleRadius * Math.sin(angle));
+			angle -= angleOffset;
+		    }
+		}
+		for (int i=0;i<oa.length;i++){
+		    // compute translation only once, make assumption that
+		    // first glyph is the main node shape (whose center should be in xs[i])
+		    trans = new LongPoint(xs[i].x-oa[i].head.glyphs[0].vx,
+					  xs[i].y-oa[i].head.glyphs[0].vy);
+		    for (int j=0;j<oa[i].head.glyphs.length;j++){
+			fresnelizedNodeGlyphs.add(new FresnelInfo(oa[i].head.glyphs[j], trans));
+			mSpace.onTop(oa[i].head.glyphs[j]);
+			vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, trans,
+							  oa[i].head.glyphs[j].getID());
+		    }
+		}
+		// incoming edges
+		xs = new LongPoint[ia.length];
+		if (ia.length == 1){
+		    xs[0] = new LongPoint(g.vx - fresnelCircleRadius, g.vy);
+		}
+		else {
+		    double angleOffset = 2 * Math.PI / (3 * (double)(ia.length-1));
+		    double angle = 2 * Math.PI / 3.0;
+		    for (int i=0;i<ia.length;i++){
+			xs[i] = new LongPoint(g.vx + fresnelCircleRadius * Math.cos(angle),
+					      g.vy + fresnelCircleRadius * Math.sin(angle));
+			angle += angleOffset;
+		    }
+		}
+		for (int i=0;i<ia.length;i++){
+		    // compute translation only once, make assumption that
+		    // first glyph is the main node shape (whose center should be in xs[i])
+		    trans = new LongPoint(xs[i].x-ia[i].tail.glyphs[0].vx,
+					  xs[i].y-ia[i].tail.glyphs[0].vy);
+		    for (int j=0;j<ia[i].tail.glyphs.length;j++){
+			fresnelizedNodeGlyphs.add(new FresnelInfo(ia[i].tail.glyphs[j], trans));
+			mSpace.onTop(ia[i].tail.glyphs[j]);
+			vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, trans,
+							  ia[i].tail.glyphs[j].getID());
+		    }
+		}
+	    }
+	}
+    }
+
+    void unfresnelizeNodes(){
+	FresnelInfo fi;
+	// nodes
+	for (int i=0;i<fresnelizedNodeGlyphs.size();i++){
+	    fi = (FresnelInfo)fresnelizedNodeGlyphs.elementAt(i);
+	    // location
+	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG,
+					      fi.translationOffset, fi.g.getID());
+	    // color
+	    //XXX:TBW
+	}
+	fresnelizedNodeGlyphs.removeAllElements();
+    }
+    
+}
+
+class FresnelInfo {
+
+    /* Class used to store information about the default status of a glyph.
+       Used to revert back to default after the glyph's appearance has been temporarily modified by a Fresnel lens. */
+    
+    Glyph g;
+    LongPoint translationOffset;
+    float[] colorOffset = new float[6];
+    
+    FresnelInfo(Glyph g, LongPoint lp/*, float[] co*/){
+	this.g = g;
+	this.translationOffset = new LongPoint(-lp.x, -lp.y);
+// 	for (int i=0;i<co.length;i++){
+// 	    this.colorOffset[i] = -co[i];
+// 	}
     }
     
 }
