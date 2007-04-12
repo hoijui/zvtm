@@ -637,7 +637,7 @@ public class DPath extends Glyph {
      * @param startPoint Start point of desired line
      * @param endPoint End point of desired line
      * @param whether to use absolute values
-     * @return List of LongPoint relative coordinates that can be passed to the edit(LongPoint[], boolean) method or to the AnimManager
+     * @return List of LongPoint absolute coordinates that can be passed to the edit(LongPoint[], boolean) method or to the AnimManager
      */
     public static LongPoint[] getFlattenedCoordinates(DPath path, LongPoint startPoint, LongPoint endPoint, boolean abs){
 	LongPoint[] result = path.getAllPointsCoordinates();
@@ -648,14 +648,12 @@ public class DPath extends Glyph {
 	long dx = Math.round((double)(endPoint.x - startPoint.x) / (double)result.length);
 	long dy = Math.round((double)(endPoint.y - startPoint.y) / (double)result.length);
 	
-	result[0].x = startPoint.x - result[0].x;
-	result[0].y = startPoint.y - result[0].y;
-	for (int i = 1; i < result.length - 1; i++){
-            result[i].x = startPoint.x + i * dx - result[i].x;
-            result[i].y = startPoint.y + i * dy - result[i].y;                
+	for (int i = 0; i < result.length - 1; i++){
+            result[i].x = startPoint.x + i * dx;
+            result[i].y = startPoint.y + i * dy;                
         }
-	result[result.length - 1].x = endPoint.x - result[result.length - 1].x;
-	result[result.length - 1].y = endPoint.y - result[result.length - 1].y;
+	result[result.length - 1].x = endPoint.x;
+	result[result.length - 1].y = endPoint.y;
 	return result;
     }
 }
