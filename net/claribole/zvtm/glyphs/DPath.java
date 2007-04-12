@@ -17,6 +17,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.Arrays;
@@ -655,6 +656,80 @@ public class DPath extends Glyph {
 	result[result.length - 1].x = endPoint.x;
 	result[result.length - 1].y = endPoint.y;
 	return result;
+    }
+    
+    /**
+     * Convert given VPath instance to the DPath
+     * @param vp VPath to be converted
+     * @return new instance of DPath which has the same structure and location as given VPath
+     */
+    public static DPath fromVPath(VPath vp){
+	DPath res = null;
+	if (vp != null){
+	    res = new DPath(vp.vx, vp.vy, vp.vz, vp.getColor());
+	    PathIterator pi = vp.getJava2DPathIterator();
+	    pi.next(); 
+	    double[] cds=new double[6];
+	    int type;
+	    while (!pi.isDone()){
+		type=pi.currentSegment(cds);
+		switch (type){
+		case PathIterator.SEG_CUBICTO:{
+		    res.addCbCurve((long)cds[4],(long)-cds[5],(long)cds[0],(long)-cds[1],(long)cds[2],(long)-cds[3],true);
+		    break;
+		}
+		case PathIterator.SEG_QUADTO:{
+		    res.addQdCurve((long)cds[2],(long)-cds[3],(long)cds[0],(long)-cds[1],true);
+		    break;
+		}
+		case PathIterator.SEG_LINETO:{
+		    res.addSegment((long)cds[0],(long)-cds[1],true);
+		    break;
+		}
+		case PathIterator.SEG_MOVETO:{
+		    res.jump((long)cds[0],(long)-cds[1],true);
+		    break;
+		}
+		}
+		pi.next();
+	    }
+	}
+	return res;
+    }
+    
+    /**
+     * Convert given DPath instance to the VPath
+     * @param vp DPath to be converted
+     * @return new instance of VPath which has the same structure and location as given DPath
+     */
+    public static VPath toVPath(DPath dp){
+	VPath res = null;
+	if (dp != null){
+	    res = new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
+	    for (int i = 0; i < dp.getElementsCount(); i++){
+		int elType = dp.getElementType(i);
+		LongPoint[] pts = dp.getElementPointsCoordinates(i);
+		switch(elType){
+		case DPath.CBC:{
+		    res.addCbCurve(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y, true);
+		    break;
+		}
+		case DPath.QDC:{
+		    res.addQdCurve(pts[1].x, pts[1].y, pts[2].x, pts[2].y, true);
+		    break;
+		}
+		case DPath.SEG:{
+		    res.addSegment(pts[1].x, pts[1].y, true);
+		    break;
+		}
+		case DPath.MOV:{
+		    res.jump(pts[1].x, pts[1].y, true);
+		    break;
+		}
+		}
+	    }
+	}
+	return res;
     }
 }
 
