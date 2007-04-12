@@ -1173,7 +1173,13 @@ public class AnimManager implements Runnable{
 
 
     /* ----------------------- DPath ANIMATION ------------------------- */
-    
+    /** animate DPath transformation
+     * @param duration duration of the animation in ms
+     * @param type use on of the relative (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG) or absolute (GL_TRANS_LIN_ABS, GL_TRANS_PAR_ABS, GL_TRANS_SIG_ABS)
+     * @param data relative or absolute (depending on type) coordinates for each point of DPath
+     * @param gID ID of DPath to be animated
+     * @param paa action to be performed after animation finished
+     */
     public void createDPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa){
 	Glyph g=vsm.getGlyph(gID);
 	//detect kind of glyph and instanciate appropriate animation class
@@ -1222,24 +1228,6 @@ public class AnimManager implements Runnable{
 		    an.start();   
 		    break;
 		}
-		/*case GL_TRANS_LIN_ABS:{
-		    an.steps = new LongPoint[(int)nbSteps][data.length];
-		    for (int step=0; step < nbSteps - 1; step++){
-			LongPoint[] stepCoordinates = new LongPoint[data.length];
-			for (int i=0; i < data.length; i++){
-			    stepCoordinates[i] = new LongPoint(currentPoints[i].x + (data[i].x - currentPoints[i].x)*(step+1)/nbSteps, currentPoints[i].y + (data[i].y - currentPoints[i].y)*(step+1)/nbSteps);
-			}
-			an.steps[step] = stepCoordinates;
-		    }
-		    LongPoint[] stepCoordinates = new LongPoint[data.length];
-		    for (int i=0; i < data.length; i++){
-			stepCoordinates[i] = new LongPoint(data[i].x, data[i].y); //last point is assigned from source value in order to prevent precision error 
-                    }
-		    an.steps[(int)nbSteps - 1] = stepCoordinates;
-		    animGlyphBag.add(an);
-		    an.start();   
-		    break;		    
-		}	*/	
 		case GL_TRANS_PAR:{//parabolic  (^4)
 		    an.steps = new LongPoint[(int)nbSteps][data.length];
 		    for (int step=0; step < nbSteps - 1; step++){
