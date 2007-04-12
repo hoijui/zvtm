@@ -10,27 +10,23 @@
 package net.claribole.zvtm.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.QuadCurve2D;
 import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.AlphaComposite;
-
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.QuadCurve2D;
 import java.util.Arrays;
+
+import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
+import com.xerox.VTM.glyphs.VPath;
 
 /**
  * Dynamic Path.
@@ -632,6 +628,34 @@ public class DPath extends Glyph {
 	    }
 	    }
 	}
+	return result;
+    }
+    
+    /**
+     * Calculates coordinates of all DPath's points (including control points) to display the DPAth as line.
+     * @param path DPath to be flatten
+     * @param startPoint Start point of desired line
+     * @param endPoint End point of desired line
+     * @param whether to use absolute values
+     * @return List of LongPoint relative coordinates that can be passed to the edit(LongPoint[], boolean) method or to the AnimManager
+     */
+    public static LongPoint[] getFlattenedCoordinates(DPath path, LongPoint startPoint, LongPoint endPoint, boolean abs){
+	LongPoint[] result = path.getAllPointsCoordinates();
+	if (!abs){
+	    startPoint = new LongPoint(result[0].x + startPoint.x, result[0].y + startPoint.y);
+	    endPoint = new LongPoint(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);            
+	}
+	long dx = Math.round((double)(endPoint.x - startPoint.x) / (double)result.length);
+	long dy = Math.round((double)(endPoint.y - startPoint.y) / (double)result.length);
+	
+	result[0].x = startPoint.x - result[0].x;
+	result[0].y = startPoint.y - result[0].y;
+	for (int i = 1; i < result.length - 1; i++){
+            result[i].x = startPoint.x + i * dx - result[i].x;
+            result[i].y = startPoint.y + i * dy - result[i].y;                
+        }
+	result[result.length - 1].x = endPoint.x - result[result.length - 1].x;
+	result[result.length - 1].y = endPoint.y - result[result.length - 1].y;
 	return result;
     }
 }
