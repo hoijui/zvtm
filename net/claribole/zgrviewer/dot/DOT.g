@@ -250,7 +250,7 @@ node_edge_subgraph_stmt[Object g] throws Exception { Node node=null; } :
 	    }
 	  ;
 
-edges[Object g] returns [Node n] throws Exception { n=null; } :
+edges[Object g] returns [Node n] throws Exception { n=null; } :
 	{ Node start=null, end=null; Edge edge=null; }
 	( #(D_EDGE_OP  ( start=edges[g] | start=node_id[g] ) end=node_id[g] // | subgraph
 	  {
