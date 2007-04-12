@@ -24,21 +24,18 @@
 package com.xerox.VTM.engine;
 
 import java.awt.Point;
-import java.awt.Dimension;
-
 import java.util.Hashtable;
 import java.util.Vector;
 
-import net.claribole.zvtm.engine.PostAnimationAction;
-import net.claribole.zvtm.engine.LensKillAction;
-import net.claribole.zvtm.engine.GlyphKillAction;
 import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.LensKillAction;
 import net.claribole.zvtm.engine.PAnimation;
 import net.claribole.zvtm.engine.PResize;
 import net.claribole.zvtm.engine.PTransResize;
 import net.claribole.zvtm.engine.PTranslation;
 import net.claribole.zvtm.engine.PTranslucency;
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PostAnimationAction;
 import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.lens.FSLMaxMagRadii;
 import net.claribole.zvtm.lens.FSLRadii;
