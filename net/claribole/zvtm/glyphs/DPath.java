@@ -46,6 +46,11 @@ import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 
 public class DPath extends Glyph {
     
+    static final short MOV = 0;
+    static final short SEG = 1;
+    static final short QDC = 2;
+    static final short CBC = 3;
+    
     /** For internal use. Dot not tamper with. Made public for outside package subclassing. Stores projected start point only. */
     public ProjectedCoords[] pc;
 
@@ -85,7 +90,7 @@ public class DPath extends Glyph {
 	setColor(c);
     }
 
-    /** Add a new quadratic curve to the path, from current point to point (x,y), controlled by (x1,y1)
+    /** Add a new cubic curve to the path, from current point to point (x,y), controlled by (x1,y1)
      *@param x x coordinate of end point in virtual space
      *@param y y coordinate of end point in virtual space
      *@param x1 x coordinate of 1st control point in virtual space
@@ -281,7 +286,7 @@ public class DPath extends Glyph {
 	    g.setStroke(stroke);
 	    g.translate(dx,dy);
 	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == PathElement.MOV){continue;}
+		if (elements[j].type == DPath.MOV){continue;}
 		g.draw(elements[j].getShape(i));
 	    }
 	    g.translate(-dx,-dy);
@@ -290,7 +295,7 @@ public class DPath extends Glyph {
 	else {
 	    g.translate(dx,dy);
 	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == PathElement.MOV){continue;}
+		if (elements[j].type == DPath.MOV){continue;}
 		g.draw(elements[j].getShape(i));
 	    }
 	    g.translate(-dx,-dy);
@@ -303,7 +308,7 @@ public class DPath extends Glyph {
 	    g.setStroke(stroke);
 	    g.translate(dx,dy);
 	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == PathElement.MOV){continue;}
+		if (elements[j].type == DPath.MOV){continue;}
 		g.draw(elements[j].getlShape(i));
 	    }
 	    g.translate(-dx,-dy);
@@ -312,7 +317,7 @@ public class DPath extends Glyph {
 	else {
 	    g.translate(dx,dy);
 	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == PathElement.MOV){continue;}
+		if (elements[j].type == DPath.MOV){continue;}
 		g.draw(elements[j].getlShape(i));
 	    }
 	    g.translate(-dx,-dy);
@@ -365,15 +370,274 @@ public class DPath extends Glyph {
     }
 
     public void highlight(boolean b, Color selectedColor){}
+    
+    /**
+     * Edit coordinates of start, end and control points of the element in DPath
+     * @param index index of the element in the DPath
+     * @param sx x coordinate of the element's start point
+     * @param sy y coordinate of the element's start point
+     * @param ex x coordinate of the element's end point
+     * @param ey y coordinate of the element's end point
+     * @param ctrlPoints list of the LongPoints that contain coordinates of the control point(s) (in case of QD/CB curve)
+     * @param abs indicates whether to use absolute coordinates or relative
+     */
+    public void editElement(int index, long sx, long sy, long ex, long ey, LongPoint[] ctrlPoints, boolean abs){
+	if (index > -1 && index < elements.length && elements[index] != null){
+	    if (index > 0){
+		if (abs){
+		    elements[index-1].x = sx;
+		    elements[index-1].y = sy;	            
+		}
+		else {
+		    elements[index-1].x += sx;
+		    elements[index-1].y += sy;
+		}		    
+	    }
+            else{
+        	if (abs){
+        	    this.vx = sx;
+        	    this.vy = sy;
+        	}
+        	else {
+        	    this.vx += sx;
+        	    this.vy += sy;
+        	}
+            }
+	    PathElement el = elements[index];
+	    switch(el.type){
+	    case DPath.QDC:{
+		if (ctrlPoints != null && ctrlPoints.length > 0 && ctrlPoints[0] != null){
+		    if (abs){
+			((QDCElement)el).ctrlx = ctrlPoints[0].x;
+			((QDCElement)el).ctrly = ctrlPoints[0].y;
+		    }
+		    else {
+			((QDCElement)el).ctrlx += ctrlPoints[0].x;
+			((QDCElement)el).ctrly += ctrlPoints[0].y;
+		    }
+		}
+		break;
+	    }
+	    case DPath.CBC:{
+		if (ctrlPoints != null && ctrlPoints.length > 1 && ctrlPoints[0] != null && ctrlPoints[1] != null){
+		    if (abs){
+			((CBCElement)el).ctrlx1 = ctrlPoints[0].x;
+			((CBCElement)el).ctrly1 = ctrlPoints[0].y;
+			((CBCElement)el).ctrlx2 = ctrlPoints[1].x;
+			((CBCElement)el).ctrly2 = ctrlPoints[1].y;
+		    }
+		    else {
+			((CBCElement)el).ctrlx1 += ctrlPoints[0].x;
+			((CBCElement)el).ctrly1 += ctrlPoints[0].y;
+			((CBCElement)el).ctrlx2 += ctrlPoints[1].x;
+			((CBCElement)el).ctrly2 += ctrlPoints[1].y;
+		    }
+		}
+		break;
+	    }
+	    }
+	    if (abs){
+                el.x = ex;
+                el.y = ey;
+            }
+            else {
+                el.x += ex;
+                el.y += ey;
+            }
+	}	    
+    }
+    
+    /**
+     * Transform DPath by translating each of the points
+     * @param points List of new coordinates for each point. Example order could be: startPoint, controlPoint1, controlPoint2, endPoint, controlPoint1, endPoint, endPoint ...
+     * @param abs  whether to use absolute coordinates or relative
+     */
+    public void edit(LongPoint[] points, boolean abs){
+	// check consistensy
+	int totalPointsCount = 1;
+	for (int i=0; i < elements.length; i++){
+	    totalPointsCount += 1; // for SEG and MOV
+	    switch (elements[i].type){
+	    case DPath.CBC:{totalPointsCount += 2; break;} // Two additional points
+	    case DPath.QDC:{totalPointsCount += 1; break;} // One additional point
+	    }
+	}
+	if (points != null && points.length == totalPointsCount){
+	    this.vx = points[0].x;
+	    this.vy = points[0].y;
+	    int offset = 0;
+	    for (int i=0; i < elements.length; i++) {
+		switch (elements[i].type){
+		case DPath.CBC:{
+		    if (abs){
+			((CBCElement)elements[i]).ctrlx1 = points[i+1+offset].x;
+		    	((CBCElement)elements[i]).ctrly1 = points[i+1+offset].y;
+		    	((CBCElement)elements[i]).ctrlx2 = points[i+2+offset].x;
+		    	((CBCElement)elements[i]).ctrly2 = points[i+2+offset].y;
+		    	elements[i].x = points[i+3+offset].x;
+			elements[i].y = points[i+3+offset].y;
+		    }
+		    else {
+			((CBCElement)elements[i]).ctrlx1 += points[i+1+offset].x;
+		    	((CBCElement)elements[i]).ctrly1 += points[i+1+offset].y;
+		    	((CBCElement)elements[i]).ctrlx2 += points[i+2+offset].x;
+		    	((CBCElement)elements[i]).ctrly2 += points[i+2+offset].y;
+		    	elements[i].x += points[i+3+offset].x;
+			elements[i].y += points[i+3+offset].y;
+		    }
+		    offset += 2;
+		    break;
+		}
+		case DPath.QDC:{
+		    if (abs){
+			((QDCElement)elements[i]).ctrlx = points[i+1+offset].x;
+		    	((QDCElement)elements[i]).ctrly = points[i+1+offset].y;
+		    	elements[i].x = points[i+2+offset].x;
+			elements[i].y = points[i+2+offset].y;
+		    }
+		    else{
+			((QDCElement)elements[i]).ctrlx += points[i+1+offset].x;
+		    	((QDCElement)elements[i]).ctrly += points[i+1+offset].y;
+		    	elements[i].x += points[i+2+offset].x;
+			elements[i].y += points[i+2+offset].y;
+		    }
+		    offset += 1;
+		    break;
+		}
+		default:{
+		    if (abs){
+                        elements[i].x = points[i+1+offset].x;
+                        elements[i].y = points[i+1+offset].y;
+                    }
+                    else {
+                        elements[i].x += points[i+1+offset].x;
+                        elements[i].y += points[i+1+offset].y;
+                    }
+		}
+		}
+	    }
+	}
+    }
+    
+    /**
+     * Get total number of elements in the path
+     */
+    public int getElementsCount(){
+	if (elements != null)
+	    return elements.length;
+	else
+	    return 0;
+    }
 
+    /**
+     * Get element's type
+     * @param index index of the element in the DPath
+     * @return -1 in case of incorrect parameters, otherwise returns one of the constants DPath.CBC, DPath.QDC, DPath.SEG, DPath.MOV 
+     */
+    public int getElementType(int index){
+	if (elements != null && index > -1 && index < elements.length && elements[index] != null){
+	    return elements[index].type;
+	}
+	else {
+	    return -1;
+	}
+    }
+    
+    /**
+     * Get coordinates of the start, end and control points of the element
+     * @param index index of the element in the DPath
+     * @return List of element's points ordered as startPoint, endPoint, controlPoint1, controlPoint2
+     */    
+    public LongPoint[] getElementPointsCoordinates(int index){
+	LongPoint[] result = null;
+	if (elements != null && index > -1 && index < elements.length && elements[index] != null){
+	    switch (elements[index].type){
+	    case DPath.CBC:{
+		result = new LongPoint[4];
+		if (index == 0){
+		    result[0] = new LongPoint(this.vx, this.vy);
+		}
+		else{
+		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
+		}
+		result[1] = new LongPoint(elements[index].x, elements[index].y);
+		result[2] = new LongPoint(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
+		result[3] = new LongPoint(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
+		break;
+	    }
+	    case DPath.QDC:{
+		result = new LongPoint[3];
+		if (index == 0){
+		    result[0] = new LongPoint(this.vx, this.vy);
+		}
+		else{
+		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
+		}
+		result[1] = new LongPoint(elements[index].x, elements[index].y);
+		result[2] = new LongPoint(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
+		break;
+	    }
+	    default:{
+		result = new LongPoint[2];
+		if (index == 0){
+		    result[0] = new LongPoint(this.vx, this.vy);
+		}
+		else{
+		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
+		}
+		result[1] = new LongPoint(elements[index].x, elements[index].y);
+		break;
+	    }
+	    }
+	}
+	return result;
+    }
+    
+    /**
+     * Get coordinates of each point in the path including control points
+     * @return Rerurns list of points in following format: startPoint, controlPoint1, controlPoint2, endPoint ...
+     */
+    public LongPoint[] getAllPointsCoordinates(){
+	int totalNumberOfPoints = 1;
+	for (int i=0; i < elements.length; i++){
+	    totalNumberOfPoints += 1;
+	    short type = elements[i].type;
+	    switch (type){
+	    case DPath.CBC:{totalNumberOfPoints += 2; break;}
+	    case DPath.QDC:{totalNumberOfPoints += 1; break;}
+	    }
+	}
+	LongPoint[] result = new LongPoint[totalNumberOfPoints];
+	int offset = 0;
+	result[0] = new LongPoint(this.vx, this.vy);
+	for (int i=0; i < elements.length; i++){
+	    switch(elements[i].type){
+	    case DPath.CBC:{
+		CBCElement el = (CBCElement)elements[i];
+		result[i+1+offset] = new LongPoint(el.ctrlx1, el.ctrly1);
+		result[i+2+offset] = new LongPoint(el.ctrlx2, el.ctrly2);
+		result[i+3+offset] = new LongPoint(el.x, el.y);
+		offset += 2;
+		break;
+	    }
+	    case DPath.QDC:{
+		QDCElement el = (QDCElement)elements[i];
+		result[i+1+offset] = new LongPoint(el.ctrlx, el.ctrly);
+		result[i+2+offset] = new LongPoint(el.x, el.y);
+		offset += 1;
+		break;
+	    }
+	    default:{
+		result[i+1+offset] = new LongPoint(elements[i].x, elements[i].y);
+	    }
+	    }
+	}
+	return result;
+    }
 }
 
 abstract class PathElement {
 
-    static final short MOV = 0;
-    static final short SEG = 1;
-    static final short QDC = 2;
-    static final short CBC = 3;
     short type;
 
     long x;
@@ -412,7 +676,7 @@ class MOVElement extends PathElement {
     Point2D[] lpc;
 
     MOVElement(long x, long y){
-	type = MOV;
+	type = DPath.MOV;
 	this.x = x;
 	this.y = y;
     }
@@ -498,7 +762,7 @@ class SEGElement extends PathElement {
     Line2D[] lpc;
     
     SEGElement(long x, long y){
-	type = SEG;
+	type = DPath.SEG;
 	this.x = x;
 	this.y = y;
     }
@@ -588,7 +852,7 @@ class QDCElement extends PathElement {
     QuadCurve2D[] lpc;
 
     QDCElement(long x, long y, long ctrlx, long ctrly){
-	type = QDC;
+	type = DPath.QDC;
 	this.x = x;
 	this.y = y;
 	this.ctrlx = ctrlx;
@@ -682,7 +946,7 @@ class CBCElement extends PathElement {
     CubicCurve2D[] lpc;
 
     CBCElement(long x, long y, long ctrlx1, long ctrly1, long ctrlx2, long ctrly2){
-	type = CBC;
+	type = DPath.CBC;
 	this.x = x;
 	this.y = y;
 	this.ctrlx1 = ctrlx1;
