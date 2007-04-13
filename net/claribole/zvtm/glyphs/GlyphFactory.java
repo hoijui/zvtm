@@ -53,7 +53,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VCircleST;
 import com.xerox.VTM.glyphs.VDiamond;

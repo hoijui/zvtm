@@ -94,7 +94,7 @@ public class FractalSierpinski extends FractalDemo {
 		}
 	    }
 	}
-	FractalSierpinski appli = new FractalSierpinski(n);
+	new FractalSierpinski(n);
     }
 
 }

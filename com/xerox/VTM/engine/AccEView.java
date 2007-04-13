@@ -22,13 +22,8 @@
 package com.xerox.VTM.engine;
 
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.DisplayMode;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.IllegalComponentStateException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
@@ -42,7 +37,6 @@ import javax.swing.JMenuBar;
 import javax.swing.WindowConstants;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
-
 import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**

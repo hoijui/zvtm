@@ -11,27 +11,30 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
-import java.awt.Dimension;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import javax.swing.JFileChooser;
 
-import java.util.Vector;
-import java.util.Hashtable;
+import net.claribole.zvtm.engine.Java2DPainter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.ZRoundRect;
 
 public class AbstractVisitViewer implements Java2DPainter {
 

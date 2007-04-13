@@ -11,16 +11,9 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Polygon;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
-
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import net.claribole.zvtm.lens.Lens;
 
 /**
  * Segment specifically designed for being seen through a lens without disappearing too much.

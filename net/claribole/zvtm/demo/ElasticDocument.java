@@ -12,20 +12,36 @@ package net.claribole.zvtm.demo;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.BasicStroke;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.Graphics2D;
-import javax.swing.text.Style;
-import javax.swing.ImageIcon;
-
+import java.awt.Toolkit;
 import java.util.Vector;
 
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
+import javax.swing.ImageIcon;
+import javax.swing.text.Style;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.lens.FSGaussianLens;
+import net.claribole.zvtm.lens.FSInverseCosineLens;
+import net.claribole.zvtm.lens.FSLinearLens;
+import net.claribole.zvtm.lens.FSManhattanLens;
+import net.claribole.zvtm.lens.FSScramblingLens;
+import net.claribole.zvtm.lens.L1FSInverseCosineLens;
+import net.claribole.zvtm.lens.L1FSLinearLens;
+import net.claribole.zvtm.lens.L1FSManhattanLens;
+import net.claribole.zvtm.lens.LInfFSInverseCosineLens;
+import net.claribole.zvtm.lens.LInfFSLinearLens;
+import net.claribole.zvtm.lens.LInfFSManhattanLens;
+import net.claribole.zvtm.lens.Lens;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VImage;
 
 public class ElasticDocument implements Java2DPainter {
 

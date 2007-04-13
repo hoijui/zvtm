@@ -10,21 +10,18 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Dimension;
-import java.awt.Color;
-import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import java.util.Hashtable;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
-
+import net.claribole.zvtm.engine.AnimationListener;
 import net.claribole.zvtm.engine.ViewEventHandler;
+
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 
 class AbstractTaskEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {

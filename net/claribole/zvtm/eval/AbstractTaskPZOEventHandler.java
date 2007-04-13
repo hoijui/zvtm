@@ -10,19 +10,16 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import java.util.Hashtable;
+import net.claribole.zvtm.engine.CameraPortal;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PortalEventHandler;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
+import com.xerox.VTM.engine.ViewPanel;
 
 class AbstractTaskPZOEventHandler extends AbstractTaskEventHandler implements PortalEventHandler {
 

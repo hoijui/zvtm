@@ -13,11 +13,8 @@ package net.claribole.zvtm.eval;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.glyphs.VCircle;
+import com.xerox.VTM.glyphs.VRectangle;
 
 public class AbstractTrajectoryPlayer2D implements Runnable {
 

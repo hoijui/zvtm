@@ -11,26 +11,35 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
-import java.awt.Dimension;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Vector;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.lens.FSGaussianLens;
+import net.claribole.zvtm.lens.Lens;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VImage;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.ZRoundRect;
 
 public class AbstractTrajectoryViewer2D implements Java2DPainter {
 

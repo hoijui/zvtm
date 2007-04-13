@@ -145,7 +145,7 @@ public class FractalLSystems extends FractalDemo {
 		}
 	    }
 	}
-	FractalLSystems appli = new FractalLSystems(n);
+	new FractalLSystems(n);
     }
 
     class State {

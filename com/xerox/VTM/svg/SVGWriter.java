@@ -437,7 +437,6 @@ public class SVGWriter {
 	Element text=svgDoc.createElementNS(svgURI,SVGReader._text);
 	text.setAttribute(SVGReader._x,String.valueOf(t.vx+farWest));
 	text.setAttribute(SVGReader._y,String.valueOf(-t.vy+farNorth));
-	String anchor;
 	if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){text.setAttribute(SVGReader._textanchor,"start");}
 	else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){text.setAttribute(SVGReader._textanchor,"middle");}
 	else if (t.getTextAnchor()==VText.TEXT_ANCHOR_END){text.setAttribute(SVGReader._textanchor,"end");}

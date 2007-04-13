@@ -11,32 +11,34 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.Graphics2D;
 import java.awt.Point;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-
-import java.io.File;
+import java.awt.Toolkit;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.FileWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import net.claribole.zvtm.engine.Java2DPainter;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VImage;
 
 public class LocateTask2 implements Java2DPainter {
 

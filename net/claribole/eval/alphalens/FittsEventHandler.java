@@ -1,17 +1,17 @@
 
 package net.claribole.eval.alphalens;
 
-import java.awt.Toolkit;
-import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.KeyEvent;
-import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
+import net.claribole.zvtm.engine.ViewEventHandler;
+
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.engine.*;
 
 
 class FittsEventHandler implements ViewEventHandler, ComponentListener {

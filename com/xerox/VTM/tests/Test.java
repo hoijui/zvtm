@@ -20,20 +20,13 @@
 package com.xerox.VTM.tests;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Dimension;
-import java.awt.geom.QuadCurve2D;
-
 import java.util.Vector;
 
-import javax.swing.ImageIcon;
+import net.claribole.zvtm.engine.ViewEventHandler;
 
-import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VRectangle;
 
 public class Test {
 
@@ -89,7 +82,7 @@ public class Test {
 	System.out.println("User name: "+System.getProperty("user.name"));
 	System.out.println("User home directory: "+System.getProperty("user.home"));
 	System.out.println("-----------------");
-	Test appli=new Test((args.length > 0) ? Short.parseShort(args[0]) : 0);
+	new Test((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
     
 }

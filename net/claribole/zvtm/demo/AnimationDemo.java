@@ -7,51 +7,51 @@
 
 package net.claribole.zvtm.demo;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.util.Vector;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
-import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
-import java.util.Vector;
-
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangleOrST;
-import com.xerox.VTM.glyphs.VTriangleOrST;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.VTextOr;
-import com.xerox.VTM.glyphs.VShapeST;
-import com.xerox.VTM.glyphs.VSegmentST;
+import net.claribole.zvtm.engine.TransitionManager;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
 import net.claribole.zvtm.glyphs.VImageOrST;
 import net.claribole.zvtm.glyphs.VTextOrST;
-import net.claribole.zvtm.engine.TransitionManager;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VRectangleOrST;
+import com.xerox.VTM.glyphs.VSegmentST;
+import com.xerox.VTM.glyphs.VShapeST;
+import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.VTriangleOrST;
 
 public class AnimationDemo extends JApplet implements MouseListener, KeyListener {
 

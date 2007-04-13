@@ -12,13 +12,6 @@
 package net.claribole.zvtm.lens;
 
 import java.awt.Graphics2D;
-import java.awt.AlphaComposite;
-import java.awt.geom.Point2D;
-import java.awt.image.SinglePixelPackedSampleModel;
-import java.awt.image.WritableRaster;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.xerox.VTM.glyphs.Translucent;
 

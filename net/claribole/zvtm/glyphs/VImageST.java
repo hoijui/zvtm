@@ -9,15 +9,14 @@
 
 package net.claribole.zvtm.glyphs;
 
-import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.Translucent;
-
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+
+import com.xerox.VTM.glyphs.Translucent;
+import com.xerox.VTM.glyphs.VImage;
 
 /**
  * Translucent Bitmap Image. This version is less efficient than VImage, but it can be made translucent. It cannot be reoriented (see VImageOr*).<br>

@@ -10,28 +10,27 @@
 
 package net.claribole.zvtm.eval;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.AlphaComposite;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-
 import java.util.Vector;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
+import net.claribole.zvtm.engine.Java2DPainter;
+
+import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ZRoundRect;
-import com.xerox.VTM.engine.SwingWorker;
-import net.claribole.zvtm.engine.Java2DPainter;
 
 class AbstractTaskLogManager implements Java2DPainter {
 

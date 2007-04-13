@@ -11,7 +11,6 @@
 package net.claribole.zvtm.eval;
 
 import net.claribole.zvtm.engine.PostAnimationAction;
-import net.claribole.zvtm.lens.Lens;
 
 public class DMActivator implements PostAnimationAction {
 
@@ -26,8 +25,8 @@ public class DMActivator implements PostAnimationAction {
     
     public void animationEnded(Object target, short type, String dimension){
 	if (((AbstractTaskDMEventHandler)application.eh).cursorHasNotMovedYet){
-	    application.robot.mouseMove(cursorX+2, cursorY);
-	    application.robot.mouseMove(cursorX, cursorY);
+	    ZLAbstractTask.robot.mouseMove(cursorX+2, cursorY);
+	    ZLAbstractTask.robot.mouseMove(cursorX, cursorY);
 	}
     }
     

@@ -11,22 +11,33 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Dimension;
-import java.awt.BasicStroke;
-import java.awt.Image;
 import java.awt.Font;
-import java.awt.Toolkit;
+import java.awt.Graphics2D;
 import java.awt.Point;
-import javax.swing.text.Style;
-
+import java.awt.Toolkit;
 import java.util.Vector;
 
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.engine.DraggableCameraPortal;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.engine.OverviewPortal;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.lens.FSGaussianLens;
+import net.claribole.zvtm.lens.Lens;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.ZRoundRect;
+import com.xerox.VTM.glyphs.ZSegment;
 
 public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
 

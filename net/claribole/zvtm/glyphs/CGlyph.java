@@ -21,14 +21,13 @@ package net.claribole.zvtm.glyphs;
 
 //import java.lang.Math;
 //import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.lens.Lens;
 
   /**
    * Composite glyph (abstract glyph made of a primary shape and [optional] secondary shapes). A composite glyph has no visual representation of its own : it is just a means to tie glyphs between themselves. CGlyph only offers an higher level construction to group standard glyphs ; it entirely relies on lower level functions that are also available to the programmer ; so if you are not happy with the way CGlyph works, you can always create a modified version of it. <br> 

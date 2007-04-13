@@ -24,10 +24,9 @@
 package com.xerox.VTM.engine;
 
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.DisplayMode;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -39,10 +38,9 @@ import javax.swing.JLabel;
 
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.engine.RepaintListener;
-
 import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**

@@ -10,7 +10,6 @@
 package net.claribole.eval.to;
 
 import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.glyphs.ZCircle;
 
 public class BehaviorBlock {
 

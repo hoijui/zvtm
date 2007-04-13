@@ -13,12 +13,17 @@ package net.claribole.zvtm.demo;
 import java.awt.Color;
 import java.util.Vector;
 
-import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.ViewEventHandler;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.VRectangleST;
 
 public class ViewDemo {
 
@@ -161,8 +166,8 @@ public class ViewDemo {
 
     public static void main(String[] args){
 	System.out.println(startMsg);
-	ViewDemo appli=new ViewDemo((args.length > 0) ? Short.parseShort(args[0]) : 0,
-				    (args.length > 1) ? Short.parseShort(args[1]) : 0);
+	new ViewDemo((args.length > 0) ? Short.parseShort(args[0]) : 0,
+		(args.length > 1) ? Short.parseShort(args[1]) : 0);
     }
     
 }

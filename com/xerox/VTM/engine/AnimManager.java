@@ -994,7 +994,6 @@ public class AnimManager implements Runnable{
 		}	
 		case GL_CP_TRANS_PAR:{//parabolic  (^4)
 		    double stepValue;
-		    double drad,dang;
 		    for (int i=0;i<nbSteps-1;) {
 			stepValue=Math.pow((i+1)/nbSteps,4);
 			an.steps[i++]=new PolarCoords(rad+(long)Math.round(trad*stepValue),(float)(ang+tang*stepValue));
@@ -1006,7 +1005,6 @@ public class AnimManager implements Runnable{
 		}
 		case GL_CP_TRANS_SIG:{//sigmoid
 		    double stepValue;
-		    double drad,dang;
 		    for (int i=0;i<nbSteps-1;){
 			stepValue=computeSigmoid(sigFactor,(i+1)/nbSteps);
 			an.steps[i++]=new PolarCoords(rad+Math.round(trad*stepValue),(float)(ang+tang*stepValue));

@@ -10,15 +10,14 @@
 
 package net.claribole.zvtm.engine;
 
-import java.awt.geom.Point2D;
-import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**A portal behaving as a trailing widget and showing what is seen through a camera that serves as an overview. Shape: rectangular.

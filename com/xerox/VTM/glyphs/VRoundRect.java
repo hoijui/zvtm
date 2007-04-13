@@ -12,15 +12,14 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 
-import com.xerox.VTM.engine.Camera;
-import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjRoundRect;
+
+import com.xerox.VTM.engine.Camera;
 
 /**
  * Round Rectangle. This version is the most efficient, but it cannot be made translucent (see VRoundRectST).<br>Corners are approximated to right angles for some operations such as cursor entry/exit events.

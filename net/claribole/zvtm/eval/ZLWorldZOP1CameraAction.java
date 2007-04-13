@@ -11,7 +11,6 @@
 package net.claribole.zvtm.eval;
 
 import net.claribole.zvtm.engine.PostAnimationAction;
-import net.claribole.zvtm.lens.Lens;
 
 public class ZLWorldZOP1CameraAction implements PostAnimationAction {
 

@@ -10,10 +10,8 @@
 
 package net.claribole.zvtm.engine;
 
-import java.awt.Color;
-
-import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.Glyph;
 
 /** Fade In transition for Views.

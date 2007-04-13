@@ -10,16 +10,19 @@
 
 package net.claribole.zvtm.demo;
 
-import java.awt.Toolkit;
 import java.awt.Color;
-import java.awt.Font;
-import javax.swing.ImageIcon;
-
+import java.awt.Toolkit;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.engine.TrailingOverview;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 public class PortalWorldDemo {
 

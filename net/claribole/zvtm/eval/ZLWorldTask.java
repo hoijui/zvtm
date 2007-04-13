@@ -12,21 +12,31 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.Dimension;
-import java.awt.BasicStroke;
-import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Graphics2D;
-import javax.swing.text.Style;
-
 import java.util.Vector;
 
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
+import javax.swing.text.Style;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import net.claribole.zvtm.engine.DraggableCameraPortal;
+import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.engine.OverviewPortal;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.lens.FSGaussianLens;
+import net.claribole.zvtm.lens.Lens;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.ZSegment;
 
 public class ZLWorldTask implements PostAnimationAction, MapApplication {
 
@@ -547,7 +557,6 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	float cameraAbsAlt = demoCamera.getAltitude()+demoCamera.getFocal();
 	long c2x = Math.round(mx - INV_MAG_FACTOR * (mx - demoCamera.posx));
 	long c2y = Math.round(my - INV_MAG_FACTOR * (my - demoCamera.posy));
-	Vector cadata = new Vector();
 	// -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
 	float deltAlt = (float)((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
 	if (cameraAbsAlt + deltAlt > FLOOR_ALTITUDE){
@@ -569,7 +578,6 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	float cameraAbsAlt = demoCamera.getAltitude()+demoCamera.getFocal();
 	long c2x = Math.round(mx - MAG_FACTOR * (mx - demoCamera.posx));
 	long c2y = Math.round(my - MAG_FACTOR * (my - demoCamera.posy));
-	Vector cadata = new Vector();
 	demoCamera.altitudeOffset((float)(cameraAbsAlt*(MAG_FACTOR-1)));
 	// uncomment for ZCC
  	demoCamera.move(c2x-demoCamera.posx, c2y-demoCamera.posy);

@@ -10,8 +10,6 @@
 
 package net.claribole.zvtm.eval;
 
-import com.xerox.VTM.engine.VirtualSpace;
-
 import javax.swing.text.Style;
 
 public interface MapApplication {

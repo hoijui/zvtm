@@ -151,7 +151,6 @@ public class Introduction {
 	vsm.destroyGlyphsInSpace("vs1");
 	eh=new CameraDemoEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
-	float h=0.8f;float s=1.0f;float v=1.0f;
 	long randomX=0;
 	long randomY=0;
 	long randomS=0;
@@ -512,7 +511,7 @@ public class Introduction {
 	System.out.println("User name: "+System.getProperty("user.name"));
 	System.out.println("User home directory: "+System.getProperty("user.home"));
 	System.out.println("-----------------");
-	Introduction appli=new Introduction();
+	new Introduction();
     }
     
 }

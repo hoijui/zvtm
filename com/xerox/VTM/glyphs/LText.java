@@ -11,18 +11,13 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.LensRendering;
+
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Standalone text whose visibility and color can be different depending on whether it is seen through a lens or not. Cannot be reoriented.<br>

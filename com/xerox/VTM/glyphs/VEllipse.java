@@ -22,15 +22,14 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 
-import com.xerox.VTM.engine.Camera;
-import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjEllipse;
+
+import com.xerox.VTM.engine.Camera;
 
 /**
  * Ellipse. This version is the most efficient, but it can not be made translucent (see VEllipseST).

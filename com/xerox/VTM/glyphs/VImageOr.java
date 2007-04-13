@@ -19,15 +19,14 @@
 
 package com.xerox.VTM.glyphs;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
-import net.claribole.zvtm.lens.Lens;
 
 /**
  * Re-orientable Bitmap Image. This version is less efficient than VImage, but it can be reoriented. It cannot be made translucent (see VImage*ST).

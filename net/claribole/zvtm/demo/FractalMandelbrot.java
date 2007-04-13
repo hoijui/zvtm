@@ -153,7 +153,7 @@ public class FractalMandelbrot extends FractalDemo {
 		}
 	    }
 	}
-	FractalMandelbrot appli = new FractalMandelbrot(n);
+	new FractalMandelbrot(n);
     }
 
 }

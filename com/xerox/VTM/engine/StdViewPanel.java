@@ -29,18 +29,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.GraphicsConfiguration;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
-// import java.awt.geom.AffineTransform;
-// import java.awt.image.renderable.ParameterBlock;
-// import javax.media.jai.*;
-
-import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 

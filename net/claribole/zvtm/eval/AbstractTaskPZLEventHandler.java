@@ -10,18 +10,11 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Dimension;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import java.util.Hashtable;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.AnimationListener;
+import com.xerox.VTM.engine.ViewPanel;
 
 class AbstractTaskPZLEventHandler extends AbstractTaskEventHandler {
 
@@ -142,10 +135,10 @@ class AbstractTaskPZLEventHandler extends AbstractTaskEventHandler {
 	if (!application.logm.trialStarted){return;}
 	if (lensType != 0 && application.lens != null){
 	    if (wheelDirection  == WHEEL_UP){
-		application.magnifyFocus(application.WHEEL_MM_STEP, lensType, application.demoCamera);
+		application.magnifyFocus(ZLAbstractTask.WHEEL_MM_STEP, lensType, application.demoCamera);
 	    }
 	    else {
-		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
+		application.magnifyFocus(-ZLAbstractTask.WHEEL_MM_STEP, lensType, application.demoCamera);
 	    }
 	}
 	else {

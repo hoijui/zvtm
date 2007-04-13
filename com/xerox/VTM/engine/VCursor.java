@@ -25,11 +25,10 @@ package com.xerox.VTM.engine;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Enumeration;
 import java.util.Vector;
 
-import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.lens.Lens;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VPath;
@@ -439,7 +438,6 @@ public class VCursor {
     public Vector getIntersectingGlyphs(Camera c){
 	synchronized(this){
 	    Vector res=new Vector();
-	    int index = c.getIndex();
 	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 	    Glyph glyph;
 	    for (int i=0;i<glyphs.size();i++){
@@ -461,7 +459,6 @@ public class VCursor {
     /**empty the list of glyphs under mouse*/
     void resetGlyphsUnderMouseList(VirtualSpace vs,int camIndex){
 	synchronized(this){
-	    Glyph g;
 	    for (int i=0;i<glyphsUnderMouse.length;i++){glyphsUnderMouse[i]=null;maxIndex=-1;}
 	    lastGlyphEntered=null;
 	    Glyph[] gl = vs.getVisibleGlyphList();

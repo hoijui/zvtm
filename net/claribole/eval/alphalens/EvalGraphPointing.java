@@ -1,28 +1,19 @@
 
 package net.claribole.eval.alphalens;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.Graphics2D;
-
-import java.util.Vector;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import com.xerox.VTM.svg.SVGReader;
-import net.claribole.zvtm.engine.*;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import com.xerox.VTM.svg.SVGReader;
 
 public class EvalGraphPointing extends EvalPointing {
 

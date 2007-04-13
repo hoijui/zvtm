@@ -12,16 +12,10 @@ package net.claribole.zvtm.engine;
 
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReadParam;
@@ -43,7 +37,6 @@ public class Utils {
 	    final ImageReadParam param = reader.getDefaultReadParam();
             
 	    Rectangle sourceRegion = new Rectangle();
-	    long bytesRead = 0;
 	    int w = reader.getWidth(0);
 	    int h = reader.getHeight(0);
 	    int c = 1;

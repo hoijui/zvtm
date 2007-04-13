@@ -14,14 +14,10 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
-
 import java.util.Hashtable;
 import java.util.Vector;
 
 import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.VImage;
 
 
 public class MapData {

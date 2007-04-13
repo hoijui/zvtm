@@ -19,16 +19,16 @@
 
 package com.xerox.VTM.tests;
 
-import java.util.Vector;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-
-import net.claribole.zvtm.engine.ViewEventHandler;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
+import net.claribole.zvtm.engine.ViewEventHandler;
+
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 public class EventHandlerTest implements ViewEventHandler{
 

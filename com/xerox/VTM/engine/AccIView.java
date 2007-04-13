@@ -23,7 +23,6 @@
 package com.xerox.VTM.engine;
 
 import java.awt.Container;
-import java.awt.DisplayMode;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.KeyEvent;
@@ -38,7 +37,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
-
 import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**

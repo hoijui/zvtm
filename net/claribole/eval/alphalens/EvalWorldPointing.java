@@ -1,17 +1,9 @@
 
 package net.claribole.eval.alphalens;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.Graphics2D;
 import javax.swing.ImageIcon;
 
-import java.util.Vector;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
+import com.xerox.VTM.glyphs.VImage;
 
 public class EvalWorldPointing extends EvalPointing {
 

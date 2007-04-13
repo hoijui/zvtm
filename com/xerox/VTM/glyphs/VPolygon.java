@@ -12,18 +12,17 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import net.claribole.zvtm.glyphs.projection.ProjPolygon;
+
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.glyphs.projection.ProjPolygon;
 
 /**
  * Polygon. Can be resized. Cannot be reoriented. This new implementation of VPolygon models vertices as doubles internally to allow resizing without loss of precision (and thus resizing to small sizes does not tamper with the shape's aspect). It might be more memory consuming, and less efficient than the original implementation, so the latter is still provided (class FPolygon), for people who do not care about resizing polygons.

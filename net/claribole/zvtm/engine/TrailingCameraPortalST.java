@@ -15,7 +15,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**A portal showing what is seen through a camera, with parameterable alpha channel (translucency).
    The portal behaves like a trailing widget.

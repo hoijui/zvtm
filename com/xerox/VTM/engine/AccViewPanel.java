@@ -27,8 +27,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
 import java.awt.RenderingHints;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
@@ -36,8 +34,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.Java2DPainter;
+
+import com.xerox.VTM.glyphs.Glyph;
 
 /**
  * Each view runs in its own thread - uses double buffering - Hhardware accelerated using the VolatileImage API.

@@ -10,22 +10,18 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import java.util.Hashtable;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.AnimationListener;
-import net.claribole.zvtm.engine.PortalEventHandler;
-import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.CameraPortal;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PortalEventHandler;
+
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 
 class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler {
@@ -302,10 +298,10 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	if (mode == MODE_PZL){
 	    if (lensType != 0 && application.lens != null){
 		if (wheelDirection  == WHEEL_UP){// increasing lens focus mag factor
-		    application.magnifyFocus(application.WHEEL_MM_STEP, lensType, application.demoCamera);
+		    application.magnifyFocus(ZLWorldTask.WHEEL_MM_STEP, lensType, application.demoCamera);
 		}
 		else {// decreasing lens focus mag factor
-		    application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
+		    application.magnifyFocus(-ZLWorldTask.WHEEL_MM_STEP, lensType, application.demoCamera);
 		}
 	    }
 	    else {
@@ -376,7 +372,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	else if (code==KeyEvent.VK_MINUS){application.showGridLevel(application.currentLevel-1);}
 	else if (code==KeyEvent.VK_J){application.ewmm.switchAdaptMaps();}
 	else if (code==KeyEvent.VK_K){
-	    application.SHOW_MEMORY_USAGE = !application.SHOW_MEMORY_USAGE;
+	    ZLWorldTask.SHOW_MEMORY_USAGE = !ZLWorldTask.SHOW_MEMORY_USAGE;
 	    application.vsm.repaintNow();
 	}
 	else if (code==KeyEvent.VK_G){application.gc();}

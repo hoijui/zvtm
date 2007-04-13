@@ -12,21 +12,29 @@ package net.claribole.eval.to;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.File;
+import java.util.Vector;
+
 import javax.swing.ImageIcon;
 
-import java.util.Vector;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import java.io.File;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import com.xerox.VTM.svg.SVGReader;
-import net.claribole.zvtm.engine.PortalEventHandler;
-import net.claribole.zvtm.engine.TrailingOverview;
-import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.eval.Utils;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.RepaintListener;
+import net.claribole.zvtm.engine.TrailingOverview;
+
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.ClosedShape;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.Translucent;
+import com.xerox.VTM.glyphs.VImage;
+import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.svg.SVGReader;
 
 public class BehaviorEval implements TOWApplication, RepaintListener {
 

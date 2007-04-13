@@ -12,14 +12,21 @@ package net.claribole.eval.to;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-
 import java.util.Vector;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.engine.OverviewPortal;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.RepaintListener;
+import net.claribole.zvtm.engine.TrailingOverview;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.ZCircle;
 
 public class AcquireEval implements TOWApplication, RepaintListener {
 

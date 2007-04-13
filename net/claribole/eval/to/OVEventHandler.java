@@ -9,13 +9,13 @@
 
 package net.claribole.eval.to;
 
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 
-import java.util.Vector;
+import net.claribole.zvtm.engine.CameraPortal;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PortalEventHandler;
 
-import com.xerox.VTM.engine.*;
-import net.claribole.zvtm.engine.*;
+import com.xerox.VTM.engine.ViewPanel;
 
 class OVEventHandler extends BaseEventHandler implements PortalEventHandler {
 

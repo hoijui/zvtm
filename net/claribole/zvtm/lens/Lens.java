@@ -15,11 +15,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.WritableRaster;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**Parent class of all lenses*/
 

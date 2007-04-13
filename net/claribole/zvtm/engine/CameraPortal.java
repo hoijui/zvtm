@@ -10,21 +10,18 @@
 
 package net.claribole.zvtm.engine;
 
-import java.awt.Graphics2D;
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-
 import java.util.Vector;
 
-import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.LongPoint;
-import net.claribole.zvtm.engine.Location;
-import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
 
 /**A portal showing what is seen through a camera. Shape: rectangular.

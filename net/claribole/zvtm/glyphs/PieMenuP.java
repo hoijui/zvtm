@@ -13,17 +13,14 @@ package net.claribole.zvtm.glyphs;
 import java.awt.Color;
 import java.awt.Font;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
-import com.xerox.VTM.glyphs.VCircle;
 
 public class PieMenuP extends PieMenu {
 

@@ -9,21 +9,14 @@
 
 package net.claribole.zvtm.glyphs;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.AlphaComposite;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.Translucent;
-import net.claribole.zvtm.lens.Lens;
+import com.xerox.VTM.glyphs.VPath;
 
 /**
  * Translucent General path: made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. This version is less efficient than VPath, but it can be made translucent. Can neither be resized nor reoriented (for now). This glyph does not follow the standard object model: (vx,vy) are the coordinates of the path's first point. VPaths do not fire cursor entry/exit events, but it is possible to detect that a cursor is overlapping a VPath by explicitely calling VCursor.interesctsPath(VPath p) and related methods.

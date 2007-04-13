@@ -169,10 +169,10 @@ class AbstractTV2DEventHandler implements ViewEventHandler, ComponentListener {
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	if (lensType != 0 && application.lens != null){
 	    if (wheelDirection  == WHEEL_UP){
-		application.magnifyFocus(application.WHEEL_MM_STEP, lensType, application.demoCamera);
+		application.magnifyFocus(AbstractTrajectoryViewer2D.WHEEL_MM_STEP, lensType, application.demoCamera);
 	    }
 	    else {
-		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
+		application.magnifyFocus(-AbstractTrajectoryViewer2D.WHEEL_MM_STEP, lensType, application.demoCamera);
 	    }
 	}
 	else {

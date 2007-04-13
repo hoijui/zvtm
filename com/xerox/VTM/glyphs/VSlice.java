@@ -11,18 +11,17 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.Dimension;
-import java.awt.geom.AffineTransform;
+import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+
+import net.claribole.zvtm.glyphs.projection.ProjSlice;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
-import com.xerox.VTM.svg.SVGReader;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.glyphs.projection.ProjSlice;
 
 /**
  * Slice. This version is the most efficient, but it cannot be made translucent (see VSliceST).<br>

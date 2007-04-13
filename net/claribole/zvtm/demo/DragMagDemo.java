@@ -10,17 +10,26 @@
 
 package net.claribole.zvtm.demo;
 
-import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Font;
-import javax.swing.ImageIcon;
-
+import java.awt.Toolkit;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
+import javax.swing.ImageIcon;
+
+import net.claribole.zvtm.engine.DraggableCameraPortal;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.Location;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VImage;
+import com.xerox.VTM.glyphs.VRectangle;
 
 public class DragMagDemo implements Java2DPainter {
 

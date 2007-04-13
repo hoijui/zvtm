@@ -9,22 +9,22 @@
 
 package net.claribole.eval.to;
 
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.glyphs.Glyph;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.PostAnimationAction;
+
+import com.xerox.VTM.glyphs.Glyph;
 
 public class BehaviorLogManager implements PostAnimationAction {
 

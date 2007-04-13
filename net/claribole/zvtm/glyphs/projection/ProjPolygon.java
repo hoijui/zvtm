@@ -22,7 +22,6 @@
 
 package net.claribole.zvtm.glyphs.projection;
 
-import java.awt.Polygon;
 
 /**project coordinates of a custom shape
  * @author Emmanuel Pietriga

@@ -10,19 +10,17 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
-
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
+import javax.swing.ImageIcon;
+
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.engine.Utils;
 
 public class ZLWorldTaskMapManager implements Runnable {
 

@@ -10,19 +10,20 @@
 
 package net.claribole.zvtm.demo;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangle;
-
-import net.claribole.zvtm.engine.*;
-
-import java.awt.Color;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import java.util.Vector;
+import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.ObservedRegionListener;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.ViewEventHandler;
+
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 class PWEventHandler implements ViewEventHandler, PortalEventHandler, AnimationListener, ObservedRegionListener {
 

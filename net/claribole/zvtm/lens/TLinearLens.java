@@ -11,8 +11,6 @@
 
 package net.claribole.zvtm.lens;
 
-import java.awt.image.SinglePixelPackedSampleModel;
-import java.awt.image.WritableRaster;
 
 /**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 

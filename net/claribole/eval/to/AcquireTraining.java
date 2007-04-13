@@ -11,14 +11,20 @@ package net.claribole.eval.to;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.Graphics2D;
-
+import java.awt.Toolkit;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.TrailingOverview;
+
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 public class AcquireTraining implements TOWApplication, Java2DPainter {
 

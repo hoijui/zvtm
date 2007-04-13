@@ -10,11 +10,10 @@
 
 package net.claribole.zvtm.lens;
 
-import java.awt.image.WritableRaster;
-import java.awt.image.BufferedImage;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 
-import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.ViewPanel;
 
 /**Parent class of all lenses which have a fixed size (i.e. whose radius does not depend on the view's size)*/

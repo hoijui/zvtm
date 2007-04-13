@@ -147,7 +147,6 @@ public class Eval implements TOWApplication {
     }
 
     void initWorld(){
-	float h = 0.8f;float s = 1.0f;float v = 1.0f;
 	long randomX = 0;
 	long randomY = 0;
 	long randomS = 0;

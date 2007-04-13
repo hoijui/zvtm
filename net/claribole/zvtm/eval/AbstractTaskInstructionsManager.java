@@ -63,7 +63,7 @@ class AbstractTaskInstructionsManager implements Java2DPainter {
 
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	g2d.setColor(application.SELECTION_RECT_COLOR);
+	g2d.setColor(ZLAbstractTask.SELECTION_RECT_COLOR);
 // 	if (application.lens != null){
 // 	    g2d.fillRect(application.hpanelWidth+application.lens.lx,
 // 			 application.hpanelHeight+application.lens.ly-ZLAbstractTask.H_CENTER_CROSS_SIZE,

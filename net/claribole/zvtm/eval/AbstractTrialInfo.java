@@ -10,15 +10,6 @@
 
 package net.claribole.zvtm.eval;
 
-import java.awt.Color;
-
-import java.util.Vector;
-
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.ZRoundRect;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.LongPoint;
 
 class AbstractTrialInfo {

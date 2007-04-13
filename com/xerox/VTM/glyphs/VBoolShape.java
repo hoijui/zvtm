@@ -22,18 +22,17 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
-import com.xerox.VTM.engine.Camera;
-import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.glyphs.projection.ProjBoolean;
+
+import com.xerox.VTM.engine.Camera;
 
   /**
    * Glyphs defined as a main shape modified through boolean operations using secondary shapes.

@@ -13,19 +13,15 @@ package net.claribole.zvtm.glyphs;
 import java.awt.Color;
 import java.awt.Font;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VPolygon;
-import com.xerox.VTM.glyphs.VPolygonST;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VSlice;
 import com.xerox.VTM.glyphs.VSliceST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
-import com.xerox.VTM.glyphs.VCircle;
 
 public class PieMenuC extends PieMenu {
 
@@ -55,7 +51,6 @@ public class PieMenuC extends PieMenu {
 	this.vs = vsm.getVirtualSpace(vsName);
 	long vx = menuCenterCoordinates.x;
 	long vy = menuCenterCoordinates.y;
-	LongPoint[] coords;
 	items = new VSlice[stringLabels.length];
 	labels = new VTextOr[stringLabels.length];
 	double angle = startAngle;
@@ -134,7 +129,6 @@ public class PieMenuC extends PieMenu {
 	this.vs = vsm.getVirtualSpace(vsName);
 	long vx = menuCenterCoordinates.x;
 	long vy = menuCenterCoordinates.y;
-	LongPoint[] coords;
 	items = new VSlice[stringLabels.length];
 	labels = new VTextOr[stringLabels.length];
 	double angle = startAngle;
@@ -214,7 +208,6 @@ public class PieMenuC extends PieMenu {
 	this.vs = vsm.getVirtualSpace(vsName);
 	long vx = menuCenterCoordinates.x;
 	long vy = menuCenterCoordinates.y;
-	LongPoint[] coords;
 	items = new VSlice[stringLabels.length];
 	labels = new VTextOr[stringLabels.length];
 	double angle = startAngle;
@@ -294,7 +287,6 @@ public class PieMenuC extends PieMenu {
 	this.vs = vsm.getVirtualSpace(vsName);
 	long vx = menuCenterCoordinates.x;
 	long vy = menuCenterCoordinates.y;
-	LongPoint[] coords;
 	items = new VSlice[stringLabels.length];
 	labels = new VTextOr[stringLabels.length];
 	double angle = startAngle;

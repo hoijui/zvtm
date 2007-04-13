@@ -113,7 +113,7 @@ public class FractalKoch extends FractalDemo {
 		}
 	    }
 	}
-	FractalKoch appli = new FractalKoch(n);
+	new FractalKoch(n);
     }
 
 }

@@ -9,21 +9,15 @@
 
 package net.claribole.zvtm.glyphs;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.AlphaComposite;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Translucent;
-import net.claribole.zvtm.lens.Lens;
+import com.xerox.VTM.glyphs.VText;
 
 /**
  * Translucent Standalone Text.  This version is less efficient than VText, but it can be made translucent. It cannot be reoriented (see VTextOr*).<br>

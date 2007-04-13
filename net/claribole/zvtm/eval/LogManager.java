@@ -10,26 +10,24 @@
 
 package net.claribole.zvtm.eval;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.AlphaComposite;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JFileChooser;
-
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-
 import java.util.Vector;
 
-import com.xerox.VTM.engine.SwingWorker;
+import javax.swing.JFileChooser;
+
 import net.claribole.zvtm.engine.Java2DPainter;
+
+import com.xerox.VTM.engine.SwingWorker;
 
 class LogManager implements Java2DPainter {
 

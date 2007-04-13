@@ -7,16 +7,18 @@
 
 package net.claribole.zvtm.demo;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.engine.ViewEventHandler;
 
-import net.claribole.zvtm.engine.*;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VCursor;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 class AnimationDemoEventHandler implements ViewEventHandler {
 

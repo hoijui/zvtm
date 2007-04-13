@@ -10,16 +10,21 @@
 
 package net.claribole.zvtm.demo;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangle;
-
-import net.claribole.zvtm.engine.*;
-
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
+import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.CameraPortal;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.engine.ViewEventHandler;
+
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 class DMDEventHandler implements ViewEventHandler, PortalEventHandler, AnimationListener {
 

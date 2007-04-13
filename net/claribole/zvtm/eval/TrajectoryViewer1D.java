@@ -11,36 +11,34 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Toolkit;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Container;
-import javax.swing.JTable;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JColorChooser;
-import javax.swing.JFileChooser;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.*;
-import javax.swing.event.*;
-
+import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Vector;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import javax.swing.JColorChooser;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.*;
-
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VSegment;
 
 public class TrajectoryViewer1D extends JFrame {
 

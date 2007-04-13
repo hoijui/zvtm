@@ -11,7 +11,6 @@
 package net.claribole.zvtm.eval;
 
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;

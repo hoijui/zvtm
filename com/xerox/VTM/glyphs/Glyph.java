@@ -25,14 +25,12 @@ package com.xerox.VTM.glyphs;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
-import java.util.Vector;
 
 import net.claribole.zvtm.glyphs.CGlyph;
-import net.claribole.zvtm.lens.Lens;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;

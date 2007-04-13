@@ -13,10 +13,9 @@ package net.claribole.zvtm.glyphs;
 import java.awt.Color;
 import java.awt.Font;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 public abstract class PieMenuFactory {
     

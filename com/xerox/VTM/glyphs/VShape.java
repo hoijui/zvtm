@@ -23,18 +23,17 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 
+import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
+
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
 
 /**
  * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented.<br>

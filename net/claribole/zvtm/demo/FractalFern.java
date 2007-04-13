@@ -114,7 +114,7 @@ public class FractalFern extends FractalDemo {
 		}
 	    }
 	}
-	FractalFern appli = new FractalFern(n);
+	new FractalFern(n);
     }
 
 }

@@ -21,14 +21,13 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
-import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
-import net.claribole.zvtm.lens.Lens;
 
 /**
  * Rectangle. This version is less efficient than VRectangle, but it can be reoriented. It cannot be made translucent (see VRectangle*ST).

@@ -119,7 +119,7 @@ public class FractalJulia extends FractalDemo {
 		}
 	    }
 	}
-	FractalJulia appli = new FractalJulia(n);
+	new FractalJulia(n);
     }
 
 }

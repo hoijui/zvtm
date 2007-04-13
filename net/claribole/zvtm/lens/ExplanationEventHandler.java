@@ -10,17 +10,15 @@
 
 package net.claribole.zvtm.lens;
 
-import java.awt.Dimension;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
 
 class ExplanationEventHandler implements ViewEventHandler {
 

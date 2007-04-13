@@ -22,7 +22,6 @@
 package com.xerox.VTM.engine;
 
 import java.awt.Container;
-import java.awt.DisplayMode;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Vector;
