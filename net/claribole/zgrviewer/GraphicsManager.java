@@ -25,7 +25,6 @@ import java.util.Vector;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VCursor;
-import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.DraggableCameraPortal;
 import net.claribole.zvtm.lens.*;
@@ -42,10 +41,12 @@ import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.RectangleNR;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VRectangleOr;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.svg.Metadata;
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -1076,6 +1077,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	Object o = g.getOwner();
 	if (o != null && o instanceof LNode){
 	    LNode n = (LNode)o;
+	    ClosedShape nShape = n.getShape();
 	    LEdge[] oa = n.getOutgoingArcs();
 	    LEdge[] ia = n.getIncomingArcs();
 	    LEdge[] ua = n.getUndirectedArcs();
@@ -1103,8 +1105,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    }
 		}
 		LNode oe;
+		ClosedShape oeShape;
 		for (int i=0;i<ua.length;i++){
 		    oe = ua[i].getOtherEnd(n);
+		    oeShape = oe.getShape();
 		    // animate arc
 		    VPath vp = ua[i].getSpline();
 		    if (vp != null){
@@ -1113,21 +1117,21 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			mSpace.hide(vp);
 			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
 			LongPoint[] flat;
-			if (Math.sqrt(Math.pow(vp.vx-n.glyphs[0].vx, 2) + Math.pow(vp.vy-n.glyphs[0].vy, 2)) < Math.sqrt(Math.pow(vp.vx-oe.glyphs[0].vx, 2) + Math.pow(vp.vx-oe.glyphs[0].vx, 2))){
+			if (Math.sqrt(Math.pow(vp.vx-nShape.vx, 2) + Math.pow(vp.vy-nShape.vy, 2)) < Math.sqrt(Math.pow(vp.vx-oeShape.vx, 2) + Math.pow(vp.vx-oeShape.vx, 2))){
 			    // this test identifies which arc end point is associated with which node
 			    // we have to get this information from the geometry in the case of undirected arcs
-			    flat = DPath.getFlattenedCoordinates(dp, n.glyphs[0].getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
+			    flat = DPath.getFlattenedCoordinates(dp, nShape.getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
 			}
 			else {
-			    flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), n.glyphs[0].getLocation(), true);
+			    flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), nShape.getLocation(), true);
 			}
 			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
 		    }
 		    // animate node
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
-		    trans = new LongPoint(xs[i].x-oe.glyphs[0].vx,
-					  xs[i].y-oe.glyphs[0].vy);
+		    trans = new LongPoint(xs[i].x-oeShape.vx,
+					  xs[i].y-oeShape.vy);
 		    for (int j=0;j<oe.glyphs.length;j++){
 			fresnelizedNodeGlyphs.add(new FresnelNodeInfo(oe.glyphs[j], trans));
 			mSpace.onTop(oe.glyphs[j]);
@@ -1137,6 +1141,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		}
 	    }
 	    else {// directed graph
+		ClosedShape oeShape;
 		// in theory undirected edges cannot exist in a directed graph (looks like they are ignored)
 		// outgoing edges
 		xs = new LongPoint[oa.length];
@@ -1153,7 +1158,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    }
 		}
 		for (int i=0;i<oa.length;i++){
-
 		    // animate arc
 		    VPath vp = oa[i].getSpline();
 		    if (vp != null){
@@ -1161,13 +1165,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			vsm.addGlyph(dp, mSpace);
 			mSpace.hide(vp);
 			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
-			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, n.glyphs[0].getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
+			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, nShape.getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
 			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
 		    }
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
-		    trans = new LongPoint(xs[i].x-oa[i].head.glyphs[0].vx,
-					  xs[i].y-oa[i].head.glyphs[0].vy);
+		    oeShape = oa[i].head.getShape();
+		    trans = new LongPoint(xs[i].x-oeShape.vx,
+					  xs[i].y-oeShape.vy);
 		    for (int j=0;j<oa[i].head.glyphs.length;j++){
 			fresnelizedNodeGlyphs.add(new FresnelNodeInfo(oa[i].head.glyphs[j], trans));
 			mSpace.onTop(oa[i].head.glyphs[j]);
@@ -1190,7 +1195,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    }
 		}
 		for (int i=0;i<ia.length;i++){
-
 		    // animate arc
 		    VPath vp = ia[i].getSpline();
 		    if (vp != null){
@@ -1198,15 +1202,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			vsm.addGlyph(dp, mSpace);
 			mSpace.hide(vp);
 			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
-			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), n.glyphs[0].getLocation(), true);
+			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), nShape.getLocation(), true);
 			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
 		    }
-
-
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
-		    trans = new LongPoint(xs[i].x-ia[i].tail.glyphs[0].vx,
-					  xs[i].y-ia[i].tail.glyphs[0].vy);
+		    oeShape = ia[i].tail.getShape();
+		    trans = new LongPoint(xs[i].x-oeShape.vx,
+					  xs[i].y-oeShape.vy);
 		    for (int j=0;j<ia[i].tail.glyphs.length;j++){
 			fresnelizedNodeGlyphs.add(new FresnelNodeInfo(ia[i].tail.glyphs[j], trans));
 			mSpace.onTop(ia[i].tail.glyphs[j]);

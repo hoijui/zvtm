@@ -13,6 +13,7 @@ package net.claribole.zgrviewer;
 import java.util.Vector;
 
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.svg.Metadata;
 
 class LNode extends LElem {
@@ -95,6 +96,13 @@ class LNode extends LElem {
 	    }
 	}
 	return res;
+    }
+
+    ClosedShape getShape(){
+	for (int i=0;i<glyphs.length;i++){
+	    if (glyphs[i] instanceof ClosedShape){return (ClosedShape)glyphs[i];}
+	}
+	return null;
     }
 
     public String toString(){
