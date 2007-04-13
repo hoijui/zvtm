@@ -898,7 +898,7 @@ public class AnimManager implements Runnable{
 		//create the appropriate animation
 		Glyph g = vsm.getGlyph(gID);
 		if (g instanceof DPath)
-		    this.createDPathAnimation(ap.duration, ap.type, (LongPoint[])ap.data, gID, ap.paa);
+		    this.createPathAnimation(ap.duration, ap.type, (LongPoint[])ap.data, gID, ap.paa);
 		else
 		    this.newGlyphAnim(ap.duration, ap.type, ap.data, gID, 0, ap.paa);
 		//remove entry for this glyph is there is no more anim in the queue
@@ -1180,7 +1180,7 @@ public class AnimManager implements Runnable{
      * @param gID ID of DPath to be animated
      * @param paa action to be performed after animation finished
      */
-    public void createDPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa){
+    public void createPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa){
 	Glyph g=vsm.getGlyph(gID);
 	//detect kind of glyph and instanciate appropriate animation class
 	if (g instanceof DPath){
