@@ -543,7 +543,7 @@ public class DPath extends Glyph {
     /**
      * Get coordinates of the start, end and control points of the element
      * @param index index of the element in the DPath
-     * @return List of element's points ordered as startPoint, endPoint, controlPoint1, controlPoint2
+     * @return List of element's points ordered as startPoint, controlPoint1, controlPoint2, endPoint
      */    
     public LongPoint[] getElementPointsCoordinates(int index){
 	LongPoint[] result = null;
@@ -557,9 +557,9 @@ public class DPath extends Glyph {
 		else{
 		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
 		}
-		result[1] = new LongPoint(elements[index].x, elements[index].y);
-		result[2] = new LongPoint(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
-		result[3] = new LongPoint(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
+		result[3] = new LongPoint(elements[index].x, elements[index].y);
+		result[1] = new LongPoint(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
+		result[2] = new LongPoint(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
 		break;
 	    }
 	    case DPath.QDC:{
@@ -570,8 +570,8 @@ public class DPath extends Glyph {
 		else{
 		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
 		}
-		result[1] = new LongPoint(elements[index].x, elements[index].y);
-		result[2] = new LongPoint(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
+		result[2] = new LongPoint(elements[index].x, elements[index].y);
+		result[1] = new LongPoint(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
 		break;
 	    }
 	    default:{
@@ -726,6 +726,106 @@ public class DPath extends Glyph {
 		    res.jump(pts[1].x, pts[1].y, true);
 		    break;
 		}
+		}
+	    }
+	}
+	return res;
+    }
+    
+    /**
+     * Get orientation of the tangent to the start of the path.
+     * @return radians between 0..2*Pi
+     */
+    public float getStartTangentOrientation(){
+	float res = 0;
+	if (elements.length > 0){
+	    PathElement el = elements[0];
+	    long sx = 0;
+	    long sy = 0;
+	    switch(el.type){
+	    case DPath.CBC:{
+		sx = ((CBCElement)el).ctrlx1;
+		sy = ((CBCElement)el).ctrly1;
+		break;
+	    }
+	    case DPath.QDC:{
+		sx = ((QDCElement)el).ctrlx;
+		sy = ((QDCElement)el).ctrly;
+		break;
+	    }
+	    default:{
+		sx = el.x;
+		sy = el.y;
+		break;
+	    }
+	    }
+	    if (vx == sx){ // x = 0, y = +-1
+		if (vy > sy) // y > 0
+		    res = (float)(Math.PI / 2);
+		else // y < 0
+		    res = (float)(Math.PI * 1.5);
+	    }
+	    else {
+		double tan = (double)(vy - sy) / (double)(vx - sx);
+		res = (float)Math.atan(tan);
+		if (vx < sx) { // x < 0 
+		    res += Math.PI;
+		}
+		if (vx > sx && vy < sy){ // x > 0; y < 0
+		    res += 2*Math.PI;
+		}
+	    }
+	}
+	return res;
+    }
+    
+    /**
+     * Get orientation of the tangent to the end of the path.
+     * @return radians between 0..2*Pi
+     */
+    public float getEndTangentOrientation(){
+	float res = 0;
+	if (elements.length > 0){
+	    PathElement el = elements[elements.length-1];
+	    long sx = 0;
+	    long sy = 0;
+	    switch(el.type){
+	    case DPath.CBC:{
+		sx = ((CBCElement)el).ctrlx2;
+		sy = ((CBCElement)el).ctrly2;
+		break;
+	    }
+	    case DPath.QDC:{
+		sx = ((QDCElement)el).ctrlx;
+		sy = ((QDCElement)el).ctrly;
+		break;
+	    }
+	    default:{
+		if (elements.length > 1){
+		    sx = elements[elements.length - 2].x;
+		    sy = elements[elements.length - 2].y;
+		}
+		else {
+		    sx = vx;
+		    sy = vy;
+		}
+		break;
+	    }
+	    }
+	    if (el.x == sx){ // x = 0, y = +-1
+		if (el.y > sy) // y > 0
+		    res = (float)(Math.PI / 2);
+		else // y < 0
+		    res = (float)(Math.PI * 1.5);
+	    }
+	    else {
+		double tan = (double)(el.y - sy) / (double)(el.x - sx);
+		res = (float)Math.atan(tan);
+		if (el.x < sx) { // x < 0 
+		    res += Math.PI;
+		}
+		if (el.x > sx && el.y < sy){ // x > 0; y < 0
+		    res += 2*Math.PI;
 		}
 	    }
 	}
