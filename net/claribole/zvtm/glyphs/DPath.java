@@ -9,6 +9,7 @@
 
 package net.claribole.zvtm.glyphs;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -284,7 +285,7 @@ public class DPath extends Glyph {
 	    g.translate(dx,dy);
 	    for (int j=0;j<elements.length;j++){
 		if (elements[j].type == DPath.MOV){continue;}
-		g.draw(elements[j].getShape(i));
+		g.draw(elements[j].getShape(i));		
 	    }
 	    g.translate(-dx,-dy);
 	    g.setStroke(stdS);
@@ -633,11 +634,11 @@ public class DPath extends Glyph {
     }
     
     /**
-     * Calculates coordinates of all DPath's points (including control points) to display the DPAth as line.
+     * Calculates coordinates of all DPath's points (including control points) to display the DPAth as a line.
      * @param path DPath to be flatten
      * @param startPoint Start point of desired line
      * @param endPoint End point of desired line
-     * @param whether to use absolute values
+     * @param abs whether to use absolute values
      * @return List of LongPoint absolute coordinates that can be passed to the edit(LongPoint[], boolean) method or to the AnimManager
      */
     public static LongPoint[] getFlattenedCoordinates(DPath path, LongPoint startPoint, LongPoint endPoint, boolean abs){
@@ -667,6 +668,15 @@ public class DPath extends Glyph {
 	DPath res = null;
 	if (vp != null){
 	    res = new DPath(vp.vx, vp.vy, vp.vz, vp.getColor());
+	    BasicStroke s = vp.getStroke();
+	    if (s != null){
+		res.setStroke(s);
+	    }
+	    else {
+		res.setStrokeWidth(vp.getStrokeWidth());
+	    }
+	    res.setDrawingFactor(vp.getDrawingFactor());
+	    res.setForcedDrawing(vp.getForcedDrawing());
 	    PathIterator pi = vp.getJava2DPathIterator();
 	    pi.next(); 
 	    double[] cds=new double[6];
@@ -699,23 +709,30 @@ public class DPath extends Glyph {
     
     /**
      * Convert given DPath instance to the VPath
-     * @param vp DPath to be converted
+     * @param dp DPath to be converted
      * @return new instance of VPath which has the same structure and location as given DPath
      */
     public static VPath toVPath(DPath dp){
 	VPath res = null;
 	if (dp != null){
 	    res = new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
+	    BasicStroke s = dp.getStroke();
+	    if (s != null)
+		res.setStroke(s);
+	    else
+		res.setStrokeWidth(dp.getStrokeWidth());
+	    res.setDrawingFactor(dp.drawingFactor);
+	    res.setForcedDrawing(dp.forcedDrawing);
 	    for (int i = 0; i < dp.getElementsCount(); i++){
 		int elType = dp.getElementType(i);
 		LongPoint[] pts = dp.getElementPointsCoordinates(i);
 		switch(elType){
 		case DPath.CBC:{
-		    res.addCbCurve(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y, true);
+		    res.addCbCurve(pts[3].x, pts[3].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, true);
 		    break;
 		}
 		case DPath.QDC:{
-		    res.addQdCurve(pts[1].x, pts[1].y, pts[2].x, pts[2].y, true);
+		    res.addQdCurve(pts[2].x, pts[2].y, pts[1].x, pts[1].y, true);
 		    break;
 		}
 		case DPath.SEG:{
