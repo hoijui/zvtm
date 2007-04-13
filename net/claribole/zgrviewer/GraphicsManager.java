@@ -1125,7 +1125,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			else {
 			    flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), nShape.getLocation(), true);
 			}
-			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
+			vsm.animator.createPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
 		    }
 		    // animate node
 		    // compute translation only once, make assumption that
@@ -1166,7 +1166,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			mSpace.hide(vp);
 			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
 			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, nShape.getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
-			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
+			vsm.animator.createPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
 		    }
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
@@ -1203,7 +1203,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			mSpace.hide(vp);
 			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
 			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), nShape.getLocation(), true);
-			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
+			vsm.animator.createPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
 		    }
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
@@ -1239,7 +1239,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	FresnelArcInfo fai;
 	for (int i=0;i<fresnelizedArcGlyphs.size();i++){
 	    fai = (FresnelArcInfo)fresnelizedArcGlyphs.elementAt(i);
-	    vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, fai.originalSpline,
+	    vsm.animator.createPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, fai.originalSpline,
 					      fai.dp.getID(), new PathRestorer(fai.vp, fai.dp, mSpace));
 	}
 	fresnelizedArcGlyphs.removeAllElements();	
