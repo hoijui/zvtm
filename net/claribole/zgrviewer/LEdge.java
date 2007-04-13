@@ -13,6 +13,7 @@ package net.claribole.zgrviewer;
 import java.util.Vector;
 
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.svg.Metadata;
 
 class LEdge extends LElem {
@@ -76,6 +77,13 @@ class LEdge extends LElem {
 
     LNode getOtherEnd(LNode n){
 	return (n == tail) ? head : tail;
+    }
+
+    VPath getSpline(){
+	for (int i=0;i<glyphs.length;i++){
+	    if (glyphs[i] instanceof VPath){return (VPath)glyphs[i];}
+	}
+	return null;
     }
 
     String getTitle(){
