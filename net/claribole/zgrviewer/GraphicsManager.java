@@ -31,6 +31,7 @@ import net.claribole.zvtm.engine.DraggableCameraPortal;
 import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.engine.AnimationListener;
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.PostAnimationAction;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
@@ -45,11 +46,12 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.RectangleNR;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.svg.Metadata;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.TransitionManager;
-
+import net.claribole.zvtm.glyphs.DPath;
 
 /* Multiscale feature manager */
 
@@ -1055,7 +1057,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /* ----------- Fresnel Highlighting ------------- */
 
+    static final int FRESNEL_ANIM_TIME = 500;
+
     Vector fresnelizedNodeGlyphs = new Vector();
+    Vector fresnelizedArcGlyphs = new Vector();
 
     /* Called when user selects Fresnel tool */
     void enterFresnelMode(){
@@ -1100,14 +1105,33 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		LNode oe;
 		for (int i=0;i<ua.length;i++){
 		    oe = ua[i].getOtherEnd(n);
+		    // animate arc
+		    VPath vp = ua[i].getSpline();
+		    if (vp != null){
+			DPath dp = DPath.fromVPath(vp);
+			vsm.addGlyph(dp, mSpace);
+			mSpace.hide(vp);
+			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
+			LongPoint[] flat;
+			if (Math.sqrt(Math.pow(vp.vx-n.glyphs[0].vx, 2) + Math.pow(vp.vy-n.glyphs[0].vy, 2)) < Math.sqrt(Math.pow(vp.vx-oe.glyphs[0].vx, 2) + Math.pow(vp.vx-oe.glyphs[0].vx, 2))){
+			    // this test identifies which arc end point is associated with which node
+			    // we have to get this information from the geometry in the case of undirected arcs
+			    flat = DPath.getFlattenedCoordinates(dp, n.glyphs[0].getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
+			}
+			else {
+			    flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), n.glyphs[0].getLocation(), true);
+			}
+			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
+		    }
+		    // animate node
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
 		    trans = new LongPoint(xs[i].x-oe.glyphs[0].vx,
 					  xs[i].y-oe.glyphs[0].vy);
 		    for (int j=0;j<oe.glyphs.length;j++){
-			fresnelizedNodeGlyphs.add(new FresnelInfo(oe.glyphs[j], trans));
+			fresnelizedNodeGlyphs.add(new FresnelNodeInfo(oe.glyphs[j], trans));
 			mSpace.onTop(oe.glyphs[j]);
-			vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, trans,
+			vsm.animator.createGlyphAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG, trans,
 							  oe.glyphs[j].getID());
 		    }
 		}
@@ -1129,14 +1153,25 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    }
 		}
 		for (int i=0;i<oa.length;i++){
+
+		    // animate arc
+		    VPath vp = oa[i].getSpline();
+		    if (vp != null){
+			DPath dp = DPath.fromVPath(vp);
+			vsm.addGlyph(dp, mSpace);
+			mSpace.hide(vp);
+			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
+			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, n.glyphs[0].getLocation(), new LongPoint(xs[i].x, xs[i].y), true);
+			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
+		    }
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
 		    trans = new LongPoint(xs[i].x-oa[i].head.glyphs[0].vx,
 					  xs[i].y-oa[i].head.glyphs[0].vy);
 		    for (int j=0;j<oa[i].head.glyphs.length;j++){
-			fresnelizedNodeGlyphs.add(new FresnelInfo(oa[i].head.glyphs[j], trans));
+			fresnelizedNodeGlyphs.add(new FresnelNodeInfo(oa[i].head.glyphs[j], trans));
 			mSpace.onTop(oa[i].head.glyphs[j]);
-			vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, trans,
+			vsm.animator.createGlyphAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG, trans,
 							  oa[i].head.glyphs[j].getID());
 		    }
 		}
@@ -1155,38 +1190,61 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		    }
 		}
 		for (int i=0;i<ia.length;i++){
+
+		    // animate arc
+		    VPath vp = ia[i].getSpline();
+		    if (vp != null){
+			DPath dp = DPath.fromVPath(vp);
+			vsm.addGlyph(dp, mSpace);
+			mSpace.hide(vp);
+			fresnelizedArcGlyphs.add(new FresnelArcInfo(vp, dp));
+			LongPoint[] flat = DPath.getFlattenedCoordinates(dp, new LongPoint(xs[i].x, xs[i].y), n.glyphs[0].getLocation(), true);
+			vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, flat, dp.getID(), null);
+		    }
+
+
 		    // compute translation only once, make assumption that
 		    // first glyph is the main node shape (whose center should be in xs[i])
 		    trans = new LongPoint(xs[i].x-ia[i].tail.glyphs[0].vx,
 					  xs[i].y-ia[i].tail.glyphs[0].vy);
 		    for (int j=0;j<ia[i].tail.glyphs.length;j++){
-			fresnelizedNodeGlyphs.add(new FresnelInfo(ia[i].tail.glyphs[j], trans));
+			fresnelizedNodeGlyphs.add(new FresnelNodeInfo(ia[i].tail.glyphs[j], trans));
 			mSpace.onTop(ia[i].tail.glyphs[j]);
-			vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, trans,
+			vsm.animator.createGlyphAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG, trans,
 							  ia[i].tail.glyphs[j].getID());
 		    }
 		}
+	    }
+	    for (int i=0;i<n.glyphs.length;i++){
+		mSpace.onTop(n.glyphs[i]);
 	    }
 	}
     }
 
     void unfresnelizeNodes(){
-	FresnelInfo fi;
+	FresnelNodeInfo fni;
 	// nodes
 	for (int i=0;i<fresnelizedNodeGlyphs.size();i++){
-	    fi = (FresnelInfo)fresnelizedNodeGlyphs.elementAt(i);
+	    fni = (FresnelNodeInfo)fresnelizedNodeGlyphs.elementAt(i);
 	    // location
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG,
-					      fi.translationOffset, fi.g.getID());
+	    vsm.animator.createGlyphAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG,
+					      fni.translationOffset, fni.g.getID());
 	    // color
 	    //XXX:TBW
 	}
 	fresnelizedNodeGlyphs.removeAllElements();
+	FresnelArcInfo fai;
+	for (int i=0;i<fresnelizedArcGlyphs.size();i++){
+	    fai = (FresnelArcInfo)fresnelizedArcGlyphs.elementAt(i);
+	    vsm.animator.createDPathAnimation(FRESNEL_ANIM_TIME, AnimManager.GL_TRANS_SIG_ABS, fai.originalSpline,
+					      fai.dp.getID(), new PathRestorer(fai.vp, fai.dp, mSpace));
+	}
+	fresnelizedArcGlyphs.removeAllElements();	
     }
     
 }
 
-class FresnelInfo {
+class FresnelNodeInfo {
 
     /* Class used to store information about the default status of a glyph.
        Used to revert back to default after the glyph's appearance has been temporarily modified by a Fresnel lens. */
@@ -1195,12 +1253,45 @@ class FresnelInfo {
     LongPoint translationOffset;
     float[] colorOffset = new float[6];
     
-    FresnelInfo(Glyph g, LongPoint lp/*, float[] co*/){
+    FresnelNodeInfo(Glyph g, LongPoint lp/*, float[] co*/){
 	this.g = g;
 	this.translationOffset = new LongPoint(-lp.x, -lp.y);
 // 	for (int i=0;i<co.length;i++){
 // 	    this.colorOffset[i] = -co[i];
 // 	}
+    }
+    
+}
+
+class FresnelArcInfo {
+    
+    VPath vp;
+    DPath dp;
+    LongPoint[] originalSpline;
+    
+    FresnelArcInfo(VPath vp, DPath dp){
+	this.vp = vp;
+	this.dp = dp;
+	this.originalSpline = dp.getAllPointsCoordinates();
+    }
+    
+}
+
+class PathRestorer implements PostAnimationAction {
+    
+    VPath vp;
+    DPath dp;
+    VirtualSpace vs;
+    
+    PathRestorer(VPath vp, DPath dp, VirtualSpace vs){
+	this.vp = vp;
+	this.dp = dp;
+	this.vs = vs;
+    }
+    
+    public void	animationEnded(Object target, short type, String dimension){
+	vs.show(vp);
+	vs.destroyGlyph(dp);
     }
     
 }
