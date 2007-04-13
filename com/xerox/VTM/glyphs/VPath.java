@@ -337,6 +337,7 @@ public class VPath extends Glyph {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
+	
 // 	if (true){//replace by something using projected size (so that we do not paint it if too small)
  	    at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
 	    at.preConcatenate(stdT);
@@ -416,6 +417,11 @@ public class VPath extends Glyph {
      *@see #setDrawingFactor(float f)
      */
     public void setForcedDrawing(boolean b){forcedDrawing=b;}
+    
+    /** Indicate whether force drawing is enabled
+     *@see #setForcedDrawing(boolean b)
+     */
+    public boolean getForcedDrawing(){return forcedDrawing;}
 
     /** Get a Java2D path iterator for this VPath. */
     public PathIterator getJava2DPathIterator(){return path.getPathIterator(null);}
