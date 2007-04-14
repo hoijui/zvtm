@@ -22,6 +22,8 @@ import com.xerox.VTM.glyphs.VPath;
  * Translucent General path: made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. This version is less efficient than VPath, but it can be made translucent. Can neither be resized nor reoriented (for now). This glyph does not follow the standard object model: (vx,vy) are the coordinates of the path's first point. VPaths do not fire cursor entry/exit events, but it is possible to detect that a cursor is overlapping a VPath by explicitely calling VCursor.interesctsPath(VPath p) and related methods.
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VPath
+ *@see net.claribole.zvtm.glyphs.DPath
+ *@see net.claribole.zvtm.glyphs.DPathST
  *@see com.xerox.VTM.glyphs.VQdCurve
  *@see com.xerox.VTM.glyphs.VCbCurve
  *@see com.xerox.VTM.glyphs.VSegment
@@ -44,8 +46,8 @@ public class VPathST extends VPath implements Translucent {
     }
 
     /**
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
+     *@param x start coordinate in virtual space
+     *@param y start coordinate in virtual space
      *@param z altitude
      *@param c color
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque

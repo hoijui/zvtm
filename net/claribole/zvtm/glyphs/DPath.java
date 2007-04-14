@@ -1,4 +1,4 @@
-/*   FILE: AnimationDemo.java
+/*   FILE: DPath.java
  *   DATE OF CREATION:   Thu Mar 29 19:33 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2007. All Rights Reserved
@@ -29,10 +29,12 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VPath;
+import com.xerox.VTM.glyphs.Translucent;
 
 /**
- * Dynamic Path.
- * @author Emmanuel Pietriga
+ * Dynamic Path, made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. All of these can be dynamically modified and animated through AnimManager's createPathAnimation method.
+ *@author Emmanuel Pietriga, Boris Trofimov
+ *@see net.claribole.zvtm.glyphs.DPathST
  *@see com.xerox.VTM.glyphs.VPath
  *@see net.claribole.zvtm.glyphs.VPathST
  *@see com.xerox.VTM.glyphs.VQdCurve
@@ -40,6 +42,7 @@ import com.xerox.VTM.glyphs.VPath;
  *@see com.xerox.VTM.glyphs.VSegment
  *@see com.xerox.VTM.glyphs.VSegmentST
  *@see com.xerox.VTM.engine.VCursor#intersectsVPath(VPath p)
+ *@see com.xerox.VTM.engine.AnimManager#createPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa)
  */
 
 public class DPath extends Glyph {
@@ -77,6 +80,12 @@ public class DPath extends Glyph {
 	setColor(Color.BLACK);
     }
 
+    /**
+     *@param x start coordinate in virtual space
+     *@param y start coordinate in virtual space
+     *@param z altitude
+     *@param c color
+     */
     public DPath(long x, long y, float z, Color c){
 	vx = x;
 	vy = y;
@@ -667,7 +676,7 @@ public class DPath extends Glyph {
     public static DPath fromVPath(VPath vp){
 	DPath res = null;
 	if (vp != null){
-	    res = new DPath(vp.vx, vp.vy, vp.vz, vp.getColor());
+	    res = (vp instanceof VPathST) ? new DPathST(vp.vx, vp.vy, vp.vz, vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.vz, vp.getColor());
 	    BasicStroke s = vp.getStroke();
 	    if (s != null){
 		res.setStroke(s);
@@ -715,7 +724,7 @@ public class DPath extends Glyph {
     public static VPath toVPath(DPath dp){
 	VPath res = null;
 	if (dp != null){
-	    res = new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
+	    res = (dp instanceof DPathST) ? new VPathST(dp.vx, dp.vy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue()) : new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
 	    BasicStroke s = dp.getStroke();
 	    if (s != null)
 		res.setStroke(s);
