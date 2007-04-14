@@ -51,7 +51,7 @@ import com.xerox.VTM.glyphs.VQdCurve;
 
   /**
    * The Animation Manager is in charge of running every standard glyph, camera and lens animations. It also manages motion of the active camera.
-   * @author Emmanuel Pietriga
+   * @author Emmanuel Pietriga, Boris Trofimov
    **/
 
 public class AnimManager implements Runnable{

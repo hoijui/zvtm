@@ -16,6 +16,11 @@ import net.claribole.zvtm.glyphs.DPath;
 
 import com.xerox.VTM.glyphs.Glyph;
 
+/**
+ * Path animation
+ * @author Boris Trofimov
+ */
+
 public class DPTransformation extends GAnimation {
 
     /** First index is step number and second index is number of LongPoint coordinates in this step.
