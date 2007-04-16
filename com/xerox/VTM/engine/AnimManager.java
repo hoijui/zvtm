@@ -76,13 +76,20 @@ public class AnimManager implements Runnable{
     public static final short GL_ROT_SIG = 8;
     /**coloration (pacing function=linear)*/
     public static final short GL_COLOR_LIN = 9;
-    /**translation to absolute coordinates (pacing function=linear)*/
-    public static final short GL_TRANS_LIN_ABS = 10;
-    /**translation to absolute coordinates (pacing function=parabolic - slow in/fast out motion)*/
-    public static final short GL_TRANS_PAR_ABS = 11;
-    /**translation to absolute coordinates (pacing function=sigmoid - slow in/slow out motion)*/
-    public static final short GL_TRANS_SIG_ABS = 12;
-   
+    
+    /**DPAth translation (pacing function=linear)*/
+    public static final short DP_TRANS_LIN = 0;
+    /**DPath translation (pacing function=parabolic - slow in/fast out motion)*/
+    public static final short DP_TRANS_PAR = 1;
+    /**DPath translation (pacing function=sigmoid - slow in/slow out motion)*/
+    public static final short DP_TRANS_SIG = 2;
+    /**DPath translation with absolute coordinates (pacing function=linear)*/
+    public static final short DP_TRANS_LIN_ABS = 3;
+    /**DPath translation with absolute coordinates (pacing function=parabolic - slow in/fast out motion)*/
+    public static final short DP_TRANS_PAR_ABS = 4;
+    /**DPath translation woth absolute coordinates (pacing function=sigmoid - slow in/slow out motion)*/
+    public static final short DP_TRANS_SIG_ABS = 5;
+    
 
     /**control point translation (curve) (pacing function=linear)*/
     public static final short GL_CP_TRANS_LIN = 0;
@@ -1195,20 +1202,20 @@ public class AnimManager implements Runnable{
 		double nbSteps=Math.round((float)(duration/frameTime));     //number of steps
 		
 		// if data should be interpreted as absolute coordinates then convert them to relative and proceed
-		if (type == GL_TRANS_LIN_ABS || type == GL_TRANS_PAR_ABS || type == GL_TRANS_SIG_ABS){
+		if (type == DP_TRANS_LIN_ABS || type == DP_TRANS_PAR_ABS || type == DP_TRANS_SIG_ABS){
 		    for (int i = 0; i < data.length; i++){
 			data[i].x = data[i].x - currentPoints[i].x;
 			data[i].y = data[i].y - currentPoints[i].y;			
 		    }
 		    switch(type){
-		    case GL_TRANS_LIN_ABS: { type = GL_TRANS_LIN; break;}
-		    case GL_TRANS_PAR_ABS: { type = GL_TRANS_PAR; break;}
-		    case GL_TRANS_SIG_ABS: { type = GL_TRANS_SIG; break;}
+		    case DP_TRANS_LIN_ABS: { type = DP_TRANS_LIN; break;}
+		    case DP_TRANS_PAR_ABS: { type = DP_TRANS_PAR; break;}
+		    case DP_TRANS_SIG_ABS: { type = DP_TRANS_SIG; break;}
 		    }
 		}
 		
 		switch(type){
-		case GL_TRANS_LIN:{//linear		    
+		case DP_TRANS_LIN:{//linear		    
 		    an.steps = new LongPoint[(int)nbSteps][data.length];
 		    for (int step=0; step < nbSteps - 1; step++){
 			LongPoint[] stepCoordinates = new LongPoint[data.length];
@@ -1226,7 +1233,7 @@ public class AnimManager implements Runnable{
 		    an.start();   
 		    break;
 		}
-		case GL_TRANS_PAR:{//parabolic  (^4)
+		case DP_TRANS_PAR:{//parabolic  (^4)
 		    an.steps = new LongPoint[(int)nbSteps][data.length];
 		    for (int step=0; step < nbSteps - 1; step++){
 			LongPoint[] stepCoordinates = new LongPoint[data.length];
@@ -1247,7 +1254,7 @@ public class AnimManager implements Runnable{
 		    an.start();		    
 		    break;
 		}
-		case GL_TRANS_SIG:{//sigmoid
+		case DP_TRANS_SIG:{//sigmoid
 		    an.steps = new LongPoint[(int)nbSteps][data.length];
 		    for (int step=0; step < nbSteps - 1; step++){
 			LongPoint[] stepCoordinates = new LongPoint[data.length];
