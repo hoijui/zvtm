@@ -452,6 +452,7 @@ public class DPath extends Glyph {
                 el.y += ey;
             }
 	}	    
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
     
     /**
@@ -524,6 +525,7 @@ public class DPath extends Glyph {
 		}
 	    }
 	}
+	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
     
     /**
