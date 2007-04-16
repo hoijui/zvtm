@@ -9,27 +9,17 @@
 
 package net.claribole.zvtm.glyphs;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
 import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.CubicCurve2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
-import java.util.Arrays;
 
-import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
+import net.claribole.zvtm.engine.PostAnimationAction;
 
-import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
+import com.xerox.VTM.glyphs.VPath;
 
 /**
  * Dynamic Path, made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. All of these can be dynamically modified and animated through AnimManager's createPathAnimation method. This version is less efficient than DPath, but it can be made translucent.
