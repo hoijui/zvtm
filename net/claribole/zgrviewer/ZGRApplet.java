@@ -50,6 +50,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String ANTIALIASING_PARAM = "antialiased";
 
     static final String HTTP_PROTOCOL = "http://";
+    static final String HTTPS_PROTOCOL = "https://";
     static final String FTP_PROTOCOL = "ftp:/";
     static final String FILE_PROTOCOL = "file:/";
 
@@ -228,7 +229,8 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
     //open up the default or user-specified browser (netscape, ie,...) and try to display the content uri
     void displayURLinBrowser(String uri){
-	if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
+	if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(HTTPS_PROTOCOL) ||
+	      uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
 	    // relative URL, prepend document base
 	    uri = docURL + uri;
 	}
