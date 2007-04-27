@@ -75,6 +75,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 	this.addMouseListener(this);
 	this.addMouseMotionListener(this);
 	this.addMouseWheelListener(this);
+	this.addComponentListener(this);
 	this.setDoubleBuffered(false);
 	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor

@@ -31,6 +31,8 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.Toolkit;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -39,6 +41,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.JPanel;
@@ -53,7 +58,7 @@ import com.xerox.VTM.glyphs.Glyph;
  * Each view runs in its own thread - uses double buffering
  * @author Emmanuel Pietriga
  **/
-public abstract class ViewPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public abstract class ViewPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 
     /**draw no oval between point where we started dragging the mouse and current point*/
     public final static short NONE=0;
@@ -680,5 +685,36 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     protected int[] getVisibilityPadding(){
 	return visibilityPadding;
     }
+    
+    // ---------------- Resize handling -----------------
+    
+    Timer timer = new Timer(true);
+    int currentTaskID = 0;
+    long resizeDelay = 200;
+    private class ResizeTask extends TimerTask{
+	
+	private int id;	
+	public ResizeTask(int id){
+	    this.id = id;
+	}	
+	public void run() {
+	    if (id == currentTaskID){ //if this is the last task that was scheduled
+		parent.repaintNow();
+		currentTaskID = 0;
+	    } // if it is not the last task, then we don't want to repaint view. That would be done by the last task only.
+	}	
+    }
+    
+    public void componentResized(ComponentEvent e){
+	ResizeTask task = new ResizeTask(++currentTaskID);
+	timer.schedule(task, resizeDelay);
+    }
+    
+    public void componentMoved(ComponentEvent e){}
 
+    public void componentShown(ComponentEvent e){}
+
+    public void componentHidden(ComponentEvent e){}
+    
+    //  ---------------- End Resize handling -----------------
 }

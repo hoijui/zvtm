@@ -55,6 +55,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	this.addMouseListener(this);
 	this.addMouseMotionListener(this);
 	this.addMouseWheelListener(this);
+	this.addComponentListener(this);
 	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 	if (parent.parent.debug){System.out.println("View refresh time set to "+frameTime+"ms");}
