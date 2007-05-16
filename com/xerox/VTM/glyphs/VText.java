@@ -416,7 +416,7 @@ public class VText extends Glyph {
 
     /** Set the scale factor for this text.
      * The actual size of the text will be that defined by the font size multiplied by this scale factor.
-     *@s scale factor
+     *@param s scale factor
      */
     public void setScale(float s){
 	scaleFactor = s;
