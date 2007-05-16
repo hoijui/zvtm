@@ -414,6 +414,21 @@ public class VText extends Glyph {
 	invalidate();
     }
 
+    /** Set the scale factor for this text.
+     * The actual size of the text will be that defined by the font size multiplied by this scale factor.
+     *@s scale factor
+     */
+    public void setScale(float s){
+	scaleFactor = s;
+    }
+    
+    /** Get the scale factor for this text.
+     * The actual size of the text is that defined by the font size multiplied by the scale factor returned by this method.
+     */
+    public float getScale(){
+	return scaleFactor;
+    }
+
     /** Force computation of text's bounding box at next call to draw(). */
     public void invalidate(){
 	try {
