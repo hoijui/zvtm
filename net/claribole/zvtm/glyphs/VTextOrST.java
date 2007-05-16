@@ -78,6 +78,24 @@ public class VTextOrST extends VTextOr implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
     }
 
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z altitude
+     *@param c fill color
+     *@param t text string
+     *@param or orientation
+     *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param scale scaleFactor w.r.t original image size
+     */
+    public VTextOrST(long x, long y, float z, Color c, String t, float or, short ta, float a, float scale){
+	super(x, y, z, c, t, or, ta);
+	alpha = a;
+	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
+	scaleFactor = scale;
+    }
+
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -90,31 +108,34 @@ public class VTextOrST extends VTextOr implements Translucent {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
-	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+	trueCoef = scaleFactor * coef;
+	if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+	    //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font != null){
 		g.setFont(font);
 		if (!pc[i].valid){
 		    bounds = g.getFontMetrics().getStringBounds(text, g);
-		    pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth()));
-		    pc[i].ch = (int)Math.abs(Math.round(bounds.getHeight()));
+		    // cw and ch actually hold width and height of text *in virtual space*
+		    pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
+		    pc[i].ch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
 		    pc[i].valid=true;
 		}
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, pc[i].cy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/2.0f, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/2.0f/scaleFactor, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/scaleFactor, 0));
 		}
 		g.setTransform(at);
 		if (alpha < 1.0f){
@@ -130,26 +151,27 @@ public class VTextOrST extends VTextOr implements Translucent {
 	    else {
 		if (!pc[i].valid){
 		    bounds = g.getFontMetrics().getStringBounds(text, g);
-		    pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth()));
-		    pc[i].ch = (int)Math.abs(Math.round(bounds.getHeight()));
+		    // cw and ch actually hold width and height of text *in virtual space*
+		    pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
+		    pc[i].ch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
 		    pc[i].valid=true;
 		}
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, pc[i].cy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/2.0f, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/2.0f/scaleFactor, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/scaleFactor, 0));
 		}
 		g.setTransform(at);
 		if (alpha < 1.0f){
@@ -168,31 +190,34 @@ public class VTextOrST extends VTextOr implements Translucent {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
-	if (coef*fontSize>vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+	trueCoef = scaleFactor * coef;
+	if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+	    //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font != null){
 		g.setFont(font);
 		if (!pc[i].lvalid){
 		    bounds = g.getFontMetrics().getStringBounds(text, g);
-		    pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth()));
-		    pc[i].lch = (int)Math.abs(Math.round(bounds.getHeight()));
+		    // lcw and lch actually hold width and height of text *in virtual space*
+		    pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
+		    pc[i].lch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
 		    pc[i].lvalid=true;
 		}
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, pc[i].lcy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/2.0f, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/2.0f/scaleFactor, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/scaleFactor, 0));
 		}
 		g.setTransform(at);
 		if (alpha < 1.0f){
@@ -208,26 +233,27 @@ public class VTextOrST extends VTextOr implements Translucent {
 	    else {
 		if (!pc[i].lvalid){
 		    bounds = g.getFontMetrics().getStringBounds(text, g);
-		    pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth()));
-		    pc[i].lch = (int)Math.abs(Math.round(bounds.getHeight()));
+		    // lcw and lch actually hold width and height of text *in virtual space*
+		    pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
+		    pc[i].lch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
 		    pc[i].lvalid=true;
 		}
 		if (text_anchor == TEXT_ANCHOR_START){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, pc[i].lcy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE){
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/2.0f, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/2.0f/scaleFactor, 0));
 		}
 		else {
 		    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
-		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(coef, coef));}
+		    if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 		    if (orient!=0){at.concatenate(AffineTransform.getRotateInstance(-orient));}
-		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw, 0));
+		    at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/scaleFactor, 0));
 		}
 		g.setTransform(at);
 		if (alpha < 1.0f){
