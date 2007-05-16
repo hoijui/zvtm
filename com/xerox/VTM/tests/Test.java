@@ -15,6 +15,8 @@
  * Lesser General Public License for more details.
  *
  * For full terms see the file COPYING.
+ *
+ * $Id:$
  */
 
 package com.xerox.VTM.tests;
@@ -22,11 +24,10 @@ package com.xerox.VTM.tests;
 import java.awt.Color;
 import java.util.Vector;
 
-import net.claribole.zvtm.engine.ViewEventHandler;
-
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.engine.*;
+import com.xerox.VTM.glyphs.*;
+import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.glyphs.*;
 
 public class Test {
 
