@@ -54,13 +54,13 @@ public class VImage extends ClosedShape implements RectangularShape {
     /** Aspect ratio: width divided by height (read-only). */
     public float ar;
 
-    /** For internal use. Made public for easier putside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;
 
-    /** For internal use. Made public for easier putside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public RProjectedCoordsP[] pc;
 
-    /** For internal use. Made public for easier putside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public Image image;
 
     /** Indicates when a border is drawn around the image (read-only).
@@ -68,13 +68,13 @@ public class VImage extends ClosedShape implements RectangularShape {
      */
     public short drawBorder = DRAW_BORDER_NEVER;
 
-    /** For internal use. Made public for easier putside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public boolean zoomSensitive = true;
 
-    /** For internal use. Made public for easier putside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public float scaleFactor = 1.0f;
     
-    /** For internal use. Made public for easier putside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public float trueCoef = 1.0f;
 
     /** Construct an image at (0, 0) with original scale.
