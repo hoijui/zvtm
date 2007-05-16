@@ -86,10 +86,6 @@ class LEdge extends LElem {
 	return null;
     }
 
-    String getTitle(){
-	return title;
-    }
-
     public String toString(){
 	return title + "@" + hashCode() + " [" + 
 	    ((tail != null) ? tail.getTitle() + "@" + tail.hashCode() : "NULL")+

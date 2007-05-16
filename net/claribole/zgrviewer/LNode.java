@@ -38,10 +38,6 @@ class LNode extends LElem {
 	edgeDirections = new short[0];
     }
 
-    String getTitle(){
-	return title;
-    }
-
     void addArc(LEdge e, short direction){
 	LEdge[] nedges = new LEdge[edges.length+1];
 	short[] nedgeDirections = new short[nedges.length];
