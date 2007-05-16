@@ -420,6 +420,7 @@ public class VText extends Glyph {
      */
     public void setScale(float s){
 	scaleFactor = s;
+	invalidate();
     }
     
     /** Get the scale factor for this text.
