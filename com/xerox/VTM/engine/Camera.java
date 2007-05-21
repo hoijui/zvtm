@@ -203,6 +203,20 @@ public class Camera {
 	return altitude;
     }
 
+
+    /**
+     * Set camera location
+     */
+    public void setLocation(Location l){
+	posx = l.vx;
+	posy = l.vy;
+	altitude = l.alt;
+	updatePrecisePosition();
+	if (view != null){
+	    parentSpace.vsm.repaintNow(view);
+	}
+    }
+
     /**
      * get camera location
      */
