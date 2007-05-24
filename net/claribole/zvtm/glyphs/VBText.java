@@ -90,119 +90,63 @@ public class VBText extends VText {
 		boolean res;
 		if (text_anchor == TEXT_ANCHOR_START) {
 			res =  x >= pc[camIndex].cx
-				&& x <= pc[camIndex].cx + coef * (pc[camIndex].cw + 2 * paddingX)
+				&& x <= pc[camIndex].cx + coef * pc[camIndex].cw
 				&& y <= pc[camIndex].cy
-				&& y >= pc[camIndex].cy - coef * (pc[camIndex].ch + 2 * paddingY);
+				&& y >= pc[camIndex].cy - coef * pc[camIndex].ch;
 		}
 		else if (text_anchor == TEXT_ANCHOR_MIDDLE) {
-			res =  x >= pc[camIndex].cx - coef * (pc[camIndex].cw + 2 * paddingX) / 2
-				&& x <= pc[camIndex].cx + coef * (pc[camIndex].cw + 2 * paddingX) / 2
+			res =  x >= pc[camIndex].cx - coef * pc[camIndex].cw / 2
+				&& x <= pc[camIndex].cx + coef * pc[camIndex].cw / 2
 				&& y <= pc[camIndex].cy
-				&& y >= pc[camIndex].cy - coef * (pc[camIndex].ch + 2 * paddingY);
+				&& y >= pc[camIndex].cy - coef * pc[camIndex].ch;
 		}
 		else {
-			res =  x >= pc[camIndex].cx - coef * (pc[camIndex].cw + 2 * paddingX)
+			res =  x >= pc[camIndex].cx - coef * pc[camIndex].cw
 				&& x <= pc[camIndex].cx
 				&& y <= pc[camIndex].cy
-				&& y >= pc[camIndex].cy - coef * (pc[camIndex].ch + 2 * paddingY);
-		}		
+				&& y >= pc[camIndex].cy - coef * pc[camIndex].ch;
+		}
 		return res;
 	}
-
-	public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i) {
-		if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)) { //if glyph hotspot is in the region, it is obviously visible
-			return true;
-		}
-		else {
-			// cw and ch actually hold width and height of text *in virtual space*
-			if (text_anchor == TEXT_ANCHOR_START) {
-				if ((vx <= eb) && ((vx + pc[i].cw + 2 * paddingX) >= wb) && (vy <= nb) && ((vy + pc[i].ch + 2 * paddingY) >= sb)) {
-					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-					return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-				}
-				else return false;   //otherwise the glyph is not visible
-			}
-			else if (text_anchor == TEXT_ANCHOR_MIDDLE) {
-				if ((vx - pc[i].cw / 2 <= eb) && ((vx + (pc[i].cw + 2 * paddingX) / 2) >= wb) && (vy <= nb) && ((vy + pc[i].ch + 2 * paddingY) >= sb)) {
-					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-					return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-				}
-				else return false;   //otherwise the glyph is not visible
-			}
-			else {//TEXT_ANCHOR_END
-				if ((vx - (pc[i].cw + 2 * paddingX) <= eb) && (vx >= wb) && (vy <= nb) && ((vy + pc[i].ch + 2 * paddingY) >= sb)) {
-					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-					return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-				}
-				else return false;   //otherwise the glyph is not visible
-			}
-		}
-	}
-
-	public boolean containedInRegion(long wb, long nb, long eb, long sb, int i) {
-		if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)) {
-			/* Glyph hotspot is in the region.
-					   There is a good chance the glyph is contained in the region, but this is not sufficient. */
-			// cw and ch actually hold width and height of text *in virtual space*
-			if (text_anchor == TEXT_ANCHOR_START) {
-				if ((vx <= eb) && ((vx + pc[i].cw + 2 * paddingX) >= wb) && (vy <= nb) && ((vy - (pc[i].ch + 2 * paddingY)) >= sb)) {
-					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-					return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-				}
-			}
-			else if (text_anchor == TEXT_ANCHOR_MIDDLE) {
-				if ((vx + (pc[i].cw + 2 * paddingX) / 2 <= eb) && ((vx - (pc[i].cw + 2 * paddingX) / 2) >= wb) && (vy <= nb) && ((vy - (pc[i].ch + 2 * paddingY)) >= sb)) {
-					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-					return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-				}
-			}
-			else {//TEXT_ANCHOR_END
-				if ((vx + (pc[i].cw + 2 * paddingX) <= eb) && (vx >= wb) && (vy <= nb) && ((vy - (pc[i].ch + 2 * paddingY)) >= sb)) {
-					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-					return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-				}
-			}
-		}
-		return false;
-	}
-
+	
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
-		if (coef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
+		trueCoef = scaleFactor * coef;
+		if (trueCoef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			if (font != null) {
 				g.setFont(font);
 			}
-			// there is a bug, if next line uncommented...
-			//if (!pc[i].valid)
+			if (!pc[i].valid)
 			{
 				bounds = g.getFontMetrics().getStringBounds(text, g);
-				pc[i].cw = (int) bounds.getWidth();
-				pc[i].ch = (int) bounds.getHeight();
+				pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
+				pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
 				pc[i].valid = true;
-				size = (float) Math.sqrt(Math.pow(pc[i].cw, 2) + Math.pow(pc[i].ch, 2));
 			}
 			if (text_anchor == TEXT_ANCHOR_START) {
-				at = AffineTransform.getTranslateInstance(dx + pc[i].cx, dy + pc[i].cy - 2 * paddingY * coef);
+				at = AffineTransform.getTranslateInstance(dx + pc[i].cx, dy + pc[i].cy);
 			}
 			else if (text_anchor == TEXT_ANCHOR_MIDDLE) {
-				at = AffineTransform.getTranslateInstance(dx + pc[i].cx - (pc[i].cw + 2 * paddingX) * coef / 2f, dy + pc[i].cy - 2 * paddingY * coef);
+				at = AffineTransform.getTranslateInstance(dx + pc[i].cx - pc[i].cw * coef / 2f, dy + pc[i].cy);
 			}
 			else {
-				at = AffineTransform.getTranslateInstance(dx + pc[i].cx - (pc[i].cw + 2 * paddingX) * coef, dy + pc[i].cy - 2 * paddingY * coef);
+				at = AffineTransform.getTranslateInstance(dx + pc[i].cx - pc[i].cw * coef, dy + pc[i].cy);
 			}
 			if (zoomSensitive) {
-				at.concatenate(AffineTransform.getScaleInstance(coef, coef));
+				at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));
 			}
 			g.setTransform(at);
 
 			g.setColor(fillColor);
-			g.fillRect(dx, dy - pc[i].ch, pc[i].cw + paddingX * 2, pc[i].ch + paddingY * 2);
+			int rectW = Math.round(pc[i].cw / scaleFactor);
+			int rectH = Math.round(pc[i].ch / scaleFactor);
+			g.fillRect(dx, dy - rectH, rectW, rectH);
 
 			g.setColor(borderColor);
-			g.drawRect(dx, dy - pc[i].ch, pc[i].cw + paddingX * 2, pc[i].ch + paddingY * 2);
+			g.drawRect(dx, dy - rectH, rectW, rectH);
 
 			g.setColor(this.color);
-			g.drawString(text, paddingX, paddingY);
+			g.drawString(text, paddingX, -paddingY);
 			if (font != null) {
 				g.setFont(VirtualSpaceManager.getMainFont());
 			}
@@ -215,42 +159,42 @@ public class VBText extends VText {
 
 
 	public void drawForLens(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
-		if (coef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
+		trueCoef = scaleFactor * coef;
+		if (trueCoef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			if (font != null) {
 				g.setFont(font);
 			}
-			// there is a bug, if next line uncommented...
-			//if (!pc[i].valid)
-			{
+			if (!pc[i].valid) {
 				bounds = g.getFontMetrics().getStringBounds(text, g);
-				pc[i].lcw = (int) bounds.getWidth();
-				pc[i].lch = (int) bounds.getHeight();
+				pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
+				pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
 				pc[i].valid = true;
-				size = (float) Math.sqrt(Math.pow(pc[i].lcw, 2) + Math.pow(pc[i].lch, 2));
 			}
 			if (text_anchor == TEXT_ANCHOR_START) {
-				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx, dy + pc[i].lcy - 2 * paddingY * coef);
+				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx, dy + pc[i].lcy);
 			}
 			else if (text_anchor == TEXT_ANCHOR_MIDDLE) {
-				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx - (pc[i].lcw + 2 * paddingX) * coef / 2f, dy + pc[i].lcy - 2 * paddingY * coef);
+				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx - pc[i].lcw * coef / 2f, dy + pc[i].lcy);
 			}
 			else {
-				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx - (pc[i].lcw + 2 * paddingX) * coef, dy + pc[i].lcy - 2 * paddingY * coef);
+				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx - pc[i].lcw * coef, dy + pc[i].lcy);
 			}
 			if (zoomSensitive) {
-				at.concatenate(AffineTransform.getScaleInstance(coef, coef));
+				at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));
 			}
 			g.setTransform(at);
 
 			g.setColor(fillColor);
-			g.fillRect(dx, dy - pc[i].lch, pc[i].lcw + paddingX * 2, pc[i].lch + paddingY * 2);
+			int rectW = Math.round(pc[i].lcw / scaleFactor);
+			int rectH = Math.round(pc[i].lch / scaleFactor);
+			g.fillRect(dx, dy - rectH, rectW, rectH);
 
 			g.setColor(borderColor);
-			g.drawRect(dx, dy - pc[i].lch, pc[i].lcw + paddingX * 2, pc[i].lch + paddingY * 2);
+			g.drawRect(dx, dy - rectH, rectW, rectH);
 
 			g.setColor(this.color);
-			g.drawString(text, paddingX, paddingY);
+			g.drawString(text, paddingX, -paddingY);
 			if (font != null) {
 				g.setFont(VirtualSpaceManager.getMainFont());
 			}
@@ -282,18 +226,7 @@ public class VBText extends VText {
 			}  //if it was not inside last time, nothing has changed
 		}
 		return res;
-	}
-
-	/**
-	 * Get the width and height of the bounding box in virtual space.
-	 *
-	 * @param i index of camera (Camera.getIndex())
-	 * @return the width and height of the text's bounding box, as a LongPoint
-	 */
-	public LongPoint getBounds(int i) {
-		return new LongPoint(pc[i].cw + paddingX * 2, pc[i].ch + paddingY * 2);
-	}
-
+	}	
 
 	/**
 	 * Set the VBText's border color.
