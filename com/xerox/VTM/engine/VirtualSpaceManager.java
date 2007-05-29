@@ -39,6 +39,7 @@ import javax.swing.JFrame;
 
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.PostAnimationAction;
 import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.lens.Lens;
@@ -1123,6 +1124,19 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@return the final camera location
      */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor){
+	return this.centerOnGlyph(g, c, d, z, mFactor, null);
+    }
+
+    /**translates and (un)zooms a camera in order to focus on glyph g
+     *@param g Glyph of interest
+     *@param c Camera to be moved
+     *@param d duration of the animation in ms
+     *@param z if false, do not (un)zoom, just translate (default is true)
+     *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
+     *@param a post animation action to execute after camera reachers its final position
+     *@return the final camera location
+     */
+    public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, PostAnimationAction paa){
 	View v=null;
 	try {
 	    v=c.getOwningView();
@@ -1171,11 +1185,11 @@ public class VirtualSpaceManager implements AWTEventListener {
 		    float dAlt=newAlt-currentAlt;
 		    Vector prms=new Vector();
 		    prms.add(new Float(dAlt));prms.add(new LongPoint(dx,dy));
-		    animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID());
+		    animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID(), paa);
 		    return new Location(g.vx,g.vy,newAlt);
 		}
 		else {
-		    animator.createCameraAnimation(d,AnimManager.CA_TRANS_SIG,new LongPoint(dx,dy),c.getID());
+		    animator.createCameraAnimation(d,AnimManager.CA_TRANS_SIG,new LongPoint(dx,dy),c.getID(), paa);
 		    return new Location(g.vx,g.vy,currentAlt);
 		}
 	    }
