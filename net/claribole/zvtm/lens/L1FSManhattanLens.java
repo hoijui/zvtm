@@ -11,6 +11,8 @@
 
 package net.claribole.zvtm.lens;
 
+import java.awt.Graphics2D;
+
 /**Profile: manhattan - Distance metric: L(1) (diamond shape)<br>Size expressed as an absolute value in pixels*/
 
 public class L1FSManhattanLens extends FSManhattanLens {
@@ -59,6 +61,16 @@ public class L1FSManhattanLens extends FSManhattanLens {
 	    g[0] = g[1] = MM;
 	else
 	    g[0] = g[1] = 1;
+    }
+
+    public void drawBoundary(Graphics2D g2d){
+	if (bColor != null){
+	    g2d.setColor(bColor);
+	    g2d.drawLine(lx+w/2-lensWidth/2, ly+h/2, lx+w/2, ly+h/2-lensHeight/2);
+	    g2d.drawLine(lx+w/2, ly+h/2-lensHeight/2, lx+w/2+lensWidth/2, ly+h/2);
+	    g2d.drawLine(lx+w/2+lensWidth/2, ly+h/2, lx+w/2, ly+h/2+lensHeight/2);
+	    g2d.drawLine(lx+w/2, ly+h/2+lensHeight/2, lx+w/2-lensWidth/2, ly+h/2);
+	}
     }
 
 }
