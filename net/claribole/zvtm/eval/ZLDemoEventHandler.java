@@ -193,71 +193,99 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.vsm.repaintNow();
 	}
 	else if (code==KeyEvent.VK_G){application.gc();}
-	else if (code == KeyEvent.VK_F1){
+	// L1 lenses
+	else if (code == KeyEvent.VK_2){
 	    application.lensFamily = ZLWorldDemo.L1_Linear;
 	    application.demoView.setTitle(ZLWorldDemo.L1_Linear_Title);
 	}
-	else if (code == KeyEvent.VK_F2){
+	else if (code == KeyEvent.VK_3){
 	    application.lensFamily = ZLWorldDemo.L1_InverseCosine;
 	    application.demoView.setTitle(ZLWorldDemo.L1_InverseCosine_Title);
 	}
-	else if (code == KeyEvent.VK_F3){
+	else if (code == KeyEvent.VK_4){
 	    application.lensFamily = ZLWorldDemo.L1_Manhattan;
 	    application.demoView.setTitle(ZLWorldDemo.L1_Manhattan_Title);
 	}
-	else if (code == KeyEvent.VK_F4){
-	    application.lensFamily = ZLWorldDemo.L2_Gaussian;
-	    application.demoView.setTitle(ZLWorldDemo.L2_Gaussian_Title);
-	}
-	else if (code == KeyEvent.VK_F5){
-	    application.lensFamily = ZLWorldDemo.L2_Linear;
-	    application.demoView.setTitle(ZLWorldDemo.L2_Linear_Title);
-	}
-	else if (code == KeyEvent.VK_1){
-	    application.lensFamily = ZLWorldDemo.L2_InverseCosine;
-	    application.demoView.setTitle(ZLWorldDemo.L2_InverseCosine_Title);
-	}
-	else if (code == KeyEvent.VK_2){
-	    application.lensFamily = ZLWorldDemo.L2_Manhattan;
-	    application.demoView.setTitle(ZLWorldDemo.L2_Manhattan_Title);
-	}
-	else if (code == KeyEvent.VK_3){
-	    application.lensFamily = ZLWorldDemo.L2_Scrambling;
-	    application.demoView.setTitle(ZLWorldDemo.L2_Scrambling_Title);
-	}
-	else if (code == KeyEvent.VK_4){
-	    application.lensFamily = ZLWorldDemo.LInf_Linear;
-	    application.demoView.setTitle(ZLWorldDemo.LInf_Linear_Title);
-	}
 	else if (code == KeyEvent.VK_5){
-	    application.lensFamily = ZLWorldDemo.LInf_InverseCosine;
-	    application.demoView.setTitle(ZLWorldDemo.LInf_InverseCosine_Title);
-	}
-	else if (code == KeyEvent.VK_6){
-	    application.lensFamily = ZLWorldDemo.LInf_Manhattan;
-	    application.demoView.setTitle(ZLWorldDemo.LInf_Manhattan_Title);
-	}
-	else if (code == KeyEvent.VK_7){
 	    application.lensFamily = ZLWorldDemo.L1_Fresnel;
 	    application.demoView.setTitle(ZLWorldDemo.L1_Fresnel_Title);
 	}
-	else if (code == KeyEvent.VK_8){
+	// L2 lenses
+	else if (code == KeyEvent.VK_Q){
+	    application.lensFamily = ZLWorldDemo.L2_Gaussian;
+	    application.demoView.setTitle(ZLWorldDemo.L2_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_W){
+	    application.lensFamily = ZLWorldDemo.L2_Linear;
+	    application.demoView.setTitle(ZLWorldDemo.L2_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_E){
+	    application.lensFamily = ZLWorldDemo.L2_InverseCosine;
+	    application.demoView.setTitle(ZLWorldDemo.L2_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_R){
+	    application.lensFamily = ZLWorldDemo.L2_Manhattan;
+	    application.demoView.setTitle(ZLWorldDemo.L2_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_T){
 	    application.lensFamily = ZLWorldDemo.L2_Fresnel;
 	    application.demoView.setTitle(ZLWorldDemo.L2_Fresnel_Title);
 	}
-	else if (code == KeyEvent.VK_9){
-	    application.lensFamily = ZLWorldDemo.LInf_Fresnel;
-	    application.demoView.setTitle(ZLWorldDemo.LInf_Fresnel_Title);
-	}
-	else if (code == KeyEvent.VK_0){
+	else if (code == KeyEvent.VK_Y){
 	    application.lensFamily = ZLWorldDemo.L2_TGaussian;
 	    application.demoView.setTitle(ZLWorldDemo.L2_TGaussian_Title);
 	}
-	else if (code == KeyEvent.VK_Q){
+	else if (code == KeyEvent.VK_U){
 	    application.lensFamily = ZLWorldDemo.L2_Fading;
 	    application.demoView.setTitle(ZLWorldDemo.L2_Fading_Title);
 	}
-	else if (code == KeyEvent.VK_W){
+	else if (code == KeyEvent.VK_I){
+	    application.lensFamily = ZLWorldDemo.L2_Scrambling;
+	    application.demoView.setTitle(ZLWorldDemo.L2_Scrambling_Title);
+	}
+	// L3 lenses
+	else if (code == KeyEvent.VK_A){
+	    application.lensFamily = ZLWorldDemo.L3_Gaussian;
+	    application.demoView.setTitle(ZLWorldDemo.L3_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_S){
+	    application.lensFamily = ZLWorldDemo.L3_Linear;
+	    application.demoView.setTitle(ZLWorldDemo.L3_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_D){
+	    application.lensFamily = ZLWorldDemo.L3_InverseCosine;
+	    application.demoView.setTitle(ZLWorldDemo.L3_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_F){
+	    application.lensFamily = ZLWorldDemo.L3_Manhattan;
+	    application.demoView.setTitle(ZLWorldDemo.L3_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_G){
+	    application.lensFamily = ZLWorldDemo.L3_Fresnel;
+	    application.demoView.setTitle(ZLWorldDemo.L3_Fresnel_Title);
+	}
+	// LInf lenses
+	else if (code == KeyEvent.VK_Z){
+	    application.lensFamily = ZLWorldDemo.LInf_Gaussian;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_X){
+	    application.lensFamily = ZLWorldDemo.LInf_Linear;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_C){
+	    application.lensFamily = ZLWorldDemo.LInf_InverseCosine;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_V){
+	    application.lensFamily = ZLWorldDemo.LInf_Manhattan;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_B){
+	    application.lensFamily = ZLWorldDemo.LInf_Fresnel;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_N){
 	    application.lensFamily = ZLWorldDemo.LInf_Fading;
 	    application.demoView.setTitle(ZLWorldDemo.LInf_Fading_Title);
 	}

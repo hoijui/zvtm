@@ -20,24 +20,7 @@ import javax.swing.text.Style;
 
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.lens.FSFresnelLens;
-import net.claribole.zvtm.lens.FSGaussianLens;
-import net.claribole.zvtm.lens.FSInverseCosineLens;
-import net.claribole.zvtm.lens.FSLinearLens;
-import net.claribole.zvtm.lens.FSManhattanLens;
-import net.claribole.zvtm.lens.FSScramblingLens;
-import net.claribole.zvtm.lens.L1FSFresnelLens;
-import net.claribole.zvtm.lens.L1FSInverseCosineLens;
-import net.claribole.zvtm.lens.L1FSLinearLens;
-import net.claribole.zvtm.lens.L1FSManhattanLens;
-import net.claribole.zvtm.lens.LInfFSFresnelLens;
-import net.claribole.zvtm.lens.LInfFSInverseCosineLens;
-import net.claribole.zvtm.lens.LInfFSLinearLens;
-import net.claribole.zvtm.lens.LInfFSManhattanLens;
-import net.claribole.zvtm.lens.LInfTFadingLens;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.lens.TFadingLens;
-import net.claribole.zvtm.lens.TGaussianLens;
+import net.claribole.zvtm.lens.*;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
@@ -129,6 +112,12 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final short L2_TGaussian = 14;
     static final short L2_Fading = 15;
     static final short LInf_Fading = 16;
+    static final short LInf_Gaussian = 17;
+    static final short L3_Linear = 18;
+    static final short L3_Manhattan = 19;
+    static final short L3_Gaussian = 20;
+    static final short L3_InverseCosine = 21;
+    static final short L3_Fresnel = 22;
     
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
@@ -149,6 +138,12 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / Translucence Gaussian";
     static final String L2_Fading_Title = View_Title_Prefix + "L2 / Fading";
     static final String LInf_Fading_Title = View_Title_Prefix + "LInf / Fading";
+    static final String LInf_Gaussian_Title = View_Title_Prefix + "LInf / Gaussian";
+    static final String L3_Linear_Title = View_Title_Prefix + "L3 / Linear";
+    static final String L3_InverseCosine_Title = View_Title_Prefix + "L3 / Inverse Cosine";
+    static final String L3_Gaussian_Title = View_Title_Prefix + "L3 / Gaussian";
+    static final String L3_Manhattan_Title = View_Title_Prefix + "L3 / Manhattan";
+    static final String L3_Fresnel_Title = View_Title_Prefix + "L3 / Fresnel";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -394,6 +389,11 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    fLens = null;
 	    break;
 	}
+	case LInf_Gaussian:{
+	    res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
  	case L1_Fresnel:{
 	    res = new L1FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
@@ -408,7 +408,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
 	    break;
-	} 
+	}
 	case L2_TGaussian:{
 	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
@@ -426,6 +426,31 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    fLens.setBoundaryColor(Color.RED);
 	    fLens.setObservedRegionColor(Color.RED);
 	    res = fLens;
+	    break;
+	}
+	case L3_Linear:{
+	    res = new L3FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case L3_InverseCosine:{
+	    res = new L3FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case L3_Manhattan:{
+	    res = new L3FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case L3_Gaussian:{
+	    res = new L3FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case L3_Fresnel:{
+	    res = new L3FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
 	    break;
 	}
 	}
