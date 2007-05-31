@@ -71,7 +71,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 	    cams[nbcam]=(Camera)(cameras.get(nbcam));
 	}
 	//init other stuff
-	setBackground(Color.lightGray);
+	setBackground(backColor);
 	this.addMouseListener(this);
 	this.addMouseMotionListener(this);
 	this.addMouseWheelListener(this);

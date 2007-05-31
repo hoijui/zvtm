@@ -138,8 +138,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**how long this thread should sleep in order to spend max. frameTime ms in each iteration*/
     long timeToSleep;
 
-    /**view's backgorund color (default is lightGray)*/
-    Color backColor=Color.lightGray;
+    /**view's backgorund color (default is black)*/
+    Color backColor = Color.BLACK;
 
     /**graphics2d's original stroke -passed to each glyph in case it needs to modifiy the stroke when painting itself*/
     Stroke standardStroke;
