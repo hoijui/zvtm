@@ -1133,7 +1133,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param d duration of the animation in ms
      *@param z if false, do not (un)zoom, just translate (default is true)
      *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
-     *@param a post animation action to execute after camera reachers its final position
+     *@param paa post animation action to execute after camera reachers its final position
      *@return the final camera location
      */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, PostAnimationAction paa){
