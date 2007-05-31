@@ -129,7 +129,7 @@ Usage:
 
   <!--documentation (javadoc)-->
   <target name="doc" depends="init,cleandoc">
-    <javadoc packagenames="com.xerox.VTM.engine.*,com.xerox.VTM.glyphs.*,com.xerox.VTM.svg.*,net.claribole.zvtm.engine.*,net.claribole.zvtm.mpd.*,net.claribole.zvtm.glyphs.*,net.claribole.zvtm.xml.*,net.claribole.zvtm.lens.*" excludepackagenames="net.claribole.zvtm.glyphs.projection.*"
+    <javadoc packagenames="com.xerox.VTM.engine.*,com.xerox.VTM.glyphs.*,com.xerox.VTM.svg.*,net.claribole.zvtm.engine.*,net.claribole.zvtm.mpd.*,net.claribole.zvtm.glyphs.*,net.claribole.zvtm.xml.*,net.claribole.zvtm.lens.*,fr.inria.zuist" excludepackagenames="net.claribole.zvtm.glyphs.projection.*"
              sourcepath="${src.dir}" destdir="${apidocs.dir}" Overview="${src.dir}/com/xerox/VTM/overview.html"
              defaultexcludes="yes" author="true" version="true" use="true"
              windowtitle="ZVTM API documentation">
