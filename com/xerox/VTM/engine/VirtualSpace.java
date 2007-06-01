@@ -376,10 +376,12 @@ public class VirtualSpace {
     }
 
     protected void addGlyphToDrawingList(Glyph g){
-	Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
-	System.arraycopy(drawingList, 0, newDrawingList, 0, drawingList.length);
-	newDrawingList[drawingList.length] = g;
-	drawingList = newDrawingList;
+	synchronized(drawingList){
+	    Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
+	    System.arraycopy(drawingList, 0, newDrawingList, 0, drawingList.length);
+	    newDrawingList[drawingList.length] = g;
+	    drawingList = newDrawingList;
+	}
     }
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
@@ -407,9 +409,11 @@ public class VirtualSpace {
     }
 
     protected int glyphIndexInDrawingList(Glyph g){
-	for (int i=0;i<drawingList.length;i++){
-	    if (drawingList[i] == g){
-		return i;
+	synchronized(drawingList){
+	    for (int i=0;i<drawingList.length;i++){
+		if (drawingList[i] == g){
+		    return i;
+		}
 	    }
 	}
 	return -1;
