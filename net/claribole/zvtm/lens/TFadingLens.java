@@ -52,6 +52,9 @@ public class TFadingLens extends TLens {
     Timer timer;
     TrailingTimer mouseStillUpdater;
 
+    double cutoffParamA = 2;   // 0.8
+    double cutoffParamB = 0.1;  // 0.1 to make it more difficult to acquire
+
     /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
 
@@ -230,7 +233,7 @@ public class TFadingLens extends TLens {
 	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
 	double distAway = targetPos.distance(currentPos);
 	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-	filter.setCutOffFrequency(((1.0 - opacity) * 0.8) + 0.1);
+	filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
 	currentPos = filter.apply(targetPos, frequency);
 	int tx = (int)Math.round(currentPos.getX());
 	int ty = (int)Math.round(currentPos.getY());
@@ -242,6 +245,12 @@ public class TFadingLens extends TLens {
 	    MMTf = nMMTf;
 	    owningView.parent.repaintNow();
 	}
+    }
+
+
+    public void setCutoffFrequencyParameters(double a, double b){
+	cutoffParamA = a;
+	cutoffParamB = b;
     }
 
     public void setNoUpdateWhenMouseStill(boolean b){
