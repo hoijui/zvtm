@@ -148,8 +148,8 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String L3_Gaussian_Title = View_Title_Prefix + "L3 / Gaussian";
     static final String L3_Manhattan_Title = View_Title_Prefix + "L3 / Manhattan";
     static final String L3_Fresnel_Title = View_Title_Prefix + "L3 / Fresnel";
-    static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Gaussian";
-    static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Gaussian";
+    static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Linear";
+    static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Linear";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
