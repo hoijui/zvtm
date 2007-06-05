@@ -24,7 +24,7 @@ import com.xerox.VTM.glyphs.Translucent;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class TFadingLens extends TLens {
+public class TFadingLens extends TLens implements TemporalLens {
 
     /** Controls the granularity of translucency values for rColor.
      *  The higher the number, the smoother the transition from opaque to transparent.
@@ -50,9 +50,9 @@ public class TFadingLens extends TLens {
     Point2D parentPos = new Point2D.Double(0, 0);
     Point2D targetPos = new Point2D.Double(0, 0);
     Timer timer;
-    TrailingTimer mouseStillUpdater;
+    TTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 2;   // 0.8
+    double cutoffParamA = 1;   // 0.8
     double cutoffParamB = 0.1;  // 0.1 to make it more difficult to acquire
 
     /**Lens boundary color (default is black, null if none)*/
@@ -136,7 +136,7 @@ public class TFadingLens extends TLens {
 
     void initTimer(){
 	timer = new Timer();
-	mouseStillUpdater = new TrailingTimer(this);
+	mouseStillUpdater = new TTrailingTimer(this);
 	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
     }
 
@@ -224,12 +224,12 @@ public class TFadingLens extends TLens {
 	mLastSampleTime = currentTime;
     }
 
-    public void updateAlpha(int cx, int cy){
+    public void updateTimeBasedParams(int cx, int cy){
 	parentPos.setLocation(cx, cy);
-	updateAlpha();
+	updateTimeBasedParams();
     }
 
-    public void updateAlpha(){
+    public void updateTimeBasedParams(){
 	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
 	double distAway = targetPos.distance(currentPos);
 	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
@@ -270,7 +270,7 @@ public class TFadingLens extends TLens {
     public synchronized void setAbsolutePosition(int ax, int ay, long absTime){
 	super.setAbsolutePosition(ax, ay);
 	updateFrequency(absTime);
-	updateAlpha(ax, ay);
+	updateTimeBasedParams(ax, ay);
     }
 
     /**Set the color used to draw the lens' boundaries (default is black)
@@ -308,12 +308,12 @@ public class TFadingLens extends TLens {
 
 }
 
-class TrailingTimer extends TimerTask {
+class TTrailingTimer extends TimerTask {
 
-    TFadingLens lens;
+    TemporalLens lens;
     private boolean enabled = true;
 
-    TrailingTimer(TFadingLens l){
+    TTrailingTimer(TFadingLens l){
 	super();
 	this.lens = l;
     }
@@ -328,7 +328,7 @@ class TrailingTimer extends TimerTask {
 
     public void run(){
 	if (enabled){
-	    lens.updateAlpha();
+	    lens.updateTimeBasedParams();
 	}
     }
 
