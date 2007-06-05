@@ -138,11 +138,11 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	int ty = (int)Math.round(currentPos.getY());
 	tx = Math.max(tx, w/2);
  	ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
-	System.err.println("++"+TMM);
+// 	System.err.println("++"+TMM);
 	float nMM = ((float)opacity) * TMM-1 + 1;
 	if (Math.abs(lMM - nMM) > 0.01f){// avoid unnecesarry repaint requests
 	    // make the lens almost flat when making big moves
-	    System.err.println(nMM);
+// 	    System.err.println(nMM);
 	    this.setMaximumMagnification(nMM, false);
 	    lMM = nMM;
 	    owningView.parent.repaintNow();
