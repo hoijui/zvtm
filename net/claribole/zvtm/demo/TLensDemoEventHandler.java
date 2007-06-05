@@ -47,6 +47,8 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
     static final short NOT_ZOOMING = 0;
     short zoomDirection = NOT_ZOOMING;
 
+    long[] wnes; //region seen through camera
+
     boolean cursorNearBorder = false;
 
     TLensDemo application;
@@ -142,7 +144,7 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true, e.getWhen());
+	    application.moveLens(jpx, jpy, e.getWhen());
 	}
 	//application.vsm.repaintNow();
     }
@@ -155,7 +157,7 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	    application.vsm.animator.Aspeed = 0;
  	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, false);
+	    application.moveLens(jpx, jpy, e.getWhen());
 	}
     }
 
@@ -166,17 +168,6 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	    }
 	    else {
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
-	    }
-	}
-	else {
-	    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
-	    if (wheelDirection  == WHEEL_UP){// zooming in
-		application.demoCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-		application.vsm.repaintNow();
-	    }
-	    else {//wheelDirection == WHEEL_DOWN, zooming out
-		application.demoCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-		application.vsm.repaintNow();
 	    }
 	}
     }
@@ -190,17 +181,117 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code == KeyEvent.VK_F1){
+	// L1 lenses
+	if (code == KeyEvent.VK_2){
+	    application.lensFamily = TLensDemo.L1_Linear;
+	    application.demoView.setTitle(TLensDemo.L1_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_3){
+	    application.lensFamily = TLensDemo.L1_InverseCosine;
+	    application.demoView.setTitle(TLensDemo.L1_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_4){
+	    application.lensFamily = TLensDemo.L1_Manhattan;
+	    application.demoView.setTitle(TLensDemo.L1_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_5){
+	    application.lensFamily = TLensDemo.L1_Fresnel;
+	    application.demoView.setTitle(TLensDemo.L1_Fresnel_Title);
+	}
+	// L2 lenses
+	else if (code == KeyEvent.VK_Q){
 	    application.lensFamily = TLensDemo.L2_Gaussian;
 	    application.demoView.setTitle(TLensDemo.L2_Gaussian_Title);
 	}
-	else if (code == KeyEvent.VK_F2){
+	else if (code == KeyEvent.VK_W){
+	    application.lensFamily = TLensDemo.L2_Linear;
+	    application.demoView.setTitle(TLensDemo.L2_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_E){
+	    application.lensFamily = TLensDemo.L2_InverseCosine;
+	    application.demoView.setTitle(TLensDemo.L2_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_R){
+	    application.lensFamily = TLensDemo.L2_Manhattan;
+	    application.demoView.setTitle(TLensDemo.L2_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_T){
+	    application.lensFamily = TLensDemo.L2_Fresnel;
+	    application.demoView.setTitle(TLensDemo.L2_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_Y){
+	    application.lensFamily = TLensDemo.L2_TLinear;
+	    application.demoView.setTitle(TLensDemo.L2_TLinear_Title);
+	}
+	else if (code == KeyEvent.VK_U){
 	    application.lensFamily = TLensDemo.L2_TGaussian;
 	    application.demoView.setTitle(TLensDemo.L2_TGaussian_Title);
 	}
-	else if (code == KeyEvent.VK_F3){
-	    application.lensFamily = TLensDemo.L2_TFading;
-	    application.demoView.setTitle(TLensDemo.L2_TFading_Title);
+	else if (code == KeyEvent.VK_I){
+	    application.lensFamily = TLensDemo.L2_Fading;
+	    application.demoView.setTitle(TLensDemo.L2_Fading_Title);
+	}
+	else if (code == KeyEvent.VK_O){
+	    application.lensFamily = TLensDemo.L2_Scrambling;
+	    application.demoView.setTitle(TLensDemo.L2_Scrambling_Title);
+	}
+	else if (code == KeyEvent.VK_P){
+	    application.lensFamily = TLensDemo.L2_DLinear;
+	    application.demoView.setTitle(TLensDemo.L2_DLinear_Title);
+	}
+	// L3 lenses
+	else if (code == KeyEvent.VK_A){
+	    application.lensFamily = TLensDemo.L3_Gaussian;
+	    application.demoView.setTitle(TLensDemo.L3_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_S){
+	    application.lensFamily = TLensDemo.L3_Linear;
+	    application.demoView.setTitle(TLensDemo.L3_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_D){
+	    application.lensFamily = TLensDemo.L3_InverseCosine;
+	    application.demoView.setTitle(TLensDemo.L3_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_F){
+	    application.lensFamily = TLensDemo.L3_Manhattan;
+	    application.demoView.setTitle(TLensDemo.L3_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_G){
+	    application.lensFamily = TLensDemo.L3_Fresnel;
+	    application.demoView.setTitle(TLensDemo.L3_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_H){
+	    application.lensFamily = TLensDemo.L3_TLinear;
+	    application.demoView.setTitle(TLensDemo.L3_TLinear_Title);
+	}
+	// LInf lenses
+	else if (code == KeyEvent.VK_Z){
+	    application.lensFamily = TLensDemo.LInf_Gaussian;
+	    application.demoView.setTitle(TLensDemo.LInf_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_X){
+	    application.lensFamily = TLensDemo.LInf_Linear;
+	    application.demoView.setTitle(TLensDemo.LInf_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_C){
+	    application.lensFamily = TLensDemo.LInf_InverseCosine;
+	    application.demoView.setTitle(TLensDemo.LInf_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_V){
+	    application.lensFamily = TLensDemo.LInf_Manhattan;
+	    application.demoView.setTitle(TLensDemo.LInf_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_B){
+	    application.lensFamily = TLensDemo.LInf_Fresnel;
+	    application.demoView.setTitle(TLensDemo.LInf_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_N){
+	    application.lensFamily = TLensDemo.LInf_TLinear;
+	    application.demoView.setTitle(TLensDemo.LInf_TLinear_Title);
+	}
+	else if (code == KeyEvent.VK_M){
+	    application.lensFamily = TLensDemo.LInf_Fading;
+	    application.demoView.setTitle(TLensDemo.LInf_Fading_Title);
 	}
     }
 
@@ -224,5 +315,5 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
-
+    
 }

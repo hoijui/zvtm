@@ -10,6 +10,7 @@
 
 package net.claribole.zvtm.demo;
 
+import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Vector;
@@ -17,10 +18,7 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 
 import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.lens.FSGaussianLens;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.lens.TFadingLens;
-import net.claribole.zvtm.lens.TGaussianLens;
+import net.claribole.zvtm.lens.*;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
@@ -35,8 +33,12 @@ import com.xerox.VTM.glyphs.VSegment;
 public class TLensDemo {
 
     /* screen dimensions */
-    static int SCREEN_WIDTH =  1024;
-    static int SCREEN_HEIGHT =  768;
+    static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
+    static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
+
+    /* max dimensions of ZVTM view */
+    static final int VIEW_MAX_W = 1280;
+    static final int VIEW_MAX_H = 1024;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
@@ -66,6 +68,7 @@ public class TLensDemo {
 
     /* misc. lens settings */
     Lens lens;
+    TemporalLens tLens;
     static int LENS_R1 = 100;
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
@@ -75,14 +78,63 @@ public class TLensDemo {
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
 
     /* lens distance and drop-off functions */
-    static final short L2_Gaussian = 0;
-    static final short L2_TGaussian = 1;
-    static final short L2_TFading = 2;
+    static final short L1_Linear = 0;
+    static final short L1_InverseCosine = 1;
+    static final short L1_Manhattan = 2;
+    static final short L2_Gaussian = 3;
+    static final short L2_Linear = 4;
+    static final short L2_InverseCosine = 5;
+    static final short L2_Manhattan = 6;
+    static final short L2_Scrambling = 7;
+    static final short LInf_Linear = 8;
+    static final short LInf_InverseCosine = 9;
+    static final short LInf_Manhattan = 10;
+    static final short L1_Fresnel = 11;
+    static final short L2_Fresnel = 12;
+    static final short LInf_Fresnel = 13;
+    static final short L2_TGaussian = 14;
+    static final short L2_Fading = 15;
+    static final short LInf_Fading = 16;
+    static final short LInf_Gaussian = 17;
+    static final short L3_Linear = 18;
+    static final short L3_Manhattan = 19;
+    static final short L3_Gaussian = 20;
+    static final short L3_InverseCosine = 21;
+    static final short L3_Fresnel = 22;
+    static final short LInf_TLinear = 23;
+    static final short L3_TLinear = 24;
+    static final short L2_TLinear = 25;
+    static final short L2_DLinear = 26;
+
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
+    static final String L1_Linear_Title = View_Title_Prefix + "L1 / Linear";
+    static final String L1_InverseCosine_Title = View_Title_Prefix + "L1 / Inverse Cosine";
+    static final String L1_Manhattan_Title = View_Title_Prefix + "L1 / Manhattan";
     static final String L2_Gaussian_Title = View_Title_Prefix + "L2 / Gaussian";
-    static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / TGaussian";
-    static final String L2_TFading_Title = View_Title_Prefix + "L2 / TFading";
+    static final String L2_Linear_Title = View_Title_Prefix + "L2 / Linear";
+    static final String L2_InverseCosine_Title = View_Title_Prefix + "L2 / Inverse Cosine";
+    static final String L2_Manhattan_Title = View_Title_Prefix + "L2 / Manhattan";
+    static final String L2_Scrambling_Title = View_Title_Prefix + "L2 / Scrambling (for fun)";
+    static final String LInf_Linear_Title = View_Title_Prefix + "LInf / Linear";
+    static final String LInf_InverseCosine_Title = View_Title_Prefix + "LInf / Inverse Cosine";
+    static final String LInf_Manhattan_Title = View_Title_Prefix + "LInf / Manhattan";
+    static final String L1_Fresnel_Title = View_Title_Prefix + "L1 / Fresnel";
+    static final String L2_Fresnel_Title = View_Title_Prefix + "L2 / Fresnel";
+    static final String LInf_Fresnel_Title = View_Title_Prefix + "LInf / Fresnel";
+    static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / Translucence Gaussian";
+    static final String L2_TLinear_Title = View_Title_Prefix + "L2 / Translucence Linear";
+    static final String L2_Fading_Title = View_Title_Prefix + "L2 / Fading";
+    static final String LInf_Fading_Title = View_Title_Prefix + "LInf / Fading";
+    static final String LInf_Gaussian_Title = View_Title_Prefix + "LInf / Gaussian";
+    static final String L3_Linear_Title = View_Title_Prefix + "L3 / Linear";
+    static final String L3_InverseCosine_Title = View_Title_Prefix + "L3 / Inverse Cosine";
+    static final String L3_Gaussian_Title = View_Title_Prefix + "L3 / Gaussian";
+    static final String L3_Manhattan_Title = View_Title_Prefix + "L3 / Manhattan";
+    static final String L3_Fresnel_Title = View_Title_Prefix + "L3 / Fresnel";
+    static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Linear";
+    static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Linear";
+    static final String L2_DLinear_Title = View_Title_Prefix + "L2 / Dynamic Linear";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -120,9 +172,9 @@ public class TLensDemo {
     }
 
     void loadRepresentation(){
-	for (int i=-200;i<=200;i+=40){
-	    VSegment s = new VSegment(i,0,0,0,200,Color.black);
-	    VSegment s2 = new VSegment(0,i,0,200,0,Color.black);
+	for (int i=-1000;i<=1000;i+=40){
+	    VSegment s = new VSegment(i,0,0,0,1000,Color.black);
+	    VSegment s2 = new VSegment(0,i,0,1000,0,Color.black);
 	    vsm.addGlyph(s,mainVS);vsm.addGlyph(s2,mainVS);
 	}
 	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
@@ -139,21 +191,21 @@ public class TLensDemo {
 	    VIEW_X = 80;
 	    SCREEN_WIDTH -= 80;
 	}
-	VIEW_W = SCREEN_WIDTH;
-	VIEW_H = SCREEN_HEIGHT;
+	VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
     void setLens(int t){
 	eh.lensType = t;
     }
 
-    void moveLens(int x, int y, boolean write){
-	lens.setAbsolutePosition(x, y);
-	vsm.repaintNow();
-    }
-
-    void moveLens(int x, int y, boolean write, long when){
-	((TFadingLens)lens).setAbsolutePosition(x, y, when);
+    void moveLens(int x, int y, long absTime){
+	if (tLens != null){
+	    tLens.setAbsolutePosition(x, y, absTime);
+	}
+	else {
+	    lens.setAbsolutePosition(x, y);
+	}
 	vsm.repaintNow();
     }
 
@@ -183,7 +235,7 @@ public class TLensDemo {
 	    vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
 					     lens.getID(), new TLensDemoZP2LensAction(this));
 	    vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					       cadata, demoCamera.getID(), null);
+					       cadata, demoCamera.getID());
 	}
 	else {
 	    Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
@@ -195,7 +247,7 @@ public class TLensDemo {
 	    vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
 					     lens.getID(), new TLensDemoZP2LensAction(this));
 	    vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					       cadata, demoCamera.getID(), null);
+					       cadata, demoCamera.getID());
 	}
     }
 
@@ -281,9 +333,145 @@ public class TLensDemo {
     Lens getLensDefinition(int x, int y){
 	Lens res = null;
 	switch (lensFamily){
-	case L2_Gaussian:{res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);break;}
-	case L2_TGaussian:{res = new TGaussianLens(1.0f, 0.0f, 0.9f, 150, 20, x - panelWidth/2, y - panelHeight/2);break;}
-	case L2_TFading:{res = new TFadingLens(1.0f, 0.0f, 1.0f, 100, x - panelWidth/2, y - panelHeight/2);break;}
+	case L1_Linear:{
+	    res = new L1FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L1_InverseCosine:{
+	    res = new L1FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L1_Manhattan:{
+	    res = new L1FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Gaussian:{
+	    res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Linear:{
+	    res = new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_InverseCosine:{
+	    res = new FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Manhattan:{
+	    res = new FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Scrambling:{
+	    res = new FSScramblingLens(1.0f, LENS_R1, 1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Linear:{
+	    res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_InverseCosine:{
+	    res = new LInfFSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Manhattan:{
+	    res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Gaussian:{
+	    res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+ 	case L1_Fresnel:{
+	    res = new L1FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Fresnel:{
+	    res = new FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Fresnel:{
+	    res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_TGaussian:{
+	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_TLinear:{
+	    res = new TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_TLinear:{
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_TLinear:{
+	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Fading:{
+	    tLens = new TFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
+	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    res = (Lens)tLens;
+	    break;
+	}
+	case LInf_Fading:{
+	    tLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
+	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    res = (Lens)tLens;
+	    break;
+	}
+	case L3_Linear:{
+	    res = new L3FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_InverseCosine:{
+	    res = new L3FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_Manhattan:{
+	    res = new L3FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_Gaussian:{
+	    res = new L3FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_Fresnel:{
+	    res = new L3FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_DLinear:{
+	    tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = (Lens)tLens;
+	    break;
+	}
 	}
 	return res;
     }
