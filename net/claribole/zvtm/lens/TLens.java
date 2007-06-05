@@ -37,7 +37,7 @@ public abstract class TLens extends FixedSizeLens {
     int Rr, Gr, Br;
 
     public void gf(float x, float y, float[] g){
-	d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+	d = Math.max(Math.abs(x-sw-lx), Math.abs(y-sh-ly));
 	if (d <= LR2)
 	    g[0] = g[1] = MM;
 	else
