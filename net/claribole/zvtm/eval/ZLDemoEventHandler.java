@@ -247,6 +247,10 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.lensFamily = ZLWorldDemo.L2_Scrambling;
 	    application.demoView.setTitle(ZLWorldDemo.L2_Scrambling_Title);
 	}
+	else if (code == KeyEvent.VK_P){
+	    application.lensFamily = ZLWorldDemo.L2_DLinear;
+	    application.demoView.setTitle(ZLWorldDemo.L2_DLinear_Title);
+	}
 	// L3 lenses
 	else if (code == KeyEvent.VK_A){
 	    application.lensFamily = ZLWorldDemo.L3_Gaussian;

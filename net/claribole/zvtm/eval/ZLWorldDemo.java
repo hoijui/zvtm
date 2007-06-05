@@ -82,7 +82,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 
     /* misc. lens settings */
     Lens lens;
-    TFadingLens fLens;
+    TemporalLens tLens;
     static int LENS_R1 = 100;
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
@@ -121,6 +121,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final short LInf_TLinear = 23;
     static final short L3_TLinear = 24;
     static final short L2_TLinear = 25;
+    static final short L2_DLinear = 26;
 
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
@@ -150,6 +151,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String L3_Fresnel_Title = View_Title_Prefix + "L3 / Fresnel";
     static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Linear";
     static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Linear";
+    static final String L2_DLinear_Title = View_Title_Prefix + "L2 / Dynamic Linear";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -208,8 +210,8 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     }
 
     void moveLens(int x, int y, long absTime){
-	if (fLens != null){
-	    fLens.setAbsolutePosition(x, y, absTime);
+	if (tLens != null){
+	    tLens.setAbsolutePosition(x, y, absTime);
 	}
 	else {
 	    lens.setAbsolutePosition(x, y);
@@ -343,136 +345,141 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	switch (lensFamily){
 	case L1_Linear:{
 	    res = new L1FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L1_InverseCosine:{
 	    res = new L1FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L1_Manhattan:{
 	    res = new L1FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_Gaussian:{
 	    res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_Linear:{
 	    res = new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_InverseCosine:{
 	    res = new FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_Manhattan:{
 	    res = new FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_Scrambling:{
 	    res = new FSScramblingLens(1.0f, LENS_R1, 1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case LInf_Linear:{
 	    res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case LInf_InverseCosine:{
 	    res = new LInfFSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case LInf_Manhattan:{
 	    res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case LInf_Gaussian:{
 	    res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
  	case L1_Fresnel:{
 	    res = new L1FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_Fresnel:{
 	    res = new FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case LInf_Fresnel:{
 	    res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_TGaussian:{
 	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_TLinear:{
 	    res = new TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case LInf_TLinear:{
 	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L3_TLinear:{
 	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L2_Fading:{
-	    fLens = new TFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens.setBoundaryColor(Color.RED);
-	    fLens.setObservedRegionColor(Color.RED);
-	    res = fLens;
+	    tLens = new TFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
+	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    res = (Lens)tLens;
 	    break;
 	}
 	case LInf_Fading:{
-	    fLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens.setBoundaryColor(Color.RED);
-	    fLens.setObservedRegionColor(Color.RED);
-	    res = fLens;
+	    tLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
+	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    res = (Lens)tLens;
 	    break;
 	}
 	case L3_Linear:{
 	    res = new L3FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L3_InverseCosine:{
 	    res = new L3FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L3_Manhattan:{
 	    res = new L3FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L3_Gaussian:{
 	    res = new L3FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
 	    break;
 	}
 	case L3_Fresnel:{
 	    res = new L3FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
+	    tLens = null;
+	    break;
+	}
+	case L2_DLinear:{
+	    tLens = new DLinearLens(1.0f, (float)DEFAULT_MAG_FACTOR, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = (Lens)tLens;
 	    break;
 	}
 	}
