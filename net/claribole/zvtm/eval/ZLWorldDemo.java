@@ -118,7 +118,10 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final short L3_Gaussian = 20;
     static final short L3_InverseCosine = 21;
     static final short L3_Fresnel = 22;
-    
+    static final short LInf_TLinear = 23;
+    static final short L3_TLinear = 24;
+    static final short L2_TLinear = 25;
+
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
     static final String L1_Linear_Title = View_Title_Prefix + "L1 / Linear";
@@ -136,6 +139,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String L2_Fresnel_Title = View_Title_Prefix + "L2 / Fresnel";
     static final String LInf_Fresnel_Title = View_Title_Prefix + "LInf / Fresnel";
     static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / Translucence Gaussian";
+    static final String L2_TLinear_Title = View_Title_Prefix + "L2 / Translucence Linear";
     static final String L2_Fading_Title = View_Title_Prefix + "L2 / Fading";
     static final String LInf_Fading_Title = View_Title_Prefix + "LInf / Fading";
     static final String LInf_Gaussian_Title = View_Title_Prefix + "LInf / Gaussian";
@@ -144,6 +148,8 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String L3_Gaussian_Title = View_Title_Prefix + "L3 / Gaussian";
     static final String L3_Manhattan_Title = View_Title_Prefix + "L3 / Manhattan";
     static final String L3_Fresnel_Title = View_Title_Prefix + "L3 / Fresnel";
+    static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Gaussian";
+    static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Gaussian";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -171,6 +177,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	cameras.add(demoCamera);
 	demoView = vsm.addExternalView(cameras, L2_Gaussian_Title, View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
+	demoView.setBackgroundColor(Color.GRAY);
 	demoView.setLocation(VIEW_X, VIEW_Y);
 	updatePanelSize();
 	demoView.setEventHandler(eh);
@@ -411,6 +418,21 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
 	case L2_TGaussian:{
 	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case L2_TLinear:{
+	    res = new TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case LInf_TLinear:{
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    fLens = null;
+	    break;
+	}
+	case L3_TLinear:{
+	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
 	    break;
 	}

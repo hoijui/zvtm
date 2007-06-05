@@ -184,15 +184,15 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code==KeyEvent.VK_J){application.ewmm.switchAdaptMaps();}
-	else if (code==KeyEvent.VK_M){
+	if (code==KeyEvent.VK_F4){application.ewmm.switchAdaptMaps();}
+	else if (code==KeyEvent.VK_F3){
 	    application.switchManhattanizer();
 	}
-	else if (code==KeyEvent.VK_K){
+	else if (code==KeyEvent.VK_F2){
 	    application.SHOW_MEMORY_USAGE = !application.SHOW_MEMORY_USAGE;
 	    application.vsm.repaintNow();
 	}
-	else if (code==KeyEvent.VK_G){application.gc();}
+	else if (code==KeyEvent.VK_F1){application.gc();}
 	// L1 lenses
 	else if (code == KeyEvent.VK_2){
 	    application.lensFamily = ZLWorldDemo.L1_Linear;
@@ -232,14 +232,18 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.demoView.setTitle(ZLWorldDemo.L2_Fresnel_Title);
 	}
 	else if (code == KeyEvent.VK_Y){
+	    application.lensFamily = ZLWorldDemo.L2_TLinear;
+	    application.demoView.setTitle(ZLWorldDemo.L2_TLinear_Title);
+	}
+	else if (code == KeyEvent.VK_U){
 	    application.lensFamily = ZLWorldDemo.L2_TGaussian;
 	    application.demoView.setTitle(ZLWorldDemo.L2_TGaussian_Title);
 	}
-	else if (code == KeyEvent.VK_U){
+	else if (code == KeyEvent.VK_I){
 	    application.lensFamily = ZLWorldDemo.L2_Fading;
 	    application.demoView.setTitle(ZLWorldDemo.L2_Fading_Title);
 	}
-	else if (code == KeyEvent.VK_I){
+	else if (code == KeyEvent.VK_O){
 	    application.lensFamily = ZLWorldDemo.L2_Scrambling;
 	    application.demoView.setTitle(ZLWorldDemo.L2_Scrambling_Title);
 	}
@@ -264,6 +268,10 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.lensFamily = ZLWorldDemo.L3_Fresnel;
 	    application.demoView.setTitle(ZLWorldDemo.L3_Fresnel_Title);
 	}
+	else if (code == KeyEvent.VK_H){
+	    application.lensFamily = ZLWorldDemo.L3_TLinear;
+	    application.demoView.setTitle(ZLWorldDemo.L3_TLinear_Title);
+	}
 	// LInf lenses
 	else if (code == KeyEvent.VK_Z){
 	    application.lensFamily = ZLWorldDemo.LInf_Gaussian;
@@ -286,6 +294,10 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.demoView.setTitle(ZLWorldDemo.LInf_Fresnel_Title);
 	}
 	else if (code == KeyEvent.VK_N){
+	    application.lensFamily = ZLWorldDemo.LInf_TLinear;
+	    application.demoView.setTitle(ZLWorldDemo.LInf_TLinear_Title);
+	}
+	else if (code == KeyEvent.VK_M){
 	    application.lensFamily = ZLWorldDemo.LInf_Fading;
 	    application.demoView.setTitle(ZLWorldDemo.LInf_Fading_Title);
 	}
