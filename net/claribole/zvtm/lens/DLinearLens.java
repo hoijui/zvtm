@@ -29,18 +29,18 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     Timer timer;
     DTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 1.5;   // 0.8
-    double cutoffParamB = 0.1;  // 0.1 to make it more difficult to acquire
+    double cutoffParamA = 0.8;   // 0.8
+    double cutoffParamB = 0.01;  // 0.1 to make it more difficult to acquire
 
-    float lMM;
-    float TMM = 4.0f;
+    /** Dynamic magnification factor. */
+    float dMM = MM;
+
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
     public DLinearLens(){
 	super();
-	TMM = MM;
 	initTimer();
     }
 
@@ -51,8 +51,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      */
     public DLinearLens(float mm, float tmm){
 	super(mm);
-	lMM = MM;
-	TMM = tmm;
+	dMM = MM;
 	initTimer();
     }
 
@@ -63,10 +62,9 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public DLinearLens(float mm, float tmm, int outerRadius, int innerRadius){
+    public DLinearLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
-	lMM = MM;
-	TMM = tmm;
+	dMM = MM;
 	initTimer();
     }
 
@@ -79,10 +77,9 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public DLinearLens(float mm, float tmm, int outerRadius, int innerRadius, int x, int y){
+    public DLinearLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
-	lMM = MM;
-	TMM = tmm;
+	dMM = MM;
 	initTimer();
     }
 
@@ -99,9 +96,9 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      */
     public synchronized void setAbsolutePosition(int ax, int ay, long absTime){
 	synchronized(this){
-	super.setAbsolutePosition(ax, ay);
-	updateFrequency(absTime);
-	updateTimeBasedParams(ax, ay);
+	    super.setAbsolutePosition(ax, ay);
+	    updateFrequency(absTime);
+	    updateTimeBasedParams(ax, ay);
 	}
     }
 
@@ -129,25 +126,29 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 
     public void updateTimeBasedParams(){
 	synchronized(this){
-	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-	double distAway = targetPos.distance(currentPos);
-	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-	filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
-	currentPos = filter.apply(targetPos, frequency);
-	int tx = (int)Math.round(currentPos.getX());
-	int ty = (int)Math.round(currentPos.getY());
-	tx = Math.max(tx, w/2);
- 	ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
-// 	System.err.println("++"+TMM);
-	float nMM = ((float)opacity) * TMM-1 + 1;
-	if (Math.abs(lMM - nMM) > 0.01f){// avoid unnecesarry repaint requests
-	    // make the lens almost flat when making big moves
-// 	    System.err.println(nMM);
-	    this.setMaximumMagnification(nMM, false);
-	    lMM = nMM;
-	    owningView.parent.repaintNow();
+	    targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+	    double distAway = targetPos.distance(currentPos);
+	    double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+	    filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
+	    currentPos = filter.apply(targetPos, frequency);
+	    int tx = (int)Math.round(currentPos.getX());
+	    int ty = (int)Math.round(currentPos.getY());
+	    tx = Math.max(tx, w/2);
+	    ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+	    float nMM = ((float)opacity) * (MM-1) + 1;
+	    if (Math.abs(dMM - nMM) > 0.1f){// avoid unnecesarry repaint requests
+		// make the lens almost flat when making big moves
+		dMM = nMM;
+		this.setDynamicMagnification();
+		owningView.parent.repaintNow();
+	    }
 	}
-	}
+    }
+
+    void setDynamicMagnification(){
+	a = (1-dMM)/(float)(LR1 - LR2);
+	b = (dMM*LR1-LR2)/(float)(LR1 - LR2);
+	owningView.parent.repaintNow();
     }
 
     public void setNoUpdateWhenMouseStill(boolean b){
@@ -159,8 +160,14 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	timer.cancel();
     }
     
-    public void setTrueMaximumMagnification(float tmm){
-	this.TMM = tmm;
+    public void gf(float x, float y, float[] g){
+	d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+	if (d <= LR2)
+	    g[0] = g[1] = dMM;
+	else if (d <= LR1)
+	    g[0] = g[1] = a * (float)d + b;
+	else
+	    g[0] = g[1] = 1;
     }
 
 }
