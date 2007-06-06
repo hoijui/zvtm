@@ -52,8 +52,8 @@ public class TFadingLens extends TLens implements TemporalLens {
     Timer timer;
     TTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 1;   // 0.8
-    double cutoffParamB = 0.1;  // 0.1 to make it more difficult to acquire
+    double cutoffParamA = 2;   // 0.8
+    double cutoffParamB = 0.001;  // 0.1 to make it more difficult to acquire
 
     /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
