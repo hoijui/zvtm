@@ -86,7 +86,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     void initTimer(){
 	timer = new Timer();
 	mouseStillUpdater = new DTrailingTimer(this);
-	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
+	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 10);
     }
 
     /**set the position of the lens inside the view
