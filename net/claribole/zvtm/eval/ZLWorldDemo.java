@@ -478,7 +478,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    break;
 	}
 	case L2_DLinear:{
-	    tLens = new DLinearLens(1.0f, (float)DEFAULT_MAG_FACTOR, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    res = (Lens)tLens;
 	    break;
 	}
