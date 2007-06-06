@@ -29,6 +29,7 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VCircle;
 
 public class TLensDemo {
 
@@ -172,7 +173,7 @@ public class TLensDemo {
     }
 
     void loadRepresentation(){
-	for (int i=-1000;i<=1000;i+=40){
+	for (int i=-1000;i<=1000;i+=80){
 	    VSegment s = new VSegment(i,0,0,0,1000,Color.black);
 	    VSegment s2 = new VSegment(0,i,0,1000,0,Color.black);
 	    vsm.addGlyph(s,mainVS);vsm.addGlyph(s2,mainVS);
@@ -180,6 +181,10 @@ public class TLensDemo {
 	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
 	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vsm.addGlyph(i1,mainVS);
+	vsm.addGlyph(new VCircle(500, 500, 0, 10, Color.GREEN), mainVS);
+	vsm.addGlyph(new VCircle(500, -500, 0, 10, Color.GREEN), mainVS);
+	vsm.addGlyph(new VCircle(-500, 500, 0, 10, Color.GREEN), mainVS);
+	vsm.addGlyph(new VCircle(-500, -500, 0, 10, Color.GREEN), mainVS);
     }
 
     void windowLayout(){
@@ -409,34 +414,34 @@ public class TLensDemo {
 	    break;
 	}
 	case L2_TGaussian:{
-	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new TGaussianLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L2_TLinear:{
-	    res = new TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new TLinearLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case LInf_TLinear:{
-	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L3_TLinear:{
-	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new L3TLinearLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L2_Fading:{
-	    tLens = new TFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = new TFadingLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
 	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
 	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
 	    res = (Lens)tLens;
 	    break;
 	}
 	case LInf_Fading:{
-	    tLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = new LInfTFadingLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
 	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
 	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
 	    res = (Lens)tLens;
