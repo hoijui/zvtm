@@ -29,8 +29,8 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     Timer timer;
     DTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 0.8;   // 0.8
-    double cutoffParamB = 0.01;  // 0.1 to make it more difficult to acquire
+    double cutoffParamA = 2;   // 0.8
+    double cutoffParamB = 0.05;  // 0.1 to make it more difficult to acquire
 
     /** Dynamic magnification factor. */
     float dMM = MM;
@@ -124,6 +124,8 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	updateTimeBasedParams();
     }
 
+    float mindMM = 1.0f;
+
     public void updateTimeBasedParams(){
 	synchronized(this){
 	    targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
@@ -135,7 +137,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	    int ty = (int)Math.round(currentPos.getY());
 	    tx = Math.max(tx, w/2);
 	    ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
-	    float nMM = ((float)opacity) * (MM-1) + 1;
+	    float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
 	    if (Math.abs(dMM - nMM) > 0.1f){// avoid unnecesarry repaint requests
 		// make the lens almost flat when making big moves
 		dMM = nMM;
