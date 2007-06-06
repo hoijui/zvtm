@@ -51,7 +51,7 @@ class CameraManager {
 
     /** add a camera to the owning virtual space*/
     Camera addCamera(){
-	Camera c=new Camera(0, 0, 100, Camera.DEFAULT_FOCAL, nextcIndex++);
+	Camera c=new Camera(0, 0, 0, Camera.DEFAULT_FOCAL, nextcIndex++);
 	Camera[] newList=new Camera[nextcIndex];
 	System.arraycopy(cameraList,0,newList,0,cameraList.length);
 	newList[cameraList.length]=c;
