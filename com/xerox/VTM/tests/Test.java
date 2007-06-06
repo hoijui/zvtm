@@ -16,7 +16,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */
 
 package com.xerox.VTM.tests;
@@ -58,6 +58,7 @@ public class Test {
 	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
 	}
 	testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
+	testView.setBackgroundColor(Color.LIGHT_GRAY);
 	testView.setEventHandler(eh);
 	testView.setNotifyMouseMoved(true);
 	vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
