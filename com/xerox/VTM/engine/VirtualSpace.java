@@ -354,6 +354,11 @@ public class VirtualSpace {
     /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
     public long[] findFarmostGlyphCoords(){
 	long[] res = new long[4];
+	return findFarmostGlyphCoords(res);
+    }
+    
+    /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
+    public long[] findFarmostGlyphCoords(long[] res){
 	Glyph[] gl = this.getVisibleGlyphList();
 	if (gl.length > 0){
 	    //init result with first glyph found
@@ -420,6 +425,3 @@ public class VirtualSpace {
     }
 
 }
-
-
-
