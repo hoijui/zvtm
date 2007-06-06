@@ -205,7 +205,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    try {
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
 			if (computeListAtEachRepaint && parent.mouse.isSensitive()){
-			    parent.mouse.computeMouseOverList(evH,cams[activeLayer]);
+			    parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer]);
 			}
 		    }
 		    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}

@@ -31,6 +31,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
+import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
@@ -160,9 +161,18 @@ public abstract class View {
 	panel.setAWTCursor(c);
     }
    
-    /**set application class to which events are sent*/
+    /** Set application class to which events are sent.
+     * Assumes layer 0 (deepest) is active.
+     */
     public void setEventHandler(ViewEventHandler eh){
-	panel.setEventHandler(eh);
+	setEventHandler(eh, 0);
+    }
+
+    /** Set application class to which events are sent.
+     *@param layer depth of layer to which the event handler should be associated.
+     */
+    public void setEventHandler(ViewEventHandler eh, int layer){
+	panel.setEventHandler(eh, layer);
     }
 
     /**sets whether the mouseMoved method in ViewEventHandler is triggered when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
@@ -408,30 +418,30 @@ public abstract class View {
     public void activate(){
 	parent.setActiveView(this);
 	panel.active=true;
-	if (panel.evH!=null){panel.evH.viewActivated(this);}
+	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewActivated(this);}
     }
     
     /**deactivate the view (will not be repainted unless setRepaintPolicy(true) or mouse inside the view)*/
     public void deactivate(){
 	if ((!panel.alwaysRepaintMe) && (!panel.inside)){panel.active=false;}
-	if (panel.evH!=null){panel.evH.viewDeactivated(this);}
+	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeactivated(this);}
     }
 
     /**called from the window listener when the window is iconified - repaint is automatically disabled*/
     void iconify(){
 	panel.active=false;
-	if (panel.evH!=null){panel.evH.viewIconified(this);}
+	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewIconified(this);}
     }
 
     /**called from the window listener when the window is deiconified - repaint is automatically re-enabled*/
     void deiconify(){
 	panel.active=true;
-	if (panel.evH!=null){panel.evH.viewDeiconified(this);}
+	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeiconified(this);}
     }
 
     /**called from the window listener when the window is closed*/
     protected void close(){
-	if (panel.evH!=null){panel.evH.viewClosing(this);}
+	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewClosing(this);}
     }
 
     /**Call this if you want to repaint this view at once.

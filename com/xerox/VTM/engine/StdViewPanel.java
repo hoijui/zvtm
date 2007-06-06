@@ -35,6 +35,7 @@ import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.ViewEventHandler;
 
 
 /**
@@ -65,6 +66,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	parent=v;
 	//init of camera array
 	cams=new Camera[cameras.size()];  //array of Camera
+	evHs = new ViewEventHandler[cams.length];
 	for (int nbcam=0;nbcam<cameras.size();nbcam++){
 	    cams[nbcam]=(Camera)(cameras.get(nbcam));
 	}
@@ -333,7 +335,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				    try {
 					parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
 					if (computeListAtEachRepaint && parent.mouse.isSensitive()){
-					    parent.mouse.computeMouseOverList(evH,cams[activeLayer],this.lens);
+					    parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);
 					}
 				    }
 				    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
@@ -394,7 +396,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			updateMouseOnly=false; // do this first as the thread can be interrupted inside this
 			try {                  // branch and we want to catch new requests for repaint
 			    parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-			    if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evH,cams[activeLayer],this.lens);}
+			    if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
 			}
 			catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
 			if (drawVTMcursor){

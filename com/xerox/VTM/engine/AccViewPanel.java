@@ -396,7 +396,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 					if (computeListAtEachRepaint
 						&& parent.mouse.isSensitive()) {
 					    parent.mouse.computeMouseOverList(
-						    evH, cams[activeLayer]);
+						    evHs[activeLayer], cams[activeLayer]);
 					}
 				    } catch (NullPointerException ex) {
 					if (parent.parent.debug) {
@@ -528,7 +528,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
                                                                                 // sys
 			    if (computeListAtEachRepaint
 				    && parent.mouse.isSensitive()) {
-				parent.mouse.computeMouseOverList(evH,
+				parent.mouse.computeMouseOverList(evHs[activeLayer],
 					cams[activeLayer]);
 			    }
 			} catch (NullPointerException ex) {
