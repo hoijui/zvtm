@@ -1088,6 +1088,11 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in virtual space s*/
     public static long[] findFarmostGlyphCoords(VirtualSpace s){
+	return findFarmostGlyphCoords(s, new long[4]);
+    }
+
+    /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in virtual space s*/
+    public static long[] findFarmostGlyphCoords(VirtualSpace s, long[] res){
 	if (s!=null){
 	    return s.findFarmostGlyphCoords();
 	}
