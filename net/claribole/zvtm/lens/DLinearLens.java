@@ -206,8 +206,9 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	    g2d.drawOval(lx+w/2-LR1, ly+h/2-LR1, 2*LR1, 2*LR1);
 	}
 	if (r2Color != null){
+	    int r2 = Math.round(dMM/((float)MM) * LR2);
 	    g2d.setColor(r2Color);
-	    g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
+	    g2d.drawOval(lx+w/2-r2, ly+h/2-r2, 2*r2, 2*r2);
 	}
 	g2d.setComposite(Translucent.acO);
     }
