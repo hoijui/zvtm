@@ -250,6 +250,58 @@ public class ScrollLayer implements ComponentListener {
 	}
     }
 
+    public void moveUp(){
+	long dy = vsliderRS.getHeight();
+	if (vslider.vy + dy + vsliderRS.getHeight() < upBt.vy - upBtRS.getHeight() &&
+	    vslider.vy + dy - vsliderRS.getHeight() > downBt.vy + downBtRS.getHeight()){
+	    vslider.move(0, dy);
+	    updateCameraVerticalPosition();
+	}
+	else {
+	    vslider.moveTo(vslider.vx, upBt.vy - upBtRS.getHeight() - vsliderRS.getHeight());
+	    updateCameraVerticalPosition();
+	}
+    }
+
+    public void moveDown(){
+	long dy = -vsliderRS.getHeight();
+	if (vslider.vy + dy + vsliderRS.getHeight() < upBt.vy - upBtRS.getHeight() &&
+	    vslider.vy + dy - vsliderRS.getHeight() > downBt.vy + downBtRS.getHeight()){
+	    vslider.move(0, dy);
+	    updateCameraVerticalPosition();
+	}
+	else {
+	    vslider.moveTo(vslider.vx, downBt.vy + downBtRS.getHeight() + vsliderRS.getHeight());
+	    updateCameraVerticalPosition();
+	}
+    }
+
+    public void moveLeft(){
+	long dx = -hsliderRS.getWidth();
+	if (hslider.vx + dx + hsliderRS.getWidth() < rightBt.vx - rightBtRS.getWidth() &&
+	    hslider.vx + dx - hsliderRS.getWidth() > leftBt.vx + leftBtRS.getWidth()){
+	    hslider.move(dx, 0);
+	    updateCameraHorizontalPosition();
+	}
+	else {
+	    hslider.moveTo(leftBt.vx + leftBtRS.getWidth() + hsliderRS.getWidth(), hslider.vy);
+	    updateCameraHorizontalPosition();
+	}
+    }
+
+    public void moveRight(){
+	long dx = hsliderRS.getWidth();
+	if (hslider.vx + dx + hsliderRS.getWidth() < rightBt.vx - rightBtRS.getWidth() &&
+	    hslider.vx + dx - hsliderRS.getWidth() > leftBt.vx + leftBtRS.getWidth()){
+	    hslider.move(dx, 0);
+	    updateCameraHorizontalPosition();
+	}
+	else {
+	    hslider.moveTo(rightBt.vx - rightBtRS.getWidth() - hsliderRS.getWidth(), hslider.vy);
+	    updateCameraHorizontalPosition();
+	}
+    }
+
     public Glyph getVerticalSlider(){return vslider;}
     public Glyph getHorizontalSlider(){return hslider;}
     public Glyph getUpButton(){return upBt;}
