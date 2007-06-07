@@ -479,6 +479,8 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
 	case L2_DLinear:{
 	    tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    ((DLinearLens)tLens).setInnerRadiusColor(Color.RED);
+	    ((DLinearLens)tLens).setOuterRadiusColor(Color.RED);
 	    res = (Lens)tLens;
 	    break;
 	}
