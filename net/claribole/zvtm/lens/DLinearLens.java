@@ -7,13 +7,19 @@
 
 package net.claribole.zvtm.lens;
 
+import java.awt.Color;
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.xerox.VTM.glyphs.Translucent;
+import net.claribole.zvtm.glyphs.Translucency;
 import net.claribole.zvtm.engine.LowPassFilter;
 
-/**Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
+/**Profile: linear - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
 public class DLinearLens extends FSLinearLens implements TemporalLens {
 
@@ -35,6 +41,11 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     /** Dynamic magnification factor. */
     float dMM = MM;
 
+    /** Inner radius color (default is black, null if none) */
+    Color r2Color = Color.BLACK;
+
+    /** Outer radius color (default is black, null if none) */
+    Color r1Color = Color.BLACK;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -101,7 +112,6 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	    updateTimeBasedParams(ax, ay);
 	}
     }
-
 
     public void updateFrequency() {
 	updateFrequency(System.currentTimeMillis());
@@ -170,6 +180,36 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	    g[0] = g[1] = a * (float)d + b;
 	else
 	    g[0] = g[1] = 1;
+    }
+
+    /** Set the color used to draw the lens' inner radius (default is black).
+     *@param c color of the boundary (set to null if you do not want to draw that border)
+     */
+    public void setInnerRadiusColor(Color c){
+	r2Color = c;
+    }
+
+    /** Set the color used to draw the lens' outer radius (default is black).
+     *@param c color of the boundary (set to null if you do not want to draw that border)
+     */
+    public void setOuterRadiusColor(Color c){
+	r1Color = c;
+    }
+
+    /**for internal use*/
+    public void drawBoundary(Graphics2D g2d){
+	// get the alpha composite from a precomputed list of values
+	// (we don't want to instantiate a new AlphaComposite at each repaint request)
+	g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)-1]);
+	if (r1Color != null){
+	    g2d.setColor(r1Color);
+	    g2d.drawOval(lx+w/2-LR1, ly+h/2-LR1, 2*LR1, 2*LR1);
+	}
+	if (r2Color != null){
+	    g2d.setColor(r2Color);
+	    g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
+	}
+	g2d.setComposite(Translucent.acO);
     }
 
 }
