@@ -5,7 +5,7 @@
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: L3TLinearLens.java 605 2007-04-13 13:25:21Z btrofimov $
+ * $Id$
  */ 
 
 
