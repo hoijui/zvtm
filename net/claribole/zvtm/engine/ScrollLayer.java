@@ -15,6 +15,7 @@ import java.awt.Color;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.View;
 
 import com.xerox.VTM.glyphs.*;
@@ -58,14 +59,14 @@ public class ScrollLayer implements ComponentListener {
 	slVSname = "scrollspace" + controlledCamera.getID();
 	slVS = vsm.addVirtualSpace(slVSname);
 	slC = vsm.addCamera(slVS);
-	vgutter = new VRectangle(0,0,0,10,10,Color.RED);
-	vslider = new VRectangle(0,0,0,10,10,Color.BLUE);
-	upBt = new VRectangle(0,0,0,10,10,Color.GREEN);
+	vgutter = new VRectangleST(0,0,0,10,10,Color.RED);
+	vslider = new VRectangleST(0,0,0,10,10,Color.BLUE);
+	upBt = new VRectangleST(0,0,0,10,10,Color.GREEN);
 	downBt = new VRectangle(0,0,0,10,10,Color.ORANGE);
-	hgutter = new VRectangle(0,0,0,10,10,Color.RED);
-	hslider = new VRectangle(0,0,0,10,10,Color.BLUE);
-	leftBt = new VRectangle(0,0,0,10,10,Color.GREEN);
-	rightBt = new VRectangle(0,0,0,10,10,Color.ORANGE);
+	hgutter = new VRectangleST(0,0,0,10,10,Color.RED);
+	hslider = new VRectangleST(0,0,0,10,10,Color.BLUE);
+	leftBt = new VRectangleST(0,0,0,10,10,Color.GREEN);
+	rightBt = new VRectangleST(0,0,0,10,10,Color.ORANGE);
 	vgutterRS = (RectangularShape)vgutter;
 	vsliderRS = (RectangularShape)vslider;
 	upBtRS = (RectangularShape)upBt;
@@ -105,6 +106,8 @@ public class ScrollLayer implements ComponentListener {
 	hsliderRS = (RectangularShape)hslider;
 	leftBtRS = (RectangularShape)leftBt;
 	rightBtRS = (RectangularShape)rightBt;
+	vgutter.setSensitivity(false);
+	hgutter.setSensitivity(false);
 	vsm.addGlyph(vgutter, slVS);
 	vsm.addGlyph(vslider, slVS);
 	vsm.addGlyph(upBt, slVS);
@@ -144,23 +147,23 @@ public class ScrollLayer implements ComponentListener {
     }
 
     void updateWidgetInvariants(){
-	upBt.vx = downBt.vx = vgutter.vx = vslider.vx = panelWidth / 2 - vgutterRS.getWidth();
-	upBt.vy = panelHeight / 2 - upBtRS.getHeight();
-	downBt.vy = -panelHeight / 2 + downBtRS.getHeight() + 2 * hgutterRS.getHeight();
-	vgutter.vy = (upBt.vy+downBt.vy) / 2;
-	vgutterRS.setHeight(panelHeight/2 - hgutterRS.getHeight());
+	upBt.vx = downBt.vx = vgutter.vx = vslider.vx = Math.round(Math.ceil(panelWidth / 2.0 - vgutterRS.getWidth()));
+	upBt.vy = Math.round(Math.ceil(panelHeight / 2.0 - upBtRS.getHeight()));
+	downBt.vy = Math.round(Math.ceil(-panelHeight / 2.0 + downBtRS.getHeight() + 2.0 * hgutterRS.getHeight()));
+	vgutter.vy = Math.round(Math.ceil((upBt.vy+downBt.vy)/2.0));
+	vgutterRS.setHeight(Math.round(Math.ceil(panelHeight/2.0 - hgutterRS.getHeight())));
 
 	//XXX
-	vsliderRS.setHeight(vgutterRS.getHeight()/2);
+	vsliderRS.setHeight(Math.round(Math.ceil(vgutterRS.getHeight()/2.0)));
 	
-	leftBt.vy = rightBt.vy = hgutter.vy = hslider.vy = - panelHeight / 2 + hgutterRS.getHeight();
-	leftBt.vx = -panelWidth / 2 + leftBtRS.getWidth();
-	rightBt.vx = panelWidth / 2 - rightBtRS.getWidth() - 2 * vgutterRS.getWidth();
-	hgutter.vx = (leftBt.vx+rightBt.vx)/2;
-	hgutterRS.setWidth(panelWidth/2 - vgutterRS.getWidth());
+	leftBt.vy = rightBt.vy = hgutter.vy = hslider.vy = Math.round(Math.ceil(-panelHeight / 2.0 + hgutterRS.getHeight()));
+	leftBt.vx = Math.round(Math.ceil(-panelWidth / 2.0 + leftBtRS.getWidth()));
+	rightBt.vx = Math.round(Math.ceil(panelWidth / 2.0 - rightBtRS.getWidth() - 2.0 * vgutterRS.getWidth()));
+	hgutter.vx = Math.round(Math.ceil((leftBt.vx+rightBt.vx)/2.0));
+	hgutterRS.setWidth(Math.round(Math.ceil(panelWidth/2.0 - vgutterRS.getWidth())));
 
 	//XXX
-	hsliderRS.setWidth(hgutterRS.getWidth()/2);
+	hsliderRS.setWidth(Math.round(Math.ceil(hgutterRS.getWidth()/2.0)));
     }
 
     public void updateScrollBars(){
@@ -210,12 +213,45 @@ public class ScrollLayer implements ComponentListener {
 	hslider.vx = x;
     }
 
+    /** Tells whether the given point is inside the area containing the scroll bars or not. 
+     *@param x provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param y provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     */
+    public boolean cursorInside(int cx, int cy){
+	double coef = (((double)slC.focal+(double)slC.altitude) / (double)slC.focal);
+	long vx = Math.round(((cx - (panelWidth/2)) * coef) + slC.posx);
+	long vy = Math.round((((panelHeight/2) - cy) * coef) + slC.posy);
+	return (vx > vgutter.vx-vgutterRS.getWidth()) || (vy < hgutter.vy+hgutterRS.getHeight());
+    }
+
     public Camera getWidgetCamera(){
 	return slC;
     }
 
     public Camera getControlledCamera(){
 	return controlledCamera;
+    }
+
+    public Glyph getVerticalSlider(){return vslider;}
+    public Glyph getHorizontalSlider(){return hslider;}
+    public Glyph getUpButton(){return upBt;}
+    public Glyph getDownButton(){return downBt;}
+    public Glyph getLeftButton(){return leftBt;}
+    public Glyph getRightButton(){return rightBt;}
+
+    /** Make scroll bars fade in (gradually appear).
+     * Make sure glyphs used to represent scrollbar widgets implement the Translucent interface.
+     */
+    public void fade(AnimManager am, int duration, float alphaOffset) throws ClassCastException {
+	float[] FADE_IN_DATA = {0, 0, 0, 0, 0, 0, alphaOffset};
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, vgutter.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, vslider.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, upBt.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, downBt.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, hgutter.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, hslider.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, rightBt.getID());
+	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, leftBt.getID());
     }
 
     public void componentHidden(ComponentEvent e){}
