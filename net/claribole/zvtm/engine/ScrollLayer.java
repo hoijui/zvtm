@@ -125,7 +125,8 @@ public class ScrollLayer implements ComponentListener {
     public void setView(View v){
 	controlledView = v;
 	controlledView.getPanel().addComponentListener(this);
-	updateWidgetInvariants();
+	updateViewSize(v.getPanel());
+	updateScrollBars();
     }
 
     public void virtualSpaceUpdated(){
@@ -151,19 +152,12 @@ public class ScrollLayer implements ComponentListener {
 	upBt.vy = Math.round(Math.ceil(panelHeight / 2.0 - upBtRS.getHeight()));
 	downBt.vy = Math.round(Math.ceil(-panelHeight / 2.0 + downBtRS.getHeight() + 2.0 * hgutterRS.getHeight()));
 	vgutter.vy = Math.round(Math.ceil((upBt.vy+downBt.vy)/2.0));
-	vgutterRS.setHeight(Math.round(Math.ceil(panelHeight/2.0 - hgutterRS.getHeight())));
-
-	//XXX
-	vsliderRS.setHeight(Math.round(Math.ceil(vgutterRS.getHeight()/2.0)));
-	
+	vgutterRS.setHeight(Math.round(Math.ceil(panelHeight/2.0 - hgutterRS.getHeight() - upBtRS.getHeight() - downBtRS.getHeight())));
 	leftBt.vy = rightBt.vy = hgutter.vy = hslider.vy = Math.round(Math.ceil(-panelHeight / 2.0 + hgutterRS.getHeight()));
 	leftBt.vx = Math.round(Math.ceil(-panelWidth / 2.0 + leftBtRS.getWidth()));
 	rightBt.vx = Math.round(Math.ceil(panelWidth / 2.0 - rightBtRS.getWidth() - 2.0 * vgutterRS.getWidth()));
 	hgutter.vx = Math.round(Math.ceil((leftBt.vx+rightBt.vx)/2.0));
-	hgutterRS.setWidth(Math.round(Math.ceil(panelWidth/2.0 - vgutterRS.getWidth())));
-
-	//XXX
-	hsliderRS.setWidth(Math.round(Math.ceil(hgutterRS.getWidth()/2.0)));
+	hgutterRS.setWidth(Math.round(Math.ceil(panelWidth/2.0 - vgutterRS.getWidth() - leftBtRS.getWidth() - rightBtRS.getWidth())));
     }
 
     public void updateScrollBars(){
@@ -184,11 +178,11 @@ public class ScrollLayer implements ComponentListener {
 	}
 	vsliderRS.setHeight(sliderSize);
 	long y = Math.round(2*(controlledCamera.posy-(populatedRegionBounds[1]+populatedRegionBounds[3])/2.0)/(populatedRegionBounds[1] - populatedRegionBounds[3]) * vgutterRS.getHeight());
-	if (y > upBt.vy-sliderSize){
-	    y = upBt.vy-sliderSize;
+	if (y > upBt.vy-upBtRS.getHeight()-sliderSize){
+	    y = upBt.vy-upBtRS.getHeight()-sliderSize;
 	}
-	else if (y < downBt.vy+sliderSize){
-	    y = downBt.vy+sliderSize;
+	else if (y < downBt.vy+downBtRS.getHeight()+sliderSize){
+	    y = downBt.vy+downBtRS.getHeight()+sliderSize;
 	}
 	vslider.vy = y;
     }
@@ -204,13 +198,21 @@ public class ScrollLayer implements ComponentListener {
 	}
 	hsliderRS.setWidth(sliderSize);
 	long x = Math.round(2*(controlledCamera.posx-(populatedRegionBounds[2]+populatedRegionBounds[0])/2.0)/(populatedRegionBounds[2] - populatedRegionBounds[0]) * hgutterRS.getWidth());
-	if (x > rightBt.vx-sliderSize){
-	    x = rightBt.vx-sliderSize;
+	if (x > rightBt.vx-rightBtRS.getWidth()-sliderSize){
+	    x = rightBt.vx-rightBtRS.getWidth()-sliderSize;
 	}
-	else if (x < leftBt.vx+sliderSize){
-	    x = leftBt.vx+sliderSize;
+	else if (x < leftBt.vx+leftBtRS.getWidth()+sliderSize){
+	    x = leftBt.vx+leftBtRS.getWidth()+sliderSize;
 	}
 	hslider.vx = x;
+    }
+
+    public void updateCameraVerticalPosition(){
+	controlledCamera.moveTo(0, Math.round(vslider.vy * (populatedRegionBounds[1]-populatedRegionBounds[3]) / (2.0*vgutterRS.getHeight()) + (populatedRegionBounds[1] + populatedRegionBounds[3])/2.0));
+    }
+    
+    public void updateCameraHorizontalPosition(){
+	controlledCamera.moveTo(Math.round(hslider.vx * (populatedRegionBounds[2]-populatedRegionBounds[0]) / (2.0*hgutterRS.getWidth()) + (populatedRegionBounds[2] + populatedRegionBounds[0])/2.0), 0);
     }
 
     /** Tells whether the given point is inside the area containing the scroll bars or not. 
@@ -230,6 +232,22 @@ public class ScrollLayer implements ComponentListener {
 
     public Camera getControlledCamera(){
 	return controlledCamera;
+    }
+
+    public void draggingHorizontalSlider(int dx){
+	if (hslider.vx + dx + hsliderRS.getWidth() < rightBt.vx - rightBtRS.getWidth() &&
+	    hslider.vx + dx - hsliderRS.getWidth() > leftBt.vx + leftBtRS.getWidth()){
+	    hslider.move(dx, 0);
+	    updateCameraHorizontalPosition();
+	}
+    }
+
+    public void draggingVerticalSlider(int dy){
+	if (vslider.vy + dy + vsliderRS.getHeight() < upBt.vy - upBtRS.getHeight() &&
+	    vslider.vy + dy - vsliderRS.getHeight() > downBt.vy + downBtRS.getHeight()){
+	    vslider.move(0, dy);
+	    updateCameraVerticalPosition();
+	}
     }
 
     public Glyph getVerticalSlider(){return vslider;}
