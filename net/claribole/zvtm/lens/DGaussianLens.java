@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$
+ * $Id: DLinearLens.java 662 2007-06-07 07:00:52Z epietrig $
  */
 
 package net.claribole.zvtm.lens;
@@ -19,9 +19,9 @@ import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.glyphs.Translucency;
 import net.claribole.zvtm.engine.LowPassFilter;
 
-/**Profile: linear - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
+/**Profile: gaussian - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
-public class DLinearLens extends FSLinearLens implements TemporalLens {
+public class DGaussianLens extends FSGaussianLens implements TemporalLens {
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -33,7 +33,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     Point2D parentPos = new Point2D.Double(0, 0);
     Point2D targetPos = new Point2D.Double(0, 0);
     Timer timer;
-    DLTrailingTimer mouseStillUpdater;
+    DGTrailingTimer mouseStillUpdater;
 
     double cutoffParamA = 0.2;   // 0.8
     double cutoffParamB = 0.001;  // 0.1 to make it more difficult to acquire
@@ -50,7 +50,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public DLinearLens(){
+    public DGaussianLens(){
 	super();
 	initTimer();
     }
@@ -60,7 +60,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      *
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
-    public DLinearLens(float mm){
+    public DGaussianLens(float mm){
 	super(mm);
 	dMM = MM;
 	initTimer();
@@ -73,7 +73,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public DLinearLens(float mm, int outerRadius, int innerRadius){
+    public DGaussianLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
 	dMM = MM;
 	initTimer();
@@ -88,7 +88,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public DLinearLens(float mm, int outerRadius, int innerRadius, int x, int y){
+    public DGaussianLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
 	dMM = MM;
 	initTimer();
@@ -96,7 +96,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 
     void initTimer(){
 	timer = new Timer();
-	mouseStillUpdater = new DLTrailingTimer(this);
+	mouseStillUpdater = new DGTrailingTimer(this);
 	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 10);
     }
 
@@ -158,8 +158,8 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     }
 
     void setDynamicMagnification(){
-	a = (1-dMM)/(float)(LR1 - LR2);
-	b = (dMM*LR1-LR2)/(float)(LR1 - LR2);
+	c = (dMM-1)/2;
+	e = (1+dMM)/2;
 	owningView.parent.repaintNow();
     }
 
@@ -177,7 +177,7 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	if (d <= LR2)
 	    g[0] = g[1] = dMM;
 	else if (d <= LR1)
-	    g[0] = g[1] = a * (float)d + b;
+	    g[0] = g[1] = (float)(c * Math.cos(a*d+b) + e);
 	else
 	    g[0] = g[1] = 1;
     }
@@ -216,12 +216,12 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 }
 
 
-class DLTrailingTimer extends TimerTask {
+class DGTrailingTimer extends TimerTask {
 
     TemporalLens lens;
     private boolean enabled = true;
 
-    DLTrailingTimer(TemporalLens l){
+    DGTrailingTimer(TemporalLens l){
 	super();
 	this.lens = l;
     }
