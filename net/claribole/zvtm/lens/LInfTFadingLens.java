@@ -14,6 +14,7 @@ package net.claribole.zvtm.lens;
 import java.awt.Graphics2D;
 
 import com.xerox.VTM.glyphs.Translucent;
+import net.claribole.zvtm.glyphs.Translucency;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(Inf) (rectangular shape)<br>Size expressed as an absolute value in pixels*/
 
@@ -81,7 +82,7 @@ public class LInfTFadingLens extends TFadingLens {
 	    g2d.setColor(rColor);
 	    // get the alpha composite from a precomputed list of values
 	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
-	    g2d.setComposite(acs[Math.round((1.0f-MMTf)*ACS_ACCURACY)-1]);  
+	    g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)-1]);  
 	    g2d.drawRect(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
 	    g2d.setComposite(Translucent.acO);
 	}

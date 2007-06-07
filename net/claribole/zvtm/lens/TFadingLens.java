@@ -21,24 +21,11 @@ import java.util.TimerTask;
 import net.claribole.zvtm.engine.LowPassFilter;
 
 import com.xerox.VTM.glyphs.Translucent;
+import net.claribole.zvtm.glyphs.Translucency;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class TFadingLens extends TLens implements TemporalLens {
-
-    /** Controls the granularity of translucency values for rColor.
-     *  The higher the number, the smoother the transition from opaque to transparent.
-     *  The higher the number, the more memory is consumed by these values (should not be that memory hungry though).
-     *  10 seems to be a minimum, while 100 is definitely too high for most needs.
-     */
-    static final int ACS_ACCURACY = 20;
-    
-    static final AlphaComposite[] acs;
-    static {acs = new AlphaComposite[ACS_ACCURACY+1];
-	for (int i=0;i<acs.length;i++){
-	    acs[i] = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, i/((float)ACS_ACCURACY));
-	}
-    }
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -52,8 +39,8 @@ public class TFadingLens extends TLens implements TemporalLens {
     Timer timer;
     TTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 2;   // 0.8
-    double cutoffParamB = 0.001;  // 0.1 to make it more difficult to acquire
+    double cutoffParamA = 1;   // 0.8
+    double cutoffParamB = 0.1;  // 0.1 to make it more difficult to acquire
 
     /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
@@ -300,7 +287,7 @@ public class TFadingLens extends TLens implements TemporalLens {
 	    g2d.setColor(rColor);
 	    // get the alpha composite from a precomputed list of values
 	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
-	    g2d.setComposite(acs[Math.round((1.0f-MMTf)*ACS_ACCURACY)-1]);  
+	    g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)-1]);  
 	    g2d.drawOval(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
 	    g2d.setComposite(Translucent.acO);
 	}
