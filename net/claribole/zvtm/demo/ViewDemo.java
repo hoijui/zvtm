@@ -77,6 +77,7 @@ public class ViewDemo {
 	Vector cameras=new Vector();
 	cameras.add(vsm.addCamera(mainSpaceName));
 	demoView = vsm.addExternalView(cameras, mainViewName, viewType, 800, 600, false, true);
+	demoView.setBackgroundColor(Color.WHITE);
 	demoView.setEventHandler(eh);
 	fri = new FrameRateIndicator(this);
 	demoView.setJava2DPainter(fri, Java2DPainter.FOREGROUND);
