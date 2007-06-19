@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.ViewEventHandler;
 
 /**
  * Each view runs in its own thread - uses OpenGL acceletation provided by J2SE 5.0<br>
@@ -47,6 +48,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	parent=v;
 	//init of camera array
 	cams=new Camera[cameras.size()];  //array of Camera
+	evHs = new ViewEventHandler[cams.length];
 	for (int nbcam=0;nbcam<cameras.size();nbcam++){
 	    cams[nbcam]=(Camera)(cameras.get(nbcam));
 	}

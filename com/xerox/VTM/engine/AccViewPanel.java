@@ -35,6 +35,7 @@ import java.awt.image.VolatileImage;
 import java.util.Vector;
 
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.ViewEventHandler;
 
 import com.xerox.VTM.glyphs.Glyph;
 
@@ -65,6 +66,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	parent = v;
 	// init of camera array
 	cams = new Camera[cameras.size()]; // array of Camera
+	evHs = new ViewEventHandler[cams.length];
 	for (int nbcam = 0; nbcam < cameras.size(); nbcam++) {
 	    cams[nbcam] = (Camera) (cameras.get(nbcam));
 	}
