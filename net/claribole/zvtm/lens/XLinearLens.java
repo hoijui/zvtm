@@ -170,26 +170,19 @@ public class XLinearLens extends TLinearLens {
 	    iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsI);
 	    // get magnified source pixels in a second array
 	    ewr.getDataElements(0, 0, mbw, mbh, mPixelsI);
-
-	    // transfer them to the target array taking the gain function into account
-	    for (int x=lurd[0];x<lurd[2];x++){
-		for (int y=lurd[1];y<lurd[3];y++){
-
-		}
-	    }
 	    // transfer them to the target array taking the gain function into account
 	    if (BMl.length == 4){// the sample model features four bands
 		for (int x=lurd[0];x<lurd[2];x++){
 		    for (int y=lurd[1];y<lurd[3];y++){
-
-		    /* gain is computed w.r.t main buffer pixels
-		       (we do not want to compute the gain for pixels that won't be in the output) */
-		    this.gf(x,y,gain);
-		    tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-			mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
-		    toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-			oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
-
+			/* SPATIAL DISTORTION */
+			/* gain is computed w.r.t main buffer pixels
+			   (we do not want to compute the gain for pixels that won't be in the output) */
+			this.gf(x,y,gain);
+			tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
+			/* ALPHA BLENDING */
 			// get pixel from lens raster
 			Pl = tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])];
 			Rl = (Pl & BMl[0]) >>> BOl[0];
@@ -218,16 +211,15 @@ public class XLinearLens extends TLinearLens {
 	    else {// the sample model probably features 3 bands
 		for (int x=lurd[0];x<lurd[2];x++){
 		    for (int y=lurd[1];y<lurd[3];y++){
-
-		    /* gain is computed w.r.t main buffer pixels
-		       (we do not want to compute the gain for pixels that won't be in the output) */
-		    this.gf(x,y,gain);
-		    tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-			mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
-		    toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-			oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
-
-			//this.gf(x,y,gain);
+			/* SPATIAL DISTORTION */
+			/* gain is computed w.r.t main buffer pixels
+			   (we do not want to compute the gain for pixels that won't be in the output) */
+			this.gf(x,y,gain);
+			tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
+			/* ALPHA BLENDING */
 			// get pixel from lens raster
 			Pl = tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])];
 			Rl = (Pl & BMl[0]) >>> BOl[0];
