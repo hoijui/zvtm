@@ -106,6 +106,7 @@ public class TLensDemo {
     static final short L3_TLinear = 24;
     static final short L2_TLinear = 25;
     static final short L2_DLinear = 26;
+    static final short L2_XLinear = 27;
 
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
@@ -136,6 +137,7 @@ public class TLensDemo {
     static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Linear";
     static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Linear";
     static final String L2_DLinear_Title = View_Title_Prefix + "L2 / Dynamic Linear";
+    static final String L2_XLinear_Title = View_Title_Prefix + "L2 / X Linear";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -479,6 +481,13 @@ public class TLensDemo {
 	    res = (Lens)tLens;
 	    break;
 	}
+
+	case L2_XLinear:{
+	    res = new XLinearLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
+	    break;
+	}
+
 	}
 	return res;
     }

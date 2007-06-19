@@ -239,6 +239,12 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	    application.lensFamily = TLensDemo.L2_DLinear;
 	    application.demoView.setTitle(TLensDemo.L2_DLinear_Title);
 	}
+
+	else if (code == KeyEvent.VK_OPEN_BRACKET){
+	    application.lensFamily = TLensDemo.L2_XLinear;
+	    application.demoView.setTitle(TLensDemo.L2_XLinear_Title);
+	}
+
 	// L3 lenses
 	else if (code == KeyEvent.VK_A){
 	    application.lensFamily = TLensDemo.L3_Gaussian;
