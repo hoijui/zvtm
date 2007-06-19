@@ -230,7 +230,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	paMngr = new PeriodicActionManager(this);
 	mainView.setBackgroundColor(cfgMngr.backgroundColor);
 	meh = eh;
-	mainView.setEventHandler((ViewEventHandler)eh);
+	// same event handler handling all layers for now
+	//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
+	mainView.setEventHandler((ViewEventHandler)eh, 0);
+	mainView.setEventHandler((ViewEventHandler)eh, 1);
+	mainView.setEventHandler((ViewEventHandler)eh, 2);
 	mainView.setNotifyMouseMoved(true);
 	vsm.animator.setAnimationListener(this);
 	mainView.setVisible(true);
@@ -455,7 +459,10 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		reh = new RadarEvtHdlr(this);
 		rView = vsm.getView(radarView);
 		rView.setBackgroundColor(cfgMngr.backgroundColor);
-		rView.setEventHandler(reh);
+		// same event handler handling all layers for now
+		//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
+		rView.setEventHandler(reh, 0);
+		rView.setEventHandler(reh, 1);
 		rView.setResizable(false);
 		rView.setActiveLayer(1);
 		rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
