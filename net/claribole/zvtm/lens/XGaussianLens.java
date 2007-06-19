@@ -1,11 +1,11 @@
-/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+/*   FILE: TLinearLens.java
+ *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: TLinearLens.java 664 2007-06-07 07:44:44Z epietrig $
  */ 
-
 
 package net.claribole.zvtm.lens;
 
@@ -15,26 +15,20 @@ import java.awt.image.WritableRaster;
 
 /**Profile: linear - Distance metric: L(2) (circular shape)<br>Rendering enhanced through alpha blending between focus and context in spatially-distorted transition zone.<br>Size expressed as an absolute value in pixels*/
 
-public class XLinearLens extends TLinearLens {
+public class XGaussianLens extends XLinearLens {
 
-    int[] tmPixelsI, toPixelsI;
-    short[] tmPixelsS, toPixelsS;
-    byte[] tmPixelsB, toPixelsB;
-
-    //gain function parameters
-    protected double a = 0;
-    protected double b = 0;
-
-    double dd = 0;
+    protected double c = 0;
+    protected double e = 0;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public XLinearLens(){
+    public XGaussianLens(){
 	super();
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
-
+	a = Math.PI/(LR1-LR2);
+	b = - Math.PI*LR2/(LR1-LR2);
+	c = (MM-1)/2;
+	e = (1+MM)/2;
     }
 
     /**
@@ -42,10 +36,12 @@ public class XLinearLens extends TLinearLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public XLinearLens(float mm){
+    public XGaussianLens(float mm){
 	super(mm);
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	a = Math.PI/(LR1-LR2);
+	b = - Math.PI*LR2/(LR1-LR2);
+	c = (MM-1)/2;
+	e = (1+MM)/2;
     }
 
     /**
@@ -57,10 +53,12 @@ public class XLinearLens extends TLinearLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public XLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
+    public XGaussianLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
 	super(mm, tc, tf, outerRadius, innerRadius);
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	a = Math.PI/(LR1-LR2);
+	b = - Math.PI*LR2/(LR1-LR2);
+	c = (MM-1)/2;
+	e = (1+MM)/2;
     }
 
     /**
@@ -74,83 +72,34 @@ public class XLinearLens extends TLinearLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public XLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
+    public XGaussianLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
 	super(mm, tc, tf, outerRadius, innerRadius, x, y);
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
-    }
-
-    void initBuffers(int mainBufferSize, int magBufferSize){
-	switch(transferType){
-	case DataBuffer.TYPE_INT:{/*Mac OS X (256/1K/1M), Windows (32bits), Linux/Xorg (24bits and maybe 32bits)*/
-	    // in theory this should be s.width*s.height*Raster.getNumDataElements
-	    // the latter seems to always be 1 in our context
-	    oPixelsI = new int[mainBufferSize];
-	    mPixelsI = new int[magBufferSize];
-	    tPixelsI = new int[mainBufferSize];
-	    tmPixelsI = new int[mainBufferSize];
-	    toPixelsI = new int[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	case DataBuffer.TYPE_USHORT:{/*Windows (16bits), Linux/Xorg (16bits, 15bits)*/
-	    // same comment as above
-	    oPixelsS = new short[mainBufferSize];
-	    mPixelsS = new short[magBufferSize];
-	    tPixelsS = new short[mainBufferSize];
-	    tmPixelsS = new short[mainBufferSize];
-	    toPixelsS = new short[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
-	    // same comment as above
-	    oPixelsB = new byte[mainBufferSize];
-	    mPixelsB = new byte[magBufferSize];
-	    tPixelsB = new byte[mainBufferSize];
-	    tmPixelsB = new byte[mainBufferSize];
-	    toPixelsB = new byte[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	case DataBuffer.TYPE_SHORT:{
-	    // same comment as above
-	    oPixelsS = new short[mainBufferSize];
-	    mPixelsS = new short[magBufferSize];
-	    tPixelsS = new short[mainBufferSize];
-	    tmPixelsS = new short[mainBufferSize];
-	    toPixelsS = new short[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	default:{
-	    // same comment as above
-	    oPixelsI = new int[mainBufferSize];
-	    mPixelsI = new int[magBufferSize];
-	    tPixelsI = new int[mainBufferSize];
-	    tmPixelsI = new int[mainBufferSize];
-	    toPixelsI = new int[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	}
+	a = Math.PI/(LR1-LR2);
+	b = - Math.PI*LR2/(LR1-LR2);
+	c = (MM-1)/2;
+	e = (1+MM)/2;
     }
 
     public void gf(float x, float y, float[] g){
 	dd = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
-	if (dd <= LR2)
+	if (dd <= LR2){
 	    g[0] = g[1] = MM;
-	else if (dd <= LR1)
-	    g[0] = g[1] = (float)(a * (float)dd + b);
-	else
+	}
+	else if (dd <= LR1){
+	    g[0] = g[1] = (float)(c * Math.cos(a*dd+b) + e);
+	}
+	else {
 	    g[0] = g[1] = 1;
+	}
     }
 
     void computeDropoffFactors(){
 	aT = (MMTc-MMTf) / ((float)(LR1-LR2));
 	bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	a = Math.PI/(LR1-LR2);
+	b = - Math.PI*LR2/(LR1-LR2);
+	c = (MM-1)/2;
+	e = (1+MM)/2;
     }
 
     synchronized void transformI(WritableRaster iwr, WritableRaster ewr){
