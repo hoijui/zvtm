@@ -122,6 +122,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final short L3_TLinear = 24;
     static final short L2_TLinear = 25;
     static final short L2_DLinear = 26;
+    static final short L2_XGaussian = 27;
 
     short lensFamily = L2_Gaussian;
     static final String View_Title_Prefix = "Probing Lens Demo - ";
@@ -152,6 +153,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Linear";
     static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Linear";
     static final String L2_DLinear_Title = View_Title_Prefix + "L2 / Dynamic Linear";
+    static final String L2_XGaussian_Title = View_Title_Prefix + "L2 / eXtended Gaussian";
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -482,6 +484,11 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    ((DLinearLens)tLens).setInnerRadiusColor(Color.RED);
 	    ((DLinearLens)tLens).setOuterRadiusColor(Color.RED);
 	    res = (Lens)tLens;
+	    break;
+	}
+	case L2_XGaussian:{
+	    res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    tLens = null;
 	    break;
 	}
 	}
