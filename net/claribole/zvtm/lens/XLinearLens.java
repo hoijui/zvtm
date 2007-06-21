@@ -153,6 +153,8 @@ public class XLinearLens extends TLinearLens {
 	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
     }
 
+    int ti;
+
     synchronized void transformI(WritableRaster iwr, WritableRaster ewr){
 	synchronized(this){
 	    if (BMl == null){// || BMm == null || BOl == null || BOm == null
@@ -176,18 +178,19 @@ public class XLinearLens extends TLinearLens {
 			/* gain is computed w.r.t main buffer pixels
 			   (we do not want to compute the gain for pixels that won't be in the output) */
 			this.gf(x,y,gain);
-			tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			ti = (y-lurd[1])*(lensWidth)+(x-lurd[0]);
+			tmPixelsI[ti] =
 			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
-			toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			toPixelsI[ti] =
 			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 			/* ALPHA BLENDING */
 			// get pixel from lens raster
-			Pl = tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])];
+			Pl = tmPixelsI[ti];
 			Rl = (Pl & BMl[0]) >>> BOl[0];
 			Gl = (Pl & BMl[1]) >>> BOl[1];
 			Bl = (Pl & BMl[2]) >>> BOl[2];
 			// get pixel from main raster
-			Pm = toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])];
+			Pm = toPixelsI[ti];
 			Rm = (Pm & BMm[0]) >>> BOm[0];
 			Gm = (Pm & BMm[1]) >>> BOm[1];
 			Bm = (Pm & BMm[2]) >>> BOm[2];
@@ -202,7 +205,7 @@ public class XLinearLens extends TLinearLens {
 			Gr = Math.round(Gl*gainT[0] + Gm*(1-gainT[0]));
 			Br = Math.round(Bl*gainT[0] + Bm*(1-gainT[0]));
 			// set new pixel value in target raster
-			tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = (Rr << BOm[0]) | (Gr << BOl[1]) | (Br << BOl[2]) | (Am << BOl[3]);
+			tPixelsI[ti] = (Rr << BOm[0]) | (Gr << BOl[1]) | (Br << BOl[2]) | (Am << BOl[3]);
 		    }
 		}
 	    }
@@ -213,18 +216,19 @@ public class XLinearLens extends TLinearLens {
 			/* gain is computed w.r.t main buffer pixels
 			   (we do not want to compute the gain for pixels that won't be in the output) */
 			this.gf(x,y,gain);
-			tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			ti = (y-lurd[1])*(lensWidth)+(x-lurd[0]);
+			tmPixelsI[ti] =
 			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
-			toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
+			toPixelsI[ti] =
 			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 			/* ALPHA BLENDING */
 			// get pixel from lens raster
-			Pl = tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])];
+			Pl = tmPixelsI[ti];
 			Rl = (Pl & BMl[0]) >>> BOl[0];
 			Gl = (Pl & BMl[1]) >>> BOl[1];
 			Bl = (Pl & BMl[2]) >>> BOl[2];
 			// get pixel from main raster
-			Pm = toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])];
+			Pm = toPixelsI[ti];
 			Rm = (Pm & BMm[0]) >>> BOm[0];
 			Gm = (Pm & BMm[1]) >>> BOm[1];
 			Bm = (Pm & BMm[2]) >>> BOm[2];
@@ -238,7 +242,7 @@ public class XLinearLens extends TLinearLens {
 			Gr = Math.round(Gl*gainT[0] + Gm*(1-gainT[0]));
 			Br = Math.round(Bl*gainT[0] + Bm*(1-gainT[0]));
 			// set new pixel value in target raster
-			tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = (Rr << BOm[0]) | (Gr << BOl[1]) | (Br << BOl[2]);
+			tPixelsI[ti] = (Rr << BOm[0]) | (Gr << BOl[1]) | (Br << BOl[2]);
 		    }
 		}
 	    }
@@ -247,7 +251,61 @@ public class XLinearLens extends TLinearLens {
 	}
     }
 
-    synchronized void transformS(WritableRaster iwr, WritableRaster ewr){System.err.println("Error: translucent lens: Sample model not supported yet");}
+    synchronized void transformS(WritableRaster iwr, WritableRaster ewr){
+	synchronized(this){
+	    if (BMl == null){// || BMm == null || BOl == null || BOm == null
+		// initialization of raster band configuration (should only occur once)
+		SinglePixelPackedSampleModel SMl = (SinglePixelPackedSampleModel)ewr.getSampleModel();
+		SinglePixelPackedSampleModel SMm = (SinglePixelPackedSampleModel)iwr.getSampleModel();
+		BMl = SMl.getBitMasks();
+		BMm = SMm.getBitMasks();
+		BOl = SMl.getBitOffsets();
+		BOm = SMm.getBitOffsets();
+	    }
+	    // get source pixels in an array
+	    iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsS);
+	    // get magnified source pixels in a second array
+	    ewr.getDataElements(0, 0, mbw, mbh, mPixelsS);
+	    // transfer them to the target array taking the gain function into account
+	    for (int x=lurd[0];x<lurd[2];x++){
+		for (int y=lurd[1];y<lurd[3];y++){
+		    /* SPATIAL DISTORTION */
+		    /* gain is computed w.r.t main buffer pixels
+		       (we do not want to compute the gain for pixels that won't be in the output) */
+		    this.gf(x,y,gain);
+		    ti = (y-lurd[1])*(lensWidth)+(x-lurd[0]);
+		    tmPixelsS[ti] =
+			mPixelsS[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+		    toPixelsS[ti] =
+			oPixelsS[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
+		    /* ALPHA BLENDING */
+		    // get pixel from lens raster
+		    Pl = tmPixelsS[ti];
+		    Rl = (Pl & BMl[0]) >>> BOl[0];
+		    Gl = (Pl & BMl[1]) >>> BOl[1];
+		    Bl = (Pl & BMl[2]) >>> BOl[2];
+		    // get pixel from main raster
+		    Pm = toPixelsS[ti];
+		    Rm = (Pm & BMm[0]) >>> BOm[0];
+		    Gm = (Pm & BMm[1]) >>> BOm[1];
+		    Bm = (Pm & BMm[2]) >>> BOm[2];
+		    // compute contribution from each pixel, for each band
+		    // Use the Porter-Duff Source Atop Destination rule to achieve our effect.
+		    // Fs = Ad and Fd = (1-As), thus:
+		    //   Cd = Cs*Ad + Cd*(1-As)
+		    //   Ad = As*Ad + Ad*(1-As) = Ad
+		    this.gfT(x,y,gainT);
+		    Rr = Math.round(Rl*gainT[0] + Rm*(1-gainT[0]));
+		    Gr = Math.round(Gl*gainT[0] + Gm*(1-gainT[0]));
+		    Br = Math.round(Bl*gainT[0] + Bm*(1-gainT[0]));
+		    // set new pixel value in target raster
+		    tPixelsS[ti] = (short) ((Rr << BOm[0]) | (Gr << BOl[1]) | (Br << BOl[2]));
+		}
+	    }
+	    // transfer pixels in the target array back to the raster
+	    iwr.setDataElements(lurd[0], lurd[1], lensWidth, lensHeight, tPixelsS);
+	}
+    }
 
     synchronized void transformB(WritableRaster iwr, WritableRaster ewr){System.err.println("Error: translucent lens: Sample model not supported yet");}
 
