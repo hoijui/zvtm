@@ -169,11 +169,11 @@ public class ScrollLayer implements ComponentListener {
 
     void updateWidgetInvariants(){
 	upBt.vx = downBt.vx = vgutter.vx = vslider.vx = Math.round(Math.ceil(panelWidth / 2.0 - vgutterRS.getWidth()));
-	upBt.vy = Math.round(Math.ceil(panelHeight / 2.0 - upBtRS.getHeight()));
+	upBt.vy = Math.round(Math.floor(panelHeight / 2.0 - upBtRS.getHeight()));
 	downBt.vy = Math.round(Math.ceil(-panelHeight / 2.0 + downBtRS.getHeight() + 2.0 * hgutterRS.getHeight()));
 	vgutter.vy = Math.round(Math.ceil((upBt.vy+downBt.vy)/2.0));
 	vgutterRS.setHeight(Math.round(Math.ceil(panelHeight/2.0 - hgutterRS.getHeight() - upBtRS.getHeight() - downBtRS.getHeight())));
-	leftBt.vy = rightBt.vy = hgutter.vy = hslider.vy = Math.round(Math.ceil(-panelHeight / 2.0 + hgutterRS.getHeight()));
+	leftBt.vy = rightBt.vy = hgutter.vy = hslider.vy = Math.round(Math.floor(-panelHeight / 2.0 + hgutterRS.getHeight()));
 	leftBt.vx = Math.round(Math.ceil(-panelWidth / 2.0 + leftBtRS.getWidth()));
 	rightBt.vx = Math.round(Math.ceil(panelWidth / 2.0 - rightBtRS.getWidth() - 2.0 * vgutterRS.getWidth()));
 	hgutter.vx = Math.round(Math.ceil((leftBt.vx+rightBt.vx)/2.0));
@@ -245,11 +245,11 @@ public class ScrollLayer implements ComponentListener {
     }
 
     void updateCameraVerticalPosition(){
-	controlledCamera.moveTo(0, Math.round(vslider.vy * (populatedRegionBounds[1]-populatedRegionBounds[3]) / (2.0*vgutterRS.getHeight()) + (populatedRegionBounds[1] + populatedRegionBounds[3])/2.0));
+	controlledCamera.moveTo(controlledCamera.posx, Math.round(vslider.vy * (populatedRegionBounds[1]-populatedRegionBounds[3]) / (2.0*vgutterRS.getHeight()) + (populatedRegionBounds[1] + populatedRegionBounds[3])/2.0));
     }
     
     void updateCameraHorizontalPosition(){
-	controlledCamera.moveTo(Math.round(hslider.vx * (populatedRegionBounds[2]-populatedRegionBounds[0]) / (2.0*hgutterRS.getWidth()) + (populatedRegionBounds[2] + populatedRegionBounds[0])/2.0), 0);
+	controlledCamera.moveTo(Math.round(hslider.vx * (populatedRegionBounds[2]-populatedRegionBounds[0]) / (2.0*hgutterRS.getWidth()) + (populatedRegionBounds[2] + populatedRegionBounds[0])/2.0), controlledCamera.posy);
     }
 
     /** Tells whether the given point is inside the area containing the scroll bars or not. 
