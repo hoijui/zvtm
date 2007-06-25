@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: DLinearLens.java 662 2007-06-07 07:00:52Z epietrig $
+ * $Id$
  */
 
 package net.claribole.zvtm.lens;
