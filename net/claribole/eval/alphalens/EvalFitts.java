@@ -30,8 +30,9 @@ public class EvalFitts implements Java2DPainter {
     static final short TECHNIQUE_ML = 1; // melting lens
     static final short TECHNIQUE_DL = 2; // distortion lens
     static final short TECHNIQUE_HL = 3; // manhattan lens
-    static final String[] TECHNIQUE_NAMES = {"Fading_Lens", "Melting_Lens", "Distortion_Lens", "Manhattan_Lens"}; 
-    static final String[] TECHNIQUE_NAMES_ABBR = {"FL", "ML", "DL", "HL"}; 
+    static final short TECHNIQUE_SCF = 4;// speed-coupled flattening
+    static final String[] TECHNIQUE_NAMES = {"Fading_Lens", "Melting_Lens", "Distortion_Lens", "Manhattan_Lens", "Speed-coupled flattening"}; 
+    static final String[] TECHNIQUE_NAMES_ABBR = {"FL", "ML", "DL", "HL", "SC"}; 
     short technique = TECHNIQUE_FL;
 
     /* screen dimensions, actual dimensions of windows */
@@ -55,6 +56,25 @@ public class EvalFitts implements Java2DPainter {
 
     FittsEventHandler eh;
 
+    /* lens */
+    static final Color LENS_BOUNDARY_COLOR = Color.RED;
+    static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
+    float magFactor = 8.0f;
+    static final int LENS_INNER_RADIUS = 50;
+    static final int LENS_OUTER_RADIUS = 100;
+    Lens lens;
+    TemporalLens tlens;
+
+    /* Fitts' ID */
+    static final double D = 1200;
+    static final double W2 = 6.0;
+    static final double W1_4 = 2 * LENS_INNER_RADIUS / 4.0;
+    static final double W1_8 = 2 * LENS_INNER_RADIUS / 8.0;
+    static final double W1_12 = 2 * LENS_INNER_RADIUS / 12.0;
+    static final double ID_4 = Math.log(D/((double)(Math.abs(W1_4-W2))) + 1) / Math.log(2);
+    static final double ID_8 = Math.log(D/((double)(Math.abs(W1_8-W2))) + 1) / Math.log(2);
+    static final double ID_12 = Math.log(D/((double)(Math.abs(W1_12-W2))) + 1) / Math.log(2);
+
     /* cursor */
     static final Color CURSOR_COLOR = Color.RED;
 
@@ -66,25 +86,18 @@ public class EvalFitts implements Java2DPainter {
 
     static final Color INSTRUCTIONS_COLOR = Color.WHITE;
 
-    /* lens */
-    static final Color LENS_BOUNDARY_COLOR = Color.RED;
-    static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
-    float magFactor = 8.0f;
-    static final int LENS_INNER_RADIUS = 50;
-    static final int LENS_OUTER_RADIUS = 100;
-    Lens lens;
-    TFadingLens flens;
+    static final float CAM_ALT = 900.0f;  // so as to get a proj coef of 0.1 (focal is 100.0f)
 
     /* target */
     static final Color TARGET_COLOR = Color.BLACK;
     VRectangle target;
-    static final long TARGET_X_POS = 6300;
+    static final long TARGET_X_POS = Math.round(D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
     static final long TARGET_Y_POS = 0;
-    static final long TARGET_HEIGHT = 400;
+    static final long TARGET_HEIGHT = 500;
 
     /* grid color */
     static final Color GRID_COLOR = Color.LIGHT_GRAY;
-    static final long GRID_STEP = 1000;
+    static final long GRID_STEP = 200;
     static final long GRID_W = 16000;
     static final long GRID_H = 12000;
 
@@ -124,7 +137,7 @@ public class EvalFitts implements Java2DPainter {
 	loadTrials();
 	initScene();
 	mCamera.moveTo(0, 0);
-	mCamera.setAltitude(1000.0f);
+	mCamera.setAltitude(CAM_ALT);
 	say(Messages.PSTS);
     }
 
@@ -172,7 +185,7 @@ public class EvalFitts implements Java2DPainter {
 	    vsm.addGlyph(new BRectangle(0, y, 0, GRID_W/2, 1, GRID_COLOR), mSpace);
 	    y += GRID_STEP;
 	}	
- 	target = new VRectangle(TARGET_X_POS, TARGET_Y_POS, 0, 10, TARGET_HEIGHT, TARGET_COLOR);
+ 	target = new VRectangle(TARGET_X_POS, TARGET_Y_POS, 0, Math.round(W2/2), TARGET_HEIGHT, TARGET_COLOR);
  	vsm.addGlyph(target, mSpace);
     }
 
@@ -372,26 +385,33 @@ public class EvalFitts implements Java2DPainter {
     void setLens(int x, int y){
 	switch(technique){
 	case TECHNIQUE_FL:{
-	    flens = new TFadingLens(magFactor, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
-	    flens.setBoundaryColor(LENS_BOUNDARY_COLOR);
-	    flens.setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
-	    lens = flens;
+	    tlens = new TFadingLens(magFactor, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    ((TFadingLens)tlens).setBoundaryColor(LENS_BOUNDARY_COLOR);
+	    ((TFadingLens)tlens).setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
+	    lens = (Lens)tlens;
 	    break;
 	}
 	case TECHNIQUE_ML:{
 	    lens = new TLinearLens(magFactor, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
-	    flens = null;
+	    tlens = null;
 	    break;
 	}
 	case TECHNIQUE_DL:{
 	    lens = new FSGaussianLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
-	    flens = null;
+	    tlens = null;
 	    break;
 	}
 	case TECHNIQUE_HL:{
 	    lens = new FSManhattanLens(magFactor, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    ((FSManhattanLens)lens).setBoundaryColor(LENS_BOUNDARY_COLOR);
-	    flens = null;
+	    tlens = null;
+	    break;
+	}
+	case TECHNIQUE_SCF:{
+	    tlens = new DGaussianLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    ((DGaussianLens)tlens).setInnerRadiusColor(LENS_BOUNDARY_COLOR);
+	    ((DGaussianLens)tlens).setOuterRadiusColor(LENS_BOUNDARY_COLOR);
+	    lens = (Lens)tlens;
 	    break;
 	}
 	}
@@ -404,8 +424,8 @@ public class EvalFitts implements Java2DPainter {
     }
 
     void moveLens(int x, int y, long absTime){
-	if (flens != null){// dealing with a fading lens
-	    flens.setAbsolutePosition(x, y, absTime);
+	if (tlens != null){// dealing with a fading lens
+	    tlens.setAbsolutePosition(x, y, absTime);
 	}
 	else {// dealing with a probing lens
 	    lens.setAbsolutePosition(x, y);
