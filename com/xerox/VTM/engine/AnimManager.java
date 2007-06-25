@@ -423,8 +423,8 @@ public class AnimManager implements Runnable{
 	}
     }
     
-    /**set an animation listener - calls back method notify() each time the animation manager makes a change to a camera (possibly each time the thread runs through the loop) - set by client application if it wants to be notified of animations currently running  (for instance when the camera is moved)
-     *@param al the class implementing interface AnimationListener  (set to null if you want to remove it)
+    /** Set an animation listsner. This AnimManager will call back method cameraMoved() each time it makes a change to a camera or (possibly each time the animation thread runs through the loop). Set by client application if it wants to be notified of animations currently running.
+     *@param al the class implementing interface AnimationListener (set to null if you want to remove it)
      */
     public void setAnimationListener(AnimationListener al){
 	this.animListener=al;
