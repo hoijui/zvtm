@@ -21,8 +21,9 @@ package net.claribole.zvtm.engine;
 
 
 /**
- * Animation Listener interface - AnimManager calls back method notify() each time it makes a change to a camera or (possibly each time the animation thread runs through the loop) - set by client application if it wants to be notified of animations currently running  (for instance when the camera is moved)
- * @author Emmanuel Pietriga
+ * Animation Listener interface. AnimManager calls back method cameraMoved() each time it makes a change to a camera or (possibly each time the animation thread runs through the loop). Set by client application if it wants to be notified of animations currently running.
+ *@see com.xerox.VTM.engine.AnimManager#setAnimationListener(AnimationListener al)
+ *@author Emmanuel Pietriga
  **/
 
 public interface AnimationListener {
