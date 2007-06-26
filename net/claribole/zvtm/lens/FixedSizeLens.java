@@ -11,6 +11,8 @@
 package net.claribole.zvtm.lens;
 
 import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
@@ -23,6 +25,13 @@ public abstract class FixedSizeLens extends Lens {
     //lens radii
     protected int LR1 = 100;
     protected int LR2 = 50;
+
+    /** Inner radius color (default is black, null if none) */
+    Color r2Color = null;
+
+    /** Outer radius color (default is black, null if none) */
+    Color r1Color = null;
+
 
     /**
      * set the lens' outer radius (beyond which no magnification is applied - outward)
@@ -261,5 +270,30 @@ public abstract class FixedSizeLens extends Lens {
 	lensHeight = lurd[3] - lurd[1];
     }
 
-}
+    /** Set the color used to draw the lens' inner radius (default is black).
+     *@param c color of the boundary (set to null if you do not want to draw that border)
+     */
+    public void setInnerRadiusColor(Color c){
+	r2Color = c;
+    }
 
+    /** Set the color used to draw the lens' outer radius (default is black).
+     *@param c color of the boundary (set to null if you do not want to draw that border)
+     */
+    public void setOuterRadiusColor(Color c){
+	r1Color = c;
+    }
+
+    /**for internal use*/
+    public void drawBoundary(Graphics2D g2d){
+	if (r1Color != null){
+	    g2d.setColor(r1Color);
+	    g2d.drawOval(lx+w/2-LR1, ly+h/2-LR1, 2*LR1, 2*LR1);
+	}
+	if (r2Color != null){
+	    g2d.setColor(r2Color);
+	    g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
+	}
+    }
+
+}

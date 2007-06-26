@@ -41,12 +41,6 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
     /** Dynamic magnification factor. */
     float dMM = MM;
 
-    /** Inner radius color (default is black, null if none) */
-    Color r2Color = Color.BLACK;
-
-    /** Outer radius color (default is black, null if none) */
-    Color r1Color = Color.BLACK;
-
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
@@ -180,20 +174,6 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	    g[0] = g[1] = a * (float)d + b;
 	else
 	    g[0] = g[1] = 1;
-    }
-
-    /** Set the color used to draw the lens' inner radius (default is black).
-     *@param c color of the boundary (set to null if you do not want to draw that border)
-     */
-    public void setInnerRadiusColor(Color c){
-	r2Color = c;
-    }
-
-    /** Set the color used to draw the lens' outer radius (default is black).
-     *@param c color of the boundary (set to null if you do not want to draw that border)
-     */
-    public void setOuterRadiusColor(Color c){
-	r1Color = c;
     }
 
     /**for internal use*/
