@@ -56,7 +56,7 @@ public class EvalFitts implements Java2DPainter {
 
     FittsEventHandler eh;
 
-    static double D = 1200;
+    static double D = 800;
     static double W1_6 = 2 * EvalFitts.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_10 = 2 * EvalFitts.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_14 = 2 * EvalFitts.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
@@ -88,10 +88,9 @@ public class EvalFitts implements Java2DPainter {
 
     /* target */
     static final Color TARGET_COLOR = Color.BLACK;
-    VCircle target;
-    static final long TARGET_X_POS = Math.round(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
-    static final long TARGET_Y_POS = 0;
-    static final long TARGET_HEIGHT = 500;
+    static int NB_TARGETS = 24;
+    VCircle[] targets;
+    static final long TARGET_R_POS = Math.round(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
 
     /* grid color */
     static final Color GRID_COLOR = Color.LIGHT_GRAY;
@@ -191,9 +190,16 @@ public class EvalFitts implements Java2DPainter {
 	    r.setDrawBorder(false);
 	    vsm.addGlyph(r, mSpace);
 	    y += GRID_STEP;
-	}	
- 	target = new VCircle(TARGET_X_POS, TARGET_Y_POS, 0, Math.round(W2_6/2), TARGET_COLOR);
- 	vsm.addGlyph(target, mSpace);
+	}
+	targets = new VCircle[NB_TARGETS];
+	double angle = 0;
+	for (int i=0;i<NB_TARGETS;i++){
+	    x = Math.round(TARGET_R_POS * Math.cos(angle));
+	    y = Math.round(TARGET_R_POS * Math.sin(angle));
+	    targets[i] = new VCircle(x, y, 0, Math.round(W2_6/2), TARGET_COLOR);
+	    vsm.addGlyph(targets[i], mSpace);
+	    angle += 2 * Math.PI / ((double)NB_TARGETS);
+	}
     }
 
     void loadTrials(){
@@ -271,8 +277,7 @@ public class EvalFitts implements Java2DPainter {
 		      "Hit" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "lx" + OUTPUT_CSV_SEP +
-		      "ly" + OUTPUT_CSV_SEP +
-		      "tx");
+		      "ly");
 	    bwt.newLine();
 	    bwt.flush();
 	}
@@ -323,8 +328,11 @@ public class EvalFitts implements Java2DPainter {
 	trialCount++;
 	nbErrors = 0;
 	hitCount = 0;
-	target.vx = -TARGET_X_POS;
-	target.sizeTo(idSeq.Ws[trialCount]/2.0f);
+	//XXX: TBW: highlight first target on circle
+// 	target.vx = -TARGET_X_POS;
+	for (int i=0;i<targets.length;i++){
+	    targets[i].sizeTo(idSeq.Ws[trialCount]/2.0f);
+	}
 	magFactor = idSeq.MMs[trialCount];
 	System.err.println((idSeq.Ws[trialCount]/2.0f)+" "+idSeq.MMs[trialCount]+" "+idSeq.IDs[trialCount]);
 	showStartButton(true);
@@ -344,7 +352,8 @@ public class EvalFitts implements Java2DPainter {
 	timeToTarget[hitCount] = System.currentTimeMillis() - startTime;
 	hitCount++;
 	if (hitCount < NB_TARGETS_PER_TRIAL){
-	    target.vx = -target.vx;
+	    //XXX: TBW: highlight next target on circle
+// 	    target.vx = -target.vx;
 	    vsm.repaintNow();
 	}
 	else {
@@ -378,8 +387,7 @@ public class EvalFitts implements Java2DPainter {
 		      hitCount + OUTPUT_CSV_SEP +
 		      (System.currentTimeMillis()-startTime) + OUTPUT_CSV_SEP +
 		      lens.lx + OUTPUT_CSV_SEP +
-		      lens.ly + OUTPUT_CSV_SEP +
-		      target.vx);
+		      lens.ly);
 	    bwc.newLine();
 	}
 	catch (IOException ex){ex.printStackTrace();}
