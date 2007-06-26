@@ -3,54 +3,55 @@ package net.claribole.eval.alphalens;
 
 class IDSequence {
 
-    static final long D = 12600;
-
-    int[] IDs;
+    int[] MMs;
+    double[] IDs;
     long[] Ws;
     
     IDSequence(){
-	this.IDs = new int[0];
+	this.MMs = new int[0];
     }
 
     int length(){
-	return IDs.length;
+	return MMs.length;
     }
 
     void addSequence(String[] idseq){
-	int[] tmpSeq = new int[IDs.length + idseq.length];
-	System.arraycopy(IDs, 0, tmpSeq, 0, IDs.length);
+	int[] tmpSeq = new int[MMs.length + idseq.length];
+	System.arraycopy(MMs, 0, tmpSeq, 0, MMs.length);
 	for (int i=0;i<idseq.length;i++){
-	    tmpSeq[i+IDs.length] = Integer.parseInt(idseq[i]);
+	    tmpSeq[i+MMs.length] = Integer.parseInt(idseq[i]);
 	}
-	IDs = tmpSeq;
+	MMs = tmpSeq;
     }
 
-    void computeWs(){
-	Ws = new long[IDs.length];
+    void computeWsAndIDs(){
+	Ws = new long[MMs.length];
+	IDs = new double[MMs.length];
 	for (int i=0;i<Ws.length;i++){
-	    if (IDs[i] == 6){
-		Ws[i] = D/64;
+	    if (MMs[i] == 6){
+		Ws[i] = EvalFitts.W2_6;
+		IDs[i] = Math.log(EvalFitts.D/((double)(Math.abs(EvalFitts.W1_6-EvalFitts.W2_6))) + 1) / Math.log(2);
 	    }
-	    else if (IDs[i] == 7){
-		Ws[i] = D/128;
+	    else if (MMs[i] == 10){
+		Ws[i] = EvalFitts.W2_10;
+		IDs[i] = Math.log(EvalFitts.D/((double)(Math.abs(EvalFitts.W1_10-EvalFitts.W2_10))) + 1) / Math.log(2);
 	    }
-	    else if (IDs[i] == 8){
-		Ws[i] = D/256;
-	    }
-	    else if (IDs[i] == 9){
-		Ws[i] = D/512;
-	    }
-	    else if (IDs[i] == 10){
-		Ws[i] = D/1024;
+	    else if (MMs[i] == 14){
+		Ws[i] = EvalFitts.W2_14;
+		IDs[i] = Math.log(EvalFitts.D/((double)(Math.abs(EvalFitts.W1_14-EvalFitts.W2_14))) + 1) / Math.log(2);
 	    }
 	    else {
-		System.err.println("Error: ID value not supported: "+IDs[i]);
+		System.err.println("Error: MM value not supported: "+MMs[i]);
 	    }
 	}
     }
 
     public String toString(){
-	String res = "" + IDs[0];
+	String res = "" + MMs[0];
+	for (int i=1;i<MMs.length;i++){
+	    res += ", " + MMs[i];
+	}
+	res += "\n" + IDs[0];
 	for (int i=1;i<IDs.length;i++){
 	    res += ", " + IDs[i];
 	}

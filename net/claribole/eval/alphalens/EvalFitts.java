@@ -26,20 +26,20 @@ import net.claribole.zvtm.lens.*;
 public class EvalFitts implements Java2DPainter {
 
     /* techniques */
-    static final short TECHNIQUE_FL = 0; // fading lens
-    static final short TECHNIQUE_ML = 1; // melting lens
-    static final short TECHNIQUE_DL = 2; // distortion lens
-    static final short TECHNIQUE_HL = 3; // manhattan lens
+    static final short TECHNIQUE_FL = 2; // fading lens
+    static final short TECHNIQUE_ML = 3; // melting lens
+    static final short TECHNIQUE_DL = 1; // distortion lens
+    static final short TECHNIQUE_HL = 0; // manhattan lens
     static final short TECHNIQUE_SCF = 4;// speed-coupled flattening
-    static final String[] TECHNIQUE_NAMES = {"Fading_Lens", "Melting_Lens", "Distortion_Lens", "Manhattan_Lens", "Speed-coupled flattening"}; 
-    static final String[] TECHNIQUE_NAMES_ABBR = {"FL", "ML", "DL", "HL", "SC"}; 
+    static final String[] TECHNIQUE_NAMES = {"Manhattan_Lens", "Distortion_Lens", "Fading_Lens", "Melting_Lens", "Speed-coupled flattening"}; 
+    static final String[] TECHNIQUE_NAMES_ABBR = {"HL", "DL", "FL", "ML", "SC"}; 
     short technique = TECHNIQUE_FL;
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1600;
-    static int VIEW_MAX_H = 1200;
+    static int VIEW_MAX_W = 1280;
+    static int VIEW_MAX_H = 800;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -56,6 +56,14 @@ public class EvalFitts implements Java2DPainter {
 
     FittsEventHandler eh;
 
+    static final double D = 800;
+    static final double W1_6 = 2 * EvalFitts.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static final double W1_10 = 2 * EvalFitts.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static final double W1_14 = 2 * EvalFitts.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static long W2_6 = 60;
+    static long W2_10 = 60;
+    static long W2_14 = 60;
+
     /* lens */
     static final Color LENS_BOUNDARY_COLOR = Color.RED;
     static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
@@ -64,16 +72,6 @@ public class EvalFitts implements Java2DPainter {
     static final int LENS_OUTER_RADIUS = 100;
     Lens lens;
     TemporalLens tlens;
-
-    /* Fitts' ID */
-    static final double D = 1200;
-    static final double W2 = 6.0;
-    static final double W1_4 = 2 * LENS_INNER_RADIUS / 4.0;
-    static final double W1_8 = 2 * LENS_INNER_RADIUS / 8.0;
-    static final double W1_12 = 2 * LENS_INNER_RADIUS / 12.0;
-    static final double ID_4 = Math.log(D/((double)(Math.abs(W1_4-W2))) + 1) / Math.log(2);
-    static final double ID_8 = Math.log(D/((double)(Math.abs(W1_8-W2))) + 1) / Math.log(2);
-    static final double ID_12 = Math.log(D/((double)(Math.abs(W1_12-W2))) + 1) / Math.log(2);
 
     /* cursor */
     static final Color CURSOR_COLOR = Color.RED;
@@ -90,8 +88,8 @@ public class EvalFitts implements Java2DPainter {
 
     /* target */
     static final Color TARGET_COLOR = Color.BLACK;
-    VRectangle target;
-    static final long TARGET_X_POS = Math.round(D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
+    VCircle target;
+    static final long TARGET_X_POS = Math.round(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
     static final long TARGET_Y_POS = 0;
     static final long TARGET_HEIGHT = 500;
 
@@ -127,10 +125,14 @@ public class EvalFitts implements Java2DPainter {
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
     
-    public EvalFitts(short t, float mf){
+    public EvalFitts(short t){
+
+	System.out.println(W1_6);
+	System.out.println(W1_10);
+	System.out.println(W1_14);
+
 	initGUI();
 	this.technique = t;
-	this.magFactor = mf;
 	mViewName = TECHNIQUE_NAMES[this.technique];
 	eh = new FittsEventHandler(this);
 	mView.setEventHandler(eh);
@@ -185,7 +187,7 @@ public class EvalFitts implements Java2DPainter {
 	    vsm.addGlyph(new BRectangle(0, y, 0, GRID_W/2, 1, GRID_COLOR), mSpace);
 	    y += GRID_STEP;
 	}	
- 	target = new VRectangle(TARGET_X_POS, TARGET_Y_POS, 0, Math.round(W2/2), TARGET_HEIGHT, TARGET_COLOR);
+ 	target = new VCircle(TARGET_X_POS, TARGET_Y_POS, 0, Math.round(W2_6/2), TARGET_COLOR);
  	vsm.addGlyph(target, mSpace);
     }
 
@@ -204,7 +206,8 @@ public class EvalFitts implements Java2DPainter {
 		line = br.readLine();
 	    }
 	    fis.close();
-	    idSeq.computeWs();
+	    idSeq.computeWsAndIDs();
+	    System.out.println(idSeq);
 	}
 	catch (Exception ex){ex.printStackTrace();}
     }
@@ -291,6 +294,7 @@ public class EvalFitts implements Java2DPainter {
 	if (trialStarted){return;}
 	trialStarted = true;
 	setLens(jpx, jpy);
+	mView.mouse.setSize(0);
 	showStartButton(false);
 	say(null);
 	startTime = System.currentTimeMillis();
@@ -299,6 +303,7 @@ public class EvalFitts implements Java2DPainter {
     void endTrial(){
 	trialStarted = false;
 	unsetLens();
+	mView.mouse.setSize(5);
 	flushTrial();
 	flushCinematic();
 	if (trialCount+1 < idSeq.length()){
@@ -314,13 +319,15 @@ public class EvalFitts implements Java2DPainter {
 	nbErrors = 0;
 	hitCount = 0;
 	target.vx = -TARGET_X_POS;
-	target.setWidth(idSeq.Ws[trialCount]);
+	target.sizeTo(idSeq.Ws[trialCount]/2.0f);
+	magFactor = idSeq.MMs[trialCount];
+	System.err.println((idSeq.Ws[trialCount]/2.0f)+" "+idSeq.MMs[trialCount]);
 	showStartButton(true);
 	say("Trial " + (trialCount+1) + " / " + idSeq.length() + " - " + Messages.PSBTC);
     }
 
     void selectTarget(Glyph g){
-	if (g == target){// target was hit
+	if (true){//(g == target){// target was hit
 	    hitTarget();
 	}
 	else {
@@ -492,15 +499,15 @@ public class EvalFitts implements Java2DPainter {
 
     public static void main(String[] args){
 	try {
-	    if (args.length >= 4){
+	    if (args.length >= 3){
 		EvalFitts.VIEW_MAX_W = Integer.parseInt(args[2]);
 		EvalFitts.VIEW_MAX_H = Integer.parseInt(args[3]);
 	    }
-	    new EvalFitts(Short.parseShort(args[0]), Float.parseFloat(args[1]));
+	    new EvalFitts(Short.parseShort(args[0]));
 	}
 	catch (Exception ex){
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
-	    new EvalFitts(EvalFitts.TECHNIQUE_FL, 8.0f);
+	    new EvalFitts(EvalFitts.TECHNIQUE_FL);
 	}
     }
 
