@@ -38,8 +38,8 @@ public class EvalFitts implements Java2DPainter {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1280;
-    static int VIEW_MAX_H = 800;
+    static int VIEW_MAX_W = 1600;
+    static int VIEW_MAX_H = 1200;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -56,13 +56,13 @@ public class EvalFitts implements Java2DPainter {
 
     FittsEventHandler eh;
 
-    static final double D = 800;
-    static final double W1_6 = 2 * EvalFitts.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static final double W1_10 = 2 * EvalFitts.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static final double W1_14 = 2 * EvalFitts.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static long W2_6 = 60;
-    static long W2_10 = 60;
-    static long W2_14 = 60;
+    static double D = 800;
+    static double W1_6 = 2 * EvalFitts.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static double W1_10 = 2 * EvalFitts.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static double W1_14 = 2 * EvalFitts.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static long W2_6 = 40;
+    static long W2_10 = 40;
+    static long W2_14 = 40;
 
     /* lens */
     static final Color LENS_BOUNDARY_COLOR = Color.RED;
@@ -70,7 +70,7 @@ public class EvalFitts implements Java2DPainter {
     float magFactor = 8.0f;
     static final int LENS_INNER_RADIUS = 50;
     static final int LENS_OUTER_RADIUS = 100;
-    Lens lens;
+    FixedSizeLens lens;
     TemporalLens tlens;
 
     /* cursor */
@@ -321,7 +321,7 @@ public class EvalFitts implements Java2DPainter {
 	target.vx = -TARGET_X_POS;
 	target.sizeTo(idSeq.Ws[trialCount]/2.0f);
 	magFactor = idSeq.MMs[trialCount];
-	System.err.println((idSeq.Ws[trialCount]/2.0f)+" "+idSeq.MMs[trialCount]);
+	System.err.println((idSeq.Ws[trialCount]/2.0f)+" "+idSeq.MMs[trialCount]+" "+idSeq.IDs[trialCount]);
 	showStartButton(true);
 	say("Trial " + (trialCount+1) + " / " + idSeq.length() + " - " + Messages.PSBTC);
     }
@@ -395,7 +395,7 @@ public class EvalFitts implements Java2DPainter {
 	    tlens = new TFadingLens(magFactor, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    ((TFadingLens)tlens).setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    ((TFadingLens)tlens).setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
-	    lens = (Lens)tlens;
+	    lens = (FixedSizeLens)tlens;
 	    break;
 	}
 	case TECHNIQUE_ML:{
@@ -404,8 +404,9 @@ public class EvalFitts implements Java2DPainter {
 	    break;
 	}
 	case TECHNIQUE_DL:{
-	    lens = new FSGaussianLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new XGaussianLens(magFactor, 0.5f, 1.0f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    tlens = null;
+	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
 	}
 	case TECHNIQUE_HL:{
@@ -416,9 +417,9 @@ public class EvalFitts implements Java2DPainter {
 	}
 	case TECHNIQUE_SCF:{
 	    tlens = new DGaussianLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
-	    ((DGaussianLens)tlens).setInnerRadiusColor(LENS_BOUNDARY_COLOR);
-	    ((DGaussianLens)tlens).setOuterRadiusColor(LENS_BOUNDARY_COLOR);
-	    lens = (Lens)tlens;
+	    lens = (FixedSizeLens)tlens;
+	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
+	    lens.setOuterRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
 	}
 	}
