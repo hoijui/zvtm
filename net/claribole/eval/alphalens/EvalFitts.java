@@ -56,7 +56,7 @@ public class EvalFitts implements Java2DPainter {
 
     FittsEventHandler eh;
 
-    static double D = 800;
+    static double D = 1200;
     static double W1_6 = 2 * EvalFitts.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_10 = 2 * EvalFitts.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_14 = 2 * EvalFitts.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
@@ -177,14 +177,19 @@ public class EvalFitts implements Java2DPainter {
     void initScene(){
 	mView.setBackgroundColor(EvalFitts.BACKGROUND_COLOR);
 	// grid
+	VRectangle r;
 	long x = -GRID_W / 2;
 	for (int i=0;i<GRID_W/GRID_STEP+1;i++){
-	    vsm.addGlyph(new BRectangle(x, 0, 0, 1, GRID_H/2, GRID_COLOR), mSpace);
+	    r = new VRectangle(x, 0, 0, 4, GRID_H/2, GRID_COLOR);
+	    r.setDrawBorder(false);
+	    vsm.addGlyph(r, mSpace);
 	    x += GRID_STEP;
 	}
 	long y = -GRID_H / 2;
 	for (int i=0;i<GRID_H/GRID_STEP+1;i++){
-	    vsm.addGlyph(new BRectangle(0, y, 0, GRID_W/2, 1, GRID_COLOR), mSpace);
+	    r = new VRectangle(0, y, 0, GRID_W/2, 4, GRID_COLOR);
+	    r.setDrawBorder(false);
+	    vsm.addGlyph(r, mSpace);
 	    y += GRID_STEP;
 	}	
  	target = new VCircle(TARGET_X_POS, TARGET_Y_POS, 0, Math.round(W2_6/2), TARGET_COLOR);
@@ -401,10 +406,11 @@ public class EvalFitts implements Java2DPainter {
 	case TECHNIQUE_ML:{
 	    lens = new TLinearLens(magFactor, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    tlens = null;
+	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
 	}
 	case TECHNIQUE_DL:{
-	    lens = new XGaussianLens(magFactor, 0.5f, 1.0f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = new FSGaussianLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    tlens = null;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
