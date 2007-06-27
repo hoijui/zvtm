@@ -80,9 +80,9 @@ public class EvalFitts implements Java2DPainter {
     TemporalLens tlens;
 
     /* cursor */
-    static final Color CURSOR_COLOR = Color.RED;
+    static final Color CURSOR_COLOR = Color.WHITE;
 
-    static final Color START_BUTTON_COLOR = Color.BLUE;
+    static final Color START_BUTTON_COLOR = Color.RED;
 
     /* padding for lenses */
     static final int[] vispad = {100, 100, 100, 100};
@@ -346,9 +346,13 @@ public class EvalFitts implements Java2DPainter {
     long[] rif = new long[4];
 
     void selectTarget(){
+	// do not take early clicks into account
+	// (if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high)
+	if ((technique==TECHNIQUE_FL && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
+	    || (technique==TECHNIQUE_SCF && ((DGaussianLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 	Glyph target = targets[hitCount];
 	lens.getVisibleRegionInFocus(mCamera, rif);
-	if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) < (rif[2]-rif[0])/2.0-target.getSize()){
+	if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
 	    // target is in focus region
 	    hitTarget();
 	}
