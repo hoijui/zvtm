@@ -173,4 +173,12 @@ public abstract class TLens extends FixedSizeLens {
 
     synchronized void transformB(WritableRaster iwr, WritableRaster ewr){System.err.println("Error: translucent lens: Sample model not supported yet");}
 
+    public float getFocusTranslucencyValue(){
+	return MMTf;
+    }
+
+    public float getContextTranslucencyValue(){
+	return MMTc;
+    }
+
 }

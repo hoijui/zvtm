@@ -193,6 +193,10 @@ public class DLinearLens extends FSLinearLens implements TemporalLens {
 	g2d.setComposite(Translucent.acO);
     }
 
+    public float getActualMaximumMagnification(){
+	return dMM;
+    }
+
 }
 
 

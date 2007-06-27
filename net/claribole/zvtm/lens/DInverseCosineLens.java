@@ -192,6 +192,10 @@ public class DInverseCosineLens extends FSInverseCosineLens implements TemporalL
 	g2d.setComposite(Translucent.acO);
     }
 
+    public float getActualMaximumMagnification(){
+	return dMM;
+    }
+
 }
 
 
