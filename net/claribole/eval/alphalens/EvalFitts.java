@@ -418,8 +418,8 @@ public class EvalFitts implements Java2DPainter {
 	    break;
 	}
 	case TECHNIQUE_ML:{
-	    lens = new TLinearLens(magFactor, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
-	    tlens = null;
+	    tlens = new MeltingLens(magFactor, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
 	}
