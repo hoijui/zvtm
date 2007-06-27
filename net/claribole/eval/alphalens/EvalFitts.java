@@ -45,7 +45,7 @@ public class EvalFitts implements Java2DPainter {
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
     static int VIEW_MAX_W = 1600;
-    static int VIEW_MAX_H = 1100;
+    static int VIEW_MAX_H = 1200;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -106,6 +106,8 @@ public class EvalFitts implements Java2DPainter {
     static final long GRID_H = 12000;
 
     /* logs */
+    String TRIAL_FILE_NAME;
+
     static final boolean WRITE_CINEMATIC = true;
 
     static final String LOG_FILE_EXT = ".csv";
@@ -130,9 +132,10 @@ public class EvalFitts implements Java2DPainter {
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
     
-    public EvalFitts(short t){
+    public EvalFitts(short t, String f){
 	initGUI();
 	this.technique = t;
+	this.TRIAL_FILE_NAME = f;
 	mViewName = TECHNIQUE_NAMES[this.technique];
 	eh = new FittsEventHandler(this);
 	mView.setEventHandler(eh);
@@ -208,7 +211,7 @@ public class EvalFitts implements Java2DPainter {
 
     void loadTrials(){
 	try {
-	    File trialFile = new File(TRIAL_DIR_FULL + File.separator + "fitts.csv");
+	    File trialFile = new File(TRIAL_DIR_FULL + File.separator + TRIAL_FILE_NAME);
 	    FileInputStream fis = new FileInputStream(trialFile);
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
@@ -529,15 +532,15 @@ public class EvalFitts implements Java2DPainter {
 
     public static void main(String[] args){
 	try {
-	    if (args.length >= 3){
-		EvalFitts.VIEW_MAX_W = Integer.parseInt(args[2]);
-		EvalFitts.VIEW_MAX_H = Integer.parseInt(args[3]);
+	    if (args.length >= 4){
+		EvalFitts.VIEW_MAX_W = Integer.parseInt(args[3]);
+		EvalFitts.VIEW_MAX_H = Integer.parseInt(args[4]);
 	    }
-	    new EvalFitts(Short.parseShort(args[0]));
+	    new EvalFitts(Short.parseShort(args[0]), args[1]);
 	}
 	catch (Exception ex){
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
-	    new EvalFitts(EvalFitts.TECHNIQUE_FL);
+	    new EvalFitts(EvalFitts.TECHNIQUE_FL, "fitts.csv");
 	}
     }
 
