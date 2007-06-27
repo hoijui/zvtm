@@ -58,7 +58,7 @@ public class DistortionLens extends FSGaussianLens implements TemporalLens {
      */
     public DistortionLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
- 	computeOpacityFactors(0, 1);
+ 	computeOpacityFactors(0, 0.9f);
 	initTimer();
     }
 

@@ -60,7 +60,7 @@ public class MeltingLens extends TLinearLens implements TemporalLens {
      */
     public MeltingLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
 	super(mm, tc, tf, outerRadius, innerRadius, x, y);
- 	computeOpacityFactors(0, 1);
+ 	computeOpacityFactors(0.0f, 0.9f);
 	initTimer();
     }
     void initTimer(){
