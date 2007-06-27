@@ -126,11 +126,15 @@ public class EvalFitts implements Java2DPainter {
     IDSequence idSeq;
     int trialCount = -1;
     boolean trialStarted = false;
-    long startTime = 0;
-    int nbErrors = 0;
+    long startTime;
+    long hitTime;
+    long lastHitTime;
 
+    int[] nbErrors = new int[NB_TARGETS_PER_TRIAL];
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
+
+    static final int ERROR_DELAY = 500;
     
     public EvalFitts(short t, String f){
 	initGUI();
@@ -233,8 +237,8 @@ public class EvalFitts implements Java2DPainter {
 	subjectName = JOptionPane.showInputDialog("Subject Name");
 	subjectID = JOptionPane.showInputDialog("Subject ID");
 	blockNumber = JOptionPane.showInputDialog("Block");
-	tlogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+magFactor+"-block"+blockNumber+"-trials", LOG_DIR);
-	clogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+magFactor+"-block"+blockNumber+"-cinematic", LOG_DIR);
+	tlogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+Math.round(magFactor)+"-block"+blockNumber+"-trials", LOG_DIR);
+	clogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+Math.round(magFactor)+"-block"+blockNumber+"-cinematic", LOG_DIR);
 	try {
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tlogFile), "UTF-8"));
 	    writeTrialHeaders();
@@ -279,13 +283,13 @@ public class EvalFitts implements Java2DPainter {
     void writeCinematicHeaders(){
 	try {
 	    // trial column headers
-	    bwt.write("Trial" + OUTPUT_CSV_SEP +
+	    bwc.write("Trial" + OUTPUT_CSV_SEP +
 		      "Hit" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "lx" + OUTPUT_CSV_SEP +
 		      "ly");
-	    bwt.newLine();
-	    bwt.flush();
+	    bwc.newLine();
+	    bwc.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
     }
@@ -314,6 +318,7 @@ public class EvalFitts implements Java2DPainter {
 	showStartButton(false);
 	say(null);
 	startTime = System.currentTimeMillis();
+	lastHitTime = startTime;
     }
 
     void endTrial(){
@@ -332,8 +337,10 @@ public class EvalFitts implements Java2DPainter {
 
     void initNextTrial(){
 	trialCount++;
-	nbErrors = 0;
 	hitCount = 0;
+	for (int i=0;i<nbErrors.length;i++){
+	    nbErrors[i] = 0;
+	}
 	for (int i=0;i<targets.length;i++){
 	    targets[i].sizeTo(idSeq.Ws[trialCount]/2.0f);
 	}
@@ -346,9 +353,10 @@ public class EvalFitts implements Java2DPainter {
     long[] rif = new long[4];
 
     void selectTarget(){
-	// do not take early clicks into account
-	// (if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high)
-	if ((technique==TECHNIQUE_FL && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
+	// do not take early clicks into account if an error is currently being displayed,
+	// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
+	if (warning
+	    || (technique==TECHNIQUE_FL && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
 	    || (technique==TECHNIQUE_SCF && ((DGaussianLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 	Glyph target = targets[hitCount];
 	lens.getVisibleRegionInFocus(mCamera, rif);
@@ -357,12 +365,15 @@ public class EvalFitts implements Java2DPainter {
 	    hitTarget();
 	}
 	else {
-	    nbErrors++;
+	    warn(Messages.TARGET_NOT_IN_FOCUS, ERROR_DELAY);
+	    nbErrors[hitCount] += 1;
 	}
     }
 
     void hitTarget(){
-	timeToTarget[hitCount] = System.currentTimeMillis() - startTime;
+	hitTime = System.currentTimeMillis();
+	timeToTarget[hitCount] = hitTime - lastHitTime;
+	lastHitTime = hitTime;
 	highlight(hitCount, false);
 	hitCount++;
 	if (hitCount < NB_TARGETS_PER_TRIAL){
@@ -395,7 +406,7 @@ public class EvalFitts implements Java2DPainter {
 			  idSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
 			  i + OUTPUT_CSV_SEP +  // hit index
 			  timeToTarget[i] + OUTPUT_CSV_SEP +
-			  nbErrors);
+			  nbErrors[i]);
 		bwt.newLine();
 	    }
 	    bwt.flush();
@@ -494,6 +505,25 @@ public class EvalFitts implements Java2DPainter {
 	vsm.repaintNow();
     }
 
+    boolean warning = false;
+    String warningText = null;
+    
+    void warn(final String s, final int duration){
+	final SwingWorker worker=new SwingWorker(){
+		public Object construct(){
+		    warningText = s;
+		    warning = true;
+		    vsm.repaintNow();
+		    sleep(duration);
+		    warning = false;
+		    warningText = null;
+		    vsm.repaintNow();
+		    return null;
+		}
+	    };
+	worker.start();
+    }
+
     void showStartButton(boolean b){
 	drawStartButton = b;
 	vsm.repaintNow();
@@ -523,6 +553,12 @@ public class EvalFitts implements Java2DPainter {
 	if (instructions != null){
 	    g2d.setColor(INSTRUCTIONS_COLOR);
 	    g2d.drawString(instructions, vispad[0], viewHeight-vispad[3]/2);
+	}
+	if (warning && warningText != null){
+	    g2d.setColor(Color.BLACK);
+	    g2d.fillRect(0, viewHeight/2-100, viewWidth, 200);
+	    g2d.setColor(Color.RED);
+	    g2d.drawString(warningText, viewWidth/2-50, viewHeight/2);
 	}
 	if (drawStartButton){
 	    g2d.setColor(START_BUTTON_COLOR);

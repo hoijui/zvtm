@@ -13,6 +13,8 @@ class Messages {
     
     static final String PSTS = "PRESS S TO START";
 
-    static final String EOS = "END OF SESSION";    
+    static final String EOS = "END OF SESSION";
+
+    static final String TARGET_NOT_IN_FOCUS = "TARGET NOT IN FOCUS";
     
 }
