@@ -52,7 +52,7 @@ public class EvalFitts implements Java2DPainter {
     int panelWidth, panelHeight;
 
     /* ZVTM components */
-    static final Color BACKGROUND_COLOR = Color.WHITE;
+    static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
     VirtualSpaceManager vsm;
     VirtualSpace mSpace;
     static final String mSpaceName = "mainSpace";
@@ -93,13 +93,14 @@ public class EvalFitts implements Java2DPainter {
     static final float CAM_ALT = 900.0f;  // so as to get a proj coef of 0.1 (focal is 100.0f)
 
     /* target */
+    static final Color HTARGET_COLOR = Color.WHITE;
     static final Color TARGET_COLOR = Color.BLACK;
-    static int NB_TARGETS = 24;
+    static int NB_TARGETS_PER_TRIAL = 24;
     VCircle[] targets;
     static final long TARGET_R_POS = Math.round(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
 
     /* grid color */
-    static final Color GRID_COLOR = Color.LIGHT_GRAY;
+    static final Color GRID_COLOR = Color.GRAY;
     static final long GRID_STEP = 200;
     static final long GRID_W = 16000;
     static final long GRID_H = 12000;
@@ -126,16 +127,10 @@ public class EvalFitts implements Java2DPainter {
     long startTime = 0;
     int nbErrors = 0;
 
-    static final int NB_TARGETS_PER_TRIAL = 6;
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
     
     public EvalFitts(short t){
-
-	System.out.println(W1_6);
-	System.out.println(W1_10);
-	System.out.println(W1_14);
-
 	initGUI();
 	this.technique = t;
 	mViewName = TECHNIQUE_NAMES[this.technique];
@@ -197,14 +192,17 @@ public class EvalFitts implements Java2DPainter {
 	    vsm.addGlyph(r, mSpace);
 	    y += GRID_STEP;
 	}
-	targets = new VCircle[NB_TARGETS];
+	targets = new VCircle[NB_TARGETS_PER_TRIAL];
 	double angle = 0;
-	for (int i=0;i<NB_TARGETS;i++){
+	for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
 	    x = Math.round(TARGET_R_POS * Math.cos(angle));
 	    y = Math.round(TARGET_R_POS * Math.sin(angle));
 	    targets[i] = new VCircle(x, y, 0, Math.round(W2_6/2), TARGET_COLOR);
+	    targets[i].setDrawBorder(false);
 	    vsm.addGlyph(targets[i], mSpace);
-	    angle += 2 * Math.PI / ((double)NB_TARGETS);
+	    // lay out targets so that they between each side of the circle (ISO9241-9)
+	    if (i % 2 == 0){angle += Math.PI;}
+	    else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
 	}
     }
 
@@ -224,7 +222,6 @@ public class EvalFitts implements Java2DPainter {
 	    }
 	    fis.close();
 	    idSeq.computeWsAndIDs();
-	    System.out.println(idSeq);
 	}
 	catch (Exception ex){ex.printStackTrace();}
     }
@@ -334,19 +331,17 @@ public class EvalFitts implements Java2DPainter {
 	trialCount++;
 	nbErrors = 0;
 	hitCount = 0;
-	//XXX: TBW: highlight first target on circle
-// 	target.vx = -TARGET_X_POS;
 	for (int i=0;i<targets.length;i++){
 	    targets[i].sizeTo(idSeq.Ws[trialCount]/2.0f);
 	}
+	highlight(hitCount, true);
 	magFactor = idSeq.MMs[trialCount];
-	System.err.println((idSeq.Ws[trialCount]/2.0f)+" "+idSeq.MMs[trialCount]+" "+idSeq.IDs[trialCount]);
 	showStartButton(true);
 	say("Trial " + (trialCount+1) + " / " + idSeq.length() + " - " + Messages.PSBTC);
     }
 
     void selectTarget(Glyph g){
-	if (true){//(g == target){// target was hit
+	if (true){//(g == targets[hitCount]){// target was hit
 	    hitTarget();
 	}
 	else {
@@ -356,14 +351,23 @@ public class EvalFitts implements Java2DPainter {
 
     void hitTarget(){
 	timeToTarget[hitCount] = System.currentTimeMillis() - startTime;
+	highlight(hitCount, false);
 	hitCount++;
 	if (hitCount < NB_TARGETS_PER_TRIAL){
-	    //XXX: TBW: highlight next target on circle
-// 	    target.vx = -target.vx;
+	    highlight(hitCount, true);
 	    vsm.repaintNow();
 	}
 	else {
 	    endTrial();
+	}
+    }
+
+    void highlight(int targetIndex, boolean b){
+	if (b){
+	    targets[targetIndex].setColor(HTARGET_COLOR);
+	}
+	else {
+	    targets[targetIndex].setColor(TARGET_COLOR);	    
 	}
     }
 
