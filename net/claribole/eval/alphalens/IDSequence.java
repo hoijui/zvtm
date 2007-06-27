@@ -7,6 +7,8 @@
 
 package net.claribole.eval.alphalens;
 
+import com.xerox.VTM.engine.Camera;
+
 class IDSequence {
 
     int[] MMs;
@@ -36,15 +38,15 @@ class IDSequence {
 	for (int i=0;i<Ws.length;i++){
 	    if (MMs[i] == 6){
 		Ws[i] = EvalFitts.W2_6;
-		IDs[i] = Math.log(EvalFitts.D/((double)(Math.abs(EvalFitts.W1_6-EvalFitts.W2_6))) + 1) / Math.log(2);
+		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_6-EvalFitts.W2_6))) + 1) / Math.log(2);
 	    }
 	    else if (MMs[i] == 10){
 		Ws[i] = EvalFitts.W2_10;
-		IDs[i] = Math.log(EvalFitts.D/((double)(Math.abs(EvalFitts.W1_10-EvalFitts.W2_10))) + 1) / Math.log(2);
+		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_10-EvalFitts.W2_10))) + 1) / Math.log(2);
 	    }
 	    else if (MMs[i] == 14){
 		Ws[i] = EvalFitts.W2_14;
-		IDs[i] = Math.log(EvalFitts.D/((double)(Math.abs(EvalFitts.W1_14-EvalFitts.W2_14))) + 1) / Math.log(2);
+		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_14-EvalFitts.W2_14))) + 1) / Math.log(2);
 	    }
 	    else {
 		System.err.println("Error: MM value not supported: "+MMs[i]);
