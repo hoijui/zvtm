@@ -45,7 +45,7 @@ public class EvalFitts implements Java2DPainter {
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
     static int VIEW_MAX_W = 1600;
-    static int VIEW_MAX_H = 1200;
+    static int VIEW_MAX_H = 1100;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -340,8 +340,13 @@ public class EvalFitts implements Java2DPainter {
 	say("Trial " + (trialCount+1) + " / " + idSeq.length() + " - " + Messages.PSBTC);
     }
 
-    void selectTarget(Glyph g){
-	if (true){//(g == targets[hitCount]){// target was hit
+    long[] rif = new long[4];
+
+    void selectTarget(){
+	Glyph target = targets[hitCount];
+	lens.getVisibleRegionInFocus(mCamera, rif);
+	if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) < (rif[2]-rif[0])/2.0-target.getSize()){
+	    // target is in focus region
 	    hitTarget();
 	}
 	else {
