@@ -16,6 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
+import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.ViewPanel;
 
 /**Parent class of all lenses which have a fixed size (i.e. whose radius does not depend on the view's size)*/
@@ -308,6 +309,18 @@ public abstract class FixedSizeLens extends Lens {
 	    g2d.setColor(r2Color);
 	    g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
 	}
+    }
+
+    /**returns bounds of rectangle representing virtual space's region seen through focus of lens and camera c [west,north,east,south]
+     *@param c camera
+     *@param res array which will contain the result */
+    public long[] getVisibleRegionInFocus(Camera c, long[] res){
+	float uncoef = (float)((c.focal+c.altitude)/c.focal);
+	res[0] = (long)(c.posx + (lx-LR2/MM)*uncoef);
+	res[1] = (long)(c.posy + (-ly+LR2/MM)*uncoef);
+	res[2] = (long)(c.posx + (lx+LR2/MM)*uncoef);
+	res[3] = (long)(c.posy + (-ly-LR2/MM)*uncoef);
+	return res;
     }
 
 }
