@@ -284,6 +284,20 @@ public abstract class FixedSizeLens extends Lens {
 	r1Color = c;
     }
 
+    /** Get the color used to draw the lens' inner radius.
+     *@return color of the boundary (null if border is not drawn)
+     */
+    public Color getInnerRadiusColor(){
+	return r2Color;
+    }
+
+    /** Get the color used to draw the lens' outer radius.
+     *@return color of the boundary (null if border is not drawn)
+     */
+    public Color getOuterRadiusColor(){
+	return r1Color;
+    }
+
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
 	if (r1Color != null){
