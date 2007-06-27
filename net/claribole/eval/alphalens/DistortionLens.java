@@ -47,8 +47,6 @@ public class DistortionLens extends FSGaussianLens implements TemporalLens {
 
     protected float MMTf = 1.0f;
 
-    Color rColor = Color.RED;
-
     /**
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
@@ -142,8 +140,8 @@ public class DistortionLens extends FSGaussianLens implements TemporalLens {
 
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
-	if (rColor != null){
-	    g2d.setColor(rColor);
+	if (getInnerRadiusColor() != null){
+	    g2d.setColor(getInnerRadiusColor());
 	    // get the alpha composite from a precomputed list of values
 	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
 	    g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)-1]);  
