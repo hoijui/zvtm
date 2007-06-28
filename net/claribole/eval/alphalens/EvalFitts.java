@@ -237,8 +237,8 @@ public class EvalFitts implements Java2DPainter {
 	subjectName = JOptionPane.showInputDialog("Subject Name");
 	subjectID = JOptionPane.showInputDialog("Subject ID");
 	blockNumber = JOptionPane.showInputDialog("Block");
-	tlogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+Math.round(magFactor)+"-block"+blockNumber+"-trials", LOG_DIR);
-	clogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-MM"+Math.round(magFactor)+"-block"+blockNumber+"-cinematic", LOG_DIR);
+	tlogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-block"+blockNumber+"-trials", LOG_DIR);
+	clogFile = initLogFile(subjectID+"-"+TECHNIQUE_NAMES_ABBR[technique]+"-block"+blockNumber+"-cinematic", LOG_DIR);
 	try {
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tlogFile), "UTF-8"));
 	    writeTrialHeaders();
