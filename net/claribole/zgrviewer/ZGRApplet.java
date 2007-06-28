@@ -53,6 +53,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String HTTPS_PROTOCOL = "https://";
     static final String FTP_PROTOCOL = "ftp:/";
     static final String FILE_PROTOCOL = "file:/";
+    static final String JAVASCRIPT_PROTOCOL = "javascript:";
 
     String APPLET_TITLE = "ZGRViewer - Applet";
 
@@ -229,13 +230,16 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
     //open up the default or user-specified browser (netscape, ie,...) and try to display the content uri
     void displayURLinBrowser(String uri){
-	if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(HTTPS_PROTOCOL) ||
-	      uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
+	String target = ConfigManager._BLANK;
+	if (uri.startsWith(JAVASCRIPT_PROTOCOL)) {
+	    target = ConfigManager._SELF;
+	}
+	else if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
 	    // relative URL, prepend document base
 	    uri = docURL + uri;
 	}
 	try {
-	    getAppletContext().showDocument(new URL(uri), ConfigManager._BLANK);
+	    getAppletContext().showDocument(new URL(uri), target);
 	}
 	catch(MalformedURLException ex){System.out.println("Error: could not load "+uri);}
     }

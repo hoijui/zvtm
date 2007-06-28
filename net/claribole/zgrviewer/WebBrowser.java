@@ -30,27 +30,27 @@ class WebBrowser {
 			Process proc=Runtime.getRuntime().exec(command);
 		    }
 		    else {//UNIX and perhaps Linux - not tested yet  (no support for Mac right now)
-			command="mozilla -remote openURL("+url+")";
+			command="mozilla-firefox -remote openURL("+url+")";
 			Process proc=Runtime.getRuntime().exec(command);
 			int exitCode;
 			try {
 			    if ((exitCode=proc.waitFor())!=0){
-				command="mozilla "+url;
+				command="mozilla-firefox "+url;
 				proc=Runtime.getRuntime().exec(command);
 			    }
 			}
-			catch (InterruptedException ex1){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex1);}
+			catch (InterruptedException ex1){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invocation failed "+command+"\n"+ex1);}
 		    }
 		    
 		}
-		catch (IOException ex2){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex2);}
+		catch (IOException ex2){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invocation failed "+command+"\n"+ex2);}
 	    }
 	    else {
 		try {
 		    command=ConfigManager.browserPath+" "+ConfigManager.browserOptions+" "+url;
 		    Process proc=Runtime.getRuntime().exec(command);
 		}
-		catch (Exception ex3){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invokation failed "+command+"\n"+ex3);}
+		catch (Exception ex3){javax.swing.JOptionPane.showMessageDialog(gm.vsm.getActiveView().getFrame(),"Browser invocation failed "+command+"\n"+ex3);}
 	    }
 	}
     }
