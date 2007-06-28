@@ -287,7 +287,8 @@ public class EvalFitts implements Java2DPainter {
 		      "Hit" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
 		      "lx" + OUTPUT_CSV_SEP +
-		      "ly");
+		      "ly" + OUTPUT_CSV_SEP +
+		      "Errors");
 	    bwc.newLine();
 	    bwc.flush();
 	}
@@ -367,6 +368,7 @@ public class EvalFitts implements Java2DPainter {
 	else {
 	    warn(Messages.TARGET_NOT_IN_FOCUS, ERROR_DELAY);
 	    nbErrors[hitCount] += 1;
+	    writeCinematic();
 	}
     }
 
@@ -420,7 +422,8 @@ public class EvalFitts implements Java2DPainter {
 		      hitCount + OUTPUT_CSV_SEP +
 		      (System.currentTimeMillis()-startTime) + OUTPUT_CSV_SEP +
 		      lens.lx + OUTPUT_CSV_SEP +
-		      lens.ly);
+		      lens.ly + OUTPUT_CSV_SEP +
+		      nbErrors[hitCount]);
 	    bwc.newLine();
 	}
 	catch (IOException ex){ex.printStackTrace();}
@@ -445,7 +448,7 @@ public class EvalFitts implements Java2DPainter {
 	    break;
 	}
 	case TECHNIQUE_ML:{
-	    tlens = new MeltingLens(magFactor, 0.0f, 0.90f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    tlens = new MeltingLens(magFactor, 0.0f, 0.80f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
