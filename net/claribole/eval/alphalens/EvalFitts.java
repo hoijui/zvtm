@@ -94,7 +94,7 @@ public class EvalFitts implements Java2DPainter {
 
     /* target */
     static final Color HTARGET_COLOR = Color.WHITE;
-    static final Color TARGET_COLOR = Color.BLACK;
+    static final Color TARGET_COLOR = Color.WHITE;
     static int NB_TARGETS_PER_TRIAL = 24;
     VCircle[] targets;
     static final long TARGET_R_POS = Math.round(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
@@ -206,6 +206,7 @@ public class EvalFitts implements Java2DPainter {
 	    y = Math.round(TARGET_R_POS * Math.sin(angle));
 	    targets[i] = new VCircle(x, y, 0, Math.round(W2_6/2), TARGET_COLOR);
 	    targets[i].setDrawBorder(false);
+	    targets[i].setVisible(false);
 	    vsm.addGlyph(targets[i], mSpace);
 	    // lay out targets so that they between each side of the circle (ISO9241-9)
 	    if (i % 2 == 0){angle += Math.PI;}
@@ -389,10 +390,12 @@ public class EvalFitts implements Java2DPainter {
 
     void highlight(int targetIndex, boolean b){
 	if (b){
-	    targets[targetIndex].setColor(HTARGET_COLOR);
+	    targets[targetIndex].setVisible(true);
+// 	    targets[targetIndex].setColor(HTARGET_COLOR);
 	}
 	else {
-	    targets[targetIndex].setColor(TARGET_COLOR);	    
+	    targets[targetIndex].setVisible(false);
+// 	    targets[targetIndex].setColor(TARGET_COLOR);	    
 	}
     }
 
@@ -545,14 +548,6 @@ public class EvalFitts implements Java2DPainter {
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	drawVisibilityPadding(g2d, viewWidth, viewHeight);
-    }
-
-    void drawVisibilityPadding(Graphics2D g2d, int viewWidth, int viewHeight){
-	g2d.setColor(PADDING_COLOR);
-	g2d.fillRect(0, 0, viewWidth, vispad[1]);
-	g2d.fillRect(0, vispad[1], vispad[0], viewHeight-vispad[1]-vispad[3]-1);
-	g2d.fillRect(viewWidth-vispad[2], vispad[1], vispad[2], viewHeight-vispad[1]-vispad[3]-1);
-	g2d.fillRect(0, viewHeight-vispad[3]-1, viewWidth, vispad[3]+1);
 	if (instructions != null){
 	    g2d.setColor(INSTRUCTIONS_COLOR);
 	    g2d.drawString(instructions, vispad[0], viewHeight-vispad[3]/2);
@@ -567,6 +562,14 @@ public class EvalFitts implements Java2DPainter {
 	    g2d.setColor(START_BUTTON_COLOR);
 	    g2d.fillRect(viewWidth/2-10, viewHeight/2-10, 20, 20);
 	}
+    }
+
+    void drawVisibilityPadding(Graphics2D g2d, int viewWidth, int viewHeight){
+	g2d.setColor(PADDING_COLOR);
+	g2d.fillRect(0, 0, viewWidth, vispad[1]);
+	g2d.fillRect(0, vispad[1], vispad[0], viewHeight-vispad[1]-vispad[3]-1);
+	g2d.fillRect(viewWidth-vispad[2], vispad[1], vispad[2], viewHeight-vispad[1]-vispad[3]-1);
+	g2d.fillRect(0, viewHeight-vispad[3]-1, viewWidth, vispad[3]+1);
     }
 
     void exit(){
