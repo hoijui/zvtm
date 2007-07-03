@@ -36,7 +36,15 @@ class IDSequence {
 	Ws = new long[MMs.length];
 	IDs = new double[MMs.length];
 	for (int i=0;i<Ws.length;i++){
-	    if (MMs[i] == 6){
+	    if (MMs[i] == 2){
+		Ws[i] = EvalFitts.W2_2;
+		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_2-EvalFitts.W2_2))) + 1) / Math.log(2);
+	    }
+	    else if (MMs[i] == 4){
+		Ws[i] = EvalFitts.W2_4;
+		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_4-EvalFitts.W2_10))) + 1) / Math.log(2);
+	    }
+	    else if (MMs[i] == 6){
 		Ws[i] = EvalFitts.W2_6;
 		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_6-EvalFitts.W2_6))) + 1) / Math.log(2);
 	    }

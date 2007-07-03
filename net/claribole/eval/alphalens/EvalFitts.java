@@ -63,9 +63,13 @@ public class EvalFitts implements Java2DPainter {
     FittsEventHandler eh;
 
     static double D = 800;
+    static double W1_2 = 2 * EvalFitts.LENS_INNER_RADIUS / 2.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static double W1_4 = 2 * EvalFitts.LENS_INNER_RADIUS / 4.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_6 = 2 * EvalFitts.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_10 = 2 * EvalFitts.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_14 = 2 * EvalFitts.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static long W2_2 = 40;
+    static long W2_4 = 40;
     static long W2_6 = 40;
     static long W2_10 = 40;
     static long W2_14 = 40;
