@@ -477,6 +477,12 @@ public class EvalFitts implements Java2DPainter {
 	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    lens.setOuterRadiusColor(LENS_BOUNDARY_COLOR);
+	    if (magFactor == 2.0f){
+		((DGaussianLens)lens).setCutoffFrequencyParameters(0.4, 0.01);
+	    }
+	    else if (magFactor == 4.0f){
+		((DGaussianLens)lens).setCutoffFrequencyParameters(0.3, 0.01);
+	    }
 	    break;
 	}
 	}
