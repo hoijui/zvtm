@@ -156,6 +156,11 @@ public class DInverseCosineLens extends FSInverseCosineLens implements TemporalL
 	owningView.parent.repaintNow();
     }
 
+    public void setCutoffFrequencyParameters(double a, double b){
+	cutoffParamA = a;
+	cutoffParamB = b;
+    }
+
     public void setNoUpdateWhenMouseStill(boolean b){
 	mouseStillUpdater.setEnabled(!b);
     }

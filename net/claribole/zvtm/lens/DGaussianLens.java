@@ -157,6 +157,11 @@ public class DGaussianLens extends FSGaussianLens implements TemporalLens {
 	owningView.parent.repaintNow();
     }
 
+    public void setCutoffFrequencyParameters(double a, double b){
+	cutoffParamA = a;
+	cutoffParamB = b;
+    }
+
     public void setNoUpdateWhenMouseStill(boolean b){
 	mouseStillUpdater.setEnabled(!b);
     }
