@@ -124,7 +124,7 @@ public class TFadingLens extends TLens implements TemporalLens {
     void initTimer(){
 	timer = new Timer();
 	mouseStillUpdater = new TTrailingTimer(this);
-	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
+	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 20);
     }
 
     /**
