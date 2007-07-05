@@ -21,6 +21,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.glyphs.Glyph;
 
 class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
@@ -173,13 +174,30 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
 	    }
 	}
+	else {
+	    Camera c = application.demoCamera;
+	    float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	    if (wheelDirection == WHEEL_UP){
+		c.altitudeOffset(-a*5);
+		cameraMoved();
+		application.vsm.repaintNow();
+	    }
+	    else {//wheelDirection == WHEEL_DOWN
+		c.altitudeOffset(a*5);
+		cameraMoved();
+		application.vsm.repaintNow();
+	    }
+	}
     }
 
     public void enterGlyph(Glyph g){}
 
     public void exitGlyph(Glyph g){}
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+	if (c == '+'){application.showGridLevel(application.currentLevel+1);}
+	else if (c == '-'){application.showGridLevel(application.currentLevel-1);}
+    }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

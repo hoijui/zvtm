@@ -21,6 +21,7 @@ import javax.swing.text.Style;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.lens.*;
+import com.xerox.VTM.glyphs.ZSegment;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
@@ -164,10 +165,25 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     static final float START_ALTITUDE = 10000;
     static final float FLOOR_ALTITUDE = 100.0f;
 
-    ZLWorldDemo(){
+
+    /* GRID */
+    ZSegment[][] hGridLevels = new ZSegment[GRID_DEPTH+1][];
+    ZSegment[][] vGridLevels = new ZSegment[GRID_DEPTH+1][];
+    Vector tmpHGrid;
+    Vector tmpVGrid;
+    static final Color GRID_COLOR = new Color(156,53,53);
+    static final int GRID_DEPTH = 8;
+    int currentLevel = -1;
+
+
+    ZLWorldDemo(boolean showGrid){
 	vsm = new VirtualSpaceManager();
 // 	vsm.setDebug(true);
 	init();
+	if (showGrid){
+	    buildGrid();
+	}
+	System.gc();
     }
 
     public void init(){
@@ -191,7 +207,6 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	demoCamera.setAltitude(START_ALTITUDE);
 	ewmm = new ZLWorldTaskMapManager(this, vsm, mainVS, demoCamera, demoView);
 	ewmm.initMap();
-	System.gc();
     }
 
     void windowLayout(){
@@ -206,6 +221,135 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
+
+    void buildGrid(){
+	// frame
+	ZSegment s = new ZSegment(-HALF_MAP_WIDTH, 0, 0, 0, HALF_MAP_HEIGHT, GRID_COLOR);
+	vsm.addGlyph(s, mainVSname);
+	s = new ZSegment(HALF_MAP_WIDTH, 0, 0, 0, HALF_MAP_HEIGHT, GRID_COLOR);
+	vsm.addGlyph(s, mainVSname);
+	s = new ZSegment(0, -HALF_MAP_HEIGHT, 0, HALF_MAP_WIDTH, 0, GRID_COLOR);
+	vsm.addGlyph(s, mainVSname);
+	s = new ZSegment(0, HALF_MAP_HEIGHT, 0, HALF_MAP_WIDTH, 0, GRID_COLOR);
+	vsm.addGlyph(s, mainVSname);
+	// grid (built recursively, max. rec depth control by GRID_DEPTH)
+	tmpHGrid = new Vector();
+	tmpVGrid = new Vector();
+	buildHorizontalGridLevel(-HALF_MAP_HEIGHT, HALF_MAP_HEIGHT, 0);
+	buildVerticalGridLevel(-HALF_MAP_WIDTH, HALF_MAP_WIDTH, 0);
+	storeGrid();
+	showGridLevel(1);
+    }
+
+    void buildHorizontalGridLevel(long c1, long c2, int depth){
+	long c = (c1+c2)/2;
+	ZSegment s = new ZSegment(0, c, 0, HALF_MAP_WIDTH, 0, GRID_COLOR);
+	storeSegmentInHGrid(s, depth);
+	vsm.addGlyph(s, mainVSname);
+	s.setVisible(false);
+	if (depth < GRID_DEPTH){
+	    buildHorizontalGridLevel(c1, c, depth+1);
+	    buildHorizontalGridLevel(c, c2, depth+1);
+	}
+    }
+
+    void buildVerticalGridLevel(long c1, long c2, int depth){
+	long c = (c1+c2)/2;
+	ZSegment s = new ZSegment(c, 0, 0, 0, HALF_MAP_HEIGHT, GRID_COLOR);
+	storeSegmentInVGrid(s, depth);
+	vsm.addGlyph(s, mainVSname);
+	s.setVisible(false);
+	if (depth < GRID_DEPTH+1){// not GRID_DEPTH because we want to maintain the same spacing between parallels
+	    buildVerticalGridLevel(c1, c, depth+1);// and meridians and map is twice as large as it is high
+	    buildVerticalGridLevel(c, c2, depth+1);
+	}
+    }
+
+    void storeSegmentInHGrid(ZSegment s, int depth){
+	if (tmpHGrid.size() > depth){
+	    Vector v = (Vector)tmpHGrid.elementAt(depth);
+	    v.add(s);
+	}
+	else {
+	    Vector v = new Vector();
+	    v.add(s);
+	    tmpHGrid.add(v);
+	}
+    }
+
+    void storeSegmentInVGrid(ZSegment s, int depth){
+	if (tmpVGrid.size() > depth){
+	    Vector v = (Vector)tmpVGrid.elementAt(depth);
+	    v.add(s);
+	}
+	else {
+	    Vector v = new Vector();
+	    v.add(s);
+	    tmpVGrid.add(v);
+	}
+    }
+
+    void storeGrid(){
+	int levelSize;
+	Vector v;
+	for (int i=0;i<tmpHGrid.size();i++){
+	    v = (Vector)tmpHGrid.elementAt(i);
+	    levelSize = v.size();
+	    hGridLevels[i] = new ZSegment[levelSize];
+	    for (int j=0;j<v.size();j++){
+		hGridLevels[i][j] = (ZSegment)v.elementAt(j);
+	    }
+	}
+	/* levels 0 and 1 are merged in a single level to keep a 1:1 ratio
+	   between parallels and meridians */
+	for (int i=1;i<tmpVGrid.size();i++){
+	    v = (Vector)tmpVGrid.elementAt(i);
+	    levelSize = v.size();
+	    vGridLevels[i-1] = new ZSegment[levelSize];
+	    for (int j=0;j<v.size();j++){
+		vGridLevels[i-1][j] = (ZSegment)v.elementAt(j);
+	    }
+	}
+	/* putting top-level meridian as first element of level just below,
+	   which then becomes the top level for meridians*/ 
+	ZSegment[] level0 = new ZSegment[vGridLevels[0].length+1];
+	System.arraycopy(vGridLevels[0], 0, level0, 1, vGridLevels[0].length);
+	level0[0] = (ZSegment)((Vector)tmpVGrid.elementAt(0)).elementAt(0);
+	vGridLevels[0] = level0;
+    }
+
+    /*incremental display of the grid*/
+    void showGridLevel(int level){
+	if (level > GRID_DEPTH || level < -1 || level == currentLevel){
+	    return;
+	}
+	if (level < currentLevel){
+	    for (int i=level+1;i<=currentLevel;i++){
+		for (int j=0;j<hGridLevels[i].length;j++){
+		    hGridLevels[i][j].setVisible(false);
+		}
+	    }
+	    for (int i=level+1;i<=currentLevel;i++){
+		for (int j=0;j<vGridLevels[i].length;j++){
+		    vGridLevels[i][j].setVisible(false);
+		}
+	    }
+	}
+	else if (level > currentLevel){
+	    for (int i=currentLevel+1;i<=level;i++){
+		for (int j=0;j<hGridLevels[i].length;j++){
+		    hGridLevels[i][j].setVisible(true);
+		}
+	    }
+	    for (int i=currentLevel+1;i<=level;i++){
+		for (int j=0;j<vGridLevels[i].length;j++){
+		    vGridLevels[i][j].setVisible(true);
+		}
+	    }
+	}
+	currentLevel = level;
+    }
+
 
     void setLens(int t){
 	eh.lensType = t;
@@ -599,7 +743,8 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
     }
 
     public static void main(String[] args){
-	new ZLWorldDemo();
+	boolean showGrid = (args.length > 0) ? (new Boolean(args[0])).booleanValue() : false;
+	new ZLWorldDemo(showGrid);
     }
     
 }
