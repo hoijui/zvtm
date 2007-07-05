@@ -23,7 +23,9 @@
 
 package com.xerox.VTM.engine;
 
-import java.awt.Color;
+import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.ViewEventHandler;
+
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -33,8 +35,6 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
-
-import net.claribole.zvtm.engine.Java2DPainter;
 
 /**
  * Each view runs in its own thread - uses double buffering - for use in JApplet only
@@ -70,6 +70,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 	for (int nbcam=0;nbcam<cameras.size();nbcam++){
 	    cams[nbcam]=(Camera)(cameras.get(nbcam));
 	}
+		evHs = new ViewEventHandler[cams.length];
 	//init other stuff
 	setBackground(backColor);
 	this.addMouseListener(this);
