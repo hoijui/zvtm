@@ -23,6 +23,12 @@
 
 package com.xerox.VTM.engine;
 
+import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.engine.RepaintListener;
+import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.lens.Lens;
+
+import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -41,18 +47,9 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-
-import javax.swing.JPanel;
-
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.RepaintListener;
-
-import com.xerox.VTM.glyphs.Glyph;
 
 /**
  * Each view runs in its own thread - uses double buffering
@@ -208,7 +205,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	evHs[layer] = eh;
     }
 
-    /* -------------------- PORTALS ------------------- */
+	public ViewEventHandler[] getEventHandlers(){
+		return evHs;
+	}
+
+	/* -------------------- PORTALS ------------------- */
 
     // if = 0, not inside any portal,
     // if = N > 0, inside N portals
@@ -708,8 +709,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     }
     
     public void componentResized(ComponentEvent e){
-	ResizeTask task = new ResizeTask(++currentTaskID);
-	timer.schedule(task, resizeDelay);
+		ResizeTask task = new ResizeTask(++currentTaskID);
+		timer.schedule(task, resizeDelay);
     }
     
     public void componentMoved(ComponentEvent e){}
