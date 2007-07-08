@@ -39,7 +39,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 
     /* max dimensions of ZVTM view */
     static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 1024;
+    static final int VIEW_MAX_H = 860;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
@@ -486,6 +486,8 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
     }
 
+    float F_V = 1.0f;
+
     Lens getLensDefinition(int x, int y){
 	Lens res = null;
 	switch (lensFamily){
@@ -501,6 +503,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
 	case L1_Manhattan:{
 	    res = new L1FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
 	    tLens = null;
 	    break;
 	}
@@ -521,6 +524,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
 	case L2_Manhattan:{
 	    res = new FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
 	    tLens = null;
 	    break;
 	}
@@ -541,6 +545,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
 	case LInf_Manhattan:{
 	    res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
 	    tLens = null;
 	    break;
 	}
@@ -585,7 +590,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    break;
 	}
 	case L2_Fading:{
-	    tLens = new TFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    tLens = new TFadingLens(1.0f, 0.0f, F_V, LENS_R1, x - panelWidth/2, y - panelHeight/2);
 	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
 	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
 	    res = (Lens)tLens;
@@ -610,6 +615,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	}
 	case L3_Manhattan:{
 	    res = new L3FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
 	    tLens = null;
 	    break;
 	}

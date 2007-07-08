@@ -128,6 +128,7 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+	System.err.println(v.getMouse().vx+" "+v.getMouse().vy);
 	if ((jpx-ZLWorldDemo.LENS_R1) < 0){
 	    jpx = ZLWorldDemo.LENS_R1;
 	    cursorNearBorder = true;
@@ -197,6 +198,8 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	if (c == '+'){application.showGridLevel(application.currentLevel+1);}
 	else if (c == '-'){application.showGridLevel(application.currentLevel-1);}
+	else if (c == '8'){application.F_V -= 0.1f;}
+	else if (c == '9'){application.F_V += 0.1f;}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

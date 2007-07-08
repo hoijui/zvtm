@@ -177,6 +177,7 @@ public class ZLWorldTaskMapManager implements Runnable {
     void switchAdaptMaps(){
 	adaptMaps = !adaptMaps;
 	if (ZLWorldTask.SHOW_CONSOLE){application.writeOnConsole("Adapt maps: "+((adaptMaps) ? "On\n" : "Off\n"));}
+	else {System.out.println("Adapt maps: "+((adaptMaps) ? "On" : "Off"));}
     }
 
     /*called by thread on a regular basis ; pops request from queue in a FIFO manner*/
