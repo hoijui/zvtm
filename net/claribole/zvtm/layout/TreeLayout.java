@@ -142,7 +142,8 @@ public class TreeLayout {
 	/**
 	 * Layout all elements of the LTree. This method updates position of each LNode instance in LTree tree.
 	 * @param cameraIndex index of active camera. Used to retrieve bounds of VText and VBText instances.
-	 * @see LNode, LTree
+	 * @see LNode
+	 * @see LTree
 	 */
 	public void doLayout(int cameraIndex) {
 		camIndex = cameraIndex;
@@ -163,7 +164,7 @@ public class TreeLayout {
 		determineDepths();
 
 		// do second pass - assign layout positions
-		secondWalk(root, null, -rp.prelim, 0);
+		secondWalk(root, -rp.prelim, 0);
 
 		tree.getRoot().updateNode(getOrientation(), camIndex);
 	}
@@ -308,22 +309,22 @@ public class TreeLayout {
 		}
 	}
 
-	private void secondWalk(LNode n, LNode p, double m, int depth) {
+	private void secondWalk(LNode n, double m, int depth) {
 		Params np = getParams(n);
-		setBreadth(n, p, np.prelim + m);
-		setDepth(n, p, depths[depth]);
+		setBreadth(n, np.prelim + m);
+		setDepth(n, depths[depth]);
 
 		if (n.isExpanded()) {
 			depth += 1;
 			for (LNode c = n.getFirstChild(); c != null; c = c.getNextSibling()) {
-				secondWalk(c, n, m + np.mod, depth);
+				secondWalk(c, m + np.mod, depth);
 			}
 		}
 
 		np.clear();
 	}
 
-	private void setBreadth(LNode n, LNode p, double b) {
+	private void setBreadth(LNode n, double b) {
 		switch (orientation) {
 		case TreeOrientation.LEFT_RIGHT:
 		case TreeOrientation.RIGHT_LEFT:
@@ -338,7 +339,7 @@ public class TreeLayout {
 		}
 	}
 
-	private void setDepth(LNode n, LNode p, double d) {
+	private void setDepth(LNode n, double d) {
 		switch (orientation) {
 		case TreeOrientation.LEFT_RIGHT:
 			setX(n, anchorX + d);

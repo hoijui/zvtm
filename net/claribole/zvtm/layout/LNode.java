@@ -189,8 +189,8 @@ public class LNode {
 
 	/**
 	 * Get user object that was set for this key using method setClientProperty(Object key, Object value).
-	 * @param key that
-	 * @return
+	 * @param key key to retrieve value
+	 * @return corresponding value
 	 */
 	public Object getClientProperty(Object key) {
 		if (clientProperties.containsKey(key)) {
@@ -201,8 +201,8 @@ public class LNode {
 
 	/**
 	 * Set any key-value pair to the LNode instance.
-	 * @param key
-	 * @param value
+	 * @param key key for the value
+	 * @param value any user object
 	 */
 	public void setClientProperty(Object key, Object value) {
 		if (key != null && value != null) {
@@ -314,8 +314,8 @@ public class LNode {
 	/**
 	 * This method can be called after the tree was layouted with layout algorithm
 	 * to update position of this node and all children.
-	 * @param treeOrientation
-	 * @param camIndex
+	 * @param treeOrientation One of the TreeOrientation constants.
+	 * @param camIndex Index of active camera.
 	 */
 	public void updateNode(int treeOrientation, int camIndex) {
 		long textX = 0;
