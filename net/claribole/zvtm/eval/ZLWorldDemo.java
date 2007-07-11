@@ -570,22 +570,22 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 	    break;
 	}
 	case L2_TGaussian:{
-	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L2_TLinear:{
-	    res = new TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new TLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case LInf_TLinear:{
-	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L3_TLinear:{
-	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
