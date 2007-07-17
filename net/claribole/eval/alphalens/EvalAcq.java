@@ -69,12 +69,12 @@ public class EvalAcq implements Java2DPainter {
     static double D = 800;
     static double W1_8 = 2 * EvalAcq.LENS_INNER_RADIUS / 8.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
     static double W1_12 = 2 * EvalAcq.LENS_INNER_RADIUS / 12.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static long W2_8 = 60;
-    static long W2_12 = 60;
+    static long W2_8 = 40;
+    static long W2_12 = 40;
 
     /* lens */
-    static final Color LENS_BOUNDARY_COLOR = Color.RED;
-    static final Color LENS_OBSERVED_REGION_COLOR = Color.RED;
+    static final Color LENS_BOUNDARY_COLOR = Color.WHITE;
+    static final Color LENS_OBSERVED_REGION_COLOR = Color.WHITE;
     float magFactor = 8.0f;
     static final int LENS_INNER_RADIUS = 50;
     static final int LENS_OUTER_RADIUS = 100;
@@ -84,7 +84,7 @@ public class EvalAcq implements Java2DPainter {
     /* cursor */
     static final Color CURSOR_COLOR = Color.BLACK;
 
-    static final Color START_BUTTON_COLOR = Color.RED;
+    static final Color START_BUTTON_COLOR = Color.BLUE;
 
     /* padding for lenses */
     static final int[] vispad = {100, 100, 100, 100};
@@ -100,6 +100,12 @@ public class EvalAcq implements Java2DPainter {
     static int NB_TARGETS_PER_TRIAL = 24;
     VCircleST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcq.D * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
+
+    /* target indicators */
+    static final int INDICATOR_LENGTH = 500;
+    static final int INDICATOR_THICKNESS = 20;
+    static final Color INDICATOR_COLOR = Color.BLUE;
+    VRectangle latIndicatorW, latIndicatorE, longIndicatorN, longIndicatorS;
 
     /* grid color */
     static final Color GRID_COLOR = Color.GRAY;
@@ -187,10 +193,11 @@ public class EvalAcq implements Java2DPainter {
 
     void initScene(){
 	mView.setBackgroundColor(EvalAcq.BACKGROUND_COLOR);
-	vsm.addGlyph(new VImage(-4000,4000,0, (new ImageIcon("images/world/1320.png")).getImage(), 2.0f), mSpace);
-	vsm.addGlyph(new VImage(-4000,-4000,0, (new ImageIcon("images/world/1340.png")).getImage(), 2.0f), mSpace);
-	vsm.addGlyph(new VImage(4000,4000,0, (new ImageIcon("images/world/1410.png")).getImage(), 2.0f), mSpace);
-	vsm.addGlyph(new VImage(4000,-4000,0, (new ImageIcon("images/world/1430.png")).getImage(), 2.0f), mSpace);
+	vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon("images/world/evalacq.png")).getImage(), 2.0f), mSpace);
+// 	vsm.addGlyph(new VImage(-4000, 4000, 0, (new ImageIcon("images/world/1320.png")).getImage(), 2.0f), mSpace);
+// 	vsm.addGlyph(new VImage(-4000, -4000, 0, (new ImageIcon("images/world/1340.png")).getImage(), 2.0f), mSpace);
+// 	vsm.addGlyph(new VImage(4000, 4000, 0, (new ImageIcon("images/world/1410.png")).getImage(), 2.0f), mSpace);
+// 	vsm.addGlyph(new VImage(4000, -4000, 0, (new ImageIcon("images/world/1430.png")).getImage(), 2.0f), mSpace);
 	long x,y;
 	targets = new VCircleST[NB_TARGETS_PER_TRIAL];
 	double angle = 0;
@@ -205,6 +212,18 @@ public class EvalAcq implements Java2DPainter {
 	    if (i % 2 == 0){angle += Math.PI;}
 	    else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
 	}
+	latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR);
+	latIndicatorW.setDrawBorder(false);
+	vsm.addGlyph(latIndicatorW, mSpace);
+	latIndicatorE = new VRectangle(7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR);
+	latIndicatorE.setDrawBorder(false);
+	vsm.addGlyph(latIndicatorE, mSpace);
+	longIndicatorN = new VRectangle(0, 5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR);
+	longIndicatorN.setDrawBorder(false);
+	vsm.addGlyph(longIndicatorN, mSpace);
+	longIndicatorS = new VRectangle(0, -5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR);
+	longIndicatorS.setDrawBorder(false);
+	vsm.addGlyph(longIndicatorS, mSpace);
     }
 
     void loadTrials(){
@@ -383,6 +402,8 @@ public class EvalAcq implements Java2DPainter {
 
     void highlight(int targetIndex, boolean b){
 	if (b){
+	    latIndicatorW.vy = latIndicatorE.vy = targets[targetIndex].vy;
+	    longIndicatorN.vx = longIndicatorS.vx = targets[targetIndex].vx;
 	    targets[targetIndex].setVisible(true);
 // 	    targets[targetIndex].setColor(HTARGET_COLOR);
 	}

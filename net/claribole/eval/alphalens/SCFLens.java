@@ -199,7 +199,8 @@ public class SCFLens extends FSGaussianLens implements TemporalLens {
 	if (getInnerRadiusColor() != null){
 	    int r2 = Math.round(dMM/((float)MM) * LR2);
 	    g2d.setColor(getInnerRadiusColor());
-	    g2d.setComposite(Translucency.acs[(ai+1 < Translucency.acs.length) ? ai+1 : ai]);
+	    if (ai < 5){ai = 5;}
+ 	    g2d.setComposite(Translucency.acs[ai]);
 	    g2d.drawOval(lx+w/2-r2, ly+h/2-r2, 2*r2, 2*r2);
 	}
 	g2d.setComposite(Translucent.acO);
