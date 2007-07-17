@@ -403,11 +403,35 @@ public class EvalAcq implements Java2DPainter {
 	}
     }
 
-    void highlight(int targetIndex, boolean b){
+//     static final int INDICATOR_ANIM_LENGTH = 250;
+    static final int BRIGHT_HIGHLIGHT_TIME = 800;
+    
+    void highlight(final int targetIndex, boolean b){
 	if (b){
 	    latIndicatorW.vy = latIndicatorE.vy = targets[targetIndex].vy;
 	    longIndicatorN.vx = longIndicatorS.vx = targets[targetIndex].vx;
+// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
+// 					      new LongPoint(0, targets[targetIndex].vy-latIndicatorW.vy), latIndicatorW.getID());
+// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
+// 					      new LongPoint(0, targets[targetIndex].vy-latIndicatorE.vy), latIndicatorE.getID());
+// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
+// 					      new LongPoint(targets[targetIndex].vx-longIndicatorN.vx, 0), longIndicatorN.getID());
+// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
+// 					      new LongPoint(targets[targetIndex].vx-longIndicatorS.vx, 0), longIndicatorS.getID());
 	    targets[targetIndex].setVisible(true);
+	    final SwingWorker worker=new SwingWorker(){
+		    public Object construct(){
+			targets[targetIndex].setTranslucencyValue(1.0f);
+			targets[targetIndex].setBorderColor(Color.WHITE);
+			vsm.repaintNow();
+			sleep(BRIGHT_HIGHLIGHT_TIME);
+			targets[targetIndex].setBorderColor(Color.BLACK);
+			targets[targetIndex].setTranslucencyValue(idSeq.TAs[trialCount]);
+			vsm.repaintNow();
+			return null;
+		    }
+		};
+	    worker.start();
 // 	    targets[targetIndex].setColor(HTARGET_COLOR);
 	}
 	else {
