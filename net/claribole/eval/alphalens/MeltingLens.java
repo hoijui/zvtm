@@ -21,8 +21,6 @@ import net.claribole.zvtm.glyphs.Translucency;
 import net.claribole.zvtm.lens.TLinearLens;
 import net.claribole.zvtm.lens.TemporalLens;
 
-/**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
-
 public class MeltingLens extends TLinearLens implements TemporalLens {
 
     double frequency = -1;

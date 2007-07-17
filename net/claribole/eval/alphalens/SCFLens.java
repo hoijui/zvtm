@@ -20,8 +20,6 @@ import net.claribole.zvtm.glyphs.Translucency;
 import net.claribole.zvtm.engine.LowPassFilter;
 import net.claribole.zvtm.lens.*;
 
-/**Profile: gaussian - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
-
 public class SCFLens extends FSGaussianLens implements TemporalLens {
 
     double frequency = -1;

@@ -21,8 +21,6 @@ import net.claribole.zvtm.glyphs.Translucency;
 import net.claribole.zvtm.lens.FSGaussianLens;
 import net.claribole.zvtm.lens.TemporalLens;
 
-/**Profile: gaussian - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
-
 public class DistortionLens extends FSGaussianLens implements TemporalLens {
 
     double frequency = -1;
