@@ -281,6 +281,7 @@ public class EvalAcq implements Java2DPainter {
 		      "SID" + OUTPUT_CSV_SEP +
 		      "Technique" + OUTPUT_CSV_SEP +
 		      "MM" + OUTPUT_CSV_SEP +
+		      "Alpha" + OUTPUT_CSV_SEP +
 		      "Block" + OUTPUT_CSV_SEP +
 		      "Trial" + OUTPUT_CSV_SEP +
 		      "ID" + OUTPUT_CSV_SEP +
@@ -420,6 +421,7 @@ public class EvalAcq implements Java2DPainter {
 			  subjectID + OUTPUT_CSV_SEP +
 			  TECHNIQUE_NAMES_ABBR[technique] + OUTPUT_CSV_SEP +
 			  magFactor + OUTPUT_CSV_SEP +
+			  targetAlphaStr + OUTPUT_CSV_SEP +
 			  blockNumber + OUTPUT_CSV_SEP +
 			  trialCount + OUTPUT_CSV_SEP +
 			  idSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
