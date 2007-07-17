@@ -193,11 +193,11 @@ public class EvalAcq implements Java2DPainter {
 
     void initScene(){
 	mView.setBackgroundColor(EvalAcq.BACKGROUND_COLOR);
-	vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon("images/world/evalacq.png")).getImage(), 2.0f), mSpace);
-// 	vsm.addGlyph(new VImage(-4000, 4000, 0, (new ImageIcon("images/world/1320.png")).getImage(), 2.0f), mSpace);
-// 	vsm.addGlyph(new VImage(-4000, -4000, 0, (new ImageIcon("images/world/1340.png")).getImage(), 2.0f), mSpace);
-// 	vsm.addGlyph(new VImage(4000, 4000, 0, (new ImageIcon("images/world/1410.png")).getImage(), 2.0f), mSpace);
-// 	vsm.addGlyph(new VImage(4000, -4000, 0, (new ImageIcon("images/world/1430.png")).getImage(), 2.0f), mSpace);
+// 	vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon("images/world/evalacq.png")).getImage(), 2.0f), mSpace);
+ 	vsm.addGlyph(new VImage(-3500, 2500, 0, (new ImageIcon("images/world/evalacqNW.png")).getImage(), 2.0f), mSpace);
+ 	vsm.addGlyph(new VImage(-3500, -2500, 0, (new ImageIcon("images/world/evalacqSW.png")).getImage(), 2.0f), mSpace);
+ 	vsm.addGlyph(new VImage(3500, 2500, 0, (new ImageIcon("images/world/evalacqNE.png")).getImage(), 2.0f), mSpace);
+ 	vsm.addGlyph(new VImage(3500, -2500, 0, (new ImageIcon("images/world/evalacqSE.png")).getImage(), 2.0f), mSpace);
 	long x,y;
 	targets = new VCircleST[NB_TARGETS_PER_TRIAL];
 	double angle = 0;
