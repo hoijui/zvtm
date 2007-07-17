@@ -42,9 +42,6 @@ public class EvalAcq implements Java2DPainter {
     static final String[] TECHNIQUE_NAMES_ABBR = {"HL", "DL", "FL", "ML", "SC"}; 
     short technique = TECHNIQUE_FL;
 
-    float targetAlpha = 1.0f;
-    String targetAlphaStr = "1.0";
-
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -101,6 +98,11 @@ public class EvalAcq implements Java2DPainter {
     VCircleST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcq.D * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
 
+    static final float OBVIOUS_TARGET = 1.0f;
+    static final float FURTIVE_TARGET = 0.5f;
+    float targetAlpha = OBVIOUS_TARGET;
+    String targetAlphaStr = "1.0";
+
     /* target indicators */
     static final int INDICATOR_LENGTH = 500;
     static final int INDICATOR_THICKNESS = 20;
@@ -144,11 +146,9 @@ public class EvalAcq implements Java2DPainter {
 
     static final int ERROR_DELAY = 500;
     
-    public EvalAcq(short t, String a, String f){
+    public EvalAcq(short t, String f){
 	initGUI();
 	this.technique = t;
-	this.targetAlphaStr = a;
-	this.targetAlpha = Float.parseFloat(this.targetAlphaStr);
 	this.TRIAL_FILE_NAME = f;
 	mViewName = TECHNIQUE_NAMES[this.technique];
 	eh = new AcqEventHandler(this);
@@ -356,8 +356,10 @@ public class EvalAcq implements Java2DPainter {
 	for (int i=0;i<nbErrors.length;i++){
 	    nbErrors[i] = 0;
 	}
+	setTargetVisibility(idSeq.TAs[trialCount]);
 	for (int i=0;i<targets.length;i++){
 	    targets[i].sizeTo(idSeq.Ws[trialCount]/2.0f);
+	    targets[i].setTranslucencyValue(targetAlpha);
 	}
 	highlight(hitCount, true);
 	magFactor = idSeq.MMs[trialCount];
@@ -453,6 +455,11 @@ public class EvalAcq implements Java2DPainter {
 	    bwc.flush();
 	}
 	catch (IOException ex){ex.printStackTrace();}
+    }
+
+    void setTargetVisibility(float a){
+	targetAlpha = a;
+	targetAlphaStr = Float.toString(targetAlpha);
     }
     
     /* -------------- lenses ----------------- */
@@ -600,15 +607,15 @@ public class EvalAcq implements Java2DPainter {
 
     public static void main(String[] args){
 	try {
-	    if (args.length >= 5){
-		EvalAcq.VIEW_MAX_W = Integer.parseInt(args[4]);
-		EvalAcq.VIEW_MAX_H = Integer.parseInt(args[5]);
+	    if (args.length >= 4){
+		EvalAcq.VIEW_MAX_W = Integer.parseInt(args[3]);
+		EvalAcq.VIEW_MAX_H = Integer.parseInt(args[4]);
 	    }
-	    new EvalAcq(Short.parseShort(args[0]), args[1], args[2]);
+	    new EvalAcq(Short.parseShort(args[0]), args[1]);
 	}
 	catch (Exception ex){
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
-	    new EvalAcq(EvalAcq.TECHNIQUE_FL, "1.0", "fitts.csv");
+	    new EvalAcq(EvalAcq.TECHNIQUE_FL, "acqT.csv");
 	}
     }
 
