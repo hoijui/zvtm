@@ -56,6 +56,14 @@ class IDSequence {
 		Ws[i] = EvalFitts.W2_14;
 		IDs[i] = Math.log(EvalFitts.D * (Camera.DEFAULT_FOCAL+EvalFitts.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalFitts.W1_14-EvalFitts.W2_14))) + 1) / Math.log(2);
 	    }
+	    else if (MMs[i] == 8){
+		Ws[i] = EvalAcq.W2_8;
+		IDs[i] = Math.log(EvalAcq.D * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalAcq.W1_8-EvalAcq.W2_8))) + 1) / Math.log(2);
+	    }
+	    else if (MMs[i] == 12){
+		Ws[i] = EvalAcq.W2_12;
+		IDs[i] = Math.log(EvalAcq.D * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL/((double)(Math.abs(EvalAcq.W1_12-EvalAcq.W2_12))) + 1) / Math.log(2);
+	    }
 	    else {
 		System.err.println("Error: MM value not supported: "+MMs[i]);
 	    }

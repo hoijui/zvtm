@@ -67,16 +67,10 @@ public class EvalAcq implements Java2DPainter {
     AcqEventHandler eh;
 
     static double D = 800;
-    static double W1_2 = 2 * EvalAcq.LENS_INNER_RADIUS / 2.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static double W1_4 = 2 * EvalAcq.LENS_INNER_RADIUS / 4.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static double W1_6 = 2 * EvalAcq.LENS_INNER_RADIUS / 6.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static double W1_10 = 2 * EvalAcq.LENS_INNER_RADIUS / 10.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static double W1_14 = 2 * EvalAcq.LENS_INNER_RADIUS / 14.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static long W2_2 = 40;
-    static long W2_4 = 40;
-    static long W2_6 = 40;
-    static long W2_10 = 40;
-    static long W2_14 = 40;
+    static double W1_8 = 2 * EvalAcq.LENS_INNER_RADIUS / 8.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static double W1_12 = 2 * EvalAcq.LENS_INNER_RADIUS / 12.0 * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL;
+    static long W2_8 = 60;
+    static long W2_12 = 60;
 
     /* lens */
     static final Color LENS_BOUNDARY_COLOR = Color.RED;
@@ -88,7 +82,7 @@ public class EvalAcq implements Java2DPainter {
     TemporalLens tlens;
 
     /* cursor */
-    static final Color CURSOR_COLOR = Color.WHITE;
+    static final Color CURSOR_COLOR = Color.BLACK;
 
     static final Color START_BUTTON_COLOR = Color.RED;
 
@@ -102,7 +96,7 @@ public class EvalAcq implements Java2DPainter {
 
     /* target */
     static final Color HTARGET_COLOR = Color.RED;
-    static final Color TARGET_COLOR = Color.YELLOW;
+    static final Color TARGET_COLOR = Color.RED;
     static int NB_TARGETS_PER_TRIAL = 24;
     VCircleST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcq.D * (Camera.DEFAULT_FOCAL+EvalAcq.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
@@ -193,20 +187,17 @@ public class EvalAcq implements Java2DPainter {
 
     void initScene(){
 	mView.setBackgroundColor(EvalAcq.BACKGROUND_COLOR);
-
-	vsm.addGlyph(new VImage(-2100,2000,0, (new ImageIcon("images/world/1320.png")).getImage()), mSpace);
-	vsm.addGlyph(new VImage(-2000,-2000,0, (new ImageIcon("images/world/1340.png")).getImage()), mSpace);
-	vsm.addGlyph(new VImage(2000,2000,0, (new ImageIcon("images/world/1410.png")).getImage()), mSpace);
-	vsm.addGlyph(new VImage(2000,-2000,0, (new ImageIcon("images/world/1430.png")).getImage()), mSpace);
-
-
+	vsm.addGlyph(new VImage(-4000,4000,0, (new ImageIcon("images/world/1320.png")).getImage(), 2.0f), mSpace);
+	vsm.addGlyph(new VImage(-4000,-4000,0, (new ImageIcon("images/world/1340.png")).getImage(), 2.0f), mSpace);
+	vsm.addGlyph(new VImage(4000,4000,0, (new ImageIcon("images/world/1410.png")).getImage(), 2.0f), mSpace);
+	vsm.addGlyph(new VImage(4000,-4000,0, (new ImageIcon("images/world/1430.png")).getImage(), 2.0f), mSpace);
 	long x,y;
 	targets = new VCircleST[NB_TARGETS_PER_TRIAL];
 	double angle = 0;
 	for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
 	    x = Math.round(TARGET_R_POS * Math.cos(angle));
 	    y = Math.round(TARGET_R_POS * Math.sin(angle));
-	    targets[i] = new VCircleST(x, y, 0, Math.round(W2_6/2), TARGET_COLOR, Color.BLACK, targetAlpha);
+	    targets[i] = new VCircleST(x, y, 0, Math.round(W2_8/2), TARGET_COLOR, Color.BLACK, targetAlpha);
 	    targets[i].setDrawBorder(true);
 	    targets[i].setVisible(false);
 	    vsm.addGlyph(targets[i], mSpace);
@@ -361,7 +352,7 @@ public class EvalAcq implements Java2DPainter {
 	// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
 	if (warning
 	    || (technique==TECHNIQUE_FL && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
-	    || (technique==TECHNIQUE_SCF && ((DGaussianLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
+	    || (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 	Glyph target = targets[hitCount];
 	lens.getVisibleRegionInFocus(mCamera, rif);
 	if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
@@ -476,10 +467,10 @@ public class EvalAcq implements Java2DPainter {
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    lens.setOuterRadiusColor(LENS_BOUNDARY_COLOR);
 	    if (magFactor == 2.0f){
-		((DGaussianLens)lens).setCutoffFrequencyParameters(0.4, 0.01);
+		((SCFLens)lens).setCutoffFrequencyParameters(0.4, 0.01);
 	    }
 	    else if (magFactor == 4.0f){
-		((DGaussianLens)lens).setCutoffFrequencyParameters(0.3, 0.01);
+		((SCFLens)lens).setCutoffFrequencyParameters(0.3, 0.01);
 	    }
 	    break;
 	}
