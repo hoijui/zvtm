@@ -62,23 +62,23 @@ class FittsEventHandler implements ViewEventHandler, ComponentListener {
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
 	cjpx = jpx;
 	cjpy = jpy;
-	if ((jpx-EvalPointing.LENS_OUTER_RADIUS) < 0){
-	    jpx = EvalPointing.LENS_OUTER_RADIUS;
+	if ((jpx-EvalFitts.LENS_OUTER_RADIUS) < 0){
+	    jpx = EvalFitts.LENS_OUTER_RADIUS;
 	    cursorNearBorder = true;
 	}
-	else if ((jpx+EvalPointing.LENS_OUTER_RADIUS) > application.panelWidth){
-	    jpx = application.panelWidth - EvalPointing.LENS_OUTER_RADIUS;
+	else if ((jpx+EvalFitts.LENS_OUTER_RADIUS) > application.panelWidth){
+	    jpx = application.panelWidth - EvalFitts.LENS_OUTER_RADIUS;
 	    cursorNearBorder = true;
 	}
 	else {
 	    cursorNearBorder = false;
 	}
-	if ((jpy-EvalPointing.LENS_OUTER_RADIUS) < 0){
-	    jpy = EvalPointing.LENS_OUTER_RADIUS;
+	if ((jpy-EvalFitts.LENS_OUTER_RADIUS) < 0){
+	    jpy = EvalFitts.LENS_OUTER_RADIUS;
 	    cursorNearBorder = true;
 	}
-	else if ((jpy+EvalPointing.LENS_OUTER_RADIUS) > application.panelHeight){
-	    jpy = application.panelHeight - EvalPointing.LENS_OUTER_RADIUS;
+	else if ((jpy+EvalFitts.LENS_OUTER_RADIUS) > application.panelHeight){
+	    jpy = application.panelHeight - EvalFitts.LENS_OUTER_RADIUS;
 	    cursorNearBorder = true;
 	}
 	if (application.lens != null){
