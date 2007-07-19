@@ -143,6 +143,7 @@ public class EvalAcq implements Java2DPainter {
 
     int[] nbErrors = new int[NB_TARGETS_PER_TRIAL];
     long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
+    long[] ctimeToTarget = new long[NB_TARGETS_PER_TRIAL];
     int hitCount = 0;
 
     static final int ERROR_DELAY = 500;
@@ -288,6 +289,7 @@ public class EvalAcq implements Java2DPainter {
 		      "ID" + OUTPUT_CSV_SEP +
 		      "Hit" + OUTPUT_CSV_SEP +
 		      "Time" + OUTPUT_CSV_SEP +
+		      "CTime" + OUTPUT_CSV_SEP +
 		      "Errors");
 	    bwt.newLine();
 	    bwt.flush();
@@ -392,6 +394,7 @@ public class EvalAcq implements Java2DPainter {
     void hitTarget(){
 	hitTime = System.currentTimeMillis();
 	timeToTarget[hitCount] = hitTime - lastHitTime;
+	ctimeToTarget[hitCount] = hitTime - startTime;
 	lastHitTime = hitTime;
 	highlight(hitCount, false);
 	hitCount++;
@@ -454,6 +457,7 @@ public class EvalAcq implements Java2DPainter {
 			  idSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
 			  i + OUTPUT_CSV_SEP +  // hit index
 			  timeToTarget[i] + OUTPUT_CSV_SEP +
+			  ctimeToTarget[i] + OUTPUT_CSV_SEP +
 			  nbErrors[i]);
 		bwt.newLine();
 	    }
