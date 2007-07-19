@@ -9,6 +9,13 @@
 
 package net.claribole.zvtm.glyphs;
 
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.Translucent;
+import com.xerox.VTM.glyphs.VPath;
+import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,14 +30,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.util.Arrays;
 
-import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
-
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VPath;
-import com.xerox.VTM.glyphs.Translucent;
-
 /**
  * Dynamic Path, made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. All of these can be dynamically modified and animated through AnimManager's createPathAnimation method.
  *@author Emmanuel Pietriga, Boris Trofimov
@@ -42,7 +41,7 @@ import com.xerox.VTM.glyphs.Translucent;
  *@see com.xerox.VTM.glyphs.VSegment
  *@see com.xerox.VTM.glyphs.VSegmentST
  *@see com.xerox.VTM.engine.VCursor#intersectsVPath(VPath p)
- *@see com.xerox.VTM.engine.AnimManager#createPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa)
+ *@see com.xerox.VTM.engine.AnimManager#createPathAnimation(long duration, short type, LongPoint[] data, Long gID,net.claribole.zvtm.engine.PostAnimationActionpaa)
  */
 
 public class DPath extends Glyph {
@@ -391,25 +390,25 @@ public class DPath extends Glyph {
     public void editElement(int index, long sx, long sy, long ex, long ey, LongPoint[] ctrlPoints, boolean abs){
 	if (index > -1 && index < elements.length && elements[index] != null){
 	    if (index > 0){
-		if (abs){
-		    elements[index-1].x = sx;
-		    elements[index-1].y = sy;	            
+			if (abs){
+				elements[index-1].x = sx;
+				elements[index-1].y = sy;
+			}
+			else {
+				elements[index-1].x += sx;
+				elements[index-1].y += sy;
+			}
 		}
-		else {
-		    elements[index-1].x += sx;
-		    elements[index-1].y += sy;
-		}		    
-	    }
-            else{
-        	if (abs){
-        	    this.vx = sx;
-        	    this.vy = sy;
-        	}
-        	else {
-        	    this.vx += sx;
-        	    this.vy += sy;
-        	}
-            }
+		else{
+			if (abs){
+				this.vx = sx;
+				this.vy = sy;
+			}
+			else {
+				this.vx += sx;
+				this.vy += sy;
+			}
+		}
 	    PathElement el = elements[index];
 	    switch(el.type){
 	    case DPath.QDC:{
@@ -444,14 +443,17 @@ public class DPath extends Glyph {
 	    }
 	    }
 	    if (abs){
-                el.x = ex;
-                el.y = ey;
-            }
-            else {
-                el.x += ex;
-                el.y += ey;
-            }
-	}	    
+			el.x = ex;
+			el.y = ey;
+		}
+		else {
+			el.x += ex;
+			el.y += ey;
+		}
+		if (index == elements.length - 1){ // if this is last element
+			endPoint = new LongPoint(el.x, el.y);
+		}
+	}
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
     
@@ -475,55 +477,58 @@ public class DPath extends Glyph {
 	    this.vy = points[0].y;
 	    int offset = 0;
 	    for (int i=0; i < elements.length; i++) {
-		switch (elements[i].type){
-		case DPath.CBC:{
-		    if (abs){
-			((CBCElement)elements[i]).ctrlx1 = points[i+1+offset].x;
-		    	((CBCElement)elements[i]).ctrly1 = points[i+1+offset].y;
-		    	((CBCElement)elements[i]).ctrlx2 = points[i+2+offset].x;
-		    	((CBCElement)elements[i]).ctrly2 = points[i+2+offset].y;
-		    	elements[i].x = points[i+3+offset].x;
-			elements[i].y = points[i+3+offset].y;
-		    }
-		    else {
-			((CBCElement)elements[i]).ctrlx1 += points[i+1+offset].x;
-		    	((CBCElement)elements[i]).ctrly1 += points[i+1+offset].y;
-		    	((CBCElement)elements[i]).ctrlx2 += points[i+2+offset].x;
-		    	((CBCElement)elements[i]).ctrly2 += points[i+2+offset].y;
-		    	elements[i].x += points[i+3+offset].x;
-			elements[i].y += points[i+3+offset].y;
-		    }
-		    offset += 2;
-		    break;
+			switch (elements[i].type){
+			case DPath.CBC:{
+				if (abs){
+				((CBCElement)elements[i]).ctrlx1 = points[i+1+offset].x;
+					((CBCElement)elements[i]).ctrly1 = points[i+1+offset].y;
+					((CBCElement)elements[i]).ctrlx2 = points[i+2+offset].x;
+					((CBCElement)elements[i]).ctrly2 = points[i+2+offset].y;
+					elements[i].x = points[i+3+offset].x;
+				elements[i].y = points[i+3+offset].y;
+				}
+				else {
+				((CBCElement)elements[i]).ctrlx1 += points[i+1+offset].x;
+					((CBCElement)elements[i]).ctrly1 += points[i+1+offset].y;
+					((CBCElement)elements[i]).ctrlx2 += points[i+2+offset].x;
+					((CBCElement)elements[i]).ctrly2 += points[i+2+offset].y;
+					elements[i].x += points[i+3+offset].x;
+				elements[i].y += points[i+3+offset].y;
+				}
+				offset += 2;
+				break;
+			}
+			case DPath.QDC:{
+				if (abs){
+				((QDCElement)elements[i]).ctrlx = points[i+1+offset].x;
+					((QDCElement)elements[i]).ctrly = points[i+1+offset].y;
+					elements[i].x = points[i+2+offset].x;
+				elements[i].y = points[i+2+offset].y;
+				}
+				else{
+				((QDCElement)elements[i]).ctrlx += points[i+1+offset].x;
+					((QDCElement)elements[i]).ctrly += points[i+1+offset].y;
+					elements[i].x += points[i+2+offset].x;
+				elements[i].y += points[i+2+offset].y;
+				}
+				offset += 1;
+				break;
+			}
+			default:{
+				if (abs){
+							elements[i].x = points[i+1+offset].x;
+							elements[i].y = points[i+1+offset].y;
+						}
+						else {
+							elements[i].x += points[i+1+offset].x;
+							elements[i].y += points[i+1+offset].y;
+						}
+			}
+			}
+			if (i == elements.length - 1){ // if this is last element
+				endPoint = new LongPoint(elements[i].x, elements[i].y);
+			}
 		}
-		case DPath.QDC:{
-		    if (abs){
-			((QDCElement)elements[i]).ctrlx = points[i+1+offset].x;
-		    	((QDCElement)elements[i]).ctrly = points[i+1+offset].y;
-		    	elements[i].x = points[i+2+offset].x;
-			elements[i].y = points[i+2+offset].y;
-		    }
-		    else{
-			((QDCElement)elements[i]).ctrlx += points[i+1+offset].x;
-		    	((QDCElement)elements[i]).ctrly += points[i+1+offset].y;
-		    	elements[i].x += points[i+2+offset].x;
-			elements[i].y += points[i+2+offset].y;
-		    }
-		    offset += 1;
-		    break;
-		}
-		default:{
-		    if (abs){
-                        elements[i].x = points[i+1+offset].x;
-                        elements[i].y = points[i+1+offset].y;
-                    }
-                    else {
-                        elements[i].x += points[i+1+offset].x;
-                        elements[i].y += points[i+1+offset].y;
-                    }
-		}
-		}
-	    }
 	}
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
@@ -693,26 +698,26 @@ public class DPath extends Glyph {
 	    double[] cds=new double[6];
 	    int type;
 	    while (!pi.isDone()){
-		type=pi.currentSegment(cds);
-		switch (type){
-		case PathIterator.SEG_CUBICTO:{
-		    res.addCbCurve((long)cds[4],(long)-cds[5],(long)cds[0],(long)-cds[1],(long)cds[2],(long)-cds[3],true);
-		    break;
-		}
-		case PathIterator.SEG_QUADTO:{
-		    res.addQdCurve((long)cds[2],(long)-cds[3],(long)cds[0],(long)-cds[1],true);
-		    break;
-		}
-		case PathIterator.SEG_LINETO:{
-		    res.addSegment((long)cds[0],(long)-cds[1],true);
-		    break;
-		}
-		case PathIterator.SEG_MOVETO:{
-		    res.jump((long)cds[0],(long)-cds[1],true);
-		    break;
-		}
-		}
-		pi.next();
+			type=pi.currentSegment(cds);
+			switch (type){
+			case PathIterator.SEG_CUBICTO:{
+				res.addCbCurve((long)cds[4],(long)-cds[5],(long)cds[0],(long)-cds[1],(long)cds[2],(long)-cds[3],true);
+				break;
+			}
+			case PathIterator.SEG_QUADTO:{
+				res.addQdCurve((long)cds[2],(long)-cds[3],(long)cds[0],(long)-cds[1],true);
+				break;
+			}
+			case PathIterator.SEG_LINETO:{
+				res.addSegment((long)cds[0],(long)-cds[1],true);
+				break;
+			}
+			case PathIterator.SEG_MOVETO:{
+				res.jump((long)cds[0],(long)-cds[1],true);
+				break;
+			}
+			}
+			pi.next();
 	    }
 	}
 	return res;
