@@ -81,7 +81,7 @@ public class EvalAcq implements Java2DPainter {
     /* cursor */
     static final Color CURSOR_COLOR = Color.BLACK;
 
-    static final Color START_BUTTON_COLOR = Color.BLUE;
+    static final Color START_BUTTON_COLOR = Color.RED;
 
     /* padding for lenses */
     static final int[] vispad = {100, 100, 100, 100};
@@ -106,7 +106,8 @@ public class EvalAcq implements Java2DPainter {
     /* target indicators */
     static final int INDICATOR_LENGTH = 500;
     static final int INDICATOR_THICKNESS = 20;
-    static final Color INDICATOR_COLOR = Color.BLUE;
+    static final Color INDICATOR_COLOR = Color.RED;
+    static final Color INDICATOR_BORDER = Color.BLACK;
     VRectangle latIndicatorW, latIndicatorE, longIndicatorN, longIndicatorS;
 
     /* grid color */
@@ -212,17 +213,17 @@ public class EvalAcq implements Java2DPainter {
 	    if (i % 2 == 0){angle += Math.PI;}
 	    else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
 	}
-	latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR);
-	latIndicatorW.setDrawBorder(false);
+	latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
+	//latIndicatorW.setDrawBorder(false);
 	vsm.addGlyph(latIndicatorW, mSpace);
-	latIndicatorE = new VRectangle(7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR);
-	latIndicatorE.setDrawBorder(false);
+	latIndicatorE = new VRectangle(7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
+	//latIndicatorE.setDrawBorder(false);
 	vsm.addGlyph(latIndicatorE, mSpace);
-	longIndicatorN = new VRectangle(0, 5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR);
-	longIndicatorN.setDrawBorder(false);
+	longIndicatorN = new VRectangle(0, 5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR, INDICATOR_BORDER);
+	//longIndicatorN.setDrawBorder(false);
 	vsm.addGlyph(longIndicatorN, mSpace);
-	longIndicatorS = new VRectangle(0, -5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR);
-	longIndicatorS.setDrawBorder(false);
+	longIndicatorS = new VRectangle(0, -5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR, INDICATOR_BORDER);
+	//longIndicatorS.setDrawBorder(false);
 	vsm.addGlyph(longIndicatorS, mSpace);
     }
 
