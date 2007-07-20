@@ -27,9 +27,7 @@ import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.VCircle;
+import com.xerox.VTM.glyphs.*;
 
 public class TLensDemo {
 
@@ -163,30 +161,49 @@ public class TLensDemo {
 	cameras.add(demoCamera);
 	demoView = vsm.addExternalView(cameras, L2_Gaussian_Title, View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
+	demoView.mouse.setSize(1);
 	demoView.setLocation(VIEW_X, VIEW_Y);
 	updatePanelSize();
 	demoView.setEventHandler(eh);
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
 	demoView.setBackgroundColor(Color.WHITE);
+	demoView.setAntialiasing(true);
 	demoCamera.setAltitude(START_ALTITUDE);
 	loadRepresentation();
 	System.gc();
     }
 
     void loadRepresentation(){
-	for (int i=-1000;i<=1000;i+=80){
+	float angle = 0;
+	float h = 0;
+	int NB_RECTS = 12;
+	float dangle = (float)(2 * Math.PI / ((float)NB_RECTS));
+	float dh = 1 / ((float)NB_RECTS);
+	int D = 250;
+	VRectangle r;
+	for (int i=0;i<NB_RECTS;i++){
+	    r = new VRectangleOr(Math.round(D*Math.cos(angle)), Math.round(D*Math.sin(angle)), 0, 240, 10, Color.WHITE, (float)(angle));
+	    r.setHSVColor(h, 1, 1);
+	    r.setBorderColor(Color.BLACK);
+	    vsm.addGlyph(r, mainVS);
+	    angle += dangle;
+	    h += dh;
+	}
+	for (int i=-1000;i<=1000;i+=70){
 	    VSegment s = new VSegment(i,0,0,0,1000,Color.black);
 	    VSegment s2 = new VSegment(0,i,0,1000,0,Color.black);
 	    vsm.addGlyph(s,mainVS);vsm.addGlyph(s2,mainVS);
 	}
-	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
-	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(i1,mainVS);
-	vsm.addGlyph(new VCircle(500, 500, 0, 10, Color.GREEN), mainVS);
-	vsm.addGlyph(new VCircle(500, -500, 0, 10, Color.GREEN), mainVS);
-	vsm.addGlyph(new VCircle(-500, 500, 0, 10, Color.GREEN), mainVS);
-	vsm.addGlyph(new VCircle(-500, -500, 0, 10, Color.GREEN), mainVS);
+
+
+// 	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
+// 	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+// 	vsm.addGlyph(i1,mainVS);
+// 	vsm.addGlyph(new VCircle(500, 500, 0, 10, Color.GREEN), mainVS);
+// 	vsm.addGlyph(new VCircle(500, -500, 0, 10, Color.GREEN), mainVS);
+// 	vsm.addGlyph(new VCircle(-500, 500, 0, 10, Color.GREEN), mainVS);
+// 	vsm.addGlyph(new VCircle(-500, -500, 0, 10, Color.GREEN), mainVS);
     }
 
     void windowLayout(){
@@ -294,6 +311,7 @@ public class TLensDemo {
 	synchronized (lens){
 	    double nmf = MAG_FACTOR + magOffset;
 	    if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
+		System.err.println(nmf);
 		setMagFactor(nmf);
 		if (zooming == TLensDemoEventHandler.ZOOMOUT_LENS){
 		    /* if unzooming, we want to keep the focus point stable, and unzoom the context

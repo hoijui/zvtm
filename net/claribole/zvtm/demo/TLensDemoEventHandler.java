@@ -20,6 +20,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.glyphs.Glyph;
 
 class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
@@ -168,6 +169,18 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
 	    }
 	    else {
 		application.magnifyFocus(-application.WHEEL_MM_STEP, lensType, application.demoCamera);
+	    }
+	}
+	else {
+	    Camera c = application.demoCamera;
+	    float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	    if (wheelDirection == WHEEL_UP){
+		c.altitudeOffset(-a*5);
+		application.vsm.repaintNow();
+	    }
+	    else {//wheelDirection == WHEEL_DOWN
+		c.altitudeOffset(a*5);
+		application.vsm.repaintNow();
 	    }
 	}
     }
