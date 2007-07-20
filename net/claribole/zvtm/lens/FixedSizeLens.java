@@ -135,10 +135,10 @@ public abstract class FixedSizeLens extends Lens {
 	h = s.height;
 	sw = w / 2;
 	sh = h / 2;
-	lurd[0] = lx + sw - LR1;
-	lurd[1] = ly + sh - LR1;
-	lurd[2] = lx + sw + LR1;
-	lurd[3] = ly + sh + LR1;
+	lurd[0] = lx + sw - getRadius();
+	lurd[1] = ly + sh - getRadius();
+	lurd[2] = lx + sw + getRadius();
+	lurd[3] = ly + sh + getRadius();
 	if (lurd[0] < 0){lurd[0] = 0;}
 	if (lurd[1] < 0){lurd[1] = 0;}
 	if (lurd[2] > w){lurd[2] = w;}
@@ -259,10 +259,10 @@ public abstract class FixedSizeLens extends Lens {
     public synchronized void setAbsolutePosition(int ax, int ay){
 	lx = ax - sw;
 	ly = ay - sh;
-	lurd[0] = lx + sw - LR1;
-	lurd[1] = ly + sh - LR1;
-	lurd[2] = lx + sw + LR1;
-	lurd[3] = ly + sh + LR1;
+	lurd[0] = lx + sw - getRadius();
+	lurd[1] = ly + sh - getRadius();
+	lurd[2] = lx + sw + getRadius();
+	lurd[3] = ly + sh + getRadius();
 	if (lurd[0] < 0){lurd[0] = 0;}
 	if (lurd[1] < 0){lurd[1] = 0;}
 	if (lurd[2] > w){lurd[2] = w;}

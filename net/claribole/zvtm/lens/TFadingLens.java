@@ -260,6 +260,10 @@ public class TFadingLens extends TLens implements TemporalLens {
 	updateTimeBasedParams(ax, ay);
     }
 
+    public int getRadius(){
+	return LR2;
+    }
+
     /**Set the color used to draw the lens' boundaries (default is black)
      *@param bc color of the boundary (set to null if you do not want to draw the border)
      */
