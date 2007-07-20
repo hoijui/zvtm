@@ -36,8 +36,8 @@ public class TLensDemo {
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
 
     /* max dimensions of ZVTM view */
-    static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 1024;
+    static final int VIEW_MAX_W = 1200;
+    static final int VIEW_MAX_H = 1200;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H;
@@ -434,22 +434,22 @@ public class TLensDemo {
 	    break;
 	}
 	case L2_TGaussian:{
-	    res = new TGaussianLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new TGaussianLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L2_TLinear:{
-	    res = new TLinearLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case LInf_TLinear:{
-	    res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L3_TLinear:{
-	    res = new L3TLinearLens(1.0f, 0.0f, 0.95f, 150, 40, x - panelWidth/2, y - panelHeight/2);
+	    res = new L3TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
@@ -501,7 +501,7 @@ public class TLensDemo {
 	}
 
 	case L2_XLinear:{
-	    res = new XLinearLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
