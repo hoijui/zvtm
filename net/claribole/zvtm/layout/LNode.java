@@ -74,6 +74,10 @@ public class LNode {
 		this.selectedBackgroundColor = selectedBackgroundColor;
 	}
 
+	public LTree getTree(){
+		return tree;
+	}
+
 	/**
 	 * Get text of the node.
 	 * @return string text.
@@ -210,13 +214,18 @@ public class LNode {
 		}
 	}
 
+	public LNode getParentNode(){
+		return parent;
+	}
+
 	/**
 	 * Add new child to this node.
 	 * @param owner Any user data
 	 * @param text Text representation of the node.
+	 * @param visible Visibility of newly created node.
 	 * @return Just created child.
 	 */
-	public LNode addChild(Object owner, String text){
+	public LNode addChild(Object owner, String text, boolean visible){
 		LNode child = new LNode(tree, drawBorder, textColor, borderColor, backgroundColor,
 				selectedTextColor, selectedBorderColor, selectedBackgroundColor);
 		child.parent = this;
@@ -224,11 +233,23 @@ public class LNode {
 		child.text = text;
 		child.initLNode();
 		children.add(child);
+		child.inEdge.visible = visible;
+		child.vText.visible = visible;
 		return child;
+	}
+
+	public LNode addChild(Object owner, String text){
+		return addChild(owner, text, true);
 	}
 
 	public boolean hasChildren() {
 		return children.size() > 0;
+	}
+
+	public LNode[] getChildren(){
+		LNode[] array = new LNode[children.size()];
+		children.toArray(array);
+		return array;
 	}
 
 	public LNode getFirstChild() {
@@ -282,6 +303,35 @@ public class LNode {
 			return null;
 	}
 
+	public void removeChild(LNode child, boolean deleteSubTree){
+		if (children.contains(child)){
+			tree.vs.destroyGlyph(child.inEdge);
+			tree.vs.destroyGlyph(child.vText);
+			if (!deleteSubTree){ // set my parents as parents of my children.
+				for (LNode node : child.children){
+					if (!children.contains(node)){
+						children.add(node);
+						node.parent = this;
+					}
+				}
+			}
+			else{
+				for (LNode node : child.getChildren()) {
+					child.removeChild(node, deleteSubTree);
+				}
+			}
+			children.remove(child);
+		}
+		if (!hasChildren()){ // if there is no more children
+			isExpanded = true;
+			switchToExpandedView();
+		}
+	}
+
+	public void deleteFromTree(boolean deleteSubTree){
+		parent.removeChild(this, deleteSubTree);
+	}
+
 	void initLNode() {
 		if (drawBorder)
 			vText = new VBText(0, 0, 0, Color.blue, text);
@@ -290,6 +340,14 @@ public class LNode {
 		vText.setOwner(this);
 		inEdge = new DPath();
 		inEdge.addCbCurve(0, 0, 0, 0, 0, 0, false);
+		if (parent != null) {
+			LongPoint[] cp = new LongPoint[2];
+			cp[0] = new LongPoint(parent.vText.vx, parent.vText.vy);
+			cp[1] = new LongPoint(parent.vText.vx, parent.vText.vy);
+			inEdge.editElement(0, parent.vText.vx, parent.vText.vy, parent.vText.vx, parent.vText.vy, cp, true);
+			vText.vx = parent.vText.vx;
+			vText.vy = parent.vText.vy;
+		}
 		inEdge.setForcedDrawing(true);
 		tree.vs.vsm.addGlyph(inEdge, tree.vs);
 		tree.vs.vsm.addGlyph(vText, tree.vs);
@@ -328,7 +386,6 @@ public class LNode {
 		PostAnimationAction paa = null;
 
 		if (collapseTo != null) {
-
 			switch (treeOrientation){
 			case TreeOrientation.LEFT_RIGHT:
 				textX = collapseTo.x + collapseTo.getBounds(camIndex).x - getBounds(camIndex).x;
@@ -533,6 +590,7 @@ public class LNode {
 		collapseTo = colTo;
 		isExpanded = false;
 		for (LNode child : children) {
+			child.switchToCollapsedView();
 			child.setCollapseToRecursively(colTo);
 		}
 	}
@@ -541,10 +599,17 @@ public class LNode {
 	 * Expand this node to show all children.
 	 */
 	public void expand() {
-		isExpanded = true;
-		switchToExpandedView();
-		for (LNode child : children) {
-			child.shouldExpand = true;
+		if (hasChildren()){
+			isExpanded = true;
+			switchToExpandedView();
+			for (LNode child : children) {
+				child.shouldExpand = true;
+				child.isExpanded = false;
+				child.switchToCollapsedView();
+			}
+		}
+		else{
+			isExpanded = true;
 		}
 	}
 
@@ -552,11 +617,17 @@ public class LNode {
 	 * Collapse this node to hide all children.
 	 */
 	public void collapse() {
-		isExpanded = false;
-		switchToCollapsedView();
-		for (LNode child : children) {
-			child.setCollapseToRecursively(this);
+		if (hasChildren()){
+			isExpanded = false;
+			switchToCollapsedView();
+			for (LNode child : children) {
+				child.setCollapseToRecursively(this);
+			}
 		}
+		else {
+			isExpanded = true;
+		}
+
 	}
 
 	public boolean isExpanded() {
