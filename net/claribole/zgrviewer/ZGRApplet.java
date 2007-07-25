@@ -234,7 +234,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	if (uri.startsWith(JAVASCRIPT_PROTOCOL)) {
 	    target = ConfigManager._SELF;
 	}
-	else if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
+	else if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(HTTPS_PROTOCOL) || uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
 	    // relative URL, prepend document base
 	    uri = docURL + uri;
 	}
