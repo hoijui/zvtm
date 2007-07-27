@@ -134,7 +134,7 @@ public class EvalAcq implements Java2DPainter {
     String subjectName;
     String blockNumber;
 
-    IDSequence idSeq;
+    IDSequence2 idSeq;
     int trialCount = -1;
     boolean trialStarted = false;
     long startTime;
@@ -235,7 +235,7 @@ public class EvalAcq implements Java2DPainter {
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
 	    String line = br.readLine();
-	    idSeq = new IDSequence();
+	    idSeq = new IDSequence2();
 	    while (line != null){
 		if (line.length() > 0){
 		    idSeq.addSequence(line.split(INPUT_CSV_SEP));
