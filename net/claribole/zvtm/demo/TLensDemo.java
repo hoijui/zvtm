@@ -146,12 +146,12 @@ public class TLensDemo {
     static final float START_ALTITUDE = 100;
     static final float FLOOR_ALTITUDE = 100.0f;
 
-    TLensDemo(){
+    TLensDemo(boolean gridOnly){
 	vsm = new VirtualSpaceManager();
-	init();
+	init(gridOnly);
     }
 
-    public void init(){
+    public void init(boolean gridOnly){
 	eh = new TLensDemoEventHandler(this);
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
@@ -170,29 +170,48 @@ public class TLensDemo {
 	demoView.setBackgroundColor(Color.WHITE);
 	demoView.setAntialiasing(true);
 	demoCamera.setAltitude(START_ALTITUDE);
-	loadRepresentation();
+	buildGrid();
+	if (!gridOnly){loadRepresentation();}
 	System.gc();
     }
 
     void loadRepresentation(){
-	float angle = 0;
+// 	float angle = 0;
+// 	float h = 0;
+// 	int NB_RECTS = 12;
+// 	float dangle = (float)(2 * Math.PI / ((float)NB_RECTS));
+// 	float dh = 1 / ((float)NB_RECTS);
+// 	int D = 250;
+// 	VRectangle r;
+// 	for (int i=0;i<NB_RECTS;i++){
+// 	    r = new VRectangleOr(Math.round(D*Math.cos(angle)), Math.round(D*Math.sin(angle)), 0, 240, 10, Color.WHITE, (float)(angle));
+// 	    r.setHSVColor(h, 1, 1);
+// 	    r.setBorderColor(Color.BLACK);
+// 	    vsm.addGlyph(r, mainVS);
+// 	    angle += dangle;
+// 	    h += dh;
+// 	}
+
 	float h = 0;
-	int NB_RECTS = 12;
-	float dangle = (float)(2 * Math.PI / ((float)NB_RECTS));
+	long x = -1000;
+	int NB_RECTS = 50;
 	float dh = 1 / ((float)NB_RECTS);
-	int D = 250;
+	long dx = 2000 / NB_RECTS;
 	VRectangle r;
 	for (int i=0;i<NB_RECTS;i++){
-	    r = new VRectangleOr(Math.round(D*Math.cos(angle)), Math.round(D*Math.sin(angle)), 0, 240, 10, Color.WHITE, (float)(angle));
+	    r = new VRectangle(x, 0, 0, 10, 240, Color.WHITE);
 	    r.setHSVColor(h, 1, 1);
-	    r.setBorderColor(Color.BLACK);
+	    r.setDrawBorder(false);
 	    vsm.addGlyph(r, mainVS);
-	    angle += dangle;
 	    h += dh;
+	    x += dx;
 	}
-	for (int i=-1000;i<=1000;i+=70){
-	    VSegment s = new VSegment(i,0,0,0,1000,Color.black);
-	    VSegment s2 = new VSegment(0,i,0,1000,0,Color.black);
+    }
+
+    void buildGrid(){
+	for (int i=-2000;i<=2000;i+=30){
+	    VSegment s = new VSegment(i,0,0,0,2000,Color.black);
+	    VSegment s2 = new VSegment(0,i,0,2000,0,Color.black);
 	    vsm.addGlyph(s,mainVS);vsm.addGlyph(s2,mainVS);
 	}
 
@@ -559,7 +578,8 @@ public class TLensDemo {
     }
 
     public static void main(String[] args){
-	new TLensDemo();
+	boolean gridOnly = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
+	new TLensDemo(gridOnly);
     }
     
 }
