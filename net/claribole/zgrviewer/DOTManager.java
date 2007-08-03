@@ -91,7 +91,7 @@ class DOTManager {
                     deleteTempFiles();
                     return;
                 }
-                displaySVG(pp, dotF.getParentFile());
+                displaySVG(pp, dotF.getAbsoluteFile().getParentFile());
                 if (ConfigManager.DELETE_TEMP_FILES) {
                     deleteTempFiles();
                 }
@@ -265,6 +265,7 @@ class DOTManager {
 	pp.setLabel("Displaying...");
 	pp.setPBValue(80);
 	try {
+	    System.err.println(sourceDotFileParentDir);
 	    SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
 	    grMngr.seekBoundingBox();
 	    grMngr.buildLogicalStructure();
