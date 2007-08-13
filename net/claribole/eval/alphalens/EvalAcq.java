@@ -33,14 +33,14 @@ import net.claribole.zvtm.lens.*;
 public class EvalAcq implements Java2DPainter {
 
     /* techniques */
-    static final short TECHNIQUE_FL = 2; // fading lens
-    static final short TECHNIQUE_ML = 3; // melting lens
-    static final short TECHNIQUE_DL = 1; // distortion lens
-    static final short TECHNIQUE_HL = 0; // manhattan lens
+    static final short TECHNIQUE_SCB = 2; // fading lens
+    static final short TECHNIQUE_BL = 3; // melting lens
+    static final short TECHNIQUE_FL = 1; // distortion lens
+    static final short TECHNIQUE_ML = 0; // manhattan lens
     static final short TECHNIQUE_SCF = 4;// speed-coupled flattening
-    static final String[] TECHNIQUE_NAMES = {"Manhattan_Lens", "Distortion_Lens", "Fading_Lens", "Melting_Lens", "Speed-coupled flattening"}; 
-    static final String[] TECHNIQUE_NAMES_ABBR = {"HL", "DL", "FL", "ML", "SC"}; 
-    short technique = TECHNIQUE_FL;
+    static final String[] TECHNIQUE_NAMES = {"Magnifier_Lens", "Fisheye_Lens", "Speed_Coupled_Blending_Lens", "Blending_Lens", "Speed_Coupled_Flattening"}; 
+    static final String[] TECHNIQUE_NAMES_ABBR = {"ML", "FL", "SCB", "BL", "SCF"}; 
+    short technique = TECHNIQUE_SCB;
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -376,7 +376,7 @@ public class EvalAcq implements Java2DPainter {
 	// do not take early clicks into account if an error is currently being displayed,
 	// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
 	if (warning
-	    || (technique==TECHNIQUE_FL && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
+	    || (technique==TECHNIQUE_SCB && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
 	    || (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 	Glyph target = targets[hitCount];
 	lens.getVisibleRegionInFocus(mCamera, rif);
@@ -495,26 +495,26 @@ public class EvalAcq implements Java2DPainter {
 
     void setLens(int x, int y){
 	switch(technique){
-	case TECHNIQUE_FL:{
+	case TECHNIQUE_SCB:{
 	    tlens = new TFadingLens(magFactor, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    ((TFadingLens)tlens).setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    ((TFadingLens)tlens).setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
 	    lens = (FixedSizeLens)tlens;
 	    break;
 	}
-	case TECHNIQUE_ML:{
+	case TECHNIQUE_BL:{
 	    tlens = new MeltingLens(magFactor, 0.0f, 0.80f, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
 	}
-	case TECHNIQUE_DL:{
+	case TECHNIQUE_FL:{
 	    tlens = new DistortionLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    break;
 	}
-	case TECHNIQUE_HL:{
+	case TECHNIQUE_ML:{
 	    lens = new FSManhattanLens(magFactor, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    ((FSManhattanLens)lens).setBoundaryColor(LENS_BOUNDARY_COLOR);
 	    tlens = null;
@@ -643,8 +643,8 @@ public class EvalAcq implements Java2DPainter {
 	    new EvalAcq(Short.parseShort(args[0]), args[1]);
 	}
 	catch (Exception ex){
-	    System.err.println("No cmd line parameter to indicate technique, defaulting to Fading Lens");
-	    new EvalAcq(EvalAcq.TECHNIQUE_FL, "acqT.csv");
+	    System.err.println("No cmd line parameter to indicate technique, defaulting to Speed-Coupled Blending Lens");
+	    new EvalAcq(EvalAcq.TECHNIQUE_SCB, "acqT.csv");
 	}
     }
 
