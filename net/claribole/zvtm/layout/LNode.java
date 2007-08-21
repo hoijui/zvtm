@@ -35,7 +35,7 @@ public class LNode {
 	Color selectedBackgroundColor = Color.lightGray;
 	Color selectedTextColor = Color.black;
 	Color selectedBorderColor = Color.black;
-
+	
 	Object owner;
 	VText vText;
 	List<LNode> children;
@@ -180,6 +180,14 @@ public class LNode {
 			vText.setBorderColor(selectedBorderColor);
 		}
 		this.selectedBorderColor = selectedBorderColor;
+	}
+
+	public Color getEdgeColor() {
+		return inEdge.getColor();
+	}
+
+	public void setEdgeColor(Color edgeColor) {
+		inEdge.setColor(edgeColor);
 	}
 
 	/**
@@ -604,8 +612,13 @@ public class LNode {
 			switchToExpandedView();
 			for (LNode child : children) {
 				child.shouldExpand = true;
-				child.isExpanded = false;
-				child.switchToCollapsedView();
+				if (child.hasChildren()){
+					child.isExpanded = false;
+					child.switchToCollapsedView();
+				}
+				else{
+					child.expand();
+				}
 			}
 		}
 		else{
