@@ -23,10 +23,10 @@
 
 package com.xerox.VTM.engine;
 
+import com.xerox.VTM.glyphs.Glyph;
+
 import java.util.Enumeration;
 import java.util.Vector;
-
-import com.xerox.VTM.glyphs.Glyph;
 
   /**
    * A virtual space contains glyphs and can be observed through multiple cameras
@@ -248,7 +248,7 @@ public class VirtualSpace {
 	Glyph g;
 	for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
 	    g=(Glyph)e.nextElement();
-	    if ((t.equals("")) || (g.getType().equals(t))){v.add(g);}
+	    if ((t.equals("")) || (t.equals(g.getType()))){v.add(g);}
 	}
 	return v;
     }
