@@ -154,19 +154,21 @@ public class TreeLayout {
 		anchorX = a.getX();
 		anchorY = a.getY();
 
-		LNode root = tree.rootLNode;
-		Params rp = getParams(root);
+		if (tree != null && tree.rootLNode != null){
+			LNode root = tree.rootLNode;
+			Params rp = getParams(root);
 
-		// do first pass - compute breadth information, collect depth info
-		firstWalk(root, 0, 1);
+			// do first pass - compute breadth information, collect depth info
+			firstWalk(root, 0, 1);
 
-		// sum up the depth info
-		determineDepths();
+			// sum up the depth info
+			determineDepths();
 
-		// do second pass - assign layout positions
-		secondWalk(root, -rp.prelim, 0);
+			// do second pass - assign layout positions
+			secondWalk(root, -rp.prelim, 0);
 
-		tree.getRoot().updateNode(getOrientation(), camIndex);
+			tree.getRoot().updateNode(getOrientation(), camIndex);
+		}
 	}
 
 	private void firstWalk(LNode n, int num, int depth) {
