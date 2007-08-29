@@ -320,6 +320,8 @@ public class LNode {
 					if (!children.contains(node)){
 						children.add(node);
 						node.parent = this;
+						node.inEdge.visible = true;
+						node.vText.visible = true;
 					}
 				}
 			}
