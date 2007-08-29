@@ -92,6 +92,7 @@ public class LNode {
 	 */
 	public void setText(String text){
 		this.text = text;
+		vText.setText(text);
 	}
 
 	/**
