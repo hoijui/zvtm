@@ -45,6 +45,7 @@ import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.lens.Lens;
 
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.RectangularShape;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VText;
 // import EDU.Washington.grad.gjb.cassowary.*;
@@ -1176,13 +1177,31 @@ public class VirtualSpaceManager implements AWTEventListener {
 		float currentAlt=c.getAltitude()+c.getFocal();
 		if (z){
 		    long[] regBounds=v.getVisibleRegion(c);
-		    long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};  //region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ; we only take left and down because ratios are equals for left and right, up and down
+		    // region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
+		    // we only take left and down because ratios are equals for left and right, up and down
+		    long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};
 		    float ratio=0;
 		    //compute the mult factor for altitude to see glyph g entirely
-		    if (trRegBounds[0]!=0){ratio=((g instanceof VText) ? (float) (((VText)g).getBounds(0).x) : g.getSize())/((float)(g.vx-trRegBounds[0]));}
+		    if (trRegBounds[0]!=0){
+			if (g instanceof VText){
+			    ratio = ((float)(((VText)g).getBounds(0).x)) / ((float)(g.vx-trRegBounds[0]));
+			}
+			else if (g instanceof RectangularShape){
+			    ratio = ((float)(((RectangularShape)g).getWidth())) / ((float)(g.vx-trRegBounds[0]));
+			}
+			else {
+			    ratio = g.getSize() / ((float)(g.vx-trRegBounds[0]));
+			}
+		    }
 		    //same for Y ; take the max of both
 		    if (trRegBounds[1]!=0){
-			float tmpRatio=(g.getSize())/((float)(g.vy-trRegBounds[1]));
+			float tmpRatio;
+			if (g instanceof RectangularShape){
+			    tmpRatio = ((float)(((RectangularShape)g).getHeight())) / ((float)(g.vy-trRegBounds[1]));
+			}
+			else {
+			    tmpRatio = (g.getSize())/((float)(g.vy-trRegBounds[1]));
+			}
 			if (tmpRatio>ratio){ratio=tmpRatio;}
 		    }
 		    ratio *= mFactor;
