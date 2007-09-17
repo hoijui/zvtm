@@ -237,6 +237,10 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		backBufferGraphics.setPaintMode();
 		backBufferGraphics.setColor(blankColor);
 		backBufferGraphics.fillRect(0, 0, getWidth(), getHeight());
+		// call to after-portals java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(backBufferGraphics, size.width, size.height);
+		}
 	    }
 	}
 	catch (NullPointerException ex0){if (parent.parent.debug){System.err.println("GLViewPanel.paint "+ex0);}}

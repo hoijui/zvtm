@@ -698,6 +698,10 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 		    stableRefToBackBufferGraphics.setColor(blankColor);
 		    stableRefToBackBufferGraphics.fillRect(0, 0, size.width,
 			    size.height);
+		    // call to after-portals java2d painting hook
+		    if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+			parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		    }
 		} while (backBuffer.contentsLost());
 		repaint();
 		try {

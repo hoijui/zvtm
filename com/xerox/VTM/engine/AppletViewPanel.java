@@ -529,6 +529,10 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 		stableRefToBackBufferGraphics.setPaintMode();
 		stableRefToBackBufferGraphics.setColor(blankColor);
 		stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
+		// call to after-portals java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
 		repaint();
 		try {
 		    runView.sleep(blankSleepTime);   //sleep ... ms  
