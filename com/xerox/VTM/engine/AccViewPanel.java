@@ -700,7 +700,10 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			    size.height);
 		    // call to after-portals java2d painting hook
 		    if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-			parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
+			try {
+			    parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
+			}
+			catch(ClassCastException ex){if (VirtualSpaceManager.debugModeON()){System.err.println("Failed to draw AFTER_PORTALS in blank mode");}}
 		    }
 		} while (backBuffer.contentsLost());
 		repaint();
