@@ -465,14 +465,16 @@ public class VCursor {
             }
             lastGlyphEntered = null;
             Glyph[] gl = vs.getVisibleGlyphList();
-            for (int i=0;i<gl.length;i++){
-                try {
-                    gl[i].resetMouseIn(camIndex);
-                }
-                catch (NullPointerException ex){
-                    if (VirtualSpaceManager.debugModeON()){
-                        System.err.println("Recovered from error when resetting list of glyphs under mouse");
-                        ex.printStackTrace();
+            synchronized(gl){
+                for (int i=0;i<gl.length;i++){
+                    try {
+                        gl[i].resetMouseIn(camIndex);
+                    }
+                    catch (NullPointerException ex){
+                        if (VirtualSpaceManager.debugModeON()){
+                            System.err.println("Recovered from error when resetting list of glyphs under mouse");
+                            ex.printStackTrace();
+                        }
                     }
                 }
             }
