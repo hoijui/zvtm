@@ -458,14 +458,25 @@ public class VCursor {
 
     /**empty the list of glyphs under mouse*/
     void resetGlyphsUnderMouseList(VirtualSpace vs,int camIndex){
-	synchronized(this){
-	    for (int i=0;i<glyphsUnderMouse.length;i++){glyphsUnderMouse[i]=null;maxIndex=-1;}
-	    lastGlyphEntered=null;
-	    Glyph[] gl = vs.getVisibleGlyphList();
-	    for (int i=0;i<gl.length;i++){
-		gl[i].resetMouseIn(camIndex);
-	    }
-	}
+        synchronized(this){
+            for (int i=0;i<glyphsUnderMouse.length;i++){
+                glyphsUnderMouse[i] = null;
+                maxIndex =- 1;
+            }
+            lastGlyphEntered = null;
+            Glyph[] gl = vs.getVisibleGlyphList();
+            for (int i=0;i<gl.length;i++){
+                try {
+                    gl[i].resetMouseIn(camIndex);
+                }
+                catch (NullPointerException ex){
+                    if (VirtualSpaceManager.debugModeON()){
+                        System.err.println("Recovered from error when resetting list of glyphs under mouse");
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     /**get the list of glyphs currently under mouse (last entry is last glyph entered)
