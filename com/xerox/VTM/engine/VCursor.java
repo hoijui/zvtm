@@ -25,6 +25,7 @@ package com.xerox.VTM.engine;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
 import java.util.Vector;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -34,6 +35,14 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.Translucent;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.geom.Point2D;
+
+import net.claribole.zvtm.engine.LowPassFilter;
+
 
 /**
  * Glyph representing mouse cursor
@@ -92,17 +101,17 @@ public class VCursor {
     int size = 10;
 
     VCursor(View v){
-	this.owningView=v;
-	vx=0;pvx=0;
-	vy=0;pvy=0;
-	cx=0;
-	cy=0;
-	mx=0;
-	my=0;
-	color=Color.black;
-	hcolor = Color.black;
-	stickedGlyphs = new Glyph[0];
-	sync=true;
+        this.owningView=v;
+        vx=0;pvx=0;
+        vy=0;pvy=0;
+        cx=0;
+        cy=0;
+        mx=0;
+        my=0;
+        color=Color.black;
+        hcolor = Color.black;
+        stickedGlyphs = new Glyph[0];
+        sync=true;
     }
 
     /**Set size of cursor (crosshair length).*/
@@ -680,11 +689,133 @@ public class VCursor {
 
     /**draw mouse cursor*/
     public void draw(Graphics2D g){
-	if (isVisible){
-	    g.setColor(this.color);
-	    g.drawLine(mx-size,my,mx+size,my);
-	    g.drawLine(mx,my-size,mx,my+size);
-	}
+        if (isVisible){
+            g.setColor(this.color);
+            g.drawLine(mx-size,my,mx+size,my);
+            g.drawLine(mx,my-size,mx,my+size);
+            if (bubbleHotspot){
+                g.setColor(HOTSPOT_COLOR);
+                g.setComposite(HOTSPOT_TRANSLUCENCY);
+                g.fillOval(mx-radius, my-radius, 2*radius, 2*radius);
+                g.setComposite(Translucent.acO);
+            }
+        }
+    }
+
+    /*--------------------- Bubble Hotspot --------------------*/
+    
+    /* To use, simply call 
+        v.getMouse().updateFrequency(e.getWhen());
+	    v.getMouse().updateHotspot(jpx, jpy);
+       in your ViewEventHandler.mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e) method
+       
+       The bubble hotspot should first be activated through VCursor.activateBubbleHotspot();
+       */
+    
+    boolean bubbleHotspot = false;
+    
+    Color HOTSPOT_COLOR = Color.RED;
+    AlphaComposite HOTSPOT_TRANSLUCENCY = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f);  //transparency set to alpha
+
+    int maxRadius = 40;
+    int radius = 0;
+
+    double frequency = -1;
+    long mLastSampleTime = -1;
+    int xOffset = -10;
+    int yOffset = 10;
+    double maxDist = 2 * Math.abs(xOffset);
+    LowPassFilter filter = new LowPassFilter();
+    Point2D currentPos = new Point2D.Double(0, 0);
+    Point2D parentPos = new Point2D.Double(0, 0);
+    Point2D targetPos = new Point2D.Double(0, 0);
+    Timer timer;
+    HotspotTimer mouseStillUpdater;
+
+    double cutoffParamA = 0.8;   // 0.8
+    double cutoffParamB = 0.1;  // 0.1 to make it more difficult to acquire
+
+    double distAway = 0;
+
+    void initTimer(){
+        timer = new Timer();
+        mouseStillUpdater = new HotspotTimer(this);
+        timer.scheduleAtFixedRate(mouseStillUpdater, 40, 20);
+    }
+    
+    public void updateFrequency() {
+        updateFrequency(System.currentTimeMillis());
+    }
+
+    public void updateFrequency(long currentTime) {
+        if (frequency == -1){
+            frequency = 1;
+        }
+        else {
+            if (currentTime != mLastSampleTime){
+                frequency = 1000.0 / ((double)(currentTime - mLastSampleTime));
+            }
+        }
+        mLastSampleTime = currentTime;
+    }
+
+    public void updateHotspot(int cx, int cy){
+        parentPos.setLocation(cx, cy);
+        updateHotspot();
+    }
+
+    public void updateHotspot(){
+        targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+        distAway = targetPos.distance(currentPos);
+        double maxDist = 2 * Math.abs(xOffset);
+        double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+        filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
+        currentPos = filter.apply(targetPos, frequency);
+        radius = (int)Math.round(maxRadius * (1.0-opacity));
+        owningView.repaintNow();
+    }
+
+    /**true -> do not update trailing widget position when mouse does not move at all*/
+    public void setNoUpdateWhenMouseStill(boolean b){
+        mouseStillUpdater.setEnabled(!b);
+    }
+
+    public void activateBubbleHotspot(){
+        initTimer();
+        bubbleHotspot = true;
+    }
+
+    public void deactivateBubbleHotspot(){
+        bubbleHotspot = false;
+        if (timer != null){
+            timer.cancel();
+        }
+    }
+
+}
+
+class HotspotTimer extends TimerTask {
+
+    VCursor c;
+    private boolean enabled = true;
+
+    HotspotTimer(VCursor c){
+        super();
+        this.c = c;
+    }
+
+    public void setEnabled(boolean b){
+        enabled = b;
+    }
+
+    public boolean isEnabled(){
+        return enabled;
+    }
+
+    public void run(){
+        if (enabled){
+            c.updateHotspot();
+        }
     }
 
 }
