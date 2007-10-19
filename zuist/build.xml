@@ -29,7 +29,7 @@ Usage:
     <property name="classes.dir" value="${basedir}/classes"/>
     <property name="img.dir" value="${basedir}/images"/>
     <property name="lib.dir" value="${basedir}/lib"/>
-    <property name="src.dir" value="${basedir}/src"/>
+    <property name="src.dir" value="${basedir}/src/java"/>
     <mkdir dir="${apidocs.dir}"/>
     <mkdir dir="${classes.dir}"/>
     <mkdir dir="${lib.dir}"/>

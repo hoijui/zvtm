@@ -57,9 +57,9 @@ public class MenuManager {
 	static final int MENU_ZONE_WIDTH = 2 * (NAV_MENU_ITEM_WIDTH + HOME_BT_WIDTH + UP_BT_WIDTH + BACK_BT_WIDTH + ABOUT_BT_WIDTH);
 	static final int MENU_ZONE_HEIGHT = 2 * NAV_MENU_ITEM_HEIGHT;
 	
-	static final String HOME_ICON_PATH = "data/zuist/home-icon.png";
-	static final String UP_ICON_PATH = "data/zuist/up-icon.png";
-	static final String BACK_ICON_PATH = "data/zuist/back-icon.png";
+	static final String HOME_ICON_PATH = "/images/ue/home-icon.png";
+	static final String UP_ICON_PATH = "/images/ue/up-icon.png";
+	static final String BACK_ICON_PATH = "/images/ue/back-icon.png";
 
     VRectangleST navMenuTitleBox;
     VText navMenuTitleLabel;
@@ -108,17 +108,17 @@ public class MenuManager {
         application.vsm.addGlyph(navMenuTitleLabel, application.mnSpace);
         homeBtBox = new VRectangleST(0, 0, 0, HOME_BT_WIDTH, HOME_BT_HEIGHT,
             MENU_FILL_COLOR, MENU_BORDER_COLOR, MENU_TRANSLUCENCE);
-        homeBtIcon = new VImage(0, 0, 0, (new ImageIcon(HOME_ICON_PATH)).getImage());
+        homeBtIcon = new VImage(0, 0, 0, (new ImageIcon(this.getClass().getResource(HOME_ICON_PATH))).getImage());
         application.vsm.addGlyph(homeBtBox, application.mnSpace);
         application.vsm.addGlyph(homeBtIcon, application.mnSpace);
         upBtBox = new VRectangleST(0, 0, 0, UP_BT_WIDTH, UP_BT_HEIGHT,
             MENU_FILL_COLOR, MENU_BORDER_COLOR, MENU_TRANSLUCENCE);
-        upBtIcon = new VImage(0, 0, 0, (new ImageIcon(UP_ICON_PATH)).getImage());
+        upBtIcon = new VImage(0, 0, 0, (new ImageIcon(this.getClass().getResource(UP_ICON_PATH))).getImage());
         application.vsm.addGlyph(upBtBox, application.mnSpace);
         application.vsm.addGlyph(upBtIcon, application.mnSpace);
         backBtBox = new VRectangleST(0, 0, 0, BACK_BT_WIDTH, BACK_BT_HEIGHT,
             MENU_FILL_COLOR, MENU_BORDER_COLOR, MENU_TRANSLUCENCE);
-        backBtIcon = new VImage(0, 0, 0, (new ImageIcon(BACK_ICON_PATH)).getImage());
+        backBtIcon = new VImage(0, 0, 0, (new ImageIcon(this.getClass().getResource(BACK_ICON_PATH))).getImage());
         application.vsm.addGlyph(backBtBox, application.mnSpace);
         application.vsm.addGlyph(backBtIcon, application.mnSpace);
         aboutBtBox = new VRectangleST(0, 0, 0, ABOUT_BT_WIDTH, ABOUT_BT_HEIGHT,

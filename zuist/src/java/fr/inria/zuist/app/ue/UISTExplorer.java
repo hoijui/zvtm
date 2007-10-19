@@ -68,7 +68,7 @@ import org.xml.sax.SAXException;
 
 public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListener, RegionListener {
 
-    static final String PATH_TO_HIERARCHY = "data/zuist/uist4z";
+    static final String PATH_TO_HIERARCHY = "data/uist4z";
     static final String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/scene.xml";
     static final String PATH_TO_METADATA = PATH_TO_HIERARCHY + "/UISTmetadata.xml";
     static final File PROCEEDINGS_DIR = new File(PATH_TO_HIERARCHY);
