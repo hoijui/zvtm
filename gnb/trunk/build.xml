@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+Copyright (c) INRIA, 2004-2005. All Rights Reserved
+Licensed under the GNU LGPL. For full terms see the file COPYING.
+$Id: build.xml 789 2007-10-19 13:37:41Z epietrig $
+
+Usage:
+- build bytecode from source code: 'ant'
+- build bytecode from source code and create gnb.jar: 'ant gnbjar'
+- clean bytecode and javadoc: 'ant realclean'
+- clean bytecode files: 'ant clean'
+-->
+
+<project name="gnb" default="gnbbuild" basedir=".">
+  <description>ZVTM/ZGRViewer build file</description>
+  <path id="project.class.path">
+    <pathelement location="${basedir}/lib/zvtm.jar"/>
+    <pathelement location="${basedir}/lib/xercesImpl.jar"/>
+    <pathelement location="${basedir}/lib/xml-apis.jar"/>
+    <pathelement location="${basedir}/lib/antlr-2.7.5.jar"/>
+    <pathelement location="${basedir}/lib/statemachine.jar"/>
+    <pathelement location="${basedir}/lib/jena/jena.jar"/>
+    <pathelement location="${basedir}/lib/fresnel/jfresnel.jar"/>
+  </path>
+
+  <target name="init">
+    <property name="classes.dir" value="${basedir}/classes"/>
+    <property name="img.dir" value="${basedir}/images"/>
+    <property name="lib.dir" value="${basedir}/lib"/>
+    <property name="src.dir" value="${basedir}/src"/>
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${lib.dir}"/>
+  </target>
+
+  <target name="gnbbuild" depends="init">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}"
+           debug="on" deprecation="off" optimize="on"
+           includes="**/*java">
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target>
+
+  <!--geonames browser jar-->
+  <target name="gnbjar" depends="init,gnbbuild">
+    <jar destfile="${lib.dir}/gnb.jar">
+      <fileset dir="${classes.dir}"
+               includes="net/claribole/gnb/**"/>
+    </jar>
+  </target>
+
+  <!--clean up classes (bytecode)-->
+  <target name="clean" depends="init">
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <!--clean up classes, doc and old versions of source files-->
+  <target name="realclean" depends="clean">
+    <delete>
+      <fileset dir="${basedir}">
+        <include name="**/*~"/>
+        <include name="**/#*#"/>
+      </fileset>
+    </delete>
+  </target>
+
+</project>
+
