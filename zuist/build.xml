@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+Copyright (c) INRIA, 2004-2005. All Rights Reserved
+Licensed under the GNU LGPL. For full terms see the file COPYING.
+$Id: build.xml 789 2007-10-19 13:37:41Z epietrig $
+
+Usage:
+- build bytecode from source code: 'ant', or 'ant zuistbuild'
+- build bytecode from source code and create zuist-engine.jar: 'ant enginejar'
+- build bytecode from source code and create zuist-app-ue.jar: 'ant uejar'
+- generate ZVTM javadoc: 'ant doc'
+- clean bytecode and javadoc: 'ant realclean'
+- clean bytecode files: 'ant clean'
+- clean javadoc: 'ant cleandoc'
+-->
+
+<project name="zgrv" default="zuistbuild" basedir=".">
+  <description>ZGRViewer build file</description>
+  <path id="project.class.path">
+    <pathelement location="${basedir}/lib/zvtm.jar"/>
+    <pathelement location="${basedir}/lib/xercesImpl.jar"/>
+    <pathelement location="${basedir}/lib/xml-apis.jar"/>
+    <pathelement location="${basedir}/lib/statemachine.jar"/>
+  </path>
+
+  <target name="init">
+    <property name="apidocs.dir" value="${basedir}/apidocs"/>
+    <property name="classes.dir" value="${basedir}/classes"/>
+    <property name="img.dir" value="${basedir}/images"/>
+    <property name="lib.dir" value="${basedir}/lib"/>
+    <property name="src.dir" value="${basedir}/src"/>
+    <mkdir dir="${apidocs.dir}"/>
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${lib.dir}"/>
+  </target>
+
+  <!--ZUIST build-->
+  <target name="zuistbuild" depends="init">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}"
+           debug="on" deprecation="off" optimize="on"
+           includes="**/*java">
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target>
+
+  <!--zuist jar-->
+  <target name="enginejar" depends="init,zuistbuild">
+    <jar destfile="${lib.dir}/zuist-engine.jar">
+      <fileset dir="${classes.dir}"
+               includes="fr/inria/zuist/engine/**"/>
+    </jar>
+  </target>
+
+  <!--zuist jar-->
+  <target name="uejar" depends="init,zuistbuild">
+    <jar destfile="${lib.dir}/zuist-app-ue.jar">
+      <fileset dir="${classes.dir}"
+               includes="fr/inria/zuist/app/ue/**"/>
+      <fileset dir="${basedir}"
+               includes="images/ue/*.png"/>
+    </jar>
+  </target>
+
+  <!--documentation (javadoc)-->
+  <target name="doc" depends="init,cleandoc">
+    <javadoc packagenames="fr.inria.zuist.engine.*"
+             sourcepath="${src.dir}" destdir="${apidocs.dir}" Overview="${src.dir}/fr/inria/zuist/engine/overview.html"
+             defaultexcludes="yes" author="true" version="true" use="true"
+             windowtitle="ZUIST engine API documentation">
+      <classpath refid="project.class.path"/>
+      <doctitle><![CDATA[<h1>ZUIST engine API documentation</h1>]]></doctitle>
+      <bottom><![CDATA[<i>Copyright &#169; 2007 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+    </javadoc>
+  </target>
+
+  <!--clean up classes (bytecode)-->
+  <target name="clean" depends="init">
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <!--clean up documentation-->
+  <target name="cleandoc" depends="init">
+    <delete dir="${apidocs.dir}"/>
+  </target>
+
+  <!--clean up classes, doc and old versions of source files-->
+  <target name="realclean" depends="clean, cleandoc">
+    <delete>
+      <fileset dir="${basedir}">
+        <include name="**/*~"/>
+        <include name="**/#*#"/>
+      </fileset>
+    </delete>
+  </target>
+
+</project>
