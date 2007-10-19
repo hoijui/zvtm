@@ -32,29 +32,29 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
     // pan buttons: NW, N, NE, W, H, E, SW, S, SE
     JButton[] panBts = new JButton[9];
     // icons for these buttons
-    final ImageIcon[] icons = {new ImageIcon(this.getClass().getResource("/images/zgrv/m_nw.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_n.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_ne.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_w.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_home.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_e.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_sw.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_s.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/m_se.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/zm_i.png")),
-			       new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o.png"))};
+    final ImageIcon[] icons = {new ImageIcon(this.getClass().getResource("/images/m_nw.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_n.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_ne.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_w.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_home.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_e.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_sw.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_s.png")),
+			       new ImageIcon(this.getClass().getResource("/images/m_se.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zm_i.png")),
+			       new ImageIcon(this.getClass().getResource("/images/zm_o.png"))};
     // rollover icons for these buttons
-    final ImageIcon[] r_icons = {new ImageIcon(this.getClass().getResource("/images/zgrv/m_nw_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_n_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_ne_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_w_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_home_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_e_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_sw_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_s_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/m_se_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_i_h.png")),
-				 new ImageIcon(this.getClass().getResource("/images/zgrv/zm_o_h.png"))};
+    final ImageIcon[] r_icons = {new ImageIcon(this.getClass().getResource("/images/m_nw_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_n_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_ne_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_w_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_home_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_e_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_sw_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_s_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/m_se_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zm_i_h.png")),
+				 new ImageIcon(this.getClass().getResource("/images/zm_o_h.png"))};
     // zoom buttons: zoom in, zoom out
     JButton[] zoomBts = new JButton[2];
     

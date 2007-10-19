@@ -37,21 +37,21 @@ public class ToolPalette {
     static final short HIGHLIGHT_MODE = 5;
     static final short FRESNEL_MODE = 6;
 
-    static final String[] ICON_PATHS = {"/images/zgrv/stdnav24b.png",
-					"/images/zgrv/flnav24b.png",
-					"/images/zgrv/dmnav24b.png",
-					"/images/zgrv/plnav24b.png",
-					"/images/zgrv/mlnav24b.png",
-					"/images/zgrv/hl24b.png",
-					"/images/zgrv/fl24b.png"};
+    static final String[] ICON_PATHS = {"/images/stdnav24b.png",
+					"/images/flnav24b.png",
+					"/images/dmnav24b.png",
+					"/images/plnav24b.png",
+					"/images/mlnav24b.png",
+					"/images/hl24b.png",
+					"/images/fl24b.png"};
 
-    static final String[] SELECTED_ICON_PATHS = {"/images/zgrv/stdnav24g.png",
-						 "/images/zgrv/flnav24g.png",
-						 "/images/zgrv/dmnav24g.png",
-						 "/images/zgrv/plnav24g.png",
-						 "/images/zgrv/mlnav24g.png",
-						 "/images/zgrv/hl24g.png",
-						 "/images/zgrv/fl24g.png"};
+    static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
+						 "/images/flnav24g.png",
+						 "/images/dmnav24g.png",
+						 "/images/plnav24g.png",
+						 "/images/mlnav24g.png",
+						 "/images/hl24g.png",
+						 "/images/fl24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
