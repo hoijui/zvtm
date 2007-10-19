@@ -1,0 +1,42 @@
+<!-- $Id: scene.dtd,v 1.11 2007/10/04 09:52:01 pietriga Exp $ -->
+
+<!ELEMENT scene (level+,region+)>
+
+<!ELEMENT level EMPTY>
+<!ATTLIST level depth CDATA #REQUIRED
+                floor CDATA #REQUIRED
+                ceiling CDATA #REQUIRED>
+
+<!ELEMENT region (object)*>
+<!ATTLIST region depth CDATA #REQUIRED
+                 id ID #REQUIRED
+                 title CDATA #IMPLIED
+                 containedIn IDREF #IMPLIED
+                 x CDATA #REQUIRED
+                 y CDATA #REQUIRED
+                 w CDATA #REQUIRED
+                 h CDATA #REQUIRED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 tful (appear|disappear|fadein|fadeout) "appear"
+                 tfll (appear|disappear|fadein|fadeout) "appear"
+                 ttul (appear|disappear|fadein|fadeout) "appear"
+                 ttll (appear|disappear|fadein|fadeout) "appear"
+                 sensitive (true|false) "false"
+                 requestOrdering (decl|dist) "dist">
+
+<!ELEMENT object ANY>
+<!ATTLIST object id ID #REQUIRED
+                 type (image|text|rect) #REQUIRED
+                 x CDATA #REQUIRED
+                 y CDATA #REQUIRED
+                 w CDATA #IMPLIED
+                 h CDATA #IMPLIED
+                 src CDATA #IMPLIED
+                 scale CDATA #IMPLIED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 takesToObject IDREF #IMPLIED
+                 takesToRegion IDREF #IMPLIED
+                 sensitive (true|false) "true"
+                 anchor (start|middle|end) "middle">
