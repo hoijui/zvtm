@@ -43,7 +43,8 @@ Usage:
 
   <!--geonames browser jar-->
   <target name="gnbjar" depends="init,gnbbuild">
-    <jar destfile="${lib.dir}/gnb.jar">
+    <jar destfile="${lib.dir}/gnb.jar"
+         manifest="gnb-manifest.mf">
       <fileset dir="${classes.dir}"
                includes="net/claribole/gnb/**"/>
     </jar>
