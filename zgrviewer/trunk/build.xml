@@ -58,7 +58,8 @@ Usage:
 
   <!--zgrviewer jar-->
   <target name="zgrvjar" depends="init,zgrvbuild">
-    <jar destfile="${lib.dir}/zgrviewer.jar">
+    <jar destfile="${lib.dir}/zgrviewer.jar"
+         manifest="zgrv-manifest.mf">
       <fileset dir="${classes.dir}"
                includes="net/claribole/zgrviewer/**"/>
       <fileset dir="${basedir}"
