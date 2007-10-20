@@ -44,7 +44,7 @@ Usage:
     </javac>
   </target>
 
-  <!--zuist jar-->
+  <!--zuist engine jar-->
   <target name="enginejar" depends="init,zuistbuild">
     <jar destfile="${lib.dir}/zuist-engine.jar">
       <fileset dir="${classes.dir}"
@@ -52,9 +52,10 @@ Usage:
     </jar>
   </target>
 
-  <!--zuist jar-->
+  <!--UIST explorer jar-->
   <target name="uejar" depends="init,zuistbuild">
-    <jar destfile="${lib.dir}/zuist-app-ue.jar">
+    <jar destfile="${lib.dir}/zuist-app-ue.jar"
+         manifest="ue-manifest.mf">
       <fileset dir="${classes.dir}"
                includes="fr/inria/zuist/app/ue/**"/>
       <fileset dir="${basedir}"
