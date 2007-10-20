@@ -32,11 +32,10 @@ public class GeonamesBrowser implements Java2DPainter {
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
 
-    /* max dimensions of ZVTM view */
-    static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 1024;
-
     static final int CONTROL_PANEL_WIDTH = 300;
+    /* max dimensions of ZVTM view */
+    static final int VIEW_MAX_W = 1024-CONTROL_PANEL_WIDTH;
+    static final int VIEW_MAX_H = 768;
 
     /* actual dimensions of view */
     int VIEW_W, VIEW_H;
