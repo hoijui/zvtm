@@ -140,7 +140,8 @@ public class GeonamesBrowser implements Java2DPainter {
 	cameras.add(mCamera);
 	cameras.add(fm.iCamera);
 	mView = vsm.addExternalView(cameras, Messages.MAIN_VIEW_TITLE, View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
-	mView.mouse.setHintColor(HCURSOR_COLOR);
+    mView.mouse.setColor(HCURSOR_COLOR);
+    mView.mouse.setHintColor(HCURSOR_COLOR);
 	mView.setLocation(VIEW_X, VIEW_Y);
 	updatePanelSize();
 	mView.setEventHandler(eh);
