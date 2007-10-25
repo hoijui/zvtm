@@ -10,10 +10,14 @@ package net.claribole.zvtm.layout;
 
 /**
  * Tree orientation constants
+ * @author Boris Trofimov
  */
+ 
 public class TreeOrientation {
+    
 	public static final int LEFT_RIGHT = 0;
 	public static final int RIGHT_LEFT = 1;
 	public static final int TOP_BOTTOM = 3;
 	public static final int BOTTOM_TOP = 2;
+
 }

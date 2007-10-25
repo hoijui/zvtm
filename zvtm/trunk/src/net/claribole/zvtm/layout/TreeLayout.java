@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 /**
  * Layout algorithm to layout LTree objects.
+ * @author Boris Trofimov
  */
 public class TreeLayout {
 
@@ -35,7 +36,7 @@ public class TreeLayout {
 
 	/**
 	 * Creates instance of layout algorithm.
-	 * @param tree LTree instance to be layouted.
+	 * @param tree LTree instance to be laid out.
 	 */
 	public TreeLayout(LTree tree) {
 		this.tree = tree;
@@ -43,7 +44,7 @@ public class TreeLayout {
 
 	/**
 	 * Creates instance of layout algorithm.
-	 * @param tree LTree instance to be layouted.
+	 * @param tree LTree instance to be laid out.
 	 * @param orientation Orientation is one of the TreeOrientation constants.
 	 * @param dspace the spacing between depth levels
 	 * @param bspace the spacing between sibling children

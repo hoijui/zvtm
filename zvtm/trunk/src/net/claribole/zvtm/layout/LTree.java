@@ -14,7 +14,8 @@ import java.awt.Color;
 
 /**
  * Representation of abstract tree.
- * This tree can be layouted with TreeLayout instance.
+ * This tree can be laid out with TreeLayout instance.
+ * @author Boris Trofimov
  * @see LNode
  * @see TreeLayout
  */

@@ -22,6 +22,7 @@ import java.util.List;
 
 /**
  * Node of the LTree tree.
+ * @author Boris Trofimov
  * @see LTree
  * @see TreeLayout
  */
@@ -381,7 +382,7 @@ public class LNode {
 	}
 
 	/**
-	 * This method can be called after the tree was layouted with layout algorithm
+	 * This method can be called after the tree was laid out with layout algorithm
 	 * to update position of this node and all children.
 	 * @param treeOrientation One of the TreeOrientation constants.
 	 * @param camIndex Index of active camera.
