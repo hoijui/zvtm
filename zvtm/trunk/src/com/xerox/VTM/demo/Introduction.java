@@ -30,6 +30,7 @@ import java.awt.Font;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
@@ -497,21 +498,25 @@ public class Introduction {
     }
 
     public static void main(String[] args){
-	System.out.println("-----------------");
-	System.out.println("General information");
-	System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
-	System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
-	System.out.println("-----------------");
-	System.out.println("Directory information");
-	System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
-	System.out.println("Java directory: "+System.getProperty("java.home"));
-	System.out.println("Launching from: "+System.getProperty("user.dir"));
-	System.out.println("-----------------");
-	System.out.println("User informations");
-	System.out.println("User name: "+System.getProperty("user.name"));
-	System.out.println("User home directory: "+System.getProperty("user.home"));
-	System.out.println("-----------------");
-	new Introduction();
+        System.out.println("-----------------");
+        System.out.println("General information");
+        System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
+        System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
+        System.out.println("-----------------");
+        System.out.println("Directory information");
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java directory: "+System.getProperty("java.home"));
+        System.out.println("Launching from: "+System.getProperty("user.dir"));
+        System.out.println("-----------------");
+        System.out.println("User informations");
+        System.out.println("User name: "+System.getProperty("user.name"));
+        System.out.println("User home directory: "+System.getProperty("user.home"));
+        System.out.println("-----------------");
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new Introduction();
+            }
+        });
     }
     
 }
