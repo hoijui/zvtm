@@ -17,6 +17,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Graphics2D;
 import javax.swing.text.Style;
+import javax.swing.SwingUtilities;
 
 import java.util.Vector;
 
@@ -460,12 +461,16 @@ public class GeonamesBrowser implements Java2DPainter {
     }
 
     void gc(){
-	System.gc();
-	if (SHOW_MEMORY_USAGE){vsm.repaintNow();}
+        System.gc();
+        if (SHOW_MEMORY_USAGE){vsm.repaintNow();}
     }
 
     public static void main(String[] args){
-	new GeonamesBrowser();
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new GeonamesBrowser();
+            }
+        });
     }
     
 }
