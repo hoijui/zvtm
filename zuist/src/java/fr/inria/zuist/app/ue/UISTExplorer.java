@@ -15,6 +15,7 @@ import java.awt.Font;
 import java.awt.AlphaComposite;
 import java.awt.GraphicsEnvironment;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 import java.util.Vector;
 import java.util.Hashtable;
@@ -1034,10 +1035,14 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
     }
 
     public static void main(String[] args){
-        short vt = (args.length > 0) ? Short.parseShort(args[0]) : 0;
-        boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : true;
-        boolean le = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
-        new UISTExplorer(vt, fs, le);
+        final short vt = (args.length > 0) ? Short.parseShort(args[0]) : 0;
+        final boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : true;
+        final boolean le = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new UISTExplorer(vt, fs, le);
+            }
+        });
     }
     
 }
