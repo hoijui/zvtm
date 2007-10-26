@@ -37,6 +37,7 @@ import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
 
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.Document;
@@ -460,35 +461,41 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     public static void main(String[] args){
-	if (Utils.osIsMacOS()){
-	    System.setProperty("apple.laf.useScreenMenuBar", "true");
-	}
-	int acceleratedView = 0;
-	for (int i=0;i<args.length;i++){
-	    if (args[i].startsWith("-")){
-		if (args[i].equals("--help")){
-		    System.out.println("\n\njava net.claribole.zgrviewer.ZGRViewer [options] [file]");
-		    System.out.println("[options] -volatile ZVTM will run in VolatileImage accelerated mode (requires JDK 1.4 or later)");
-		    System.out.println("          -opengl   ZVTM will run in OpenGL accelerated mode (requires JDK 1.5 or later)");
-		    System.out.println("          -Pxxx     where xxx={dot, neato, svg} to specify what program to use to compute the [file]'s layout");
-		    System.out.println("[file]    can be a relative or full path ; use the native OS syntax\n\n");
-		    System.exit(0);
-		}
-		else if (args[i].equals("-opengl")){
-		    System.setProperty("sun.java2d.opengl", "true");
-		    System.out.println("OpenGL accelerated mode");
-		    acceleratedView = 2;
-		}
-		else if (args[i].equals("-volatile")){System.out.println("Volatile Image accelerated mode");acceleratedView = 1;}
-		else if (args[i].startsWith("-P")){cmdLinePrg=args[i];}
-	    }
-	    else {//the only other stuff allowed as a cmd line param is a dot file
-		File f=new File(args[i]);
-		if (f.exists()){cmdLineDOTFile=f;}
-	    }
-	}
-	System.out.println("--help for command line options");
-	ZGRViewer appli=new ZGRViewer(acceleratedView);
+        if (Utils.osIsMacOS()){
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
+        int acceleratedView = 0;
+        for (int i=0;i<args.length;i++){
+            if (args[i].startsWith("-")){
+                if (args[i].equals("--help")){
+                    System.out.println("\n\njava net.claribole.zgrviewer.ZGRViewer [options] [file]");
+                    System.out.println("[options] -volatile ZVTM will run in VolatileImage accelerated mode (requires JDK 1.4 or later)");
+                    System.out.println("          -opengl   ZVTM will run in OpenGL accelerated mode (requires JDK 1.5 or later)");
+                    System.out.println("          -Pxxx     where xxx={dot, neato, svg} to specify what program to use to compute the [file]'s layout");
+                    System.out.println("[file]    can be a relative or full path ; use the native OS syntax\n\n");
+                    System.exit(0);
+                }
+                else if (args[i].equals("-opengl")){
+                    System.setProperty("sun.java2d.opengl", "true");
+                    System.out.println("OpenGL accelerated mode");
+                    acceleratedView = 2;
+                }
+                else if (args[i].equals("-volatile")){System.out.println("Volatile Image accelerated mode");acceleratedView = 1;}
+                else if (args[i].startsWith("-P")){cmdLinePrg=args[i];}
+            }
+            else {
+                //the only other stuff allowed as a cmd line param is a dot file
+                File f=new File(args[i]);
+                if (f.exists()){cmdLineDOTFile=f;}
+            }
+        }
+        System.out.println("--help for command line options");
+        final int av = acceleratedView;
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new ZGRViewer(av);
+            }
+        });
     }
     
 }
