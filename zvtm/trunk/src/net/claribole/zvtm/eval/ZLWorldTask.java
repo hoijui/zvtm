@@ -16,7 +16,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.util.Vector;
-
+import javax.swing.SwingUtilities;
 import javax.swing.text.Style;
 
 import net.claribole.zvtm.engine.DraggableCameraPortal;
@@ -1026,15 +1026,19 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     }
 
     public static void main(String[] args){
-	/* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZA_TECHNIQUE, PZL_TECHNIQUE or SS_TECHNIQUE for appropriate values
-	   Second argument is either 1 (show console for messages) or 0 (don't show it)
-	   Third argument is either 1 (show map manager monitor) or 0 (don't show it) */
-	short tech = (args.length > 0) ? Short.parseShort(args[0]) : SS_TECHNIQUE;
-	boolean sc = (args.length > 1) ? (Short.parseShort(args[1])==1) : false;
-	boolean smm = (args.length > 2) ? (Short.parseShort(args[2])==1) : false;
-	boolean si = (args.length > 3) ? (Short.parseShort(args[3])==1) : true;
-	boolean td = (args.length > 4) ? (Short.parseShort(args[4])==1) : false;
-	new ZLWorldTask(tech, sc, smm, si, td);
+        /* First argument is the technique: see ZL_TECHNIQUE, PZ_TECHNIQUE, PZA_TECHNIQUE, PZL_TECHNIQUE or SS_TECHNIQUE for appropriate values
+            Second argument is either 1 (show console for messages) or 0 (don't show it)
+            Third argument is either 1 (show map manager monitor) or 0 (don't show it) */
+        final short tech = (args.length > 0) ? Short.parseShort(args[0]) : SS_TECHNIQUE;
+        final boolean sc = (args.length > 1) ? (Short.parseShort(args[1])==1) : false;
+        final boolean smm = (args.length > 2) ? (Short.parseShort(args[2])==1) : false;
+        final boolean si = (args.length > 3) ? (Short.parseShort(args[3])==1) : true;
+        final boolean td = (args.length > 4) ? (Short.parseShort(args[4])==1) : false;
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new ZLWorldTask(tech, sc, smm, si, td);
+            }
+        });
     }
     
 }

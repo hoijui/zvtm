@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.util.Vector;
-
+import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 
 import net.claribole.zvtm.engine.DraggableCameraPortal;
@@ -292,7 +292,11 @@ public class DragMagDemo implements Java2DPainter {
     }
 
     public static void main(String[] args){
- 	new DragMagDemo();
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+             	new DragMagDemo();
+            }
+        });
     }
 
 }

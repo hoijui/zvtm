@@ -16,6 +16,7 @@ import java.awt.Dimension;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.lens.*;
@@ -578,8 +579,12 @@ public class TLensDemo {
     }
 
     public static void main(String[] args){
-	boolean gridOnly = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
-	new TLensDemo(gridOnly);
+        final boolean gridOnly = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new TLensDemo(gridOnly);
+            }
+        });
     }
     
 }

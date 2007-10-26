@@ -12,6 +12,7 @@ package net.claribole.zvtm.demo;
 
 import java.awt.Color;
 import java.util.Vector;
+import javax.swing.SwingUtilities;
 
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -165,10 +166,13 @@ public class ViewDemo {
 	"\nLaunching from: " + System.getProperty("user.dir") +
 	"\n-----------------\n\nThe ViewDemo gives an indication of the refresh rate under extreme conditions:\n10,000 (possibly translucent) objects are displayed. The refresh rate (given in\nframes per second) corresponds to the approximate theoretical rate ZVTM could\nproduce. In practive, ZVTM limits the refresh rate to 40 fps maximum, as this\nis already beyond human perception capabilities.\n\n-----------------\nThe OpenGL-based View demo requires the use of a Java Virtual Machine\nv1.5.0 or later\n-----------------\nDrag mouse to move camera, Shift + vertical mouse drag to zoom in/out.\n-----------------";
 
-    public static void main(String[] args){
-	System.out.println(startMsg);
-	new ViewDemo((args.length > 0) ? Short.parseShort(args[0]) : 0,
-		(args.length > 1) ? Short.parseShort(args[1]) : 0);
+    public static void main(final String[] args){
+        System.out.println(startMsg);
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new ViewDemo((args.length > 0) ? Short.parseShort(args[0]) : 0, (args.length > 1) ? Short.parseShort(args[1]) : 0);
+            }
+        });
     }
     
 }

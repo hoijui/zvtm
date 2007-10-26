@@ -17,6 +17,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.util.Vector;
+import javax.swing.SwingUtilities;
 
 import net.claribole.zvtm.engine.DraggableCameraPortal;
 import net.claribole.zvtm.engine.Java2DPainter;
@@ -863,9 +864,13 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     }
 
     public static void main(String[] args){
-	/* First argument is the technique: see PZO_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE for appropriate values*/
-	short tech = (args.length > 0) ? Short.parseShort(args[0]) : PZ_TECHNIQUE;
-	new ZLAbstractTask(tech);
+        /* First argument is the technique: see PZO_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE for appropriate values*/
+        final short tech = (args.length > 0) ? Short.parseShort(args[0]) : PZ_TECHNIQUE;
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                new ZLAbstractTask(tech);
+            }
+        });
     }
     
 }
