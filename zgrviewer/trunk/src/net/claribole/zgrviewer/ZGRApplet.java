@@ -198,7 +198,15 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 		    sleep(1000);
 		    requestFocus();
 		    grMngr.vsm.repaintNow();
-		    gvLdr.loadSVG(getParameter(SVG_FILE_URL_PARAM));
+            URL svgUrl = null;
+            try {
+                svgUrl = new URL(getDocumentBase(), getParameter(SVG_FILE_URL_PARAM));
+            }
+            catch (MalformedURLException e) {
+                //TODO
+                e.printStackTrace();
+            }
+            gvLdr.loadSVG(svgUrl.toString());
 		    // override SVG's background color if background color is specified in applet params
 		    if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(cfgMngr.backgroundColor);}
 		    setStatusBarText(Messages.EMPTY_STRING);
