@@ -209,7 +209,6 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
             gvLdr.loadSVG(svgUrl.toString());
 		    // override SVG's background color if background color is specified in applet params
 		    if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(cfgMngr.backgroundColor);}
-		    setStatusBarText(Messages.EMPTY_STRING);
 		    grMngr.tp.updateHiddenPosition();
 		    grMngr.vsm.repaintNow(grMngr.mainView, ZGRApplet.this);
 		    while (!ZGRApplet.this.paintedAtLeastOnce){
@@ -221,6 +220,11 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 		    grMngr.vsm.repaintNow();
 		    return null; 
 		}
+
+        public void finished(){
+            setStatusBarText(Messages.EMPTY_STRING);
+        }
+
 	    };
 	worker.start();
     }
