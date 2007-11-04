@@ -117,5 +117,9 @@ public class Messages {
     static final String PATH_NOT_SET = "NOT SET";
 
     static final String FAILED_TO_BUILD_LOGICAL_STRUCT = "Failed to build logical structure. Some tools are disabled.";
+    
+    static final String ERROR_LOADING_DOT_FILE = "An error occured while parsing this DOT file.";
+
+    static final String SVG_PARSING_ERROR = "SVG parsing error";
 
 }

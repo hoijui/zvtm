@@ -259,42 +259,42 @@ class DOTManager {
     }
 
     void displaySVG(ProgPanel pp, File sourceDotFileParentDir){
-	pp.setLabel("Parsing SVG...");
-	pp.setPBValue(60);
-	Document svgDoc=Utils.parse(svgF,false);
-	pp.setLabel("Displaying...");
-	pp.setPBValue(80);
-	try {
-	    System.err.println(sourceDotFileParentDir);
-	    SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
-	    grMngr.seekBoundingBox();
-	    grMngr.buildLogicalStructure();
-	}
-	catch (MalformedURLException ex){
-	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), svgF.getAbsolutePath(),
-					  "SVG parsing error", JOptionPane.ERROR_MESSAGE);
-	    System.err.println("Error loading SVG file.\n");
-	}
+        pp.setLabel("Parsing SVG...");
+        pp.setPBValue(60);
+        Document svgDoc=Utils.parse(svgF,false);
+        pp.setLabel("Displaying...");
+        pp.setPBValue(80);
+        try {
+            SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
+            grMngr.seekBoundingBox();
+            grMngr.buildLogicalStructure();
+        }
+        catch (MalformedURLException ex){
+            JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), svgF.getAbsolutePath(),
+                Messages.SVG_PARSING_ERROR, JOptionPane.ERROR_MESSAGE);
+            System.err.println("Error loading SVG file.\n");
+        }
     }
 
     void displayDOT(ProgPanel pp) throws Exception {
-        pp.setLabel("Parsing Augmented DOT...");
-        pp.setPBValue(60);
-        DataInputStream graphInput = new DataInputStream(new FileInputStream(
+        try {
+            pp.setLabel("Parsing Augmented DOT...");
+            pp.setPBValue(60);
+            DataInputStream graphInput = new DataInputStream(new FileInputStream(
                 svgF));
-        DOTLexer graphLexer = new DOTLexer(graphInput);
-        DOTParser graphParser = new DOTParser(graphLexer);
-
-        graphParser.graph();
-
-        CommonAST ast = (CommonAST) graphParser.getAST();
-
-        DOTTreeParser graphWalker = new DOTTreeParser();
-        graph = graphWalker.graph(ast);
-
-        pp.setLabel("Displaying...");
-        pp.setPBValue(80);
-        ZgrReader.load(graph, grMngr.vsm, grMngr.mainSpace, true);
+            DOTLexer graphLexer = new DOTLexer(graphInput);
+            DOTParser graphParser = new DOTParser(graphLexer);
+            graphParser.graph();
+            CommonAST ast = (CommonAST) graphParser.getAST();
+            DOTTreeParser graphWalker = new DOTTreeParser();
+            graph = graphWalker.graph(ast);
+            pp.setLabel("Displaying...");
+            pp.setPBValue(80);
+            ZgrReader.load(graph, grMngr.vsm, grMngr.mainSpace, true);
+        }
+        catch (NullPointerException ex){
+            JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.ERROR_LOADING_DOT_FILE, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 
