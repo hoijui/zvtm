@@ -346,17 +346,19 @@ public class VirtualSpaceManager implements AWTEventListener {
 	return (Glyph)(allGlyphs.get(id));
     }
 
-    /**destroy all glyphs in space whose name is spaceName*/
+    /** Destroy all glyphs in a virtual space.
+     *@param spaceName name of that virtual space
+     */
     public void destroyGlyphsInSpace(String spaceName){
-	VirtualSpace vs=getVirtualSpace(spaceName);
-	Glyph g;
-	Vector entClone=(Vector)vs.getAllGlyphs().clone();
-	for (Enumeration e=entClone.elements();e.hasMoreElements();){
-	    g=(Glyph)(e.nextElement());
-	    vs.destroyGlyph(g);
-	    allGlyphs.remove(g);
-	}
-	repaintNow();
+        VirtualSpace vs=getVirtualSpace(spaceName);
+        Glyph g;
+        Vector entClone=(Vector)vs.getAllGlyphs().clone();
+        for (int i=0;i<entClone.size();i++){
+            g = (Glyph)entClone.elementAt(i);
+            vs.destroyGlyph(g, false);
+            allGlyphs.remove(g);
+        }
+        repaintNow();
     }
 
     /**add camera to space whose name is vs

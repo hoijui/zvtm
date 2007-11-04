@@ -253,41 +253,63 @@ public class VirtualSpace {
 	return v;
     }
 
-    /**remove this glyph from this virtual space (should then be garbage-collected)
+    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
      *@param gID glyph's ID
      */
     public void destroyGlyph(Long gID){
-	destroyGlyph(vsm.getGlyph(gID));
+	    destroyGlyph(vsm.getGlyph(gID), true);
     }
 
-    /**remove this glyph from this virtual space (should then be garbage-collected)*/
+    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
+     *@param gID glyph's ID
+     *@param repaint should the view be updated automatically or not
+     */
+    public void destroyGlyph(Long gID, boolean repaint){
+	    destroyGlyph(vsm.getGlyph(gID), repaint);
+    }
+
+    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated. */
     public void destroyGlyph(Glyph g){
-	try {
-	    if (g.stickedTo!=null){
-		if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
-		else if (g.stickedTo instanceof Camera){((Camera)g.stickedTo).unstick(g);}
-		else {((VCursor)g.stickedTo).unstickSpecificGlyph(g);}
-	    }
-	    if (g.getCGlyph()!=null){//remove from composite glyph if was part of one
-		g.getCGlyph().removeSecondaryGlyph(g);
-	    }
-	    for (int i=0;i<camera2drawnList.length;i++){
-		if (camera2drawnList[i]!=null){//camera2drawnlist[i] can be null if camera i has been removed from 
-		    camera2drawnList[i].remove(g);//the virtual space
-		}
-	    }
-	    View v;
-	    for (int i=0;i<cm.cameraList.length;i++){
-		if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
-		    cm.cameraList[i].view.mouse.removeGlyphFromList(g);
-		}
-	    }
-	    visualEnts.remove(g);
-	    removeGlyphFromDrawingList(g);
-	    vsm.allGlyphs.remove(g);
-	    vsm.repaintNow();
-	}
-	catch (NullPointerException ex){System.err.println("ZVTM Error: VirtualSpace.destroyGlyph(): the glyph you are trying to delete might not be a member of this virtual space ("+spaceName+") or might be null");ex.printStackTrace();}
+        destroyGlyph(g, true);
+    }
+
+    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
+        *@param repaint should the view be updated automatically or not
+        */
+    public void destroyGlyph(Glyph g, boolean repaint){
+        try {
+            if (g.stickedTo!=null){
+                if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
+                else if (g.stickedTo instanceof Camera){((Camera)g.stickedTo).unstick(g);}
+                else {((VCursor)g.stickedTo).unstickSpecificGlyph(g);}
+            }
+            if (g.getCGlyph()!=null){
+                //remove from composite glyph if was part of one
+                g.getCGlyph().removeSecondaryGlyph(g);
+            }
+            for (int i=0;i<camera2drawnList.length;i++){
+                if (camera2drawnList[i]!=null){
+                    //camera2drawnlist[i] can be null if camera i has been removed from the virtual space
+                    camera2drawnList[i].remove(g);
+                }
+            }
+            View v;
+            for (int i=0;i<cm.cameraList.length;i++){
+                if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
+                    cm.cameraList[i].view.mouse.removeGlyphFromList(g);
+                }
+            }
+            visualEnts.remove(g);
+            removeGlyphFromDrawingList(g);
+            vsm.allGlyphs.remove(g);
+            if (repaint){
+                vsm.repaintNow();
+            }
+        }
+        catch (NullPointerException ex){
+            System.err.println("ZVTM Error: VirtualSpace.destroyGlyph(): the glyph you are trying to delete might not be a member of this virtual space ("+spaceName+") or might be null");
+            ex.printStackTrace();
+        }
     }
 
     /**show Glyph g
