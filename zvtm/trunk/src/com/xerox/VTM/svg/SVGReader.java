@@ -151,32 +151,37 @@ public class SVGReader {
     }
 
     /** Check that an SVG path value is supported by ZVTM.
-     * This does not test for well-formedness of the expression. It just verifies that all SVG commands are actually supported by ZVTM (M,m,L,l,H,h,V,v,C,c,Q,q)*/
+        * Verifies that all SVG commands are actually supported by ZVTM (M,m,L,l,H,h,V,v,C,c,Q,q)
+        */
     public static boolean checkSVGPath(String svg){
-	boolean res=true;
-	byte[] chrs=svg.getBytes();
-	for (int i=0;i<chrs.length;i++){
-	    if (!((chrs[i] == 32) ||                     // space
-		  (chrs[i] == 45) ||                     // minus
-		  ((chrs[i] >= 48) && (chrs[i] <= 57)) ||// 0-9
-		  (chrs[i] == 67) ||                     // C
-		  (chrs[i] == 72) ||                     // H
-		  (chrs[i] == 76) ||                     // L
-		  (chrs[i] == 77) ||                     // M
-		  (chrs[i] == 81) ||                     // Q
-		  (chrs[i] == 86) ||                     // V
-		  (chrs[i] == 99) ||                     // c
-		  (chrs[i] == 104) ||                    // h
-		  (chrs[i] == 108) ||                    // l
-		  (chrs[i] == 109) ||                    // m
-		  (chrs[i] == 113) ||                    // q
-		  (chrs[i] == 118) ||                    // v
-		  (chrs[i] == 44) ||                     // comma
-		  (chrs[i] == 46))){                     // point
-		res=false;System.err.println("SVG Path: char '"+svg.substring(i,i+1)+"' not supported");break;
-	    }
-	}
-	return res;
+        boolean res=true;
+        byte[] chrs=svg.getBytes();
+        for (int i=0;i<chrs.length;i++){
+            if (!((chrs[i] == 32) ||                   // space
+                (chrs[i] == 45) ||                     // minus
+                ((chrs[i] >= 48) && (chrs[i] <= 57)) ||// 0-9
+                (chrs[i] == 67) ||                     // C
+                (chrs[i] == 72) ||                     // H
+                (chrs[i] == 76) ||                     // L
+                (chrs[i] == 77) ||                     // M
+                (chrs[i] == 81) ||                     // Q
+                (chrs[i] == 86) ||                     // V
+                (chrs[i] == 99) ||                     // c
+                (chrs[i] == 104) ||                    // h
+                (chrs[i] == 108) ||                    // l
+                (chrs[i] == 109) ||                    // m
+                (chrs[i] == 113) ||                    // q
+                (chrs[i] == 118) ||                    // v
+                (chrs[i] == 101) ||                    // e (exponent in floating-point-constant)
+                (chrs[i] == 69) ||                     // E (exponent in floating-point-constant)
+                (chrs[i] == 44) ||                     // comma
+                (chrs[i] == 46))){                     // point
+                    res=false;
+                    System.err.println("SVG Path: char '"+svg.substring(i,i+1)+"' not supported");
+                    break;
+             }
+        }
+        return res;
     }
 
     public static long getLong(String s){
