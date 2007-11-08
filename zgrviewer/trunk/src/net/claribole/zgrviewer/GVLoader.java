@@ -9,16 +9,19 @@
 
 package net.claribole.zgrviewer;
 
-import java.awt.Color;
 import javax.swing.JOptionPane;
 import javax.swing.JFileChooser;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.zip.GZIPInputStream;
 
 import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.svg.SVGReader;
-import net.claribole.zvtm.engine.Location;
-
 import org.w3c.dom.Document;
 
 /* Multiscale feature manager */
@@ -100,7 +103,7 @@ class GVLoader {
 	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 	    dotMngr.load(f, prg, parser);
 	    //in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	    ConfigManager.defaultFont = grMngr.vsm.getMainFont();
+	    ConfigManager.defaultFont = VirtualSpaceManager.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
 	    grMngr.reveal();
 	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
@@ -121,7 +124,8 @@ class GVLoader {
 	    pp.setLabel("Displaying...");
 	    pp.setPBValue(80);
 	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-	    SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, f.toURL().toString());
+	    SVGReader.load(svgDoc, grMngr.vsm, GraphicsManager.mainSpace, true,
+	    		f.toURI().toURL().toString());
 	    grMngr.seekBoundingBox();
 	    grMngr.buildLogicalStructure();
 	    ConfigManager.defaultFont=grMngr.vsm.getMainFont();
@@ -143,16 +147,39 @@ class GVLoader {
 	}
     }
 
-    /* method used by ZGRViewer - Applet to get the server-side generated SVG file */
+    /** Method used by ZGRViewer - Applet to get the server-side generated SVG file.
+     * Adds acceptance of gzip encoding in request and handles response with gzip
+     * encoding. (i.e. SVGZ format).
+     */
     void loadSVG(String svgFileURL){
 	try {
-	    Document svgDoc = AppletUtils.parse(svgFileURL, false);
+		// Construct a URL, get the connection and set that gzip is an accepted
+		// encoding. This gives the server a chance to dynamically deliver "svgz" 
+		// content.
+		//
+		URL url = new URL(svgFileURL);
+		URLConnection c = url.openConnection();
+		c.setRequestProperty("Accept-Encoding", "gzip");
+		// Connection is opened when something is requested - the header or
+		// the content. The encoding is needed to determine if data is in gzip format.
+		//
+		InputStream is = c.getInputStream();
+		String encoding = c.getContentEncoding();
+		if("gzip".equals(encoding)||"x-gzip".equals(encoding))
+		{
+			// handle gzip stream
+			is = new GZIPInputStream(is);			
+		}
+		is = new BufferedInputStream(is);
+		
+		// parse the content of the stream
+	    Document svgDoc = AppletUtils.parse(is, false);
 	    if (svgDoc != null){
 		if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-		SVGReader.load(svgDoc, grMngr.vsm, grMngr.mainSpace, true, svgFileURL);
+		SVGReader.load(svgDoc, grMngr.vsm, GraphicsManager.mainSpace, true, svgFileURL);
 		grMngr.seekBoundingBox();
 		grMngr.buildLogicalStructure();
-		ConfigManager.defaultFont = grMngr.vsm.getMainFont();
+		ConfigManager.defaultFont = VirtualSpaceManager.getMainFont();
 		grMngr.reveal();
 		//do not remember camera's initial location (before global view)
 		if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
@@ -167,8 +194,7 @@ class GVLoader {
 	}
 	catch (Exception ex){grMngr.reveal();ex.printStackTrace();}
     }
-
-
+    
     void load(String commandLine, String sourceFile){
 	grMngr.reset();
 	dotMngr.loadCustom(sourceFile, commandLine);
