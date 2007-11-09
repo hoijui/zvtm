@@ -7,7 +7,7 @@ Generating metadata:
 
 ./metadataProcessor.py uist4z metadata.xsl
 ./cdataRemover.py uist4z
-./metadataMerger.py uist4z authorids.csv coauthors.csv authors.csv kw1-keywords.csv kw2-keywords.csv
+./metadataMerger.py uist4z authorids.csv coauthors.csv authors.csv nkw1-keywords.csv nkw2-keywords.csv nkw3-keywords.csv videos.tsv
 ./prettym.sh
 
 Eventually creates uist4z/UISTmetadata.xml
