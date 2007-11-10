@@ -33,6 +33,8 @@ kwa2kws = {}
 kw2papers = {}
 # keywords that got fixed by Michel
 kw2fixed = {}
+# paper DOI to companion video
+doi2video = {}
 
 ################################################################################
 # Author metadata generated @ insitu by Michel
@@ -158,6 +160,17 @@ def xmlizeKeywords(allkeywordsEL):
         atomEL.set('nbopkwe', ",".join(atomdata[1]))
         atomEL.set('totalnbo', atomdata[2])
         atomEL.text = atom
+        
+################################################################################
+# Videos metadata generated @ insitu by Michel
+################################################################################
+def processVideos(f):
+    csvFile = open(f, 'r')
+    # csvreader = csv.reader(csvFile, dialect="excel", delimiter="\t", quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    csvreader = csv.reader(csvFile, delimiter="\t", quoting=csv.QUOTE_MINIMAL)
+    for row in csvreader:
+        doi2video[row[3]] = row[4]
+    csvFile.close()
     
 ################################################################################
 # Metadata from ACM DL
@@ -240,6 +253,11 @@ def processDLMetadata(f, proceedingsEL):
                 log("Error: could not find \"%s\" in list of authors" % name)
             else:
                 author.set('idref', ida)
+        # add companion video information
+        doi = article.get("doi")
+        if doi and doi2video.has_key(doi):
+            print "%s %s" % (doi, doi2video.get(doi))
+            article.set("video", doi2video.get(doi))
     xmlFile.close()
 
 ################################################################################
@@ -260,7 +278,7 @@ def log(msg, level=0):
 ################################################################################
 # main
 ################################################################################
-if len(sys.argv) > 7:
+if len(sys.argv) > 8:
     SRC_DIR = os.path.realpath(sys.argv[1])
     AUTHOR_PATH = os.path.realpath(sys.argv[2])
     COAUTHORS_PATH = os.path.realpath(sys.argv[3])
@@ -268,8 +286,9 @@ if len(sys.argv) > 7:
     KWA2KWS_PATH = os.path.realpath(sys.argv[5])
     KW2_PAPER_PATH = os.path.realpath(sys.argv[6])
     KW2FIXEDKW = os.path.realpath(sys.argv[7])
-    if len(sys.argv) > 8:
-        TRACE_LEVEL = int(sys.argv[8])
+    VIDEOS_PATH = os.path.realpath(sys.argv[8])
+    if len(sys.argv) > 9:
+        TRACE_LEVEL = int(sys.argv[9])
 else:
     sys.exit(0)
 
@@ -283,6 +302,7 @@ processCoauthors(COAUTHORS_PATH)
 xmlizeAuthors(authorsEL)
 processKeywords(KWA2KWS_PATH, KW2_PAPER_PATH, KW2FIXEDKW)
 xmlizeKeywords(keywordsEL)
+processVideos(VIDEOS_PATH)
 processProceedingsMetadata(SRC_DIR, proceedingsEL)
 
 # serialize the tree
