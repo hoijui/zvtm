@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-# $Id: uist_scene_generator.py,v 1.65 2007/10/11 03:16:11 pietriga Exp $
+# $Id$
 
 import os, sys
 import math

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-<!-- $Id: metadata.xsl,v 1.9 2007/08/23 13:42:54 pietriga Exp $-->
+<!-- $Id$-->
 <xsl:output method="xml" indent="yes" encoding="UTF-8"
             cdata-section-elements=""/>
 

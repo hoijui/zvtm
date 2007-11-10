@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# $Id: cdataRemover.py,v 1.3 2007/08/22 08:27:52 pietriga Exp $
+# $Id$
 
 # Usage:
 #    cdataRemover.py <src_dir>

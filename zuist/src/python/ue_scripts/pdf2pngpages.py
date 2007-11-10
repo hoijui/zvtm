@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# $Id: pdf2pngpages.py,v 1.4 2007/10/09 20:07:51 pietriga Exp $
+# $Id$
 
 import os, sys
 from CoreGraphics import CGColorSpaceCreateWithName, kCGColorSpaceGenericRGB,\

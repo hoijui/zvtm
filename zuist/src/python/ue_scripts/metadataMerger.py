@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: ISO-8859-1 -*-
-# $Id: metadataMerger.py,v 1.17 2007/10/03 15:23:09 pietriga Exp $
+# $Id$
 
 # Usage:
 #    metadataProcessor.py <src_dir> <stylesheet>

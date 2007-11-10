@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# $Id: metadataProcessor.py,v 1.2 2007/08/22 07:09:04 pietriga Exp $
+# $Id$
 
 # Usage:
 #    metadataProcessor.py <src_dir> <stylesheet>
