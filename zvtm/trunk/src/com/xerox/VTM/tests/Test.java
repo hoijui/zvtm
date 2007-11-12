@@ -28,11 +28,12 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.glyphs.*;
+import net.claribole.zvtm.layout.*;
 
 public class Test {
 
     VirtualSpaceManager vsm;
-
+    VirtualSpace vs;
     ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
 
     View testView;
@@ -47,7 +48,7 @@ public class Test {
     public void initTest(short ogl){
 
 	eh=new EventHandlerTest(this);
-	vsm.addVirtualSpace("src");
+	vs = vsm.addVirtualSpace("src");
 	vsm.setZoomLimit(-90);
 	vsm.addCamera("src");
 	Vector cameras=new Vector();
@@ -64,9 +65,18 @@ public class Test {
 	vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 
 	
-	vsm.addGlyph(new VRectangle(0,0,0,100,100,Color.white),"src");
 
 	vsm.repaintNow();
+    }
+    
+    void tree(){
+        LTree tree = new LTree(vs);
+        LNode rootNode = tree.createRootNode(null, "A");
+        rootNode.addChild(null, "B1").addChild(null, "C1");
+        rootNode.addChild(null, "B2").addChild(null, "C2").addChild(null, "D1");
+        rootNode.addChild(null, "B3");
+        TreeLayout tl = new TreeLayout(tree, TreeOrientation.LEFT_RIGHT, 100, 200, 100);
+        tl.doLayout(0);
     }
 
     public static void main(String[] args){

@@ -292,11 +292,7 @@ public class DragMagDemo implements Java2DPainter {
     }
 
     public static void main(String[] args){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-             	new DragMagDemo();
-            }
-        });
+        new DragMagDemo();
     }
 
 }

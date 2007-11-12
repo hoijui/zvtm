@@ -512,11 +512,7 @@ public class Introduction {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new Introduction();
-            }
-        });
+        new Introduction();
     }
     
 }

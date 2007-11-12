@@ -1034,11 +1034,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
         final boolean smm = (args.length > 2) ? (Short.parseShort(args[2])==1) : false;
         final boolean si = (args.length > 3) ? (Short.parseShort(args[3])==1) : true;
         final boolean td = (args.length > 4) ? (Short.parseShort(args[4])==1) : false;
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new ZLWorldTask(tech, sc, smm, si, td);
-            }
-        });
+        new ZLWorldTask(tech, sc, smm, si, td);
     }
     
 }

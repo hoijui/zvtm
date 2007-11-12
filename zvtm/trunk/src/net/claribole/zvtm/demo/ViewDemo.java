@@ -168,11 +168,7 @@ public class ViewDemo {
 
     public static void main(final String[] args){
         System.out.println(startMsg);
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new ViewDemo((args.length > 0) ? Short.parseShort(args[0]) : 0, (args.length > 1) ? Short.parseShort(args[1]) : 0);
-            }
-        });
+        new ViewDemo((args.length > 0) ? Short.parseShort(args[0]) : 0, (args.length > 1) ? Short.parseShort(args[1]) : 0);
     }
     
 }

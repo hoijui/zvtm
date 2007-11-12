@@ -131,7 +131,7 @@ public class EventHandlerTest implements ViewEventHandler{
 
     }
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-
+        application.tree();
     }
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 

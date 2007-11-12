@@ -866,11 +866,7 @@ public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {
     public static void main(String[] args){
         /* First argument is the technique: see PZO_TECHNIQUE, PZ_TECHNIQUE, PZL_TECHNIQUE, DM_TECHNIQUE for appropriate values*/
         final short tech = (args.length > 0) ? Short.parseShort(args[0]) : PZ_TECHNIQUE;
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new ZLAbstractTask(tech);
-            }
-        });
+        new ZLAbstractTask(tech);
     }
     
 }

@@ -751,11 +751,7 @@ public class ZLWorldDemo implements Java2DPainter, MapApplication {
 
     public static void main(String[] args){
         final boolean showGrid = (args.length > 0) ? (new Boolean(args[0])).booleanValue() : false;
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new ZLWorldDemo(showGrid);
-            }
-        });
+        new ZLWorldDemo(showGrid);
     }
     
 }

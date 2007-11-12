@@ -580,11 +580,7 @@ public class TLensDemo {
 
     public static void main(String[] args){
         final boolean gridOnly = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new TLensDemo(gridOnly);
-            }
-        });
+        new TLensDemo(gridOnly);
     }
     
 }
