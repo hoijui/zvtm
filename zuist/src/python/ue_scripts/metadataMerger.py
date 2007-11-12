@@ -166,7 +166,6 @@ def xmlizeKeywords(allkeywordsEL):
 ################################################################################
 def processVideos(f):
     csvFile = open(f, 'r')
-    # csvreader = csv.reader(csvFile, dialect="excel", delimiter="\t", quotechar='"', quoting=csv.QUOTE_MINIMAL)
     csvreader = csv.reader(csvFile, delimiter="\t", quoting=csv.QUOTE_MINIMAL)
     for row in csvreader:
         doi2video[row[3]] = row[4]
@@ -256,7 +255,6 @@ def processDLMetadata(f, proceedingsEL):
         # add companion video information
         doi = article.get("doi")
         if doi and doi2video.has_key(doi):
-            print "%s %s" % (doi, doi2video.get(doi))
             article.set("video", doi2video.get(doi))
     xmlFile.close()
 
