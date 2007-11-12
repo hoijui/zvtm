@@ -491,11 +491,7 @@ public class ZGRViewer implements ZGRApplication {
         }
         System.out.println("--help for command line options");
         final int av = acceleratedView;
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new ZGRViewer(av);
-            }
-        });
+        new ZGRViewer(av);
     }
     
 }
