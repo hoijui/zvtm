@@ -1,4 +1,4 @@
-<!-- $Id: scene.dtd,v 1.11 2007/10/04 09:52:01 pietriga Exp $ -->
+<!-- $Id$ -->
 
 <!ELEMENT scene (level+,region+)>
 
