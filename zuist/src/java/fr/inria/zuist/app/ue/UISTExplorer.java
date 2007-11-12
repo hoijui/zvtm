@@ -1038,11 +1038,7 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
         final short vt = (args.length > 0) ? Short.parseShort(args[0]) : 0;
         final boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : true;
         final boolean le = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new UISTExplorer(vt, fs, le);
-            }
-        });
+        new UISTExplorer(vt, fs, le);
     }
     
 }
