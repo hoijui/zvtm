@@ -37,7 +37,6 @@ import javax.swing.JMenuBar;
 import javax.swing.WindowConstants;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
-import fr.lri.swingstates.sm.BasicInputStateMachine;
 
 /**
  * An external view is a window and can be composed of one or several cameras superimposed (uses a standard JFrame)
@@ -284,21 +283,5 @@ public class EView extends View implements KeyListener{
 
     /**used only in Internal Views to get focus in view for key events (called automatically when the mouse enters the (Acc)IView)*/
     public void requestFocus(){}
-
-    /**Add a state machine that listens to mouse and keyboard events in this view.
-     *@param sm the state machine in charge of handling mouse and keyboard events
-     */
-    public void addSMEventHandler(BasicInputStateMachine sm){
-	super.addSMEventHandler(sm);
-	frame.addKeyListener(sm);
-    }
-
-    /**Remove a state machine that was listening to mouse and keyboard events in this view.
-     *@param sm the state machine to be dissociated from this view
-     */
-    public void removeSMEventHandler(BasicInputStateMachine sm){
-	super.removeSMEventHandler(sm);
-	frame.removeKeyListener(sm);
-    }
 
 }

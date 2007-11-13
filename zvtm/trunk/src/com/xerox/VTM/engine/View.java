@@ -42,7 +42,6 @@ import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
-import fr.lri.swingstates.sm.BasicInputStateMachine;
 
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>
@@ -610,24 +609,6 @@ public abstract class View {
     */
     public int[] getVisibilityPadding(){
 	return panel.getVisibilityPadding();
-    }
-
-    /**Add a state machine that listens to mouse and keyboard events in this view.
-     *@param sm the state machine to be dissociated from this view
-     */
-    public void addSMEventHandler(BasicInputStateMachine sm){
-	panel.addMouseListener(sm);
-	panel.addMouseMotionListener(sm);
-	panel.addMouseWheelListener(sm);
-    }
-
-    /**Remove a state machine that was listening to mouse and keyboard events in this view.
-     *@param sm the state machine to be dissociated from this view
-     */
-    public void removeSMEventHandler(BasicInputStateMachine sm){
-	panel.removeMouseListener(sm);
-	panel.removeMouseMotionListener(sm);
-	panel.removeMouseWheelListener(sm);
     }
     
     /**Set how much time should the view go to sleep between to consecutive repaints when the view is not active.
