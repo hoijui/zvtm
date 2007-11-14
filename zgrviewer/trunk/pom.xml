@@ -39,7 +39,7 @@ $Id$
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.9.6</version>
+      <version>0.9.6-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
