@@ -30,13 +30,13 @@ public interface Plugin {
 
     /**
      * Called by ZGRViewer at init time when loading preferences from zgrviewer.cfg
-     * @parameter settings contains preferences relevant to this plug-in, as they were exported by method savePreferences
+     * @param settings contains preferences relevant to this plug-in, as they were exported by method savePreferences
      */
     public void loadPreferences(Hashtable settings);
 
     /**
      * Called by ZGRViewer when saving preferences to zgrviewer.cfg
-     * @parameter export preferences relevant to this plug-in as a hashtable (can be null)
+     * @return preferences relevant to this plug-in as a hashtable (can be null)
      */
     public Hashtable savePreferences();
 
