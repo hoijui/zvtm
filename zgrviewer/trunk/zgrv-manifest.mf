@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: net.claribole.zgrviewer.ZGRViewer
-Class-Path: zvtm.jar xercesImpl.jar xml-apis.jar antlr-2.7.5.jar statemachine.jar
