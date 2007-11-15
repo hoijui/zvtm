@@ -54,6 +54,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String FTP_PROTOCOL = "ftp:/";
     static final String FILE_PROTOCOL = "file:/";
     static final String JAVASCRIPT_PROTOCOL = "javascript:";
+    static final String HREF_TARGET_PARAM = "target";
 
     String APPLET_TITLE = "ZGRViewer - Applet";
 
@@ -71,8 +72,6 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     int appletWindowWidth = DEFAULT_VIEW_WIDTH;
     int appletWindowHeight = DEFAULT_VIEW_HEIGHT;
 
-    String docURL;
-
     public ZGRApplet(){
 	getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
     }
@@ -87,8 +86,6 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	cfgMngr = new ConfigManager(grMngr, true);
 	grMngr.setConfigManager(cfgMngr);
 	gvLdr = new GVLoader(this, grMngr, cfgMngr, null);
-	URL docBase = getDocumentBase();
-	docURL = docBase.getProtocol() + "://" + docBase.getHost() + docBase.getPath();
     }
 
     void initGUI(){
@@ -242,18 +239,27 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
     //open up the default or user-specified browser (netscape, ie,...) and try to display the content uri
     void displayURLinBrowser(String uri){
-	String target = ConfigManager._BLANK;
-	if (uri.startsWith(JAVASCRIPT_PROTOCOL)) {
-	    target = ConfigManager._SELF;
-	}
-	else if (!(uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(HTTPS_PROTOCOL) || uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
-	    // relative URL, prepend document base
-	    uri = docURL + uri;
-	}
-	try {
-	    getAppletContext().showDocument(new URL(uri), target);
-	}
-	catch(MalformedURLException ex){System.out.println("Error: could not load "+uri);}
+        String target = getParameter(HREF_TARGET_PARAM);
+        // always reset target for javascript: protocol
+        if (uri.startsWith(JAVASCRIPT_PROTOCOL)) {
+            target = ConfigManager._SELF;
+        }
+        // make sure we have a target if not previously set
+        if (target == null) target = ConfigManager._BLANK;
+        try {	
+            URL displayUrl;
+            if (!(uri.startsWith(JAVASCRIPT_PROTOCOL) ||
+                uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(HTTPS_PROTOCOL) ||
+                uri.startsWith(FTP_PROTOCOL) || uri.startsWith(FILE_PROTOCOL))){
+                // relative URL, prepend document base
+                displayUrl = new URL(getDocumentBase(), uri);
+            }
+            else {
+                displayUrl = new URL(uri);
+            }
+            getAppletContext().showDocument(displayUrl, target);
+        }
+        catch(MalformedURLException ex){System.out.println("Error: could not load "+uri);}
     }
 
     public void about(){
