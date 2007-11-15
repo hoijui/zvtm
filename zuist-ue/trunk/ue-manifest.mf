@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: fr.inria.zuist.app.ue.UISTExplorer
-Class-Path: zvtm.jar zuist-engine.jar statemachine.jar
