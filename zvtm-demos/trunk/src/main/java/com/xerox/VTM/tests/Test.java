@@ -28,7 +28,6 @@ import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.layout.*;
 
 public class Test {
 
@@ -39,62 +38,48 @@ public class Test {
     View testView;
 
     Test(short ogl){
-	vsm=new VirtualSpaceManager();
-	vsm.setDebug(true);
-	//vsm.setDefaultMultiFills(true);
-	initTest(ogl);
+        vsm=new VirtualSpaceManager();
+        vsm.setDebug(true);
+        //vsm.setDefaultMultiFills(true);
+        initTest(ogl);
     }
 
     public void initTest(short ogl){
-
-	eh=new EventHandlerTest(this);
-	vs = vsm.addVirtualSpace("src");
-	vsm.setZoomLimit(-90);
-	vsm.addCamera("src");
-	Vector cameras=new Vector();
-	cameras.add(vsm.getVirtualSpace("src").getCamera(0));
-	short vt = View.STD_VIEW;
-	switch(ogl){
-	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
-	}
-	testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
-	testView.setBackgroundColor(Color.LIGHT_GRAY);
-	testView.setEventHandler(eh);
-	testView.setNotifyMouseMoved(true);
-	vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-
-	
-
-	vsm.repaintNow();
+        eh=new EventHandlerTest(this);
+        vs = vsm.addVirtualSpace("src");
+        vsm.setZoomLimit(-90);
+        vsm.addCamera("src");
+        Vector cameras=new Vector();
+        cameras.add(vsm.getVirtualSpace("src").getCamera(0));
+        short vt = View.STD_VIEW;
+        switch(ogl){
+            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
+            case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
+        }
+        testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
+        testView.setBackgroundColor(Color.LIGHT_GRAY);
+        testView.setEventHandler(eh);
+        testView.setNotifyMouseMoved(true);
+        vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
+        vsm.repaintNow();
     }
     
-    void tree(){
-        LTree tree = new LTree(vs);
-        LNode rootNode = tree.createRootNode(null, "A");
-        rootNode.addChild(null, "B1").addChild(null, "C1");
-        rootNode.addChild(null, "B2").addChild(null, "C2").addChild(null, "D1");
-        rootNode.addChild(null, "B3");
-        TreeLayout tl = new TreeLayout(tree, TreeOrientation.LEFT_RIGHT, 100, 200, 100);
-        tl.doLayout(0);
-    }
-
     public static void main(String[] args){
-	System.out.println("-----------------");
-	System.out.println("General information");
-	System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
-	System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
-	System.out.println("-----------------");
-	System.out.println("Directory information");
-	System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
-	System.out.println("Java directory: "+System.getProperty("java.home"));
-	System.out.println("Launching from: "+System.getProperty("user.dir"));
-	System.out.println("-----------------");
-	System.out.println("User informations");
-	System.out.println("User name: "+System.getProperty("user.name"));
-	System.out.println("User home directory: "+System.getProperty("user.home"));
-	System.out.println("-----------------");
-	new Test((args.length > 0) ? Short.parseShort(args[0]) : 0);
+        System.out.println("-----------------");
+        System.out.println("General information");
+        System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
+        System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
+        System.out.println("-----------------");
+        System.out.println("Directory information");
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java directory: "+System.getProperty("java.home"));
+        System.out.println("Launching from: "+System.getProperty("user.dir"));
+        System.out.println("-----------------");
+        System.out.println("User informations");
+        System.out.println("User name: "+System.getProperty("user.name"));
+        System.out.println("User home directory: "+System.getProperty("user.home"));
+        System.out.println("-----------------");
+        new Test((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
     
 }
