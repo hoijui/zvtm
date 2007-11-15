@@ -466,11 +466,7 @@ public class GeonamesBrowser implements Java2DPainter {
     }
 
     public static void main(String[] args){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                new GeonamesBrowser();
-            }
-        });
+        new GeonamesBrowser();
     }
     
 }
