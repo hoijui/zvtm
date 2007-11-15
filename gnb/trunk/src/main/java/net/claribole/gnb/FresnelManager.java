@@ -173,7 +173,7 @@ class FresnelManager {
 	    Format f;
 	    for (int i=0;i<statementsToDisplay.size();i++){
 		s = (Statement)statementsToDisplay.elementAt(i);
-		f = selectedDetailLens.getBestFormatForProperty(s, detailFSLEvaluator);
+		f = selectedDetailLens.getBestFormatForProperty(null, detailFSLEvaluator, s, null);
 		if (f != null){
 		    statements2formats.put(s, f);
 		}
@@ -250,8 +250,15 @@ class FresnelManager {
 	}
     }
 
+    public String apply(ContentFormat cf, Statement s, boolean firstItem, boolean lastItem){	
+        String res = (!firstItem && cf.before != null) ? cf.before : "";	 
+        res += (s.getObject() instanceof Literal) ? s.getLiteral().getLexicalForm() : s.getResource().toString();	 
+        if (!lastItem && cf.after != null){res += cf.after;}	 
+        return res;	 
+    }
+
     String applyFormattingInstructions(Statement s, JenaFormat f, boolean firstItem, boolean lastItem){
- 	return (f != null) ? f.apply(s, firstItem, lastItem) : JenaFormat.defaultFormat(s);
+ 	return (f.getValueFormattingInstructions() != null) ? apply(f.getValueFormattingInstructions(), s, firstItem, lastItem) : JenaFormat.defaultFormat(s);
     }
     
     synchronized void hideInformationAbout(){
