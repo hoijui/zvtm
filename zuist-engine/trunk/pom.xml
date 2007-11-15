@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id$
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.claribole.zvtm</groupId>
+  <artifactId>zuist-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>ZUIST</name>
+  <version>0.1.0</version>
+  <url>http://zvtm.sourceforge.net/zuist/</url>
+  
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>INRIA In-Situ Repository</id>
+      <url>ftp://ftp.inria.fr/INRIA/in-situ/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+  
+  <!-- Distribution - Deploy to FTP -->
+  <distributionManagement>
+    <repository>
+      <id>INRIA In-Situ Repository</id>
+      <url>ftp://ftp.inria.fr/INRIA/in-situ/maven</url>    </repository>
+  </distributionManagement>
+  
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>net.claribole.zvtm</groupId>
+      <artifactId>zvtm</artifactId>
+      <version>0.9.6-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+  
+  <!-- Build -->
+  <build>
+  	<extensions> 
+      <extension> 
+        <groupId>org.apache.maven.wagon</groupId> 
+        <artifactId>wagon-ftp</artifactId> 
+        <version>1.0-alpha-6</version> 
+      </extension>
+	</extensions>
+    <plugins>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <!-- Reporting -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+          <overview>${basedir}/overview.html</overview>
+          <doctitle><![CDATA[<h1>ZUIST API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[<i>Copyright &#169; 2007 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <links> 
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
