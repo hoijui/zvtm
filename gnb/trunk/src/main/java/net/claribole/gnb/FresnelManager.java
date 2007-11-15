@@ -41,6 +41,7 @@ import fr.inria.jfresnel.FresnelDocument;
 import fr.inria.jfresnel.Constants;
 import fr.inria.jfresnel.Lens;
 import fr.inria.jfresnel.Format;
+import fr.inria.jfresnel.ContentFormat;
 import fr.inria.jfresnel.Group;
 import fr.inria.jfresnel.jena.JenaLens;
 import fr.inria.jfresnel.jena.JenaFormat;
@@ -202,22 +203,25 @@ class FresnelManager {
 	    }
 	    String[] textLines = new String[lines.size()];
 	    JenaFormat jf;
-	    for (int i=0;i<textLines.length;i++){
-		v = (Vector)lines.elementAt(i);
-		String text = "";
-		// all statements on a line have the same format (as a result of the previous loop)
-		jf = (JenaFormat)statements2formats.get(v.firstElement());
-		for (int j=0;j<v.size();j++){// apply contentBefore and contentAfter instructions, if any
-		    text += applyFormattingInstructions((Statement)v.elementAt(j), jf, j==0, j==v.size()-1);
-		}
-		textLines[i] = text;
-		// apply label, contentFirst and contentLast instructions, if any
-		if (jf != null){
-		    if (jf.getContentFirst() != null){textLines[i] = jf.getContentFirst() + textLines[i];}
-		    if (jf.getValueLabel() != null){textLines[i] = jf.getValueLabel() + textLines[i];}
-		    if (jf.getContentLast() != null){textLines[i] += jf.getContentLast();}
-		}
-	    }
+        for (int i=0;i<textLines.length;i++){
+            v = (Vector)lines.elementAt(i);
+            String text = "";
+            // all statements on a line have the same format (as a result of the previous loop)
+            jf = (JenaFormat)statements2formats.get(v.firstElement());
+            for (int j=0;j<v.size();j++){// apply contentBefore and contentAfter instructions, if any
+                text += applyFormattingInstructions((Statement)v.elementAt(j), jf, j==0, j==v.size()-1);
+        }
+        textLines[i] = text;
+        // apply label, contentFirst and contentLast instructions, if any
+        if (jf != null){
+            ContentFormat cf = jf.getValueFormattingInstructions();
+            if (cf != null){
+                if (cf.getContentFirst() != null){textLines[i] = cf.getContentFirst() + textLines[i];}
+                if (jf.getValueLabel() != null){textLines[i] = jf.getValueLabel() + textLines[i];}
+                if (cf.getContentLast() != null){textLines[i] += cf.getContentLast();}
+            }
+        }
+    }
 	    long frameWidth = (statementsToDisplay.size() > 0) ? 0 : DETAIL_FRAME_MIN_WIDTH;
 	    long frameHalfHeight = DETAIL_FRAME_MIN_HEIGHT;
  	    long vertCoordOfLines[] = new long[textLines.length]; // relative vertical position of text line inside box
