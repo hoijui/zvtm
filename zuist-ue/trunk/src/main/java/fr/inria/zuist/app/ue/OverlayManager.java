@@ -50,7 +50,7 @@ public class OverlayManager {
     static final float NORMAL_FONT_SCALE_FACTOR = 1.5f;
     static final float SMALL_FONT_SCALE_FACTOR = 1.0f;
     
-    static final String INSITU_LOGO_PATH = "/images/ue/insitu.png";
+    static final String INSITU_LOGO_PATH = "/images/insitu.png";
 
     boolean showingLinks = false;
     

@@ -57,9 +57,9 @@ public class MenuManager {
 	static final int MENU_ZONE_WIDTH = 2 * (NAV_MENU_ITEM_WIDTH + HOME_BT_WIDTH + UP_BT_WIDTH + BACK_BT_WIDTH + ABOUT_BT_WIDTH);
 	static final int MENU_ZONE_HEIGHT = 2 * NAV_MENU_ITEM_HEIGHT;
 	
-	static final String HOME_ICON_PATH = "/images/ue/home-icon.png";
-	static final String UP_ICON_PATH = "/images/ue/up-icon.png";
-	static final String BACK_ICON_PATH = "/images/ue/back-icon.png";
+	static final String HOME_ICON_PATH = "/images/home-icon.png";
+	static final String UP_ICON_PATH = "/images/up-icon.png";
+	static final String BACK_ICON_PATH = "/images/back-icon.png";
 
     VRectangleST navMenuTitleBox;
     VText navMenuTitleLabel;
