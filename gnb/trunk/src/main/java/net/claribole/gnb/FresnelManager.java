@@ -36,6 +36,7 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Glyph;
 
 import fr.inria.jfresnel.FresnelParser;
+import fr.inria.jfresnel.jena.FresnelJenaParser;
 import fr.inria.jfresnel.FresnelDocument;
 import fr.inria.jfresnel.Constants;
 import fr.inria.jfresnel.Lens;
@@ -46,7 +47,7 @@ import fr.inria.jfresnel.jena.JenaFormat;
 import fr.inria.jfresnel.fsl.FSLPath;
 import fr.inria.jfresnel.fsl.FSLNSResolver;
 import fr.inria.jfresnel.fsl.FSLHierarchyStore;
-import fr.inria.jfresnel.fsl.FSLJenaEvaluator;
+import fr.inria.jfresnel.fsl.jena.FSLJenaEvaluator;
 
 class FresnelManager {
 
@@ -130,7 +131,7 @@ class FresnelManager {
 
     void buildLayoutLenses(){
 	// parse layout lenses N3 RDF file
-	FresnelParser fp = new FresnelParser(Constants.JENA_API, nsr, fhs);
+	FresnelJenaParser fp = new FresnelJenaParser(nsr, fhs);
 	FresnelDocument fd = fp.parse(LAYOUT_LENS_FILE, Constants.N3_READER);
 	Lens[] l = fd.getLenses();
 	layoutLenses = new JenaLens[l.length];
@@ -145,7 +146,7 @@ class FresnelManager {
 
     void buildDetailLenses(){
 	// parse layout lenses N3 RDF file
-	FresnelParser fp = new FresnelParser(Constants.JENA_API, nsr, fhs);
+	FresnelJenaParser fp = new FresnelJenaParser(nsr, fhs);
 	FresnelDocument fd = fp.parse(DETAIL_LENS_FILE, Constants.N3_READER);
 	Lens[] l = fd.getLenses();
 	detailLenses = new JenaLens[l.length];
