@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: net.claribole.gnb.GeonamesBrowser
-Class-Path: zvtm.jar statemachine.jar fresnel/jfresnel.jar antlr-2.7.5.jar jena/jena.jar jena/icu4j_3_4.jar jena/commons-logging.jar jena/xercesImpl.jar
