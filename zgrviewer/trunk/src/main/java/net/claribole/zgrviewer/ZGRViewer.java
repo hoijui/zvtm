@@ -438,6 +438,7 @@ public class ZGRViewer implements ZGRApplication {
 	    String version = Utils.getTextContent(new URL(CURRENT_VERSION_URL), 10);
 	    if (version != null){
 		if (version.equals(Messages.VERSION)){
+		    // we should actually compare numbers
 		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.YOU_HAVE_THE_MOST_RECENT_VERSION);
 		}
 		else {
