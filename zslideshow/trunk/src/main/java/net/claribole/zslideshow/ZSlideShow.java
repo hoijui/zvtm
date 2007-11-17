@@ -39,7 +39,7 @@ import com.xerox.VTM.engine.SwingWorker;
 //import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 //import com.xerox.VTM.glyphs.Translucent;
-//import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.VImage;
 //import com.xerox.VTM.glyphs.VRectangle;
 //import com.xerox.VTM.glyphs.VRectangleST;
 //import net.claribole.zvtm.engine.PostAnimationAdapter;
@@ -152,8 +152,18 @@ public class ZSlideShow {
         panelHeight = d.height;
     }
     
+    /* List of picture files in the current directory. */
+    File[] contents = new File[0];
+    VImage[] images = new VImage[0];
+    int currentIndex = -1;
+        
     void reset(){
         //XXX:TBW: remove glyphs from virtual space, reset hooks to glyphs
+        if (currentIndex != -1){
+            hidePicture(currentIndex);
+        }
+        contents = new File[0];
+        images = new VImage[0];
     }
     
     void selectDirectory(){
@@ -166,11 +176,10 @@ public class ZSlideShow {
         }
     }
     
-    /* List of picture files in the current directory. */
-    File[] contents = new File[0];
-    
     void openDirectory(File dir){
+        reset();
         contents = dir.listFiles(new ImageFileFilter());
+        images = new VImage[contents.length];
         if (contents.length > 0){
             displayPicture(0);
         }
@@ -181,16 +190,16 @@ public class ZSlideShow {
         }
     }
     
-    /* Image currently displayed. */
-    Glyph currentImage = null;
-    /* Next image in the lst (preloaded). */
-    Glyph nextImage = null;
-    int currentIndex = -1;
-    
     void displayPicture(final int i){
         final SwingWorker worker=new SwingWorker(){
 		    public Object construct(){
 			    doDisplayPicture(i);
+			    if (i<images.length-1 && images[i+1] == null){
+			        preload(i+1);
+			    }
+			    if (i>0 && images[i-1] == null){
+			        preload(i-1);
+			    }
 			    return null; 
 		    }
 		};
@@ -210,17 +219,33 @@ public class ZSlideShow {
     }
     
     void doDisplayPicture(int i){
-        currentIndex = i;
-        if (currentImage != null){
-            hideCurrentPicture();
+        if (currentIndex != -1){
+            hidePicture(currentIndex);
         }
-        currentImage = new RImage(0, 0, 0, RImage.getBufferedImageFromFile(contents[i]), 2.0f, 1.0f);
-        vsm.addGlyph(currentImage, mSpace);
+        currentIndex = i;
+        if (images[i] == null){
+            System.out.println("loading "+i);
+            
+            images[i] = new RImage(0, 0, 0, RImage.getBufferedImageFromFile(contents[i]), 2.0f, 1.0f);
+            images[i].setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+            images[i].setBorderColor(Color.WHITE);
+        }
+        vsm.addGlyph(images[i], mSpace);
     }
     
-    void hideCurrentPicture(){
+    void preload(int i){
+        System.out.println("preloading "+i);
+        
+        images[i] = new RImage(0, 0, 0, RImage.getBufferedImageFromFile(contents[i]), 2.0f, 1.0f);
+        images[i].setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        images[i].setBorderColor(Color.WHITE);
+    }
+    
+    void hidePicture(int i){
         //XXX:TBW animate destruction
-        mSpace.destroyGlyph(currentImage);
+        if (images[i] != null){
+            mSpace.destroyGlyph(images[i]);
+        }
     }
     
     void exit(){
