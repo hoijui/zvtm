@@ -33,6 +33,23 @@ import com.xerox.VTM.glyphs.VImage;
 
 public class RImage extends VImageST {
     
+    static float REFLECTION_HEIGHT_RATIO = 0.5f;
+    static float REFLECTION_MASK_ALPHA_BASE = 0.2f;
+    static float REFLECTION_MASK_ALPHA_EDGE = 0.0f;
+    
+    public static void setReflectionHeight(float ratio){
+        REFLECTION_HEIGHT_RATIO = ratio;
+    }
+    
+    /**
+        *@param base alpha value between in [0.0,1.0] (default value: 0.2)
+        *@param edge alpha value between in [0.0,1.0] (typically 0.0)
+        */
+    public static void setReflectionMaskEndPoints(float base, float edge){
+        REFLECTION_MASK_ALPHA_BASE = base;
+        REFLECTION_MASK_ALPHA_EDGE = edge;        
+    }
+    
     // include reflection in height computation
     boolean irihc = false;
     
@@ -74,16 +91,10 @@ public class RImage extends VImageST {
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
      *@param hir true if height measurement should include mirrored version of the image (doubles the image's height) - defaults to false
-     *@param gp custom alpha mask (can be null, in which case the default one 0.5->0 is applied)
      */
-    public RImage(long x, long y, float z, Image img, double scale, float a, boolean hir, GradientPaint gp){
+    public RImage(long x, long y, float z, Image img, double scale, float a, boolean hir){
         super(x, y, z, img, scale, a);
-        if (gp != null){
-            this.image = createReflection(img, gp);
-        }
-        else {
-            this.image = createReflection(img);
-        }
+        this.image = createReflection(img);
         this.irihc = hir;
         if (this.irihc){
             ///XXX:TBW
@@ -118,9 +129,9 @@ public class RImage extends VImageST {
     
     public static BufferedImage createReflection(Image src){
         return createReflection(src,
-            new GradientPaint(0, 0, new Color(1.0f, 1.0f, 1.0f, 0.5f),
-                0, src.getHeight(null) / 2, new Color(1.0f, 1.0f, 1.0f, 0.0f)));
-    }
+            new GradientPaint(0, 0, new Color(1.0f, 1.0f, 1.0f, REFLECTION_MASK_ALPHA_BASE),
+                0, Math.round(src.getHeight(null) * REFLECTION_HEIGHT_RATIO), new Color(1.0f, 1.0f, 1.0f, REFLECTION_MASK_ALPHA_EDGE)));
+    }    
     
     public static BufferedImage createReflection(Image src, GradientPaint mask){
         // code strongly inspired by the book Filthy Rich Clients, by Chet Haase and Romain Guy
