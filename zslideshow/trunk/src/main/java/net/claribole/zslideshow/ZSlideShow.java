@@ -10,7 +10,7 @@ package net.claribole.zslideshow;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.Dimension;
-//import java.awt.Graphics2D;
+import java.awt.Graphics2D;
 import java.awt.Font;
 //import java.awt.AlphaComposite;
 import java.awt.GraphicsEnvironment;
@@ -19,6 +19,7 @@ import javax.swing.JFileChooser;
 //import javax.swing.SwingUtilities;
 //
 import java.util.Vector;
+import java.util.Arrays;
 //import java.util.Hashtable;
 //import java.util.Enumeration;
 //
@@ -44,7 +45,7 @@ import com.xerox.VTM.glyphs.VImage;
 //import com.xerox.VTM.glyphs.VRectangleST;
 //import net.claribole.zvtm.engine.PostAnimationAdapter;
 //import net.claribole.zvtm.engine.TransitionManager;
-//import net.claribole.zvtm.engine.Java2DPainter;       
+import net.claribole.zvtm.engine.Java2DPainter;
 //import net.claribole.zvtm.engine.RepaintAdapter;
 //import net.claribole.zvtm.engine.RepaintListener;
 //import net.claribole.zvtm.engine.GlyphKillAction;
@@ -70,7 +71,7 @@ import net.claribole.zvtm.glyphs.RImage;
 //import org.w3c.dom.NodeList;
 //import org.xml.sax.SAXException;
 //
-public class ZSlideShow {
+public class ZSlideShow implements Java2DPainter {
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -97,11 +98,16 @@ public class ZSlideShow {
 
     static final Font MAIN_FONT = new Font("Arial", Font.PLAIN, 10);
     
-    static final Color BACKGROUND_COLOR = new Color(10,10,10);
+    static Color BACKGROUND_COLOR = new Color(10,10,10);
+    static Color IMAGE_BORDER_COLOR = Color.WHITE;
+    
+    GlyphLoader gl;
     
     public ZSlideShow(short fullscreen){
         initGUI(fullscreen);
+        gl = new GlyphLoader(this);
         System.gc();
+        gl.setEnabled(true);
     }
 
     void initGUI(short fullscreen){
@@ -127,6 +133,7 @@ public class ZSlideShow {
         mneh = new ZSSMenuEventHandler(this);
         mView.setEventHandler(mneh, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
+        mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         RImage.setReflectionHeight(0.5f);
         RImage.setReflectionMaskEndPoints(0.15f, 0.0f);
         updatePanelSize();
@@ -152,99 +159,13 @@ public class ZSlideShow {
         panelHeight = d.height;
     }
     
-    /* List of picture files in the current directory. */
-    File[] contents = new File[0];
-    VImage[] images = new VImage[0];
-    int currentIndex = -1;
-        
-    void reset(){
-        //XXX:TBW: remove glyphs from virtual space, reset hooks to glyphs
-        if (currentIndex != -1){
-            hidePicture(currentIndex);
-        }
-        contents = new File[0];
-        images = new VImage[0];
-    }
-    
     void selectDirectory(){
         final JFileChooser fc = new JFileChooser(System.getProperty("user.home"));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Browse Directory...");
         int returnVal= fc.showOpenDialog(mView.getFrame());
         if (returnVal == JFileChooser.APPROVE_OPTION){
-            openDirectory(fc.getSelectedFile());
-        }
-    }
-    
-    void openDirectory(File dir){
-        reset();
-        contents = dir.listFiles(new ImageFileFilter());
-        images = new VImage[contents.length];
-        if (contents.length > 0){
-            displayPicture(0);
-        }
-        else {
-            //XXX: SIGNAL NO FILE THAT CAN BE DISPLAYED IN SLIDESHOW
-            System.out.println("Directory " + dir.getAbsolutePath() + "does not contain any file that can be displayed");
-            
-        }
-    }
-    
-    void displayPicture(final int i){
-        final SwingWorker worker=new SwingWorker(){
-		    public Object construct(){
-			    doDisplayPicture(i);
-			    if (i<images.length-1 && images[i+1] == null){
-			        preload(i+1);
-			    }
-			    if (i>0 && images[i-1] == null){
-			        preload(i-1);
-			    }
-			    return null; 
-		    }
-		};
-	    worker.start();
-    }
-    
-    void displayPreviousPicture(){
-        if (currentIndex > 0){
-            displayPicture(currentIndex-1);
-        }
-    }
-
-    void displayNextPicture(){
-        if (currentIndex < contents.length-1){
-            displayPicture(currentIndex+1);
-        }        
-    }
-    
-    void doDisplayPicture(int i){
-        if (currentIndex != -1){
-            hidePicture(currentIndex);
-        }
-        currentIndex = i;
-        if (images[i] == null){
-            System.out.println("loading "+i);
-            
-            images[i] = new RImage(0, 0, 0, RImage.getBufferedImageFromFile(contents[i]), 2.0f, 1.0f);
-            images[i].setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-            images[i].setBorderColor(Color.WHITE);
-        }
-        vsm.addGlyph(images[i], mSpace);
-    }
-    
-    void preload(int i){
-        System.out.println("preloading "+i);
-        
-        images[i] = new RImage(0, 0, 0, RImage.getBufferedImageFromFile(contents[i]), 2.0f, 1.0f);
-        images[i].setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-        images[i].setBorderColor(Color.WHITE);
-    }
-    
-    void hidePicture(int i){
-        //XXX:TBW animate destruction
-        if (images[i] != null){
-            mSpace.destroyGlyph(images[i]);
+            gl.openDirectory(fc.getSelectedFile());
         }
     }
     
@@ -252,28 +173,48 @@ public class ZSlideShow {
         System.exit(0);
     }
 
+    static boolean SHOW_MEMORY_USAGE = true;
+    long maxMem = Runtime.getRuntime().maxMemory();
+    int totalMemRatio, usedMemRatio;
+
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (SHOW_MEMORY_USAGE){showMemoryUsage(g2d, viewWidth, viewHeight);}
+    }
+
+    void showMemoryUsage(Graphics2D g2d, int viewWidth, int viewHeight){
+        totalMemRatio = (int)(Runtime.getRuntime().totalMemory() * 100 / maxMem);
+        usedMemRatio = (int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 100 / maxMem);
+        g2d.setColor(Color.green);
+        g2d.fillRect(20,
+            viewHeight - 40,
+            200,
+            15);
+        g2d.setColor(Color.orange);
+        g2d.fillRect(20,
+            viewHeight - 40,
+            totalMemRatio * 2,
+            15);
+        g2d.setColor(Color.red);
+        g2d.fillRect(20,
+            viewHeight - 40,
+            usedMemRatio * 2,
+            15);
+        g2d.setColor(Color.black);
+        g2d.drawRect(20,
+            viewHeight - 40,
+            200,
+            15);
+        g2d.drawString(usedMemRatio + "%", 50, viewHeight - 28);
+        g2d.drawString(totalMemRatio + "%", 100, viewHeight - 28);
+        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);	
+    }
+
     static final short FULL_SCREEN = 1;
 
     public static void main(String[] args){
         final short fs = (args.length > 0) ? Short.parseShort(args[0]) : 0;
         new ZSlideShow(fs);
-    }
-    
-}
-
-class ImageFileFilter implements FilenameFilter {
-    
-    static final String[] EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif"};
-    
-    ImageFileFilter(){}
-    
-    public boolean accept(File dir, String name){
-        for (int i=0;i<EXTENSIONS.length;i++){
-            if (name.endsWith(EXTENSIONS[i])){
-                return true;
-            }
-        }
-        return false;
     }
     
 }

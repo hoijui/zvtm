@@ -68,8 +68,8 @@ public class ZSSEventHandler implements ViewEventHandler {
     
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_O){application.selectDirectory();}
-        else if (code==KeyEvent.VK_RIGHT){application.displayNextPicture();}
-        else if (code==KeyEvent.VK_LEFT){application.displayPreviousPicture();}
+        else if (code==KeyEvent.VK_RIGHT){application.gl.displayNextPicture();}
+        else if (code==KeyEvent.VK_LEFT){application.gl.displayPreviousPicture();}
     }
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
