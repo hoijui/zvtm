@@ -60,6 +60,7 @@ public class ToolPalette {
 
     boolean visible = false;
     boolean paintPalette = true; // set to false temporarily during panel resizing operations ; used as an optimization indicator
+    boolean enabled = true;
 
     static final int ANIM_TIME = 200;
     static final int TRIGGER_ZONE_WIDTH = 48;
@@ -87,6 +88,14 @@ public class ToolPalette {
 	    grMngr.vsm.addGlyph(selectedButtons[i], paletteSpace);
 	}
 	selectButton(buttons[0]);
+    }
+    
+    void setEnabled(boolean b){
+        enabled = b;
+    }
+    
+    boolean isEnabled(){
+        return enabled;
     }
 
     boolean isStdNavMode(){
@@ -149,7 +158,7 @@ public class ToolPalette {
 	}
     }
 
-    /* Called with false when resizing the main view to temprarily hide the palette
+    /* Called with false when resizing the main view to temporarily hide the palette
        until it actually gets relocated to the top-left corner of that window.
        It is then called with true.*/
     void displayPalette(boolean b){

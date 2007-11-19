@@ -41,6 +41,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String APPLET_HEIGHT_PARAM = "height";
     static final String SVG_FILE_URL_PARAM = "svgURL";
     static final String SHOW_NAVIGATION_CONTROLS_PARAM = "showNavControls";
+    static final String SHOW_FC_PALETTE_PARAM = "showFCPalette";
     static final String APPLET_TITLE_PARAM = "title";
     static final String APPLET_BKG_COLOR_PARAM = "appletBackgroundColor";
     static final String GRAPH_BKG_COLOR_PARAM = "graphBackgroundColor";
@@ -105,6 +106,14 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    }
 	}
 	catch(Exception ex){showNavControl = true;}
+	boolean showFCPalette = true;
+	try {
+	    String s = getParameter(SHOW_FC_PALETTE_PARAM);
+	    if (s != null){
+            showFCPalette = (new Boolean(s)).booleanValue();
+	    }
+	}
+	catch(Exception ex){showFCPalette = true;}
 	try {
 	    APPLET_TITLE = getParameter(APPLET_TITLE_PARAM);
 	}
@@ -190,6 +199,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    grMngr.mainView.mouse.setColor(CURSOR_COLOR);
 	    grMngr.mainView.mouse.setHintColor(CURSOR_COLOR);
 	}
+    grMngr.tp.setEnabled(showFCPalette);
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
 		    sleep(1000);

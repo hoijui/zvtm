@@ -201,38 +201,38 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-	lx = jpx;
-	ly = jpy;
-	if ((jpx-grMngr.LENS_R1) < 0){
-	    lx = grMngr.LENS_R1;
-	    cursorNearBorder = true;
-	}
-	else if ((jpx+grMngr.LENS_R1) > grMngr.panelWidth){
-	    lx = grMngr.panelWidth - grMngr.LENS_R1;
-	    cursorNearBorder = true;
-	}
-	else {
-	    cursorNearBorder = false;
-	}
-	if ((jpy-grMngr.LENS_R1) < 0){
-	    ly = grMngr.LENS_R1;
-	    cursorNearBorder = true;
-	}
-	else if ((jpy+grMngr.LENS_R1) > grMngr.panelHeight){
-	    ly = grMngr.panelHeight - grMngr.LENS_R1;
-	    cursorNearBorder = true;
-	}
-	if (grMngr.lensType != 0 && grMngr.lens != null){
-	    grMngr.moveLens(lx, ly, e.getWhen());
-	}
-	else {
-	    if (grMngr.tp.insidePaletteTriggerZone(jpx, jpy)){
-		if (!grMngr.tp.isShowing()){grMngr.tp.show();}
-	    }
-	    else {
-		if (grMngr.tp.isShowing()){grMngr.tp.hide();}
-	    }
-	}
+        lx = jpx;
+        ly = jpy;
+        if ((jpx-grMngr.LENS_R1) < 0){
+            lx = grMngr.LENS_R1;
+            cursorNearBorder = true;
+        }
+        else if ((jpx+grMngr.LENS_R1) > grMngr.panelWidth){
+            lx = grMngr.panelWidth - grMngr.LENS_R1;
+            cursorNearBorder = true;
+        }
+        else {
+            cursorNearBorder = false;
+        }
+        if ((jpy-grMngr.LENS_R1) < 0){
+            ly = grMngr.LENS_R1;
+            cursorNearBorder = true;
+        }
+        else if ((jpy+grMngr.LENS_R1) > grMngr.panelHeight){
+            ly = grMngr.panelHeight - grMngr.LENS_R1;
+            cursorNearBorder = true;
+        }
+        if (grMngr.lensType != 0 && grMngr.lens != null){
+            grMngr.moveLens(lx, ly, e.getWhen());
+        }
+        else if (grMngr.tp.isEnabled()){
+            if (grMngr.tp.insidePaletteTriggerZone(jpx, jpy)){
+                if (!grMngr.tp.isShowing()){grMngr.tp.show();}
+            }
+            else {
+                if (grMngr.tp.isShowing()){grMngr.tp.hide();}
+            }
+        }
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
