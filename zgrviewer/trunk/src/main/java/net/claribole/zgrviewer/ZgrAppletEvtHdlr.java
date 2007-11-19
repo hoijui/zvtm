@@ -159,7 +159,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	Glyph g=v.lastGlyphEntered();
-	if (g!=null){
+	if (g!=null && g != grMngr.boundingBox){
 	    if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
 	}
 	else {

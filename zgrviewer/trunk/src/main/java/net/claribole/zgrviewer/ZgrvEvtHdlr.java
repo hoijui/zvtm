@@ -159,14 +159,14 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (toolPaletteIsActive){return;}
-	Glyph g=v.lastGlyphEntered();
-	if (g!=null){
-	    if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
-	}
-	else {
-	    attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
-	}
+        if (toolPaletteIsActive){return;}
+        Glyph g=v.lastGlyphEntered();
+        if (g!=null && g != grMngr.boundingBox){
+            if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
+        }
+        else {
+            attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
+        }
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -459,16 +459,25 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
 	}
 	else {
+	    System.out.println("a");
+	    
 	    otherGlyphs=mouse.getIntersectingPaths(cam);
 	    if (otherGlyphs!=null && otherGlyphs.size()>0){
+	        System.out.println("b");
+	        
 		g=(Glyph)otherGlyphs.firstElement();
-		if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner());}
+		if (g.getOwner()!=null){System.out.println("c");
+		getAndDisplayURL((LElem)g.getOwner());}
 	    }
 	}
     }
 
     void getAndDisplayURL(LElem noa){
+        System.out.println("1"+noa);
+        
 	String url = noa.getURL();
+	System.out.println("2"+url);
+	
 	if (url!=null && url.length()>0){
 	    application.displayURLinBrowser(url);
 	}
