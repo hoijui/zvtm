@@ -16,22 +16,23 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   
   <!-- Repositories -->
   <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
     <repository>
       <id>central</id>
       <name>Maven Repository</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
-	<repository>
-      <id>INRIA In-Situ Repository</id>
-      <url>ftp://ftp.inria.fr/INRIA/in-situ/maven</url>
-    </repository>
   </repositories>
   
   <!-- Distribution - Deploy to FTP -->
   <distributionManagement>
-    <repository>
-      <id>INRIA In-Situ Repository</id>
-      <url>ftp://ftp.inria.fr/INRIA/in-situ/maven</url>    </repository>
+	<repository>
+      <id>zvtm repository</id>
+      <url>scp://zvtm.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+    </repository>
   </distributionManagement>
   
   <!-- Dependencies -->
@@ -45,13 +46,6 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   
   <!-- Build -->
   <build>
-  	<extensions> 
-      <extension> 
-        <groupId>org.apache.maven.wagon</groupId> 
-        <artifactId>wagon-ftp</artifactId> 
-        <version>1.0-alpha-6</version> 
-      </extension>
-	</extensions>
     <plugins>
       <plugin>
         <inherited>true</inherited>
