@@ -173,6 +173,13 @@ public class ZSlideShow implements Java2DPainter {
         System.exit(0);
     }
 
+    void gc(){
+        System.gc();
+        if (SHOW_MEMORY_USAGE){
+            vsm.repaintNow();
+        }
+    }
+    
     static boolean SHOW_MEMORY_USAGE = true;
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;

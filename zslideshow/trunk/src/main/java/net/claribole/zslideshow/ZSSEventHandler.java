@@ -70,6 +70,7 @@ public class ZSSEventHandler implements ViewEventHandler {
         if (code==KeyEvent.VK_O){application.selectDirectory();}
         else if (code==KeyEvent.VK_RIGHT){application.gl.displayNextPicture();}
         else if (code==KeyEvent.VK_LEFT){application.gl.displayPreviousPicture();}
+        else if (code==KeyEvent.VK_G){application.gc();}
     }
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
