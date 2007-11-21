@@ -351,7 +351,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
     }
 
     public void enterGlyph(Glyph g){
-	grMngr.mainView.setStatusBarText(Messages.EMPTY_STRING);
+	grMngr.mainView.setStatusBarText(Messages.SPACE_STRING);
 	if (g == grMngr.magWindow){
 	    inMagWindow = true;
 	    return;

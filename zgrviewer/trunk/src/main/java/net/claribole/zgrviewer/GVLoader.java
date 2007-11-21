@@ -115,36 +115,38 @@ class GVLoader {
     }
 
     void loadSVG(File f){
-	ProgPanel pp=new ProgPanel("Parsing SVG...","Loading SVG File");
-	try {
-	    pp.setPBValue(30);
-	    cfgMngr.lastFileOpened = f;
-	    dotMngr.lastProgramUsed = DOTManager.SVG_FILE;
-	    Document svgDoc=Utils.parse(f,false);
-	    pp.setLabel("Displaying...");
-	    pp.setPBValue(80);
-	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-	    SVGReader.load(svgDoc, grMngr.vsm, GraphicsManager.mainSpace, true,
-	    		f.toURI().toURL().toString());
-	    grMngr.seekBoundingBox();
-	    grMngr.buildLogicalStructure();
-	    ConfigManager.defaultFont=grMngr.vsm.getMainFont();
-	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
-// 	    grMngr.getGlobalView();
-	    grMngr.reveal();
-	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	    if (grMngr.rView != null){
-		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
-		grMngr.cameraMoved();
-	    }
-	    pp.destroy();
-	}
-	catch (Exception ex){
-	    grMngr.reveal();
-	    pp.destroy();
-	    ex.printStackTrace();
-	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
-	}
+        grMngr.gp.setMessage("Parsing SVG...");
+        grMngr.gp.setProgress(10);
+        grMngr.gp.setVisible(true);
+        try {
+            grMngr.gp.setProgress(30);
+            cfgMngr.lastFileOpened = f;
+            dotMngr.lastProgramUsed = DOTManager.SVG_FILE;
+            Document svgDoc=Utils.parse(f,false);
+            grMngr.gp.setMessage("Building graph...");
+            grMngr.gp.setProgress(80);
+            if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
+            SVGReader.load(svgDoc, grMngr.vsm, GraphicsManager.mainSpace, true,
+                f.toURI().toURL().toString());
+            grMngr.seekBoundingBox();
+            grMngr.buildLogicalStructure();
+            ConfigManager.defaultFont=grMngr.vsm.getMainFont();
+            grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
+            grMngr.reveal();
+            //do not remember camera's initial location (before global view)
+            if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
+            if (grMngr.rView != null){
+                grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+                grMngr.cameraMoved();
+            }
+            grMngr.gp.setVisible(false);
+        }
+        catch (Exception ex){
+            grMngr.reveal();
+            grMngr.gp.setVisible(false);
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
+        }
     }
 
     /** Method used by ZGRViewer - Applet to get the server-side generated SVG file.

@@ -104,7 +104,9 @@ public class Messages {
 
     static final String LOADING_SVG = "Loading Graphviz/SVG...";
 
-    static final String EMPTY_STRING = " ";
+    static final String EMPTY_STRING = "";
+
+    static final String SPACE_STRING = " ";
 
     static final String YOU_HAVE_THE_MOST_RECENT_VERSION = "You have the most recent version of ZGRViewer (" + VERSION + ")";
     

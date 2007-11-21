@@ -229,7 +229,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 		}
 
         public void finished(){
-            setStatusBarText(Messages.EMPTY_STRING);
+            setStatusBarText(Messages.SPACE_STRING);
         }
 
 	    };

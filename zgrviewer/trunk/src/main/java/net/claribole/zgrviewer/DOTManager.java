@@ -53,52 +53,53 @@ class DOTManager {
 	this.cfgMngr = cm;
     }
 
-    void load(File f, short prg, boolean parser){// prg is the program to use DOTManager.*_PROGRAM
-	ProgPanel pp=new ProgPanel("Resetting...","Loading DOT File");
-	try {
-	    svgF=Utils.createTempFile(ConfigManager.m_TmpDir.toString(),"zgrv",(parser?".dot":".svg"));
-	    dotF=f;
-	    callGraphViz(pp, prg, parser);
-	    pp.setLabel("Deleting Temp File...");
-	    pp.setPBValue(100);
-	    pp.destroy();
-	}
-	catch (Exception ex){
-	    pp.destroy();
-	    javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
-	}
+    void load(File f, short prg, boolean parser){
+        // prg is the program to use DOTManager.*_PROGRAM
+        grMngr.gp.setMessage("Resetting...");
+        grMngr.gp.setProgress(10);
+        grMngr.gp.setVisible(true);
+        try {
+            svgF=Utils.createTempFile(ConfigManager.m_TmpDir.toString(),"zgrv",(parser?".dot":".svg"));
+            dotF=f;
+            callGraphViz(prg, parser);
+            grMngr.gp.setMessage("Deleting Temp File...");
+            grMngr.gp.setProgress(100);
+            grMngr.gp.setVisible(false);
+        }
+        catch (Exception ex){
+            grMngr.gp.setVisible(false);
+            javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
+        }
     }
     
-    private void callGraphViz(ProgPanel pp, short prg, boolean parser)
-            throws Exception {// prg is the program to use DOTManager.*_PROGRAM
+    private void callGraphViz(short prg, boolean parser) throws Exception {
+        // prg is the program to use DOTManager.*_PROGRAM
         try {
-            pp.setLabel("Preparing " + (parser ? "Augmented DOT" : "SVG")
-                    + " Temp File");
-            pp.setPBValue(10);
+            grMngr.gp.setMessage("Preparing " + (parser ? "Augmented DOT" : "SVG")
+                + " Temp File");
+            grMngr.gp.setProgress(10);
             if (parser) {
-                if (!generateDOTFile(dotF.getAbsolutePath(), svgF
-                        .getAbsolutePath(), pp, prg)) {
+                if (!generateDOTFile(dotF.getAbsolutePath(), svgF.getAbsolutePath(), prg)) {
                     deleteTempFiles();
                     return;
                 }
-                displayDOT(pp);
+                displayDOT();
                 if (ConfigManager.DELETE_TEMP_FILES) {
                     deleteTempFiles();
                 }
             } else {
-                if (!generateSVGFile(dotF.getAbsolutePath(), svgF
-                        .getAbsolutePath(), pp, prg)) {
+                if (!generateSVGFile(dotF.getAbsolutePath(), svgF.getAbsolutePath(), prg)) {
                     deleteTempFiles();
                     return;
                 }
-                displaySVG(pp, dotF.getAbsoluteFile().getParentFile());
+                displaySVG(dotF.getAbsoluteFile().getParentFile());
                 if (ConfigManager.DELETE_TEMP_FILES) {
                     deleteTempFiles();
                 }
             }
         } catch (Exception e) {
             System.err.println("Exception generating graph: " + e.getMessage()
-                    + "\n");
+                + "\n");
             e.printStackTrace();
             throw new Exception();
         }
@@ -119,106 +120,107 @@ class DOTManager {
 	}
     }
     
-    private boolean generateDOTFile(String dotFilePath, String tmpFilePath, ProgPanel pp, short prg){
+    private boolean generateDOTFile(String dotFilePath, String tmpFilePath, short prg){
         String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
-	cmdArray[0] = getProgram(prg);
-	cmdArray[1] = "-Tdot";
-	if (cfgMngr.FORCE_SILENT){
-	    cmdArray[2] = "-q";
-	    cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
-	    cmdArray[4] = "-o";
-	    cmdArray[5] = tmpFilePath;
-	    cmdArray[6] = dotFilePath;
-	}
-	else {
-	    cmdArray[2] = checkOptions(ConfigManager.CMD_LINE_OPTS);
-	    cmdArray[3] = "-o";
-	    cmdArray[4] = tmpFilePath;
-	    cmdArray[5] = dotFilePath;
-	}
-        Runtime rt=Runtime.getRuntime();
-	pp.setLabel("Computing Graph Layout (GraphViz)...");
-	pp.setPBValue(40);
-        try {
-	    try {
-		File execDir = (new File(dotFilePath)).getParentFile();
-		Process p = rt.exec(cmdArray, null, execDir);
-		p.waitFor();
-	    }
-	    catch (IOException ex){
-		Process p = rt.exec(cmdArray);
-		p.waitFor();
-	    }
+        cmdArray[0] = getProgram(prg);
+        cmdArray[1] = "-Tdot";
+        if (cfgMngr.FORCE_SILENT){
+            cmdArray[2] = "-q";
+            cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
+            cmdArray[4] = "-o";
+            cmdArray[5] = tmpFilePath;
+            cmdArray[6] = dotFilePath;
         }
-	catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
+        else {
+            cmdArray[2] = checkOptions(ConfigManager.CMD_LINE_OPTS);
+            cmdArray[3] = "-o";
+            cmdArray[4] = tmpFilePath;
+            cmdArray[5] = dotFilePath;
+        }
+        Runtime rt=Runtime.getRuntime();
+        grMngr.gp.setMessage("Computing Graph Layout (GraphViz)...");
+        grMngr.gp.setProgress(40);
+        try {
+            try {
+                File execDir = (new File(dotFilePath)).getParentFile();
+                Process p = rt.exec(cmdArray, null, execDir);
+                p.waitFor();
+            }
+            catch (IOException ex){
+                Process p = rt.exec(cmdArray);
+                p.waitFor();
+            }
+        }
+        catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
     }
 
     /**
-     * Invokes the GraphViz program to create a graph image from the
-     * the given DOT data file
-     *@param dotFilePath the name of the DOT data file
-     *@param svgFilePath the name of the output data file
-     *@param prg program to use (dot or neato)
-     
-     *@return true if success; false if any failure occurs
-     */
-    private boolean generateSVGFile(String dotFilePath, String svgFilePath, ProgPanel pp, short prg){
+        * Invokes the GraphViz program to create a graph image from the
+        * the given DOT data file
+        *@param dotFilePath the name of the DOT data file
+        *@param svgFilePath the name of the output data file
+        *@param prg program to use (dot or neato)
+        *@return true if success; false if any failure occurs
+        */
+    private boolean generateSVGFile(String dotFilePath, String svgFilePath, short prg){
         String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
-	cmdArray[0] = getProgram(prg);
-	cmdArray[1] = "-Tsvg";
-	if (cfgMngr.FORCE_SILENT){
-	    cmdArray[2] = "-q";
-	    cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
-	    cmdArray[4] = "-o";
-	    cmdArray[5] = svgFilePath;
-	    cmdArray[6] = dotFilePath;
-	}
-	else {
-	    cmdArray[2] = checkOptions(ConfigManager.CMD_LINE_OPTS);
-	    cmdArray[3] = "-o";
-	    cmdArray[4] = svgFilePath;
-	    cmdArray[5] = dotFilePath;
-	}
-        Runtime rt=Runtime.getRuntime();
-	pp.setLabel("Computing Graph Layout (GraphViz)...");
-	pp.setPBValue(40);
-        try {
-	    try {
-		File execDir = (new File(dotFilePath)).getParentFile();
-		Process p = rt.exec(cmdArray, null, execDir);
-		p.waitFor();
-	    }
-	    catch (IOException ex){
-		Process p = rt.exec(cmdArray);
-		p.waitFor();
-	    }
+        cmdArray[0] = getProgram(prg);
+        cmdArray[1] = "-Tsvg";
+        if (cfgMngr.FORCE_SILENT){
+            cmdArray[2] = "-q";
+            cmdArray[3] = checkOptions(ConfigManager.CMD_LINE_OPTS);
+            cmdArray[4] = "-o";
+            cmdArray[5] = svgFilePath;
+            cmdArray[6] = dotFilePath;
         }
-	catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
+        else {
+            cmdArray[2] = checkOptions(ConfigManager.CMD_LINE_OPTS);
+            cmdArray[3] = "-o";
+            cmdArray[4] = svgFilePath;
+            cmdArray[5] = dotFilePath;
+        }
+        Runtime rt=Runtime.getRuntime();
+        grMngr.gp.setMessage("Computing Graph Layout (GraphViz)...");
+        grMngr.gp.setProgress(40);
+        try {
+            try {
+                File execDir = (new File(dotFilePath)).getParentFile();
+                Process p = rt.exec(cmdArray, null, execDir);
+                p.waitFor();
+            }
+            catch (IOException ex){
+                Process p = rt.exec(cmdArray);
+                p.waitFor();
+            }
+        }
+        catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
     }
 
     /*load a file using a program other than dot/neato for computing the layout (e.g. twopi)*/
     void loadCustom(String srcFile, String cmdLineExpr){
-	ProgPanel pp = new ProgPanel("Resetting...","Loading File");
-	try {
-	    svgF = Utils.createTempFile(ConfigManager.m_TmpDir.toString(), "zgrv", ".svg");
-	    if (!generateSVGFileFOP(srcFile, svgF.getAbsolutePath(), pp, cmdLineExpr)){
-		deleteTempFiles();
-		return;
-	    }
-	    displaySVG(pp, (new File(srcFile)).getParentFile());
-	    if (ConfigManager.DELETE_TEMP_FILES) {
-		deleteTempFiles();
-	    }
-	    pp.setLabel("Deleting Temp File...");
-	    pp.setPBValue(100);
-	    pp.destroy();
-	}
-	catch (Exception ex){
-	    pp.destroy();
-	    javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+srcFile);
-	}
+        grMngr.gp.setMessage("Resetting SVG...");
+        grMngr.gp.setProgress(10);
+        grMngr.gp.setVisible(true);
+        try {
+            svgF = Utils.createTempFile(ConfigManager.m_TmpDir.toString(), "zgrv", ".svg");
+            if (!generateSVGFileFOP(srcFile, svgF.getAbsolutePath(), cmdLineExpr)){
+                deleteTempFiles();
+                return;
+            }
+            displaySVG((new File(srcFile)).getParentFile());
+            if (ConfigManager.DELETE_TEMP_FILES) {
+                deleteTempFiles();
+            }
+            grMngr.gp.setMessage("Deleting Temp File...");
+            grMngr.gp.setProgress(100);
+            grMngr.gp.setVisible(false);
+        }
+        catch (Exception ex){
+            grMngr.gp.setVisible(false);
+            javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+srcFile);
+        }
     }
     
 
@@ -226,7 +228,7 @@ class DOTManager {
      * Invokes a program to create an SVG image from a source file using a program other than dot/neato for computing the layout (e.g. twopi)
      *@return true if success; false if any failure occurs
      */
-    private boolean generateSVGFileFOP(String srcFilePath, String svgFilePath, ProgPanel pp, String commandLine){
+    private boolean generateSVGFileFOP(String srcFilePath, String svgFilePath, String commandLine){
 	StringTokenizer st = new StringTokenizer(commandLine, " ");
 	int nbTokens = st.countTokens();
 	String[] cmdArray = new String[nbTokens];
@@ -236,8 +238,8 @@ class DOTManager {
 	    else if (cmdArray[i].equals("%t")){cmdArray[i] = svgFilePath;}
 	}
 	Runtime rt=Runtime.getRuntime();
- 	pp.setLabel("Computing layout...");
- 	pp.setPBValue(40);
+ 	grMngr.gp.setMessage("Computing layout...");
+ 	grMngr.gp.setProgress(40);
 	try {
 	    try {
 		File execDir = (new File(srcFilePath)).getParentFile();
@@ -258,12 +260,12 @@ class DOTManager {
         return true;
     }
 
-    void displaySVG(ProgPanel pp, File sourceDotFileParentDir){
-        pp.setLabel("Parsing SVG...");
-        pp.setPBValue(60);
+    void displaySVG(File sourceDotFileParentDir){
+        grMngr.gp.setMessage("Parsing SVG...");
+        grMngr.gp.setProgress(60);
         Document svgDoc=Utils.parse(svgF,false);
-        pp.setLabel("Displaying...");
-        pp.setPBValue(80);
+        grMngr.gp.setMessage("Displaying...");
+        grMngr.gp.setProgress(80);
         try {
             SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
             grMngr.seekBoundingBox();
@@ -276,10 +278,10 @@ class DOTManager {
         }
     }
 
-    void displayDOT(ProgPanel pp) throws Exception {
+    void displayDOT() throws Exception {
         try {
-            pp.setLabel("Parsing Augmented DOT...");
-            pp.setPBValue(60);
+            grMngr.gp.setMessage("Parsing Augmented DOT...");
+            grMngr.gp.setProgress(60);
             DataInputStream graphInput = new DataInputStream(new FileInputStream(
                 svgF));
             DOTLexer graphLexer = new DOTLexer(graphInput);
@@ -288,8 +290,8 @@ class DOTManager {
             CommonAST ast = (CommonAST) graphParser.getAST();
             DOTTreeParser graphWalker = new DOTTreeParser();
             graph = graphWalker.graph(ast);
-            pp.setLabel("Displaying...");
-            pp.setPBValue(80);
+            grMngr.gp.setMessage("Displaying...");
+            grMngr.gp.setProgress(80);
             ZgrReader.load(graph, grMngr.vsm, grMngr.mainSpace, true);
         }
         catch (NullPointerException ex){
