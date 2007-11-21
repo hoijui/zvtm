@@ -20,6 +20,9 @@ import java.awt.GradientPaint;
 import java.awt.Font;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.KeyAdapter;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -1343,6 +1346,9 @@ class ZGRGlassPane extends JComponent {
     ZGRGlassPane(GraphicsManager grMngr){
         super();
         this.grMngr = grMngr;
+        addMouseListener(new MouseAdapter(){});
+        addMouseMotionListener(new MouseMotionAdapter(){});
+        addKeyListener(new KeyAdapter(){});
     }
     
     void setProgress(int c){
