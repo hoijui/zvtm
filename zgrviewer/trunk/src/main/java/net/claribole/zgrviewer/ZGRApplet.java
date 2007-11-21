@@ -16,6 +16,7 @@ import java.awt.event.MouseListener;
 import javax.swing.JApplet;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
 
@@ -72,6 +73,8 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
     int appletWindowWidth = DEFAULT_VIEW_WIDTH;
     int appletWindowHeight = DEFAULT_VIEW_HEIGHT;
+
+    ZGRAGlassPane gp;
 
     public ZGRApplet(){
 	getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
@@ -171,7 +174,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	grMngr.parameterizeView(meh);
  	viewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-40));
 	grMngr.mainView.setAntialiasing(antialiased);
-	statusBar = new JLabel(Messages.LOADING_SVG);
+	statusBar = new JLabel(Messages.EMPTY_STRING);
 	JPanel borderPanel = new JPanel();
 	borderPanel.setLayout(new BorderLayout());
 	borderPanel.add(viewPanel, BorderLayout.CENTER);
@@ -200,6 +203,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    grMngr.mainView.mouse.setHintColor(CURSOR_COLOR);
 	}
     grMngr.tp.setEnabled(showFCPalette);
+    gp = new ZGRAGlassPane(appletWindowWidth, appletWindowHeight);
+    this.setGlassPane(gp);
+    gp.setVisible(true);
+    gp.setMessage(Messages.LOADING_SVG);
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
 		    sleep(1000);
@@ -225,6 +232,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 			grMngr.search(centerOnLabelF, 1);
 		    }
 		    grMngr.vsm.repaintNow();
+		    gp.setVisible(false);
 		    return null; 
 		}
 
@@ -346,4 +354,43 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	gbc.weighty = wy;
     }
 
+}
+
+class ZGRAGlassPane extends JComponent {
+
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final Color MSG_COLOR = Color.DARK_GRAY;
+    
+    String msg = Messages.EMPTY_STRING;
+    int msgX = 0;
+    int msgY = 0;
+    
+    int w,h;
+    
+    ZGRAGlassPane(int w, int h){
+        super();
+        this.w = w;
+        this.h = h;
+    }
+    
+    void setMessage(String m){
+        msg = m;
+        msgX = w/2-100;
+        msgY = h/2;
+        repaint(msgX, msgY-50, 200, 70);
+    }
+    
+    protected void paintComponent(Graphics g){
+        Graphics2D g2 = (Graphics2D)g;
+        Rectangle clip = g.getClipBounds();
+        g2.setComposite(GLASS_ALPHA);
+        g2.setColor(Color.WHITE);
+        g2.fillRect(clip.x, clip.y, clip.width, clip.height);
+        g2.setComposite(AlphaComposite.Src);
+        if (msg != Messages.EMPTY_STRING){
+            g2.setColor(MSG_COLOR);
+            g2.drawString(msg, msgX, msgY);
+        }
+    }
+    
 }
