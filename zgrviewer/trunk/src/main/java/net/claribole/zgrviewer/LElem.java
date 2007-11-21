@@ -10,26 +10,30 @@
 
 package net.claribole.zgrviewer;
 
+import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.svg.Metadata;
 
 class LElem {
 
     String title;
-    String url;
+    // URLs associated with each glyph (there might be different URLs associated with
+    // the various glyphs constituting a node or edge)
+    String[] URLs;
 
     LElem(){}
 
     LElem(Metadata md){
-	this.title = md.getTitle();
-	this.url = md.getURL();
+        this.title = md.getTitle();
+        this.URLs = new String[1];
+        this.URLs[0] = md.getURL();
     }
 
     String getTitle(){
-	return title;
+        return title;
     }
 
-    String getURL(){
-	return url;
+    String getURL(Glyph g){
+        return URLs[0];
     }
 
 }

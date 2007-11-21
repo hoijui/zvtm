@@ -24,18 +24,31 @@ class LNode extends LElem {
     short[] edgeDirections;
 
     LNode(String title, Vector glyphs){
-	this.title = title;
-	this.glyphs = new Glyph[glyphs.size()];
-	for (int i=0;i<this.glyphs.length;i++){
-	    this.glyphs[i] = (Glyph)glyphs.elementAt(i);
-	}
-	Metadata md = (Metadata)this.glyphs[0].getOwner();
-	if (md != null){this.url = md.getURL();}
-	for (int i=0;i<this.glyphs.length;i++){
-	    this.glyphs[i].setOwner(this);
-	}
-	edges = new LEdge[0];
-	edgeDirections = new short[0];
+        this.title = title;
+        this.glyphs = new Glyph[glyphs.size()];
+        this.URLs = new String[glyphs.size()];
+        for (int i=0;i<this.glyphs.length;i++){
+            this.glyphs[i] = (Glyph)glyphs.elementAt(i);
+            // URL associated with each glyph (there might be different URLs associated with
+            // the various glyphs constituting a node or edge)
+            if (this.glyphs[i].getOwner() != null){
+                URLs[i] = ((Metadata)this.glyphs[i].getOwner()).getURL();
+            }
+        }
+        for (int i=0;i<this.glyphs.length;i++){
+            this.glyphs[i].setOwner(this);
+        }
+        edges = new LEdge[0];
+        edgeDirections = new short[0];
+    }
+    
+    String getURL(Glyph g){
+        for (int i=0;i<glyphs.length;i++){
+            if (g == glyphs[i]){
+                return URLs[i];
+            }
+        }
+        return null;
     }
 
     void addArc(LEdge e, short direction){
