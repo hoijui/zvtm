@@ -46,19 +46,10 @@ public class ImageDescription {
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void loadObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeIn, boolean show){
         if (glyph == null){
-            // On Mac OS X, ImageIcon returns an OSXImage, while ImageIO.read() returns a BufferedImage
-            // OSXImage is correctly garbage-collected. BufferedImage is not
-            // (at least with just an IMage.flush() and removal of all references to it)
             Image i = (new ImageIcon(imageFile)).getImage();
-//            Image i=null;
-//            try{
-//              i = ImageIO.read(new File(imageFile));
-//            
-//            }
-//            catch(java.io.IOException ex){}
 /*            int ih = i.getHeight(null);
-            double sf = vh / ((double)ih);
-*/            double sf = 1.0f;
+            double sf = vh / ((double)ih);*/
+            double sf = 1.0f;
             float alpha = (fadeIn) ? 0.0f : 1.0f;
             glyph = new VImageST(0, 0, 0, i, sf, alpha);
             glyph.setBorderColor(ZSlideShow.IMAGE_BORDER_COLOR);
