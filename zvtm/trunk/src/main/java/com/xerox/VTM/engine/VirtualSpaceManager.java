@@ -341,9 +341,14 @@ public class VirtualSpaceManager implements AWTEventListener {
 	else {System.err.println("Error:VirtualSpaceManager:addCGlyph:attempting to add a null composite glyph in space: "+vs);return null;}
     }
 
-    /**get glyph with ID id*/
+    /** Get glyph with ID id. */
     public Glyph getGlyph(Long id){
-	return (Glyph)(allGlyphs.get(id));
+        return (Glyph)(allGlyphs.get(id));
+    }
+    
+    /** Get all glyphs currently present in the various virtual spaces managed by this VSM. */
+    public Enumeration getAllGlyphs(){
+        return allGlyphs.elements();
     }
 
     /** Destroy all glyphs in a virtual space.
