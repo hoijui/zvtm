@@ -69,14 +69,16 @@ public class VirtualSpace {
     /**camera manager for this virtual space*/
     CameraManager cm;
 
-    /**all glyphs in this virtual space, visible or not*/
+    /** All glyphs in this virtual space, visible or not. Glyph instances. */
     Vector visualEnts;
 
-    /**visible glyphs - order is important  (biggest index gets drawn on top)<br>
-       shared by all cameras in the virtual space as it is the same for all of them*/
+    /** Visible glyphs. Ordering is important: biggest index gets drawn on top.<br>
+        Shared by all cameras in the virtual space as it is the same for all of them. */
     Glyph[] drawingList;
 
-    Vector[] camera2drawnList; //sharing drawnList was causing a problem ; we now have one for each camera
+    /** List of glyphs draw for a given camera. Vector contains Glyph instances. */
+    Vector[] camera2drawnList;
+    //sharing drawnList was causing a problem ; we now have one for each camera
 
     /**
      *@param n virtual space name
@@ -301,7 +303,7 @@ public class VirtualSpace {
             }
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
-            vsm.allGlyphs.remove(g);
+            vsm.allGlyphs.remove(g.getID());
             if (repaint){
                 vsm.repaintNow();
             }
