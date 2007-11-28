@@ -105,6 +105,20 @@ public class RImage extends VImageST {
         return irihc;
     }
     
+    /** Set bitmap image to be displayed. */
+    public void setImage(Image i){
+        image = createReflection(i);
+        vw = Math.round(image.getWidth(null)/2.0);
+        vh = Math.round(image.getHeight(null)/4.0);
+        ar = (float)vw/(float)vh;
+        computeSize();
+        try{vsm.repaintNow();}catch(NullPointerException e){}
+    }
+    
+    public long getHeight(){
+        return (irihc) ? vh : vh/2;
+    }
+    
     public Object clone(){
     	RImage res = new RImage(vx, vy, 0, image, alpha);
     	res.setWidth(vw);

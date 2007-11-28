@@ -186,8 +186,9 @@ public class VImage extends ClosedShape implements RectangularShape {
 
     public float getSize(){return size;}
 
-    void computeSize(){
-	size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+    /** For internal use. */
+    public void computeSize(){
+        size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
     public void setWidth(long w){
