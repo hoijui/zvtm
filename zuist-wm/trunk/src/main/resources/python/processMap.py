@@ -6,6 +6,9 @@ from PIL import Image
 
 TRACE_LEVEL = 1
 
+def processSrcMap():
+    
+
 ################################################################################
 # Trace exec on std output
 ################################################################################
@@ -16,10 +19,12 @@ def log(msg, level=0):
 ################################################################################
 # main
 ################################################################################
-if len(sys.argv) > 1:
+if len(sys.argv) > 2:
     SRC_DIR = os.path.realpath(sys.argv[1])
-    if len(sys.argv) > 2:
-        TRACE_LEVEL = int(sys.argv[2])
+    TGT_DIR = os.path.realpath(sys.argv[2])    
+    if len(sys.argv) > 3:
+        TRACE_LEVEL = int(sys.argv[3])
 else:
     sys.exit(0)
 
+processSrcMap()
