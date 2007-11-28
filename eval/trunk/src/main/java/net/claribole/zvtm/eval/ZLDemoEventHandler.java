@@ -205,15 +205,15 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	if (code==KeyEvent.VK_F4){application.ewmm.switchAdaptMaps();}
-	else if (code==KeyEvent.VK_F3){
+	if (mod == SHIFT_MOD && code==KeyEvent.VK_F4){application.ewmm.switchAdaptMaps();}
+	else if (mod == SHIFT_MOD && code==KeyEvent.VK_F3){
 	    application.switchManhattanizer();
 	}
-	else if (code==KeyEvent.VK_F2){
+	else if (mod == SHIFT_MOD && code==KeyEvent.VK_F2){
 	    application.SHOW_MEMORY_USAGE = !application.SHOW_MEMORY_USAGE;
 	    application.vsm.repaintNow();
 	}
-	else if (code==KeyEvent.VK_F1){application.gc();}
+	else if (mod == SHIFT_MOD && code==KeyEvent.VK_F1){application.gc();}
 	// L1 lenses
 	else if (code == KeyEvent.VK_2){
 	    application.lensFamily = ZLWorldDemo.L1_Linear;
@@ -330,6 +330,18 @@ class ZLDemoEventHandler implements ViewEventHandler, AnimationListener, Compone
 	    application.lensFamily = ZLWorldDemo.LInf_Fading;
 	    application.demoView.setTitle(ZLWorldDemo.LInf_Fading_Title);
 	}
+	
+	else if (code == KeyEvent.VK_F1){
+	    application.lensFamily = ZLWorldDemo.LP_Gaussian;
+	    application.demoView.setTitle(ZLWorldDemo.LP_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_F2){
+	    application.setDistanceMetrics(-1);
+	}
+	else if (code == KeyEvent.VK_F3){
+	    application.setDistanceMetrics(1);
+	}
+	
     }
 
     public void viewActivated(View v){}
