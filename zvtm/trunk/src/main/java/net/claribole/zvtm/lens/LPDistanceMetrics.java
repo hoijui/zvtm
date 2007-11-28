@@ -11,6 +11,8 @@ package net.claribole.zvtm.lens;
 
 public interface LPDistanceMetrics {
 
+    public static float LP_FLOOR = 0.01f;
+    
     /**
      *@param lp value of L(P), the Lp-metrics defining the lens' shape, in ]0,+inf[
      */

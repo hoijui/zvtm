@@ -17,7 +17,7 @@ public class LPFSGaussianLens extends FSGaussianLens implements LPDistanceMetric
     float INV_P = 1 / P;
 
     /**
-     * create a lens with a maximum magnification factor of 2.0
+     * create a lens with a maximum magnification factor of 2.0, and Lp(2)
      */
     public LPFSGaussianLens(){
 	    super();

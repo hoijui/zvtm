@@ -43,6 +43,8 @@ import net.claribole.zvtm.lens.FixedSizeLens;
 import net.claribole.zvtm.lens.LAnimation;
 import net.claribole.zvtm.lens.LMaximumMagnification;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.lens.LMetrics;
+import net.claribole.zvtm.lens.LPDistanceMetrics;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
@@ -1985,7 +1987,7 @@ public class AnimManager implements Runnable{
             }
             case LS_MM_RD_LIN:{
                 //radii + maximu magnification - linear
-                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                if (animatedLenses.containsKey(lID) && ((((int[])animatedLenses.get(lID))[0] == 1) || (((int[])animatedLenses.get(lID))[1] == 1))){
                     putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
                 }
                 else {
@@ -2044,7 +2046,7 @@ public class AnimManager implements Runnable{
             }
             case LS_MM_RD_PAR:{
                 //radii + maximu magnification - parabolic (^4)
-                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                if (animatedLenses.containsKey(lID) && ((((int[])animatedLenses.get(lID))[0] == 1) || (((int[])animatedLenses.get(lID))[1] == 1))){
                     putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
                 }
                 else {
@@ -2103,7 +2105,7 @@ public class AnimManager implements Runnable{
             }
             case LS_MM_RD_SIG:{
                 //radii + maximu magnification - sigmoid
-                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                if (animatedLenses.containsKey(lID) && ((((int[])animatedLenses.get(lID))[0] == 1) || (((int[])animatedLenses.get(lID))[1] == 1))){
                     putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
                 }
                 else {
@@ -2154,6 +2156,112 @@ public class AnimManager implements Runnable{
                             // after animation if it gets smaller
                             an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
                         }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_LP_LIN:{
+                // distance metrics - linear
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[2] == 1)){
+                    putAsPendingLAnimation(lID, LS_LP, duration, type, data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[2] = 1;}
+                    else {int[] tmpA = {0, 0, 1};animatedLenses.put(lID, tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        LMetrics an = new LMetrics(l, this, duration);
+                        an.setPostAnimationAction(paa);
+                        float mm = ((LPDistanceMetrics)l).getDistanceMetrics();
+                        // data is a distance metrics offset
+                        float tmm = ((Float)data).floatValue();
+                        double dmm = tmm/nbSteps;
+                        an.steps = new float[(int)nbSteps];
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            step = (float)(mm + i*dmm);
+                            if (step <= LPDistanceMetrics.LP_FLOOR){step = LPDistanceMetrics.LP_FLOOR;}
+                            an.steps[i] = step;
+                            i++;
+                        }
+                        step = mm + tmm;
+                        if (step < LPDistanceMetrics.LP_FLOOR){step = LPDistanceMetrics.LP_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.steps[(int)nbSteps-1]=step;
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_LP_PAR:{
+                // distance metrics - parabolic  (^4)
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[2] == 1)){
+                    putAsPendingLAnimation(lID, LS_LP, duration, type, data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[2] = 1;}
+                    else {int[] tmpA = {0, 0, 1};animatedLenses.put(lID, tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        LMetrics an = new LMetrics(l, this, duration);
+                        an.setPostAnimationAction(paa);
+                        float mm = ((LPDistanceMetrics)l).getDistanceMetrics();
+                        // data is a distance metrics offset
+                        float tmm = ((Float)data).floatValue();
+                        an.steps = new float[(int)nbSteps];
+                        double stepValue;
+                        float dmm;
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue = Math.pow((i+1)/nbSteps,4);
+                            dmm = (float)tmm*(float)stepValue;
+                            step = mm + dmm;
+                            if (step < LPDistanceMetrics.LP_FLOOR){step = LPDistanceMetrics.LP_FLOOR;}
+                            an.steps[i++]=step;
+                        }
+                        step = mm + tmm;
+                        if (step < LPDistanceMetrics.LP_FLOOR){step = LPDistanceMetrics.LP_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.steps[(int)nbSteps-1] = step;
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_LP_SIG:{
+                // distance metrics - sigmoid
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[2] == 1)){
+                    putAsPendingLAnimation(lID, LS_LP, duration, type, data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[2]=1;}
+                    else {int[] tmpA = {0, 0, 1};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        LMetrics an = new LMetrics(l, this, duration);
+                        an.setPostAnimationAction(paa);
+                        float mm = ((LPDistanceMetrics)l).getDistanceMetrics();
+                        // data is a distance metrics offset
+                        float tmm = ((Float)data).floatValue();
+                        an.steps = new float[(int)nbSteps];
+                        double stepValue;
+                        float dmm;
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue = computeSigmoid(sigFactor,(i+1)/nbSteps);
+                            dmm = (float)tmm*(float)stepValue;
+                            step = mm + dmm;
+                            if (step < LPDistanceMetrics.LP_FLOOR){step = LPDistanceMetrics.LP_FLOOR;}
+                            an.steps[i++] = step;
+                        }
+                        step = mm+tmm;
+                        if (step < LPDistanceMetrics.LP_FLOOR){step = LPDistanceMetrics.LP_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.steps[(int)nbSteps-1] = step;
                         animLensBag.add(an);
                         an.start();
                     }
