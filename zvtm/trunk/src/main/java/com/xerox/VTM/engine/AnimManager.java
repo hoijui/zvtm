@@ -116,6 +116,12 @@ public class AnimManager implements Runnable{
     public static final short LS_MM_RD_PAR = 7;
     /**lens max magnification factor and radii value animation (pacing function = sigmoid - slow in/slow out motion)*/
     public static final short LS_MM_RD_SIG = 8;
+    /**lens distance metrics animation (pacing function = linear)*/
+    public static final short LS_LP_LIN = 9;
+    /**lens distance metrics animation (pacing function = parabolic - slow in/fast out motion)*/
+    public static final short LS_LP_PAR = 10;
+    /**lens distance metrics animation (pacing function = sigmoid - slow in/slow out motion)*/
+    public static final short LS_LP_SIG = 11;
 
     /**camera translation (pacing function=linear)*/
     public static final short CA_TRANS_LIN = 0;
@@ -186,6 +192,8 @@ public class AnimManager implements Runnable{
     public static final String LS_RD = "rd";
     /**Interrupt max magnification factor and radii value animation*/
     public static final String LS_BOTH = "both";
+    /**Interrupt distance metric animation*/
+    public static final String LS_LP = "lp";
 
     /**root VTM class*/
     VirtualSpaceManager vsm;
@@ -1685,25 +1693,25 @@ public class AnimManager implements Runnable{
 
     /**animate a lens
      *@param duration in milliseconds
-     *@param type use one of (LS_MM_LIN, LS_MM_PAR, LS_MM_SIG, LS_RD_LIN, LS_RD_PAR, LS_RD_SIG, LS_MM_RD_LIN, LS_MM_RD_PAR, LS_MM_RD_SIG)
+     *@param type use one of (LS_MM_LIN, LS_MM_PAR, LS_MM_SIG, LS_RD_LIN, LS_RD_PAR, LS_RD_SIG, LS_MM_RD_LIN, LS_MM_RD_PAR, LS_MM_RD_SIG, LS_LP_LIN, LS_LP_PAR, LS_LP_SIG)
      *@param data for radii, data is an array of int[2] ; the first value is the outer radius offset, the second value is the inner radius offset<br>
      *            for maximum magnification factor, data is a factor offset (Float)<br>
      *            for max magnification and radii, data is a vector containing a Float (factor offset) and an array of int[2] representing outer and inner radius offsets
      *@param lID ID of lens to be animated
      *@param kill true if lens should be removed from view after this animation ends
      */
-    public void createLensAnimation(long duration,short type,Object data,Integer lID, boolean kill){
-	if (kill){
-	    createLensAnimation(duration, type, data, lID, new LensKillAction(vsm));
-	}
-	else {
-	    createLensAnimation(duration, type, data, lID, null);
-	}
-    }
-
+     public void createLensAnimation(long duration,short type,Object data,Integer lID, boolean kill){
+         if (kill){
+             createLensAnimation(duration, type, data, lID, new LensKillAction(vsm));
+         }
+         else {
+             createLensAnimation(duration, type, data, lID, null);
+         }
+     }
+    
     /**animate a lens
      *@param duration in milliseconds
-     *@param type use one of (LS_MM_LIN, LS_MM_PAR, LS_MM_SIG, LS_RD_LIN, LS_RD_PAR, LS_RD_SIG, LS_MM_RD_LIN, LS_MM_RD_PAR, LS_MM_RD_SIG)
+     *@param type use one of (LS_MM_LIN, LS_MM_PAR, LS_MM_SIG, LS_RD_LIN, LS_RD_PAR, LS_RD_SIG, LS_MM_RD_LIN, LS_MM_RD_PAR, LS_MM_RD_SIG, LS_LP_LIN, LS_LP_PAR, LS_LP_SIG)
      *@param data for radii, data is an array of int[2] ; the first value is the outer radius offset, the second value is the inner radius offset<br>
      *            for maximum magnification factor, data is a factor offset (Float)<br>
      *            for max magnification and radii, data is a vector containing a Float (factor offset) and an array of int[2] representing outer and inner radius offsets
@@ -1711,454 +1719,507 @@ public class AnimManager implements Runnable{
      *@param paa action to perform after animation ends
      */
     public void createLensAnimation(long duration,short type,Object data,Integer lID, PostAnimationAction paa){
-	Lens l = vsm.getLens(lID);
-	if (l == null){return;}
-	switch(type){
-	case LS_RD_LIN:{//radii - linear
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[1] == 1)){
-		putAsPendingLAnimation(lID,LS_RD,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[1]=1;}
-		else {int[] tmpA = {0,1};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    int r1 = ((FixedSizeLens)l).getOuterRadius();
-		    int r2 = ((FixedSizeLens)l).getInnerRadius();
-		    FSLRadii an = new FSLRadii((FixedSizeLens)l, this, duration);
-		    an.setPostAnimationAction(paa);
-		    int[] offsets = (int[])data;
-		    int tr1 = offsets[0];    //data is an array of int[2] representing offsets for outer and inner radii
-		    int tr2 = offsets[1];
-		    double dr1 = tr1/nbSteps;
-		    double dr2 = tr2/nbSteps;
-		    an.steps = new int[(int)nbSteps][2];
-		    for (int i=0;i<nbSteps-1;) {
-			an.steps[i][0] = (int)Math.round(r1 + i * dr1);
-			an.steps[i][1] = (int)Math.round(r2 + i * dr2);
-			i++;
-		    }
-		    an.steps[(int)nbSteps-1][0] = r1 + tr1;
-		    an.steps[(int)nbSteps-1][1] = r2 + tr2;
-		    // change magnification buffer size
-		    if (an.steps[an.steps.length-1][0] > an.steps[0][0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_RD_PAR:{//radii - parabolic (^4)
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[1] == 1)){
-		putAsPendingLAnimation(lID,LS_RD,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[1]=1;}
-		else {int[] tmpA = {0,1};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    FSLRadii an = new FSLRadii((FixedSizeLens)l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    int r1 = ((FixedSizeLens)l).getOuterRadius();
-		    int r2 = ((FixedSizeLens)l).getInnerRadius();
-		    int[] offsets = (int[])data;
-		    int tr1 = offsets[0];    //data is an array of int[2] representing offsets for outer and inner radii
-		    int tr2 = offsets[1];
-		    double stepValue;
-		    an.steps=new int[(int)nbSteps][2];
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue=Math.pow((i+1)/nbSteps,4);
-			an.steps[i][0] = (int)Math.round(r1 + tr1*stepValue);
-			an.steps[i][1] = (int)Math.round(r2 + tr2*stepValue);
-			i++;
-		    }
-		    an.steps[(int)nbSteps-1][0] = r1 + tr1;
-		    an.steps[(int)nbSteps-1][1] = r2 + tr2;
-		    // change magnification buffer size
-		    if (an.steps[an.steps.length-1][0] > an.steps[0][0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_RD_SIG:{//radii - sigmoid
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[1] == 1)){
-		putAsPendingLAnimation(lID,LS_RD,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[1]=1;}
-		else {int[] tmpA = {0,1};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    FSLRadii an = new FSLRadii((FixedSizeLens)l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    int r1 = ((FixedSizeLens)l).getOuterRadius();
-		    int r2 = ((FixedSizeLens)l).getInnerRadius();
-		    int[] offsets = (int[])data;
-		    int tr1 = offsets[0];    //data is an array of int[2] representing offsets for outer and inner radii
-		    int tr2 = offsets[1];
-		    double stepValue;
-		    an.steps=new int[(int)nbSteps][2];
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue = computeSigmoid(sigFactor,(i+1)/nbSteps);
-			an.steps[i][0] = (int)Math.round(r1 + tr1*stepValue);
-			an.steps[i][1] = (int)Math.round(r2 + tr2*stepValue);
-			i++;
-		    }
-		    an.steps[(int)nbSteps-1][0] = r1 + tr1;
-		    an.steps[(int)nbSteps-1][1] = r2 + tr2;
-		    // change magnification buffer size
-		    if (an.steps[an.steps.length-1][0] > an.steps[0][0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_MM_LIN:{//maximum magnification - linear
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
-		putAsPendingLAnimation(lID,LS_MM,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
-		else {int[] tmpA = {1,0};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    LMaximumMagnification an = new LMaximumMagnification(l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    float mm = l.getMaximumMagnification();
-		    float tmm = ((Float)data).floatValue();    //data is an magnification offset
-		    double dmm = tmm/nbSteps;
-		    an.steps=new float[(int)nbSteps];
-		    float step;
-		    for (int i=0;i<nbSteps-1;) {
-			step=(float)(mm+i*dmm);
-			if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-			an.steps[i]=step;
-			i++;
-		    }
-		    step=mm+tmm;
-		    if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-		    an.steps[(int)nbSteps-1]=step;  //last point is assigned from source value in order to prevent precision error
-		    // change magnification buffer size
-		    if (step > an.steps[0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*step*l.getRadius()));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*step*l.getRadius()));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_MM_PAR:{//maximum magnification - parabolic  (^4)
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
-		putAsPendingLAnimation(lID,LS_MM,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
-		else {int[] tmpA = {1,0};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    LMaximumMagnification an = new LMaximumMagnification(l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    float mm = l.getMaximumMagnification();
-		    float tmm = ((Float)data).floatValue();    //data is an magnification offset
-		    an.steps=new float[(int)nbSteps];
-		    double stepValue;
-		    float dmm;
-		    float step;
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue = Math.pow((i+1)/nbSteps,4);
-			dmm = (float)tmm*(float)stepValue;
-			step = mm+dmm;
-			if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-			an.steps[i++]=step;
-		    }
-		    step = mm+tmm;
-		    if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-		    an.steps[(int)nbSteps-1] = step;  //last point is assigned from source value in order to prevent precision error
-		    // change magnification buffer size
-		    if (step > an.steps[0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*step*l.getRadius()));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*step*l.getRadius()));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_MM_SIG:{//maximum magnification - sigmoid
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
-		putAsPendingLAnimation(lID,LS_MM,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
-		else {int[] tmpA = {1,0};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    LMaximumMagnification an = new LMaximumMagnification(l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    float mm = l.getMaximumMagnification();
-		    float tmm = ((Float)data).floatValue();    //data is an magnification offset
-		    an.steps=new float[(int)nbSteps];
-		    double stepValue;
-		    float dmm;
-		    float step;
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue=computeSigmoid(sigFactor,(i+1)/nbSteps);
-			dmm = (float)tmm*(float)stepValue;
-			step = mm+dmm;
-			if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-			an.steps[i++]=step;
-		    }
-		    step = mm+tmm;
-		    if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-		    an.steps[(int)nbSteps-1] = step;  //last point is assigned from source value in order to prevent precision error
-		    // change magnification buffer size
-		    if (step > an.steps[0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*step*l.getRadius()));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*step*l.getRadius()));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_MM_RD_LIN:{//radii + maximu magnification - linear
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
-		putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
-		else {int[] tmpA = {1,0};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    FSLMaxMagRadii an = new FSLMaxMagRadii((FixedSizeLens)l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    int r1 = ((FixedSizeLens)l).getOuterRadius();
-		    int r2 = ((FixedSizeLens)l).getInnerRadius();
-		    int[] offsets = (int[])(((Vector)data).elementAt(1));
-		    int tr1 = offsets[0];    //data is an array of int[2] representing offsets for outer and inner radii
-		    int tr2 = offsets[1];
-		    double dr1 = tr1/nbSteps;
-		    double dr2 = tr2/nbSteps;
-		    an.rsteps=new int[(int)nbSteps][2];
-		    for (int i=0;i<nbSteps-1;) {
-			an.rsteps[i][0] = (int)Math.round(r1 + i * dr1);
-			an.rsteps[i][1] = (int)Math.round(r2 + i * dr2);
-			i++;
-		    }
-		    an.rsteps[(int)nbSteps-1][0] = r1 + tr1;
-		    an.rsteps[(int)nbSteps-1][1] = r2 + tr2;
-		    float mm = l.getMaximumMagnification();
-		    float tmm = ((Float)(((Vector)data).elementAt(0))).floatValue();    //data is an magnification offset
-		    double dmm = tmm/nbSteps;
-		    an.mmsteps = new float[(int)nbSteps];
-		    float step;
-		    for (int i=0;i<nbSteps-1;) {
-			step = (float)(mm+i*dmm);
-			if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-			an.mmsteps[i] = step;
-			i++;
-		    }
-		    step = mm+tmm;
-		    if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-		    an.mmsteps[(int)nbSteps-1] = step;  //last point is assigned from source value in order to prevent precision error
-		    // change magnification buffer size
-		    if (an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1] > an.rsteps[0][0] * an.mmsteps[0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_MM_RD_PAR:{//radii + maximu magnification - parabolic (^4)
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
-		putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
-		else {int[] tmpA = {1,0};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    FSLMaxMagRadii an = new FSLMaxMagRadii((FixedSizeLens)l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    int r1 = ((FixedSizeLens)l).getOuterRadius();
-		    int r2 = ((FixedSizeLens)l).getInnerRadius();
-		    int[] offsets = (int[])(((Vector)data).elementAt(1));
-		    int tr1 = offsets[0];    //data is an array of int[2] representing offsets for outer and inner radii
-		    int tr2 = offsets[1];
-		    double stepValue;
-		    an.rsteps=new int[(int)nbSteps][2];
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue=Math.pow((i+1)/nbSteps,4);
-			an.rsteps[i][0] = (int)Math.round(r1 + tr1*stepValue);
-			an.rsteps[i][1] = (int)Math.round(r2 + tr2*stepValue);
-			i++;
-		    }
-		    an.rsteps[(int)nbSteps-1][0] = r1 + tr1;
-		    an.rsteps[(int)nbSteps-1][1] = r2 + tr2;
-		    float mm = l.getMaximumMagnification();
-		    float tmm = ((Float)(((Vector)data).elementAt(0))).floatValue();    //data is an magnification offset
-		    float dmm, step;
-		    an.mmsteps = new float[(int)nbSteps];
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue = Math.pow((i+1)/nbSteps,4);
-			dmm = (float)tmm*(float)stepValue;
-			step = mm+dmm;
-			if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-			an.mmsteps[i++]=step;
-		    }
-		    step = mm+tmm;
-		    if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-		    an.mmsteps[(int)nbSteps-1] = step;  //last point is assigned from source value in order to prevent precision error
-		    // change magnification buffer size
-		    if (an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1] > an.rsteps[0][0] * an.mmsteps[0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	case LS_MM_RD_SIG:{//radii + maximu magnification - sigmoid
-	    if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
-		putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
-	    }
-	    else {
-		if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
-		else {int[] tmpA = {1,0};animatedLenses.put(lID,tmpA);}
-		double nbSteps = Math.round((float)(duration/frameTime));     //number of steps
-		if (nbSteps>0){
-		    FSLMaxMagRadii an = new FSLMaxMagRadii((FixedSizeLens)l,this,duration);
-		    an.setPostAnimationAction(paa);
-		    int r1 = ((FixedSizeLens)l).getOuterRadius();
-		    int r2 = ((FixedSizeLens)l).getInnerRadius();
-		    int[] offsets = (int[])(((Vector)data).elementAt(1));
-		    int tr1 = offsets[0];    //data is an array of int[2] representing offsets for outer and inner radii
-		    int tr2 = offsets[1];
-		    double stepValue;
-		    an.rsteps=new int[(int)nbSteps][2];
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue = computeSigmoid(sigFactor,(i+1)/nbSteps);
-			an.rsteps[i][0] = (int)Math.round(r1 + tr1*stepValue);
-			an.rsteps[i][1] = (int)Math.round(r2 + tr2*stepValue);
-			i++;
-		    }
-		    an.rsteps[(int)nbSteps-1][0] = r1 + tr1;
-		    an.rsteps[(int)nbSteps-1][1] = r2 + tr2;
-		    float mm = l.getMaximumMagnification();
-		    float tmm = ((Float)(((Vector)data).elementAt(0))).floatValue();    //data is an magnification offset
-		    float dmm, step;
-		    an.mmsteps = new float[(int)nbSteps];
-		    for (int i=0;i<nbSteps-1;) {
-			stepValue=computeSigmoid(sigFactor,(i+1)/nbSteps);
-			dmm = (float)tmm*(float)stepValue;
-			step = mm+dmm;
-			if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-			an.mmsteps[i++]=step;
-		    }
-		    step = mm+tmm;
-		    if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
-		    an.mmsteps[(int)nbSteps-1] = step;  //last point is assigned from source value in order to prevent precision error
-		    // change magnification buffer size
-		    if (an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1] > an.rsteps[0][0] * an.mmsteps[0]){// before animation if it gets bigger
-			l.setMagRasterDimensions(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
-		    }
-		    else {// after animation if it gets smaller
-			an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
-		    }
-		    animLensBag.add(an);
-		    an.start();
-		}
-	    }
-	    break;
-	}
-	default:{
-	    System.err.println("Error : AnimManager.createLensAnimation : unknown animation type");
-	}
-	}
+        Lens l = vsm.getLens(lID);
+        if (l == null){return;}
+        switch(type){
+            case LS_RD_LIN:{
+                //radii - linear
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[1] == 1)){
+                    putAsPendingLAnimation(lID,LS_RD,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[1]=1;}
+                    else {int[] tmpA = {0,1, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        int r1 = ((FixedSizeLens)l).getOuterRadius();
+                        int r2 = ((FixedSizeLens)l).getInnerRadius();
+                        FSLRadii an = new FSLRadii((FixedSizeLens)l, this, duration);
+                        an.setPostAnimationAction(paa);
+                        int[] offsets = (int[])data;
+                        //data is an array of int[2] representing offsets for outer and inner radii
+                        int tr1 = offsets[0];
+                        int tr2 = offsets[1];
+                        double dr1 = tr1/nbSteps;
+                        double dr2 = tr2/nbSteps;
+                        an.steps = new int[(int)nbSteps][2];
+                        for (int i=0;i<nbSteps-1;) {
+                            an.steps[i][0] = (int)Math.round(r1 + i * dr1);
+                            an.steps[i][1] = (int)Math.round(r2 + i * dr2);
+                            i++;
+                        }
+                        an.steps[(int)nbSteps-1][0] = r1 + tr1;
+                        an.steps[(int)nbSteps-1][1] = r2 + tr2;
+                        // change magnification buffer size
+                        if (an.steps[an.steps.length-1][0] > an.steps[0][0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_RD_PAR:{
+                //radii - parabolic (^4)
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[1] == 1)){
+                    putAsPendingLAnimation(lID,LS_RD,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[1]=1;}
+                    else {int[] tmpA = {0,1, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        FSLRadii an = new FSLRadii((FixedSizeLens)l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        int r1 = ((FixedSizeLens)l).getOuterRadius();
+                        int r2 = ((FixedSizeLens)l).getInnerRadius();
+                        int[] offsets = (int[])data;
+                        //data is an array of int[2] representing offsets for outer and inner radii
+                        int tr1 = offsets[0];
+                        int tr2 = offsets[1];
+                        double stepValue;
+                        an.steps=new int[(int)nbSteps][2];
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue=Math.pow((i+1)/nbSteps,4);
+                            an.steps[i][0] = (int)Math.round(r1 + tr1*stepValue);
+                            an.steps[i][1] = (int)Math.round(r2 + tr2*stepValue);
+                            i++;
+                        }
+                        an.steps[(int)nbSteps-1][0] = r1 + tr1;
+                        an.steps[(int)nbSteps-1][1] = r2 + tr2;
+                        // change magnification buffer size
+                        if (an.steps[an.steps.length-1][0] > an.steps[0][0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_RD_SIG:{
+                //radii - sigmoid
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[1] == 1)){
+                    putAsPendingLAnimation(lID,LS_RD,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[1]=1;}
+                    else {int[] tmpA = {0,1, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        FSLRadii an = new FSLRadii((FixedSizeLens)l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        int r1 = ((FixedSizeLens)l).getOuterRadius();
+                        int r2 = ((FixedSizeLens)l).getInnerRadius();
+                        int[] offsets = (int[])data;
+                        //data is an array of int[2] representing offsets for outer and inner radii
+                        int tr1 = offsets[0];
+                        int tr2 = offsets[1];
+                        double stepValue;
+                        an.steps=new int[(int)nbSteps][2];
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue = computeSigmoid(sigFactor,(i+1)/nbSteps);
+                            an.steps[i][0] = (int)Math.round(r1 + tr1*stepValue);
+                            an.steps[i][1] = (int)Math.round(r2 + tr2*stepValue);
+                            i++;
+                        }
+                        an.steps[(int)nbSteps-1][0] = r1 + tr1;
+                        an.steps[(int)nbSteps-1][1] = r2 + tr2;
+                        // change magnification buffer size
+                        if (an.steps[an.steps.length-1][0] > an.steps[0][0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*l.getMaximumMagnification()*an.steps[an.steps.length-1][0]));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_MM_LIN:{
+                //maximum magnification - linear
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                    putAsPendingLAnimation(lID,LS_MM,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
+                    else {int[] tmpA = {1,0, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        LMaximumMagnification an = new LMaximumMagnification(l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        float mm = l.getMaximumMagnification();
+                        //data is a magnification offset
+                        float tmm = ((Float)data).floatValue();
+                        double dmm = tmm/nbSteps;
+                        an.steps=new float[(int)nbSteps];
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            step=(float)(mm+i*dmm);
+                            if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                            an.steps[i]=step;
+                            i++;
+                        }
+                        step=mm+tmm;
+                        if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.steps[(int)nbSteps-1]=step;
+                        // change magnification buffer size
+                        if (step > an.steps[0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*step*l.getRadius()));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*step*l.getRadius()));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_MM_PAR:{
+                //maximum magnification - parabolic  (^4)
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                    putAsPendingLAnimation(lID,LS_MM,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
+                    else {int[] tmpA = {1,0, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        LMaximumMagnification an = new LMaximumMagnification(l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        float mm = l.getMaximumMagnification();
+                        //data is an magnification offset
+                        float tmm = ((Float)data).floatValue();
+                        an.steps=new float[(int)nbSteps];
+                        double stepValue;
+                        float dmm;
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue = Math.pow((i+1)/nbSteps,4);
+                            dmm = (float)tmm*(float)stepValue;
+                            step = mm+dmm;
+                            if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                            an.steps[i++]=step;
+                        }
+                        step = mm+tmm;
+                        if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.steps[(int)nbSteps-1] = step;
+                        // change magnification buffer size
+                        if (step > an.steps[0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*step*l.getRadius()));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*step*l.getRadius()));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_MM_SIG:{
+                //maximum magnification - sigmoid
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                    putAsPendingLAnimation(lID,LS_MM,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
+                    else {int[] tmpA = {1,0, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        LMaximumMagnification an = new LMaximumMagnification(l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        float mm = l.getMaximumMagnification();
+                        //data is an magnification offset
+                        float tmm = ((Float)data).floatValue();
+                        an.steps=new float[(int)nbSteps];
+                        double stepValue;
+                        float dmm;
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue=computeSigmoid(sigFactor,(i+1)/nbSteps);
+                            dmm = (float)tmm*(float)stepValue;
+                            step = mm+dmm;
+                            if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                            an.steps[i++]=step;
+                        }
+                        step = mm+tmm;
+                        if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                        an.steps[(int)nbSteps-1] = step;  //last point is assigned from source value in order to prevent precision error
+                        // change magnification buffer size
+                        if (step > an.steps[0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*step*l.getRadius()));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*step*l.getRadius()));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_MM_RD_LIN:{
+                //radii + maximu magnification - linear
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                    putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
+                    else {int[] tmpA = {1,1, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        FSLMaxMagRadii an = new FSLMaxMagRadii((FixedSizeLens)l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        int r1 = ((FixedSizeLens)l).getOuterRadius();
+                        int r2 = ((FixedSizeLens)l).getInnerRadius();
+                        int[] offsets = (int[])(((Vector)data).elementAt(1));
+                        //data is an array of int[2] representing offsets for outer and inner radii
+                        int tr1 = offsets[0];
+                        int tr2 = offsets[1];
+                        double dr1 = tr1/nbSteps;
+                        double dr2 = tr2/nbSteps;
+                        an.rsteps=new int[(int)nbSteps][2];
+                        for (int i=0;i<nbSteps-1;) {
+                            an.rsteps[i][0] = (int)Math.round(r1 + i * dr1);
+                            an.rsteps[i][1] = (int)Math.round(r2 + i * dr2);
+                            i++;
+                        }
+                        an.rsteps[(int)nbSteps-1][0] = r1 + tr1;
+                        an.rsteps[(int)nbSteps-1][1] = r2 + tr2;
+                        float mm = l.getMaximumMagnification();
+                        //data is an magnification offset
+                        float tmm = ((Float)(((Vector)data).elementAt(0))).floatValue();
+                        double dmm = tmm/nbSteps;
+                        an.mmsteps = new float[(int)nbSteps];
+                        float step;
+                        for (int i=0;i<nbSteps-1;) {
+                            step = (float)(mm+i*dmm);
+                            if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                            an.mmsteps[i] = step;
+                            i++;
+                        }
+                        step = mm+tmm;
+                        if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.mmsteps[(int)nbSteps-1] = step;
+                        // change magnification buffer size
+                        if (an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1] > an.rsteps[0][0] * an.mmsteps[0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_MM_RD_PAR:{
+                //radii + maximu magnification - parabolic (^4)
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                    putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
+                    else {int[] tmpA = {1,1, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        FSLMaxMagRadii an = new FSLMaxMagRadii((FixedSizeLens)l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        int r1 = ((FixedSizeLens)l).getOuterRadius();
+                        int r2 = ((FixedSizeLens)l).getInnerRadius();
+                        int[] offsets = (int[])(((Vector)data).elementAt(1));
+                        //data is an array of int[2] representing offsets for outer and inner radii
+                        int tr1 = offsets[0];
+                        int tr2 = offsets[1];
+                        double stepValue;
+                        an.rsteps=new int[(int)nbSteps][2];
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue=Math.pow((i+1)/nbSteps,4);
+                            an.rsteps[i][0] = (int)Math.round(r1 + tr1*stepValue);
+                            an.rsteps[i][1] = (int)Math.round(r2 + tr2*stepValue);
+                            i++;
+                        }
+                        an.rsteps[(int)nbSteps-1][0] = r1 + tr1;
+                        an.rsteps[(int)nbSteps-1][1] = r2 + tr2;
+                        float mm = l.getMaximumMagnification();
+                        //data is an magnification offset
+                        float tmm = ((Float)(((Vector)data).elementAt(0))).floatValue();
+                        float dmm, step;
+                        an.mmsteps = new float[(int)nbSteps];
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue = Math.pow((i+1)/nbSteps,4);
+                            dmm = (float)tmm*(float)stepValue;
+                            step = mm+dmm;
+                            if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                            an.mmsteps[i++]=step;
+                        }
+                        step = mm+tmm;
+                        if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.mmsteps[(int)nbSteps-1] = step;
+                        // change magnification buffer size
+                        if (an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1] > an.rsteps[0][0] * an.mmsteps[0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            case LS_MM_RD_SIG:{
+                //radii + maximu magnification - sigmoid
+                if (animatedLenses.containsKey(lID) && (((int[])animatedLenses.get(lID))[0] == 1)){
+                    putAsPendingLAnimation(lID,LS_BOTH,duration,type,data, paa);
+                }
+                else {
+                    if (animatedLenses.containsKey(lID)){((int[])animatedLenses.get(lID))[0]=1;}
+                    else {int[] tmpA = {1,1, 0};animatedLenses.put(lID,tmpA);}
+                    double nbSteps = Math.round((float)(duration/frameTime));
+                    if (nbSteps>0){
+                        FSLMaxMagRadii an = new FSLMaxMagRadii((FixedSizeLens)l,this,duration);
+                        an.setPostAnimationAction(paa);
+                        int r1 = ((FixedSizeLens)l).getOuterRadius();
+                        int r2 = ((FixedSizeLens)l).getInnerRadius();
+                        int[] offsets = (int[])(((Vector)data).elementAt(1));
+                        //data is an array of int[2] representing offsets for outer and inner radii
+                        int tr1 = offsets[0];
+                        int tr2 = offsets[1];
+                        double stepValue;
+                        an.rsteps=new int[(int)nbSteps][2];
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue = computeSigmoid(sigFactor,(i+1)/nbSteps);
+                            an.rsteps[i][0] = (int)Math.round(r1 + tr1*stepValue);
+                            an.rsteps[i][1] = (int)Math.round(r2 + tr2*stepValue);
+                            i++;
+                        }
+                        an.rsteps[(int)nbSteps-1][0] = r1 + tr1;
+                        an.rsteps[(int)nbSteps-1][1] = r2 + tr2;
+                        float mm = l.getMaximumMagnification();
+                        //data is an magnification offset
+                        float tmm = ((Float)(((Vector)data).elementAt(0))).floatValue();
+                        float dmm, step;
+                        an.mmsteps = new float[(int)nbSteps];
+                        for (int i=0;i<nbSteps-1;) {
+                            stepValue=computeSigmoid(sigFactor,(i+1)/nbSteps);
+                            dmm = (float)tmm*(float)stepValue;
+                            step = mm+dmm;
+                            if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                            an.mmsteps[i++]=step;
+                        }
+                        step = mm+tmm;
+                        if (step < Lens.MM_FLOOR){step = Lens.MM_FLOOR;}
+                        //last point is assigned from source value in order to prevent precision error
+                        an.mmsteps[(int)nbSteps-1] = step;
+                        // change magnification buffer size
+                        if (an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1] > an.rsteps[0][0] * an.mmsteps[0]){
+                            // before animation if it gets bigger
+                            l.setMagRasterDimensions(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
+                        }
+                        else {
+                            // after animation if it gets smaller
+                            an.setFinalRasterSize(Math.round(2*an.rsteps[an.rsteps.length-1][0] * an.mmsteps[an.mmsteps.length-1]));
+                        }
+                        animLensBag.add(an);
+                        an.start();
+                    }
+                }
+                break;
+            }
+            default:{
+                System.err.println("Error : AnimManager.createLensAnimation : unknown animation type");
+            }
+        }
     }
 
     //XXX: should probably add finalRasterSize data to the set of parameters remembered
     void putAsPendingLAnimation(Integer lID,String dim,long duration,short type,Object data, PostAnimationAction paa){
-	Vector pa;
-	//look for other pending animations for this lens and add this one to the end (FIFO)
-	if (pendingLAnims.containsKey(lID)){
-	    Hashtable animByDim=(Hashtable)pendingLAnims.get(lID);
-	    if (animByDim.containsKey(dim)){pa=(Vector)animByDim.get(dim);}
-	    else {pa=new Vector();}
-	    pa.add(new AnimParams(duration,type,data, paa));
-	    animByDim.put(dim,pa);
-	}
-	else {
-	    pa=new Vector();
-	    pa.add(new AnimParams(duration,type,data, paa));
-	    Hashtable animByDim=new Hashtable();
-	    animByDim.put(dim,pa);
-	    pendingLAnims.put(lID,animByDim);
-	}
+        Vector pa;
+        //look for other pending animations for this lens and add this one to the end (FIFO)
+        if (pendingLAnims.containsKey(lID)){
+            Hashtable animByDim=(Hashtable)pendingLAnims.get(lID);
+            if (animByDim.containsKey(dim)){pa=(Vector)animByDim.get(dim);}
+            else {pa=new Vector();}
+            pa.add(new AnimParams(duration,type,data, paa));
+            animByDim.put(dim,pa);
+        }
+        else {
+            pa=new Vector();
+            pa.add(new AnimParams(duration,type,data, paa));
+            Hashtable animByDim=new Hashtable();
+            animByDim.put(dim,pa);
+            pendingLAnims.put(lID,animByDim);
+        }
     }
 
     public void killLAnim(LAnimation lan,String dim){
-	lan.updateRaster();
-	Integer lID=lan.target.getID();   //get the lens ID
-	animLensBag.remove(lan);      //remove animation from bag of anims to be executed (it's over, kill it)
-	if (animatedLenses.containsKey(lID)){//remove lens from list of lenses being animated
-	    int[] animDims=(int[])animatedLenses.get(lID);
-	    if (dim.equals(LS_MM)){animDims[0]=0;}
-	    else if (dim.equals(LS_RD)){animDims[1]=0;}
-	    else if (dim.equals(LS_BOTH)){animDims[0]=0;animDims[1]=0;}
-	    if (allValuesEqualZero(animDims)){animatedLenses.remove(lID);}
-	}
-	lan.postAnimAction();
-	if (pendingLAnims.containsKey(lID)){  //look for first anim standing by whose target is this lens	    
-	    Hashtable pendingDims=(Hashtable)pendingLAnims.get(lID);
-	    if (pendingDims.containsKey(dim)){
-		Vector pa=(Vector)pendingDims.get(dim);
-		AnimParams ap=(AnimParams)pa.elementAt(0);  //get its params
-		pa.removeElementAt(0);  //remove the animation we're about to execute
-		if (pa.isEmpty()) { //if there is no pending anim left, delete entry for this glyph
-		    pendingDims.remove(dim);
-		    if (pendingDims.isEmpty()){pendingLAnims.remove(lID);}
-		}
-		this.createLensAnimation(ap.duration,ap.type,ap.data,lID,ap.paa);  //create the appropriate animation
-	    }
-	}
+        lan.updateRaster();
+        //get the lens ID
+        Integer lID=lan.target.getID();
+        //remove animation from bag of anims to be executed (it's over, kill it)
+        animLensBag.remove(lan);
+        //remove lens from list of lenses being animated
+        if (animatedLenses.containsKey(lID)){
+            int[] animDims=(int[])animatedLenses.get(lID);
+            if (dim.equals(LS_MM)){animDims[0]=0;}
+            else if (dim.equals(LS_RD)){animDims[1]=0;}
+            else if (dim.equals(LS_BOTH)){animDims[0]=0;animDims[1]=0;}
+            else if (dim.equals(LS_LP)){animDims[2]=0;}
+            if (allValuesEqualZero(animDims)){animatedLenses.remove(lID);}
+        }
+        lan.postAnimAction();
+        if (pendingLAnims.containsKey(lID)){
+            //look for first anim standing by whose target is this lens	    
+            Hashtable pendingDims=(Hashtable)pendingLAnims.get(lID);
+            if (pendingDims.containsKey(dim)){
+                Vector pa=(Vector)pendingDims.get(dim);
+                //get its params
+                AnimParams ap=(AnimParams)pa.elementAt(0);
+                //remove the animation we're about to execute
+                pa.removeElementAt(0);
+                //if there is no pending anim left, delete entry for this glyph
+                if (pa.isEmpty()){
+                    pendingDims.remove(dim);
+                    if (pendingDims.isEmpty()){pendingLAnims.remove(lID);}
+                }
+                //create the appropriate animation
+                this.createLensAnimation(ap.duration,ap.type,ap.data,lID,ap.paa);
+            }
+        }
     }
 
     /* ----------------------- PORTAL ANIMATION ------------------------- */
