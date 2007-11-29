@@ -24,6 +24,8 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.glyphs.VSegment;
 
@@ -42,9 +44,9 @@ import org.xml.sax.SAXException;
 
 public class WorldExplorer {
     
-    static final String PATH_TO_HIERARCHY = "data/tgt";
-    static final String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
-    static final File SCENE_FILE = new File(PATH_TO_SCENE);
+    String PATH_TO_HIERARCHY = "data/tgt";
+    String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
+    File SCENE_FILE = new File(PATH_TO_SCENE);
         
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -55,6 +57,13 @@ public class WorldExplorer {
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
+    
+    /* Navigation constants */
+    static final int ANIM_MOVE_LENGTH = 300;
+    static final short MOVE_UP = 0;
+    static final short MOVE_DOWN = 1;
+    static final short MOVE_LEFT = 2;
+    static final short MOVE_RIGHT = 3;
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
@@ -67,7 +76,12 @@ public class WorldExplorer {
 
     SceneManager sm;
 
-    public WorldExplorer(boolean fullscreen){
+    public WorldExplorer(boolean fullscreen, String dir){
+        if (dir != null){
+            PATH_TO_HIERARCHY = dir;
+            PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
+            SCENE_FILE = new File(PATH_TO_SCENE);
+        }
         initGUI(fullscreen);
         sm = new SceneManager(vsm, mSpace, mCamera);
         sm.setSceneCameraBounds(eh.wnes);
@@ -110,6 +124,48 @@ public class WorldExplorer {
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
     
+    /*-------------     Navigation       -------------*/
+
+    void getGlobalView(){
+        vsm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_LENGTH);
+    }
+
+    /* Higher view */
+    void getHigherView(){
+        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
+        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+    }
+
+    /* Higher view */
+    void getLowerView(){
+        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
+        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+    }
+
+    /* Direction should be one of WorldExplorer.MOVE_* */
+    void translateView(short direction){
+        LongPoint trans;
+        long[] rb = mView.getVisibleRegion(mCamera);
+        if (direction==MOVE_UP){
+            long qt = Math.round((rb[1]-rb[3])/4.0);
+            trans = new LongPoint(0,qt);
+        }
+        else if (direction==MOVE_DOWN){
+            long qt = Math.round((rb[3]-rb[1])/4.0);
+            trans = new LongPoint(0,qt);
+        }
+        else if (direction==MOVE_RIGHT){
+            long qt = Math.round((rb[2]-rb[0])/4.0);
+            trans = new LongPoint(qt,0);
+        }
+        else {
+            // direction==MOVE_LEFT
+            long qt = Math.round((rb[0]-rb[2])/4.0);
+            trans = new LongPoint(qt,0);
+        }
+        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+    }
+    
     void altitudeChanged(){
         sm.updateLevel(mCamera.altitude);
     }
@@ -141,8 +197,9 @@ public class WorldExplorer {
     }
 
     public static void main(String[] args){
-        final boolean fs = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
-        new WorldExplorer(fs);
+        boolean fs = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
+        String dir = (args.length > 1) ? args[1] : null;
+        new WorldExplorer(fs, dir);
     }
 
 }

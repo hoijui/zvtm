@@ -122,7 +122,15 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 //        g.highlight(false, null);
     }
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
+    	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
+    	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
+    	else if (code==KeyEvent.VK_UP){application.translateView(WorldExplorer.MOVE_UP);}
+    	else if (code==KeyEvent.VK_DOWN){application.translateView(WorldExplorer.MOVE_DOWN);}
+    	else if (code==KeyEvent.VK_LEFT){application.translateView(WorldExplorer.MOVE_LEFT);}
+    	else if (code==KeyEvent.VK_RIGHT){application.translateView(WorldExplorer.MOVE_RIGHT);}
+    }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
