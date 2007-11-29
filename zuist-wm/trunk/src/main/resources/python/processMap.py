@@ -22,7 +22,9 @@ STC = {"A1":(-2*STS,STS), "B1":(-STS,STS), "C1":(0,STS), "D1":(STS,STS),\
 
 TILE_SIZES_PER_LEVEL = [1350, 1350, 1350, 1350, 1350]
 
+#TILE_SUBDIVS_PER_LEVEL = [1, 2, 2, 2]
 TILE_SUBDIVS_PER_LEVEL = [1, 2, 2, 2, 2]
+
 NB_LEVELS = len(TILE_SUBDIVS_PER_LEVEL)
 SCALE_FACTOR_PER_LEVEL = [TILE_SUBDIVS_PER_LEVEL[0]]
 for TSPL in TILE_SUBDIVS_PER_LEVEL[1:]:
@@ -86,7 +88,9 @@ def processTile(srcTilePath, tileName, rootEL):
 def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRegion, rootEL):
     log("Generating level %s for tile %s" % (level, tileName))
     tileID = copy(parentTileID)
-    subDivFactor = SCALE_FACTOR_PER_LEVEL[level]
+    subDivFactor = TILE_SUBDIVS_PER_LEVEL[0]
+    for v in TILE_SUBDIVS_PER_LEVEL[1:level+1]:
+        subDivFactor *= v
     doCrop = (subDivFactor != 1.0)
     cw = int(im.size[0] / subDivFactor)
     ch = int(im.size[1] / subDivFactor)
