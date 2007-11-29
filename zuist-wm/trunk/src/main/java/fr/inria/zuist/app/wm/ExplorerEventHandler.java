@@ -1,0 +1,166 @@
+/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
+package fr.inria.zuist.app.wm;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
+
+import java.util.Vector;
+
+import com.xerox.VTM.engine.VCursor;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VText;
+import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.engine.AnimationListener;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.engine.TextDescription;
+
+class ExplorerEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
+
+    static final float MAIN_SPEED_FACTOR = 50.0f;
+
+    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
+    
+    static float WHEEL_MM_STEP = 1.0f;
+    
+    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    long lastVX, lastVY;
+    int currentJPX, currentJPY;
+
+    /* bounds of region in virtual space currently observed through mCamera */
+    long[] wnes = new long[4];
+    float oldCameraAltitude;
+
+    boolean mCamStickedToMouse = false;
+
+    WorldExplorer application;
+    
+    Glyph g;
+    
+    boolean dragging = false;
+    
+    ExplorerEventHandler(WorldExplorer app){
+        this.application = app;
+        oldCameraAltitude = this.application.mCamera.getAltitude();
+    }
+
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+        dragging = true;
+    }
+
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        dragging = false;
+    }
+
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        application.mView.setStatusBarText(v.getMouse().vx+" "+v.getMouse().vy
+            +" "+application.mCamera.posx+" "+application.mCamera.posy+" "+application.mCamera.altitude);
+    }
+
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+        if (dragging){
+            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+            synchronized(application.mCamera){
+                application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+                lastJPX = jpx;
+                lastJPY = jpy;
+                cameraMoved();
+            }
+        }
+    }
+
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+        float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+        if (wheelDirection  == WHEEL_UP){
+            // zooming in
+            application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+            cameraMoved();
+            application.vsm.repaintNow();
+        }
+        else {
+            //wheelDirection == WHEEL_DOWN, zooming out
+            application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+            cameraMoved();
+            application.vsm.repaintNow();
+        }
+    }
+
+    public void enterGlyph(Glyph g){
+//        g.highlight(true, null);
+    }
+
+    public void exitGlyph(Glyph g){
+//        g.highlight(false, null);
+    }
+
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void viewActivated(View v){}
+    
+    public void viewDeactivated(View v){}
+
+    public void viewIconified(View v){}
+
+    public void viewDeiconified(View v){}
+
+    public void viewClosing(View v){
+        application.exit();
+    }
+
+    /*ComponentListener*/
+    public void componentHidden(ComponentEvent e){}
+    public void componentMoved(ComponentEvent e){}
+    public void componentResized(ComponentEvent e){
+        application.updatePanelSize();
+    }
+    public void componentShown(ComponentEvent e){}
+
+    public void cameraMoved(){
+        // region seen through camera
+        application.mView.getVisibleRegion(application.mCamera, wnes);
+        float alt = application.mCamera.getAltitude();
+        if (alt != oldCameraAltitude){
+            // camera was an altitude change
+            application.altitudeChanged();
+            oldCameraAltitude = alt;
+        }
+        else {
+            // camera movement was a simple translation
+            application.sm.updateVisibleRegions();
+        }
+    }
+
+}
