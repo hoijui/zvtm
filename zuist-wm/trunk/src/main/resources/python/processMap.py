@@ -9,7 +9,7 @@ import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
 
-GENERATE_TILES = True
+GENERATE_TILES = False
 
 SRC_TILE_NAMES = ["A1", "B1", "C1", "D1",\
               "A2", "B2", "C2", "D2"]
@@ -22,16 +22,23 @@ STC = {"A1":(-2*STS,STS), "B1":(-STS,STS), "C1":(0,STS), "D1":(STS,STS),\
 
 TILE_SIZES_PER_LEVEL = [1350, 1350, 1350, 1350, 1350]
 
-TILE_SUBDIVS_PER_LEVEL = [1, 2, 2, 2]
-#TILE_SUBDIVS_PER_LEVEL = [1, 2, 2, 2, 2]
-
+TILE_SUBDIVS_PER_LEVEL = [1, 2, 2, 2, 2]
 NB_LEVELS = len(TILE_SUBDIVS_PER_LEVEL)
+SCALE_FACTOR_PER_LEVEL = [TILE_SUBDIVS_PER_LEVEL[0]]
+for TSPL in TILE_SUBDIVS_PER_LEVEL[1:]:
+    SCALE_FACTOR_PER_LEVEL.append(SCALE_FACTOR_PER_LEVEL[-1]*TSPL)
+SCALE_FACTOR_PER_LEVEL.reverse()
+
+F = 100.0 # camera focal distance
+ALTS = [(100000, int(F*SCALE_FACTOR_PER_LEVEL[0]-F))]
+SFPLi = 1
+for SFPL in SCALE_FACTOR_PER_LEVEL[1:]:
+    ALTS.append((int(F*SCALE_FACTOR_PER_LEVEL[SFPLi-1]-F), int(F*SCALE_FACTOR_PER_LEVEL[SFPLi]-F)))
+    SFPLi += 1
 
 XML_LEVELS = []
 LEVEL_FLOORS = []
 LEVEL_CEILINGS = []
-
-ALTS = [("1000000","2800"), ("2800","600"), ("600","200"), ("200","0")]
 
 def createTargetDir():
     if not os.path.exists(TGT_DIR):
@@ -79,9 +86,7 @@ def processTile(srcTilePath, tileName, rootEL):
 def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRegion, rootEL):
     log("Generating level %s for tile %s" % (level, tileName))
     tileID = copy(parentTileID)
-    subDivFactor = TILE_SUBDIVS_PER_LEVEL[0]
-    for v in TILE_SUBDIVS_PER_LEVEL[1:level+1]:
-        subDivFactor *= v
+    subDivFactor = SCALE_FACTOR_PER_LEVEL[level]
     doCrop = (subDivFactor != 1.0)
     cw = int(im.size[0] / subDivFactor)
     ch = int(im.size[1] / subDivFactor)
