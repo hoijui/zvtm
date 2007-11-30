@@ -40,6 +40,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import org.geotools.factory.GeoTools;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -79,6 +81,7 @@ public class WorldExplorer implements Java2DPainter {
     ExplorerEventHandler eh;
 
     SceneManager sm;
+    GeoToolsManager gm;
 
     public WorldExplorer(boolean fullscreen, String dir){
         if (dir != null){
@@ -90,6 +93,7 @@ public class WorldExplorer implements Java2DPainter {
         sm = new SceneManager(vsm, mSpace, mCamera);
         sm.setSceneCameraBounds(eh.wnes);
         sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY);
+        gm = new GeoToolsManager(this);
     }
 
     void initGUI(boolean fullscreen){
@@ -113,8 +117,8 @@ public class WorldExplorer implements Java2DPainter {
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();
-        vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(-45000, 0, 0, Color.BLACK, 45000, 0), mSpace);
-        vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(0, -25000, 0, Color.BLACK, 0, 25000), mSpace);
+//        vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(-45000, 0, 0, Color.BLACK, 45000, 0), mSpace);
+//        vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(0, -25000, 0, Color.BLACK, 0, 25000), mSpace);
     }
 
     void windowLayout(){
@@ -252,6 +256,7 @@ public class WorldExplorer implements Java2DPainter {
     public static void main(String[] args){
         boolean fs = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
         String dir = (args.length > 1) ? args[1] : null;
+        System.out.println("Using GeoTools v" + GeoTools.getVersion() );
         new WorldExplorer(fs, dir);
     }
 
