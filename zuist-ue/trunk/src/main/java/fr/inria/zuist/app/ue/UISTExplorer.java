@@ -41,7 +41,7 @@ import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
 import net.claribole.zvtm.engine.PostAnimationAdapter;
 import net.claribole.zvtm.engine.TransitionManager;
-import net.claribole.zvtm.engine.Java2DPainter;       
+import net.claribole.zvtm.engine.Java2DPainter;   
 import net.claribole.zvtm.engine.RepaintAdapter;
 import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.engine.GlyphKillAction;
