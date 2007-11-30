@@ -378,9 +378,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    if (grMngr.tp.isHighlightMode()){
 		grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
 	    }
-	    else if (grMngr.tp.isFresnelMode()){
-		grMngr.fresnelizeNode(g);
-	    }
+//	    else if (grMngr.tp.isFresnelMode()){
+//		grMngr.fresnelizeNode(g);
+//	    }
 	    else {// node highlighting is taken care of above (in a slightly different manner)
 		g.highlight(true, null);
 	    }
@@ -411,9 +411,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    if (application.grMngr.tp.isHighlightMode()){
 		grMngr.unhighlightAll();
 	    }
-	    else if (grMngr.tp.isFresnelMode()){
-		grMngr.unfresnelizeNodes();
-	    }
+//	    else if (grMngr.tp.isFresnelMode()){
+//		grMngr.unfresnelizeNodes();
+//	    }
 	    else {// node highlighting is taken care of above (in a slightly different manner)
 		g.highlight(false, null);
 	    }
