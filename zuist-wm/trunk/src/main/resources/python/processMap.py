@@ -113,7 +113,7 @@ def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRe
             regionEL.set("y", str(orig[1]-ty-ch/2))
             regionEL.set("w", str(cw))
             regionEL.set("h", str(ch))
-            regionEL.set("stroke", "blue")
+            #regionEL.set("stroke", "blue")
             objectEL = ET.SubElement(regionEL, "object")
             objectEL.set("id", "I%s" % strID)
             objectEL.set("type", "image")
