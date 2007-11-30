@@ -1376,6 +1376,7 @@ class ZGRGlassPane extends JComponent {
         g2.setComposite(AlphaComposite.Src);
         if (msg != Messages.EMPTY_STRING){
             g2.setColor(MSG_COLOR);
+            g2.setFont(ConfigManager.defaultFont);
             g2.drawString(msg, msgX, msgY);
         }
         g2.setPaint(PROGRESS_GRADIENT);
