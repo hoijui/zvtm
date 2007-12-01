@@ -55,6 +55,7 @@ public class RImage extends VImageST {
     
     /**
         *@param img image to be displayed
+        *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public RImage(Image img, float a){
         super(img, a);
@@ -66,6 +67,7 @@ public class RImage extends VImageST {
      *@param y coordinate in virtual space
      *@param z altitude
      *@param img image to be displayed
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
     public RImage(long x,long y,float z,Image img, float a){
         super(x, y, z, img, a);
@@ -78,6 +80,7 @@ public class RImage extends VImageST {
      *@param z altitude
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
     public RImage(long x, long y, float z, Image img, double scale, float a){
         super(x, y, z, img, scale, a);
@@ -90,6 +93,7 @@ public class RImage extends VImageST {
      *@param z altitude
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
+     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      *@param hir true if height measurement should include mirrored version of the image (doubles the image's height) - defaults to false
      */
     public RImage(long x, long y, float z, Image img, double scale, float a, boolean hir){
