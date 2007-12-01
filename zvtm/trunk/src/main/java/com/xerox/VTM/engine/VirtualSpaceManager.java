@@ -326,6 +326,13 @@ public class VirtualSpaceManager implements AWTEventListener {
 	}
 	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
     }
+    
+    public void addGlyphs(Glyph[] gs, VirtualSpace vs, boolean repaint){
+        for (int i=0;i<gs.length;i++){
+            addGlyph(gs[i], vs, false);
+        }
+        repaintNow();
+    }
 
     /**add composite glyph c to virtual space whose name is vs*/
     public CGlyph addCGlyph(CGlyph c,String vs){
