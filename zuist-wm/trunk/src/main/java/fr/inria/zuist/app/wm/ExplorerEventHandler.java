@@ -122,6 +122,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 //        g.highlight(false, null);
     }
 
+    int ci = 1180;
+
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
@@ -132,6 +134,19 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(WorldExplorer.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
+        else if (code == KeyEvent.VK_C){
+            application.gm.showAllCountries();
+        }
+//        else if (code == KeyEvent.VK_V){
+//            application.gm.showCountry(1182);
+//        }
+//        else if (code == KeyEvent.VK_N){
+//            for (int j=0;j<1;j++){
+//                application.gm.showCountry(ci++);
+//            }
+//            System.out.println(ci);
+//
+//        }
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
