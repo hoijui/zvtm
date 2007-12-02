@@ -172,6 +172,7 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
 
     public UISTExplorer(short viewtype, boolean fullscreen, boolean le){
         initGUI(viewtype, fullscreen);
+        this.loggingEnabled = le;
         RepaintListener rl = new RepaintAdapter(){
             public void viewRepainted(View v){
                 setShowLoadProgress(true);
