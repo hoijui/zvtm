@@ -208,13 +208,15 @@ public class Camera {
      * Set camera location
      */
     public void setLocation(Location l){
-	posx = l.vx;
-	posy = l.vy;
-	altitude = l.alt;
-	updatePrecisePosition();
-	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
-	}
+        propagateMove(l.vx-posx, l.vy-posy);
+        propagateAltitudeChange(l.alt - altitude);
+        posx = l.vx;
+        posy = l.vy;
+        altitude = l.alt;
+        updatePrecisePosition();
+        if (view != null){
+            parentSpace.vsm.repaintNow(view);
+        }
     }
 
     /**
@@ -393,7 +395,7 @@ public class Camera {
 
 
     /**
-     *attach a camera to this camera (any translation and altitude change of this camera will be propagated to the other camera)
+     * Attach a camera to this camera. Any translation and altitude change of this camera will be propagated to the other camera.
      *@param c camera to be attached to this camera
      *@see #unstick(Camera c)
      *@see #unstickAllCameras()
@@ -403,7 +405,7 @@ public class Camera {
     }
 
     /**
-     *attach a camera to this camera (any translation of this camera will be propagated to the other camera)
+     * Attach a camera to this camera. Any translation of this camera will be propagated to the other camera.
      *@param c camera to be attached to this camera
      *@param stickAlt also propagate altitude changes, in addition translations
      *@see #unstick(Camera c)

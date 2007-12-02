@@ -41,7 +41,6 @@ public class LPFSGaussianLens extends FSGaussianLens implements LPDistanceMetric
      *@param lp value of L(P), the Lp-metrics defining the lens' shape, in ]0,+inf[
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
-     *@param lp value of L(P), the Lp-metrics defining the lens' shape, in ]0,+inf[
      */
     public LPFSGaussianLens(float mm, float lp, int outerRadius, int innerRadius){
 	    super(mm, outerRadius, innerRadius);
