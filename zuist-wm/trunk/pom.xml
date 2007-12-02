@@ -30,6 +30,14 @@ $Id$
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <id>geotools</id>
+      <name>Geotools repository</name>
+      <url>http://maven.geotools.fr/repository</url>
+    </repository>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
       <id>ibiblio</id>
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
@@ -38,14 +46,6 @@ $Id$
       <id>refractions</id>
       <name>Refractions Research Maven 2 Repository</name>
       <url>http://lists.refractions.net/m2</url>
-    </repository>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>geotools</id>
-      <name>Geotools repository</name>
-      <url>http://maven.geotools.fr/repository</url>
     </repository>
   </repositories>
   
@@ -78,12 +78,12 @@ $Id$
 	<dependency>
 		<groupId>org.geotools</groupId>
 		<artifactId>gt2-shapefile</artifactId>
-		<version>2.4-SNAPSHOT</version>
+		<version>2.4-RC0</version>
 	</dependency>
 	<dependency>
 		<groupId>org.geotools</groupId>
 		<artifactId>gt2-epsg-wkt</artifactId>
-		<version>2.4-SNAPSHOT</version>
+		<version>2.4-RC0</version>
 	</dependency>
   </dependencies>
   
