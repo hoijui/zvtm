@@ -83,9 +83,10 @@ public class WorldExplorer implements Java2DPainter {
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
-    static final String mSpaceName = "World Space";
-    VirtualSpace mSpace;
-    Camera mCamera;
+    static final String mSpaceName = "BMNG Space";
+    static final String bSpaceName = "Country Boundary Space";
+    VirtualSpace mSpace, bSpace;
+    Camera mCamera, bCamera;
     static final String mViewName = "World Explorer";
     View mView;
     ExplorerEventHandler eh;
@@ -111,7 +112,7 @@ public class WorldExplorer implements Java2DPainter {
         sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, gp);
         gm = new GeoToolsManager(this);
         gp.setVisible(false);
-        gp.setLabel(WEGlassPane.EMPTY_STRING);
+        gp.setLabel(WEGlassPane.EMPTY_STRING);        
         vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
     }
 
@@ -119,9 +120,14 @@ public class WorldExplorer implements Java2DPainter {
         windowLayout();
         vsm = new VirtualSpaceManager();
         mSpace = vsm.addVirtualSpace(mSpaceName);
+        bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = vsm.addCamera(mSpace);
+        bCamera = vsm.addCamera(bSpace);
+        System.out.println(mCamera.altitude+" "+bCamera.altitude);
         Vector cameras = new Vector();
         cameras.add(mCamera);
+        cameras.add(bCamera);
+        mCamera.stick(bCamera, true);
         mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, true, false, false, null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());

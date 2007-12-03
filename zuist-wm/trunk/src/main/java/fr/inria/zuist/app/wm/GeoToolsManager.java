@@ -87,6 +87,7 @@ class GeoToolsManager {
                         application.gp.setValue(progress);
                     }
                 }
+                showAllCountries();
             }
             catch (IOException ioex){
                 ioex.printStackTrace();
@@ -99,15 +100,19 @@ class GeoToolsManager {
 
     void showAllCountries(){
         for (int i=0;i<countryBoundaries.length;i++){
-            application.vsm.addGlyph(countryBoundaries[i], application.mSpace, false);
+            application.vsm.addGlyph(countryBoundaries[i], application.bSpace, false);
         }
         application.vsm.repaintNow();
     }
 
     void showCountry(int i){
         if (i<countryBoundaries.length){
-            application.vsm.addGlyph(countryBoundaries[i], application.mSpace);
+            application.vsm.addGlyph(countryBoundaries[i], application.bSpace);
         }
+    }
+    
+    void toggleBoundaryDisplay(){
+        application.bCamera.setEnabled(!application.bCamera.isEnabled());
     }
 
 }

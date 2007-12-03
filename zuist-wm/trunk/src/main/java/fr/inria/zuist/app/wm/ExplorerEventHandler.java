@@ -134,8 +134,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(WorldExplorer.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
-        else if (code == KeyEvent.VK_C){
-            application.gm.showAllCountries();
+        else if (code == KeyEvent.VK_B){
+            application.gm.toggleBoundaryDisplay();
         }
 //        else if (code == KeyEvent.VK_V){
 //            application.gm.showCountry(1182);
