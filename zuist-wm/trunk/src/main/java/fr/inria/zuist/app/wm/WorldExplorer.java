@@ -107,8 +107,11 @@ public class WorldExplorer implements Java2DPainter {
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
         gp.setVisible(true);
-        sm = new SceneManager(vsm, mSpace, mCamera);
-        sm.setSceneCameraBounds(eh.wnes);
+        VirtualSpace[]  sceneSpaces = {mSpace, bSpace}; 
+        Camera[] sceneCameras = {mCamera, bCamera};
+        sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
+        sm.setSceneCameraBounds(mCamera, eh.wnes);
+        sm.setSceneCameraBounds(bCamera, eh.wnes);
         sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, gp);
         gm = new GeoToolsManager(this);
         gp.setVisible(false);
@@ -123,7 +126,6 @@ public class WorldExplorer implements Java2DPainter {
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = vsm.addCamera(mSpace);
         bCamera = vsm.addCamera(bSpace);
-        System.out.println(mCamera.altitude+" "+bCamera.altitude);
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
