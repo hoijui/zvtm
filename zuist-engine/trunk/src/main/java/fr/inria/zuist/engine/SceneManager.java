@@ -91,9 +91,6 @@ public class SceneManager {
     VirtualSpace[] sceneSpaces;
     Camera[] sceneCameras;
     long[][] sceneCameraBounds;
-//    VirtualSpace sceneSpace;
-//    Camera sceneCamera;
-//    long[] sceneCameraBounds;
 
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable id2region;
@@ -186,6 +183,8 @@ public class SceneManager {
         return glyphLoader.requestQueue.size();
     }
 
+    /* ----------- level / region / object creation (API and XML) ----------- */
+
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
@@ -252,10 +251,7 @@ public class SceneManager {
 	regionName2containerRegionName.clear();
 //    	printLevelInfo();
 //   	printRegionInfo();
-//	Location l = vsm.getGlobalView(sceneCamera);
-//	sceneCamera.setLocation(l);
 	updateLevel = true;
-//	updateLevel(l.alt);
 	System.gc();
 	glyphLoader.setEnabled(true);
 	if (pl != null){
@@ -301,7 +297,6 @@ public class SceneManager {
         if (title != null && title.length() > 0){
             region.setTitle(title);
         }
-        //XXX:TBW should add rectangle only if visible
         VRectangle r = new VRectangle(x, y, 0, w/2, h/2, Color.WHITE, Color.BLACK);
         if (fill != null){
             r.setColor(fill);
@@ -317,8 +312,6 @@ public class SceneManager {
         }
         if (fill != null || stroke != null || sensitivity){
             // add the rectangle representing the region only if it is visible or sensitive
-            System.out.print(".");
-            
             vsm.addGlyph(r, sceneSpaces[vsi]);
         }
         region.setGlyph(r);
@@ -366,89 +359,111 @@ public class SceneManager {
     }
 
     void processObject(Element objectEL, Level level, Region region, String sceneFileDirectory){
-	String type = objectEL.getAttribute(_type);
-	String id = objectEL.getAttribute(_id);
-	
-	if (id == null || id.length() == 0){
-	    System.err.println("Warning: object "+objectEL+" has no ID");
-	}
-	ObjectDescription res = null;
-	if (type.equals(_image)){
-	    res = processImage(objectEL, id, level, region, sceneFileDirectory);
-	}
-	else if (type.equals(_rect)){
-	    res = processRectangle(objectEL, id, level, region);
-	}
-	else if (type.equals(_text)){
-	    res = processText(objectEL, id, level, region);
-	}
-	else {
-	    System.err.println("Error: failed to process object declaration: "+id);
-	    return;
-	}
-	String tto = objectEL.getAttribute(_takesToO);
-	String ttr = objectEL.getAttribute(_takesToR);
-	if (tto != null && tto.length() > 0){
-	    res.setTakesTo(tto, TAKES_TO_OBJECT);
-	}
-	else if (ttr != null && ttr.length() > 0){
-	    res.setTakesTo(ttr, TAKES_TO_REGION);
-	}
-	if (!id2object.containsKey(id)){
-	    id2object.put(id, res);
-	}
-	else {
-	    System.err.println("Warning: ID: "+id+" used to identify more than one object.");
-	}
+        String type = objectEL.getAttribute(_type);
+        String id = objectEL.getAttribute(_id);
+        if (id == null || id.length() == 0){
+            System.err.println("Warning: object "+objectEL+" has no ID");
+        }
+        ObjectDescription res = null;
+        if (type.equals(_image)){
+            res = processImage(objectEL, id, region, sceneFileDirectory);
+        }
+        else if (type.equals(_rect)){
+            res = processRectangle(objectEL, id, region);
+        }
+        else if (type.equals(_text)){
+            res = processText(objectEL, id, region);
+        }
+        else {
+            System.err.println("Error: failed to process object declaration: "+id);
+            return;
+        }
+        String tto = objectEL.getAttribute(_takesToO);
+        String ttr = objectEL.getAttribute(_takesToR);
+        if (tto != null && tto.length() > 0){
+            res.setTakesTo(tto, TAKES_TO_OBJECT);
+        }
+        else if (ttr != null && ttr.length() > 0){
+            res.setTakesTo(ttr, TAKES_TO_REGION);
+        }
+        if (!id2object.containsKey(id)){
+            id2object.put(id, res);
+        }
+        else {
+            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+        }
     }
 
-    ObjectDescription processImage(Element objectEL, String id, Level level, Region region, String sceneFileDirectory){
-	long x = Long.parseLong(objectEL.getAttribute(_x));
-	long y = Long.parseLong(objectEL.getAttribute(_y));
-	long w = Long.parseLong(objectEL.getAttribute(_w));
-	long h = Long.parseLong(objectEL.getAttribute(_h));
-	Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
-	ObjectDescription od = new ImageDescription(id, x, y, w, h,
-						    sceneFileDirectory + "/" + objectEL.getAttribute(_src),
-						    stroke, region);
-	if (objectEL.hasAttribute(_sensitive)){
-	    od.setSensitive(Boolean.parseBoolean(objectEL.getAttribute(_sensitive)));
-	}
-	region.addObject(od);
-	return od;
+    ImageDescription processImage(Element objectEL, String id, Region region, String sceneFileDirectory){
+        long x = Long.parseLong(objectEL.getAttribute(_x));
+        long y = Long.parseLong(objectEL.getAttribute(_y));
+        long w = Long.parseLong(objectEL.getAttribute(_w));
+        long h = Long.parseLong(objectEL.getAttribute(_h));
+        String src = objectEL.getAttribute(_src);
+        Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
+        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+        ImageDescription od = createImage(x, y, w, h, id, region, sceneFileDirectory+"/"+src, sensitivity, stroke);
+        return od;
     }
 
-    ObjectDescription processRectangle(Element objectEL, String id, Level level, Region region){
-	long x = Long.parseLong(objectEL.getAttribute(_x));
-	long y = Long.parseLong(objectEL.getAttribute(_y));
-	long w = Long.parseLong(objectEL.getAttribute(_w));
-	long h = Long.parseLong(objectEL.getAttribute(_h));
-	Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
-	Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
-	ObjectDescription od = new RectangleDescription(id, x, y, w, h,
-							fill, stroke, region);
-	if (objectEL.hasAttribute(_sensitive)){
-	    od.setSensitive(Boolean.parseBoolean(objectEL.getAttribute(_sensitive)));
-	}
-	region.addObject(od);
-	return od;
+    /** Creates an image and adds it to a region.
+     *
+     */
+    public ImageDescription createImage(long x, long y, long w, long h, String id, Region region,
+                                        String imagePath, boolean sensitivity, Color stroke){
+        ImageDescription od = new ImageDescription(id, x, y, w, h, imagePath, stroke, region);
+        od.setSensitive(sensitivity);
+        region.addObject(od);
+        return od;
     }
 
-    ObjectDescription processText(Element objectEL, String id, Level level, Region region){
+    RectangleDescription processRectangle(Element objectEL, String id, Region region){
+        long x = Long.parseLong(objectEL.getAttribute(_x));
+        long y = Long.parseLong(objectEL.getAttribute(_y));
+        long w = Long.parseLong(objectEL.getAttribute(_w));
+        long h = Long.parseLong(objectEL.getAttribute(_h));
+        Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
+        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
+        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+        RectangleDescription od = createRectangle(x, y, w, h, id, region, sensitivity, fill, stroke);
+        return od;
+    }
+    
+    /** Creates a rectangle and adds it to a region.
+     *
+     */
+    public RectangleDescription createRectangle(long x, long y, long w, long h, String id, Region region,
+                                                boolean sensitivity, Color fill, Color stroke){
+        RectangleDescription od = new RectangleDescription(id, x, y, w, h, fill, stroke, region);
+        od.setSensitive(sensitivity);
+        region.addObject(od);
+        return od;
+    }
+
+    TextDescription processText(Element objectEL, String id, Region region){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
         float scale = Float.parseFloat(objectEL.getAttribute(_scale));
         String text = objectEL.getFirstChild().getNodeValue();
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
-        ObjectDescription od = new TextDescription(id, x, y, scale, text, (fill != null) ? fill : Color.BLACK,
-            (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE,
-            region);
-        if (objectEL.hasAttribute(_sensitive)){
-            od.setSensitive(Boolean.parseBoolean(objectEL.getAttribute(_sensitive)));
-        }
+        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+        short anchor = (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
+        TextDescription od = createText(x, y, id, region, scale, text, anchor, fill, sensitivity);
+        return od;
+    }
+    
+    /** Creates a text object and adds it to a region.
+     *
+     */
+    public TextDescription createText(long x, long y, String id, Region region, float scale, String text,
+                                      short anchor, Color fill, boolean sensitivity){
+        TextDescription od = new TextDescription(id, x, y, scale, text, (fill != null) ? fill : Color.BLACK, anchor, region);
+        od.setSensitive(sensitivity);
         region.addObject(od);
         return od;
     }
+
+    /* ----------- level / region visibility update ----------- */
 
     int previousLevel = -2;
     int currentLevel = -1;
