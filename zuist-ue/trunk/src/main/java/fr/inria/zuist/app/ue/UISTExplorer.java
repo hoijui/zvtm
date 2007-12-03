@@ -179,12 +179,19 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
             }
         };
         vsm.repaintNow(mView, rl);
-        sm = new SceneManager(vsm, mSpace, mCamera);
-        sm.setSceneCameraBounds(eh.wnes);
+        VirtualSpace[] sceneSpace = {mSpace};
+        Camera[] sceneCamera = {mCamera};
+        sm = new SceneManager(vsm, sceneSpace, sceneCamera);
+        sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setLevelListener(this);
         sm.setRegionListener(this);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, this);
+
+        Location l = vsm.getGlobalView(mCamera);
+        mCamera.setLocation(l);
+        sm.updateLevel(l.alt);
+
         postProcessLabels();
         loadMetadata();
         setShowLoadProgress(false);
