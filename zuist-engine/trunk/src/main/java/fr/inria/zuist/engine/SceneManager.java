@@ -263,17 +263,67 @@ public class SceneManager {
 	    pl.setValue(100);
 	}
     }
-
+    
+    public Level createLevel(int depth, float calt, float falt){
+        if (depth >= levels.length){
+            Level[] tmpL = new Level[depth+1];
+            System.arraycopy(levels, 0, tmpL, 0, levels.length);
+            levels = tmpL;
+            levels[depth] = new Level(calt, falt);
+            return levels[depth];
+        }
+        else {
+            return null;
+        }
+    }
+    
     void processLevel(Element levelEL){
-	int depth = Integer.parseInt(levelEL.getAttribute(_depth));
-	if (depth >= levels.length){
-	    float calt = Float.parseFloat(levelEL.getAttribute(_ceiling));
-	    float falt = Float.parseFloat(levelEL.getAttribute(_floor));
-	    Level[] tmpL = new Level[depth+1];
-	    System.arraycopy(levels, 0, tmpL, 0, levels.length);
-	    levels = tmpL;
-	    levels[depth] = new Level(calt, falt);
-	}
+        createLevel(Integer.parseInt(levelEL.getAttribute(_depth)), Float.parseFloat(levelEL.getAttribute(_ceiling)), Float.parseFloat(levelEL.getAttribute(_floor)));
+    }
+    
+    /** Create a new region.
+     * Important: when called directly from the client application, Region.setContainingRegion() should also be called manually (if there is any such containing region).
+     * Also important: if the region is neither visible nor sensitive at instantiation time, its associated glyph is not added to the virtual space.
+     */
+    public Region createRegion(long x, long y, long w, long h,
+                               int depth, String id, int vsi, String[] transitions, String requestOrdering,
+                               boolean sensitivity, String title, Color fill, Color stroke){
+        Region region = new Region(x, y, w, h, depth, id, vsi, transitions, requestOrdering, this);
+        if (!id2region.containsKey(id)){
+            id2region.put(id, region);
+        }
+        else {
+            System.err.println("Error: ID "+id+" used to identify more than one region.");
+            return null;
+        }
+        levels[depth].addRegion(region);
+        if (sensitivity){region.setSensitive(true);}
+        if (title != null && title.length() > 0){
+            region.setTitle(title);
+        }
+        //XXX:TBW should add rectangle only if visible
+        VRectangle r = new VRectangle(x, y, 0, w/2, h/2, Color.WHITE, Color.BLACK);
+        if (fill != null){
+            r.setColor(fill);
+        }
+        else {
+            r.setFilled(false);
+        }
+        if (stroke != null){
+            r.setBorderColor(stroke);
+        }
+        else {
+            r.setDrawBorder(false);
+        }
+        if (fill != null || stroke != null || sensitivity){
+            // add the rectangle representing the region only if it is visible or sensitive
+            System.out.print(".");
+            
+            vsm.addGlyph(r, sceneSpaces[vsi]);
+        }
+        region.setGlyph(r);
+        r.setOwner(region);
+        return region;
     }
 
     void processRegion(Element regionEL, Hashtable rn2crn, String sceneFileDirectory){
@@ -294,41 +344,13 @@ public class SceneManager {
             // put region in first (assumed to be the only if yields -1) virtual space
             vsi = 0;
         }
-        Region region = new Region(x, y, w, h, depth, id, vsi, transitions, regionEL.getAttribute(_ro), this);
-        if (!id2region.containsKey(id)){
-            id2region.put(id, region);
-        }
-        else {
-            System.err.println("Error: ID "+id+" used to identify more than one region.");
-            System.exit(0);
-        }
         boolean sensitivity = (regionEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(regionEL.getAttribute(_sensitive)) : false;
-        if (sensitivity){region.setSensitive(true);}
         String title = regionEL.getAttribute(_title);
-        if (title != null && title.length() > 0){
-            region.setTitle(title);
-        }
+        Region region = createRegion(x, y, w, h, depth, id, vsi, transitions, regionEL.getAttribute(_ro), sensitivity, title, fill, stroke);
         String containerID = (regionEL.hasAttribute(_containedIn)) ? regionEL.getAttribute(_containedIn) : null;
         if (containerID != null){
             rn2crn.put(id, containerID);
         }
-        levels[depth].addRegion(region);
-        VRectangle r = new VRectangle(x, y, 0, w/2, h/2, Color.WHITE, Color.BLACK);
-        if (fill != null){
-            r.setColor(fill);
-        }
-        else {
-            r.setFilled(false);
-        }
-        if (stroke != null){
-            r.setBorderColor(stroke);
-        }
-        else {
-            r.setDrawBorder(false);
-        }
-        vsm.addGlyph(r, sceneSpaces[vsi]);
-        region.setGlyph(r);
-        r.setOwner(region);
         Node n;
         Element e;
         NodeList nl = regionEL.getChildNodes();
