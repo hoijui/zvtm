@@ -35,7 +35,7 @@ public class Region {
     static final short TTUL = 2;  // transition to upper level
     static final short TTLL = 3;  // transition to lower level
     static final short TASL = 4;  // transition at same level - not stored, always appear/disappear as this is always off screen
-    short[] transitions = new short[4];
+    short[] transitions = {APPEAR, APPEAR, DISAPPEAR, DISAPPEAR};
 
     static final short ORDERING_ARRAY = 0;
     static final short ORDERING_DISTANCE = 1;
