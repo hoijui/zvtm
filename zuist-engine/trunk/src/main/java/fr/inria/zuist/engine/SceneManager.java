@@ -77,6 +77,7 @@ public class SceneManager {
     static final String _takesToO = "takesToObject";
     static final String _sensitive = "sensitive";
     static final String _anchor = "anchor";
+    static final String _spaceName = "spaceName";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -86,9 +87,13 @@ public class SceneManager {
     Level[] levels = new Level[0];
 
     VirtualSpaceManager vsm;
-    VirtualSpace sceneSpace;
-    Camera sceneCamera;
-    long[] sceneCameraBounds;
+    
+    VirtualSpace[] sceneSpaces;
+    Camera[] sceneCameras;
+    long[][] sceneCameraBounds;
+//    VirtualSpace sceneSpace;
+//    Camera sceneCamera;
+//    long[] sceneCameraBounds;
 
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable id2region;
@@ -100,16 +105,17 @@ public class SceneManager {
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vsm ZVTM virtual space manager instantiated by client application
-     *@param vs virtual space in which the scene will be loaded
-     *@param c main camera through which the scene will be observed
+     *@param vss virtual spaces in which the scene will be loaded
+     *@param cs cameras associated to those virtual spaces, through which the scene will be observed
      */
-    public SceneManager(VirtualSpaceManager vsm, VirtualSpace vs, Camera c){
-	this.vsm = vsm;
-	this.sceneSpace = vs;
-	this.sceneCamera = c;
-	glyphLoader = new GlyphLoader(this);
-	id2region = new Hashtable();
-	id2object = new Hashtable();
+    public SceneManager(VirtualSpaceManager vsm, VirtualSpace[] vss, Camera[] cs){
+        this.vsm = vsm;
+        this.sceneSpaces = vss;
+        this.sceneCameras = cs;
+        sceneCameraBounds = new long[cs.length][];
+        glyphLoader = new GlyphLoader(this);
+        id2region = new Hashtable();
+        id2object = new Hashtable();
     }
 
     /** Set the array containing information about the bounds of the region of virtual space seen through the camera observing the scene.
@@ -117,8 +123,13 @@ public class SceneManager {
      *@see com.xerox.VTM.engine.View#getVisibleRegion(Camera c, long[] res)
      *@see com.xerox.VTM.engine.View#getVisibleRegion(Camera c)
      */
-    public void setSceneCameraBounds(long[] bounds){
-	sceneCameraBounds = bounds;
+    public void setSceneCameraBounds(Camera c, long[] bounds){
+	    for (int i=0;i<sceneCameras.length;i++){
+	        if (sceneCameras[i] == c){
+	            sceneCameraBounds[i] = bounds;
+	            break;
+            }
+        }
     }
 
     public Enumeration getRegionIDs(){
@@ -241,10 +252,10 @@ public class SceneManager {
 	regionName2containerRegionName.clear();
 //    	printLevelInfo();
 //   	printRegionInfo();
-	Location l = vsm.getGlobalView(sceneCamera);
-	sceneCamera.setLocation(l);
+//	Location l = vsm.getGlobalView(sceneCamera);
+//	sceneCamera.setLocation(l);
 	updateLevel = true;
-	updateLevel(l.alt);
+//	updateLevel(l.alt);
 	System.gc();
 	glyphLoader.setEnabled(true);
 	if (pl != null){
@@ -278,8 +289,12 @@ public class SceneManager {
             regionEL.getAttribute(_tfll),
             regionEL.getAttribute(_ttul),
             regionEL.getAttribute(_ttll)};
-        Region region = new Region(x, y, w, h, depth, id, transitions,
-            regionEL.getAttribute(_ro), this);
+        int vsi = getVirtualSpaceIndex(regionEL.getAttribute(_spaceName));
+        if (vsi == -1){
+            // put region in first (assumed to be the only if yields -1) virtual space
+            vsi = 0;
+        }
+        Region region = new Region(x, y, w, h, depth, id, vsi, transitions, regionEL.getAttribute(_ro), this);
         if (!id2region.containsKey(id)){
             id2region.put(id, region);
         }
@@ -311,7 +326,7 @@ public class SceneManager {
         else {
             r.setDrawBorder(false);
         }
-        vsm.addGlyph(r, sceneSpace);
+        vsm.addGlyph(r, sceneSpaces[vsi]);
         region.setGlyph(r);
         r.setOwner(region);
         Node n;
@@ -461,7 +476,8 @@ public class SceneManager {
 
     void exitLevel(int depth, boolean goingToLowerAltLevel){
         for (int i=0;i<levels[depth].regions.length;i++){
-            levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL , sceneCamera.posx, sceneCamera.posy);
+            levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
+                                          sceneCameras[levels[depth].regions[i].vsi].posx, sceneCameras[levels[depth].regions[i].vsi].posy);
         }
         if (levelListener != null){
 	        levelListener.exitedLevel(depth);
@@ -482,7 +498,7 @@ public class SceneManager {
 
     void updateVisibleRegions(int level, short transition){
         for (int i=0;i<levels[level].regions.length;i++){
-            levels[level].regions[i].updateVisibility(sceneCameraBounds, currentLevel, transition, regionListener);
+            levels[level].regions[i].updateVisibility(sceneCameraBounds[levels[level].regions[i].vsi], currentLevel, transition, regionListener);
         }
     }
 
@@ -499,6 +515,15 @@ public class SceneManager {
 
     public void setFadeOutDuration(int d){
 	glyphLoader.FADE_OUT_DURATION = d;
+    }
+
+    int getVirtualSpaceIndex(String spaceName){
+        for (int i=0;i<sceneSpaces.length;i++){
+            if (sceneSpaces[i].getName().equals(spaceName)){
+                return i;
+            }
+        }
+        return -1;
     }
 
     // debug

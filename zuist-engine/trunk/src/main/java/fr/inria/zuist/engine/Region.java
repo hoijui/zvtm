@@ -65,6 +65,9 @@ public class Region {
     String id;
     String title;
 
+    // virtual space index (in SceneManager)
+    int vsi = 0;
+
     Region containingRegion = null;
     Region[] containedRegions = new Region[0];
 
@@ -80,28 +83,29 @@ public class Region {
     
     boolean isSensitive = false;
     
-    Region(long x, long y, long w, long h, int depth, String id, String[] trans, String ro, SceneManager sm){
-	this.x = x;
-	this.y = y;
-	this.w = w;
-	this.h = h;
-	wnes = new long[4];
-	wnes[0] = x - w/2;
-	wnes[1] = y + h/2;
-	wnes[2] = x + w/2;
-	wnes[3] = y - h/2;
-	this.depth = depth;
-	this.id = id;
-	this.sm = sm;
-	for (int i=0;i<transitions.length;i++){
-	    if (trans[i].equals(FADE_IN_STR)){transitions[i] = FADE_IN;}
-	    else if (trans[i].equals(FADE_OUT_STR)){transitions[i] = FADE_OUT;}
-	    else if (trans[i].equals(APPEAR_STR)){transitions[i] = APPEAR;}
-	    else if (trans[i].equals(DISAPPEAR_STR)){transitions[i] = DISAPPEAR;}
-	}
-	if (ro != null && ro.length() > 0){
-	    requestOrder = Region.parseOrdering(ro);
-	}
+    Region(long x, long y, long w, long h, int depth, String id, int vsi, String[] trans, String ro, SceneManager sm){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        this.vsi = vsi;
+        wnes = new long[4];
+        wnes[0] = x - w/2;
+        wnes[1] = y + h/2;
+        wnes[2] = x + w/2;
+        wnes[3] = y - h/2;
+        this.depth = depth;
+        this.id = id;
+        this.sm = sm;
+        for (int i=0;i<transitions.length;i++){
+            if (trans[i].equals(FADE_IN_STR)){transitions[i] = FADE_IN;}
+            else if (trans[i].equals(FADE_OUT_STR)){transitions[i] = FADE_OUT;}
+            else if (trans[i].equals(APPEAR_STR)){transitions[i] = APPEAR;}
+            else if (trans[i].equals(DISAPPEAR_STR)){transitions[i] = DISAPPEAR;}
+        }
+        if (ro != null && ro.length() > 0){
+            requestOrder = Region.parseOrdering(ro);
+        }
     }
 
     public String getID(){
@@ -114,6 +118,14 @@ public class Region {
     
     public String getTitle(){
         return title;
+    }
+
+    void setVirtualSpaceIndex(int i){
+        vsi = i;
+    }
+
+    int getVirtualSpaceIndex(){
+        return vsi;
     }
 
     /** Get index of level this region belongs to.

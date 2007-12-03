@@ -18,7 +18,7 @@ import com.xerox.VTM.glyphs.Glyph;
 public abstract class ObjectDescription {
 
     String id;
-
+    
     long vx, vy;
     boolean sensitive = true;
 
@@ -75,5 +75,4 @@ public abstract class ObjectDescription {
 	return id;
     }
 
-    
 }
