@@ -491,15 +491,42 @@ public class Camera {
     }
 
     /**
-     * enable camera
+     * Enable camera. What is seen through the camera will be painted in the View.
+     *@deprecated As of zvtm 0.9.6, replaced by setEnabled.
+     *@see #setEnabled(boolean b)
      */
-    public void enable(){enabled=true;}
+    public void enable(){
+        setEnabled(true);
+    }
 
     /**
-     * disable camera
+     * Disable camera. What is seen through the camera will not be painted in the View.
+      *@deprecated As of zvtm 0.9.6, replaced by setEnabled.
+      *@see #setEnabled(boolean b)
+      */
+    public void disable(){
+        setEnabled(false);
+    }
+    
+    /**
+     * Enable or disable camera. What is seen through the camera will (or will not) be painted in the View.
+     *@see #isEnabled()
      */
-    public void disable(){enabled=false;}
+    public void setEnabled(boolean b){
+        if (b != enabled){
+            enabled = b;
+            parentSpace.vsm.repaintNow(view);
+        }
+    }
 
+    /**
+     * Tells whether the camera is enabled or disabled.
+     *@see #setEnabled(boolean b)
+     */
+    public boolean isEnabled(){
+        return enabled;
+    }
+    
     /**
      * set eager or lazy mode
      * @param b true=lazy, false=eager
