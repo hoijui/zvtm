@@ -20,10 +20,11 @@
                  fill CDATA #IMPLIED
                  tful (appear|disappear|fadein|fadeout) "appear"
                  tfll (appear|disappear|fadein|fadeout) "appear"
-                 ttul (appear|disappear|fadein|fadeout) "appear"
-                 ttll (appear|disappear|fadein|fadeout) "appear"
+                 ttul (appear|disappear|fadein|fadeout) "disappear"
+                 ttll (appear|disappear|fadein|fadeout) "disappear"
                  sensitive (true|false) "false"
-                 requestOrdering (decl|dist) "dist">
+                 requestOrdering (decl|dist) "dist"
+                 spaceName CDATA #IMPLIED>
 
 <!ELEMENT object ANY>
 <!ATTLIST object id ID #REQUIRED
