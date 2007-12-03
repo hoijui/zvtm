@@ -115,8 +115,10 @@ public class WorldExplorer implements Java2DPainter {
         sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, gp);
         gm = new GeoToolsManager(this);
         gp.setVisible(false);
-        gp.setLabel(WEGlassPane.EMPTY_STRING);        
-        vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
+        gp.setLabel(WEGlassPane.EMPTY_STRING);
+//        vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
+        mCamera.setAltitude(10000.0f);
+        eh.cameraMoved();
     }
 
     void initGUI(boolean fullscreen){
@@ -144,8 +146,6 @@ public class WorldExplorer implements Java2DPainter {
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();
-//        vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(-45000, 0, 0, Color.BLACK, 45000, 0), mSpace);
-//        vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(0, -25000, 0, Color.BLACK, 0, 25000), mSpace);
     }
 
     void windowLayout(){
