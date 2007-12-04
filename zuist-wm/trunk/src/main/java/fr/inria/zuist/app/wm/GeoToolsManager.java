@@ -21,13 +21,18 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.Feature;
 import org.geotools.factory.GeoTools;
+import org.geotools.data.shapefile.shp.JTSUtilities;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.engine.LongPoint;
+
+import fr.inria.zuist.engine.PolygonDescription;
+import fr.inria.zuist.engine.Region;
 
 class GeoToolsManager {
     
@@ -39,7 +44,9 @@ class GeoToolsManager {
 
     WorldExplorer application;
     
-    VPolygon[] countryBoundaries;
+    PolygonDescription[] countryBoundaries;
+    
+    static final String[] transitions = {Region.APPEAR_STR, Region.APPEAR_STR, Region.DISAPPEAR_STR, Region.DISAPPEAR_STR};
     
     // polygon 968 is Canada, and contains an error
     // polygon 1182 is Chile, and contains an error
@@ -66,9 +73,13 @@ class GeoToolsManager {
                 Feature[] features = (Feature[])collection.toArray();
                 LongPoint[] zvtmCoords;
                 Vector points = new Vector();
-                countryBoundaries = new VPolygon[features.length];
+                countryBoundaries = new PolygonDescription[features.length];
+                Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, "BR0", 1,
+                                                            transitions, Region.ORDERING_DISTANCE_STR,
+                                                            false, "Boundaries", null, null);
                 for (int i=0;i<features.length;i++){
                     Feature feature = features[i];
+                    //Geometry geometry = DouglasPeuckerSimplifier.simplify(feature.getDefaultGeometry(), 0.0);
                     Geometry geometry = feature.getDefaultGeometry();
                     Coordinate[] coords = geometry.getCoordinates();
                     points.clear();
@@ -79,15 +90,14 @@ class GeoToolsManager {
                     for (int j=0;j<zvtmCoords.length;j++){
                         zvtmCoords[j] = (LongPoint)points.elementAt(j);
                     }
-                    countryBoundaries[i] = new VPolygon(zvtmCoords, Color.BLACK, COUNTRY_BOUNDARY_COLOR);
-                    countryBoundaries[i].setFilled(false);
+                    application.sm.createPolygon(zvtmCoords, "B"+Integer.toString(i), region,
+                                                 false, null, Color.YELLOW);
                     newProgress = i *100 / features.length;
                     if (newProgress > progress){
                         progress = newProgress;
                         application.gp.setValue(progress);
                     }
                 }
-                showAllCountries();
             }
             catch (IOException ioex){
                 ioex.printStackTrace();
@@ -95,19 +105,6 @@ class GeoToolsManager {
         }
         catch(MalformedURLException uex){
             uex.printStackTrace();
-        }
-    }
-
-    void showAllCountries(){
-        for (int i=0;i<countryBoundaries.length;i++){
-            application.vsm.addGlyph(countryBoundaries[i], application.bSpace, false);
-        }
-        application.vsm.repaintNow();
-    }
-
-    void showCountry(int i){
-        if (i<countryBoundaries.length){
-            application.vsm.addGlyph(countryBoundaries[i], application.bSpace);
         }
     }
     
