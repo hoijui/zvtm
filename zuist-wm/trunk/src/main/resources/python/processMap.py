@@ -42,6 +42,9 @@ XML_LEVELS = []
 LEVEL_FLOORS = []
 LEVEL_CEILINGS = []
 
+BMNG_SPACE = "BMNG Space"
+CB_SPACE = "Country Boundary Space"
+
 def createTargetDir():
     if not os.path.exists(TGT_DIR):
         log("Creating target directory %s" % TGT_DIR, 2)
@@ -113,6 +116,7 @@ def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRe
             regionEL.set("y", str(orig[1]-ty-ch/2))
             regionEL.set("w", str(cw))
             regionEL.set("h", str(ch))
+            regionEL.set("spaceName", BMNG_SPACE)
             #regionEL.set("stroke", "blue")
             objectEL = ET.SubElement(regionEL, "object")
             objectEL.set("id", "I%s" % strID)
