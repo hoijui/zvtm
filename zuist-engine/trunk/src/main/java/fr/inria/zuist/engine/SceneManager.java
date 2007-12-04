@@ -478,9 +478,9 @@ public class SceneManager {
     }
 
     /** Notify altitude changes.
-        * It is up to the client application to notify the scene manager each time the altitude of the camera used to observe the scene changes.
-        *@param altitude the new camera's altitude
-        */
+     * It is up to the client application to notify the scene manager each time the altitude of the camera used to observe the scene changes.
+     *@param altitude the new camera's altitude
+     */
     public void updateLevel(float altitude){
         if (!updateLevel){return;}
         // find out new level
@@ -494,6 +494,11 @@ public class SceneManager {
             }
             enterLevel(currentLevel, currentLevel > previousLevel);
             previousLevel = currentLevel;
+        }
+        else {
+            // if level hasn't changed, it is still necessary to update
+            // visible regions as some of them might have become (in)visible
+            updateVisibleRegions();
         }
     }
 
@@ -530,7 +535,7 @@ public class SceneManager {
      *
      */
     public void updateVisibleRegions(){
-	updateVisibleRegions(0, Region.TASL);
+	updateVisibleRegions(currentLevel, Region.TASL);
     }
 
     void updateVisibleRegions(int level, short transition){
