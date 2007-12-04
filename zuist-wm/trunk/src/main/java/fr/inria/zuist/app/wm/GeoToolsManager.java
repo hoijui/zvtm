@@ -61,6 +61,7 @@ class GeoToolsManager {
         application.gp.setValue(0);
         application.gp.setLabel("Loading country boundaries...");
         File file = new File("data/shapefiles/world_borders.shp");
+        //File file = new File("data/shapefiles2/countries.shp");
         Map connect = new HashMap();
         int newProgress = 0;
         try {
@@ -79,11 +80,11 @@ class GeoToolsManager {
                                                             false, "Boundaries", null, null);
                 for (int i=0;i<features.length;i++){
                     Feature feature = features[i];
-                    //Geometry geometry = DouglasPeuckerSimplifier.simplify(feature.getDefaultGeometry(), 0.0);
+                    //Geometry geometry = DouglasPeuckerSimplifier.simplify(feature.getDefaultGeometry(), 0.01);
                     Geometry geometry = feature.getDefaultGeometry();
                     Coordinate[] coords = geometry.getCoordinates();
                     points.clear();
-                    for (int j=0;j<coords.length-LOD;j+=LOD){
+                    for (int j=0;j<coords.length;j+=1){
                         points.add(new LongPoint(Math.round(coords[j].x*CC), Math.round(coords[j].y*CC)));
                     }
                     zvtmCoords = new LongPoint[points.size()];
