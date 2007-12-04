@@ -51,10 +51,12 @@ public class SceneManager {
     static final String _type = "type";
     static final String _text = "text";
     static final String _rect = "rect";
+    static final String _polygon = "polygon";
     static final String _x = "x";
     static final String _y = "y";
     static final String _w = "w";
     static final String _h = "h";
+    static final String _points = "points";
     static final String _fill = "fill";
     static final String _stroke = "stroke";
     static final String _scale = "scale";
@@ -374,6 +376,9 @@ public class SceneManager {
         else if (type.equals(_text)){
             res = processText(objectEL, id, region);
         }
+        else if (type.equals(_polygon)){
+            res = processPolygon(objectEL, id, region);
+        }
         else {
             System.err.println("Error: failed to process object declaration: "+id);
             return;
@@ -394,6 +399,7 @@ public class SceneManager {
         }
     }
 
+    /** Process XML description of an image object. */
     ImageDescription processImage(Element objectEL, String id, Region region, String sceneFileDirectory){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
@@ -417,6 +423,7 @@ public class SceneManager {
         return od;
     }
 
+    /** Process XML description of a rectangle object. */
     RectangleDescription processRectangle(Element objectEL, String id, Region region){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
@@ -440,6 +447,7 @@ public class SceneManager {
         return od;
     }
 
+    /** Process XML description of a text object. */
     TextDescription processText(Element objectEL, String id, Region region){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
@@ -461,6 +469,38 @@ public class SceneManager {
         od.setSensitive(sensitivity);
         region.addObject(od);
         return od;
+    }
+
+    /** Process XML description of a polygon object. */
+    PolygonDescription processPolygon(Element objectEL, String id, Region region){
+        LongPoint[] vertices = parseVertexCoordinates(objectEL.getAttribute(_points));
+        Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
+        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
+        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+        PolygonDescription od = createPolygon(vertices, id, region, sensitivity, fill, stroke);
+        return od;
+    }
+    
+    /** Creates a polygon and adds it to a region.
+     *
+     */
+    public PolygonDescription createPolygon(LongPoint[] vertices, String id, Region region,
+                                            boolean sensitivity, Color fill, Color stroke){
+        PolygonDescription od = new PolygonDescription(id, vertices, fill, stroke, region);
+        od.setSensitive(sensitivity);
+        region.addObject(od);
+        return od;
+    }
+    
+    public static LongPoint[] parseVertexCoordinates(String s){
+        String[] points = s.split(";");
+        LongPoint[] res = new LongPoint[points.length];
+        String[] xy;
+        for (int i=0;i<points.length;i++){
+            xy = points[i].split(",");
+            res[i] = new LongPoint(SVGReader.getLong(xy[0]), SVGReader.getLong(xy[1]));
+        }
+        return res;
     }
 
     /* ----------- level / region visibility update ----------- */

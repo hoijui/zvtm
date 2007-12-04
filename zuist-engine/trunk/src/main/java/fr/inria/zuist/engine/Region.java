@@ -21,26 +21,26 @@ import com.xerox.VTM.glyphs.VRectangle;
 
 public class Region {
 
-    static final short FADE_IN = 0;
-    static final short FADE_OUT = 1;
-    static final short APPEAR = 2;
-    static final short DISAPPEAR = 3;
-    static final String FADE_IN_STR = "fadein";
-    static final String FADE_OUT_STR = "fadeout";
-    static final String APPEAR_STR = "appear";
-    static final String DISAPPEAR_STR = "disappear";
+    public static final short FADE_IN = 0;
+    public static final short FADE_OUT = 1;
+    public static final short APPEAR = 2;
+    public static final short DISAPPEAR = 3;
+    public static final String FADE_IN_STR = "fadein";
+    public static final String FADE_OUT_STR = "fadeout";
+    public static final String APPEAR_STR = "appear";
+    public static final String DISAPPEAR_STR = "disappear";
 
-    static final short TFUL = 0;  // transition from upper level
-    static final short TFLL = 1;  // transition from lower level
-    static final short TTUL = 2;  // transition to upper level
-    static final short TTLL = 3;  // transition to lower level
-    static final short TASL = 4;  // transition at same level - not stored, always appear/disappear as this is always off screen
+    public static final short TFUL = 0;  // transition from upper level
+    public static final short TFLL = 1;  // transition from lower level
+    public static final short TTUL = 2;  // transition to upper level
+    public static final short TTLL = 3;  // transition to lower level
+    public static final short TASL = 4;  // transition at same level - not stored, always appear/disappear as this is always off screen
     short[] transitions = {APPEAR, APPEAR, DISAPPEAR, DISAPPEAR};
 
-    static final short ORDERING_ARRAY = 0;
-    static final short ORDERING_DISTANCE = 1;
-    static final String ORDERING_ARRAY_STR = "decl";
-    static final String ORDERING_DISTANCE_STR = "dist";
+    public static final short ORDERING_ARRAY = 0;
+    public static final short ORDERING_DISTANCE = 1;
+    public static final String ORDERING_ARRAY_STR = "decl";
+    public static final String ORDERING_DISTANCE_STR = "dist";
     short requestOrder = ORDERING_DISTANCE;
 
     static short parseOrdering(String o){

@@ -19,6 +19,7 @@ public class Level {
     float floorAlt;
     
     Region[] regions = new Region[0];
+    Region[] orphanRegions = new Region[0];
 
     Level(float c, float f){
 	ceilingAlt = c;

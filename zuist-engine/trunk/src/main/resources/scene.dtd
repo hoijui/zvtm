@@ -28,11 +28,12 @@
 
 <!ELEMENT object ANY>
 <!ATTLIST object id ID #REQUIRED
-                 type (image|text|rect) #REQUIRED
+                 type (image|text|rect|polygon) #REQUIRED
                  x CDATA #REQUIRED
                  y CDATA #REQUIRED
                  w CDATA #IMPLIED
                  h CDATA #IMPLIED
+                 points CDATA #IMPLIED
                  src CDATA #IMPLIED
                  scale CDATA #IMPLIED
                  stroke CDATA #IMPLIED
