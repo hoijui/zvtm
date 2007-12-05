@@ -35,7 +35,7 @@ public class LPDGaussianLens extends LPFSGaussianLens implements TemporalLens {
     Timer timer;
     LPDLTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 0.2;   // 0.8
+    double cutoffParamA = 0.1;   // 0.8
     double cutoffParamB = 0.001;  // 0.1 to make it more difficult to acquire
 
     // MMTf is used to hold the current translucence
