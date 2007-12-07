@@ -190,18 +190,18 @@ class GlyphLoader implements Runnable {
 
 
     void showObject(ObjectDescription od, short transition){
-	if (DEBUG){
-	    System.out.println("Actually loading "+od);
-	}
-	od.createObject(sm.sceneSpaces[od.getParentRegion().getVirtualSpaceIndex()], sm.vsm, transition==Request.TRANSITION_FADE);
+        if (DEBUG){
+            System.out.println("Actually loading "+od);
+        }
+        od.createObject(sm.sceneLayers[od.getParentRegion().getLayerIndex()], sm.vsm, transition==Request.TRANSITION_FADE);
     }
 
 
     void hideObject(ObjectDescription od, short transition){
-	if (DEBUG){
-	    System.out.println("Actually unloading "+od);
-	}
-	od.destroyObject(sm.sceneSpaces[od.getParentRegion().getVirtualSpaceIndex()], sm.vsm, transition==Request.TRANSITION_FADE);
+        if (DEBUG){
+            System.out.println("Actually unloading "+od);
+        }
+        od.destroyObject(sm.sceneLayers[od.getParentRegion().getLayerIndex()], sm.vsm, transition==Request.TRANSITION_FADE);
     }
 
 

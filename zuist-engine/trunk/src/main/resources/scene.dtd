@@ -24,7 +24,7 @@
                  ttll (appear|disappear|fadein|fadeout) "disappear"
                  sensitive (true|false) "false"
                  requestOrdering (decl|dist) "dist"
-                 spaceName CDATA #IMPLIED>
+                 layer CDATA #IMPLIED>
 
 <!ELEMENT object ANY>
 <!ATTLIST object id ID #REQUIRED

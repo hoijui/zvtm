@@ -65,8 +65,8 @@ public class Region {
     String id;
     String title;
 
-    // virtual space index (in SceneManager)
-    int vsi = 0;
+    // virtual space/layer index (in SceneManager)
+    int li = 0;
 
     Region containingRegion = null;
     Region[] containedRegions = new Region[0];
@@ -83,12 +83,12 @@ public class Region {
     
     boolean isSensitive = false;
     
-    Region(long x, long y, long w, long h, int depth, String id, int vsi, String[] trans, String ro, SceneManager sm){
+    Region(long x, long y, long w, long h, int depth, String id, int li, String[] trans, String ro, SceneManager sm){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.vsi = vsi;
+        this.li = li;
         wnes = new long[4];
         wnes[0] = x - w/2;
         wnes[1] = y + h/2;
@@ -120,12 +120,12 @@ public class Region {
         return title;
     }
 
-    void setVirtualSpaceIndex(int i){
-        vsi = i;
+    void setLayerIndex(int i){
+        li = i;
     }
 
-    int getVirtualSpaceIndex(){
-        return vsi;
+    int getLayerIndex(){
+        return li;
     }
 
     /** Get index of level this region belongs to.

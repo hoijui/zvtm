@@ -79,7 +79,7 @@ public class SceneManager {
     static final String _takesToO = "takesToObject";
     static final String _sensitive = "sensitive";
     static final String _anchor = "anchor";
-    static final String _spaceName = "spaceName";
+    static final String _layer = "layer";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -90,7 +90,7 @@ public class SceneManager {
 
     VirtualSpaceManager vsm;
     
-    VirtualSpace[] sceneSpaces;
+    VirtualSpace[] sceneLayers;
     Camera[] sceneCameras;
     long[][] sceneCameraBounds;
 
@@ -109,7 +109,7 @@ public class SceneManager {
      */
     public SceneManager(VirtualSpaceManager vsm, VirtualSpace[] vss, Camera[] cs){
         this.vsm = vsm;
-        this.sceneSpaces = vss;
+        this.sceneLayers = vss;
         this.sceneCameras = cs;
         sceneCameraBounds = new long[cs.length][];
         glyphLoader = new GlyphLoader(this);
@@ -284,9 +284,9 @@ public class SceneManager {
      * Also important: if the region is neither visible nor sensitive at instantiation time, its associated glyph is not added to the virtual space.
      */
     public Region createRegion(long x, long y, long w, long h,
-                               int depth, String id, int vsi, String[] transitions, String requestOrdering,
+                               int depth, String id, int li, String[] transitions, String requestOrdering,
                                boolean sensitivity, String title, Color fill, Color stroke){
-        Region region = new Region(x, y, w, h, depth, id, vsi, transitions, requestOrdering, this);
+        Region region = new Region(x, y, w, h, depth, id, li, transitions, requestOrdering, this);
         if (!id2region.containsKey(id)){
             id2region.put(id, region);
         }
@@ -314,7 +314,7 @@ public class SceneManager {
         }
         if (fill != null || stroke != null || sensitivity){
             // add the rectangle representing the region only if it is visible or sensitive
-            vsm.addGlyph(r, sceneSpaces[vsi]);
+            vsm.addGlyph(r, sceneLayers[li]);
         }
         region.setGlyph(r);
         r.setOwner(region);
@@ -334,14 +334,14 @@ public class SceneManager {
             regionEL.getAttribute(_tfll),
             regionEL.getAttribute(_ttul),
             regionEL.getAttribute(_ttll)};
-        int vsi = getVirtualSpaceIndex(regionEL.getAttribute(_spaceName));
-        if (vsi == -1){
-            // put region in first (assumed to be the only if yields -1) virtual space
-            vsi = 0;
+        int li = getLayerIndex(regionEL.getAttribute(_layer));
+        if (li == -1){
+            // put region in first (assumed to be the only if yields -1) virtual space corresponding to a layer
+            li = 0;
         }
         boolean sensitivity = (regionEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(regionEL.getAttribute(_sensitive)) : false;
         String title = regionEL.getAttribute(_title);
-        Region region = createRegion(x, y, w, h, depth, id, vsi, transitions, regionEL.getAttribute(_ro), sensitivity, title, fill, stroke);
+        Region region = createRegion(x, y, w, h, depth, id, li, transitions, regionEL.getAttribute(_ro), sensitivity, title, fill, stroke);
         String containerID = (regionEL.hasAttribute(_containedIn)) ? regionEL.getAttribute(_containedIn) : null;
         if (containerID != null){
             rn2crn.put(id, containerID);
@@ -559,7 +559,7 @@ public class SceneManager {
     void exitLevel(int depth, boolean goingToLowerAltLevel){
         for (int i=0;i<levels[depth].regions.length;i++){
             levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
-                                          sceneCameras[levels[depth].regions[i].vsi].posx, sceneCameras[levels[depth].regions[i].vsi].posy);
+                                          sceneCameras[levels[depth].regions[i].li].posx, sceneCameras[levels[depth].regions[i].li].posy);
         }
         if (levelListener != null){
 	        levelListener.exitedLevel(depth);
@@ -580,7 +580,7 @@ public class SceneManager {
 
     void updateVisibleRegions(int level, short transition){
         for (int i=0;i<levels[level].regions.length;i++){
-            levels[level].regions[i].updateVisibility(sceneCameraBounds[levels[level].regions[i].vsi], currentLevel, transition, regionListener);
+            levels[level].regions[i].updateVisibility(sceneCameraBounds[levels[level].regions[i].li], currentLevel, transition, regionListener);
         }
     }
 
@@ -599,9 +599,9 @@ public class SceneManager {
 	glyphLoader.FADE_OUT_DURATION = d;
     }
 
-    int getVirtualSpaceIndex(String spaceName){
-        for (int i=0;i<sceneSpaces.length;i++){
-            if (sceneSpaces[i].getName().equals(spaceName)){
+    int getLayerIndex(String spaceName){
+        for (int i=0;i<sceneLayers.length;i++){
+            if (sceneLayers[i].getName().equals(spaceName)){
                 return i;
             }
         }
