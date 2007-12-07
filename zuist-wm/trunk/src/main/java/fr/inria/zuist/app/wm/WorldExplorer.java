@@ -83,8 +83,8 @@ public class WorldExplorer implements Java2DPainter {
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
-    static final String mSpaceName = "BMNG Space";
-    static final String bSpaceName = "Country Boundary Space";
+    static final String mSpaceName = "BMNG Layer";
+    static final String bSpaceName = "Boundary Layer";
     VirtualSpace mSpace, bSpace;
     Camera mCamera, bCamera;
     static final String mViewName = "World Explorer";
