@@ -8,6 +8,7 @@
 package fr.inria.zuist.app.wm;
 
 import java.awt.Color;
+import java.awt.geom.PathIterator;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -22,12 +23,14 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.Feature;
 import org.geotools.factory.GeoTools;
 import org.geotools.data.shapefile.shp.JTSUtilities;
+import org.geotools.geometry.jts.LiteShape;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
+
 
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VPolygon;
@@ -42,7 +45,8 @@ class GeoToolsManager {
 
     static final int LOD = 1;
     
-    static final Color COUNTRY_BOUNDARY_COLOR = Color.YELLOW;
+    static final Color COUNTRY_COLOR = Color.YELLOW;
+    static final Color ADMIN_DIV_1_COLOR = Color.ORANGE;
 
     WorldExplorer application;
     
@@ -54,19 +58,19 @@ class GeoToolsManager {
     
     GeoToolsManager(WorldExplorer app){
         this.application = app;
-        Region region = application.sm.createRegion(0, 0, 84600, 43200, 3, "BR0", 1,
+        Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, "BR0", 1,
                                                     transitions, Region.ORDERING_DISTANCE_STR,
                                                     false, "Boundaries", null, null);
 
-        load(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region);
-//        load(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region);
-//        load(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region);
-//        load(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region);
-//        load(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region);
-//        load(new File("data/shapefiles/china/CHN0.shp"), "Loading Chinese administrative divisions...", region);
+        load(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
+//        load(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
+//        load(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
+//        load(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
+//        load(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
+//        load(new File("data/shapefiles/china/CHN0.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
     }
 
-    void load(File shapeFile, String msg, Region region){
+    void load(File shapeFile, String msg, Region region, Color shapeColor){
         int progress = 0;
         application.gp.setValue(0);
         application.gp.setLabel(msg);
@@ -89,19 +93,45 @@ class GeoToolsManager {
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     for (int k=0;k<polygons.length;k++){
                     
-                        Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.00001);
+                        Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.0001);
                         //Geometry simplifiedPolygon = (Geometry)polygons[k];
-                        Coordinate[] coords = simplifiedPolygon.getCoordinates();
-                        points.clear();
-                        for (int j=0;j<coords.length;j+=1){
-                            points.add(new LongPoint(Math.round(coords[j].x*CC), Math.round(coords[j].y*CC)));
+                        PathIterator pi = (new LiteShape(simplifiedPolygon, null, false)).getPathIterator(null);
+                        double[] coords = new double[6];
+                        int type;
+                        Vector shapes = new Vector();
+                        while (!pi.isDone()){
+                            type = pi.currentSegment(coords);
+                            if (type == PathIterator.SEG_LINETO){
+                                points.add(new LongPoint(Math.round(coords[0]*CC), Math.round(coords[1]*CC)));
+                            }
+                            else if (type == PathIterator.SEG_MOVETO){
+                                points.clear();
+                            }
+                            else if (type == PathIterator.SEG_CLOSE){
+                                zvtmCoords = new LongPoint[points.size()];
+                                for (int j=0;j<zvtmCoords.length;j++){
+                                    zvtmCoords[j] = (LongPoint)points.elementAt(j);
+                                }
+                                application.sm.createPolygon(zvtmCoords, "B"+Integer.toString(polygonID++), region,
+                                                             false, null, shapeColor);
+                            }
+                            else {
+                                System.err.println("Error");
+                            }
+                            pi.next();
                         }
-                        zvtmCoords = new LongPoint[points.size()];
-                        for (int j=0;j<zvtmCoords.length;j++){
-                            zvtmCoords[j] = (LongPoint)points.elementAt(j);
-                        }
-                        application.sm.createPolygon(zvtmCoords, "B"+Integer.toString(polygonID++), region,
-                            false, null, Color.YELLOW);
+
+//                        Coordinate[] coords = simplifiedPolygon.getCoordinates();
+//                        points.clear();
+//                        for (int j=0;j<coords.length;j+=1){
+//                            points.add(new LongPoint(Math.round(coords[j].x*CC), Math.round(coords[j].y*CC)));
+//                        }
+//                        zvtmCoords = new LongPoint[points.size()];
+//                        for (int j=0;j<zvtmCoords.length;j++){
+//                            zvtmCoords[j] = (LongPoint)points.elementAt(j);
+//                        }
+//                        application.sm.createPolygon(zvtmCoords, "B"+Integer.toString(polygonID++), region,
+//                            false, null, Color.YELLOW);
                     }
                     newProgress = i *100 / features.length;
                     if (newProgress > progress){
