@@ -8,7 +8,7 @@
                 ceiling CDATA #REQUIRED>
 
 <!ELEMENT region (object)*>
-<!ATTLIST region depth CDATA #REQUIRED
+<!ATTLIST region levels CDATA #REQUIRED
                  id ID #REQUIRED
                  title CDATA #IMPLIED
                  containedIn IDREF #IMPLIED
