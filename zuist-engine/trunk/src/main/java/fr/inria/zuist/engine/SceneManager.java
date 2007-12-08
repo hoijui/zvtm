@@ -71,6 +71,7 @@ public class SceneManager {
     static final String _diappear = "disappear";
     static final String _fadein = "fadein";
     static final String _fadeout = "fadeout";
+    static final String _levels = "levels";
     static final String _depth = "depth";
     static final String _ceiling = "ceiling";
     static final String _floor = "floor";
@@ -282,11 +283,27 @@ public class SceneManager {
     /** Create a new region.
      * Important: when called directly from the client application, Region.setContainingRegion() should also be called manually (if there is any such containing region).
      * Also important: if the region is neither visible nor sensitive at instantiation time, its associated glyph is not added to the virtual space.
+     *@param x center of region
+     *@param y center of region
+     *@param w width of region
+     *@param h height of region
+     *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel) 
+     *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
+     *@param id region ID
+     *@param title region's title (metadata)
+     *@param li layer index (information layer/space in which objects will be put)
+     *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
+                         transitions from upper level, from lower level, to upper level, to lower level.
+     *@param requestOrdering how requests for loading / unloading objects should be ordered when
+                             entering / leaving this region; one of Region.{ORDERING_ARRAY, ORDERING_DISTANCE}.
+     *@param sensitivity should the rectangle symbolizing the region itself be sensitive to mouse events or not.
+     *@param fill fill color of the rectangle symbolizing the region itself
+     *@param stroke border color of the rectangle symbolizing the region itself
      */
-    public Region createRegion(long x, long y, long w, long h,
-                               int depth, String id, int li, String[] transitions, String requestOrdering,
-                               boolean sensitivity, String title, Color fill, Color stroke){
-        Region region = new Region(x, y, w, h, depth, id, li, transitions, requestOrdering, this);
+    public Region createRegion(long x, long y, long w, long h, int highestLevel, int lowestLevel,
+                               String id, String title, int li, String[] transitions, String requestOrdering,
+                               boolean sensitivity, Color fill, Color stroke){
+        Region region = new Region(x, y, w, h, highestLevel, lowestLevel, id, li, transitions, requestOrdering, this);
         if (!id2region.containsKey(id)){
             id2region.put(id, region);
         }
@@ -294,7 +311,9 @@ public class SceneManager {
             System.err.println("Error: ID "+id+" used to identify more than one region.");
             return null;
         }
-        levels[depth].addRegion(region);
+        for (int i=highestLevel;i<=lowestLevel;i++){
+            levels[i].addRegion(region);            
+        }
         if (sensitivity){region.setSensitive(true);}
         if (title != null && title.length() > 0){
             region.setTitle(title);
@@ -328,7 +347,6 @@ public class SceneManager {
         long h = Long.parseLong(regionEL.getAttribute(_h));
         Color fill = SVGReader.getColor(regionEL.getAttribute(_fill));
         Color stroke = SVGReader.getColor(regionEL.getAttribute(_stroke));
-        int depth = Integer.parseInt(regionEL.getAttribute(_depth));
         String id = regionEL.getAttribute(_id);
         String[] transitions = {regionEL.getAttribute(_tful),
             regionEL.getAttribute(_tfll),
@@ -341,7 +359,18 @@ public class SceneManager {
         }
         boolean sensitivity = (regionEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(regionEL.getAttribute(_sensitive)) : false;
         String title = regionEL.getAttribute(_title);
-        Region region = createRegion(x, y, w, h, depth, id, li, transitions, regionEL.getAttribute(_ro), sensitivity, title, fill, stroke);
+        int lowestLevel = 0;
+        int highestLevel = 0;
+        String levelStr = regionEL.getAttribute(_levels);
+        int scIndex = levelStr.indexOf(";");
+        if (scIndex != -1){// level information given as, e.g., 2;4 (region spans multiple levels)
+            highestLevel = Integer.parseInt(levelStr.substring(0, scIndex));
+            lowestLevel = Integer.parseInt(levelStr.substring(scIndex+1));
+        }
+        else {// level information given as, e.g., 2, short for 2;2 (single level)
+            lowestLevel = highestLevel = Integer.parseInt(levelStr);
+        }
+        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title, li, transitions, regionEL.getAttribute(_ro), sensitivity, fill, stroke);
         String containerID = (regionEL.hasAttribute(_containedIn)) ? regionEL.getAttribute(_containedIn) : null;
         if (containerID != null){
             rn2crn.put(id, containerID);
@@ -354,13 +383,13 @@ public class SceneManager {
             if (n.getNodeType() == Node.ELEMENT_NODE){
                 e = (Element)n;
                 if (e.getTagName().equals(_object)){
-                    processObject(e, levels[depth], region, sceneFileDirectory);
+                    processObject(e, region, sceneFileDirectory);
                 }
             }
         }
     }
 
-    void processObject(Element objectEL, Level level, Region region, String sceneFileDirectory){
+    void processObject(Element objectEL, Region region, String sceneFileDirectory){
         String type = objectEL.getAttribute(_type);
         String id = objectEL.getAttribute(_id);
         if (id == null || id.length() == 0){

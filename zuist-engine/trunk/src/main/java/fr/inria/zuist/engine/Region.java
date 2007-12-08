@@ -61,7 +61,10 @@ public class Region {
     long w;       // width and height of region
     long h;
     long[] wnes;  // west, north, east and south bounds of region
-    int depth;
+    // lowest level index
+    int lli = 0;
+    // highest level index
+    int hli = 0;
     String id;
     String title;
 
@@ -83,18 +86,32 @@ public class Region {
     
     boolean isSensitive = false;
     
-    Region(long x, long y, long w, long h, int depth, String id, int li, String[] trans, String ro, SceneManager sm){
+    /** Create a new region.
+     *@param x center of region
+     *@param y center of region
+     *@param w width of region
+     *@param h height of region
+     *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel) 
+     *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
+     *@param id region ID
+     *@param li layer index (information layer/space in which objects will be put)
+     *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
+                         transitions from upper level, from lower level, to upper level, to lower level.
+     */
+    Region(long x, long y, long w, long h, int highestLevel, int lowestLevel,
+           String id, int li, String[] trans, String ro, SceneManager sm){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
+        this.hli = highestLevel;
+        this.lli = lowestLevel;
         this.li = li;
         wnes = new long[4];
         wnes[0] = x - w/2;
         wnes[1] = y + h/2;
         wnes[2] = x + w/2;
         wnes[3] = y - h/2;
-        this.depth = depth;
         this.id = id;
         this.sm = sm;
         for (int i=0;i<transitions.length;i++){
@@ -128,21 +145,27 @@ public class Region {
         return li;
     }
 
-    /** Get index of level this region belongs to.
+    /** Get index of highest and lowest level this region belongs to.
      */
-    public int getLevel(){
-	return depth;
+    public int getHighestLevel(){
+	    return hli;
+    }
+
+    /** Get index of highest and lowest level this region belongs to.
+     */
+    public int getLowestLevel(){
+	    return lli;
     }
 
     public Region getContainingRegion(){
 	return containingRegion;
     }
 
-    public Region getContainingRegionAtLevel(int level){
-	if (depth <= level){return this;}
-	else if (containingRegion != null){return containingRegion.getContainingRegionAtLevel(level);}
-	else return null;
-    }
+//    public Region getContainingRegionAtLevel(int level){
+//	      if (lli <= level){return this;}
+//	      else if (containingRegion != null){return containingRegion.getContainingRegionAtLevel(level);}
+//	      else return null;
+//    }
     
     public Vector getContainingRegions(Vector cr){
         cr.insertElementAt(this, 0);
@@ -211,7 +234,7 @@ public class Region {
                 for (int i=0;i<containedRegions.length;i++){
                     containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
                 }
-                if (atDepth == depth){
+                if (atDepth >= hli && atDepth <= lli){
                     forceShow(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.enteredRegion(this);
@@ -226,7 +249,7 @@ public class Region {
                 for (int i=0;i<containedRegions.length;i++){
                     containedRegions[i].updateVisibility(false, viewportBounds, atDepth, transition, rl);
                 }
-                if (atDepth == depth){
+                if (atDepth >= hli && atDepth <= lli){
                     forceHide(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.exitedRegion(this);
@@ -257,7 +280,7 @@ public class Region {
                 for (int i=0;i<containedRegions.length;i++){
                     containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
                 }
-                if (atDepth == depth){
+                if (atDepth >= hli && atDepth <= lli){
                     forceShow(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.enteredRegion(this);
@@ -273,7 +296,7 @@ public class Region {
                 for (int i=0;i<containedRegions.length;i++){
                     containedRegions[i].updateVisibility(false, viewportBounds, atDepth, transition, rl);
                 }
-                if (atDepth == depth){
+                if (atDepth >= hli && atDepth <= lli){
                     forceHide(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.exitedRegion(this);
