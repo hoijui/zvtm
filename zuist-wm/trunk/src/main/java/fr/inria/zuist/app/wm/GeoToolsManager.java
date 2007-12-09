@@ -31,12 +31,9 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
-
-import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.VPolygon;
+import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.engine.LongPoint;
 
-import fr.inria.zuist.engine.PolygonDescription;
 import fr.inria.zuist.engine.Region;
 
 class GeoToolsManager {
@@ -50,17 +47,15 @@ class GeoToolsManager {
 
     WorldExplorer application;
     
-    PolygonDescription[] countryBoundaries;
-    
     static final String[] transitions = {Region.APPEAR_STR, Region.APPEAR_STR, Region.DISAPPEAR_STR, Region.DISAPPEAR_STR};
 
     int polygonID = 0;
     
     GeoToolsManager(WorldExplorer app){
         this.application = app;
-        Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, "BR0", 1,
-                                                    transitions, Region.ORDERING_DISTANCE_STR,
-                                                    false, "Boundaries", null, null);
+        Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, 4, "BR0", "Boundaries",
+                                                    1, transitions, Region.ORDERING_DISTANCE_STR,
+                                                    false, null, null);
 
         load(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
 //        load(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
@@ -86,7 +81,6 @@ class GeoToolsManager {
                 Feature[] features = (Feature[])collection.toArray();
                 LongPoint[] zvtmCoords;
                 Vector points = new Vector();
-                countryBoundaries = new PolygonDescription[features.length];
                 for (int i=0;i<features.length;i++){
                     Feature feature = features[i];
                     Geometry geometry = feature.getPrimaryGeometry();                    
@@ -112,8 +106,10 @@ class GeoToolsManager {
                                 for (int j=0;j<zvtmCoords.length;j++){
                                     zvtmCoords[j] = (LongPoint)points.elementAt(j);
                                 }
-                                application.sm.createPolygon(zvtmCoords, "B"+Integer.toString(polygonID++), region,
-                                                             false, null, shapeColor);
+                                VPolygonST polygon = new VPolygonST(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
+                                polygon.setFilled(false);
+                                application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
+                                                                            region, false);
                             }
                             else {
                                 System.err.println("Error");
