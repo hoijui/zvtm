@@ -420,13 +420,14 @@ public class VirtualSpace {
 
     protected void addGlyphToDrawingList(Glyph g){
         int zindex = g.getZindex();
+        // insert at bottom of list if no other glyph has a lower z-index
         int insertAt = 0;
         synchronized(drawingList){
             // insert glyph in the drawing list so that 
             // it is the last glyph to be drawn for a given z-index
             for (int i=drawingList.length-1;i>=0;i--){
-                insertAt = i + 1;
                 if (drawingList[i].getZindex() <= zindex){
+                    insertAt = i + 1;
                     break;
                 }
             }
@@ -435,6 +436,8 @@ public class VirtualSpace {
     }
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
+        System.out.println("inserting at"+index);
+        
         synchronized(drawingList){
             Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
             System.arraycopy(drawingList, 0, newDrawingList, 0, index);
