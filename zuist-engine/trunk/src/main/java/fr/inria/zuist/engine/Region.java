@@ -352,10 +352,10 @@ public class Region {
 	int res = 0;
 	if (objects.length > 0){
 	    // do not take the square root to get the actual distance as we are just comparing values
-	    long shortestDistance = Math.round(Math.pow(x-objects[0].vx,2) + Math.pow(y-objects[0].vy,2));
+	    long shortestDistance = Math.round(Math.pow(x-objects[0].getX(),2) + Math.pow(y-objects[0].getY(),2));
 	    long distance;
 	    for (int i=1;i<objects.length;i++){
-		distance = Math.round(Math.pow(x-objects[i].vx,2) + Math.pow(y-objects[i].vy,2));
+		distance = Math.round(Math.pow(x-objects[i].getX(),2) + Math.pow(y-objects[i].getY(),2));
 		if (distance < shortestDistance){
 		    shortestDistance = distance;
 		    res = i;
@@ -385,10 +385,10 @@ class DistanceComparator implements Comparator<ObjectDescription> {
     }
     
     public int compare(ObjectDescription od1, ObjectDescription od2){
-	if (Math.pow(x-od1.vx, 2) + Math.pow(y-od1.vy, 2) < Math.pow(x-od2.vx, 2) + Math.pow(y-od2.vy, 2)){
+	if (Math.pow(x-od1.getX(), 2) + Math.pow(y-od1.getY(), 2) < Math.pow(x-od2.getX(), 2) + Math.pow(y-od2.getY(), 2)){
 	    return -1;
 	}
-	else if (Math.pow(x-od1.vx, 2) + Math.pow(y-od1.vy, 2) > Math.pow(x-od2.vx, 2) + Math.pow(y-od2.vy, 2)){
+	else if (Math.pow(x-od1.getX(), 2) + Math.pow(y-od1.getY(), 2) > Math.pow(x-od2.getX(), 2) + Math.pow(y-od2.getY(), 2)){
 	    return 1;
 	}
 	else {

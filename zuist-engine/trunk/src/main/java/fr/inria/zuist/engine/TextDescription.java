@@ -28,7 +28,9 @@ public class TextDescription extends ObjectDescription {
     public static final String _middle = "middle";
     public static final String _end = "end";
 
-    /* necessary info about an image for instantiation */
+    /* necessary info about a text for instantiation */
+    long vx, vy;
+    int zindex;
     float scale;
     String text;
     short anchor = VText.TEXT_ANCHOR_MIDDLE;
@@ -48,10 +50,11 @@ public class TextDescription extends ObjectDescription {
         this.parentRegion = pr;
     }
 
-    TextDescription(String id, long x, long y, float s, String tx, Color c, short ta, Region pr){
+    TextDescription(String id, long x, long y, int z, float s, String tx, Color c, short ta, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
+    	this.zindex = z;
         this.scale = s;
         this.text = tx;
         this.fillColor = c;
@@ -63,7 +66,7 @@ public class TextDescription extends ObjectDescription {
     public synchronized void createObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeIn){
         if (glyph == null){
             if (fadeIn){
-                glyph = new VTextST(vx, vy, 0, fillColor, text, anchor, 0.0f, scale);
+                glyph = new VTextST(vx, vy, zindex, fillColor, text, anchor, 0.0f, scale);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
                 vsm.addGlyph(glyph, vs);
@@ -71,7 +74,7 @@ public class TextDescription extends ObjectDescription {
                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
             }
             else {
-                glyph = new VTextST(vx, vy, 0, fillColor, text, anchor, 1.0f, scale);
+                glyph = new VTextST(vx, vy, zindex, fillColor, text, anchor, 1.0f, scale);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
                 vsm.addGlyph(glyph, vs);
@@ -121,6 +124,14 @@ public class TextDescription extends ObjectDescription {
 	if (anchor.equals(_start)){return VText.TEXT_ANCHOR_START;}
 	else if (anchor.equals(_end)){return VText.TEXT_ANCHOR_END;}
 	else {return VText.TEXT_ANCHOR_MIDDLE;}
+    }
+    
+    public long getX(){
+        return vx;
+    }
+    
+    public long getY(){
+        return vy;
     }
     
 }

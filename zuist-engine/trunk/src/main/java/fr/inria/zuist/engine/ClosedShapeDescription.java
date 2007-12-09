@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: RectangleDescription.java,v 1.4 2007/10/04 13:59:00 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.engine;
@@ -13,51 +13,46 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.ClosedShape;
+import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.engine.PostAnimationAction;
-import com.xerox.VTM.glyphs.VRectangleST;
 
-/** Description of rectangle objects to be loaded/unloaded in the scene.
+/** Description of any ZVTM glyph to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
  */
 
-public class RectangleDescription extends ObjectDescription {
+public class ClosedShapeDescription extends ObjectDescription {
 
-    /* necessary info about a rectangle for instantiation */
-    long vw, vh;
-    Color strokeColor, fillColor;
+    ClosedShape glyph;
+    boolean inSpace = false;
 
-    VRectangleST glyph;
-
-    RectangleDescription(String id, long x, long y, long w, long h, Color fc, Color sc, Region pr){
-	this.id = id;
-	this.vx = x;
-	this.vy = y;
-	this.vw = w;
-	this.vh = h;
-	this.strokeColor = sc;
-	this.fillColor = fc;
-	this.parentRegion = pr;
+    /**
+     *@param g any ClosedShape. It must implement com.xerox.VTM.glyphs.Translucent if fade in/out transitions are used in the parent region.
+     */
+    ClosedShapeDescription(String id, ClosedShape g, Region pr, boolean sensitive){
+        this.id = id;
+        this.glyph = g;
+        this.parentRegion = pr;
+        this.sensitive = sensitive;
     }
 
     /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeIn){
-        if (glyph == null){
+        if (!inSpace){
             if (fadeIn){
-                glyph = new VRectangleST(vx, vy, 0, vw/2, vh/2, (fillColor!=null) ? fillColor : Color.BLACK, (strokeColor!=null) ? strokeColor : Color.WHITE, 0.0f);
+                ((Translucent)glyph).setTranslucencyValue(0.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
-                if (fillColor == null){glyph.setFilled(false);}
-                if (strokeColor == null){glyph.setDrawBorder(false);}
                 vsm.addGlyph(glyph, vs);
+                //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
+                //        not necessarily 1.0f
                 vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
             }
             else {
-                glyph = new VRectangleST(vx, vy, 0, vw/2, vh/2, (fillColor!=null) ? fillColor : Color.BLACK, (strokeColor!=null) ? strokeColor : Color.WHITE, 1.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
-                if (fillColor == null){glyph.setFilled(false);}
-                if (strokeColor == null){glyph.setDrawBorder(false);}
                 vsm.addGlyph(glyph, vs);
             }
+            inSpace = true;
             glyph.setOwner(this);
         }
         loadRequest = null;
@@ -65,31 +60,39 @@ public class RectangleDescription extends ObjectDescription {
 
     /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
     public synchronized void destroyObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeOut){
-        if (glyph != null){
+        if (inSpace){
             if (fadeOut){
                 vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
                     GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
-                    new RectangleHideAction(vs));
+                    new ClosedShapeHideAction(vs));
             }
             else {
                 vs.destroyGlyph(glyph);
             }
-            glyph = null;
+            inSpace = false;
         }
         unloadRequest = null;
     }
 
     public Glyph getGlyph(){
-	return glyph;
+	    return glyph;
+    }
+    
+    public long getX(){
+        return glyph.vx;
+    }
+    
+    public long getY(){
+        return glyph.vy;
     }
     
 }
 
-class RectangleHideAction implements PostAnimationAction {
+class ClosedShapeHideAction implements PostAnimationAction {
     
     VirtualSpace vs;
     
-    RectangleHideAction(VirtualSpace vs){
+    ClosedShapeHideAction(VirtualSpace vs){
 	this.vs = vs;
     }
     

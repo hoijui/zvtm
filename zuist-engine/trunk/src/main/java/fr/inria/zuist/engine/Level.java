@@ -19,7 +19,6 @@ public class Level {
     float floorAlt;
     
     Region[] regions = new Region[0];
-    Region[] orphanRegions = new Region[0];
 
     Level(float c, float f){
 	ceilingAlt = c;
@@ -54,6 +53,15 @@ public class Level {
 		else {
 			return null;
 		}
+	}
+	
+	public boolean contains(Region r){
+	    for (int i=0;i<regions.length;i++){
+	        if (regions[i] == r){
+	            return true;
+	        }
+	    }
+	    return false;
 	}
     
     void addRegion(Region r){

@@ -31,6 +31,7 @@
                  type (image|text|rect|polygon) #REQUIRED
                  x CDATA #REQUIRED
                  y CDATA #REQUIRED
+                 z-index CDATA #IMPLIED
                  w CDATA #IMPLIED
                  h CDATA #IMPLIED
                  points CDATA #IMPLIED

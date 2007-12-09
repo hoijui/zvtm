@@ -20,9 +20,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 
 import com.xerox.VTM.glyphs.VRectangle;
+import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.glyphs.VImage;
+import net.claribole.zvtm.glyphs.VImageST;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
+import net.claribole.zvtm.glyphs.VTextST;
+import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -81,6 +86,7 @@ public class SceneManager {
     static final String _sensitive = "sensitive";
     static final String _anchor = "anchor";
     static final String _layer = "layer";
+    static final String _zindex = "z-index";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -392,21 +398,22 @@ public class SceneManager {
     void processObject(Element objectEL, Region region, String sceneFileDirectory){
         String type = objectEL.getAttribute(_type);
         String id = objectEL.getAttribute(_id);
+        int zindex = (objectEL.hasAttribute(_zindex)) ? Integer.parseInt(objectEL.getAttribute(_zindex)) : 0;
         if (id == null || id.length() == 0){
             System.err.println("Warning: object "+objectEL+" has no ID");
         }
         ObjectDescription res = null;
         if (type.equals(_image)){
-            res = processImage(objectEL, id, region, sceneFileDirectory);
+            res = processImage(objectEL, id, zindex, region, sceneFileDirectory);
         }
         else if (type.equals(_rect)){
-            res = processRectangle(objectEL, id, region);
+            res = processRectangle(objectEL, id, zindex, region);
         }
         else if (type.equals(_text)){
-            res = processText(objectEL, id, region);
+            res = processText(objectEL, id, zindex, region);
         }
         else if (type.equals(_polygon)){
-            res = processPolygon(objectEL, id, region);
+            res = processPolygon(objectEL, id, zindex, region);
         }
         else {
             System.err.println("Error: failed to process object declaration: "+id);
@@ -429,7 +436,7 @@ public class SceneManager {
     }
 
     /** Process XML description of an image object. */
-    ImageDescription processImage(Element objectEL, String id, Region region, String sceneFileDirectory){
+    ImageDescription processImage(Element objectEL, String id, int zindex, Region region, String sceneFileDirectory){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
         long w = Long.parseLong(objectEL.getAttribute(_w));
@@ -437,23 +444,32 @@ public class SceneManager {
         String src = objectEL.getAttribute(_src);
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        ImageDescription od = createImage(x, y, w, h, id, region, sceneFileDirectory+"/"+src, sensitivity, stroke);
+        ImageDescription od = createImageDescription(x, y, w, h, id, zindex, region, sceneFileDirectory+"/"+src, sensitivity, stroke);
         return od;
     }
 
     /** Creates an image and adds it to a region.
      *
      */
-    public ImageDescription createImage(long x, long y, long w, long h, String id, Region region,
-                                        String imagePath, boolean sensitivity, Color stroke){
-        ImageDescription od = new ImageDescription(id, x, y, w, h, imagePath, stroke, region);
-        od.setSensitive(sensitivity);
-        region.addObject(od);
-        return od;
+    public ImageDescription createImageDescription(long x, long y, long w, long h, String id, int zindex, Region region,
+                                                   String imagePath, boolean sensitivity, Color stroke){
+        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imagePath, stroke, region);
+        imd.setSensitive(sensitivity);
+        region.addObject(imd);
+        return imd;
+    }
+    
+    /**
+     *@param g any ClosedShape. It must implement com.xerox.VTM.glyphs.Translucent if fade in/out transitions are used in the parent region.
+     */
+    public ClosedShapeDescription createClosedShapeDescription(ClosedShape g, String id, Region region, boolean sensitivity){
+        ClosedShapeDescription gd = new ClosedShapeDescription(id, g, region, sensitivity);
+        region.addObject(gd);
+        return gd;
     }
 
     /** Process XML description of a rectangle object. */
-    RectangleDescription processRectangle(Element objectEL, String id, Region region){
+    ClosedShapeDescription processRectangle(Element objectEL, String id, int zindex, Region region){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
         long w = Long.parseLong(objectEL.getAttribute(_w));
@@ -461,64 +477,22 @@ public class SceneManager {
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        RectangleDescription od = createRectangle(x, y, w, h, id, region, sensitivity, fill, stroke);
-        return od;
-    }
-    
-    /** Creates a rectangle and adds it to a region.
-     *
-     */
-    public RectangleDescription createRectangle(long x, long y, long w, long h, String id, Region region,
-                                                boolean sensitivity, Color fill, Color stroke){
-        RectangleDescription od = new RectangleDescription(id, x, y, w, h, fill, stroke, region);
-        od.setSensitive(sensitivity);
-        region.addObject(od);
-        return od;
-    }
-
-    /** Process XML description of a text object. */
-    TextDescription processText(Element objectEL, String id, Region region){
-        long x = Long.parseLong(objectEL.getAttribute(_x));
-        long y = Long.parseLong(objectEL.getAttribute(_y));
-        float scale = Float.parseFloat(objectEL.getAttribute(_scale));
-        String text = objectEL.getFirstChild().getNodeValue();
-        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
-        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        short anchor = (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
-        TextDescription od = createText(x, y, id, region, scale, text, anchor, fill, sensitivity);
-        return od;
-    }
-    
-    /** Creates a text object and adds it to a region.
-     *
-     */
-    public TextDescription createText(long x, long y, String id, Region region, float scale, String text,
-                                      short anchor, Color fill, boolean sensitivity){
-        TextDescription od = new TextDescription(id, x, y, scale, text, (fill != null) ? fill : Color.BLACK, anchor, region);
-        od.setSensitive(sensitivity);
-        region.addObject(od);
-        return od;
+        ClosedShape g = new VRectangleST(x, y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
+        if (fill == null){g.setFilled(false);}
+        if (stroke == null){g.setDrawBorder(false);}
+        return createClosedShapeDescription(g, id, region, sensitivity);
     }
 
     /** Process XML description of a polygon object. */
-    PolygonDescription processPolygon(Element objectEL, String id, Region region){
+    ClosedShapeDescription processPolygon(Element objectEL, String id, int zindex, Region region){
         LongPoint[] vertices = parseVertexCoordinates(objectEL.getAttribute(_points));
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        PolygonDescription od = createPolygon(vertices, id, region, sensitivity, fill, stroke);
-        return od;
-    }
-    
-    /** Creates a polygon and adds it to a region.
-     *
-     */
-    public PolygonDescription createPolygon(LongPoint[] vertices, String id, Region region,
-                                            boolean sensitivity, Color fill, Color stroke){
-        PolygonDescription od = new PolygonDescription(id, vertices, fill, stroke, region);
-        od.setSensitive(sensitivity);
-        region.addObject(od);
-        return od;
+        ClosedShape g = new VPolygonST(vertices, zindex, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
+        if (fill == null){g.setFilled(false);}
+        if (stroke == null){g.setDrawBorder(false);}
+        return createClosedShapeDescription(g, id, region, sensitivity);
     }
     
     public static LongPoint[] parseVertexCoordinates(String s){
@@ -530,6 +504,30 @@ public class SceneManager {
             res[i] = new LongPoint(SVGReader.getLong(xy[0]), SVGReader.getLong(xy[1]));
         }
         return res;
+    }
+
+    /** Process XML description of a text object. */
+    TextDescription processText(Element objectEL, String id, int zindex, Region region){
+        long x = Long.parseLong(objectEL.getAttribute(_x));
+        long y = Long.parseLong(objectEL.getAttribute(_y));
+        float scale = Float.parseFloat(objectEL.getAttribute(_scale));
+        String text = objectEL.getFirstChild().getNodeValue();
+        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
+        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+        short anchor = (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
+        TextDescription od = createTextDescription(x, y, id, zindex, region, scale, text, anchor, fill, sensitivity);
+        return od;
+    }
+    
+    /** Creates a text object and adds it to a region.
+     *
+     */
+    public TextDescription createTextDescription(long x, long y, String id, int zindex, Region region, float scale, String text,
+                                                 short anchor, Color fill, boolean sensitivity){
+        TextDescription td = new TextDescription(id, x, y, zindex, scale, text, (fill != null) ? fill : Color.BLACK, anchor, region);
+        td.setSensitive(sensitivity);
+        region.addObject(td);
+        return td;
     }
 
     /* ----------- level / region visibility update ----------- */
@@ -558,6 +556,8 @@ public class SceneManager {
         }
         // compare to current level
         if (previousLevel != currentLevel){
+            // it is important that exitLevel() gets called before enterLevel()
+            // because of regions spanning multiple levels that get checked in exitLevel()
             if (previousLevel >= 0){
                 exitLevel(previousLevel, currentLevel > previousLevel);
             }
@@ -587,8 +587,12 @@ public class SceneManager {
 
     void exitLevel(int depth, boolean goingToLowerAltLevel){
         for (int i=0;i<levels[depth].regions.length;i++){
-            levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
-                                          sceneCameras[levels[depth].regions[i].li].posx, sceneCameras[levels[depth].regions[i].li].posy);
+            // hide only if region does not span the level where we are going
+            if ((goingToLowerAltLevel && !levels[depth+1].contains(levels[depth].regions[i]))
+                || (!goingToLowerAltLevel && !levels[depth-1].contains(levels[depth].regions[i]))){
+                    levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
+                        sceneCameras[levels[depth].regions[i].li].posx, sceneCameras[levels[depth].regions[i].li].posy);
+            }
         }
         if (levelListener != null){
 	        levelListener.exitedLevel(depth);

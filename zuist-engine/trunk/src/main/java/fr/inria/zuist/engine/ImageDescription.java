@@ -25,21 +25,24 @@ import net.claribole.zvtm.glyphs.VImageST;
 public class ImageDescription extends ObjectDescription {
 
     /* necessary info about an image for instantiation */
+    long vx, vy;
+    int zindex;
     long vw, vh;
     String path;
     Color strokeColor;
 
     VImageST glyph;
 
-    ImageDescription(String id, long x, long y, long w, long h, String p, Color sc, Region pr){
-	this.id = id;
-	this.vx = x;
-	this.vy = y;
-	this.vw = w;
-	this.vh = h;
-	this.path = p;
-	this.strokeColor = sc;
-	this.parentRegion = pr;
+    ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){
+        this.id = id;
+        this.vx = x;
+        this.vy = y;
+        this.zindex = z;
+        this.vw = w;
+        this.vh = h;
+        this.path = p;
+        this.strokeColor = sc;
+        this.parentRegion = pr;
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
@@ -49,7 +52,7 @@ public class ImageDescription extends ObjectDescription {
             int ih = i.getHeight(null);
             double sf = vh / ((double)ih);
             if (fadeIn){
-                glyph = new VImageST(vx, vy, 0, i, sf, 0.0f);
+                glyph = new VImageST(vx, vy, zindex, i, sf, 0.0f);
                 if (strokeColor != null){
                     glyph.setBorderColor(strokeColor);
                     glyph.setDrawBorderPolicy(VImageST.DRAW_BORDER_ALWAYS);
@@ -60,7 +63,7 @@ public class ImageDescription extends ObjectDescription {
                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
             }
             else {
-                glyph = new VImageST(vx, vy, 0, i, sf, 1.0f);
+                glyph = new VImageST(vx, vy, zindex, i, sf, 1.0f);
                 if (strokeColor != null){
                     glyph.setBorderColor(strokeColor);
                     glyph.setDrawBorderPolicy(VImageST.DRAW_BORDER_ALWAYS);
@@ -91,9 +94,17 @@ public class ImageDescription extends ObjectDescription {
     }
 
     public Glyph getGlyph(){
-	return glyph;
+	    return glyph;
+    }
+
+    public long getX(){
+        return vx;
     }
     
+    public long getY(){
+        return vy;
+    }
+        
 }
 
 class ImageHideAction implements PostAnimationAction {

@@ -18,8 +18,7 @@ import com.xerox.VTM.glyphs.Glyph;
 public abstract class ObjectDescription {
 
     String id;
-    
-    long vx, vy;
+
     boolean sensitive = true;
 
     Integer loadRequest, unloadRequest;
@@ -28,7 +27,7 @@ public abstract class ObjectDescription {
 
     String takesTo;
     short takesToType;
-
+    
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public abstract void createObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeIn);
 
@@ -74,5 +73,9 @@ public abstract class ObjectDescription {
     public String getID(){
 	return id;
     }
+    
+    public abstract long getX();
+    
+    public abstract long getY();
 
 }
