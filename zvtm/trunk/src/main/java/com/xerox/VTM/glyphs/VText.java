@@ -109,11 +109,11 @@ public class VText extends Glyph {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      */
-    public VText(long x,long y,float z,Color c,String t){
+    public VText(long x,long y, int z,Color c,String t){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -125,12 +125,12 @@ public class VText extends Glyph {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
-    public VText(long x,long y,float z,Color c,String t,short ta){
+    public VText(long x,long y, int z,Color c,String t,short ta){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -143,13 +143,13 @@ public class VText extends Glyph {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size
      */
-    public VText(long x, long y, float z, Color c, String t, short ta, float scale){
+    public VText(long x, long y, int z, Color c, String t, short ta, float scale){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -366,6 +366,7 @@ public class VText extends Glyph {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	g.setColor(this.color);
+	trueCoef = scaleFactor * coef;
 	if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
 	    //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 	    if (font!=null){
