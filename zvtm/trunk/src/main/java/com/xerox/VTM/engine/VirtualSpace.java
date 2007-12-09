@@ -339,38 +339,52 @@ public class VirtualSpace {
 	vsm.repaintNow();
     }
 
-    /**put this glyph on top of the drawing list (will be drawn last)*/
+    /** Put this glyph on top of the drawing list (will be drawn last).
+        * Important: this might affect the glyph's z-index.
+        */
     public void onTop(Glyph g){
-	if (glyphIndexInDrawingList(g) != -1){
-	    removeGlyphFromDrawingList(g);
-	    addGlyphToDrawingList(g);
-	}
+        if (glyphIndexInDrawingList(g) != -1){
+            removeGlyphFromDrawingList(g);
+            addGlyphToDrawingList(g);
+            // assign the glyph the same z-index as the glyph that was previously the topmost in the list
+            g.setZindex((drawingList.length>0) ? drawingList[drawingList.length-1].getZindex() : 0);
+        }
     }
 
-    /**put this glyph at bottom of the drawing list (will be drawn first)*/
+    /** Put this glyph at bottom of the drawing list (will be drawn first).
+        * Important: this might affect the glyph's z-index.
+        */
     public void atBottom(Glyph g){
-	if (glyphIndexInDrawingList(g) != -1){
-	    removeGlyphFromDrawingList(g);
-	    insertGlyphInDrawingList(g,0);
-	}
+        if (glyphIndexInDrawingList(g) != -1){
+            removeGlyphFromDrawingList(g);
+            insertGlyphInDrawingList(g,0);
+            // assign the glyph the lowest z-index possible
+            g.setZindex(0);
+        }
     }
 
-    /**put glyph g1 just above glyph g2 in the drawing list (g1 painted after g2)*/
-    public void above(Glyph g1,Glyph g2){
-	if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
-	    removeGlyphFromDrawingList(g1);
-	    int i = glyphIndexInDrawingList(g2);
-	    insertGlyphInDrawingList(g1,i+1);
-	}
+    /** Put glyph g1 just above glyph g2 in the drawing list (g1 painted after g2).
+        * Important: this might affect the glyph's z-index.
+        */
+    public void above(Glyph g1, Glyph g2){
+        if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
+            removeGlyphFromDrawingList(g1);
+            int i = glyphIndexInDrawingList(g2);
+            insertGlyphInDrawingList(g1,i+1);
+            g1.setZindex(g2.getZindex());
+        }
     }
 
-    /**put glyph g1 just below glyph g2 in the drawing list (g1 painted before g2)*/
-    public void below(Glyph g1,Glyph g2){
-	if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
-	    removeGlyphFromDrawingList(g1);
-	    int i = glyphIndexInDrawingList(g2);
-	    insertGlyphInDrawingList(g1,i);
-	}
+    /** Put glyph g1 just below glyph g2 in the drawing list (g1 painted before g2).
+        * Important: this might affect the glyph's z-index.
+        */
+    public void below(Glyph g1, Glyph g2){
+        if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
+            removeGlyphFromDrawingList(g1);
+            int i = glyphIndexInDrawingList(g2);
+            insertGlyphInDrawingList(g1,i);
+            g1.setZindex(g2.getZindex());
+        }
     }
 
     void setManager(VirtualSpaceManager v){this.vsm=v;}
@@ -405,47 +419,54 @@ public class VirtualSpace {
     }
 
     protected void addGlyphToDrawingList(Glyph g){
-	synchronized(drawingList){
-	    Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
-	    System.arraycopy(drawingList, 0, newDrawingList, 0, drawingList.length);
-	    newDrawingList[drawingList.length] = g;
-	    drawingList = newDrawingList;
-	}
+        int zindex = g.getZindex();
+        int insertAt = 0;
+        synchronized(drawingList){
+            // insert glyph in the drawing list so that 
+            // it is the last glyph to be drawn for a given z-index
+            for (int i=drawingList.length-1;i>=0;i--){
+                insertAt = i + 1;
+                if (drawingList[i].getZindex() <= zindex){
+                    break;
+                }
+            }
+            insertGlyphInDrawingList(g, insertAt);
+        }
     }
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
-	synchronized(drawingList){
-	    Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
-	    System.arraycopy(drawingList, 0, newDrawingList, 0, index);
-	    newDrawingList[index] = g;
-	    System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
-	    drawingList = newDrawingList;
-	}
+        synchronized(drawingList){
+            Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
+            System.arraycopy(drawingList, 0, newDrawingList, 0, index);
+            newDrawingList[index] = g;
+            System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
+            drawingList = newDrawingList;
+        }
     }
 
     protected void removeGlyphFromDrawingList(Glyph g){
-	synchronized(drawingList){
-	    for (int i=0;i<drawingList.length;i++){
-		if (drawingList[i] == g){
-		    Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
-		    System.arraycopy(drawingList, 0, newDrawingList, 0, i);
-		    System.arraycopy(drawingList, i+1, newDrawingList, i, drawingList.length-i-1);
-		    drawingList = newDrawingList;
-		    break;
-		}
-	    }
-	}
+        synchronized(drawingList){
+            for (int i=0;i<drawingList.length;i++){
+                if (drawingList[i] == g){
+                    Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
+                    System.arraycopy(drawingList, 0, newDrawingList, 0, i);
+                    System.arraycopy(drawingList, i+1, newDrawingList, i, drawingList.length-i-1);
+                    drawingList = newDrawingList;
+                    break;
+                }
+            }
+        }
     }
 
     protected int glyphIndexInDrawingList(Glyph g){
-	synchronized(drawingList){
-	    for (int i=0;i<drawingList.length;i++){
-		if (drawingList[i] == g){
-		    return i;
-		}
-	    }
-	}
-	return -1;
+        synchronized(drawingList){
+            for (int i=0;i<drawingList.length;i++){
+                if (drawingList[i] == g){
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
 }

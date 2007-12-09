@@ -39,11 +39,11 @@ public class LText extends VText implements LensRendering {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      */
-    public LText(long x,long y,float z,Color c,String t){
+    public LText(long x,long y, int z,Color c,String t){
 	super(x,y,z,c,t);
 	fillColorThroughLens = color;
     }
@@ -51,12 +51,12 @@ public class LText extends VText implements LensRendering {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
-    public LText(long x,long y,float z,Color c,String t,short ta){
+    public LText(long x,long y, int z,Color c,String t,short ta){
 	super(x,y,z,c,t,ta);
 	fillColorThroughLens = color;
     }
@@ -64,13 +64,13 @@ public class LText extends VText implements LensRendering {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size
      */
-    public LText(long x, long y, float z, Color c, String t, short ta, float scale){
+    public LText(long x, long y, int z, Color c, String t, short ta, float scale){
 	super(x,y,z,c,t,ta);
 	fillColorThroughLens = color;
 	scaleFactor = scale;

@@ -71,11 +71,11 @@ public class VTriangle extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param h height in virtual space
      *@param c fill color
      */
-    public VTriangle(long x,long y,float z,long h,Color c){
+    public VTriangle(long x,long y, int z,long h,Color c){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -89,12 +89,12 @@ public class VTriangle extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param h height in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VTriangle(long x, long y, float z, long h, Color c, Color bc){
+    public VTriangle(long x, long y, int z, long h, Color c, Color bc){
 	vx=x;
 	vy=y;
 	vz=z;

@@ -46,12 +46,12 @@ public class VImageOrST extends VImageOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param or orientation
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VImageOrST(long x, long y, float z, Image img, float or, float a){
+    public VImageOrST(long x, long y, int z, Image img, float or, float a){
 	super(x, y, z, img, or);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha

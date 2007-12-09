@@ -49,15 +49,30 @@ public class VPoint extends Glyph {
     }
 
     /**
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param c color
-     */
-    public VPoint(long x,long y,Color c){
-	vx=x;
-	vy=y;
-	size=1;   //radius of the bounding circle
-	setColor(c);
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param c color
+        */
+    public VPoint(long x,long y, Color c){
+        vx=x;
+        vy=y;
+        vz = 0;
+        size=1;   //radius of the bounding circle
+        setColor(c);
+    }
+
+    /**
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index
+        *@param c color
+        */
+    public VPoint(long x,long y, int z, Color c){
+        vx=x;
+        vy=y;
+        vz = z;
+        size=1;   //radius of the bounding circle
+        setColor(c);
     }
 
     public void initCams(int nbCam){

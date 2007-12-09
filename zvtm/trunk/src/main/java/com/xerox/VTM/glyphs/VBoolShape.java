@@ -59,14 +59,14 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude in virtual space
+     *@param z z-index in virtual space
      *@param sx horizontal size in virtual space
      *@param sy vertical size in virtual space
      *@param st shape type, one of BooleanOps.SHAPE_TYPE_*
      *@param b array of boolean operations
      *@param c main shape's color
      */
-    public VBoolShape(long x,long y,float z,long sx,long sy,int st,BooleanOps[] b,Color c){
+    public VBoolShape(long x,long y, int z,long sx,long sy,int st,BooleanOps[] b,Color c){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -81,7 +81,7 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude in virtual space
+     *@param z z-index in virtual space
      *@param sx horizontal size in virtual space
      *@param sy vertical size in virtual space
      *@param st shape type, one of BooleanOps.SHAPE_TYPE_*
@@ -89,7 +89,7 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
      *@param c main shape's color
      *@param bc main shape's border color
      */
-    public VBoolShape(long x, long y, float z, long sx, long sy, int st, BooleanOps[] b, Color c, Color bc){
+    public VBoolShape(long x, long y, int z, long sx, long sy, int st, BooleanOps[] b, Color c, Color bc){
 	vx=x;
 	vy=y;
 	vz=z;

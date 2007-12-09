@@ -45,11 +45,11 @@ public class VImageST extends VImage implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VImageST(long x,long y,float z,Image img, float a){
+    public VImageST(long x,long y, int z,Image img, float a){
 	super(x, y, z, img);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -58,12 +58,12 @@ public class VImageST extends VImage implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VImageST(long x, long y, float z, Image img, double scale, float a){
+    public VImageST(long x, long y, int z, Image img, double scale, float a){
 	super(x, y, z, img, scale);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha

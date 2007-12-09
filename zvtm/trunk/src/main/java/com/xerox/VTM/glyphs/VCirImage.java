@@ -59,13 +59,13 @@ public class VCirImage extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param img image to be displayed
      *@param c fill color of bounding circle
      *@param or orientation
      */
-    public VCirImage(long x,long y,float z,long s,Image img,Color c,float or){
+    public VCirImage(long x,long y, int z,long s,Image img,Color c,float or){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -82,14 +82,14 @@ public class VCirImage extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param img image to be displayed
      *@param c fill color of bounding circle
      *@param bc border color of bounding circle
      *@param or orientation
      */
-    public VCirImage(long x, long y, float z, long s, Image img, Color c, Color bc, float or){
+    public VCirImage(long x, long y, int z, long s, Image img, Color c, Color bc, float or){
 	vx=x;
 	vy=y;
 	vz=z;

@@ -82,10 +82,10 @@ public class DPath extends Glyph {
     /**
      *@param x start coordinate in virtual space
      *@param y start coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c color
      */
-    public DPath(long x, long y, float z, Color c){
+    public DPath(long x, long y, int z, Color c){
 	vx = x;
 	vy = y;
 	vz = z;
@@ -683,7 +683,7 @@ public class DPath extends Glyph {
     public static DPath fromVPath(VPath vp){
 	DPath res = null;
 	if (vp != null){
-	    res = (vp instanceof VPathST) ? new DPathST(vp.vx, vp.vy, vp.vz, vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.vz, vp.getColor());
+	    res = (vp instanceof VPathST) ? new DPathST(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor());
 	    BasicStroke s = vp.getStroke();
 	    if (s != null){
 		res.setStroke(s);

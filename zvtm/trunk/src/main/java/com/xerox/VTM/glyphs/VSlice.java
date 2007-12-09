@@ -59,72 +59,75 @@ public class VSlice extends ClosedShape {
     ProjSlice[] pc;
     
     /** Construct a slice by giving its 3 vertices
-     *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc
-     *@param c fill color
-     *@param bc border color
-     */
-    public VSlice(LongPoint[] v, Color c, Color bc){
-	vx = v[0].x;
-	vy = v[0].y;
-	vz = 0;
-	p1 = v[1];
-	p2 = v[2];
-	computeSize();
-	computeOrient();
-	computeAngle();
-	computePolygonEdges();
-	setColor(c);
-	setBorderColor(bc);
+        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
+        *@param z z-index
+        *@param c fill color
+        *@param bc border color
+        */
+    public VSlice(LongPoint[] v, int z, Color c, Color bc){
+        vx = v[0].x;
+        vy = v[0].y;
+        vz = z;
+        p1 = v[1];
+        p2 = v[2];
+        computeSize();
+        computeOrient();
+        computeAngle();
+        computePolygonEdges();
+        setColor(c);
+        setBorderColor(bc);
     }
 
     /** Construct a slice by giving its size, angle and orientation
-     *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param vs arc radius in virtual space (in rad)
-     *@param ag arc angle in virtual space (in rad)
-     *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
-     *@param c fill color
-     *@param bc border color
-     */
-    public VSlice(long x, long y, long vs, double ag, double or, Color c, Color bc){
-	vx = x;
-	vy = y;
-	vz = 0;
-	size = (float)vs;
-	vr = vs;
-	orient = or;
-	orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
-	angle = ag;
-	angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
-	computeSliceEdges();
-	computePolygonEdges();
-	setColor(c);
-	setBorderColor(bc);
+        *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param z z-index
+        *@param vs arc radius in virtual space (in rad)
+        *@param ag arc angle in virtual space (in rad)
+        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
+        *@param c fill color
+        *@param bc border color
+        */
+    public VSlice(long x, long y, int z, long vs, double ag, double or, Color c, Color bc){
+        vx = x;
+        vy = y;
+        vz = z;
+        size = (float)vs;
+        vr = vs;
+        orient = or;
+        orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
+        angle = ag;
+        angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
+        computeSliceEdges();
+        computePolygonEdges();
+        setColor(c);
+        setBorderColor(bc);
     }
 
     /** Construct a slice by giving its size, angle and orientation
-     *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param vs arc radius in virtual space (in degrees)
-     *@param ag arc angle in virtual space (in degrees)
-     *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
-     *@param c fill color
-     *@param bc border color
-     */
-    public VSlice(long x, long y, long vs, int ag, int or, Color c, Color bc){
-	vx = x;
-	vy = y;
-	vz = 0;
-	size = (float)vs;
-	vr = vs;
-	orient = or * DEG2RAD_FACTOR;
-	orientDeg = or;
-	angle = ag * DEG2RAD_FACTOR;
-	angleDeg = ag;
-	computeSliceEdges();
-	computePolygonEdges();
-	setColor(c);
-	setBorderColor(bc);
+        *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint 
+        *@param z z-index
+        *@param vs arc radius in virtual space (in degrees)
+        *@param ag arc angle in virtual space (in degrees)
+        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
+        *@param c fill color
+        *@param bc border color
+        */
+    public VSlice(long x, long y, int z, long vs, int ag, int or, Color c, Color bc){
+        vx = x;
+        vy = y;
+        vz = z;
+        size = (float)vs;
+        vr = vs;
+        orient = or * DEG2RAD_FACTOR;
+        orientDeg = or;
+        angle = ag * DEG2RAD_FACTOR;
+        angleDeg = ag;
+        computeSliceEdges();
+        computePolygonEdges();
+        setColor(c);
+        setBorderColor(bc);
     }
 
     void computeSize(){

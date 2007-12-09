@@ -53,14 +53,14 @@ public class VQdCurve extends Glyph {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      *@param or orientation
      *@param ctrlDist1 distance of control point (polar coords origin=(x,y) provided in this constructor)
      *@param or1 orientation of control point (polar coords origin=(x,y) provided in this constructor)
      */
-    public VQdCurve(long x,long y,float z,long s,Color c,float or,long ctrlDist1,float or1){
+    public VQdCurve(long x,long y, int z,long s,Color c,float or,long ctrlDist1,float or1){
 	vx=x;
 	vy=y;
 	vz=z;

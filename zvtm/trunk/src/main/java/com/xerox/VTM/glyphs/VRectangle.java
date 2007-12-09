@@ -66,12 +66,12 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      */
-    public VRectangle(long x,long y,float z,long w,long h,Color c){
+    public VRectangle(long x,long y, int z,long w,long h,Color c){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -88,13 +88,13 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VRectangle(long x, long y, float z, long w, long h, Color c, Color bc){
+    public VRectangle(long x, long y, int z, long w, long h, Color c, Color bc){
 	vx=x;
 	vy=y;
 	vz=z;

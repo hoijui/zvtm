@@ -37,13 +37,13 @@ public class VSegmentST extends VSegment implements Translucent {
      *give the centre of segment and half its projected length on X and Y axis
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space (can be negative)
      *@param h half height in virtual space (can be negative)
      *@param c fill color
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSegmentST(long x, long y, float z, long w, long h, Color c, float a){
+    public VSegmentST(long x, long y, int z, long w, long h, Color c, float a){
 	super(x, y, z, w, h, c);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
@@ -53,13 +53,13 @@ public class VSegmentST extends VSegment implements Translucent {
      *give the end points of segment
      *@param x1 coordinate of endpoint 1 in virtual space
      *@param y1 coordinate of endpoint 1 in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param x2 coordinate of endpoint 2 in virtual space
      *@param y2 coordinate of endpoint 2 in virtual space
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSegmentST(long x1, long y1, float z, Color c, long x2, long y2, float a){
+    public VSegmentST(long x1, long y1, int z, Color c, long x2, long y2, float a){
 	super(x1, y1, z, c, x2, y2);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
@@ -69,13 +69,13 @@ public class VSegmentST extends VSegment implements Translucent {
      *give the centre of segment and half its length & orient
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param lgth half length in virtual space
      *@param angle orientation
      *@param c fill color
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSegmentST(long x, long y, float z, float lgth, float angle, Color c, float a){
+    public VSegmentST(long x, long y, int z, float lgth, float angle, Color c, float a){
 	super(x, y, z, lgth, angle, c);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

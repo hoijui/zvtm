@@ -31,54 +31,57 @@ public class VSliceST extends VSlice implements Translucent {
     float alpha=0.5f;
 
     /** Construct a slice by giving its 3 vertices
-     *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc
-     *@param c fill color
-     *@param bc border color
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
-    public VSliceST(LongPoint[] v, Color c, Color bc, float a){
-	super(v, c, bc);
-	alpha = a;
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc   
+        *@param z z-index
+        *@param c fill color
+        *@param bc border color
+        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VSliceST(LongPoint[] v, int z, Color c, Color bc, float a){
+        super(v, z, c, bc);
+        alpha = a;
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
     /** Construct a slice by giving its size, angle and orientation
-     *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param vs arc radius in virtual space (in rad)
-     *@param ag arc angle in virtual space (in rad)
-     *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
-     *@param c fill color
-     *@param bc border color
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
-    public VSliceST(long x, long y, long vs, double ag, double or, Color c, Color bc, float a){
-	super(x, y, vs, ag, or, c, bc);
-	alpha = a;
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+        *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param z z-index
+        *@param vs arc radius in virtual space (in rad)
+        *@param ag arc angle in virtual space (in rad)
+        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
+        *@param c fill color
+        *@param bc border color
+        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VSliceST(long x, long y, int z, long vs, double ag, double or, Color c, Color bc, float a){
+        super(x, y, z, vs, ag, or, c, bc);
+        alpha = a;
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
     /** Construct a slice by giving its size, angle and orientation
-     *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
-     *@param vs arc radius in virtual space (in degrees)
-     *@param ag arc angle in virtual space (in degrees)
-     *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
-     *@param c fill color
-     *@param bc border color
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
-    public VSliceST(long x, long y, long vs, int ag, int or, Color c, Color bc, float a){
-	super(x, y, vs, ag, or, c, bc);
-	alpha = a;
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+        *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param z z-index
+        *@param vs arc radius in virtual space (in degrees)
+        *@param ag arc angle in virtual space (in degrees)
+        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
+        *@param c fill color
+        *@param bc border color
+        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VSliceST(long x, long y, int z, long vs, int ag, int or, Color c, Color bc, float a){
+        super(x, y, z, vs, ag, or, c, bc);
+        alpha = a;
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
     public void setTranslucencyValue(float a){
-	alpha = a;
-	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
-	try{vsm.repaintNow();}
-	catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+        alpha = a;
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
+        try{vsm.repaintNow();}
+        catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
     public float getTranslucencyValue(){return alpha;}

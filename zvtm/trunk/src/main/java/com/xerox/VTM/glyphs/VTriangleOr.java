@@ -46,12 +46,12 @@ public class VTriangleOr extends VTriangle {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param h height in virtual space
      *@param c fill color
      *@param or orientation
      */
-    public VTriangleOr(long x,long y,float z,long h,Color c,float or){
+    public VTriangleOr(long x,long y, int z,long h,Color c,float or){
 	super(x,y,z,h,c);
 	orient=or;
     }
@@ -59,13 +59,13 @@ public class VTriangleOr extends VTriangle {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param h height in virtual space
      *@param c fill color
      *@param bc border color
      *@param or orientation
      */
-    public VTriangleOr(long x, long y, float z, long h, Color c, Color bc, float or){
+    public VTriangleOr(long x, long y, int z, long h, Color c, Color bc, float or){
 	super(x, y, z, h, c, bc);
 	orient=or;
     }

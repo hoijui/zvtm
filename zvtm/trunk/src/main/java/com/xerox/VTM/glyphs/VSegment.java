@@ -62,12 +62,12 @@ public class VSegment extends Glyph implements RectangularShape {
      *give the centre of segment and half its projected length on X & Y axis
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space (can be negative)
      *@param h half height in virtual space (can be negative)
      *@param c fill color
      */
-    public VSegment(long x,long y,float z,long w,long h,Color c){
+    public VSegment(long x,long y, int z,long w,long h,Color c){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -83,10 +83,10 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param y1 coordinate of endpoint 1 in virtual space
      *@param x2 coordinate of endpoint 2 in virtual space
      *@param y2 coordinate of endpoint 2 in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      */
-    public VSegment(long x1, long y1, float z, Color c, long x2, long y2){
+    public VSegment(long x1, long y1, int z, Color c, long x2, long y2){
 	vx = (x1 + x2) / 2;
 	vy = (y1 + y2) / 2;
 	vz = z;
@@ -100,12 +100,12 @@ public class VSegment extends Glyph implements RectangularShape {
      *give the centre of segment and half its length & orient
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param lgth half length in virtual space
      *@param angle orientation
      *@param c fill color
      */
-    public VSegment(long x,long y,float z,float lgth,float angle,Color c){
+    public VSegment(long x,long y, int z,float lgth,float angle,Color c){
 	vx=x;
 	vy=y;
 	vz=z;

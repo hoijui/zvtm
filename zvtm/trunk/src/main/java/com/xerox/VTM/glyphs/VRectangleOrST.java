@@ -48,13 +48,13 @@ public class VRectangleOrST extends VRectangleOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param or orientation
      */
-    public VRectangleOrST(long x, long y, float z, long w, long h, Color c, float or){
+    public VRectangleOrST(long x, long y, int z, long w, long h, Color c, float or){
 	super(x, y, z, w, h, c, or);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
@@ -62,7 +62,7 @@ public class VRectangleOrST extends VRectangleOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
@@ -70,7 +70,7 @@ public class VRectangleOrST extends VRectangleOr implements Translucent {
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      *@param or orientation
      */
-    public VRectangleOrST(long x, long y, float z, long w, long h, Color c, Color bc, float a, float or){
+    public VRectangleOrST(long x, long y, int z, long w, long h, Color c, Color bc, float a, float or){
 	super(x, y, z, w, h, c, bc, or);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

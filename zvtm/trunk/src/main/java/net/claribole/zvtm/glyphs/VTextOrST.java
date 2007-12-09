@@ -50,13 +50,13 @@ public class VTextOrST extends VTextOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param or orientation
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VTextOrST(long x, long y, float z, Color c, String t, float or, float a){
+    public VTextOrST(long x, long y, int z, Color c, String t, float or, float a){
 	super(x, y, z, c, t, or);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -65,14 +65,14 @@ public class VTextOrST extends VTextOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param or orientation
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VTextOrST(long x, long y, float z, Color c, String t, float or, short ta, float a){
+    public VTextOrST(long x, long y, int z, Color c, String t, float or, short ta, float a){
 	super(x, y, z, c, t, or, ta);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -81,7 +81,7 @@ public class VTextOrST extends VTextOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param or orientation
@@ -89,7 +89,7 @@ public class VTextOrST extends VTextOr implements Translucent {
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      *@param scale scaleFactor w.r.t original image size
      */
-    public VTextOrST(long x, long y, float z, Color c, String t, float or, short ta, float a, float scale){
+    public VTextOrST(long x, long y, int z, Color c, String t, float or, short ta, float a, float scale){
 	super(x, y, z, c, t, or, ta);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha

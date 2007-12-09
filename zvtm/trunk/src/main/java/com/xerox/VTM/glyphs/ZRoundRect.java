@@ -35,14 +35,14 @@ public class ZRoundRect extends VRoundRect  {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public ZRoundRect(long x,long y,float z,long w,long h,Color c,int aw,int ah, boolean rr){
+    public ZRoundRect(long x,long y, int z,long w,long h,Color c,int aw,int ah, boolean rr){
 	super(x, y, z, w, h, c, aw, ah);
 	this.renderRound = rr;
     }

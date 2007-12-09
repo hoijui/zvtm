@@ -44,11 +44,11 @@ public class LBText extends LText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      */
-    public LBText(long x,long y,float z,Color c,String t){
+    public LBText(long x,long y, int z,Color c,String t){
 	super(x,y,z,c,t);
 	fillColorThroughLens = color;
 	borderColor = null;
@@ -58,12 +58,12 @@ public class LBText extends LText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
-    public LBText(long x,long y,float z,Color c,String t,short ta){
+    public LBText(long x,long y, int z,Color c,String t,short ta){
 	super(x,y,z,c,t,ta);
 	fillColorThroughLens = color;
 	borderColor = null;
@@ -73,13 +73,13 @@ public class LBText extends LText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size
      */
-    public LBText(long x, long y, float z, Color c, String t, short ta, float scale){
+    public LBText(long x, long y, int z, Color c, String t, short ta, float scale){
 	super(x,y,z,c,t,ta);
 	fillColorThroughLens = color;
 	borderColor = null;

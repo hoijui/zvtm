@@ -38,12 +38,12 @@ public class LRectangle extends VRectangle implements LensRendering {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      */
-    public LRectangle(long x, long y, float z, long w, long h, Color c){
+    public LRectangle(long x, long y, int z, long w, long h, Color c){
 	super(x, y, z, w, h, c);
 	fillColorThroughLens = color;
 	borderColorThroughLens = borderColor;

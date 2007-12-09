@@ -49,12 +49,12 @@ public class VEllipseST extends VEllipse implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      */
-    public VEllipseST(long x, long y, float z, long w, long h, Color c){
+    public VEllipseST(long x, long y, int z, long w, long h, Color c){
 	super(x, y, z, w, h, c);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
@@ -62,14 +62,14 @@ public class VEllipseST extends VEllipse implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param bc border color
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VEllipseST(long x, long y, float z, long w, long h, Color c, Color bc, float a){
+    public VEllipseST(long x, long y, int z, long w, long h, Color c, Color bc, float a){
 	super(x, y, z, w, h, c, bc);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

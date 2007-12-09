@@ -64,6 +64,29 @@ public class VPolygonST extends VPolygon implements Translucent {
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
+    /**
+        *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
+        *@param z z-index
+        *@param c fill color
+        */
+    public VPolygonST(LongPoint[] v, int z, Color c){
+        super(v, z, c);
+        acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
+    }
+
+    /**
+        *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
+        *@param z z-index
+        *@param c fill color
+        *@param bc border color
+        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VPolygonST(LongPoint[] v, int z, Color c, Color bc, float a){
+        super(v, z, c, bc);
+        alpha = a;
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
+
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha

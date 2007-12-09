@@ -41,11 +41,11 @@ public class ZCircle extends VCircle {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param r radius in virtual space
      *@param c fill color
      */
-    public ZCircle(long x,long y,float z,long r,Color c){
+    public ZCircle(long x,long y, int z,long r,Color c){
 	super(x, y, z, r, c);
     }
 

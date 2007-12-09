@@ -125,8 +125,8 @@ public abstract class Glyph implements Cloneable {
      */
     public long vy;
 
-    /** Altitude (in virtual space). Not used yet. */
-    public float vz;
+    /** z-index */
+    protected int vz;
 
     /** Radius of bounding circle (read-only).
      *@see #sizeTo(float radius)
@@ -184,7 +184,23 @@ public abstract class Glyph implements Cloneable {
      *@param angle in [0:2Pi[ 
      */
     public abstract void orientTo(float angle);
+    
+    /** Get this object's z-index.
+     *@return the default value, 0 if a z-index was not specified
+     */
+    public int getZindex(){
+        return vz;
+    }
 
+    /** FOR INTERNAL USE ONLY. Will have no effect on actual z-ordering. Use appropriate methods in VirtualSpace.
+        *@see com.xerox.VTM.engine.VirtualSpace#onTop(Glyph g)
+        *@see com.xerox.VTM.engine.VirtualSpace#atBottom(Glyph g)
+        *@see com.xerox.VTM.engine.VirtualSpace#above(Glyph g1,Glyph g2)
+        *@see com.xerox.VTM.engine.VirtualSpace#below(Glyph g1,Glyph g2)
+        */
+    public void setZindex(int z){
+        vz = z;
+    }
 
     /*---Visibility and sensitivity------------------------------*/
 

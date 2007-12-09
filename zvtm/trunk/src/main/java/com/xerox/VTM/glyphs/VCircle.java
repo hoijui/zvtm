@@ -62,11 +62,11 @@ public class VCircle extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param r radius in virtual space
      *@param c fill color
      */
-    public VCircle(long x,long y,float z,long r,Color c){
+    public VCircle(long x,long y, int z,long r,Color c){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -80,12 +80,12 @@ public class VCircle extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param r radius in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VCircle(long x, long y, float z, long r, Color c, Color bc){
+    public VCircle(long x, long y, int z, long r, Color c, Color bc){
 	vx=x;
 	vy=y;
 	vz=z;

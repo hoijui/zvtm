@@ -48,11 +48,11 @@ public class VTriangleST extends VTriangle implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param h height in virtual space
      *@param c fill color
      */
-    public VTriangleST(long x,long y,float z,long h,Color c){
+    public VTriangleST(long x,long y, int z,long h,Color c){
 	super(x,y,z,h,c);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
@@ -60,13 +60,13 @@ public class VTriangleST extends VTriangle implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param h height in virtual space
      *@param c fill color
      *@param bc border color
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VTriangleST(long x, long y, float z, long h, Color c, Color bc, float a){
+    public VTriangleST(long x, long y, int z, long h, Color c, Color bc, float a){
 	super(x, y, z, h, c, bc);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }

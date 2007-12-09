@@ -67,11 +67,11 @@ public class VOctagon extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      */
-    public VOctagon(long x,long y,float z,long s,Color c){
+    public VOctagon(long x,long y, int z,long s,Color c){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -85,12 +85,12 @@ public class VOctagon extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VOctagon(long x, long y, float z, long s, Color c, Color bc){
+    public VOctagon(long x, long y, int z, long s, Color c, Color bc){
 	vx=x;
 	vy=y;
 	vz=z;

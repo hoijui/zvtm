@@ -55,11 +55,11 @@ public class VImageOr extends VImage {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param or orientation
      */
-    public VImageOr(long x,long y,float z,Image img,float or){
+    public VImageOr(long x,long y, int z,Image img,float or){
 	super(x,y,z,img);
 	orient=or;
     }

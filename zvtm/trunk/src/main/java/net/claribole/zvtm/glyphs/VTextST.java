@@ -49,12 +49,12 @@ public class VTextST extends VText implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VTextST(long x,long y,float z,Color c,String t, float a){
+    public VTextST(long x,long y, int z,Color c,String t, float a){
 	super(x, y, z, c, t);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -63,13 +63,13 @@ public class VTextST extends VText implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public VTextST(long x,long y,float z,Color c,String t,short ta, float a){
+    public VTextST(long x,long y, int z,Color c,String t,short ta, float a){
 	super(x, y, z, c, t, ta);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -78,14 +78,14 @@ public class VTextST extends VText implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      *@param scale scaleFactor w.r.t original image size
      */
-    public VTextST(long x,long y,float z,Color c,String t,short ta, float a, float scale){
+    public VTextST(long x,long y, int z,Color c,String t,short ta, float a, float scale){
 	super(x, y, z, c, t, ta);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha

@@ -64,14 +64,14 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public VRoundRect(long x,long y,float z,long w,long h,Color c,int aw,int ah){
+    public VRoundRect(long x,long y, int z,long w,long h,Color c,int aw,int ah){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -91,7 +91,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
@@ -99,7 +99,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public VRoundRect(long x, long y, float z, long w, long h, Color c, Color bc, int aw, int ah){
+    public VRoundRect(long x, long y, int z, long w, long h, Color c, Color bc, int aw, int ah){
 	vx=x;
 	vy=y;
 	vz=z;

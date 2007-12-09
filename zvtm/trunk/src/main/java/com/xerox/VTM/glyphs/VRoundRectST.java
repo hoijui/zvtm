@@ -37,14 +37,14 @@ public class VRoundRectST extends VRoundRect implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public VRoundRectST(long x, long y, float z, long w, long h, Color c, int aw, int ah){
+    public VRoundRectST(long x, long y, int z, long w, long h, Color c, int aw, int ah){
 	super(x, y, z, w, h, c, aw, ah);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
@@ -52,7 +52,7 @@ public class VRoundRectST extends VRoundRect implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
@@ -61,7 +61,7 @@ public class VRoundRectST extends VRoundRect implements Translucent {
      *@param aw arc width in virtual space
      *@param ah arc height in virtual space
      */
-    public VRoundRectST(long x, long y, float z, long w, long h, Color c, Color bc, float a, int aw, int ah){
+    public VRoundRectST(long x, long y, int z, long w, long h, Color c, Color bc, float a, int aw, int ah){
 	super(x, y, z, w, h, c, bc, aw, ah);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

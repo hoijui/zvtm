@@ -111,36 +111,36 @@ public class VPath extends Glyph {
     }
 
     /**
-     *@param x start coordinate in virtual space
-     *@param y start coordinate in virtual space
-     *@param z altitude
-     *@param c color
-     */
-    public VPath(long x,long y,float z,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	sensit=false;
-	setColor(c);
-	path=new GeneralPath();
-	lp=new LongPoint(vx,vy);
-	realHotSpot=new LongPoint(vx,vy);
-	path.moveTo(vx,-vy);
-	computeSize();
+        *@param x start coordinate in virtual space
+        *@param y start coordinate in virtual space
+        *@param z z-index
+        *@param c color
+        */
+    public VPath(long x, long y, int z, Color c){
+        vx=x;
+        vy=y;
+        vz=z;
+        sensit=false;
+        setColor(c);
+        path=new GeneralPath();
+        lp=new LongPoint(vx,vy);
+        realHotSpot=new LongPoint(vx,vy);
+        path.moveTo(vx,-vy);
+        computeSize();
     }
 
     /**
-     *@param z altitude
-     *@param c color
-     *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
-     */
-    public VPath(float z,Color c,String svg){
-	vx=0;
-	vy=0;
-	vz=z;
-	sensit=false;
-	setColor(c);
-	this.setSVGPath(svg);
+        *@param z z-index
+        *@param c color
+        *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
+        */
+    public VPath(int z,Color c,String svg){
+        vx=0;
+        vy=0;
+        vz=z;
+        sensit=false;
+        setColor(c);
+        this.setSVGPath(svg);
     }
 
     /** Reset path and assign it new coordinates according to what is specified in the SVG expression.

@@ -50,13 +50,13 @@ public class VRectangleH extends VRectangle {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VRectangleH(long x, long y, float z, long w, long h, Color c, Color bc){
+    public VRectangleH(long x, long y, int z, long w, long h, Color c, Color bc){
 	super(x, y, z, w, h, c, bc);
 	initPattern();
     }

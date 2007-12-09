@@ -45,12 +45,12 @@ public class VDiamondOr extends VDiamond {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      *@param or orientation
      */
-    public VDiamondOr(long x,long y,float z,long s,Color c,float or){
+    public VDiamondOr(long x,long y, int z,long s,Color c,float or){
 	super(x,y,z,s,c);
 	orient=or;
     }
@@ -58,13 +58,13 @@ public class VDiamondOr extends VDiamond {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      *@param bc border color
      *@param or orientation
      */
-    public VDiamondOr(long x, long y, float z, long s, Color c, Color bc, float or){
+    public VDiamondOr(long x, long y, int z, long s, Color c, Color bc, float or){
 	super(x, y, z, s, c, bc);
 	orient=or;
     }

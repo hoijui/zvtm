@@ -46,13 +46,13 @@ public class VOctagonOr extends VOctagon {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      *@param bc border color
      *@param or orientation
      */
-    public VOctagonOr(long x, long y, float z, long s, Color c, Color bc, float or){
+    public VOctagonOr(long x, long y, int z, long s, Color c, Color bc, float or){
 	super(x, y, z, s, c, bc);
 	orient=or;
     }

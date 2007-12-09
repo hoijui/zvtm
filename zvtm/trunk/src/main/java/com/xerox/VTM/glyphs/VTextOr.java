@@ -55,12 +55,12 @@ public class VTextOr extends VText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param or orientation
      */
-    public VTextOr(long x,long y,float z,Color c,String t,float or){
+    public VTextOr(long x,long y, int z,Color c,String t,float or){
 	super(x,y,z,c,t);
 	orient=or;
     }
@@ -68,13 +68,13 @@ public class VTextOr extends VText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param or orientation
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
      */
-    public VTextOr(long x,long y,float z,Color c,String t,float or,short ta){
+    public VTextOr(long x,long y, int z,Color c,String t,float or,short ta){
 	super(x, y, z, c, t, ta);
 	orient = or;
     }
@@ -82,14 +82,14 @@ public class VTextOr extends VText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c fill color
      *@param t text string
      *@param or orientation
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size
      */
-    public VTextOr(long x, long y, float z, Color c, String t, float or, short ta, float scale){
+    public VTextOr(long x, long y, int z, Color c, String t, float or, short ta, float scale){
 	super(x, y, z, c, t, ta);
 	orient = or;
 	scaleFactor = scale;

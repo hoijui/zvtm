@@ -44,12 +44,12 @@ public class ZSegment extends VRectangle {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space
      *@param h half height in virtual space
      *@param c fill color
      */
-    public ZSegment(long x,long y,float z,long w,long h,Color c){
+    public ZSegment(long x,long y, int z,long w,long h,Color c){
 	vx = x;
 	vy = y;
 	vz = z;

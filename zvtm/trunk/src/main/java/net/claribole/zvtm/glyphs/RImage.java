@@ -65,11 +65,11 @@ public class RImage extends VImageST {
     /** Construct an image at (x, y) with original scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public RImage(long x,long y,float z,Image img, float a){
+    public RImage(long x,long y, int z,Image img, float a){
         super(x, y, z, img, a);
         this.image = createReflection(img);
     }
@@ -77,12 +77,12 @@ public class RImage extends VImageST {
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public RImage(long x, long y, float z, Image img, double scale, float a){
+    public RImage(long x, long y, int z, Image img, double scale, float a){
         super(x, y, z, img, scale, a);
         this.image = createReflection(img);
     }
@@ -90,13 +90,13 @@ public class RImage extends VImageST {
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      *@param hir true if height measurement should include mirrored version of the image (doubles the image's height) - defaults to false
      */
-    public RImage(long x, long y, float z, Image img, double scale, float a, boolean hir){
+    public RImage(long x, long y, int z, Image img, double scale, float a, boolean hir){
         super(x, y, z, img, scale, a);
         this.image = createReflection(img);
         this.irihc = hir;

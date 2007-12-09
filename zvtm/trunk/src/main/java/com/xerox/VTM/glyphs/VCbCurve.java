@@ -55,7 +55,7 @@ public class VCbCurve extends Glyph {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (distance between start and end points) in virtual space
      *@param c color
      *@param or orientation
@@ -64,7 +64,7 @@ public class VCbCurve extends Glyph {
      *@param ctrlDist2 distance of control point (polar coords origin=end point)
      *@param or2 orientation of control point (polar coords origin=end point)
      */
-    public VCbCurve(long x,long y,float z,long s,Color c,float or,long ctrlDist1,float or1,long ctrlDist2,float or2){
+    public VCbCurve(long x,long y, int z,long s,Color c,float or,long ctrlDist1,float or1,long ctrlDist2,float or2){
 	vx=x;
 	vy=y;
 	vz=z;

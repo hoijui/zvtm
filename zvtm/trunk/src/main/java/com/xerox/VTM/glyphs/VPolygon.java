@@ -105,6 +105,69 @@ public class VPolygon extends ClosedShape {
 	setBorderColor(bc);
     }
 
+    /**
+        *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
+        *@param z z-index
+        *@param c fill color
+        */
+    public VPolygon(LongPoint[] v, int z, Color c){
+        vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
+        vy=0;  //several lines below
+        vz = z;
+        xcoords=new double[v.length];
+        ycoords=new double[v.length];
+        lxcoords=new double[v.length];
+        lycoords=new double[v.length];
+        for (int i=0;i<v.length;i++){
+            xcoords[i]=v[i].x;
+            ycoords[i]=v[i].y;
+        }
+        orient=0;
+        LongPoint ct=getCentroid();
+        vx=ct.x;
+        vy=ct.y;
+        for (int i=0;i<xcoords.length;i++){
+            //translate to get relative coords w.r.t centroid
+            xcoords[i]-=vx;
+            ycoords[i]-=vy;
+        }
+        computeSize();
+        setColor(c);
+        setBorderColor(Color.black);
+    }
+
+    /**
+        *@param v list of x,y vertices ABSOLUTE coordinates i virtual space
+        *@param z z-index
+        *@param c fill color
+        *@param bc border color
+        */
+    public VPolygon(LongPoint[] v, int z, Color c, Color bc){
+        vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
+        vy=0;  //several lines below
+        vz = z;
+        xcoords=new double[v.length];
+        ycoords=new double[v.length];
+        lxcoords=new double[v.length];
+        lycoords=new double[v.length];
+        for (int i=0;i<v.length;i++){
+            xcoords[i]=v[i].x;
+            ycoords[i]=v[i].y;
+        }
+        orient=0;
+        LongPoint ct=getCentroid();
+        vx=ct.x;
+        vy=ct.y;
+        for (int i=0;i<xcoords.length;i++){
+            //translate to get relative coords w.r.t centroid
+            xcoords[i]-=vx;
+            ycoords[i]-=vy;
+        }
+        computeSize();
+        setColor(c);
+        setBorderColor(bc);
+    }
+
     public void initCams(int nbCam){
 	pc=new ProjPolygon[nbCam];
 	for (int i=0;i<nbCam;i++){

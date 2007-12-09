@@ -34,12 +34,12 @@ public class LSegment extends VSegment {
      *give the centre of segment and half its projected length on X & Y axis
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param w half width in virtual space (can be negative)
      *@param h half height in virtual space (can be negative)
      *@param c color
      */
-    public LSegment(long x,long y,float z,long w,long h,Color c){
+    public LSegment(long x,long y, int z,long w,long h,Color c){
 	super(x, y, z, w, h, c);
     }
 
@@ -49,10 +49,10 @@ public class LSegment extends VSegment {
      *@param y1 coordinate of endpoint 1 in virtual space
      *@param x2 coordinate of endpoint 2 in virtual space
      *@param y2 coordinate of endpoint 2 in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c color
      */
-    public LSegment(long x1, long y1, float z, Color c, long x2, long y2){
+    public LSegment(long x1, long y1, int z, Color c, long x2, long y2){
 	super(x1, y1, z, c, x2, y2);
     }
 
@@ -60,12 +60,12 @@ public class LSegment extends VSegment {
      *give the centre of segment and half its length & orient
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param lgth half length in virtual space
      *@param angle orientation
      *@param c color
      */
-    public LSegment(long x,long y,float z,float lgth,float angle,Color c){
+    public LSegment(long x,long y, int z,float lgth,float angle,Color c){
 	super(x, y, z, lgth, angle, c);
     }
 

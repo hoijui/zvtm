@@ -49,11 +49,11 @@ public class VCircleST extends VCircle implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param r radius in virtual space
      *@param c fill color
      */
-    public VCircleST(long x, long y, float z, long r, Color c){
+    public VCircleST(long x, long y, int z, long r, Color c){
 	super(x, y, z, r, c);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
@@ -61,13 +61,13 @@ public class VCircleST extends VCircle implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param r radius in virtual space
      *@param c fill color
      *@param bc fill color
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VCircleST(long x, long y, float z, long r, Color c, Color bc, float a){
+    public VCircleST(long x, long y, int z, long r, Color c, Color bc, float a){
 	super(x, y, z, r, c, bc);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

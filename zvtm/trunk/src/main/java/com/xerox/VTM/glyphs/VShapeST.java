@@ -51,13 +51,13 @@ public class VShapeST extends VShape implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param or shape's orientation in [0, 2Pi[
      */
-    public VShapeST(long x,long y,float z,long s,float[] v,Color c,float or){
+    public VShapeST(long x,long y, int z,long s,float[] v,Color c,float or){
 	super(x,y,z,s,v,c,or);
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to 0.5
     }
@@ -65,7 +65,7 @@ public class VShapeST extends VShape implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
@@ -73,7 +73,7 @@ public class VShapeST extends VShape implements Translucent {
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      *@param or shape's orientation in [0, 2Pi[
      */
-    public VShapeST(long x, long y, float z, long s, float[] v, Color c, Color bc, float a, float or){
+    public VShapeST(long x, long y, int z, long s, float[] v, Color c, Color bc, float a, float or){
 	super(x, y, z, s, v, c, bc, or);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

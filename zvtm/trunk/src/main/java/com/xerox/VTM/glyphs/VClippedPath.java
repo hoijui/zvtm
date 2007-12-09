@@ -56,20 +56,20 @@ public class VClippedPath extends VPath {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c color
      */
-    public VClippedPath(long x,long y,float z,Color c){
+    public VClippedPath(long x,long y, int z,Color c){
 	super(x,y,z,c);
     }
 
     /**
-     *@param z altitude
-     *@param c color
-     *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
-     */
-    public VClippedPath(float z,Color c,String svg){
-	super(z,c,svg);
+        *@param z z-index
+        *@param c color
+        *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
+        */
+    public VClippedPath(int z, Color c, String svg){
+        super(z,c,svg);
     }
 
     /**

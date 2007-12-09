@@ -48,13 +48,13 @@ public class VDiamondST extends VDiamond implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param c fill color
      *@param bc border color
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VDiamondST(long x, long y, float z, long s, Color c, Color bc, float a){
+    public VDiamondST(long x, long y, int z, long s, Color c, Color bc, float a){
 	super(x, y, z, s, c, bc);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);

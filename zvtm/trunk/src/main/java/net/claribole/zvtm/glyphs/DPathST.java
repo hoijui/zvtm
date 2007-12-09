@@ -52,11 +52,11 @@ public class DPathST extends DPath implements Translucent {
     /**
      *@param x start coordinate in virtual space
      *@param y start coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param c color
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public DPathST(long x, long y, float z, Color c, float a){
+    public DPathST(long x, long y, int z, Color c, float a){
 	super(x, y, z, c);
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha

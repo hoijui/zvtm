@@ -60,10 +60,10 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
 	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
+		items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
+		items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
 	    }
 	    items[i].setMouseInsideFillColor(fillSColor);
 	    items[i].setMouseInsideHighlightColor(borderSColor);
@@ -80,14 +80,14 @@ public class PieMenuC extends PieMenu {
 		    }
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2),
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2),
-					    0.0f, labelColor, stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColor, stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
 
 		    labels[i].setSpecialFont(font);
 		}
 		else {
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2),
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2),
-					    0.0f, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
 		    labels[i].setSpecialFont(font);
 		}
 		vsm.addGlyph(labels[i], vs);
@@ -138,10 +138,10 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
  	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
+		items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
+		items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
 	    }
 	    items[i].setMouseInsideFillColor(fillSColors[i]);
 	    items[i].setMouseInsideHighlightColor(borderSColors[i]);
@@ -157,14 +157,14 @@ public class PieMenuC extends PieMenu {
 		    }
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2),
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2),
-					    0.0f, labelColors[i], stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColors[i], stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
 		    labels[i].setBorderColor(borderColors[i]);
 		    labels[i].setSpecialFont(font);
 		}
 		else {
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2),
 					  Math.round(vy+Math.sin(angle)*pieMenuRadius/2),
-					    0.0f, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
 		    labels[i].setBorderColor(borderColors[i]);
 		    labels[i].setSpecialFont(font);
 		}
@@ -217,10 +217,10 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
 	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
+		items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
+		items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
 	    }
 	    items[i].setMouseInsideFillColor(fillSColor);
 	    items[i].setMouseInsideHighlightColor(borderSColor);
@@ -237,14 +237,14 @@ public class PieMenuC extends PieMenu {
 		    }
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2 + labelOffsets[i].x),
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2 + labelOffsets[i].y),
-					    0.0f, labelColor, stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColor, stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
 
 		    labels[i].setSpecialFont(font);
 		}
 		else {
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2 + labelOffsets[i].x),
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2 + labelOffsets[i].y),
-					    0.0f, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
 		    labels[i].setSpecialFont(font);
 		}
 		vsm.addGlyph(labels[i], vs);
@@ -296,10 +296,10 @@ public class PieMenuC extends PieMenu {
 	for (int i=0;i<labels.length;i++){
  	    angle += angleDelta;
 	    if (alphaT >= 1.0f){
-		items[i] = new VSlice(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
+		items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
 	    }
 	    else {
-		items[i] = new VSliceST(vx, vy, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
+		items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
 	    }
 	    items[i].setMouseInsideFillColor(fillSColors[i]);
 	    items[i].setMouseInsideHighlightColor(borderSColors[i]);
@@ -315,14 +315,14 @@ public class PieMenuC extends PieMenu {
 		    }
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2) + labelOffsets[i].x,
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2) + labelOffsets[i].y,
-					    0.0f, labelColors[i], stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColors[i], stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
 		    labels[i].setBorderColor(borderColors[i]);
 		    labels[i].setSpecialFont(font);
 		}
 		else {
 		    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle)*pieMenuRadius/2) + labelOffsets[i].x,
 					    Math.round(vy+Math.sin(angle)*pieMenuRadius/2) + labelOffsets[i].y,
-					    0.0f, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
+					    0, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
 		    labels[i].setBorderColor(borderColors[i]);
 		    labels[i].setSpecialFont(font);
 		}

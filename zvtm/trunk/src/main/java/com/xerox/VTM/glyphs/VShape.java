@@ -80,13 +80,13 @@ public class VShape extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param or shape's orientation in [0, 2Pi[
      */
-    public VShape(long x,long y,float z,long s,float[] v,Color c,float or){
+    public VShape(long x,long y, int z,long s,float[] v,Color c,float or){
 	vx=x;
 	vy=y;
 	vz=z;
@@ -105,14 +105,14 @@ public class VShape extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z altitude
+     *@param z z-index
      *@param s size (width=height) in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param bc border color
      *@param or shape's orientation in [0, 2Pi[
      */
-    public VShape(long x, long y, float z, long s, float[] v, Color c, Color bc, float or){
+    public VShape(long x, long y, int z, long s, float[] v, Color c, Color bc, float or){
 	vx=x;
 	vy=y;
 	vz=z;

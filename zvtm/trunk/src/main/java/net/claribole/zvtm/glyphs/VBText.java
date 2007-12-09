@@ -46,11 +46,11 @@ public class VBText extends VText {
 	/**
 	 *@param x coordinate in virtual space
 	 *@param y coordinate in virtual space
-	 *@param z altitude
+	 *@param z z-index
 	 *@param c color of the text
 	 *@param t text string
 	 */
-	public VBText(long x, long y, float z, Color c, String t) {
+	public VBText(long x, long y, int z, Color c, String t) {
 		super(x, y, z, c, t);
 		this.sensit = true;
 	}
@@ -64,7 +64,7 @@ public class VBText extends VText {
 	 * @param fillColor color of the background
 	 * @param text text string
 	 */
-	public VBText(long x, long y, float z, Color textColor, Color borderColor, Color fillColor, String text) {
+	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text) {
 		super(x, y, z, textColor, text);
 		this.fillColor = fillColor;
 		this.borderColor = borderColor;
@@ -80,7 +80,7 @@ public class VBText extends VText {
 	 * @param text text string
 	 * @param ta text anchor
 	 */
-	public VBText(long x, long y, float z, Color textColor, Color borderColor, Color fillColor, String text, short ta) {
+	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text, short ta) {
 		super(x, y, z, textColor, text, ta);
 		this.fillColor = fillColor;
 		this.borderColor = borderColor;
