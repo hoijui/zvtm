@@ -42,8 +42,8 @@ XML_LEVELS = []
 LEVEL_FLOORS = []
 LEVEL_CEILINGS = []
 
-BMNG_SPACE = "BMNG Space"
-CB_SPACE = "Country Boundary Space"
+BMNG_LAYER = "BMNG Layer"
+CB_LAYER = "Boundary Layer"
 
 def createTargetDir():
     if not os.path.exists(TGT_DIR):
@@ -111,12 +111,15 @@ def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRe
             regionEL.set("id", "R%s" % strID)
             if parentRegion is not None:
                 regionEL.set("containedIn", parentRegion.get("id"))
-            regionEL.set("depth", str(level))
+            if level == 0:
+                regionEL.set("levels", "%s;%s" % (0, NB_LEVELS-1))
+            else:
+                regionEL.set("levels", str(level))
             regionEL.set("x", str(orig[0]+tx+cw/2))
             regionEL.set("y", str(orig[1]-ty-ch/2))
             regionEL.set("w", str(cw))
             regionEL.set("h", str(ch))
-            regionEL.set("spaceName", BMNG_SPACE)
+            regionEL.set("layer", BMNG_LAYER)
             #regionEL.set("stroke", "blue")
             objectEL = ET.SubElement(regionEL, "object")
             objectEL.set("id", "I%s" % strID)
@@ -126,6 +129,7 @@ def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRe
             objectEL.set("w", str(cw))
             objectEL.set("h", str(ch))
             objectEL.set("src", tileFileName)
+            objectEL.set("z-index", str(level))
             # calls to ImageMagick
             if os.path.exists(tilePath) or not GENERATE_TILES:
                 log("%s already exists (skipped)" % tilePath, 2)
