@@ -436,8 +436,6 @@ public class VirtualSpace {
     }
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
-        System.out.println("inserting at"+index);
-        
         synchronized(drawingList){
             Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
             System.arraycopy(drawingList, 0, newDrawingList, 0, index);
