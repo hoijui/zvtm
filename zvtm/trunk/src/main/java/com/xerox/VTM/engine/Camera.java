@@ -241,31 +241,31 @@ public class Camera {
 	return focal;
     }
 
-    /**Propagate this camera's movement to all glyphs and cameras attached to it.*/
+    /** Propagate this camera's movement to all glyphs and cameras attached to it. */
     public void propagateMove(double x, double y){
-	long lx = Math.round(x);
-	long ly = Math.round(y);
-	if (stickedGlyphs != null){
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		stickedGlyphs[i].move(lx,ly);
-	    }
-	}
-	if (stickedCameras != null){
-	    for (int i=0;i<stickedCameras.length;i++){
-		stickedCameras[i].move(lx,ly);
-	    }
-	}
+        long lx = Math.round(x);
+        long ly = Math.round(y);
+        if (stickedGlyphs != null){
+            for (int i=0;i<stickedGlyphs.length;i++){
+                stickedGlyphs[i].move(lx,ly);
+            }
+        }
+        if (stickedCameras != null){
+            for (int i=0;i<stickedCameras.length;i++){
+                stickedCameras[i].moveTo(posx, posy);
+            }
+        }
     }
 
     /**Propagate this camera's altitude change to all cameras attached to it.*/
     public void propagateAltitudeChange(float alt){
-	if (stickedCameras != null && alt != 0){
-	    for (int i=0;i<stickedCameras.length;i++){
-		if (stickAltitude[i]){
-		    stickedCameras[i].altitudeOffset(alt, true);
-		}
-	    }
-	}
+        if (stickedCameras != null && alt != 0){
+            for (int i=0;i<stickedCameras.length;i++){
+                if (stickAltitude[i]){
+                    stickedCameras[i].setAltitude(altitude);
+                }
+            }
+        }
     }
 
     /**
@@ -395,7 +395,7 @@ public class Camera {
 
 
     /**
-     * Attach a camera to this camera. Any translation and altitude change of this camera will be propagated to the other camera.
+     * Attach a camera to this camera. Both cameras will have the same location.
      *@param c camera to be attached to this camera
      *@see #unstick(Camera c)
      *@see #unstickAllCameras()
@@ -405,9 +405,9 @@ public class Camera {
     }
 
     /**
-     * Attach a camera to this camera. Any translation of this camera will be propagated to the other camera.
-     *@param c camera to be attached to this camera
-     *@param stickAlt also propagate altitude changes, in addition translations
+     * Attach a camera to this camera. Both cameras will have the same location.
+     *@param c camera to be attached to this camera.
+     *@param stickAlt also propagate altitude changes, in addition to translations.
      *@see #unstick(Camera c)
      *@see #unstickAllCameras()
      */
