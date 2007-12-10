@@ -59,7 +59,7 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
      *@param sx horizontal size in virtual space
      *@param sy vertical size in virtual space
      *@param st shape type, one of BooleanOps.SHAPE_TYPE_*
@@ -81,7 +81,7 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
      *@param sx horizontal size in virtual space
      *@param sy vertical size in virtual space
      *@param st shape type, one of BooleanOps.SHAPE_TYPE_*

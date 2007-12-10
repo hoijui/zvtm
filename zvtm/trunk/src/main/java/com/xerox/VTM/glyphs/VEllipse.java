@@ -66,7 +66,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
      *@param sx horizontal axis radius in virtual space
      *@param sy vertical axis radius in virtual space
      *@param c fill color
@@ -86,7 +86,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
      *@param sx horizontal axis radius in virtual space
      *@param sy vertical axis radius in virtual space
      *@param c fill color

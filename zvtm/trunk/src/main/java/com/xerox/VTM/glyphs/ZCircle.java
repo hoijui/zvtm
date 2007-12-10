@@ -41,7 +41,7 @@ public class ZCircle extends VCircle {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param r radius in virtual space
      *@param c fill color
      */

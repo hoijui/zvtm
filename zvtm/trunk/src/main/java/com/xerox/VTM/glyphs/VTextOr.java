@@ -55,7 +55,7 @@ public class VTextOr extends VText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c fill color
      *@param t text string
      *@param or orientation
@@ -68,7 +68,7 @@ public class VTextOr extends VText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c fill color
      *@param t text string
      *@param or orientation
@@ -82,7 +82,7 @@ public class VTextOr extends VText {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c fill color
      *@param t text string
      *@param or orientation

@@ -60,7 +60,7 @@ public class VSlice extends ClosedShape {
     
     /** Construct a slice by giving its 3 vertices
         *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         *@param bc border color
         */
@@ -81,7 +81,7 @@ public class VSlice extends ClosedShape {
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space (in rad)
         *@param ag arc angle in virtual space (in rad)
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
@@ -107,7 +107,7 @@ public class VSlice extends ClosedShape {
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint 
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space (in degrees)
         *@param ag arc angle in virtual space (in degrees)
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)

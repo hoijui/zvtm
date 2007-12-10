@@ -66,7 +66,7 @@ public class VPolygonST extends VPolygon implements Translucent {
 
     /**
         *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         */
     public VPolygonST(LongPoint[] v, int z, Color c){
@@ -76,7 +76,7 @@ public class VPolygonST extends VPolygon implements Translucent {
 
     /**
         *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         *@param bc border color
         *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque

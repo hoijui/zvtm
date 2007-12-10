@@ -97,7 +97,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     /** Construct an image at (x, y) with original scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
      */
     public VImage(long x,long y, int z,Image img){
@@ -117,7 +117,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
      */

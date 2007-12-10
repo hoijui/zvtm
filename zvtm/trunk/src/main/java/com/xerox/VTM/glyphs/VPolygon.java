@@ -107,7 +107,7 @@ public class VPolygon extends ClosedShape {
 
     /**
         *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         */
     public VPolygon(LongPoint[] v, int z, Color c){
@@ -138,7 +138,7 @@ public class VPolygon extends ClosedShape {
 
     /**
         *@param v list of x,y vertices ABSOLUTE coordinates i virtual space
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         *@param bc border color
         */

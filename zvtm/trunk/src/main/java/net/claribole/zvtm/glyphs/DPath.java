@@ -82,7 +82,7 @@ public class DPath extends Glyph {
     /**
      *@param x start coordinate in virtual space
      *@param y start coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c color
      */
     public DPath(long x, long y, int z, Color c){

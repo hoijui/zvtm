@@ -46,7 +46,7 @@ public class VImageOrST extends VImageOr implements Translucent {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
      *@param or orientation
      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque

@@ -59,7 +59,7 @@ public class VCirImage extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param s size (width=height) in virtual space
      *@param img image to be displayed
      *@param c fill color of bounding circle
@@ -82,7 +82,7 @@ public class VCirImage extends ClosedShape {
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param s size (width=height) in virtual space
      *@param img image to be displayed
      *@param c fill color of bounding circle

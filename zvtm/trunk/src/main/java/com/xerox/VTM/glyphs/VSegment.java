@@ -62,7 +62,7 @@ public class VSegment extends Glyph implements RectangularShape {
      *give the centre of segment and half its projected length on X & Y axis
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param w half width in virtual space (can be negative)
      *@param h half height in virtual space (can be negative)
      *@param c fill color
@@ -83,7 +83,7 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param y1 coordinate of endpoint 1 in virtual space
      *@param x2 coordinate of endpoint 2 in virtual space
      *@param y2 coordinate of endpoint 2 in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c fill color
      */
     public VSegment(long x1, long y1, int z, Color c, long x2, long y2){
@@ -100,7 +100,7 @@ public class VSegment extends Glyph implements RectangularShape {
      *give the centre of segment and half its length & orient
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
-     *@param z z-index
+     *@param z z-index (pass 0 if you do not use z-ordering)
      *@param lgth half length in virtual space
      *@param angle orientation
      *@param c fill color

@@ -113,7 +113,7 @@ public class VPath extends Glyph {
     /**
         *@param x start coordinate in virtual space
         *@param y start coordinate in virtual space
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c color
         */
     public VPath(long x, long y, int z, Color c){
@@ -130,7 +130,7 @@ public class VPath extends Glyph {
     }
 
     /**
-        *@param z z-index
+        *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c color
         *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
         */
