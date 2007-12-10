@@ -40,8 +40,6 @@ class GeoToolsManager {
     
     static final double CC = 21600 * 2 / 180.0;
 
-    static final int LOD = 1;
-    
     static final Color COUNTRY_COLOR = Color.YELLOW;
     static final Color ADMIN_DIV_1_COLOR = Color.ORANGE;
 
@@ -87,7 +85,7 @@ class GeoToolsManager {
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     for (int k=0;k<polygons.length;k++){
                     
-                        Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.0001);
+                        Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.01);
                         //Geometry simplifiedPolygon = (Geometry)polygons[k];
                         PathIterator pi = (new LiteShape(simplifiedPolygon, null, false)).getPathIterator(null);
                         double[] coords = new double[6];

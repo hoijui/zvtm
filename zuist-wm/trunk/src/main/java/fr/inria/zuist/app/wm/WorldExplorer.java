@@ -93,6 +93,7 @@ public class WorldExplorer implements Java2DPainter {
 
     SceneManager sm;
     GeoToolsManager gm;
+    NavigationManager nm;
     
     WEGlassPane gp;
 
@@ -102,6 +103,7 @@ public class WorldExplorer implements Java2DPainter {
             PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
             SCENE_FILE = new File(PATH_TO_SCENE);
         }
+        nm = new NavigationManager(this);
         initGUI(fullscreen);
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);

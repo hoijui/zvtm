@@ -47,13 +47,16 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     boolean mCamStickedToMouse = false;
 
     WorldExplorer application;
+    NavigationManager nm;
     
     Glyph g;
     
+    boolean cursorNearBorder = false;
     boolean dragging = false;
     
     ExplorerEventHandler(WorldExplorer app){
         this.application = app;
+        this.nm = app.nm;
         oldCameraAltitude = this.application.mCamera.getAltitude();
     }
 
@@ -67,7 +70,19 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         dragging = false;
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        lastVX = v.getMouse().vx;
+    	lastVY = v.getMouse().vy;
+    	if (nm.lensType != NavigationManager.NO_LENS){
+    	    nm.zoomInPhase2(lastVX, lastVY);
+    	}
+    	else {
+    	    if (cursorNearBorder){// do not activate the lens when cursor is near the border
+    		return;
+    	    }
+    	    nm.zoomInPhase1(jpx, jpy);
+    	}
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -79,11 +94,46 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+        lastVX = v.getMouse().vx;
+        lastVY = v.getMouse().vy;
+        if (nm.lensType != NavigationManager.NO_LENS){
+            nm.zoomOutPhase2();
+        }
+        else {
+            if (cursorNearBorder){
+                // do not activate the lens when cursor is near the border
+                return;
+            }
+            nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+        }
+    }
+        
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        application.mView.setStatusBarText(v.getMouse().vx+" "+v.getMouse().vy
-            +" "+application.mCamera.posx+" "+application.mCamera.posy+" "+application.mCamera.altitude);
+    	if ((jpx-NavigationManager.LENS_R1) < 0){
+    	    jpx = NavigationManager.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	else if ((jpx+NavigationManager.LENS_R1) > application.panelWidth){
+    	    jpx = application.panelWidth - NavigationManager.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	else {
+    	    cursorNearBorder = false;
+    	}
+    	if ((jpy-NavigationManager.LENS_R1) < 0){
+    	    jpy = NavigationManager.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	else if ((jpy+NavigationManager.LENS_R1) > application.panelHeight){
+    	    jpy = application.panelHeight - NavigationManager.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	if (nm.lensType != 0 && nm.lens != null){
+    	    nm.moveLens(jpx, jpy, e.getWhen());
+    	}
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -95,23 +145,36 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
                 lastJPY = jpy;
                 cameraMoved();
             }
+            if (nm.lensType != 0 && nm.lens != null){
+        	    nm.moveLens(jpx, jpy, e.getWhen());
+        	}
         }
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-        if (wheelDirection  == WHEEL_UP){
-            // zooming in
-            application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-            cameraMoved();
-            application.vsm.repaintNow();
+        if (nm.lensType != 0 && nm.lens != null){
+            if (wheelDirection  == ViewEventHandler.WHEEL_UP){
+                nm.magnifyFocus(NavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
+            }
+            else {
+                nm.magnifyFocus(-NavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
+            }
         }
         else {
-            //wheelDirection == WHEEL_DOWN, zooming out
-            application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-            cameraMoved();
-            application.vsm.repaintNow();
-        }
+            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+            if (wheelDirection  == WHEEL_UP){
+                // zooming in
+                application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+                cameraMoved();
+                application.vsm.repaintNow();
+            }
+            else {
+                //wheelDirection == WHEEL_DOWN, zooming out
+                application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+                cameraMoved();
+                application.vsm.repaintNow();
+            }
+    	}
     }
 
     public void enterGlyph(Glyph g){
@@ -137,16 +200,6 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         else if (code == KeyEvent.VK_B){
             application.gm.toggleBoundaryDisplay();
         }
-//        else if (code == KeyEvent.VK_V){
-//            application.gm.showCountry(1182);
-//        }
-//        else if (code == KeyEvent.VK_N){
-//            for (int j=0;j<1;j++){
-//                application.gm.showCountry(ci++);
-//            }
-//            System.out.println(ci);
-//
-//        }
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
