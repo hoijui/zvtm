@@ -9,6 +9,8 @@ package fr.inria.zuist.app.wm;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
 
@@ -49,27 +51,20 @@ class NavigationManager {
     static final short L2_Linear = 4;
     static final short L2_InverseCosine = 5;
     static final short L2_Manhattan = 6;
-    static final short L2_Scrambling = 7;
-    static final short LInf_Linear = 8;
-    static final short LInf_InverseCosine = 9;
-    static final short LInf_Manhattan = 10;
-    static final short L1_Fresnel = 11;
-    static final short L2_Fresnel = 12;
-    static final short LInf_Fresnel = 13;
-    static final short L2_TGaussian = 14;
-    static final short L2_Fading = 15;
-    static final short LInf_Fading = 16;
-    static final short LInf_Gaussian = 17;
-    static final short L3_Linear = 18;
-    static final short L3_Manhattan = 19;
-    static final short L3_Gaussian = 20;
-    static final short L3_InverseCosine = 21;
-    static final short L3_Fresnel = 22;
-    static final short LInf_TLinear = 23;
-    static final short L3_TLinear = 24;
-    static final short L2_TLinear = 25;
-    static final short L2_DLinear = 26;
-    static final short L2_XGaussian = 27;
+    static final short L2_TLinear = 7;
+    static final short L2_Fading = 8;
+    static final short L2_DLinear = 9;
+    static final short L3_Gaussian = 10;
+    static final short L3_Linear = 11;
+    static final short L3_InverseCosine = 12;
+    static final short L3_Manhattan = 13;
+    static final short L3_TLinear = 14;
+    static final short LInf_Gaussian = 15;
+    static final short LInf_Linear = 16;
+    static final short LInf_InverseCosine = 17;
+    static final short LInf_Manhattan = 18;
+    static final short LInf_TLinear = 19;
+    static final short LInf_Fading = 20;
     short lensFamily = L2_Gaussian;
     
     static final float FLOOR_ALTITUDE = 100.0f;
@@ -253,11 +248,6 @@ class NavigationManager {
                 tLens = null;
                 break;
             }
-            case L2_Scrambling:{
-                res = new FSScramblingLens(1.0f, LENS_R1, 1, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
             case LInf_Linear:{
                 res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
@@ -275,26 +265,6 @@ class NavigationManager {
             }
             case LInf_Gaussian:{
                 res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L1_Fresnel:{
-                res = new L1FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Fresnel:{
-                res = new FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Fresnel:{
-                res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_TGaussian:{
-                res = new TGaussianLens(1.0f, 0.0f, 0.90f, LENS_R1, 40, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
@@ -347,19 +317,12 @@ class NavigationManager {
                 tLens = null;
                 break;
             }
-            case L3_Fresnel:{
-                res = new L3FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_XGaussian:{
-                res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-
         }
         return res;
+    }
+    
+    void showLensChooser(){
+        new LensChooser(this);
     }
 
 }
@@ -385,7 +348,7 @@ class ZP2LensAction implements PostAnimationAction {
     
 }
 
-class LensChooser extends JFrame {
+class LensChooser extends JFrame implements ItemListener {
 
     // index of lenses should correspond to short value of associated lens type in NavigationManager
     static final String[] LENS_NAMES = {"L1 / Linear", "L1 / Inverse Cosine", "L1 / Manhattan",
@@ -408,6 +371,21 @@ class LensChooser extends JFrame {
     void initGUI(){
         Container cp = getContentPane();
         lensList = new JComboBox(LENS_NAMES);
+        lensList.setSelectedIndex(nm.lensFamily);
+        lensList.addItemListener(this);
+        cp.add(lensList);
+    }
+    
+    public void itemStateChanged(ItemEvent e){
+        if (e.getStateChange() == ItemEvent.SELECTED){
+            Object src = e.getItem();
+            for (int i=0;i<LENS_NAMES.length;i++){
+                if (src == LENS_NAMES[i]){
+                    nm.lensFamily = (short)i;
+                    return;
+                }
+            }
+        }
     }
     
 }
