@@ -65,6 +65,8 @@ class NavigationManager {
     static final short LInf_Manhattan = 18;
     static final short LInf_TLinear = 19;
     static final short LInf_Fading = 20;
+    static final short L2_Wave = 21;
+    static final short LInf_Step = 22;
     short lensFamily = L2_Gaussian;
     
     static final float FLOOR_ALTITUDE = 100.0f;
@@ -317,6 +319,16 @@ class NavigationManager {
                 tLens = null;
                 break;
             }
+            case L2_Wave:{
+                res = new FSWaveLens(1.0f, 200, 40, 5, x - application.panelWidth/2, y - application.panelHeight/2);
+                tLens = null;
+                break;
+            }
+            case LInf_Step:{
+                res = new LInfFSStepLens(1.0f, LENS_R1, LENS_R2, 1, x - application.panelWidth/2, y - application.panelHeight/2);
+                tLens = null;
+                break;
+            }
         }
         return res;
     }
@@ -354,7 +366,8 @@ class LensChooser extends JFrame implements ItemListener {
     static final String[] LENS_NAMES = {"L1 / Linear", "L1 / Inverse Cosine", "L1 / Manhattan",
         "L2 / Gaussian", "L2 / Linear", "L2 / Inverse Cosine", "L2 / Manhattan", "L2 / Translucence Linear", "L2 / Fading", "L2 / Dynamic Linear",
         "L3 / Gaussian", "L3 / Linear", "L3 / Inverse Cosine", "L3 / Manhattan", "L3 / Translucence Linear",
-        "LInf / Gaussian", "LInf / Linear", "LInf / Inverse Cosine", "LInf / Manhattan", "LInf / Translucence Linear", "LInf / Fading"};
+        "LInf / Gaussian", "LInf / Linear", "LInf / Inverse Cosine", "LInf / Manhattan", "LInf / Translucence Linear", "LInf / Fading",
+        "L2 / Wave", "LInf / Step"};
 
     NavigationManager nm;
 

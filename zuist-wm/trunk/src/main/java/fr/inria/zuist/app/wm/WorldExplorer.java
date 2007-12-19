@@ -97,7 +97,7 @@ public class WorldExplorer implements Java2DPainter {
     
     WEGlassPane gp;
 
-    public WorldExplorer(boolean fullscreen, String dir){
+    public WorldExplorer(boolean fullscreen, boolean grid, String dir){
         if (dir != null){
             PATH_TO_HIERARCHY = dir;
             PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
@@ -115,6 +115,7 @@ public class WorldExplorer implements Java2DPainter {
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setSceneCameraBounds(bCamera, eh.wnes);
         sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, gp);
+        if (grid){buildGrid();}
         gm = new GeoToolsManager(this);
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
@@ -160,6 +161,17 @@ public class WorldExplorer implements Java2DPainter {
         }
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+    
+    void buildGrid(){
+        for (int i=-43200;i<=43200;){
+            vsm.addGlyph(new VSegment(i, 0, 0, 0, 21600, Color.RED), bSpace);
+            i += 4320;
+        }
+        for (int i=-21600;i<=21600;){
+            vsm.addGlyph(new VSegment(0, i, 0, 43200, 0, Color.RED), bSpace);
+            i += 4320;
+        }
     }
     
     /*-------------     Navigation       -------------*/
@@ -284,9 +296,10 @@ public class WorldExplorer implements Java2DPainter {
 
     public static void main(String[] args){
         boolean fs = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
-        String dir = (args.length > 1) ? args[1] : null;
+        boolean grid = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
+        String dir = (args.length > 2) ? args[2] : null;
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
-        new WorldExplorer(fs, dir);
+        new WorldExplorer(fs, grid, dir);
     }
 
 }
