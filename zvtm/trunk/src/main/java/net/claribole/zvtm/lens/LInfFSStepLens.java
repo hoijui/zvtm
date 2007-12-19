@@ -72,13 +72,5 @@ public class LInfFSStepLens extends FSStepLens {
         else
             g[0] = g[1] = 1;
     }
-    
-    public void drawBoundary(Graphics2D g2d){
-	    g2d.setColor(java.awt.Color.RED);
-	    for (int i=0;i<nbSteps;i++){
-    	    g2d.drawRect(Math.round(lx+w/2-lensWidth/2/((float)(nbSteps*i))), Math.round(ly+h/2-lensHeight/2/((float)(nbSteps*i))),
-    	                 Math.round(lensWidth/((float)(nbSteps*i))), Math.round(lensHeight/((float)(nbSteps*i))));
-	    }
-    }
 
 }
