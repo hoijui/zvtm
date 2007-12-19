@@ -42,11 +42,6 @@ $Id$
       <name>Ibiblio - the public's library and digital archive</name>
       <url>http://www.ibiblio.org/maven2</url>
     </repository>
-    <repository>
-      <id>refractions</id>
-      <name>Refractions Research Maven 2 Repository</name>
-      <url>http://lists.refractions.net/m2</url>
-    </repository>
   </repositories>
   
   <!-- Distribution - Deploy to FTP -->
