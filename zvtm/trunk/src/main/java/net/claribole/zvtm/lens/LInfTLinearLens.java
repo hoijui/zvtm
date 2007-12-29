@@ -69,13 +69,13 @@ public class LInfTLinearLens extends TLinearLens {
     }
 
     public void gfT(float x, float y, float[] g){
-	d = Math.max(Math.abs(x-sw-lx), Math.abs(y-sh-ly));
-	if (d <= LR2)
-	    g[0] = MMTf;
-	else if (d <= LR1)
-	    g[0] = aT * (float)d + bT;
-	else
-	    g[0] = MMTc;
+        d = Math.max(Math.abs(x-sw-lx), Math.abs(y-sh-ly));
+        if (d <= LR2)
+            g[0] = MMTf;
+        else if (d <= LR1)
+            g[0] = aT * (float)d + bT;
+        else
+            g[0] = 0;
     }
 
 }

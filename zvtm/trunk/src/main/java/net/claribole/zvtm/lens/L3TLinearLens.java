@@ -61,13 +61,13 @@ public class L3TLinearLens extends TLinearLens {
     }
 
     public void gfT(float x, float y, float[] g){
-	d = Math.pow(Math.pow(Math.abs(x-sw-lx), 3) + Math.pow(Math.abs(y-sh-ly), 3), L3FSLinearLens.onethird);
-	if (d <= LR2)
-	    g[0] = MMTf;
-	else if (d <= LR1)
-	    g[0] = aT * (float)d + bT;
-	else
-	    g[0] = MMTc;
+        d = Math.pow(Math.pow(Math.abs(x-sw-lx), 3) + Math.pow(Math.abs(y-sh-ly), 3), L3FSLinearLens.onethird);
+        if (d <= LR2)
+            g[0] = MMTf;
+        else if (d <= LR1)
+            g[0] = aT * (float)d + bT;
+        else
+            g[0] = 0;
     }
 
 }

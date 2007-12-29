@@ -162,13 +162,13 @@ public class TLinearLens extends TLens {
     }
 
     public void gfT(float x, float y, float[] g){
-	d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
-	if (d <= LR2)
-	    g[0] = MMTf;
-	else if (d <= LR1)
-	    g[0] = aT * (float)d + bT;
-	else
-	    g[0] = MMTc;
+        d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+        if (d <= LR2)
+            g[0] = MMTf;
+        else if (d <= LR1)
+            g[0] = aT * (float)d + bT;
+        else
+            g[0] = 0;
     }
 
 }
