@@ -25,6 +25,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.ImageIcon;
 
 import java.util.Vector;
 
@@ -38,6 +39,7 @@ import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VImage;
 import net.claribole.zvtm.engine.Java2DPainter;
 
 import fr.inria.zuist.engine.SceneManager;
@@ -109,8 +111,9 @@ public class WorldExplorer implements Java2DPainter {
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
         gp.setVisible(true);
-        VirtualSpace[]  sceneSpaces = {mSpace, bSpace}; 
+        VirtualSpace[]  sceneSpaces = {mSpace, bSpace};
         Camera[] sceneCameras = {mCamera, bCamera};
+		vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setSceneCameraBounds(bCamera, eh.wnes);
