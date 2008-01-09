@@ -207,7 +207,10 @@ def processDLMetadata(f, proceedingsEL):
     proceedingEL.set("location", location)
     proceedingEL.append(DLmetadata.find("//chairs"))
     for article in DLmetadata.findall("//article"):
-        article.set('id', "%s#p%s-%s" % (year, article.findtext("firstPage"), article.find("authors/author/last_name").text.encode("iso-8859-1").translate(diacritics_trans).lower().replace(" ", "")))
+        aln = article.find("authors/author/last_name").text.encode("iso-8859-1").translate(diacritics_trans).lower().replace(" ", "")
+        if aln == "delr.millan":
+            aln = "millan"
+        article.set('id', "%s#p%s-%s" % (year, article.findtext("firstPage"), aln))
         proceedingEL.append(article)
         # get rid of escaped <p></p> in <par>
         pars = article.findall(".//abstract/par")
