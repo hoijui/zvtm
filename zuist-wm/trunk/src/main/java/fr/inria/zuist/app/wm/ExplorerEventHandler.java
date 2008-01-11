@@ -112,6 +112,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+//        System.err.println(v.getMouse().vx+" "+v.getMouse().vy);
     	if ((jpx-NavigationManager.LENS_R1) < 0){
     	    jpx = NavigationManager.LENS_R1;
     	    cursorNearBorder = true;
@@ -199,6 +200,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_B){application.gm.toggleBoundaryDisplay();}
         else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
+        else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

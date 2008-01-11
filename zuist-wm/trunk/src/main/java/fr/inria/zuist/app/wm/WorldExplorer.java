@@ -76,6 +76,8 @@ public class WorldExplorer implements Java2DPainter {
     
     boolean SHOW_MEMORY_USAGE = false;
     
+    boolean UPDATE_MAPS = true;
+    
     /* Navigation constants */
     static final int ANIM_MOVE_LENGTH = 300;
     static final short MOVE_UP = 0;
@@ -166,14 +168,16 @@ public class WorldExplorer implements Java2DPainter {
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
     
+    static final int GRID_STEP = 2160;
+    
     void buildGrid(){
         for (int i=-43200;i<=43200;){
             vsm.addGlyph(new VSegment(i, 0, 0, 0, 21600, Color.RED), bSpace);
-            i += 4320;
+            i += GRID_STEP;
         }
         for (int i=-21600;i<=21600;){
             vsm.addGlyph(new VSegment(0, i, 0, 43200, 0, Color.RED), bSpace);
-            i += 4320;
+            i += GRID_STEP;
         }
     }
     
@@ -234,6 +238,11 @@ public class WorldExplorer implements Java2DPainter {
         vsm.repaintNow();
     }
 
+    void toggleUpdateMaps(){
+        UPDATE_MAPS = !UPDATE_MAPS;
+        sm.setUpdateLevel(UPDATE_MAPS);
+    }
+    
     void gc(){
         System.gc();
         if (SHOW_MEMORY_USAGE){
