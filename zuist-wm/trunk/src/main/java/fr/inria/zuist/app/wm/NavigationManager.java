@@ -68,6 +68,8 @@ class NavigationManager {
     static final short L2_Wave = 21;
     static final short L2_TWave = 22;
     static final short LInf_Step = 23;
+    static final short L2_XGaussian = 24;
+    static final short L2_HLinear = 25;
     short lensFamily = L2_Gaussian;
     
     static final float FLOOR_ALTITUDE = 100.0f;
@@ -272,7 +274,7 @@ class NavigationManager {
                 break;
             }
             case L2_TLinear:{
-                res = new TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                res = new TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 50, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
@@ -287,7 +289,7 @@ class NavigationManager {
                 break;
             }
             case L2_Fading:{
-                tLens = new TFadingLens(1.0f, 0.0f, 0.65f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
+                tLens = new TFadingLens(1.0f, 0.0f, 0.85f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
                 ((TFadingLens)tLens).setBoundaryColor(Color.RED);
                 ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
                 res = (Lens)tLens;
@@ -321,7 +323,7 @@ class NavigationManager {
                 break;
             }
             case L2_Wave:{
-                res = new FSWaveLens(1.0f, 200, 40, 5, x - application.panelWidth/2, y - application.panelHeight/2);
+                res = new FSWaveLens(1.0f, LENS_R1, LENS_R2/2, 8, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
@@ -332,6 +334,16 @@ class NavigationManager {
             }
             case LInf_Step:{
                 res = new LInfFSStepLens(1.0f, LENS_R1, LENS_R2, 1, x - application.panelWidth/2, y - application.panelHeight/2);
+                tLens = null;
+                break;
+            }
+        	case L2_XGaussian:{
+        	    res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+        	    tLens = null;
+        	    break;
+        	}
+            case L2_HLinear:{
+                res = new HLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
@@ -373,7 +385,7 @@ class LensChooser extends JFrame implements ItemListener {
         "L2 / Gaussian", "L2 / Linear", "L2 / Inverse Cosine", "L2 / Manhattan", "L2 / Translucence Linear", "L2 / Fading", "L2 / Dynamic Linear",
         "L3 / Gaussian", "L3 / Linear", "L3 / Inverse Cosine", "L3 / Manhattan", "L3 / Translucence Linear",
         "LInf / Gaussian", "LInf / Linear", "LInf / Inverse Cosine", "LInf / Manhattan", "LInf / Translucence Linear", "LInf / Fading",
-        "L2 / Wave", "L2 / Translucent Wave", "LInf / Step"};
+        "L2 / Wave", "L2 / Translucent Wave", "LInf / Step", "L2 / XGaussian", "L2 / HLinear"};
 
     NavigationManager nm;
 
