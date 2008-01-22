@@ -110,7 +110,127 @@ class WorldTaskEventHandler implements ViewEventHandler, AnimationListener, Comp
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
+
+	// L1 lenses
+	if (code == KeyEvent.VK_2){
+	    application.lensFamily = ZLWorldTask.L1_Linear;
+	    application.demoView.setTitle(ZLWorldTask.L1_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_3){
+	    application.lensFamily = ZLWorldTask.L1_InverseCosine;
+	    application.demoView.setTitle(ZLWorldTask.L1_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_4){
+	    application.lensFamily = ZLWorldTask.L1_Manhattan;
+	    application.demoView.setTitle(ZLWorldTask.L1_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_5){
+	    application.lensFamily = ZLWorldTask.L1_Fresnel;
+	    application.demoView.setTitle(ZLWorldTask.L1_Fresnel_Title);
+	}
+	// L2 lenses
+	else if (code == KeyEvent.VK_Q){
+	    application.lensFamily = ZLWorldTask.L2_Gaussian;
+	    application.demoView.setTitle(ZLWorldTask.L2_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_W){
+	    application.lensFamily = ZLWorldTask.L2_Linear;
+	    application.demoView.setTitle(ZLWorldTask.L2_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_E){
+	    application.lensFamily = ZLWorldTask.L2_InverseCosine;
+	    application.demoView.setTitle(ZLWorldTask.L2_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_R){
+	    application.lensFamily = ZLWorldTask.L2_Manhattan;
+	    application.demoView.setTitle(ZLWorldTask.L2_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_T){
+	    application.lensFamily = ZLWorldTask.L2_Fresnel;
+	    application.demoView.setTitle(ZLWorldTask.L2_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_Y){
+	    application.lensFamily = ZLWorldTask.L2_TLinear;
+	    application.demoView.setTitle(ZLWorldTask.L2_TLinear_Title);
+	}
+	else if (code == KeyEvent.VK_U){
+	    application.lensFamily = ZLWorldTask.L2_TGaussian;
+	    application.demoView.setTitle(ZLWorldTask.L2_TGaussian_Title);
+	}
+	else if (code == KeyEvent.VK_I){
+	    application.lensFamily = ZLWorldTask.L2_Fading;
+	    application.demoView.setTitle(ZLWorldTask.L2_Fading_Title);
+	}
+	else if (code == KeyEvent.VK_O){
+	    application.lensFamily = ZLWorldTask.L2_Scrambling;
+	    application.demoView.setTitle(ZLWorldTask.L2_Scrambling_Title);
+	}
+	else if (code == KeyEvent.VK_P){
+	    application.lensFamily = ZLWorldTask.L2_DLinear;
+	    application.demoView.setTitle(ZLWorldTask.L2_DLinear_Title);
+	}
+	else if (code == KeyEvent.VK_OPEN_BRACKET){
+	    application.lensFamily = ZLWorldTask.L2_XGaussian;
+	    application.demoView.setTitle(ZLWorldTask.L2_XGaussian_Title);
+	}
+	// L3 lenses
+	else if (code == KeyEvent.VK_A){
+	    application.lensFamily = ZLWorldTask.L3_Gaussian;
+	    application.demoView.setTitle(ZLWorldTask.L3_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_S){
+	    application.lensFamily = ZLWorldTask.L3_Linear;
+	    application.demoView.setTitle(ZLWorldTask.L3_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_D){
+	    application.lensFamily = ZLWorldTask.L3_InverseCosine;
+	    application.demoView.setTitle(ZLWorldTask.L3_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_F){
+	    application.lensFamily = ZLWorldTask.L3_Manhattan;
+	    application.demoView.setTitle(ZLWorldTask.L3_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_G){
+	    application.lensFamily = ZLWorldTask.L3_Fresnel;
+	    application.demoView.setTitle(ZLWorldTask.L3_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_H){
+	    application.lensFamily = ZLWorldTask.L3_TLinear;
+	    application.demoView.setTitle(ZLWorldTask.L3_TLinear_Title);
+	}
+	// LInf lenses
+	else if (code == KeyEvent.VK_Z){
+	    application.lensFamily = ZLWorldTask.LInf_Gaussian;
+	    application.demoView.setTitle(ZLWorldTask.LInf_Gaussian_Title);
+	}
+	else if (code == KeyEvent.VK_X){
+	    application.lensFamily = ZLWorldTask.LInf_Linear;
+	    application.demoView.setTitle(ZLWorldTask.LInf_Linear_Title);
+	}
+	else if (code == KeyEvent.VK_C){
+	    application.lensFamily = ZLWorldTask.LInf_InverseCosine;
+	    application.demoView.setTitle(ZLWorldTask.LInf_InverseCosine_Title);
+	}
+	else if (code == KeyEvent.VK_V){
+	    application.lensFamily = ZLWorldTask.LInf_Manhattan;
+	    application.demoView.setTitle(ZLWorldTask.LInf_Manhattan_Title);
+	}
+	else if (code == KeyEvent.VK_B){
+	    application.lensFamily = ZLWorldTask.LInf_Fresnel;
+	    application.demoView.setTitle(ZLWorldTask.LInf_Fresnel_Title);
+	}
+	else if (code == KeyEvent.VK_N){
+	    application.lensFamily = ZLWorldTask.LInf_TLinear;
+	    application.demoView.setTitle(ZLWorldTask.LInf_TLinear_Title);
+	}
+	else if (code == KeyEvent.VK_M){
+	    application.lensFamily = ZLWorldTask.LInf_Fading;
+	    application.demoView.setTitle(ZLWorldTask.LInf_Fading_Title);
+	}
+		
+    }
+
 
     /*ComponentListener*/
     public void componentHidden(ComponentEvent e){}

@@ -200,7 +200,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true);
+	    application.moveLens(jpx, jpy, true, e.getWhen());
 	}
 	//application.vsm.repaintNow();
     }
@@ -288,7 +288,7 @@ class DMEventHandler extends WorldTaskEventHandler implements PortalEventHandler
 		    application.vsm.animator.Aspeed = 0;
 		}
 		if (mode == MODE_PZL && lensType != 0 && application.lens != null){
-		    application.moveLens(jpx, jpy, false);
+		    application.moveLens(jpx, jpy, false, e.getWhen());
 		}
 	    }
 	}

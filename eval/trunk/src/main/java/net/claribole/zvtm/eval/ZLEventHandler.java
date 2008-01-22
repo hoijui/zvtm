@@ -119,7 +119,7 @@ class ZLEventHandler extends WorldTaskEventHandler {
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true);
+	    application.moveLens(jpx, jpy, true, e.getWhen());
 	}
 	//application.vsm.repaintNow();
     }
@@ -142,7 +142,7 @@ class ZLEventHandler extends WorldTaskEventHandler {
 	    }
  	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, false);
+	    application.moveLens(jpx, jpy, false, e.getWhen());
 	}
     }
 

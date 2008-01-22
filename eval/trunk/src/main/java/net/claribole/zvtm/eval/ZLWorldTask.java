@@ -24,8 +24,7 @@ import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.OverviewPortal;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.PostAnimationAction;
-import net.claribole.zvtm.lens.FSGaussianLens;
-import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.lens.*;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
@@ -46,7 +45,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 
     /* max dimensions of ZVTM view */
     static final int VIEW_MAX_W = 1280;
-    static final int VIEW_MAX_H = 1024;
+    static final int VIEW_MAX_H = 720;
 
     /* actual dimensions of windows on screen */
     int VIEW_W, VIEW_H, CONSOLE_W, MAP_MONITOR_W, INSTRUCTIONS_W;
@@ -108,6 +107,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 
     /* misc. lens settings */
     Lens lens;
+	TemporalLens tLens;
     static int LENS_R1 = 100;
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
@@ -116,6 +116,70 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     static double DEFAULT_MAG_FACTOR = 4.0;
     static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
+
+    /* lens distance and drop-off functions */
+    static final short L1_Linear = 0;
+    static final short L1_InverseCosine = 1;
+    static final short L1_Manhattan = 2;
+    static final short L2_Gaussian = 3;
+    static final short L2_Linear = 4;
+    static final short L2_InverseCosine = 5;
+    static final short L2_Manhattan = 6;
+    static final short L2_Scrambling = 7;
+    static final short LInf_Linear = 8;
+    static final short LInf_InverseCosine = 9;
+    static final short LInf_Manhattan = 10;
+    static final short L1_Fresnel = 11;
+    static final short L2_Fresnel = 12;
+    static final short LInf_Fresnel = 13;
+    static final short L2_TGaussian = 14;
+    static final short L2_Fading = 15;
+    static final short LInf_Fading = 16;
+    static final short LInf_Gaussian = 17;
+    static final short L3_Linear = 18;
+    static final short L3_Manhattan = 19;
+    static final short L3_Gaussian = 20;
+    static final short L3_InverseCosine = 21;
+    static final short L3_Fresnel = 22;
+    static final short LInf_TLinear = 23;
+    static final short L3_TLinear = 24;
+    static final short L2_TLinear = 25;
+    static final short L2_DLinear = 26;
+    static final short L2_XGaussian = 27;
+    static final short LP_Gaussian = 28;
+
+    short lensFamily = L2_Gaussian;
+    static final String View_Title_Prefix = "Probing Lens Demo - ";
+    static final String L1_Linear_Title = View_Title_Prefix + "L1 / Linear";
+    static final String L1_InverseCosine_Title = View_Title_Prefix + "L1 / Inverse Cosine";
+    static final String L1_Manhattan_Title = View_Title_Prefix + "L1 / Manhattan";
+    static final String L2_Gaussian_Title = View_Title_Prefix + "L2 / Gaussian";
+    static final String L2_Linear_Title = View_Title_Prefix + "L2 / Linear";
+    static final String L2_InverseCosine_Title = View_Title_Prefix + "L2 / Inverse Cosine";
+    static final String L2_Manhattan_Title = View_Title_Prefix + "L2 / Manhattan";
+    static final String L2_Scrambling_Title = View_Title_Prefix + "L2 / Scrambling (for fun)";
+    static final String LInf_Linear_Title = View_Title_Prefix + "LInf / Linear";
+    static final String LInf_InverseCosine_Title = View_Title_Prefix + "LInf / Inverse Cosine";
+    static final String LInf_Manhattan_Title = View_Title_Prefix + "LInf / Manhattan";
+    static final String L1_Fresnel_Title = View_Title_Prefix + "L1 / Fresnel";
+    static final String L2_Fresnel_Title = View_Title_Prefix + "L2 / Fresnel";
+    static final String LInf_Fresnel_Title = View_Title_Prefix + "LInf / Fresnel";
+    static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / Translucence Gaussian";
+    static final String L2_TLinear_Title = View_Title_Prefix + "L2 / Translucence Linear";
+    static final String L2_Fading_Title = View_Title_Prefix + "L2 / Fading";
+    static final String LInf_Fading_Title = View_Title_Prefix + "LInf / Fading";
+    static final String LInf_Gaussian_Title = View_Title_Prefix + "LInf / Gaussian";
+    static final String L3_Linear_Title = View_Title_Prefix + "L3 / Linear";
+    static final String L3_InverseCosine_Title = View_Title_Prefix + "L3 / Inverse Cosine";
+    static final String L3_Gaussian_Title = View_Title_Prefix + "L3 / Gaussian";
+    static final String L3_Manhattan_Title = View_Title_Prefix + "L3 / Manhattan";
+    static final String L3_Fresnel_Title = View_Title_Prefix + "L3 / Fresnel";
+    static final String LInf_TLinear_Title = View_Title_Prefix + "LInf / Translucence Linear";
+    static final String L3_TLinear_Title = View_Title_Prefix + "L3 / Translucence Linear";
+    static final String L2_DLinear_Title = View_Title_Prefix + "L2 / Dynamic Linear";
+    static final String L2_XGaussian_Title = View_Title_Prefix + "L2 / eXtended Gaussian";
+    static final String LP_Gaussian_Title = View_Title_Prefix + "LP / Gaussian";
+
 
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
@@ -141,6 +205,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     Camera overviewCamera;
 
     static final Color HCURSOR_COLOR = new Color(200,48,48);
+    static final Color CURSOR_COLOR = new Color(200,48,48);
 
     /* GRID */
     static final Color GRID_COLOR = new Color(156,53,53);
@@ -151,7 +216,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 //     static final float[] SHOW_GRID_ANIM_PARAMS = {0, 0, 0, 0, 0, 0, 1.0f};
 //     static final float[] HIDE_GRID_ANIM_PARAMS = {0, 0, 0, 0, 0, 0, -1.0f};
 
-    static final float START_ALTITUDE = 10000;
+    static final float START_ALTITUDE = 4900;
     static final float FLOOR_ALTITUDE = 100.0f;
 
     boolean cameraOnFloor = false;
@@ -191,7 +256,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     short technique = ZL_TECHNIQUE;
     String techniqueName;
 
-    static final int[] vispad = {100,100,100,100};
+    static final int[] vispad = {0,0,0,0};
 
     ZLWorldTask(short t, boolean showConsole, boolean showMapMonitor,
 		boolean showInstructions, boolean trainingData){
@@ -259,6 +324,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	demoView = vsm.addExternalView(cameras, techniqueName, View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 	demoView.setVisibilityPadding(vispad);
 	demoView.mouse.setHintColor(HCURSOR_COLOR);
+	demoView.mouse.setColor(CURSOR_COLOR);
 	demoView.setLocation(VIEW_X, VIEW_Y);
 	robot.mouseMove(VIEW_X+VIEW_W/2, VIEW_Y+VIEW_H/2);
 	updatePanelSize();
@@ -281,7 +347,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	else {
 	    ewmm.initMap();
 	}
-// 	buildGrid();
+ 	buildGrid();
 	gds.buildAll();
 	logm = new LogManager(this);
 	System.gc();
@@ -546,11 +612,16 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	}
     }
 
-    void moveLens(int x, int y, boolean write){
-	lens.setAbsolutePosition(x, y);
-	logm.lensPositionChanged(write);
-	vsm.repaintNow();
-    }
+	void moveLens(int x, int y, boolean write, long absTime){
+		if (tLens != null){
+			tLens.setAbsolutePosition(x, y, absTime);
+		}
+		else {
+			lens.setAbsolutePosition(x, y);
+		}
+		logm.lensPositionChanged(write);
+		vsm.repaintNow();
+	}
 
     void dzoomIn(long mx, long my){
 	// compute camera animation parameters
@@ -683,9 +754,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	// create lens if it does not exist
 	if (lens == null){
 	    Dimension d = demoView.getPanel().getSize();
- 	    lens = demoView.setLens(new FSGaussianLens(1.0f, LENS_R1, LENS_R2,
-						       x - d.width/2,
-						       y - d.height/2));
+ 	    lens = demoView.setLens(getLensDefinition(d, x, y));
 	    lens.setBufferThreshold(1.5f);
 	}
 	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
@@ -735,9 +804,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	// create lens if it does not exist
 	if (lens == null){
 	    Dimension d = demoView.getPanel().getSize();
-	    lens = demoView.setLens(new FSGaussianLens(1.0f, LENS_R1, LENS_R2,
-						       x - d.width/2,
-						       y - d.height/2));
+	    lens = demoView.setLens(getLensDefinition(d, x, y));
 	    lens.setBufferThreshold(1.5f);
 	}
 	// animate lens and camera simultaneously
@@ -752,6 +819,170 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	// make lens disappear (killing anim)
 	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
 					 lens.getID(), new ZLWorldZOP2LensAction(this));
+    }
+
+    float F_V = 1.0f;
+
+    Lens getLensDefinition(Dimension d, int x, int y){
+	Lens res = null;
+	switch (lensFamily){
+	case L1_Linear:{
+	    res = new L1FSLinearLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L1_InverseCosine:{
+	    res = new L1FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L1_Manhattan:{
+	    res = new L1FSManhattanLens(1.0f, LENS_R1, x - d.width/2, y - d.height/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
+	    tLens = null;
+	    break;
+	}
+	case L2_Gaussian:{
+	    res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Linear:{
+	    res = new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_InverseCosine:{
+	    res = new FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Manhattan:{
+	    res = new FSManhattanLens(1.0f, LENS_R1, x - d.width/2, y - d.height/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
+	    tLens = null;
+	    break;
+	}
+	case L2_Scrambling:{
+	    res = new FSScramblingLens(1.0f, LENS_R1, 1, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Linear:{
+	    res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_InverseCosine:{
+	    res = new LInfFSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Manhattan:{
+	    res = new LInfFSManhattanLens(1.0f, LENS_R1, x - d.width/2, y - d.height/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Gaussian:{
+	    res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+ 	case L1_Fresnel:{
+	    res = new L1FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Fresnel:{
+	    res = new FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_Fresnel:{
+	    res = new LInfFSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_TGaussian:{
+	    res = new TGaussianLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_TLinear:{
+	    res = new TLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case LInf_TLinear:{
+	    res = new LInfTLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_TLinear:{
+	    res = new L3TLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_Fading:{
+	    tLens = new TFadingLens(1.0f, 0.0f, F_V, LENS_R1, x - d.width/2, y - d.height/2);
+	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
+	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    res = (Lens)tLens;
+	    break;
+	}
+	case LInf_Fading:{
+	    tLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, LENS_R1, x - d.width/2, y - d.height/2);
+	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
+	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    res = (Lens)tLens;
+	    break;
+	}
+	case L3_Linear:{
+	    res = new L3FSLinearLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_InverseCosine:{
+	    res = new L3FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_Manhattan:{
+	    res = new L3FSManhattanLens(1.0f, LENS_R1, x - d.width/2, y - d.height/2);
+	    ((FSManhattanLens)res).setBoundaryColor(Color.RED);
+	    tLens = null;
+	    break;
+	}
+	case L3_Gaussian:{
+	    res = new L3FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L3_Fresnel:{
+	    res = new L3FSFresnelLens(1.0f, LENS_R1, LENS_R2, 4, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case L2_DLinear:{
+	    tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    ((DLinearLens)tLens).setInnerRadiusColor(Color.RED);
+	    ((DLinearLens)tLens).setOuterRadiusColor(Color.RED);
+	    res = (Lens)tLens;
+	    break;
+	}
+	case L2_XGaussian:{
+	    res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	case LP_Gaussian:{
+	    res = new LPFSGaussianLens(1.0f, 2.0f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
+	    tLens = null;
+	    break;
+	}
+	}
+	return res;
     }
 
     void setMagFactor(double m){
@@ -893,30 +1124,30 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     }
 
     void updateGridLevel(long visibleSize){
-// 	if (visibleSize < 1200){
-// 	    showGridLevel(8);
-// 	}
-// 	else if (visibleSize < 2400){
-// 	    showGridLevel(7);
-// 	}
-// 	else if (visibleSize < 4800){
-// 	    showGridLevel(6);
-// 	}
-// 	else if (visibleSize < 9600){
-// 	    showGridLevel(5);
-// 	}
-// 	else if (visibleSize < 19200){
-// 	    showGridLevel(4);
-// 	}
-// 	else if (visibleSize < 38400){
-// 	    showGridLevel(3);
-// 	}
-// 	else if (visibleSize < 76800){
-// 	    showGridLevel(2);
-// 	}
-// 	else {
-// 	    showGridLevel(1);
-// 	}
+ 	if (visibleSize < 1200){
+ 	    showGridLevel(8);
+ 	}
+ 	else if (visibleSize < 2400){
+ 	    showGridLevel(7);
+ 	}
+ 	else if (visibleSize < 4800){
+ 	    showGridLevel(6);
+ 	}
+ 	else if (visibleSize < 9600){
+ 	    showGridLevel(5);
+ 	}
+ 	else if (visibleSize < 19200){
+ 	    showGridLevel(4);
+ 	}
+ 	else if (visibleSize < 38400){
+ 	    showGridLevel(3);
+ 	}
+ 	else if (visibleSize < 76800){
+ 	    showGridLevel(2);
+ 	}
+ 	else {
+ 	    showGridLevel(1);
+ 	}
     }
 
     static float MAX_OVERVIEW_ALT = 30000.0f;

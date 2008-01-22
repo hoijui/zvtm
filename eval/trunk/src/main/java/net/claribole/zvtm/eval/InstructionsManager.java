@@ -89,7 +89,7 @@ class InstructionsManager implements Java2DPainter {
 	// uncomment to draw a cross at the window center
 // 	g2d.fillRect(hpanelWidth, ZLWorldTask.CENTER_N, 1, ZLWorldTask.CENTER_CROSS_SIZE);
 // 	g2d.fillRect(ZLWorldTask.CENTER_W, hpanelHeight, ZLWorldTask.CENTER_CROSS_SIZE, 1);
-	drawFrame(g2d, viewWidth, viewHeight);
+	//drawFrame(g2d, viewWidth, viewHeight);
 	writeInstructions(g2d, viewWidth, viewHeight);
 	if (ZLWorldTask.SHOW_MEMORY_USAGE){showMemoryUsage(g2d, viewWidth, viewHeight);}
 //  	if (ZLWorldTask.SHOW_COORDS){showLatLong(g2d, viewWidth, viewHeight);}

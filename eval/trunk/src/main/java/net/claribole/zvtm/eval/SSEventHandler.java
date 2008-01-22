@@ -118,7 +118,7 @@ class SSEventHandler extends WorldTaskEventHandler {
 	    cursorNearBorder = true;
 	}
 	if (lensType != 0 && application.lens != null){
-	    application.moveLens(jpx, jpy, true);
+	    application.moveLens(jpx, jpy, true, e.getWhen());
 	}
 	if (application.SHOW_COORDS){
 // 	    latitude = doubleFormatter(v.getMouse().vy * ZLWorldTaskMapManager.COORDS_CONV);
