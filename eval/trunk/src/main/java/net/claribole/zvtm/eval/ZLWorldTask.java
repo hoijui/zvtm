@@ -143,7 +143,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     static final short L3_Fresnel = 22;
     static final short LInf_TLinear = 23;
     static final short L3_TLinear = 24;
-    static final short L2_TLinear = 25;
+    static final short L2_HLinear = 25;
     static final short L2_DLinear = 26;
     static final short L2_XGaussian = 27;
     static final short LP_Gaussian = 28;
@@ -165,7 +165,7 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
     static final String L2_Fresnel_Title = View_Title_Prefix + "L2 / Fresnel";
     static final String LInf_Fresnel_Title = View_Title_Prefix + "LInf / Fresnel";
     static final String L2_TGaussian_Title = View_Title_Prefix + "L2 / Translucence Gaussian";
-    static final String L2_TLinear_Title = View_Title_Prefix + "L2 / Translucence Linear";
+    static final String L2_HLinear_Title = View_Title_Prefix + "L2 / Translucence Linear";
     static final String L2_Fading_Title = View_Title_Prefix + "L2 / Fading";
     static final String LInf_Fading_Title = View_Title_Prefix + "LInf / Fading";
     static final String LInf_Gaussian_Title = View_Title_Prefix + "LInf / Gaussian";
@@ -909,8 +909,8 @@ public class ZLWorldTask implements PostAnimationAction, MapApplication {
 	    tLens = null;
 	    break;
 	}
-	case L2_TLinear:{
-	    res = new TLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, 40, x - d.width/2, y - d.height/2);
+	case L2_HLinear:{
+	    res = new HLinearLens(1.0f, 0.0f, 0.85f, LENS_R1, LENS_R2, x - d.width/2, y - d.height/2);
 	    tLens = null;
 	    break;
 	}

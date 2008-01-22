@@ -151,8 +151,8 @@ class WorldTaskEventHandler implements ViewEventHandler, AnimationListener, Comp
 	    application.demoView.setTitle(ZLWorldTask.L2_Fresnel_Title);
 	}
 	else if (code == KeyEvent.VK_Y){
-	    application.lensFamily = ZLWorldTask.L2_TLinear;
-	    application.demoView.setTitle(ZLWorldTask.L2_TLinear_Title);
+	    application.lensFamily = ZLWorldTask.L2_HLinear;
+	    application.demoView.setTitle(ZLWorldTask.L2_HLinear_Title);
 	}
 	else if (code == KeyEvent.VK_U){
 	    application.lensFamily = ZLWorldTask.L2_TGaussian;
