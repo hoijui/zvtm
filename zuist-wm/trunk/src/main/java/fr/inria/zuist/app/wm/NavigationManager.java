@@ -27,8 +27,8 @@ class NavigationManager {
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
-    static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
+    static int LENS_R1 = 400;
+    static int LENS_R2 = 200;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 4.0;
@@ -279,12 +279,12 @@ class NavigationManager {
                 break;
             }
             case LInf_TLinear:{
-                res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 100, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
             case L3_TLinear:{
-                res = new L3TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                res = new L3TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 100, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
