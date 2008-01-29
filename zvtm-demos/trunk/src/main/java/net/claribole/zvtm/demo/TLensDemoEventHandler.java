@@ -125,7 +125,7 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
- 	System.err.println(v.getMouse().vx+" "+v.getMouse().vy);
+// 	System.err.println(v.getMouse().vx+" "+v.getMouse().vy);
 	if ((jpx-TLensDemo.LENS_R1) < 0){
 	    jpx = TLensDemo.LENS_R1;
 	    cursorNearBorder = true;
