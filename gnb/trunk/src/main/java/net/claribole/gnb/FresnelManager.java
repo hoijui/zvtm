@@ -166,14 +166,14 @@ class FresnelManager {
     synchronized void showInformationAbout(Resource r, int jpx, int jpy){
 	if (!ssd){return;}
 	// check that this resource can indeed be handled by the current Fresnel lens
-	if (selectedDetailLens.selects(r, detailFSLEvaluator)){
-	    Vector statementsToDisplay = selectedDetailLens.getPropertyValuesToDisplay(r, detailFSLEvaluator);
+	if (selectedDetailLens.selects(r, detailFSLEvaluator, null)){
+	    Vector statementsToDisplay = selectedDetailLens.getPropertyValuesToDisplay(r, detailFSLEvaluator, null);
 	    statements2formats.clear();
 	    Statement s;
 	    Format f;
 	    for (int i=0;i<statementsToDisplay.size();i++){
 		s = (Statement)statementsToDisplay.elementAt(i);
-		f = selectedDetailLens.getBestFormatForProperty(null, detailFSLEvaluator, s, null);
+		f = selectedDetailLens.getBestFormatForProperty(null, detailFSLEvaluator, null, s, null);
 		if (f != null){
 		    statements2formats.put(s, f);
 		}
