@@ -233,7 +233,7 @@ public class OverlayManager {
             fadeAbout = new VRectangleST(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLine1 = new VText(0, 150, 0, Color.WHITE, "ZUIST", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
-            aboutLine2 = new VText(0, 80, 0, Color.WHITE, "By Emmanuel Pietriga (INRIA) & Michel Beaudouin-Lafon, (Universit\u00E9 Paris-Sud)", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLine2 = new VText(0, 80, 0, Color.WHITE, "By Emmanuel Pietriga (INRIA) & Michel Beaudouin-Lafon (Universit\u00E9 Paris-Sud)", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
             insituLogo = new RImage(0, 10, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLine3 = new VText(0, -100, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
