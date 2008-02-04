@@ -27,8 +27,8 @@ class NavigationManager {
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
-    static int LENS_R1 = 400;
-    static int LENS_R2 = 200;
+    static int LENS_R1 = 100;
+    static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 4.0;
