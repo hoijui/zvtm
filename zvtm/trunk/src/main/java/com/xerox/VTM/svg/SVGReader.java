@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2008. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@ import java.awt.Font;
 import javax.swing.ImageIcon;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URI;
 import java.net.MalformedURLException;
@@ -36,10 +37,17 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import org.xml.sax.SAXException;
 
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
@@ -112,6 +120,8 @@ public class SVGReader {
     public static final String _inherit="inherit";
     public static final String _pt = "pt";
     public static final String _id = "id";
+    public static final String _transform = "transform";
+    public static final String _viewBox = "viewBox";
 
     public static final String xlinkURI="http://www.w3.org/1999/xlink";
     public static final String _href="href";
@@ -124,6 +134,7 @@ public class SVGReader {
 
     static long xoffset=0;
     static long yoffset=0;
+    static double scale=1.0;
 
     public static float RRARCR=0.4f;
 
@@ -473,6 +484,8 @@ public class SVGReader {
 	//Vector ar=Utilities.getSepElements(s,";");
 	String[] ar=null;
 	if (s!=null){
+		s = s.replaceAll("\n", "");
+		s = s.replaceAll(" ", "");
 	    StringTokenizer st=new StringTokenizer(s,";");
 	    ar=new String[st.countTokens()];
 	    int i=0;
@@ -513,9 +526,19 @@ public class SVGReader {
     //seek and consume next pair of numerical coordinates in a string
     private static void processNextSVGCoords(StringBuffer svg,Vector res){
 	if (svg.length()>0){
-	    long x=getNextNumber(svg)+xoffset;
+	    long x=getNextNumber(svg);
+
 	    //seekSecondCoord(svg);
-	    long y=getNextNumber(svg)+yoffset;
+	    long y=getNextNumber(svg);
+
+		if (scale != 1.0) {
+			x = (long)(Math.floor((double)x * scale));
+			y = (long)(Math.floor((double)y * scale));
+		}
+
+		x += xoffset;
+		y += yoffset;
+
 	    res.add(new LongPoint(x,y));
 	}
     }
@@ -626,10 +649,22 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VEllipse createEllipse(Element e,Context ctx,boolean meta){
-	long x = getLong(e.getAttribute(_cx)) + xoffset;
-	long y = getLong(e.getAttribute(_cy)) + yoffset;
+
+	long x = getLong(e.getAttribute(_cx));
+	long y = getLong(e.getAttribute(_cy));
 	long w = getLong(e.getAttribute(_rx));
 	long h = getLong(e.getAttribute(_ry));
+
+	if (scale != 1.0) {
+		x = (long)(Math.floor((double)x * scale));
+		y = (long)(Math.floor((double)y * scale));
+		w = (long)(Math.floor((double)w * scale));
+		h = (long)(Math.floor((double)h * scale));
+	}
+
+	x += xoffset;
+	y += yoffset;
+
 	VEllipse res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
@@ -696,10 +731,22 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VCircle createCircle(Element e,Context ctx,boolean meta){
-	long x = getLong(e.getAttribute(_cx)) + xoffset;
-	long y = getLong(e.getAttribute(_cy)) + yoffset;
+
+	long x = getLong(e.getAttribute(_cx));
+	long y = getLong(e.getAttribute(_cy));
 	long r = getLong(e.getAttribute(_r));
+
+	if (scale != 1.0) {
+		x = (long)(Math.floor((double)x * scale));
+		y = (long)(Math.floor((double)y * scale));
+		r = (long)(Math.floor((double)r * scale));
+	}
+
+	x += xoffset;
+	y += yoffset;
+
 	VCircle res;
+
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
@@ -720,10 +767,9 @@ public class SVGReader {
 		res.setDrawBorder(false);
 	    }
 	    if (ss.requiresSpecialStroke()){
-		assignStroke(res, ss);
+			assignStroke(res, ss);
 	    }
-	}
-	else {res=new VCircle(x,-y,0,r,Color.white);}
+	} else {res=new VCircle(x,-y,0,r,Color.white);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -756,8 +802,17 @@ public class SVGReader {
      */
     public static VText createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
 	String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
-	long x = getLong(e.getAttribute(_x)) + xoffset;
-	long y = getLong(e.getAttribute(_y)) + yoffset;
+	long x = getLong(e.getAttribute(_x));
+	long y = getLong(e.getAttribute(_y));
+
+	if (scale != 1.0) {
+		x = (long)(Math.floor((double)x * scale));
+		y = (long)(Math.floor((double)y * scale));
+	}
+
+	x += xoffset;
+	y += yoffset;
+
 	VText res;
 	short ta=VText.TEXT_ANCHOR_START;
 	if (e.hasAttribute(_textanchor)){
@@ -767,6 +822,7 @@ public class SVGReader {
 	    else if (tas.equals(_inherit)){System.err.println("SVGReader::'inherit' value for text-anchor attribute not supported yet");}
 	}
 	SVGStyle ss = null;
+
 	if (e.hasAttribute(_style)){
 	    ss = getStyle(e.getAttribute(_style));
 	    if (ss.getBorderColor()==null){
@@ -1004,10 +1060,21 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VRectangleOr createRectangle(Element e,Context ctx,boolean meta){
-	long x = getLong(e.getAttribute(_x)) + xoffset;
-	long y = getLong(e.getAttribute(_y)) + yoffset;
+	long x = getLong(e.getAttribute(_x));
+	long y = getLong(e.getAttribute(_y));
 	long w = getLong(e.getAttribute(_width))/2;
 	long h = getLong(e.getAttribute(_height))/2;
+
+	if (scale != 1.0) {
+		x = (long)(Math.floor((double)x * scale));
+		y = (long)(Math.floor((double)y * scale));
+		w = (long)(Math.floor((double)w * scale));
+		h = (long)(Math.floor((double)h * scale));
+	}
+
+	x += xoffset;
+	y += yoffset;
+
 	VRectangleOr res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
@@ -1089,34 +1156,59 @@ public class SVGReader {
     public static VImage createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
 	long x = getLong(e.getAttribute(_x)) + xoffset;
 	long y = getLong(e.getAttribute(_y)) + yoffset;
+
 	String width = e.getAttribute(_width);
-	if (width.endsWith("px")){width = width.substring(0,width.length()-2);}
+
+	// remove "px" from width and height
+
+	if (width.endsWith("px")) {
+		width = width.substring(0,width.length()-2);
+	}
+
 	String height = e.getAttribute(_height);
-	if (height.endsWith("px")){height = height.substring(0,height.length()-2);}
+
+	if (height.endsWith("px")) {
+		height = height.substring(0,height.length()-2);
+	}
+
 	long w = getLong(width);
 	long h = getLong(height);
+
 	long hw = w / 2;
 	long hh = h / 2;
+
 	VImage res = null;
+
 	if (e.hasAttributeNS(xlinkURI, _href)){
 	    String imagePath = e.getAttributeNS(xlinkURI, _href);
 	    if (imagePath.length() > 0){
-		ImageIcon ii = getImage(imagePath, documentParentURL, fallbackParentURL, imageStore);
-		if (ii != null){
-		    int aw = ii.getIconWidth();
-		    int ah = ii.getIconHeight();
-		    double wr = w/((double)aw);
-		    double hr = h/((double)ah);
-		    if (wr != 1.0 || hr != 1.0){
-			res = new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr));
-		    }
-		    else {
-			res = new VImage(x+hw, -y-hh, 0, ii.getImage());
-		    }
-		}
+			ImageIcon ii = getImage(imagePath, documentParentURL, fallbackParentURL, imageStore);
+
+			if (ii != null){
+
+	// icon-specified dimensions
+
+			    int aw = ii.getIconWidth();
+			    int ah = ii.getIconHeight();
+
+	// width and height ratios
+
+			    double wr = w/((double)aw);
+			    double hr = h/((double)ah);
+
+			    if (wr != 1.0 || hr != 1.0){
+					res = new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr));
+			    } else {
+					res = new VImage(x+hw, -y-hh, 0, ii.getImage());
+		   		 }
+			}
 	    }
 	}
-	if (meta && res != null){setMetadata(res, ctx);}
+
+	if (meta && res != null) {
+		setMetadata(res, ctx);
+	}
+
 	return res;
     }
 
@@ -1219,7 +1311,9 @@ public class SVGReader {
      */
     public static VSegment[] createPolyline(Element e,Context ctx,boolean meta){
 	Vector coords=new Vector();
+
 	translateSVGPolygon(e.getAttribute(_points),coords);
+
 	VSegment[] res=new VSegment[coords.size()-1];
 	SVGStyle ss = null;
 	if (e.hasAttribute(_style)){
@@ -1281,10 +1375,23 @@ public class SVGReader {
 	    if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
 	    else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
 	}
-	long x1 = getLong(e.getAttribute(_x1)) + xoffset;
-	long y1 = getLong(e.getAttribute(_y1)) + yoffset;
-	long x2 = getLong(e.getAttribute(_x2)) + xoffset;
-	long y2 = getLong(e.getAttribute(_y2)) + yoffset;
+	long x1 = getLong(e.getAttribute(_x1));
+	long y1 = getLong(e.getAttribute(_y1));
+	long x2 = getLong(e.getAttribute(_x2));
+	long y2 = getLong(e.getAttribute(_y2));
+
+	if (scale != 1.0) {
+		x1 = (long)(Math.floor((double)x1 * scale));
+		y1 = (long)(Math.floor((double)y1 * scale));
+		x2 = (long)(Math.floor((double)x2 * scale));
+		y2 = (long)(Math.floor((double)y2 * scale));
+	}
+
+	x1 += xoffset;
+	y1 += yoffset;
+	x2 += xoffset;
+	y2 += yoffset;
+
 	VSegment res = new VSegment(x1, -y1, 0, border, x2, -y2);
 	if (ss != null && ss.requiresSpecialStroke()){
 	    assignStroke(res, ss);
@@ -1445,8 +1552,11 @@ public class SVGReader {
 // 	String documentURL = d.getDocumentURI();
  	String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
 	Element svgRoot=d.getDocumentElement();
+
+
 	NodeList objects=svgRoot.getChildNodes();
 	Hashtable imageStore = new Hashtable();
+
 	for (int i=0;i<objects.getLength();i++){
 	    Node obj=objects.item(i);
 	    if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,meta, documentParentURL, fallbackParentURL, imageStore);}
@@ -1488,13 +1598,97 @@ public class SVGReader {
 	else if (tagName.equals(_line)){
 	    vsm.addGlyph(createLine(e, ctx, meta), vs);
 	}
-	else if (tagName.equals(_image)){
-	    Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
-	    if (g != null){
-		vsm.addGlyph(g, vs);
-	    }
+	else if (tagName.equals(_image)) {
+
+		if (isSVGImage(e)) {
+	    	String imagePath = e.getAttributeNS(xlinkURI, _href);
+
+			URL imageURL = getImageURL(imagePath, documentParentURL, fallbackParentURL);
+
+			String width = e.getAttribute(_width);
+
+    // remove "px" from width and height
+
+			if (width.endsWith("px")) {
+				width = width.substring(0,width.length()-2);
+    		}
+
+			String height = e.getAttribute(_height);
+
+			if (height.endsWith("px")) {
+				height = height.substring(0,height.length()-2);
+			}
+
+			long w = getLong(width);
+			long h = getLong(height);
+
+			long x = getLong(e.getAttribute(_x));
+			long y = getLong(e.getAttribute(_y));
+
+			long xos = xoffset;
+			long yos = yoffset;
+
+			xoffset += x;
+			yoffset += y;
+
+			String imPath = imageURL.toString();
+
+//			System.out.println("image path: " + imPath);
+
+			Document imageDoc = parseSVG(imPath, false);
+			Element svgRoot=imageDoc.getDocumentElement();
+	
+	    	String viewBox = svgRoot.getAttribute(_viewBox);
+			String[] vbs = viewBox.split(" ");
+
+			String xorigin = vbs[0];
+			String yorigin = vbs[1];
+			String iwidth = vbs[2];
+			String iheight = vbs[3];
+
+			long xor = getLong(xorigin);
+			long yor = getLong(yorigin);
+			long iw = getLong(iwidth);
+			long ih = getLong(iheight);
+
+			scale = (double)w / iw;
+
+			xoffset -= (long)Math.floor((double)xor * scale);
+			yoffset -= (long)Math.floor((double)yor * scale);
+
+    		load(imageDoc, vsm, vs, meta, imPath);
+
+			scale = 1.0;
+			xoffset = xos;
+			yoffset = yos;
+
+		} else { 
+	    	Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
+	    	if (g != null){
+				vsm.addGlyph(g, vs);
+	    	}
+		}
 	}
 	else if (tagName.equals(_g)){
+		long xos = xoffset;
+		long yos = yoffset;
+
+	    if (e.hasAttribute(SVGReader._transform)){
+
+			String transform = e.getAttribute(_transform);
+//			System.out.println("transform: " + transform);
+
+			int transl = transform.indexOf("translate");
+			int rp = transform.indexOf(")", transl);
+
+			String tlate = transform.substring(transl + 10, rp);
+			String tx = tlate.split(" ")[0];
+			String ty = tlate.split(" ")[1];
+
+			xoffset += (long)Math.floor((double)getLong(tx) * scale);
+			yoffset += (long)Math.floor((double)getLong(ty) * scale);
+		}
+
 	    NodeList objects=e.getChildNodes();
 	    boolean setAFont=false;
 	    if (e.hasAttribute(SVGReader._style)){
@@ -1532,6 +1726,9 @@ public class SVGReader {
 				documentParentURL, fallbackParentURL, imageStore);
 		}
 	    }
+
+		xoffset = xos;
+		yoffset = yos;
 	}
 	else if (tagName.equals(_a)){
 	    NodeList objects=e.getChildNodes();
@@ -1617,9 +1814,10 @@ public class SVGReader {
 	else {return false;}
     }
 
-    /*get the in-memory ImageIcon of icon at imageLocation*/
-    static ImageIcon getImage(String imagePath, String documentParentURL, String fallbackParentURL, Hashtable imageStore){
+	static URL getImageURL(String imagePath, String documentParentURL, String fallbackParentURL) {
+
 	URL imageURL = null;
+
 	// deal with absolute vs. relative paths
 	if (imagePath.startsWith(FILE_SCHEME) || imagePath.startsWith(HTTP_SCHEME)){
 	    // test file:/XXX, http://XXX, absolute URL with scheme, nothing to do
@@ -1673,7 +1871,17 @@ public class SVGReader {
  		}
 	    }
 	}
+
+	return imageURL;
+	}
+
+    /*get the in-memory ImageIcon of icon at imageLocation*/
+    static ImageIcon getImage(String imagePath, String documentParentURL, String fallbackParentURL, Hashtable imageStore){
+
+	URL imageURL = getImageURL(imagePath, documentParentURL, fallbackParentURL);
+
 	ImageIcon res = null;
+
 	if (imageStore.containsKey(imageURL)){
 	    res = (ImageIcon)imageStore.get(imageURL);
 	}
@@ -1687,4 +1895,31 @@ public class SVGReader {
 	return res;
     }
 
+	static boolean isSVGImage(Element e) {
+
+		if (e.hasAttributeNS(xlinkURI, _href)){
+	    	String imagePath = e.getAttributeNS(xlinkURI, _href);
+			if (imagePath.endsWith(".svg")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+    static Document parseSVG(String uri,boolean validation){
+    try {
+        DocumentBuilderFactory factory=DocumentBuilderFactory.newInstance();
+        factory.setValidating(validation);
+        if (!validation){factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd",new Boolean(false));}
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder=factory.newDocumentBuilder();
+        Document res=builder.parse(uri);
+        return res;
+    }
+    catch (FactoryConfigurationError e){e.printStackTrace();return null;}
+    catch (ParserConfigurationException e){e.printStackTrace();return null;}
+    catch (SAXException e){e.printStackTrace();return null;}
+    catch (IOException e){e.printStackTrace();return null;}
+    }
 }
