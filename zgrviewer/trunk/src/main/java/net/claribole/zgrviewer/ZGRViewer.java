@@ -439,10 +439,12 @@ public class ZGRViewer implements ZGRApplication {
 	    if (version != null){
 		if (version.equals(Messages.VERSION)){
 		    // we should actually compare numbers
-		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.YOU_HAVE_THE_MOST_RECENT_VERSION);
+		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.YOU_HAVE_THE_MOST_RECENT_VERSION,
+		                                  "Version Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 		else {
-		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.NEW_VERSION_AVAILABLE+version);
+		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.NEW_VERSION_AVAILABLE+version+"\n"+Messages.DOWNLOAD_URL,
+		                                  "Version Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 	    }
 	    else {
