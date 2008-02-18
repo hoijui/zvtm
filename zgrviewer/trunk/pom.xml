@@ -11,7 +11,7 @@ $Id$
   <artifactId>zgrviewer</artifactId>
   <packaging>jar</packaging>
   <name>ZGRViewer</name>
-  <version>0.8.0</version>
+  <version>0.8.1-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net/zgrviewer.html</url>
   
   <!-- Repositories -->
