@@ -43,12 +43,13 @@ import com.xerox.VTM.engine.Camera;
 
 public class VRectangle extends ClosedShape implements RectangularShape {
 
-    /*half width and height in virtual space*/
-    long vw,vh;
+    /** For internal use. Made public for easier outside package subclassing. */
+    public long vw,vh;
     /*aspect ratio (width divided by height)*/
     float ar;
 
-    RProjectedCoordsP[] pc;
+    /** For internal use. Made public for easier outside package subclassing. */
+    public RProjectedCoordsP[] pc;
 
     public VRectangle(){
 	vx=0;
