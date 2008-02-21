@@ -289,11 +289,18 @@ class NavigationManager {
                 break;
             }
             case L2_Fading:{
-                tLens = new TFadingLens(1.0f, 0.0f, 0.85f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
+                tLens = new TFadingLens(1.0f, 0.0f, 1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
                 ((TFadingLens)tLens).setBoundaryColor(Color.RED);
                 ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
                 res = (Lens)tLens;
                 break;
+            }
+            case L2_DLinear:{
+                tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                res = (Lens)tLens;
+                ((FixedSizeLens)res).setInnerRadiusColor(Color.RED);
+                ((FixedSizeLens)res).setOuterRadiusColor(Color.RED);
+				break;
             }
             case LInf_Fading:{
                 tLens = new LInfTFadingLens(1.0f, 0.0f, 0.98f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
