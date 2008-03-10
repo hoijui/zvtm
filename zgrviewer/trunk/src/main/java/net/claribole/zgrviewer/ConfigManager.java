@@ -103,8 +103,8 @@ class ConfigManager {
 
     /*location of the configuration file - at init time, we look for it in the user's home dir.
      If it is not there, we take the one in ZGRViewer dir.*/
-    static File cfgFile;
-    static String PREFS_FILE_NAME="zgrviewer.cfg";
+    static String PREFS_FILE_NAME = ".zgrviewer";
+    static String OLD_PREFS_FILE_NAME = "zgrviewer.cfg";
 
     static int ANIM_MOVE_LENGTH=300;
 
@@ -135,134 +135,137 @@ class ConfigManager {
     double autoZoomFactor = 1;
     double autoUnzoomFactor = -0.5;
 
-    /**/
     static Vector LAST_COMMANDS;
     static int COMMAND_LIMIT = 5;
 
     GraphicsManager grMngr;
 
-    ConfigManager(GraphicsManager gm, boolean applet){
-	this.grMngr = gm;
-	if (!applet){cfgFile = new File(System.getProperty("user.home")+"/"+PREFS_FILE_NAME);}
-	LAST_COMMANDS = new Vector();
-    }
-
-    /*load user prefs from config file (in theory, if the file cannot be found, 
-      every variable should have a default value)*/
-    void loadConfig(){
-	if (cfgFile.exists()){
-	    System.out.println("Loading Preferences from : "+cfgFile.getAbsolutePath());
-	    try {
-		Document d=Utils.parse(cfgFile,false);
-		d.normalize();
-		Element rt=d.getDocumentElement();
-		Element e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"directories")).item(0);
-		try {
-		    ConfigManager.m_TmpDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"tmpDir").item(0).getFirstChild().getNodeValue());
-		    ConfigManager.DELETE_TEMP_FILES=(new Boolean(((Element)e.getElementsByTagNameNS(ConfigManager.zgrvURI,"tmpDir").item(0)).getAttribute("value"))).booleanValue();
-		}
-		catch (Exception ex){}
-		try {ConfigManager.m_PrjDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphDir").item(0).getFirstChild().getNodeValue());}
-		catch (Exception ex){}
-		try {ConfigManager.m_DotPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"dot").item(0).getFirstChild().getNodeValue());}
-		catch (Exception ex){}
-		try {ConfigManager.m_NeatoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"neato").item(0).getFirstChild().getNodeValue());}
-		catch (Exception ex){}
-		try {ConfigManager.m_CircoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"circo").item(0).getFirstChild().getNodeValue());}
-		catch (Exception ex){}
-		try {ConfigManager.m_TwopiPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"twopi").item(0).getFirstChild().getNodeValue());}
-		catch (Exception ex){}
-		try {ConfigManager.m_GraphVizFontDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphvizFontDir").item(0).getFirstChild().getNodeValue());}
-		catch (Exception ex){}
-		//web browser settings
-		try {
-		    e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"webBrowser")).item(0);
-		    ConfigManager.autoDetectBrowser=(new Boolean(e.getAttribute("autoDetect"))).booleanValue();
-		    ConfigManager.browserPath=new File(e.getAttribute("path"));
-		    ConfigManager.browserOptions=e.getAttribute("options");
-		}
-		catch (Exception ex){}
-		//proxy settings
-		try {
-		    e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"proxy")).item(0);
-		    updateProxy((new Boolean(e.getAttribute("enable"))).booleanValue(),
-				e.getAttribute("host"),e.getAttribute("port"));
-		}
-		catch (Exception ex){System.getProperties().put("proxySet","false");}
-		//misc prefs
-		try {
-		    e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"preferences")).item(0);
-		}
-		catch (Exception ex){}
-		try {
-		    ConfigManager.ANTIALIASING=((new Boolean(e.getAttribute("antialiasing"))).booleanValue());
-		}
-		catch (Exception ex){}
-		try {
-		    ConfigManager.HIGHLIGHT_COLOR = new Color((new Integer(e.getAttribute("highlightColor"))).intValue());
-		}
-		catch (Exception ex){}
-		try {
-		    ConfigManager.SAVE_WINDOW_LAYOUT=(new Boolean(e.getAttribute("saveWindowLayout"))).booleanValue();
-		}
-		catch (Exception ex){}
-		try {
-		    this.setSDZoomEnabled((new Boolean(e.getAttribute("sdZoom"))).booleanValue());
-		}
-		catch (Exception ex){}
-		try {
-		    this.setSDZoomFactor(Integer.parseInt(e.getAttribute("sdZoomFactor")));
-		}
-		catch (Exception ex){}
-		try {
-		    this.setMagnificationFactor(Float.parseFloat(e.getAttribute("magFactor")));
-		}
-		catch (Exception ex){}
-		try {
-		    ConfigManager.CMD_LINE_OPTS=e.getAttribute("cmdL_options");
-		}
-		catch (Exception ex){}
-		try {
-		    ConfigManager.FORCE_SILENT = ((new Boolean(e.getAttribute("silent"))).booleanValue());
-		}
-		catch (Exception ex){}
-		try {
-		    if (ConfigManager.SAVE_WINDOW_LAYOUT){//window layout preferences
-			e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"windows")).item(0);
-			mainViewX=(new Integer(e.getAttribute("mainX"))).intValue();
-			mainViewY=(new Integer(e.getAttribute("mainY"))).intValue();
-			mainViewW=(new Integer(e.getAttribute("mainW"))).intValue();
-			mainViewH=(new Integer(e.getAttribute("mainH"))).intValue();
-		    }
-		}
-		catch (Exception ex){}
-		//plugin settings
-		try {
-		    e = (Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugins")).item(0);
-		    if (e!=null){
-			loadPluginPreferences(e);
-		    }
-		}
-		catch (Exception ex){System.err.println("Failed to set some plugin preferences");}
-		// stored command lines (for programs other than dot/neato)
-		LAST_COMMANDS.removeAllElements();
-		try {
-		    NodeList nl = ((Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).item(0)).getElementsByTagNameNS(ConfigManager.zgrvURI, "li");
-		    for (int i=0;i<nl.getLength();i++){
-			if (i < COMMAND_LIMIT){LAST_COMMANDS.add(nl.item(i).getFirstChild().getNodeValue());}
-		    }
-		}
-		catch (NullPointerException ex1){}
-		
-		
-	    }
-	    catch (Exception ex){
-		System.err.println("Error while loading ZGRViewer configuration file (zgrviewer.cfg): ");
-		ex.printStackTrace();
-	    }
+	ConfigManager(GraphicsManager gm, boolean applet){
+		this.grMngr = gm;
+		LAST_COMMANDS = new Vector();
 	}
-	else {System.out.println("No Preferences File Found in : "+System.getProperty("user.home"));}
-    }
+
+	/* load user prefs from config file (in theory, if the file cannot be found, 
+	   every variable should have a default value) */
+	void loadConfig(){
+		File cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+		if (!cfgFile.exists()){
+			cfgFile = new File(System.getProperty("user.home") + "/" + OLD_PREFS_FILE_NAME);				
+		}
+		if (cfgFile.exists()){
+			System.out.println("Loading Preferences from : "+cfgFile.getAbsolutePath());
+			try {
+				Document d=Utils.parse(cfgFile,false);
+				d.normalize();
+				Element rt=d.getDocumentElement();
+				Element e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"directories")).item(0);
+				try {
+					ConfigManager.m_TmpDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"tmpDir").item(0).getFirstChild().getNodeValue());
+					ConfigManager.DELETE_TEMP_FILES=(new Boolean(((Element)e.getElementsByTagNameNS(ConfigManager.zgrvURI,"tmpDir").item(0)).getAttribute("value"))).booleanValue();
+				}
+				catch (Exception ex){}
+				try {ConfigManager.m_PrjDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphDir").item(0).getFirstChild().getNodeValue());}
+				catch (Exception ex){}
+				try {ConfigManager.m_DotPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"dot").item(0).getFirstChild().getNodeValue());}
+				catch (Exception ex){}
+				try {ConfigManager.m_NeatoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"neato").item(0).getFirstChild().getNodeValue());}
+				catch (Exception ex){}
+				try {ConfigManager.m_CircoPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"circo").item(0).getFirstChild().getNodeValue());}
+				catch (Exception ex){}
+				try {ConfigManager.m_TwopiPath=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"twopi").item(0).getFirstChild().getNodeValue());}
+				catch (Exception ex){}
+				try {ConfigManager.m_GraphVizFontDir=new File(e.getElementsByTagNameNS(ConfigManager.zgrvURI,"graphvizFontDir").item(0).getFirstChild().getNodeValue());}
+				catch (Exception ex){}
+				//web browser settings
+				try {
+					e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"webBrowser")).item(0);
+					ConfigManager.autoDetectBrowser=(new Boolean(e.getAttribute("autoDetect"))).booleanValue();
+					ConfigManager.browserPath=new File(e.getAttribute("path"));
+					ConfigManager.browserOptions=e.getAttribute("options");
+				}
+				catch (Exception ex){}
+				//proxy settings
+				try {
+					e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"proxy")).item(0);
+					updateProxy((new Boolean(e.getAttribute("enable"))).booleanValue(),
+						e.getAttribute("host"),e.getAttribute("port"));
+				}
+				catch (Exception ex){System.getProperties().put("proxySet","false");}
+				//misc prefs
+				try {
+					e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"preferences")).item(0);
+				}
+				catch (Exception ex){}
+				try {
+					ConfigManager.ANTIALIASING=((new Boolean(e.getAttribute("antialiasing"))).booleanValue());
+				}
+				catch (Exception ex){}
+				try {
+					ConfigManager.HIGHLIGHT_COLOR = new Color((new Integer(e.getAttribute("highlightColor"))).intValue());
+				}
+				catch (Exception ex){}
+				try {
+					ConfigManager.SAVE_WINDOW_LAYOUT=(new Boolean(e.getAttribute("saveWindowLayout"))).booleanValue();
+				}
+				catch (Exception ex){}
+				try {
+					this.setSDZoomEnabled((new Boolean(e.getAttribute("sdZoom"))).booleanValue());
+				}
+				catch (Exception ex){}
+				try {
+					this.setSDZoomFactor(Integer.parseInt(e.getAttribute("sdZoomFactor")));
+				}
+				catch (Exception ex){}
+				try {
+					this.setMagnificationFactor(Float.parseFloat(e.getAttribute("magFactor")));
+				}
+				catch (Exception ex){}
+				try {
+					ConfigManager.CMD_LINE_OPTS=e.getAttribute("cmdL_options");
+				}
+				catch (Exception ex){}
+				try {
+					ConfigManager.FORCE_SILENT = ((new Boolean(e.getAttribute("silent"))).booleanValue());
+				}
+				catch (Exception ex){}
+				try {
+					if (ConfigManager.SAVE_WINDOW_LAYOUT){
+						//window layout preferences
+						e=(Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI,"windows")).item(0);
+						mainViewX=(new Integer(e.getAttribute("mainX"))).intValue();
+						mainViewY=(new Integer(e.getAttribute("mainY"))).intValue();
+						mainViewW=(new Integer(e.getAttribute("mainW"))).intValue();
+						mainViewH=(new Integer(e.getAttribute("mainH"))).intValue();
+					}
+				}
+				catch (Exception ex){}
+				//plugin settings
+				try {
+					e = (Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugins")).item(0);
+					if (e!=null){
+						loadPluginPreferences(e);
+					}
+				}
+				catch (Exception ex){System.err.println("Failed to set some plugin preferences");}
+				// stored command lines (for programs other than dot/neato)
+				LAST_COMMANDS.removeAllElements();
+				try {
+					NodeList nl = ((Element)(rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).item(0)).getElementsByTagNameNS(ConfigManager.zgrvURI, "li");
+					for (int i=0;i<nl.getLength();i++){
+						if (i < COMMAND_LIMIT){LAST_COMMANDS.add(nl.item(i).getFirstChild().getNodeValue());}
+					}
+				}
+				catch (NullPointerException ex1){}
+
+
+			}
+			catch (Exception ex){
+				System.err.println("Error while loading ZGRViewer configuration file (" + cfgFile.getAbsolutePath() + "): ");
+				ex.printStackTrace();
+			}
+		}
+		else {System.out.println("No Preferences File Found in : "+System.getProperty("user.home"));}
+	}
 
     void loadPluginPreferences(Element pluginsEL){
 	NodeList nl = pluginsEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugin");
@@ -289,149 +292,155 @@ class ConfigManager {
 	}
     }
 
-    /*save user prefs to config file*/
-    void saveConfig(){
- 	DOMImplementation di=new DOMImplementationImpl();
-	//DocumentType dtd=di.createDocumentType("isv:config",null,"isv.dtd");
-	Document cfg=di.createDocument(ConfigManager.zgrvURI,"zgrv:config",null);
-	//generate the XML document
-	Element rt=cfg.getDocumentElement();
-	rt.setAttribute("xmlns:zgrv",ConfigManager.zgrvURI);
-	//save directory preferences
-	Element dirs=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:directories");
-	rt.appendChild(dirs);
-	Element aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:tmpDir");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_TmpDir.toString()));
-	aDir.setAttribute("value",String.valueOf(ConfigManager.DELETE_TEMP_FILES));
-	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphDir");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_PrjDir.toString()));
-	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:dot");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_DotPath.toString()));
-	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:neato");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_NeatoPath.toString()));
-	dirs.appendChild(aDir);
-	aDir = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:circo");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_CircoPath.toString()));
-	dirs.appendChild(aDir);
-	aDir = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:twopi");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_TwopiPath.toString()));
-	dirs.appendChild(aDir);
-	aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphvizFontDir");
-	aDir.appendChild(cfg.createTextNode(ConfigManager.m_GraphVizFontDir.toString()));
-	dirs.appendChild(aDir);
-	//web settings
-	Element consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:webBrowser");
-	consts.setAttribute("autoDetect",String.valueOf(ConfigManager.autoDetectBrowser));
-	consts.setAttribute("path",ConfigManager.browserPath.toString());
-	consts.setAttribute("options",ConfigManager.browserOptions);
-	rt.appendChild(consts);
-	consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:proxy");
-	consts.setAttribute("enable",String.valueOf(ConfigManager.useProxy));
-	consts.setAttribute("host",ConfigManager.proxyHost);
-	consts.setAttribute("port",ConfigManager.proxyPort);
-	rt.appendChild(consts);
-	//save misc. constants
-	consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:preferences");
-	rt.appendChild(consts);
-// 	consts.setAttribute("graphOrient",ConfigManager.GRAPH_ORIENTATION);
-	consts.setAttribute("antialiasing",String.valueOf(ConfigManager.ANTIALIASING));
-	consts.setAttribute("highlightColor", Integer.toString(HIGHLIGHT_COLOR.getRGB()));
-	consts.setAttribute("silent", String.valueOf(ConfigManager.FORCE_SILENT));
-	consts.setAttribute("saveWindowLayout",String.valueOf(ConfigManager.SAVE_WINDOW_LAYOUT));
-	consts.setAttribute("sdZoom",String.valueOf(SD_ZOOM_ENABLED));
-	consts.setAttribute("sdZoomFactor",String.valueOf(this.getSDZoomFactor()));
-	consts.setAttribute("magFactor", String.valueOf(this.getMagnificationFactor()));
-	consts.setAttribute("cmdL_options",ConfigManager.CMD_LINE_OPTS);
-	//window locations and sizes
-	if (ConfigManager.SAVE_WINDOW_LAYOUT){
-	    //first update the values
-	    updateWindowVariables();
-	    consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:windows");
-	    consts.setAttribute("mainX",String.valueOf(mainViewX));
-	    consts.setAttribute("mainY",String.valueOf(mainViewY));
-	    consts.setAttribute("mainW",String.valueOf(mainViewW));
-	    consts.setAttribute("mainH",String.valueOf(mainViewH));
-	    rt.appendChild(consts);
-	}
-	Element pluginsEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:plugins");
-	rt.appendChild(pluginsEL);
-	Hashtable pluginSettings;
-	Element pluginEL, settingEL;
-	String settingName, settingValue;
-	for (int i=0;i<plugins.length;i++){
-	    pluginSettings = plugins[i].savePreferences();
-	    if (pluginSettings != null && pluginSettings.size() > 0){
-		pluginEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:plugin");
-		pluginsEL.appendChild(pluginEL);
-		pluginEL.setAttribute("name", plugins[i].getName());
-		for (Enumeration e=pluginSettings.keys();e.hasMoreElements();){
-		    settingName = (String)e.nextElement();
-		    settingValue = (String)pluginSettings.get(settingName);
-		    settingEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:setting");
-		    settingEL.setAttribute("name", settingName);
-		    settingEL.appendChild(cfg.createTextNode(settingValue));
-		    pluginEL.appendChild(settingEL);
+	/*save user prefs to config file*/
+	void saveConfig(){
+		DOMImplementation di=new DOMImplementationImpl();
+		//DocumentType dtd=di.createDocumentType("isv:config",null,"isv.dtd");
+		Document cfg=di.createDocument(ConfigManager.zgrvURI,"zgrv:config",null);
+		//generate the XML document
+		Element rt=cfg.getDocumentElement();
+		rt.setAttribute("xmlns:zgrv",ConfigManager.zgrvURI);
+		//save directory preferences
+		Element dirs=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:directories");
+		rt.appendChild(dirs);
+		Element aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:tmpDir");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_TmpDir.toString()));
+		aDir.setAttribute("value",String.valueOf(ConfigManager.DELETE_TEMP_FILES));
+		dirs.appendChild(aDir);
+		aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphDir");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_PrjDir.toString()));
+		dirs.appendChild(aDir);
+		aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:dot");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_DotPath.toString()));
+		dirs.appendChild(aDir);
+		aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:neato");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_NeatoPath.toString()));
+		dirs.appendChild(aDir);
+		aDir = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:circo");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_CircoPath.toString()));
+		dirs.appendChild(aDir);
+		aDir = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:twopi");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_TwopiPath.toString()));
+		dirs.appendChild(aDir);
+		aDir=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:graphvizFontDir");
+		aDir.appendChild(cfg.createTextNode(ConfigManager.m_GraphVizFontDir.toString()));
+		dirs.appendChild(aDir);
+		//web settings
+		Element consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:webBrowser");
+		consts.setAttribute("autoDetect",String.valueOf(ConfigManager.autoDetectBrowser));
+		consts.setAttribute("path",ConfigManager.browserPath.toString());
+		consts.setAttribute("options",ConfigManager.browserOptions);
+		rt.appendChild(consts);
+		consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:proxy");
+		consts.setAttribute("enable",String.valueOf(ConfigManager.useProxy));
+		consts.setAttribute("host",ConfigManager.proxyHost);
+		consts.setAttribute("port",ConfigManager.proxyPort);
+		rt.appendChild(consts);
+		//save misc. constants
+		consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:preferences");
+		rt.appendChild(consts);
+		// 	consts.setAttribute("graphOrient",ConfigManager.GRAPH_ORIENTATION);
+		consts.setAttribute("antialiasing",String.valueOf(ConfigManager.ANTIALIASING));
+		consts.setAttribute("highlightColor", Integer.toString(HIGHLIGHT_COLOR.getRGB()));
+		consts.setAttribute("silent", String.valueOf(ConfigManager.FORCE_SILENT));
+		consts.setAttribute("saveWindowLayout",String.valueOf(ConfigManager.SAVE_WINDOW_LAYOUT));
+		consts.setAttribute("sdZoom",String.valueOf(SD_ZOOM_ENABLED));
+		consts.setAttribute("sdZoomFactor",String.valueOf(this.getSDZoomFactor()));
+		consts.setAttribute("magFactor", String.valueOf(this.getMagnificationFactor()));
+		consts.setAttribute("cmdL_options",ConfigManager.CMD_LINE_OPTS);
+		//window locations and sizes
+		if (ConfigManager.SAVE_WINDOW_LAYOUT){
+			//first update the values
+			updateWindowVariables();
+			consts=cfg.createElementNS(ConfigManager.zgrvURI,"zgrv:windows");
+			consts.setAttribute("mainX",String.valueOf(mainViewX));
+			consts.setAttribute("mainY",String.valueOf(mainViewY));
+			consts.setAttribute("mainW",String.valueOf(mainViewW));
+			consts.setAttribute("mainH",String.valueOf(mainViewH));
+			rt.appendChild(consts);
 		}
-	    }
+		Element pluginsEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:plugins");
+		rt.appendChild(pluginsEL);
+		Hashtable pluginSettings;
+		Element pluginEL, settingEL;
+		String settingName, settingValue;
+		for (int i=0;i<plugins.length;i++){
+			pluginSettings = plugins[i].savePreferences();
+			if (pluginSettings != null && pluginSettings.size() > 0){
+				pluginEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:plugin");
+				pluginsEL.appendChild(pluginEL);
+				pluginEL.setAttribute("name", plugins[i].getName());
+				for (Enumeration e=pluginSettings.keys();e.hasMoreElements();){
+					settingName = (String)e.nextElement();
+					settingValue = (String)pluginSettings.get(settingName);
+					settingEL = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:setting");
+					settingEL.setAttribute("name", settingName);
+					settingEL.appendChild(cfg.createTextNode(settingValue));
+					pluginEL.appendChild(settingEL);
+				}
+			}
+		}
+		// command lines
+		consts = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
+		rt.appendChild(consts);
+		if (LAST_COMMANDS != null){
+			for (int i=0;i<LAST_COMMANDS.size();i++){
+				Element aCommand = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
+				aCommand.appendChild(cfg.createTextNode((String)LAST_COMMANDS.elementAt(i)));
+				consts.appendChild(aCommand);
+			}
+		}
+		File cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+		if (cfgFile.exists()){cfgFile.delete();}
+		Utils.serialize(cfg, cfgFile);
 	}
-	// command lines
-	consts = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
-	rt.appendChild(consts);
-	if (LAST_COMMANDS != null){
-	    for (int i=0;i<LAST_COMMANDS.size();i++){
-		Element aCommand = cfg.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
-		aCommand.appendChild(cfg.createTextNode((String)LAST_COMMANDS.elementAt(i)));
-		consts.appendChild(aCommand);
-	    }
-	}
-	if (cfgFile.exists()){cfgFile.delete();}
-	Utils.serialize(cfg, cfgFile);
-    }
 
-    /*save command lines on exit, without modifying user settings if he did not ask to do so*/
-    void saveCommandLines(){
-	try {
-	    Document d;
-	    Element rt;
-	    Element cLines;
-	    if (cfgFile.exists()){
-		d = Utils.parse(cfgFile, false);
-		d.normalize();
-		rt = d.getDocumentElement();
-		if ((rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).getLength()>0){
-		    rt.removeChild((rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).item(0));
+	/*save command lines on exit, without modifying user settings if he did not ask to do so*/
+	void saveCommandLines(){
+		try {
+			Document d;
+			Element rt;
+			Element cLines;
+			File cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+			if (!cfgFile.exists()){
+				cfgFile = new File(System.getProperty("user.home") + "/" + OLD_PREFS_FILE_NAME);				
+			}
+			if (cfgFile.exists()){
+				d = Utils.parse(cfgFile, false);
+				d.normalize();
+				rt = d.getDocumentElement();
+				if ((rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).getLength()>0){
+					rt.removeChild((rt.getElementsByTagNameNS(ConfigManager.zgrvURI, "commandLines")).item(0));
+				}
+				cLines = d.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
+				if (LAST_COMMANDS != null){
+					for (int i=0;i<LAST_COMMANDS.size();i++){
+						Element aCmdLine = d.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
+						aCmdLine.appendChild(d.createTextNode((String)LAST_COMMANDS.elementAt(i)));
+						cLines.appendChild(aCmdLine);
+					}
+				}
+			}
+			else {
+				DOMImplementation di = new DOMImplementationImpl();
+				d = di.createDocument(ConfigManager.zgrvURI, "zgrv:config", null);
+				rt = d.getDocumentElement();
+				rt.setAttribute("xmlns:zgrv", ConfigManager.zgrvURI);
+				cLines = d.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
+				if (LAST_COMMANDS != null){
+					for (int i=0;i<LAST_COMMANDS.size();i++){
+						Element aCmdLine = d.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
+						aCmdLine.appendChild(d.createTextNode((String)LAST_COMMANDS.elementAt(i)));
+						cLines.appendChild(aCmdLine);
+					}
+				}
+			}
+			rt.appendChild(cLines);
+			cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+			Utils.serialize(d, cfgFile);
 		}
-		cLines = d.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
-		if (LAST_COMMANDS != null){
-		    for (int i=0;i<LAST_COMMANDS.size();i++){
-			Element aCmdLine = d.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
-			aCmdLine.appendChild(d.createTextNode((String)LAST_COMMANDS.elementAt(i)));
-			cLines.appendChild(aCmdLine);
-		    }
-		}
-	    }
-	    else {
-		DOMImplementation di = new DOMImplementationImpl();
-		d = di.createDocument(ConfigManager.zgrvURI, "zgrv:config", null);
-		rt = d.getDocumentElement();
-		rt.setAttribute("xmlns:zgrv", ConfigManager.zgrvURI);
-		cLines = d.createElementNS(ConfigManager.zgrvURI, "zgrv:commandLines");
-		if (LAST_COMMANDS != null){
-		    for (int i=0;i<LAST_COMMANDS.size();i++){
-			Element aCmdLine = d.createElementNS(ConfigManager.zgrvURI, "zgrv:li");
-			aCmdLine.appendChild(d.createTextNode((String)LAST_COMMANDS.elementAt(i)));
-			cLines.appendChild(aCmdLine);
-		    }
-		}
-	    }
-	    rt.appendChild(cLines);
-	    Utils.serialize(d, cfgFile);
+		catch (Exception ex){}
 	}
-	catch (Exception ex){}
-    }
 
     static boolean checkProgram(short prg){
 	switch (prg){
