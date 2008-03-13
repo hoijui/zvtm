@@ -1042,6 +1042,10 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
         System.exit(0);
     }
 
+	/* vt: view type 0 (standard) or 1 (opengl)
+	   fs: true/false fullscreen
+	   le: true/false logging
+	 */
     public static void main(String[] args){
         final short vt = (args.length > 0) ? Short.parseShort(args[0]) : 0;
         final boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : true;
