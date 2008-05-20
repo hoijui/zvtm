@@ -92,6 +92,7 @@ public class ToolPalette {
     
     void setEnabled(boolean b){
         enabled = b;
+		paletteCamera.setEnabled(b);
     }
     
     boolean isEnabled(){
