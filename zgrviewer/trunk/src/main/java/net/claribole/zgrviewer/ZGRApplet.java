@@ -53,6 +53,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String CURSOR_COLOR_PARAM = "cursorColor";
     static final String CENTER_ON_LABEL_PARAM = "centerOnLabel";
     static final String ANTIALIASING_PARAM = "antialiased";
+    static final String DISPLAY_OVERVIEW_PARAM = "displayOverview";
 
     static final String HTTP_PROTOCOL = "http://";
     static final String HTTPS_PROTOCOL = "https://";
@@ -120,6 +121,14 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    }
 	}
 	catch(Exception ex){showFCPalette = true;}
+	boolean showOverview = true;
+	try {
+	    String s = getParameter(DISPLAY_OVERVIEW_PARAM);
+	    if (s != null){
+			showOverview = (new Boolean(s)).booleanValue();
+	    }
+	}
+	catch(Exception ex){showOverview = true;}
 	try {
 	    APPLET_TITLE = getParameter(APPLET_TITLE_PARAM);
 	}
@@ -182,9 +191,9 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	borderPanel.setLayout(new BorderLayout());
 	borderPanel.add(viewPanel, BorderLayout.CENTER);
 	borderPanel.add(statusBar, BorderLayout.SOUTH);
-	borderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black,2), APPLET_TITLE));
+	borderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 1), APPLET_TITLE));
 	borderPanel.setOpaque(false);
-	if (showNavControl){
+	if (showNavControl || showOverview){
 	    GridBagLayout gridBag = new GridBagLayout();
 	    GridBagConstraints constraints = new GridBagConstraints();
 	    constraints.fill = GridBagConstraints.BOTH;
@@ -193,7 +202,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    buildConstraints(constraints,0,0,1,1,90,100);
 	    gridBag.setConstraints(borderPanel, constraints);
 	    cpane.add(borderPanel);
-	    navPanel = new NavPanel(grMngr, centerOnLabelF);
+	    navPanel = new NavPanel(grMngr, centerOnLabelF, showOverview);
 	    buildConstraints(constraints,1,0,1,1,10,0);
 	    gridBag.setConstraints(navPanel, constraints);
 	    cpane.add(navPanel);

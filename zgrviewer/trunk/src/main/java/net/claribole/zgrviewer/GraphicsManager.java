@@ -81,7 +81,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     public View mainView;
     View rView;
-    static final String radarView = "Overview";
+    static final String RADAR_VIEW_NAME = "Overview";
     Camera mainCamera;
     JPanel mainViewPanel;
 
@@ -467,9 +467,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		Vector cameras = new Vector();
 		cameras.add(mSpace.getCamera(1));
 		cameras.add(rSpace.getCamera(0));
-		vsm.addExternalView(cameras, radarView, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
+		vsm.addExternalView(cameras, RADAR_VIEW_NAME, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
 		reh = new RadarEvtHdlr(this);
-		rView = vsm.getView(radarView);
+		rView = vsm.getView(RADAR_VIEW_NAME);
 		rView.setBackgroundColor(cfgMngr.backgroundColor);
 		// same event handler handling all layers for now
 		//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
@@ -511,7 +511,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	vsm.repaintNow();
     }
 
-    void centerRadarView(){
+    void centerRADAR_VIEW_NAME(){
 	if (rView != null){
 	    vsm.getGlobalView(mSpace.getCamera(1),ConfigManager.ANIM_MOVE_LENGTH);
 	    cameraMoved();

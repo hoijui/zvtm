@@ -159,7 +159,7 @@ class GVLoader {
 		// encoding. This gives the server a chance to dynamically deliver "svgz" 
 		// content.
 		//
-		URL url = new URL(svgFileURL);
+		URL url = new URL(svgFileURL);		
 		URLConnection c = url.openConnection();
 		c.setRequestProperty("Accept-Encoding", "gzip");
 		// Connection is opened when something is requested - the header or

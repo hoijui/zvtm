@@ -15,6 +15,8 @@ import java.awt.event.KeyEvent;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -47,7 +49,11 @@ public class RadarEvtHdlr implements ViewEventHandler {
 	}
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+		LongPoint lp = v.getMouse().getLocation();
+		Camera c = grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(0);
+		grMngr.vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, new LongPoint(lp.x-c.posx, lp.y-c.posy), c.getID());
+	}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	grMngr.vsm.getGlobalView(grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(1),500);
@@ -119,9 +125,9 @@ public class RadarEvtHdlr implements ViewEventHandler {
 
     public void viewDeiconified(View v){}
 
-    public void viewClosing(View v){
-	grMngr.vsm.getView(grMngr.radarView).destroyView();
-	grMngr.rView=null;
-    }
+	public void viewClosing(View v){
+		grMngr.rView.destroyView();
+		grMngr.rView=null;
+	}
 
 }

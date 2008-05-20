@@ -23,11 +23,17 @@ import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 import javax.swing.BorderFactory;
 
+import java.util.Vector;
+
+import com.xerox.VTM.engine.View;
+
 /* Navigation Panel (directional arrows, plus zoom) */
 
 class NavPanel extends JPanel implements ActionListener, ChangeListener {
 
     GraphicsManager grMngr;
+
+	View overview = null;
 
     // pan buttons: NW, N, NE, W, H, E, SW, S, SE
     JButton[] panBts = new JButton[9];
@@ -62,15 +68,43 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
     
     JButton aboutBt;
 
-    NavPanel(GraphicsManager gm, String initialSearchString){
+    NavPanel(GraphicsManager gm, String initialSearchString, boolean displayOverview){
 	super();
 	this.setOpaque(false);
 	this.grMngr = gm;
 	GridBagLayout gridBag = new GridBagLayout();
 	GridBagConstraints constraints = new GridBagConstraints();
-	constraints.fill = GridBagConstraints.NONE;
+	constraints.fill = GridBagConstraints.BOTH;
 	constraints.anchor = GridBagConstraints.CENTER;
 	this.setLayout(gridBag);
+	int gncl_i = 0;
+	// Overview
+	if (displayOverview){
+		JPanel borderPanel = new JPanel();
+		borderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 1), "Overview"));
+		borderPanel.setOpaque(false);
+		borderPanel.setLayout(new BorderLayout());
+		Vector cameras = new Vector();	
+		cameras.add(grMngr.mSpace.getCamera(1));
+		cameras.add(grMngr.rSpace.getCamera(0));
+		JPanel ovPanel = grMngr.vsm.addPanelView(cameras, GraphicsManager.RADAR_VIEW_NAME, 100, 100);
+		grMngr.reh = new RadarEvtHdlr(grMngr);
+		grMngr.rView = grMngr.vsm.getView(GraphicsManager.RADAR_VIEW_NAME);
+		grMngr.rView.setBackgroundColor(grMngr.cfgMngr.backgroundColor);
+		// same event handler handling all layers for now
+		//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
+		grMngr.rView.setEventHandler(grMngr.reh, 0);
+		grMngr.rView.setEventHandler(grMngr.reh, 1);
+		grMngr.rView.setActiveLayer(1);
+		grMngr.rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
+		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+		grMngr.cameraMoved();
+		borderPanel.add(ovPanel, BorderLayout.CENTER);
+		buildConstraints(constraints, 0, gncl_i++, 1, 1, 100, 64);
+		gridBag.setConstraints(borderPanel, constraints);
+		this.add(borderPanel);
+	}
+	constraints.fill = GridBagConstraints.NONE;
 	//translation buttons in a 3x3 grid
 	JPanel p1 = new JPanel();
 	p1.setLayout(new GridLayout(3,3));
@@ -85,7 +119,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 	    panBts[i].addActionListener(this);
 	    p1.add(panBts[i]);
 	}
-	buildConstraints(constraints,0,0,1,1,100,1);
+	buildConstraints(constraints,0,gncl_i++, 1,1,0,16);
 	gridBag.setConstraints(p1, constraints);
 	this.add(p1);
 	//zoom buttons
@@ -102,18 +136,18 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 	    zoomBts[i].addActionListener(this);
 	    p2.add(zoomBts[i]);
 	}
-	buildConstraints(constraints,0,1,1,1,0,1);
+	buildConstraints(constraints,0,gncl_i++, 1,1,0,16);
 	gridBag.setConstraints(p2, constraints);
 	this.add(p2);
 	// search widgets
 	SearchPanel p3 = new SearchPanel(grMngr, initialSearchString);
-	buildConstraints(constraints,0,2,1,1,0,30);
+	buildConstraints(constraints,0,gncl_i++, 1,1,0,16);
 	gridBag.setConstraints(p3, constraints);
 	this.add(p3);
 	// antialiasing checkbox
 	aaCb = new JCheckBox("Antialiasing", grMngr.mainView.getAntialiasing());
 	aaCb.setOpaque(false);
-	buildConstraints(constraints,0,3,1,1,0,30);
+	buildConstraints(constraints,0,gncl_i++, 1,1,0,16);
 	gridBag.setConstraints(aaCb, constraints);
 	this.add(aaCb);
 	aaCb.addChangeListener(this);
@@ -124,7 +158,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 	aboutBt.setOpaque(false);
 	aboutBt.addActionListener(this);
 	p4.add(aboutBt);
-	buildConstraints(constraints,0,4,1,1,0,38);
+	buildConstraints(constraints,0,gncl_i++, 1,1,0,16);
 	gridBag.setConstraints(p4, constraints);
 	this.add(p4);
     }
