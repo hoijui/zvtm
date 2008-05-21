@@ -148,9 +148,9 @@ class ConfigManager {
 	/* load user prefs from config file (in theory, if the file cannot be found, 
 	   every variable should have a default value) */
 	void loadConfig(){
-		File cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+		File cfgFile = new File(System.getProperty("user.home") + File.separatorChar + PREFS_FILE_NAME);
 		if (!cfgFile.exists()){
-			cfgFile = new File(System.getProperty("user.home") + "/" + OLD_PREFS_FILE_NAME);				
+			cfgFile = new File(System.getProperty("user.home") + File.separatorChar + OLD_PREFS_FILE_NAME);				
 		}
 		if (cfgFile.exists()){
 			System.out.println("Loading Preferences from : "+cfgFile.getAbsolutePath());
@@ -390,7 +390,7 @@ class ConfigManager {
 				consts.appendChild(aCommand);
 			}
 		}
-		File cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+		File cfgFile = new File(System.getProperty("user.home") + File.separatorChar + PREFS_FILE_NAME);
 		if (cfgFile.exists()){cfgFile.delete();}
 		Utils.serialize(cfg, cfgFile);
 	}
@@ -401,9 +401,9 @@ class ConfigManager {
 			Document d;
 			Element rt;
 			Element cLines;
-			File cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+			File cfgFile = new File(System.getProperty("user.home") + File.separatorChar + PREFS_FILE_NAME);
 			if (!cfgFile.exists()){
-				cfgFile = new File(System.getProperty("user.home") + "/" + OLD_PREFS_FILE_NAME);				
+				cfgFile = new File(System.getProperty("user.home") + File.separatorChar + OLD_PREFS_FILE_NAME);				
 			}
 			if (cfgFile.exists()){
 				d = Utils.parse(cfgFile, false);
@@ -436,7 +436,7 @@ class ConfigManager {
 				}
 			}
 			rt.appendChild(cLines);
-			cfgFile = new File(System.getProperty("user.home") + "/" + PREFS_FILE_NAME);
+			cfgFile = new File(System.getProperty("user.home") + File.separatorChar + PREFS_FILE_NAME);
 			Utils.serialize(d, cfgFile);
 		}
 		catch (Exception ex){}
