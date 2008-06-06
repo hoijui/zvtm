@@ -38,13 +38,13 @@ public class VRingST extends VRing implements Translucent {
     
     /** Construct a slice by giving its 3 vertices
         *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param irr inner ring radius in virtual space (in rad)
+        *@param irr inner ring radius as a percentage of outer ring radius
 		*@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         *@param bc border color
      	*@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
-	public VRingST(LongPoint[] v, long irr, int z, Color c, Color bc, float a){
+	public VRingST(LongPoint[] v, float irr, int z, Color c, Color bc, float a){
 		super(v, irr, z, c, bc);
 		alpha = a;
 		acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -56,13 +56,13 @@ public class VRingST extends VRing implements Translucent {
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
         *@param ag arc angle in virtual space (in rad)
-        *@param irr inner ring radius in virtual space
+        *@param irr inner ring radius as a percentage of outer ring radius
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc) (in rad)
         *@param c fill color
         *@param bc border color
      	*@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
-    public VRingST(long x, long y, int z, long vs, double ag, long irr, double or, Color c, Color bc, float a){
+    public VRingST(long x, long y, int z, long vs, double ag, float irr, double or, Color c, Color bc, float a){
 		super(x, y, z, vs, ag, irr, or, c, bc);
 		alpha = a;
 		acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -74,13 +74,13 @@ public class VRingST extends VRing implements Translucent {
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
         *@param ag arc angle in virtual space (in degrees)
-        *@param irr inner ring radius in virtual space
+        *@param irr inner ring radius as a percentage of outer ring radius
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)  (in degrees)
         *@param c fill color
         *@param bc border color
      	*@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
-    public VRingST(long x, long y, int z, long vs, int ag, long irr, int or, Color c, Color bc, float a){
+    public VRingST(long x, long y, int z, long vs, int ag, float irr, int or, Color c, Color bc, float a){
 		super(x, y, z, vs, ag, irr, or, c, bc);
 		alpha = a;
 		acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
@@ -106,7 +106,7 @@ public class VRingST extends VRing implements Translucent {
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0)-1, angleDeg+1, Arc2D.PIE);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
@@ -159,7 +159,7 @@ public class VRingST extends VRing implements Translucent {
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
 					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0)-1, angleDeg+1, Arc2D.PIE);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);

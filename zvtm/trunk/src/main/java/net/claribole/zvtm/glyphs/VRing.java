@@ -34,7 +34,7 @@ public class VRing extends VSlice {
 	ProjRing[] pr;
 
 	/** Radius of inner ring, from center of ring.*/
-	double irr_p;
+	float irr_p;
     
     /** Construct a slice by giving its 3 vertices
         *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
@@ -43,7 +43,7 @@ public class VRing extends VSlice {
         *@param c fill color
         *@param bc border color
         */
-    public VRing(LongPoint[] v, double irr, int z, Color c, Color bc){
+    public VRing(LongPoint[] v, float irr, int z, Color c, Color bc){
 		initCoordArray(4);
         vx = v[0].x;
         vy = v[0].y;
@@ -67,7 +67,7 @@ public class VRing extends VSlice {
         *@param c fill color
         *@param bc border color
         */
-    public VRing(long x, long y, int z, long vs, double ag, double irr, double or, Color c, Color bc){
+    public VRing(long x, long y, int z, long vs, double ag, float irr, double or, Color c, Color bc){
 		initCoordArray(4);	
         vx = x;
         vy = y;
@@ -94,7 +94,7 @@ public class VRing extends VSlice {
         *@param c fill color
         *@param bc border color
         */
-    public VRing(long x, long y, int z, long vs, int ag, double irr, int or, Color c, Color bc){
+    public VRing(long x, long y, int z, long vs, int ag, float irr, int or, Color c, Color bc){
 		initCoordArray(4);	
         vx = x;
         vy = y;
@@ -159,7 +159,7 @@ public class VRing extends VSlice {
 		pc[i].cx = hw + Math.round((vx-c.posx) * coef);
 		pc[i].cy = hh - Math.round((vy-c.posy) * coef);
 		pc[i].innerCircleRadius = Math.round(size * coef);
-		pr[i].innerRingRadius = Math.round(vs * irr_p * coef);
+		pr[i].innerRingRadius = Math.round(size * irr_p * coef);
 	}
 
 	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
@@ -172,7 +172,7 @@ public class VRing extends VSlice {
 		pc[i].lcx = hw + Math.round((vx-lensx) * coef);
 		pc[i].lcy = hh - Math.round((vy-lensy) * coef);
 		pc[i].linnerCircleRadius = Math.round(size * coef);
-		pr[i].linnerRingRadius = Math.round(vs * irr_p * coef);
+		pr[i].linnerRingRadius = Math.round(size * irr_p * coef);
 	}
 	
 	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
@@ -189,7 +189,7 @@ public class VRing extends VSlice {
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0)-1, angleDeg+1, Arc2D.PIE);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
@@ -227,7 +227,7 @@ public class VRing extends VSlice {
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
 					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0)-1, angleDeg+1, Arc2D.PIE);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
