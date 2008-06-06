@@ -102,7 +102,7 @@ public class VRingST extends VRing implements Translucent {
 				// larger pie slice
 				outerSlice.setArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
 					2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius,
@@ -155,7 +155,7 @@ public class VRingST extends VRing implements Translucent {
 				// larger pie slice
 				outerSlice.setArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
 					2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
 					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius,
