@@ -189,7 +189,7 @@ public class VRing extends VSlice {
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0)-1, angleDeg+1, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0)-10, angleDeg+10, Arc2D.PIE);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
@@ -227,7 +227,7 @@ public class VRing extends VSlice {
 				// smaller pie slice to remove to create the ring
 				innerSlice.setArc(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
 					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0)-1, angleDeg+1, Arc2D.PIE);
+					(int)Math.round(orientDeg-angleDeg/2.0)-10, angleDeg+10, Arc2D.PIE);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
