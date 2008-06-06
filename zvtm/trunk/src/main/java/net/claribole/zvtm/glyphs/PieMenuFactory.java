@@ -29,6 +29,7 @@ public abstract class PieMenuFactory {
     static float TRANSLUCENCY = 1.0f;
     static double SENSIT_BOUNDING_RADIUS = 1.0f;
     static Font FONT = VirtualSpaceManager.getMainFont();
+	static float RING_INNER_RATIO = 0.1f;
 
     /**Standard pie menu creation method.
      *
@@ -40,8 +41,8 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPieMenu(String[] labels, long animLength, View v, VirtualSpaceManager vsm){
-	return new PieMenuC(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
+			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
 			    animLength, SENSIT_BOUNDING_RADIUS, FONT);
     }
@@ -63,8 +64,8 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, long animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
-	return new PieMenuC(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
+			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 			    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
 			    animLength, SENSIT_BOUNDING_RADIUS, FONT);
     }
@@ -80,8 +81,8 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPieMenu(String[] labels, LongPoint[] labelOffsets, long animLength, View v, VirtualSpaceManager vsm){
-	return new PieMenuC(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
+			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
 			    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
@@ -104,8 +105,8 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, LongPoint[] labelOffsets, long animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
-	return new PieMenuC(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
+			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 			    itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
 			    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
