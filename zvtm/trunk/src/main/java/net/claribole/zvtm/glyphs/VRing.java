@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2008. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: $
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs;
@@ -34,21 +34,21 @@ public class VRing extends VSlice {
 	ProjRing[] pr;
 
 	/** Radius of inner ring, from center of ring.*/
-	long virr;
+	double irr_p;
     
     /** Construct a slice by giving its 3 vertices
         *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param irr inner ring radius in virtual space (in rad)
+        *@param irr inner ring radius as a percentage of outer ring radius
 		*@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         *@param bc border color
         */
-    public VRing(LongPoint[] v, long irr, int z, Color c, Color bc){
+    public VRing(LongPoint[] v, double irr, int z, Color c, Color bc){
 		initCoordArray(4);
         vx = v[0].x;
         vy = v[0].y;
         vz = z;
-		virr = irr;
+		irr_p = irr;
         computeSize();
         computeOrient();
         computeAngle();
@@ -62,19 +62,19 @@ public class VRing extends VSlice {
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
         *@param ag arc angle in virtual space (in rad)
-        *@param irr inner ring radius in virtual space
+        *@param irr inner ring radius as a percentage of outer ring radius
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc) (in rad)
         *@param c fill color
         *@param bc border color
         */
-    public VRing(long x, long y, int z, long vs, double ag, long irr, double or, Color c, Color bc){
+    public VRing(long x, long y, int z, long vs, double ag, double irr, double or, Color c, Color bc){
 		initCoordArray(4);	
         vx = x;
         vy = y;
         vz = z;
         size = (float)vs;
         vr = vs;
-		virr = irr;
+		irr_p = irr;
         orient = or;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         angle = ag;
@@ -89,19 +89,19 @@ public class VRing extends VSlice {
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
         *@param ag arc angle in virtual space (in degrees)
-        *@param irr inner ring radius in virtual space
+        *@param irr inner ring radius as a percentage of outer ring radius
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)  (in degrees)
         *@param c fill color
         *@param bc border color
         */
-    public VRing(long x, long y, int z, long vs, int ag, long irr, int or, Color c, Color bc){
+    public VRing(long x, long y, int z, long vs, int ag, double irr, int or, Color c, Color bc){
 		initCoordArray(4);	
         vx = x;
         vy = y;
         vz = z;
         size = (float)vs;
         vr = vs;
-		virr = irr;
+		irr_p = irr;
         orient = or * DEG2RAD_FACTOR;
         orientDeg = or;
         angle = ag * DEG2RAD_FACTOR;
@@ -159,7 +159,7 @@ public class VRing extends VSlice {
 		pc[i].cx = hw + Math.round((vx-c.posx) * coef);
 		pc[i].cy = hh - Math.round((vy-c.posy) * coef);
 		pc[i].innerCircleRadius = Math.round(size * coef);
-		pr[i].innerRingRadius = Math.round(virr * coef);
+		pr[i].innerRingRadius = Math.round(vs * irr_p * coef);
 	}
 
 	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
@@ -172,7 +172,7 @@ public class VRing extends VSlice {
 		pc[i].lcx = hw + Math.round((vx-lensx) * coef);
 		pc[i].lcy = hh - Math.round((vy-lensy) * coef);
 		pc[i].linnerCircleRadius = Math.round(size * coef);
-		pr[i].linnerRingRadius = Math.round(virr * coef);
+		pr[i].linnerRingRadius = Math.round(vs * irr_p * coef);
 	}
 	
 	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
