@@ -33,30 +33,45 @@ import com.xerox.VTM.engine.Utilities;
 public class VSlice extends ClosedShape {
 
     /*vertex x coords*/
-    int[] xpcoords = new int[3];
+    public int[] xpcoords;
     /*vertex y coords*/
-    int[] ypcoords = new int[3];
+    public int[] ypcoords;
 
     public static final double RAD2DEG_FACTOR = 360 / Utilities.TWO_PI;
     public static final double DEG2RAD_FACTOR = Utilities.TWO_PI / 360.0;
 
     /*2nd point (arc end point)*/
-    LongPoint p1 = new LongPoint(0,0);
+    public LongPoint p1 = new LongPoint(0,0);
     /*3rd point (arc end point)*/
-    LongPoint p2 = new LongPoint(0,0);
+    public LongPoint p2 = new LongPoint(0,0);
     /*1st point corresponding to the outer triangle (near 2nd point)*/
-    LongPoint p3 = new LongPoint(0,0);
+    public LongPoint p3 = new LongPoint(0,0);
     /*2nd point corresponding to the outer triangle (near 3rd point)*/
-    LongPoint p4 = new LongPoint(0,0);
+    public LongPoint p4 = new LongPoint(0,0);
 
     /*radius in virtual space (equal to bounding circle radius since this is a circle)*/
-    long vr;
+    public long vr;
 
-    double angle;
-    double orient;
-    int angleDeg;
-    int orientDeg;
-    ProjSlice[] pc;
+    public double angle;
+    public double orient;
+    public int angleDeg;
+    public int orientDeg;
+    public ProjSlice[] pc;
+
+    public VSlice(){
+		initCoordArray(3);	
+        vx = 0;
+        vy = 0;
+        vz = 0;
+        p1 = new LongPoint(10, 10);
+        p2 = new LongPoint(-10, 10);
+        computeSize();
+        computeOrient();
+        computeAngle();
+        computePolygonEdges();
+        setColor(Color.WHITE);
+        setBorderColor(Color.BLACK);
+    }
     
     /** Construct a slice by giving its 3 vertices
         *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
@@ -65,6 +80,7 @@ public class VSlice extends ClosedShape {
         *@param bc border color
         */
     public VSlice(LongPoint[] v, int z, Color c, Color bc){
+		initCoordArray(3);	
         vx = v[0].x;
         vy = v[0].y;
         vz = z;
@@ -89,6 +105,7 @@ public class VSlice extends ClosedShape {
         *@param bc border color
         */
     public VSlice(long x, long y, int z, long vs, double ag, double or, Color c, Color bc){
+		initCoordArray(3);	
         vx = x;
         vy = y;
         vz = z;
@@ -115,6 +132,7 @@ public class VSlice extends ClosedShape {
         *@param bc border color
         */
     public VSlice(long x, long y, int z, long vs, int ag, int or, Color c, Color bc){
+		initCoordArray(3);	
         vx = x;
         vy = y;
         vz = z;
@@ -130,12 +148,20 @@ public class VSlice extends ClosedShape {
         setBorderColor(bc);
     }
 
-    void computeSize(){
+	/** FOR INTERNAL USE ONLY */
+	public void initCoordArray(int n){
+		xpcoords = new int[n];
+	    ypcoords = new int[n];
+	}
+
+	/** FOR INTERNAL USE ONLY */
+    public void computeSize(){
 	size = (float)Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
 	vr = Math.round(size);
     }
 
-    void computeOrient(){
+	/** FOR INTERNAL USE ONLY */
+    public void computeOrient(){
 	double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
 	double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
 	double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
@@ -144,7 +170,8 @@ public class VSlice extends ClosedShape {
 	orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
     }
 
-    void computeAngle(){
+	/** FOR INTERNAL USE ONLY */
+	public void computeAngle(){
 	double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
 	double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
 	double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
@@ -152,14 +179,16 @@ public class VSlice extends ClosedShape {
 	angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
     }
 
-    void computeSliceEdges(){
+	/** FOR INTERNAL USE ONLY */
+    public void computeSliceEdges(){
 	p1.x = Math.round(Math.cos(orient-angle/2.0)*size) + vx;
 	p1.y = Math.round(Math.sin(orient-angle/2.0)*size) + vy;
 	p2.x = Math.round(Math.cos(orient+angle/2.0)*size) + vx;
 	p2.y = Math.round(Math.sin(orient+angle/2.0)*size) + vy;
     }
 
-    void computePolygonEdges(){
+	/** FOR INTERNAL USE ONLY */
+    public void computePolygonEdges(){
 	if (angle < Math.PI){
 	    p3.x = vx + Math.round((p1.x-vx)/Math.cos(angle/2.0));
 	    p3.y = vy + Math.round((p1.y-vy)/Math.cos(angle/2.0));
@@ -290,7 +319,7 @@ public class VSlice extends ClosedShape {
 	return false;
     }
     
-    boolean coordInsideHemisphere(int x, int y, int camIndex){
+    public boolean coordInsideHemisphere(int x, int y, int camIndex){
 	if (orient == 0){
 	    return (x >= pc[camIndex].cx) ? true : false;
 	}
