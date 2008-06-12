@@ -14,6 +14,7 @@ import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import java.awt.Shape;
 
@@ -176,7 +177,7 @@ public class VRing extends VSlice {
 	}
 	
 	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
-	Arc2D innerSlice = new Arc2D.Double(Arc2D.PIE);
+	Ellipse2D innerSlice = new Ellipse2D.Double();
     Area ring, subring;
 	
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
@@ -187,9 +188,8 @@ public class VRing extends VSlice {
 					2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
 					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
-				innerSlice.setArc(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
-					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0)-10, angleDeg+10, Arc2D.PIE);
+				innerSlice.setFrame(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
+					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
@@ -225,9 +225,8 @@ public class VRing extends VSlice {
 					2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
 					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
-				innerSlice.setArc(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
-					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0)-10, angleDeg+10, Arc2D.PIE);
+				innerSlice.setFrame(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
+					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius);
 				// actually combine both to create the ring (subtraction)
 				ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
