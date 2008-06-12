@@ -66,8 +66,10 @@ import com.xerox.VTM.glyphs.VRectangleOrST;
 import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.glyphs.VRoundRectST;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VSegmentST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VImage;
+import net.claribole.zvtm.glyphs.VTextST;
 
 /**
  *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
@@ -824,32 +826,44 @@ public class SVGReader {
 		SVGStyle ss = null;
 		if (e.hasAttribute(_style)){
 			ss = getStyle(e.getAttribute(_style));
-			if (ss.getBorderColor()==null){
-				if (ss.getFillColor()!=null){
-					res=new VText(x,-y,0,ss.getFillColor(),tx,ta);
-				}
-				else {
-					res=new VText(x,-y,0,Color.black,tx,ta);
+		}
+		Color tc = Color.BLACK;
+		if (ss != null){
+			if (ss.getBorderColor() == null){
+				if (ss.getFillColor() != null){
+					tc = ss.getFillColor();
 				}
 			}
 			else {
-				res=new VText(x,-y,0,ss.getBorderColor(),tx,ta);
+				tc = ss.getBorderColor();
 			}
-		}
-		else {
-			res=new VText(x,-y,0,Color.black,tx,ta);
-		}
-		Font f;
-		if (ss != null){
+			if (ss.hasTransparencyInformation()){
+				res = new VTextST(x, -y, 0, tc, tx, ta, ss.getAlphaTransparencyValue());
+			}
+			else {
+				res = new VText(x, -y, 0, tc, tx, ta);				
+			}
+			Font f;
 			if (specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
 				res.setSpecialFont(f);
 			}
 		}
 		else if (ctx != null){
+			if (ctx.hasTransparencyInformation()){
+				res = new VTextST(x, -y, 0, tc, tx, ta, ctx.getAlphaTransparencyValue());
+			}
+			else {
+				res = new VText(x, -y, 0, tc, tx, ta);				
+			}
+			Font f;
 			if (specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
 				res.setSpecialFont(f);
 			}
 		}
+		else {
+			res = new VText(x, -y, 0, tc, tx, ta);
+		}
+
 		if (meta){
 			setMetadata(res,ctx);
 		}
@@ -1369,20 +1383,7 @@ public class SVGReader {
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
 	public static VSegment createLine(Element e, Context ctx, boolean meta){
-		SVGStyle ss = null;
-		if (e.hasAttribute(_style)){
-			ss = getStyle(e.getAttribute(_style));
-		}
-		Color border = Color.black;
-		if (ss != null){
-			border = ss.getBorderColor();
-			if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
-		}
-		else if (ctx != null){
-			if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
-			else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
-		}
-		
+		VSegment res;		
 		long x1 = getLong(e.getAttribute(_x1));
 		long y1 = getLong(e.getAttribute(_y1));
 		long x2 = getLong(e.getAttribute(_x2));
@@ -1398,7 +1399,35 @@ public class SVGReader {
 		x2 += xoffset;
 		y2 += yoffset;
 
-		VSegment res = new VSegment(x1, -y1, 0, border, x2, -y2);
+
+		SVGStyle ss = null;
+		if (e.hasAttribute(_style)){
+			ss = getStyle(e.getAttribute(_style));
+		}
+		Color border = Color.black;
+		if (ss != null){
+			border = ss.getBorderColor();
+			if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+			if (ss.hasTransparencyInformation()){
+			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ss.getAlphaTransparencyValue());
+			}
+			else {
+			    res = new VSegment(x1, -y1, 0, border, x2, -y2);
+			}
+		}
+		else if (ctx != null){
+			if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
+			else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+			if (ctx.hasTransparencyInformation()){
+			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ctx.getAlphaTransparencyValue());
+			}
+			else {
+			    res = new VSegment(x1, -y1, 0, border, x2, -y2);
+			}
+		}
+		else {
+			res = new VSegment(x1, -y1, 0, border, x2, -y2);			
+		}
 		if (ss != null && ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
 		}
