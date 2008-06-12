@@ -793,61 +793,68 @@ public class SVGReader {
 	return createText(e,ctx,vsm,false);
     }
 
-    /** Create a VText from an SVG text element.
-     * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
-     *@param e an SVG text as a DOM element (org.w3c.dom.Element)
-     *@param ctx used to propagate contextual style information (put null if none)
-     *@param vsm the virtual space manager (to get some font information)
-     *@param meta store metadata associated with this node (URL, title) in glyph's associated object
-     */
-    public static VText createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
-	String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
-	long x = getLong(e.getAttribute(_x));
-	long y = getLong(e.getAttribute(_y));
+	/** Create a VText from an SVG text element.
+		* Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
+		*@param e an SVG text as a DOM element (org.w3c.dom.Element)
+		*@param ctx used to propagate contextual style information (put null if none)
+		*@param vsm the virtual space manager (to get some font information)
+		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
+		*/
+	public static VText createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
+		String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
+		long x = getLong(e.getAttribute(_x));
+		long y = getLong(e.getAttribute(_y));
 
-	if (scale != 1.0) {
-		x = (long)(Math.floor((double)x * scale));
-		y = (long)(Math.floor((double)y * scale));
-	}
-
-	x += xoffset;
-	y += yoffset;
-
-	VText res;
-	short ta=VText.TEXT_ANCHOR_START;
-	if (e.hasAttribute(_textanchor)){
-	    String tas=e.getAttribute(_textanchor);
-	    if (tas.equals(_middle)){ta=VText.TEXT_ANCHOR_MIDDLE;}
-	    else if (tas.equals(_end)){ta=VText.TEXT_ANCHOR_END;}
-	    else if (tas.equals(_inherit)){System.err.println("SVGReader::'inherit' value for text-anchor attribute not supported yet");}
-	}
-	SVGStyle ss = null;
-
-	if (e.hasAttribute(_style)){
-	    ss = getStyle(e.getAttribute(_style));
-	    if (ss.getBorderColor()==null){
-		if (ss.getFillColor()!=null){
-		    res=new VText(x,-y,0,ss.getFillColor(),tx,ta);
+		if (scale != 1.0) {
+			x = (long)(Math.floor((double)x * scale));
+			y = (long)(Math.floor((double)y * scale));
 		}
-		else {res=new VText(x,-y,0,Color.black,tx,ta);}
-	    }
-	    else {res=new VText(x,-y,0,ss.getBorderColor(),tx,ta);}
+		x += xoffset;
+		y += yoffset;
+
+		VText res;
+		short ta=VText.TEXT_ANCHOR_START;
+		if (e.hasAttribute(_textanchor)){
+			String tas=e.getAttribute(_textanchor);
+			if (tas.equals(_middle)){ta=VText.TEXT_ANCHOR_MIDDLE;}
+			else if (tas.equals(_end)){ta=VText.TEXT_ANCHOR_END;}
+			else if (tas.equals(_inherit)){System.err.println("SVGReader::'inherit' value for text-anchor attribute not supported yet");}
+		}
+
+		SVGStyle ss = null;
+		if (e.hasAttribute(_style)){
+			ss = getStyle(e.getAttribute(_style));
+			if (ss.getBorderColor()==null){
+				if (ss.getFillColor()!=null){
+					res=new VText(x,-y,0,ss.getFillColor(),tx,ta);
+				}
+				else {
+					res=new VText(x,-y,0,Color.black,tx,ta);
+				}
+			}
+			else {
+				res=new VText(x,-y,0,ss.getBorderColor(),tx,ta);
+			}
+		}
+		else {
+			res=new VText(x,-y,0,Color.black,tx,ta);
+		}
+		Font f;
+		if (ss != null){
+			if (specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
+				res.setSpecialFont(f);
+			}
+		}
+		else if (ctx != null){
+			if (specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
+				res.setSpecialFont(f);
+			}
+		}
+		if (meta){
+			setMetadata(res,ctx);
+		}
+		return res;
 	}
-	else {res=new VText(x,-y,0,Color.black,tx,ta);}
-	Font f;
-	if (ss != null){
-	    if (specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
-		res.setSpecialFont(f);
-	    }
-	}
-	else if (ctx != null){
-	    if (specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
-		res.setSpecialFont(f);
-	    }
-	}
-	if (meta){setMetadata(res,ctx);}
-	return res;
-    }
  
     /** Create a VRectangle from an SVG polygon element.
      * After checking this is actually a rectangle - returns null if not.
@@ -1356,49 +1363,48 @@ public class SVGReader {
 	return createLine(e, ctx, false);
     }
 
-    /** Create a VSegment from an SVG line element.
-     *@param e an SVG line as a DOM element (org.w3c.dom.Element)
-     *@param ctx used to propagate contextual style information (put null if none)
-     *@param meta store metadata associated with this node (URL, title) in glyph's associated object
-     */
-    public static VSegment createLine(Element e, Context ctx, boolean meta){
-	SVGStyle ss = null;
-	if (e.hasAttribute(_style)){
-	    ss = getStyle(e.getAttribute(_style));
-	}
-	Color border = Color.black;
-	if (ss != null){
-	    border = ss.getBorderColor();
-	    if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
-	}
-	else if (ctx != null){
-	    if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
-	    else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
-	}
-	long x1 = getLong(e.getAttribute(_x1));
-	long y1 = getLong(e.getAttribute(_y1));
-	long x2 = getLong(e.getAttribute(_x2));
-	long y2 = getLong(e.getAttribute(_y2));
+	/** Create a VSegment from an SVG line element.
+		*@param e an SVG line as a DOM element (org.w3c.dom.Element)
+		*@param ctx used to propagate contextual style information (put null if none)
+		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
+		*/
+	public static VSegment createLine(Element e, Context ctx, boolean meta){
+		SVGStyle ss = null;
+		if (e.hasAttribute(_style)){
+			ss = getStyle(e.getAttribute(_style));
+		}
+		Color border = Color.black;
+		if (ss != null){
+			border = ss.getBorderColor();
+			if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+		}
+		else if (ctx != null){
+			if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
+			else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+		}
+		
+		long x1 = getLong(e.getAttribute(_x1));
+		long y1 = getLong(e.getAttribute(_y1));
+		long x2 = getLong(e.getAttribute(_x2));
+		long y2 = getLong(e.getAttribute(_y2));
+		if (scale != 1.0) {
+			x1 = (long)(Math.floor((double)x1 * scale));
+			y1 = (long)(Math.floor((double)y1 * scale));
+			x2 = (long)(Math.floor((double)x2 * scale));
+			y2 = (long)(Math.floor((double)y2 * scale));
+		}
+		x1 += xoffset;
+		y1 += yoffset;
+		x2 += xoffset;
+		y2 += yoffset;
 
-	if (scale != 1.0) {
-		x1 = (long)(Math.floor((double)x1 * scale));
-		y1 = (long)(Math.floor((double)y1 * scale));
-		x2 = (long)(Math.floor((double)x2 * scale));
-		y2 = (long)(Math.floor((double)y2 * scale));
+		VSegment res = new VSegment(x1, -y1, 0, border, x2, -y2);
+		if (ss != null && ss.requiresSpecialStroke()){
+			assignStroke(res, ss);
+		}
+		if (meta){setMetadata(res,ctx);}
+		return res;
 	}
-
-	x1 += xoffset;
-	y1 += yoffset;
-	x2 += xoffset;
-	y2 += yoffset;
-
-	VSegment res = new VSegment(x1, -y1, 0, border, x2, -y2);
-	if (ss != null && ss.requiresSpecialStroke()){
-	    assignStroke(res, ss);
-	}
-	if (meta){setMetadata(res,ctx);}
-	return res;
-    }
 
     /** Create a VPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
