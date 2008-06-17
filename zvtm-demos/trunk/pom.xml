@@ -11,7 +11,7 @@ $Id$
   <artifactId>zvtm-demos</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM Demos</name>
-  <version>0.9.5</version>
+  <version>0.9.6</version>
   <url>http://zvtm.sourceforge.net</url>
   
   <!-- Repositories -->
@@ -40,7 +40,7 @@ $Id$
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.9.6-SNAPSHOT</version>
+      <version>0.9.6</version>
     </dependency>
   </dependencies>
   
