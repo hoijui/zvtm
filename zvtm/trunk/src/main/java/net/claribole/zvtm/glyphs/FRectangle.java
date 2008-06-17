@@ -22,7 +22,6 @@ import com.xerox.VTM.glyphs.VRectangle;
  *@author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VRectangle
  *@see com.xerox.VTM.glyphs.VRectangleOr
- *@see com.xerox.VTM.glyphs.FRectangle
  *@see com.xerox.VTM.glyphs.VRectangleOrST
  */
 
@@ -58,7 +57,6 @@ public class FRectangle extends VRectangle {
 		*@param h half height in virtual space
 		*@param c fill color
 		*@param bc border color
-		*@param a alpha channel value
 		*@param ta gradient top alpha value
 		*@param ba gradient bottom alpha value
 		*/
