@@ -48,21 +48,24 @@ public class CGlyph extends Glyph implements Cloneable {
     Glyph pGlyph; //primaryGlyph
     SGlyph[] sGlyphs;  //secondary glyphs
 
-    /**
-     *REMINDER : both CGlyphs AND and their components (primary and all secondary glyphs) should be added to the virtual space.
-     *@param primary primary glyph in the composition
-     *@param secondaries array of secondary glyphs (null if none)
-     */
-    public CGlyph(Glyph primary,SGlyph[] secondaries){
-	setPrimaryGlyph(primary);
-	if (secondaries!=null && secondaries.length>0){
-	    sGlyphs=secondaries;
-	    for (int i=0;i<sGlyphs.length;i++){
-		sGlyphs[i].g.moveTo(pGlyph.vx+Math.round(sGlyphs[i].xoffset), pGlyph.vy+Math.round(sGlyphs[i].yoffset));
-		sGlyphs[i].g.setCGlyph(this);
-	    }
+	/**
+		*REMINDER : both CGlyphs AND and their components (primary and all secondary glyphs) should be added to the virtual space.
+		*@param primary primary glyph in the composition (null if none, call setPrimaryGlyph to set it later)
+		*@param secondaries array of secondary glyphs (null if none)
+		*@see #setPrimaryGlyph(Glyph g)
+		*/
+	public CGlyph(Glyph primary,SGlyph[] secondaries){
+		if (primary != null){
+			setPrimaryGlyph(primary);
+		}
+		if (secondaries!=null && secondaries.length>0){
+			sGlyphs=secondaries;
+			for (int i=0;i<sGlyphs.length;i++){
+				sGlyphs[i].g.moveTo(pGlyph.vx+Math.round(sGlyphs[i].xoffset), pGlyph.vy+Math.round(sGlyphs[i].yoffset));
+				sGlyphs[i].g.setCGlyph(this);
+			}
+		}
 	}
-    }
 
     public void initCams(int nbCam){}
 
