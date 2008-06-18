@@ -103,6 +103,11 @@ public abstract class View {
     /**mouse glyph*/
     public VCursor mouse;
 
+	/** Returns this view's cursor object. */
+	public VCursor getCursor(){
+		return mouse;
+	}
+
     /**the actual panel*/
     ViewPanel panel;
 
