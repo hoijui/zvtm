@@ -28,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
 
 import java.util.Vector;
+import java.util.Arrays;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
@@ -811,20 +812,54 @@ public class VCursor {
 	}
 
 	/** Get the set of glyphs intersected by the cursor's dynaspot region.
-	 *@param the array to be filled with glyphs interesecting the region.
+	 *@param res the array to be filled with glyphs interesecting the region.
 	 * If len(res) &gt; count(glyphs), then the last len(res)-count(glyphs) cells are empty.
 	 * If len(res) &lt; count(glyphs), only the first len(res) glyphs are returned (meaning that some interesecting glyphs are not returned).
 	 * If res is null, an array of adequate length is instantiated and returned.
 	 *@return an empty array if the DynaSpot if not activated.
 	 */
-	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res){
+	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res, Camera c){
 		//XXX:TBW get glyphs in the region (first clip with a rectangle bounding the dynaspot region, then look more carefully for the glyphs remaining)
+		// compute area in virtual space, so as to use Glyph.visibleInRegion()
+		
+		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+		Glyph g;
 		if (res != null){
-			//XXX:TBW fill the array with the glyphs
+			int gCount = 0;
+			for (int i=0;i<drawnGlyphs.size();i++){
+				g = (Glyph)drawnGlyphs.elementAt(i);
+				if (g.visibleInRegion(0, 0, 0, 0, 0)){
+					//XXX
+					
+					
+					res[gCount++] = g;
+				}
+				if (gCount >= res.length){
+					// if the provided array has been filled, ignore remaining glyphs
+					// (won't be returned anyway)
+					break;
+				}
+			}
+			if (gCount < res.length){
+				// nullify unfilled slots (if any)
+				Arrays.fill(res, gCount, res.length-1, null);
+			}
 		}
 		else {
-			//XXX: TBW count number of glyphs, and return them in an array of appropriate size
+			Vector tres = new Vector();
+			for (int i=0;i<drawnGlyphs.size();i++){
+				g = (Glyph)drawnGlyphs.elementAt(i);
+				if (g.visibleInRegion(0, 0, 0, 0, 0)){
+					//XXX 
+					
+					
+					
+					tres.add(g);
+				}
+			}
+			res = (Glyph[])tres.toArray();
 		}
+		return res;
 	}
 
 }
