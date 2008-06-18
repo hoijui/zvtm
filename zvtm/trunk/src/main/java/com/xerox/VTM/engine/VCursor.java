@@ -820,8 +820,6 @@ public class VCursor {
 	 *@return an empty array if the DynaSpot if not activated.
 	 */
 	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res, Camera c){
-		//XXX:TBW get glyphs in the region (first clip with a rectangle bounding the dynaspot region, then look more carefully for the glyphs remaining)
-		// compute area in virtual space, so as to use Glyph.visibleInRegion()		
 		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 		Glyph g;
 	    long unprojectedDSRadius = Math.round((((double)c.focal+(double)c.altitude) / (double)c.focal) * dynaSpotRadius);
@@ -833,9 +831,9 @@ public class VCursor {
 			int gCount = 0;
 			for (int i=0;i<drawnGlyphs.size();i++){
 				g = (Glyph)drawnGlyphs.elementAt(i);
-				// first check bounding box
+				// first check bounding boxes intersect (both Glyph's and DynaSpot's)
 				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
-					//XXX:TBW then check circle
+					//XXX:TBW then check circle and actual object shape
 					if (true){
 						res[gCount++] = g;
 					}
@@ -855,16 +853,16 @@ public class VCursor {
 			Vector tres = new Vector();
 			for (int i=0;i<drawnGlyphs.size();i++){
 				g = (Glyph)drawnGlyphs.elementAt(i);
-				// first check bounding box
+				// first check bounding boxes intersect (both Glyph's and DynaSpot's)
 				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
-					//XXX:TBW then check circle
+					//XXX:TBW then check circle and actual object shape
 					if (true){
 						tres.add(g);
 					}
-				}					
+				}				
 			}
-			//res = (Glyph[])tres.toArray();
-		}
+			res = (Glyph[])tres.toArray(new Glyph[tres.size()]);
+		}		
 		return res;
 	}
 
