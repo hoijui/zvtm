@@ -25,6 +25,8 @@ package com.xerox.VTM.engine;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
+
 import java.util.Vector;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -34,12 +36,28 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.Translucent;
 
-
+/* For DynaSpot */
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.geom.Point2D;
+import net.claribole.zvtm.engine.LowPassFilter;
 
 /**
  * Glyph representing mouse cursor
  * @author Emmanuel Pietriga
+ *
+ * <h4>Using DynaSpot</h4>
+ * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
+ * <ul><li>activateDynaSpot(boolean b)</li></ul>
+ * 
+ * <p>In your ViewEventHandler's mouseMoved() method, call:</p>
+ * <ol>
+ *  <li>v.getMouse().updateDynaSpotFrequency(e.getWhen());</li>
+ *  <li>v.getMouse().updateDynaSpot(jpx, jpy);</li>
+ * </ol>
+ * 
  */
 
 public class VCursor {
@@ -687,6 +705,152 @@ public class VCursor {
             g.drawLine(mx-size,my,mx+size,my);
             g.drawLine(mx,my-size,mx,my+size);
         }
-    }
+		if (dynaSpotActivated){
+			g.setColor(DYNASPOT_COLOR);
+			g.setComposite(DYNASPOT_TRANSLUCENCY);
+			g.fillOval(mx-dynaSpotRadius, my-dynaSpotRadius, 2*dynaSpotRadius, 2*dynaSpotRadius);
+			g.setComposite(Translucent.acO);
+		}
+	}
 
+	/* ---- DynaSpot implementation ---- */
+	
+	Color DYNASPOT_COLOR = Color.RED;
+	AlphaComposite DYNASPOT_TRANSLUCENCY = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f);
+	
+	int DYNASPOT_MAX_RADIUS = 40;
+	int dynaSpotRadius = 0;
+	
+	boolean dynaSpotActivated = false;
+	
+	/* Low-pass filter variables */
+	double frequency = -1;
+	long mLastSampleTime = -1;
+	int xOffset = -10;
+	int yOffset = 10;
+	double maxDist = 2 * Math.abs(xOffset);
+	LowPassFilter filter = new LowPassFilter();
+	Point2D currentPos = new Point2D.Double(0, 0);
+	Point2D parentPos = new Point2D.Double(0, 0);
+	Point2D targetPos = new Point2D.Double(0, 0);
+	Timer dstimer;
+	DynaSpotTimer cursorStillDSUpdater;
+	double cutoffParamA = 3; // decrease to make the region stay at max radius longer before shrinking
+	double cutoffParamB = 0.0001;
+	double distAway = 0;	 
+
+	
+	void initDynaSpotTimer(){
+		dstimer = new Timer();
+		cursorStillDSUpdater = new DynaSpotTimer(this);
+		dstimer.scheduleAtFixedRate(cursorStillDSUpdater, 40, 20);
+	}
+	
+	public void updateDynaSpotFrequency(){
+		updateDynaSpotFrequency(System.currentTimeMillis());
+	}
+
+	public void updateDynaSpotFrequency(long currentTime){
+		if (frequency == -1){
+			frequency = 1;
+		}
+		else {
+			if (currentTime != mLastSampleTime){
+				frequency = 1000.0 / ((double)(currentTime - mLastSampleTime));
+			}
+		}
+		mLastSampleTime = currentTime;
+	}
+	
+	public void updateDynaSpot(int cx, int cy){
+		parentPos.setLocation(cx, cy);
+	}
+	
+	public void updateDynaSpot(){
+		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+		distAway = targetPos.distance(currentPos);
+		double maxDist = 2 * Math.abs(xOffset);
+		double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
+		currentPos = filter.apply(targetPos, frequency);
+		dynaSpotRadius = (int)Math.round(DYNASPOT_MAX_RADIUS * (1.0-opacity));
+		owningView.repaintNow();
+	}
+	
+	/** Set to true if the dynaspot selection region should be updated when the cursor does not move. Default is true. */
+	public void setDynaSpotUpdateWhenCursorStill(boolean b){
+		cursorStillDSUpdater.setEnabled(b);
+	}
+
+	/** Activate or deactivate DynaSpot behavior. */
+	public void activateDynaSpot(boolean b){
+		dynaSpotActivated = b;
+		if (dynaSpotActivated){
+			if (dstimer != null){
+				dstimer.cancel();
+			}
+			initDynaSpotTimer();
+		}
+		else {
+			try {
+				dstimer.cancel();
+				dstimer = null;
+			}
+			catch (NullPointerException ex){}
+		}
+	}
+
+	/** Set maximum size of DynaSpot selection region. */
+	public void setDynaSpotMaxRadius(int r){
+		DYNASPOT_MAX_RADIUS = (r < 0) ? 0 : r;
+	}
+
+	/** Get maximum size of DynaSpot selection region. */
+	public int getDynaSpotMaxRadius(){
+		return DYNASPOT_MAX_RADIUS;
+	}
+
+	/** Get the set of glyphs intersected by the cursor's dynaspot region.
+	 *@param the array to be filled with glyphs interesecting the region.
+	 * If len(res) &gt; count(glyphs), then the last len(res)-count(glyphs) cells are empty.
+	 * If len(res) &lt; count(glyphs), only the first len(res) glyphs are returned (meaning that some interesecting glyphs are not returned).
+	 * If res is null, an array of adequate length is instantiated and returned.
+	 *@return an empty array if the DynaSpot if not activated.
+	 */
+	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res){
+		//XXX:TBW get glyphs in the region (first clip with a rectangle bounding the dynaspot region, then look more carefully for the glyphs remaining)
+		if (res != null){
+			//XXX:TBW fill the array with the glyphs
+		}
+		else {
+			//XXX: TBW count number of glyphs, and return them in an array of appropriate size
+		}
+	}
+
+}
+
+class DynaSpotTimer extends TimerTask{
+
+	VCursor c;
+	private boolean enabled = true;
+	
+	DynaSpotTimer(VCursor c){
+		super();
+		this.c = c;
+	}
+	
+	public void setEnabled(boolean b){
+		enabled = b;
+	}
+	
+	public boolean isEnabled(){
+		return enabled;
+	}
+	
+	public void run(){
+		if (enabled){
+			c.updateDynaSpot();
+		}
+	}
+	
 }
