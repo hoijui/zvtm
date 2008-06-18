@@ -740,6 +740,7 @@ public class VCursor {
 	double cutoffParamB = 0.0001;
 	double distAway = 0;	 
 
+	long[] dynawnes = new long[4];
 	
 	void initDynaSpotTimer(){
 		dstimer = new Timer();
@@ -820,19 +821,24 @@ public class VCursor {
 	 */
 	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res, Camera c){
 		//XXX:TBW get glyphs in the region (first clip with a rectangle bounding the dynaspot region, then look more carefully for the glyphs remaining)
-		// compute area in virtual space, so as to use Glyph.visibleInRegion()
-		
+		// compute area in virtual space, so as to use Glyph.visibleInRegion()		
 		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 		Glyph g;
+	    long unprojectedDSRadius = Math.round((((double)c.focal+(double)c.altitude) / (double)c.focal) * dynaSpotRadius);
+		dynawnes[0] = vx - unprojectedDSRadius; // west bound
+		dynawnes[1] = vy + unprojectedDSRadius; // north bound
+		dynawnes[2] = vx + unprojectedDSRadius; // east bound
+		dynawnes[3] = vy - unprojectedDSRadius; // south bound
 		if (res != null){
 			int gCount = 0;
 			for (int i=0;i<drawnGlyphs.size();i++){
 				g = (Glyph)drawnGlyphs.elementAt(i);
-				if (g.visibleInRegion(0, 0, 0, 0, 0)){
-					//XXX
-					
-					
-					res[gCount++] = g;
+				// first check bounding box
+				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
+					//XXX:TBW then check circle
+					if (true){
+						res[gCount++] = g;
+					}
 				}
 				if (gCount >= res.length){
 					// if the provided array has been filled, ignore remaining glyphs
@@ -849,15 +855,15 @@ public class VCursor {
 			Vector tres = new Vector();
 			for (int i=0;i<drawnGlyphs.size();i++){
 				g = (Glyph)drawnGlyphs.elementAt(i);
-				if (g.visibleInRegion(0, 0, 0, 0, 0)){
-					//XXX 
-					
-					
-					
-					tres.add(g);
-				}
+				// first check bounding box
+				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
+					//XXX:TBW then check circle
+					if (true){
+						tres.add(g);
+					}
+				}					
 			}
-			res = (Glyph[])tres.toArray();
+			//res = (Glyph[])tres.toArray();
 		}
 		return res;
 	}
