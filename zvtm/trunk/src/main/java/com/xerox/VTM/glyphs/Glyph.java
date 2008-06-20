@@ -29,6 +29,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 
 import net.claribole.zvtm.glyphs.CGlyph;
 
@@ -743,6 +744,11 @@ public abstract class Glyph implements Cloneable {
      */
     public abstract boolean fillsView(long w,long h,int camIndex);
 
+	/** Find out if a glyph is visible in a circular area (not implemented yet for most glyph classes).
+	 */
+	public boolean visibleInDisc(long vx, long vy, long radius, int camIndex){
+		return false;
+	}
 
     /*-------Internal use only----------------------------------*/
 
