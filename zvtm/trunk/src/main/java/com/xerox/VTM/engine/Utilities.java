@@ -262,22 +262,37 @@ public class Utilities {
 	}
     }
 
-    /** checks whether Glyph array ga contains glyph g or not
-     */
-    public static boolean containsGlyph(Glyph[] ga, Glyph g){
-	for (int i=0;i<ga.length;i++){
-	    if (ga[i] == g){return true;}
+	/** Checks whether Glyph array ga contains glyph g or not.
+		*/
+	public static boolean containsGlyph(Glyph[] ga, Glyph g){
+		return containsGlyph(ga, g, ga.length);
 	}
-	return false;
-    }
 
-    /** checks whether Glyph array ga contains glyph g or not and returns its index
-     */
-    public static int indexOfGlyph(Glyph[] ga, Glyph g){
-	for (int i=0;i<ga.length;i++){
-	    if (ga[i] == g){return i;}
+
+	/** Checks whether Glyph array ga contains glyph g or not within its first N items.
+		*@param maxIndex look for g in items in range [0,maxIndex[
+		*/
+	public static boolean containsGlyph(Glyph[] ga, Glyph g, int maxIndex){	
+		for (int i=0;i<maxIndex;i++){
+			if (ga[i] == g){return true;}
+		}
+		return false;
 	}
-	return -1;
-    }
+
+	/** Checks whether Glyph array ga contains glyph g or not and returns its index.
+		*/
+	public static int indexOfGlyph(Glyph[] ga, Glyph g){
+		return indexOfGlyph(ga, g, ga.length);
+	}
+	
+	/** Checks whether Glyph array ga contains glyph g or not within its first N items, and returns its index.
+		*@param maxIndex look for g in items in range [0,maxIndex[
+		*/
+	public static int indexOfGlyph(Glyph[] ga, Glyph g, int maxIndex){
+		for (int i=0;i<maxIndex;i++){
+			if (ga[i] == g){return i;}
+		}
+		return -1;
+	}
 
 }

@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2008. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,6 +43,8 @@ import com.xerox.VTM.glyphs.Translucent;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.awt.geom.Point2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Area;
 import net.claribole.zvtm.engine.LowPassFilter;
 
 /**
@@ -97,7 +99,8 @@ public class VCursor {
 
     int maxIndex=-1;  //used in computeMouseOverGlyph
     
-    /**list of glyphs overlapped by mouse (last entry is last glyph entered)*/
+    /** List of glyphs overlapped by mouse. Last entry is last glyph entered.
+        IMPORTANT: elements beyond maxIndex might not be up to date. Do not trust the value, especially if not null.*/
     public Glyph[] glyphsUnderMouse=new Glyph[50];  //50 is default, will grow if not enough
 
     /**last glyph the mouse entered in*/
@@ -706,7 +709,7 @@ public class VCursor {
             g.drawLine(mx-size,my,mx+size,my);
             g.drawLine(mx,my-size,mx,my+size);
         }
-		if (dynaSpotActivated){
+		if (dynaSpotActivated && showDynarea){
 			g.setColor(DYNASPOT_COLOR);
 			g.setComposite(DYNASPOT_TRANSLUCENCY);
 			g.fillOval(mx-dynaSpotRadius, my-dynaSpotRadius, 2*dynaSpotRadius, 2*dynaSpotRadius);
@@ -724,10 +727,12 @@ public class VCursor {
 	
 	boolean dynaSpotActivated = false;
 	
+	boolean showDynarea = true;
+	
 	/* Low-pass filter variables */
 	double frequency = -1;
 	long mLastSampleTime = -1;
-	int xOffset = -10;
+	int xOffset = 10;
 	int yOffset = 10;
 	double maxDist = 2 * Math.abs(xOffset);
 	LowPassFilter filter = new LowPassFilter();
@@ -811,13 +816,91 @@ public class VCursor {
 	public int getDynaSpotMaxRadius(){
 		return DYNASPOT_MAX_RADIUS;
 	}
+	
+	/** Set the low-pass filter's parameters. */
+	public void setCutoffFrequencyParameters(double a, double b){
+		cutoffParamA = a;
+		cutoffParamB = b;
+	}
+	
+	/** Higher values make it more difficult to reach the max radius. Speed of cursor has to be higher.*/
+	public void setOffsets(int x, int y){
+		xOffset = x;
+		yOffset = y;
+	}
+	
+	public void setDynaSpotAreaVisible(boolean b){
+		showDynarea = b;
+	}
+	
+	public boolean isDynaSpotAreaVisible(){
+		return showDynarea;
+	}
+	
+	/** Get the glyph picked by the dynaspot cursor.
+	 * If several glyphs are picked by the dynaspot cursor, the best picked glyph is returned.
+	 *@return null if the dynaspot cursor does not pick anything.
+     *@see #getGlyphsInDynaSpotRegion(Glyph[] res, Camera c)
+	 */
+	public Glyph dynaPick(Camera c, int x, int y){
+		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+		Glyph res = null;
+		Glyph g;
+		int gumIndex = -1;
+		int cgumIndex = -1;
+		for (int i=0;i<drawnGlyphs.size();i++){
+			g = (Glyph)drawnGlyphs.elementAt(i);
+			// check if cursor hotspot is inside glyph
+			// if hotspot in several glyphs, take last glyph entered (according to glyphsUnderMouse)
+			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
+			if (cgumIndex > -1){
+				if (cgumIndex > gumIndex){
+					gumIndex = cgumIndex;
+					res = g;
+					if (gumIndex == maxIndex){
+						// minor optimization: don't look at remaining drawnGlyphs if the one just tested
+						// positive is the last glyph entered (won't be overridden anyway)
+						break;
+					}
+				}
+			}
+		}
+		if (res == null){
+			// if cursor not inside any glyph look at dynaspot area
+		    long unprojectedDSRadius = Math.round((((double)c.focal+(double)c.altitude) / (double)c.focal) * dynaSpotRadius);
+			dynawnes[0] = vx - unprojectedDSRadius; // west bound
+			dynawnes[1] = vy + unprojectedDSRadius; // north bound
+			dynawnes[2] = vx + unprojectedDSRadius; // east bound
+			dynawnes[3] = vy - unprojectedDSRadius; // south bound
+			for (int i=0;i<drawnGlyphs.size();i++){
+				g = (Glyph)drawnGlyphs.elementAt(i);
+				// first check bounding boxes intersect (both Glyph's and DynaSpot's), and if positive perform
+				// a finer grain chec with Areas
+				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
+				 	g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
+						// return something only if dynapost area intersects only one glyph
+						if (res == null){
+							res = g;
+						}
+						// if dynapost area intersects more than one glyph, selection is ambiguous
+						// our current policy is to select nothing
+						// (hence the check of the entire array of drawnGlyphs without any break condition)
+						else {
+							return null;
+						}
+				}
+			}
+		}		
+		return res;
+	}
 
 	/** Get the set of glyphs intersected by the cursor's dynaspot region.
 	 *@param res the array to be filled with glyphs interesecting the region.
 	 * If len(res) &gt; count(glyphs), then the last len(res)-count(glyphs) cells are empty.
 	 * If len(res) &lt; count(glyphs), only the first len(res) glyphs are returned (meaning that some interesecting glyphs are not returned).
 	 * If res is null, an array of adequate length is instantiated and returned.
-	 *@return an empty array if the DynaSpot if not activated.
+	 *@return an empty array if the DynaSpot is not activated.
+	 *@see #dynaPick()
 	 */
 	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res, Camera c){
 		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
@@ -833,8 +916,8 @@ public class VCursor {
 				g = (Glyph)drawnGlyphs.elementAt(i);
 				// first check bounding boxes intersect (both Glyph's and DynaSpot's)
 				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
-					//XXX:TBW then check circle and actual object shape
-					if (true){
+					// then check circle and actual object shape
+					if (g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
 						res[gCount++] = g;
 					}
 				}
@@ -855,8 +938,8 @@ public class VCursor {
 				g = (Glyph)drawnGlyphs.elementAt(i);
 				// first check bounding boxes intersect (both Glyph's and DynaSpot's)
 				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
-					//XXX:TBW then check circle and actual object shape
-					if (true){
+					// then check circle and actual object shape
+					if (g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
 						tres.add(g);
 					}
 				}				
