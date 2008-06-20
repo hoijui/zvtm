@@ -1,4 +1,10 @@
-
+/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2007-2008. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:  $
+ */
 
 package net.claribole.zvtm.demo;
 
@@ -26,8 +32,8 @@ public class DynaSpotDemoEvtHdlr implements ViewEventHandler {
     long x1,x2,y1,y2;
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		Glyph[] gs = application.demoView.getCursor().getGlyphsInDynaSpotRegion(null, v.cams[0]);
-		System.out.println(java.util.Arrays.toString(gs));
+		Glyph gs = application.demoView.getCursor().dynaPick(v.cams[0], jpx, jpy);
+		System.out.println("Selected "+gs);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){

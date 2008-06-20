@@ -1,4 +1,10 @@
-
+/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2007-2008. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:  $
+ */
 
 package net.claribole.zvtm.demo;
 
@@ -40,11 +46,12 @@ public class DynaSpotDemo {
         demoView.setEventHandler(eh);
         demoView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-		vsm.addGlyph(new VCircle(0,0,0,50,Color.WHITE), "src");
+		vsm.addGlyph(new VCircle(-300,0,0,4,Color.BLACK), "src");
+		vsm.addGlyph(new VCircle(300,0,0,4,Color.BLACK), "src");
         vsm.repaintNow();
 		// DynaSpot setup and activation
-		demoView.getCursor().setDynaSpotMaxRadius(20);
-		demoView.getCursor().setCutoffFrequencyParameters(3, 0.001);
+		demoView.getCursor().setDynaSpotMaxRadius(40);
+		demoView.getCursor().setCutoffFrequencyParameters(3, 0.1);
 		demoView.getCursor().activateDynaSpot(true);
     }
     
