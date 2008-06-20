@@ -46,6 +46,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import net.claribole.zvtm.engine.LowPassFilter;
+import java.awt.Point;
 
 /**
  * Glyph representing mouse cursor
@@ -823,10 +824,22 @@ public class VCursor {
 		cutoffParamB = b;
 	}
 	
+	public double getCutoffFrequencyParameterA(){
+		return cutoffParamA;
+	}
+
+	public double getCutoffFrequencyParameterB(){
+		return cutoffParamB;
+	}
+	
 	/** Higher values make it more difficult to reach the max radius. Speed of cursor has to be higher.*/
 	public void setOffsets(int x, int y){
 		xOffset = x;
 		yOffset = y;
+	}
+	
+	public Point getOffsets(){
+		return new Point(xOffset, yOffset);
 	}
 	
 	public void setDynaSpotAreaVisible(boolean b){
