@@ -85,7 +85,7 @@ class ConfigManager {
     static String CMD_LINE_OPTS="";
 
     //directories
-    static File m_TmpDir=new File("tmp");
+    static File m_TmpDir = new File(System.getProperty("java.io.tmpdir"));
     static File m_PrjDir=new File("graphs");
     static File m_DotPath=new File("dot");
     static File m_NeatoPath=new File("neato");
