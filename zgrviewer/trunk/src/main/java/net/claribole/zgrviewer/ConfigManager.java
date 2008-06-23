@@ -87,11 +87,11 @@ class ConfigManager {
     //directories
     static File m_TmpDir=new File("tmp");
     static File m_PrjDir=new File("graphs");
-    static File m_DotPath=new File("C:\\Tools\\ATT\\Graphviz\\bin\\dot.exe");
-    static File m_NeatoPath=new File("C:\\Tools\\ATT\\Graphviz\\bin\\neato.exe");
-    static File m_CircoPath = new File("C:\\Tools\\ATT\\Graphviz\\bin\\circo.exe");
-    static File m_TwopiPath = new File("C:\\Tools\\ATT\\Graphviz\\bin\\twopi.exe");
-    static File m_GraphVizFontDir = new File("C:\\WINDOWS\\Fonts");
+    static File m_DotPath=new File("dot");
+    static File m_NeatoPath=new File("neato");
+    static File m_CircoPath = new File("circo");
+    static File m_TwopiPath = new File("twopi");
+    static File m_GraphVizFontDir = new File("");
     static File m_LastDir=null;
     static File m_LastExportDir=null;
     /*Plug in directory*/
