@@ -1598,207 +1598,182 @@ public class SVGReader {
 	}
     }
 
-    /*e is a DOM element, vs is the name of the virtual space where the new glyph(s) is(are) put*/
-    private static void processNode(Element e,VirtualSpaceManager vsm,String vs,
-				    Context ctx,boolean mainFontSet,boolean meta,
-				    String documentParentURL, String fallbackParentURL,
-				    Hashtable imageStore){
-	String tagName=e.getTagName();
-	if (tagName.equals(_rect)){
-	    vsm.addGlyph(createRectangle(e,ctx,meta),vs);
-	}
-	else if (tagName.equals(_ellipse)){
-	    vsm.addGlyph(createEllipse(e,ctx,meta),vs);
-	}
-	else if (tagName.equals(_circle)){
-	    vsm.addGlyph(createCircle(e,ctx,meta),vs);
-	}
-	else if (tagName.equals(_path)){
-	    vsm.addGlyph(createPath(e,new VPath(),ctx,meta),vs);
-	}
-	else if (tagName.equals(_text)){
-	    vsm.addGlyph(createText(e,ctx,vsm,meta),vs);
-	}
-	else if (tagName.equals(_polygon)){
-	    Glyph g=createRectangleFromPolygon(e,ctx,meta);
-	    if (g!=null){vsm.addGlyph(g,vs);}          //if e does not describe a rectangle
-	    else {vsm.addGlyph(createPolygon(e,ctx,meta),vs);}  //create a VPolygon
-	}
-	else if (tagName.equals(_polyline)){
-	    Glyph[] segments=createPolyline(e,ctx,meta);
-	    for (int i=0;i<segments.length;i++){
-		vsm.addGlyph(segments[i],vs);
-	    }
-	}
-	else if (tagName.equals(_line)){
-	    vsm.addGlyph(createLine(e, ctx, meta), vs);
-	}
-	else if (tagName.equals(_image)) {
-
-		if (isSVGImage(e)) {
-	    	String imagePath = e.getAttributeNS(xlinkURI, _href);
-
-			URL imageURL = getImageURL(imagePath, documentParentURL, fallbackParentURL);
-
-			String width = e.getAttribute(_width);
-
-    // remove "px" from width and height
-
-			if (width.endsWith("px")) {
-				width = width.substring(0,width.length()-2);
-    		}
-
-			String height = e.getAttribute(_height);
-
-			if (height.endsWith("px")) {
-				height = height.substring(0,height.length()-2);
+	/*e is a DOM element, vs is the name of the virtual space where the new glyph(s) is(are) put*/
+	private static void processNode(Element e,VirtualSpaceManager vsm,String vs,
+									Context ctx,boolean mainFontSet,boolean meta,
+									String documentParentURL, String fallbackParentURL,
+									Hashtable imageStore){
+		String tagName=e.getTagName();
+		if (tagName.equals(_rect)){
+			vsm.addGlyph(createRectangle(e,ctx,meta),vs);
+		}
+		else if (tagName.equals(_ellipse)){
+			vsm.addGlyph(createEllipse(e,ctx,meta),vs);
+		}
+		else if (tagName.equals(_circle)){
+			vsm.addGlyph(createCircle(e,ctx,meta),vs);
+		}
+		else if (tagName.equals(_path)){
+			vsm.addGlyph(createPath(e,new VPath(),ctx,meta),vs);
+		}
+		else if (tagName.equals(_text)){
+			vsm.addGlyph(createText(e,ctx,vsm,meta),vs);
+		}
+		else if (tagName.equals(_polygon)){
+			Glyph g=createRectangleFromPolygon(e,ctx,meta);
+			//if e does not describe a rectangle
+			if (g!=null){vsm.addGlyph(g,vs);}
+			//create a VPolygon
+			else {vsm.addGlyph(createPolygon(e,ctx,meta),vs);}
+		}
+		else if (tagName.equals(_polyline)){
+			Glyph[] segments=createPolyline(e,ctx,meta);
+			for (int i=0;i<segments.length;i++){
+				vsm.addGlyph(segments[i],vs);
 			}
+		}
+		else if (tagName.equals(_line)){
+			vsm.addGlyph(createLine(e, ctx, meta), vs);
+		}
+		else if (tagName.equals(_image)) {
+			if (isSVGImage(e)) {
+				String imagePath = e.getAttributeNS(xlinkURI, _href);
+				URL imageURL = getImageURL(imagePath, documentParentURL, fallbackParentURL);
+				String width = e.getAttribute(_width);
+				// remove "px" from width and height
+				if (width.endsWith("px")) {
+					width = width.substring(0,width.length()-2);
+				}
+				String height = e.getAttribute(_height);
+				if (height.endsWith("px")) {
+					height = height.substring(0,height.length()-2);
+				}
+				long w = getLong(width);
+				long h = getLong(height);
+				long x = getLong(e.getAttribute(_x));
+				long y = getLong(e.getAttribute(_y));
+				long xos = xoffset;
+				long yos = yoffset;
+				xoffset += x;
+				yoffset += y;
+				String imPath = imageURL.toString();
+				Document imageDoc = parseSVG(imPath, false);
+				Element svgRoot=imageDoc.getDocumentElement();
+				String viewBox = svgRoot.getAttribute(_viewBox);
+				String[] vbs = viewBox.split(" ");
+				String xorigin = vbs[0];
+				String yorigin = vbs[1];
+				String iwidth = vbs[2];
+				String iheight = vbs[3];
+				long xor = getLong(xorigin);
+				long yor = getLong(yorigin);
+				long iw = getLong(iwidth);
+				long ih = getLong(iheight);
+				scale = (double)w / iw;
+				xoffset -= (long)Math.floor((double)xor * scale);
+				yoffset -= (long)Math.floor((double)yor * scale);
+				load(imageDoc, vsm, vs, meta, imPath);
+				scale = 1.0;
+				xoffset = xos;
+				yoffset = yos;
 
-			long w = getLong(width);
-			long h = getLong(height);
-
-			long x = getLong(e.getAttribute(_x));
-			long y = getLong(e.getAttribute(_y));
-
+			}
+			else { 
+				Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
+				if (g != null){
+					vsm.addGlyph(g, vs);
+				}
+			}
+		}
+		else if (tagName.equals(_g)){
 			long xos = xoffset;
 			long yos = yoffset;
-
-			xoffset += x;
-			yoffset += y;
-
-			String imPath = imageURL.toString();
-
-//			System.out.println("image path: " + imPath);
-
-			Document imageDoc = parseSVG(imPath, false);
-			Element svgRoot=imageDoc.getDocumentElement();
-	
-	    	String viewBox = svgRoot.getAttribute(_viewBox);
-			String[] vbs = viewBox.split(" ");
-
-			String xorigin = vbs[0];
-			String yorigin = vbs[1];
-			String iwidth = vbs[2];
-			String iheight = vbs[3];
-
-			long xor = getLong(xorigin);
-			long yor = getLong(yorigin);
-			long iw = getLong(iwidth);
-			long ih = getLong(iheight);
-
-			scale = (double)w / iw;
-
-			xoffset -= (long)Math.floor((double)xor * scale);
-			yoffset -= (long)Math.floor((double)yor * scale);
-
-    		load(imageDoc, vsm, vs, meta, imPath);
-
-			scale = 1.0;
+			if (e.hasAttribute(SVGReader._transform)){
+				String transform = e.getAttribute(_transform);
+				int transl = transform.indexOf("translate");
+				int rp = transform.indexOf(")", transl);
+				String tlate = transform.substring(transl + 10, rp);
+				String tx = tlate.split(" ")[0];
+				String ty = tlate.split(" ")[1];
+				xoffset += (long)Math.floor((double)getLong(tx) * scale);
+				yoffset += (long)Math.floor((double)getLong(ty) * scale);
+			}
+			NodeList objects=e.getChildNodes();
+			boolean setAFont=false;
+			if (e.hasAttribute(SVGReader._style)){
+				if (ctx!=null){ctx.add(e.getAttribute(SVGReader._style));}
+				else {ctx=new Context(e.getAttribute(SVGReader._style));}
+				if (!mainFontSet){
+					Font f;
+					if ((f=ctx.getDefinedFont())!=null){
+						vsm.setMainFont(f);
+						setAFont=true;
+					}
+				}
+				else {setAFont=true;}
+			}
+			NodeList titles=e.getElementsByTagName(_title);
+			if (titles.getLength()>0){
+				if (ctx==null){ctx=new Context();}
+				try {
+					//try to get the title, be quiet if anything goes wrong
+					ctx.setTitle(((Element)titles.item(0)).getFirstChild().getNodeValue());
+				}
+				catch(Exception ex){}
+				if (e.hasAttribute(SVGReader._id)){
+					try {
+						//try to get the group's id, be quiet if anything goes wrong
+						ctx.setClosestAncestorGroupID(e.getAttribute(SVGReader._id));
+					}
+					catch(Exception ex){}
+				}
+			}
+			for (int i=0;i<objects.getLength();i++){
+				Node obj=objects.item(i);
+				if (obj.getNodeType()==Node.ELEMENT_NODE){
+					processNode((Element)obj, vsm, vs,
+						(ctx != null) ? ctx.duplicate() : null,
+						setAFont, meta,
+						documentParentURL, fallbackParentURL, imageStore);
+				}
+			}
 			xoffset = xos;
 			yoffset = yos;
-
-		} else { 
-	    	Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
-	    	if (g != null){
-				vsm.addGlyph(g, vs);
-	    	}
 		}
+		else if (tagName.equals(_a)){
+			NodeList objects=e.getChildNodes();
+			boolean setAFont=false;
+			if (e.hasAttribute(SVGReader._style)){
+				if (ctx!=null){ctx.add(e.getAttribute(SVGReader._style));}
+				else {ctx=new Context(e.getAttribute(SVGReader._style));}
+				if (!mainFontSet){
+					Font f;
+					if ((f=ctx.getDefinedFont())!=null){
+						vsm.setMainFont(f);
+						setAFont=true;
+					}
+				}
+				else {setAFont=true;}
+			}
+			if (e.hasAttributeNS(xlinkURI,_href)){
+				if (ctx==null){ctx=new Context();}
+				ctx.setURL(e.getAttributeNS(xlinkURI,_href));
+			}
+			for (int i=0;i<objects.getLength();i++){
+				Node obj=objects.item(i);
+				if (obj.getNodeType()==Node.ELEMENT_NODE){
+					processNode((Element)obj, vsm, vs,
+						(ctx != null) ? ctx.duplicate() : null,
+						setAFont, meta,
+						documentParentURL, fallbackParentURL, imageStore);
+				}
+			}
+		}
+		else if (tagName.equals(_title)){
+			//do nothing - is taken care of in each element's processing method if meta is true
+		}
+		else System.err.println("SVGReader: unsupported element: "+tagName);
 	}
-	else if (tagName.equals(_g)){
-		long xos = xoffset;
-		long yos = yoffset;
-
-	    if (e.hasAttribute(SVGReader._transform)){
-
-			String transform = e.getAttribute(_transform);
-//			System.out.println("transform: " + transform);
-
-			int transl = transform.indexOf("translate");
-			int rp = transform.indexOf(")", transl);
-
-			String tlate = transform.substring(transl + 10, rp);
-			String tx = tlate.split(" ")[0];
-			String ty = tlate.split(" ")[1];
-
-			xoffset += (long)Math.floor((double)getLong(tx) * scale);
-			yoffset += (long)Math.floor((double)getLong(ty) * scale);
-		}
-
-	    NodeList objects=e.getChildNodes();
-	    boolean setAFont=false;
-	    if (e.hasAttribute(SVGReader._style)){
-		if (ctx!=null){ctx.add(e.getAttribute(SVGReader._style));}
-		else {ctx=new Context(e.getAttribute(SVGReader._style));}
-		if (!mainFontSet){
-		    Font f;
-		    if ((f=ctx.getDefinedFont())!=null){
-			vsm.setMainFont(f);
-			setAFont=true;
-		    }
-		}
-		else {setAFont=true;}
-	    }
-	    NodeList titles=e.getElementsByTagName(_title);
-	    if (titles.getLength()>0){
-		if (ctx==null){ctx=new Context();}
-		try {//try to get the title, be quiet if anything goes wrong
-		    ctx.setTitle(((Element)titles.item(0)).getFirstChild().getNodeValue());
-		}
-		catch(Exception ex){}
-		if (e.hasAttribute(SVGReader._id)){
-		    try {//try to get the group's id, be quiet if anything goes wrong
-			ctx.setClosestAncestorGroupID(e.getAttribute(SVGReader._id));
-		    }
-		    catch(Exception ex){}
-		}
-	    }
-	    for (int i=0;i<objects.getLength();i++){
-		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){
-		    processNode((Element)obj, vsm, vs,
-				(ctx != null) ? ctx.duplicate() : null,
-				setAFont, meta,
-				documentParentURL, fallbackParentURL, imageStore);
-		}
-	    }
-
-		xoffset = xos;
-		yoffset = yos;
-	}
-	else if (tagName.equals(_a)){
-	    NodeList objects=e.getChildNodes();
-	    boolean setAFont=false;
-	    if (e.hasAttribute(SVGReader._style)){
-		if (ctx!=null){ctx.add(e.getAttribute(SVGReader._style));}
-		else {ctx=new Context(e.getAttribute(SVGReader._style));}
-		if (!mainFontSet){
-		    Font f;
-		    if ((f=ctx.getDefinedFont())!=null){
-			vsm.setMainFont(f);
-			setAFont=true;
-		    }
-		}
-		else {setAFont=true;}
-	    }
-	    if (e.hasAttributeNS(xlinkURI,_href)){
-		if (ctx==null){ctx=new Context();}
-		ctx.setURL(e.getAttributeNS(xlinkURI,_href));
-	    }
-	    for (int i=0;i<objects.getLength();i++){
-		Node obj=objects.item(i);
-		if (obj.getNodeType()==Node.ELEMENT_NODE){
-		    processNode((Element)obj, vsm, vs,
-				(ctx != null) ? ctx.duplicate() : null,
-				setAFont, meta,
-				documentParentURL, fallbackParentURL, imageStore);
-		}
-	    }
-	}
-	else if (tagName.equals(_title)){
-	    //do nothing - is taken care of in each element's processing method if meta is true
-	}
-	else System.err.println("SVGReader: unsupported element: "+tagName);
-    }
 
     /** Returns the Font object corresponding to the provided description.
      * The font is taken from the cache if in there, or created if not (and then stored for subsequent requests)
