@@ -1686,6 +1686,7 @@ public class SVGReader {
 			}
 		}
 		else if (tagName.equals(_g)){
+			if (ctx==null){ctx=new Context();}
 			long xos = xoffset;
 			long yos = yoffset;
 			if (e.hasAttribute(SVGReader._transform)){
@@ -1701,8 +1702,7 @@ public class SVGReader {
 			NodeList objects=e.getChildNodes();
 			boolean setAFont=false;
 			if (e.hasAttribute(SVGReader._style)){
-				if (ctx!=null){ctx.add(e.getAttribute(SVGReader._style));}
-				else {ctx=new Context(e.getAttribute(SVGReader._style));}
+				ctx.add(e.getAttribute(SVGReader._style));
 				if (!mainFontSet){
 					Font f;
 					if ((f=ctx.getDefinedFont())!=null){
@@ -1714,25 +1714,24 @@ public class SVGReader {
 			}
 			NodeList titles=e.getElementsByTagName(_title);
 			if (titles.getLength()>0){
-				if (ctx==null){ctx=new Context();}
 				try {
 					//try to get the title, be quiet if anything goes wrong
 					ctx.setTitle(((Element)titles.item(0)).getFirstChild().getNodeValue());
 				}
 				catch(Exception ex){}
-				if (e.hasAttribute(SVGReader._id)){
-					try {
-						//try to get the group's id, be quiet if anything goes wrong
-						ctx.setClosestAncestorGroupID(e.getAttribute(SVGReader._id));
-					}
-					catch(Exception ex){}
+			}
+			if (e.hasAttribute(SVGReader._id)){
+				try {
+					//try to get the group's id, be quiet if anything goes wrong
+					ctx.setClosestAncestorGroupID(e.getAttribute(SVGReader._id));
 				}
+				catch(Exception ex){}
 			}
 			for (int i=0;i<objects.getLength();i++){
 				Node obj=objects.item(i);
 				if (obj.getNodeType()==Node.ELEMENT_NODE){
 					processNode((Element)obj, vsm, vs,
-						(ctx != null) ? ctx.duplicate() : null,
+						ctx.duplicate(),
 						setAFont, meta,
 						documentParentURL, fallbackParentURL, imageStore);
 				}
