@@ -69,6 +69,9 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+		if (v.lastGlyphEntered() != null){
+			application.vsm.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], 500);
+		}
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
