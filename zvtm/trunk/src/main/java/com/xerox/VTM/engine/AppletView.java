@@ -35,25 +35,23 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 
 public class AppletView extends View implements KeyListener {
 
-    /**
-     *@param v list of cameras
-     *@param t view name
-     *@param panelWidth width of window in pixels
-     *@param panelHeight height of window in pixels
-     *@param vsm root VTM class
-     */
-    protected AppletView(Vector v,String t,int panelWidth,int panelHeight,VirtualSpaceManager vsm){
-	mouse=new VCursor(this);
-	name=t;
-	parent=vsm;
-	detectMultipleFullFills = vsm.defaultMultiFill;
-	initCameras(v);   //vector -> cast elements as "Camera"
-	panel=new AppletViewPanel(v,this);
-	panel.setSize(panelWidth,panelHeight);
-	// following line does not work (no event sent)
-//  	panel.addKeyListener(this);
-    }
-
+	/**
+		*@param v list of cameras
+		*@param t view name
+		*@param panelWidth width of window in pixels
+		*@param panelHeight height of window in pixels
+		*@param vsm root VTM class
+		*/
+	protected AppletView(Vector v,String t,int panelWidth,int panelHeight,VirtualSpaceManager vsm){
+		mouse=new VCursor(this);
+		name=t;
+		parent=vsm;
+		detectMultipleFullFills = vsm.defaultMultiFill;
+		initCameras(v);   //vector -> cast elements as "Camera"
+		panel=new AppletViewPanel(v,this);
+		panel.setSize(panelWidth,panelHeight);
+		panel.addKeyListener(this);
+	}
 
     /**get the java.awt.Container for this view*/
     public Container getFrame(){return panel;}
