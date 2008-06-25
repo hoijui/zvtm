@@ -61,7 +61,7 @@ public class EvalDebugger {
 
 	void generateScene(){
 		int w = 10;
-		DistractorGenerator.setParameters(300, w, 0.5f, 20);
+		DistractorGenerator.setParameters(300, w, 1f, 20);
 		vsm.addGlyph(new VCircle(0, 0, 0, w/2, Color.RED), "src");
 		Point[] coords = DistractorGenerator.generate();
 		// 1st coords are the target

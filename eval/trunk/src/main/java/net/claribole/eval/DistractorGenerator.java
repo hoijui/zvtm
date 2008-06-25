@@ -57,8 +57,15 @@ public class DistractorGenerator {
 		tres.add(new Point(A, -W-InS));
 		tres.add(new Point(A, W+InS));
 		// distractors in 20deg cone
-		
-		
+		// distance from start point edge to first distractor edge
+		// - 4 * W/2 - InS, actually
+		int distractorInterval = A - 2*W - InS;
+		float maxNumberOfDistractors = distractorInterval / ((float)W);
+		int numberOfDistractors = Math.round(maxNumberOfDistractors * D);
+		float step = distractorInterval / ((float)numberOfDistractors);
+		for (int i=0;i<numberOfDistractors;i++){
+			tres.add(new Point(Math.round(W+i*step), 0));
+		}
 		// other distractors
 		
 		return (Point[])tres.toArray(new Point[tres.size()]);
