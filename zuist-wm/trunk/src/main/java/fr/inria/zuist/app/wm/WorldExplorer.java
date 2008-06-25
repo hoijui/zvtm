@@ -119,7 +119,7 @@ public class WorldExplorer implements Java2DPainter {
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setSceneCameraBounds(bCamera, eh.wnes);
-        sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, gp);
+        sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), gp);
         if (grid){buildGrid();}
         gm = new GeoToolsManager(this);
         gp.setVisible(false);
