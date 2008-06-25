@@ -2,10 +2,10 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ExplorerEventHandler.java 1049 2008-01-11 10:06:02Z epietrig $
+ * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.viewer;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;

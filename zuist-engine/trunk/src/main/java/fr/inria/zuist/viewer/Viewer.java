@@ -2,10 +2,10 @@
  *   Copyright (c) INRIA, 2008. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Viewer.java 1065 2008-02-21 09:27:34Z epietrig $
+ * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.viewer;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,9 +63,7 @@ import org.xml.sax.SAXException;
 
 public class Viewer {
     
-    String PATH_TO_HIERARCHY;
-    String PATH_TO_SCENE;
-    File SCENE_FILE;
+    File SCENE_FILE, SCENE_FILE_DIR;
         
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -95,18 +93,17 @@ public class Viewer {
 
     SceneManager sm;
     
-    public Viewer(boolean fullscreen, String dir){
-        if (dir != null){
-            PATH_TO_HIERARCHY = dir;
-            PATH_TO_SCENE = PATH_TO_HIERARCHY + "/scene.xml";
-            SCENE_FILE = new File(PATH_TO_SCENE);
+    public Viewer(boolean fullscreen, String xmlSceneFile){
+        if (xmlSceneFile != null){
+        	SCENE_FILE = new File(xmlSceneFile);
+            SCENE_FILE_DIR = SCENE_FILE.getParentFile();
         }
         initGUI(fullscreen);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
-        sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, null);
+        sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR);
         mCamera.setAltitude(10000.0f);
         eh.cameraMoved();
     }
@@ -118,7 +115,7 @@ public class Viewer {
         mCamera = vsm.addCamera(mSpace);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
+        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -554,9 +551,13 @@ public class Viewer {
     }
 
     public static void main(String[] args){
-        boolean fs = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
-        String dir = (args.length > 1) ? args[1] : null;
-        new Viewer(fs, dir);
+        String xmlSceneFile = (args.length > 0) ? args[0] : null;
+		if (xmlSceneFile == null){
+			System.out.println(Messages.USAGE);
+			System.exit(0);
+		}
+        boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
+        new Viewer(fs, xmlSceneFile);
     }
 
 }

@@ -10,7 +10,7 @@ package fr.inria.zuist.engine;
 import java.awt.Color;
 import java.awt.Image;
 import javax.swing.ImageIcon;
-
+import java.io.File;
 import java.util.Hashtable;
 import java.util.Enumeration;
 
@@ -198,7 +198,7 @@ public class SceneManager {
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      */
-    public void loadScene(Document scene, String sceneFileDirectory){
+    public void loadScene(Document scene, File sceneFileDirectory){
 	loadScene(scene, sceneFileDirectory, null);
     }
 
@@ -206,7 +206,7 @@ public class SceneManager {
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      */
-    public void loadScene(Document scene, String sceneFileDirectory, ProgressListener pl){
+    public void loadScene(Document scene, File sceneFileDirectory, ProgressListener pl){
 	id2region.clear();
 	id2object.clear();
 	Element root = scene.getDocumentElement();
@@ -346,7 +346,7 @@ public class SceneManager {
         return region;
     }
 
-    void processRegion(Element regionEL, Hashtable rn2crn, String sceneFileDirectory){
+    void processRegion(Element regionEL, Hashtable rn2crn, File sceneFileDirectory){
         long x = Long.parseLong(regionEL.getAttribute(_x));
         long y = Long.parseLong(regionEL.getAttribute(_y));
         long w = Long.parseLong(regionEL.getAttribute(_w));
@@ -395,7 +395,7 @@ public class SceneManager {
         }
     }
 
-    void processObject(Element objectEL, Region region, String sceneFileDirectory){
+    void processObject(Element objectEL, Region region, File sceneFileDirectory){
         String type = objectEL.getAttribute(_type);
         String id = objectEL.getAttribute(_id);
         int zindex = (objectEL.hasAttribute(_zindex)) ? Integer.parseInt(objectEL.getAttribute(_zindex)) : 0;
@@ -436,7 +436,7 @@ public class SceneManager {
     }
 
     /** Process XML description of an image object. */
-    ImageDescription processImage(Element objectEL, String id, int zindex, Region region, String sceneFileDirectory){
+    ImageDescription processImage(Element objectEL, String id, int zindex, Region region, File sceneFileDirectory){
         long x = Long.parseLong(objectEL.getAttribute(_x));
         long y = Long.parseLong(objectEL.getAttribute(_y));
         long w = Long.parseLong(objectEL.getAttribute(_w));
@@ -444,7 +444,8 @@ public class SceneManager {
         String src = objectEL.getAttribute(_src);
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        ImageDescription od = createImageDescription(x, y, w, h, id, zindex, region, sceneFileDirectory+"/"+src, sensitivity, stroke);
+		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
+		ImageDescription od = createImageDescription(x, y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke);
         return od;
     }
 
