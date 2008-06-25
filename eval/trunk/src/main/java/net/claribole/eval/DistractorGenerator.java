@@ -9,6 +9,7 @@
 package net.claribole.eval;
 
 import java.awt.Point;
+import java.awt.geom.AffineTransform;
 
 import java.util.Vector;
 import java.util.Arrays;
@@ -29,6 +30,10 @@ public class DistractorGenerator {
 	static float D;
 	// interspace
 	static int InS;
+	
+	static Point translate = new Point(0, 0);
+	static float direction = 0;
+	
 
 	/** Set generator's parameters.
 		*@param a amplitude (distance from start point to target's center)
@@ -41,6 +46,15 @@ public class DistractorGenerator {
 		W = w;
 		D = d;
 		InS = ins;
+	}
+	
+	public static void setTranslate(int x, int y){
+		translate.x = x;
+		translate.y = y;
+	}
+	
+	public static void setDirection(float angle){
+		direction = angle;
 	}
 	
 	/** Generate a target and set of distractors.
@@ -66,8 +80,22 @@ public class DistractorGenerator {
 			tres.add(new Point(Math.round(i*step), 0));
 		}
 		// other distractors
-		
-		return (Point[])tres.toArray(new Point[tres.size()]);
+		// XXX:TBW
+
+		// build result array		
+		if (direction != 0 || translate.x != 0 || translate.y != 0){
+			// translate and rotate if necessary
+			AffineTransform at = AffineTransform.getTranslateInstance(translate.x, translate.y);
+			at.concatenate(AffineTransform.getRotateInstance(direction));
+			Point[] res = new Point[tres.size()];
+			for (int i=0;i<tres.size();i++){
+				res[i] = (Point)at.transform((Point)tres.elementAt(i), new Point());
+			}
+			return res;			
+		}
+		else {
+			return (Point[])tres.toArray(new Point[tres.size()]);			
+		}
 	}
 
 	/** Generate a target and set of distractors and save them to a file.
