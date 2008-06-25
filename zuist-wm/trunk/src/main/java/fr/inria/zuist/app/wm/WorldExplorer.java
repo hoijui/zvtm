@@ -67,8 +67,8 @@ public class WorldExplorer implements Java2DPainter {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 640;  // 1400
-    static int VIEW_MAX_H = 480;   // 1050
+    static int VIEW_MAX_W = 1024;  // 1400
+    static int VIEW_MAX_H = 768;   // 1050
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
