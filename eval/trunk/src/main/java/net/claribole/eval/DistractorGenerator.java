@@ -62,7 +62,6 @@ public class DistractorGenerator {
 		// other distractors
 		
 		return (Point[])tres.toArray(new Point[tres.size()]);
-		
 	}
 
 	/** Generate a target and set of distractors and save them to a file.
@@ -70,7 +69,13 @@ public class DistractorGenerator {
 		*@param f file name
 		*/	
 	public static String generateAsString(){
-		return Arrays.toString(generate());
+		String res = "";
+		Point[] pres = generate();
+		for (int i=0;i<pres.length-1;i++){
+			res += pres[i].x + "," + pres[i].y + ",";
+		}
+		res += pres[pres.length-1].x + "," + pres[pres.length-1].y;
+		return res;
 	}
 	
 	/** Generate a target and set of distractors and save them to a file.
@@ -85,6 +90,23 @@ public class DistractorGenerator {
 			bwt.flush();
 		}
 		catch (IOException ex){ex.printStackTrace();}
+	}
+	
+	public static void main(String[] args){
+		if (args.length > 3){
+			DistractorGenerator.setParameters(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
+				                              Float.parseFloat(args[2]), Integer.parseInt(args[3]));
+		}
+		else {
+			System.out.println("Usage:\n\tjava DistractorGenerator <amplitude> <width> <density> <interspace> [output_file]");
+			System.exit(0);
+		}
+		if (args.length > 4){
+			DistractorGenerator.generate(new File(args[4]));
+		}
+		else {
+			System.out.println(DistractorGenerator.generateAsString());
+		}
 	}
 
 }
