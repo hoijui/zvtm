@@ -8,6 +8,11 @@
 
 package net.claribole.eval;
 
+import java.awt.Point;
+
+import java.util.Vector;
+import java.util.Arrays;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.FileOutputStream;
@@ -39,12 +44,33 @@ public class DistractorGenerator {
 	}
 	
 	/** Generate a target and set of distractors.
-		*@return the (x,y) coordinates of the target and distractors. All values separated by commas: x1,y,x2,y2,x3,y3,... 
+		*@return the (x,y) coordinates of the target and distractors.
 		*/
-	public static String generate(){
-		String res = "";
+	public static Point[] generate(){
+		Vector tres = new Vector();
+		// target
+		tres.add(new Point(A, 0));
+		// 4 surrounding distractors
+		// +/- 2 * W/2 - InS, actually
+		tres.add(new Point(A-W-InS, 0));
+		tres.add(new Point(A+W+InS, 0));
+		tres.add(new Point(A, -W-InS));
+		tres.add(new Point(A, W+InS));
+		// distractors in 20deg cone
 		
-		return res;
+		
+		// other distractors
+		
+		return (Point[])tres.toArray(new Point[tres.size()]);
+		
+	}
+
+	/** Generate a target and set of distractors and save them to a file.
+	    * Generates the (x,y) coordinates of the target and distractors. All values separated by commas: x1,y,x2,y2,x3,y3,... 
+		*@param f file name
+		*/	
+	public static String generateAsString(){
+		return Arrays.toString(generate());
 	}
 	
 	/** Generate a target and set of distractors and save them to a file.
@@ -54,7 +80,7 @@ public class DistractorGenerator {
 	public static void generate(File f){
 		try {
 			BufferedWriter bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
-			bwt.write(generate());
+			bwt.write(generateAsString());
 			bwt.newLine();
 			bwt.flush();
 		}

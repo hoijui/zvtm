@@ -9,6 +9,8 @@
 package net.claribole.eval;
 
 import java.awt.Color;
+import java.awt.Point;
+
 import java.util.Vector;
 
 import com.xerox.VTM.engine.*;
@@ -43,18 +45,35 @@ public class EvalDebugger {
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
             case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
         }
-        testView = vsm.addExternalView(cameras, "Test", vt, 1280, 1024, false, true);
+        testView = vsm.addExternalView(cameras, "Test", vt, 1280, 800, false, true);
         testView.setBackgroundColor(Color.WHITE);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(0);
-		//DistractorGenerator.setParameters();
+		testView.setAntialiasing(true);
+		generateScene();
         vsm.repaintNow();
-		testView.getCursor().setDynaSpotMaxRadius(50);
-		testView.getCursor().setCutoffFrequencyParameters(3, 0.1);
+		testView.getCursor().setDynaSpotMaxRadius(20);
+		testView.getCursor().setCutoffFrequencyParameters(0.8, 0.1);
 		testView.getCursor().activateDynaSpot(true);
 		testView.getCursor().setDynaSpotAreaVisible(true);
     }
+
+	void generateScene(){
+		int w = 10;
+		DistractorGenerator.setParameters(300, w, 0.5f, 20);
+		vsm.addGlyph(new VCircle(0, 0, 0, w/2, Color.RED), "src");
+		Point[] coords = DistractorGenerator.generate();
+		// 1st coords are the target
+		vsm.addGlyph(new VCircle(coords[0].x, coords[0].y, 0, w/2, Color.GREEN), "src");
+		// other are distractors
+		VCircle c;
+		for (int i=1;i<coords.length;i++){
+			c = new VCircle(coords[i].x, coords[i].y, 0, w/2, Color.DARK_GRAY, Color.DARK_GRAY);
+			c.setFilled(false);
+			vsm.addGlyph(c, "src");
+		}
+	}
     
     public static void main(String[] args){
         System.out.println("-----------------");
