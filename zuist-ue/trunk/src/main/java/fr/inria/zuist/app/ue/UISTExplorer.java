@@ -114,7 +114,8 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
     static final short L2_Linear = 1;
     static final short LInf_Linear = 2;
     static final short LInf_Manhattan = 5;
-    short lensFamily = L2_Linear;
+    static final short L2_HLinear = 6;
+    short lensFamily = L2_HLinear;
 
     static final float FLOOR_ALTITUDE = 0.0f;
 
@@ -186,7 +187,7 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
         sm.setLevelListener(this);
         sm.setRegionListener(this);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
-        sm.loadScene(parseXML(SCENE_FILE), PATH_TO_HIERARCHY, this);
+        sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), this);
 
         Location l = vsm.getGlobalView(mCamera);
         mCamera.setLocation(l);
@@ -390,7 +391,7 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
         }
         else {
             NAV_MODE++;
-            if (NAV_MODE == NAV_MODE_FISHEYE){lensFamily = L2_Linear;}
+            if (NAV_MODE == NAV_MODE_FISHEYE){lensFamily = L2_HLinear;}
             else if (NAV_MODE == NAV_MODE_FISHEYE2){lensFamily = LInf_Linear;}
         }
         ovm.say("Navigation Mode: "+NAV_MODES_STR[NAV_MODE], SWITCHING_MODE_MSG_DURATION);
@@ -439,6 +440,10 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
             }
             case LInf_Manhattan:{
                 res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+                break;
+            }
+            case L2_HLinear:{
+                res = new HLinearLens(1.0f, 0.4f, 1.0f, 300, 150, x - panelWidth/2, y - panelHeight/2);
                 break;
             }
         }
