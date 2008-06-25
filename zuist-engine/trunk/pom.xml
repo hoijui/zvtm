@@ -98,8 +98,8 @@ $Id$
         <configuration>
           <archive>
             <manifest>
-              <mainClass>fr.inria.zuist.engine.Viewer</mainClass>
-              <packageName>fr.inria.zuist.engine</packageName>
+              <mainClass>fr.inria.zuist.viewer.Viewer</mainClass>
+              <packageName>fr.inria.zuist.viewer</packageName>
               <addClasspath>true</addClasspath>
             </manifest>
             <manifestEntries>
