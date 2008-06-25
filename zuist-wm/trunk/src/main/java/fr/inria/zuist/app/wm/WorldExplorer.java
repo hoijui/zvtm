@@ -307,9 +307,9 @@ public class WorldExplorer implements Java2DPainter {
     }
 
     public static void main(String[] args){
-        boolean fs = (args.length > 0) ? Boolean.parseBoolean(args[0]) : false;
-        boolean grid = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
-        String dir = (args.length > 2) ? args[2] : null;
+        String dir = (args.length > 0) ? args[0] : null;
+        boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
+        boolean grid = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
         new WorldExplorer(fs, grid, dir);
     }
