@@ -76,6 +76,8 @@ public class DistractorGenerator {
 		*/
 	public static Point[] generate(){
 		Vector tres = new Vector();
+		// start point
+		tres.add(new Point(0, 0));		
 		// target
 		tres.add(new Point(A, 0));
 		// 4 surrounding distractors
@@ -196,7 +198,7 @@ public class DistractorGenerator {
 			System.out.println("\tdensity: float in [0.0,1.0]");
 			System.out.println("\tinterspace int");
 			System.out.println("\toffset (x,y): int,int");
-			System.out.println("\tdirection (angle in degrees): float");
+			System.out.println("\tdirection (angle in rad): float");
 			System.out.println("\n\tExample: java DistractorGenerator 300 10 0.5 20 100,100 0");
 			System.out.println("\n\tExample: java DistractorGenerator 300 10 0.5 20 100,100 0 res.csv\n");
 			System.exit(0);
