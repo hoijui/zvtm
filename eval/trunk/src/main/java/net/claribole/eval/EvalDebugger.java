@@ -64,7 +64,7 @@ public class EvalDebugger {
 		int ox = 0;
 		int oy = 0;
 		float dir = 0;
-		DistractorGenerator.setParameters(300, w, 0.5f, 20);
+		DistractorGenerator.setParameters(300, w, 1.0f, 20);
 		DistractorGenerator.setTranslation(ox, oy);
 		DistractorGenerator.setDirection(dir);
 		vsm.addGlyph(new VCircle(ox, oy, 0, w/2, Color.RED), "src");

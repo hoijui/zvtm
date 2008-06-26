@@ -102,7 +102,7 @@ public class DistractorGenerator {
 		// follow same principle but in two adjacent cones (one on each side, slightly longer)
 		step *= 1.2f;
 		AffineTransform at = AffineTransform.getTranslateInstance(0, 2*W);
-		at.concatenate(AffineTransform.getRotateInstance(coneAngle*1.2));
+		at.concatenate(AffineTransform.getRotateInstance(coneAngle));
 		for (int i=1;i<numberOfDistractors;i++){
 			x = Math.round(i*step);
 			maxY = x * Math.tan(coneAngle/2.0);
@@ -114,7 +114,7 @@ public class DistractorGenerator {
 			tres.add(p);
 		}
 		at = AffineTransform.getTranslateInstance(0, -2*W);
-		at.concatenate(AffineTransform.getRotateInstance(-coneAngle*1.2));
+		at.concatenate(AffineTransform.getRotateInstance(-coneAngle));
 		for (int i=1;i<numberOfDistractors;i++){
 			x = Math.round(i*step);
 			maxY = x * Math.tan(coneAngle/2.0);
