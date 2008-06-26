@@ -22,18 +22,24 @@ import java.io.BufferedWriter;
 
 public class DistractorGenerator {
 
-	// amplitude
+	/** Amplitude */
 	static int A;
-	// width
+	/** Width */
 	static int W;
-	// density
+	/** Density */
 	static float D;
-	// interspace
+	/** Interspace */
 	static int InS;
 	
+	/** Translate objects by x,y */
 	static Point translate = new Point(0, 0);
+	/** Direction of target w.r.t start point. Impacts position of distractors. */
 	static float direction = 0;
 	
+	static final float DEG2RAD = (float)(2*Math.PI/360.0);
+	
+	/** Angle of cone containing main series of distractors (in rad). */
+	static float coneAngle = 20.0f * DEG2RAD;
 
 	/** Set generator's parameters.
 		*@param a amplitude (distance from start point to target's center)
@@ -48,13 +54,21 @@ public class DistractorGenerator {
 		InS = ins;
 	}
 	
-	public static void setTranslate(int x, int y){
+	public static void setTranslation(int x, int y){
 		translate.x = x;
 		translate.y = y;
 	}
 	
 	public static void setDirection(float angle){
 		direction = angle;
+	}
+	
+	public static void setConeAngleDeg(float a){
+		coneAngle = a * DEG2RAD;
+	}
+
+	public static void setConeAngleRad(float a){
+		coneAngle = a;
 	}
 	
 	/** Generate a target and set of distractors.
@@ -76,8 +90,12 @@ public class DistractorGenerator {
 		int maxNumberOfDistractors = (startToFirstDistractor-W) / W - 1;
 		int numberOfDistractors = Math.round(maxNumberOfDistractors * D);
 		float step = startToFirstDistractor / ((float)numberOfDistractors);
+		int x;
+		double maxY;
 		for (int i=1;i<numberOfDistractors;i++){
-			tres.add(new Point(Math.round(i*step), 0));
+			x = Math.round(i*step);
+			maxY = x * Math.tan(coneAngle/2.0);
+			tres.add(new Point(x, (int)(2*maxY*Math.random()-maxY)));
 		}
 		// other distractors
 		// XXX:TBW
