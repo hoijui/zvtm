@@ -182,16 +182,27 @@ public class DistractorGenerator {
 	}
 	
 	public static void main(String[] args){
-		if (args.length > 3){
+		if (args.length > 5){
 			DistractorGenerator.setParameters(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
 				                              Float.parseFloat(args[2]), Integer.parseInt(args[3]));
+			String[] offset = args[4].split(",");
+			DistractorGenerator.setTranslation(Integer.parseInt(offset[0]), Integer.parseInt(offset[1]));
+			DistractorGenerator.setDirection(Float.parseFloat(args[5]));
 		}
 		else {
-			System.out.println("Usage:\n\tjava DistractorGenerator <amplitude> <width> <density> <interspace> [output_file]");
+			System.out.println("Usage:\n\tjava DistractorGenerator <amplitude> <width> <density> <interspace> <offset> <direction> [output_file]");
+			System.out.println("\n\tamplitude: int");
+			System.out.println("\twidth: int");
+			System.out.println("\tdensity: float in [0.0,1.0]");
+			System.out.println("\tinterspace int");
+			System.out.println("\toffset (x,y): int,int");
+			System.out.println("\tdirection (angle in degrees): float");
+			System.out.println("\n\tExample: java DistractorGenerator 300 10 0.5 20 100,100 0");
+			System.out.println("\n\tExample: java DistractorGenerator 300 10 0.5 20 100,100 0 res.csv\n");
 			System.exit(0);
 		}
-		if (args.length > 4){
-			DistractorGenerator.generate(new File(args[4]));
+		if (args.length > 6){
+			DistractorGenerator.generate(new File(args[6]));
 		}
 		else {
 			System.out.println(DistractorGenerator.generateAsString());
