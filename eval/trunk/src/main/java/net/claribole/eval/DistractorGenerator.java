@@ -93,17 +93,43 @@ public class DistractorGenerator {
 		int x;
 		double maxY;
 		for (int i=1;i<numberOfDistractors;i++){
+			// start at 1 as [0] is the position of the start point
 			x = Math.round(i*step);
 			maxY = x * Math.tan(coneAngle/2.0);
 			tres.add(new Point(x, (int)(2*maxY*Math.random()-maxY)));
 		}
 		// other distractors
-		// XXX:TBW
+		// follow same principle but in two adjacent cones (one on each side, slightly longer)
+		step *= 1.2f;
+		AffineTransform at = AffineTransform.getTranslateInstance(0, 2*W);
+		at.concatenate(AffineTransform.getRotateInstance(coneAngle*1.2));
+		for (int i=1;i<numberOfDistractors;i++){
+			x = Math.round(i*step);
+			maxY = x * Math.tan(coneAngle/2.0);
+			Point p = new Point();
+			at.transform(new Point(x, (int)(2*maxY*Math.random()-maxY)), p);
+			while (checkForOverlap(p, W, (Point[])tres.toArray(new Point[tres.size()]))){
+				at.transform(new Point(x, (int)(2*maxY*Math.random()-maxY)), p);
+			}			
+			tres.add(p);
+		}
+		at = AffineTransform.getTranslateInstance(0, -2*W);
+		at.concatenate(AffineTransform.getRotateInstance(-coneAngle*1.2));
+		for (int i=1;i<numberOfDistractors;i++){
+			x = Math.round(i*step);
+			maxY = x * Math.tan(coneAngle/2.0);
+			Point p = new Point();
+			at.transform(new Point(x, (int)(2*maxY*Math.random()-maxY)), p);
+			while (checkForOverlap(p, W, (Point[])tres.toArray(new Point[tres.size()]))){
+				at.transform(new Point(x, (int)(2*maxY*Math.random()-maxY)), p);
+			}
+			tres.add(p);
+		}
 
 		// build result array		
 		if (direction != 0 || translate.x != 0 || translate.y != 0){
 			// translate and rotate if necessary
-			AffineTransform at = AffineTransform.getTranslateInstance(translate.x, translate.y);
+			at = AffineTransform.getTranslateInstance(translate.x, translate.y);
 			at.concatenate(AffineTransform.getRotateInstance(direction));
 			Point[] res = new Point[tres.size()];
 			for (int i=0;i<tres.size();i++){
@@ -114,6 +140,17 @@ public class DistractorGenerator {
 		else {
 			return (Point[])tres.toArray(new Point[tres.size()]);			
 		}
+	}
+	
+	static boolean checkForOverlap(Point p, int w, Point[] existingObjects){
+		for (int i=0;i<existingObjects.length;i++){
+			if (Math.sqrt(Math.pow(p.x-existingObjects[i].x,2)+Math.pow(p.y-existingObjects[i].y,2)) < w){
+				System.out.print(i+ " "+Math.sqrt(Math.pow(p.x-existingObjects[i].x,2)+Math.pow(p.y-existingObjects[i].y,2)));
+				
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** Generate a target and set of distractors and save them to a file.
