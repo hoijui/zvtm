@@ -17,6 +17,8 @@ import java.util.Vector;
 
 import com.xerox.VTM.engine.VCursor;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
@@ -78,50 +80,27 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
 
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		v.parent.setActiveLayer(1);
+		application.displayMainPieMenu(true);
+	}
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		Glyph g = v.lastGlyphEntered();
+		if (g != null && g.getType() == Messages.PM_ENTRY){
+			application.pieMenuEvent(g);
+		}
+		if (application.mainPieMenu != null){
+			application.displayMainPieMenu(false);
+		}
+		v.parent.setActiveLayer(0);
+	}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getMouse().vx;
-    	lastVY = v.getMouse().vy;
-    	if (application.lensType != Viewer.NO_LENS){
-    	    application.zoomInPhase2(lastVX, lastVY);
-    	}
-    	else {
-    	    if (cursorNearBorder){// do not activate the lens when cursor is near the border
-    		return;
-    	    }
-    	    application.zoomInPhase1(jpx, jpy);
-    	}
-    }
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
         
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-    	if ((jpx-Viewer.LENS_R1) < 0){
-    	    jpx = Viewer.LENS_R1;
-    	    cursorNearBorder = true;
-    	}
-    	else if ((jpx+Viewer.LENS_R1) > application.panelWidth){
-    	    jpx = application.panelWidth - Viewer.LENS_R1;
-    	    cursorNearBorder = true;
-    	}
-    	else {
-    	    cursorNearBorder = false;
-    	}
-    	if ((jpy-Viewer.LENS_R1) < 0){
-    	    jpy = Viewer.LENS_R1;
-    	    cursorNearBorder = true;
-    	}
-    	else if ((jpy+Viewer.LENS_R1) > application.panelHeight){
-    	    jpy = application.panelHeight - Viewer.LENS_R1;
-    	    cursorNearBorder = true;
-    	}
-    	if (application.lensType != 0 && application.lens != null){
-    	    application.moveLens(jpx, jpy, e.getWhen());
-    	}
-    }
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (dragging){
@@ -132,47 +111,43 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
                 lastJPY = jpy;
                 cameraMoved();
             }
-            if (application.lensType != 0 && application.lens != null){
-        	    application.moveLens(jpx, jpy, e.getWhen());
-        	}
         }
     }
 
-    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        if (application.lensType != 0 && application.lens != null){
-            if (wheelDirection  == ViewEventHandler.WHEEL_UP){
-                application.magnifyFocus(Viewer.WHEEL_MM_STEP, application.lensType, application.mCamera);
-            }
-            else {
-                application.magnifyFocus(-Viewer.WHEEL_MM_STEP, application.lensType, application.mCamera);
-            }
-        }
-        else {
-            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-            if (wheelDirection  == WHEEL_UP){
-                // zooming in
-                application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-                cameraMoved();
-                application.vsm.repaintNow();
-            }
-            else {
-                //wheelDirection == WHEEL_DOWN, zooming out
-                application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                cameraMoved();
-                application.vsm.repaintNow();
-            }
-    	}
-    }
+	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+		float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		if (wheelDirection  == WHEEL_UP){
+			// zooming in
+			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+			cameraMoved();
+			application.vsm.repaintNow();
+		}
+		else {
+			//wheelDirection == WHEEL_DOWN, zooming out
+			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+			cameraMoved();
+			application.vsm.repaintNow();
+		}
+	}
 
-    public void enterGlyph(Glyph g){
-//        g.highlight(true, null);
-    }
+	public void enterGlyph(Glyph g){
+		if (application.vsm.getActiveView().getActiveLayer() == 1){
+			// interacting with pie menu
+			g.highlight(true, null);
+			VirtualSpace vs = application.vsm.getVirtualSpace(application.mnSpaceName);
+			vs.onTop(g);
+			int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
+			if (i != -1){
+				vs.onTop(application.mainPieMenu.getLabels()[i]);
+			}
+		}
+	}
 
-    public void exitGlyph(Glyph g){
-//        g.highlight(false, null);
+	public void exitGlyph(Glyph g){
+		if (application.vsm.getActiveView().getActiveLayer() == 1){
+			g.highlight(false, null);
+		}
     }
-
-    int ci = 1180;
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
@@ -183,7 +158,6 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F2){application.gc();}
-        else if (code == KeyEvent.VK_L){application.showLensChooser();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

@@ -7,9 +7,6 @@
 
 package fr.inria.zuist.viewer;
 
-import java.io.File;
-import java.io.IOException;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -20,20 +17,28 @@ import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
 import java.awt.Container;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import java.util.Vector;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -42,10 +47,10 @@ import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
-import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.engine.PostAnimationAction;
-import net.claribole.zvtm.lens.*;
+import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.glyphs.PieMenu;
+import net.claribole.zvtm.glyphs.PieMenuFactory;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -84,7 +89,8 @@ public class Viewer {
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
-    static final String mSpaceName = "Main Space";
+    static final String mSpaceName = "Scene Space";
+    static final String mnSpaceName = "PieMenu Space";
     VirtualSpace mSpace;
     Camera mCamera;
     static final String mViewName = "ZUIST Viewer";
@@ -92,43 +98,118 @@ public class Viewer {
     ViewerEventHandler eh;
 
     SceneManager sm;
+
+	VWGlassPane gp;
+	PieMenu mainPieMenu;
     
-    public Viewer(boolean fullscreen, String xmlSceneFile){
-        if (xmlSceneFile != null){
-        	SCENE_FILE = new File(xmlSceneFile);
-            SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-        }
-        initGUI(fullscreen);
+    public Viewer(boolean fullscreen, boolean antialiased, File xmlSceneFile){
+		initGUI(fullscreen, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
-        sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR);
-        mCamera.setAltitude(10000.0f);
-        eh.cameraMoved();
+        if (xmlSceneFile != null){
+			loadScene(xmlSceneFile);
+		}
     }
 
-    void initGUI(boolean fullscreen){
+    void initGUI(boolean fullscreen, boolean antialiased){
         windowLayout();
         vsm = new VirtualSpaceManager();
         mSpace = vsm.addVirtualSpace(mSpaceName);
+        vsm.addVirtualSpace(mnSpaceName);
         mCamera = vsm.addCamera(mSpace);
+		vsm.addCamera(mnSpaceName).setAltitude(10);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
+		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
             mView.setVisible(true);
         }
+        updatePanelSize();
+		gp = new VWGlassPane(this);
+		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new ViewerEventHandler(this);
         mView.setEventHandler(eh, 0);
+        mView.setEventHandler(eh, 1);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
+		mView.setAntialiasing(antialiased);
         vsm.animator.setAnimationListener(eh);
-        updatePanelSize();
     }
+
+	private JMenuBar initMenu(){
+		final JMenuItem openMI = new JMenuItem("Open...");
+		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem reloadMI = new JMenuItem("Reload");
+		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem exitMI = new JMenuItem("Exit");
+		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem aboutMI = new JMenuItem("About...");
+		ActionListener a0 = new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				if (e.getSource()==openMI){openFile();}
+				else if (e.getSource()==reloadMI){reload();}
+				else if (e.getSource()==exitMI){exit();}
+				else if (e.getSource()==aboutMI){about();}
+			}
+		};
+		JMenuBar jmb = new JMenuBar();
+		JMenu fileM = new JMenu("File");
+		JMenu helpM = new JMenu("Help");
+		fileM.add(openMI);
+		fileM.add(reloadMI);
+		fileM.addSeparator();
+		fileM.add(exitMI);
+		helpM.add(aboutMI);
+		jmb.add(fileM);
+		jmb.add(helpM);
+		openMI.addActionListener(a0);
+		reloadMI.addActionListener(a0);
+		exitMI.addActionListener(a0);
+		aboutMI.addActionListener(a0);
+		return jmb;
+	}
+	
+	void displayMainPieMenu(boolean b){
+		if (b){
+			PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+			PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
+			PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
+			PieMenuFactory.setSelectedItemBorderColor(null);
+			PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
+			PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
+			PieMenuFactory.setTranslucency(0.7f);
+			PieMenuFactory.setSensitivityRadius(0.5);
+			PieMenuFactory.setAngle(-Math.PI/2.0);
+			PieMenuFactory.setRadius(150);
+			mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, mView, vsm);
+			Glyph[] items = mainPieMenu.getItems();
+			items[0].setType(Messages.PM_ENTRY);
+			items[1].setType(Messages.PM_ENTRY);
+			items[2].setType(Messages.PM_ENTRY);
+			items[3].setType(Messages.PM_ENTRY);
+		}
+		else {
+			mainPieMenu.destroy(0);
+			mainPieMenu = null;
+		}
+	}
+
+	void pieMenuEvent(Glyph menuItem){
+		int index = mainPieMenu.getItemIndex(menuItem);
+		if (index != -1){
+			String label = mainPieMenu.getLabels()[index].getText();
+			if (label == Messages.PM_BACK){moveBack();}
+			else if (label == Messages.PM_GLOBALVIEW){getGlobalView();}
+			else if (label == Messages.PM_OPEN){openFile();}
+			else if (label == Messages.PM_RELOAD){reload();}
+		}
+	}
 
     void windowLayout(){
         if (Utilities.osIsWindows()){
@@ -141,6 +222,55 @@ public class Viewer {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
+
+	/*-------------  Scene management    -------------*/
+	
+	void reset(){
+		sm.reset();
+		vsm.destroyGlyphsInSpace(mSpaceName);
+	}
+	
+	void openFile(){
+		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fc.setDialogTitle("Find ZUIST Scene File");
+		int returnVal= fc.showOpenDialog(mView.getFrame());
+		if (returnVal == JFileChooser.APPROVE_OPTION){
+		    final SwingWorker worker = new SwingWorker(){
+			    public Object construct(){
+					reset();
+					loadScene(fc.getSelectedFile());
+					return null; 
+			    }
+			};
+		    worker.start();
+		}
+	}
+	
+	void reload(){
+		if (SCENE_FILE==null){return;}
+		final SwingWorker worker = new SwingWorker(){
+		    public Object construct(){
+				reset();
+				loadScene(SCENE_FILE);
+				return null; 
+		    }
+		};
+	    worker.start();
+	}
+
+	void loadScene(File xmlSceneFile){
+		gp.setValue(0);
+		gp.setVisible(true);
+		SCENE_FILE = xmlSceneFile;
+	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, gp);
+	    gp.setVisible(false);
+	    gp.setLabel(VWGlassPane.EMPTY_STRING);
+        mCamera.setAltitude(0.0f);
+        sm.updateLevel(mCamera.altitude);
+        eh.cameraMoved();
+	}
     
     /*-------------     Navigation       -------------*/
 
@@ -183,7 +313,12 @@ public class Viewer {
         }
         vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
     }
-    
+
+	void moveBack(){
+		System.out.println("Moving back");
+		
+	}
+	
     void altitudeChanged(){
         sm.updateLevel(mCamera.altitude);
     }
@@ -194,338 +329,6 @@ public class Viewer {
         panelHeight = d.height;
     }
     
-    /* misc. lens settings */
-    Lens lens;
-    TemporalLens tLens;
-    static int LENS_R1 = 200;
-    static int LENS_R2 = 100;
-    static final int WHEEL_ANIM_TIME = 50;
-    static final int LENS_ANIM_TIME = 300;
-    static double DEFAULT_MAG_FACTOR = 4.0;
-    static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
-    static double INV_MAG_FACTOR = 1/MAG_FACTOR;
-    /* LENS MAGNIFICATION */
-    static float WHEEL_MM_STEP = 1.0f;
-    static final float MAX_MAG_FACTOR = 12.0f;
-    
-    static final int NO_LENS = 0;
-    static final int ZOOMIN_LENS = 1;
-    static final int ZOOMOUT_LENS = -1;
-    int lensType = NO_LENS;
-    
-    /* lens distance and drop-off functions */
-    static final short L1_Linear = 0;
-    static final short L1_InverseCosine = 1;
-    static final short L1_Manhattan = 2;
-    static final short L2_Gaussian = 3;
-    static final short L2_Linear = 4;
-    static final short L2_InverseCosine = 5;
-    static final short L2_Manhattan = 6;
-    static final short L2_TLinear = 7;
-    static final short L2_Fading = 8;
-    static final short L2_DLinear = 9;
-    static final short L3_Gaussian = 10;
-    static final short L3_Linear = 11;
-    static final short L3_InverseCosine = 12;
-    static final short L3_Manhattan = 13;
-    static final short L3_TLinear = 14;
-    static final short LInf_Gaussian = 15;
-    static final short LInf_Linear = 16;
-    static final short LInf_InverseCosine = 17;
-    static final short LInf_Manhattan = 18;
-    static final short LInf_TLinear = 19;
-    static final short LInf_Fading = 20;
-    static final short L2_Wave = 21;
-    static final short L2_TWave = 22;
-    static final short LInf_Step = 23;
-    static final short L2_XGaussian = 24;
-    static final short L2_HLinear = 25;
-    short lensFamily = L2_Gaussian;
-    
-    static final float FLOOR_ALTITUDE = 100.0f;
-    
-    void setLens(int t){
-        lensType = t;
-    }
-
-    void moveLens(int x, int y, long absTime){
-        if (tLens != null){
-            tLens.setAbsolutePosition(x, y, absTime);
-        }
-        else {
-            lens.setAbsolutePosition(x, y);
-        }
-        vsm.repaintNow();
-    }
-
-    void zoomInPhase1(int x, int y){
-        // create lens if it does not exist
-        if (lens == null){
-            lens = mView.setLens(getLensDefinition(x, y));
-            lens.setBufferThreshold(1.5f);
-        }
-        vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-            lens.getID(), null);
-        setLens(ZOOMIN_LENS);
-    }
-    
-    void zoomInPhase2(long mx, long my){
-        // compute camera animation parameters
-        float cameraAbsAlt = mCamera.getAltitude()+mCamera.getFocal();
-        long c2x = Math.round(mx - INV_MAG_FACTOR * (mx - mCamera.posx));
-        long c2y = Math.round(my - INV_MAG_FACTOR * (my - mCamera.posy));
-        Vector cadata = new Vector();
-        // -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
-        Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
-        if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
-            cadata.add(deltAlt);
-            cadata.add(new LongPoint(c2x-mCamera.posx, c2y-mCamera.posy));
-            // animate lens and camera simultaneously (lens will die at the end)
-            vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-                lens.getID(), new ZP2LensAction(this));
-            vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-                cadata, mCamera.getID());
-        }
-        else {
-            Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
-            double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
-            cadata.add(actualDeltAlt);
-            cadata.add(new LongPoint(Math.round((c2x-mCamera.posx)*ratio),
-                Math.round((c2y-mCamera.posy)*ratio)));
-            // animate lens and camera simultaneously (lens will die at the end)
-            vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-                lens.getID(), new ZP2LensAction(this));
-            vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-                cadata, mCamera.getID());
-        }
-    }
-
-    void zoomOutPhase1(int x, int y, long mx, long my){
-        sm.setUpdateLevel(false);
-        // compute camera animation parameters
-        float cameraAbsAlt = mCamera.getAltitude()+mCamera.getFocal();
-        long c2x = Math.round(mx - MAG_FACTOR * (mx - mCamera.posx));
-        long c2y = Math.round(my - MAG_FACTOR * (my - mCamera.posy));
-        Vector cadata = new Vector();
-        cadata.add(new Float(cameraAbsAlt*(MAG_FACTOR-1)));
-        cadata.add(new LongPoint(c2x-mCamera.posx, c2y-mCamera.posy));
-        // create lens if it does not exist
-        if (lens == null){
-            lens = mView.setLens(getLensDefinition(x, y));
-            lens.setBufferThreshold(1.5f);
-        }
-        // animate lens and camera simultaneously
-        vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-            lens.getID(), null);
-        vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-            cadata, mCamera.getID(), null);
-        setLens(ZOOMOUT_LENS);
-    }
-
-    void zoomOutPhase2(){
-        // make lens disappear (killing anim)
-        vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-            lens.getID(), new ZP2LensAction(this));
-    }
-
-    void setMagFactor(double m){
-        MAG_FACTOR = m;
-        INV_MAG_FACTOR = 1 / MAG_FACTOR;
-    }
-
-    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
-        synchronized (lens){
-            double nmf = MAG_FACTOR + magOffset;
-            if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
-                setMagFactor(nmf);
-                if (zooming == ZOOMOUT_LENS){
-                    /* if unzooming, we want to keep the focus point stable, and unzoom the context
-                        this means that camera altitude must be adjusted to keep altitude + lens mag
-                        factor constant in the lens focus region. The camera must also be translated
-                        to keep the same region of the virtual space under the focus region */
-                        float a1 = mCamera.getAltitude();
-                    lens.setMaximumMagnification((float)nmf, true);
-                    /* explanation for the altitude offset computation: the projected size of an object
-                        in the focus region (in lens space) should remain the same before and after the
-                        change of magnification factor. The size of an object is a function of the
-                        projection coefficient (see any Glyph.projectForLens() method). This means that
-                        the following equation must be true, where F is the camera's focal distance, a1
-                        is the camera's altitude before the move and a2 is the camera altitude after the
-                        move:
-                        MAG_FACTOR * F / (F + a1) = MAG_FACTOR + magOffset * F / (F + a2)
-                        From this we can get the altitude difference (a2 - a1)                       */
-                        mCamera.altitudeOffset((float)((a1+mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset)));
-                    /* explanation for the X offset computation: the position in X of an object in the
-                        focus region (lens space) should remain the same before and after the change of
-                        magnification factor. This means that the following equation must be true (taken
-                        by simplifying pc[i].lcx computation in a projectForLens() method):
-                        (vx-(lensx1))*coef1 = (vx-(lensx2))*coef2
-                        -- coef1 is actually MAG_FACTOR * F/(F+a1)
-                        -- coef2 is actually (MAG_FACTOR + magOffset) * F/(F+a2)
-                        -- lensx1 is actually camera.posx1 + ((F+a1)/F) * lens.lx
-                        -- lensx2 is actually camera.posx2 + ((F+a2)/F) * lens.lx
-                        Given that (MAG_FACTOR + magOffset) / (F+a2) = MAG_FACTOR / (F+a1)
-                        we eventually have:
-                        Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
-                        JPanel coordinates w.r.t the view's center - see Lens.java)                */
-                        mCamera.move(Math.round((a1-mCamera.getAltitude())/mCamera.getFocal()*lens.lx),
-                        -Math.round((a1-mCamera.getAltitude())/mCamera.getFocal()*lens.ly));
-                }
-                else {
-                    vsm.animator.createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
-                        lens.getID(), null);
-                }
-            }
-        }
-    }
-
-    Lens getLensDefinition(int x, int y){
-        Lens res = null;
-        switch (lensFamily){
-            case L1_Linear:{
-                res = new L1FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L1_InverseCosine:{
-                res = new L1FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L1_Manhattan:{
-                res = new L1FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Gaussian:{
-                res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Linear:{
-                res = new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_InverseCosine:{
-                res = new FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Manhattan:{
-                res = new FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Linear:{
-                res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_InverseCosine:{
-                res = new LInfFSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Manhattan:{
-                res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Gaussian:{
-                res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_TLinear:{
-                res = new TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 10, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_TLinear:{
-                res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 100, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_TLinear:{
-                res = new L3TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 100, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Fading:{
-                tLens = new TFadingLens(1.0f, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                ((TFadingLens)tLens).setBoundaryColor(Color.RED);
-                ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
-                res = (Lens)tLens;
-                break;
-            }
-            case L2_DLinear:{
-                tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                res = (Lens)tLens;
-                ((FixedSizeLens)res).setInnerRadiusColor(Color.RED);
-                ((FixedSizeLens)res).setOuterRadiusColor(Color.RED);
-				break;
-            }
-            case LInf_Fading:{
-                tLens = new LInfTFadingLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                ((TFadingLens)tLens).setBoundaryColor(Color.RED);
-                ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
-                res = (Lens)tLens;
-                break;
-            }
-            case L3_Linear:{
-                res = new L3FSLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_InverseCosine:{
-                res = new L3FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_Manhattan:{
-                res = new L3FSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_Gaussian:{
-                res = new L3FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Wave:{
-                res = new FSWaveLens(1.0f, LENS_R1, LENS_R2/2, 8, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_TWave:{
-                res = new TWaveLens(1.0f, 0.0f, 0.95f, 200, 40, 10, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Step:{
-                res = new LInfFSStepLens(1.0f, LENS_R1, LENS_R2, 1, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-        	case L2_XGaussian:{
-        	    res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-        	    tLens = null;
-        	    break;
-        	}
-            case L2_HLinear:{
-                res = new HLinearLens(1.0f, 0.4f, 1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-                tLens = null;
-                break;
-            }
-        }
-        return res;
-    }
-    
-    void showLensChooser(){
-        new LensChooser(this);
-    }
-
     void gc(){
         System.gc();
     }
@@ -546,83 +349,113 @@ public class Viewer {
         catch (IOException e){e.printStackTrace();return null;}
     }
     
+    public void about(){
+		JOptionPane.showMessageDialog(mView.getFrame(), Messages.ABOUT_MSG);
+    }
+
     void exit(){
         System.exit(0);
     }
 
     public static void main(String[] args){
-        String xmlSceneFile = (args.length > 0) ? args[0] : null;
-		if (xmlSceneFile == null){
-			System.out.println(Messages.USAGE);
-			System.exit(0);
-		}
-        boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
-        new Viewer(fs, xmlSceneFile);
-    }
-
-}
-
-
-class ZP2LensAction implements PostAnimationAction {
-
-    Viewer vw;
-    
-    ZP2LensAction(Viewer vw){
-	    this.vw = vw;
-    }
-    
-    public void animationEnded(Object target, short type, String dimension){
-        if (type == PostAnimationAction.LENS){
-            vw.vsm.getOwningView(((Lens)target).getID()).setLens(null);
-            ((Lens)target).dispose();
-            vw.setMagFactor(Viewer.DEFAULT_MAG_FACTOR);
-            vw.lens = null;
-            vw.setLens(Viewer.NO_LENS);
-            vw.sm.setUpdateLevel(true);
-        }
-    }
-    
-}
-
-class LensChooser extends JFrame implements ItemListener {
-
-    // index of lenses should correspond to short value of associated lens type in Viewer
-    static final String[] LENS_NAMES = {"L1 / Linear", "L1 / Inverse Cosine", "L1 / Manhattan",
-        "L2 / Gaussian", "L2 / Linear", "L2 / Inverse Cosine", "L2 / Manhattan", "L2 / Translucence Linear", "L2 / Fading", "L2 / Dynamic Linear",
-        "L3 / Gaussian", "L3 / Linear", "L3 / Inverse Cosine", "L3 / Manhattan", "L3 / Translucence Linear",
-        "LInf / Gaussian", "LInf / Linear", "LInf / Inverse Cosine", "LInf / Manhattan", "LInf / Translucence Linear", "LInf / Fading",
-        "L2 / Wave", "L2 / Translucent Wave", "LInf / Step", "L2 / XGaussian", "L2 / HLinear"};
-
-    Viewer vw;
-
-    JComboBox lensList;
-
-    LensChooser(Viewer vw){
-        super();
-        this.vw = vw;
-        initGUI();
-        this.pack();
-        this.setVisible(true);
-    }
-    
-    void initGUI(){
-        Container cp = getContentPane();
-        lensList = new JComboBox(LENS_NAMES);
-        lensList.setSelectedIndex(vw.lensFamily);
-        lensList.addItemListener(this);
-        cp.add(lensList);
-    }
-    
-    public void itemStateChanged(ItemEvent e){
-        if (e.getStateChange() == ItemEvent.SELECTED){
-            Object src = e.getItem();
-            for (int i=0;i<LENS_NAMES.length;i++){
-                if (src == LENS_NAMES[i]){
-                    vw.lensFamily = (short)i;
-                    return;
-                }
+        File xmlSceneFile = null;
+		boolean fs = false;
+		boolean aa = true;
+		for (int i=0;i<args.length;i++){
+			if (args[i].startsWith("-")){
+				if (args[i].substring(1).equals("fs")){fs = true;}
+				else if (args[i].substring(1).equals("noaa")){aa = false;}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Messages.printCmdLineHelp();System.exit(0);}
+			}
+            else {
+                // the only other thing allowed as a cmd line param is a scene file
+                File f = new File(args[i]);
+                if (f.exists()){xmlSceneFile = f;}
             }
+		}
+        if (!fs && Utilities.osIsMacOS()){
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
+        System.out.println("--help for command line options");
+        new Viewer(fs, aa, xmlSceneFile);
+    }
+}
+
+class VWGlassPane extends JComponent implements ProgressListener {
+    
+    static final int BAR_WIDTH = 200;
+    static final int BAR_HEIGHT = 10;
+
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final Color MSG_COLOR = Color.DARK_GRAY;
+    GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
+
+    static final String EMPTY_STRING = "";
+    String msg = EMPTY_STRING;
+    int msgX = 0;
+    int msgY = 0;
+    
+    int completion = 0;
+    int prX = 0;
+    int prY = 0;
+    int prW = 0;
+    
+    Viewer application;
+    
+    VWGlassPane(Viewer app){
+        super();
+        this.application = app;
+        addMouseListener(new MouseAdapter(){});
+        addMouseMotionListener(new MouseMotionAdapter(){});
+        addKeyListener(new KeyAdapter(){});
     }
     
+    public void setValue(int c){
+        completion = c;
+        prX = application.panelWidth/2-BAR_WIDTH/2;
+        prY = application.panelHeight/2-BAR_HEIGHT/2;
+        prW = (int)(BAR_WIDTH * ((float)completion) / 100.0f);
+        PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
+        repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
+    }
+    
+    public void setLabel(String m){
+        msg = m;
+        msgX = application.panelWidth/2-BAR_WIDTH/2;
+        msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
+        repaint(msgX, msgY-50, 400, 70);
+    }
+    
+    protected void paintComponent(Graphics g){
+        Graphics2D g2 = (Graphics2D)g;
+        Rectangle clip = g.getClipBounds();
+        g2.setComposite(GLASS_ALPHA);
+        g2.setColor(Color.WHITE);
+        g2.fillRect(clip.x, clip.y, clip.width, clip.height);
+        g2.setComposite(AlphaComposite.Src);
+        if (msg != EMPTY_STRING){
+            g2.setColor(MSG_COLOR);
+            g2.setFont(ConfigManager.GLASSPANE_FONT);
+            g2.drawString(msg, msgX, msgY);
+        }
+        g2.setPaint(PROGRESS_GRADIENT);
+        g2.fillRect(prX, prY, prW, BAR_HEIGHT);
+        g2.setColor(MSG_COLOR);
+        g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
+    }
+    
+}
+
+class ConfigManager {
+
+	static Color PIEMENU_FILL_COLOR = Color.BLACK;
+	static Color PIEMENU_BORDER_COLOR = Color.WHITE;
+	static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
+	
+	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
+
+    static final Font PIEMENU_FONT = DEFAULT_FONT;
+
+    static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
+
 }

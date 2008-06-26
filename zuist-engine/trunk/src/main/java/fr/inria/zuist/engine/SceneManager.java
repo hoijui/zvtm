@@ -194,6 +194,11 @@ public class SceneManager {
 
     /* ----------- level / region / object creation (API and XML) ----------- */
 
+	public void reset(){
+		id2region.clear();
+		id2object.clear();
+	}
+
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
@@ -207,8 +212,7 @@ public class SceneManager {
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      */
     public void loadScene(Document scene, File sceneFileDirectory, ProgressListener pl){
-	id2region.clear();
-	id2object.clear();
+		reset();
 	Element root = scene.getDocumentElement();
 	NodeList nl = root.getChildNodes();
 	Node n;
