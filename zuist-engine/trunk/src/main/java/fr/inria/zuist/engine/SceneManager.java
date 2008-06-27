@@ -178,6 +178,14 @@ public class SceneManager {
         return levels.length;
     }
 
+	/** Get a level.
+	 *@param level index of level.
+ 	 *@return null if level index does not correspond to an actual level.
+	 */
+	public Level getLevel(int index){
+		return (index < levels.length) ? levels[index] : null;
+	}
+
 	/** Get all regions that belong to a given level.
 	 *@param level index of level.
 	 *@return sequence of regions at this level, in no particular order.

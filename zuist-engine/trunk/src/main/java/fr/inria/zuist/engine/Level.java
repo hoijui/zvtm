@@ -80,4 +80,24 @@ public class Level {
 	    "Floor: " + floorAlt + "\n";
     }
 
+	/** Get the bounding box enclosing all regions at this level.
+	 *@return the west, north, east and south bounds of the box. {0,0,0,0} if no region.
+	 */
+    public long[] getBounds(){
+		if (regions.length > 0){
+			long[] res = {regions[0].wnes[0], regions[0].wnes[1], regions[0].wnes[2], regions[0].wnes[3]};
+			for (int i=1;i<regions.length;i++){
+				if (regions[i].wnes[0] < res[0]){res[0] = regions[i].wnes[0];}
+				if (regions[i].wnes[1] > res[1]){res[1] = regions[i].wnes[1];}
+				if (regions[i].wnes[2] > res[2]){res[2] = regions[i].wnes[2];}
+				if (regions[i].wnes[3] < res[3]){res[3] = regions[i].wnes[3];}
+			}
+			return res;			
+		}
+		else {
+			long[] res = {0,0,0,0};
+			return res;
+		}
+    }
+
 }

@@ -111,6 +111,7 @@ public class Viewer {
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
+			getGlobalView();
 		}
     }
 
@@ -241,6 +242,7 @@ public class Viewer {
 			    public Object construct(){
 					reset();
 					loadScene(fc.getSelectedFile());
+					getGlobalView();
 					return null; 
 			    }
 			};
@@ -277,18 +279,16 @@ public class Viewer {
 
     void getGlobalView(){
 		int l = 0;
-		Region[] regionsAtHighestPopulatedLevel = sm.getRegionsAtLevel(l);
-		while (regionsAtHighestPopulatedLevel == null){
-			regionsAtHighestPopulatedLevel = sm.getRegionsAtLevel(++l);
-		}
-		if (regionsAtHighestPopulatedLevel != null){
-			Region largestRegion = regionsAtHighestPopulatedLevel[0];
-			for (int i=1;i<regionsAtHighestPopulatedLevel.length;i++){
-				if (regionsAtHighestPopulatedLevel[i].getWidth()*regionsAtHighestPopulatedLevel[i].getHeight() > largestRegion.getWidth()*largestRegion.getHeight()){
-					largestRegion = regionsAtHighestPopulatedLevel[i];
-				}
+		while (sm.getRegionsAtLevel(l) == null){
+			l++;
+			if (l > sm.getLevelCount()){
+				l = -1;
+				break;
 			}
-	        vsm.centerOnGlyph(largestRegion.getBounds(), mCamera, Viewer.ANIM_MOVE_LENGTH);		
+		}
+		if (l > -1){
+			long[] wnes = sm.getLevel(l).getBounds();
+	        vsm.centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
 		}
     }
 
