@@ -53,6 +53,7 @@ import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ProgressListener;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -275,7 +276,20 @@ public class Viewer {
     /*-------------     Navigation       -------------*/
 
     void getGlobalView(){
-        vsm.getGlobalView(mCamera, Viewer.ANIM_MOVE_LENGTH);
+		int l = 0;
+		Region[] regionsAtHighestPopulatedLevel = sm.getRegionsAtLevel(l);
+		while (regionsAtHighestPopulatedLevel == null){
+			regionsAtHighestPopulatedLevel = sm.getRegionsAtLevel(++l);
+		}
+		if (regionsAtHighestPopulatedLevel != null){
+			Region largestRegion = regionsAtHighestPopulatedLevel[0];
+			for (int i=1;i<regionsAtHighestPopulatedLevel.length;i++){
+				if (regionsAtHighestPopulatedLevel[i].getWidth()*regionsAtHighestPopulatedLevel[i].getHeight() > largestRegion.getWidth()*largestRegion.getHeight()){
+					largestRegion = regionsAtHighestPopulatedLevel[i];
+				}
+			}
+	        vsm.centerOnGlyph(largestRegion.getBounds(), mCamera, Viewer.ANIM_MOVE_LENGTH);		
+		}
     }
 
     /* Higher view */

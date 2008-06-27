@@ -186,6 +186,14 @@ public class Region {
 	return bounds;
     }
 
+	public long getWidth(){
+		return w;
+	}
+	
+	public long getHeight(){
+		return h;
+	}
+
     public void setSensitive(boolean b){
         isSensitive = b;
         if (bounds != null){bounds.setSensitivity(b);}

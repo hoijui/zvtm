@@ -149,9 +149,12 @@ public class SceneManager {
 	return (Region)id2region.get(id);
     }
 
-    public Enumeration getObjectIDs(){
-	return id2object.keys();
-    }
+	/** Get a list of all object IDs, at any level and in any region.
+	 *@return sequence of object IDs in no particular order
+	 */
+	public Enumeration getObjectIDs(){
+		return id2object.keys();
+	}
 
     /** Get an object knowing its ID.
      *@return null if no object associated with this ID.
@@ -160,18 +163,37 @@ public class SceneManager {
 	return (ObjectDescription)id2object.get(id);
     }
 
+	/** Get the total number of objects (at any level and in any region) in the scene. */
     public int getObjectCount(){
         return id2object.size();
     }
 
+	/** Get the total number of regions (at any level) in the scene. */
     public int getRegionCount(){
         return id2region.size();
     }
     
+	/** Get the total number of levels in the scene. */
     public int getLevelCount(){
         return levels.length;
     }
-    
+
+	/** Get all regions that belong to a given level.
+	 *@param level index of level.
+	 *@return sequence of regions at this level, in no particular order.
+	 *        Returns null if level index does not correspond to an actual level.
+	 */
+	public Region[] getRegionsAtLevel(int level){
+		if (level < levels.length){
+			Region[] res = new Region[levels[level].regions.length];
+			System.arraycopy(levels[level].regions, 0, res, 0, levels[level].regions.length);
+			return res;
+		}
+		return null;
+	}
+	
+    /* ----------- ZUIST events ----------- */
+
     public void setLevelListener(LevelListener ll){
         levelListener = ll;
     }
@@ -188,6 +210,8 @@ public class SceneManager {
         return regionListener;
     }
     
+    /* ----------- level / region / object creation (API and XML) ----------- */
+
     public int getPendingRequestQueueSize(){
         return glyphLoader.requestQueue.size();
     }
