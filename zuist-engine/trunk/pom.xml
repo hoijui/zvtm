@@ -129,7 +129,7 @@ $Id$
           <aggregate>true</aggregate>
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZUIST API documentation</h1>]]></doctitle>
-          <bottom><![CDATA[<i>Copyright &#169; 2007 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <bottom><![CDATA[<i>Copyright &#169; 2007-2008 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
