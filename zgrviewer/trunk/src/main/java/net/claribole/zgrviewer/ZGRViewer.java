@@ -313,13 +313,13 @@ public class ZGRViewer implements ZGRApplication {
 
     void displayMainPieMenu(boolean b){
 	if (b){
-	    PieMenuFactory.setItemFillColor(ConfigManager.OBSERVED_REGION_COLOR);
-	    PieMenuFactory.setItemBorderColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
+	    PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+	    PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
 	    PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
 	    PieMenuFactory.setSelectedItemBorderColor(null);
-	    PieMenuFactory.setLabelColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
+	    PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
 	    PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
-	    PieMenuFactory.setTranslucency(0.95f);
+	    PieMenuFactory.setTranslucency(0.85f);
 	    PieMenuFactory.setSensitivityRadius(0.5);
 	    PieMenuFactory.setAngle(-Math.PI/2.0);
 	    PieMenuFactory.setRadius(150);
@@ -342,8 +342,8 @@ public class ZGRViewer implements ZGRApplication {
 	    if (index != -1){
 		String label = mainPieMenu.getLabels()[index].getText();
 		PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
-		PieMenuFactory.setItemFillColor(ConfigManager.OBSERVED_REGION_COLOR);
-		PieMenuFactory.setItemBorderColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
+		PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+		PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
 		PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
 		PieMenuFactory.setSelectedItemBorderColor(null);
 		PieMenuFactory.setSensitivityRadius(1.0);

@@ -58,21 +58,12 @@ class ConfigManager {
     Color backgroundColor = Color.WHITE;
     static Color HIGHLIGHT_COLOR = Color.RED;
 
-    static Color OBSERVED_REGION_COLOR;
-    static Color PIEMENU_INSIDE_COLOR;
-    static Color OBSERVED_REGION_BORDER_COLOR;
-    static {
-	if (Utilities.osIsWindows() || Utilities.osIsMacOS()){
-	    OBSERVED_REGION_COLOR = new Color(186,135,186);
-	    OBSERVED_REGION_BORDER_COLOR = Color.getHSBColor(0.83519f,0.28f,0.45f); //rgb(299,28,45)
-	    PIEMENU_INSIDE_COLOR = Color.getHSBColor(0.83519f,0.28f,0.9f);
-	}
-	else {
-	    OBSERVED_REGION_COLOR = Color.white;
-	    OBSERVED_REGION_BORDER_COLOR = Color.red;
-	    PIEMENU_INSIDE_COLOR = new Color(230,230,230);
-	}
-    }
+    static Color OBSERVED_REGION_COLOR = new Color(186,135,186);
+    static Color OBSERVED_REGION_BORDER_COLOR = Color.getHSBColor(0.83519f,0.28f,0.45f); //rgb(299,28,45)
+
+    static Color PIEMENU_FILL_COLOR = Color.BLACK;
+    static Color PIEMENU_BORDER_COLOR = Color.WHITE;
+    static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
 
     /* Misc. Prefs */
     static boolean SAVE_WINDOW_LAYOUT=false;
