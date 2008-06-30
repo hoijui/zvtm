@@ -179,7 +179,7 @@ public class SceneManager {
     }
 
 	/** Get a level.
-	 *@param level index of level.
+	 *@param index index of level.
  	 *@return null if level index does not correspond to an actual level.
 	 */
 	public Level getLevel(int index){

@@ -25,6 +25,7 @@ import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.AnimationListener;
 
+import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
@@ -54,6 +55,8 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     
     boolean cursorNearBorder = false;
     boolean dragging = false;
+
+	Glyph objectJustSelected = null;
     
     ViewerEventHandler(Viewer app){
         this.application = app;
@@ -71,8 +74,30 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		if (v.lastGlyphEntered() != null){
-			application.vsm.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], 500);
+		Vector gum = v.getMouse().getIntersectingGlyphs(v.cams[0]);
+		if (gum == null){
+			return;
+		}
+		Glyph g = (Glyph)gum.lastElement();
+		if (objectJustSelected != null && g == objectJustSelected){
+			// last click was on this object, already centered on it,
+			// check if it takes somewhere and go there if it does
+			Object owner = g.getOwner();
+			if (owner != null && owner instanceof ObjectDescription){
+				ObjectDescription od = (ObjectDescription)owner;
+				String takesToID = od.takesTo();
+				if (takesToID != null){
+					switch(od.takesToType()){
+						case SceneManager.TAKES_TO_OBJECT:{application.centerOnObject(takesToID);break;}
+						case SceneManager.TAKES_TO_REGION:{application.centerOnRegion(takesToID);break;}
+					}
+				}
+			}				
+		}
+		else {
+			// last click was not on this object, center on it
+			application.vsm.centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			objectJustSelected = g;
 		}
     }
 

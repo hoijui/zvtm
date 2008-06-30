@@ -55,6 +55,7 @@ import net.claribole.zvtm.glyphs.PieMenuFactory;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.engine.ObjectDescription;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -328,6 +329,26 @@ public class Viewer {
         vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
     }
 
+	void centerOnObject(String id){
+		ObjectDescription od = sm.getObject(id);
+		if (od != null){
+			Glyph g = od.getGlyph();
+			if (g != null){
+				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			}
+		}
+	}
+
+	void centerOnRegion(String id){
+		Region r = sm.getRegion(id);
+		if (r != null){
+			Glyph g = r.getBounds();
+			if (g != null){
+				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			}
+		}		
+	}
+
 	void moveBack(){
 		System.out.println("Moving back");
 		
@@ -342,12 +363,14 @@ public class Viewer {
         panelWidth = d.width;
         panelHeight = d.height;
     }
+
+    /* ----- Misc  ------*/
     
     void gc(){
         System.gc();
     }
     
-    static Document parseXML(File f){ 
+    static Document parseXML(File f){
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
