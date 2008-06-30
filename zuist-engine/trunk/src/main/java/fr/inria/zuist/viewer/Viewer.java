@@ -49,6 +49,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
 import net.claribole.zvtm.engine.Java2DPainter;
@@ -96,7 +97,8 @@ public class Viewer implements Java2DPainter {
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Scene Space";
     static final String mnSpaceName = "PieMenu Space";
-    VirtualSpace mSpace;
+    static final String ovSpaceName = "Overlay Space";
+    VirtualSpace mSpace, ovSpace;
     Camera mCamera;
     static final String mViewName = "ZUIST Viewer";
     View mView;
@@ -104,10 +106,12 @@ public class Viewer implements Java2DPainter {
 
     SceneManager sm;
 
+	OverlayManager ovm;
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
     
     public Viewer(boolean fullscreen, boolean antialiased, File xmlSceneFile){
+		ovm = new OverlayManager(this);
 		initGUI(fullscreen, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
@@ -127,9 +131,12 @@ public class Viewer implements Java2DPainter {
         vsm.addVirtualSpace(mnSpaceName);
         mCamera = vsm.addCamera(mSpace);
 		vsm.addCamera(mnSpaceName).setAltitude(10);
+        ovSpace = vsm.addVirtualSpace(ovSpaceName);
+		vsm.addCamera(ovSpaceName);
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
@@ -143,6 +150,7 @@ public class Viewer implements Java2DPainter {
         eh = new ViewerEventHandler(this);
         mView.setEventHandler(eh, 0);
         mView.setEventHandler(eh, 1);
+        mView.setEventHandler(ovm, 2);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
@@ -274,6 +282,7 @@ public class Viewer implements Java2DPainter {
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, gp);
+		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
 		mView.setTitle(mViewName + " - " + SCENE_FILE.getAbsolutePath());
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
@@ -412,50 +421,79 @@ public class Viewer implements Java2DPainter {
 	
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;	
-    boolean SHOW_MEMORY_USAGE = false;
+    boolean SHOW_MISC_INFO = false;
 
-    void toggleMemoryUsageDisplay(){
-        SHOW_MEMORY_USAGE = !SHOW_MEMORY_USAGE;
+    void toggleMiscInfoDisplay(){
+        SHOW_MISC_INFO = !SHOW_MISC_INFO;
         vsm.repaintNow();
     }
+
+	static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
+	static final Color MID_DARK_GRAY = new Color(64,64,64);
 
     void showMemoryUsage(Graphics2D g2d, int viewWidth, int viewHeight){
         totalMemRatio = (int)(Runtime.getRuntime().totalMemory() * 100 / maxMem);
         usedMemRatio = (int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 100 / maxMem);
-        g2d.setColor(Color.green);
+        g2d.setColor(Color.LIGHT_GRAY);
         g2d.fillRect(20,
-            viewHeight - 40,
+            3,
             200,
-            15);
-        g2d.setColor(Color.orange);
+            13);
+        g2d.setColor(Viewer.MID_DARK_GRAY);
         g2d.fillRect(20,
-            viewHeight - 40,
+            3,
             totalMemRatio * 2,
-            15);
-        g2d.setColor(Color.red);
+            13);
+        g2d.setColor(Color.DARK_GRAY);
         g2d.fillRect(20,
-            viewHeight - 40,
+            3,
             usedMemRatio * 2,
-            15);
-        g2d.setColor(Color.black);
+            13);
+        g2d.setColor(Color.WHITE);
         g2d.drawRect(20,
-            viewHeight - 40,
+            3,
             200,
-            15);
-        g2d.drawString(usedMemRatio + "%", 50, viewHeight - 28);
-        g2d.drawString(totalMemRatio + "%", 100, viewHeight - 28);
-        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);	
+            13);
+        g2d.drawString(usedMemRatio + "%", 50, 14);
+        g2d.drawString(totalMemRatio + "%", 100, 14);
+        g2d.drawString(maxMem/1048576 + " Mb", 170, 14);	
+    }
+
+    // consider 1000 as the maximum number of requests that can be in the queue at any given time
+    // 1000 is the default value ; adapt for each scene depending on the number of objects
+    // as this could vary dramatically from one scene to another - see loadScene()
+    float MAX_NB_REQUESTS = 1000;
+    static final int REQ_QUEUE_BAR_WIDTH = 100;
+    static final int REQ_QUEUE_BAR_HEIGHT = 6;
+    
+    void showReqQueueStatus(Graphics2D g2d, int viewWidth, int viewHeight){
+        float ratio = sm.getPendingRequestQueueSize()/(MAX_NB_REQUESTS);
+        if (ratio > 1.0f){
+            // do not go over gauge boundary, even if actual number of requests goes beyond MAX_NB_REQUESTS
+            ratio = 1.0f;
+        }
+        g2d.setColor(Color.GRAY);
+        g2d.fillRect(viewWidth-Math.round(REQ_QUEUE_BAR_WIDTH * ratio)-10, 7, Math.round(REQ_QUEUE_BAR_WIDTH * ratio), REQ_QUEUE_BAR_HEIGHT);
+        g2d.drawRect(viewWidth-REQ_QUEUE_BAR_WIDTH-10, 7, REQ_QUEUE_BAR_WIDTH, REQ_QUEUE_BAR_HEIGHT);
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-        if (SHOW_MEMORY_USAGE){showMemoryUsage(g2d, viewWidth, viewHeight);}
+        if (!SHOW_MISC_INFO){return;}
+		g2d.setComposite(acST);
+		showMemoryUsage(g2d, viewWidth, viewHeight);
+		showReqQueueStatus(g2d, viewWidth, viewHeight);
+		g2d.setComposite(Translucent.acO);
     }
 
     /* ----- Misc  ------*/
     
+    void about(){
+        ovm.showAbout();
+    }
+
 	void gc(){
 		System.gc();
-		if (SHOW_MEMORY_USAGE){
+		if (SHOW_MISC_INFO){
 			vsm.repaintNow();
 		}
     }
@@ -476,10 +514,6 @@ public class Viewer implements Java2DPainter {
         catch (IOException e){e.printStackTrace();return null;}
     }
     
-    public void about(){
-		JOptionPane.showMessageDialog(mView.getFrame(), Messages.ABOUT_MSG);
-    }
-
     void exit(){
         System.exit(0);
     }
