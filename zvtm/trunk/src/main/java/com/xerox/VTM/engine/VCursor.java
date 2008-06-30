@@ -455,9 +455,10 @@ public class VCursor {
 	return s.intersects(jpx, jpy, tolerance, camIndex);
     }
 
-    /**returns a list of all Glyphs under the mouse cursor - returns null if none<br>
+    /** Get a list of all Glyphs under the mouse cursor.
      * This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active)
-     *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
+     *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
+     *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
      *@see #getGlyphsUnderMouseList()
      */
     public Vector getIntersectingGlyphs(Camera c){
