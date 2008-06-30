@@ -455,25 +455,38 @@ public class VCursor {
 	return s.intersects(jpx, jpy, tolerance, camIndex);
     }
 
-    /** Get a list of all Glyphs under the mouse cursor.
-     * This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active)
-     *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
-     *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
-     *@see #getGlyphsUnderMouseList()
-     */
-    public Vector getIntersectingGlyphs(Camera c){
-	synchronized(this){
-	    Vector res=new Vector();
-	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-	    Glyph glyph;
-	    for (int i=0;i<glyphs.size();i++){
-		glyph = (Glyph)glyphs.elementAt(i);
-		if (glyph.coordInside(mx, my, c.getIndex())){res.add(glyph);}
-	    }
-	    if (res.isEmpty()){res = null;}
-	    return res;
+	/** Get a list of all Glyphs (including texts and paths) under the mouse cursor.
+		* This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active).
+		* Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
+		* It can thus be much more computationaly expensive than getGlyphsUnderMouseList()
+		*@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
+		*@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
+		*@see #getGlyphsUnderMouseList()
+		*/
+	public Vector getIntersectingGlyphs(Camera c){
+		synchronized(this){
+			Vector res=new Vector();
+			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+			Glyph glyph;
+			for (int i=0;i<glyphs.size();i++){
+				glyph = (Glyph)glyphs.elementAt(i);
+				if (glyph.coordInside(mx, my, c.getIndex())){
+					res.add(glyph);
+				}
+				else if (glyph instanceof VSegment && intersectsSegment((VSegment)glyph, 2, c.getIndex())){
+					res.add(glyph);
+				}
+				else if (glyph instanceof VText && intersectsVText((VText)glyph, c.getIndex())){
+					res.add(glyph);
+				}
+				else if (glyph instanceof VPath && intersectsVPath((VPath)glyph)){
+					res.add(glyph);
+				}
+			}
+			if (res.isEmpty()){res = null;}
+			return res;
+		}
 	}
-    }
 
     /**double capacity of array containing glyphs under mouse*/
     void doubleCapacity(){
@@ -512,6 +525,7 @@ public class VCursor {
      * (in other words, the array returned by this method is not synchronized with the actual list over time)
      *@deprecated As of zvtm 0.9.3, replaced by getGlyphsUnderMouseList()
      *@see #getGlyphsUnderMouseList()
+     *@see #getIntersectingGlyphs(Camera c)
      */
     public Vector getGlyphsUnderMouse(){
 	Vector res=new Vector();
@@ -525,6 +539,7 @@ public class VCursor {
      * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called.
      * In other words, the array returned by this method is not synchronized with the actual list over time.
      *@return an empty array if the cursor is not over any object.
+	 *@see #getIntersectingGlyphs(Camera c)
      */
     public Glyph[] getGlyphsUnderMouseList(){
 	if (maxIndex >= 0){
