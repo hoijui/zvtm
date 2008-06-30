@@ -51,6 +51,7 @@ import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
+import net.claribole.zvtm.engine.Java2DPainter;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -68,7 +69,7 @@ import org.xml.sax.SAXException;
  * @author Emmanuel Pietriga
  */
 
-public class Viewer {
+public class Viewer implements Java2DPainter {
     
     File SCENE_FILE, SCENE_FILE_DIR;
         
@@ -142,6 +143,7 @@ public class Viewer {
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
+		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
     }
 
@@ -269,6 +271,7 @@ public class Viewer {
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, gp);
+		mView.setTitle(mViewName + " - " + SCENE_FILE.getAbsolutePath());
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
@@ -364,10 +367,56 @@ public class Viewer {
         panelHeight = d.height;
     }
 
+	/* ---- Debug information ----*/
+	
+    long maxMem = Runtime.getRuntime().maxMemory();
+    int totalMemRatio, usedMemRatio;	
+    boolean SHOW_MEMORY_USAGE = false;
+
+    void toggleMemoryUsageDisplay(){
+        SHOW_MEMORY_USAGE = !SHOW_MEMORY_USAGE;
+        vsm.repaintNow();
+    }
+
+    void showMemoryUsage(Graphics2D g2d, int viewWidth, int viewHeight){
+        totalMemRatio = (int)(Runtime.getRuntime().totalMemory() * 100 / maxMem);
+        usedMemRatio = (int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 100 / maxMem);
+        g2d.setColor(Color.green);
+        g2d.fillRect(20,
+            viewHeight - 40,
+            200,
+            15);
+        g2d.setColor(Color.orange);
+        g2d.fillRect(20,
+            viewHeight - 40,
+            totalMemRatio * 2,
+            15);
+        g2d.setColor(Color.red);
+        g2d.fillRect(20,
+            viewHeight - 40,
+            usedMemRatio * 2,
+            15);
+        g2d.setColor(Color.black);
+        g2d.drawRect(20,
+            viewHeight - 40,
+            200,
+            15);
+        g2d.drawString(usedMemRatio + "%", 50, viewHeight - 28);
+        g2d.drawString(totalMemRatio + "%", 100, viewHeight - 28);
+        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);	
+    }
+
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (SHOW_MEMORY_USAGE){showMemoryUsage(g2d, viewWidth, viewHeight);}
+    }
+
     /* ----- Misc  ------*/
     
-    void gc(){
-        System.gc();
+	void gc(){
+		System.gc();
+		if (SHOW_MEMORY_USAGE){
+			vsm.repaintNow();
+		}
     }
     
     static Document parseXML(File f){

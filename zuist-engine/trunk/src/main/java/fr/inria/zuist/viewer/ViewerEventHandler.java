@@ -182,6 +182,7 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     	else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
+		else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
     }
 
