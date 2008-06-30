@@ -52,6 +52,8 @@ import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.engine.PostAnimationAdapter;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -111,6 +113,7 @@ public class Viewer implements Java2DPainter {
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
+		previousLocations = new Vector();
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			getGlobalView();
@@ -291,6 +294,7 @@ public class Viewer implements Java2DPainter {
 			}
 		}
 		if (l > -1){
+			rememberLocation(mCamera.getLocation());
 			long[] wnes = sm.getLevel(l).getBounds();
 	        vsm.centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
 		}
@@ -298,12 +302,14 @@ public class Viewer implements Java2DPainter {
 
     /* Higher view */
     void getHigherView(){
+		rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
         vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
     }
 
     /* Higher view */
     void getLowerView(){
+		rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
         vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
     }
@@ -337,6 +343,7 @@ public class Viewer implements Java2DPainter {
 		if (od != null){
 			Glyph g = od.getGlyph();
 			if (g != null){
+				rememberLocation(mCamera.getLocation());
 				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}
@@ -347,14 +354,48 @@ public class Viewer implements Java2DPainter {
 		if (r != null){
 			Glyph g = r.getBounds();
 			if (g != null){
+				rememberLocation(mCamera.getLocation());
 				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}		
 	}
 
-	void moveBack(){
-		System.out.println("Moving back");
-		
+	Vector previousLocations;
+	static final int MAX_PREV_LOC = 100;
+	
+	void rememberLocation(){
+	    rememberLocation(mCamera.getLocation());
+    }
+    
+	void rememberLocation(Location l){
+		if (previousLocations.size() >= MAX_PREV_LOC){
+			// as a result of release/click being undifferentiated)
+			previousLocations.removeElementAt(0);
+		}
+		if (previousLocations.size()>0){
+			if (!Location.equals((Location)previousLocations.lastElement(),l)){
+                previousLocations.add(l);
+            }
+		}
+		else {previousLocations.add(l);}
+	}
+	
+	void moveBack(){		
+		if (previousLocations.size()>0){
+			Location newlc = (Location)previousLocations.lastElement();
+			Location currentlc = mSpace.getCamera(0).getLocation();
+			Vector animParams = Location.getDifference(currentlc,newlc);
+			sm.setUpdateLevel(false);
+			vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
+				animParams, mSpace.getCamera(0).getID(),
+				new PostAnimationAdapter(){
+                    public void animationEnded(Object target, short type, String dimension){
+                        sm.setUpdateLevel(true);
+                        sm.updateLevel(mCamera.altitude);
+                    }
+                    });
+			previousLocations.removeElementAt(previousLocations.size()-1);
+		}
 	}
 	
     void altitudeChanged(){

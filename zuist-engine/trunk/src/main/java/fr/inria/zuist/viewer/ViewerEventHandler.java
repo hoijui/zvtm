@@ -96,6 +96,7 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
 		}
 		else {
 			// last click was not on this object, center on it
+			application.rememberLocation(application.mCamera.getLocation());
 			application.vsm.centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			objectJustSelected = g;
 		}
