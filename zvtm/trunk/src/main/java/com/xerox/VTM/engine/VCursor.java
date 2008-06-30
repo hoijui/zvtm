@@ -520,9 +520,10 @@ public class VCursor {
 	return res;
     }
 
-    /**get the list of glyphs currently under mouse (last entry is last glyph entered)
-     * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called
-     * (in other words, the array returned by this method is not synchronized with the actual list over time)
+    /** Get the list of glyphs currently under the cursor. Last entry is last glyph entered.
+     * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called.
+     * In other words, the array returned by this method is not synchronized with the actual list over time.
+     *@return an empty array if the cursor is not over any object.
      */
     public Glyph[] getGlyphsUnderMouseList(){
 	if (maxIndex >= 0){
