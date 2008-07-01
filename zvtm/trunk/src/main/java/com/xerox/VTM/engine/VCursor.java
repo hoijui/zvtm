@@ -46,6 +46,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import net.claribole.zvtm.engine.LowPassFilter;
+import net.claribole.zvtm.glyphs.Translucency;
 import java.awt.Point;
 
 /**
@@ -729,7 +730,11 @@ public class VCursor {
         }
 		if (dynaSpotActivated && showDynarea){
 			g.setColor(DYNASPOT_COLOR);
-			g.setComposite(DYNASPOT_TRANSLUCENCY);
+			switch(dynaSpotVisibility){
+				case DYNASPOT_VISIBILITY_VISIBLE:{g.setComposite(acST);break;}
+				case DYNASPOT_VISIBILITY_FADEIN:{g.setComposite(Translucency.acs[(int)Math.round((1-opacity) * DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
+				case DYNASPOT_VISIBILITY_FADEOUT:{g.setComposite(Translucency.acs[(int)Math.round(opacity * DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
+			}
 			g.fillOval(mx-dynaSpotRadius, my-dynaSpotRadius, 2*dynaSpotRadius, 2*dynaSpotRadius);
 			g.setComposite(Translucent.acO);
 		}
@@ -738,7 +743,27 @@ public class VCursor {
 	/* ---- DynaSpot implementation ---- */
 	
 	Color DYNASPOT_COLOR = Color.RED;
-	AlphaComposite DYNASPOT_TRANSLUCENCY = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f);
+	double DYNASPOT_MAX_TRANSLUCENCY = 0.3;
+	AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
+	
+	/** The DynaSpot area is never displayed. */
+	public static final short DYNASPOT_VISIBILITY_INVISIBLE = 0;
+	/** The DynaSpot area is always displayed. */
+	public static final short DYNASPOT_VISIBILITY_VISIBLE = 1;
+	/** The DynaSpot area is invisible when the cursor is still, and gradually fades in when the cursor moves. */
+	public static final short DYNASPOT_VISIBILITY_FADEIN = 2;
+	/** The DynaSpot area is visible when the cursor is still, and gradually fades out when the cursor moves. */
+	public static final short DYNASPOT_VISIBILITY_FADEOUT = 3;
+	
+	short dynaSpotVisibility = DYNASPOT_VISIBILITY_VISIBLE;
+	
+	/** Set the visibility and visual behaviour of the DynaSpot.
+	 *@param v one of DYNASPOT_VISIBILITY_*
+	 */
+	public void setDynaSpotVisibility(short v){
+		dynaSpotVisibility = v;
+		showDynarea = dynaSpotVisibility != DYNASPOT_VISIBILITY_INVISIBLE;
+	}
 	
 	int DYNASPOT_MAX_RADIUS = 40;
 	int dynaSpotRadius = 0;
@@ -762,6 +787,8 @@ public class VCursor {
 	double cutoffParamA = 3; // decrease to make the region stay at max radius longer before shrinking
 	double cutoffParamB = 0.0001;
 	double distAway = 0;	 
+
+	double opacity = 1.0f;
 
 	long[] dynawnes = new long[4];
 	
@@ -795,7 +822,7 @@ public class VCursor {
 		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
 		distAway = targetPos.distance(currentPos);
 		double maxDist = 2 * Math.abs(xOffset);
-		double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+		opacity = 1.0 - Math.min(1.0, distAway / maxDist);
 		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
 		currentPos = filter.apply(targetPos, frequency);
 		dynaSpotRadius = (int)Math.round(DYNASPOT_MAX_RADIUS * (1.0-opacity));
@@ -857,14 +884,6 @@ public class VCursor {
 	
 	public Point getOffsets(){
 		return new Point(xOffset, yOffset);
-	}
-	
-	public void setDynaSpotAreaVisible(boolean b){
-		showDynarea = b;
-	}
-	
-	public boolean isDynaSpotAreaVisible(){
-		return showDynarea;
 	}
 	
 	/** Get the glyph picked by the dynaspot cursor.
