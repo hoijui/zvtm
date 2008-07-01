@@ -44,7 +44,6 @@ import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.SwingWorker;
-import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -191,9 +190,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	RectangleNR seg2;
 	observedRegion=new VRectangleST(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR);
 	observedRegion.setBorderColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
-	seg1=new RectangleNR(0,0,0,0,500,new Color(115,83,115));  //500 should be sufficient as the radar window is
-	seg2=new RectangleNR(0,0,0,500,0,new Color(115,83,115));  //not resizable and is 300x200 (see rdW,rdH below)
-	if (!(Utilities.osIsWindows() || Utilities.osIsMacOS())){
+	seg1 = new RectangleNR(0, 0, 0, 0, 500, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);  //500 should be sufficient as the radar window is
+	seg2 = new RectangleNR(0, 0, 0, 500, 0, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);  //not resizable and is 300x200 (see rdW,rdH below)
+	if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
 	    observedRegion.setFilled(false);
 	}
 	vsm.addGlyph(observedRegion,rdRegionVirtualSpace);

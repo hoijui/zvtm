@@ -60,10 +60,19 @@ class ConfigManager {
 
     static Color OBSERVED_REGION_COLOR = new Color(186,135,186);
     static Color OBSERVED_REGION_BORDER_COLOR = Color.getHSBColor(0.83519f,0.28f,0.45f); //rgb(299,28,45)
+	static Color OBSERVED_REGION_CROSSHAIR_COLOR = new Color(115, 83, 115);
+	static {
+		if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
+			OBSERVED_REGION_BORDER_COLOR = OBSERVED_REGION_CROSSHAIR_COLOR = Color.RED;
+		}
+	}
 
     static Color PIEMENU_FILL_COLOR = Color.BLACK;
     static Color PIEMENU_BORDER_COLOR = Color.WHITE;
     static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
+	static final float PIEMENU_MAIN_ALPHA = 0.85f;
+	static final float PIEMENU_SUB_ALPHA = 0.95f;
+	
 
     /* Misc. Prefs */
     static boolean SAVE_WINDOW_LAYOUT=false;

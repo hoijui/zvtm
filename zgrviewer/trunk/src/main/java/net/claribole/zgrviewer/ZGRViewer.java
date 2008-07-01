@@ -319,7 +319,7 @@ public class ZGRViewer implements ZGRApplication {
 	    PieMenuFactory.setSelectedItemBorderColor(null);
 	    PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
 	    PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
-	    PieMenuFactory.setTranslucency(0.85f);
+	    if (Utils.osIsWindows() || Utils.osIsMacOS()){PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_MAIN_ALPHA);}
 	    PieMenuFactory.setSensitivityRadius(0.5);
 	    PieMenuFactory.setAngle(-Math.PI/2.0);
 	    PieMenuFactory.setRadius(150);
@@ -347,7 +347,7 @@ public class ZGRViewer implements ZGRApplication {
 		PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
 		PieMenuFactory.setSelectedItemBorderColor(null);
 		PieMenuFactory.setSensitivityRadius(1.0);
-		PieMenuFactory.setTranslucency(0.95f);
+	    if (Utils.osIsWindows() || Utils.osIsMacOS()){PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_SUB_ALPHA);}
 		PieMenuFactory.setRadius(120);
 		Glyph[] items;
 		if (label == Messages.PM_FILE){
