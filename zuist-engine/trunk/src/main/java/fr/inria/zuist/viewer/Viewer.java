@@ -9,8 +9,8 @@ package fr.inria.zuist.viewer;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
+import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -122,6 +123,7 @@ public class Viewer implements Java2DPainter {
 			loadScene(xmlSceneFile);
 			getGlobalView();
 		}
+		ovm.initConsole();
     }
 
     void initGUI(boolean fullscreen, boolean antialiased){
@@ -156,6 +158,7 @@ public class Viewer implements Java2DPainter {
 		mView.setAntialiasing(antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
+		mView.getFrame().addComponentListener(eh);
     }
 
 	private JMenuBar initMenu(){
@@ -414,8 +417,8 @@ public class Viewer implements Java2DPainter {
     void updatePanelSize(){
         Dimension d = mView.getPanel().getSize();
         panelWidth = d.width;
-        panelHeight = d.height;
-    }
+		panelHeight = d.height;
+	}
 
 	/* ---- Debug information ----*/
 	

@@ -13,12 +13,19 @@ import javax.swing.ImageIcon;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import javax.swing.OverlayLayout;
+import javax.swing.JLayeredPane;
+import javax.swing.JFrame;
+import java.awt.Dimension;
+import java.awt.LayoutManager;
+import java.awt.Component;
 
-//import com.xerox.VTM.engine.SwingWorker;
+import java.awt.BorderLayout;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.View;
-//import com.xerox.VTM.engine.LongPoint;
-//import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
@@ -27,8 +34,7 @@ import com.xerox.VTM.glyphs.VRectangleST;
 import net.claribole.zvtm.glyphs.VTextST;
 import net.claribole.zvtm.glyphs.RImage;
 import net.claribole.zvtm.engine.ViewEventHandler;
-//import net.claribole.zvtm.engine.RepaintAdapter;
-//import net.claribole.zvtm.engine.GlyphKillAction;
+import net.claribole.zvtm.widgets.TranslucentTextArea;
 
 class OverlayManager implements ViewEventHandler {
     
@@ -40,9 +46,34 @@ class OverlayManager implements ViewEventHandler {
 
     Viewer application;
 
+	JPanel consolePane;
+	TranslucentTextArea console;
+
     OverlayManager(Viewer app){
         this.application = app;
     }
+
+	void initConsole(){
+		JFrame f = (JFrame)application.mView.getFrame();
+		JLayeredPane lp = f.getRootPane().getLayeredPane();
+		lp.setLayout(new OverlayLayout(lp));
+		consolePane = new JPanel();
+		consolePane.setOpaque(false);
+		consolePane.setLayout(new BorderLayout());
+		console = new TranslucentTextArea("Console");
+		console.setPreferredSize(new Dimension((int)Math.round(application.panelWidth*0.9), (int)Math.round(application.panelHeight*0.2)));
+		consolePane.add(console, BorderLayout.SOUTH);
+		lp.add(consolePane, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+		consolePane.setVisible(false);
+	}
+	
+	void toggleConsole(){
+		consolePane.setVisible(!consolePane.isVisible());
+	}
+	
+	void sayInConsole(String text){
+		console.append(text);
+	}
     
     boolean showingAbout = false;
     VRectangleST fadeAbout;
