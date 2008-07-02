@@ -23,6 +23,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -119,11 +121,11 @@ public class Viewer implements Java2DPainter {
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
 		previousLocations = new Vector();
+		ovm.initConsole();
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			getGlobalView();
 		}
-		ovm.initConsole();
     }
 
     void initGUI(boolean fullscreen, boolean antialiased){
@@ -158,7 +160,14 @@ public class Viewer implements Java2DPainter {
 		mView.setAntialiasing(antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
-		mView.getFrame().addComponentListener(eh);
+		mView.getPanel().addComponentListener(eh);
+		ComponentAdapter ca0 = new ComponentAdapter(){
+			public void componentResized(ComponentEvent e){
+				updatePanelSize();
+			}
+		};
+		mView.getFrame().addComponentListener(ca0);
+		
     }
 
 	private JMenuBar initMenu(){
@@ -280,6 +289,7 @@ public class Viewer implements Java2DPainter {
 	}
 
 	void loadScene(File xmlSceneFile){
+		ovm.sayInConsole("Loading "+xmlSceneFile.getAbsolutePath()+"\n");
 		gp.setValue(0);
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;

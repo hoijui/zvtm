@@ -19,6 +19,7 @@ import javax.swing.JFrame;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.Component;
+import java.awt.Insets;
 
 import java.awt.BorderLayout;
 import javax.swing.BoxLayout;
@@ -46,8 +47,12 @@ class OverlayManager implements ViewEventHandler {
 
     Viewer application;
 
-	JPanel consolePane;
 	TranslucentTextArea console;
+
+	// west, east and south margins of console (north bound depends on frame's height)
+	int[] consoleMarginsWES = {10, 10, 10};
+	
+	int[] consolePaddingWNES = {5, 5, 5, 5};
 
     OverlayManager(Viewer app){
         this.application = app;
@@ -56,23 +61,26 @@ class OverlayManager implements ViewEventHandler {
 	void initConsole(){
 		JFrame f = (JFrame)application.mView.getFrame();
 		JLayeredPane lp = f.getRootPane().getLayeredPane();
-		lp.setLayout(new OverlayLayout(lp));
-		consolePane = new JPanel();
-		consolePane.setOpaque(false);
-		consolePane.setLayout(new BorderLayout());
-		console = new TranslucentTextArea("Console");
-		console.setPreferredSize(new Dimension((int)Math.round(application.panelWidth*0.9), (int)Math.round(application.panelHeight*0.2)));
-		consolePane.add(console, BorderLayout.SOUTH);
-		lp.add(consolePane, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
-		consolePane.setVisible(false);
+		console = new TranslucentTextArea("");
+		console.setEditable(false);
+		console.setMargin(new Insets(consolePaddingWNES[1], consolePaddingWNES[0], consolePaddingWNES[3], consolePaddingWNES[2]));
+		lp.add(console, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
+		updateConsoleBounds();
+	}
+	
+	void updateConsoleBounds(){
+		console.setBounds(consoleMarginsWES[0], Math.round(application.panelHeight*.8f),
+		                  application.panelWidth-consoleMarginsWES[1]-consoleMarginsWES[0], Math.round(application.panelHeight*.2f-consoleMarginsWES[2]));
 	}
 	
 	void toggleConsole(){
-		consolePane.setVisible(!consolePane.isVisible());
+		console.setVisible(!console.isVisible());
 	}
 	
 	void sayInConsole(String text){
-		console.append(text);
+		System.out.println("saying "+text);
+		
+		console.setText(console.getText()+text);
 	}
     
     boolean showingAbout = false;
