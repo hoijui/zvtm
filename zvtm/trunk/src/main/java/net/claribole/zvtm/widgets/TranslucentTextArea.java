@@ -36,33 +36,46 @@ public class TranslucentTextArea extends JTextArea {
 	AlphaComposite bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f);
 	AlphaComposite fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f);
 	
-	TranslucentTextArea(){
+	public TranslucentTextArea(){
 		super();
+		initColors();
 	}
 	
-	TranslucentTextArea(javax.swing.text.Document doc){
+	public TranslucentTextArea(javax.swing.text.Document doc){
 		super(doc);
 		setOpaque(false);
+		initColors();
 	}
 	
-	TranslucentTextArea(javax.swing.text.Document doc, String text, int rows, int columns){
+	public TranslucentTextArea(javax.swing.text.Document doc, String text, int rows, int columns){
 		super(doc, text, rows, columns);
 		setOpaque(false);
+		initColors();
 	}
 	
-	TranslucentTextArea(int rows, int columns){
+	public TranslucentTextArea(int rows, int columns){
 		super(rows, columns);
 		setOpaque(false);
+		initColors();
 	}
 	
-	TranslucentTextArea(String text){
+	public TranslucentTextArea(String text){
 		super(text);
 		setOpaque(false);
+		initColors();
 	}
 
-	TranslucentTextArea(String text, int rows, int columns){
+	public TranslucentTextArea(String text, int rows, int columns){
 		super(text, rows, columns);
 		setOpaque(false);
+		initColors();
+	}
+	
+	void initColors(){
+        setForeground(Color.WHITE);
+        setBackground(Color.BLACK);
+        setSelectionColor(Color.WHITE);
+        setSelectedTextColor(Color.BLACK);
 	}
 	
 	/**Set the translucence value of this text area's background.
