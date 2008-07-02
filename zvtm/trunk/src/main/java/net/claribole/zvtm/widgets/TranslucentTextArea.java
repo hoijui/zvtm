@@ -76,6 +76,7 @@ public class TranslucentTextArea extends JTextArea {
         setBackground(Color.BLACK);
         setSelectionColor(Color.WHITE);
         setSelectedTextColor(Color.BLACK);
+		setCaretColor(Color.WHITE);
 	}
 	
 	/**Set the translucence value of this text area's background.
