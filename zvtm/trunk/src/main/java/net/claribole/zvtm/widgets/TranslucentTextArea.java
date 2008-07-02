@@ -98,6 +98,8 @@ public class TranslucentTextArea extends JTextArea {
 		g2d.setColor(getBackground());
 		g2d.fillRect(0,0,getWidth(),getHeight());
 		g2d.setComposite(fgAC);
+		g2d.setColor(getForeground());
+		g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
 		super.paint(g2d);
 	}
 	
