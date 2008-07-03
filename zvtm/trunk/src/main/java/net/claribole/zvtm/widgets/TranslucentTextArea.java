@@ -12,15 +12,12 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import javax.swing.JTextArea;
-import javax.swing.JLayeredPane;
-import javax.swing.OverlayLayout;
 
 /** Translucent text area, typically used in an overlay pane.
 <p>Example of use, setting a white text on a dark translucent background:</p>
 <pre>
 JFrame f = ...;
 JLayeredPane lp = f.getRootPane().getLayeredPane();
-lp.setLayout(new OverlayLayout(lp));
 JTextArea t = new TranslucentTextArea(...);
 t.setForeground(Color.WHITE);
 t.setBackground(Color.BLACK);
@@ -31,13 +28,14 @@ t.setBounds(x, y, w, h);
 *@since 0.9.7
 */
 
-public class TranslucentTextArea extends JTextArea {
+public class TranslucentTextArea extends JTextArea implements TranslucentWidget {
 		
-	AlphaComposite bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f);
-	AlphaComposite fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f);
+	AlphaComposite bgAC = AB_08;
+	AlphaComposite fgAC = AB_10;
 	
 	public TranslucentTextArea(){
 		super();
+		setOpaque(false);
 		initColors();
 	}
 	
@@ -86,7 +84,7 @@ public class TranslucentTextArea extends JTextArea {
 		this.bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
 
-	/**Set the translucence value of this text area's background.
+	/**Set the translucence value of this text area's foreground.
 	 *@param alpha blending value, in [0.0,1.0]. Default is 1.0
 	 */
 	public void setForegroundTranslucence(float alpha){
