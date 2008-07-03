@@ -275,7 +275,7 @@ public class Viewer implements Java2DPainter {
 		    worker.start();
 		}
 	}
-	
+
 	void reload(){
 		if (SCENE_FILE==null){return;}
 		final SwingWorker worker = new SwingWorker(){
@@ -364,6 +364,7 @@ public class Viewer implements Java2DPainter {
     }
 
 	void centerOnObject(String id){
+		ovm.sayInConsole("Centering on object "+id+"\n");
 		ObjectDescription od = sm.getObject(id);
 		if (od != null){
 			Glyph g = od.getGlyph();
@@ -375,6 +376,7 @@ public class Viewer implements Java2DPainter {
 	}
 
 	void centerOnRegion(String id){
+		ovm.sayInConsole("Centering on region "+id+"\n");
 		Region r = sm.getRegion(id);
 		if (r != null){
 			Glyph g = r.getBounds();
@@ -431,6 +433,9 @@ public class Viewer implements Java2DPainter {
         Dimension d = mView.getPanel().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
+		if (ovm.console != null){
+			ovm.updateConsoleBounds();
+		}
 	}
 
 	/* ---- Debug information ----*/
