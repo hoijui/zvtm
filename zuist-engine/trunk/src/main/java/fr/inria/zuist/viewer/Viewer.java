@@ -289,14 +289,17 @@ public class Viewer implements Java2DPainter {
 	}
 
 	void loadScene(File xmlSceneFile){
-		ovm.sayInConsole("Loading "+xmlSceneFile.getAbsolutePath()+"\n");
+		try {
+			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
+			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());			
+		}
+		catch (IOException ex){}
 		gp.setValue(0);
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, gp);
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-		mView.setTitle(mViewName + " - " + SCENE_FILE.getAbsolutePath());
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);

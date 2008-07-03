@@ -78,8 +78,6 @@ class OverlayManager implements ViewEventHandler {
 	}
 	
 	void sayInConsole(String text){
-		System.out.println("saying "+text);
-		
 		console.setText(console.getText()+text);
 	}
     
