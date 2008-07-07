@@ -85,7 +85,7 @@ class ConfigManager {
     static String CMD_LINE_OPTS="";
 
     //directories
-    static File m_TmpDir = new File(System.getProperty("java.io.tmpdir"));
+    static File m_TmpDir;
     static File m_PrjDir=new File("graphs");
     static File m_DotPath=new File("dot");
     static File m_NeatoPath=new File("neato");
@@ -143,6 +143,7 @@ class ConfigManager {
 	ConfigManager(GraphicsManager gm, boolean applet){
 		this.grMngr = gm;
 		LAST_COMMANDS = new Vector();
+		if (!applet){m_TmpDir = new File(System.getProperty("java.io.tmpdir"));}
 	}
 
 	/* load user prefs from config file (in theory, if the file cannot be found, 
