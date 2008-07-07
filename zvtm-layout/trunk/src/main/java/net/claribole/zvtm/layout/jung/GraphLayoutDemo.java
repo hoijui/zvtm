@@ -32,6 +32,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VPath;
+import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
 import edu.uci.ics.jung.graph.Graph;
@@ -121,11 +122,12 @@ public class GraphLayoutDemo {
 	void layoutGraph(AbstractLayout l){
 		if (l == null){return;}
 		layout = l;
-		layout.initialize(new java.awt.Dimension(800,600));
+		int numVertices = graph.numVertices();
+		layout.initialize(new java.awt.Dimension(numVertices * 10, numVertices * 10));
 		Iterator i = layout.getVisibleEdges().iterator();
 		while (i.hasNext()){
 			Edge e = (Edge)i.next();
-			VPath p = EdgeTransformer.getVPath(e, l, EDGE_SHAPE, Color.BLACK);
+			DPath p = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK);
 			vsm.addGlyph(p, mSpaceName);
 			edge2glyph.put(e, p);
 			p.setOwner(e);
