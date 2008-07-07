@@ -15,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VSegment;
 import net.claribole.zvtm.glyphs.DPath;
@@ -127,6 +128,24 @@ public class EdgeTransformer {
 		return s;
 	}
 	
+	public static void updateLine(Edge e, AbstractLayout l, DPath p){
+		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
+		double[] tgt = new double[4];
+		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
+		LongPoint[] coords = {new LongPoint(Math.round(tgt[0]),Math.round(tgt[1])),
+			                  new LongPoint(Math.round(tgt[2]),Math.round(tgt[3]))};
+		p.edit(coords, true);
+	}
+	
+	public static void updateLine(Edge e, AbstractLayout l, VSegment s){
+		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
+		double[] tgt = new double[4];
+		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
+		s.setEndPoints(Math.round(tgt[0]), Math.round(tgt[1]), Math.round(tgt[2]), Math.round(tgt[3]));
+	}
+	
 	/** Get a VPath composed of a quadratic curve representing a given edge in the graph.
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
@@ -157,6 +176,17 @@ public class EdgeTransformer {
 		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
 		p.addQdCurve(Math.round(tgt[2]), Math.round(tgt[3]), Math.round(tgt[4]), Math.round(tgt[5]), true);
 		return p;
+	}
+	
+	public static void updateQuadCurve(Edge e, AbstractLayout l, DPath p){
+		QuadCurve2D curve = (QuadCurve2D)(new EdgeShape.QuadCurve()).getShape(e);
+		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
+		double[] tgt = new double[6];
+		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
+		LongPoint[] coords = {new LongPoint(Math.round(tgt[0]), Math.round(tgt[1])),
+			                  new LongPoint(Math.round(tgt[4]), Math.round(tgt[5])),
+                              new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
+		p.edit(coords, true);
 	}
 
 	/** Get a VPath composed of a cubic curve representing a given edge in the graph.
@@ -197,6 +227,19 @@ public class EdgeTransformer {
 		return p;
 	}
 
+	public static void updateCubicCurve(Edge e, AbstractLayout l, DPath p){
+		CubicCurve2D curve = (CubicCurve2D)(new EdgeShape.CubicCurve()).getShape(e);
+		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
+			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
+		double[] tgt = new double[8];
+		getTransform(e, l, curve).transform(src, 0, tgt, 0, 4);
+		LongPoint[] coords = {new LongPoint(Math.round(tgt[0]), Math.round(tgt[1])),
+                              new LongPoint(Math.round(tgt[4]), Math.round(tgt[5])),
+                              new LongPoint(Math.round(tgt[6]), Math.round(tgt[7])),
+							  new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
+		p.edit(coords, true);
+	}
+	
 	private static AffineTransform getTransform(Edge e, AbstractLayout l, Shape edgeShape){
 		/* code inspired by edu.uci.ics.jung.visualization.PluggableRenderer (Jung 1.7.6) */
 		Pair ep = e.getEndpoints();		
