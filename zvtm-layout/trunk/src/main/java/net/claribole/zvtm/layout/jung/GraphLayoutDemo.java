@@ -127,10 +127,10 @@ public class GraphLayoutDemo {
 		Iterator i = layout.getVisibleEdges().iterator();
 		while (i.hasNext()){
 			Edge e = (Edge)i.next();
-			DPath p = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK);
-			vsm.addGlyph(p, mSpaceName);
-			edge2glyph.put(e, p);
-			p.setOwner(e);
+			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK);
+			vsm.addGlyph(g, mSpaceName);
+			edge2glyph.put(e, g);
+			g.setOwner(e);
 		}
 		i = layout.getVisibleVertices().iterator();
 		while (i.hasNext()){
@@ -148,14 +148,15 @@ public class GraphLayoutDemo {
 		if (layout == null){return;}
 		layout.advancePositions();
 		Iterator i = layout.getVisibleEdges().iterator();
-//		while (i.hasNext()){
-//			Edge e = (Edge)i.next();
-//			Pair ep = e.getEndpoints();
-//			Coordinates c1 = layout.getCoordinates((Vertex)ep.getFirst());
-//			Coordinates c2 = layout.getCoordinates((Vertex)ep.getSecond());
-//			VSegment s = (VSegment)edge2glyph.get(e);
-//			s.setEndPoints((int)c1.getX(), (int)c1.getY(), (int)c2.getX(), (int)c2.getY());
-//		}
+		while (i.hasNext()){
+			Edge e = (Edge)i.next();
+			DPath p = (DPath)edge2glyph.get(e);
+			switch (EDGE_SHAPE){
+				case EdgeTransformer.EDGE_LINE:{EdgeTransformer.updateLine(e, layout, p);break;}
+				case EdgeTransformer.EDGE_QUAD_CURVE:{EdgeTransformer.updateQuadCurve(e, layout, p);break;}
+				case EdgeTransformer.EDGE_CUBIC_CURVE:{EdgeTransformer.updateCubicCurve(e, layout, p);break;}
+			}
+		}
 		i = layout.getVisibleVertices().iterator();
 		while (i.hasNext()){
 			Vertex v = (Vertex)i.next();
