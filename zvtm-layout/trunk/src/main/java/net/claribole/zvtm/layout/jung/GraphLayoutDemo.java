@@ -8,6 +8,9 @@
 package net.claribole.zvtm.layout.jung;
 
 import java.awt.Color;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.QuadCurve2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -28,6 +31,7 @@ import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VPath;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
 import edu.uci.ics.jung.graph.Graph;
@@ -44,6 +48,10 @@ import edu.uci.ics.jung.visualization.StaticLayout;
 import edu.uci.ics.jung.io.GraphMLFile;
 import edu.uci.ics.jung.visualization.Coordinates;
 import edu.uci.ics.jung.utils.Pair;
+import edu.uci.ics.jung.graph.decorators.EdgeShape;
+
+import edu.uci.ics.jung.graph.decorators.EdgeShape;
+import edu.uci.ics.jung.graph.decorators.EdgeShapeFunction;
 
 public class GraphLayoutDemo {
 
@@ -55,9 +63,12 @@ public class GraphLayoutDemo {
 
 	Graph graph;
 	AbstractLayout layout;
-
-	public GraphLayoutDemo(String graphFilePath, short layout){
+	
+	short EDGE_SHAPE = EdgeTransformer.EDGE_QUAD_CURVE;
+	
+	public GraphLayoutDemo(String graphFilePath, short layout, short es){
 		initZVTMelements();
+		EDGE_SHAPE = es;
 		loadGraph(new File(graphFilePath));
 		layoutGraph(getLayout(layout));
 	}
@@ -114,13 +125,10 @@ public class GraphLayoutDemo {
 		Iterator i = layout.getVisibleEdges().iterator();
 		while (i.hasNext()){
 			Edge e = (Edge)i.next();
-			Pair ep = e.getEndpoints();
-			Coordinates c1 = layout.getCoordinates((Vertex)ep.getFirst());
-			Coordinates c2 = layout.getCoordinates((Vertex)ep.getSecond());
-			VSegment s = new VSegment((int)c1.getX(), (int)c1.getY(), 0, Color.BLACK, (int)c2.getX(), (int)c2.getY());
-			vsm.addGlyph(s, mSpaceName);
-			edge2glyph.put(e, s);
-			s.setOwner(e);
+			VPath p = EdgeTransformer.getVPath(e, l, EDGE_SHAPE, Color.BLACK);
+			vsm.addGlyph(p, mSpaceName);
+			edge2glyph.put(e, p);
+			p.setOwner(e);
 		}
 		i = layout.getVisibleVertices().iterator();
 		while (i.hasNext()){
@@ -138,14 +146,14 @@ public class GraphLayoutDemo {
 		if (layout == null){return;}
 		layout.advancePositions();
 		Iterator i = layout.getVisibleEdges().iterator();
-		while (i.hasNext()){
-			Edge e = (Edge)i.next();
-			Pair ep = e.getEndpoints();
-			Coordinates c1 = layout.getCoordinates((Vertex)ep.getFirst());
-			Coordinates c2 = layout.getCoordinates((Vertex)ep.getSecond());
-			VSegment s = (VSegment)edge2glyph.get(e);
-			s.setEndPoints((int)c1.getX(), (int)c1.getY(), (int)c2.getX(), (int)c2.getY());
-		}
+//		while (i.hasNext()){
+//			Edge e = (Edge)i.next();
+//			Pair ep = e.getEndpoints();
+//			Coordinates c1 = layout.getCoordinates((Vertex)ep.getFirst());
+//			Coordinates c2 = layout.getCoordinates((Vertex)ep.getSecond());
+//			VSegment s = (VSegment)edge2glyph.get(e);
+//			s.setEndPoints((int)c1.getX(), (int)c1.getY(), (int)c2.getX(), (int)c2.getY());
+//		}
 		i = layout.getVisibleVertices().iterator();
 		while (i.hasNext()){
 			Vertex v = (Vertex)i.next();
@@ -156,7 +164,7 @@ public class GraphLayoutDemo {
 	}
 	
 	public static void main(String[] args){
-		new GraphLayoutDemo(args[0], Short.parseShort(args[1]));
+		new GraphLayoutDemo(args[0], Short.parseShort(args[1]), Short.parseShort(args[2]));
 	}
 	
 }
@@ -265,3 +273,4 @@ class GraphLayoutDemoEventHandler implements ViewEventHandler {
     public void viewClosing(View v){System.exit(0);}
 
 }
+
