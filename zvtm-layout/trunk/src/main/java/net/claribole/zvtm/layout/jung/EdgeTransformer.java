@@ -38,10 +38,15 @@ public class EdgeTransformer {
 	public static final short EDGE_QUAD_CURVE = 2;
 	public static final short EDGE_CUBIC_CURVE = 3;
 	
-	protected static VertexShapeFunction vertexShapeFunction = 
-        new EllipseVertexShapeFunction(
-                new ConstantVertexSizeFunction(20),
-                new ConstantVertexAspectRatioFunction(1.0f));
+	protected static VertexShapeFunction vertexShapeFunction =  new EllipseVertexShapeFunction(new ConstantVertexSizeFunction(20), new ConstantVertexAspectRatioFunction(1.0f));
+
+	public static void setVertexShapeFunction(VertexShapeFunction vsf){
+		vertexShapeFunction = vsf;
+	}
+	
+	public static VertexShapeFunction getVertexShapeFunction(){
+		return vertexShapeFunction;
+	}
 
 	/** Get a VPath representing a given edge in the graph.
 	 *@param e the Jung edge
@@ -193,6 +198,7 @@ public class EdgeTransformer {
 	}
 
 	private static AffineTransform getTransform(Edge e, AbstractLayout l, Shape edgeShape){
+		/* code inspired by edu.uci.ics.jung.visualization.PluggableRenderer (Jung 1.7.6) */
 		Pair ep = e.getEndpoints();		
 		Vertex v1 = (Vertex)ep.getFirst();
         Vertex v2 = (Vertex)ep.getSecond();
