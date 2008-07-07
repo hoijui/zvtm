@@ -9,11 +9,18 @@ package net.claribole.zvtm.layout.jung;
 
 import java.awt.Color;
 import java.awt.Shape;
+import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.QuadCurve2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseWheelEvent;
+import java.awt.Container;
+import javax.swing.JApplet;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
+import java.awt.BorderLayout;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -22,6 +29,12 @@ import java.util.Vector;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.MalformedURLException;
 
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -54,56 +67,125 @@ import edu.uci.ics.jung.graph.decorators.EdgeShape;
 import edu.uci.ics.jung.graph.decorators.EdgeShape;
 import edu.uci.ics.jung.graph.decorators.EdgeShapeFunction;
 
-public class GraphLayoutDemo {
+public class GraphLayoutDemo extends JApplet {
 
-	VirtualSpaceManager vsm;
-	static final String mSpaceName = "graph space";
-	View mView;
-	Camera mCamera;
-	GraphLayoutDemoEventHandler eh;
-
-	Graph graph;
-	AbstractLayout layout;
-	
+	static final String EDGE_TYPE_PARAM = "edgeType";
 	short EDGE_SHAPE = EdgeTransformer.EDGE_QUAD_CURVE;
-	
-	public GraphLayoutDemo(String graphFilePath, short layout, short es){
-		initZVTMelements();
-		EDGE_SHAPE = es;
-		loadGraph(new File(graphFilePath));
-		layoutGraph(getLayout(layout));
-	}
 
-	void initZVTMelements(){
-		vsm = new VirtualSpaceManager();
-		eh = new GraphLayoutDemoEventHandler(this);
-		vsm.addVirtualSpace(mSpaceName);
-		mCamera = vsm.addCamera(mSpaceName);
-		Vector cameras = new Vector();
-		cameras.add(mCamera);
-		mView = vsm.addExternalView(cameras, "Jung-based Graph Layout Demo", View.STD_VIEW, 800, 600, false, true);
-		mView.setBackgroundColor(Color.WHITE);
-		mView.setEventHandler(eh);
-		mView.setNotifyMouseMoved(true);
-		mView.setAntialiasing(true);
-		mCamera.setAltitude(0);
-	}
-	
-	void loadGraph(File graphFile){
-		GraphMLFile f = new GraphMLFile();
-		try {
-			graph = f.load(new FileReader(graphFile));
-		}
-		catch (IOException ex){ex.printStackTrace();}
-	}
-
+	static final String LAYOUT_TYPE_PARAM = "layoutType";
 	static final short LAYOUT_CIRCLE = 0;
 	static final short LAYOUT_KK = 1;
 	static final short LAYOUT_SPRING = 2;
 	static final short LAYOUT_ISOM = 3;
 	static final short LAYOUT_FR = 4;
 	static final short LAYOUT_STATIC = 5;
+	short LAYOUT_TYPE = LAYOUT_SPRING;
 	
+	static final String GRAPHML_FILE_URL_PARAM = "GraphMLFile";
+	URL SVG_URL = null;
+
+   	static final int DEFAULT_VIEW_WIDTH = 640;
+    static final int DEFAULT_VIEW_HEIGHT = 480;
+    static final String APPLET_WIDTH_PARAM = "width";
+    static final String APPLET_HEIGHT_PARAM = "height";
+	int appletWindowWidth = DEFAULT_VIEW_WIDTH;
+	int appletWindowHeight = DEFAULT_VIEW_HEIGHT;
+
+	VirtualSpaceManager vsm;
+	static final String mSpaceName = "graph space";
+	static final String mViewName = "Jung in ZVTM Demo";
+	View mView;
+	Camera mCamera;
+	GraphLayoutDemoEventHandler eh;
+	JPanel viewPanel;
+
+	Graph graph;
+	AbstractLayout layout;
+		
+	public GraphLayoutDemo(){
+		getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
+    }
+
+    public void init(){
+		getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
+		initConfig();
+		initGUI();
+		loadGraph(SVG_URL);
+		layoutGraph(getLayout(LAYOUT_TYPE));
+    }
+
+    void initConfig(){
+		// get width and height of applet panel
+		try {appletWindowWidth = Integer.parseInt(getParameter(APPLET_WIDTH_PARAM));}
+		catch(NumberFormatException ex){appletWindowWidth = DEFAULT_VIEW_WIDTH;}
+		try {appletWindowHeight = Integer.parseInt(getParameter(APPLET_HEIGHT_PARAM));}
+		catch(NumberFormatException ex){appletWindowHeight = DEFAULT_VIEW_HEIGHT;}
+        try {
+            SVG_URL = new URL(getDocumentBase(), getParameter(GRAPHML_FILE_URL_PARAM));
+        }
+        catch (MalformedURLException ex){
+            ex.printStackTrace();
+        }
+        try {
+            EDGE_SHAPE = Short.parseShort(getParameter(EDGE_TYPE_PARAM));
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        try {
+            EDGE_SHAPE = Short.parseShort(getParameter(EDGE_TYPE_PARAM));
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+	void initGUI(){
+		this.addKeyListener(new GraphLayoutDemoKeyEventHandler(this));
+		Container cpane = getContentPane();
+		this.setSize(appletWindowWidth-10, appletWindowHeight-10);
+		cpane.setSize(appletWindowWidth, appletWindowHeight);
+		cpane.setBackground(Color.WHITE);
+		vsm = new VirtualSpaceManager(true);
+		eh = new GraphLayoutDemoEventHandler(this);
+		vsm.addVirtualSpace(mSpaceName);
+		mCamera = vsm.addCamera(mSpaceName);
+		Vector cameras = new Vector();
+		cameras.add(mCamera);		
+		viewPanel = vsm.addPanelView(cameras, mViewName, appletWindowWidth, appletWindowHeight);
+		viewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-40));
+		JPanel borderPanel = new JPanel();
+		borderPanel.setLayout(new BorderLayout());
+		borderPanel.add(viewPanel, BorderLayout.CENTER);
+		borderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK, 1), "Test"));
+		borderPanel.setOpaque(false);
+		mView = vsm.getView(mViewName);
+		mView.setBackgroundColor(Color.WHITE);
+		mView.setEventHandler(eh);
+		mView.setNotifyMouseMoved(true);
+		mView.setAntialiasing(true);
+		mCamera.setAltitude(0);
+		cpane.add(borderPanel);
+	}
+
+	void loadGraph(URL url){	
+		try {
+			URLConnection c = url.openConnection();
+			InputStream is = new BufferedInputStream(c.getInputStream());
+			GraphMLFile f = new GraphMLFile();
+			graph = f.load(new InputStreamReader(is));
+		}
+		catch (Exception ex){ex.printStackTrace();}
+	}
+	
+//	void loadGraph(File graphFile){
+//		GraphMLFile f = new GraphMLFile();
+//		try {
+//			graph = f.load(new FileReader(graphFile));
+//		}
+//		catch (IOException ex){ex.printStackTrace();}
+//	}
+
 	Hashtable edge2glyph = new Hashtable();
 	Hashtable vertex2glyph = new Hashtable();
 
@@ -141,7 +223,7 @@ public class GraphLayoutDemo {
 			vertex2glyph.put(v, cl);
 			cl.setOwner(v);
 		}
-		vsm.getGlobalView(mCamera, 300);
+		//vsm.getGlobalView(mCamera, 300);
 	}
 	
 	void updateLayout(){
@@ -166,9 +248,9 @@ public class GraphLayoutDemo {
 		}
 	}
 	
-	public static void main(String[] args){
-		new GraphLayoutDemo(args[0], Short.parseShort(args[1]), Short.parseShort(args[2]));
-	}
+//	public static void main(String[] args){
+//		new GraphLayoutDemo(args[0], Short.parseShort(args[1]), Short.parseShort(args[2]));
+//	}
 	
 }
 
@@ -277,3 +359,23 @@ class GraphLayoutDemoEventHandler implements ViewEventHandler {
 
 }
 
+class GraphLayoutDemoKeyEventHandler implements KeyListener {
+	
+	GraphLayoutDemo application;
+	
+	GraphLayoutDemoKeyEventHandler(GraphLayoutDemo app){
+		this.application = app;
+	}
+	
+	/* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */
+    
+	public void keyPressed(KeyEvent e){
+		int code = e.getKeyCode();
+		if (code == KeyEvent.VK_SPACE){application.updateLayout();}
+	}
+	
+	public void keyReleased(KeyEvent e){}
+	
+	public void keyTyped(KeyEvent e){}
+	
+}
