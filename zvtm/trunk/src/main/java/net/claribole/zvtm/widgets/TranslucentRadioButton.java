@@ -50,7 +50,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 	boolean cursorInside = false;
 	boolean buttonPressed = false;
 	
-	public JRadioButton(){
+	public TranslucentRadioButton(){
 		super();
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -59,7 +59,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(Action a){
+	public TranslucentRadioButton(Action a){
 		super(a);
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -68,7 +68,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(Icon icon){
+	public TranslucentRadioButton(Icon icon){
 		super(icon);
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -77,7 +77,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(Icon icon, boolean selected){
+	public TranslucentRadioButton(Icon icon, boolean selected){
 		super(icon, selected);
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -86,7 +86,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(String text){
+	public TranslucentRadioButton(String text){
 		super(text);
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -95,7 +95,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(String text, boolean selected){
+	public TranslucentRadioButton(String text, boolean selected){
 		super(text, selected);
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -104,7 +104,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(String text, Icon icon){
+	public TranslucentRadioButton(String text, Icon icon){
 		super(text, icon);
 		setOpaque(false);
 		setContentAreaFilled(false);
@@ -113,7 +113,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		initListeners();
 	}
 	
-	public JRadioButton(String text, Icon icon, boolean selected){
+	public TranslucentRadioButton(String text, Icon icon, boolean selected){
 		super(text, icon, selected);
 		setOpaque(false);
 		setContentAreaFilled(false);
