@@ -21,13 +21,16 @@
 
 package com.xerox.VTM.tests;
 
-import java.awt.Color;
+import java.awt.*;
+import javax.swing.*;
+
 import java.util.Vector;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.glyphs.*;
+import net.claribole.zvtm.widgets.*;
 
 public class Test {
 
@@ -61,10 +64,17 @@ public class Test {
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
+		vsm.addGlyph(new VCircle(0,0,0,100,Color.WHITE), "src");
         vsm.repaintNow();
     }
     
     public static void main(String[] args){
+//		try{UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");}
+//		catch (Exception ex){ex.printStackTrace();}
+//com.sun.java.swing.plaf.gtk.GTKLookAndFeel
+//com.sun.java.swing.plaf.motif.MotifLookAndFeel
+//com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+//javax.swing.plaf.metal.MetalLookAndFeel
         System.out.println("-----------------");
         System.out.println("General information");
         System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
