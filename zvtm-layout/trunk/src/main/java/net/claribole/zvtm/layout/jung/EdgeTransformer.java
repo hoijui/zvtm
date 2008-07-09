@@ -92,7 +92,7 @@ public class EdgeTransformer {
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
-		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
+		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addSegment(Math.round(tgt[2]), Math.round(tgt[3]), true);
 		return p;
 	}
@@ -108,7 +108,7 @@ public class EdgeTransformer {
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
-		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
+		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addSegment(Math.round(tgt[2]), Math.round(tgt[3]), true);
 		return p;
 	}
@@ -124,7 +124,7 @@ public class EdgeTransformer {
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
-		VSegment s = new VSegment(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK, Math.round(tgt[2]), Math.round(tgt[3]));
+		VSegment s = new VSegment(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, Math.round(tgt[2]), Math.round(tgt[3]));
 		return s;
 	}
 	
@@ -157,7 +157,7 @@ public class EdgeTransformer {
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
-		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
+		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addQdCurve(Math.round(tgt[2]), Math.round(tgt[3]), Math.round(tgt[4]), Math.round(tgt[5]), true);
 		return p;
 	}
@@ -173,7 +173,7 @@ public class EdgeTransformer {
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
-		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
+		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addQdCurve(Math.round(tgt[2]), Math.round(tgt[3]), Math.round(tgt[4]), Math.round(tgt[5]), true);
 		return p;
 	}
@@ -201,7 +201,7 @@ public class EdgeTransformer {
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 4);
-		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
+		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addCbCurve(Math.round(tgt[2]), Math.round(tgt[3]),
 		             Math.round(tgt[4]), Math.round(tgt[5]),
 		             Math.round(tgt[6]), Math.round(tgt[7]), true);
@@ -220,7 +220,7 @@ public class EdgeTransformer {
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 4);
-		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, Color.BLACK);
+		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addCbCurve(Math.round(tgt[2]), Math.round(tgt[3]),
 		             Math.round(tgt[4]), Math.round(tgt[5]),
 		             Math.round(tgt[6]), Math.round(tgt[7]), true);
