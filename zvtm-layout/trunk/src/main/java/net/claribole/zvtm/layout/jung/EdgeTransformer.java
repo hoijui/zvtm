@@ -16,6 +16,7 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VSegment;
 import net.claribole.zvtm.glyphs.DPath;
@@ -128,16 +129,33 @@ public class EdgeTransformer {
 		return s;
 	}
 	
-	public static void updateLine(Edge e, AbstractLayout l, DPath p){
+	/** Update the position of an existing straight DPath representing a given edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param p the DPath representing this edge
+	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
+	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
+	 */	
+	public static void updateLine(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
 		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
 		LongPoint[] coords = {new LongPoint(Math.round(tgt[0]),Math.round(tgt[1])),
 			                  new LongPoint(Math.round(tgt[2]),Math.round(tgt[3]))};
-		p.edit(coords, true);
+		if (animDuration > 0){
+			animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+		}
+		else {
+			p.edit(coords, true);			
+		}
 	}
 	
+	/** Update the position of an existing VSegment representing a given edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param p the DPath representing this edge
+	 */	
 	public static void updateLine(Edge e, AbstractLayout l, VSegment s){
 		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
@@ -178,15 +196,27 @@ public class EdgeTransformer {
 		return p;
 	}
 	
-	public static void updateQuadCurve(Edge e, AbstractLayout l, DPath p){
+	/** Update the position of an existing quadratic curve representing a given edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param p the DPath representing this edge
+	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
+	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
+	 */	
+	public static void updateQuadCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
 		QuadCurve2D curve = (QuadCurve2D)(new EdgeShape.QuadCurve()).getShape(e);
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
 		LongPoint[] coords = {new LongPoint(Math.round(tgt[0]), Math.round(tgt[1])),
 			                  new LongPoint(Math.round(tgt[4]), Math.round(tgt[5])),
-                              new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
-		p.edit(coords, true);
+							  new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
+   	    if (animDuration > 0){
+   	    	animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+   	    }
+   	    else {
+   	    	p.edit(coords, true);			
+   	    }        
 	}
 
 	/** Get a VPath composed of a cubic curve representing a given edge in the graph.
@@ -227,7 +257,14 @@ public class EdgeTransformer {
 		return p;
 	}
 
-	public static void updateCubicCurve(Edge e, AbstractLayout l, DPath p){
+	/** Update the position of an existing cubic curve representing a given edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param p the DPath representing this edge
+	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
+	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
+	 */	
+	public static void updateCubicCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
 		CubicCurve2D curve = (CubicCurve2D)(new EdgeShape.CubicCurve()).getShape(e);
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
@@ -237,7 +274,12 @@ public class EdgeTransformer {
                               new LongPoint(Math.round(tgt[4]), Math.round(tgt[5])),
                               new LongPoint(Math.round(tgt[6]), Math.round(tgt[7])),
 							  new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
-		p.edit(coords, true);
+   	    if (animDuration > 0){
+   	    	animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+   	    }
+   	    else {
+   	    	p.edit(coords, true);			
+   	    }        
 	}
 	
 	private static AffineTransform getTransform(Edge e, AbstractLayout l, Shape edgeShape){
