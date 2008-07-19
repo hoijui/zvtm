@@ -97,7 +97,7 @@ public class DPath extends Glyph {
     }
 
     /**
-	 *@param pi PathIterator describing this path
+	 *@param pi PathIterator describing this path (virtual space coordinates)
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c color
      */
