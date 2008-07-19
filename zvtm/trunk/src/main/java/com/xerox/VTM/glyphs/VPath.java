@@ -129,6 +129,55 @@ public class VPath extends Glyph {
         computeSize();
     }
 
+	/**
+	 *@param pi PathIterator describing this path (virtual space coordinates)
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c color
+     */
+    public VPath(PathIterator pi, int z, Color c){
+		vz = z;
+		double[] cds = new double[6];
+		// if first instruction is a jump, make it the start point
+		if (pi.currentSegment(cds) == PathIterator.SEG_MOVETO){
+			vx = (long)cds[0];
+			vy = (long)cds[1];
+			pi.next();
+		}
+		else {
+			vx = 0;
+			vy = 0;
+		}
+		path = new GeneralPath();
+        lp = new LongPoint(vx,vy);
+        realHotSpot = new LongPoint(vx,vy);
+        path.moveTo(vx,-vy);        
+		int type;
+	    while (!pi.isDone()){
+			type = pi.currentSegment(cds);
+			switch (type){
+			case PathIterator.SEG_CUBICTO:{
+				addCbCurve((long)cds[4],(long)cds[5],(long)cds[0],(long)cds[1],(long)cds[2],(long)cds[3],true);
+				break;
+			}
+			case PathIterator.SEG_QUADTO:{
+				addQdCurve((long)cds[2],(long)cds[3],(long)cds[0],(long)cds[1],true);
+				break;
+			}
+			case PathIterator.SEG_LINETO:{
+				addSegment((long)cds[0],(long)cds[1],true);
+				break;
+			}
+			case PathIterator.SEG_MOVETO:{
+				jump((long)cds[0],(long)cds[1],true);
+				break;
+			}
+			}
+			pi.next();
+	    }
+		sensit = false;
+		setColor(c);
+	}
+
     /**
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c color
