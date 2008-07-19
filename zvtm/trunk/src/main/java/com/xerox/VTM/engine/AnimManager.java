@@ -1190,7 +1190,7 @@ public class AnimManager implements Runnable{
     /* ----------------------- DPath ANIMATION ------------------------- */
     /** animate DPath transformation
      * @param duration duration of the animation in ms
-     * @param type use on of the relative (GL_TRANS_LIN, GL_TRANS_PAR, GL_TRANS_SIG) or absolute (GL_TRANS_LIN_ABS, GL_TRANS_PAR_ABS, GL_TRANS_SIG_ABS)
+     * @param type use on of the relative (DP_TRANS_LIN, DP_TRANS_PAR, DP_TRANS_SIG) or absolute (DP_TRANS_LIN_ABS, DP_TRANS_PAR_ABS, DP_TRANS_SIG_ABS)
      * @param data relative or absolute (depending on type) coordinates for each point of DPath
      * @param gID ID of DPath to be animated
      * @param paa action to be performed after animation finished
