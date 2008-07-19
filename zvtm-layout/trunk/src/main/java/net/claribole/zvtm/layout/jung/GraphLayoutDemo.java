@@ -234,9 +234,9 @@ public class GraphLayoutDemo extends JApplet {
 			Edge e = (Edge)i.next();
 			DPath p = (DPath)edge2glyph.get(e);
 			switch (EDGE_SHAPE){
-				case EdgeTransformer.EDGE_LINE:{EdgeTransformer.updateLine(e, layout, p);break;}
-				case EdgeTransformer.EDGE_QUAD_CURVE:{EdgeTransformer.updateQuadCurve(e, layout, p);break;}
-				case EdgeTransformer.EDGE_CUBIC_CURVE:{EdgeTransformer.updateCubicCurve(e, layout, p);break;}
+				case EdgeTransformer.EDGE_LINE:{EdgeTransformer.updateLine(e, layout, p, 0, null);break;}
+				case EdgeTransformer.EDGE_QUAD_CURVE:{EdgeTransformer.updateQuadCurve(e, layout, p, 0, null);break;}
+				case EdgeTransformer.EDGE_CUBIC_CURVE:{EdgeTransformer.updateCubicCurve(e, layout, p, 0, null);break;}
 			}
 		}
 		i = layout.getVisibleVertices().iterator();
