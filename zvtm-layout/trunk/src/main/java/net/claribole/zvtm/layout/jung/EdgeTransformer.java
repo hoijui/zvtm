@@ -13,7 +13,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.CubicCurve2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
 
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.AnimManager;
@@ -56,6 +58,7 @@ public class EdgeTransformer {
 	 *@param edgeShape the edge type requested, one of EdgeTransformer.EDGE_*
 	 *@param c stroke color of VPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getDPath(Edge e, AbstractLayout l, short edgeShape, Color c)
 	 */
 	public static VPath getVPath(Edge e, AbstractLayout l, short edgeShape, Color c){
 		switch (edgeShape){
@@ -70,8 +73,9 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param edgeShape the edge type requested, one of EdgeTransformer.EDGE_*
-	 *@param c stroke color of VPath object
+	 *@param c stroke color of DPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getVPath(Edge e, AbstractLayout l, short edgeShape, Color c)
 	 */
 	public static DPath getDPath(Edge e, AbstractLayout l, short edgeShape, Color c){
 		switch (edgeShape){
@@ -87,9 +91,16 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getLineAsDPath(Edge e, AbstractLayout l, Color c)
+	 *@see #getLineAsVSegment(Edge e, AbstractLayout l, Color c)
 	 */
 	public static VPath getLineAsVPath(Edge e, AbstractLayout l, Color c){
-		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		Shape s = (new EdgeShape.Line()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			return getShapeAsVPath(e, l, c, s);
+		}
+		Line2D curve = (Line2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
@@ -101,11 +112,18 @@ public class EdgeTransformer {
 	/** Get a straight DPath representing a given edge in the graph.
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
-	 *@param c stroke color of VPath object
+	 *@param c stroke color of DPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getLineAsVPath(Edge e, AbstractLayout l, Color c)
+	 *@see #getLineAsVSegment(Edge e, AbstractLayout l, Color c)
 	 */
 	public static DPath getLineAsDPath(Edge e, AbstractLayout l, Color c){
-		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		Shape s = (new EdgeShape.Line()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			return getShapeAsDPath(e, l, c, s);
+		}
+		Line2D curve = (Line2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
@@ -113,15 +131,23 @@ public class EdgeTransformer {
 		p.addSegment(Math.round(tgt[2]), Math.round(tgt[3]), true);
 		return p;
 	}
-
+	
 	/** Get a VSegment representing a given edge in the graph.
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
-	 *@param c stroke color of VPath object
-	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@param c stroke color of VSegment object
+	 *@return null if edgeShape does not correspond to a known edge shape, or if the edge is a self-loop, in which case one should use getLineAsDPath or getLineAsVPath
+	 *@see #getLineAsDPath(Edge e, AbstractLayout l, Color c)
+	 *@see #getLineAsVPath(Edge e, AbstractLayout l, Color c)
 	 */
 	public static VSegment getLineAsVSegment(Edge e, AbstractLayout l, Color c){
-		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		Shape shp = (new EdgeShape.Line()).getShape(e);
+		if (shp instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			// return null in that case as a self loop can hardly be represented with a segment
+			return null;
+		}
+		Line2D curve = (Line2D)shp;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
@@ -135,9 +161,16 @@ public class EdgeTransformer {
 	 *@param p the DPath representing this edge
 	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
 	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
+	 *@see #updateLine(Edge e, AbstractLayout l, VSegment s)
 	 */	
 	public static void updateLine(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
-		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		Shape s = (new EdgeShape.Line()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			updateShape(e, l, p, animDuration, animator, s);
+			return;
+		}
+		Line2D curve = (Line2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
@@ -154,10 +187,17 @@ public class EdgeTransformer {
 	/** Update the position of an existing VSegment representing a given edge in the graph.
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
-	 *@param p the DPath representing this edge
+	 *@param s the VSegment representing this edge
+	 *@see #updateLine(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator)
 	 */	
 	public static void updateLine(Edge e, AbstractLayout l, VSegment s){
-		Line2D curve = (Line2D)(new EdgeShape.Line()).getShape(e);
+		Shape shp = (new EdgeShape.Line()).getShape(e);
+		if (shp instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			// do nothing in that case as a self loop can hardly be represented with a segment
+			return;
+		}
+		Line2D curve = (Line2D)shp;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
@@ -169,9 +209,15 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getQuadCurveAsDPath(Edge e, AbstractLayout l, Color c)
 	 */
 	public static VPath getQuadCurveAsVPath(Edge e, AbstractLayout l, Color c){
-		QuadCurve2D curve = (QuadCurve2D)(new EdgeShape.QuadCurve()).getShape(e);
+		Shape s = (new EdgeShape.QuadCurve()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			return getShapeAsVPath(e, l, c, s);
+		}
+		QuadCurve2D curve = (QuadCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
@@ -183,11 +229,17 @@ public class EdgeTransformer {
 	/** Get a DPath composed of a quadratic curve representing a given edge in the graph.
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
-	 *@param c stroke color of VPath object
+	 *@param c stroke color of DPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getQuadCurveAsVPath(Edge e, AbstractLayout l, Color c)
 	 */
 	public static DPath getQuadCurveAsDPath(Edge e, AbstractLayout l, Color c){
-		QuadCurve2D curve = (QuadCurve2D)(new EdgeShape.QuadCurve()).getShape(e);
+		Shape s = (new EdgeShape.QuadCurve()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			return getShapeAsDPath(e, l, c, s);
+		}
+		QuadCurve2D curve = (QuadCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
@@ -204,7 +256,13 @@ public class EdgeTransformer {
 	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
 	 */	
 	public static void updateQuadCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
-		QuadCurve2D curve = (QuadCurve2D)(new EdgeShape.QuadCurve()).getShape(e);
+		Shape s = (new EdgeShape.QuadCurve()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			updateShape(e, l, p, animDuration, animator, s);
+			return;
+		}
+		QuadCurve2D curve = (QuadCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
@@ -224,9 +282,15 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getCubicCurveAsDPath(Edge e, AbstractLayout l, Color c)
 	 */
 	public static VPath getCubicCurveAsVPath(Edge e, AbstractLayout l, Color c){
-		CubicCurve2D curve = (CubicCurve2D)(new EdgeShape.CubicCurve()).getShape(e);
+		Shape s = (new EdgeShape.CubicCurve()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			return getShapeAsVPath(e, l, c, s);
+		}
+		CubicCurve2D curve = (CubicCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
@@ -241,11 +305,17 @@ public class EdgeTransformer {
 	/** Get a DPath composed of a cubic curve representing a given edge in the graph.
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
-	 *@param c stroke color of VPath object
+	 *@param c stroke color of DPath object
 	 *@return null if edgeShape does not correspond to a known edge shape
+	 *@see #getCubicCurveAsVPath(Edge e, AbstractLayout l, Color c)
 	 */
 	public static DPath getCubicCurveAsDPath(Edge e, AbstractLayout l, Color c){
-		CubicCurve2D curve = (CubicCurve2D)(new EdgeShape.CubicCurve()).getShape(e);
+		Shape s = (new EdgeShape.CubicCurve()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			return getShapeAsDPath(e, l, c, s);
+		}
+		CubicCurve2D curve = (CubicCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
@@ -265,7 +335,13 @@ public class EdgeTransformer {
 	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
 	 */	
 	public static void updateCubicCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
-		CubicCurve2D curve = (CubicCurve2D)(new EdgeShape.CubicCurve()).getShape(e);
+		Shape s = (new EdgeShape.CubicCurve()).getShape(e);
+		if (s instanceof Ellipse2D){
+			// special case of loops, represented as ellipses
+			updateShape(e, l, p, animDuration, animator, s);
+			return;
+		}
+		CubicCurve2D curve = (CubicCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
@@ -280,6 +356,87 @@ public class EdgeTransformer {
    	    else {
    	    	p.edit(coords, true);			
    	    }        
+	}
+
+	/** Get a DPath representing a given self-loop edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param c stroke color of DPath object
+	 *@param s the shape already extracted from the Edge object
+	 *@return null if edgeShape does not correspond to a known edge shape
+	 */
+	protected static VPath getShapeAsVPath(Edge e, AbstractLayout l, Color c, Shape s){
+		PathIterator pi = s.getPathIterator(getTransform(e, l, s));
+		return new VPath(pi, 0, c);
+	}
+	
+	/** Get a DPath representing a given self-loop edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param c stroke color of DPath object
+	 *@param s the shape already extracted from the Edge object
+	 *@return null if edgeShape does not correspond to a known edge shape
+	 */
+	protected static DPath getShapeAsDPath(Edge e, AbstractLayout l, Color c, Shape s){
+		PathIterator pi = s.getPathIterator(getTransform(e, l, s));
+		return new DPath(pi, 0, c);
+	}
+	
+	/** Update the position of an existing straight DPath representing a given edge in the graph.
+	 *@param e the Jung edge
+	 *@param l the layout that produced the graph's geometry
+	 *@param p the DPath representing this edge
+	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
+	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
+	 *@param s the shape already extracted from the Edge object
+	 */	
+	protected static void updateShape(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator, Shape s){
+		LongPoint[] coords = new LongPoint[0];
+		PathIterator pi = s.getPathIterator(getTransform(e, l, s));
+		int type;
+		double[] picoords = new double[6];
+		while (!pi.isDone()){
+			LongPoint[] ncoords = null;
+			type = pi.currentSegment(picoords);
+			switch (type){
+			case PathIterator.SEG_CUBICTO:{
+				ncoords = new LongPoint[coords.length+3];
+				System.arraycopy(coords, 0, ncoords, 0, coords.length);
+				ncoords[coords.length] = new LongPoint(picoords[0], picoords[1]);
+				ncoords[coords.length+1] = new LongPoint(picoords[2], picoords[3]);
+				ncoords[coords.length+2] = new LongPoint(picoords[4], picoords[5]);
+				break;
+			}
+			case PathIterator.SEG_QUADTO:{
+				ncoords = new LongPoint[coords.length+2];
+				System.arraycopy(coords, 0, ncoords, 0, coords.length);
+				ncoords[coords.length] = new LongPoint(picoords[0], picoords[1]);
+				ncoords[coords.length+1] = new LongPoint(picoords[2], picoords[3]);
+				break;
+			}
+			case PathIterator.SEG_LINETO:{
+				ncoords = new LongPoint[coords.length+1];
+				System.arraycopy(coords, 0, ncoords, 0, coords.length);
+				ncoords[coords.length] = new LongPoint(picoords[0], picoords[1]);
+				break;
+			}
+			case PathIterator.SEG_MOVETO:{
+				ncoords = new LongPoint[coords.length+1];
+				System.arraycopy(coords, 0, ncoords, 0, coords.length);
+				ncoords[coords.length] = new LongPoint(picoords[0], picoords[1]);
+				break;
+			}
+			case PathIterator.SEG_CLOSE:{pi.next();continue;}
+			}
+			coords = ncoords;
+			pi.next();
+		}
+		if (animDuration > 0){
+			animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+		}
+		else {
+			p.edit(coords, true);			
+		}
 	}
 	
 	private static AffineTransform getTransform(Edge e, AbstractLayout l, Shape edgeShape){
