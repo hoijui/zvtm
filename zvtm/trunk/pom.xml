@@ -113,7 +113,7 @@ $Id$
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
-          <excludePackageNames>net.claribole.zvtm.glyphs.projection</excludePackageNames>
+          <excludePackageNames>com.xerox.VTM.tests,net.claribole.zvtm.glyphs.projection</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
