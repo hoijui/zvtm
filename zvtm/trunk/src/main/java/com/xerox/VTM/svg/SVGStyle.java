@@ -105,20 +105,44 @@ public class SVGStyle {
 	return fillColorDefined;
     }
 
-    /**set the stroke (border) color*/
-    public void setBorderColor(Color c){
-	strokeColor=c;
-	strokeColorDefined = true;
-    }
+	/** Set the stroke (border) color. */
+	public void setStrokeColor(Color c){
+		strokeColor = c;
+		strokeColorDefined = true;
+	}
 
-    /**returns the stroke (border) color*/
-    public Color getBorderColor(){
-	return strokeColor;
-    }
+	/** Set the stroke (border) color.
+		*@deprecated Since 0.9.7
+		*@see #hasStrokeColorInformation
+		*/
+	public void setBorderColor(Color c){
+		setStrokeColor(c);
+	}
+
+	/** Returns the stroke color. */
+	public Color getStrokeColor(){
+		return strokeColor;
+	}
+
+	/** Returns the stroke (border) color. 
+		*@deprecated Since 0.9.7
+		*@see #getStrokeColor()
+	*/
+	public Color getBorderColor(){
+		return getStrokeColor();
+	}
 
     /**Tells whether there is stroke color information or not.*/
+    public boolean hasStrokeColorInformation(){
+		return strokeColorDefined;
+    }
+
+    /**Tells whether there is stroke color information or not.
+		*@deprecated Since 0.9.7
+		*@see #hasStrokeColorInformation()
+		*/
     public boolean hasBorderColorInformation(){
-	return strokeColorDefined;
+		return hasStrokeColorInformation();
     }
 
     /**set the transparency value (between 0 (fully transparent) and 1.0 (opaque))*/

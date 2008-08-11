@@ -95,14 +95,30 @@ public class Context {
 	return fillColorDefined;
     }
 
-    /**returns the stroke (border) color*/
-    public Color getBorderColor(){
-	return stroke;
-    }
+	/** Returns the stroke color. */
+	public Color getStrokeColor(){
+		return stroke;
+	}
+
+	/** Returns the stroke (border) color. 
+		*@deprecated Since 0.9.7
+		*@see #getStrokeColor()
+	*/
+	public Color getBorderColor(){
+		return getStrokeColor();
+	}
 
     /**Tells whether there is stroke color information or not.*/
+    public boolean hasStrokeColorInformation(){
+		return strokeColorDefined;
+    }
+
+    /**Tells whether there is stroke color information or not.
+		*@deprecated Since 0.9.7
+		*@see #hasStrokeColorInformation()
+		*/
     public boolean hasBorderColorInformation(){
-	return strokeColorDefined;
+		return hasStrokeColorInformation();
     }
 
     /**returns the alpha transparency value (1.0 if opaque, 0 is fully transparent)*/

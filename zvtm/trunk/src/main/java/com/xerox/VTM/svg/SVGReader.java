@@ -499,7 +499,7 @@ public class SVGReader {
 	    SVGStyle ss=new SVGStyle();
 	    for (int i=0;i<ar.length;i++){
 		if (ar[i].startsWith(_fill)){ss.setFillColor(getColor(ar[i].substring(5,ar[i].length())));}
-		else if (ar[i].startsWith(_stroke)){ss.setBorderColor(getColor(ar[i].substring(7,ar[i].length())));}
+		else if (ar[i].startsWith(_stroke)){ss.setStrokeColor(getColor(ar[i].substring(7,ar[i].length())));}
 		else if (ar[i].startsWith(_strokewidth)){ss.setStrokeWidth(ar[i].substring(13,ar[i].length()));}
 		else if (ar[i].startsWith(_strokedasharray)){ss.setStrokeDashArray(ar[i].substring(17,ar[i].length()));}
 		else if (ar[i].startsWith(_fillopacity)){ss.setAlphaTransparencyValue(new Float(ar[i].substring(13,ar[i].length())));}
@@ -679,12 +679,12 @@ public class SVGReader {
 		if (ss.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.white);res.setFilled(false);}
 		else {res=new VEllipse(x,-y,0,w,h,ss.getFillColor());}
 	    }
-	    Color border=ss.getBorderColor();
+	    Color border=ss.getStrokeColor();
 	    if (border != null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
-	    else if (ss.hasBorderColorInformation()){
+	    else if (ss.hasStrokeColorInformation()){
 		res.setDrawBorder(false);
 	    }
 	    if (ss.requiresSpecialStroke()){
@@ -701,7 +701,7 @@ public class SVGReader {
 		if (ctx.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.white);res.setFilled(false);}
 		else {res=new VEllipse(x,-y,0,w,h,ctx.getFillColor());}
 	    }
-	    Color border=ctx.getBorderColor();
+	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
@@ -760,12 +760,12 @@ public class SVGReader {
 		if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.white);res.setFilled(false);}
 		else {res=new VCircle(x,-y,0,r,ss.getFillColor());}
 	    }
-	    Color border=ss.getBorderColor();
+	    Color border=ss.getStrokeColor();
 	    if (border != null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
-	    else if (ss.hasBorderColorInformation()){
+	    else if (ss.hasStrokeColorInformation()){
 		res.setDrawBorder(false);
 	    }
 	    if (ss.requiresSpecialStroke()){
@@ -829,13 +829,13 @@ public class SVGReader {
 		}
 		Color tc = Color.BLACK;
 		if (ss != null){
-			if (ss.getBorderColor() == null){
+			if (ss.getStrokeColor() == null){
 				if (ss.getFillColor() != null){
 					tc = ss.getFillColor();
 				}
 			}
 			else {
-				tc = ss.getBorderColor();
+				tc = ss.getStrokeColor();
 			}
 			if (ss.hasTransparencyInformation()){
 				res = new VTextST(x, -y, 0, tc, tx, ta, ss.getAlphaTransparencyValue());
@@ -927,12 +927,12 @@ public class SVGReader {
 		    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
 		    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ss.getFillColor(),0);}
 		}
-		Color border=ss.getBorderColor();
+		Color border=ss.getStrokeColor();
 		if (border != null){
 		    float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		    res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 		}
-		else if (ss.hasBorderColorInformation()){
+		else if (ss.hasStrokeColorInformation()){
 		    res.setDrawBorder(false);
 		}
 		if (ss.requiresSpecialStroke()){
@@ -949,12 +949,12 @@ public class SVGReader {
 		    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
 		    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ctx.getFillColor(),0);}
 		}
-		Color border=ctx.getBorderColor();
+		Color border=ctx.getStrokeColor();
 		if (border != null){
 		    float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		    res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 		}
-		else if (ctx.hasBorderColorInformation()){
+		else if (ctx.hasStrokeColorInformation()){
 		    res.setDrawBorder(false);
 		}
 	    }
@@ -1022,12 +1022,12 @@ public class SVGReader {
 		    if (ss.getFillColor()==null){res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
 		    else {res=new VRoundRect(x,-y,0,w/2,h/2,ss.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		}
-		Color border=ss.getBorderColor();
+		Color border=ss.getStrokeColor();
 		if (border != null){
 		    float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		    res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 		}
-		else if (ss.hasBorderColorInformation()){
+		else if (ss.hasStrokeColorInformation()){
 		    res.setDrawBorder(false);
 		}
 		if (ss.requiresSpecialStroke()){
@@ -1044,12 +1044,12 @@ public class SVGReader {
 		    if (ctx.getFillColor()==null){res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
 		    else {res=new VRoundRect(x,-y,0,w/2,h/2,ctx.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		}
-		Color border=ctx.getBorderColor();
+		Color border=ctx.getStrokeColor();
 		if (border!=null){
 		    float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		    res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 		}
-		else if (ctx.hasBorderColorInformation()){
+		else if (ctx.hasStrokeColorInformation()){
 		    res.setDrawBorder(false);
 		}
 	    }
@@ -1108,12 +1108,12 @@ public class SVGReader {
 		if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
 		else {res=new VRectangleOr(x+w,-y-h,0,w,h,ss.getFillColor(),0);}
 	    }
-	    Color border=ss.getBorderColor();
+	    Color border=ss.getStrokeColor();
 	    if (border != null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
-	    else if (ss.hasBorderColorInformation()){
+	    else if (ss.hasStrokeColorInformation()){
 		res.setDrawBorder(false);
 	    }
 	    if (ss.requiresSpecialStroke()){
@@ -1130,12 +1130,12 @@ public class SVGReader {
 		if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
 		else {res=new VRectangleOr(x+w,-y-h,0,w,h,ctx.getFillColor(),0);}
 	    }
-	    Color border=ctx.getBorderColor();
+	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
-	    else if (ctx.hasBorderColorInformation()){
+	    else if (ctx.hasStrokeColorInformation()){
 		res.setDrawBorder(false);
 	    }
 	}
@@ -1274,12 +1274,12 @@ public class SVGReader {
 		if (ss.getFillColor()==null){res=new VPolygon(coords2,Color.white);res.setFilled(false);}
 		else {res=new VPolygon(coords2,ss.getFillColor());}
 	    }
-	    Color border=ss.getBorderColor();
+	    Color border=ss.getStrokeColor();
 	    if (border != null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
-	    else if (ss.hasBorderColorInformation()){
+	    else if (ss.hasStrokeColorInformation()){
 		res.setDrawBorder(false);
 	    }
 	    if (ss.requiresSpecialStroke()){
@@ -1296,12 +1296,12 @@ public class SVGReader {
 		if (ctx.getFillColor()==null){res=new VPolygon(coords2,Color.white);res.setFilled(false);}
 		else {res=new VPolygon(coords2,ctx.getFillColor());}
 	    }
-	    Color border=ctx.getBorderColor();
+	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
 		float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
-	    else if (ctx.hasBorderColorInformation()){
+	    else if (ctx.hasStrokeColorInformation()){
 		res.setDrawBorder(false);
 	    }
 	}
@@ -1342,12 +1342,12 @@ public class SVGReader {
 	}
 	Color border=Color.black;
 	if (ss != null){
-	    border = ss.getBorderColor();
-	    if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+	    border = ss.getStrokeColor();
+	    if (border == null){border = (ss.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 	}
 	else if (ctx != null){
-	    if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
-	    else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+	    if (ctx.getStrokeColor() != null){border = ctx.getStrokeColor();}
+	    else {border = (ctx.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 	}
 	LongPoint lp1,lp2;
 	for (int i=0;i<coords.size()-1;i++){
@@ -1406,8 +1406,8 @@ public class SVGReader {
 		}
 		Color border = Color.black;
 		if (ss != null){
-			border = ss.getBorderColor();
-			if (border == null){border = (ss.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+			border = ss.getStrokeColor();
+			if (border == null){border = (ss.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ss.hasTransparencyInformation()){
 			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ss.getAlphaTransparencyValue());
 			}
@@ -1416,8 +1416,8 @@ public class SVGReader {
 			}
 		}
 		else if (ctx != null){
-			if (ctx.getBorderColor() != null){border = ctx.getBorderColor();}
-			else {border = (ctx.hasBorderColorInformation()) ? Color.WHITE : Color.BLACK;}
+			if (ctx.getStrokeColor() != null){border = ctx.getStrokeColor();}
+			else {border = (ctx.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ctx.hasTransparencyInformation()){
 			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ctx.getAlphaTransparencyValue());
 			}
@@ -1468,7 +1468,7 @@ public class SVGReader {
 	    }
 	    if (e.hasAttribute(_style)){
 		SVGStyle ss=getStyle(e.getAttribute(_style));
-		Color border=ss.getBorderColor();
+		Color border=ss.getStrokeColor();
 		if (border != null){
 		    float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		    ph.setHSVColor(hsv[0],hsv[1],hsv[2]);
@@ -1477,8 +1477,8 @@ public class SVGReader {
 		    }
 		}
 	    }
-	    else if (ctx!=null && ctx.getBorderColor()!=null){
-		Color border=ctx.getBorderColor();
+	    else if (ctx!=null && ctx.getStrokeColor()!=null){
+		Color border=ctx.getStrokeColor();
 		if (border!=null){
 		    float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
 		    ph.setHSVColor(hsv[0],hsv[1],hsv[2]);
