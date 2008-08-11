@@ -566,7 +566,7 @@ public class SVGReader {
 	return res;
     }
 
-    static void assignStroke(Glyph g, SVGStyle ss){
+    public static void assignStroke(Glyph g, SVGStyle ss){
 	Float sw = ss.getStrokeWidth();
 	if (sw == null){sw = new Float(1.0f);}
 	float[] sda = ss.getStrokeDashArray();
