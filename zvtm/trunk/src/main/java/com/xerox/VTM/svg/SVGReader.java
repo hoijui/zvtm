@@ -479,8 +479,8 @@ public class SVGReader {
     }
 
     /** Parse style information.
-     *@param s the value of an SVG style attribute
-     *@return styling attributes which can be interpreted by the VTM (color, transparency)
+     *@param s the value of an SVG style attribute. Supported declarations are: fill, fill-opacity, font-family, font-size, font-weight, font-style, stroke, stroke-dasharray, stroke-width
+     *@return styling attributes which can be interpreted by ZVTM
      */
     public static SVGStyle getStyle(String s){
 	//Vector ar=Utilities.getSepElements(s,";");
