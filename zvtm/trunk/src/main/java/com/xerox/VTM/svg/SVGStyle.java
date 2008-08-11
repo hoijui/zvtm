@@ -64,24 +64,24 @@ public class SVGStyle {
     protected String font_weight;
     protected String font_style;
     
-    SVGStyle(){}
+    public SVGStyle(){}
 
-    /**fill color, border color*/
-    SVGStyle(Color c1,Color c2){
-	fillColor=c1;
-	strokeColor=c2;
-	fillColorDefined = true;
-	strokeColorDefined = true;
-    }
+	/** Fill color, then stroke/border color. */
+	public SVGStyle(Color c1, Color c2){
+		fillColor=c1;
+		strokeColor=c2;
+		fillColorDefined = (fillColor != null);
+		strokeColorDefined = (strokeColor != null);
+	}
 
-    /**fill color, border color, transparency*/
-    SVGStyle(Color c1,Color c2,Float a){
-	fillColor=c1;
-	strokeColor=c2;
-	alphaValue=a;
-	fillColorDefined = true;
-	strokeColorDefined = true;
-    }
+	/** Fill color, then stroke/border color, then transparency. */
+	public SVGStyle(Color c1,Color c2,Float a){
+		fillColor=c1;
+		strokeColor=c2;
+		alphaValue=a;
+		fillColorDefined = (fillColor != null);
+		strokeColorDefined = (strokeColor != null);
+	}
 
     /**returns true if there is transparency information (the value does not matter)*/
     public boolean hasTransparencyInformation(){
