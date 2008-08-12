@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VPath;
@@ -70,6 +71,19 @@ public class VPathST extends VPath implements Translucent {
         acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
     }
 
+
+	/**
+	 *@param pi PathIterator describing this path (virtual space coordinates)
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c color
+	 *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     */
+    public VPathST(PathIterator pi, int z, Color c, float a){
+        super(pi, z, c);
+        alpha = a;
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
+	}
+	
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
