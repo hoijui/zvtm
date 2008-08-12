@@ -113,9 +113,7 @@ public class VBText extends VText {
 		trueCoef = scaleFactor * coef;
 		if (trueCoef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			if (font != null) {
-				g.setFont(font);
-			}
+			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].valid)
 			{
 				bounds = g.getFontMetrics().getStringBounds(text, g);
@@ -147,9 +145,6 @@ public class VBText extends VText {
 
 			g.setColor(this.color);
 			g.drawString(text, paddingX, -paddingY);
-			if (font != null) {
-				g.setFont(VirtualSpaceManager.getMainFont());
-			}
 			g.setTransform(stdT);
 		}
 		else {
@@ -162,9 +157,7 @@ public class VBText extends VText {
 		trueCoef = scaleFactor * coef;
 		if (trueCoef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			if (font != null) {
-				g.setFont(font);
-			}
+			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].valid) {
 				bounds = g.getFontMetrics().getStringBounds(text, g);
 				pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
@@ -195,9 +188,6 @@ public class VBText extends VText {
 
 			g.setColor(this.color);
 			g.drawString(text, paddingX, -paddingY);
-			if (font != null) {
-				g.setFont(VirtualSpaceManager.getMainFont());
-			}
 			g.setTransform(stdT);
 		}
 		else {
