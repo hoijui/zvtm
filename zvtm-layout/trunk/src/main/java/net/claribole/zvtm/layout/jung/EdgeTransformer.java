@@ -21,7 +21,10 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VSegmentST;
 import net.claribole.zvtm.glyphs.DPath;
+import net.claribole.zvtm.glyphs.DPathST;
+import net.claribole.zvtm.glyphs.VPathST;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -57,14 +60,15 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param edgeShape the edge type requested, one of EdgeTransformer.EDGE_*
 	 *@param c stroke color of VPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getDPath(Edge e, AbstractLayout l, short edgeShape, Color c)
 	 */
-	public static VPath getVPath(Edge e, AbstractLayout l, short edgeShape, Color c){
+	public static VPath getVPath(Edge e, AbstractLayout l, short edgeShape, Color c, boolean translucence){
 		switch (edgeShape){
-			case EDGE_LINE:{return getLineAsVPath(e, l, c);}
-			case EDGE_QUAD_CURVE:{return getQuadCurveAsVPath(e, l, c);}
-			case EDGE_CUBIC_CURVE:{return getCubicCurveAsVPath(e, l, c);}
+			case EDGE_LINE:{return getLineAsVPath(e, l, c, translucence);}
+			case EDGE_QUAD_CURVE:{return getQuadCurveAsVPath(e, l, c, translucence);}
+			case EDGE_CUBIC_CURVE:{return getCubicCurveAsVPath(e, l, c, translucence);}
 			default:{return null;}
 		}
 	}
@@ -74,14 +78,15 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param edgeShape the edge type requested, one of EdgeTransformer.EDGE_*
 	 *@param c stroke color of DPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getVPath(Edge e, AbstractLayout l, short edgeShape, Color c)
 	 */
-	public static DPath getDPath(Edge e, AbstractLayout l, short edgeShape, Color c){
+	public static DPath getDPath(Edge e, AbstractLayout l, short edgeShape, Color c, boolean translucence){
 		switch (edgeShape){
-			case EDGE_LINE:{return getLineAsDPath(e, l, c);}
-			case EDGE_QUAD_CURVE:{return getQuadCurveAsDPath(e, l, c);}
-			case EDGE_CUBIC_CURVE:{return getCubicCurveAsDPath(e, l, c);}
+			case EDGE_LINE:{return getLineAsDPath(e, l, c, translucence);}
+			case EDGE_QUAD_CURVE:{return getQuadCurveAsDPath(e, l, c, translucence);}
+			case EDGE_CUBIC_CURVE:{return getCubicCurveAsDPath(e, l, c, translucence);}
 			default:{return null;}
 		}
 	}
@@ -90,21 +95,22 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getLineAsDPath(Edge e, AbstractLayout l, Color c)
 	 *@see #getLineAsVSegment(Edge e, AbstractLayout l, Color c)
 	 */
-	public static VPath getLineAsVPath(Edge e, AbstractLayout l, Color c){
+	public static VPath getLineAsVPath(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape s = (new EdgeShape.Line()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
-			return getShapeAsVPath(e, l, c, s);
+			return getShapeAsVPath(e, l, c, s, translucence);
 		}
 		Line2D curve = (Line2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
-		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
+		VPath p = (translucence) ? new VPathST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, 1.0f) : new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addSegment(Math.round(tgt[2]), Math.round(tgt[3]), true);
 		return p;
 	}
@@ -113,21 +119,22 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of DPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getLineAsVPath(Edge e, AbstractLayout l, Color c)
 	 *@see #getLineAsVSegment(Edge e, AbstractLayout l, Color c)
 	 */
-	public static DPath getLineAsDPath(Edge e, AbstractLayout l, Color c){
+	public static DPath getLineAsDPath(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape s = (new EdgeShape.Line()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
-			return getShapeAsDPath(e, l, c, s);
+			return getShapeAsDPath(e, l, c, s, translucence);
 		}
 		Line2D curve = (Line2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
-		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
+		DPath p = (translucence) ? new DPathST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, 1.0f) : new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addSegment(Math.round(tgt[2]), Math.round(tgt[3]), true);
 		return p;
 	}
@@ -136,11 +143,12 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VSegment object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape, or if the edge is a self-loop, in which case one should use getLineAsDPath or getLineAsVPath
 	 *@see #getLineAsDPath(Edge e, AbstractLayout l, Color c)
 	 *@see #getLineAsVPath(Edge e, AbstractLayout l, Color c)
 	 */
-	public static VSegment getLineAsVSegment(Edge e, AbstractLayout l, Color c){
+	public static VSegment getLineAsVSegment(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape shp = (new EdgeShape.Line()).getShape(e);
 		if (shp instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
@@ -151,7 +159,7 @@ public class EdgeTransformer {
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2()};
 		double[] tgt = new double[4];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 2);
-		VSegment s = new VSegment(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, Math.round(tgt[2]), Math.round(tgt[3]));
+		VSegment s = (translucence) ? new VSegmentST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, Math.round(tgt[2]), Math.round(tgt[3]), 1.0f) : new VSegment(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, Math.round(tgt[2]), Math.round(tgt[3]));
 		return s;
 	}
 	
@@ -208,20 +216,21 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getQuadCurveAsDPath(Edge e, AbstractLayout l, Color c)
 	 */
-	public static VPath getQuadCurveAsVPath(Edge e, AbstractLayout l, Color c){
+	public static VPath getQuadCurveAsVPath(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape s = (new EdgeShape.QuadCurve()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
-			return getShapeAsVPath(e, l, c, s);
+			return getShapeAsVPath(e, l, c, s, translucence);
 		}
 		QuadCurve2D curve = (QuadCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
-		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
+		VPath p = (translucence) ? new VPathST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, 1.0f) : new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addQdCurve(Math.round(tgt[2]), Math.round(tgt[3]), Math.round(tgt[4]), Math.round(tgt[5]), true);
 		return p;
 	}
@@ -230,20 +239,21 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of DPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getQuadCurveAsVPath(Edge e, AbstractLayout l, Color c)
 	 */
-	public static DPath getQuadCurveAsDPath(Edge e, AbstractLayout l, Color c){
+	public static DPath getQuadCurveAsDPath(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape s = (new EdgeShape.QuadCurve()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
-			return getShapeAsDPath(e, l, c, s);
+			return getShapeAsDPath(e, l, c, s, translucence);
 		}
 		QuadCurve2D curve = (QuadCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(), curve.getCtrlX(), curve.getCtrlY()};
 		double[] tgt = new double[6];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 3);
-		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
+		DPath p = (translucence) ? new DPathST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, 1.0f) : new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addQdCurve(Math.round(tgt[2]), Math.round(tgt[3]), Math.round(tgt[4]), Math.round(tgt[5]), true);
 		return p;
 	}
@@ -281,21 +291,22 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of VPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getCubicCurveAsDPath(Edge e, AbstractLayout l, Color c)
 	 */
-	public static VPath getCubicCurveAsVPath(Edge e, AbstractLayout l, Color c){
+	public static VPath getCubicCurveAsVPath(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape s = (new EdgeShape.CubicCurve()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
-			return getShapeAsVPath(e, l, c, s);
+			return getShapeAsVPath(e, l, c, s, translucence);
 		}
 		CubicCurve2D curve = (CubicCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 4);
-		VPath p = new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
+		VPath p = (translucence) ? new VPathST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, 1.0f) : new VPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addCbCurve(Math.round(tgt[2]), Math.round(tgt[3]),
 		             Math.round(tgt[4]), Math.round(tgt[5]),
 		             Math.round(tgt[6]), Math.round(tgt[7]), true);
@@ -306,21 +317,22 @@ public class EdgeTransformer {
 	 *@param e the Jung edge
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of DPath object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 *@see #getCubicCurveAsVPath(Edge e, AbstractLayout l, Color c)
 	 */
-	public static DPath getCubicCurveAsDPath(Edge e, AbstractLayout l, Color c){
+	public static DPath getCubicCurveAsDPath(Edge e, AbstractLayout l, Color c, boolean translucence){
 		Shape s = (new EdgeShape.CubicCurve()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
-			return getShapeAsDPath(e, l, c, s);
+			return getShapeAsDPath(e, l, c, s, translucence);
 		}
 		CubicCurve2D curve = (CubicCurve2D)s;
 		double[] src = {curve.getX1(), curve.getY1(), curve.getX2(), curve.getY2(),
 			            curve.getCtrlX1(), curve.getCtrlY1(), curve.getCtrlX2(), curve.getCtrlY2()};
 		double[] tgt = new double[8];
 		getTransform(e, l, curve).transform(src, 0, tgt, 0, 4);
-		DPath p = new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
+		DPath p = (translucence) ? new DPathST(Math.round(tgt[0]), Math.round(tgt[1]), 0, c, 1.0f) : new DPath(Math.round(tgt[0]), Math.round(tgt[1]), 0, c);
 		p.addCbCurve(Math.round(tgt[2]), Math.round(tgt[3]),
 		             Math.round(tgt[4]), Math.round(tgt[5]),
 		             Math.round(tgt[6]), Math.round(tgt[7]), true);
@@ -363,11 +375,12 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of DPath object
 	 *@param s the shape already extracted from the Edge object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 */
-	protected static VPath getShapeAsVPath(Edge e, AbstractLayout l, Color c, Shape s){
+	protected static VPath getShapeAsVPath(Edge e, AbstractLayout l, Color c, Shape s, boolean translucence){
 		PathIterator pi = s.getPathIterator(getTransform(e, l, s));
-		return new VPath(pi, 0, c);
+		return (translucence) ? new VPathST(pi, 0, c, 1.0f) : new VPath(pi, 0, c);
 	}
 	
 	/** Get a DPath representing a given self-loop edge in the graph.
@@ -375,11 +388,12 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param c stroke color of DPath object
 	 *@param s the shape already extracted from the Edge object
+	 *@param translucence true if the returned VPath should be a VPathST (with a default alpha of 1.0)
 	 *@return null if edgeShape does not correspond to a known edge shape
 	 */
-	protected static DPath getShapeAsDPath(Edge e, AbstractLayout l, Color c, Shape s){
+	protected static DPath getShapeAsDPath(Edge e, AbstractLayout l, Color c, Shape s, boolean translucence){
 		PathIterator pi = s.getPathIterator(getTransform(e, l, s));
-		return new DPath(pi, 0, c);
+		return (translucence) ? new DPathST(pi, 0, c, 1.0f) : new DPath(pi, 0, c);
 	}
 	
 	/** Update the position of an existing straight DPath representing a given edge in the graph.

@@ -209,7 +209,7 @@ public class GraphLayoutDemo extends JApplet {
 		Iterator i = layout.getVisibleEdges().iterator();
 		while (i.hasNext()){
 			Edge e = (Edge)i.next();
-			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK);
+			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK, false);
 			vsm.addGlyph(g, mSpaceName);
 			edge2glyph.put(e, g);
 			g.setOwner(e);
