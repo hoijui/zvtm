@@ -32,6 +32,8 @@ import javax.swing.JScrollPane;
 
 public class FontDialog extends JDialog implements ActionListener {
 
+	static final String ZVTM_FONT_CHOOSER = "ZVTM Font Chooser";
+
     static String DEFAULT_FAMILY="Dialog";
     static int DEFAULT_STYLE=Font.PLAIN;
     static int DEFAULT_SIZE=10;
@@ -46,7 +48,6 @@ public class FontDialog extends JDialog implements ActionListener {
     String[] allFontStyles={"Plain","Bold","Italic","BoldItalic"};
     String[] allFontSizes={"4","6","8","10","12","14","16","18","20","24"};
     
-
     /** Call a FontDialog window that will return  the font selected in the window
      *@param owner application frame that owns this Modal component
      */
@@ -151,14 +152,14 @@ public class FontDialog extends JDialog implements ActionListener {
     }
 
     FontDialog(FontTracker ftt,Frame owner){
-	super(owner,"ZVTM Font Chooser",true);
+	super(owner,ZVTM_FONT_CHOOSER,true);
 	setLocation(owner.getLocation());
 	ft=ftt;
 	initUI();
     }
 
     FontDialog(FontTracker ftt,Dialog owner){
-	super(owner,"ZVTM Font Chooser",true);
+	super(owner,ZVTM_FONT_CHOOSER,true);
 	setLocation(owner.getLocation());
 	ft=ftt;
 	initUI();
