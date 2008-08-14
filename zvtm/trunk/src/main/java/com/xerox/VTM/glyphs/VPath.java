@@ -469,7 +469,7 @@ public class VPath extends Glyph {
      */
     public void setForcedDrawing(boolean b){forcedDrawing=b;}
     
-    /** Indicate whether force drawing is enabled
+    /** Indicate whether forced drawing is enabled
      *@see #setForcedDrawing(boolean b)
      */
     public boolean getForcedDrawing(){return forcedDrawing;}
