@@ -59,9 +59,6 @@ public class DPath extends Glyph implements RectangularShape {
 
     PathElement[] elements;
 	
-	/** Point at the center of the path's bounding box. Computed by computeBounds(). Not necessarily (and often not) on the path itself. */
-	LongPoint hotSpot;
-
     /* endPoint contains the coordinates of the last element's endpoint */
     LongPoint endPoint;
 
@@ -78,7 +75,6 @@ public class DPath extends Glyph implements RectangularShape {
 		vy = sy = 0;
 		vz = 0;
 		endPoint = new LongPoint(vx, vy);
-		hotSpot = new LongPoint(vx, vy);
 		elements = new PathElement[0];
 		computeBounds();
 		sensit = false;
@@ -96,7 +92,6 @@ public class DPath extends Glyph implements RectangularShape {
 		vy = sy = y;
 		vz = z;
 		endPoint = new LongPoint(vx, vy);
-		hotSpot = new LongPoint(vx, vy);
 		elements = new PathElement[0];
 		computeBounds();
 		sensit = false;
@@ -122,7 +117,6 @@ public class DPath extends Glyph implements RectangularShape {
 			vy = sy = 0;
 		}
 		endPoint = new LongPoint(vx, vy);
-		hotSpot = new LongPoint(vx, vy);
 		elements = new PathElement[0];
 		int type;
 	    while (!pi.isDone()){
@@ -313,7 +307,8 @@ public class DPath extends Glyph implements RectangularShape {
 	public void computeBounds(){
 		LongPoint[] allPoints = getAllPointsCoordinates();
 		if (allPoints.length == 0){
-			hotSpot.setLocation(sx, sy);
+			vx = sx;
+			vy = sy;
 			vw = 0;
 			vh = 0;
 			return;
@@ -329,7 +324,6 @@ public class DPath extends Glyph implements RectangularShape {
 		// compute hotspot position (central point)
 		vx = (wnes[0]+wnes[2]) / 2;
 		vy = (wnes[1]+wnes[3]) / 2;
-		hotSpot.setLocation(vx, vy);
 		// compute width and height of bounding box
 		vw = (wnes[2]-wnes[0]) / 2;
 		vh = (wnes[1]-wnes[3]) / 2;
@@ -425,11 +419,11 @@ public class DPath extends Glyph implements RectangularShape {
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
-	    if ((hotSpot.x >= wb) && (hotSpot.x <= eb) && (hotSpot.y >= sb) && (hotSpot.y <= nb)){
+	    if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
 			// if glyph hotspot is in the region, we consider it is visible
 			return true;
 	    }
-		else if ((hotSpot.x-vw <= eb) && (hotSpot.x+vw >= wb) && (hotSpot.y-vh <= nb) && (hotSpot.y+vh >= sb)){
+		else if ((vx-vw <= eb) && (vx+vw >= wb) && (vy-vh <= nb) && (vy+vh >= sb)){
 			/* Glyph is at least partially in region.
 			   We approximate using the glyph bounding box, meaning that some glyphs not
 			   actually visible can be projected and drawn (but they won't be displayed)) */
@@ -439,11 +433,11 @@ public class DPath extends Glyph implements RectangularShape {
     }
 
     public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
-	    if ((hotSpot.x >= wb) && (hotSpot.x <= eb) && (hotSpot.y >= sb) && (hotSpot.y <= nb)){
+	    if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
 			// if glyph hotspot is in the region, we consider it is visible
 			return true;
 	    }
-		else if ((hotSpot.x+vw <= eb) && (hotSpot.x-vw >= wb) && (hotSpot.y+vh <= nb) && (hotSpot.y-vh >= sb)){
+		else if ((vx+vw <= eb) && (vx-vw >= wb) && (vy+vh <= nb) && (vy-vh >= sb)){
 			/* Glyph is at least partially in region.
 			   We approximate using the glyph bounding box, meaning that some glyphs not
 			   actually visible can be projected and drawn (but they won't be displayed)) */
@@ -451,10 +445,6 @@ public class DPath extends Glyph implements RectangularShape {
 		}
 		return false;
     }
-
-	public LongPoint getHotSpot(){
-		return hotSpot;
-	}
 
     /** Not implemented yet. */
     public Object clone(){
