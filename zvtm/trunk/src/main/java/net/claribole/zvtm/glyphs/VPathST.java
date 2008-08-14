@@ -20,6 +20,7 @@ import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VPath;
 
 /**
+ * <strong>As of 0.9.7-SNAPSHOT, DPathST should be prefered to VPathST.</strong>
  * Translucent General path: made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. This version is less efficient than VPath, but it can be made translucent. Can neither be resized nor reoriented (for now). This glyph does not follow the standard object model: (vx,vy) are the coordinates of the path's first point. VPaths do not fire cursor entry/exit events, but it is possible to detect that a cursor is overlapping a VPath by explicitely calling VCursor.interesctsPath(VPath p) and related methods.
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VPath

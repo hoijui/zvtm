@@ -38,6 +38,7 @@ import com.xerox.VTM.svg.SVGReader;
 
 
 /**
+ * <strong>As of 0.9.7-SNAPSHOT, DPathST should be prefered to VPathST.</strong>
  * General path: made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. Can neither be resized nor reoriented (for now). This glyph does not follow the standard object model: (vx,vy) are the coordinates of the path's first point. VPaths do not fire cursor entry/exit events, but it is possible to detect that a cursor is overlapping a VPath by explicitely calling VCursor.interesctsPath(VPath p) and related methods.
  * @author Emmanuel Pietriga
  *@see net.claribole.zvtm.glyphs.VPathST
