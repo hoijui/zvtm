@@ -78,7 +78,7 @@ public class ZSegment extends VRectangle {
 	}
 	else if ((vx-vw <= eb) && (vx+vw >= wb) && (vy-vh <= nb) && (vy+vh >= sb)){
 		/* Glyph is at least partially in region.
-		   We approximate using the glyph bounding circle, meaning that some glyphs not
+		   We approximate using the glyph bounding box, meaning that some glyphs not
 		   actually visible can be projected and drawn (but they won't be displayed)) */
 	    return true;
 	}

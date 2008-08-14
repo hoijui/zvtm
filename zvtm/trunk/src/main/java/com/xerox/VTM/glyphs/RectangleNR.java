@@ -208,7 +208,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	else {
 	    if (((vx-pc[i].cw)<=eb) && ((vx+pc[i].cw)>=wb) && ((vy-pc[i].ch)<=nb) && ((vy+pc[i].ch)>=sb)){
 		/* Glyph is at least partially in region.
-		   We approximate using the glyph bounding circle, meaning that some glyphs not
+		   We approximate using the glyph bounding box, meaning that some glyphs not
 		   actually visible can be projected and drawn (but they won't be displayed)) */
 		return true;  
 	    }

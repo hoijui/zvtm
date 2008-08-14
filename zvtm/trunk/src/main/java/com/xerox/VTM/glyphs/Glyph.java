@@ -707,7 +707,7 @@ public abstract class Glyph implements Cloneable {
 	else {
 	    if (((vx-size)<=eb) && ((vx+size)>=wb) && ((vy-size)<=nb) && ((vy+size)>=sb)){
 		/* Glyph is at least partially in region.
-		   We approximate using the glyph bounding circle, meaning that some glyphs not
+		   We approximate using the glyph bounding box, meaning that some glyphs not
 		   actually visible can be projected and drawn (but they won't be displayed)) */
 		return true;  
 	    }
