@@ -62,7 +62,6 @@ public class DPath extends Glyph implements RectangularShape {
 	/** Point at the center of the path's bounding box. Computed by computeBounds(). Not necessarily (and often not) on the path itself. */
 	LongPoint hotSpot;
 
-    /* vx,vy are the coordinates of the path's start point */
     /* endPoint contains the coordinates of the last element's endpoint */
     LongPoint endPoint;
 
@@ -71,9 +70,12 @@ public class DPath extends Glyph implements RectangularShape {
     /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
     public long vh;
 
+    /* sx,sy are the coordinates of the path's start point */
+	long sx, sy;
+
 	public DPath(){
-		vx = 0;
-		vy = 0;
+		vx = sx = 0;
+		vy = sy = 0;
 		vz = 0;
 		endPoint = new LongPoint(vx, vy);
 		hotSpot = new LongPoint(vx, vy);
@@ -90,8 +92,8 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param c color
 		*/
 	public DPath(long x, long y, int z, Color c){
-		vx = x;
-		vy = y;
+		vx = sx = x;
+		vy = sy = y;
 		vz = z;
 		endPoint = new LongPoint(vx, vy);
 		hotSpot = new LongPoint(vx, vy);
@@ -111,13 +113,13 @@ public class DPath extends Glyph implements RectangularShape {
 		double[] cds = new double[6];
 		// if first instruction is a jump, make it the start point
 		if (pi.currentSegment(cds) == PathIterator.SEG_MOVETO){
-			vx = (long)cds[0];
-			vy = (long)cds[1];
+			vx = sx = (long)cds[0];
+			vy = sy = (long)cds[1];
 			pi.next();
 		}
 		else {
-			vx = 0;
-			vy = 0;
+			vx = sx = 0;
+			vy = sy = 0;
 		}
 		endPoint = new LongPoint(vx, vy);
 		hotSpot = new LongPoint(vx, vy);
@@ -194,7 +196,6 @@ public class DPath extends Glyph implements RectangularShape {
 			e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1);
 			endPoint.translate(x, y);
 		}
-		//	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
 		PathElement[] tmp = new PathElement[elements.length+1];
 		System.arraycopy(elements, 0, tmp, 0, elements.length);
 		tmp[elements.length] = e;
@@ -312,7 +313,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public void computeBounds(){
 		LongPoint[] allPoints = getAllPointsCoordinates();
 		if (allPoints.length == 0){
-			hotSpot.setLocation(vx, vy);
+			hotSpot.setLocation(sx, sy);
 			vw = 0;
 			vh = 0;
 			return;
@@ -326,7 +327,9 @@ public class DPath extends Glyph implements RectangularShape {
 			if (allPoints[i].y > wnes[1]){wnes[1] = allPoints[i].y;}
 		}
 		// compute hotspot position (central point)
-		hotSpot.setLocation((wnes[0]+wnes[2]) / 2, (wnes[1]+wnes[3]) / 2);
+		vx = (wnes[0]+wnes[2]) / 2;
+		vy = (wnes[1]+wnes[3]) / 2;
+		hotSpot.setLocation(vx, vy);
 		// compute width and height of bounding box
 		vw = (wnes[2]-wnes[0]) / 2;
 		vh = (wnes[1]-wnes[3]) / 2;
@@ -354,8 +357,8 @@ public class DPath extends Glyph implements RectangularShape {
 	coef = (float)(c.focal / (c.focal+c.altitude));
 	hw = d.width/2;
 	hh = d.height/2;
-	pc[i].cx = hw + Math.round((vx-c.posx)*coef);
-	pc[i].cy = hh - Math.round((vy-c.posy)*coef);
+	pc[i].cx = hw + Math.round((sx-c.posx)*coef);
+	pc[i].cy = hh - Math.round((sy-c.posy)*coef);
 	if (elements.length == 0){return;}
 	elements[0].project(i, hw, hh, c, coef, pc[i].cx, pc[i].cy);
 	for (int j=1;j<elements.length;j++){
@@ -368,8 +371,8 @@ public class DPath extends Glyph implements RectangularShape {
 	coef = (float)(c.focal / (c.focal+c.altitude)) * lensMag;
 	lhw = lensWidth/2;
 	lhh = lensHeight/2;
-	pc[i].lcx = lhw + Math.round((vx-(lensx))*coef);
-	pc[i].lcy = lhh - Math.round((vy-(lensy))*coef);
+	pc[i].lcx = lhw + Math.round((sx-(lensx))*coef);
+	pc[i].lcy = lhh - Math.round((sy-(lensy))*coef);
 	if (elements.length == 0){return;}
 	elements[0].projectForLens(i, lhw, lhh, lensx, lensy, coef, pc[i].lcx, pc[i].lcy);
 	for (int j=1;j<elements.length;j++){
@@ -463,33 +466,33 @@ public class DPath extends Glyph implements RectangularShape {
 	/**
 		* Edit coordinates of start, end and control points of the element in DPath
 		* @param index index of the element in the DPath
-		* @param sx x coordinate of the element's start point
-		* @param sy y coordinate of the element's start point
-		* @param ex x coordinate of the element's end point
-		* @param ey y coordinate of the element's end point
+		* @param lsx x coordinate of the element's start point
+		* @param lsy y coordinate of the element's start point
+		* @param lex x coordinate of the element's end point
+		* @param ley y coordinate of the element's end point
 		* @param ctrlPoints list of the LongPoints that contain coordinates of the control point(s) (in case of QD/CB curve)
 		* @param abs indicates whether to use absolute coordinates or relative
 		*/
-	public void editElement(int index, long sx, long sy, long ex, long ey, LongPoint[] ctrlPoints, boolean abs){
+	public void editElement(int index, long lsx, long lsy, long lex, long ley, LongPoint[] ctrlPoints, boolean abs){
 		if (index > -1 && index < elements.length && elements[index] != null){
 			if (index > 0){
 				if (abs){
-					elements[index-1].x = sx;
-					elements[index-1].y = sy;
+					elements[index-1].x = lsx;
+					elements[index-1].y = lsy;
 				}
 				else {
-					elements[index-1].x += sx;
-					elements[index-1].y += sy;
+					elements[index-1].x += lsx;
+					elements[index-1].y += lsy;
 				}
 			}
 			else{
 				if (abs){
-					this.vx = sx;
-					this.vy = sy;
+					this.sx = lsx;
+					this.sy = lsy;
 				}
 				else {
-					this.vx += sx;
-					this.vy += sy;
+					this.sx += lsx;
+					this.sy += lsy;
 				}
 			}
 			PathElement el = elements[index];
@@ -526,12 +529,12 @@ public class DPath extends Glyph implements RectangularShape {
 				}
 			}
 			if (abs){
-				el.x = ex;
-				el.y = ey;
+				el.x = lex;
+				el.y = ley;
 			}
 			else {
-				el.x += ex;
-				el.y += ey;
+				el.x += lex;
+				el.y += ley;
 			}
 			if (index == elements.length - 1){
 				// if this is last element
@@ -561,8 +564,8 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 		}
 		if (points != null && points.length == totalPointsCount){
-			this.vx = points[0].x;
-			this.vy = points[0].y;
+			this.sx = points[0].x;
+			this.sy = points[0].y;
 			int offset = 0;
 			for (int i=0; i < elements.length; i++) {
 				switch (elements[i].type){
@@ -672,7 +675,7 @@ public class DPath extends Glyph implements RectangularShape {
 	    case DPath.QDC:{
 		result = new LongPoint[3];
 		if (index == 0){
-		    result[0] = new LongPoint(this.vx, this.vy);
+		    result[0] = new LongPoint(this.sx, this.sy);
 		}
 		else{
 		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
@@ -684,7 +687,7 @@ public class DPath extends Glyph implements RectangularShape {
 	    default:{
 		result = new LongPoint[2];
 		if (index == 0){
-		    result[0] = new LongPoint(this.vx, this.vy);
+		    result[0] = new LongPoint(this.sx, this.sy);
 		}
 		else{
 		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
@@ -819,7 +822,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public static VPath toVPath(DPath dp){
 		VPath res = null;
 		if (dp != null){
-			res = (dp instanceof DPathST) ? new VPathST(dp.vx, dp.vy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue()) : new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
+			res = (dp instanceof DPathST) ? new VPathST(dp.sx, dp.sy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue()) : new VPath(dp.sx, dp.sy, dp.vz, dp.getColor());
 			BasicStroke s = dp.getStroke();
 			if (s != null)
 				res.setStroke(s);
@@ -859,38 +862,38 @@ public class DPath extends Glyph implements RectangularShape {
 	float res = 0;
 	if (elements.length > 0){
 	    PathElement el = elements[0];
-	    long sx = 0;
-	    long sy = 0;
+	    long lsx = 0;
+	    long lsy = 0;
 	    switch(el.type){
 	    case DPath.CBC:{
-		sx = ((CBCElement)el).ctrlx1;
-		sy = ((CBCElement)el).ctrly1;
+		lsx = ((CBCElement)el).ctrlx1;
+		lsy = ((CBCElement)el).ctrly1;
 		break;
 	    }
 	    case DPath.QDC:{
-		sx = ((QDCElement)el).ctrlx;
-		sy = ((QDCElement)el).ctrly;
+		lsx = ((QDCElement)el).ctrlx;
+		lsy = ((QDCElement)el).ctrly;
 		break;
 	    }
 	    default:{
-		sx = el.x;
-		sy = el.y;
+		lsx = el.x;
+		lsy = el.y;
 		break;
 	    }
 	    }
-	    if (vx == sx){ // x = 0, y = +-1
-		if (vy > sy) // y > 0
+	    if (sx == lsx){ // x = 0, y = +-1
+		if (sy > lsy) // y > 0
 		    res = (float)(Math.PI / 2);
 		else // y < 0
 		    res = (float)(Math.PI * 1.5);
 	    }
 	    else {
-		double tan = (double)(vy - sy) / (double)(vx - sx);
+		double tan = (double)(sy - lsy) / (double)(sx - lsx);
 		res = (float)Math.atan(tan);
-		if (vx < sx) { // x < 0 
+		if (sx < lsx) { // x < 0 
 		    res += Math.PI;
 		}
-		if (vx > sx && vy < sy){ // x > 0; y < 0
+		if (sx > lsx && sy < lsy){ // x > 0; y < 0
 		    res += 2*Math.PI;
 		}
 	    }
@@ -906,44 +909,44 @@ public class DPath extends Glyph implements RectangularShape {
 	float res = 0;
 	if (elements.length > 0){
 	    PathElement el = elements[elements.length-1];
-	    long sx = 0;
-	    long sy = 0;
+	    long lsx = 0;
+	    long lsy = 0;
 	    switch(el.type){
 	    case DPath.CBC:{
-		sx = ((CBCElement)el).ctrlx2;
-		sy = ((CBCElement)el).ctrly2;
+		lsx = ((CBCElement)el).ctrlx2;
+		lsy = ((CBCElement)el).ctrly2;
 		break;
 	    }
 	    case DPath.QDC:{
-		sx = ((QDCElement)el).ctrlx;
-		sy = ((QDCElement)el).ctrly;
+		lsx = ((QDCElement)el).ctrlx;
+		lsy = ((QDCElement)el).ctrly;
 		break;
 	    }
 	    default:{
 		if (elements.length > 1){
-		    sx = elements[elements.length - 2].x;
-		    sy = elements[elements.length - 2].y;
+		    lsx = elements[elements.length - 2].x;
+		    lsy = elements[elements.length - 2].y;
 		}
 		else {
-		    sx = vx;
-		    sy = vy;
+		    lsx = vx;
+		    lsy = vy;
 		}
 		break;
 	    }
 	    }
-	    if (el.x == sx){ // x = 0, y = +-1
-		if (el.y > sy) // y > 0
+	    if (el.x == lsx){ // x = 0, y = +-1
+		if (el.y > lsy) // y > 0
 		    res = (float)(Math.PI / 2);
 		else // y < 0
 		    res = (float)(Math.PI * 1.5);
 	    }
 	    else {
-		double tan = (double)(el.y - sy) / (double)(el.x - sx);
+		double tan = (double)(el.y - lsy) / (double)(el.x - lsx);
 		res = (float)Math.atan(tan);
-		if (el.x < sx) { // x < 0 
+		if (el.x < lsx) { // x < 0 
 		    res += Math.PI;
 		}
-		if (el.x > sx && el.y < sy){ // x > 0; y < 0
+		if (el.x > lsx && el.y < lsy){ // x > 0; y < 0
 		    res += 2*Math.PI;
 		}
 	    }
