@@ -20,7 +20,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VEllipse;
-import com.xerox.VTM.glyphs.VPath;
+import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.glyphs.VShape;
@@ -157,8 +157,8 @@ public class ZgrReader {
                 vsm.addGlyph(rect, vs);
 
                 for (int j = 0; j < lines.length - 1; j++) {
-                    VPath line;
-                    line = new VPath(lines[j].x1, lines[j].y1, 1, Color.black);
+                    DPath line;
+                    line = new DPath(lines[j].x1, lines[j].y1, 1, Color.black);
                     line.addSegment(lines[j].x2, lines[j].y2, true);
 
                     vsm.addGlyph(line, vs);
@@ -489,13 +489,13 @@ public class ZgrReader {
                 if (edge.pos != null) {
                     Point[] points = edge.pos.getControls();
 
-                    VPath pathGlyph;
+                    DPath pathGlyph;
                     // TODO: use all colors of tmp.color and slide each colored edge
                     if (edge.color == null)
-                        pathGlyph = new VPath(points[0].coords[0],
+                        pathGlyph = new DPath(points[0].coords[0],
                                 points[0].coords[1], 1, Colors.black);
                     else
-                        pathGlyph = new VPath(points[0].coords[0],
+                        pathGlyph = new DPath(points[0].coords[0],
                                 points[0].coords[1], 1, edge.color[0]);
 
                     for (int j = 1; j < points.length; j += 3) {
@@ -547,9 +547,9 @@ public class ZgrReader {
         // TODO: add other shapes
         switch (end.outerShape.shape) {
             case Shape.NONE:
-                arrow = new VPath(start.coords[0], start.coords[1], 1,
+                arrow = new DPath(start.coords[0], start.coords[1], 1,
                         Color.red);
-                ((VPath) arrow).addSegment(point.coords[0], point.coords[1],
+                ((DPath) arrow).addSegment(point.coords[0], point.coords[1],
                         true);
                 break;
             case Shape.NORMAL:
