@@ -884,63 +884,94 @@ public class VirtualSpaceManager implements AWTEventListener {
 	c.unstickAllGlyphs();
     }
 
-    /**returns the location from which a camera will see everything visible in the associated virtual space
-     *@param c camera considered (will not be moved)
-     *@return the location to which the camera should go
-     *@see #getGlobalView(Camera c, int d)
-     */
-    public Location getGlobalView(Camera c){
-	View v = null;
-	try {
-	    v = c.getOwningView();
-	    if (v!=null){
-		long[] wnes = findFarmostGlyphCoords(c.parentSpace);  //wnes=west north east south
-		long dx = (wnes[2]+wnes[0])/2;  //new coords where camera should go
-		long dy = (wnes[1]+wnes[3])/2;
-		long[] regBounds = v.getVisibleRegion(c);
-		/*region that will be visible after translation, but before zoom/unzoom (need to
-		  compute zoom) ; we only take left and down because we only need horizontal and
-		  vertical ratios, which are equals for left and right, up and down*/
-		long[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
-		float currentAlt = c.getAltitude()+c.getFocal();
-		float ratio = 0;
-		//compute the mult factor for altitude to see all stuff on X
-		if (trRegBounds[0]!=0){ratio = (dx-wnes[0])/((float)(dx-trRegBounds[0]));}
-		//same for Y ; take the max of both
-		if (trRegBounds[1]!=0){
-		    float tmpRatio = (dy-wnes[3])/((float)(dy-trRegBounds[1]));
-		    if (tmpRatio>ratio){ratio = tmpRatio;}
-		}
-		return new Location(dx, dy, currentAlt*Math.abs(ratio));
-	    }
-	    else return null;
+	/**returns the location from which a camera will see everything visible in the associated virtual space
+		*@param c camera considered (will not be moved)
+		*@return the location to which the camera should go
+		*@see #getGlobalView(Camera c, int d)
+		*@see #getGlobalView(Camera c, int d, float mFactor)
+		*@see #getGlobalView(Camera c, float mFactor)
+		*/
+	public Location getGlobalView(Camera c){
+		return getGlobalView(c, 1.0f);
 	}
-	catch (NullPointerException e){
-	    System.err.println("Error:VirtualSpaceManager:getGlobalView: ");
-	    System.err.println("Camera c="+c);
-	    System.err.println("View v="+v);
-	    if (debug){e.printStackTrace();}
-	    else {System.err.println(e);}
-	    return null;
-	}
-    }
 
-    /**translates and (un)zooms a camera in order to see everything visible in the associated virtual space
-     *@param c Camera to be moved (will actually be moved)
-     *@param d duration of the animation in ms
-     *@return the final camera location
-     *@see #getGlobalView(Camera c)
-     */
-    public Location getGlobalView(Camera c, int d){
-	Location l = getGlobalView(c);
-	if (l != null){
-	    float dAlt = l.alt - c.getAltitude() - c.getFocal();
-	    Vector prms=new Vector();
-	    prms.add(new Float(dAlt));prms.add(new LongPoint(l.vx-c.posx, l.vy-c.posy));
-	    animator.createCameraAnimation(d, AnimManager.CA_ALT_TRANS_SIG, prms, c.getID());
+	/** Get the location from which a camera will see all glyphs visible in the associated virtual space.
+		*@param c camera considered (will not be moved)
+     	*@param mFactor magnification factor - 1.0 (default) means that the glyphs will occupy the whole screen. mFactor &gt; 1 will zoom out from this default location. mFactor &lt; 1 will do the opposite
+		*@return the location to which the camera should go
+		*@see #getGlobalView(Camera c, int d)
+		*@see #getGlobalView(Camera c)
+		*@see #getGlobalView(Camera c, int d, float mFactor)
+		*/
+	public Location getGlobalView(Camera c, float mFactor){
+		View v = null;
+		try {
+			v = c.getOwningView();
+			if (v!=null){
+				long[] wnes = findFarmostGlyphCoords(c.parentSpace);  //wnes=west north east south
+				long dx = (wnes[2]+wnes[0])/2;  //new coords where camera should go
+				long dy = (wnes[1]+wnes[3])/2;
+				long[] regBounds = v.getVisibleRegion(c);
+				/*region that will be visible after translation, but before zoom/unzoom (need to
+					compute zoom) ; we only take left and down because we only need horizontal and
+					vertical ratios, which are equals for left and right, up and down*/
+					long[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
+				float currentAlt = c.getAltitude()+c.getFocal();
+				float ratio = 0;
+				//compute the mult factor for altitude to see all stuff on X
+				if (trRegBounds[0]!=0){ratio = (dx-wnes[0])/((float)(dx-trRegBounds[0]));}
+				//same for Y ; take the max of both
+				if (trRegBounds[1]!=0){
+					float tmpRatio = (dy-wnes[3])/((float)(dy-trRegBounds[1]));
+					if (tmpRatio>ratio){ratio = tmpRatio;}
+				}
+				ratio *= mFactor;
+				return new Location(dx, dy, currentAlt*Math.abs(ratio));
+			}
+			else return null;
+		}
+		catch (NullPointerException e){
+			System.err.println("Error:VirtualSpaceManager:getGlobalView: ");
+			System.err.println("Camera c="+c);
+			System.err.println("View v="+v);
+			if (debug){e.printStackTrace();}
+			else {System.err.println(e);}
+			return null;
+		}
 	}
-	return l;
-    }
+
+	/**translates and (un)zooms a camera in order to see everything visible in the associated virtual space
+		*@param c Camera to be moved (will actually be moved)
+		*@param d duration of the animation in ms
+		*@return the final camera location
+		*@see #getGlobalView(Camera c)
+		*@see #getGlobalView(Camera c, int d, float mFactor)
+		*@see #getGlobalView(Camera c, float mFactor)
+		*/
+    public Location getGlobalView(Camera c, int d){
+		return getGlobalView(c, d, 1.0f);
+	}
+
+	/**translates and (un)zooms a camera in order to see everything visible in the associated virtual space
+		*@param c Camera to be moved (will actually be moved)
+		*@param d duration of the animation in ms
+     	*@param mFactor magnification factor - 1.0 (default) means that the glyphs will occupy the whole screen. mFactor &gt; 1 will zoom out from this default location. mFactor &lt; 1 will do the opposite
+		*@return the final camera location
+		*@see #getGlobalView(Camera c)
+		*@see #getGlobalView(Camera c, int d)
+		*@see #getGlobalView(Camera c, float mFactor)
+		*/
+	public Location getGlobalView(Camera c, int d, float mFactor){
+		Location l = getGlobalView(c, mFactor);
+		if (l != null){
+			float dAlt = l.alt - c.getAltitude() - c.getFocal();
+			Vector prms = new Vector();
+			prms.add(new Float(dAlt));
+			prms.add(new LongPoint(l.vx-c.posx, l.vy-c.posy));
+			animator.createCameraAnimation(d, AnimManager.CA_ALT_TRANS_SIG, prms, c.getID());
+		}
+		return l;
+	}
 
     /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in virtual space s*/
     public static long[] findFarmostGlyphCoords(VirtualSpace s){
