@@ -1,7 +1,7 @@
 /*   FILE: DPathST.java
  *   DATE OF CREATION:   Sat Apr 14 10:16 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2008. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
