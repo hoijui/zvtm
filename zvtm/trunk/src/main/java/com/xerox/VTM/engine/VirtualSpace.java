@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2008. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,9 @@
 package com.xerox.VTM.engine;
 
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.RectangularShape;
 
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -395,28 +397,51 @@ public class VirtualSpace {
 	return findFarmostGlyphCoords(res);
     }
     
-    /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
-    public long[] findFarmostGlyphCoords(long[] res){
-	Glyph[] gl = this.getVisibleGlyphList();
-	if (gl.length > 0){
-	    //init result with first glyph found
-	    long size = (long)gl[0].getSize();
-	    res[0] = gl[0].vx-size;
-	    res[1] = gl[0].vy+size;
-	    res[2] = gl[0].vx+size;
-	    res[3] = gl[0].vy-size;
-	    long tmp;
-	    for (int i=1;i<gl.length;i++){
-		size = (long)gl[i].getSize();
-		tmp = gl[i].vx-size; if (tmp<res[0]){res[0] = tmp;}
-		tmp = gl[i].vy+size; if (tmp>res[1]){res[1] = tmp;}
-		tmp = gl[i].vx+size; if (tmp>res[2]){res[2] = tmp;}
-		tmp = gl[i].vy-size; if (tmp<res[3]){res[3] = tmp;}
-	    }
-	    return res;
+	/**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
+	public long[] findFarmostGlyphCoords(long[] res){
+		Glyph[] gl = this.getVisibleGlyphList();
+		if (gl.length > 0){
+			RectangularShape rs;
+			long size;
+			//init result with first glyph found
+			if (gl[0] instanceof RectangularShape){
+				rs = (RectangularShape)gl[0];
+				res[0] = gl[0].vx - rs.getWidth();
+				res[1] = gl[0].vy + rs.getHeight();
+				res[2] = gl[0].vx + rs.getWidth();
+				res[3] = gl[0].vy - rs.getHeight();				
+			}
+			else {
+				size = (long)gl[0].getSize();
+				res[0] = gl[0].vx - size;
+				res[1] = gl[0].vy + size;
+				res[2] = gl[0].vx + size;
+				res[3] = gl[0].vy - size;
+			}
+			long tmp;
+			for (int i=1;i<gl.length;i++){
+				if (gl[i] instanceof RectangularShape){
+					rs = (RectangularShape)gl[i];
+					tmp = gl[i].vx - rs.getWidth();if (tmp<res[0]){res[0] = tmp;}
+					tmp = gl[i].vy + rs.getHeight();if (tmp>res[1]){res[1] = tmp;}
+					tmp = gl[i].vx + rs.getWidth();if (tmp>res[2]){res[2] = tmp;}
+					tmp = gl[i].vy - rs.getHeight();if (tmp<res[3]){res[3] = tmp;}
+				}
+				else {
+					size = (long)gl[i].getSize();
+					tmp = gl[i].vx - size;if (tmp<res[0]){res[0] = tmp;}
+					tmp = gl[i].vy + size;if (tmp>res[1]){res[1] = tmp;}
+					tmp = gl[i].vx + size;if (tmp>res[2]){res[2] = tmp;}
+					tmp = gl[i].vy - size;if (tmp<res[3]){res[3] = tmp;}
+				}
+			}
+			return res;
+		}
+		else {
+			Arrays.fill(res, 0);
+			return res;
+		}
 	}
-	else {res[0] = 0;res[1] = 0;res[2] = 0;res[3] =  0;return res;}
-    }
 
     protected void addGlyphToDrawingList(Glyph g){
         int zindex = g.getZindex();
