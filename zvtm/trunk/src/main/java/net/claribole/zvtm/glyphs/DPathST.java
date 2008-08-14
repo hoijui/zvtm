@@ -169,9 +169,9 @@ public class DPathST extends DPath implements Translucent {
 	}
     }
 
-    /** Not implemented yet. */
-    public Object clone(){
-	return new DPathST(alpha);
-    }
+	/** Not implemented yet. */
+	public Object clone(){
+		return null;
+	}
 
 }
