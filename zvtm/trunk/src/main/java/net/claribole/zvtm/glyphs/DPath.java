@@ -14,6 +14,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VPath;
+import com.xerox.VTM.glyphs.RectangularShape;
 import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 
 import java.awt.BasicStroke;
@@ -31,7 +32,9 @@ import java.awt.geom.QuadCurve2D;
 import java.util.Arrays;
 
 /**
- * Dynamic Path, made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. All of these can be dynamically modified and animated through AnimManager's createPathAnimation method.
+ * Dynamic Path, made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps.
+ * All of these can be dynamically modified and animated through AnimManager's createPathAnimation method.
+ * This class implements RectangularShape even though it is not, just to give easy access to the path's bounding box dimensions.
  *@author Emmanuel Pietriga, Boris Trofimov
  *@see net.claribole.zvtm.glyphs.DPathST
  *@see com.xerox.VTM.glyphs.VPath
@@ -44,7 +47,7 @@ import java.util.Arrays;
  *@see com.xerox.VTM.engine.AnimManager#createPathAnimation(long duration, short type, LongPoint[] data, Long gID,net.claribole.zvtm.engine.PostAnimationAction paa)
  */
 
-public class DPath extends Glyph {
+public class DPath extends Glyph implements RectangularShape {
     
     static final short MOV = 0;
     static final short SEG = 1;
@@ -55,46 +58,48 @@ public class DPath extends Glyph {
     public ProjectedCoords[] pc;
 
     PathElement[] elements;
+	
+	/** Point at the center of the path's bounding box. Computed by computeBounds(). Not necessarily (and often not) on the path itself. */
+	LongPoint hotSpot;
 
     /* vx,vy are the coordinates of the path's start point */
     /* endPoint contains the coordinates of the last element's endpoint */
     LongPoint endPoint;
-    /* centerPoint contains the coordinates of the point half way on 
-       the virtual line linking the path's start point and end point. */
-    LongPoint centerPoint;
-    
-    /* Variables used to determine and control the path clipping/drawing */
-    float drawingRadius;
-    float drawingFactor = 1.2f;
-    boolean forcedDrawing = false;
 
-    public DPath(){
-	vx = 0;
-	vy = 0;
-	vz = 0;
-	endPoint = new LongPoint(vx, vy);
-	centerPoint = new LongPoint(vx, vy);
-	elements = new PathElement[0];
-	sensit = false;
-	setColor(Color.BLACK);
-    }
+    /** For internal use. Made public for easier outside package subclassing. Half width in virtual space.*/
+    public long vw;
+    /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
+    public long vh;
 
-    /**
-     *@param x start coordinate in virtual space
-     *@param y start coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param c color
-     */
-    public DPath(long x, long y, int z, Color c){
-	vx = x;
-	vy = y;
-	vz = z;
-	endPoint = new LongPoint(vx, vy);
-	centerPoint = new LongPoint(vx, vy);
-	elements = new PathElement[0];
-	sensit = false;
-	setColor(c);
-    }
+	public DPath(){
+		vx = 0;
+		vy = 0;
+		vz = 0;
+		endPoint = new LongPoint(vx, vy);
+		hotSpot = new LongPoint(vx, vy);
+		elements = new PathElement[0];
+		computeBounds();
+		sensit = false;
+		setColor(Color.BLACK);
+	}
+
+	/**
+		*@param x start coordinate in virtual space
+		*@param y start coordinate in virtual space
+		*@param z z-index (pass 0 if you do not use z-ordering)
+		*@param c color
+		*/
+	public DPath(long x, long y, int z, Color c){
+		vx = x;
+		vy = y;
+		vz = z;
+		endPoint = new LongPoint(vx, vy);
+		hotSpot = new LongPoint(vx, vy);
+		elements = new PathElement[0];
+		computeBounds();
+		sensit = false;
+		setColor(c);
+	}
 
     /**
 	 *@param pi PathIterator describing this path (virtual space coordinates)
@@ -115,7 +120,7 @@ public class DPath extends Glyph {
 			vy = 0;
 		}
 		endPoint = new LongPoint(vx, vy);
-		centerPoint = new LongPoint(vx, vy);
+		hotSpot = new LongPoint(vx, vy);
 		elements = new PathElement[0];
 		int type;
 	    while (!pi.isDone()){
@@ -140,97 +145,109 @@ public class DPath extends Glyph {
 			}
 			pi.next();
 	    }
+		computeBounds();
 		sensit = false;
 		setColor(c);
     }
 
-    /** Add a new cubic curve to the path, from current point to point (x,y), controlled by (x1,y1)
-     *@param x x coordinate of end point in virtual space
-     *@param y y coordinate of end point in virtual space
-     *@param x1 x coordinate of 1st control point in virtual space
-     *@param y1 y coordinate of 1st control point in virtual space
-     *@param x2 x coordinate of 2nd control point in virtual space
-     *@param y2 y coordinate of 2nd control point in virtual space
-     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
-     */
-    public void addCbCurve(long x, long y, long x1, long y1, long x2, long y2, boolean abs){
-	CBCElement e;
-	if (abs){
-	    e = new CBCElement(x, y, x1, y1, x2, y2);
-	    endPoint.setLocation(x, y);
+	/** Add a new cubic curve to the path, from current point to point (x,y), controlled by (x1,y1)
+		*@param x x coordinate of end point in virtual space
+		*@param y y coordinate of end point in virtual space
+		*@param x1 x coordinate of 1st control point in virtual space
+		*@param y1 y coordinate of 1st control point in virtual space
+		*@param x2 x coordinate of 2nd control point in virtual space
+		*@param y2 y coordinate of 2nd control point in virtual space
+		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+		*/
+	public void addCbCurve(long x, long y, long x1, long y1, long x2, long y2, boolean abs){
+		CBCElement e;
+		if (abs){
+			e = new CBCElement(x, y, x1, y1, x2, y2);
+			endPoint.setLocation(x, y);
+		}
+		else {
+			e = new CBCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, endPoint.x+x2, endPoint.y+y2);
+			endPoint.translate(x, y);
+		}
+		PathElement[] tmp = new PathElement[elements.length+1];
+		System.arraycopy(elements, 0, tmp, 0, elements.length);
+		tmp[elements.length] = e;
+		Arrays.fill(elements, null);
+		elements = tmp;
+		computeBounds();
 	}
-	else {
-	    e = new CBCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, endPoint.x+x2, endPoint.y+y2);
-	    endPoint.translate(x, y);
-	}
-	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
-	PathElement[] tmp = new PathElement[elements.length+1];
-	System.arraycopy(elements, 0, tmp, 0, elements.length);
-	tmp[elements.length] = e;
-	Arrays.fill(elements, null);
-	elements = tmp;
-	computeSize();
-    }
 
-    /** Add a new quadratic curve to the path, from current point to point (x,y), controlled by (x1,y1)
-     *@param x x coordinate of end point in virtual space
-     *@param y y coordinate of end point in virtual space
-     *@param x1 x coordinate of control point in virtual space
-     *@param y1 y coordinate of control point in virtual space
-     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
-     */
-    public void addQdCurve(long x, long y, long x1, long y1, boolean abs){
-	QDCElement e;
-	if (abs){
-	    e = new QDCElement(x, y, x1, y1);
-	    endPoint.setLocation(x, y);
+	/** Add a new quadratic curve to the path, from current point to point (x,y), controlled by (x1,y1)
+		*@param x x coordinate of end point in virtual space
+		*@param y y coordinate of end point in virtual space
+		*@param x1 x coordinate of control point in virtual space
+		*@param y1 y coordinate of control point in virtual space
+		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+		*/
+	public void addQdCurve(long x, long y, long x1, long y1, boolean abs){
+		QDCElement e;
+		if (abs){
+			e = new QDCElement(x, y, x1, y1);
+			endPoint.setLocation(x, y);
+		}
+		else {
+			e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1);
+			endPoint.translate(x, y);
+		}
+		//	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
+		PathElement[] tmp = new PathElement[elements.length+1];
+		System.arraycopy(elements, 0, tmp, 0, elements.length);
+		tmp[elements.length] = e;
+		Arrays.fill(elements, null);
+		elements = tmp;
+		computeBounds();
 	}
-	else {
-	    e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1);
-	    endPoint.translate(x, y);
+
+	/** Add a new segment to the path, from current point to point (x,y).
+		*@param x x coordinate of end point in virtual space
+		*@param y y coordinate of end point in virtual space
+		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+		*/
+	public void addSegment(long x, long y, boolean abs){
+		if (abs){endPoint.setLocation(x, y);}
+		else {endPoint.translate(x, y);}
+		PathElement[] tmp = new PathElement[elements.length+1];
+		System.arraycopy(elements, 0, tmp, 0, elements.length);
+		tmp[elements.length] = new SEGElement(endPoint.x, endPoint.y);
+		Arrays.fill(elements, null);
+		elements = tmp;
+		computeBounds();
 	}
-	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
-	PathElement[] tmp = new PathElement[elements.length+1];
-	System.arraycopy(elements, 0, tmp, 0, elements.length);
-	tmp[elements.length] = e;
-	Arrays.fill(elements, null);
-	elements = tmp;
-	computeSize();
-    }
 
-    /** Add a new segment to the path, from current point to point (x,y).
-     *@param x x coordinate of end point in virtual space
-     *@param y y coordinate of end point in virtual space
-     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
-     */
-    public void addSegment(long x, long y, boolean abs){
-	if (abs){endPoint.setLocation(x, y);}
-	else {endPoint.translate(x, y);}
-	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
-	PathElement[] tmp = new PathElement[elements.length+1];
-	System.arraycopy(elements, 0, tmp, 0, elements.length);
-	tmp[elements.length] = new SEGElement(endPoint.x, endPoint.y);
-	Arrays.fill(elements, null);
-	elements = tmp;
-	computeSize();
-    }
+	/** Add a new 'gap' to the path (move without drawing anything), from current point to point (x,y).
+		*@param x x coordinate of end point in virtual space
+		*@param y y coordinate of end point in virtual space
+		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
+		*/
+	public void jump(long x, long y, boolean abs){
+		if (abs){endPoint.setLocation(x, y);}
+		else {endPoint.translate(x, y);}
+		PathElement[] tmp = new PathElement[elements.length+1];
+		System.arraycopy(elements, 0, tmp, 0, elements.length);
+		tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y);
+		Arrays.fill(elements, null);
+		elements = tmp;
+		computeBounds();
+	}
 
-    /** Add a new 'gap' to the path (move without drawing anything), from current point to point (x,y).
-     *@param x x coordinate of end point in virtual space
-     *@param y y coordinate of end point in virtual space
-     *@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
-     */
-    public void jump(long x, long y, boolean abs){
-	if (abs){endPoint.setLocation(x, y);}
-	else {endPoint.translate(x, y);}
-	centerPoint.setLocation((vx+endPoint.x)/2, (vy+endPoint.y)/2);
-	PathElement[] tmp = new PathElement[elements.length+1];
-	System.arraycopy(elements, 0, tmp, 0, elements.length);
-	tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y);
-	Arrays.fill(elements, null);
-	elements = tmp;
-	computeSize();
-    }
+	/* ------------- implementation of RectangularShape --------------- */
+
+	/** Get the horizontal distance from western-most point to the eastern-most one. */
+    public long getWidth(){return 2 * vw;}
+
+	/** Get the vertical distance from northern-most point to the southern-most one. */
+    public long getHeight(){return 2 * vh;}
+
+	/** Not implemented yet. */
+    public void setWidth(long w){}
+
+	/** Not implemented yet. */
+    public void setHeight(long h){}
 
     public void initCams(int nbCam){
 	pc = new ProjectedCoords[nbCam];
@@ -250,14 +267,14 @@ public class DPath extends Glyph {
 		System.arraycopy(ta, 0, pc, 0, ta.length);
 		pc[pc.length-1] = new ProjectedCoords();
 	    }
-	    else {System.err.println("VPath:Error while adding camera "+verifIndex);}
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
 	}
 	else {
 	    if (verifIndex == 0){
 		pc = new ProjectedCoords[1];
 		pc[0] = new ProjectedCoords();
 	    }
-	    else {System.err.println("VPath:Error while adding camera "+verifIndex);}
+	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
 	}
 	for (int i=0;i<elements.length;i++){
 	    elements[i].addCamera(verifIndex);
@@ -275,10 +292,13 @@ public class DPath extends Glyph {
 
     public void resetMouseIn(int i){}
     
+	/** No effect. */
     public void sizeTo(float factor){}
 
+	/** No effect. */
     public void reSize(float factor){}
 
+	/** No effect. */
     public void orientTo(float angle){}
 
     public float getSize(){
@@ -286,9 +306,32 @@ public class DPath extends Glyph {
     }
 
     void computeSize(){
-	size = (float)Math.sqrt(Math.pow((endPoint.x-vx)/2, 2) + Math.pow((endPoint.y-vy)/2, 2));
-	drawingRadius = size * drawingFactor;
+		size = (float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
+
+	public void computeBounds(){
+		LongPoint[] allPoints = getAllPointsCoordinates();
+		if (allPoints.length == 0){
+			hotSpot.setLocation(vx, vy);
+			vw = 0;
+			vh = 0;
+			return;
+		}
+		// identify western/northern/eastern/southern-most points
+		long[] wnes = {allPoints[0].x, allPoints[0].y, allPoints[0].x, allPoints[0].y};
+		for (int i=1;i<allPoints.length;i++){
+			if (allPoints[i].x < wnes[0]){wnes[0] = allPoints[i].x;}
+			if (allPoints[i].x > wnes[2]){wnes[2] = allPoints[i].x;}
+			if (allPoints[i].y < wnes[3]){wnes[3] = allPoints[i].y;}
+			if (allPoints[i].y > wnes[1]){wnes[1] = allPoints[i].y;}
+		}
+		// compute hotspot position (central point)
+		hotSpot.setLocation((wnes[0]+wnes[2]) / 2, (wnes[1]+wnes[3]) / 2);
+		// compute width and height of bounding box
+		vw = (wnes[2]-wnes[0]) / 2;
+		vh = (wnes[1]-wnes[3]) / 2;
+		computeSize();
+	}
 
     public float getOrient(){return orient;}
 
@@ -379,191 +422,188 @@ public class DPath extends Glyph {
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
-	if (forcedDrawing){return true;}
-	else {
-	    if ((centerPoint.x >= wb) && (centerPoint.x <= eb)
-		&& (centerPoint.y >= sb) && (centerPoint.y <= nb)){
-		// if glyph hotspot is in the region, we consider it is visible
-		return true;
+	    if ((hotSpot.x >= wb) && (hotSpot.x <= eb) && (hotSpot.y >= sb) && (hotSpot.y <= nb)){
+			// if glyph hotspot is in the region, we consider it is visible
+			return true;
 	    }
-	    else {// if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning 
-		//   that some glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-		return (((centerPoint.x-drawingRadius) <= eb) && ((centerPoint.x+drawingRadius) >= wb)
-			&& ((centerPoint.y-drawingRadius) <= nb) && ((centerPoint.y+drawingRadius) >= sb));
-	    }
-	}
+		else if ((hotSpot.x-vw <= eb) && (hotSpot.x+vw >= wb) && (hotSpot.y-vh <= nb) && (hotSpot.y+vh >= sb)){
+			/* Glyph is at least partially in region.
+			   We approximate using the glyph bounding box, meaning that some glyphs not
+			   actually visible can be projected and drawn (but they won't be displayed)) */
+		    return true;
+		}
+		return false;
     }
 
     public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
-	if (forcedDrawing){return true;}
-	else {
-	    return ((centerPoint.x >= wb) && (centerPoint.x <= eb) &&
-		    (centerPoint.y >= sb) && (centerPoint.y <= nb)
-		    && ((centerPoint.x+drawingRadius) <= eb) && ((centerPoint.x-drawingRadius) >= wb)
-		    && ((centerPoint.y+drawingRadius) <= nb) && ((centerPoint.y-drawingRadius) >= sb));
+	    if ((hotSpot.x >= wb) && (hotSpot.x <= eb) && (hotSpot.y >= sb) && (hotSpot.y <= nb)){
+			// if glyph hotspot is in the region, we consider it is visible
+			return true;
+	    }
+		else if ((hotSpot.x+vw <= eb) && (hotSpot.x-vw >= wb) && (hotSpot.y+vh <= nb) && (hotSpot.y-vh >= sb)){
+			/* Glyph is at least partially in region.
+			   We approximate using the glyph bounding box, meaning that some glyphs not
+			   actually visible can be projected and drawn (but they won't be displayed)) */
+		    return true;
+		}
+		return false;
+    }
+
+	public LongPoint getHotSpot(){
+		return hotSpot;
 	}
-    }
-
-    /** Sets a threshold below which the pass should be drawn. Default is 1.5.
-     *@see #setForcedDrawing(boolean b)
-     */
-    public void setDrawingFactor(float f){
-	drawingFactor = f;
-    }
-
-    /** Force drawing of path, even if not visible. The algorithm in charge of detecting whether a glyph should be drawn or not is not completely reliable for weird paths.<br>Default is false. Use only if absolutely sure that your path is not displayed whereas it should be. Also try increasing drawing factor before resorting to forced drawing.
-     *@see #setDrawingFactor(float f)
-     */
-    public void setForcedDrawing(boolean b){
-	forcedDrawing = b;
-    }
 
     /** Not implemented yet. */
     public Object clone(){
-	return new DPath();
+		return null;
     }
 
     public void highlight(boolean b, Color selectedColor){}
     
-    /**
-     * Edit coordinates of start, end and control points of the element in DPath
-     * @param index index of the element in the DPath
-     * @param sx x coordinate of the element's start point
-     * @param sy y coordinate of the element's start point
-     * @param ex x coordinate of the element's end point
-     * @param ey y coordinate of the element's end point
-     * @param ctrlPoints list of the LongPoints that contain coordinates of the control point(s) (in case of QD/CB curve)
-     * @param abs indicates whether to use absolute coordinates or relative
-     */
-    public void editElement(int index, long sx, long sy, long ex, long ey, LongPoint[] ctrlPoints, boolean abs){
-	if (index > -1 && index < elements.length && elements[index] != null){
-	    if (index > 0){
-			if (abs){
-				elements[index-1].x = sx;
-				elements[index-1].y = sy;
-			}
-			else {
-				elements[index-1].x += sx;
-				elements[index-1].y += sy;
-			}
-		}
-		else{
-			if (abs){
-				this.vx = sx;
-				this.vy = sy;
-			}
-			else {
-				this.vx += sx;
-				this.vy += sy;
-			}
-		}
-	    PathElement el = elements[index];
-	    switch(el.type){
-	    case DPath.QDC:{
-		if (ctrlPoints != null && ctrlPoints.length > 0 && ctrlPoints[0] != null){
-		    if (abs){
-			((QDCElement)el).ctrlx = ctrlPoints[0].x;
-			((QDCElement)el).ctrly = ctrlPoints[0].y;
-		    }
-		    else {
-			((QDCElement)el).ctrlx += ctrlPoints[0].x;
-			((QDCElement)el).ctrly += ctrlPoints[0].y;
-		    }
-		}
-		break;
-	    }
-	    case DPath.CBC:{
-		if (ctrlPoints != null && ctrlPoints.length > 1 && ctrlPoints[0] != null && ctrlPoints[1] != null){
-		    if (abs){
-			((CBCElement)el).ctrlx1 = ctrlPoints[0].x;
-			((CBCElement)el).ctrly1 = ctrlPoints[0].y;
-			((CBCElement)el).ctrlx2 = ctrlPoints[1].x;
-			((CBCElement)el).ctrly2 = ctrlPoints[1].y;
-		    }
-		    else {
-			((CBCElement)el).ctrlx1 += ctrlPoints[0].x;
-			((CBCElement)el).ctrly1 += ctrlPoints[0].y;
-			((CBCElement)el).ctrlx2 += ctrlPoints[1].x;
-			((CBCElement)el).ctrly2 += ctrlPoints[1].y;
-		    }
-		}
-		break;
-	    }
-	    }
-	    if (abs){
-			el.x = ex;
-			el.y = ey;
-		}
-		else {
-			el.x += ex;
-			el.y += ey;
-		}
-		if (index == elements.length - 1){ // if this is last element
-			endPoint = new LongPoint(el.x, el.y);
-		}
-	}
-	try{vsm.repaintNow();}catch(NullPointerException e){}
-    }
-    
-    /**
-     * Transform DPath by translating each of the points
-     * @param points List of new coordinates for each point. Example order could be: startPoint, controlPoint1, controlPoint2, endPoint, controlPoint1, endPoint, endPoint ...
-     * @param abs  whether to use absolute coordinates or relative
-     */
-    public void edit(LongPoint[] points, boolean abs){
-	// check consistensy
-	int totalPointsCount = 1;
-	for (int i=0; i < elements.length; i++){
-	    totalPointsCount += 1; // for SEG and MOV
-	    switch (elements[i].type){
-	    case DPath.CBC:{totalPointsCount += 2; break;} // Two additional points
-	    case DPath.QDC:{totalPointsCount += 1; break;} // One additional point
-	    }
-	}
-	if (points != null && points.length == totalPointsCount){
-	    this.vx = points[0].x;
-	    this.vy = points[0].y;
-	    int offset = 0;
-	    for (int i=0; i < elements.length; i++) {
-			switch (elements[i].type){
-			case DPath.CBC:{
+	/**
+		* Edit coordinates of start, end and control points of the element in DPath
+		* @param index index of the element in the DPath
+		* @param sx x coordinate of the element's start point
+		* @param sy y coordinate of the element's start point
+		* @param ex x coordinate of the element's end point
+		* @param ey y coordinate of the element's end point
+		* @param ctrlPoints list of the LongPoints that contain coordinates of the control point(s) (in case of QD/CB curve)
+		* @param abs indicates whether to use absolute coordinates or relative
+		*/
+	public void editElement(int index, long sx, long sy, long ex, long ey, LongPoint[] ctrlPoints, boolean abs){
+		if (index > -1 && index < elements.length && elements[index] != null){
+			if (index > 0){
 				if (abs){
-				((CBCElement)elements[i]).ctrlx1 = points[i+1+offset].x;
-					((CBCElement)elements[i]).ctrly1 = points[i+1+offset].y;
-					((CBCElement)elements[i]).ctrlx2 = points[i+2+offset].x;
-					((CBCElement)elements[i]).ctrly2 = points[i+2+offset].y;
-					elements[i].x = points[i+3+offset].x;
-				elements[i].y = points[i+3+offset].y;
+					elements[index-1].x = sx;
+					elements[index-1].y = sy;
 				}
 				else {
-				((CBCElement)elements[i]).ctrlx1 += points[i+1+offset].x;
-					((CBCElement)elements[i]).ctrly1 += points[i+1+offset].y;
-					((CBCElement)elements[i]).ctrlx2 += points[i+2+offset].x;
-					((CBCElement)elements[i]).ctrly2 += points[i+2+offset].y;
-					elements[i].x += points[i+3+offset].x;
-				elements[i].y += points[i+3+offset].y;
+					elements[index-1].x += sx;
+					elements[index-1].y += sy;
 				}
-				offset += 2;
-				break;
 			}
-			case DPath.QDC:{
+			else{
 				if (abs){
-				((QDCElement)elements[i]).ctrlx = points[i+1+offset].x;
-					((QDCElement)elements[i]).ctrly = points[i+1+offset].y;
-					elements[i].x = points[i+2+offset].x;
-				elements[i].y = points[i+2+offset].y;
+					this.vx = sx;
+					this.vy = sy;
 				}
-				else{
-				((QDCElement)elements[i]).ctrlx += points[i+1+offset].x;
-					((QDCElement)elements[i]).ctrly += points[i+1+offset].y;
-					elements[i].x += points[i+2+offset].x;
-				elements[i].y += points[i+2+offset].y;
+				else {
+					this.vx += sx;
+					this.vy += sy;
 				}
-				offset += 1;
-				break;
 			}
-			default:{
-				if (abs){
+			PathElement el = elements[index];
+			switch(el.type){
+				case DPath.QDC:{
+					if (ctrlPoints != null && ctrlPoints.length > 0 && ctrlPoints[0] != null){
+						if (abs){
+							((QDCElement)el).ctrlx = ctrlPoints[0].x;
+							((QDCElement)el).ctrly = ctrlPoints[0].y;
+						}
+						else {
+							((QDCElement)el).ctrlx += ctrlPoints[0].x;
+							((QDCElement)el).ctrly += ctrlPoints[0].y;
+						}
+					}
+					break;
+				}
+				case DPath.CBC:{
+					if (ctrlPoints != null && ctrlPoints.length > 1 && ctrlPoints[0] != null && ctrlPoints[1] != null){
+						if (abs){
+							((CBCElement)el).ctrlx1 = ctrlPoints[0].x;
+							((CBCElement)el).ctrly1 = ctrlPoints[0].y;
+							((CBCElement)el).ctrlx2 = ctrlPoints[1].x;
+							((CBCElement)el).ctrly2 = ctrlPoints[1].y;
+						}
+						else {
+							((CBCElement)el).ctrlx1 += ctrlPoints[0].x;
+							((CBCElement)el).ctrly1 += ctrlPoints[0].y;
+							((CBCElement)el).ctrlx2 += ctrlPoints[1].x;
+							((CBCElement)el).ctrly2 += ctrlPoints[1].y;
+						}
+					}
+					break;
+				}
+			}
+			if (abs){
+				el.x = ex;
+				el.y = ey;
+			}
+			else {
+				el.x += ex;
+				el.y += ey;
+			}
+			if (index == elements.length - 1){
+				// if this is last element
+				endPoint = new LongPoint(el.x, el.y);
+			}
+		}
+		computeBounds();
+		try{vsm.repaintNow();}catch(NullPointerException e){}
+	}
+
+	/**
+		* Transform DPath by translating each of the points
+		* @param points List of new coordinates for each point. Example order could be: startPoint, controlPoint1, controlPoint2, endPoint, controlPoint1, endPoint, endPoint ...
+		* @param abs  whether to use absolute coordinates or relative
+		*/
+	public void edit(LongPoint[] points, boolean abs){
+		// check consistensy
+		int totalPointsCount = 1;
+		for (int i=0; i < elements.length; i++){
+			// for SEG and MOV
+			totalPointsCount += 1;
+			switch (elements[i].type){
+				// Two additional points
+				case DPath.CBC:{totalPointsCount += 2; break;}
+				// One additional point
+				case DPath.QDC:{totalPointsCount += 1; break;}
+			}
+		}
+		if (points != null && points.length == totalPointsCount){
+			this.vx = points[0].x;
+			this.vy = points[0].y;
+			int offset = 0;
+			for (int i=0; i < elements.length; i++) {
+				switch (elements[i].type){
+					case DPath.CBC:{
+						if (abs){
+							((CBCElement)elements[i]).ctrlx1 = points[i+1+offset].x;
+							((CBCElement)elements[i]).ctrly1 = points[i+1+offset].y;
+							((CBCElement)elements[i]).ctrlx2 = points[i+2+offset].x;
+							((CBCElement)elements[i]).ctrly2 = points[i+2+offset].y;
+							elements[i].x = points[i+3+offset].x;
+							elements[i].y = points[i+3+offset].y;
+						}
+						else {
+							((CBCElement)elements[i]).ctrlx1 += points[i+1+offset].x;
+							((CBCElement)elements[i]).ctrly1 += points[i+1+offset].y;
+							((CBCElement)elements[i]).ctrlx2 += points[i+2+offset].x;
+							((CBCElement)elements[i]).ctrly2 += points[i+2+offset].y;
+							elements[i].x += points[i+3+offset].x;
+							elements[i].y += points[i+3+offset].y;
+						}
+						offset += 2;
+						break;
+					}
+					case DPath.QDC:{
+						if (abs){
+							((QDCElement)elements[i]).ctrlx = points[i+1+offset].x;
+							((QDCElement)elements[i]).ctrly = points[i+1+offset].y;
+							elements[i].x = points[i+2+offset].x;
+							elements[i].y = points[i+2+offset].y;
+						}
+						else{
+							((QDCElement)elements[i]).ctrlx += points[i+1+offset].x;
+							((QDCElement)elements[i]).ctrly += points[i+1+offset].y;
+							elements[i].x += points[i+2+offset].x;
+							elements[i].y += points[i+2+offset].y;
+						}
+						offset += 1;
+						break;
+					}
+					default:{
+						if (abs){
 							elements[i].x = points[i+1+offset].x;
 							elements[i].y = points[i+1+offset].y;
 						}
@@ -571,16 +611,18 @@ public class DPath extends Glyph {
 							elements[i].x += points[i+1+offset].x;
 							elements[i].y += points[i+1+offset].y;
 						}
-			}
-			}
-			if (i == elements.length - 1){ // if this is last element
-				endPoint = new LongPoint(elements[i].x, elements[i].y);
+					}
+				}
+				if (i == elements.length - 1){
+					// if this is last element
+					endPoint = new LongPoint(elements[i].x, elements[i].y);
+				}
 			}
 		}
+		computeBounds();
+		try{vsm.repaintNow();}catch(NullPointerException e){}
 	}
-	try{vsm.repaintNow();}catch(NullPointerException e){}
-    }
-    
+
     /**
      * Get total number of elements in the path
      */
@@ -698,7 +740,7 @@ public class DPath extends Glyph {
     }
     
     /**
-     * Calculates coordinates of all DPath's points (including control points) to display the DPAth as a line.
+     * Calculates coordinates of all DPath's points (including control points) to display the DPath as a line.
      * @param path DPath to be flatten
      * @param startPoint Start point of desired line
      * @param endPoint End point of desired line
@@ -723,95 +765,91 @@ public class DPath extends Glyph {
 	return result;
     }
     
-    /**
-     * Convert given VPath instance to the DPath
-     * @param vp VPath to be converted
-     * @return new instance of DPath which has the same structure and location as given VPath
-     */
-    public static DPath fromVPath(VPath vp){
-	DPath res = null;
-	if (vp != null){
-	    res = (vp instanceof VPathST) ? new DPathST(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor());
-	    BasicStroke s = vp.getStroke();
-	    if (s != null){
-		res.setStroke(s);
-	    }
-	    else {
-		res.setStrokeWidth(vp.getStrokeWidth());
-	    }
-	    res.setDrawingFactor(vp.getDrawingFactor());
-	    res.setForcedDrawing(vp.getForcedDrawing());
-	    PathIterator pi = vp.getJava2DPathIterator();
-	    pi.next(); 
-	    double[] cds=new double[6];
-	    int type;
-	    while (!pi.isDone()){
-			type=pi.currentSegment(cds);
-			switch (type){
-			case PathIterator.SEG_CUBICTO:{
-				res.addCbCurve((long)cds[4],(long)-cds[5],(long)cds[0],(long)-cds[1],(long)cds[2],(long)-cds[3],true);
-				break;
+	/**
+		* Convert given VPath instance to the DPath
+		* @param vp VPath to be converted
+		* @return new instance of DPath which has the same structure and location as given VPath
+		*/
+	public static DPath fromVPath(VPath vp){
+		DPath res = null;
+		if (vp != null){
+			res = (vp instanceof VPathST) ? new DPathST(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor());
+			BasicStroke s = vp.getStroke();
+			if (s != null){
+				res.setStroke(s);
 			}
-			case PathIterator.SEG_QUADTO:{
-				res.addQdCurve((long)cds[2],(long)-cds[3],(long)cds[0],(long)-cds[1],true);
-				break;
+			else {
+				res.setStrokeWidth(vp.getStrokeWidth());
 			}
-			case PathIterator.SEG_LINETO:{
-				res.addSegment((long)cds[0],(long)-cds[1],true);
-				break;
+			PathIterator pi = vp.getJava2DPathIterator();
+			pi.next(); 
+			double[] cds=new double[6];
+			int type;
+			while (!pi.isDone()){
+				type=pi.currentSegment(cds);
+				switch (type){
+					case PathIterator.SEG_CUBICTO:{
+						res.addCbCurve((long)cds[4],(long)-cds[5],(long)cds[0],(long)-cds[1],(long)cds[2],(long)-cds[3],true);
+						break;
+					}
+					case PathIterator.SEG_QUADTO:{
+						res.addQdCurve((long)cds[2],(long)-cds[3],(long)cds[0],(long)-cds[1],true);
+						break;
+					}
+					case PathIterator.SEG_LINETO:{
+						res.addSegment((long)cds[0],(long)-cds[1],true);
+						break;
+					}
+					case PathIterator.SEG_MOVETO:{
+						res.jump((long)cds[0],(long)-cds[1],true);
+						break;
+					}
+				}
+				pi.next();
 			}
-			case PathIterator.SEG_MOVETO:{
-				res.jump((long)cds[0],(long)-cds[1],true);
-				break;
-			}
-			}
-			pi.next();
-	    }
+		}
+		return res;
 	}
-	return res;
-    }
     
-    /**
-     * Convert given DPath instance to the VPath
-     * @param dp DPath to be converted
-     * @return new instance of VPath which has the same structure and location as given DPath
-     */
-    public static VPath toVPath(DPath dp){
-	VPath res = null;
-	if (dp != null){
-	    res = (dp instanceof DPathST) ? new VPathST(dp.vx, dp.vy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue()) : new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
-	    BasicStroke s = dp.getStroke();
-	    if (s != null)
-		res.setStroke(s);
-	    else
-		res.setStrokeWidth(dp.getStrokeWidth());
-	    res.setDrawingFactor(dp.drawingFactor);
-	    res.setForcedDrawing(dp.forcedDrawing);
-	    for (int i = 0; i < dp.getElementsCount(); i++){
-		int elType = dp.getElementType(i);
-		LongPoint[] pts = dp.getElementPointsCoordinates(i);
-		switch(elType){
-		case DPath.CBC:{
-		    res.addCbCurve(pts[3].x, pts[3].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, true);
-		    break;
+	/**
+		* Convert given DPath instance to the VPath
+		* @param dp DPath to be converted
+		* @return new instance of VPath which has the same structure and location as given DPath
+		*/
+	public static VPath toVPath(DPath dp){
+		VPath res = null;
+		if (dp != null){
+			res = (dp instanceof DPathST) ? new VPathST(dp.vx, dp.vy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue()) : new VPath(dp.vx, dp.vy, dp.vz, dp.getColor());
+			BasicStroke s = dp.getStroke();
+			if (s != null)
+				res.setStroke(s);
+			else
+				res.setStrokeWidth(dp.getStrokeWidth());
+			for (int i = 0; i < dp.getElementsCount(); i++){
+				int elType = dp.getElementType(i);
+				LongPoint[] pts = dp.getElementPointsCoordinates(i);
+				switch(elType){
+					case DPath.CBC:{
+						res.addCbCurve(pts[3].x, pts[3].y, pts[1].x, pts[1].y, pts[2].x, pts[2].y, true);
+						break;
+					}
+					case DPath.QDC:{
+						res.addQdCurve(pts[2].x, pts[2].y, pts[1].x, pts[1].y, true);
+						break;
+					}
+					case DPath.SEG:{
+						res.addSegment(pts[1].x, pts[1].y, true);
+						break;
+					}
+					case DPath.MOV:{
+						res.jump(pts[1].x, pts[1].y, true);
+						break;
+					}
+				}
+			}
 		}
-		case DPath.QDC:{
-		    res.addQdCurve(pts[2].x, pts[2].y, pts[1].x, pts[1].y, true);
-		    break;
-		}
-		case DPath.SEG:{
-		    res.addSegment(pts[1].x, pts[1].y, true);
-		    break;
-		}
-		case DPath.MOV:{
-		    res.jump(pts[1].x, pts[1].y, true);
-		    break;
-		}
-		}
-	    }
+		return res;
 	}
-	return res;
-    }
     
     /**
      * Get orientation of the tangent to the start of the path.
