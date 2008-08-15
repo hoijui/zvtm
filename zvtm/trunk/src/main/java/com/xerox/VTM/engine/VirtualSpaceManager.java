@@ -926,7 +926,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 					if (tmpRatio>ratio){ratio = tmpRatio;}
 				}
 				ratio *= mFactor;
-				return new Location(dx, dy, currentAlt*Math.abs(ratio));
+				return new Location(dx, dy, currentAlt*Math.abs(ratio)-c.getFocal());
 			}
 			else return null;
 		}
@@ -964,7 +964,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	public Location getGlobalView(Camera c, int d, float mFactor){
 		Location l = getGlobalView(c, mFactor);
 		if (l != null){
-			float dAlt = l.alt - c.getAltitude() - c.getFocal();
+			float dAlt = l.alt - c.getAltitude();
 			Vector prms = new Vector();
 			prms.add(new Float(dAlt));
 			prms.add(new LongPoint(l.vx-c.posx, l.vy-c.posy));
