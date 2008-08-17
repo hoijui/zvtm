@@ -1116,52 +1116,58 @@ public class VirtualSpaceManager implements AWTEventListener {
 	}
     }
 
-    /**translates and (un)zooms a camera in order to focus on a specific rectangular region
-     *@param c Camera to be moved
-     *@param d duration of the animation in ms
-     *@param x1 coordinate of the region's west bound (in virtual space)
-     *@param y1 coordinate of the region's north bound (in virtual space)
-     *@param x2 coordinate of the region's east bound (in virtual space)
-     *@param y2 coordinate of the region's south bound (in virtual space)
-     *@return the final camera location
-     */
-    public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2){
-	View v=null;
-	try {
-	    v=c.getOwningView();
-	    if (v!=null){
-		long[] wnes={x1,y1,x2,y2};  //wnes=west north east south
-		long dx=(wnes[2]+wnes[0])/2;  //new coords where camera should go
-		long dy=(wnes[1]+wnes[3])/2;
-		long[] regBounds=v.getVisibleRegion(c);
-		long[] trRegBounds={regBounds[0]+dx-c.posx,regBounds[3]+dy-c.posy};  //region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ; we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
-		float currentAlt=c.getAltitude()+c.getFocal();
-		float ratio=0;
-		//compute the mult factor for altitude to see all stuff on X
-		if (trRegBounds[0]!=0){ratio=(dx-wnes[0])/((float)(dx-trRegBounds[0]));}
-		//same for Y ; take the max of both
-		if (trRegBounds[1]!=0){
-		    float tmpRatio=(dy-wnes[3])/((float)(dy-trRegBounds[1]));
-		    if (tmpRatio>ratio){ratio=tmpRatio;}
+	/**translates and (un)zooms a camera in order to focus on a specific rectangular region
+		*@param c Camera to be moved
+		*@param d duration of the animation in ms
+		*@param x1 x coord of first point
+		*@param y1 y coord of first point
+		*@param x2 x coord of opposite point
+		*@param y2 y coord of opposite point
+		*@return the final camera location
+		*/
+	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2){
+		View v=null;
+		try {
+			v=c.getOwningView();
+			if (v!=null){
+				long minX=Math.min(x1,x2);
+				long minY=Math.min(y1,y2);
+				long maxX=Math.max(x1,x2);
+				long maxY=Math.max(y1,y2);
+				long[] wnes={minX,maxY,maxX,minY};  //wnes=west north east south
+				long dx=(wnes[2]+wnes[0])/2;  //new coords where camera should go
+				long dy=(wnes[1]+wnes[3])/2;
+				long[] regBounds=v.getVisibleRegion(c);
+				// region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
+				// we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
+				long[] trRegBounds={regBounds[0]+dx-c.posx,regBounds[3]+dy-c.posy};
+				float currentAlt=c.getAltitude()+c.getFocal();
+				float ratio=0;
+				//compute the mult factor for altitude to see all stuff on X
+				if (trRegBounds[0]!=0){ratio=(dx-wnes[0])/((float)(dx-trRegBounds[0]));}
+				//same for Y ; take the max of both
+				if (trRegBounds[1]!=0){
+					float tmpRatio=(dy-wnes[3])/((float)(dy-trRegBounds[1]));
+					if (tmpRatio>ratio){ratio=tmpRatio;}
+				}
+				float newAlt=currentAlt*Math.abs(ratio);
+				float dAlt=newAlt-currentAlt;
+				Vector prms=new Vector();
+				prms.add(new Float(dAlt));prms.add(new LongPoint(dx-c.posx,dy-c.posy));
+				animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID());
+				return new Location(dx,dy,newAlt);
+			}
+			else return null;
 		}
-		float newAlt=currentAlt*Math.abs(ratio);
-		float dAlt=newAlt-currentAlt;
-		Vector prms=new Vector();
-		prms.add(new Float(dAlt));prms.add(new LongPoint(dx-c.posx,dy-c.posy));
-		animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID());
-		return new Location(dx,dy,newAlt);
-	    }
-	    else return null;
+		catch (NullPointerException e){
+			System.err.println("Error:VirtualSpaceManager:centerOnRegion: ");
+			System.err.println("Camera c="+c);
+			System.err.println("View v="+v);
+			if (debug){e.printStackTrace();}
+			else {System.err.println(e);}
+			return null;
+		}
 	}
-	catch (NullPointerException e){
-	    System.err.println("Error:VirtualSpaceManager:centerOnRegion: ");
-	    System.err.println("Camera c="+c);
-	    System.err.println("View v="+v);
-	    if (debug){e.printStackTrace();}
-	    else {System.err.println(e);}
-	    return null;
-	}
-    }
 
     /** returns a vector of glyphs whose hotspot is in region delimited by rectangle (x1,y1,x2,y2) in virtual space vs (returns null if empty). Coordinates of the mouse cursor in virtual space are available in instance variables vx and vy of class VCursor. The selection rectangle can be drawn on screen by using ViewPanel.setDrawRect(true) (e.g. call when mouse button is pressed)/ViewPanel.setDrawRect(false) (e.g. call when mouse button is released)
      *@param x1 x coord of first point
