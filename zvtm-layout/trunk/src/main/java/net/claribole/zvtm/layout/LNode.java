@@ -360,7 +360,6 @@ public class LNode {
 			vText.vx = parent.vText.vx;
 			vText.vy = parent.vText.vy;
 		}
-		inEdge.setForcedDrawing(true);
 		tree.vs.vsm.addGlyph(inEdge, tree.vs);
 		tree.vs.vsm.addGlyph(vText, tree.vs);
 		tree.vs.atBottom(inEdge);
