@@ -42,6 +42,18 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <artifactId>zvtm</artifactId>
       <version>0.9.7-SNAPSHOT</version>
     </dependency>
+<!--
+
+	SwingLab's PRDFRenderer is not available in any Maven repository.
+	Build it and install the JAR file in your local repository using the following command line:
+        mvn install:install-file -Dfile=PDFRenderer.jar -DgroupId=com.sun.pdfrenderer -DartifactId=pdfRenderer -Dversion=1.0 -Dpackaging=jar	
+
+-->
+	<dependency>
+      <groupId>com.sun.pdfrenderer</groupId>
+      <artifactId>pdfRenderer</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
   
   <!-- Build -->
@@ -104,8 +116,9 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
           <aggregate>true</aggregate>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
           <bottom><![CDATA[Copyright &#169; 2008 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
-          <links> 
+          <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs</link>
             <link>https://pdf-renderer.dev.java.net/nonav/demos/latest/javadoc</link>
           </links>
         </configuration>
