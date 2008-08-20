@@ -311,6 +311,12 @@ public class WorldExplorer implements Java2DPainter {
         boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
         boolean grid = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
+		if (dir == null){
+			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [fs] [grid]");
+			System.out.println("\n\tfs: fullscreen: true or false");
+			System.out.println("\tgrid: draw a grid on top of the map: true or false");
+			System.exit(0);
+		}
         new WorldExplorer(fs, grid, dir);
     }
 
