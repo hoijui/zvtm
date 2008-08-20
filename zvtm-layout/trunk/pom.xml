@@ -10,7 +10,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <groupId>net.claribole.zvtm</groupId>
   <artifactId>zvtm-layout</artifactId>
   <packaging>jar</packaging>
-  <name>ZVTM</name>
+  <name>ZVTM-LAYOUT</name>
   <version>0.2.0-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net</url>
   
