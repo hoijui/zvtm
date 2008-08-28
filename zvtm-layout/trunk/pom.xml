@@ -114,6 +114,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
             <link>http://zvtm.sourceforge.net/apidocs</link>
             <link>http://jung.sourceforge.net/doc/api</link>
           </links>
+          <excludePackageNames>net.claribole.zvtm.layout.tests</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
