@@ -58,7 +58,7 @@ import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VCircleST;
 import com.xerox.VTM.glyphs.VEllipse;
 import com.xerox.VTM.glyphs.VEllipseST;
-import com.xerox.VTM.glyphs.VPath;
+import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.glyphs.VRectangleOr;
@@ -201,7 +201,7 @@ public class SVGReader {
 	return Math.round(Double.parseDouble(s));
     }
 
-    private static void processNextSVGPathCommand(StringBuffer svg,VPath ph,StringBuffer lastCommand){
+    private static void processNextSVGPathCommand(StringBuffer svg,DPath ph,StringBuffer lastCommand){
 	if (svg.length()>0) {
 	    switch (svg.charAt(0)){
 	    case 'M':{
@@ -1435,30 +1435,30 @@ public class SVGReader {
 		return res;
 	}
 
-    /** Create a VPath from an SVG text element.
+    /** Create a DPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
-     *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new VPath()</i>)
+     *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      */
-    public static VPath createPath(Element e,VPath ph){
+    public static DPath createPath(Element e,DPath ph){
 	return createPath(e,ph,null,false);
     }
 
-    /** Create a VPath from an SVG text element.
+    /** Create a DPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
-     *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new VPath()</i>)
+     *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VPath createPath(Element e,VPath ph,Context ctx){
+    public static DPath createPath(Element e,DPath ph,Context ctx){
 	return createPath(e,ph,ctx,false);
     }
 
-    /** Create a VPath from an SVG text element.
+    /** Create a DPath from an SVG text element.
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
-     *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new VPath()</i>)
+     *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VPath createPath(Element e,VPath ph,Context ctx,boolean meta){
+    public static DPath createPath(Element e,DPath ph,Context ctx,boolean meta){
 	StringBuffer svg=new StringBuffer(e.getAttribute(_d));
 	if (checkSVGPath(svg.toString())){
 	    StringBuffer lastCommand=new StringBuffer("M");
@@ -1490,30 +1490,30 @@ public class SVGReader {
 	else return null;
     }
 
-    /** Create a VPath from an SVG text element.
+    /** Create a DPath from an SVG text element.
      *@param d the <i>d</i> attribute value of an SVG path
-     *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new VPath()</i>)
+     *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      */
-    public static VPath createPath(String d,VPath ph){
+    public static DPath createPath(String d,DPath ph){
 	return createPath(d,ph,null,false);
     }
 
-    /** Create a VPath from an SVG text element.
+    /** Create a DPath from an SVG text element.
      *@param d the <i>d</i> attribute value of an SVG path
-     *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new VPath()</i>)
+     *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VPath createPath(String d,VPath ph,Context ctx){
+    public static DPath createPath(String d,DPath ph,Context ctx){
 	return createPath(d,ph,ctx,false);
     }
 
-    /** Create a VPath from an SVG text element.
+    /** Create a DPath from an SVG text element.
      *@param d the <i>d</i> attribute value of an SVG path
-     *@param ph a VPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new VPath()</i>)
+     *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VPath createPath(String d,VPath ph,Context ctx,boolean meta){
+    public static DPath createPath(String d,DPath ph,Context ctx,boolean meta){
 	StringBuffer svg=new StringBuffer(d);
 	if (checkSVGPath(svg.toString())){
 	    StringBuffer lastCommand=new StringBuffer("M");
@@ -1614,7 +1614,7 @@ public class SVGReader {
 			vsm.addGlyph(createCircle(e,ctx,meta),vs);
 		}
 		else if (tagName.equals(_path)){
-			vsm.addGlyph(createPath(e,new VPath(),ctx,meta),vs);
+			vsm.addGlyph(createPath(e,new DPath(),ctx,meta),vs);
 		}
 		else if (tagName.equals(_text)){
 			vsm.addGlyph(createText(e,ctx,vsm,meta),vs);
