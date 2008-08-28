@@ -1080,7 +1080,12 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
 	/* -------------- Bring and Go mode (previously called Fresnel mode) --------------------*/
 	
+	static final int BRING_ANIM_DURATION = 300;
+	static final double BRING_DISTANCE_FACTOR = 1.5;
+	
 	boolean isBringingAndGoing = false;
+	
+	Vector broughtElements = new Vector();
 	
 	void enterBringAndGoMode(){
 		System.out.println("Entering BG mode");
@@ -1093,8 +1098,23 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	}
 	
 	void startBringAndGo(Glyph g){
-		System.out.println("Starting bring and go at "+g);
 		isBringingAndGoing = true;
+		LNode n = LogicalStructure.getNode(g);
+		if (n == null){return;}
+		ClosedShape thisEndShape = n.getShape();
+		double thisEndBoundingCircleRadius = thisEndShape.getSize();
+		LEdge[] arcs = n.getAllArcs();		
+		for (int i=0;i<arcs.length;i++){
+			LNode otherEnd = arcs[i].getOtherEnd(n);			
+			ClosedShape otherEndShape = otherEnd.getShape();
+			double otherEndBoundingCircleRadius = otherEndShape.getSize();
+			double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
+			double bd = (thisEndBoundingCircleRadius + otherEndBoundingCircleRadius) * BRING_DISTANCE_FACTOR;
+			double ratio = bd / d;
+			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
+			long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
+			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, bx, by);
+		}
 	}
 	
 	void endBringAndGo(Glyph g){
@@ -1102,6 +1122,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		//        else send all nodes and edges to their initial position, but also move camera to g
 		System.out.println("Ending bring and go");
 		isBringingAndGoing = false;
+		if (!broughtElements.isEmpty()){
+			for (int i=broughtElements.size()-1;i>=0;i--){
+				sendBack((BroughtElement)broughtElements.elementAt(i));
+			}
+		}
 	}
 	
 	void attemptToBringMore(Glyph g){
@@ -1111,6 +1136,38 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	void attemptToBringLess(Glyph g){
 		System.out.println("Attempting to send back for "+g);
 		
+	}
+	
+	void bring(LEdge arc, LNode node, long sx, long sy, long bx, long by){
+		broughtElements.add(BroughtElement.rememberPreviousState(node));
+		broughtElements.add(BroughtElement.rememberPreviousState(arc));
+		ClosedShape nodeShape = node.getShape();
+		LongPoint translation = new LongPoint(bx-nodeShape.vx, by-nodeShape.vy);
+		Glyph[] glyphs = node.getGlyphs();
+		for (int i=0;i<glyphs.length;i++){
+			vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, glyphs[i].getID());			
+		}
+		DPath spline = arc.getSpline();
+		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, new LongPoint(sx, sy), new LongPoint(bx,by), true);
+		vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
+		glyphs = arc.getGlyphs();
+		for (int i=0;i<glyphs.length;i++){
+			if (glyphs[i] != spline){
+				if (glyphs[i] instanceof VText){
+					// put any label at the center of the edge (simplest think we can do)
+					vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, new LongPoint(bx-sx, by-sy), glyphs[i].getID());
+				}
+				else {
+					// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
+					glyphs[i].setVisible(false);
+				}
+			}
+		}
+	}
+	
+	void sendBack(BroughtElement be){
+		be.restorePreviousState(vsm.animator, BRING_ANIM_DURATION);
+		broughtElements.remove(be);
 	}
 
 }

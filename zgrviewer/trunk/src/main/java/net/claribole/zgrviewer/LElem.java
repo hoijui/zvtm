@@ -20,6 +20,8 @@ class LElem {
     // the various glyphs constituting a node or edge)
     String[] URLs;
 
+    Glyph[] glyphs;
+
     LElem(){}
 
     LElem(Metadata md){
@@ -35,5 +37,11 @@ class LElem {
     String getURL(Glyph g){
         return URLs[0];
     }
+
+	Glyph[] getGlyphs(){
+		Glyph[] res = new Glyph[glyphs.length];
+		System.arraycopy(glyphs, 0, res, 0, glyphs.length);
+		return res;
+	}
 
 }

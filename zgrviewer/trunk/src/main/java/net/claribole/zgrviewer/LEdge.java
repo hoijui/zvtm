@@ -27,8 +27,6 @@ class LEdge extends LElem {
 
     boolean directed = false;
 
-    Glyph[] glyphs;
-
     LNode tail;
     LNode head;
 

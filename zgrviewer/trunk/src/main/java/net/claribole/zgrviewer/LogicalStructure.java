@@ -155,4 +155,26 @@ class LogicalStructure {
 	return res;
     }
 
+	/** Get the logical node corresponding to this glyph.
+	 *@return null if g is not associated to a logical node.
+	 */
+	static LNode getNode(Glyph g){
+		Object o = (g != null) ? g.getOwner() : null;
+		if (o != null){
+			return (o instanceof LNode) ? (LNode)o : null;
+		}
+		return null;
+	}
+
+	/** Get the logical arc corresponding to this glyph.
+	 *@return null if g is not associated to a logical arc.
+	 */
+	static LEdge getEdge(Glyph g){
+		Object o = (g != null) ? g.getOwner() : null;
+		if (o != null){
+			return (o instanceof LEdge) ? (LEdge)o : null;
+		}
+		return null;
+	}
+
 }

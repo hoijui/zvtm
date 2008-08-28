@@ -18,8 +18,6 @@ import com.xerox.VTM.svg.Metadata;
 
 class LNode extends LElem {
 
-    Glyph[] glyphs;
-
     LEdge[] edges;
     short[] edgeDirections;
 
@@ -61,6 +59,12 @@ class LNode extends LElem {
 	edges = nedges;
 	edgeDirections = nedgeDirections;
     }
+
+	LEdge[] getAllArcs(){
+		LEdge[] res = new LEdge[edges.length];
+		System.arraycopy(edges, 0, res, 0, edges.length);
+		return res;
+	}
 
     LEdge[] getOutgoingArcs(){
 	int oaCount = 0;

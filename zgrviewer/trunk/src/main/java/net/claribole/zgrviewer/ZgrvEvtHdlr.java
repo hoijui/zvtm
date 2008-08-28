@@ -109,6 +109,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				x2=v.getMouse().vx;
 				y2=v.getMouse().vy;
 				if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
+					System.out.println("a");
+					
 					grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 				}
 				zoomingInRegion=false;
@@ -130,6 +132,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			if (v.lastGlyphEntered() != null){grMngr.tp.selectButton((VImage)v.lastGlyphEntered());}
 		}
 		else {
+			if (grMngr.tp.isBringAndGoMode()){return;}
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
@@ -158,6 +161,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 					}
 					else {
 						if (g != null && g != grMngr.boundingBox){
+							System.out.println("b");
+							
 							grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
 						}
 					}
