@@ -167,6 +167,14 @@ public class VSegment extends Glyph implements RectangularShape {
 
     public float getSize(){return size;}
 
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		return res;
+	}
+
     /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
     public void setEndPoints(long x1, long y1, long x2, long y2){
 	vx = (x1 + x2) / 2;

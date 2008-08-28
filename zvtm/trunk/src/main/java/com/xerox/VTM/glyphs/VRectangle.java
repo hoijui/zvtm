@@ -207,6 +207,14 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	else {return false;}
     }
 
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		return res;
+	}
+
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph

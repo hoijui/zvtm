@@ -338,6 +338,14 @@ public class DPath extends Glyph implements RectangularShape {
 		computeSize();
 	}
 
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		return res;
+	}
+
     public float getOrient(){return orient;}
 
     public boolean fillsView(long w,long h,int camIndex){

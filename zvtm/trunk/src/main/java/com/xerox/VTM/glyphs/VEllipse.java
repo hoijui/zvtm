@@ -189,6 +189,14 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		return res;
+	}
+
     public boolean fillsView(long w,long h,int camIndex){//would be too complex: just say no
 	return false;
     }

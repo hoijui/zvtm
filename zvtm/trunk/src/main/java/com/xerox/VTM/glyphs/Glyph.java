@@ -162,7 +162,9 @@ public abstract class Glyph implements Cloneable {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
-    /** Get the coordinates of the glyph's geometrical center. */
+    /** Get the coordinates of the glyph's geometrical center.
+     *@return a copy of the glyph's location. Changing the x,y coordinates of the returned LongPoint will not have any effect on the glyph's position.
+     */
     public LongPoint getLocation(){return new LongPoint(vx,vy);}
 
     /** Get glyph's size (radius of bounding circle). */
@@ -748,6 +750,14 @@ public abstract class Glyph implements Cloneable {
 	 */
 	public boolean visibleInDisc(long vx, long vy, long radius, int camIndex){
 		return false;
+	}
+	
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-Math.round(size),vy+Math.round(size),vx+Math.round(size),vy-Math.round(size)};
+		return res;
 	}
 
     /*-------Internal use only----------------------------------*/

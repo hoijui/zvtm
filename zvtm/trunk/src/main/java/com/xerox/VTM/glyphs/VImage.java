@@ -227,6 +227,14 @@ public class VImage extends ClosedShape implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		return res;
+	}
+
     /** Set bitmap image to be displayed. */
     public void setImage(Image i){
 	image=i;

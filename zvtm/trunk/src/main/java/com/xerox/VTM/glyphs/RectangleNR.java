@@ -188,6 +188,14 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
+	/** Get the bounding box of this Glyph in virtual space coordinates.
+	 *@return west, north, east and south bounds in virtual space.
+	 */
+	public long[] getBounds(){
+		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		return res;
+	}
+
     private void updateProjectedWH(){
 	if (pc!=null){
 	    for (int i=0;i<pc.length;i++){
