@@ -63,6 +63,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				grMngr.vsm.stickToMouse(grMngr.magWindow);
 				draggingMagWindow = true;
 			}
+			else if (grMngr.tp.isBringAndGoMode() && (g = v.lastGlyphEntered()) != null){
+				grMngr.startBringAndGo(g);
+			}
 			else {
 				grMngr.rememberLocation(v.cams[0].getLocation());
 				if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
@@ -90,6 +93,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		if (grMngr.isBringingAndGoing){
+			grMngr.endBringAndGo(v.lastGlyphEntered());
+		}
 		if (toolPaletteIsActive){return;}
 		else {
 			draggingZoomWindow = false;
@@ -267,7 +273,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-		if (toolPaletteIsActive){return;}
+		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
 		if (mod != ALT_MOD && buttonNumber == 1){
 			if (draggingZoomWindow){
 				grMngr.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
@@ -393,8 +399,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				grMngr.highlightElement(g, null, null, true); 
 				// g is guaranteed to be != null, don't care about camera and cursor
 			}
-			else if (grMngr.tp.isBringAndGoMode()){
-				grMngr.bring(g);
+			else if (grMngr.isBringingAndGoing){
+				grMngr.attemptToBringMore(g);
 			}
 			else {
 				// node highlighting is taken care of above (in a slightly different manner)
@@ -427,6 +433,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		else {
 			if (application.grMngr.tp.isHighlightMode()){
 				grMngr.unhighlightAll();
+			}
+			else if (grMngr.isBringingAndGoing){
+				grMngr.attemptToBringLess(g);
 			}
 			else {
 				// node highlighting is taken care of above (in a slightly different manner)

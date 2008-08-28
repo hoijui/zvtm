@@ -1078,6 +1078,41 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	originalEdgeColor.removeAllElements();
     }
 
+	/* -------------- Bring and Go mode (previously called Fresnel mode) --------------------*/
+	
+	boolean isBringingAndGoing = false;
+	
+	void enterBringAndGoMode(){
+		System.out.println("Entering BG mode");
+		
+	}
+	
+	void exitBringAndGoMode(){
+		System.out.println("Exiting BG mode");
+		
+	}
+	
+	void startBringAndGo(Glyph g){
+		System.out.println("Starting bring and go at "+g);
+		isBringingAndGoing = true;
+	}
+	
+	void endBringAndGo(Glyph g){
+		//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
+		//        else send all nodes and edges to their initial position, but also move camera to g
+		System.out.println("Ending bring and go");
+		isBringingAndGoing = false;
+	}
+	
+	void attemptToBringMore(Glyph g){
+		System.out.println("Attempting to bring more for "+g);
+	}
+	
+	void attemptToBringLess(Glyph g){
+		System.out.println("Attempting to send back for "+g);
+		
+	}
+
 }
 
 class ZGRGlassPane extends JComponent {
