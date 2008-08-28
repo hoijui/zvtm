@@ -230,11 +230,19 @@ public class DPath extends Glyph implements RectangularShape {
 	public void jump(long x, long y, boolean abs){
 		if (abs){endPoint.setLocation(x, y);}
 		else {endPoint.translate(x, y);}
-		PathElement[] tmp = new PathElement[elements.length+1];
-		System.arraycopy(elements, 0, tmp, 0, elements.length);
-		tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y);
-		Arrays.fill(elements, null);
-		elements = tmp;
+		if (elements.length == 0){
+			// ignore jump if first command (instead, locate start point at jump coordinates)
+			// this will work even if there are multiple jump commands at the start of the path
+			spx = vx = endPoint.x;
+			spy = vy = endPoint.y;
+		}
+		else {
+			PathElement[] tmp = new PathElement[elements.length+1];
+			System.arraycopy(elements, 0, tmp, 0, elements.length);
+			tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y);
+			Arrays.fill(elements, null);
+			elements = tmp;			
+		}
 		computeBounds();
 	}
 
@@ -251,6 +259,10 @@ public class DPath extends Glyph implements RectangularShape {
 
 	/** Not implemented yet. */
     public void setHeight(long h){}
+
+	public LongPoint getStartPoint(){
+		return new LongPoint(spx, spy);
+	}
 
     public void initCams(int nbCam){
 	pc = new ProjectedCoords[nbCam];
