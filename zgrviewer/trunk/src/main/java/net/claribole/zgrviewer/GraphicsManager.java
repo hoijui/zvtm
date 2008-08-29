@@ -50,16 +50,18 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ClosedShape;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.RectangleNR;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.glyphs.VRectangleOr;
+import net.claribole.zvtm.glyphs.DPath;
+import net.claribole.zvtm.glyphs.DPathST;
 import com.xerox.VTM.svg.Metadata;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.TransitionManager;
-import net.claribole.zvtm.glyphs.DPath;
 
 /* Multiscale feature manager */
 
@@ -284,7 +286,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	magWindow.setFilled(false);
 	magWindow.setBorderColor(GraphicsManager.DM_COLOR);
 	vsm.addGlyph(magWindow, mSpace);
-	mSpace.hide(magWindow);
+	mSpace.hide(magWindow);	
     }
 
 	/* Starting at version ? (somewhere between 1.16 and 2.8), GraphViz programs generate a polygon that bounds the entire graph.
@@ -1089,9 +1091,16 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	static final int BRING_ANIM_DURATION = 300;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
+	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.1f;
+	static final float[] FADE_IN_ANIM = {0,0,0,0,0,0,1-FADED_ELEMENTS_TRANSLUCENCY};
+	static final float[] FADE_OUT_ANIM = {0,0,0,0,0,0,FADED_ELEMENTS_TRANSLUCENCY-1};
+	static final float SECOND_STEP_TRANSLUCENCY = 0.4f;
+	
 	boolean isBringingAndGoing = false;
 	
 	Vector broughtElements = new Vector();
+	Vector allElements;
+	float[] allElementsAlpha;
 	
 	void enterBringAndGoMode(){
 		System.out.println("Entering BG mode");
@@ -1107,7 +1116,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		isBringingAndGoing = true;
 		LNode n = LogicalStructure.getNode(g);
 		if (n == null){return;}
+		allElements = (Vector)mSpace.getAllGlyphs().clone();
+		allElements.remove(magWindow);
 		ClosedShape thisEndShape = n.getShape();
+		Glyph[] glyphs = n.getGlyphs();
+		for (int i=0;i<glyphs.length;i++){
+			allElements.remove(glyphs[i]);
+		}		
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		LEdge[] arcs = n.getAllArcs();
 		Hashtable node2bposition = new Hashtable();
@@ -1129,6 +1144,17 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			ClosedShape otherEndShape = otherEnd.getShape();
 			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
 		}
+		allElementsAlpha = new float[allElements.size()];
+		Translucent t;
+		for (int i=0;i<allElements.size();i++){
+			try {
+				t = (Translucent)allElements.elementAt(i);
+				allElementsAlpha[i] = t.getTranslucencyValue();
+				//t.setTranslucencyValue(FADED_ELEMENTS_TRANSLUCENCY);
+				vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_OUT_ANIM, ((Glyph)t).getID());
+			}
+			catch ( ClassCastException e) {}
+		}
 	}
 	
 	void endBringAndGo(Glyph g){
@@ -1141,6 +1167,14 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 				sendBack((BroughtElement)broughtElements.elementAt(i));
 			}
 		}
+		for (int i=0;i<allElements.size();i++){
+			try {
+				//((Translucent)allElements.elementAt(i)).setTranslucencyValue(allElementsAlpha[i]);
+				vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_IN_ANIM, ((Glyph)allElements.elementAt(i)).getID());
+			}
+			catch ( ClassCastException e) {}
+		}
+		allElements.clear();
 	}
 	
 	void attemptToBringMore(Glyph g){
@@ -1156,13 +1190,16 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		broughtElements.add(BroughtElement.rememberPreviousState(node));
 		broughtElements.add(BroughtElement.rememberPreviousState(arc));
 		ClosedShape nodeShape = node.getShape();
+		allElements.remove(nodeShape);
 		LongPoint bposition = (LongPoint)node2bposition.get(node);
 		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
 		Glyph[] glyphs = node.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){
+			allElements.remove(glyphs[i]);
 			vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, glyphs[i].getID());			
 		}
-		DPath spline = arc.getSpline();
+		DPathST spline = arc.getSpline();
+		allElements.remove(spline);
 		LongPoint asp = spline.getStartPoint();
 		LongPoint aep = spline.getEndPoint();
 		LongPoint sp, ep;
@@ -1181,6 +1218,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		glyphs = arc.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){
 			if (glyphs[i] != spline){
+				allElements.remove(glyphs[i]);
 				if (glyphs[i] instanceof VText){
 					// put any label at the center of the edge (simplest think we can do)
 					vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, new LongPoint(bposition.x-sx, bposition.y-sy), glyphs[i].getID());
@@ -1192,24 +1230,26 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			}
 		}
 		LEdge[] otherArcs = node.getOtherArcs(arc);
+		Glyph oe;
 		for (int i=0;i<otherArcs.length;i++){
 			broughtElements.add(BroughtElement.rememberPreviousState(otherArcs[i]));
 			spline = otherArcs[i].getSpline();
+			allElements.remove(spline);
 			asp = spline.getStartPoint();
 			aep = spline.getEndPoint();
-			
 			if (node2bposition.containsKey(otherArcs[i].getTail())
 			    && node2bposition.containsKey(otherArcs[i].getHead())){
 				sp = (LongPoint)node2bposition.get(otherArcs[i].getTail());
 				ep = (LongPoint)node2bposition.get(otherArcs[i].getHead());
 			}
 			else {
+				oe = otherArcs[i].getOtherEnd(node).getShape();
 				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
 					sp = new LongPoint(bposition.x, bposition.y);
-					ep = aep;
+					ep = oe.getLocation();
 				}
 				else {
-					sp = asp;
+					sp = oe.getLocation();
 					ep = new LongPoint(bposition.x, bposition.y);
 				}
 			}
@@ -1217,7 +1257,21 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			//mSpace.atBottom(spline);
 			mSpace.above(spline, boundingBox);
 			vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
+			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
 			glyphs = otherArcs[i].getGlyphs();
+			for (int j=0;j<glyphs.length;j++){
+				if (glyphs[j] != spline){
+					allElements.remove(glyphs[j]);
+					if (glyphs[j] instanceof VText){
+						continue;
+					}
+					else {
+						// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
+						glyphs[j].setVisible(false);
+					}
+				}
+			}
+			
 		}
 	}
 	

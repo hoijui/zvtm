@@ -11,7 +11,7 @@ import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.glyphs.DPath;
+import net.claribole.zvtm.glyphs.DPathST;
 
 abstract class BroughtElement {
 	
@@ -50,7 +50,8 @@ class BroughtNode extends BroughtElement {
 
 class BroughtEdge extends BroughtElement {
 
-	DPath spline;
+	DPathST spline;
+	float splineAlpha;
 	LongPoint[] splineCoords;
 	
 	BroughtEdge(LEdge e){
@@ -58,6 +59,7 @@ class BroughtEdge extends BroughtElement {
 		spline = e.getSpline();
 		if (spline != null){
 			splineCoords = spline.getAllPointsCoordinates();
+			splineAlpha = spline.getTranslucencyValue();
 		}
 		previousLocations = new LongPoint[glyphs.length];
 		for (int i=0;i<glyphs.length;i++){
@@ -76,6 +78,7 @@ class BroughtEdge extends BroughtElement {
 	
 	void restorePreviousState(AnimManager animator, int duration){
 		animator.createPathAnimation(duration, AnimManager.DP_TRANS_SIG_ABS, splineCoords, spline.getID(), null);
+		spline.setTranslucencyValue(splineAlpha);
 		for (int i=0;i<glyphs.length;i++){
 			if (!glyphs[i].isVisible()){
 				glyphs[i].setVisible(true);
