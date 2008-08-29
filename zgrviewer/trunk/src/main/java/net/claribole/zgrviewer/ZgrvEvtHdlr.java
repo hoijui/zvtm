@@ -455,10 +455,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		if(code==KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
 		else if (code==KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
 		else if (code==KeyEvent.VK_HOME){grMngr.getGlobalView();}
-		else if (code==KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_UP);}
-		else if (code==KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
-		else if (code==KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
-		else if (code==KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
+		else if (code==KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
+		else if (code==KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_UP);}
+		else if (code==KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
+		else if (code==KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
 		else if (code==KeyEvent.VK_L || code==KeyEvent.VK_SPACE){
 			Glyph g=v.lastGlyphEntered();
 			if (g!=null){

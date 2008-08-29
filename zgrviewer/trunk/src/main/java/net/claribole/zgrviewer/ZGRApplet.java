@@ -304,10 +304,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	if(code == KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
 	else if (code == KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
 	else if (code == KeyEvent.VK_HOME){grMngr.getGlobalView();}
-	else if (code == KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_UP);}
-	else if (code == KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
-	else if (code == KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
-	else if (code == KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
+	else if (code == KeyEvent.VK_UP){grMngr.translateView(GraphicsManager.MOVE_DOWN);}
+	else if (code == KeyEvent.VK_DOWN){grMngr.translateView(GraphicsManager.MOVE_UP);}
+	else if (code == KeyEvent.VK_LEFT){grMngr.translateView(GraphicsManager.MOVE_RIGHT);}
+	else if (code == KeyEvent.VK_RIGHT){grMngr.translateView(GraphicsManager.MOVE_LEFT);}
 	else if (c == '+'){
 	    if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
 		grMngr.magnifyFocus(GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
