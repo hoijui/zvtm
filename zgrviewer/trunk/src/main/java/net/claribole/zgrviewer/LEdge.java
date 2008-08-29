@@ -64,6 +64,10 @@ class LEdge extends LElem {
 	return directed;
     }
 
+	boolean isLoop(){
+		return tail == head;
+	}
+
     void setTail(LNode n){
 	tail = n;
 	if (tail != null){

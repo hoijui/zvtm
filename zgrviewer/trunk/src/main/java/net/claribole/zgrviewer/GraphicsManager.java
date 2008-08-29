@@ -1105,6 +1105,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		LEdge[] arcs = n.getAllArcs();		
 		for (int i=0;i<arcs.length;i++){
+			if (arcs[i].isLoop()){continue;}
 			LNode otherEnd = arcs[i].getOtherEnd(n);			
 			ClosedShape otherEndShape = otherEnd.getShape();
 			double otherEndBoundingCircleRadius = otherEndShape.getSize();
@@ -1113,7 +1114,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			double ratio = bd / d;
 			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
 			long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
-			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, bx, by);
+			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, bx, by);
 		}
 	}
 	
@@ -1138,7 +1139,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		
 	}
 	
-	void bring(LEdge arc, LNode node, long sx, long sy, long bx, long by){
+	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, long bx, long by){
 		broughtElements.add(BroughtElement.rememberPreviousState(node));
 		broughtElements.add(BroughtElement.rememberPreviousState(arc));
 		ClosedShape nodeShape = node.getShape();
@@ -1148,7 +1149,18 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, glyphs[i].getID());			
 		}
 		DPath spline = arc.getSpline();
-		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, new LongPoint(sx, sy), new LongPoint(bx,by), true);
+		LongPoint asp = spline.getStartPoint();
+		LongPoint aep = spline.getEndPoint();
+		LongPoint sp, ep;
+		if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
+			sp = new LongPoint(bx, by);
+			ep = new LongPoint(sx, sy);
+		}
+		else {
+			sp = new LongPoint(sx, sy);
+			ep = new LongPoint(bx, by);			
+		}
+		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
 		vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 		glyphs = arc.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){

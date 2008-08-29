@@ -51,10 +51,14 @@ class BroughtNode extends BroughtElement {
 class BroughtEdge extends BroughtElement {
 
 	DPath spline;
+	LongPoint[] splineCoords;
 	
 	BroughtEdge(LEdge e){
 		glyphs = e.getGlyphs();
 		spline = e.getSpline();
+		if (spline != null){
+			splineCoords = spline.getAllPointsCoordinates();
+		}
 		previousLocations = new LongPoint[glyphs.length];
 		for (int i=0;i<glyphs.length;i++){
 			if (glyphs[i] == spline){
@@ -71,6 +75,7 @@ class BroughtEdge extends BroughtElement {
 	}
 	
 	void restorePreviousState(AnimManager animator, int duration){
+		animator.createPathAnimation(duration, AnimManager.DP_TRANS_SIG_ABS, splineCoords, spline.getID(), null);
 		for (int i=0;i<glyphs.length;i++){
 			if (!glyphs[i].isVisible()){
 				glyphs[i].setVisible(true);
