@@ -477,7 +477,7 @@ public class SVGReader {
 		else return null;
 	    }
 	}
-	catch (Exception ex){System.err.println("Error: SVGReader.getColor(): "+ex);return Color.white;}
+	catch (Exception ex){System.err.println("Error: SVGReader.getColor(): "+ex);return Color.WHITE;}
     }
 
     /** Parse style information.
@@ -673,13 +673,13 @@ public class SVGReader {
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
-		if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
-		else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f);}
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
-		else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f);}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -695,13 +695,13 @@ public class SVGReader {
 	}
 	else if (ctx!=null){
 	    if (ctx.hasTransparencyInformation()){
-		if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
-		else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor());}
+		if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f);}
 		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
-		else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor());}
+		if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f);}
 	    }
 	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
@@ -709,7 +709,7 @@ public class SVGReader {
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
 	}
-	else {res=new VEllipseST(x,-y,0,w,h,Color.white);}
+	else {res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -754,13 +754,13 @@ public class SVGReader {
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
-		if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.white);res.setFilled(false);}
-		else {res=new VCircleST(x,-y,0,r,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VCircleST(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.white);res.setFilled(false);}
-		else {res=new VCircleST(x,-y,0,r,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VCircleST(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -773,7 +773,7 @@ public class SVGReader {
 	    if (ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
 	    }
-	} else {res=new VCircleST(x,-y,0,r,Color.white);}
+	} else {res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -863,7 +863,7 @@ public class SVGReader {
 			}
 		}
 		else {
-			res = new VTextST(x, -y, 0, tc, tx, ta);
+			res = new VTextST(x, -y, 0, tc, tx, ta,1.0f);
 		}
 
 		if (meta){
@@ -921,13 +921,13 @@ public class SVGReader {
 	    if (e.hasAttribute(_style)){
 		SVGStyle ss=getStyle(e.getAttribute(_style));
 		if (ss.hasTransparencyInformation()){
-		    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
-		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(),0);}
+		    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
 		    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
-		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(),0);}
+		    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
 		}
 		Color border=ss.getStrokeColor();
 		if (border != null){
@@ -943,13 +943,13 @@ public class SVGReader {
 	    }
 	    else if (ctx!=null){
 		if (ctx.hasTransparencyInformation()){
-		    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
-		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(),0);}
+		    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
 		    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
-		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(),0);}
+		    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
 		}
 		Color border=ctx.getStrokeColor();
 		if (border != null){
@@ -960,7 +960,7 @@ public class SVGReader {
 		    res.setDrawBorder(false);
 		}
 	    }
-	    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);}
+	    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);}
 	    if (meta){setMetadata(res,ctx);}
 	    return res;
 	}
@@ -1016,13 +1016,13 @@ public class SVGReader {
 	    if (e.hasAttribute(_style)){
 		SVGStyle ss=getStyle(e.getAttribute(_style));
 		if (ss.hasTransparencyInformation()){
-		    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+		    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
+		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+		    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
+		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		}
 		Color border=ss.getStrokeColor();
 		if (border != null){
@@ -1038,13 +1038,13 @@ public class SVGReader {
 	    }
 	    else if (ctx!=null){
 		if (ctx.hasTransparencyInformation()){
-		    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+		    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
+		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+		    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
+		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		}
 		Color border=ctx.getStrokeColor();
 		if (border!=null){
@@ -1055,7 +1055,7 @@ public class SVGReader {
 		    res.setDrawBorder(false);
 		}
 	    }
-	    else {res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+	    else {res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 	    if (meta){setMetadata(res,ctx);}
 	    return res;
 	}
@@ -1102,13 +1102,13 @@ public class SVGReader {
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
-	        if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
+	        if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
 		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(),0);}
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
-		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(),0);}
+		if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -1124,13 +1124,13 @@ public class SVGReader {
 	}
 	else if (ctx!=null){
 	    if (ctx.hasTransparencyInformation()){
-	        if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
-		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(),0);}
+	        if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
 		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
-		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(),0);}
+		if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
 	    }
 	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
@@ -1141,7 +1141,7 @@ public class SVGReader {
 		res.setDrawBorder(false);
 	    }
 	}
-	else {res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);}
+	else {res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -1268,13 +1268,13 @@ public class SVGReader {
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
-		if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
-		else {res=new VPolygonST(coords2,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VPolygonST(coords2,ss.getFillColor(), Color.BLACK, 1.0f);}
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
-		else {res=new VPolygonST(coords2,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VPolygonST(coords2,ss.getFillColor(), Color.BLACK, 1.0f);}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -1290,13 +1290,13 @@ public class SVGReader {
 	}
 	else if (ctx!=null){
 	    if (ctx.hasTransparencyInformation()){
-		if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
-		else {res=new VPolygonST(coords2,ctx.getFillColor());}
+		if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VPolygonST(coords2,ctx.getFillColor(), Color.BLACK, 1.0f);}
 		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
-		else {res=new VPolygonST(coords2,ctx.getFillColor());}
+		if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+		else {res=new VPolygonST(coords2,ctx.getFillColor(), Color.BLACK, 1.0f);}
 	    }
 	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
@@ -1307,7 +1307,7 @@ public class SVGReader {
 		res.setDrawBorder(false);
 	    }
 	}
-	else {res=new VPolygonST(coords2,Color.white);}
+	else {res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
