@@ -324,6 +324,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		}
 		// If they are, then it is very likely that the rectangle is a bounding box.
 		boundingBox = largestRectangle;
+		boundingBox.setVisible(false);
 	}
 
     boolean bigger(VRectangleOr r1, VRectangleOr r2){// returns true if r1 bigger than r2
@@ -1173,7 +1174,8 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			sp = new LongPoint(sx, sy);
 			ep = new LongPoint(bposition.x, bposition.y);
 		}
-		mSpace.below(spline, nodeShape);
+		//mSpace.atBottom(spline);
+		mSpace.above(spline, boundingBox);
 		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
 		vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 		glyphs = arc.getGlyphs();
@@ -1212,7 +1214,8 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 				}
 			}
 			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
-			mSpace.below(spline, nodeShape);
+			//mSpace.atBottom(spline);
+			mSpace.above(spline, boundingBox);
 			vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 			glyphs = otherArcs[i].getGlyphs();
 		}
