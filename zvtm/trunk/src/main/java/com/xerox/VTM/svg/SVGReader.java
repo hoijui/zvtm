@@ -54,22 +54,24 @@ import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
-import com.xerox.VTM.glyphs.VCircle;
+//import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VCircleST;
-import com.xerox.VTM.glyphs.VEllipse;
+//import com.xerox.VTM.glyphs.VEllipse;
 import com.xerox.VTM.glyphs.VEllipseST;
-import net.claribole.zvtm.glyphs.DPath;
-import com.xerox.VTM.glyphs.VPolygon;
+//import net.claribole.zvtm.glyphs.DPath;
+import net.claribole.zvtm.glyphs.DPathST;
+//import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
-import com.xerox.VTM.glyphs.VRectangleOr;
+//import com.xerox.VTM.glyphs.VRectangleOr;
 import com.xerox.VTM.glyphs.VRectangleOrST;
-import com.xerox.VTM.glyphs.VRoundRect;
+//import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.glyphs.VRoundRectST;
-import com.xerox.VTM.glyphs.VSegment;
+//import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VSegmentST;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.VImage;
+//import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.glyphs.VTextST;
+//import com.xerox.VTM.glyphs.VImage;
+import net.claribole.zvtm.glyphs.VImageST;
 
 /**
  *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
@@ -201,7 +203,7 @@ public class SVGReader {
 	return Math.round(Double.parseDouble(s));
     }
 
-    private static void processNextSVGPathCommand(StringBuffer svg,DPath ph,StringBuffer lastCommand){
+    private static void processNextSVGPathCommand(StringBuffer svg,DPathST ph,StringBuffer lastCommand){
 	if (svg.length()>0) {
 	    switch (svg.charAt(0)){
 	    case 'M':{
@@ -633,7 +635,7 @@ public class SVGReader {
     /** Create a VEllipse from an SVG ellipse element.
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      */
-    public static VEllipse createEllipse(Element e){
+    public static VEllipseST createEllipse(Element e){
 	return createEllipse(e,null,false);
     }
 
@@ -641,7 +643,7 @@ public class SVGReader {
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VEllipse createEllipse(Element e,Context ctx){
+    public static VEllipseST createEllipse(Element e,Context ctx){
 	return createEllipse(e,ctx,false);
     }
 
@@ -650,7 +652,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VEllipse createEllipse(Element e,Context ctx,boolean meta){
+    public static VEllipseST createEllipse(Element e,Context ctx,boolean meta){
 
 	long x = getLong(e.getAttribute(_cx));
 	long y = getLong(e.getAttribute(_cy));
@@ -667,7 +669,7 @@ public class SVGReader {
 	x += xoffset;
 	y += yoffset;
 
-	VEllipse res;
+	VEllipseST res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
@@ -676,8 +678,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.white);res.setFilled(false);}
-		else {res=new VEllipse(x,-y,0,w,h,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
+		else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor());}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -698,8 +700,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ctx.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.white);res.setFilled(false);}
-		else {res=new VEllipse(x,-y,0,w,h,ctx.getFillColor());}
+		if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.white);res.setFilled(false);}
+		else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor());}
 	    }
 	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
@@ -707,7 +709,7 @@ public class SVGReader {
 		res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
 	    }
 	}
-	else {res=new VEllipse(x,-y,0,w,h,Color.white);}
+	else {res=new VEllipseST(x,-y,0,w,h,Color.white);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -715,7 +717,7 @@ public class SVGReader {
     /** Create a VCircle from an SVG circle element.
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      */
-    public static VCircle createCircle(Element e){
+    public static VCircleST createCircle(Element e){
 	return createCircle(e,null,false);
     }
 
@@ -723,7 +725,7 @@ public class SVGReader {
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VCircle createCircle(Element e,Context ctx){
+    public static VCircleST createCircle(Element e,Context ctx){
 	return createCircle(e,ctx,false);
     }
 
@@ -732,7 +734,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VCircle createCircle(Element e,Context ctx,boolean meta){
+    public static VCircleST createCircle(Element e,Context ctx,boolean meta){
 
 	long x = getLong(e.getAttribute(_cx));
 	long y = getLong(e.getAttribute(_cy));
@@ -747,7 +749,7 @@ public class SVGReader {
 	x += xoffset;
 	y += yoffset;
 
-	VCircle res;
+	VCircleST res;
 
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
@@ -757,8 +759,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.white);res.setFilled(false);}
-		else {res=new VCircle(x,-y,0,r,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.white);res.setFilled(false);}
+		else {res=new VCircleST(x,-y,0,r,ss.getFillColor());}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -771,7 +773,7 @@ public class SVGReader {
 	    if (ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
 	    }
-	} else {res=new VCircle(x,-y,0,r,Color.white);}
+	} else {res=new VCircleST(x,-y,0,r,Color.white);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -781,7 +783,7 @@ public class SVGReader {
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      *@param vsm the virtual space manager (to get some font information)
      */
-    public static VText createText(Element e,VirtualSpaceManager vsm){
+    public static VTextST createText(Element e,VirtualSpaceManager vsm){
 	return createText(e,null,vsm,false);
     }
 
@@ -791,7 +793,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param vsm the virtual space manager (to get some font information)
      */
-    public static VText createText(Element e,Context ctx,VirtualSpaceManager vsm){
+    public static VTextST createText(Element e,Context ctx,VirtualSpaceManager vsm){
 	return createText(e,ctx,vsm,false);
     }
 
@@ -802,7 +804,7 @@ public class SVGReader {
 		*@param vsm the virtual space manager (to get some font information)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
-	public static VText createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
+	public static VTextST createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
 		String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
 		long x = getLong(e.getAttribute(_x));
 		long y = getLong(e.getAttribute(_y));
@@ -814,12 +816,12 @@ public class SVGReader {
 		x += xoffset;
 		y += yoffset;
 
-		VText res;
-		short ta=VText.TEXT_ANCHOR_START;
+		VTextST res;
+		short ta=VTextST.TEXT_ANCHOR_START;
 		if (e.hasAttribute(_textanchor)){
 			String tas=e.getAttribute(_textanchor);
-			if (tas.equals(_middle)){ta=VText.TEXT_ANCHOR_MIDDLE;}
-			else if (tas.equals(_end)){ta=VText.TEXT_ANCHOR_END;}
+			if (tas.equals(_middle)){ta=VTextST.TEXT_ANCHOR_MIDDLE;}
+			else if (tas.equals(_end)){ta=VTextST.TEXT_ANCHOR_END;}
 			else if (tas.equals(_inherit)){System.err.println("SVGReader::'inherit' value for text-anchor attribute not supported yet");}
 		}
 
@@ -841,7 +843,7 @@ public class SVGReader {
 				res = new VTextST(x, -y, 0, tc, tx, ta, ss.getAlphaTransparencyValue());
 			}
 			else {
-				res = new VText(x, -y, 0, tc, tx, ta);				
+				res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
 			}
 			Font f;
 			if (specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
@@ -853,7 +855,7 @@ public class SVGReader {
 				res = new VTextST(x, -y, 0, tc, tx, ta, ctx.getAlphaTransparencyValue());
 			}
 			else {
-				res = new VText(x, -y, 0, tc, tx, ta);				
+				res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
 			}
 			Font f;
 			if (specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
@@ -861,7 +863,7 @@ public class SVGReader {
 			}
 		}
 		else {
-			res = new VText(x, -y, 0, tc, tx, ta);
+			res = new VTextST(x, -y, 0, tc, tx, ta);
 		}
 
 		if (meta){
@@ -874,7 +876,7 @@ public class SVGReader {
      * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
-    public static VRectangleOr createRectangleFromPolygon(Element e){
+    public static VRectangleOrST createRectangleFromPolygon(Element e){
 	return createRectangleFromPolygon(e,null,false);
     }
 
@@ -883,7 +885,7 @@ public class SVGReader {
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VRectangleOr createRectangleFromPolygon(Element e,Context ctx){
+    public static VRectangleOrST createRectangleFromPolygon(Element e,Context ctx){
 	return createRectangleFromPolygon(e,ctx,false);
     }
 
@@ -893,7 +895,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VRectangleOr createRectangleFromPolygon(Element e,Context ctx,boolean meta){
+    public static VRectangleOrST createRectangleFromPolygon(Element e,Context ctx,boolean meta){
 	Vector coords=new Vector();
 	translateSVGPolygon(e.getAttribute(_points),coords);
 	if (isRectangle(coords)){
@@ -915,7 +917,7 @@ public class SVGReader {
 	    long w=Math.abs(pNW.x-pNE.x);
 	    long x=pNE.x-w/2;
 	    long y=pNE.y-h/2;
-	    VRectangleOr res;
+	    VRectangleOrST res;
 	    if (e.hasAttribute(_style)){
 		SVGStyle ss=getStyle(e.getAttribute(_style));
 		if (ss.hasTransparencyInformation()){
@@ -924,8 +926,8 @@ public class SVGReader {
 		    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
-		    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ss.getFillColor(),0);}
+		    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
+		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(),0);}
 		}
 		Color border=ss.getStrokeColor();
 		if (border != null){
@@ -946,8 +948,8 @@ public class SVGReader {
 		    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
-		    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ctx.getFillColor(),0);}
+		    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);res.setFilled(false);}
+		    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(),0);}
 		}
 		Color border=ctx.getStrokeColor();
 		if (border != null){
@@ -958,7 +960,7 @@ public class SVGReader {
 		    res.setDrawBorder(false);
 		}
 	    }
-	    else {res=new VRectangleOr(x,-y,0,w/2,h/2,Color.white,0);}
+	    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.white,0);}
 	    if (meta){setMetadata(res,ctx);}
 	    return res;
 	}
@@ -969,7 +971,7 @@ public class SVGReader {
      * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
-    public static VRoundRect createRoundRectFromPolygon(Element e){
+    public static VRoundRectST createRoundRectFromPolygon(Element e){
 	return createRoundRectFromPolygon(e,null,false);
     }
 
@@ -978,7 +980,7 @@ public class SVGReader {
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VRoundRect createRoundRectFromPolygon(Element e,Context ctx){
+    public static VRoundRectST createRoundRectFromPolygon(Element e,Context ctx){
 	return createRoundRectFromPolygon(e,ctx,false);
     }
 
@@ -988,7 +990,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VRoundRect createRoundRectFromPolygon(Element e,Context ctx,boolean meta){
+    public static VRoundRectST createRoundRectFromPolygon(Element e,Context ctx,boolean meta){
 	Vector coords=new Vector();
 	translateSVGPolygon(e.getAttribute(_points),coords);
 	if (isRectangle(coords)){
@@ -1010,7 +1012,7 @@ public class SVGReader {
 	    long w=Math.abs(pNW.x-pNE.x);
 	    long x=pNE.x-w/2;
 	    long y=pNE.y-h/2;
-	    VRoundRect res;
+	    VRoundRectST res;
 	    if (e.hasAttribute(_style)){
 		SVGStyle ss=getStyle(e.getAttribute(_style));
 		if (ss.hasTransparencyInformation()){
@@ -1019,8 +1021,8 @@ public class SVGReader {
 		    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ss.getFillColor()==null){res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-		    else {res=new VRoundRect(x,-y,0,w/2,h/2,ss.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+		    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
+		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		}
 		Color border=ss.getStrokeColor();
 		if (border != null){
@@ -1041,8 +1043,8 @@ public class SVGReader {
 		    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 		}
 		else {
-		    if (ctx.getFillColor()==null){res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-		    else {res=new VRoundRect(x,-y,0,w/2,h/2,ctx.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+		    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
+		    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 		}
 		Color border=ctx.getStrokeColor();
 		if (border!=null){
@@ -1053,7 +1055,7 @@ public class SVGReader {
 		    res.setDrawBorder(false);
 		}
 	    }
-	    else {res=new VRoundRect(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+	    else {res=new VRoundRectST(x,-y,0,w/2,h/2,Color.white,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 	    if (meta){setMetadata(res,ctx);}
 	    return res;
 	}
@@ -1063,7 +1065,7 @@ public class SVGReader {
     /** Create a VRectangle from an SVG rect element.
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      */
-    public static VRectangleOr createRectangle(Element e){
+    public static VRectangleOrST createRectangle(Element e){
 	return createRectangle(e,null,false);
     }
 
@@ -1071,7 +1073,7 @@ public class SVGReader {
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VRectangleOr createRectangle(Element e,Context ctx){
+    public static VRectangleOrST createRectangle(Element e,Context ctx){
 	return createRectangle(e,ctx,false);
     }
 
@@ -1080,7 +1082,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VRectangleOr createRectangle(Element e,Context ctx,boolean meta){
+    public static VRectangleOrST createRectangle(Element e,Context ctx,boolean meta){
 	long x = getLong(e.getAttribute(_x));
 	long y = getLong(e.getAttribute(_y));
 	long w = getLong(e.getAttribute(_width))/2;
@@ -1096,7 +1098,7 @@ public class SVGReader {
 	x += xoffset;
 	y += yoffset;
 
-	VRectangleOr res;
+	VRectangleOrST res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
@@ -1105,8 +1107,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
-		else {res=new VRectangleOr(x+w,-y-h,0,w,h,ss.getFillColor(),0);}
+		if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
+		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(),0);}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -1127,8 +1129,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
-		else {res=new VRectangleOr(x+w,-y-h,0,w,h,ctx.getFillColor(),0);}
+		if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);res.setFilled(false);}
+		else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(),0);}
 	    }
 	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
@@ -1139,7 +1141,7 @@ public class SVGReader {
 		res.setDrawBorder(false);
 	    }
 	}
-	else {res=new VRectangleOr(x+w,-y-h,0,w,h,Color.white,0);}
+	else {res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.white,0);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -1174,7 +1176,7 @@ public class SVGReader {
      * associated images staying in the original directory) ; set to null if no fallback directory is known.
      *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL)
      */
-    public static VImage createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
+    public static VImageST createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
 	long x = getLong(e.getAttribute(_x)) + xoffset;
 	long y = getLong(e.getAttribute(_y)) + yoffset;
 
@@ -1198,7 +1200,7 @@ public class SVGReader {
 	long hw = w / 2;
 	long hh = h / 2;
 
-	VImage res = null;
+	VImageST res = null;
 
 	if (e.hasAttributeNS(xlinkURI, _href)){
 	    String imagePath = e.getAttributeNS(xlinkURI, _href);
@@ -1218,9 +1220,9 @@ public class SVGReader {
 			    double hr = h/((double)ah);
 
 			    if (wr != 1.0 || hr != 1.0){
-					res = new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr));
+					res = new VImageST(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr), 1.0f);
 			    } else {
-					res = new VImage(x+hw, -y-hh, 0, ii.getImage());
+					res = new VImageST(x+hw, -y-hh, 0, ii.getImage(), 1.0f);
 		   		 }
 			}
 	    }
@@ -1236,7 +1238,7 @@ public class SVGReader {
     /** Create a VPolygon from an SVG polygon element.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
-    public static VPolygon createPolygon(Element e){
+    public static VPolygonST createPolygon(Element e){
 	return createPolygon(e,null,false);
     }
 
@@ -1244,7 +1246,7 @@ public class SVGReader {
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VPolygon createPolygon(Element e,Context ctx){
+    public static VPolygonST createPolygon(Element e,Context ctx){
 	return createPolygon(e,ctx,false);
     }
 
@@ -1253,7 +1255,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VPolygon createPolygon(Element e,Context ctx,boolean meta){
+    public static VPolygonST createPolygon(Element e,Context ctx,boolean meta){
 	Vector coords=new Vector();
 	translateSVGPolygon(e.getAttribute(_points),coords);
 	LongPoint[] coords2=new LongPoint[coords.size()];
@@ -1262,7 +1264,7 @@ public class SVGReader {
 	    lp=(LongPoint)coords.elementAt(i);
 	    coords2[i]=new LongPoint(lp.x,-lp.y);
 	}
-	VPolygon res;
+	VPolygonST res;
 	if (e.hasAttribute(_style)){
 	    SVGStyle ss=getStyle(e.getAttribute(_style));
 	    if (ss.hasTransparencyInformation()){
@@ -1271,8 +1273,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ss.getFillColor()==null){res=new VPolygon(coords2,Color.white);res.setFilled(false);}
-		else {res=new VPolygon(coords2,ss.getFillColor());}
+		if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
+		else {res=new VPolygonST(coords2,ss.getFillColor());}
 	    }
 	    Color border=ss.getStrokeColor();
 	    if (border != null){
@@ -1293,8 +1295,8 @@ public class SVGReader {
 		((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
 	    }
 	    else {
-		if (ctx.getFillColor()==null){res=new VPolygon(coords2,Color.white);res.setFilled(false);}
-		else {res=new VPolygon(coords2,ctx.getFillColor());}
+		if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.white);res.setFilled(false);}
+		else {res=new VPolygonST(coords2,ctx.getFillColor());}
 	    }
 	    Color border=ctx.getStrokeColor();
 	    if (border!=null){
@@ -1305,7 +1307,7 @@ public class SVGReader {
 		res.setDrawBorder(false);
 	    }
 	}
-	else {res=new VPolygon(coords2,Color.white);}
+	else {res=new VPolygonST(coords2,Color.white);}
 	if (meta){setMetadata(res,ctx);}
 	return res;
     }
@@ -1313,7 +1315,7 @@ public class SVGReader {
     /** Create a set of VSegments from an SVG polyline element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      */
-    public static VSegment[] createPolyline(Element e){
+    public static VSegmentST[] createPolyline(Element e){
 	return createPolyline(e,null,false);
     }
 
@@ -1321,7 +1323,7 @@ public class SVGReader {
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VSegment[] createPolyline(Element e,Context ctx){
+    public static VSegmentST[] createPolyline(Element e,Context ctx){
 	return createPolyline(e,ctx,false);
     }
 
@@ -1330,12 +1332,12 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VSegment[] createPolyline(Element e,Context ctx,boolean meta){
+    public static VSegmentST[] createPolyline(Element e,Context ctx,boolean meta){
 	Vector coords=new Vector();
 
 	translateSVGPolygon(e.getAttribute(_points),coords);
 
-	VSegment[] res=new VSegment[coords.size()-1];
+	VSegmentST[] res=new VSegmentST[coords.size()-1];
 	SVGStyle ss = null;
 	if (e.hasAttribute(_style)){
 	    ss=getStyle(e.getAttribute(_style));
@@ -1353,7 +1355,7 @@ public class SVGReader {
 	for (int i=0;i<coords.size()-1;i++){
 	    lp1=(LongPoint)coords.elementAt(i);
 	    lp2=(LongPoint)coords.elementAt(i+1);
-	    res[i] = new VSegment(lp1.x, -lp1.y, 0, border, lp2.x, -lp2.y);
+	    res[i] = new VSegmentST(lp1.x, -lp1.y, 0, border, lp2.x, -lp2.y, 1.0f);
 	    if (ss != null && ss.requiresSpecialStroke()){
 		assignStroke(res[i], ss);
 	    }
@@ -1365,7 +1367,7 @@ public class SVGReader {
     /** Create a VSegment from an SVG line element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      */
-    public static VSegment createLine(Element e){
+    public static VSegmentST createLine(Element e){
 	return createLine(e, null, false);
     }
 
@@ -1373,7 +1375,7 @@ public class SVGReader {
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VSegment createLine(Element e, Context ctx){
+    public static VSegmentST createLine(Element e, Context ctx){
 	return createLine(e, ctx, false);
     }
 
@@ -1382,8 +1384,8 @@ public class SVGReader {
 		*@param ctx used to propagate contextual style information (put null if none)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
-	public static VSegment createLine(Element e, Context ctx, boolean meta){
-		VSegment res;		
+	public static VSegmentST createLine(Element e, Context ctx, boolean meta){
+		VSegmentST res;		
 		long x1 = getLong(e.getAttribute(_x1));
 		long y1 = getLong(e.getAttribute(_y1));
 		long x2 = getLong(e.getAttribute(_x2));
@@ -1412,7 +1414,7 @@ public class SVGReader {
 			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ss.getAlphaTransparencyValue());
 			}
 			else {
-			    res = new VSegment(x1, -y1, 0, border, x2, -y2);
+			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, 1.0f);
 			}
 		}
 		else if (ctx != null){
@@ -1422,11 +1424,11 @@ public class SVGReader {
 			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ctx.getAlphaTransparencyValue());
 			}
 			else {
-			    res = new VSegment(x1, -y1, 0, border, x2, -y2);
+			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, 1.0f);
 			}
 		}
 		else {
-			res = new VSegment(x1, -y1, 0, border, x2, -y2);			
+			res = new VSegmentST(x1, -y1, 0, border, x2, -y2, 1.0f);			
 		}
 		if (ss != null && ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
@@ -1439,7 +1441,7 @@ public class SVGReader {
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      */
-    public static DPath createPath(Element e,DPath ph){
+    public static DPathST createPath(Element e,DPathST ph){
 	return createPath(e,ph,null,false);
     }
 
@@ -1448,7 +1450,7 @@ public class SVGReader {
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static DPath createPath(Element e,DPath ph,Context ctx){
+    public static DPathST createPath(Element e,DPathST ph,Context ctx){
 	return createPath(e,ph,ctx,false);
     }
 
@@ -1458,7 +1460,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static DPath createPath(Element e,DPath ph,Context ctx,boolean meta){
+    public static DPathST createPath(Element e,DPathST ph,Context ctx,boolean meta){
 	StringBuffer svg=new StringBuffer(e.getAttribute(_d));
 	if (checkSVGPath(svg.toString())){
 	    StringBuffer lastCommand=new StringBuffer("M");
@@ -1494,7 +1496,7 @@ public class SVGReader {
      *@param d the <i>d</i> attribute value of an SVG path
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      */
-    public static DPath createPath(String d,DPath ph){
+    public static DPathST createPath(String d,DPathST ph){
 	return createPath(d,ph,null,false);
     }
 
@@ -1503,7 +1505,7 @@ public class SVGReader {
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static DPath createPath(String d,DPath ph,Context ctx){
+    public static DPathST createPath(String d,DPathST ph,Context ctx){
 	return createPath(d,ph,ctx,false);
     }
 
@@ -1513,7 +1515,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static DPath createPath(String d,DPath ph,Context ctx,boolean meta){
+    public static DPathST createPath(String d,DPathST ph,Context ctx,boolean meta){
 	StringBuffer svg=new StringBuffer(d);
 	if (checkSVGPath(svg.toString())){
 	    StringBuffer lastCommand=new StringBuffer("M");
@@ -1614,7 +1616,7 @@ public class SVGReader {
 			vsm.addGlyph(createCircle(e,ctx,meta),vs);
 		}
 		else if (tagName.equals(_path)){
-			vsm.addGlyph(createPath(e,new DPath(),ctx,meta),vs);
+			vsm.addGlyph(createPath(e,new DPathST(1.0f),ctx,meta),vs);
 		}
 		else if (tagName.equals(_text)){
 			vsm.addGlyph(createText(e,ctx,vsm,meta),vs);
