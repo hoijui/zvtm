@@ -264,6 +264,10 @@ public class DPath extends Glyph implements RectangularShape {
 		return new LongPoint(spx, spy);
 	}
 
+	public LongPoint getEndPoint(){
+		return new LongPoint(endPoint.x, endPoint.y);
+	}
+
     public void initCams(int nbCam){
 	pc = new ProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
