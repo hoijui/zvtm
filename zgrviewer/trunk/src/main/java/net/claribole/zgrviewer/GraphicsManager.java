@@ -287,41 +287,44 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	mSpace.hide(magWindow);
     }
 
-    /* Starting at version ? (somewhere between 1.16 and 2.8), GraphViz programs generate a polygon that bounds the entire graph.
-     * Attempt to identify it so that when clicking in what appears to be empty space (but is actually the bounding box),
-     * the view does not get unzoomed. Also prevent border highlighting when the cursor enters this bounding box.
-     */
-    void seekBoundingBox(){
-	Vector v = mSpace.getAllGlyphs();
-	VRectangleOr largestRectangle = null;
-	VRectangleOr r;
-	int lri = -1; // largest rectangle's index
-	// First identify the largest rectangle
-	for (int i=0;i<v.size();i++){
-	    if (v.elementAt(i) instanceof VRectangleOr){
-		r = (VRectangleOr)v.elementAt(i);
-		if (largestRectangle == null || bigger(r, largestRectangle)){
-		    // first rectangle encountered in the list, or compare this rectangle to biggest rectangle at this time
-		    largestRectangle = r;
-		    lri = i;
+	/* Starting at version ? (somewhere between 1.16 and 2.8), GraphViz programs generate a polygon that bounds the entire graph.
+		* Attempt to identify it so that when clicking in what appears to be empty space (but is actually the bounding box),
+		* the view does not get unzoomed. Also prevent border highlighting when the cursor enters this bounding box.
+		*/
+	void seekBoundingBox(){
+		Vector v = mSpace.getAllGlyphs();
+		VRectangleOr largestRectangle = null;
+		VRectangleOr r;
+		int lri = -1; // largest rectangle's index
+		// First identify the largest rectangle
+		for (int i=0;i<v.size();i++){
+			if (v.elementAt(i) instanceof VRectangleOr){
+				r = (VRectangleOr)v.elementAt(i);
+				if (largestRectangle == null || bigger(r, largestRectangle)){
+					// first rectangle encountered in the list, or compare this rectangle to biggest rectangle at this time
+					largestRectangle = r;
+					lri = i;
+				}
+			}
 		}
-	    }
+		if (lri == -1){return;}
+		// Then check that all other nodes are contained within that rectangle.
+		//XXX: disabled check for objects lower in the stack as their seems to be some unidentified object that messes around
+		// in some versions of GraphViz such as 2.14 - this workaround should be fairly safe until we identify that object
+//		for (int i=0;i<lri;i++){
+//			if (!containedIn((Glyph)v.elementAt(i), largestRectangle)){
+//				System.out.println(v.elementAt(i));
+//				//return;
+//			}
+//		}
+		for (int i=lri+1;i<v.size();i++){
+			if (!containedIn((Glyph)v.elementAt(i), largestRectangle)){
+				return;
+			}
+		}
+		// If they are, then it is very likely that the rectangle is a bounding box.
+		boundingBox = largestRectangle;
 	}
-	if (lri == -1){return;}
-	// Then check that all other nodes are contained within that rectangle.
-	for (int i=0;i<lri;i++){
-	    if (!containedIn((Glyph)v.elementAt(i), largestRectangle)){
- 		return;
-	    }
-	}
-	for (int i=lri+1;i<v.size();i++){
-	    if (!containedIn((Glyph)v.elementAt(i), largestRectangle)){
- 		return;
-	    }
-	}
-	// If they are, then it is very likely that the rectangle is a bounding box.
-	boundingBox = largestRectangle;
-    }
 
     boolean bigger(VRectangleOr r1, VRectangleOr r2){// returns true if r1 bigger than r2
 	return (r1.getWidth()*r1.getHeight() > r2.getWidth()*r2.getHeight());
@@ -357,16 +360,17 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /*----------  Reveal graph (after loading) --------------*/
 
-    void reveal(){
-	Camera c = mSpace.getCamera(0);
-	Location l = vsm.getGlobalView(c);
-	c.posx = l.vx;
-	c.posy = l.vy;
-	c.updatePrecisePosition();
-	c.setAltitude(l.alt-c.getFocal());
-	rememberLocation(mSpace.getCamera(0).getLocation());
-	TransitionManager.fadeIn(mainView, 500, vsm);
-    }
+	void reveal(){
+		Camera c = mSpace.getCamera(0);
+		Location l = vsm.getGlobalView(c);
+		c.posx = l.vx;
+		c.posy = l.vy;
+		c.updatePrecisePosition();
+		c.setAltitude(l.alt-c.getFocal());
+		rememberLocation(mSpace.getCamera(0).getLocation());
+		TransitionManager.fadeIn(mainView, 500, vsm);
+		getGlobalView();
+	}
 
     /*-------------     Navigation              -------------*/
 
