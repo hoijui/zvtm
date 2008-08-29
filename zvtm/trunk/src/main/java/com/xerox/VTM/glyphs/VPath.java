@@ -179,27 +179,27 @@ public class VPath extends Glyph {
 		setColor(c);
 	}
 
-    /**
-        *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param c color
-        *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
-        */
-    public VPath(int z,Color c,String svg){
-        vx=0;
-        vy=0;
-        vz=z;
-        sensit=false;
-        setColor(c);
-        this.setSVGPath(svg);
-    }
+//    /**
+//        *@param z z-index (pass 0 if you do not use z-ordering)
+//        *@param c color
+//        *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
+//        */
+//    public VPath(int z,Color c,String svg){
+//        vx=0;
+//        vy=0;
+//        vz=z;
+//        sensit=false;
+//        setColor(c);
+//        this.setSVGPath(svg);
+//    }
 
-    /** Reset path and assign it new coordinates according to what is specified in the SVG expression.
-     *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
-     */
-    public void setSVGPath(String svg){
-	resetPath();
-	SVGReader.createPath(svg,this);
-    }
+//    /** Reset path and assign it new coordinates according to what is specified in the SVG expression.
+//     *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
+//     */
+//    public void setSVGPath(String svg){
+//	resetPath();
+//	SVGReader.createPath(svg,this);
+//    }
 
     /** New path, will begin at (vx,vy)
      */
