@@ -1080,7 +1080,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
 	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
 	
-	static final int BRING_ANIM_DURATION = 3000;
+	static final int BRING_ANIM_DURATION = 300;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
 	boolean isBringingAndGoing = false;
