@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenuBar;
 import java.awt.event.ComponentListener;
 
+import java.util.Hashtable;
 import java.util.Vector;
 
 import com.xerox.VTM.engine.Camera;
@@ -1103,10 +1104,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		if (n == null){return;}
 		ClosedShape thisEndShape = n.getShape();
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
-		LEdge[] arcs = n.getAllArcs();		
+		LEdge[] arcs = n.getAllArcs();
+		Hashtable node2bposition = new Hashtable();
 		for (int i=0;i<arcs.length;i++){
 			if (arcs[i].isLoop()){continue;}
-			LNode otherEnd = arcs[i].getOtherEnd(n);			
+			LNode otherEnd = arcs[i].getOtherEnd(n);
 			ClosedShape otherEndShape = otherEnd.getShape();
 			double otherEndBoundingCircleRadius = otherEndShape.getSize();
 			double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
@@ -1114,7 +1116,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			double ratio = bd / d;
 			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
 			long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
-			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, bx, by);
+			node2bposition.put(otherEnd, new LongPoint(bx, by));
+		}
+		for (int i=0;i<arcs.length;i++){
+			if (arcs[i].isLoop()){continue;}
+			LNode otherEnd = arcs[i].getOtherEnd(n);
+			ClosedShape otherEndShape = otherEnd.getShape();
+			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
 		}
 	}
 	
@@ -1139,11 +1147,12 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		
 	}
 	
-	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, long bx, long by){
+	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, Hashtable node2bposition){
 		broughtElements.add(BroughtElement.rememberPreviousState(node));
 		broughtElements.add(BroughtElement.rememberPreviousState(arc));
 		ClosedShape nodeShape = node.getShape();
-		LongPoint translation = new LongPoint(bx-nodeShape.vx, by-nodeShape.vy);
+		LongPoint bposition = (LongPoint)node2bposition.get(node);
+		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
 		Glyph[] glyphs = node.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){
 			vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, glyphs[i].getID());			
@@ -1153,12 +1162,12 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		LongPoint aep = spline.getEndPoint();
 		LongPoint sp, ep;
 		if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
-			sp = new LongPoint(bx, by);
+			sp = new LongPoint(bposition.x, bposition.y);
 			ep = new LongPoint(sx, sy);
 		}
 		else {
 			sp = new LongPoint(sx, sy);
-			ep = new LongPoint(bx, by);			
+			ep = new LongPoint(bposition.x, bposition.y);
 		}
 		mSpace.below(spline, nodeShape);
 		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
@@ -1168,7 +1177,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			if (glyphs[i] != spline){
 				if (glyphs[i] instanceof VText){
 					// put any label at the center of the edge (simplest think we can do)
-					vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, new LongPoint(bx-sx, by-sy), glyphs[i].getID());
+					vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, new LongPoint(bposition.x-sx, bposition.y-sy), glyphs[i].getID());
 				}
 				else {
 					// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
@@ -1182,29 +1191,26 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			spline = otherArcs[i].getSpline();
 			asp = spline.getStartPoint();
 			aep = spline.getEndPoint();
-			if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
-				sp = new LongPoint(bx, by);
-				ep = aep;
+			
+			if (node2bposition.containsKey(otherArcs[i].getTail())
+			    && node2bposition.containsKey(otherArcs[i].getHead())){
+				sp = (LongPoint)node2bposition.get(otherArcs[i].getTail());
+				ep = (LongPoint)node2bposition.get(otherArcs[i].getHead());
 			}
 			else {
-				sp = asp;
-				ep = new LongPoint(bx, by);
+				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
+					sp = new LongPoint(bposition.x, bposition.y);
+					ep = aep;
+				}
+				else {
+					sp = asp;
+					ep = new LongPoint(bposition.x, bposition.y);
+				}
 			}
 			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
 			mSpace.below(spline, nodeShape);
 			vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 			glyphs = otherArcs[i].getGlyphs();
-			for (int j=0;j<glyphs.length;j++){
-				if (glyphs[j] != spline){
-					if (glyphs[j] instanceof VText){
-						continue;
-					}
-					else {
-						// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
-						glyphs[j].setVisible(false);
-					}
-				}
-			}
 		}
 	}
 	
