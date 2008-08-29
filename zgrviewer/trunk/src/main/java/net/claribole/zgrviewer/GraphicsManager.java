@@ -1078,9 +1078,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	originalEdgeColor.removeAllElements();
     }
 
-	/* -------------- Bring and Go mode (previously called Fresnel mode) --------------------*/
+	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
 	
-	static final int BRING_ANIM_DURATION = 300;
+	static final int BRING_ANIM_DURATION = 3000;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
 	boolean isBringingAndGoing = false;
@@ -1160,6 +1160,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			sp = new LongPoint(sx, sy);
 			ep = new LongPoint(bx, by);			
 		}
+		mSpace.below(spline, nodeShape);
 		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
 		vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 		glyphs = arc.getGlyphs();
@@ -1172,6 +1173,36 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 				else {
 					// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
 					glyphs[i].setVisible(false);
+				}
+			}
+		}
+		LEdge[] otherArcs = node.getOtherArcs(arc);
+		for (int i=0;i<otherArcs.length;i++){
+			broughtElements.add(BroughtElement.rememberPreviousState(otherArcs[i]));
+			spline = otherArcs[i].getSpline();
+			asp = spline.getStartPoint();
+			aep = spline.getEndPoint();
+			if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
+				sp = new LongPoint(bx, by);
+				ep = aep;
+			}
+			else {
+				sp = asp;
+				ep = new LongPoint(bx, by);
+			}
+			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
+			mSpace.below(spline, nodeShape);
+			vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
+			glyphs = otherArcs[i].getGlyphs();
+			for (int j=0;j<glyphs.length;j++){
+				if (glyphs[j] != spline){
+					if (glyphs[j] instanceof VText){
+						continue;
+					}
+					else {
+						// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
+						glyphs[j].setVisible(false);
+					}
 				}
 			}
 		}

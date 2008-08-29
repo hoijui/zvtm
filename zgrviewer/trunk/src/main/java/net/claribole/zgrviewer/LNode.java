@@ -65,6 +65,20 @@ class LNode extends LElem {
 		System.arraycopy(edges, 0, res, 0, edges.length);
 		return res;
 	}
+	
+	/** Get all arcs incoming or outgoing from this node, except for the specified one. */
+	LEdge[] getOtherArcs(LEdge arc){
+		int count = 0;
+		for (int i=0;i<edges.length;i++){
+			if (arc != edges[i]){count++;}
+		}
+		LEdge[] res = new LEdge[count];
+		int j = 0;
+		for (int i=0;i<edges.length;i++){
+			if (arc != edges[i]){res[j++] = edges[i];}
+		}
+		return res;
+	}
 
     LEdge[] getOutgoingArcs(){
 	int oaCount = 0;
