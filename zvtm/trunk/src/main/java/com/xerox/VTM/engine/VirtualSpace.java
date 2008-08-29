@@ -188,7 +188,9 @@ public class VirtualSpace {
 
     /**get all visible glyphs*/
     public Glyph[] getVisibleGlyphList(){
-	return drawingList;
+		Glyph[] res = new Glyph[drawingList.length];
+		System.arraycopy(drawingList, 0, res, 0, drawingList.length);
+		return res;
     }
 
     /**
