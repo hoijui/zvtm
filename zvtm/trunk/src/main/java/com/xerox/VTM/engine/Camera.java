@@ -136,16 +136,16 @@ public class Camera {
 	}
     }
 
-    /**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
-    public void moveTo(long x,long y){
-	propagateMove(x-posx, y-posy);  //take care of sticked glyphs
-	posx = x;
-	posy = y;
-	updatePrecisePosition();
-	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
+	/**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
+	public void moveTo(long x,long y){
+		posx = x;
+		posy = y;
+		updatePrecisePosition();
+		propagateMove(x-posx, y-posy);  //take care of sticked glyphs
+		if (view != null){
+			parentSpace.vsm.repaintNow(view);
+		}
 	}
-    }
 
     /**
      * Set camera altitude (absolute value).
