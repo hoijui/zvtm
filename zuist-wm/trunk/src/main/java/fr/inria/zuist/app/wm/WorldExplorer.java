@@ -73,6 +73,8 @@ public class WorldExplorer implements Java2DPainter {
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
+
+	static final Color BACKGROUND_COLOR = Color.GRAY;
     
     boolean SHOW_MEMORY_USAGE = false;
     
@@ -90,7 +92,7 @@ public class WorldExplorer implements Java2DPainter {
     static final String mSpaceName = "BMNG Layer";
     static final String bSpaceName = "Boundary Layer";
     VirtualSpace mSpace, bSpace;
-    Camera mCamera, bCamera;
+    Camera mCamera, bCamera, ovCamera;
     static final String mViewName = "World Explorer";
     View mView;
     ExplorerEventHandler eh;
@@ -124,9 +126,10 @@ public class WorldExplorer implements Java2DPainter {
         gm = new GeoToolsManager(this);
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
-//        vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
-        mCamera.setAltitude(10000.0f);
+        mCamera.setAltitude(9000.0f);
+        vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
         eh.cameraMoved();
+		nm.createOverview();
     }
 
     void initGUI(boolean fullscreen){
@@ -135,7 +138,8 @@ public class WorldExplorer implements Java2DPainter {
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = vsm.addCamera(mSpace);
-        bCamera = vsm.addCamera(bSpace);
+        ovCamera = vsm.addCamera(mSpace);
+		bCamera = vsm.addCamera(bSpace);
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
@@ -150,7 +154,7 @@ public class WorldExplorer implements Java2DPainter {
         eh = new ExplorerEventHandler(this);
         mView.setEventHandler(eh, 0);
         mView.setNotifyMouseMoved(true);
-        mView.setBackgroundColor(Color.GRAY);
+        mView.setBackgroundColor(BACKGROUND_COLOR);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();

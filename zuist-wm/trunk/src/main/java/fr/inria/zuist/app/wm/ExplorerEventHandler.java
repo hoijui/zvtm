@@ -7,6 +7,7 @@
 
 package fr.inria.zuist.app.wm;
 
+import java.awt.Cursor;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -14,6 +15,8 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
 import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.xerox.VTM.engine.VCursor;
 import com.xerox.VTM.engine.View;
@@ -22,12 +25,15 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.engine.OverviewPortal;
+import net.claribole.zvtm.engine.PortalEventHandler;
 
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ExplorerEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
+class ExplorerEventHandler implements ViewEventHandler, AnimationListener, ComponentListener, PortalEventHandler {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -36,6 +42,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     
     static float WHEEL_MM_STEP = 1.0f;
     
+	// update scene when panned from overview every 1.0s
+	static final int DELAYED_UPDATE_FREQUENCY = 1000;
+
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
     int currentJPX, currentJPY;
@@ -45,6 +54,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     float oldCameraAltitude;
 
     boolean mCamStickedToMouse = false;
+    boolean regionStickedToMouse = false;
+    boolean inPortal = false;
 
     WorldExplorer application;
     NavigationManager nm;
@@ -52,22 +63,47 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     Glyph g;
     
     boolean cursorNearBorder = false;
-    boolean dragging = false;
+    boolean panning = false;
     
+	DelayedUpdateTimer dut;
+
     ExplorerEventHandler(WorldExplorer app){
         this.application = app;
         this.nm = app.nm;
         oldCameraAltitude = this.application.mCamera.getAltitude();
+		initDelayedUpdateTimer();
     }
+
+	void initDelayedUpdateTimer(){
+		Timer timer = new Timer();
+		dut = new DelayedUpdateTimer(this);
+		timer.scheduleAtFixedRate(dut, DELAYED_UPDATE_FREQUENCY, DELAYED_UPDATE_FREQUENCY);
+	}
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        dragging = true;
+		if (inPortal){
+		    if (application.nm.ovPortal.coordInsideObservedRegion(jpx, jpy)){
+				regionStickedToMouse = true;
+		    }
+			else {
+				double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
+				application.mCamera.moveTo(Math.round(a*(jpx-application.nm.ovPortal.x-application.nm.ovPortal.w/2)),
+				                           Math.round(-a*(jpy-application.nm.ovPortal.y-application.nm.ovPortal.h/2)));
+				cameraMoved();
+				// position camera where user has pressed, and then allow seamless dragging
+				regionStickedToMouse = true;
+			}
+		}
+		else {
+	        panning = true;			
+		}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        dragging = false;
+		panning = false;
+		regionStickedToMouse = false;
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -138,7 +174,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (dragging){
+        if (panning){
             float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
@@ -150,6 +186,13 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         	    nm.moveLens(jpx, jpy, e.getWhen());
         	}
         }
+		else if (regionStickedToMouse){
+			float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
+			application.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+			dut.requestUpdate();
+			lastJPX = jpx;
+			lastJPY = jpy;
+		}
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
@@ -238,8 +281,59 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         }
         else {
             // camera movement was a simple translation
+			dut.cancelUpdate();
             application.sm.updateVisibleRegions();
         }
     }
+
+	/* Overview Portal */
+	public void enterPortal(Portal p){
+		inPortal = true;
+		((OverviewPortal)p).setBorder(NavigationManager.OV_INSIDE_BORDER_COLOR);
+		application.vsm.repaintNow();
+	}
+
+	public void exitPortal(Portal p){
+		inPortal = false;
+		((OverviewPortal)p).setBorder(NavigationManager.OV_BORDER_COLOR);
+		application.vsm.repaintNow();
+	}
+	
+}
+
+class DelayedUpdateTimer extends TimerTask {
+
+    private boolean enabled = true;
+	private boolean update = false;
+	
+	ExplorerEventHandler eh;
+
+	DelayedUpdateTimer(ExplorerEventHandler eh){
+		super();
+		this.eh = eh;
+	}
+
+	public void setEnabled(boolean b){
+		enabled = b;
+	}
+
+	public boolean isEnabled(){
+		return enabled;
+	}
+
+	public void run(){		
+		if (enabled && update){
+			eh.cameraMoved();
+			update = false;
+		}
+	}
+	
+	void requestUpdate(){
+		update = true;
+	}
+	
+	void cancelUpdate(){
+		update = false;
+	}
 
 }

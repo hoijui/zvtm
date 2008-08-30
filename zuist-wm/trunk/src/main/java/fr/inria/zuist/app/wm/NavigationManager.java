@@ -21,6 +21,7 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.engine.OverviewPortal;
 
 class NavigationManager {
 
@@ -79,7 +80,36 @@ class NavigationManager {
     NavigationManager(WorldExplorer app){
         this.application = app;
     }
+
+	/* -------------- Overview ------------------- */
+	
+	static final int OVERVIEW_WIDTH = 200;
+	static final int OVERVIEW_HEIGHT = 100;
+	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
+	static final float OBSERVED_REGION_ALPHA = 0.5f;
+	static final Color OV_BORDER_COLOR = Color.GREEN;
+	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
+	
+	OverviewPortal ovPortal;
+	
+	void createOverview(){
+		ovPortal = new OverviewPortal(application.panelWidth-OVERVIEW_WIDTH-1, application.panelHeight-OVERVIEW_HEIGHT-1, OVERVIEW_WIDTH, OVERVIEW_HEIGHT, application.ovCamera, application.mCamera);
+		ovPortal.setPortalEventHandler(application.eh);
+		ovPortal.setBackgroundColor(WorldExplorer.BACKGROUND_COLOR);
+		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
+		ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);
+		application.vsm.addPortal(ovPortal, application.mView);
+		ovPortal.setBorder(Color.GREEN);
+		updateOverview();
+	}
+	
+	void updateOverview(){
+		if (ovPortal != null){application.ovCamera.setLocation(ovPortal.getGlobalView());}
+	}
+
     
+	/* -------------- Sigma Lenses ------------------- */
+
     void setLens(int t){
         lensType = t;
     }
