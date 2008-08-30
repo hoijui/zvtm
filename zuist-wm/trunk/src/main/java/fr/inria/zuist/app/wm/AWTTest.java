@@ -57,7 +57,7 @@ public class AWTTest extends JFrame {
                 // for each feature
                 for (int i=0;i<features.length;i++){
                     Feature feature = features[i];
-                    Geometry geometry = feature.getPrimaryGeometry();
+                    Geometry geometry = feature.getDefaultGeometry();
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     // for each polygon in the MultiPolygon
                     for (int j=0;j<polygons.length;j++){

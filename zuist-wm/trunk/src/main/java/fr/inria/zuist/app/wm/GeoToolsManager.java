@@ -41,7 +41,7 @@ class GeoToolsManager {
     static final double CC = 21600 * 2 / 180.0;
 
     static final Color COUNTRY_COLOR = Color.YELLOW;
-    static final Color ADMIN_DIV_1_COLOR = Color.ORANGE;
+    static final Color ADMIN_DIV_1_COLOR = Color.GREEN;
 
     WorldExplorer application;
     
@@ -60,7 +60,7 @@ class GeoToolsManager {
 //        load(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
 //        load(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
 //        load(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
-//        load(new File("data/shapefiles/china/CHN0.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
+//        load(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
     }
 
     void load(File shapeFile, String msg, Region region, Color shapeColor){
@@ -81,7 +81,7 @@ class GeoToolsManager {
                 Vector points = new Vector();
                 for (int i=0;i<features.length;i++){
                     Feature feature = features[i];
-                    Geometry geometry = feature.getPrimaryGeometry();                    
+                    Geometry geometry = feature.getDefaultGeometry();                    
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     for (int k=0;k<polygons.length;k++){
                     
