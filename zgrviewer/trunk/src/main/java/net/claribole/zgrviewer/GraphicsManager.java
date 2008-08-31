@@ -1124,26 +1124,35 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			allElements.remove(glyphs[i]);
 		}		
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
+		// distance between two rings
+		double RING_STEP = 4 * thisEndBoundingCircleRadius;
+		
 		LEdge[] arcs = n.getAllArcs();
 		Hashtable node2bposition = new Hashtable();
+		RingManager rm = new RingManager();
+		// compute the position of nodes to be brought
 		for (int i=0;i<arcs.length;i++){
 			if (arcs[i].isLoop()){continue;}
 			LNode otherEnd = arcs[i].getOtherEnd(n);
 			ClosedShape otherEndShape = otherEnd.getShape();
-			double otherEndBoundingCircleRadius = otherEndShape.getSize();
 			double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
-			double bd = (thisEndBoundingCircleRadius + otherEndBoundingCircleRadius) * BRING_DISTANCE_FACTOR;
+			//XXX:TBW compute right angle for direction
+			Ring ring = rm.getRing(Math.atan2(1,1), otherEndShape.getSize(), RING_STEP);
+			//EOXXX
+			double bd = ring.rank * RING_STEP;			
 			double ratio = bd / d;
 			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
 			long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
 			node2bposition.put(otherEnd, new LongPoint(bx, by));
 		}
+		// actually bring the arcs and nodes
 		for (int i=0;i<arcs.length;i++){
 			if (arcs[i].isLoop()){continue;}
 			LNode otherEnd = arcs[i].getOtherEnd(n);
 			ClosedShape otherEndShape = otherEnd.getShape();
 			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
 		}
+		// make edges translucent
 		allElementsAlpha = new float[allElements.size()];
 		Translucent t;
 		for (int i=0;i<allElements.size();i++){
@@ -1344,4 +1353,80 @@ class ZGRGlassPane extends JComponent {
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
     
+}
+
+class RingManager {
+	
+	Ring[] rings = new Ring[0];
+	
+	Ring getRing(double direction, double size, double ringStep){
+		double a1 = 0;
+		double a2 = 0;
+		// look for a ring where the new object could be placed, starting with the innermost one
+		for (int i=0;i<rings.length;i++){
+
+			//XXX:TBW for each ring actually have to compute a1 and a2 based on direction, size and ringStep
+
+			if (!rings[i].intersectsConeOfInfluence(a1, a2)){
+				return rings[i];
+			}
+		}
+		// if couldn't find any room, create a new ring
+		return createNewRing();
+	}
+	
+	private Ring createNewRing(){
+		Ring[] tr = new Ring[rings.length+1];
+		System.arraycopy(rings, 0, tr, 0, rings.length);
+		tr[rings.length] = new Ring(tr.length);
+		rings = tr;
+		return rings[rings.length-1];
+	}
+	
+}
+
+class Ring {
+
+	/* rank of this ring (starts at 1) */
+	int rank;
+//  /* nodes on this ring */
+//  LNode[] nodes = new LNode[0];
+//  /* nodes on this ring */
+//  LongPoint[] broughtPositions = new LongPoint[0];
+//  /* cones of influence, for each item, first element is the smallest angle in [0, 2Pi[, second the largest angle in [0, 2Pi[ */
+	double[][] cones = new double[0][2];
+	
+	Ring(int r){
+		this.rank = r;
+	}
+	
+//	void addNode(/*LNode n, LongPoint p,*/ double a1, double a2){
+	void addNode(double a1, double a2){
+//		// add node
+//		LNode[] ta = new LNode[nodes.length+1];
+//		System.arraycopy(nodes, 0, ta, 0, nodes.length);
+//		ta[nodes.length] = n;
+//		nodes = ta;
+//		// add node
+//		LongPoint[] tp = new LongPoint[broughtPositions.length+1];
+//		System.arraycopy(broughtPositions, 0, tp, 0, broughtPositions.length);
+//		tp[nodes.length] = p;
+//		broughtPositions = tp;
+		// compute its cone of influence
+		double[][] tc = new double[cones.length+1][2];
+		System.arraycopy(cones, 0, tc, 0, cones.length);
+		if (a1 < 0){a1 = 2 * Math.PI + a1;}
+		if (a2 < 0){a2 = 2 * Math.PI + a2;}
+		tc[cones.length][0] = Math.min(a1, a2);
+		tc[cones.length][1] = Math.max(a1, a2);
+		cones = tc;
+	}
+	
+	boolean intersectsConeOfInfluence(double a1, double a2){
+		for (int i=0;i<cones.length;i++){
+			if (a2 > cones[i][0] && a1 < cones[i][1]){return true;}
+		}
+		return false;
+	}
+	
 }
