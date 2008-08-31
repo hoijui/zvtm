@@ -1126,7 +1126,6 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		// distance between two rings
 		double RING_STEP = 4 * thisEndBoundingCircleRadius;
-		
 		LEdge[] arcs = n.getAllArcs();
 		Hashtable node2bposition = new Hashtable();
 		RingManager rm = new RingManager();
@@ -1136,9 +1135,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 			LNode otherEnd = arcs[i].getOtherEnd(n);
 			ClosedShape otherEndShape = otherEnd.getShape();
 			double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
-			//XXX:TBW compute right angle for direction
-			Ring ring = rm.getRing(Math.atan2(1,1), otherEndShape.getSize(), RING_STEP);
-			//EOXXX
+			Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), otherEndShape.getSize(), RING_STEP);
 			double bd = ring.rank * RING_STEP;			
 			double ratio = bd / d;
 			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
@@ -1360,6 +1357,8 @@ class RingManager {
 	Ring[] rings = new Ring[0];
 	
 	Ring getRing(double direction, double size, double ringStep){
+		// normalize direction in [0,2Pi[
+		if (direction < 0){direction = 2 * Math.PI + direction;}		
 		double a1 = 0;
 		double a2 = 0;
 		// look for a ring where the new object could be placed, starting with the innermost one
@@ -1415,6 +1414,7 @@ class Ring {
 		// compute its cone of influence
 		double[][] tc = new double[cones.length+1][2];
 		System.arraycopy(cones, 0, tc, 0, cones.length);
+		// normalize angles in [0,2Pi[
 		if (a1 < 0){a1 = 2 * Math.PI + a1;}
 		if (a2 < 0){a2 = 2 * Math.PI + a2;}
 		tc[cones.length][0] = Math.min(a1, a2);
