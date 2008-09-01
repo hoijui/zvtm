@@ -392,17 +392,19 @@ class DistanceComparator implements Comparator<ObjectDescription> {
 	this.y = y;
     }
     
-    public int compare(ObjectDescription od1, ObjectDescription od2){
-	if (Math.pow(x-od1.getX(), 2) + Math.pow(y-od1.getY(), 2) < Math.pow(x-od2.getX(), 2) + Math.pow(y-od2.getY(), 2)){
-	    return -1;
+	public int compare(ObjectDescription od1, ObjectDescription od2){
+		double d1 = Math.pow(x-od1.getX(), 2) + Math.pow(y-od1.getY(), 2);
+		double d2 = Math.pow(x-od2.getX(), 2) + Math.pow(y-od2.getY(), 2);
+		if (d1 < d2){
+			return -1;
+		}
+		else if (d1 > d2){
+			return 1;
+		}
+		else {
+			return 0;
+		}
 	}
-	else if (Math.pow(x-od1.getX(), 2) + Math.pow(y-od1.getY(), 2) > Math.pow(x-od2.getX(), 2) + Math.pow(y-od2.getY(), 2)){
-	    return 1;
-	}
-	else {
-	    return 0;
-	}
-    }
-    
+
     
 }
