@@ -1358,20 +1358,20 @@ class RingManager {
 	
 	Ring getRing(double direction, double size, double ringStep){
 		// normalize direction in [0,2Pi[
-		if (direction < 0){direction = 2 * Math.PI + direction;}		
-		double a1 = 0;
-		double a2 = 0;
+		if (direction < 0){direction = 2 * Math.PI + direction;}
 		// look for a ring where the new object could be placed, starting with the innermost one
 		for (int i=0;i<rings.length;i++){
-
-			//XXX:TBW for each ring actually have to compute a1 and a2 based on direction, size and ringStep
-
-			if (!rings[i].intersectsConeOfInfluence(a1, a2)){
+			double a = Math.abs(Math.atan2(size, rings[i].rank * ringStep));
+			if (!rings[i].intersectsConeOfInfluence(direction-a, direction+a)){
+				rings[i].addNode(direction-a, direction+a);
 				return rings[i];
 			}
 		}
 		// if couldn't find any room, create a new ring
-		return createNewRing();
+		Ring r = createNewRing();
+		double a = Math.abs(Math.atan2(size, ringStep));
+		r.addNode(direction-a, direction+a);
+		return r;
 	}
 	
 	private Ring createNewRing(){
