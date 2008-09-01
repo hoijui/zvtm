@@ -31,6 +31,7 @@ import java.awt.event.ComponentListener;
 
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.Arrays;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VCursor;
@@ -1127,6 +1128,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		// distance between two rings
 		double RING_STEP = 4 * thisEndBoundingCircleRadius;
 		LEdge[] arcs = n.getAllArcs();
+		// sort them according to distance from start node
+		// (so as to try to keep the closest ones closer to the start node)
+		Arrays.sort(arcs, new DistanceComparator(n));
 		Hashtable node2bposition = new Hashtable();
 		RingManager rm = new RingManager();
 		// compute the position of nodes to be brought
@@ -1429,4 +1433,32 @@ class Ring {
 		return false;
 	}
 	
+}
+
+class DistanceComparator implements java.util.Comparator {
+
+	LNode centerNode;
+	Glyph centerShape;
+
+	DistanceComparator(LNode cn){
+		this.centerNode = cn;
+		this.centerShape = cn.getShape();
+	}
+    
+	public int compare(Object o1, Object o2){
+		Glyph n1 = ((LEdge)o1).getOtherEnd(centerNode).getShape();
+		Glyph n2 = ((LEdge)o2).getOtherEnd(centerNode).getShape();
+		double d1 = Math.pow(centerShape.vx-n1.vx, 2) + Math.pow(centerShape.vy-n1.vy, 2);
+		double d2 = Math.pow(centerShape.vx-n2.vx, 2) + Math.pow(centerShape.vy-n2.vy, 2);
+		if (d1 < d2){
+			return -1;
+		}
+		else if (d1 > d2){
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+        
 }
