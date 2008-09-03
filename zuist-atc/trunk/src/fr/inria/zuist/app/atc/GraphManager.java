@@ -45,8 +45,8 @@ class GraphManager {
     static final String[] transitions = {Region.APPEAR_STR, Region.APPEAR_STR, Region.DISAPPEAR_STR, Region.DISAPPEAR_STR};
 	
 	ATCExplorer application;
-	String GML_FILE_PATH = "gdata/airtraffic_2004.gml";
-	String GEO_FILE_PATH = "gdata/airports.csv";
+	String GML_FILE_PATH = "data/airtraffic_2004.gml";
+	String GEO_FILE_PATH = "data/airports.csv";
 	
 	static final String INPUT_CSV_SEP = ";";
 	
