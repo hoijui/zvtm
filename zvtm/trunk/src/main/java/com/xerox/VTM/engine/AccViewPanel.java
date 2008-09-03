@@ -232,7 +232,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 					    viewSC = (long) (cams[nbcam].posy - (viewH / 2 - visibilityPadding[3])
 						    * uncoef);
 					    gll = cams[nbcam].parentSpace
-						    .getVisibleGlyphList();
+						    .getDrawingList();
 					    if (parent.detectMultipleFullFills) {// if
                                                                                         // detect
                                                                                         // multiple

@@ -224,7 +224,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 						    lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
 						    lensVx = (lviewWC+lviewEC)/2;
 						    lensVy = (lviewSC+lviewNC)/2;
-						    gll = cams[nbcam].parentSpace.getVisibleGlyphList();
+						    gll = cams[nbcam].parentSpace.getDrawingList();
 						    for (int i=0;i<gll.length;i++){
 							if (gll[i] != null){
 							    synchronized(gll[i]){
@@ -297,7 +297,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
 						viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
 						viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
 						viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-						gll = cams[nbcam].parentSpace.getVisibleGlyphList();
+						gll = cams[nbcam].parentSpace.getDrawingList();
 						for (int i=0;i<gll.length;i++){
 						    if (gll[i] != null){
 							synchronized(gll[i]){

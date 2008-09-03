@@ -169,7 +169,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			    viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
 			    viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
 			    viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-			    gll = cams[nbcam].parentSpace.getVisibleGlyphList();
+			    gll = cams[nbcam].parentSpace.getDrawingList();
 			    for (int i=0;i<gll.length;i++){
 				if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
 				    //if glyph is at least partially visible in the reg. seen from this view, display

@@ -165,7 +165,7 @@ public class SVGWriter {
 	    Element mainGroup=svgDoc.createElementNS(svgURI,SVGReader._g);
 	    mainGroup.setAttribute(SVGReader._style,createFontInformation(VirtualSpaceManager.getMainFont()));
 	    root.appendChild(mainGroup);
-	    Glyph[] visibleGlyphs=vs.getVisibleGlyphList();
+	    Glyph[] visibleGlyphs=vs.getDrawingList();
 	    Element el;
 	    for (int i=0;i<visibleGlyphs.length;i++){
 		el=processGlyph(visibleGlyphs[i]);
@@ -203,7 +203,7 @@ public class SVGWriter {
 	    Element mainGroup=svgDoc.createElementNS(svgURI,SVGReader._g);
 	    mainGroup.setAttribute(SVGReader._style,createFontInformation(VirtualSpaceManager.getMainFont()));
 	    root.appendChild(mainGroup);
-	    Glyph[] visibleGlyphs=vs.getVisibleGlyphList();
+	    Glyph[] visibleGlyphs=vs.getDrawingList();
 	    Element el;
 	    for (int i=0;i<visibleGlyphs.length;i++){
 		el=processGlyph(visibleGlyphs[i]);

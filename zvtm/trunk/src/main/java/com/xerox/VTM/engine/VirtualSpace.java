@@ -186,7 +186,12 @@ public class VirtualSpace {
 	return res;
     }
 
-    /**get all visible glyphs*/
+    /** Get all visible glyphs (not cloned). */
+	public Glyph[] getDrawingList(){
+		return drawingList;
+	}
+
+    /** Get all visible glyphs (clone). */
     public Glyph[] getVisibleGlyphList(){
 		Glyph[] res = new Glyph[drawingList.length];
 		System.arraycopy(drawingList, 0, res, 0, drawingList.length);

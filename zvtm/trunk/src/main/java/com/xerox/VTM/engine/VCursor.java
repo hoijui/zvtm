@@ -504,7 +504,7 @@ public class VCursor {
                 maxIndex =- 1;
             }
             lastGlyphEntered = null;
-            Glyph[] gl = vs.getVisibleGlyphList();
+            Glyph[] gl = vs.getDrawingList();
             synchronized(gl){
                 for (int i=0;i<gl.length;i++){
                     try {

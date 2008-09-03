@@ -83,7 +83,7 @@ public class RoundCameraPortalST extends RoundCameraPortal implements Translucen
 	    viewNC = (long)(camera.posy + (h/2)*uncoef);
 	    viewEC = (long)(camera.posx + (w/2)*uncoef);
 	    viewSC = (long)(camera.posy - (h/2)*uncoef);
-	    gll = cameraSpace.getVisibleGlyphList();
+	    gll = cameraSpace.getDrawingList();
 	    for (int i=0;i<gll.length;i++){
 		if (gll[i] != null){
 		    synchronized(gll[i]){
