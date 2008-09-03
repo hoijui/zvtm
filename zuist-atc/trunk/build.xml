@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+
+<project name="zuist-atc" default="atcjar" basedir=".">
+  <description>ZUIST-ATC build file</description>
+  <path id="project.class.path">
+	<pathelement location="${basedir}/lib/infovis.jar"/>
+	<pathelement location="${basedir}/lib/JFontChooser.jar"/>
+	<pathelement location="${basedir}/lib/antlr.jar"/>
+	<pathelement location="${basedir}/lib/colt.jar"/>
+	<pathelement location="${basedir}/lib/commons-beanutils-1.7.0.jar"/>
+	<pathelement location="${basedir}/lib/commons-logging-1.0.3.jar"/>
+	<pathelement location="${basedir}/lib/concurrent-1.3.4.jar"/>
+	<pathelement location="${basedir}/lib/concurrent.jar"/>
+	<pathelement location="${basedir}/lib/geoapi-nogenerics-2.1.0.jar"/>
+	<pathelement location="${basedir}/lib/gt2-api-2.4.3.jar"/>
+	<pathelement location="${basedir}/lib/gt2-epsg-wkt-2.4.3.jar"/>
+	<pathelement location="${basedir}/lib/gt2-main-2.4.3.jar"/>
+	<pathelement location="${basedir}/lib/gt2-metadata-2.4.3.jar"/>
+	<pathelement location="${basedir}/lib/gt2-referencing-2.4.3.jar"/>
+	<pathelement location="${basedir}/lib/gt2-shapefile-2.4.3.jar"/>
+	<pathelement location="${basedir}/lib/intset.jar"/>
+	<pathelement location="${basedir}/lib/jdom-1.0.jar"/>
+	<pathelement location="${basedir}/lib/jsr108-0.01.jar"/>
+	<pathelement location="${basedir}/lib/jts-1.8.jar"/>
+	<pathelement location="${basedir}/lib/log4j.jar"/>
+	<pathelement location="${basedir}/lib/swing-worker.jar"/>
+	<pathelement location="${basedir}/lib/vecmath-1.3.1.jar"/>
+	<pathelement location="${basedir}/lib/velocity-1.4.jar"/>
+	<pathelement location="${basedir}/lib/xercesImpl-2.8.1.jar"/>
+	<pathelement location="${basedir}/lib/xml-apis-1.3.03.jar"/>
+	<pathelement location="${basedir}/lib/xml-writer.jar"/>
+	<pathelement location="${basedir}/lib/xmlParserAPIs-2.6.2.jar"/>
+	<pathelement location="${basedir}/lib/xp.jar"/>
+	<pathelement location="${basedir}/lib/xpp3_min-1.1.3.4.O.jar"/>
+	<pathelement location="${basedir}/lib/xstream-1.2.2.jar"/>
+	<pathelement location="${basedir}/lib/zuist-engine-0.1.1-SNAPSHOT.jar"/>
+	<pathelement location="${basedir}/lib/zvtm-0.9.7-SNAPSHOT.jar"/>
+  </path>
+
+  <target name="init">
+    <property name="classes.dir" value="${basedir}/classes"/>
+    <property name="lib.dir" value="${basedir}/lib"/>
+    <property name="src.dir" value="${basedir}/src"/>
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${lib.dir}"/>
+  </target>
+
+  <target name="atcbuild" depends="init">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}"
+           debug="on" deprecation="off" optimize="on"
+           includes="**/*java">
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target>
+
+  <target name="atcjar" depends="init,atcbuild">
+    <jar destfile="${lib.dir}/zuist-atc.jar">
+      <fileset dir="${classes.dir}"
+               includes="fr/inria/**"/>
+    </jar>
+  </target>
+
+  <target name="clean" depends="init">
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <target name="realclean" depends="clean">
+    <delete>
+      <fileset dir="${basedir}">
+        <include name="**/*~"/>
+        <include name="**/#*#"/>
+      </fileset>
+    </delete>
+  </target>
+
+</project>
