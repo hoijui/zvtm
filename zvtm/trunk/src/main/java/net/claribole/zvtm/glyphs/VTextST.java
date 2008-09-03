@@ -33,8 +33,8 @@ import com.xerox.VTM.glyphs.VText;
 
 public class VTextST extends VText implements Translucent {
 
-    AlphaComposite acST;
-    float alpha=0.5f;
+    public AlphaComposite acST;
+    public float alpha = 0.5f;
 
     /**
      *@param t text string
@@ -102,8 +102,9 @@ public class VTextST extends VText implements Translucent {
 	return alpha;
     }
 
+	Color borderColor = Color.BLACK;
+
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
@@ -122,10 +123,18 @@ public class VTextST extends VText implements Translucent {
 			g.setTransform(at);
 			if (alpha < 1.0f){
 				g.setComposite(acST);
+
+				g.setColor(Color.BLACK);
+				g.fillRect(dx-2, dy-pc[i].ch+1, pc[i].cw+4, pc[i].ch+1);
+				g.setColor(this.color);
+
 				g.drawString(text, 0.0f, 0.0f);
 				g.setComposite(acO);
 			}
 			else {
+				g.setColor(Color.BLACK);
+				g.fillRect(dx-2, dy-pc[i].ch+6, pc[i].cw+4, pc[i].ch);
+				g.setColor(this.color);
 				g.drawString(text, 0.0f, 0.0f);
 			}
 			g.setTransform(stdT);
