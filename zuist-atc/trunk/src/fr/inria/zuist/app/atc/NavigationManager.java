@@ -29,6 +29,7 @@ import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.glyphs.DPathST;
 import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.engine.PostAnimationAdapter;
 import net.claribole.zvtm.engine.OverviewPortal;
 
 class NavigationManager {
@@ -402,9 +403,8 @@ class NavigationManager {
 
 	/* ---------------------- Bring and go -----------------------------*/
 	
-	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
-	
 	static final int BRING_ANIM_DURATION = 400;
+	static final int FOLLOW_ANIM_DURATION = 1000;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
 	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.3f;
@@ -472,6 +472,32 @@ class NavigationManager {
 		//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
 		//        else send all nodes and edges to their initial position, but also move camera to g
 		isBringingAndGoing = false;
+		BroughtNode bn = (BroughtNode)broughtElements.get(g.getOwner());
+		if (bn != null){
+			// translate camera to node in which button was released
+			LongPoint lp = bn.previousLocations[0];
+			LongPoint trans = new LongPoint((lp.x-application.mCamera.posx)/2, (lp.y-application.mCamera.posy)/2);
+			Vector zoomout = new Vector();
+			//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
+			zoomout.add(new Float(3000));
+			zoomout.add(trans);
+			Vector zoomin = new Vector();
+			//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
+			zoomin.add(new Float(-3000));
+			zoomin.add(trans);
+			application.sm.setUpdateLevel(false);
+			application.mView.setAntialiasing(false);			
+			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_SIG,
+			                                               zoomout, application.mCamera.getID());
+   			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_SIG,
+ 														   zoomin, application.mCamera.getID(),
+                                                           new PostAnimationAdapter(){
+	                                                            public void animationEnded(Object target, short type, String dimension){
+		                                                            application.sm.setUpdateLevel(true);
+		                                                            application.mView.setAntialiasing(true);
+	                                                            }
+                                                           });
+		}
 		if (!broughtElements.isEmpty()){
 			Iterator i = broughtElements.keySet().iterator();
 			while (i.hasNext()){
