@@ -138,7 +138,7 @@ public class ATCExplorer implements Java2DPainter {
     }
 
     void initGUI(boolean fullscreen){
-        windowLayout();
+        windowLayout(fullscreen);
         vsm = new VirtualSpaceManager();
 		vsm.setMainFont(GRAPH_FONT);
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -168,17 +168,24 @@ public class ATCExplorer implements Java2DPainter {
 		mView.setActiveLayer(1);
     }
 
-    void windowLayout(){
-        if (Utilities.osIsWindows()){
-            VIEW_X = VIEW_Y = 0;
-        }
-        else if (Utilities.osIsMacOS()){
-            VIEW_X = 80;
-            SCREEN_WIDTH -= 80;
-        }
-        VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
-        VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
-    }
+	void windowLayout(boolean fullscreen){
+		if (fullscreen){
+			VIEW_W = SCREEN_WIDTH;
+			VIEW_H = SCREEN_HEIGHT;
+		}
+		else {
+			if (Utilities.osIsWindows()){
+				VIEW_X = VIEW_Y = 0;
+			}
+			else if (Utilities.osIsMacOS()){
+				VIEW_X = 80;
+				SCREEN_WIDTH -= 80;
+			}
+			VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+			VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+
+		}
+	}
     
     static final int GRID_STEP = 2160;
     
@@ -326,13 +333,15 @@ public class ATCExplorer implements Java2DPainter {
 		if (args.length > 3){GraphManager.MAX_WEIGHT = Integer.parseInt(args[3]);}
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
 		if (dir == null){
-			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [fs] [grid]");
+			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-atc.jar <path_to_scene_dir> [fs] [grid] [weight]");
 			System.out.println("\n\tfs: fullscreen: true or false");
 			System.out.println("\tgrid: draw a grid on top of the map: true or false");
+			System.out.println("\tweight: display only flight routes with a weight superior to this value");
+			System.out.println();
 			System.exit(0);
 		}
-        new ATCExplorer(fs, grid, dir);
-    }
+		new ATCExplorer(fs, grid, dir);
+	}
 
 }
 
