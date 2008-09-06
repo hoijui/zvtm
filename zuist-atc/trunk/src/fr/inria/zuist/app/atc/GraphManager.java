@@ -132,6 +132,7 @@ class GraphManager {
 					DPathST p = new DPathST(tail.getShape().vx, tail.getShape().vy, 0, SHAPE_FILL_COLOR, 0.7f);
 					p.addQdCurve(head.getShape().vx, head.getShape().vy, cx, cy, true);
 					application.vsm.addGlyph(p, application.bSpace);
+					application.bSpace.atBottom(p);
 					LEdge e = new LEdge(weight, p);
 					e.setDirected(true);
 					e.setTail(tail);

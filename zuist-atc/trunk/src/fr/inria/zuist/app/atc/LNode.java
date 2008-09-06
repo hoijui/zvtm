@@ -115,6 +115,15 @@ class LNode {
 		}
 		return res;
 	}
+	
+	LEdge getEdgeLeadingTo(LNode n){
+		for (int i=0;i<edges.length;i++){
+			if (edges[i].getOtherEnd(this) == n){
+				return edges[i];
+			}
+		}
+		return null;
+	}
 
 	VCircleST getShape(){
 		return nodeShape;

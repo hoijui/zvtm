@@ -99,7 +99,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 		else {
 			Glyph g;
 			if ((g = v.lastGlyphEntered()) != null){
-				nm.startBringAndGo(g);
+				nm.bringFor(g);
 			}
 		}
     }
@@ -225,21 +225,11 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
     public void enterGlyph(Glyph g){
 		if (nm.isBringingAndGoing){
-			nm.attemptToBringMore(g);
-		}
-		else {
-	        g.highlight(true, null);			
+			nm.attemptToBring(g);
 		}
     }
 
-    public void exitGlyph(Glyph g){
-		if (nm.isBringingAndGoing){
-			nm.attemptToBringLess(g);
-		}
-		else {
-	        g.highlight(false, null);			
-		}
-    }
+    public void exitGlyph(Glyph g){}
 
     int ci = 1180;
 

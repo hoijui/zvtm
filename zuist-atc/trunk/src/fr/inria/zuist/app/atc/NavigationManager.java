@@ -412,19 +412,51 @@ class NavigationManager {
 	static final float[] FADE_OUT_ANIM = {0,0,0,0,0,0,FADED_ELEMENTS_TRANSLUCENCY-1};
 	static final float SECOND_STEP_TRANSLUCENCY = 0.4f;
 	
+	static final Color BNG_SHAPE_FILL_COLOR = Color.RED;
+	
 	boolean isBringingAndGoing = false;
 	
-	HashMap broughtElements = new HashMap();
-	Vector allElements;
-	float[] allElementsAlpha;
+	Vector broughtStack = new Vector();
 	
-	void startBringAndGo(Glyph g){
-		isBringingAndGoing = true;
+	HashMap brought2location = new HashMap();
+	HashMap broughtnode2broughtby = new HashMap();
+	HashMap broughtarc2broughtby = new HashMap();
+	
+//	Vector allElements;
+//	float[] allElementsAlpha;
+	
+	void attemptToBring(Glyph g){
 		LNode n = (LNode)g.getOwner();
 		if (n == null){return;}
-		allElements = (Vector)application.bSpace.getAllGlyphs().clone();
+		int iis = broughtStack.indexOf(n);
+		if (iis == -1){
+			// entered a node that is not on the stack of nodes visited during this bring and go
+			bringFor(n);
+			//XXX:TBW send back nodes and arcs that are not brought by the current active bring and go node
+		}
+		else {
+			// entered a node previsouly visited during this bring and go
+			// send back all nodes and arcs brought by subsequent steps of the bring and go
+			for (int i=broughtStack.size()-1;i>=iis+1;i--){
+				LNode n2 = (LNode)broughtStack.elementAt(i);
+				sendBackFor(n2);
+				broughtStack.remove(n2);
+			}
+		}
+	}
+
+	void bringFor(Glyph g){
+		bringFor((LNode)g.getOwner());
+	}
+		
+	void bringFor(LNode n){
+		if (n == null){return;}
+		isBringingAndGoing = true;
+		broughtStack.add(n);
+//		allElements = (Vector)application.bSpace.getAllGlyphs().clone();
 		ClosedShape thisEndShape = n.getShape();
-		allElements.remove(thisEndShape);
+		thisEndShape.setColor(BNG_SHAPE_FILL_COLOR);
+//		allElements.remove(thisEndShape);
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		// distance between two rings
 		double RING_STEP = 4 * thisEndBoundingCircleRadius;
@@ -434,10 +466,14 @@ class NavigationManager {
 		Arrays.sort(arcs, new DistanceComparator(n));
 		Hashtable node2bposition = new Hashtable();
 		RingManager rm = new RingManager();
+		Vector arcsToBring = new Vector();
 		// compute the position of nodes to be brought
 		for (int i=0;i<arcs.length;i++){
 			if (arcs[i].isLoop()){continue;}
 			LNode otherEnd = arcs[i].getOtherEnd(n);
+			// do not bring nodes that are on the bring and go stack (these nodes are frozen during the whole bring and go)
+			// otherwise it would be a mess (they would move when entering one of the nodes brought by them)
+			if (broughtStack.contains(otherEnd)){continue;}
 			ClosedShape otherEndShape = otherEnd.getShape();
 			double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
 			Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), otherEndShape.getSize(), RING_STEP);
@@ -445,98 +481,128 @@ class NavigationManager {
 			double ratio = bd / d;
 			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
 			long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
+			arcsToBring.add(arcs[i]);
 			node2bposition.put(otherEnd, new LongPoint(bx, by));
 		}
 		// actually bring the arcs and nodes
-		for (int i=0;i<arcs.length;i++){
-			if (arcs[i].isLoop()){continue;}
-			LNode otherEnd = arcs[i].getOtherEnd(n);
+		for (int i=0;i< arcsToBring.size();i++){
+			LEdge e = (LEdge)arcsToBring.elementAt(i);
+			LNode otherEnd = e.getOtherEnd(n);
 			ClosedShape otherEndShape = otherEnd.getShape();
-			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
+			bring(e, otherEnd, n, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
 		}
-		// make edges translucent
-		allElementsAlpha = new float[allElements.size()];
-		Translucent t;
-		for (int i=0;i<allElements.size();i++){
-			try {
-				t = (Translucent)allElements.elementAt(i);
-				allElementsAlpha[i] = t.getTranslucencyValue();
-				//t.setTranslucencyValue(FADED_ELEMENTS_TRANSLUCENCY);
-				application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_OUT_ANIM, ((Glyph)t).getID());
-			}
-			catch ( ClassCastException e) {}
-		}
+//		// make edges translucent
+//		allElementsAlpha = new float[allElements.size()];
+//		Translucent t;
+//		for (int i=0;i<allElements.size();i++){
+//			try {
+//				t = (Translucent)allElements.elementAt(i);
+//				allElementsAlpha[i] = t.getTranslucencyValue();
+//				//t.setTranslucencyValue(FADED_ELEMENTS_TRANSLUCENCY);
+//				application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_OUT_ANIM, ((Glyph)t).getID());
+//			}
+//			catch ( ClassCastException e) {}
+//		}
 	}
 	
+	void sendBackFor(LNode n){
+		n.getShape().setColor(GraphManager.SHAPE_FILL_COLOR);
+	}
+		
+		
+		
 	void endBringAndGo(Glyph g){
 		//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
 		//        else send all nodes and edges to their initial position, but also move camera to g
 		isBringingAndGoing = false;
-		BroughtNode bn = (BroughtNode)broughtElements.get(g.getOwner());
-		if (bn != null){
-			// translate camera to node in which button was released
-			LongPoint lp = bn.previousLocations[0];
-			LongPoint trans = new LongPoint((lp.x-application.mCamera.posx)/2, (lp.y-application.mCamera.posy)/2);
-			Vector zoomout = new Vector();
-			//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
-			zoomout.add(new Float(3000));
-			zoomout.add(trans);
-			Vector zoomin = new Vector();
-			//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
-			zoomin.add(new Float(-3000));
-			zoomin.add(trans);
-			application.sm.setUpdateLevel(false);
-			application.mView.setAntialiasing(false);			
-			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_SIG,
-			                                               zoomout, application.mCamera.getID());
-   			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_SIG,
- 														   zoomin, application.mCamera.getID(),
-                                                           new PostAnimationAdapter(){
-	                                                            public void animationEnded(Object target, short type, String dimension){
-		                                                            application.sm.setUpdateLevel(true);
-		                                                            application.mView.setAntialiasing(true);
-	                                                            }
-                                                           });
+		if (g != null){
+			LNode n = (LNode)g.getOwner();
+			BroughtNode bn = (BroughtNode)brought2location.get(n);
+			if (bn != null && broughtStack.indexOf(n) != 0){
+				// do not translate if node in which we release button is the node
+				// in which the bring and go was inititated (unlikely the user wants to move)
+				//XXX:TBW add more tests to do this translation only if its worth it (far away enough)
+				// translate camera to node in which button was released
+				LongPoint lp = bn.previousLocations[0];
+				LongPoint trans = new LongPoint((lp.x-application.mCamera.posx)/2, (lp.y-application.mCamera.posy)/2);
+				Vector zoomout = new Vector();
+				//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
+				zoomout.add(new Float(1000));
+				zoomout.add(trans);
+				Vector zoomin = new Vector();
+				//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
+				zoomin.add(new Float(-1000));
+				zoomin.add(trans);
+				application.sm.setUpdateLevel(false);
+				application.mView.setAntialiasing(false);			
+				application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_LIN,
+				                                               zoomout, application.mCamera.getID());
+	   			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_LIN,
+	 														   zoomin, application.mCamera.getID(),
+	                                                           new PostAnimationAdapter(){
+		                                                            public void animationEnded(Object target, short type, String dimension){
+			                                                            application.sm.setUpdateLevel(true);
+			                                                            application.mView.setAntialiasing(true);
+		                                                            }
+	                                                           });
+			}			
 		}
-		if (!broughtElements.isEmpty()){
-			Iterator i = broughtElements.keySet().iterator();
+//		for (int i=0;i<allElements.size();i++){
+//			try {
+//				//((Translucent)allElements.elementAt(i)).setTranslucencyValue(allElementsAlpha[i]);
+//				application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_IN_ANIM, ((Glyph)allElements.elementAt(i)).getID());
+//			}
+//			catch ( ClassCastException e) {}
+//		}
+//		allElements.clear();
+		if (!brought2location.isEmpty()){
+			Iterator i = brought2location.keySet().iterator();
 			while (i.hasNext()){
 				sendBack(i.next());
 			}
-			broughtElements.clear();
+			brought2location.clear();
 		}
-		for (int i=0;i<allElements.size();i++){
-			try {
-				//((Translucent)allElements.elementAt(i)).setTranslucencyValue(allElementsAlpha[i]);
-				application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_IN_ANIM, ((Glyph)allElements.elementAt(i)).getID());
+		if (!broughtnode2broughtby.isEmpty()){
+			//XXX:TBW clean up (maybe ; not sure there is anything to do before with clear it)
+			broughtnode2broughtby.clear();
+		}
+		if (!broughtarc2broughtby.isEmpty()){
+			//XXX:TBW clean up (maybe ; not sure there is anything to do before with clear it)
+			broughtarc2broughtby.clear();
+		}
+		if (!broughtStack.isEmpty()){
+			for (int i=0;i<broughtStack.size();i++){
+				((LNode)broughtStack.elementAt(i)).getShape().setColor(GraphManager.SHAPE_FILL_COLOR);
 			}
-			catch ( ClassCastException e) {}
+			broughtStack.clear();
 		}
-		allElements.clear();
 	}
-	
-	void attemptToBringMore(Glyph g){
-		System.out.println("Attempting to bring more for "+g);
-	}
-	
-	void attemptToBringLess(Glyph g){
-		System.out.println("Attempting to send back for "+g);
-		
-	}
-	
-	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, Hashtable node2bposition){
-		broughtElements.put(node, BroughtElement.rememberPreviousState(node));
-		broughtElements.put(arc, BroughtElement.rememberPreviousState(arc));
+
+	void bring(LEdge arc, LNode node, LNode broughtby, long sx, long sy, long ex, long ey, Hashtable node2bposition){
+		if (brought2location.containsKey(node)){
+			broughtnode2broughtby.put(node, broughtby);
+		}
+		else {
+			brought2location.put(node, BroughtElement.rememberPreviousState(node));
+			broughtnode2broughtby.put(node, broughtby);
+		}
+		if (brought2location.containsKey(arc)){
+			broughtarc2broughtby.put(arc, broughtby);
+		}
+		else {
+			brought2location.put(arc, BroughtElement.rememberPreviousState(arc));
+			broughtarc2broughtby.put(arc, broughtby);
+		}
 		ClosedShape nodeShape = node.getShape();
-		allElements.remove(nodeShape);
+//		allElements.remove(nodeShape);
 		BText nodeLabel = node.getLabel();
-		allElements.remove(nodeLabel);
+//		allElements.remove(nodeLabel);
 		LongPoint bposition = (LongPoint)node2bposition.get(node);
 		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
 		application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, nodeShape.getID());
 		application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, nodeLabel.getID());
 		DPathST spline = arc.getSpline();
-		allElements.remove(spline);
+//		allElements.remove(spline);
 		LongPoint asp = spline.getStartPoint();
 		LongPoint aep = spline.getEndPoint();
 		LongPoint sp, ep;
@@ -548,15 +614,18 @@ class NavigationManager {
 			sp = new LongPoint(sx, sy);
 			ep = new LongPoint(bposition.x, bposition.y);
 		}
-		application.bSpace.atBottom(spline);
+		//application.bSpace.atBottom(spline);
 		LongPoint[] flatCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
 		application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 		LEdge[] otherArcs = node.getOtherArcs(arc);
 		Glyph oe;
 		for (int i=0;i<otherArcs.length;i++){
-			broughtElements.put(otherArcs[i], BroughtElement.rememberPreviousState(otherArcs[i]));
+			if (!brought2location.containsKey(otherArcs[i])){
+				//broughtarc2broughtby.put(otherArcs[i], broughtby);
+				brought2location.put(otherArcs[i], BroughtElement.rememberPreviousState(otherArcs[i]));
+			}
 			spline = otherArcs[i].getSpline();
-			allElements.remove(spline);
+//			allElements.remove(spline);
 			asp = spline.getStartPoint();
 			aep = spline.getEndPoint();
 			if (node2bposition.containsKey(otherArcs[i].getTail())
@@ -576,14 +645,14 @@ class NavigationManager {
 				}
 			}
 			flatCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
-			application.bSpace.atBottom(spline);
+			//application.bSpace.atBottom(spline);
 			application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
-			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
+//			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
 		}
 	}
 	
 	void sendBack(Object k){
-		BroughtElement be = (BroughtElement)broughtElements.get(k);
+		BroughtElement be = (BroughtElement)brought2location.get(k);
 		be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
 	}
 	
