@@ -52,8 +52,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import org.geotools.factory.GeoTools;
-
 /**
  * @author Emmanuel Pietriga
  */
@@ -100,7 +98,6 @@ public class ATCExplorer implements Java2DPainter {
     ExplorerEventHandler eh;
 
     SceneManager sm;
-    GeoToolsManager gm;
     NavigationManager nm;
 	GraphManager grm;
     
@@ -126,7 +123,6 @@ public class ATCExplorer implements Java2DPainter {
         sm.setSceneCameraBounds(bCamera, eh.wnes);
         sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), gp);
         if (grid){buildGrid();}
-        gm = new GeoToolsManager(this);
 		grm = new GraphManager(this);
 		grm.loadAirTraffic();
         gp.setVisible(false);
@@ -331,7 +327,6 @@ public class ATCExplorer implements Java2DPainter {
         boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
         boolean grid = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
 		if (args.length > 3){GraphManager.MAX_WEIGHT = Integer.parseInt(args[3]);}
-        System.out.println("Using GeoTools v" + GeoTools.getVersion() );
 		if (dir == null){
 			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-atc.jar <path_to_scene_dir> [fs] [grid] [weight]");
 			System.out.println("\n\tfs: fullscreen: true or false");

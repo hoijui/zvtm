@@ -34,7 +34,9 @@ import net.claribole.zvtm.glyphs.DPathST;
 import fr.inria.zuist.engine.Region;
 
 class GraphManager {
-	
+		
+    static final double CC = 21600 * 2 / 180.0;
+
 	static int MAX_WEIGHT = 400000;
 	
 	static final Color SHAPE_FILL_COLOR = Color.YELLOW;
@@ -153,8 +155,8 @@ class GraphManager {
 			String iataCode = airport_code.get(nodeIndex);
 			if (iata2airport.containsKey(iataCode)){
 				Airport ap = (Airport)iata2airport.get(iataCode);
-				long x = Math.round(ap.lng * GeoToolsManager.CC);
-				long y = Math.round(ap.lat * GeoToolsManager.CC);
+				long x = Math.round(ap.lng * GraphManager.CC);
+				long y = Math.round(ap.lat * GraphManager.CC);
 				VCircleST shape = new VCircleST(x, y, 0, 10, SHAPE_FILL_COLOR, SHAPE_STROKE_COLOR, 1.0f);
 				BText label = new BText(x, y-3, 0, LABEL_STROKE_COLOR, ap.iataCode, BText.TEXT_ANCHOR_MIDDLE, 1.0f, 1);
 				application.vsm.addGlyph(shape, application.bSpace);
