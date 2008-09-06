@@ -657,8 +657,10 @@ class NavigationManager {
 			brought2location.put(arc, BroughtElement.rememberPreviousState(arc));
 		}
 		ClosedShape nodeShape = node.getShape();
+		application.bSpace.onTop(nodeShape);
 //		allElements.remove(nodeShape);
 		BText nodeLabel = node.getLabel();
+		application.bSpace.onTop(nodeLabel);
 //		allElements.remove(nodeLabel);
 		LongPoint bposition = (LongPoint)node2bposition.get(node);
 		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
