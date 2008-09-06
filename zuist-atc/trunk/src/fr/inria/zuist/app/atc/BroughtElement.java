@@ -25,14 +25,14 @@ abstract class BroughtElement {
 		return new BroughtEdge((LEdge)el);
 	}
 
-	Glyph[] glyphs;
-	LongPoint[] previousLocations;
-	
 	abstract void restorePreviousState(AnimManager animator, int duration);
 		
 }
 
 class BroughtNode extends BroughtElement {
+	
+	Glyph[] glyphs;
+	LongPoint[] previousLocations;
 	
 	BroughtNode(LNode n){
 		owner = n;

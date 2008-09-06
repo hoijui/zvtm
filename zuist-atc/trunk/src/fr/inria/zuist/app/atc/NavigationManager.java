@@ -420,7 +420,6 @@ class NavigationManager {
 	
 	HashMap brought2location = new HashMap();
 	HashMap broughtnode2broughtby = new HashMap();
-	HashMap broughtarc2broughtby = new HashMap();
 	
 //	Vector allElements;
 //	float[] allElementsAlpha;
@@ -432,15 +431,20 @@ class NavigationManager {
 		if (iis == -1){
 			// entered a node that is not on the stack of nodes visited during this bring and go
 			bringFor(n);
-			//XXX:TBW send back nodes and arcs that are not brought by the current active bring and go node
+			// if there was a previous node in the stack, send back its brought nodes where they belong
+			// (provided they are not brought by the new one we've just been working on)
+			// do it only for previous node on stack; those before should have been taken care of when the
+			// previous one was dealt with in here
+			if (broughtStack.size() > 1){fadeStack((LNode)broughtStack.elementAt(broughtStack.size()-2), n);}
 		}
 		else {
-			// entered a node previsouly visited during this bring and go
+			// entered a node previously visited during this bring and go
 			// send back all nodes and arcs brought by subsequent steps of the bring and go
 			for (int i=broughtStack.size()-1;i>=iis+1;i--){
 				LNode n2 = (LNode)broughtStack.elementAt(i);
-				sendBackFor(n2);
+				n2.getShape().setColor(GraphManager.SHAPE_FILL_COLOR);
 				broughtStack.remove(n2);
+				sendBackFor(n2, n, n2.getArcLeadingTo(n) == null);
 			}
 		}
 	}
@@ -505,12 +509,76 @@ class NavigationManager {
 //		}
 	}
 	
-	void sendBackFor(LNode n){
-		n.getShape().setColor(GraphManager.SHAPE_FILL_COLOR);
+	// n1 is the node for which we attempt to send back connected nodes
+	// n2 is the new center of the bring and go, so we do not send back nodes connected to n1 that are also connected to n2
+	void sendBackFor(LNode n1, LNode n2, boolean nodeItself){
+		if (nodeItself){
+			BroughtElement be = (BroughtElement)brought2location.get(n1);
+			be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
+			// get the remembered location as the animation won't have finished before we need that
+			// location to compute new edge end points
+			updateEdges(n1, ((BroughtNode)be).previousLocations[0]);
+			Vector nodesToSendBack = new Vector();
+			synchronized(broughtnode2broughtby){
+				Iterator it = broughtnode2broughtby.keySet().iterator();
+				while (it.hasNext()){
+					LNode n = (LNode)it.next();
+					if (n != n2 && broughtnode2broughtby.get(n) == n1){
+						// do not send back n2, obviously
+						nodesToSendBack.add(n);
+					}
+				}
+				for (int i=0;i<nodesToSendBack.size();i++){
+					LNode n = (LNode)nodesToSendBack.elementAt(i);
+					sendBack(n);
+					sendBack(n.getArcLeadingTo(n1));
+					broughtnode2broughtby.remove(n);				
+				}
+			}
+		}
+		else {
+//			Vector nodesToSendBack = new Vector();
+//			synchronized(broughtnode2broughtby){
+//				Iterator it = broughtnode2broughtby.keySet().iterator();
+//				while (it.hasNext()){
+//					LNode n = (LNode)it.next();
+//					if (n != n2 && broughtnode2broughtby.get(n) == n1){
+//						// do not send back n2, obviously
+//						nodesToSendBack.add(n);
+//					}
+//				}
+//				for (int i=0;i<nodesToSendBack.size();i++){
+//					LNode n = (LNode)nodesToSendBack.elementAt(i);
+//					sendBack(n);
+//					sendBack(n.getArcLeadingTo(n1));
+//					broughtnode2broughtby.remove(n);				
+//				}
+//			}			
+		}
 	}
-		
-		
-		
+	
+	void updateEdges(LNode n, LongPoint p){
+		LEdge[] arcs = n.getAllArcs();
+		for (int i=0;i<arcs.length;i++){
+			DPathST spline = arcs[i].edgeSpline;
+			LNode oe = arcs[i].getOtherEnd(n);
+			LongPoint asp = spline.getStartPoint();
+			LongPoint aep = spline.getEndPoint();
+			LongPoint sp, ep;
+			if (Math.sqrt(Math.pow(p.x-aep.x,2) + Math.pow(p.y-aep.y,2)) < Math.sqrt(Math.pow(p.x-asp.x,2) + Math.pow(p.y-asp.y,2))){
+				sp = oe.getShape().getLocation();
+				ep = p;
+			}
+			else {
+				sp = p;
+				ep = oe.getShape().getLocation();				
+			}
+			LongPoint[] splineCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
+			application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS,
+			                                             splineCoords, spline.getID(), null);
+		}
+	}
+	
 	void endBringAndGo(Glyph g){
 		//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
 		//        else send all nodes and edges to their initial position, but also move camera to g
@@ -562,13 +630,10 @@ class NavigationManager {
 			}
 			brought2location.clear();
 		}
-		if (!broughtnode2broughtby.isEmpty()){
-			//XXX:TBW clean up (maybe ; not sure there is anything to do before with clear it)
-			broughtnode2broughtby.clear();
-		}
-		if (!broughtarc2broughtby.isEmpty()){
-			//XXX:TBW clean up (maybe ; not sure there is anything to do before with clear it)
-			broughtarc2broughtby.clear();
+		synchronized(broughtnode2broughtby){
+			if (!broughtnode2broughtby.isEmpty()){
+				broughtnode2broughtby.clear();
+			}
 		}
 		if (!broughtStack.isEmpty()){
 			for (int i=0;i<broughtStack.size();i++){
@@ -579,19 +644,17 @@ class NavigationManager {
 	}
 
 	void bring(LEdge arc, LNode node, LNode broughtby, long sx, long sy, long ex, long ey, Hashtable node2bposition){
-		if (brought2location.containsKey(node)){
-			broughtnode2broughtby.put(node, broughtby);
+		synchronized(broughtnode2broughtby){
+			if (brought2location.containsKey(node)){
+				broughtnode2broughtby.put(node, broughtby);
+			}
+			else {
+				brought2location.put(node, BroughtElement.rememberPreviousState(node));
+				broughtnode2broughtby.put(node, broughtby);
+			}
 		}
-		else {
-			brought2location.put(node, BroughtElement.rememberPreviousState(node));
-			broughtnode2broughtby.put(node, broughtby);
-		}
-		if (brought2location.containsKey(arc)){
-			broughtarc2broughtby.put(arc, broughtby);
-		}
-		else {
+		if (!brought2location.containsKey(arc)){
 			brought2location.put(arc, BroughtElement.rememberPreviousState(arc));
-			broughtarc2broughtby.put(arc, broughtby);
 		}
 		ClosedShape nodeShape = node.getShape();
 //		allElements.remove(nodeShape);
@@ -614,14 +677,12 @@ class NavigationManager {
 			sp = new LongPoint(sx, sy);
 			ep = new LongPoint(bposition.x, bposition.y);
 		}
-		//application.bSpace.atBottom(spline);
 		LongPoint[] flatCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
 		application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 		LEdge[] otherArcs = node.getOtherArcs(arc);
 		Glyph oe;
 		for (int i=0;i<otherArcs.length;i++){
 			if (!brought2location.containsKey(otherArcs[i])){
-				//broughtarc2broughtby.put(otherArcs[i], broughtby);
 				brought2location.put(otherArcs[i], BroughtElement.rememberPreviousState(otherArcs[i]));
 			}
 			spline = otherArcs[i].getSpline();
@@ -645,7 +706,6 @@ class NavigationManager {
 				}
 			}
 			flatCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
-			//application.bSpace.atBottom(spline);
 			application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
 //			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
 		}
@@ -654,6 +714,14 @@ class NavigationManager {
 	void sendBack(Object k){
 		BroughtElement be = (BroughtElement)brought2location.get(k);
 		be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
+		//brought2location.remove(k);
+	}
+
+	// n1 is the node for which we attempt to send back connected nodes
+	// n2 is the new center of the bring and go, so we do not send back nodes connected to n1 that are also connected to n2
+	void fadeStack(LNode n1, LNode n2){
+		//System.out.println("Fading back "+n1.code);
+		//XXX:TBW		
 	}
 	
 }

@@ -116,7 +116,7 @@ class LNode {
 		return res;
 	}
 	
-	LEdge getEdgeLeadingTo(LNode n){
+	LEdge getArcLeadingTo(LNode n){
 		for (int i=0;i<edges.length;i++){
 			if (edges[i].getOtherEnd(this) == n){
 				return edges[i];
