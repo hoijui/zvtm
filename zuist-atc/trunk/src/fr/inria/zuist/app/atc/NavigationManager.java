@@ -733,12 +733,30 @@ class NavigationManager {
 	
 	/* ---------------------- Highlighting -----------------------------*/
 	
+	static final Color HIGHLIGHT_COLOR = Color.RED;
+	Vector highlightedElements = new Vector();
+	
 	void highlight(Glyph g){
-		
+		LNode n = (LNode)g.getOwner();
+		if (n != null){
+			LEdge[] arcs = n.getAllArcs();
+			Glyph g2;
+			for (int i=0;i<arcs.length;i++){
+				g2 = arcs[i].getSpline();
+				g2.setColor(HIGHLIGHT_COLOR);
+				highlightedElements.add(g2);
+				g2 = arcs[i].getOtherEnd(n).getShape();
+				g2.setColor(HIGHLIGHT_COLOR);
+				highlightedElements.add(g2);
+			}
+		}
 	}
 
 	void unhighlight(Glyph g){
-		
+		for (int i=0;i<highlightedElements.size();i++){
+			((Glyph)highlightedElements.elementAt(i)).setColor(GraphManager.SHAPE_FILL_COLOR);
+		}
+		highlightedElements.clear();
 	}	
 	
 }
