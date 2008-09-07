@@ -159,6 +159,7 @@ public class ATCExplorer implements Java2DPainter {
         mView.setEventHandler(eh, 1);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
+		mView.getCursor().setHintColor(Color.WHITE);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
 		mView.setAntialiasing(true);
         vsm.animator.setAnimationListener(eh);

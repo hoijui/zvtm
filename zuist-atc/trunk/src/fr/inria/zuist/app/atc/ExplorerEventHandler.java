@@ -48,6 +48,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
     int currentJPX, currentJPY;
+	// region zooming
+	long x1, y1, x2, y2;
 
     /* bounds of region in virtual space currently observed through mCamera */
     long[] wnes = new long[4];
@@ -64,6 +66,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     
     boolean cursorNearBorder = false;
     boolean panning = false;
+	boolean selectingRegion = false;
     
 	DelayedUpdateTimer dut;
 
@@ -97,9 +100,26 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 			}
 		}
 		else {
-			Glyph g;
-			if ((g = v.lastGlyphEntered()) != null){
-				nm.bringFor(g);
+			if (mod == ALT_MOD){
+				selectingRegion = true;
+				x1 = v.getMouse().vx;
+				y1 = v.getMouse().vy;
+				v.setDrawRect(true);
+			}
+			else {
+				Glyph g;
+				switch(mode){
+					case MODE_BRINGANDGO:{
+						if ((g = v.lastGlyphEntered()) != null){
+							nm.bringFor(g);
+						}
+						break;
+					}
+					case MODE_LINKSLIDER:{
+						//XXX:TBW pick edge
+						break;
+					}
+				}				
 			}
 		}
     }
@@ -107,6 +127,15 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		if (nm.isBringingAndGoing){
 			nm.endBringAndGo(v.lastGlyphEntered());
+		}
+		else if (selectingRegion){
+			v.setDrawRect(false);
+			x2 = v.getMouse().vx;
+			y2 = v.getMouse().vy;
+			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
+				application.vsm.centerOnRegion(application.mCamera, ATCExplorer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
+			}
+			selectingRegion = false;
 		}
 		regionStickedToMouse = false;
     }
@@ -228,15 +257,31 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
 
     public void enterGlyph(Glyph g){
-		if (nm.isBringingAndGoing){
-			nm.attemptToBring(g);
+		switch (mode){
+			case MODE_BRINGANDGO:{
+				if (nm.isBringingAndGoing){
+					nm.attemptToBring(g);
+				}
+				break;
+			}
+			case MODE_HIGHLIGHTING:{
+				application.nm.highlight(g);
+				break;
+			}
 		}
 		application.updateBreadCrumb();
     }
 
-    public void exitGlyph(Glyph g){}
+    public void exitGlyph(Glyph g){
+		switch (mode){
+			case MODE_HIGHLIGHTING:{
+				application.nm.unhighlight(g);
+				break;
+			}
+		}
+	}
 
-    int ci = 1180;
+    //int ci = 1180;
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
@@ -248,8 +293,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(ATCExplorer.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
-        else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
+//        else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
+        else if (code == KeyEvent.VK_S){toggleMode();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -303,6 +349,19 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 		inPortal = false;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_BORDER_COLOR);
 		application.vsm.repaintNow();
+	}
+	
+	static final short MODE_HIGHLIGHTING = 0;
+	static final short MODE_BRINGANDGO = 1;
+	static final short MODE_LINKSLIDER = 2;
+	short mode = MODE_BRINGANDGO;
+	
+	void toggleMode(){
+		switch(mode){
+			case MODE_HIGHLIGHTING:{mode = MODE_BRINGANDGO;break;}
+			case MODE_BRINGANDGO:{mode = MODE_LINKSLIDER;break;}
+			case MODE_LINKSLIDER:{mode = MODE_HIGHLIGHTING;break;}
+		}
 	}
 	
 }

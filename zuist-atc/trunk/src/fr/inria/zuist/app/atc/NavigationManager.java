@@ -728,6 +728,19 @@ class NavigationManager {
 		//XXX:TBW		
 	}
 	
+	/* ----------------------  LinkSlider  -----------------------------*/
+	
+	
+	/* ---------------------- Highlighting -----------------------------*/
+	
+	void highlight(Glyph g){
+		
+	}
+
+	void unhighlight(Glyph g){
+		
+	}	
+	
 }
 
 class ZP2LensAction implements PostAnimationAction {
