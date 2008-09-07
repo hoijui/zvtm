@@ -161,7 +161,7 @@ class GraphManager {
 				BText label = new BText(x, y-3, 0, LABEL_STROKE_COLOR, ap.iataCode, BText.TEXT_ANCHOR_MIDDLE, 1.0f, 1);
 				application.vsm.addGlyph(shape, application.bSpace);
 				application.vsm.addGlyph(label, application.bSpace);
-				LNode res = new LNode(iataCode, ap.iataCode, shape, label);
+				LNode res = new LNode(iataCode, ap.name, shape, label);
 				i2n.put(kv, res);
 				return res;
 			}

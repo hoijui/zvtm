@@ -451,6 +451,7 @@ class NavigationManager {
 
 	void bringFor(Glyph g){
 		bringFor((LNode)g.getOwner());
+		application.updateBreadCrumb();
 	}
 		
 	void bringFor(LNode n){
@@ -641,6 +642,7 @@ class NavigationManager {
 			}
 			broughtStack.clear();
 		}
+		application.updateBreadCrumb();
 	}
 
 	void bring(LEdge arc, LNode node, LNode broughtby, long sx, long sy, long ex, long ey, Hashtable node2bposition){

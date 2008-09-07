@@ -38,9 +38,11 @@ import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VImage;
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.widgets.TranslucentWidget;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -81,7 +83,7 @@ public class ATCExplorer implements Java2DPainter {
     boolean UPDATE_MAPS = true;
     
     /* Navigation constants */
-    static final int ANIM_MOVE_LENGTH = 300;
+    static final int ANIM_MOVE_DURATION = 300;
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
@@ -128,7 +130,7 @@ public class ATCExplorer implements Java2DPainter {
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(9000.0f);
-        vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
+        vsm.getGlobalView(mCamera, ANIM_MOVE_DURATION);
         eh.cameraMoved();
 		nm.createOverview();
     }
@@ -199,19 +201,19 @@ public class ATCExplorer implements Java2DPainter {
     /*-------------     Navigation       -------------*/
 
     void getGlobalView(){
-        vsm.getGlobalView(mCamera, ATCExplorer.ANIM_MOVE_LENGTH);
+        vsm.getGlobalView(mCamera, ATCExplorer.ANIM_MOVE_DURATION);
     }
 
     /* Higher view */
     void getHigherView(){
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        vsm.animator.createCameraAnimation(ATCExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        vsm.animator.createCameraAnimation(ATCExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
     }
 
     /* Higher view */
     void getLowerView(){
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        vsm.animator.createCameraAnimation(ATCExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        vsm.animator.createCameraAnimation(ATCExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
     }
 
     /* Direction should be one of ATCExplorer.MOVE_* */
@@ -235,7 +237,7 @@ public class ATCExplorer implements Java2DPainter {
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
-        vsm.animator.createCameraAnimation(ATCExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        vsm.animator.createCameraAnimation(ATCExplorer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
     }
     
     void altitudeChanged(){
@@ -268,9 +270,12 @@ public class ATCExplorer implements Java2DPainter {
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;
 
+	boolean SHOW_BREADCRUMB = true;
+
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (SHOW_MEMORY_USAGE){showMemoryUsage(g2d, viewWidth, viewHeight);}
+		if (SHOW_BREADCRUMB){showBreadCrumb(g2d, viewWidth, viewHeight);}
     }
 
     void showMemoryUsage(Graphics2D g2d, int viewWidth, int viewHeight){
@@ -299,7 +304,45 @@ public class ATCExplorer implements Java2DPainter {
         g2d.drawString(usedMemRatio + "%", 50, viewHeight - 28);
         g2d.drawString(totalMemRatio + "%", 100, viewHeight - 28);
         g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);	
-    }    
+    }
+
+	static final Font PATH_FONT = new Font("Arial", Font.PLAIN, 10);
+	static final Color PATH_BG_COLOR = Color.BLACK;
+	static final Color PATH_FG_COLOR = Color.WHITE;
+	static final String EMPTY_STRING = "";
+	static final String BREADCRUMB_SEP = "> ";
+	String bcStr = BREADCRUMB_SEP;
+
+    void showBreadCrumb(Graphics2D g2d, int viewWidth, int viewHeight){
+		g2d.setComposite(TranslucentWidget.AB_08);
+		g2d.setColor(PATH_BG_COLOR);
+		g2d.fillRect(1, 1, viewWidth-2, 15);
+		g2d.setComposite(TranslucentWidget.AB_10);
+		g2d.setColor(PATH_FG_COLOR);
+		g2d.drawRect(0, 0, viewWidth-1, 16);
+		if (bcStr.length() > 0){
+			g2d.setFont(PATH_FONT);
+			g2d.drawString(bcStr, 8, 12);
+		}
+	}
+	
+	void updateBreadCrumb(){
+		if (nm.broughtStack.size() > 0){
+			bcStr = EMPTY_STRING;
+			for (int i=0;i<nm.broughtStack.size();i++){
+				bcStr += BREADCRUMB_SEP + ((LNode)nm.broughtStack.elementAt(i)).name;
+			}
+		}
+		else {
+			Glyph g = mView.getPanel().lastGlyphEntered();
+			if (g != null && g.getOwner() != null){
+				bcStr = BREADCRUMB_SEP + ((LNode)g.getOwner()).name;
+			}
+			else {
+				bcStr = EMPTY_STRING;
+			}
+		}
+	}
     
     static Document parseXML(File f){ 
         try {

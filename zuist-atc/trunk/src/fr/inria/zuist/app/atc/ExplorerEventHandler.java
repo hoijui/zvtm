@@ -146,6 +146,10 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         lastJPY = jpy;
         lastVX = v.getMouse().vx;
         lastVY = v.getMouse().vy;
+		Glyph g;
+		if ((g=v.lastGlyphEntered()) != null){
+			application.vsm.centerOnGlyph(g, application.mCamera, ATCExplorer.ANIM_MOVE_DURATION);
+		}
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
@@ -227,6 +231,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 		if (nm.isBringingAndGoing){
 			nm.attemptToBring(g);
 		}
+		application.updateBreadCrumb();
     }
 
     public void exitGlyph(Glyph g){}
