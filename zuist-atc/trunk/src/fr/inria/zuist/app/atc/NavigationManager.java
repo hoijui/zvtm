@@ -733,8 +733,20 @@ class NavigationManager {
 	// n1 is the node for which we attempt to send back connected nodes
 	// n2 is the new center of the bring and go, so we do not send back nodes connected to n1 that are also connected to n2
 	void fadeStack(LNode n1, LNode n2){
-		//System.out.println("Fading back "+n1.code);
-		//XXX:TBW		
+		LEdge[] arcs = n1.getAllArcs();
+		LNode oe;
+		for (int i=0;i<arcs.length;i++){
+			oe = arcs[i].getOtherEnd(n1);
+			if (broughtnode2broughtby.get(oe) == n1 && !broughtStack.contains(oe)){
+				// hide nodes that are brought by some node in the brought stack but not by the current one
+				// do not send them back, just hide them in place (and don't do it for nodes in the brought stack)
+				oe.setTranslucency(0.0f);
+				LEdge[] arcs2 = oe.getAllArcs();
+				for (int j=0;j<arcs2.length;j++){
+					arcs2[j].setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
+				}
+			}
+		}
 	}
 	
 	/* ----------------------  LinkSlider  -----------------------------*/
