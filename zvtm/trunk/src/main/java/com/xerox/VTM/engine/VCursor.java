@@ -26,6 +26,7 @@ package com.xerox.VTM.engine;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.AlphaComposite;
+import java.awt.geom.GeneralPath;
 
 import java.util.Vector;
 import java.util.Arrays;
@@ -35,6 +36,7 @@ import net.claribole.zvtm.lens.Lens;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VPath;
+import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Translucent;
@@ -264,26 +266,26 @@ public class VCursor {
     /**tells whether mouse sends events related to entry/exit in glyphs or not*/
     public boolean isSensitive(){return sensit;}
 
-    /**returns a list of all VPaths under the mouse cursor - returns null if none
-     *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
-     *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
-     *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
-     *@see #getIntersectingPaths(Camera c)
-     */
-    public Vector getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY){
-	synchronized(this){
-	    Vector res=new Vector();
-	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-	    Object glyph;
-	    for (int i=0;i<glyphs.size();i++){
-		glyph = glyphs.elementAt(i);
-		if ((glyph instanceof VPath) && intersectsVPath((VPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
-	    }
-	    if (res.isEmpty()){res=null;}
-	    return res;
+	/**returns a list of all VPaths under the mouse cursor - returns null if none
+		*@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
+		*@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
+		*@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
+		*@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
+		*@see #getIntersectingPaths(Camera c)
+		*/
+	public Vector getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY){
+		synchronized(this){
+			Vector res=new Vector();
+			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+			Object glyph;
+			for (int i=0;i<glyphs.size();i++){
+				glyph = glyphs.elementAt(i);
+				if ((glyph instanceof DPath) && intersectsVPath((VPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
+			}
+			if (res.isEmpty()){res=null;}
+			return res;
+		}
 	}
-    }
     
     /**returns a list of all VPaths under the mouse cursor (default tolerance, 5) - returns null if none
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
@@ -299,7 +301,38 @@ public class VCursor {
      *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
      */
     public Vector getIntersectingPaths(Camera c, int tolerance){
-	return getIntersectingPaths(c, tolerance, vx, vy);
+		return getIntersectingPaths(c, tolerance, vx, vy);
+    }
+
+    /**tells if the mouse is above DPath p
+     *@param p DPath instance to be tested
+     *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
+     *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
+     *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
+     *@see #intersectsDPath(DPath p)
+     */
+	public boolean intersectsPath(DPath p, int tolerance, long cursorX, long cursorY){
+		if (!p.coordsInsideBoundingBox(cursorX, cursorY)){return false;}
+		int dtol = tolerance * 2;
+		GeneralPath gp = p.getJava2DGeneralPath();
+		return gp.intersects(cursorX-dtol, cursorY-dtol, dtol, dtol) && !p.getJava2DGeneralPath().contains(cursorX-tolerance, cursorY-tolerance, dtol, dtol);
+	}
+
+    /**tells if the mouse is above DPath p (default tolerance, 5)
+     *@param p DPath instance to be tested
+     *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
+     *@see #intersectsDPath(DPath p, int tolerance, long cursorX, long cursorY)
+     */
+    public boolean intersectsPath(DPath p, int tolerance){
+		return intersectsPath(p, tolerance, vx, vy);
+    }
+
+    /**tells if the mouse is above DPath p (default tolerance, 5)
+     *@param p DPath instance to be tested
+     *@see #intersectsDPath(DPath p, int tolerance, long cursorX, long cursorY)
+     */
+    public boolean intersectsPath(DPath p){
+		return intersectsPath(p, 5, vx, vy);
     }
 
     /**tells if the mouse is above VPath p
@@ -310,12 +343,10 @@ public class VCursor {
      *@see #intersectsVPath(VPath p)
      */
     public boolean intersectsVPath(VPath p, int tolerance, long cursorX, long cursorY){
-	int dtol = tolerance * 2;
-	boolean res = p.getJava2DGeneralPath().intersects(cursorX-dtol, -cursorY-dtol, dtol, dtol);
-	//XXX: why the hell did I do that? there is probably a reason... there ought to be a reason...
-	if (p.getJava2DGeneralPath().contains(cursorX-tolerance, -cursorY-tolerance, tolerance, tolerance)){res=false;}
-	return res;
-    }
+		int dtol = tolerance * 2;
+		return p.getJava2DGeneralPath().intersects(cursorX-dtol, -cursorY-dtol, dtol, dtol) &&
+			   p.getJava2DGeneralPath().contains(cursorX-tolerance, -cursorY-tolerance, tolerance, tolerance);
+	}
 
     /**tells if the mouse is above VPath p (default tolerance, 5)
      *@param p VPath instance to be tested

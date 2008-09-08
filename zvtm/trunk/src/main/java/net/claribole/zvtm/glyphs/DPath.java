@@ -29,6 +29,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
+import java.awt.geom.GeneralPath;
 import java.util.Arrays;
 
 /**
@@ -361,6 +362,11 @@ public class DPath extends Glyph implements RectangularShape {
 		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
 	}
+	
+	public boolean coordsInsideBoundingBox(long x, long y){
+		return (x >= vx-vw) && (x <= vx+vw) &&
+		       (y >= vy-vh) && (y <= vy+vh);
+	}
 
     public float getOrient(){return orient;}
 
@@ -375,7 +381,7 @@ public class DPath extends Glyph implements RectangularShape {
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
-    
+
     int hw, hh, lhw, lhh;
 
     public void project(Camera c, Dimension d){
@@ -876,6 +882,34 @@ public class DPath extends Glyph implements RectangularShape {
 		return res;
 	}
     
+	public GeneralPath getJava2DGeneralPath(){
+		GeneralPath res = new GeneralPath();
+		res.moveTo(spx, spy);
+		for (int i = 0; i < this.getElementsCount(); i++){
+			int elType = this.getElementType(i);
+			LongPoint[] pts = this.getElementPointsCoordinates(i);
+			switch(elType){
+				case DPath.CBC:{
+					res.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
+					break;
+				}
+				case DPath.QDC:{
+					res.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
+					break;
+				}
+				case DPath.SEG:{
+					res.lineTo(pts[1].x, pts[1].y);
+					break;
+				}
+				case DPath.MOV:{
+					res.moveTo(pts[1].x, pts[1].y);
+					break;
+				}
+			}
+		}
+		return res;
+	}
+
     /**
      * Get orientation of the tangent to the start of the path.
      * @return radians between 0..2*Pi
