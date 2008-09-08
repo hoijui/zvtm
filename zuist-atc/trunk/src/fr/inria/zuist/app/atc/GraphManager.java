@@ -152,8 +152,8 @@ class GraphManager {
 		allArcs = (LEdge[])aes.toArray(new LEdge[aes.size()]);
 		Vector ans = new Vector(int2node.values());
 		allNodes = (LNode[])ans.toArray(new LNode[ans.size()]);
-		System.out.println("Loaded " + allNodes.length + " airports");
-		System.out.println("Loaded " + allArcs.length + " connections");
+		System.out.println("Constructing " + allNodes.length + " airports");
+		System.out.println("Constructing " + allArcs.length + " connections");
 	}
 
 	LNode getNode(Region region, int nodeIndex, StringColumn airport_code, StringColumn city_name, NumberColumn xc, NumberColumn yc, HashMap i2n){

@@ -735,7 +735,6 @@ class NavigationManager {
 				// hide nodes that are brought by some node in the brought stack but not by the current one
 				// do not send them back, just hide them in place (and don't do it for nodes in the brought stack)
 				oe.setTranslucency(0.0f);
-				System.out.println("Hiding "+oe.code);
 				LEdge[] arcs2 = oe.getAllArcs();
 				for (int j=0;j<arcs2.length;j++){
 					arcs2[j].setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
