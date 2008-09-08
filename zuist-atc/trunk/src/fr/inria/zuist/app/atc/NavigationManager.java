@@ -534,23 +534,17 @@ class NavigationManager {
 			}
 		}
 		else {
-//			Vector nodesToSendBack = new Vector();
-//			synchronized(broughtnode2broughtby){
-//				Iterator it = broughtnode2broughtby.keySet().iterator();
-//				while (it.hasNext()){
-//					LNode n = (LNode)it.next();
-//					if (n != n2 && broughtnode2broughtby.get(n) == n1){
-//						// do not send back n2, obviously
-//						nodesToSendBack.add(n);
-//					}
-//				}
-//				for (int i=0;i<nodesToSendBack.size();i++){
-//					LNode n = (LNode)nodesToSendBack.elementAt(i);
-//					sendBack(n);
-//					sendBack(n.getArcLeadingTo(n1));
-//					broughtnode2broughtby.remove(n);				
-//				}
-//			}			
+			LEdge[] arcs = n2.getAllArcs();
+			LNode oe;
+			for (int i=0;i<arcs.length;i++){
+				arcs[i].setTranslucency(1.0f);
+				oe = arcs[i].getOtherEnd(n2);
+				oe.setTranslucency(1.0f);
+				LEdge[] arcs2 = oe.getOtherArcs(arcs[i]);
+				for (int j=0;j<arcs2.length;j++){
+					arcs2[j].setTranslucency(SECOND_BNG_STEP_TRANSLUCENCY);
+				}
+			}
 		}
 	}
 	
@@ -741,6 +735,7 @@ class NavigationManager {
 				// hide nodes that are brought by some node in the brought stack but not by the current one
 				// do not send them back, just hide them in place (and don't do it for nodes in the brought stack)
 				oe.setTranslucency(0.0f);
+				System.out.println("Hiding "+oe.code);
 				LEdge[] arcs2 = oe.getAllArcs();
 				for (int j=0;j<arcs2.length;j++){
 					arcs2[j].setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
