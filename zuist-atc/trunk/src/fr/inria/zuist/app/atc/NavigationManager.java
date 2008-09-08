@@ -407,10 +407,10 @@ class NavigationManager {
 	static final int FOLLOW_ANIM_DURATION = 1000;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
-	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.3f;
-	static final float[] FADE_IN_ANIM = {0,0,0,0,0,0,1-FADED_ELEMENTS_TRANSLUCENCY};
-	static final float[] FADE_OUT_ANIM = {0,0,0,0,0,0,FADED_ELEMENTS_TRANSLUCENCY-1};
-	static final float SECOND_STEP_TRANSLUCENCY = 0.4f;
+	static final float SECOND_BNG_STEP_TRANSLUCENCY = 0.2f;
+	static final float OUTSIDE_BNG_SCOPE_TRANSLUCENCY = 0.05f;
+	static final float[] FADE_IN_ANIM = {0,0,0,0,0,0,1-OUTSIDE_BNG_SCOPE_TRANSLUCENCY};
+	static final float[] FADE_OUT_ANIM = {0,0,0,0,0,0,OUTSIDE_BNG_SCOPE_TRANSLUCENCY-1};
 	
 	static final Color BNG_SHAPE_FILL_COLOR = Color.RED;
 	
@@ -421,8 +421,8 @@ class NavigationManager {
 	HashMap brought2location = new HashMap();
 	HashMap broughtnode2broughtby = new HashMap();
 	
-//	Vector allElements;
-//	float[] allElementsAlpha;
+	Vector nodesOutsideScope;
+	Vector arcsOutsideScope;
 	
 	void attemptToBring(Glyph g){
 		LNode n = (LNode)g.getOwner();
@@ -450,6 +450,8 @@ class NavigationManager {
 	}
 
 	void bringFor(Glyph g){
+		nodesOutsideScope = new Vector(Arrays.asList(application.grm.allNodes));
+		arcsOutsideScope = new Vector(Arrays.asList(application.grm.allArcs));
 		bringFor((LNode)g.getOwner());
 		application.updateBreadCrumb();
 	}
@@ -458,10 +460,9 @@ class NavigationManager {
 		if (n == null){return;}
 		isBringingAndGoing = true;
 		broughtStack.add(n);
-//		allElements = (Vector)application.bSpace.getAllGlyphs().clone();
 		ClosedShape thisEndShape = n.getShape();
+		nodesOutsideScope.remove(n);
 		thisEndShape.setColor(BNG_SHAPE_FILL_COLOR);
-//		allElements.remove(thisEndShape);
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		// distance between two rings
 		double RING_STEP = 4 * thisEndBoundingCircleRadius;
@@ -496,18 +497,13 @@ class NavigationManager {
 			ClosedShape otherEndShape = otherEnd.getShape();
 			bring(e, otherEnd, n, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
 		}
-//		// make edges translucent
-//		allElementsAlpha = new float[allElements.size()];
-//		Translucent t;
-//		for (int i=0;i<allElements.size();i++){
-//			try {
-//				t = (Translucent)allElements.elementAt(i);
-//				allElementsAlpha[i] = t.getTranslucencyValue();
-//				//t.setTranslucencyValue(FADED_ELEMENTS_TRANSLUCENCY);
-//				application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_OUT_ANIM, ((Glyph)t).getID());
-//			}
-//			catch ( ClassCastException e) {}
-//		}
+		// fade elements outside bring and go scope
+		for (int i=0;i<arcsOutsideScope.size();i++){
+			((LEdge)arcsOutsideScope.elementAt(i)).setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
+		}
+		for (int i=0;i<nodesOutsideScope.size();i++){
+			((LNode)nodesOutsideScope.elementAt(i)).setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
+		}
 	}
 	
 	// n1 is the node for which we attempt to send back connected nodes
@@ -614,20 +610,12 @@ class NavigationManager {
 			                                                            application.mView.setAntialiasing(true);
 		                                                            }
 	                                                           });
-			}			
+			}
 		}
-//		for (int i=0;i<allElements.size();i++){
-//			try {
-//				//((Translucent)allElements.elementAt(i)).setTranslucencyValue(allElementsAlpha[i]);
-//				application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_IN_ANIM, ((Glyph)allElements.elementAt(i)).getID());
-//			}
-//			catch ( ClassCastException e) {}
-//		}
-//		allElements.clear();
 		if (!brought2location.isEmpty()){
 			Iterator i = brought2location.keySet().iterator();
 			while (i.hasNext()){
-				sendBack(i.next());
+				sendBackNTU(i.next());
 			}
 			brought2location.clear();
 		}
@@ -643,6 +631,14 @@ class NavigationManager {
 			broughtStack.clear();
 		}
 		application.updateBreadCrumb();
+		for (int i=0;i<application.grm.allArcs.length;i++){
+			application.grm.allArcs[i].setTranslucency(1.0f);
+		}
+		for (int i=0;i<application.grm.allNodes.length;i++){
+			application.grm.allNodes[i].setTranslucency(1.0f);
+		}
+		nodesOutsideScope.clear();
+		arcsOutsideScope.clear();
 	}
 
 	void bring(LEdge arc, LNode node, LNode broughtby, long sx, long sy, long ex, long ey, Hashtable node2bposition){
@@ -660,16 +656,13 @@ class NavigationManager {
 		}
 		ClosedShape nodeShape = node.getShape();
 		application.bSpace.onTop(nodeShape);
-//		allElements.remove(nodeShape);
 		BText nodeLabel = node.getLabel();
 		application.bSpace.onTop(nodeLabel);
-//		allElements.remove(nodeLabel);
 		LongPoint bposition = (LongPoint)node2bposition.get(node);
 		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
 		application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, nodeShape.getID());
 		application.vsm.animator.createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, nodeLabel.getID());
 		DPathST spline = arc.getSpline();
-//		allElements.remove(spline);
 		LongPoint asp = spline.getStartPoint();
 		LongPoint aep = spline.getEndPoint();
 		LongPoint sp, ep;
@@ -683,6 +676,10 @@ class NavigationManager {
 		}
 		LongPoint[] flatCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
 		application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
+		// brought elements should not be faded
+		node.setTranslucency(1.0f);
+		nodesOutsideScope.remove(node);
+		arcsOutsideScope.remove(arc);
 		LEdge[] otherArcs = node.getOtherArcs(arc);
 		Glyph oe;
 		for (int i=0;i<otherArcs.length;i++){
@@ -690,7 +687,6 @@ class NavigationManager {
 				brought2location.put(otherArcs[i], BroughtElement.rememberPreviousState(otherArcs[i]));
 			}
 			spline = otherArcs[i].getSpline();
-//			allElements.remove(spline);
 			asp = spline.getStartPoint();
 			aep = spline.getEndPoint();
 			if (node2bposition.containsKey(otherArcs[i].getTail())
@@ -711,14 +707,27 @@ class NavigationManager {
 			}
 			flatCoords = DPathST.getFlattenedCoordinates(spline, sp, ep, true);
 			application.vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
-//			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
-		}
+			otherArcs[i].setTranslucency(SECOND_BNG_STEP_TRANSLUCENCY);
+			// 2nd step brought elements should not be faded
+			arcsOutsideScope.remove(otherArcs[i]);
+		}		
 	}
 	
-	void sendBack(Object k){
+	void sendBackNTU(Object k){
 		BroughtElement be = (BroughtElement)brought2location.get(k);
 		be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
-		//brought2location.remove(k);
+	}
+
+	void sendBack(LNode n){
+		BroughtElement be = (BroughtElement)brought2location.get(n);
+		be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
+		n.setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
+	}
+
+	void sendBack(LEdge e){
+		BroughtElement be = (BroughtElement)brought2location.get(e);
+		be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
+		e.setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
 	}
 
 	// n1 is the node for which we attempt to send back connected nodes

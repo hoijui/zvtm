@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 
 import java.util.HashMap;
+import java.util.Vector;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,6 +57,9 @@ class GraphManager {
 	
 	int shapeID = 0;
 	int labelID = 0;
+	
+	LNode[] allNodes;
+	LEdge[] allArcs;
 	
 	GraphManager(ATCExplorer app){
 		this.application = app;
@@ -113,6 +117,7 @@ class GraphManager {
 		HashMap int2node = new HashMap();
 		int count = 0;
 		int weight;
+		Vector aes = new Vector();
 		while (ri.hasNext()){
 			edge = ri.nextRow();
 			//   2000 leaves 10412 edges
@@ -140,10 +145,15 @@ class GraphManager {
 					e.setTail(tail);
 					e.setHead(head);
 					count++;
+					aes.add(e);
 				}
 			}
 		}
-		System.out.println("Loaded " + count + " connections");
+		allArcs = (LEdge[])aes.toArray(new LEdge[aes.size()]);
+		Vector ans = new Vector(int2node.values());
+		allNodes = (LNode[])ans.toArray(new LNode[ans.size()]);
+		System.out.println("Loaded " + allNodes.length + " airports");
+		System.out.println("Loaded " + allArcs.length + " connections");
 	}
 
 	LNode getNode(Region region, int nodeIndex, StringColumn airport_code, StringColumn city_name, NumberColumn xc, NumberColumn yc, HashMap i2n){

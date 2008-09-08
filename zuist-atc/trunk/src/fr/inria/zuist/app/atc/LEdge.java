@@ -12,7 +12,7 @@ import java.util.Vector;
 import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.glyphs.DPathST;
 
-class LEdge {
+class LEdge extends LElem {
 
 	static final short UNDIRECTED = 0;
 	static final short INCOMING = 1;
@@ -76,6 +76,10 @@ class LEdge {
 
 	DPathST getSpline(){
 		return edgeSpline;
+	}
+
+	void setTranslucency(float a){
+		edgeSpline.setTranslucencyValue(a);
 	}
 
 	public String toString(){

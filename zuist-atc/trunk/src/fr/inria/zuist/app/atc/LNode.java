@@ -11,7 +11,7 @@ import java.util.Vector;
 
 import com.xerox.VTM.glyphs.VCircleST;
 
-class LNode {
+class LNode extends LElem {
 
     String code, name;
 
@@ -131,6 +131,11 @@ class LNode {
 	
 	BText getLabel(){
 		return nodeLabel;
+	}
+	
+	void setTranslucency(float a){
+		nodeShape.setTranslucencyValue(a);
+		nodeLabel.setTranslucencyValue(a);
 	}
 
 	public String toString(){
