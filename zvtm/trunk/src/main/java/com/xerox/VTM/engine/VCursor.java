@@ -309,7 +309,7 @@ public class VCursor {
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
      *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
-     *@see #intersectsDPath(DPath p)
+     *@see #intersectsPath(DPath p)
      */
 	public boolean intersectsPath(DPath p, int tolerance, long cursorX, long cursorY){
 		if (!p.coordsInsideBoundingBox(cursorX, cursorY)){return false;}
@@ -321,7 +321,7 @@ public class VCursor {
     /**tells if the mouse is above DPath p (default tolerance, 5)
      *@param p DPath instance to be tested
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@see #intersectsDPath(DPath p, int tolerance, long cursorX, long cursorY)
+     *@see #intersectsPath(DPath p, int tolerance, long cursorX, long cursorY)
      */
     public boolean intersectsPath(DPath p, int tolerance){
 		return intersectsPath(p, tolerance, vx, vy);
@@ -329,7 +329,7 @@ public class VCursor {
 
     /**tells if the mouse is above DPath p (default tolerance, 5)
      *@param p DPath instance to be tested
-     *@see #intersectsDPath(DPath p, int tolerance, long cursorX, long cursorY)
+     *@see #intersectsPath(DPath p, int tolerance, long cursorX, long cursorY)
      */
     public boolean intersectsPath(DPath p){
 		return intersectsPath(p, 5, vx, vy);
