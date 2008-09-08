@@ -116,10 +116,10 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 						break;
 					}
 					case MODE_LINKSLIDER:{
-						//XXX:TBW pick edge
+						//Vector paths = v.getMouse().getIntersectingPaths(application.bCamera, 5);
 						break;
 					}
-				}				
+				}
 			}
 		}
     }
