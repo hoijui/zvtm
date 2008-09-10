@@ -8,11 +8,13 @@
 package fr.inria.zuist.app.atc;
 
 import java.awt.Cursor;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import javax.swing.SwingUtilities;
 
 import java.util.Vector;
 import java.util.Timer;
@@ -116,7 +118,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 						break;
 					}
 					case MODE_LINKSLIDER:{
-						//Vector paths = v.getMouse().getIntersectingPaths(application.bCamera, 5);
+						Point location = e.getComponent().getLocationOnScreen();
+						Point relative = e.getPoint();
+						application.nm.startLinkSliding(v.getMouse().getIntersectingPaths(application.bCamera, 5), location.x+relative.x, location.y+relative.y);
 						break;
 					}
 				}
@@ -127,6 +131,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		if (nm.isBringingAndGoing){
 			nm.endBringAndGo(v.lastGlyphEntered());
+		}
+		else if (nm.isLinkSliding){
+			nm.endLinkSliding();
 		}
 		else if (selectingRegion){
 			v.setDrawRect(false);
@@ -209,7 +216,11 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (nm.isBringingAndGoing){return;}
-        if (panning){
+		if (nm.isLinkSliding){
+			nm.linkSlider(v.getMouse().vx, v.getMouse().vy);
+			dut.requestUpdate();				
+		}
+        else if (panning){
             float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));

@@ -9,8 +9,11 @@ package fr.inria.zuist.app.atc;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Robot;
+import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
 
@@ -26,11 +29,14 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.Translucent;
+import com.xerox.VTM.glyphs.VCircleST;
 import net.claribole.zvtm.glyphs.DPathST;
 import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.engine.PostAnimationAction;
 import net.claribole.zvtm.engine.PostAnimationAdapter;
 import net.claribole.zvtm.engine.OverviewPortal;
+
+import fr.inria.insitu.linksliderforvideo.LinkSliderCalc;
 
 class NavigationManager {
 
@@ -744,6 +750,62 @@ class NavigationManager {
 	}
 	
 	/* ----------------------  LinkSlider  -----------------------------*/
+	
+	boolean isLinkSliding = false;
+	LinkSliderCalc lsc;
+	DPathST slidingLink;
+	Point2D mPos = new Point2D.Double();
+	
+	VCircleST slideCursor;
+	double scale;
+	Point2D cPos;
+
+	int screen_cursor_x,screen_cursor_y;
+	Robot awtRobot;
+	
+	void startLinkSliding(Vector pathsUnderMouse, int scr_x, int scr_y){
+		if (pathsUnderMouse.size() > 0){
+			isLinkSliding = true;
+			screen_cursor_x = scr_x;
+			screen_cursor_y = scr_y;
+			try {
+				awtRobot = new Robot();
+				slidingLink = (DPathST)pathsUnderMouse.firstElement();
+				slidingLink.setColor(HIGHLIGHT_COLOR);
+				lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), application.eh.wnes[2]-application.eh.wnes[0]);
+				slideCursor = new VCircleST(0, 0, 0, 10, HIGHLIGHT_COLOR, HIGHLIGHT_COLOR, 1.0f);
+				application.vsm.addGlyph(slideCursor, application.bSpace);
+			}
+			catch (java.awt.AWTException e){ 
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	void linkSlider(long vx, long vy){
+		mPos.setLocation(vx, vy);
+//		System.out.println("Move to: "+screen_cursor_x+" "+screen_cursor_y);
+		//application.mView.getCursor().setSync(false);
+		//awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
+		//application.mView.getCursor().setSync(true);
+		lsc.updateMousePosition(mPos);
+		cPos = lsc.getPositionAlongPath();
+		scale = lsc.getScale();
+		float alt = (float)(Camera.DEFAULT_FOCAL / scale + Camera.DEFAULT_FOCAL);
+//		System.out.println(scale + " "+  alt);
+		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
+		application.mCamera.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
+		application.mCamera.setAltitude(alt);
+	}
+	
+	void endLinkSliding(){
+		application.bSpace.destroyGlyph(slideCursor);
+		slidingLink.setColor(GraphManager.SHAPE_FILL_COLOR);
+		slidingLink = null;
+		isLinkSliding = false;
+		lsc = null;
+		awtRobot = null;
+	}
 	
 	
 	/* ---------------------- Highlighting -----------------------------*/

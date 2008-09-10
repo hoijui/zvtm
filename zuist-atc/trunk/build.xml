@@ -3,6 +3,7 @@
 <project name="zuist-atc" default="atcjar" basedir=".">
   <description>ZUIST-ATC build file</description>
   <path id="project.class.path">
+	<pathelement location="${basedir}/lib/linkslider.jar"/>
 	<pathelement location="${basedir}/lib/infovis.jar"/>
 	<pathelement location="${basedir}/lib/JFontChooser.jar"/>
 	<pathelement location="${basedir}/lib/antlr.jar"/>
