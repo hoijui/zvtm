@@ -29,7 +29,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.Translucent;
-import com.xerox.VTM.glyphs.VCircleST;
+import net.claribole.zvtm.glyphs.CircleNR;
 import net.claribole.zvtm.glyphs.DPathST;
 import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.engine.PostAnimationAction;
@@ -751,12 +751,14 @@ class NavigationManager {
 	
 	/* ----------------------  LinkSlider  -----------------------------*/
 	
+	static final int SLIDER_CURSOR_SIZE = 6;
+	
 	boolean isLinkSliding = false;
 	LinkSliderCalc lsc;
 	DPathST slidingLink;
 	Point2D mPos = new Point2D.Double();
 	
-	VCircleST slideCursor;
+	CircleNR slideCursor;
 	double scale;
 	Point2D cPos;
 
@@ -773,7 +775,7 @@ class NavigationManager {
 				slidingLink = (DPathST)pathsUnderMouse.firstElement();
 				slidingLink.setColor(HIGHLIGHT_COLOR);
 				lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), application.eh.wnes[2]-application.eh.wnes[0]);
-				slideCursor = new VCircleST(0, 0, 0, 10, HIGHLIGHT_COLOR, HIGHLIGHT_COLOR, 1.0f);
+				slideCursor = new CircleNR(0, 0, 0, SLIDER_CURSOR_SIZE, HIGHLIGHT_COLOR, HIGHLIGHT_COLOR);
 				application.vsm.addGlyph(slideCursor, application.bSpace);
 			}
 			catch (java.awt.AWTException e){ 
