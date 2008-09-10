@@ -44,10 +44,10 @@ import com.xerox.VTM.engine.Camera;
 public class VCircle extends ClosedShape {
 
     /**radius in virtual space (equal to bounding circle radius since this is a circle)*/
-    long vr;
+    public long vr;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
-    BProjectedCoords[] pc;
+    public BProjectedCoords[] pc;
 
     public VCircle(){
 	vx=0;
