@@ -280,9 +280,8 @@ public class VCursor {
 			Object glyph;
 			for (int i=0;i<glyphs.size();i++){
 				glyph = glyphs.elementAt(i);
-				if ((glyph instanceof DPath) && intersectsVPath((VPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
+				if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
 			}
-			if (res.isEmpty()){res=null;}
 			return res;
 		}
 	}
