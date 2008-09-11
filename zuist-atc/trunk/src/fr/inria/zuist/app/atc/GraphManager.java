@@ -40,6 +40,8 @@ class GraphManager {
 
 	static int MAX_WEIGHT = 400000;
 	
+	static final int AIRPORT_NODE_SIZE = 10;
+	
 	static final Color SHAPE_FILL_COLOR = Color.YELLOW;
 	static final Color SHAPE_STROKE_COLOR = Color.BLACK;
 	//static final Color LABEL_FILL_COLOR = Color.BLACK;
@@ -167,7 +169,7 @@ class GraphManager {
 				Airport ap = (Airport)iata2airport.get(iataCode);
 				long x = Math.round(ap.lng * GraphManager.CC);
 				long y = Math.round(ap.lat * GraphManager.CC);
-				VCircleST shape = new VCircleST(x, y, 0, 10, SHAPE_FILL_COLOR, SHAPE_STROKE_COLOR, 1.0f);
+				VCircleST shape = new VCircleST(x, y, 0, AIRPORT_NODE_SIZE, SHAPE_FILL_COLOR, SHAPE_STROKE_COLOR, 1.0f);
 				BText label = new BText(x, y-3, 0, LABEL_STROKE_COLOR, ap.iataCode, BText.TEXT_ANCHOR_MIDDLE, 1.0f, 1);
 				application.vsm.addGlyph(shape, application.bSpace);
 				application.vsm.addGlyph(label, application.bSpace);

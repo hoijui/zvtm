@@ -765,23 +765,66 @@ class NavigationManager {
 	int screen_cursor_x,screen_cursor_y;
 	Robot awtRobot;
 	
-	void startLinkSliding(Vector pathsUnderMouse, int scr_x, int scr_y){
-		if (pathsUnderMouse.size() > 0){
-			isLinkSliding = true;
-			screen_cursor_x = scr_x;
-			screen_cursor_y = scr_y;
-			try {
-				awtRobot = new Robot();
-				slidingLink = (DPathST)pathsUnderMouse.firstElement();
-				slidingLink.setColor(HIGHLIGHT_COLOR);
-				lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), application.eh.wnes[2]-application.eh.wnes[0]);
-				slideCursor = new CircleNR(0, 0, 0, SLIDER_CURSOR_SIZE, HIGHLIGHT_COLOR, HIGHLIGHT_COLOR);
-				application.vsm.addGlyph(slideCursor, application.bSpace);
-			}
-			catch (java.awt.AWTException e){ 
-				e.printStackTrace();
+	void attemptLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
+		LNode closestNode = application.grm.allNodes[0];
+		ClosedShape nodeShape = closestNode.getShape();
+		double shortestDistance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+		double distance;
+		for (int i=1;i<application.grm.allNodes.length;i++){
+			nodeShape = application.grm.allNodes[i].getShape();
+			distance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+			if (distance < shortestDistance){
+				closestNode = application.grm.allNodes[i];
+				shortestDistance = distance;
 			}
 		}
+		if (shortestDistance < 3*GraphManager.AIRPORT_NODE_SIZE){
+			// if clicked near a node, select edge connected to this node closest to the click point
+			LEdge[] arcs = closestNode.getAllArcs();
+			if (arcs.length == 0){return;}
+			long vieww = application.eh.wnes[2]-application.eh.wnes[0];
+			slidingLink = arcs[0].getSpline();
+			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
+			mPos.setLocation(press_vx, press_vy);
+			lsc.updateMousePosition(mPos);
+			cPos = lsc.getPositionAlongPath();
+			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+			for (int i=1;i<arcs.length;i++){
+				lsc = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
+				lsc.updateMousePosition(mPos);
+				cPos = lsc.getPositionAlongPath();
+				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+				if (distance < shortestDistance){
+					shortestDistance = distance;
+					slidingLink = arcs[i].getSpline();
+				}
+			}
+			startLinkSliding(press_vx, press_vy, scr_x, scr_y);
+		}
+		else {
+			// else select the edge hovered by the cursor (if any)
+			Vector pum = application.mView.getCursor().getIntersectingPaths(application.bCamera, 10);
+			if (pum.size() > 0){
+				slidingLink = (DPathST)pum.firstElement();
+				startLinkSliding(press_vx, press_vy, scr_x, scr_y);
+			}
+		}
+	}
+	
+	void startLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
+		isLinkSliding = true;
+		screen_cursor_x = scr_x;
+		screen_cursor_y = scr_y;
+		try {
+			awtRobot = new Robot();
+			slidingLink.setColor(HIGHLIGHT_COLOR);
+			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), application.eh.wnes[2]-application.eh.wnes[0]);
+			slideCursor = new CircleNR(0, 0, 0, SLIDER_CURSOR_SIZE, HIGHLIGHT_COLOR, HIGHLIGHT_COLOR);
+			application.vsm.addGlyph(slideCursor, application.bSpace);
+		}
+		catch (java.awt.AWTException e){ 
+			e.printStackTrace();
+		}		
 	}
 	
 	void linkSlider(long vx, long vy){

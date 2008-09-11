@@ -71,6 +71,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 	boolean selectingRegion = false;
     
 	DelayedUpdateTimer dut;
+	
+	long LS_SX, LS_SY;
 
     ExplorerEventHandler(ATCExplorer app){
         this.application = app;
@@ -120,7 +122,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 					case MODE_LINKSLIDER:{
 						Point location = e.getComponent().getLocationOnScreen();
 						Point relative = e.getPoint();
-						application.nm.startLinkSliding(v.getMouse().getIntersectingPaths(application.bCamera, 5), location.x+relative.x, location.y+relative.y);
+						LS_SX = v.getMouse().vx;
+						LS_SY = v.getMouse().vy;
+						application.nm.attemptLinkSliding(LS_SX, LS_SY, location.x+relative.x, location.y+relative.y);
 						break;
 					}
 				}
