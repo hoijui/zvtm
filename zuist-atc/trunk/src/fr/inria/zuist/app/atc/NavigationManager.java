@@ -751,7 +751,7 @@ class NavigationManager {
 	
 	/* ----------------------  LinkSlider  -----------------------------*/
 	
-	static final int SLIDER_CURSOR_SIZE = 6;
+	static final int SLIDER_CURSOR_SIZE = 12;
 	
 	boolean isLinkSliding = false;
 	LinkSliderCalc lsc;
@@ -759,7 +759,6 @@ class NavigationManager {
 	Point2D mPos = new Point2D.Double();
 	
 	CircleNR slideCursor;
-	double scale;
 	Point2D cPos;
 
 	int screen_cursor_x,screen_cursor_y;
@@ -820,11 +819,13 @@ class NavigationManager {
 			slidingLink.setColor(HIGHLIGHT_COLOR);
 			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), application.eh.wnes[2]-application.eh.wnes[0]);
 			slideCursor = new CircleNR(0, 0, 0, SLIDER_CURSOR_SIZE, HIGHLIGHT_COLOR, HIGHLIGHT_COLOR);
+			slideCursor.setDrawBorder(false);
 			application.vsm.addGlyph(slideCursor, application.bSpace);
+			application.bSpace.atBottom(slideCursor);
 		}
 		catch (java.awt.AWTException e){ 
 			e.printStackTrace();
-		}		
+		}
 	}
 	
 	void linkSlider(long vx, long vy){
@@ -835,12 +836,9 @@ class NavigationManager {
 		//application.mView.getCursor().setSync(true);
 		lsc.updateMousePosition(mPos);
 		cPos = lsc.getPositionAlongPath();
-		scale = lsc.getScale();
-		float alt = (float)(Camera.DEFAULT_FOCAL / scale + Camera.DEFAULT_FOCAL);
-//		System.out.println(scale + " "+  alt);
 		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
 		application.mCamera.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
-		application.mCamera.setAltitude(alt);
+		application.mCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
 	}
 	
 	void endLinkSliding(){
