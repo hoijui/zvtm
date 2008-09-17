@@ -104,6 +104,7 @@ public class VTextST extends VText implements Translucent {
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		trueCoef = scaleFactor * coef;
+		g.setColor(this.color);
 		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
@@ -121,12 +122,10 @@ public class VTextST extends VText implements Translucent {
 			g.setTransform(at);
 			if (alpha < 1.0f){
 				g.setComposite(acST);
-				g.setColor(this.color);
 				g.drawString(text, 0.0f, 0.0f);
 				g.setComposite(acO);
 			}
 			else {
-				g.setColor(this.color);
 				g.drawString(text, 0.0f, 0.0f);
 			}
 			g.setTransform(stdT);
