@@ -372,6 +372,46 @@ public class VirtualSpace {
         }
     }
 
+	public void onTop(Glyph g, int z){
+		if (glyphIndexInDrawingList(g) != -1){
+            removeGlyphFromDrawingList(g);
+	        // insert at bottom of list if no other glyph has a lower z-index
+	        int insertAt = 0;
+	        synchronized(drawingList){
+	            // insert glyph in the drawing list so that 
+	            // it is the last glyph to be drawn for a given z-index
+	            for (int i=drawingList.length-1;i>=0;i--){
+	                if (drawingList[i].getZindex() <= z){
+	                    insertAt = i + 1;
+	                    break;
+	                }
+	            }
+	            insertGlyphInDrawingList(g, insertAt);
+	        }
+            g.setZindex(z);
+        }
+	}
+	
+	public void atBottom(Glyph g, int z){
+		if (glyphIndexInDrawingList(g) != -1){
+            removeGlyphFromDrawingList(g);
+	        // insert at bottom of list if no other glyph has a lower z-index
+	        int insertAt = 0;
+	        synchronized(drawingList){
+	            // insert glyph in the drawing list so that 
+	            // it is the last glyph to be drawn for a given z-index
+	            for (int i=0;i<drawingList.length;i++){
+	                if (drawingList[i].getZindex() > z){
+	                    insertAt = i;
+	                    break;
+	                }
+	            }
+	            insertGlyphInDrawingList(g, insertAt);
+	        }
+            g.setZindex(z);
+        }
+	}
+
     /** Put glyph g1 just above glyph g2 in the drawing list (g1 painted after g2).
         * Important: this might affect the glyph's z-index.
         */
