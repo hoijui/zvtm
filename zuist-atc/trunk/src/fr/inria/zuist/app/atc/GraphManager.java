@@ -169,8 +169,8 @@ class GraphManager {
 				Airport ap = (Airport)iata2airport.get(iataCode);
 				long x = Math.round(ap.lng * GraphManager.CC);
 				long y = Math.round(ap.lat * GraphManager.CC);
-				VCircleST shape = new VCircleST(x, y, 0, AIRPORT_NODE_SIZE, SHAPE_FILL_COLOR, SHAPE_STROKE_COLOR, 1.0f);
-				BText label = new BText(x, y-3, 0, LABEL_STROKE_COLOR, ap.iataCode, BText.TEXT_ANCHOR_MIDDLE, 1.0f, 1);
+				VCircleST shape = new VCircleST(x, y, 1, AIRPORT_NODE_SIZE, SHAPE_FILL_COLOR, SHAPE_STROKE_COLOR, 1.0f);
+				BText label = new BText(x, y-3, 1, LABEL_STROKE_COLOR, ap.iataCode, BText.TEXT_ANCHOR_MIDDLE, 1.0f, 1);
 				application.vsm.addGlyph(shape, application.bSpace);
 				application.vsm.addGlyph(label, application.bSpace);
 				LNode res = new LNode(iataCode, ap.name, shape, label);
