@@ -64,6 +64,7 @@ public class CameraPortalST extends CameraPortal implements Translucent {
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+		if (!visible){return;}
 	g2d.setClip(x, y, w, h);
 	g2d.setComposite(acST);
 	if (bkgColor != null){

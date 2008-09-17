@@ -36,6 +36,8 @@ public abstract class Portal {
     /**remembers wether cursor was inside portal or not last time it moved*/
     public boolean cursorInside = false;
 
+	boolean visible = true;
+
     /**move the portal by dx and dy inside the view (JPanel coordinates)*/
     public void move(int dx, int dy){
 	x += dx;
@@ -153,6 +155,14 @@ public abstract class Portal {
 	res[3] = y + h - cy;	
 	return res;
     }
+
+	public void setVisible(boolean b){
+		visible = b;
+	}
+	
+	public boolean isVisible(){
+		return visible;
+	}
 
     public abstract void paint(Graphics2D g2d, int viewWidth, int viewHeight);
 

@@ -63,6 +63,7 @@ public class RoundCameraPortalST extends RoundCameraPortal implements Translucen
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+		if (!visible){return;}
  	g2d.setClip(clippingShape);
 	g2d.setComposite(acST);
 	if (bkgColor != null){

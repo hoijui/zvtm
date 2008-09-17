@@ -112,6 +112,7 @@ public class OverviewPortal extends CameraPortal {
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+		if (!visible){return;}
 	g2d.setClip(x, y, w, h);
 	if (bkgColor != null){
 	    g2d.setColor(bkgColor);

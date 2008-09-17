@@ -67,6 +67,7 @@ public class RoundCameraPortal extends CameraPortal {
     }
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+		if (!visible){return;}
  	g2d.setClip(clippingShape);
 	if (bkgColor != null){
 	    g2d.setColor(bkgColor);
