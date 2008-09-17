@@ -1820,10 +1820,22 @@ public class SVGReader {
 	}
     }
 
-    private static boolean specialFont(Font cFont,Font mFont){//context font, main font
-	if (!cFont.getFamily().equals(mFont.getFamily()) || cFont.getSize()!=mFont.getSize() || cFont.getStyle()!=mFont.getStyle()){return true;}
-	else {return false;}
-    }
+	// context font, main font
+	private static boolean specialFont(Font cFont,Font mFont){
+		if (cFont == null){
+			// if the context font is not defined, we do not have any information
+			// to create a special font
+			return false;
+		}
+		else if (!cFont.getFamily().equals(mFont.getFamily())
+		         || cFont.getSize() != mFont.getSize()
+		         || cFont.getStyle() != mFont.getStyle()){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
 	static URL getImageURL(String imagePath, String documentParentURL, String fallbackParentURL) {
 
