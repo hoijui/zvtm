@@ -48,6 +48,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import net.claribole.zvtm.engine.LowPassFilter;
+import net.claribole.zvtm.engine.DynaSpotListener;
 import net.claribole.zvtm.glyphs.Translucency;
 import java.awt.Point;
 
@@ -772,7 +773,7 @@ public class VCursor {
 
 	/* ---- DynaSpot implementation ---- */
 	
-	Color DYNASPOT_COLOR = Color.RED;
+	Color DYNASPOT_COLOR = Color.LIGHT_GRAY;
 	double DYNASPOT_MAX_TRANSLUCENCY = 0.3;
 	AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
 	
@@ -795,7 +796,7 @@ public class VCursor {
 		showDynarea = dynaSpotVisibility != DYNASPOT_VISIBILITY_INVISIBLE;
 	}
 	
-	int DYNASPOT_MAX_RADIUS = 40;
+	int DYNASPOT_MAX_RADIUS = 32;
 	int dynaSpotRadius = 0;
 	
 	boolean dynaSpotActivated = false;
@@ -856,7 +857,20 @@ public class VCursor {
 		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
 		currentPos = filter.apply(targetPos, frequency);
 		dynaSpotRadius = (int)Math.round(DYNASPOT_MAX_RADIUS * (1.0-opacity));
+		if (dsl != null){
+			dsl.spotSizeChanged(this, dynaSpotRadius);
+		}
 		owningView.repaintNow();
+	}
+	
+	DynaSpotListener dsl;
+
+	public void setDynaSpotListener(DynaSpotListener dsl){
+		this.dsl = dsl;
+	}
+	
+	public DynaSpotListener getDynaSpotListener(){
+		return dsl;
 	}
 	
 	/** Set to true if the dynaspot selection region should be updated when the cursor does not move. Default is true. */
@@ -921,7 +935,7 @@ public class VCursor {
 	 *@return null if the dynaspot cursor does not pick anything.
      *@see #getGlyphsInDynaSpotRegion(Glyph[] res, Camera c)
 	 */
-	public Glyph dynaPick(Camera c, int x, int y){
+	public Glyph dynaPick(Camera c){
 		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 		Glyph res = null;
 		Glyph g;
