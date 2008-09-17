@@ -61,6 +61,10 @@ class LEdge extends LElem {
 			head.addArc(this, (directed) ? LEdge.INCOMING : LEdge.UNDIRECTED);
 		}
 	}
+	
+	boolean isConnectedTo(LNode n){
+		return (n == head) || (n == tail);
+	}
 
 	LNode getTail(){
 		return tail;
