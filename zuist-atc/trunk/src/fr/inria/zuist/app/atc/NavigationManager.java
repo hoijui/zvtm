@@ -409,8 +409,8 @@ class NavigationManager {
 
 	/* ---------------------- Bring and go -----------------------------*/
 	
-	static final int BRING_ANIM_DURATION = 400;
-	static final int FOLLOW_ANIM_DURATION = 1000;
+	static final int BRING_ANIM_DURATION = 400 * ATCExplorer.ANIM_FACTOR;
+	static final int FOLLOW_ANIM_DURATION = 2000 * ATCExplorer.ANIM_FACTOR;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
 	static final float SECOND_BNG_STEP_TRANSLUCENCY = 0.2f;
@@ -580,6 +580,7 @@ class NavigationManager {
 		//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
 		//        else send all nodes and edges to their initial position, but also move camera to g
 		isBringingAndGoing = false;
+		LNode followedNode = null;
 		if (g != null){
 			LNode n = (LNode)g.getOwner();
 			BroughtNode bn = (BroughtNode)brought2location.get(n);
@@ -588,6 +589,7 @@ class NavigationManager {
 				// in which the bring and go was inititated (unlikely the user wants to move)
 				//XXX:TBW add more tests to do this translation only if its worth it (far away enough)
 				// translate camera to node in which button was released
+				followedNode = n;
 				LongPoint lp = bn.previousLocations[0];
 				LongPoint trans = new LongPoint((lp.x-application.mCamera.posx)/2, (lp.y-application.mCamera.posy)/2);
 				Vector zoomout = new Vector();
@@ -600,9 +602,9 @@ class NavigationManager {
 				zoomin.add(trans);
 				application.sm.setUpdateLevel(false);
 				application.mView.setAntialiasing(false);			
-				application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_LIN,
+				application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION/2, AnimManager.CA_ALT_TRANS_LIN,
 				                                               zoomout, application.mCamera.getID());
-	   			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION, AnimManager.CA_ALT_TRANS_LIN,
+	   			application.vsm.animator.createCameraAnimation(FOLLOW_ANIM_DURATION/2, AnimManager.CA_ALT_TRANS_LIN,
 	 														   zoomin, application.mCamera.getID(),
 	                                                           new PostAnimationAdapter(){
 		                                                            public void animationEnded(Object target, short type, String dimension){
@@ -615,7 +617,7 @@ class NavigationManager {
 		if (!brought2location.isEmpty()){
 			Iterator i = brought2location.keySet().iterator();
 			while (i.hasNext()){
-				sendBackNTU(i.next());
+				sendBackNTU(i.next(), followedNode);
 			}
 			brought2location.clear();
 		}
@@ -713,9 +715,16 @@ class NavigationManager {
 		}		
 	}
 	
-	void sendBackNTU(Object k){
+	void sendBackNTU(Object k, LNode followedNode){
 		BroughtElement be = (BroughtElement)brought2location.get(k);
-		be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);
+//		if (k == followedNode ||
+//		    (k instanceof LEdge && ((LEdge)k).isConnectedTo(followedNode))){
+		if (k == followedNode){
+			be.restorePreviousState(application.vsm.animator, FOLLOW_ANIM_DURATION);			
+		}
+		else {
+			be.restorePreviousState(application.vsm.animator, BRING_ANIM_DURATION);						
+		}
 	}
 
 	void sendBack(LNode n){
@@ -857,6 +866,7 @@ class NavigationManager {
 	Vector highlightedElements = new Vector();
 	
 	void highlight(Glyph g){
+		g.setColor(HIGHLIGHT_COLOR);
 		LNode n = (LNode)g.getOwner();
 		if (n != null){
 			LEdge[] arcs = n.getAllArcs();
@@ -864,6 +874,7 @@ class NavigationManager {
 			for (int i=0;i<arcs.length;i++){
 				g2 = arcs[i].getSpline();
 				g2.setColor(HIGHLIGHT_COLOR);
+				application.bSpace.onTop(g2, 0);
 				highlightedElements.add(g2);
 				g2 = arcs[i].getOtherEnd(n).getShape();
 				g2.setColor(HIGHLIGHT_COLOR);
@@ -873,8 +884,11 @@ class NavigationManager {
 	}
 
 	void unhighlight(Glyph g){
+		Glyph g2;
 		for (int i=0;i<highlightedElements.size();i++){
-			((Glyph)highlightedElements.elementAt(i)).setColor(GraphManager.SHAPE_FILL_COLOR);
+			g2 = (Glyph)highlightedElements.elementAt(i);
+			g2.setColor(GraphManager.SHAPE_FILL_COLOR);
+			application.bSpace.atBottom(g2, 0);
 		}
 		highlightedElements.clear();
 	}	
