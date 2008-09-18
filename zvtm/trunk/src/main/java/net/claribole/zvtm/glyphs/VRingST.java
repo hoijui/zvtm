@@ -97,6 +97,7 @@ public class VRingST extends VRing implements Translucent {
 	}
 
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 		if (pc[i].innerCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
@@ -149,6 +150,7 @@ public class VRingST extends VRing implements Translucent {
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 		if (pc[i].linnerCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice

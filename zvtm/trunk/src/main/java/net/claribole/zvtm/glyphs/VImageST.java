@@ -80,6 +80,7 @@ public class VImageST extends VImage implements Translucent {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	if ((pc[i].cw>1) && (pc[i].ch>1)){
 	    if (zoomSensitive){
 		trueCoef = scaleFactor*coef;
@@ -163,6 +164,7 @@ public class VImageST extends VImage implements Translucent {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
 	    if (zoomSensitive){trueCoef=scaleFactor*coef;}
 	    else {trueCoef=scaleFactor;}

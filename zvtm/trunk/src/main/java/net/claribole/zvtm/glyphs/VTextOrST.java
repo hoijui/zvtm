@@ -107,6 +107,7 @@ public class VTextOrST extends VTextOr implements Translucent {
     }
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
@@ -151,6 +152,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){

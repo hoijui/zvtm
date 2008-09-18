@@ -89,6 +89,7 @@ public class VSegmentST extends VSegment implements Translucent {
     public float getTranslucencyValue(){return alpha;}
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    if (alpha < 1.0f){
@@ -115,6 +116,7 @@ public class VSegmentST extends VSegment implements Translucent {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	g.setColor(this.color);
 	if (stroke!=null) {
 	    if (alpha < 1.0f){

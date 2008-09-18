@@ -103,6 +103,7 @@ public class VTextST extends VText implements Translucent {
     }
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 		trueCoef = scaleFactor * coef;
 		g.setColor(this.color);
 		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
@@ -143,6 +144,7 @@ public class VTextST extends VText implements Translucent {
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){

@@ -96,6 +96,7 @@ public class VPathST extends VPath implements Translucent {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	g.setColor(this.color);
 // 	if (true){//replace by something using projected size (so that we do not paint it if too small)
  	    at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
@@ -129,6 +130,7 @@ public class VPathST extends VPath implements Translucent {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	g.setColor(this.color);
 // 	if (true){//replace by something using projected size (so that we do not paint it if too small)
  	    at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);

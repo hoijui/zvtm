@@ -84,6 +84,7 @@ public class VEllipseST extends VEllipse implements Translucent {
     public float getTranslucencyValue(){return alpha;}
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	if ((pc[i].ellipse.getBounds().width>2) && (pc[i].ellipse.getBounds().height>2)){
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
@@ -148,6 +149,7 @@ public class VEllipseST extends VEllipse implements Translucent {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alpha == 0){return;}
 	if ((pc[i].lellipse.getBounds().width>2) && (pc[i].lellipse.getBounds().height>2)){
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
