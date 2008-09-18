@@ -74,7 +74,7 @@ public class ATCExplorer implements Java2DPainter {
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-	static final Color BACKGROUND_COLOR = Color.GRAY;
+	static final Color BACKGROUND_COLOR = Color.BLACK;
 	
 	static final Font GRAPH_FONT = new Font("Arial", Font.PLAIN, 8);
     
@@ -83,7 +83,8 @@ public class ATCExplorer implements Java2DPainter {
     boolean UPDATE_MAPS = true;
     
     /* Navigation constants */
-    static final int ANIM_MOVE_DURATION = 300;
+	static final int ANIM_FACTOR = 2;
+    static final int ANIM_MOVE_DURATION = 300 * ANIM_FACTOR;
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
@@ -139,6 +140,7 @@ public class ATCExplorer implements Java2DPainter {
         windowLayout(fullscreen);
         vsm = new VirtualSpaceManager();
 		vsm.setMainFont(GRAPH_FONT);
+//		vsm.setZoomLimit(-90);
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = vsm.addCamera(mSpace);
@@ -159,6 +161,7 @@ public class ATCExplorer implements Java2DPainter {
         mView.setEventHandler(eh, 1);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
+		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
 		mView.setAntialiasing(true);

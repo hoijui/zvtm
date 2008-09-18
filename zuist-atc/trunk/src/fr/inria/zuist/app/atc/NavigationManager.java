@@ -122,6 +122,10 @@ class NavigationManager {
 		if (ovPortal != null){application.ovCamera.setLocation(ovPortal.getGlobalView());}
 	}
 
+	void toggleOverview(){
+		ovPortal.setVisible(!ovPortal.isVisible());
+		application.vsm.repaintNow();
+	}
     
 	/* -------------- Sigma Lenses ------------------- */
 
@@ -546,6 +550,7 @@ class NavigationManager {
 				arcs[i].setTranslucency(1.0f);
 				oe = arcs[i].getOtherEnd(n2);
 				oe.setTranslucency(1.0f);
+				oe.getShape().setSensitivity(true);
 				LEdge[] arcs2 = oe.getOtherArcs(arcs[i]);
 				for (int j=0;j<arcs2.length;j++){
 					arcs2[j].setTranslucency(SECOND_BNG_STEP_TRANSLUCENCY);
@@ -750,6 +755,7 @@ class NavigationManager {
 				// hide nodes that are brought by some node in the brought stack but not by the current one
 				// do not send them back, just hide them in place (and don't do it for nodes in the brought stack)
 				oe.setTranslucency(0.0f);
+				oe.getShape().setSensitivity(false);
 				LEdge[] arcs2 = oe.getAllArcs();
 				for (int j=0;j<arcs2.length;j++){
 					arcs2[j].setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
@@ -863,34 +869,52 @@ class NavigationManager {
 	/* ---------------------- Highlighting -----------------------------*/
 	
 	static final Color HIGHLIGHT_COLOR = Color.RED;
+
+	static final float DIMMED_ARC_ALPHA = 0.2f;
+
 	Vector highlightedElements = new Vector();
+	Vector dimmedElements = new Vector();
 	
 	void highlight(Glyph g){
 		g.setColor(HIGHLIGHT_COLOR);
 		LNode n = (LNode)g.getOwner();
 		if (n != null){
+			for (int i=0;i<application.grm.allArcs.length;i++){
+				dimmedElements.add(application.grm.allArcs[i].getSpline());			
+			}
 			LEdge[] arcs = n.getAllArcs();
 			Glyph g2;
 			for (int i=0;i<arcs.length;i++){
+				dimmedElements.remove(arcs[i].getSpline());
 				g2 = arcs[i].getSpline();
 				g2.setColor(HIGHLIGHT_COLOR);
+				g2.setStrokeWidth(2.0f);
 				application.bSpace.onTop(g2, 0);
 				highlightedElements.add(g2);
 				g2 = arcs[i].getOtherEnd(n).getShape();
 				g2.setColor(HIGHLIGHT_COLOR);
 				highlightedElements.add(g2);
 			}
+			for (int i=0;i<dimmedElements.size();i++){
+				((Translucent)dimmedElements.elementAt(i)).setTranslucencyValue(DIMMED_ARC_ALPHA);
+			}
 		}
 	}
 
 	void unhighlight(Glyph g){
+		g.setColor(GraphManager.SHAPE_FILL_COLOR);
 		Glyph g2;
 		for (int i=0;i<highlightedElements.size();i++){
 			g2 = (Glyph)highlightedElements.elementAt(i);
 			g2.setColor(GraphManager.SHAPE_FILL_COLOR);
+			g2.setStrokeWidth(1.0f);
 			application.bSpace.atBottom(g2, 0);
 		}
+		for (int i=0;i<dimmedElements.size();i++){
+			((Translucent)dimmedElements.elementAt(i)).setTranslucencyValue(GraphManager.DEFAULT_ARC_ALPHA);
+		}
 		highlightedElements.clear();
+		dimmedElements.clear();
 	}	
 	
 }

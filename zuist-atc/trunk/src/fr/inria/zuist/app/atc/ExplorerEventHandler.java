@@ -308,6 +308,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(ATCExplorer.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
+        else if (code == KeyEvent.VK_F12){application.nm.toggleOverview();}
 //        else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
         else if (code == KeyEvent.VK_S){toggleMode();}

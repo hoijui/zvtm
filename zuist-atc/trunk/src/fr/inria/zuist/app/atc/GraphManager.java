@@ -46,6 +46,8 @@ class GraphManager {
 	static final Color SHAPE_STROKE_COLOR = Color.BLACK;
 	//static final Color LABEL_FILL_COLOR = Color.BLACK;
 	static final Color LABEL_STROKE_COLOR = Color.BLACK;
+	
+	static final float DEFAULT_ARC_ALPHA = 0.7f;
 
     static final String[] transitions = {Region.APPEAR_STR, Region.APPEAR_STR, Region.DISAPPEAR_STR, Region.DISAPPEAR_STR};
 	
@@ -138,7 +140,7 @@ class GraphManager {
 					double rho = ds / Math.cos(QUAD_ANGLE);					
 					long cx = Math.round(tail.getShape().vx + rho*Math.cos(alpha+QUAD_ANGLE));
 					long cy = Math.round(tail.getShape().vy + rho*Math.sin(alpha+QUAD_ANGLE));
-					DPathST p = new DPathST(tail.getShape().vx, tail.getShape().vy, 0, SHAPE_FILL_COLOR, 0.7f);
+					DPathST p = new DPathST(tail.getShape().vx, tail.getShape().vy, 0, SHAPE_FILL_COLOR, DEFAULT_ARC_ALPHA);
 					p.addQdCurve(head.getShape().vx, head.getShape().vy, cx, cy, true);
 					application.vsm.addGlyph(p, application.bSpace);
 					application.bSpace.atBottom(p);
