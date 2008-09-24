@@ -31,7 +31,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <distributionManagement>
 	<repository>
       <id>zvtm repository</id>
-      <url>scp://zvtm.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+      <url>scp://web.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
   
