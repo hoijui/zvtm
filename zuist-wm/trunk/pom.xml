@@ -48,7 +48,7 @@ $Id$
   <distributionManagement>
 	<repository>
       <id>zvtm repository</id>
-      <url>scp://zvtm.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+      <url>scp://web.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
   
