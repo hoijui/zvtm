@@ -53,10 +53,6 @@ public class EvalDebugger {
 		testView.setAntialiasing(true);
 		generateScene();
         vsm.repaintNow();
-		testView.getCursor().setDynaSpotMaxRadius(20);
-		testView.getCursor().setCutoffFrequencyParameters(0.8, 0.1);
-		testView.getCursor().activateDynaSpot(true);
-		testView.getCursor().setDynaSpotAreaVisible(true);
     }
 
 	void generateScene(){
