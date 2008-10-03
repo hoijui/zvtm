@@ -826,6 +826,7 @@ class NavigationManager {
 	}
 	
 	void startLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
+		application.mView.getCursor().setVisibility(false);
 		isLinkSliding = true;
 		screen_cursor_x = scr_x;
 		screen_cursor_y = scr_y;
@@ -845,10 +846,7 @@ class NavigationManager {
 	
 	void linkSlider(long vx, long vy){
 		mPos.setLocation(vx, vy);
-//		System.out.println("Move to: "+screen_cursor_x+" "+screen_cursor_y);
-		//application.mView.getCursor().setSync(false);
-		//awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
-		//application.mView.getCursor().setSync(true);
+		awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
 		lsc.updateMousePosition(mPos);
 		cPos = lsc.getPositionAlongPath();
 		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
@@ -857,6 +855,7 @@ class NavigationManager {
 	}
 	
 	void endLinkSliding(){
+		application.mView.getCursor().setVisibility(true);
 		application.bSpace.destroyGlyph(slideCursor);
 		slidingLink.setColor(GraphManager.SHAPE_FILL_COLOR);
 		slidingLink = null;

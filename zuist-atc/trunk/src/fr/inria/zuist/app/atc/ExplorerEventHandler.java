@@ -48,7 +48,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 	static final int DELAYED_UPDATE_FREQUENCY = 1000;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    long lastVX, lastVY;
+    long lastVX, lastVY, currentVX, currentVY;
     int currentJPX, currentJPY;
 	// region zooming
 	long x1, y1, x2, y2;
@@ -73,7 +73,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 	DelayedUpdateTimer dut;
 	
 	long LS_SX, LS_SY;
-
+	Point relative;
+	
     ExplorerEventHandler(ATCExplorer app){
         this.application = app;
         this.nm = app.nm;
@@ -121,7 +122,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 					}
 					case MODE_LINKSLIDER:{
 						Point location = e.getComponent().getLocationOnScreen();
-						Point relative = e.getPoint();
+						relative = e.getPoint();
 						LS_SX = v.getMouse().vx;
 						LS_SY = v.getMouse().vy;
 						application.nm.attemptLinkSliding(LS_SX, LS_SY, location.x+relative.x, location.y+relative.y);
@@ -193,7 +194,6 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-//        System.err.println(v.getMouse().vx+" "+v.getMouse().vy);
     	if ((jpx-NavigationManager.LENS_R1) < 0){
     	    jpx = NavigationManager.LENS_R1;
     	    cursorNearBorder = true;
@@ -221,8 +221,11 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (nm.isBringingAndGoing){return;}
 		if (nm.isLinkSliding){
-			nm.linkSlider(v.getMouse().vx, v.getMouse().vy);
-			dut.requestUpdate();				
+			if (jpx != relative.x || jpy != relative.y){
+				// ignore events triggered by AWT robot
+				nm.linkSlider(v.getMouse().vx, v.getMouse().vy);
+				dut.requestUpdate();				
+			}				
 		}
         else if (panning){
             float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
