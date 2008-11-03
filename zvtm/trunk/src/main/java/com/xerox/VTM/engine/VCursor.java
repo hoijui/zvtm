@@ -993,7 +993,7 @@ public class VCursor {
 	 * If len(res) &lt; count(glyphs), only the first len(res) glyphs are returned (meaning that some interesecting glyphs are not returned).
 	 * If res is null, an array of adequate length is instantiated and returned.
 	 *@return an empty array if the DynaSpot is not activated.
-	 *@see #dynaPick(Camera c, int x, int y)
+	 *@see #dynaPick(Camera c)
 	 */
 	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res, Camera c){
 		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
