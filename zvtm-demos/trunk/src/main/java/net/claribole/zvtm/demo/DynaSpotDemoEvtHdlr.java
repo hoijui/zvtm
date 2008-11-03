@@ -32,7 +32,7 @@ public class DynaSpotDemoEvtHdlr implements ViewEventHandler {
     long x1,x2,y1,y2;
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		Glyph gs = application.demoView.getCursor().dynaPick(v.cams[0], jpx, jpy);
+		Glyph gs = application.demoView.getCursor().dynaPick(v.cams[0]);
 		System.out.println("Selected "+gs);
     }
 
