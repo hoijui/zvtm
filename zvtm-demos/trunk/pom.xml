@@ -11,7 +11,7 @@ $Id$
   <artifactId>zvtm-demos</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM Demos</name>
-  <version>0.9.7</version>
+  <version>0.9.8-SNAPSHOT</version>
   <description>The ZVTM is a Zoomable User Interface (ZUI) toolkit implemented in Java, designed to ease the task of creating complex visual editors in which large amounts of objects have to be displayed, or which contain complex geometrical shapes that need to be animated. It is based on the metaphor of universes that can be observed through smart movable/zoomable cameras, and offers features such as perceptual continuity in object animations and camera movements, which should make the end-user's overall experience more pleasing.</description>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
@@ -51,7 +51,7 @@ $Id$
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.9.7</version>
+      <version>0.9.8-SNAPSHOT</version>
     </dependency>
   </dependencies>
   
