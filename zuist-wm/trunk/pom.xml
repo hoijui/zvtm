@@ -56,11 +56,6 @@ $Id$
   <dependencies>
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
-      <artifactId>zvtm</artifactId>
-      <version>0.9.7-SNAPSHOT</version>
-    </dependency>
-	<dependency>
-      <groupId>net.claribole.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
       <version>0.1.1-SNAPSHOT</version>
     </dependency>
