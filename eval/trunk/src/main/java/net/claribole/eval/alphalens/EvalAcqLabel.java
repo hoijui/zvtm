@@ -61,10 +61,10 @@ public class EvalAcqLabel implements Java2DPainter {
     AcqLabelEventHandler eh;
 
     static double D = 800;
-    static double W1_8 = 2 * EvalAcqLabel.LENS_INNER_RADIUS / 8.0 * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static double W1_12 = 2 * EvalAcqLabel.LENS_INNER_RADIUS / 12.0 * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL;
-    static long W2_8 = 40;
-    static long W2_12 = 40;
+//    static double W1_8 = 2 * EvalAcqLabel.LENS_INNER_RADIUS / 8.0 * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL;
+//    static double W1_12 = 2 * EvalAcqLabel.LENS_INNER_RADIUS / 12.0 * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL;
+//    static long W2_8 = 40;
+//    static long W2_12 = 40;
 
     /* lens */
     static final Color LENS_BOUNDARY_COLOR = Color.WHITE;
@@ -131,7 +131,7 @@ public class EvalAcqLabel implements Java2DPainter {
     String subjectName;
     String blockNumber;
 
-    IDSequence2 idSeq;
+    LabelSequence lbSeq;
     int trialCount = -1;
     boolean trialStarted = false;
     long startTime;
@@ -232,15 +232,14 @@ public class EvalAcqLabel implements Java2DPainter {
 	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 	    BufferedReader br = new BufferedReader(isr);
 	    String line = br.readLine();
-	    idSeq = new IDSequence2();
+	    lbSeq = new LabelSequence();
 	    while (line != null){
 		if (line.length() > 0){
-		    idSeq.addSequence(line.split(INPUT_CSV_SEP));
+		    lbSeq.addSequence(line.split(INPUT_CSV_SEP));
 		}
 		line = br.readLine();
 	    }
 	    fis.close();
-	    idSeq.computeWsAndIDs();
 	}
 	catch (Exception ex){ex.printStackTrace();}
     }
@@ -342,7 +341,7 @@ public class EvalAcqLabel implements Java2DPainter {
 	mView.mouse.setSize(5);
 	flushTrial();
 	flushCinematic();
-	if (trialCount+1 < idSeq.length()){
+	if (trialCount+1 < lbSeq.length()){
 	    initNextTrial();
 	}
 	else {
@@ -356,15 +355,15 @@ public class EvalAcqLabel implements Java2DPainter {
 	for (int i=0;i<nbErrors.length;i++){
 	    nbErrors[i] = 0;
 	}
-	setTargetVisibility(idSeq.TAs[trialCount]);
+	setTargetVisibility(lbSeq.TAs[trialCount]);
 	for (int i=0;i<targets.length;i++){
-	    targets[i].sizeTo(idSeq.Ws[trialCount]/2.0f);
+	    targets[i].sizeTo(lbSeq.Ws[trialCount]/2.0f);
 	    targets[i].setTranslucencyValue(targetAlpha);
 	}
 	highlight(hitCount, true);
-	magFactor = idSeq.MMs[trialCount];
+	magFactor = lbSeq.MMs[trialCount];
 	showStartButton(true);
-	say("Trial " + (trialCount+1) + " / " + idSeq.length() + " - " + Messages.PSBTC);
+	say("Trial " + (trialCount+1) + " / " + lbSeq.length() + " - " + Messages.PSBTC);
     }
 
     long[] rif = new long[4];
@@ -427,7 +426,7 @@ public class EvalAcqLabel implements Java2DPainter {
 			vsm.repaintNow();
 			sleep(BRIGHT_HIGHLIGHT_TIME);
 			targets[targetIndex].setBorderColor(Color.BLACK);
-			targets[targetIndex].setTranslucencyValue(idSeq.TAs[trialCount]);
+			targets[targetIndex].setTranslucencyValue(lbSeq.TAs[trialCount]);
 			vsm.repaintNow();
 			return null;
 		    }
@@ -451,7 +450,7 @@ public class EvalAcqLabel implements Java2DPainter {
 			  targetAlphaStr + OUTPUT_CSV_SEP +
 			  blockNumber + OUTPUT_CSV_SEP +
 			  trialCount + OUTPUT_CSV_SEP +
-			  idSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
+			  lbSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
 			  i + OUTPUT_CSV_SEP +  // hit index
 			  timeToTarget[i] + OUTPUT_CSV_SEP +
 			  ctimeToTarget[i] + OUTPUT_CSV_SEP +
@@ -623,7 +622,7 @@ public class EvalAcqLabel implements Java2DPainter {
 	}
 	catch (Exception ex){
 	    System.err.println("No cmd line parameter to indicate technique, defaulting to Speed-Coupled Blending Lens");
-	    new EvalAcqLabel(EvalAcqLabel.TECHNIQUE_SCB, "acqT.csv");
+	    new EvalAcqLabel(EvalAcqLabel.TECHNIQUE_SCB, "acqL.csv");
 	}
     }
 
