@@ -27,6 +27,7 @@ import java.io.OutputStreamWriter;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
+import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.lens.*;
 
@@ -98,7 +99,7 @@ public class EvalAcqLabel implements Java2DPainter {
     static final Color HTARGET_COLOR = Color.RED;
     static final Color TARGET_COLOR = Color.RED;
     static int NB_TARGETS_PER_TRIAL = 24;
-    VCircleST[] targets;
+    VTextST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcqLabel.D * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
 
     static final float OBVIOUS_TARGET = 1.0f;
@@ -202,28 +203,14 @@ public class EvalAcqLabel implements Java2DPainter {
 	void initScene(){
 		if (background == BACKGROUND_MAP){
 			mView.setBackgroundColor(EvalAcqLabel.BACKGROUND_COLOR);
-			vsm.addGlyph(new VImage(-3500, 2500, 0, (new ImageIcon("images/world/EvalAcqLabelNW.png")).getImage(), 2.0f), mSpace);
-			vsm.addGlyph(new VImage(-3500, -2500, 0, (new ImageIcon("images/world/EvalAcqLabelSW.png")).getImage(), 2.0f), mSpace);
-			vsm.addGlyph(new VImage(3500, 2500, 0, (new ImageIcon("images/world/EvalAcqLabelNE.png")).getImage(), 2.0f), mSpace);
-			vsm.addGlyph(new VImage(3500, -2500, 0, (new ImageIcon("images/world/EvalAcqLabelSE.png")).getImage(), 2.0f), mSpace);			
+			vsm.addGlyph(new VImage(-3500, 2500, 0, (new ImageIcon("images/world/evalacqNW.png")).getImage(), 2.0f), mSpace);
+			vsm.addGlyph(new VImage(-3500, -2500, 0, (new ImageIcon("images/world/evalacqSW.png")).getImage(), 2.0f), mSpace);
+			vsm.addGlyph(new VImage(3500, 2500, 0, (new ImageIcon("images/world/evalacqNE.png")).getImage(), 2.0f), mSpace);
+			vsm.addGlyph(new VImage(3500, -2500, 0, (new ImageIcon("images/world/evalacqSE.png")).getImage(), 2.0f), mSpace);			
 		}
 		else {
 			System.out.println("GRAPH BKG NOT IMPLEMENT YET");
 			System.exit(0);
-		}
-		long x,y;
-		targets = new VCircleST[NB_TARGETS_PER_TRIAL];
-		double angle = 0;
-		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
-			x = Math.round(TARGET_R_POS * Math.cos(angle));
-			y = Math.round(TARGET_R_POS * Math.sin(angle));
-//			targets[i] = new VCircleST(x, y, 0, Math.round(W2_8/2), TARGET_COLOR, Color.BLACK, targetAlpha);
-//			targets[i].setDrawBorder(true);
-//			targets[i].setVisible(false);
-//			vsm.addGlyph(targets[i], mSpace);
-			// lay out targets so that they between each side of the circle (ISO9241-9)
-			if (i % 2 == 0){angle += Math.PI;}
-			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
 		}
 		latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
 		//latIndicatorW.setDrawBorder(false);
@@ -254,7 +241,7 @@ public class EvalAcqLabel implements Java2DPainter {
 				line = br.readLine();
 			}
 			fis.close();
-			trials = (LabelSequence[])trialsV.toArray(trials);
+			trials = (LabelSequence[])trialsV.toArray(new LabelSequence[trialsV.size()]);
 		}
 		catch (Exception ex){ex.printStackTrace();}
 	}
@@ -374,13 +361,30 @@ public class EvalAcqLabel implements Java2DPainter {
 
 	void initNextTrial(){
 		trialCount++;
+
+		long x,y;
+		targets = new VTextST[NB_TARGETS_PER_TRIAL];
+		double angle = 0;
+		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
+			x = Math.round(TARGET_R_POS * Math.cos(angle));
+			y = Math.round(TARGET_R_POS * Math.sin(angle));
+//			targets[i] = new VTextST(x, y, 0, Math.round(W2_8/2), TARGET_COLOR, Color.BLACK, targetAlpha);
+//			targets[i].setDrawBorder(true);
+//			targets[i].setVisible(false);
+//			vsm.addGlyph(targets[i], mSpace);
+			// lay out targets so that they between each side of the circle (ISO9241-9)
+			if (i % 2 == 0){angle += Math.PI;}
+			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
+		}
+
+
 		hitCount = 0;
 		for (int i=0;i<nbErrors.length;i++){
 			nbErrors[i] = 0;
 		}
 		setTargetVisibility(trials[trialCount].getOpacity());
 		for (int i=0;i<targets.length;i++){
-			targets[i].setTranslucencyValue(targetAlpha);
+			targets[i].setTranslucencyValue(1.0f);
 		}
 		highlight(hitCount, true);
 		showStartButton(true);
