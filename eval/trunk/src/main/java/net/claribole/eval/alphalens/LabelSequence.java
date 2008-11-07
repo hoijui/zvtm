@@ -1,8 +1,8 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2008. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: IDSequence.java 744 2007-07-27 07:08:00Z epietrig $
+ * $Id$
  */
  
 package net.claribole.eval.alphalens;
@@ -11,40 +11,56 @@ import com.xerox.VTM.engine.Camera;
 
 class LabelSequence {
 
-	int[] MMs;
-	String[] labels;
+	static final String SEP_1 = ";";
+	static final String SEP_2 = ",";
+	
+	static final String OPACITY_OPAQUE_STR = "O";
+	static final String OPACITY_TRANSLUCENT_STR = "T";
+	static final short OPACITY_OPAQUE = 0;
+	static final short OPACITY_TRANSLUCENT = 1;
 
-	LabelSequence(){
-		this.MMs = new int[0];
-		this.labels = new String[0];
+	short OPACITY;
+	String opacityStr;
+	short RANK;
+	short WORD_LENGTH;
+	String[] LABELS;
+
+	LabelSequence(String line){
+		String[] split = line.split(SEP_1);
+		opacityStr = split[0];
+		OPACITY = parseOpacity(opacityStr);
+		RANK = Short.parseShort(split[1]);
+		WORD_LENGTH = Short.parseShort(split[2]);
+		LABELS = split[3].split(SEP_2);
 	}
-
-	int length(){
-		return MMs.length;
+	
+	String getTargetWord(){
+		return LABELS[RANK-1];
 	}
-
-	void addSequence(String[] idseq){
-		int[] tmpSeq = new int[MMs.length + idseq.length];
-		float[] tmpSeqA = new float[labels.length + idseq.length];
-		System.arraycopy(MMs, 0, tmpSeq, 0, MMs.length);
-		System.arraycopy(TAs, 0, tmpSeqA, 0, TAs.length);
-		for (int i=0;i<idseq.length;i++){
-			tmpSeq[i+MMs.length] = Integer.parseInt(idseq[i]);
+	
+	float getOpacity(){
+		return (OPACITY == OPACITY_TRANSLUCENT) ? 0.5f : 1.0f;
+	}
+	
+	String getOpacityStr(){
+		return (OPACITY == OPACITY_TRANSLUCENT) ? OPACITY_TRANSLUCENT_STR : OPACITY_OPAQUE_STR;
+	}
+	
+	static short parseOpacity(String o){
+		if (o.equals(OPACITY_TRANSLUCENT_STR)){
+			return OPACITY_TRANSLUCENT;
 		}
-		MMs = tmpSeq;
-		labels = tmpSeqA;
+		else if (o.equals(OPACITY_OPAQUE_STR)){
+			return OPACITY_OPAQUE;
+		}
+		else {
+			System.out.println("Opacity parsing error");
+			return -1;
+		}
 	}
 
 	public String toString(){
-		String res = "" + MMs[0];
-		for (int i=1;i<MMs.length;i++){
-			res += ", " + MMs[i];
-		}
-		res += "\n" + labels[0];
-		for (int i=1;i<labels.length;i++){
-			res += ", " + labels[i];
-		}
-		return res;
+		return opacityStr + " " + RANK + " " + WORD_LENGTH + " " + getTargetWord();
 	}
 
 }

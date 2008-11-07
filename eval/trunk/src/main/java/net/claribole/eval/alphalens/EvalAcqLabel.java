@@ -39,6 +39,12 @@ public class EvalAcqLabel implements Java2DPainter {
     static final String[] TECHNIQUE_NAMES_ABBR = {"SCB", "SCF"}; 
     short technique = TECHNIQUE_SCB;
 
+	/* background */
+	static final short BACKGROUND_MAP = 0;
+	static final short BACKGROUND_GRAPH = 1;
+	static final String[] BACKGROUND_NAMES = {"Map", "Graph"};
+	short background = BACKGROUND_MAP;
+
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -116,7 +122,7 @@ public class EvalAcqLabel implements Java2DPainter {
     /* logs */
     String TRIAL_FILE_NAME;
 
-    static final boolean WRITE_CINEMATIC = true;
+    static final boolean WRITE_CINEMATIC = false;
 
     static final String LOG_FILE_EXT = ".csv";
     static final String INPUT_CSV_SEP = ";";
@@ -131,7 +137,7 @@ public class EvalAcqLabel implements Java2DPainter {
     String subjectName;
     String blockNumber;
 
-    LabelSequence lbSeq;
+    LabelSequence[] trials;
     int trialCount = -1;
     boolean trialStarted = false;
     long startTime;
@@ -145,19 +151,22 @@ public class EvalAcqLabel implements Java2DPainter {
 
     static final int ERROR_DELAY = 500;
     
-    public EvalAcqLabel(short t, String f){
-	initGUI();
-	this.technique = t;
-	this.TRIAL_FILE_NAME = f;
-	mViewName = TECHNIQUE_NAMES[this.technique];
-	eh = new AcqLabelEventHandler(this);
-	mView.setEventHandler(eh);
-	loadTrials();
-	initScene();
-	mCamera.moveTo(0, 0);
-	mCamera.setAltitude(CAM_ALT);
-	say(Messages.PSTS);
-    }
+	/* t = technique, b = background, mm = lens mag, f = file */
+	public EvalAcqLabel(short t, short b, float mm, String f){
+		initGUI();
+		this.technique = t;
+		this.background = b;
+		this.magFactor = mm;
+		this.TRIAL_FILE_NAME = f;
+		mViewName = TECHNIQUE_NAMES[this.technique];
+		eh = new AcqLabelEventHandler(this);
+		mView.setEventHandler(eh);
+		loadTrials();
+		initScene();
+		mCamera.moveTo(0, 0);
+		mCamera.setAltitude(CAM_ALT);
+		say(Messages.PSTS);
+	}
 
     void initGUI(){
 	windowLayout();
@@ -190,59 +199,65 @@ public class EvalAcqLabel implements Java2DPainter {
 	VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    void initScene(){
-	mView.setBackgroundColor(EvalAcqLabel.BACKGROUND_COLOR);
-// 	vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon("images/world/EvalAcqLabel.png")).getImage(), 2.0f), mSpace);
- 	vsm.addGlyph(new VImage(-3500, 2500, 0, (new ImageIcon("images/world/EvalAcqLabelNW.png")).getImage(), 2.0f), mSpace);
- 	vsm.addGlyph(new VImage(-3500, -2500, 0, (new ImageIcon("images/world/EvalAcqLabelSW.png")).getImage(), 2.0f), mSpace);
- 	vsm.addGlyph(new VImage(3500, 2500, 0, (new ImageIcon("images/world/EvalAcqLabelNE.png")).getImage(), 2.0f), mSpace);
- 	vsm.addGlyph(new VImage(3500, -2500, 0, (new ImageIcon("images/world/EvalAcqLabelSE.png")).getImage(), 2.0f), mSpace);
-	long x,y;
-	targets = new VCircleST[NB_TARGETS_PER_TRIAL];
-	double angle = 0;
-	for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
-	    x = Math.round(TARGET_R_POS * Math.cos(angle));
-	    y = Math.round(TARGET_R_POS * Math.sin(angle));
-	    targets[i] = new VCircleST(x, y, 0, Math.round(W2_8/2), TARGET_COLOR, Color.BLACK, targetAlpha);
-	    targets[i].setDrawBorder(true);
-	    targets[i].setVisible(false);
-	    vsm.addGlyph(targets[i], mSpace);
-	    // lay out targets so that they between each side of the circle (ISO9241-9)
-	    if (i % 2 == 0){angle += Math.PI;}
-	    else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
-	}
-	latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
-	//latIndicatorW.setDrawBorder(false);
-	vsm.addGlyph(latIndicatorW, mSpace);
-	latIndicatorE = new VRectangle(7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
-	//latIndicatorE.setDrawBorder(false);
-	vsm.addGlyph(latIndicatorE, mSpace);
-	longIndicatorN = new VRectangle(0, 5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR, INDICATOR_BORDER);
-	//longIndicatorN.setDrawBorder(false);
-	vsm.addGlyph(longIndicatorN, mSpace);
-	longIndicatorS = new VRectangle(0, -5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR, INDICATOR_BORDER);
-	//longIndicatorS.setDrawBorder(false);
-	vsm.addGlyph(longIndicatorS, mSpace);
-    }
-
-    void loadTrials(){
-	try {
-	    File trialFile = new File(TRIAL_DIR_FULL + File.separator + TRIAL_FILE_NAME);
-	    FileInputStream fis = new FileInputStream(trialFile);
-	    InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-	    BufferedReader br = new BufferedReader(isr);
-	    String line = br.readLine();
-	    lbSeq = new LabelSequence();
-	    while (line != null){
-		if (line.length() > 0){
-		    lbSeq.addSequence(line.split(INPUT_CSV_SEP));
+	void initScene(){
+		if (background == BACKGROUND_MAP){
+			mView.setBackgroundColor(EvalAcqLabel.BACKGROUND_COLOR);
+			vsm.addGlyph(new VImage(-3500, 2500, 0, (new ImageIcon("images/world/EvalAcqLabelNW.png")).getImage(), 2.0f), mSpace);
+			vsm.addGlyph(new VImage(-3500, -2500, 0, (new ImageIcon("images/world/EvalAcqLabelSW.png")).getImage(), 2.0f), mSpace);
+			vsm.addGlyph(new VImage(3500, 2500, 0, (new ImageIcon("images/world/EvalAcqLabelNE.png")).getImage(), 2.0f), mSpace);
+			vsm.addGlyph(new VImage(3500, -2500, 0, (new ImageIcon("images/world/EvalAcqLabelSE.png")).getImage(), 2.0f), mSpace);			
 		}
-		line = br.readLine();
-	    }
-	    fis.close();
+		else {
+			System.out.println("GRAPH BKG NOT IMPLEMENT YET");
+			System.exit(0);
+		}
+		long x,y;
+		targets = new VCircleST[NB_TARGETS_PER_TRIAL];
+		double angle = 0;
+		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
+			x = Math.round(TARGET_R_POS * Math.cos(angle));
+			y = Math.round(TARGET_R_POS * Math.sin(angle));
+//			targets[i] = new VCircleST(x, y, 0, Math.round(W2_8/2), TARGET_COLOR, Color.BLACK, targetAlpha);
+//			targets[i].setDrawBorder(true);
+//			targets[i].setVisible(false);
+//			vsm.addGlyph(targets[i], mSpace);
+			// lay out targets so that they between each side of the circle (ISO9241-9)
+			if (i % 2 == 0){angle += Math.PI;}
+			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
+		}
+		latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
+		//latIndicatorW.setDrawBorder(false);
+		vsm.addGlyph(latIndicatorW, mSpace);
+		latIndicatorE = new VRectangle(7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
+		//latIndicatorE.setDrawBorder(false);
+		vsm.addGlyph(latIndicatorE, mSpace);
+		longIndicatorN = new VRectangle(0, 5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR, INDICATOR_BORDER);
+		//longIndicatorN.setDrawBorder(false);
+		vsm.addGlyph(longIndicatorN, mSpace);
+		longIndicatorS = new VRectangle(0, -5000, 0, INDICATOR_THICKNESS, INDICATOR_LENGTH, INDICATOR_COLOR, INDICATOR_BORDER);
+		//longIndicatorS.setDrawBorder(false);
+		vsm.addGlyph(longIndicatorS, mSpace);
 	}
-	catch (Exception ex){ex.printStackTrace();}
-    }
+
+	void loadTrials(){
+		try {
+			File trialFile = new File(TRIAL_DIR_FULL + File.separator + TRIAL_FILE_NAME);
+			FileInputStream fis = new FileInputStream(trialFile);
+			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			BufferedReader br = new BufferedReader(isr);
+			String line = br.readLine();
+			Vector trialsV = new Vector();
+			while (line != null){
+				if (line.length() > 0){
+					trialsV.add(new LabelSequence(line));
+				}
+				line = br.readLine();
+			}
+			fis.close();
+			trials = (LabelSequence[])trialsV.toArray(trials);
+		}
+		catch (Exception ex){ex.printStackTrace();}
+	}
 
     void initLogs(){
 	subjectName = JOptionPane.showInputDialog("Subject Name");
@@ -253,10 +268,10 @@ public class EvalAcqLabel implements Java2DPainter {
 	try {
 	    bwt = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(tlogFile), "UTF-8"));
 	    writeTrialHeaders();
-	    if (WRITE_CINEMATIC){
-		bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(clogFile), "UTF-8"));
-		writeCinematicHeaders();
-	    }
+//	    if (WRITE_CINEMATIC){
+//		bwc = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(clogFile), "UTF-8"));
+//		writeCinematicHeaders();
+//	    }
 	}
 	catch(IOException ex){ex.printStackTrace();}
     }
@@ -270,52 +285,60 @@ public class EvalAcqLabel implements Java2DPainter {
 	    file = new File(outputFile.substring(0,outputFile.length()-4) + "-" + i + LOG_FILE_EXT);
 	}
 	return file;
-    }
-
-    void writeTrialHeaders(){
-	try {
-	    // trial column headers
-	    bwt.write("Name" + OUTPUT_CSV_SEP +
-		      "SID" + OUTPUT_CSV_SEP +
-		      "Technique" + OUTPUT_CSV_SEP +
-		      "MM" + OUTPUT_CSV_SEP +
-		      "Alpha" + OUTPUT_CSV_SEP +
-		      "Block" + OUTPUT_CSV_SEP +
-		      "Trial" + OUTPUT_CSV_SEP +
-		      "ID" + OUTPUT_CSV_SEP +
-		      "Hit" + OUTPUT_CSV_SEP +
-		      "Time" + OUTPUT_CSV_SEP +
-		      "CTime" + OUTPUT_CSV_SEP +
-		      "Errors");
-	    bwt.newLine();
-	    bwt.flush();
 	}
-	catch (IOException ex){ex.printStackTrace();}
-    }
 
-    void writeCinematicHeaders(){
-	try {
-	    // trial column headers
-	    bwc.write("Trial" + OUTPUT_CSV_SEP +
-		      "Hit" + OUTPUT_CSV_SEP +
-		      "Time" + OUTPUT_CSV_SEP +
-		      "lx" + OUTPUT_CSV_SEP +
-		      "ly" + OUTPUT_CSV_SEP +
-		      "Errors");
-	    bwc.newLine();
-	    bwc.flush();
+	void writeTrialHeaders(){
+		try {
+			// trial column headers
+			bwt.write("Name" + OUTPUT_CSV_SEP +
+				"SID" + OUTPUT_CSV_SEP +
+				"Background" + OUTPUT_CSV_SEP +
+				"Technique" + OUTPUT_CSV_SEP +
+				"MM" + OUTPUT_CSV_SEP +
+				"LbLength" + OUTPUT_CSV_SEP +
+				"Opacity" + OUTPUT_CSV_SEP +
+				"Rank" + OUTPUT_CSV_SEP +
+				"Block" + OUTPUT_CSV_SEP +
+				"Trial" + OUTPUT_CSV_SEP +
+				"Time" + OUTPUT_CSV_SEP +
+				"CTime" + OUTPUT_CSV_SEP +
+				"Errors");
+			bwt.newLine();
+			bwt.flush();
+		}
+		catch (IOException ex){ex.printStackTrace();}
 	}
-	catch (IOException ex){ex.printStackTrace();}
-    }
 
-    /* ------------ TRIAL MANAGEMENT ------------- */
+	void flushTrial(){
+		try {
+			bwt.write(subjectName + OUTPUT_CSV_SEP +
+				subjectID + OUTPUT_CSV_SEP +
+				BACKGROUND_NAMES[background] + OUTPUT_CSV_SEP +
+				TECHNIQUE_NAMES_ABBR[technique] + OUTPUT_CSV_SEP +
+				magFactor + OUTPUT_CSV_SEP +
+				trials[trialCount].WORD_LENGTH + OUTPUT_CSV_SEP +
+				trials[trialCount].getOpacityStr() + OUTPUT_CSV_SEP +
+				trials[trialCount].RANK + OUTPUT_CSV_SEP +
+				blockNumber + OUTPUT_CSV_SEP +
+				trialCount + OUTPUT_CSV_SEP +
+				//XXX:TBU
+				timeToTarget + OUTPUT_CSV_SEP +
+				ctimeToTarget + OUTPUT_CSV_SEP +
+				nbErrors);
+			bwt.newLine();
+			bwt.flush();
+		}
+		catch (IOException ex){ex.printStackTrace();}
+	}
 
-    void startSession(){
-	initLogs();
-	initNextTrial();
-    }
+	/* ------------ TRIAL MANAGEMENT ------------- */
 
-    void endSession(){
+	void startSession(){
+		initLogs();
+		initNextTrial();
+	}
+
+	void endSession(){
 	try {
 	    bwt.flush();
 	    bwt.close();
@@ -335,36 +358,34 @@ public class EvalAcqLabel implements Java2DPainter {
 	lastHitTime = startTime;
     }
 
-    void endTrial(){
-	trialStarted = false;
-	unsetLens();
-	mView.mouse.setSize(5);
-	flushTrial();
-	flushCinematic();
-	if (trialCount+1 < lbSeq.length()){
-	    initNextTrial();
+	void endTrial(){
+		trialStarted = false;
+		unsetLens();
+		mView.mouse.setSize(5);
+		flushTrial();
+//	    flushCinematic();
+		if (trialCount+1 < trials.length){
+			initNextTrial();
+		}
+		else {
+			endSession();
+		}
 	}
-	else {
-	    endSession();
-	}
-    }
 
-    void initNextTrial(){
-	trialCount++;
-	hitCount = 0;
-	for (int i=0;i<nbErrors.length;i++){
-	    nbErrors[i] = 0;
+	void initNextTrial(){
+		trialCount++;
+		hitCount = 0;
+		for (int i=0;i<nbErrors.length;i++){
+			nbErrors[i] = 0;
+		}
+		setTargetVisibility(trials[trialCount].getOpacity());
+		for (int i=0;i<targets.length;i++){
+			targets[i].setTranslucencyValue(targetAlpha);
+		}
+		highlight(hitCount, true);
+		showStartButton(true);
+		say("Trial " + (trialCount+1) + " / " + trials.length + " - " + Messages.PSBTC);
 	}
-	setTargetVisibility(lbSeq.TAs[trialCount]);
-	for (int i=0;i<targets.length;i++){
-	    targets[i].sizeTo(lbSeq.Ws[trialCount]/2.0f);
-	    targets[i].setTranslucencyValue(targetAlpha);
-	}
-	highlight(hitCount, true);
-	magFactor = lbSeq.MMs[trialCount];
-	showStartButton(true);
-	say("Trial " + (trialCount+1) + " / " + lbSeq.length() + " - " + Messages.PSBTC);
-    }
 
     long[] rif = new long[4];
 
@@ -383,7 +404,7 @@ public class EvalAcqLabel implements Java2DPainter {
 	else {
 	    warn(Messages.TARGET_NOT_IN_FOCUS, ERROR_DELAY);
 	    nbErrors[hitCount] += 1;
-	    writeCinematic();
+//	    writeCinematic();
 	}
     }
 
@@ -403,21 +424,12 @@ public class EvalAcqLabel implements Java2DPainter {
 	}
     }
 
-//     static final int INDICATOR_ANIM_LENGTH = 250;
     static final int BRIGHT_HIGHLIGHT_TIME = 800;
     
     void highlight(final int targetIndex, boolean b){
 	if (b){
 	    latIndicatorW.vy = latIndicatorE.vy = targets[targetIndex].vy;
 	    longIndicatorN.vx = longIndicatorS.vx = targets[targetIndex].vx;
-// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
-// 					      new LongPoint(0, targets[targetIndex].vy-latIndicatorW.vy), latIndicatorW.getID());
-// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
-// 					      new LongPoint(0, targets[targetIndex].vy-latIndicatorE.vy), latIndicatorE.getID());
-// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
-// 					      new LongPoint(targets[targetIndex].vx-longIndicatorN.vx, 0), longIndicatorN.getID());
-// 	    vsm.animator.createGlyphAnimation(INDICATOR_ANIM_LENGTH, AnimManager.GL_TRANS_SIG,
-// 					      new LongPoint(targets[targetIndex].vx-longIndicatorS.vx, 0), longIndicatorS.getID());
 	    targets[targetIndex].setVisible(true);
 	    final SwingWorker worker=new SwingWorker(){
 		    public Object construct(){
@@ -426,60 +438,16 @@ public class EvalAcqLabel implements Java2DPainter {
 			vsm.repaintNow();
 			sleep(BRIGHT_HIGHLIGHT_TIME);
 			targets[targetIndex].setBorderColor(Color.BLACK);
-			targets[targetIndex].setTranslucencyValue(lbSeq.TAs[trialCount]);
+			targets[targetIndex].setTranslucencyValue(trials[trialCount].getOpacity());
 			vsm.repaintNow();
 			return null;
 		    }
 		};
 	    worker.start();
-// 	    targets[targetIndex].setColor(HTARGET_COLOR);
 	}
 	else {
 	    targets[targetIndex].setVisible(false);
-// 	    targets[targetIndex].setColor(TARGET_COLOR);	    
 	}
-    }
-
-    void flushTrial(){
-	try {
-	    for (int i=0;i<timeToTarget.length;i++){
-		bwt.write(subjectName + OUTPUT_CSV_SEP +
-			  subjectID + OUTPUT_CSV_SEP +
-			  TECHNIQUE_NAMES_ABBR[technique] + OUTPUT_CSV_SEP +
-			  magFactor + OUTPUT_CSV_SEP +
-			  targetAlphaStr + OUTPUT_CSV_SEP +
-			  blockNumber + OUTPUT_CSV_SEP +
-			  trialCount + OUTPUT_CSV_SEP +
-			  lbSeq.IDs[trialCount] + OUTPUT_CSV_SEP +
-			  i + OUTPUT_CSV_SEP +  // hit index
-			  timeToTarget[i] + OUTPUT_CSV_SEP +
-			  ctimeToTarget[i] + OUTPUT_CSV_SEP +
-			  nbErrors[i]);
-		bwt.newLine();
-	    }
-	    bwt.flush();
-	}
-	catch (IOException ex){ex.printStackTrace();}
-    }
-
-    void writeCinematic(){
-	try {
-	    bwc.write(trialCount + OUTPUT_CSV_SEP +
-		      hitCount + OUTPUT_CSV_SEP +
-		      (System.currentTimeMillis()-startTime) + OUTPUT_CSV_SEP +
-		      lens.lx + OUTPUT_CSV_SEP +
-		      lens.ly + OUTPUT_CSV_SEP +
-		      nbErrors[hitCount]);
-	    bwc.newLine();
-	}
-	catch (IOException ex){ex.printStackTrace();}
-    }
-
-    void flushCinematic(){
-	try {
-	    bwc.flush();
-	}
-	catch (IOException ex){ex.printStackTrace();}
     }
 
     void setTargetVisibility(float a){
@@ -528,9 +496,9 @@ public class EvalAcqLabel implements Java2DPainter {
 	    lens.setAbsolutePosition(x, y);
 	}
 	vsm.repaintNow();
-	if (WRITE_CINEMATIC && trialStarted){
-	    writeCinematic();
-	}
+//	if (WRITE_CINEMATIC && trialStarted){
+//	    writeCinematic();
+//	}
     }
 
 
@@ -612,18 +580,18 @@ public class EvalAcqLabel implements Java2DPainter {
 	System.exit(0);
     }
 
-    public static void main(String[] args){
-	try {
-	    if (args.length >= 4){
-		EvalAcqLabel.VIEW_MAX_W = Integer.parseInt(args[3]);
-		EvalAcqLabel.VIEW_MAX_H = Integer.parseInt(args[4]);
-	    }
-	    new EvalAcqLabel(Short.parseShort(args[0]), args[1]);
+	public static void main(String[] args){
+		try {
+			if (args.length >= 6){
+				EvalAcqLabel.VIEW_MAX_W = Integer.parseInt(args[4]);
+				EvalAcqLabel.VIEW_MAX_H = Integer.parseInt(args[5]);
+			}
+			new EvalAcqLabel(Short.parseShort(args[0]), Short.parseShort(args[1]), Float.parseFloat(args[2]), args[3]);
+		}
+		catch (Exception ex){
+			System.err.println("No cmd line parameter to indicate technique, defaulting to Speed-Coupled Blending Lens");
+			new EvalAcqLabel(EvalAcqLabel.TECHNIQUE_SCB, EvalAcqLabel.BACKGROUND_MAP, 8, "acqL.csv");
+		}
 	}
-	catch (Exception ex){
-	    System.err.println("No cmd line parameter to indicate technique, defaulting to Speed-Coupled Blending Lens");
-	    new EvalAcqLabel(EvalAcqLabel.TECHNIQUE_SCB, "acqL.csv");
-	}
-    }
 
 }
