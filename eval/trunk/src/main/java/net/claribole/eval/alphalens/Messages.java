@@ -16,5 +16,7 @@ class Messages {
     static final String EOS = "END OF SESSION";
 
     static final String TARGET_NOT_IN_FOCUS = "TARGET NOT IN FOCUS";
+
+    static final String TARGET_NOT_RIGHT_ONE = "INCORRECT TARGET";
     
 }

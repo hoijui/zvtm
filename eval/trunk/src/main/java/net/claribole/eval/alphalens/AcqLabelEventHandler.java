@@ -42,10 +42,10 @@ class AcqLabelEventHandler implements ViewEventHandler, ComponentListener {
 	this.application = app;
     }
 
-    public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	if (!application.trialStarted){return;}
-	application.selectTarget();
-    }
+	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+		if (!application.trialStarted){return;}
+		application.clickOnTarget();
+	}
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
@@ -98,10 +98,17 @@ class AcqLabelEventHandler implements ViewEventHandler, ComponentListener {
     public void enterGlyph(Glyph g){}
     public void exitGlyph(Glyph g){}
 
-    public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
-	if (code == KeyEvent.VK_SPACE){if (application.cursorInsideStartButton(cjpx, cjpy)){application.startTrial(cjpx, cjpy);}}
-	else if (code == KeyEvent.VK_Q && mod== CTRL_MOD){application.exit();}
-    }
+	public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
+		if (code == KeyEvent.VK_SPACE){
+			if (application.trialStarted){
+				application.selectTarget(System.currentTimeMillis());
+			}
+			else if (application.cursorInsideStartButton(cjpx, cjpy)){
+				application.startTrial(cjpx, cjpy);
+			}
+		}
+		else if (code == KeyEvent.VK_Q && mod== CTRL_MOD){application.exit();}
+	}
            
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
 	if (code == KeyEvent.VK_S){application.startSession();}

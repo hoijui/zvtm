@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.Graphics2D;
+import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -70,7 +71,7 @@ public class EvalAcqLabel implements Java2DPainter {
     static double D = 800;
 //    static double W1_8 = 2 * EvalAcqLabel.LENS_INNER_RADIUS / 8.0 * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL;
 //    static double W1_12 = 2 * EvalAcqLabel.LENS_INNER_RADIUS / 12.0 * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL;
-//    static long W2_8 = 40;
+    static long W2_8 = 40;
 //    static long W2_12 = 40;
 
     /* lens */
@@ -97,15 +98,20 @@ public class EvalAcqLabel implements Java2DPainter {
 
     /* target */
     static final Color HTARGET_COLOR = Color.RED;
-    static final Color TARGET_COLOR = Color.RED;
+    static final Color TARGET_COLOR = Color.YELLOW;
+    static final Color TARGET_BKG_COLOR = Color.BLACK;
+	static final Font LABEL_FONT = new Font("Dialog", Font.PLAIN, 20);
     static int NB_TARGETS_PER_TRIAL = 24;
-    VTextST[] targets;
+    VBTextST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcqLabel.D * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
 
     static final float OBVIOUS_TARGET = 1.0f;
     static final float FURTIVE_TARGET = 0.5f;
     float targetAlpha = OBVIOUS_TARGET;
     String targetAlphaStr = "1.0";
+
+    /* instructions */
+	static final Font INSTRUCTIONS_FONT = new Font("Dialog", Font.PLAIN, 12);
 
     /* target indicators */
     static final int INDICATOR_LENGTH = 500;
@@ -143,11 +149,10 @@ public class EvalAcqLabel implements Java2DPainter {
     boolean trialStarted = false;
     long startTime;
     long hitTime;
-    long lastHitTime;
 
-    int[] nbErrors = new int[NB_TARGETS_PER_TRIAL];
-    long[] timeToTarget = new long[NB_TARGETS_PER_TRIAL];
-    long[] ctimeToTarget = new long[NB_TARGETS_PER_TRIAL];
+    int nbReadErrors = 0;
+    int nbAcqErrors = 0;
+    long timeToTarget = 0;
     int hitCount = 0;
 
     static final int ERROR_DELAY = 500;
@@ -289,7 +294,8 @@ public class EvalAcqLabel implements Java2DPainter {
 				"Trial" + OUTPUT_CSV_SEP +
 				"Time" + OUTPUT_CSV_SEP +
 				"CTime" + OUTPUT_CSV_SEP +
-				"Errors");
+				"AcqErrors"  + OUTPUT_CSV_SEP +
+				"ReadErrors");
 			bwt.newLine();
 			bwt.flush();
 		}
@@ -308,10 +314,9 @@ public class EvalAcqLabel implements Java2DPainter {
 				trials[trialCount].RANK + OUTPUT_CSV_SEP +
 				blockNumber + OUTPUT_CSV_SEP +
 				trialCount + OUTPUT_CSV_SEP +
-				//XXX:TBU
 				timeToTarget + OUTPUT_CSV_SEP +
-				ctimeToTarget + OUTPUT_CSV_SEP +
-				nbErrors);
+				nbAcqErrors + OUTPUT_CSV_SEP +
+				nbReadErrors);
 			bwt.newLine();
 			bwt.flush();
 		}
@@ -342,46 +347,61 @@ public class EvalAcqLabel implements Java2DPainter {
 	showStartButton(false);
 	say(null);
 	startTime = System.currentTimeMillis();
-	lastHitTime = startTime;
     }
 
-	void endTrial(){
+	void endTrial(boolean success){
+		clearTargets();
 		trialStarted = false;
 		unsetLens();
 		mView.mouse.setSize(5);
 		flushTrial();
 //	    flushCinematic();
-		if (trialCount+1 < trials.length){
-			initNextTrial();
+		if (success){
+			if (trialCount+1 < trials.length){
+				initNextTrial();
+			}
+			else {
+				endSession();
+			}			
 		}
 		else {
-			endSession();
+			initSameTrial();
 		}
 	}
 
+	void initSameTrial(){
+		initTrial();
+	}
+	
 	void initNextTrial(){
 		trialCount++;
+		initTrial();
+	}
 
+	void initTrial(){
 		long x,y;
-		targets = new VTextST[NB_TARGETS_PER_TRIAL];
+		targets = new VBTextST[NB_TARGETS_PER_TRIAL];
 		double angle = 0;
 		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
 			x = Math.round(TARGET_R_POS * Math.cos(angle));
 			y = Math.round(TARGET_R_POS * Math.sin(angle));
-//			targets[i] = new VTextST(x, y, 0, Math.round(W2_8/2), TARGET_COLOR, Color.BLACK, targetAlpha);
-//			targets[i].setDrawBorder(true);
-//			targets[i].setVisible(false);
-//			vsm.addGlyph(targets[i], mSpace);
+			System.out.println(trials[trialCount]);
+			System.out.println(trials[trialCount].LABELS.length+" "+i);
+			
+			System.out.println(trials[trialCount].LABELS[i]);
+			
+			
+			targets[i] = new VBTextST(x, y, 0, TARGET_COLOR, TARGET_COLOR, TARGET_BKG_COLOR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
+			targets[i].setSpecialFont(LABEL_FONT);
+			targets[i].setVisible(false);
+			vsm.addGlyph(targets[i], mSpace);
 			// lay out targets so that they between each side of the circle (ISO9241-9)
 			if (i % 2 == 0){angle += Math.PI;}
 			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
 		}
-
-
 		hitCount = 0;
-		for (int i=0;i<nbErrors.length;i++){
-			nbErrors[i] = 0;
-		}
+		nbReadErrors = 0;
+		nbAcqErrors = 0;
 		setTargetVisibility(trials[trialCount].getOpacity());
 		for (int i=0;i<targets.length;i++){
 			targets[i].setTranslucencyValue(1.0f);
@@ -390,43 +410,59 @@ public class EvalAcqLabel implements Java2DPainter {
 		showStartButton(true);
 		say("Trial " + (trialCount+1) + " / " + trials.length + " - " + Messages.PSBTC);
 	}
+	
+	void clearTargets(){
+		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
+			if (targets[i] != null){
+				mSpace.destroyGlyph(targets[i]);
+			}
+		}
+	}
 
     long[] rif = new long[4];
 
-    void selectTarget(){
-	// do not take early clicks into account if an error is currently being displayed,
-	// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
-	if (warning
-	    || (technique==TECHNIQUE_SCB && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
-	    || (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
-	Glyph target = targets[hitCount];
-	lens.getVisibleRegionInFocus(mCamera, rif);
-	if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
-	    // target is in focus region
-	    hitTarget();
+	void clickOnTarget(){
+		// do not take early clicks into account if an error is currently being displayed,
+		// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
+		if (warning
+			|| (technique==TECHNIQUE_SCB && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
+			|| (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
+		Glyph target = targets[hitCount];
+		lens.getVisibleRegionInFocus(mCamera, rif);
+		if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
+			// target is in focus region
+			hitTarget();
+		}
+		else {
+			warn(Messages.TARGET_NOT_IN_FOCUS, ERROR_DELAY);
+			nbAcqErrors += 1;
+			//	    writeCinematic();
+		}
 	}
-	else {
-	    warn(Messages.TARGET_NOT_IN_FOCUS, ERROR_DELAY);
-	    nbErrors[hitCount] += 1;
-//	    writeCinematic();
-	}
-    }
 
-    void hitTarget(){
-	hitTime = System.currentTimeMillis();
-	timeToTarget[hitCount] = hitTime - lastHitTime;
-	ctimeToTarget[hitCount] = hitTime - startTime;
-	lastHitTime = hitTime;
-	highlight(hitCount, false);
-	hitCount++;
-	if (hitCount < NB_TARGETS_PER_TRIAL){
-	    highlight(hitCount, true);
-	    vsm.repaintNow();
+	void hitTarget(){
+		highlight(hitCount, false);
+		hitCount++;
+		if (hitCount < NB_TARGETS_PER_TRIAL){
+			highlight(hitCount, true);
+			vsm.repaintNow();
+		}
+		else {
+			endTrial(false);
+		}
 	}
-	else {
-	    endTrial();
+
+	void selectTarget(long t){
+		if (hitCount+1 == trials[trialCount].RANK){
+			hitTime = t;
+			timeToTarget = hitTime - startTime;
+			endTrial(true);
+		}
+		else {
+			nbReadErrors += 1;
+			warn(Messages.TARGET_NOT_RIGHT_ONE, ERROR_DELAY);
+		}
 	}
-    }
 
     static final int BRIGHT_HIGHLIGHT_TIME = 800;
     
@@ -438,10 +474,10 @@ public class EvalAcqLabel implements Java2DPainter {
 	    final SwingWorker worker=new SwingWorker(){
 		    public Object construct(){
 			targets[targetIndex].setTranslucencyValue(1.0f);
-			targets[targetIndex].setBorderColor(Color.WHITE);
+			targets[targetIndex].setBackgroundFillColor(HTARGET_COLOR);
 			vsm.repaintNow();
 			sleep(BRIGHT_HIGHLIGHT_TIME);
-			targets[targetIndex].setBorderColor(Color.BLACK);
+			targets[targetIndex].setBackgroundFillColor(TARGET_BKG_COLOR);
 			targets[targetIndex].setTranslucencyValue(trials[trialCount].getOpacity());
 			vsm.repaintNow();
 			return null;
@@ -544,7 +580,8 @@ public class EvalAcqLabel implements Java2DPainter {
     }
 
     boolean cursorInsideStartButton(int jpx, int jpy){
-	return jpx >= panelWidth/2-10 &&
+	return !trialStarted &&
+	    jpx >= panelWidth/2-10 &&
 	    jpx <= panelWidth/2+10 &&
 	    jpy >= panelHeight/2-10 &&
 	    jpy <= panelHeight/2+10;
@@ -553,24 +590,29 @@ public class EvalAcqLabel implements Java2DPainter {
     String instructions = null;
     boolean drawStartButton = false;
     
-    /*Java2DPainter interface*/
-    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	drawVisibilityPadding(g2d, viewWidth, viewHeight);
-	if (instructions != null){
-	    g2d.setColor(INSTRUCTIONS_COLOR);
-	    g2d.drawString(instructions, vispad[0], viewHeight-vispad[3]/2);
+	/*Java2DPainter interface*/
+	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+		g2d.setFont(INSTRUCTIONS_FONT);
+		drawVisibilityPadding(g2d, viewWidth, viewHeight);
+		if (instructions != null){
+			g2d.setColor(INSTRUCTIONS_COLOR);
+			g2d.drawString(instructions, vispad[0], viewHeight-vispad[3]/2);
+		}
+		if (warning && warningText != null){
+			g2d.setColor(Color.BLACK);
+			g2d.fillRect(0, viewHeight/2-100, viewWidth, 200);
+			g2d.setColor(Color.RED);
+			g2d.drawString(warningText, viewWidth/2-50, viewHeight/2);
+		}
+		if (drawStartButton){
+			g2d.setColor(START_BUTTON_COLOR);
+			g2d.fillRect(viewWidth/2-10, viewHeight/2-10, 20, 20);
+		}
+		if (trialStarted){
+			g2d.setColor(INSTRUCTIONS_COLOR);
+			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2, viewHeight-vispad[3]/2);
+		}
 	}
-	if (warning && warningText != null){
-	    g2d.setColor(Color.BLACK);
-	    g2d.fillRect(0, viewHeight/2-100, viewWidth, 200);
-	    g2d.setColor(Color.RED);
-	    g2d.drawString(warningText, viewWidth/2-50, viewHeight/2);
-	}
-	if (drawStartButton){
-	    g2d.setColor(START_BUTTON_COLOR);
-	    g2d.fillRect(viewWidth/2-10, viewHeight/2-10, 20, 20);
-	}
-    }
 
     void drawVisibilityPadding(Graphics2D g2d, int viewWidth, int viewHeight){
 	g2d.setColor(PADDING_COLOR);
