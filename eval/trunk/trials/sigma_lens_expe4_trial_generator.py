@@ -19,7 +19,8 @@ WORDS_12 = ["mainstreamed","manufactured","marginalized","masculinized",\
 			"masterminded","materialized","mathematized","memorialized",\
 			"micromanaged","multilayered","miniaturized","misaddressed",\
 			"misassembled","misconceived","misconducted","misevaluated",\
-			"misprogramed","mousetrapped","multifaceted","multicolored"]
+			"misprogramed","mousetrapped","multifaceted","multicolored",\
+			"matriculated","meanspirited","merchandized","microcracked"]
 
 V = ["O", "T", "O", "T"]
 S = [[4,8,6,2], [6,2,8,4], [8,4,2,6], [2,6,4,8]]
