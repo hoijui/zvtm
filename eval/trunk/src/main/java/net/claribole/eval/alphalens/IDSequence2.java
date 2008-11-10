@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: IDSequence.java 744 2007-07-27 07:08:00Z epietrig $
+ * $Id: IDSequence.java 731 2007-07-17 11:39:47Z epietrig $
  */
 
 package net.claribole.eval.alphalens;
@@ -31,7 +31,8 @@ class IDSequence2 {
 	System.arraycopy(MMs, 0, tmpSeq, 0, MMs.length);
 	System.arraycopy(TAs, 0, tmpSeqA, 0, TAs.length);
 	for (int i=0;i<idseq.length;i++){
-	    tmpSeq[i+MMs.length] = Integer.parseInt(idseq[i]);
+ 	    tmpSeq[i+MMs.length] = Integer.parseInt(idseq[i].substring(1));
+	    tmpSeqA[i+TAs.length] = (idseq[i].charAt(0) == 'o') ? EvalAcq.OBVIOUS_TARGET : EvalAcq.FURTIVE_TARGET; // o (obvious) or f (furtive)
 	}
 	MMs = tmpSeq;
 	TAs = tmpSeqA;
