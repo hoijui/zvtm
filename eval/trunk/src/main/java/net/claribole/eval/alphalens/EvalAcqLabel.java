@@ -293,7 +293,6 @@ public class EvalAcqLabel implements Java2DPainter {
 				"Block" + OUTPUT_CSV_SEP +
 				"Trial" + OUTPUT_CSV_SEP +
 				"Time" + OUTPUT_CSV_SEP +
-				"CTime" + OUTPUT_CSV_SEP +
 				"AcqErrors"  + OUTPUT_CSV_SEP +
 				"ReadErrors");
 			bwt.newLine();
@@ -346,6 +345,7 @@ public class EvalAcqLabel implements Java2DPainter {
 	mView.mouse.setSize(0);
 	showStartButton(false);
 	say(null);
+	highlight(hitCount, true);
 	startTime = System.currentTimeMillis();
     }
 
@@ -354,9 +354,8 @@ public class EvalAcqLabel implements Java2DPainter {
 		trialStarted = false;
 		unsetLens();
 		mView.mouse.setSize(5);
-		flushTrial();
-//	    flushCinematic();
 		if (success){
+			flushTrial();
 			if (trialCount+1 < trials.length){
 				initNextTrial();
 			}
@@ -370,10 +369,12 @@ public class EvalAcqLabel implements Java2DPainter {
 	}
 
 	void initSameTrial(){
+		nbReadErrors++;
 		initTrial();
 	}
 	
 	void initNextTrial(){
+		nbReadErrors = 0;
 		trialCount++;
 		initTrial();
 	}
@@ -385,12 +386,6 @@ public class EvalAcqLabel implements Java2DPainter {
 		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
 			x = Math.round(TARGET_R_POS * Math.cos(angle));
 			y = Math.round(TARGET_R_POS * Math.sin(angle));
-			System.out.println(trials[trialCount]);
-			System.out.println(trials[trialCount].LABELS.length+" "+i);
-			
-			System.out.println(trials[trialCount].LABELS[i]);
-			
-			
 			targets[i] = new VBTextST(x, y, 0, TARGET_COLOR, TARGET_COLOR, TARGET_BKG_COLOR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
 			targets[i].setSpecialFont(LABEL_FONT);
 			targets[i].setVisible(false);
@@ -400,13 +395,11 @@ public class EvalAcqLabel implements Java2DPainter {
 			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
 		}
 		hitCount = 0;
-		nbReadErrors = 0;
 		nbAcqErrors = 0;
 		setTargetVisibility(trials[trialCount].getOpacity());
 		for (int i=0;i<targets.length;i++){
 			targets[i].setTranslucencyValue(1.0f);
 		}
-		highlight(hitCount, true);
 		showStartButton(true);
 		say("Trial " + (trialCount+1) + " / " + trials.length + " - " + Messages.PSBTC);
 	}
@@ -435,7 +428,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		}
 		else {
 			warn(Messages.TARGET_NOT_IN_FOCUS, ERROR_DELAY);
-			nbAcqErrors += 1;
+			nbAcqErrors++;
 			//	    writeCinematic();
 		}
 	}
@@ -459,7 +452,7 @@ public class EvalAcqLabel implements Java2DPainter {
 			endTrial(true);
 		}
 		else {
-			nbReadErrors += 1;
+			nbReadErrors++;
 			warn(Messages.TARGET_NOT_RIGHT_ONE, ERROR_DELAY);
 		}
 	}

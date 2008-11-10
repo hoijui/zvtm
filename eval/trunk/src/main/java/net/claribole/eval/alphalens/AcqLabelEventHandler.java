@@ -107,6 +107,9 @@ class AcqLabelEventHandler implements ViewEventHandler, ComponentListener {
 				application.startTrial(cjpx, cjpy);
 			}
 		}
+		else if (code == KeyEvent.VK_ESCAPE){
+			application.endTrial(false);
+		}
 		else if (code == KeyEvent.VK_Q && mod== CTRL_MOD){application.exit();}
 	}
            
