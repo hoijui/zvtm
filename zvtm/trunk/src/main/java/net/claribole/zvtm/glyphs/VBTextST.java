@@ -117,18 +117,18 @@ public class VBTextST extends VBText implements Translucent {
 			if (alpha < 1.0f){
 				// translucent
 				g.setComposite(acST);
-				g.fillRect(dx, dy - rectH, rectW, rectH);
+				g.fillRect(dx, dy-rectH+1, rectW, rectH-1);
 				g.setColor(borderColor);
-				g.drawRect(dx, dy - rectH, rectW, rectH);
+				g.drawRect(dx, dy-rectH+1, rectW, rectH-1);
 				g.setColor(this.color);
 				g.drawString(text, paddingX, -paddingY);
 				g.setComposite(acO);
 			}
 			else {
 				// opaque
-				g.fillRect(dx, dy - rectH, rectW, rectH);
+				g.fillRect(dx, dy-rectH, rectW, rectH);
 				g.setColor(borderColor);
-				g.drawRect(dx, dy - rectH, rectW, rectH);
+				g.drawRect(dx, dy-rectH, rectW, rectH);
 				g.setColor(this.color);
 				g.drawString(text, paddingX, -paddingY);
 			}
@@ -171,16 +171,16 @@ public class VBTextST extends VBText implements Translucent {
 				// translucent
 				g.setComposite(acST);
 				g.setColor(fillColor);
-				g.fillRect(dx, dy - rectH, rectW, rectH);
+				g.fillRect(dx, dy-rectH+1, rectW, rectH-1);
 				g.setColor(borderColor);
-				g.drawRect(dx, dy - rectH, rectW, rectH);
+				g.drawRect(dx, dy-rectH+1, rectW, rectH-1);
 				g.setColor(this.color);
 				g.drawString(text, paddingX, -paddingY);
 				g.setComposite(acO);
 			}
 			else {
 				g.setColor(fillColor);
-				g.fillRect(dx, dy - rectH, rectW, rectH);
+				g.fillRect(dx, dy - rectH, rectW+1, rectH-1);
 				g.setColor(borderColor);
 				g.drawRect(dx, dy - rectH, rectW, rectH);
 				g.setColor(this.color);
