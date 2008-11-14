@@ -134,6 +134,9 @@ public class SVGReader {
     public static final String FILE_SCHEME = "file:/";
     public static final String FILE_PROTOCOL = "file";
 
+    public static final String COMMA_SEP = ",";
+    public static final String SPACE_SEP = " ";
+
     static Hashtable fontCache = new Hashtable();
 
     static long xoffset=0;
@@ -1696,8 +1699,17 @@ public class SVGReader {
 				int transl = transform.indexOf("translate");
 				int rp = transform.indexOf(")", transl);
 				String tlate = transform.substring(transl + 10, rp);
-				String tx = tlate.split(" ")[0];
-				String ty = tlate.split(" ")[1];
+				String[] split = tlate.split(COMMA_SEP);
+				String tx,ty;
+				if (split.length >= 2){
+					tx = split[0].trim();
+					ty = split[1].trim();
+				}
+				else {
+					split = tlate.split(SPACE_SEP);
+					tx = split[0].trim();
+					ty = split[1].trim();
+				}
 				xoffset += (long)Math.floor((double)getLong(tx) * scale);
 				yoffset += (long)Math.floor((double)getLong(ty) * scale);
 			}
