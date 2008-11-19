@@ -39,7 +39,7 @@ class LabelSequence {
 	}
 	
 	float getOpacity(){
-		return (OPACITY == OPACITY_TRANSLUCENT) ? 0.5f : 1.0f;
+		return (OPACITY == OPACITY_TRANSLUCENT) ? EvalAcqLabel.FURTIVE_TARGET : EvalAcqLabel.OBVIOUS_TARGET;
 	}
 	
 	String getOpacityStr(){

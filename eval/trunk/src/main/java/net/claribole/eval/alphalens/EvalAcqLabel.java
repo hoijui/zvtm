@@ -100,13 +100,13 @@ public class EvalAcqLabel implements Java2DPainter {
     static final Color HTARGET_COLOR = Color.RED;
     static final Color TARGET_COLOR = Color.YELLOW;
     static final Color TARGET_BKG_COLOR = Color.BLACK;
-	static final Font LABEL_FONT = new Font("Dialog", Font.PLAIN, 20);
+	static final Font LABEL_FONT = new Font("Dialog", Font.PLAIN, 36);
     static int NB_TARGETS_PER_TRIAL = 24;
     VBTextST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcqLabel.D * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
 
     static final float OBVIOUS_TARGET = 1.0f;
-    static final float FURTIVE_TARGET = 0.5f;
+    static final float FURTIVE_TARGET = 0.2f;
     float targetAlpha = OBVIOUS_TARGET;
     String targetAlphaStr = "1.0";
 
@@ -324,19 +324,25 @@ public class EvalAcqLabel implements Java2DPainter {
 
 	/* ------------ TRIAL MANAGEMENT ------------- */
 
+	boolean sessionStarted = false;
+
 	void startSession(){
+		if (sessionStarted){return;}
 		initLogs();
 		initNextTrial();
+		sessionStarted = true;
 	}
 
 	void endSession(){
-	try {
-	    bwt.flush();
-	    bwt.close();
-	    say(Messages.EOS);
+		if (!sessionStarted){return;}
+		try {
+			bwt.flush();
+			bwt.close();
+			say(Messages.EOS);
+			sessionStarted = false;
+		}
+		catch (IOException ex){ex.printStackTrace();}
 	}
-	catch (IOException ex){ex.printStackTrace();}
-    }
 
     void startTrial(int jpx, int jpy){
 	if (trialStarted){return;}
@@ -604,6 +610,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		if (trialStarted){
 			g2d.setColor(INSTRUCTIONS_COLOR);
 			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2, viewHeight-vispad[3]/2);
+			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2, vispad[3]/2);
 		}
 	}
 
