@@ -100,7 +100,11 @@ public class EvalAcqLabel implements Java2DPainter {
     static final Color HTARGET_COLOR = Color.RED;
     static final Color TARGET_COLOR = Color.YELLOW;
     static final Color TARGET_BKG_COLOR = Color.BLACK;
-	static final Font LABEL_FONT = new Font("Dialog", Font.PLAIN, 36);
+
+	static final int LABEL_FONT_SIZE = 42;
+	static final Font LABEL_FONT_MM8 = new Font("Dialog", Font.PLAIN, LABEL_FONT_SIZE);
+	static final Font LABEL_FONT_MM12 = new Font("Dialog", Font.PLAIN, Math.round(LABEL_FONT_SIZE*8/12));
+
     static int NB_TARGETS_PER_TRIAL = 24;
     VBTextST[] targets;
     static final long TARGET_R_POS = Math.round(EvalAcqLabel.D * (Camera.DEFAULT_FOCAL+EvalAcqLabel.CAM_ALT)/Camera.DEFAULT_FOCAL / 2.0);
@@ -393,7 +397,7 @@ public class EvalAcqLabel implements Java2DPainter {
 			x = Math.round(TARGET_R_POS * Math.cos(angle));
 			y = Math.round(TARGET_R_POS * Math.sin(angle));
 			targets[i] = new VBTextST(x, y, 0, TARGET_COLOR, TARGET_COLOR, TARGET_BKG_COLOR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
-			targets[i].setSpecialFont(LABEL_FONT);
+			targets[i].setSpecialFont((magFactor >= 10) ? LABEL_FONT_MM12 : LABEL_FONT_MM8);
 			targets[i].setVisible(false);
 			vsm.addGlyph(targets[i], mSpace);
 			// lay out targets so that they between each side of the circle (ISO9241-9)
@@ -510,12 +514,6 @@ public class EvalAcqLabel implements Java2DPainter {
 	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
 	    lens.setOuterRadiusColor(LENS_BOUNDARY_COLOR);
-	    if (magFactor == 2.0f){
-		((SCFLens)lens).setCutoffFrequencyParameters(0.4, 0.01);
-	    }
-	    else if (magFactor == 4.0f){
-		((SCFLens)lens).setCutoffFrequencyParameters(0.3, 0.01);
-	    }
 	    break;
 	}
 	}
