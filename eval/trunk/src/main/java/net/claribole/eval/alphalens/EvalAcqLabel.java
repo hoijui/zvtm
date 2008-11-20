@@ -140,8 +140,6 @@ public class EvalAcqLabel implements Java2DPainter {
     static final String OUTPUT_CSV_SEP = "\t";
     static final String LOG_DIR = "logs";
     static final String LOG_DIR_FULL = System.getProperty("user.dir") + File.separator + LOG_DIR;
-    static final String TRIAL_DIR = "trials";
-    static final String TRIAL_DIR_FULL = System.getProperty("user.dir") + File.separator + TRIAL_DIR;
     File tlogFile, clogFile;
     BufferedWriter bwt, bwc;
     String subjectID;
@@ -237,7 +235,7 @@ public class EvalAcqLabel implements Java2DPainter {
 
 	void loadTrials(){
 		try {
-			File trialFile = new File(TRIAL_DIR_FULL + File.separator + TRIAL_FILE_NAME);
+			File trialFile = new File(TRIAL_FILE_NAME);
 			FileInputStream fis = new FileInputStream(trialFile);
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 			BufferedReader br = new BufferedReader(isr);
@@ -638,7 +636,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		}
 		catch (Exception ex){
 			System.err.println("No cmd line parameter to indicate technique, defaulting to Speed-Coupled Blending Lens");
-			new EvalAcqLabel(EvalAcqLabel.TECHNIQUE_SCB, EvalAcqLabel.BACKGROUND_MAP, 8, "acqL.csv");
+			new EvalAcqLabel(EvalAcqLabel.TECHNIQUE_SCB, EvalAcqLabel.BACKGROUND_MAP, 8, "trials/acqL.csv");
 		}
 	}
 
