@@ -132,12 +132,6 @@ public class GraphLayoutDemo extends JApplet {
         catch (Exception ex){
             ex.printStackTrace();
         }
-        try {
-            EDGE_SHAPE = Short.parseShort(getParameter(EDGE_TYPE_PARAM));
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
-        }
     }
 
 	void initGUI(){
