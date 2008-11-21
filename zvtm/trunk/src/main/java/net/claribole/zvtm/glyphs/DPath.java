@@ -318,6 +318,28 @@ public class DPath extends Glyph implements RectangularShape {
 	/** No effect. */
     public void reSize(float factor){}
 
+	/** Translate the glyph by (x,y) - relative translation.
+		*@see #moveTo(long x, long y)
+		*/
+	public void move(long x, long y){
+		LongPoint[] t = new LongPoint[getNumberOfPoints()];
+		Arrays.fill(t, new LongPoint(x, y));
+		this.edit(t, false);
+		propagateMove(x,y);  //take care of sticked glyphs
+		try{vsm.repaintNow();}catch(NullPointerException e){}
+	}
+
+	/** Translate the glyph to (x,y) - absolute translation.
+		*@see #move(long x, long y)
+		*/
+	public void moveTo(long x, long y){
+		propagateMove(x-vx, y-vy);  //take care of sticked glyphs
+		LongPoint[] t = new LongPoint[getNumberOfPoints()];
+		Arrays.fill(t, new LongPoint(x, y));
+		this.edit(t, true);
+		try{vsm.repaintNow();}catch(NullPointerException e){}
+	}
+
 	/** No effect. */
     public void orientTo(float angle){}
 
@@ -592,8 +614,14 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 		}
 		if (points != null && points.length == totalPointsCount){
-			this.spx = points[0].x;
-			this.spy = points[0].y;
+			if (abs){
+				this.spx = points[0].x;
+				this.spy = points[0].y;
+			}
+			else {
+				this.spx += points[0].x;
+				this.spy += points[0].y;				
+			}
 			int offset = 0;
 			for (int i=0; i < elements.length; i++) {
 				switch (elements[i].type){
@@ -728,47 +756,52 @@ public class DPath extends Glyph implements RectangularShape {
 	return result;
     }
     
-    /**
-     * Get coordinates of each point in the path including control points
-     * @return list of points in following format: startPoint, controlPoint1, controlPoint2, endPoint ...
-     */
-    public LongPoint[] getAllPointsCoordinates(){
-	int totalNumberOfPoints = 1;
-	for (int i=0; i < elements.length; i++){
-	    totalNumberOfPoints += 1;
-	    short type = elements[i].type;
-	    switch (type){
-	    case DPath.CBC:{totalNumberOfPoints += 2; break;}
-	    case DPath.QDC:{totalNumberOfPoints += 1; break;}
-	    }
+	public int getNumberOfPoints(){
+		int totalNumberOfPoints = 1;
+		for (int i=0; i < elements.length; i++){
+		    totalNumberOfPoints += 1;
+		    short type = elements[i].type;
+		    switch (type){
+		    case DPath.CBC:{totalNumberOfPoints += 2; break;}
+		    case DPath.QDC:{totalNumberOfPoints += 1; break;}
+		    }
+		}
+		return totalNumberOfPoints;
 	}
-	LongPoint[] result = new LongPoint[totalNumberOfPoints];
-	int offset = 0;
-	result[0] = new LongPoint(this.spx, this.spy);
-	for (int i=0; i < elements.length; i++){
-	    switch(elements[i].type){
-	    case DPath.CBC:{
-		CBCElement el = (CBCElement)elements[i];
-		result[i+1+offset] = new LongPoint(el.ctrlx1, el.ctrly1);
-		result[i+2+offset] = new LongPoint(el.ctrlx2, el.ctrly2);
-		result[i+3+offset] = new LongPoint(el.x, el.y);
-		offset += 2;
-		break;
-	    }
-	    case DPath.QDC:{
-		QDCElement el = (QDCElement)elements[i];
-		result[i+1+offset] = new LongPoint(el.ctrlx, el.ctrly);
-		result[i+2+offset] = new LongPoint(el.x, el.y);
-		offset += 1;
-		break;
-	    }
-	    default:{
-		result[i+1+offset] = new LongPoint(elements[i].x, elements[i].y);
-	    }
-	    }
+
+	/**
+		* Get coordinates of each point in the path including control points
+		* @return list of points in following format: startPoint, controlPoint1, controlPoint2, endPoint ...
+		*/
+	public LongPoint[] getAllPointsCoordinates(){
+		int totalNumberOfPoints = getNumberOfPoints();
+		LongPoint[] result = new LongPoint[totalNumberOfPoints];
+		int offset = 0;
+		result[0] = new LongPoint(this.spx, this.spy);
+		for (int i=0; i < elements.length; i++){
+			switch(elements[i].type){
+				case DPath.CBC:{
+					CBCElement el = (CBCElement)elements[i];
+					result[i+1+offset] = new LongPoint(el.ctrlx1, el.ctrly1);
+					result[i+2+offset] = new LongPoint(el.ctrlx2, el.ctrly2);
+					result[i+3+offset] = new LongPoint(el.x, el.y);
+					offset += 2;
+					break;
+				}
+				case DPath.QDC:{
+					QDCElement el = (QDCElement)elements[i];
+					result[i+1+offset] = new LongPoint(el.ctrlx, el.ctrly);
+					result[i+2+offset] = new LongPoint(el.x, el.y);
+					offset += 1;
+					break;
+				}
+				default:{
+					result[i+1+offset] = new LongPoint(elements[i].x, elements[i].y);
+				}
+			}
+		}
+		return result;
 	}
-	return result;
-    }
     
     /**
      * Calculates coordinates of all DPath's points (including control points) to display the DPath as a line.
