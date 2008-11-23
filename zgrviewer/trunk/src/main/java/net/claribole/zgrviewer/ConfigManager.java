@@ -519,11 +519,6 @@ class ConfigManager {
 	return MAG_FACTOR;
     }
 
-	/** Get the last file opened with ZGRViewer. */
-	public File getLastFileOpened(){
-		return lastFileOpened;
-	}
-
     /*remember command lines input in CallBox*/
     void rememberCommandLine(String cmdLine){
 	boolean exists = false;

@@ -417,6 +417,12 @@ public class ZGRViewer implements ZGRApplication {
 	sb.setVisible(true);
     }
 
+
+	/** Get the last file opened with ZGRViewer. */
+	public File getLastFileOpened(){
+		return cfgMngr.lastFileOpened;
+	}
+
     void saveConfiguration(){
 	cfgMngr.saveConfig();
     }
