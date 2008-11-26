@@ -563,7 +563,7 @@ public class SVGReader {
 	long res=0;
 	seekSecondCoord(sb);
 	StringBuffer dgb=new StringBuffer();
-	while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-') || (sb.charAt(0)=='.') || (sb.charAt(0)=='e') || (sb.charAt(0)=='E'))){
+	while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-') || (sb.charAt(0)=='.') || (sb.charAt(0)=='e') || (sb.charAt(0)=='E') || (sb.charAt(0)=='+'))){
 	    dgb.append(sb.charAt(0));
 	    sb.deleteCharAt(0);
 	}
