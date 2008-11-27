@@ -389,7 +389,7 @@ public class SVGWriter {
 	}
 
     public String getSVGPathCoordinates(DPath p){
-		return getSVGPathCoordinates(p.getJava2DPathIterator());
+		return getSVGPathCoordinates(p.getSVGPathIterator());
 	}
 
 	public String getSVGPathCoordinates(PathIterator pi){

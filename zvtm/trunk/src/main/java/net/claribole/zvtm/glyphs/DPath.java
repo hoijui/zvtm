@@ -914,14 +914,9 @@ public class DPath extends Glyph implements RectangularShape {
 		}
 		return res;
 	}
-	
-	/** Get a Java2D path iterator for this DPath. */
-    public PathIterator getJava2DPathIterator(){
-		return this.getJava2DGeneralPath().getPathIterator(null);
-	}
-    
-	/** Get a Java2D GeneralPath iterator for this DPath. */
-	public GeneralPath getJava2DGeneralPath(){
+
+	/** Get an SVG-compatible path iterator for this DPath. */
+    public PathIterator getSVGPathIterator(){
 		GeneralPath res = new GeneralPath();
 		res.moveTo(spx, -spy);
 		for (int i = 0; i < this.getElementsCount(); i++){
@@ -942,6 +937,64 @@ public class DPath extends Glyph implements RectangularShape {
 				}
 				case DPath.MOV:{
 					res.moveTo(pts[1].x, -pts[1].y);
+					break;
+				}
+			}
+		}
+		return res.getPathIterator(null);
+	}
+	
+	/** Get a Java2D path iterator for this DPath. */
+    public PathIterator getJava2DPathIterator(){
+		GeneralPath res = new GeneralPath();
+		res.moveTo(spx, spy);
+		for (int i = 0; i < this.getElementsCount(); i++){
+			int elType = this.getElementType(i);
+			LongPoint[] pts = this.getElementPointsCoordinates(i);
+			switch(elType){
+				case DPath.CBC:{
+					res.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
+					break;
+				}
+				case DPath.QDC:{
+					res.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
+					break;
+				}
+				case DPath.SEG:{
+					res.lineTo(pts[1].x, pts[1].y);
+					break;
+				}
+				case DPath.MOV:{
+					res.moveTo(pts[1].x, pts[1].y);
+					break;
+				}
+			}
+		}
+		return res.getPathIterator(null);
+	}
+    
+	/** Get a Java2D GeneralPath iterator for this DPath. */
+	public GeneralPath getJava2DGeneralPath(){
+		GeneralPath res = new GeneralPath();
+		res.moveTo(spx, spy);
+		for (int i = 0; i < this.getElementsCount(); i++){
+			int elType = this.getElementType(i);
+			LongPoint[] pts = this.getElementPointsCoordinates(i);
+			switch(elType){
+				case DPath.CBC:{
+					res.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
+					break;
+				}
+				case DPath.QDC:{
+					res.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
+					break;
+				}
+				case DPath.SEG:{
+					res.lineTo(pts[1].x, pts[1].y);
+					break;
+				}
+				case DPath.MOV:{
+					res.moveTo(pts[1].x, pts[1].y);
 					break;
 				}
 			}
