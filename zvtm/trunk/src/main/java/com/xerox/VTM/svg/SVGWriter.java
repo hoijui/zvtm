@@ -62,6 +62,7 @@ import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VShape;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTriangle;
+import net.claribole.zvtm.glyphs.DPath;
 
     /** A class to export the content of a virtual space as an SVG document. Support for all glyph classes defined in package com.xerox.VTM.glyphs, including transparency.
      *@author Emmanuel Pietriga
@@ -224,6 +225,7 @@ public class SVGWriter {
 	    if (o instanceof VEllipse){return createEllipse((VEllipse)o);}
 	    else if (o instanceof VRectangle){return createRect((VRectangle)o);}
 	    else if (o instanceof VPath){return createPath((VPath)o);}
+	    else if (o instanceof DPath){return createPath((DPath)o);}
 	    else if (o instanceof VText){return createText((VText)o);}
 	    else if (o instanceof VTriangle){return createPolygon((VTriangle)o);}
 	    else if (o instanceof VCircle){return createCircle((VCircle)o);}
@@ -383,55 +385,76 @@ public class SVGWriter {
     }
 
     public String getSVGPathCoordinates(VPath p){
-	StringBuffer coords=new StringBuffer();
-	PathIterator pi=p.getJava2DPathIterator();
-	float[] seg=new float[6];
-	int type;
-	char lastOp='Z';  //anything but M, L, Q, C since we want the first command to explicitely appear in any case
-	while (!pi.isDone()){//save the path as a sequence of instructions following the SVG model for "d" attributes
-	    type=pi.currentSegment(seg);
-	    switch (type){
-	    case java.awt.geom.PathIterator.SEG_MOVETO:{
-		if (lastOp!='M'){coords.append('M');} else {coords.append(' ');}
-		lastOp='M';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_LINETO:{
-		if (lastOp!='L'){coords.append('L');} else {coords.append(' ');}
-		lastOp='L';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_QUADTO:{
-		if (lastOp!='Q'){coords.append('Q');} else {coords.append(' ');}
-		lastOp='Q';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_CUBICTO:{
-		if (lastOp!='C'){coords.append('C');} else {coords.append(' ');}
-		lastOp='C';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth)+" "+abl2c(seg[4]+farWest)+" "+abl2c(seg[5]+farNorth));
-		break;
-	    }
-	    }
-	    pi.next();
+		return getSVGPathCoordinates(p.getJava2DPathIterator());
 	}
-	return coords.toString();
-    }
 
-    private Element createPath(VPath p){
-	Element path=svgDoc.createElementNS(svgURI,SVGReader._path);
-	path.setAttribute(SVGReader._d,getSVGPathCoordinates(p));
-	Color c=p.getColor();
-	String color="stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
-	path.setAttribute(SVGReader._style,"fill:none;"+color);
-	if (p.getStroke()!=null){
-	    createStrokeInformation(p,path);
+    public String getSVGPathCoordinates(DPath p){
+		return getSVGPathCoordinates(p.getJava2DPathIterator());
 	}
-	return path;
-    }
+
+	public String getSVGPathCoordinates(PathIterator pi){
+		StringBuffer coords=new StringBuffer();
+		float[] seg=new float[6];
+		int type;
+		//anything but M, L, Q, C since we want the first command to explicitely appear in any case
+		char lastOp='Z';
+		while (!pi.isDone()){
+			//save the path as a sequence of instructions following the SVG model for "d" attributes
+			type=pi.currentSegment(seg);
+			switch (type){
+				case java.awt.geom.PathIterator.SEG_MOVETO:{
+					if (lastOp!='M'){coords.append('M');} else {coords.append(' ');}
+					lastOp='M';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_LINETO:{
+					if (lastOp!='L'){coords.append('L');} else {coords.append(' ');}
+					lastOp='L';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_QUADTO:{
+					if (lastOp!='Q'){coords.append('Q');} else {coords.append(' ');}
+					lastOp='Q';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_CUBICTO:{
+					if (lastOp!='C'){coords.append('C');} else {coords.append(' ');}
+					lastOp='C';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth)+" "+abl2c(seg[4]+farWest)+" "+abl2c(seg[5]+farNorth));
+					break;
+				}
+			}
+			pi.next();
+		}
+		return coords.toString();
+	}
+
+	private Element createPath(VPath p){
+		Element path=svgDoc.createElementNS(svgURI,SVGReader._path);
+		path.setAttribute(SVGReader._d,getSVGPathCoordinates(p));
+		Color c=p.getColor();
+		String color="stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
+		path.setAttribute(SVGReader._style,"fill:none;"+color);
+		if (p.getStroke()!=null){
+			createStrokeInformation(p,path);
+		}
+		return path;
+	}
+
+	private Element createPath(DPath p){
+		Element path = svgDoc.createElementNS(svgURI, SVGReader._path);
+		path.setAttribute(SVGReader._d, getSVGPathCoordinates(p));
+		Color c = p.getColor();
+		String color = "stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
+		path.setAttribute(SVGReader._style, "fill:none;"+color);
+		if (p.getStroke() != null){
+			createStrokeInformation(p, path);
+		}
+		return path;
+	}
 
     private Element createText(VText t){
 	Element text=svgDoc.createElementNS(svgURI,SVGReader._text);
