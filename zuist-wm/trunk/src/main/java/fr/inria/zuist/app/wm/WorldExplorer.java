@@ -67,14 +67,14 @@ public class WorldExplorer implements Java2DPainter {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1024;  // 1400
-    static int VIEW_MAX_H = 768;   // 1050
+    static int VIEW_MAX_W = 1280;  // 1400
+    static int VIEW_MAX_H = 720;   // 1050
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-	static final Color BACKGROUND_COLOR = Color.GRAY;
+	static final Color BACKGROUND_COLOR = Color.BLACK;
     
     boolean SHOW_MEMORY_USAGE = false;
     
@@ -155,6 +155,8 @@ public class WorldExplorer implements Java2DPainter {
         mView.setEventHandler(eh, 0);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
+		mView.getCursor().setColor(Color.WHITE);
+		mView.getCursor().setHintColor(Color.WHITE);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();
