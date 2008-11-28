@@ -123,6 +123,7 @@ $Id$
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+		  <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>
