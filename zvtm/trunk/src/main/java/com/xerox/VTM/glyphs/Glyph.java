@@ -280,12 +280,14 @@ public abstract class Glyph implements Cloneable {
      */
     public boolean isBorderDrawn(){return true;}
 
-    /** Set the glyph's border color when cursor is inside it.
+    /** Set the glyph's border color when cursor is inside it. IMPORTANT: add ing the glyph to a virtual space <strong>after</strong> calling this method might override this color.
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      *@param c set to null to keep the original color.
+     *@see com.xerox.VTM.engine.VirtualSpaceManager#setMouseInsideGlyphColor(Color c, boolean propagate)
+     *@see com.xerox.VTM.engine.VirtualSpaceManager#setMouseInsideGlyphColor(Color c)
      */
     public void setMouseInsideHighlightColor(Color c){
-	this.mouseInsideColor = c;
+		this.mouseInsideColor = c;
     }
 
     /** Set the glyph's main color. This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.). */
