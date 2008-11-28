@@ -101,6 +101,7 @@ $Id$
         <configuration>
           <source>1.4</source>
           <target>1.4</target>
+          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>
