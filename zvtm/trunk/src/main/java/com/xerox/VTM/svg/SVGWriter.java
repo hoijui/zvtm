@@ -114,6 +114,8 @@ public class SVGWriter {
     public static String _strokejoinmiter="miter";
     public static String _strokejoinround="round";
 
+    public static String _class = "class";
+
     public static float DEFAULT_MITER_LIMIT=4.0f;
     public static float DEFAULT_DASH_OFFSET=0.0f;
 
@@ -305,6 +307,12 @@ public class SVGWriter {
 	return res;
     }
 
+	private void createClassInforation(Glyph g, Element e){
+		if (g.getType() != null){
+			e.setAttribute(SVGWriter._class, g.getType());
+		}
+	}
+
 //     private Element shapeText(Glyph g){
 // 	Element text=svgDoc.createElementNS(svgURI,SVGReader._text);
 // 	text.setAttribute(SVGReader._x,String.valueOf(g.vx+farWest));
@@ -321,68 +329,68 @@ public class SVGWriter {
 	return res;
     }
 
-    private Element createEllipse(VEllipse e){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._ellipse);
-	shape.setAttribute(SVGReader._cx,String.valueOf(e.vx+farWest));
-	shape.setAttribute(SVGReader._cy,String.valueOf(-e.vy+farNorth));
-	shape.setAttribute(SVGReader._rx,String.valueOf(e.getWidth()));
-	shape.setAttribute(SVGReader._ry,String.valueOf(e.getHeight()));
-	shape.setAttribute(SVGReader._style,shapeColors(e));
-	if (e.getStroke()!=null){
-	    createStrokeInformation(e,shape);
+	private Element createEllipse(VEllipse e){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._ellipse);
+		shape.setAttribute(SVGReader._cx,String.valueOf(e.vx+farWest));
+		shape.setAttribute(SVGReader._cy,String.valueOf(-e.vy+farNorth));
+		shape.setAttribute(SVGReader._rx,String.valueOf(e.getWidth()));
+		shape.setAttribute(SVGReader._ry,String.valueOf(e.getHeight()));
+		shape.setAttribute(SVGReader._style,shapeColors(e));
+		if (e.getStroke()!=null){
+			createStrokeInformation(e,shape);
+		}
+		createClassInforation(e, shape);
+		return shape;
 	}
-	return shape;
-    }
 
-    private Element createCircle(VCircle c){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._circle);
-	shape.setAttribute(SVGReader._cx,String.valueOf(c.vx+farWest));
-	shape.setAttribute(SVGReader._cy,String.valueOf(-c.vy+farNorth));
-	shape.setAttribute(SVGReader._r,String.valueOf(Math.round(c.getSize())));
-	shape.setAttribute(SVGReader._style,shapeColors(c));
-	if (c.getStroke()!=null){
-	    createStrokeInformation(c,shape);
+	private Element createCircle(VCircle c){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._circle);
+		shape.setAttribute(SVGReader._cx,String.valueOf(c.vx+farWest));
+		shape.setAttribute(SVGReader._cy,String.valueOf(-c.vy+farNorth));
+		shape.setAttribute(SVGReader._r,String.valueOf(Math.round(c.getSize())));
+		shape.setAttribute(SVGReader._style,shapeColors(c));
+		if (c.getStroke()!=null){
+			createStrokeInformation(c,shape);
+		}
+		createClassInforation(c, shape);
+		return shape;
 	}
-	return shape;
-    }
 
-    private Element createRect(VRectangle r){
-	if (r.getOrient()==0){
-	    Element shape=svgDoc.createElementNS(svgURI,SVGReader._rect);
-	    shape.setAttribute(SVGReader._x,String.valueOf(r.vx-r.getWidth()+farWest));
-	    shape.setAttribute(SVGReader._y,String.valueOf(-r.vy-r.getHeight()+farNorth));
-	    shape.setAttribute(SVGReader._width,String.valueOf(2*r.getWidth()));
-	    shape.setAttribute(SVGReader._height,String.valueOf(2*r.getHeight()));
-	    shape.setAttribute(SVGReader._style,shapeColors(r));
-	    if (r.getStroke()!=null){
-		createStrokeInformation(r,shape);
-	    }
-	    return shape;
+	private Element createRect(VRectangle r){
+		Element shape;
+		if (r.getOrient()==0){
+			shape = svgDoc.createElementNS(svgURI,SVGReader._rect);
+			shape.setAttribute(SVGReader._x,String.valueOf(r.vx-r.getWidth()+farWest));
+			shape.setAttribute(SVGReader._y,String.valueOf(-r.vy-r.getHeight()+farNorth));
+			shape.setAttribute(SVGReader._width,String.valueOf(2*r.getWidth()));
+			shape.setAttribute(SVGReader._height,String.valueOf(2*r.getHeight()));
+			shape.setAttribute(SVGReader._style,shapeColors(r));
+		}
+		else {
+			shape = svgDoc.createElementNS(svgURI,SVGReader._polygon);
+			double x1=-r.getWidth();
+			double y1=-r.getHeight();
+			double x2=r.getWidth();
+			double y2=r.getHeight();
+			long[] xcoords=new long[4];
+			long[] ycoords=new long[4];
+			xcoords[0]=Math.round((x2*Math.cos(Math.PI-r.getOrient())+y1*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
+			xcoords[1]=Math.round((x1*Math.cos(Math.PI-r.getOrient())+y1*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
+			xcoords[2]=Math.round((x1*Math.cos(Math.PI-r.getOrient())+y2*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
+			xcoords[3]=Math.round((x2*Math.cos(Math.PI-r.getOrient())+y2*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
+			ycoords[0]=-Math.round((y1*Math.cos(Math.PI-r.getOrient())-x2*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
+			ycoords[1]=-Math.round((y1*Math.cos(Math.PI-r.getOrient())-x1*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
+			ycoords[2]=-Math.round((y2*Math.cos(Math.PI-r.getOrient())-x1*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
+			ycoords[3]=-Math.round((y2*Math.cos(Math.PI-r.getOrient())-x2*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
+			shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3]));
+			shape.setAttribute(SVGReader._style,shapeColors(r));
+		}
+		if (r.getStroke() != null){
+			createStrokeInformation(r, shape);
+		}
+		createClassInforation(r, shape);
+		return shape;
 	}
-	else {
-	    Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-	    double x1=-r.getWidth();
-	    double y1=-r.getHeight();
-	    double x2=r.getWidth();
-	    double y2=r.getHeight();
-	    long[] xcoords=new long[4];
-	    long[] ycoords=new long[4];
-	    xcoords[0]=Math.round((x2*Math.cos(Math.PI-r.getOrient())+y1*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
-	    xcoords[1]=Math.round((x1*Math.cos(Math.PI-r.getOrient())+y1*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
-	    xcoords[2]=Math.round((x1*Math.cos(Math.PI-r.getOrient())+y2*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
-	    xcoords[3]=Math.round((x2*Math.cos(Math.PI-r.getOrient())+y2*Math.sin(Math.PI-r.getOrient()))+r.vx)+farWest;
-	    ycoords[0]=-Math.round((y1*Math.cos(Math.PI-r.getOrient())-x2*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
-	    ycoords[1]=-Math.round((y1*Math.cos(Math.PI-r.getOrient())-x1*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
-	    ycoords[2]=-Math.round((y2*Math.cos(Math.PI-r.getOrient())-x1*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
-	    ycoords[3]=-Math.round((y2*Math.cos(Math.PI-r.getOrient())-x2*Math.sin(Math.PI-r.getOrient()))+r.vy)+farNorth;
-	    shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3]));
-	    shape.setAttribute(SVGReader._style,shapeColors(r));
-	    if (r.getStroke()!=null){
-		createStrokeInformation(r,shape);
-	    }
-	    return shape;
-	}
-    }
 
     public String getSVGPathCoordinates(VPath p){
 		return getSVGPathCoordinates(p.getJava2DPathIterator());
@@ -441,6 +449,7 @@ public class SVGWriter {
 		if (p.getStroke()!=null){
 			createStrokeInformation(p,path);
 		}
+		createClassInforation(p, path);
 		return path;
 	}
 
@@ -453,305 +462,324 @@ public class SVGWriter {
 		if (p.getStroke() != null){
 			createStrokeInformation(p, path);
 		}
+		createClassInforation(p, path);
 		return path;
 	}
 
-    private Element createText(VText t){
-	Element text=svgDoc.createElementNS(svgURI,SVGReader._text);
-	text.setAttribute(SVGReader._x,String.valueOf(t.vx+farWest));
-	text.setAttribute(SVGReader._y,String.valueOf(-t.vy+farNorth));
-	if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){text.setAttribute(SVGReader._textanchor,"start");}
-	else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){text.setAttribute(SVGReader._textanchor,"middle");}
-	else if (t.getTextAnchor()==VText.TEXT_ANCHOR_END){text.setAttribute(SVGReader._textanchor,"end");}
-	text.appendChild(svgDoc.createTextNode(t.getText()));
-	Color c=t.getColor();
-	//only fill, do not add stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+") as it creates a wide stroke
-	String style="fill:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
-	if (t.usesSpecialFont()){style=createFontInformation(t.getFont())+";"+style;}
-	text.setAttribute(SVGReader._style,style);
-	return text;
-    }
+	private Element createText(VText t){
+		Element text=svgDoc.createElementNS(svgURI,SVGReader._text);
+		text.setAttribute(SVGReader._x,String.valueOf(t.vx+farWest));
+		text.setAttribute(SVGReader._y,String.valueOf(-t.vy+farNorth));
+		if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){text.setAttribute(SVGReader._textanchor,"start");}
+		else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){text.setAttribute(SVGReader._textanchor,"middle");}
+		else if (t.getTextAnchor()==VText.TEXT_ANCHOR_END){text.setAttribute(SVGReader._textanchor,"end");}
+		text.appendChild(svgDoc.createTextNode(t.getText()));
+		Color c=t.getColor();
+		//only fill, do not add stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+") as it creates a wide stroke
+		String style="fill:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
+		if (t.usesSpecialFont()){style=createFontInformation(t.getFont())+";"+style;}
+		text.setAttribute(SVGReader._style,style);
+		createClassInforation(t, text);
+		return text;
+	}
 
-    private Element createPolygon(VTriangle t){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-	long[] xcoords=new long[3];
-	long[] ycoords=new long[3];
-	long halfEdge=Math.round(0.866f*t.getSize());
-	long thirdHeight=Math.round(0.5f*t.getSize());
-	xcoords[0]=Math.round(t.vx-t.getSize()*Math.sin(Math.PI-t.getOrient()))+farWest;
-	xcoords[1]=Math.round(t.vx-halfEdge*Math.cos(Math.PI-t.getOrient())+thirdHeight*Math.sin(Math.PI-t.getOrient()))+farWest;
-	xcoords[2]=Math.round(t.vx+halfEdge*Math.cos(Math.PI-t.getOrient())+thirdHeight*Math.sin(Math.PI-t.getOrient()))+farWest;
-	ycoords[0]=-Math.round(t.vy-t.getSize()*Math.cos(Math.PI-t.getOrient()))+farNorth;
-	ycoords[1]=-Math.round(t.vy+thirdHeight*Math.cos(Math.PI-t.getOrient())+halfEdge*Math.sin(Math.PI-t.getOrient()))+farNorth;
-	ycoords[2]=-Math.round(t.vy+thirdHeight*Math.cos(Math.PI-t.getOrient())-halfEdge*Math.sin(Math.PI-t.getOrient()))+farNorth;
-	shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2]));
- 	shape.setAttribute(SVGReader._style,shapeColors(t));
-	if (t.getStroke()!=null){
-	    createStrokeInformation(t,shape);
+	private Element createPolygon(VTriangle t){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
+		long[] xcoords=new long[3];
+		long[] ycoords=new long[3];
+		long halfEdge=Math.round(0.866f*t.getSize());
+		long thirdHeight=Math.round(0.5f*t.getSize());
+		xcoords[0]=Math.round(t.vx-t.getSize()*Math.sin(Math.PI-t.getOrient()))+farWest;
+		xcoords[1]=Math.round(t.vx-halfEdge*Math.cos(Math.PI-t.getOrient())+thirdHeight*Math.sin(Math.PI-t.getOrient()))+farWest;
+		xcoords[2]=Math.round(t.vx+halfEdge*Math.cos(Math.PI-t.getOrient())+thirdHeight*Math.sin(Math.PI-t.getOrient()))+farWest;
+		ycoords[0]=-Math.round(t.vy-t.getSize()*Math.cos(Math.PI-t.getOrient()))+farNorth;
+		ycoords[1]=-Math.round(t.vy+thirdHeight*Math.cos(Math.PI-t.getOrient())+halfEdge*Math.sin(Math.PI-t.getOrient()))+farNorth;
+		ycoords[2]=-Math.round(t.vy+thirdHeight*Math.cos(Math.PI-t.getOrient())-halfEdge*Math.sin(Math.PI-t.getOrient()))+farNorth;
+		shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2]));
+		shape.setAttribute(SVGReader._style,shapeColors(t));
+		if (t.getStroke()!=null){
+			createStrokeInformation(t,shape);
+		}
+		createClassInforation(t, shape);
+		return shape;
 	}
-	return shape;
-    }
 
-    private Element createPolygon(VDiamond d){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-	long[] xcoords=new long[4];
-	long[] ycoords=new long[4];
-	xcoords[0]=Math.round(d.vx+d.getSize()*Math.cos(Math.PI-d.getOrient()))+farWest;
-	xcoords[1]=Math.round(d.vx-d.getSize()*Math.sin(Math.PI-d.getOrient()))+farWest;
-	xcoords[2]=Math.round(d.vx-d.getSize()*Math.cos(Math.PI-d.getOrient()))+farWest;
-	xcoords[3]=Math.round(d.vx+d.getSize()*Math.sin(Math.PI-d.getOrient()))+farWest;
-	ycoords[0]=-Math.round(d.vy-d.getSize()*Math.sin(Math.PI-d.getOrient()))+farNorth;
-	ycoords[1]=-Math.round(d.vy-d.getSize()*Math.cos(Math.PI-d.getOrient()))+farNorth;
-	ycoords[2]=-Math.round(d.vy+d.getSize()*Math.sin(Math.PI-d.getOrient()))+farNorth;
-	ycoords[3]=-Math.round(d.vy+d.getSize()*Math.cos(Math.PI-d.getOrient()))+farNorth;
-	shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3]));
- 	shape.setAttribute(SVGReader._style,shapeColors(d));
-	if (d.getStroke()!=null){
-	    createStrokeInformation(d,shape);
+	private Element createPolygon(VDiamond d){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
+		long[] xcoords=new long[4];
+		long[] ycoords=new long[4];
+		xcoords[0]=Math.round(d.vx+d.getSize()*Math.cos(Math.PI-d.getOrient()))+farWest;
+		xcoords[1]=Math.round(d.vx-d.getSize()*Math.sin(Math.PI-d.getOrient()))+farWest;
+		xcoords[2]=Math.round(d.vx-d.getSize()*Math.cos(Math.PI-d.getOrient()))+farWest;
+		xcoords[3]=Math.round(d.vx+d.getSize()*Math.sin(Math.PI-d.getOrient()))+farWest;
+		ycoords[0]=-Math.round(d.vy-d.getSize()*Math.sin(Math.PI-d.getOrient()))+farNorth;
+		ycoords[1]=-Math.round(d.vy-d.getSize()*Math.cos(Math.PI-d.getOrient()))+farNorth;
+		ycoords[2]=-Math.round(d.vy+d.getSize()*Math.sin(Math.PI-d.getOrient()))+farNorth;
+		ycoords[3]=-Math.round(d.vy+d.getSize()*Math.cos(Math.PI-d.getOrient()))+farNorth;
+		shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3]));
+		shape.setAttribute(SVGReader._style,shapeColors(d));
+		if (d.getStroke()!=null){
+			createStrokeInformation(d,shape);
+		}
+		createClassInforation(d, shape);
+		return shape;
 	}
-	return shape;
-    }
 
-    private Element createPolygon(VOctagon o){//svg output seems to be slightly bigger than it should be
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);//don't know why yet
-	long[] xcoords=new long[8];
-	long[] ycoords=new long[8];
-	float halfs=o.getSize()/2.0f;
-	xcoords[0]=Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[1]=Math.round((halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[2]=Math.round((-halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[3]=Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[4]=Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[5]=Math.round((-halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[6]=Math.round((halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	xcoords[7]=Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-	ycoords[0]=-Math.round((-halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[1]=-Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[2]=-Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[3]=-Math.round((-halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[4]=-Math.round((halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[5]=-Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[6]=-Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	ycoords[7]=-Math.round((halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-	shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3])+" "+String.valueOf(xcoords[4])+","+String.valueOf(ycoords[4])+" "+String.valueOf(xcoords[5])+","+String.valueOf(ycoords[5])+" "+String.valueOf(xcoords[6])+","+String.valueOf(ycoords[6])+" "+String.valueOf(xcoords[7])+","+String.valueOf(ycoords[7]));
- 	shape.setAttribute(SVGReader._style,shapeColors(o));
-	if (o.getStroke()!=null){
-	    createStrokeInformation(o,shape);
+	private Element createPolygon(VOctagon o){
+		//svg output seems to be slightly bigger than it should be
+		//don't know why yet
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
+		long[] xcoords=new long[8];
+		long[] ycoords=new long[8];
+		float halfs=o.getSize()/2.0f;
+		xcoords[0]=Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[1]=Math.round((halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[2]=Math.round((-halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[3]=Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[4]=Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[5]=Math.round((-halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[6]=Math.round((halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		xcoords[7]=Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
+		ycoords[0]=-Math.round((-halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[1]=-Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[2]=-Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[3]=-Math.round((-halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[4]=-Math.round((halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[5]=-Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[6]=-Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		ycoords[7]=-Math.round((halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
+		shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3])+" "+String.valueOf(xcoords[4])+","+String.valueOf(ycoords[4])+" "+String.valueOf(xcoords[5])+","+String.valueOf(ycoords[5])+" "+String.valueOf(xcoords[6])+","+String.valueOf(ycoords[6])+" "+String.valueOf(xcoords[7])+","+String.valueOf(ycoords[7]));
+		shape.setAttribute(SVGReader._style,shapeColors(o));
+		if (o.getStroke()!=null){
+			createStrokeInformation(o,shape);
+		}
+		createClassInforation(o, shape);
+		return shape;
 	}
-	return shape;
-    }
 
-    private Element createPoint(VPoint p){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._rect);
-	shape.setAttribute(SVGReader._x,String.valueOf(p.vx+farWest));
-	shape.setAttribute(SVGReader._y,String.valueOf(-p.vy+farNorth));
-	shape.setAttribute(SVGReader._width,"1");
-	shape.setAttribute(SVGReader._height,"1");
-	Color c=p.getColor();
-	shape.setAttribute(SVGReader._style,"stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")");
-	return shape;
-    }
+	private Element createPoint(VPoint p){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._rect);
+		shape.setAttribute(SVGReader._x,String.valueOf(p.vx+farWest));
+		shape.setAttribute(SVGReader._y,String.valueOf(-p.vy+farNorth));
+		shape.setAttribute(SVGReader._width,"1");
+		shape.setAttribute(SVGReader._height,"1");
+		Color c=p.getColor();
+		shape.setAttribute(SVGReader._style,"stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")");
+		createClassInforation(p, shape);
+		return shape;
+	}
 
-    private Element createLine(VSegment s){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._line);
-	LongPoint[] endPoints = s.getEndPoints();
-	shape.setAttribute("x1", String.valueOf(endPoints[0].x+farWest));
-	shape.setAttribute("y1", String.valueOf(-endPoints[0].y+farNorth));
-	shape.setAttribute("x2", String.valueOf(endPoints[1].x+farWest));
-	shape.setAttribute("y2", String.valueOf(-endPoints[1].y+farNorth));
-	Color c=s.getColor();
-	shape.setAttribute(SVGReader._style,"stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")");
-	if (s.getStroke()!=null){
-	    createStrokeInformation(s,shape);
+	private Element createLine(VSegment s){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._line);
+		LongPoint[] endPoints = s.getEndPoints();
+		shape.setAttribute("x1", String.valueOf(endPoints[0].x+farWest));
+		shape.setAttribute("y1", String.valueOf(-endPoints[0].y+farNorth));
+		shape.setAttribute("x2", String.valueOf(endPoints[1].x+farWest));
+		shape.setAttribute("y2", String.valueOf(-endPoints[1].y+farNorth));
+		Color c=s.getColor();
+		shape.setAttribute(SVGReader._style,"stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")");
+		if (s.getStroke()!=null){
+			createStrokeInformation(s,shape);
+		}
+		createClassInforation(s, shape);
+		return shape;
 	}
-	return shape;
-    }
 
-    private Element createPolygon(VShape s){
-	Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-	float[] vertices=s.getVertices();
-	double vertexAngle=-s.getOrient();
-	long[] xcoords=new long[vertices.length];
-	long[] ycoords=new long[vertices.length];
-	for (int j=0;j<vertices.length;j++){
-	    xcoords[j]=Math.round(s.vx+s.getSize()*Math.cos(vertexAngle)*vertices[j])+farWest;
-	    ycoords[j]=-Math.round(s.vy-s.getSize()*Math.sin(vertexAngle)*vertices[j])+farNorth;
-	    vertexAngle-=2*Math.PI/vertices.length;
+	private Element createPolygon(VShape s){
+		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
+		float[] vertices=s.getVertices();
+		double vertexAngle=-s.getOrient();
+		long[] xcoords=new long[vertices.length];
+		long[] ycoords=new long[vertices.length];
+		for (int j=0;j<vertices.length;j++){
+			xcoords[j]=Math.round(s.vx+s.getSize()*Math.cos(vertexAngle)*vertices[j])+farWest;
+			ycoords[j]=-Math.round(s.vy-s.getSize()*Math.sin(vertexAngle)*vertices[j])+farNorth;
+			vertexAngle-=2*Math.PI/vertices.length;
+		}
+		String coords="";
+		for (int j=0;j<vertices.length-1;j++){
+			coords+=String.valueOf(xcoords[j])+","+String.valueOf(ycoords[j])+" ";
+		}//last point outside loop just to avoid white space char at end of attrib value
+		coords+=String.valueOf(xcoords[vertices.length-1])+","+String.valueOf(ycoords[vertices.length-1]);
+		shape.setAttribute(SVGReader._points,coords);
+		shape.setAttribute(SVGReader._style,shapeColors(s));
+		if (s.getStroke()!=null){
+			createStrokeInformation(s,shape);
+		}
+		createClassInforation(s, shape);
+		return shape;
 	}
-	String coords="";
-	for (int j=0;j<vertices.length-1;j++){
-	    coords+=String.valueOf(xcoords[j])+","+String.valueOf(ycoords[j])+" ";
-	}//last point outside loop just to avoid white space char at end of attrib value
-	coords+=String.valueOf(xcoords[vertices.length-1])+","+String.valueOf(ycoords[vertices.length-1]);
-	shape.setAttribute(SVGReader._points,coords);
- 	shape.setAttribute(SVGReader._style,shapeColors(s));
-	if (s.getStroke()!=null){
-	    createStrokeInformation(s,shape);
-	}
-	return shape;
-    }
 
-    private Element createPolygon(VPolygon p){
-	Element polygon=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-	LongPoint[] vertices=p.getVertices();
-	long[] xcoords=new long[vertices.length];
-	long[] ycoords=new long[vertices.length];
-	for (int j=0;j<vertices.length;j++){
-	    xcoords[j]=Math.round(p.vx+vertices[j].x)+farWest;
-	    ycoords[j]=-Math.round(p.vy+vertices[j].y)+farNorth;
+	private Element createPolygon(VPolygon p){
+		Element polygon=svgDoc.createElementNS(svgURI,SVGReader._polygon);
+		LongPoint[] vertices=p.getVertices();
+		long[] xcoords=new long[vertices.length];
+		long[] ycoords=new long[vertices.length];
+		for (int j=0;j<vertices.length;j++){
+			xcoords[j]=Math.round(p.vx+vertices[j].x)+farWest;
+			ycoords[j]=-Math.round(p.vy+vertices[j].y)+farNorth;
+		}
+		String coords="";
+		for (int j=0;j<vertices.length-1;j++){
+			coords+=String.valueOf(xcoords[j])+","+String.valueOf(ycoords[j])+" ";
+		}//last point outside loop just to avoid white space char at end of attrib value
+		coords+=String.valueOf(xcoords[vertices.length-1])+","+String.valueOf(ycoords[vertices.length-1]);
+		polygon.setAttribute(SVGReader._points,coords);
+		polygon.setAttribute(SVGReader._style,shapeColors(p));
+		if (p.getStroke()!=null){
+			createStrokeInformation(p,polygon);
+		}
+		createClassInforation(p, polygon);
+		return polygon;
 	}
-	String coords="";
-	for (int j=0;j<vertices.length-1;j++){
-	    coords+=String.valueOf(xcoords[j])+","+String.valueOf(ycoords[j])+" ";
-	}//last point outside loop just to avoid white space char at end of attrib value
-	coords+=String.valueOf(xcoords[vertices.length-1])+","+String.valueOf(ycoords[vertices.length-1]);
-	polygon.setAttribute(SVGReader._points,coords);
- 	polygon.setAttribute(SVGReader._style,shapeColors(p));
-	if (p.getStroke()!=null){
-	    createStrokeInformation(p,polygon);
-	}
-	return polygon;
-    }
 
-    /*
-      We need to dump the image itself as an external PNG or JPEG
-      file and reference it using the xlink:href attribute
-    */
-    private Element createImage(VImage i){
-	Element shape;
-	try {
-	    shape=svgDoc.createElementNS(svgURI,SVGReader._image);
-	    shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()+farWest));
-	    shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()+farNorth));
-	    shape.setAttribute(SVGReader._width,String.valueOf(2*i.getWidth()));
-	    shape.setAttribute(SVGReader._height,String.valueOf(2*i.getHeight()));
-	    Image im=i.getImage();
-	    ImageWriter writer=(ImageWriter)ImageIO.getImageWritersByFormatName("png").next();
-	    File f=null;
-	    //create a subdirectory based on the main SVG file name, removing extension (probably .svg) and appending "_files"
-	    if (img_subdir==null || !img_subdir.exists() || !img_subdir.isDirectory()){
-		String dirName=destination.getName();
-		int lio;
-		if ((lio=dirName.lastIndexOf("."))>0){dirName=dirName.substring(0,lio);}
-		dirName+="_files";
-		img_subdir=new File(destination.getParentFile(),dirName);
-		img_subdir.mkdirs();
-	    }
-	    if (bitmapImages.containsKey(im)){
-		f=(File)bitmapImages.get(im);
-	    }
-	    else {
-		f=File.createTempFile("zvtm",".png",img_subdir);
-		writer.setOutput(ImageIO.createImageOutputStream(f));
-		BufferedImage bi=new BufferedImage(im.getWidth(null),im.getHeight(null),BufferedImage.TYPE_INT_ARGB);
-		(bi.createGraphics()).drawImage(im,null,null);
-		writer.write(bi);
-		bitmapImages.put(im,f);
-	    }
-	    shape.setAttributeNS(xlinkURI,"xlink:href",img_subdir.getName()+"/"+f.getName());  //relative URI as the png files are supposed
-            //to be in img_subdir w.r.t the SVG file
+	/*
+		We need to dump the image itself as an external PNG or JPEG
+		file and reference it using the xlink:href attribute
+		*/
+	private Element createImage(VImage i){
+		Element shape;
+		try {
+			shape=svgDoc.createElementNS(svgURI,SVGReader._image);
+			shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()+farWest));
+			shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()+farNorth));
+			shape.setAttribute(SVGReader._width,String.valueOf(2*i.getWidth()));
+			shape.setAttribute(SVGReader._height,String.valueOf(2*i.getHeight()));
+			Image im=i.getImage();
+			ImageWriter writer=(ImageWriter)ImageIO.getImageWritersByFormatName("png").next();
+			File f=null;
+			//create a subdirectory based on the main SVG file name, removing extension (probably .svg) and appending "_files"
+			if (img_subdir==null || !img_subdir.exists() || !img_subdir.isDirectory()){
+				String dirName=destination.getName();
+				int lio;
+				if ((lio=dirName.lastIndexOf("."))>0){dirName=dirName.substring(0,lio);}
+				dirName+="_files";
+				img_subdir=new File(destination.getParentFile(),dirName);
+				img_subdir.mkdirs();
+			}
+			if (bitmapImages.containsKey(im)){
+				f=(File)bitmapImages.get(im);
+			}
+			else {
+				f=File.createTempFile("zvtm",".png",img_subdir);
+				writer.setOutput(ImageIO.createImageOutputStream(f));
+				BufferedImage bi=new BufferedImage(im.getWidth(null),im.getHeight(null),BufferedImage.TYPE_INT_ARGB);
+				(bi.createGraphics()).drawImage(im,null,null);
+				writer.write(bi);
+				bitmapImages.put(im,f);
+			}
+			shape.setAttributeNS(xlinkURI,"xlink:href",img_subdir.getName()+"/"+f.getName());  //relative URI as the png files are supposed
+			//to be in img_subdir w.r.t the SVG file
+		}
+		catch (Exception ex){
+			shape=svgDoc.createElementNS(svgURI,SVGReader._rect);
+			shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()+farWest));
+			shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()+farNorth));
+			shape.setAttribute(SVGReader._width,String.valueOf(2*i.getWidth()));
+			shape.setAttribute(SVGReader._height,String.valueOf(2*i.getHeight()));
+			System.err.println("SVGWriter:An error occured while exporting "+i.toString()+" to PNG.\n"+ex);
+			if (!Utilities.javaVersionIs140OrLater()){
+				System.err.println("ZVTM/SVGWriter:Error: the Java Virtual Machine in use seems to be older than version 1.4.0 ; package javax.imageio is probably missing, which prevents generating bitmap files for representing VImage objects. Install a JVM version 1.4.0 or later if you want to use this functionality.");
+			}
+			ex.printStackTrace();
+		}
+		createClassInforation(i, shape);
+		return shape;
 	}
-	catch (Exception ex){
-	    shape=svgDoc.createElementNS(svgURI,SVGReader._rect);
-	    shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()+farWest));
-	    shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()+farNorth));
-	    shape.setAttribute(SVGReader._width,String.valueOf(2*i.getWidth()));
-	    shape.setAttribute(SVGReader._height,String.valueOf(2*i.getHeight()));
-	    System.err.println("SVGWriter:An error occured while exporting "+i.toString()+" to PNG.\n"+ex);
-	    if (!Utilities.javaVersionIs140OrLater()){
-		System.err.println("ZVTM/SVGWriter:Error: the Java Virtual Machine in use seems to be older than version 1.4.0 ; package javax.imageio is probably missing, which prevents generating bitmap files for representing VImage objects. Install a JVM version 1.4.0 or later if you want to use this functionality.");
-	    }
-	    ex.printStackTrace();
-	}
-	return shape;
-    }
 
-    //boolean shapes are saved as closed general paths.
-    private Element createPath(VBoolShape s){
-	Element path=svgDoc.createElementNS(svgURI,SVGReader._path);
-	Area area;
-	switch (s.getMainShapeType()) {
-	case 1:{//ellipse
-	    area=new Area(new Ellipse2D.Float(s.vx-s.getWidth()/2,-s.vy-s.getHeight()/2,s.getWidth(),s.getHeight()));
-	    break;
+	//boolean shapes are saved as closed general paths.
+	private Element createPath(VBoolShape s){
+		Element path=svgDoc.createElementNS(svgURI,SVGReader._path);
+		Area area;
+		switch (s.getMainShapeType()) {
+			case 1:{
+				//ellipse
+				area=new Area(new Ellipse2D.Float(s.vx-s.getWidth()/2,-s.vy-s.getHeight()/2,s.getWidth(),s.getHeight()));
+				break;
+			}
+			case 2:{
+				//rectangle
+				area=new Area(new Rectangle2D.Float(s.vx-s.getWidth()/2,-s.vy-s.getHeight()/2,s.getWidth(),s.getHeight()));
+				break;
+			}
+			default:{
+				//ellipse as default
+				area=new Area(new Ellipse2D.Float(s.vx-s.getWidth()/2,-s.vy-s.getHeight()/2,s.getWidth(),s.getHeight()));
+			}
+		}
+		BooleanOps[] ops=s.getOperations();
+		for (int j=0;j<ops.length;j++){
+			switch (ops[j].opType) {
+				case 1:{
+					area.add(getJ2DShape(ops[j],s.vx,-s.vy));
+					break;
+				}
+				case 2:{
+					area.subtract(getJ2DShape(ops[j],s.vx,-s.vy));
+					break;
+				}
+				case 3:{
+					area.intersect(getJ2DShape(ops[j],s.vx,-s.vy));
+					break;
+				}
+				case 4:{
+					area.exclusiveOr(getJ2DShape(ops[j],s.vx,-s.vy));
+					break;
+				}
+			}
+		}
+		StringBuffer coords=new StringBuffer();
+		PathIterator pi=area.getPathIterator(null);
+		float[] seg=new float[6];
+		int type;
+		char lastOp='Z';
+		//anything but M, L, Q, C since we want the first command to explicitely appear in any case
+		while (!pi.isDone()){
+			//save the path as a sequence of instructions following the SVG model for "d" attributes
+			type=pi.currentSegment(seg);
+			switch (type){
+				case java.awt.geom.PathIterator.SEG_MOVETO:{
+					if (lastOp!='M'){coords.append('M');} else {coords.append(' ');}
+					lastOp='M';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_LINETO:{
+					if (lastOp!='L'){coords.append('L');} else {coords.append(' ');}
+					lastOp='L';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_QUADTO:{
+					if (lastOp!='Q'){coords.append('Q');} else {coords.append(' ');}
+					lastOp='Q';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_CUBICTO:{
+					if (lastOp!='C'){coords.append('C');} else {coords.append(' ');}
+					lastOp='C';
+					coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth)+" "+abl2c(seg[4]+farWest)+" "+abl2c(seg[5]+farNorth));
+					break;
+				}
+				case java.awt.geom.PathIterator.SEG_CLOSE:{
+					//should only happen as the last instruction
+					coords.append('Z');
+					break;
+				}
+			}
+			pi.next();
+		}
+		path.setAttribute(SVGReader._d,coords.toString());
+		path.setAttribute(SVGReader._style,shapeColors(s));
+		if (s.getStroke()!=null){
+			createStrokeInformation(s,path);
+		}
+		createClassInforation(s, path);
+		return path;
 	}
-	case 2:{//rectangle
-	    area=new Area(new Rectangle2D.Float(s.vx-s.getWidth()/2,-s.vy-s.getHeight()/2,s.getWidth(),s.getHeight()));
-	    break;
-	}
-	default:{//ellipse as default
-	    area=new Area(new Ellipse2D.Float(s.vx-s.getWidth()/2,-s.vy-s.getHeight()/2,s.getWidth(),s.getHeight()));
-	}
-	}
-	BooleanOps[] ops=s.getOperations();
-	for (int j=0;j<ops.length;j++){
-	    switch (ops[j].opType) {
-	    case 1:{
-		area.add(getJ2DShape(ops[j],s.vx,-s.vy));
-		break;
-	    }
-	    case 2:{
-		area.subtract(getJ2DShape(ops[j],s.vx,-s.vy));
-		break;
-	    }
-	    case 3:{
-		area.intersect(getJ2DShape(ops[j],s.vx,-s.vy));
-		break;
-	    }
-	    case 4:{
-		area.exclusiveOr(getJ2DShape(ops[j],s.vx,-s.vy));
-		break;
-	    }
-	    }
-	}
-	StringBuffer coords=new StringBuffer();
-	PathIterator pi=area.getPathIterator(null);
-	float[] seg=new float[6];
-	int type;
-	char lastOp='Z';  //anything but M, L, Q, C since we want the first command to explicitely appear in any case
-	while (!pi.isDone()){//save the path as a sequence of instructions following the SVG model for "d" attributes
-	    type=pi.currentSegment(seg);
-	    switch (type){
-	    case java.awt.geom.PathIterator.SEG_MOVETO:{
-		if (lastOp!='M'){coords.append('M');} else {coords.append(' ');}
-		lastOp='M';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_LINETO:{
-		if (lastOp!='L'){coords.append('L');} else {coords.append(' ');}
-		lastOp='L';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_QUADTO:{
-		if (lastOp!='Q'){coords.append('Q');} else {coords.append(' ');}
-		lastOp='Q';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_CUBICTO:{
-		if (lastOp!='C'){coords.append('C');} else {coords.append(' ');}
-		lastOp='C';
-		coords.append(abl2c(seg[0]+farWest)+" "+abl2c(seg[1]+farNorth)+" "+abl2c(seg[2]+farWest)+" "+abl2c(seg[3]+farNorth)+" "+abl2c(seg[4]+farWest)+" "+abl2c(seg[5]+farNorth));
-		break;
-	    }
-	    case java.awt.geom.PathIterator.SEG_CLOSE:{//should only happen as the last instruction
-		coords.append('Z');
-		break;
-	    }
-	    }
-	    pi.next();
-	}
-	path.setAttribute(SVGReader._d,coords.toString());
- 	path.setAttribute(SVGReader._style,shapeColors(s));
-	if (s.getStroke()!=null){
-	    createStrokeInformation(s,path);
-	}
-	return path;
-    }
 
-    private Area getJ2DShape(BooleanOps ops,long x,long y){
+	private Area getJ2DShape(BooleanOps ops,long x,long y){
 	switch (ops.shapeType) {
 	case 1:{//ellipse
 	    return new Area(new Ellipse2D.Float(x+(ops.ox-ops.szx/2),y-(ops.oy+ops.szy/2),ops.szx,ops.szy));
