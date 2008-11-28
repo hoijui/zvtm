@@ -255,7 +255,7 @@ public class Viewer implements Java2DPainter {
 	
 	void reset(){
 		sm.reset();
-		vsm.destroyGlyphsInSpace(mSpaceName);
+		vsm.removeGlyphsFromSpace(mSpaceName);
 	}
 	
 	void openFile(){

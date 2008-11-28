@@ -85,7 +85,7 @@ public class ImageDescription extends ObjectDescription {
                     new ImageHideAction(vs));
             }
             else {
-                vs.destroyGlyph(glyph);
+                vs.removeGlyph(glyph);
                 glyph.getImage().flush();
             }
             glyph = null;
@@ -117,7 +117,7 @@ class ImageHideAction implements PostAnimationAction {
     
     public void animationEnded(Object target, short type, String dimension){
 	try {
-	    vs.destroyGlyph((Glyph)target);
+	    vs.removeGlyph((Glyph)target);
 	    ((VImageST)target).getImage().flush();
 	}
 	catch(ArrayIndexOutOfBoundsException ex){
@@ -128,7 +128,7 @@ class ImageHideAction implements PostAnimationAction {
 
     public void recoverFailingAnimationEnded(Object target, short type, String dimension){
 	try {
-	    vs.destroyGlyph((Glyph)target);
+	    vs.removeGlyph((Glyph)target);
 	    ((VImageST)target).getImage().flush();
 	}
 	catch(ArrayIndexOutOfBoundsException ex){

@@ -93,7 +93,7 @@ public class TextDescription extends ObjectDescription {
                     new TextHideAction(vs));
             }
             else {
-                vs.destroyGlyph(glyph);
+                vs.removeGlyph(glyph);
             }
             glyph = null;
         }
@@ -146,7 +146,7 @@ class TextHideAction implements PostAnimationAction {
     
     public void animationEnded(Object target, short type, String dimension){
 	try {
-	    vs.destroyGlyph((Glyph)target);
+	    vs.removeGlyph((Glyph)target);
 	}
 	catch(ArrayIndexOutOfBoundsException ex){
 	    System.err.println("Warning: attempt at destroying text " + ((Glyph)target).getID() + " failed. Trying one more time.");
@@ -156,7 +156,7 @@ class TextHideAction implements PostAnimationAction {
 
     public void recoverFailingAnimationEnded(Object target, short type, String dimension){
 	try {
-	    vs.destroyGlyph((Glyph)target);
+	    vs.removeGlyph((Glyph)target);
 	}
 	catch(ArrayIndexOutOfBoundsException ex){
 	    System.err.println("Warning: attempt at destroying text " + ((Glyph)target).getID() + " failed. Giving up.");

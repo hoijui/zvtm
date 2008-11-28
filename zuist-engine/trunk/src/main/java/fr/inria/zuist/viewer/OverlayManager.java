@@ -114,20 +114,20 @@ class OverlayManager implements ViewEventHandler {
         if (showingAbout){
             showingAbout = false;
             if (insituLogo != null){
-                application.ovSpace.destroyGlyph(insituLogo);
+                application.ovSpace.removeGlyph(insituLogo);
                 insituLogo = null;
             }
             if (inriaLogo != null){
-                application.ovSpace.destroyGlyph(inriaLogo);
+                application.ovSpace.removeGlyph(inriaLogo);
                 inriaLogo = null;
             }
             if (fadeAbout != null){
-                application.ovSpace.destroyGlyph(fadeAbout);
+                application.ovSpace.removeGlyph(fadeAbout);
                 fadeAbout = null;
             }
 			for (int i=0;i<aboutLines.length;i++){
 	            if (aboutLines[i] != null){
-	                application.ovSpace.destroyGlyph(aboutLines[i]);
+	                application.ovSpace.removeGlyph(aboutLines[i]);
 	                aboutLines[i] = null;
 	            }				
 			}
