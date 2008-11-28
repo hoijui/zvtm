@@ -31,16 +31,20 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.BufferedInputStream;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VPath;
+import com.xerox.VTM.svg.SVGWriter;
 import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
@@ -62,6 +66,14 @@ import edu.uci.ics.jung.graph.decorators.EdgeShape;
 
 import edu.uci.ics.jung.graph.decorators.EdgeShape;
 import edu.uci.ics.jung.graph.decorators.EdgeShapeFunction;
+
+import org.apache.xml.serialize.LineSeparator;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.apache.xml.serialize.DOMSerializer;
+import org.apache.xerces.dom.DOMImplementationImpl;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class Viewer extends JFrame {
 	
@@ -122,15 +134,16 @@ public class Viewer extends JFrame {
 		mCamera.moveTo(0, 0);
 		mCamera.setAltitude(CAM_ALT);
 		
-		double angle = 0;
-		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
-			long x = (long) (TARGET_R_POS * Math.cos(angle));
-			long y = (long) (TARGET_R_POS * Math.sin(angle));
-			Glyph g = new VCircle(x, y, 0, NODE_SIZE, Color.RED);
-			vsm.addGlyph(g, mSpaceName);
-			if (i % 2 == 0){angle += Math.PI;}
-			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
-		}
+//		double angle = 0;
+//		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
+//			long x = (long) (TARGET_R_POS * Math.cos(angle));
+//			long y = (long) (TARGET_R_POS * Math.sin(angle));
+//			Glyph g = new VCircle(x, y, 0, Math.round(NODE_SIZE*1.1), Color.RED);
+//			vsm.addGlyph(g, mSpaceName);
+//			if (i % 2 == 0){angle += Math.PI;}
+//			else {angle += 2 * Math.PI / ((double)NB_TARGETS_PER_TRIAL) - Math.PI;}
+//			g.setType("del");
+//		}
 		
 		
 		vsm.repaintNow();
@@ -206,6 +219,7 @@ public class Viewer extends JFrame {
 			Coordinates c = layout.getCoordinates(v);
 			VCircle cl = new VCircle((int)c.getX(), (int)c.getY(), 0, NODE_SIZE, Color.WHITE);
 			vsm.addGlyph(cl, mSpaceName);
+			cl.setMouseInsideHighlightColor(Color.RED);
 			vertex2glyph.put(v, cl);
 			cl.setOwner(v);
 		}
@@ -233,6 +247,28 @@ public class Viewer extends JFrame {
 		}
 	}
 	
+	void updateEdges(Glyph n){
+		Vertex v = (Vertex)n.getOwner();
+		Vertex oe;
+		Edge e;
+		Glyph oen;
+		Iterator i = v.getIncidentEdges().iterator();
+		switch (EDGE_SHAPE){
+			case EdgeTransformer.EDGE_LINE:{
+				while (i.hasNext()){
+					e = (Edge)i.next();
+					oe = e.getOpposite(v);
+					oen = (Glyph)vertex2glyph.get(oe);
+					DPath p = (DPath)edge2glyph.get(e);
+					LongPoint[] coords = {new LongPoint(Math.round(n.vx), Math.round(n.vy)),
+						                  new LongPoint(Math.round(oen.vx), Math.round(oen.vy))};
+					p.edit(coords, true);					
+				}
+				break;
+			}
+		}
+	}
+	
 	void translateGraph(long x, long y){
 		for (Enumeration e=vertex2glyph.elements();e.hasMoreElements();){
 			((Glyph)e.nextElement()).move(x, y);
@@ -242,6 +278,21 @@ public class Viewer extends JFrame {
 		}
 	}
 	
+    static final String SVG_OUTPUT_ENCODING = "UTF-8";
+	
+	void exportSVG(){
+		File f = new File("eval.svg");
+		Document d = (new SVGWriter()).exportVirtualSpace(mSpace, new DOMImplementationImpl(), f);
+		OutputFormat format=new OutputFormat(d, SVG_OUTPUT_ENCODING, true);
+	 	format.setLineSeparator(LineSeparator.Web);
+		try {
+		    OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(f), SVG_OUTPUT_ENCODING);
+		    DOMSerializer serializer = (new XMLSerializer(osw, format)).asDOMSerializer();
+		    serializer.serialize(d);
+		}
+		catch (IOException e){e.printStackTrace();}
+	}
+	
 	public static void main(String[] args){
 		new Viewer(args[0], Short.parseShort(args[1]), Short.parseShort(args[2]));
 	}
@@ -249,10 +300,14 @@ public class Viewer extends JFrame {
 }
 
 class ViewerEventHandler implements ViewEventHandler {
+	
+	int bob = 0;
 
 	Viewer application;
 	
 	int lastJPX, lastJPY;
+
+	Glyph draggedNode = null;
 	
 	ViewerEventHandler(Viewer app){
 		this.application = app;
@@ -261,30 +316,39 @@ class ViewerEventHandler implements ViewEventHandler {
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		Glyph g = v.lastGlyphEntered();
 		if (g != null){
-			application.vsm.stickToMouse(g);
+			draggedNode = g;
+			application.vsm.stickToMouse(draggedNode);
 		}
 	}
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		application.vsm.unstickFromMouse();
-		
+		draggedNode = null;
 	}
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		Vector v1 = v.getMouse().getIntersectingPaths(application.mCamera, 10);
-		if (v1 != null && !v1.isEmpty()){
-			Glyph g = (Glyph)v1.firstElement();
-			System.out.println(g);
-			application.mSpace.destroyGlyph(g);
-		}
-		
+//		Vector v1 = v.getMouse().getIntersectingPaths(application.mCamera, 10);
+//		if (v1 != null && !v1.isEmpty()){
+//			Glyph g = (Glyph)v1.firstElement();
+//			System.out.println(g);
+//			application.mSpace.destroyGlyph(g);
+//		}
 	}
 
-    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){	
+//		Glyph g = v.lastGlyphEntered();
+//		if (g != null){
+//			g.setColor(Color.YELLOW);
+//			g.setType("target_"+bob);
+//			bob++;
+//		}
+//	
+	}
 
-    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX=jpx;
@@ -321,7 +385,10 @@ class ViewerEventHandler implements ViewEventHandler {
                 application.vsm.animator.Aspeed=0;
             }
         }
-    }
+		else if (draggedNode != null){
+			application.updateEdges(draggedNode);
+		}
+	}
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         Camera c = application.vsm.getActiveCamera();
@@ -349,10 +416,17 @@ class ViewerEventHandler implements ViewEventHandler {
     
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if (code == KeyEvent.VK_SPACE){application.updateLayout();}
-		else if (code == KeyEvent.VK_LEFT){application.translateGraph(-Viewer.TARGET_R_POS/8, 0);}
-		else if (code == KeyEvent.VK_RIGHT){application.translateGraph(Viewer.TARGET_R_POS/8, 0);}
-		else if (code == KeyEvent.VK_UP){application.translateGraph(0, Viewer.TARGET_R_POS/8);}
-		else if (code == KeyEvent.VK_DOWN){application.translateGraph(0, -Viewer.TARGET_R_POS/8);}
+		else if (code == KeyEvent.VK_LEFT){application.translateGraph(-Viewer.TARGET_R_POS/16, 0);}
+		else if (code == KeyEvent.VK_RIGHT){application.translateGraph(Viewer.TARGET_R_POS/16, 0);}
+		else if (code == KeyEvent.VK_UP){application.translateGraph(0, Viewer.TARGET_R_POS/16);}
+		else if (code == KeyEvent.VK_DOWN){application.translateGraph(0, -Viewer.TARGET_R_POS/16);}
+		else if (code == KeyEvent.VK_DELETE){
+			Glyph g = v.lastGlyphEntered();
+			if (g != null){
+				application.mSpace.destroyGlyph(g);
+			}
+		}
+		else if (code == KeyEvent.VK_E){application.exportSVG();}
 	}
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
