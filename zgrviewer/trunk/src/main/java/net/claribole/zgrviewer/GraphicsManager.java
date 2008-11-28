@@ -270,17 +270,17 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	this.cfgMngr = cm;
     }
 
-    void reset(){
-	vsm.destroyGlyphsInSpace(mainSpace);
-	vsm.addGlyph(magWindow, mSpace);
-	mSpace.hide(magWindow);
-	previousLocations.removeAllElements();
-	highlightedEdges.removeAllElements();
-	highlightedNodes.removeAllElements();
-	originalEdgeColor.removeAllElements();
-	originalNodeFillColor.removeAllElements();
-	originalNodeBorderColor.removeAllElements();
-    }
+	void reset(){
+		vsm.removeGlyphsFromSpace(mainSpace);
+		vsm.addGlyph(magWindow, mSpace);
+		mSpace.hide(magWindow);
+		previousLocations.removeAllElements();
+		highlightedEdges.removeAllElements();
+		highlightedNodes.removeAllElements();
+		originalEdgeColor.removeAllElements();
+		originalNodeFillColor.removeAllElements();
+		originalNodeBorderColor.removeAllElements();
+	}
 
     void initDM(){
 	magWindow = new VRectangle(0, 0, 0, 1, 1, GraphicsManager.DM_COLOR);
