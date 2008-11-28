@@ -184,7 +184,7 @@ public class OverlayManager {
         }
         else {
             for (int i=0;i<links.length;i++){
-                application.ovSpace.destroyGlyph(links[i]);
+                application.ovSpace.removeGlyph(links[i]);
             }            
         }
         fadedRegion.setVisible(false);
@@ -257,35 +257,35 @@ public class OverlayManager {
         if (showingAbout){
             showingAbout = false;
             if (aboutLine1 != null){
-                application.ovSpace.destroyGlyph(aboutLine1);
+                application.ovSpace.removeGlyph(aboutLine1);
                 aboutLine1 = null;
             }
             if (aboutLine2 != null){
-                application.ovSpace.destroyGlyph(aboutLine2);
+                application.ovSpace.removeGlyph(aboutLine2);
                 aboutLine2 = null;
             }
             if (insituLogo != null){
-                application.ovSpace.destroyGlyph(insituLogo);
+                application.ovSpace.removeGlyph(insituLogo);
                 insituLogo = null;
             }
             if (aboutLine3 != null){
-                application.ovSpace.destroyGlyph(aboutLine3);
+                application.ovSpace.removeGlyph(aboutLine3);
                 aboutLine3 = null;
             }
             if (aboutLine4 != null){
-                application.ovSpace.destroyGlyph(aboutLine4);
+                application.ovSpace.removeGlyph(aboutLine4);
                 aboutLine4 = null;
             }
             if (aboutLine5 != null){
-                application.ovSpace.destroyGlyph(aboutLine5);
+                application.ovSpace.removeGlyph(aboutLine5);
                 aboutLine5 = null;
             }
             if (aboutLine6 != null){
-                application.ovSpace.destroyGlyph(aboutLine6);
+                application.ovSpace.removeGlyph(aboutLine6);
                 aboutLine6 = null;
             }
             if (fadeAbout != null){
-                application.ovSpace.destroyGlyph(fadeAbout);
+                application.ovSpace.removeGlyph(fadeAbout);
                 fadeAbout = null;
             }
         }
