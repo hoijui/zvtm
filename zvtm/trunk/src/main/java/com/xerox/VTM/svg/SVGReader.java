@@ -102,6 +102,7 @@ public class SVGReader {
     public static final String _fontweight="font-weight:";
     public static final String _fontstyle="font-style:";
     public static final String _style="style";
+    public static final String _class = "class";
     public static final String _cx="cx";
     public static final String _cy="cy";
     public static final String _rx="rx";
@@ -714,6 +715,9 @@ public class SVGReader {
 	}
 	else {res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
+	if (e.hasAttribute(_class)){
+		res.setType(e.getAttribute(_class));
+	}
 	return res;
     }
 
@@ -778,6 +782,9 @@ public class SVGReader {
 	    }
 	} else {res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
+	if (e.hasAttribute(_class)){
+		res.setType(e.getAttribute(_class));
+	}
 	return res;
     }
 
@@ -872,6 +879,9 @@ public class SVGReader {
 		if (meta){
 			setMetadata(res,ctx);
 		}
+		if (e.hasAttribute(_class)){
+			res.setType(e.getAttribute(_class));
+		}
 		return res;
 	}
  
@@ -965,6 +975,9 @@ public class SVGReader {
 	    }
 	    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);}
 	    if (meta){setMetadata(res,ctx);}
+		if (e.hasAttribute(_class)){
+			res.setType(e.getAttribute(_class));
+		}
 	    return res;
 	}
 	else return null;
@@ -1060,6 +1073,9 @@ public class SVGReader {
 	    }
 	    else {res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
 	    if (meta){setMetadata(res,ctx);}
+		if (e.hasAttribute(_class)){
+			res.setType(e.getAttribute(_class));
+		}
 	    return res;
 	}
 	else return null;
@@ -1146,6 +1162,9 @@ public class SVGReader {
 	}
 	else {res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);}
 	if (meta){setMetadata(res,ctx);}
+	if (e.hasAttribute(_class)){
+		res.setType(e.getAttribute(_class));
+	}
 	return res;
     }
 
@@ -1231,8 +1250,13 @@ public class SVGReader {
 	    }
 	}
 
-	if (meta && res != null) {
-		setMetadata(res, ctx);
+	if (res != null) {
+		if (e.hasAttribute(_class)){
+			res.setType(e.getAttribute(_class));
+		}
+		if (meta) {
+			setMetadata(res, ctx);
+		}
 	}
 
 	return res;
@@ -1312,6 +1336,9 @@ public class SVGReader {
 	}
 	else {res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);}
 	if (meta){setMetadata(res,ctx);}
+	if (e.hasAttribute(_class)){
+		res.setType(e.getAttribute(_class));
+	}
 	return res;
     }
 
@@ -1363,6 +1390,9 @@ public class SVGReader {
 		assignStroke(res[i], ss);
 	    }
 	    if (meta){setMetadata(res[i],ctx);}
+		if (e.hasAttribute(_class)){
+			res[i].setType(e.getAttribute(_class));
+		}
 	}
 	return res;
     }
@@ -1437,6 +1467,9 @@ public class SVGReader {
 			assignStroke(res, ss);
 		}
 		if (meta){setMetadata(res,ctx);}
+		if (e.hasAttribute(_class)){
+			res.setType(e.getAttribute(_class));
+		}
 		return res;
 	}
 
@@ -1490,6 +1523,9 @@ public class SVGReader {
 		}
 	    }
 	    if (meta){setMetadata(ph,ctx);}
+		if (e.hasAttribute(_class)){
+			ph.setType(e.getAttribute(_class));
+		}
 	    return ph;
 	}
 	else return null;
