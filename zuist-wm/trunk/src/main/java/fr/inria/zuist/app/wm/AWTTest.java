@@ -45,7 +45,7 @@ public class AWTTest extends JFrame {
     void load(File shapeFile){
         Map connect = new HashMap();
         try {
-            connect.put("url", shapeFile.toURL());
+            connect.put("url", shapeFile.toURI().toURL());
             try {
                 DataStore dataStore = DataStoreFinder.getDataStore(connect);
                 String[] typeNames = dataStore.getTypeNames();
