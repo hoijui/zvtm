@@ -21,11 +21,11 @@ public class GlyphKillAction implements PostAnimationAction {
 	this.vsm = vsm;
     }
     
-    public void animationEnded(Object target, short type, String dimension){
-	if (type == PostAnimationAction.GLYPH){
-	    Glyph g = (Glyph)target;
-	    vsm.getOwningSpace(g).destroyGlyph(g);
+	public void animationEnded(Object target, short type, String dimension){
+		if (type == PostAnimationAction.GLYPH){
+			Glyph g = (Glyph)target;
+			vsm.getOwningSpace(g).removeGlyph(g);
+		}
 	}
-    }
     
 }

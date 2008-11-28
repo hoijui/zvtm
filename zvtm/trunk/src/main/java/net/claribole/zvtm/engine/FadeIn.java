@@ -30,7 +30,7 @@ public class FadeIn implements PostAnimationAction {
     }
 
     public void animationEnded(Object target, short type, String dimension){
-	spaceOwningFadeRect.destroyGlyph((Glyph)target);
+		spaceOwningFadeRect.removeGlyph((Glyph)target);
     }
 
 }

@@ -38,32 +38,32 @@ public abstract class PieMenu {
 	destroy(0);
     }
 
-    /**destroy the pie menu (remove glyphs from virtual space)
-     *@param animLength duration of collapse animation in ms (0 if no animation)
-     */
-    public void destroy(int animLength){
-	vs.destroyGlyph(boundary);
-	for (int i=0;i<labels.length;i++){
-	    if (labels[i] != null){
-		vs.destroyGlyph(labels[i]);
-	    }   
+	/**destroy the pie menu (remove glyphs from virtual space)
+		*@param animLength duration of collapse animation in ms (0 if no animation)
+		*/
+	public void destroy(int animLength){
+		vs.removeGlyph(boundary);
+		for (int i=0;i<labels.length;i++){
+			if (labels[i] != null){
+				vs.removeGlyph(labels[i]);
+			}   
+		}
+		if (animLength > 0){
+			for (int i=0;i<items.length;i++){
+				if (items[i] != null){
+					vs.vsm.animator.createGlyphAnimation(animLength, AnimManager.GL_SZ_LIN, new Float(0.1f),
+						items[i].getID(), new GlyphKillAction(vs.vsm));
+				}   
+			}
+		}
+		else {
+			for (int i=0;i<items.length;i++){
+				if (items[i] != null){
+					vs.removeGlyph(items[i]);
+				}   
+			}
+		}
 	}
-	if (animLength > 0){
-	    for (int i=0;i<items.length;i++){
-		if (items[i] != null){
-		    vs.vsm.animator.createGlyphAnimation(animLength, AnimManager.GL_SZ_LIN, new Float(0.1f),
-							 items[i].getID(), new GlyphKillAction(vs.vsm));
-		}   
-	    }
-	}
-	else {
-	    for (int i=0;i<items.length;i++){
-		if (items[i] != null){
-		    vs.destroyGlyph(items[i]);
-		}   
-	    }
-	}
-    }
 
     /**returns the menu's items counter clockwise,
      * starting with the element placed at the start angle.<br>

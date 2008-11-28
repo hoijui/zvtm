@@ -149,15 +149,15 @@ public class VirtualSpace {
 	}
     }
 
-    /**destroy this virtual space - call method in virtual space manager*/
-    protected void destroy(){
-	for (int i=0;i<cm.cameraList.length;i++){
-	    this.removeCamera(i);
+	/**destroy this virtual space - call method in virtual space manager*/
+	protected void destroy(){
+		for (int i=0;i<cm.cameraList.length;i++){
+			this.removeCamera(i);
+		}
+		for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
+			this.removeGlyph((Glyph)e.nextElement());
+		}
 	}
-	for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
-	    this.destroyGlyph((Glyph)e.nextElement());
-	}
-    }
 
     /**add glyph g to this space*/
     void addGlyph(Glyph g){
@@ -267,27 +267,27 @@ public class VirtualSpace {
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
      *@param gID glyph's ID
      */
-    public void destroyGlyph(Long gID){
-	    destroyGlyph(vsm.getGlyph(gID), true);
+    public void removeGlyph(Long gID){
+	    removeGlyph(vsm.getGlyph(gID), true);
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
      *@param gID glyph's ID
      *@param repaint should the view be updated automatically or not
      */
-    public void destroyGlyph(Long gID, boolean repaint){
-	    destroyGlyph(vsm.getGlyph(gID), repaint);
+    public void removeGlyph(Long gID, boolean repaint){
+	    removeGlyph(vsm.getGlyph(gID), repaint);
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated. */
-    public void destroyGlyph(Glyph g){
-        destroyGlyph(g, true);
+    public void removeGlyph(Glyph g){
+        removeGlyph(g, true);
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
         *@param repaint should the view be updated automatically or not
         */
-    public void destroyGlyph(Glyph g, boolean repaint){
+    public void removeGlyph(Glyph g, boolean repaint){
         try {
             if (g.stickedTo!=null){
                 if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
@@ -318,9 +318,45 @@ public class VirtualSpace {
             }
         }
         catch (NullPointerException ex){
-            System.err.println("ZVTM Error: VirtualSpace.destroyGlyph(): the glyph you are trying to delete might not be a member of this virtual space ("+spaceName+") or might be null");
+            System.err.println("ZVTM Error: VirtualSpace.removeGlyph(): the glyph you are trying to delete might not be a member of this virtual space ("+spaceName+") or might be null");
             ex.printStackTrace();
         }
+    }
+
+	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
+		*@param gID glyph's ID
+		*@deprecated as of zvtm 0.9.8
+		*@see #removeGlyph(Long gID)
+		*/
+	public void destroyGlyph(Long gID){
+		removeGlyph(vsm.getGlyph(gID), true);
+	}
+
+	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
+		*@param gID glyph's ID
+		*@param repaint should the view be updated automatically or not
+		*@deprecated as of zvtm 0.9.8
+		*@see #removeGlyph(Long gID, boolean repaint)
+		*/
+	public void destroyGlyph(Long gID, boolean repaint){
+		removeGlyph(vsm.getGlyph(gID), repaint);
+	}
+
+	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
+		*@deprecated as of zvtm 0.9.8
+		*@see #removeGlyph(Glyph g)
+		*/
+	public void destroyGlyph(Glyph g){
+        removeGlyph(g, true);
+    }
+
+	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
+		*@param repaint should the view be updated automatically or not
+		*@deprecated as of zvtm 0.9.8
+		*@see #removeGlyph(Glyph g, boolean repaint)
+		*/
+    public void destroyGlyph(Glyph g, boolean repaint){
+		removeGlyph(g, repaint);
     }
 
     /**show Glyph g

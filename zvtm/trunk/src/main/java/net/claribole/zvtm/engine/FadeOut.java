@@ -33,9 +33,9 @@ public class FadeOut implements PostAnimationAction {
 	this.spaceOwningFadeRect = vs;
     }
 
-    public void animationEnded(Object target, short type, String dimension){
-	view.setBlank(blankColor);
-	spaceOwningFadeRect.destroyGlyph((Glyph)target);
-    }
+	public void animationEnded(Object target, short type, String dimension){
+		view.setBlank(blankColor);
+		spaceOwningFadeRect.removeGlyph((Glyph)target);
+	}
 
 }
