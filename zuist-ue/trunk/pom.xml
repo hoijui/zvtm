@@ -39,11 +39,6 @@ $Id$
   <dependencies>
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
-      <artifactId>zvtm</artifactId>
-      <version>0.9.7</version>
-    </dependency>
-	<dependency>
-      <groupId>net.claribole.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
       <version>0.1.1-SNAPSHOT</version>
     </dependency>
@@ -95,6 +90,7 @@ $Id$
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+		  <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>
