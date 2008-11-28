@@ -856,7 +856,7 @@ class NavigationManager {
 	
 	void endLinkSliding(){
 		application.mView.getCursor().setVisibility(true);
-		application.bSpace.destroyGlyph(slideCursor);
+		application.bSpace.removeGlyph(slideCursor);
 		slidingLink.setColor(GraphManager.SHAPE_FILL_COLOR);
 		slidingLink = null;
 		isLinkSliding = false;

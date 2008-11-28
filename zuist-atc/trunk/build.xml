@@ -48,7 +48,7 @@
 
   <target name="atcbuild" depends="init">
     <javac srcdir="${src.dir}" destdir="${classes.dir}"
-           debug="on" deprecation="off" optimize="on"
+           debug="on" deprecation="on" optimize="on"
            includes="**/*java">
       <classpath refid="project.class.path"/>
     </javac>
