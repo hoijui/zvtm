@@ -28,9 +28,14 @@ import java.io.OutputStreamWriter;
 
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
+import com.xerox.VTM.svg.SVGReader;
 import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.lens.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
 
 public class EvalAcqLabel implements Java2DPainter {
 
@@ -58,7 +63,6 @@ public class EvalAcqLabel implements Java2DPainter {
     int panelWidth, panelHeight;
 
     /* ZVTM components */
-    static final Color BACKGROUND_COLOR = Color.LIGHT_GRAY;
     VirtualSpaceManager vsm;
     VirtualSpace mSpace;
     static final String mSpaceName = "mainSpace";
@@ -75,8 +79,10 @@ public class EvalAcqLabel implements Java2DPainter {
 //    static long W2_12 = 40;
 
     /* lens */
-    static final Color LENS_BOUNDARY_COLOR = Color.WHITE;
-    static final Color LENS_OBSERVED_REGION_COLOR = Color.WHITE;
+    static final Color LENS_BOUNDARY_COLOR_WM = Color.WHITE;
+    static final Color LENS_OBSERVED_REGION_COLOR_WM = Color.WHITE;
+    static final Color LENS_BOUNDARY_COLOR_GR = Color.BLUE;
+    static final Color LENS_OBSERVED_REGION_COLOR_GR = Color.BLUE;
     float magFactor = 8.0f;
     static final int LENS_INNER_RADIUS = 50;
     static final int LENS_OUTER_RADIUS = 100;
@@ -98,12 +104,17 @@ public class EvalAcqLabel implements Java2DPainter {
 
     /* target */
     static final Color HTARGET_COLOR = Color.RED;
-    static final Color TARGET_COLOR = Color.YELLOW;
-    static final Color TARGET_BKG_COLOR = Color.BLACK;
+    static final Color TARGET_COLOR_WM = Color.YELLOW;
+    static final Color TARGET_BKG_COLOR_WM = Color.BLACK;
+    static final Color TARGET_COLOR_GR = Color.BLACK;
+    static final Color TARGET_BKG_COLOR_GR = Color.WHITE;
 
-	static final int LABEL_FONT_SIZE = 42;
-	static final Font LABEL_FONT_MM8 = new Font("Dialog", Font.PLAIN, LABEL_FONT_SIZE);
-	static final Font LABEL_FONT_MM12 = new Font("Dialog", Font.PLAIN, Math.round(LABEL_FONT_SIZE*8/12));
+	static final int LABEL_FONT_SIZE_WM = 42;
+	static final int LABEL_FONT_SIZE_GR = 30;
+	static final Font LABEL_FONT_MM8_WM = new Font("Dialog", Font.PLAIN, LABEL_FONT_SIZE_WM);
+	static final Font LABEL_FONT_MM12_WM = new Font("Dialog", Font.PLAIN, Math.round(LABEL_FONT_SIZE_WM*8/12));
+	static final Font LABEL_FONT_MM8_GR = new Font("Dialog", Font.PLAIN, LABEL_FONT_SIZE_GR);
+	static final Font LABEL_FONT_MM12_GR = new Font("Dialog", Font.PLAIN, Math.round(LABEL_FONT_SIZE_GR*8/12));
 
     static int NB_TARGETS_PER_TRIAL = 24;
     VBTextST[] targets;
@@ -209,15 +220,23 @@ public class EvalAcqLabel implements Java2DPainter {
 
 	void initScene(){
 		if (background == BACKGROUND_MAP){
-			mView.setBackgroundColor(EvalAcqLabel.BACKGROUND_COLOR);
+			mView.setBackgroundColor(Color.GRAY);
 			vsm.addGlyph(new VImage(-3500, 2500, 0, (new ImageIcon("images/world/evalacqNW.png")).getImage(), 2.0f), mSpace);
 			vsm.addGlyph(new VImage(-3500, -2500, 0, (new ImageIcon("images/world/evalacqSW.png")).getImage(), 2.0f), mSpace);
 			vsm.addGlyph(new VImage(3500, 2500, 0, (new ImageIcon("images/world/evalacqNE.png")).getImage(), 2.0f), mSpace);
 			vsm.addGlyph(new VImage(3500, -2500, 0, (new ImageIcon("images/world/evalacqSE.png")).getImage(), 2.0f), mSpace);			
 		}
 		else {
-			System.out.println("GRAPH BKG NOT IMPLEMENT YET");
-			System.exit(0);
+			mView.setBackgroundColor(Color.WHITE);
+			try {
+				File graphFile = new File("trials/eval_graph.svg");
+				Document svgDoc = parse(graphFile);
+				SVGReader.setPositionOffset(-8657, -6737); //fix this value on a 1600x1200 setup
+	            SVGReader.load(svgDoc, vsm, mSpaceName, false, graphFile.toURI().toURL().toString());
+			}
+			catch ( Exception e) { 
+				e.printStackTrace();
+			}
 		}
 		latIndicatorW = new VRectangle(-7000, 0, 0, INDICATOR_LENGTH, INDICATOR_THICKNESS, INDICATOR_COLOR, INDICATOR_BORDER);
 		//latIndicatorW.setDrawBorder(false);
@@ -394,8 +413,18 @@ public class EvalAcqLabel implements Java2DPainter {
 		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
 			x = Math.round(TARGET_R_POS * Math.cos(angle));
 			y = Math.round(TARGET_R_POS * Math.sin(angle));
-			targets[i] = new VBTextST(x, y, 0, TARGET_COLOR, TARGET_COLOR, TARGET_BKG_COLOR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
-			targets[i].setSpecialFont((magFactor >= 10) ? LABEL_FONT_MM12 : LABEL_FONT_MM8);
+			if (background == BACKGROUND_MAP){
+				targets[i] = new VBTextST(x, y, 0, TARGET_COLOR_WM, TARGET_COLOR_WM, TARGET_BKG_COLOR_WM, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);				
+			}
+			else {
+				targets[i] = new VBTextST(x, y, 0, TARGET_COLOR_GR, TARGET_COLOR_GR, TARGET_BKG_COLOR_GR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
+			}
+			if (background == BACKGROUND_MAP){
+				targets[i].setSpecialFont((magFactor >= 10) ? LABEL_FONT_MM12_WM : LABEL_FONT_MM8_WM);				
+			}
+			else {
+				targets[i].setSpecialFont((magFactor >= 10) ? LABEL_FONT_MM12_GR : LABEL_FONT_MM8_GR);
+			}
 			targets[i].setVisible(false);
 			vsm.addGlyph(targets[i], mSpace);
 			// lay out targets so that they between each side of the circle (ISO9241-9)
@@ -427,7 +456,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
 		if (warning
 			|| (technique==TECHNIQUE_SCB && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
-			|| (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
+			|| (technique==TECHNIQUE_SCF && ((XSCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 		Glyph target = targets[hitCount];
 		lens.getVisibleRegionInFocus(mCamera, rif);
 		if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
@@ -478,7 +507,7 @@ public class EvalAcqLabel implements Java2DPainter {
 			targets[targetIndex].setBackgroundFillColor(HTARGET_COLOR);
 			vsm.repaintNow();
 			sleep(BRIGHT_HIGHLIGHT_TIME);
-			targets[targetIndex].setBackgroundFillColor(TARGET_BKG_COLOR);
+			targets[targetIndex].setBackgroundFillColor((background == BACKGROUND_MAP) ? TARGET_BKG_COLOR_WM : TARGET_BKG_COLOR_GR);
 			targets[targetIndex].setTranslucencyValue(trials[trialCount].getOpacity());
 			vsm.repaintNow();
 			return null;
@@ -502,16 +531,16 @@ public class EvalAcqLabel implements Java2DPainter {
 	switch(technique){
 	case TECHNIQUE_SCB:{
 	    tlens = new TFadingLens(magFactor, 0.0f, 0.95f, LENS_OUTER_RADIUS, x - panelWidth/2, y - panelHeight/2);
-	    ((TFadingLens)tlens).setBoundaryColor(LENS_BOUNDARY_COLOR);
-	    ((TFadingLens)tlens).setObservedRegionColor(LENS_OBSERVED_REGION_COLOR);
+	    ((TFadingLens)tlens).setBoundaryColor((background == BACKGROUND_MAP) ? LENS_BOUNDARY_COLOR_WM : LENS_BOUNDARY_COLOR_GR);
+	    ((TFadingLens)tlens).setObservedRegionColor((background == BACKGROUND_MAP) ? LENS_OBSERVED_REGION_COLOR_WM : LENS_OBSERVED_REGION_COLOR_GR);
 	    lens = (FixedSizeLens)tlens;
 	    break;
 	}
 	case TECHNIQUE_SCF:{
-	    tlens = new SCFLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    tlens = new XSCFLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    lens = (FixedSizeLens)tlens;
-	    lens.setInnerRadiusColor(LENS_BOUNDARY_COLOR);
-	    lens.setOuterRadiusColor(LENS_BOUNDARY_COLOR);
+	    lens.setInnerRadiusColor((background == BACKGROUND_MAP) ? LENS_BOUNDARY_COLOR_WM : LENS_BOUNDARY_COLOR_GR);
+	    lens.setOuterRadiusColor((background == BACKGROUND_MAP) ? LENS_BOUNDARY_COLOR_WM : LENS_BOUNDARY_COLOR_GR);
 	    break;
 	}
 	}
@@ -625,6 +654,19 @@ public class EvalAcqLabel implements Java2DPainter {
     void exit(){
 	System.exit(0);
     }
+
+	public static Document parse(File f){ 
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			factory.setValidating(false);
+			factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", new Boolean(false));
+			factory.setNamespaceAware(true);
+			DocumentBuilder builder = factory.newDocumentBuilder();
+			Document res = builder.parse(f);
+			return res;
+		}
+		catch (Exception e){e.printStackTrace();return null;}
+	}
 
 	public static void main(String[] args){
 		try {
