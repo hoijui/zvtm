@@ -233,6 +233,18 @@ public class EvalAcqLabel implements Java2DPainter {
 				Document svgDoc = parse(graphFile);
 				SVGReader.setPositionOffset(-8657, -6737); //fix this value on a 1600x1200 setup
 	            SVGReader.load(svgDoc, vsm, mSpaceName, false, graphFile.toURI().toURL().toString());
+				Vector glyphs = (Vector)mSpace.getAllGlyphs().clone();
+				for (int i=0;i<glyphs.size();i++){
+					if (glyphs.elementAt(i) instanceof DPath){
+						vsm.addGlyph(new DPathS(((DPath)glyphs.elementAt(i)).getJava2DPathIterator(), 0, Color.BLACK, magFactor), mSpace);
+						mSpace.removeGlyph((DPath)glyphs.elementAt(i));
+					}
+					else if (glyphs.elementAt(i) instanceof VCircle){
+						VCircle c = (VCircle)glyphs.elementAt(i);
+						vsm.addGlyph(new VCircleS(c.vx, c.vy, 0, c.vr, Color.WHITE, Color.BLACK, magFactor), mSpace);
+						mSpace.removeGlyph(c);
+					}
+				}
 			}
 			catch ( Exception e) { 
 				e.printStackTrace();
@@ -456,7 +468,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		// or if actual MM of dynamic lens is not high enough, or if translucence of a fading lens is too high
 		if (warning
 			|| (technique==TECHNIQUE_SCB && ((TFadingLens)lens).getFocusTranslucencyValue() < 0.4f)
-			|| (technique==TECHNIQUE_SCF && ((XSCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
+			|| (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 		Glyph target = targets[hitCount];
 		lens.getVisibleRegionInFocus(mCamera, rif);
 		if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
@@ -537,7 +549,7 @@ public class EvalAcqLabel implements Java2DPainter {
 	    break;
 	}
 	case TECHNIQUE_SCF:{
-	    tlens = new XSCFLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
+	    tlens = new SCFLens(magFactor, LENS_OUTER_RADIUS, LENS_INNER_RADIUS, x - panelWidth/2, y - panelHeight/2);
 	    lens = (FixedSizeLens)tlens;
 	    lens.setInnerRadiusColor((background == BACKGROUND_MAP) ? LENS_BOUNDARY_COLOR_WM : LENS_BOUNDARY_COLOR_GR);
 	    lens.setOuterRadiusColor((background == BACKGROUND_MAP) ? LENS_BOUNDARY_COLOR_WM : LENS_BOUNDARY_COLOR_GR);
