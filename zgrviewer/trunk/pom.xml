@@ -36,6 +36,11 @@ $Id$
       <name>Maven Repository</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
+    <repository>
+      <id>codehaus-repository</id>
+      <name>Codehaus Repository</name>
+      <url>http://repository.codehaus.org</url>
+    </repository>
   </repositories>
   
   <!-- Distribution - Deploy to FTP -->
@@ -67,6 +72,7 @@ $Id$
       <groupId>antlr</groupId>
       <artifactId>antlr</artifactId>
       <version>2.7.7</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
   
@@ -82,48 +88,20 @@ $Id$
       </resource>
 	</resources>
     <plugins>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>generate-sources</phase>
-            <configuration>
-              <tasks>
-                <java classname="antlr.Tool"
-                      classpathref="maven.plugin.classpath"
-                      fork="true">
-                          <arg line="-o ${project.build.directory}/generated-sources/antlr/net/claribole/zgrviewer/dot"/> 
-                          <arg value="src/main/resources/antlr/DOTRecord.g"/>
-                </java>
-                <java classname="antlr.Tool"
-                      classpathref="maven.plugin.classpath"
-                      fork="true">
-                          <arg line="-o ${project.build.directory}/generated-sources/antlr/net/claribole/zgrviewer/dot"/> 
-                          <arg value="src/main/resources/antlr/DOT.g"/>
-                </java>
-                <java classname="antlr.Tool"
-                      classpathref="maven.plugin.classpath"
-                      fork="true">
-                          <arg line="-o ${project.build.directory}/generated-sources/antlr/net/claribole/zgrviewer/dot"/> 
-                          <arg value="src/main/resources/antlr/DOTTreeTransformer.g"/>
-                </java>
-              </tasks>
-             <sourceRoot>${project.build.directory}/generated-sources/antlr</sourceRoot>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>antlr</groupId>
-            <artifactId>antlr</artifactId>
-            <version>2.7.7</version>
-            <scope>compile</scope>
-          </dependency>
-        </dependencies>
-      </plugin>
+       <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>antlr-maven-plugin</artifactId>
+         <configuration>
+           <grammars>*.g</grammars>
+         </configuration>
+         <executions>
+           <execution>
+             <goals>
+               <goal>generate</goal>
+             </goals>
+           </execution>
+         </executions>
+     </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>dependency-maven-plugin</artifactId>
