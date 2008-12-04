@@ -1,5 +1,5 @@
 /* 
- * $Id:  $
+ * $Id$
  */
 
 package net.claribole.eval.alphalens;

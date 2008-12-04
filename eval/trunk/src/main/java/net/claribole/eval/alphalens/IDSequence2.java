@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: IDSequence.java 731 2007-07-17 11:39:47Z epietrig $
+ * $Id$
  */
 
 package net.claribole.eval.alphalens;

@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FittsEventHandler.java 700 2007-06-27 12:21:09Z epietrig $
+ * $Id$
  */
 
 package net.claribole.eval.alphalens;

@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: EvalAcqLabel.java 747 2007-08-13 05:15:41Z epietrig $
+ * $Id$
  */
 
 package net.claribole.eval.alphalens;

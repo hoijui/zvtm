@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: DGaussianLens.java 713 2007-07-04 07:48:17Z epietrig $
+ * $Id$
  */
 
 package net.claribole.eval.alphalens;
