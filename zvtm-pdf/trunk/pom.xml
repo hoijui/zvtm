@@ -40,7 +40,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.9.7-SNAPSHOT</version>
+      <version>0.9.8-SNAPSHOT</version>
     </dependency>
 <!--
 
@@ -102,6 +102,23 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
           <configuration>
               <downloadSources>true</downloadSources>
           </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>net.claribole.zvtm.demo.PDFViewer</mainClass>
+              <packageName>net.claribole.zvtm.demo</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
       </plugin>
     </plugins>
   </build>
