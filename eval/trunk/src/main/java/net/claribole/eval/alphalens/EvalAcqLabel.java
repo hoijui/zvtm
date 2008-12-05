@@ -472,7 +472,7 @@ public class EvalAcqLabel implements Java2DPainter {
 			|| (technique==TECHNIQUE_SCF && ((SCFLens)lens).getActualMaximumMagnification() < 0.6f*lens.getMaximumMagnification())){return;}
 		Glyph target = targets[hitCount];
 		lens.getVisibleRegionInFocus(mCamera, rif);
-		if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= (rif[2]-rif[0])/2.0-target.getSize()){
+		if (Math.sqrt(Math.pow((rif[0]+rif[2])/2.0-target.vx,2) + Math.pow((rif[3]+rif[1])/2.0-target.vy,2)) <= 0.66*(rif[2]-rif[0])-1.5*target.getSize()){
 			// target is in focus region
 			hitTarget();
 		}
@@ -507,7 +507,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		}
 	}
 
-    static final int BRIGHT_HIGHLIGHT_TIME = 1000;
+    static final int BRIGHT_HIGHLIGHT_TIME = 800;
     
     void highlight(final int targetIndex, boolean b){
 	if (b){
