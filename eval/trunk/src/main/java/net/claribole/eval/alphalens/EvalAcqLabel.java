@@ -422,7 +422,7 @@ public class EvalAcqLabel implements Java2DPainter {
 	void initTrial(){
 		long x,y;
 		targets = new VBTextST[NB_TARGETS_PER_TRIAL];
-		double angle = 0;
+		double angle = trials[trialCount].RANK * Math.PI/4.0 - Math.PI/2.0;
 		for (int i=0;i<NB_TARGETS_PER_TRIAL;i++){
 			x = Math.round(TARGET_R_POS * Math.cos(angle));
 			y = Math.round(TARGET_R_POS * Math.sin(angle));
@@ -507,7 +507,7 @@ public class EvalAcqLabel implements Java2DPainter {
 		}
 	}
 
-    static final int BRIGHT_HIGHLIGHT_TIME = 800;
+    static final int BRIGHT_HIGHLIGHT_TIME = 1000;
     
     void highlight(final int targetIndex, boolean b){
 	if (b){
