@@ -427,10 +427,10 @@ public class EvalAcqLabel implements Java2DPainter {
 			x = Math.round(TARGET_R_POS * Math.cos(angle));
 			y = Math.round(TARGET_R_POS * Math.sin(angle));
 			if (background == BACKGROUND_MAP){
-				targets[i] = new VBTextST(x, y, 0, TARGET_COLOR_WM, TARGET_COLOR_WM, TARGET_BKG_COLOR_WM, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);				
+				targets[i] = new VBTextST(x, y-20, 0, TARGET_COLOR_WM, TARGET_COLOR_WM, TARGET_BKG_COLOR_WM, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);				
 			}
 			else {
-				targets[i] = new VBTextST(x, y, 0, TARGET_COLOR_GR, TARGET_COLOR_GR, TARGET_BKG_COLOR_GR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
+				targets[i] = new VBTextST(x, y-20, 0, TARGET_COLOR_GR, TARGET_BKG_COLOR_GR, TARGET_BKG_COLOR_GR, trials[trialCount].LABELS[i], VBTextST.TEXT_ANCHOR_MIDDLE, targetAlpha);
 			}
 			if (background == BACKGROUND_MAP){
 				targets[i].setSpecialFont((magFactor >= 10) ? LABEL_FONT_MM12_WM : LABEL_FONT_MM8_WM);				
