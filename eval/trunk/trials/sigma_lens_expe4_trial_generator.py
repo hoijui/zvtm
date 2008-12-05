@@ -22,8 +22,12 @@ WORDS_12 = ["mainstreamed","manufactured","marginalized","masculinized",\
 			"misprogramed","mousetrapped","multifaceted","multicolored",\
 			"matriculated","meanspirited","merchandized","microcracked"]
 
-V = ["O", "T", "O", "T"]
-S = [[4,8,6,2], [6,2,8,4], [8,4,2,6], [2,6,4,8]]
+# 4a
+#V = ["O", "T", "O", "T"]
+#S = [[4,8,6,2], [6,2,8,4], [8,4,2,6], [2,6,4,8]]
+# 4b
+V = ["O", "O"]
+S = [[4,8,6,2], [8,4,2,6]]
 
 ###############################################################################
 def generateTrial(rank, visibility, word_pool):
