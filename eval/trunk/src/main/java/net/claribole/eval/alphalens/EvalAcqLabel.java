@@ -127,6 +127,7 @@ public class EvalAcqLabel implements Java2DPainter {
 
     /* instructions */
 	static final Font INSTRUCTIONS_FONT = new Font("Dialog", Font.PLAIN, 12);
+	static final Font INDICATIONS_FONT = new Font("Dialog", Font.PLAIN, 24);
 
     /* target indicators */
     static final int INDICATOR_LENGTH = 500;
@@ -640,18 +641,19 @@ public class EvalAcqLabel implements Java2DPainter {
 			g2d.setColor(Color.RED);
 			g2d.drawString(warningText, viewWidth/2-50, viewHeight/2);
 		}
+		g2d.setFont(INDICATIONS_FONT);
 		if (drawStartButton){
 			g2d.setColor(START_BUTTON_COLOR);
 			g2d.fillRect(viewWidth/2-10, viewHeight/2-10, 20, 20);
 			g2d.setColor(Color.BLACK);
-			g2d.fillRect(viewWidth/2-50, viewHeight/2-50, 100, 20);
+			g2d.fillRect(viewWidth/2-100, viewHeight/2-65, 200, 40);
 			g2d.setColor(INSTRUCTIONS_COLOR);
-			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2-45, viewHeight/2-35);
+			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2-55, viewHeight/2-35);
 		}
 		if (trialStarted || drawStartButton){
 			g2d.setColor(INSTRUCTIONS_COLOR);
-			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2-45, viewHeight-vispad[3]/2);
-			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2-45, vispad[3]/2);
+			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2-55, viewHeight-vispad[3]/2);
+			g2d.drawString(trials[trialCount].getTargetWord(), viewWidth/2-55, vispad[3]/2);
 		}
 	}
 
