@@ -44,7 +44,8 @@ class AcqLabelEventHandler implements ViewEventHandler, ComponentListener {
 
 	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 		if (!application.trialStarted){return;}
-		application.clickOnTarget();
+		//application.clickOnTarget();
+		application.selectTarget(System.currentTimeMillis());
 	}
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
@@ -101,7 +102,8 @@ class AcqLabelEventHandler implements ViewEventHandler, ComponentListener {
 	public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
 		if (code == KeyEvent.VK_SPACE){
 			if (application.trialStarted){
-				application.selectTarget(System.currentTimeMillis());
+				//application.selectTarget(System.currentTimeMillis());
+				application.clickOnTarget();
 			}
 			else if (application.cursorInsideStartButton(cjpx, cjpy)){
 				application.startTrial(cjpx, cjpy);
