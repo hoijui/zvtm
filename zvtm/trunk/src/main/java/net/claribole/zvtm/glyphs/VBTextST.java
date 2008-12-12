@@ -86,18 +86,18 @@ public class VBTextST extends VBText implements Translucent {
 	}
 
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
+		if (!pc[i].valid){
+			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			bounds = g.getFontMetrics().getStringBounds(text, g);
+			pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
+			pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
+			pc[i].valid = true;
+		}
 		if (alpha == 0){return;}
 		trueCoef = scaleFactor * coef;
 		if (trueCoef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
-			if (!pc[i].valid)
-			{
-				bounds = g.getFontMetrics().getStringBounds(text, g);
-				pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
-				pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
-				pc[i].valid = true;
-			}
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].cx, dy + pc[i].cy);
 			}
@@ -141,17 +141,18 @@ public class VBTextST extends VBText implements Translucent {
 
 
 	public void drawForLens(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
+		if (!pc[i].lvalid) {
+			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			bounds = g.getFontMetrics().getStringBounds(text, g);
+			pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
+			pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
+			pc[i].lvalid = true;
+		}
 		if (alpha == 0){return;}
 		trueCoef = scaleFactor * coef;
 		if (trueCoef * fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
-			if (!pc[i].lvalid) {
-				bounds = g.getFontMetrics().getStringBounds(text, g);
-				pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
-				pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
-				pc[i].lvalid = true;
-			}
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx, dy + pc[i].lcy);
 			}
