@@ -30,6 +30,8 @@ HIGHER_RES_SCALE_FACTOR = 2
 # Walk source hiearchy and mirror it in destination folder
 ################################################################################
 def processDirectory(d_src, d_dst):
+    new_doc_count = 0
+    total_doc_count = 0
     for f in os.listdir(d_src):
         # compute child path in src tree
         src_dir_abspath = "%s/%s" % (os.path.realpath(d_src), f)
@@ -41,7 +43,9 @@ def processDirectory(d_src, d_dst):
                 os.mkdir(dst_dir_abspath)
             processDirectory(src_dir_abspath, dst_dir_abspath)
         elif f.endswith(PDF_EXT):
-            processDocument(d_src, d_dst, os.path.basename(src_dir_abspath))
+            new_doc_count += processDocument(d_src, d_dst, os.path.basename(src_dir_abspath))
+            total_doc_count += 1
+    log("Processed %s new documents, for a total of %s documents available" % (new_doc_count, total_doc_count), 0)
 
 ################################################################################
 # PDF document processing
@@ -51,7 +55,7 @@ def processDocument(parent_dir_src, parent_dir_dst, document_name):
     document_dir_abspath = "%s/%s" % (parent_dir_dst, document_dir_basename)
     if os.path.exists(document_dir_abspath):
         log("Document %s already processed" % document_name, 2)
-        return
+        return 0
     else:
         log("Creating %s" % document_dir_abspath, 2)
         os.mkdir(document_dir_abspath)
@@ -68,6 +72,7 @@ def processDocument(parent_dir_src, parent_dir_dst, document_name):
     for page_number in range(1, pageCount+1):
         # writePage(pdf_document, page_number, DEFAULT_RES_SCALE_FACTOR, document_dir_basename, parent_dir_dst, "L")
         writePage(pdf_document, page_number, HIGHER_RES_SCALE_FACTOR, document_dir_basename, parent_dir_dst)
+    return 1
 
 def writePage(pdf_document, page_number, scaleFactor, document_dir_basename, parent_dir_dst):
     # for each page, create a bitmap
