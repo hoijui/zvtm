@@ -170,6 +170,8 @@ public class Viewer implements Java2DPainter {
 		
     }
 
+    JMenuItem infoMI, consoleMI;
+
 	private JMenuBar initMenu(){
 		final JMenuItem openMI = new JMenuItem("Open...");
 		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -177,28 +179,45 @@ public class Viewer implements Java2DPainter {
 		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem exitMI = new JMenuItem("Exit");
 		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		infoMI = new JMenuItem(Messages.INFO_SHOW);
+		infoMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+		consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
+		consoleMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
+		final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
+		gcMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (e.getSource()==openMI){openFile();}
 				else if (e.getSource()==reloadMI){reload();}
 				else if (e.getSource()==exitMI){exit();}
+				else if (e.getSource()==infoMI){toggleMiscInfoDisplay();}
+				else if (e.getSource()==gcMI){gc();}
+				else if (e.getSource()==consoleMI){ovm.toggleConsole();}
 				else if (e.getSource()==aboutMI){about();}
 			}
 		};
 		JMenuBar jmb = new JMenuBar();
 		JMenu fileM = new JMenu("File");
+		JMenu viewM = new JMenu("View");
 		JMenu helpM = new JMenu("Help");
 		fileM.add(openMI);
 		fileM.add(reloadMI);
 		fileM.addSeparator();
 		fileM.add(exitMI);
+		viewM.add(infoMI);
+		viewM.add(gcMI);
+		viewM.add(consoleMI);
 		helpM.add(aboutMI);
 		jmb.add(fileM);
+		jmb.add(viewM);
 		jmb.add(helpM);
 		openMI.addActionListener(a0);
 		reloadMI.addActionListener(a0);
 		exitMI.addActionListener(a0);
+		infoMI.addActionListener(a0);
+		consoleMI.addActionListener(a0);
+		gcMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
 		return jmb;
 	}
@@ -446,6 +465,12 @@ public class Viewer implements Java2DPainter {
 
     void toggleMiscInfoDisplay(){
         SHOW_MISC_INFO = !SHOW_MISC_INFO;
+        if (SHOW_MISC_INFO){
+            infoMI.setText(Messages.INFO_HIDE);
+        }
+        else {
+            infoMI.setText(Messages.INFO_SHOW);
+        }
         vsm.repaintNow();
     }
 

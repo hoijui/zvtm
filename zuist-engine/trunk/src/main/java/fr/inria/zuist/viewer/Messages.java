@@ -27,6 +27,11 @@ class Messages {
     static final String PM_GLOBALVIEW = "Global View";
     static final String PM_OPEN = "Open...";
     static final String PM_RELOAD = "Reload";
+    
+    static final String INFO_HIDE = "Hide Info";
+    static final String INFO_SHOW = "Show Info";
+    static final String CONSOLE_HIDE = "Hide Console";
+    static final String CONSOLE_SHOW = "Show Console";
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
     static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(10, 0), new LongPoint(0, 0),

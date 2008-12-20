@@ -183,9 +183,9 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     	else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
-		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
-        else if (code == KeyEvent.VK_F2){application.gc();}
-        else if (code == KeyEvent.VK_F3){application.ovm.toggleConsole();}
+//		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
+//        else if (code == KeyEvent.VK_F7){application.gc();}
+//        else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
