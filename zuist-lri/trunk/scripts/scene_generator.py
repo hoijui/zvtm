@@ -8,25 +8,34 @@ import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
 
-# paper page width and height, high resolution
-PPW_H = 1224
-PPH_H = 1584
+# paper page width and height
+PPW = 1224
+PPH = 1584
 
 PAPER_REGION_WIDTH = 0
 PAPER_REGION_HEIGHT = 0
-FIGURE_REGION_WIDTH = 0
-FIGURE_REGION_HEIGHT = 0
-L1_REGION_WIDTH = 0
-L1_REGION_HEIGHT = 0
+META_REGION_WIDTH = 0
+META_REGION_HEIGHT = 0
+YEAR_REGION_WIDTH = 0
+YEAR_REGION_HEIGHT = 0
+CAT_REGION_WIDTH = 0
+CAT_REGION_HEIGHT = 0
 
-LEVEL0_CEILING = "8000000"
-LEVEL0_FLOOR = "810000"
-LEVEL1_CEILING = "810000"
-LEVEL1_FLOOR = "45000"
-TITLE_LEVEL_CEILING = "45000"
-TITLE_LEVEL_FLOOR = "3500"
+L0_CEILING = "100000000"
+L0_FLOOR = "60000000"
+L1_CEILING = "60000000"
+L1_FLOOR = "10000000"
+CAT_LEVEL_CEILING = "10000000"
+CAT_LEVEL_FLOOR = "810000"
+YEAR_LEVEL_CEILING = "810000"
+YEAR_LEVEL_FLOOR = "45000"
+META_LEVEL_CEILING = "45000"
+META_LEVEL_FLOOR = "3500"
 PAPER_LEVEL_CEILING = "3500"
 PAPER_LEVEL_FLOOR = "0"
+
+L0_LABEL_SCALE_FACTOR = "4000000"
+TEAM_LABEL_SCALE_FACTOR = "1000000"
 
 FADE_IN = "fadein"
 FADE_OUT = "fadeout"
@@ -38,12 +47,10 @@ DISAPPEAR = "disappear"
 ################################################################################
 # paper id -> <reference/>
 id2paper = {}
-# paper year -> [paper id]
-year2id = {}
-# paper team -> [paper id]
-team2id = {}
-# paper author (authors/author/first+authors/author/last) -> [paper id]
-author2id = {}
+# paper team -> {cat:{year:[paper id]}}
+tcy2id = {}
+# paper author (authors/author/first+authors/author/last) -> {cat:{year:[paper id]}}
+acy2id = {}
 # paper directory names in lri4z/
 availablePDFs = []
 
@@ -60,16 +67,46 @@ TEAM_FIXES = {"grand large": "grandlarge",
     "compsys": "",
     "caps": ""}
 
+# from zbib/bib2xml/moulinette/lib/bibliography/aeres.py
+CATEGORIES_LRI_SEPTEMBRE_2008 = {
+    u"1":u"Articles dans des revues internationales ou nationales avec comité de lecture répertoriées dans les bases de données internationales [ACL]", # Titre
+    u"1.1":u"Revues internationales majeures avec comité de lecture",
+    u"1.2":u"Autres revues avec comité de lecture",
+    # -----------------
+    u"2":u"Conférences données à l’invitation du Comité d’organisation dans un congrès national ou international",
+    # -----------------
+    u"3":u"Communications avec actes dans un congrès international ou national [ACT]", # Titre
+    u"3.1":u"Conférences et workshops internationaux majeurs avec actes et comité de lecture",
+    u"3.2":u"Conférences et workshops nationaux majeurs avec actes et comité de lecture",
+    u"3.3":u"Autres conférences et workshops",
+    # -----------------
+    u"4":u"Communications orales [COM] et par affiche [AFF], autres communications dans les conférences et workshops",
+    # -----------------
+    u"5":u"Ouvrages scientifiques (ou chapitres de ces ouvrages) [OS]",
+    # -----------------
+    u"6":u"Directions d’ouvrages [DO]",
+    # -----------------
+    u"7":u"Ouvrages de vulgarisation (ou chapitres de ces ouvrages) [OV], diffusion de la connaissance",
+    # -----------------
+    u"8":u"Autres publications [AP]",
+    # -----------------
+    u"9":u"Thèses [TH] et habilitations soutenues",
+    # -----------------
+    u"xx":u"Type et/ou support non renseigné(s)" # Important: garder "xx" pour texreport
+    }
+        
 ################################################################################
 # Walk the hierarchy of UIST proceedings and generate XML scene description
 ################################################################################
 def buildScene(metadataFile, outputSceneFile):
     global PAPER_REGION_WIDTH
     global PAPER_REGION_HEIGHT
-    global FIGURE_REGION_WIDTH
-    global FIGURE_REGION_HEIGHT
-    global L1_REGION_WIDTH
-    global L1_REGION_HEIGHT
+    global META_REGION_WIDTH
+    global META_REGION_HEIGHT
+    global YEAR_REGION_WIDTH
+    global YEAR_REGION_HEIGHT
+    global CAT_REGION_WIDTH
+    global CAT_REGION_HEIGHT
     global id2paper
     global availablePDFs
     log("Loading metadata from %s" % metadataFile, 2)
@@ -85,114 +122,109 @@ def buildScene(metadataFile, outputSceneFile):
     availablePDFs.remove("scene.xml")
     log ("Found %s papers in PDF directory" % len(availablePDFs), 2)
     # retrieve some global information from hierarchy to compute layout
-    t = getMaxChildren()
+    t = generateAbstractTree()
     # maximum number of pages in a paper
     mpgCount = t[0]
-    # maximum number of papers all categories
-    mpallCount = t[1]
-    # maximum number of papers per year
+    # maximum paper count per year per category per team/author
+    mppCount = t[1]
+    # maximum year count per category per team/author
     mpyCount = t[2]
-    # maximum number of papers per team
-    mptCount = t[3]
-    # maximum number of papers per author
-    mpaCount = t[4]
+    # maximum category count per team/author
+    mpcCount = t[3]
     log("Maximum page count per paper: %s" % mpgCount, 0)
-    log("Maximum paper count per year: %s" % mpyCount, 0)
-    log("Maximum paper count per team: %s" % mptCount, 0)
-    log("Maximum paper count per author: %s" % mpaCount, 0)
-#    # compute largest matrix of figures for proceedings
-#    nbColRow = matrixLayout(mppCount)
-#    nbFigColProc = nbColRow[0]
-#    nbFigRowProc = nbColRow[1]
-#    log("Largest matrix of figures (proceedings): %sx%s" % (nbFigColProc, nbFigRowProc), 0)
-#    # maximum number of papers per higher level of abstraction, whatever that is
-#    mpCount = max(mppCount, mpaCount, mpkwCount)
-#    # compute dimensions of a region containing the pages of a paper
-#    # leave an empty space between pages that is .1 a page in size
-#    # same before first page and after last page (hence the +.1)
-#    PAPER_REGION_WIDTH = int(mpgCount * PPW_H * 1.1)
-#    PAPER_REGION_HEIGHT = int(PPH_H * 1.1)
-#    # compute dimensions of a region containing the figures associated with
-#    # an higher-level entity (proceedings, author, keyword)
-#    # base computation on largest matrix for all higher-level entities
-#    nbFigColMax = max(nbFigColProc, nbFigColAu, nbFigColKw)
-#    nbFigRowMax = max(nbFigRowProc, nbFigRowAu, nbFigRowKw)
-#    # leave an empty space between figures that is equal to a figure in size
-#    FIGURE_REGION_WIDTH = int(PAPER_REGION_WIDTH * (2 * nbFigColMax))
-#	# consider width instead of height as we lay out objects in a square matrix
-#    FIGURE_REGION_HEIGHT = int(PAPER_REGION_WIDTH * (2 * nbFigRowMax))
-#    # compute L1 from author matrix as there are much more authors than years
-#    nbAuthColRow = matrixLayout(authCount)
-#    # last * 2 to make harmonize sizes of keywords, years, authors
-#    L1_REGION_WIDTH = int(FIGURE_REGION_WIDTH * (2 * nbAuthColRow[0])) * 2
-#    L1_REGION_HEIGHT = int(FIGURE_REGION_HEIGHT * (2 * nbAuthColRow[1])) * 2
-#    
+    log("Maximum paper count per year per category per team/author: %s" % mppCount, 0)
+    log("Maximum year count per category per team/author: %s" % mpyCount, 0)
+    log("Maximum category count per team/author: %s" % mpcCount, 0)
+    
+    # compute dimensions of a region containing the pages of a paper
+    nbColRow = matrixLayout(mpgCount)
+    log("Largest matrix of pages will be %sx%s" % nbColRow)
+    # leave an empty space between pages that is .1 a page in size
+    # same before first page and after last page (hence the +.1)
+    PAPER_REGION_WIDTH = int(nbColRow[0] * PPW * 1.1)
+    PAPER_REGION_HEIGHT = int(nbColRow[1] * PPH * 1.1)
+    
+    # compute dimensions of a region containing all papers for a given year
+    nbColRow = matrixLayout(mppCount)
+    log("Largest matrix of papers will be %sx%s" % nbColRow)
+    META_REGION_WIDTH = int(PAPER_REGION_WIDTH * (2 * nbColRow[0]))
+	# (consider width instead of height as we lay out objects in a square matrix)
+    META_REGION_HEIGHT = int(PAPER_REGION_WIDTH * (2 * nbColRow[1]))
+    log("Meta region: %s x %s" % (META_REGION_WIDTH, META_REGION_HEIGHT), 2)
+    
+    # compute dimensions of a region containing all years for a given category
+    # (all years put on a single column ; there are only five)
+    YEAR_REGION_WIDTH = int(META_REGION_WIDTH * mpyCount * 1.1)
+    YEAR_REGION_HEIGHT = int(META_REGION_HEIGHT * mpyCount * 1.1)
+    log("Year region: %s x %s" % (YEAR_REGION_WIDTH, YEAR_REGION_HEIGHT), 2)
+    
+    # compute dimensions of a region containing all categories for a given team/author
+    CAT_REGION_WIDTH = int(YEAR_REGION_WIDTH * mpcCount * 1.1)
+    CAT_REGION_HEIGHT = int(YEAR_REGION_HEIGHT * mpcCount * 1.1)
+    log("Category region: %s x %s" % (CAT_REGION_WIDTH, CAT_REGION_HEIGHT), 2)
+    
     # generate the XML scene
     outputroot = ET.Element("scene")
-    level_entry = ET.SubElement(outputroot, "level")
-    level_entry.set("depth", "0")
-    level_entry.set("ceiling", LEVEL0_CEILING)
-    level_entry.set("floor", LEVEL0_FLOOR)
-    level1 = ET.SubElement(outputroot, "level")
-    level1.set("depth", "1")
-    level1.set("ceiling", LEVEL1_CEILING)
-    level1.set("floor", LEVEL1_FLOOR)
-    level_figs = ET.SubElement(outputroot, "level")
-    level_figs.set("depth", "2")
-    level_figs.set("ceiling", TITLE_LEVEL_CEILING)
-    level_figs.set("floor", TITLE_LEVEL_FLOOR)
-    level_lpapers = ET.SubElement(outputroot, "level")
-    level_lpapers.set("depth", "3")
-    level_lpapers.set("ceiling", PAPER_LEVEL_CEILING)
-    level_lpapers.set("floor", PAPER_LEVEL_FLOOR)
-#    root_region_el = ET.SubElement(outputroot, "region")
-#    root_region_el.set('id', 'root')
-#    root_region_el.set("levels", '0')
-#    root_region_el.set("tful", FADE_IN)
-#    root_region_el.set("tfll", FADE_IN)
-#    root_region_el.set("ttul", FADE_OUT)
-#    root_region_el.set("ttll", FADE_OUT)
-#    root_region_el.set('x', '0')
-#    root_region_el.set('y', '0')
-#    root_region_el.set('w', str(int(4 * L1_REGION_WIDTH)))
-#    root_region_el.set('h', str(int(4 * L1_REGION_HEIGHT)))
-#    root_region_el.set('stroke', "white")
-#    root_region_el.set('sensitive', "true")
-#    object_el = ET.SubElement(root_region_el, "object")
-#    object_el.set('id', "entryYearLb")
-#    object_el.set('type', "text")
-#    object_el.set('x', str(-L1_REGION_WIDTH))
-#    object_el.set('y', str(L1_REGION_HEIGHT/3))
-#    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
-#    object_el.set('sensitive', "false")
-#    object_el.text = "By year"
-#    object_el = ET.SubElement(root_region_el, "object")
-#    object_el.set('id', "yearsLb")
-#    object_el.set('type', "text")
-#    object_el.set('x', str(-L1_REGION_WIDTH))
-#    object_el.set('y', str(L1_REGION_HEIGHT))
-#    object_el.set('scale', str(int(int(L0_LABEL_SCALE_FACTOR) / 1.5)))
-#    object_el.set('sensitive', "false")
-#    object_el.set("fill", "#AAA")
-#    object_el.text = "1988 ... 2007"
-#    object_el = ET.SubElement(root_region_el, "object")
-#    object_el.set('id', "entryAuthorLb")
-#    object_el.set('type', "text")
-#    object_el.set('x', str(L1_REGION_WIDTH))
-#    object_el.set('y', str(L1_REGION_HEIGHT/3))
-#    object_el.set('sensitive', "false")
-#    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
-#    object_el.text = "By author"
-#    object_el = ET.SubElement(root_region_el, "object")
-#    object_el.set('id', "kwAuthorLb")
-#    object_el.set('type', "text")
-#    object_el.set('x', "0")
-#    object_el.set('y', str(int(-1.75 * L1_REGION_HEIGHT)))
-#    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
-#    object_el.set('sensitive', "false")
-#    object_el.text = "By keyword"
-#
-#    buildTeamTree(outputroot, metadataRoot, matrixLayout(prCount))
+    # levels
+    level_0 = ET.SubElement(outputroot, "level")
+    level_0.set("depth", "0")
+    level_0.set("ceiling", L0_CEILING)
+    level_0.set("floor", L0_FLOOR)
+    level_1 = ET.SubElement(outputroot, "level")
+    level_1.set("depth", "1")
+    level_1.set("ceiling", L1_CEILING)
+    level_1.set("floor", L1_FLOOR)
+    level_cat = ET.SubElement(outputroot, "level")
+    level_cat.set("depth", "2")
+    level_cat.set("ceiling", CAT_LEVEL_CEILING)
+    level_cat.set("floor", CAT_LEVEL_FLOOR)
+    level_year = ET.SubElement(outputroot, "level")
+    level_year.set("depth", "3")
+    level_year.set("ceiling", YEAR_LEVEL_CEILING)
+    level_year.set("floor", YEAR_LEVEL_FLOOR)
+    level_meta = ET.SubElement(outputroot, "level")
+    level_meta.set("depth", "4")
+    level_meta.set("ceiling", META_LEVEL_CEILING)
+    level_meta.set("floor", META_LEVEL_FLOOR)
+    level_paper = ET.SubElement(outputroot, "level")
+    level_paper.set("depth", "5")
+    level_paper.set("ceiling", PAPER_LEVEL_CEILING)
+    level_paper.set("floor", PAPER_LEVEL_FLOOR)
+    # high level regions
+    root_region_el = ET.SubElement(outputroot, "region")
+    root_region_el.set('id', 'root')
+    root_region_el.set("levels", '0')
+    root_region_el.set("tful", FADE_IN)
+    root_region_el.set("tfll", FADE_IN)
+    root_region_el.set("ttul", FADE_OUT)
+    root_region_el.set("ttll", FADE_OUT)
+    root_region_el.set('x', '0')
+    root_region_el.set('y', '0')
+    L0_RH = int(2 * len(tcy2id.keys()) * CAT_REGION_HEIGHT)
+    L0_RW = L0_RH * 2.4
+    root_region_el.set('w', str(int(L0_RW)))
+    root_region_el.set('h', str(int(L0_RH)))
+    root_region_el.set('stroke', "red")
+    root_region_el.set('sensitive', "true")
+    object_el = ET.SubElement(root_region_el, "object")
+    object_el.set('id', "entryTeamLb")
+    object_el.set('type', "text")
+    object_el.set('x', str(int(-L0_RH*0.6)))
+    object_el.set('y', str(0))
+    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
+    object_el.set('sensitive', "false")
+    object_el.text = "By team"
+    object_el = ET.SubElement(root_region_el, "object")
+    object_el.set('id', "entryAuthorLb")
+    object_el.set('type', "text")
+    object_el.set('x', str(int(L0_RH*0.6)))
+    object_el.set('y', str(0))
+    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
+    object_el.set('sensitive', "false")
+    object_el.text = "By author"
+
+
+    buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH)
 #    buildAuthorTree(outputroot, metadataRoot, matrixLayout(prCount))
     
     # serialize the tree
@@ -201,15 +233,13 @@ def buildScene(metadataFile, outputSceneFile):
     tree.write(outputSceneFile, encoding='utf-8') # was iso-8859-1
 
 ################################################################################
-# Max.
+# Abstract tree that will be wlaked to generate the actual ZUIST scene
 ################################################################################
-def getMaxChildren():
-    global year2id
-    global team2id
-    global author2id
+def generateAbstractTree():
     # pages per paper, papers per year/team/author
     max_page_count = 0
     missing_team_paper_ids = []
+    i = 0
     for pid in id2paper.keys():
         referenceEL = id2paper.get(pid)
         if pid in availablePDFs:
@@ -218,13 +248,7 @@ def getMaxChildren():
                 max_page_count = page_count
         else:
             log("Warning: could not find a PDF for %s" % pid, 3)
-        # year
-        year = referenceEL.find('bibentry/year').text
-        if year in year2id.keys():
-            year2id[year].append(referenceEL)
-        else:
-            year2id[year] = [referenceEL,]
-        # team
+        # team / cat / year
         teamsEL = referenceEL.find('bibentry/x-equipes')
         if teamsEL is None:
             log("Warning: could not find any team for %s" % pid, 3)
@@ -232,41 +256,170 @@ def getMaxChildren():
         else:
             for team in normalizeTeams(teamsEL.text):
                 team = team.upper()
-                if team in team2id.keys():
-                    team2id[team].append(referenceEL)
-                else:
-                    team2id[team] = [referenceEL,]
-        # authors
+                if team != "" and team != "EXT":
+                    storeTeamPaper(team, referenceEL)
+        # author / cat / year
         for authorEL in referenceEL.findall('bibentry/authors/author'):
-            if not authorEL.find('first') is None:
-                author = authorEL.find('first').text.lower()
-            if not authorEL.find('last') is None:
-                author = "%s %s" % (author, authorEL.find('last').text.lower())
-            if author in author2id.keys():
-                author2id[author].append(referenceEL)
+            fn = authorEL.find('first')
+            ln = authorEL.find('last')
+            if not fn is None and not ln is None:
+                author = "%s %s" % (fn.text.lower(), ln.text.lower())
+                storeAuthorPaper(author, referenceEL)
+            elif not ln is None:
+                author = ln.text.lower()
+                storeAuthorPaper(author, referenceEL)
+            elif not fn is None:
+                author = fn.text.lower()
+                storeAuthorPaper(author, referenceEL)
+    # max population per level
+    max_paper_per_tcy = 0
+    max_year_per_tc = 0
+    max_cat_per_t = 0
+    for categories in tcy2id.values():
+        catvals = categories.values()
+        if len(catvals) > max_cat_per_t:
+            max_cat_per_t = len(catvals)
+        for years in catvals:
+            yearvals = years.values()
+            if len(yearvals) > max_year_per_tc:
+                max_year_per_tc = len(yearvals)
+            for year in yearvals:
+                if len(year) > max_paper_per_tcy:
+                    max_paper_per_tcy = len(year)
+    max_paper_per_acy = 0
+    max_year_per_ac = 0
+    max_cat_per_a = 0
+    for categories in acy2id.values():
+        catvals = categories.values()
+        if len(catvals) > max_cat_per_t:
+            max_cat_per_t = len(catvals)
+        for years in catvals:
+            yearvals = years.values()
+            if len(yearvals) > max_year_per_tc:
+                max_year_per_tc = len(yearvals)
+            for year in yearvals:
+                if len(year) > max_paper_per_acy:
+                    max_paper_per_acy = len(year)
+    max_paper_count = max(max_paper_per_tcy, max_paper_per_acy)
+    max_year_count = max(max_year_per_tc, max_year_per_ac)
+    max_cat_count = max(max_cat_per_t, max_cat_per_a)
+    return (max_page_count, max_paper_count, max_year_count, max_cat_count)
+
+def storeTeamPaper(team, refEL):
+    global tcy2id
+    category = refEL.find('xtradata/category').text
+    year = refEL.find('bibentry/year').text
+    if tcy2id.has_key(team):
+        categories = tcy2id[team]
+        if categories.has_key(category):
+            years = categories[category]
+            if years.has_key(year):
+                years.get(year).append(refEL)
             else:
-                author2id[author] = [referenceEL,]
+                years[year] = [refEL,]
+        else:
+            categories[category] = {year: [refEL,]}
+    else:
+        tcy2id[team] = {category:{year:[refEL,]}}
     
-    max_paper_per_year = 0
-    for v in year2id.values():
-        if len(v) > max_paper_per_year:
-            max_paper_per_year = len(v)
-    max_paper_per_team = 0
-    # ignoring some teams generates entries with key ""
-    del team2id[""]
-    for k in team2id.keys():
-        print "%s %s" % (k, len(team2id[k]))
-        if k == "EXT":
-            continue
-        if len(team2id[k]) > max_paper_per_team:
-            max_paper_per_team = len(team2id[k])
-    max_paper_per_author = 0
-    for v in author2id.values():
-        if len(v) > max_paper_per_author:
-            max_paper_per_author = len(v)
-    max_paper_count = max(max_paper_per_year, max_paper_per_team, max_paper_per_author)
-    print (max_page_count, max_paper_count, max_paper_per_year, max_paper_per_team, max_paper_per_author)
-    return (max_page_count, max_paper_count, max_paper_per_year, max_paper_per_team, max_paper_per_author)
+def storeAuthorPaper(author, refEL):
+    global acy2id
+    category = refEL.find('xtradata/category').text
+    year = refEL.find('bibentry/year').text
+    if acy2id.has_key(author):
+        categories = acy2id[author]
+        if categories.has_key(category):
+            years = categories[category]
+            if years.has_key(year):
+                years.get(year).append(refEL)
+            else:
+                years[year] = [refEL,]
+        else:
+            categories[category] = {year: [refEL,]}
+    else:
+        acy2id[author] = {category:{year:[refEL,]}}
+
+################################################################################
+# Build scene subtree that corresponds to browsing papers per team/categ./year
+################################################################################
+def buildTeamTree(outputParent, xc, yc, w, h):
+    log("Building team tree", 1)
+    region_el = ET.SubElement(outputParent, "region")
+    region_el.set("x", str(int(xc)))
+    region_el.set("y", str(int(yc)))
+    region_el.set("w", str(int(w)))
+    region_el.set("h", str(int(h)))
+    region_el.set("levels", "1")
+    region_el.set("id", "teams")
+    region_el.set("title", "Teams")
+    region_el.set("containedIn", "root")
+    region_el.set("stroke", "blue")
+    region_el.set("tful", FADE_IN)
+    region_el.set("tfll", FADE_IN)
+    region_el.set("ttul", FADE_OUT)
+    region_el.set("ttll", FADE_OUT)
+    region_el.set("sensitive", "true")
+    y = yc + CAT_REGION_HEIGHT * len(tcy2id.keys()) / 2
+    teams = tcy2id.keys()
+    teams.sort()
+    for team in tcy2id.keys():
+        log("Processing team %s" % team, 2)
+        # label
+        object_el = ET.SubElement(region_el, "object")
+        object_el.set('id', "teamLb-%s" % team)
+        object_el.set('type', "text")
+        object_el.set('x', str(int(xc)))
+        object_el.set('y', str(int(y)))
+        object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
+        object_el.text = team
+        object_el.set('fill', "#AAA")
+        catRegID = "%s-team-categories" % (team)
+        object_el.set('takesToRegion', catRegID)
+        categories = tcy2id.get(team)
+        layoutCategories(categories, catRegID, region_el.get('id'),\
+                         "cats", xc, y, outputParent, "%s / Categories" % team)
+        y -= CAT_REGION_HEIGHT
+        
+        
+def layoutCategories(articles, regionID, parentRegionID, idPrefix, xc, yc,\
+         			 outputParent, regionTitle):
+    region_el = ET.SubElement(outputParent, "region")
+    region_el.set("x", str(int(xc)))
+    region_el.set("y", str(int(yc)))
+    region_el.set("w", str(CAT_REGION_WIDTH))
+    region_el.set("h", str(CAT_REGION_HEIGHT))
+    region_el.set("levels", "2")
+    region_el.set("id", regionID)
+    region_el.set("title", regionTitle)
+    region_el.set("containedIn", "root")
+    region_el.set("stroke", "green")
+    region_el.set("tful", FADE_IN)
+    region_el.set("tfll", FADE_IN)
+    region_el.set("ttul", FADE_OUT)
+    region_el.set("ttll", FADE_OUT)
+    region_el.set("sensitive", "true")
+    
+
+################################################################################
+# Build scene subtree that corresponds to browsing papers per author/categ./year
+################################################################################
+def buildAuthorTree(outputParent, metadataRoot, colRow):
+    #    authors = acy2id.keys()
+    #    authors.sort(authorSorter)
+    return
+
+################################################################################
+# Author sorter
+################################################################################
+def authorSorter(a1, a2):
+    a1l = a1.split(" ")[-1]
+    a2l = a2.split(" ")[-1]
+    if  a1l < a2l:
+        return -1
+    elif a1l > a2l:
+        return 1
+    else:
+        return 0
 
 ################################################################################
 # fix inconsistencies in team names
@@ -277,7 +430,7 @@ def normalizeTeams(teams):
         if teams.find(tf) != -1:
             teams = teams.replace(tf, TEAM_FIXES[tf])
     return teams.split(" ")
-    
+
 ################################################################################
 # compute smallest almost square matrix that can accomodate a given number
 # of items
@@ -289,86 +442,6 @@ def matrixLayout(nbItems):
     while nbCol * nbRow < nbItems:
         nbCol += 1
     return (nbCol, nbRow)
-
-################################################################################
-# Build scene subtree that corresponds to browsing papers per team/support/year
-################################################################################
-def buildTeamTree(outputParent, metadataRoot, colRow):
-    log("Building team tree", 1)
-    nbCol = colRow[0]
-    nbRow = colRow[1]
-    xc = int(-L1_REGION_WIDTH)
-    yc = int(L1_REGION_HEIGHT)
-    region_el = ET.SubElement(outputParent, "region")
-    region_el.set("x", str(xc))
-    region_el.set("y", str(yc))
-    region_el.set("w", str(L1_REGION_WIDTH))
-    region_el.set("h", str(L1_REGION_HEIGHT))
-    region_el.set("levels", "1")
-    region_el.set("id", "proceedings")
-    region_el.set("title", "Proceedings")
-    region_el.set("containedIn", "root")
-    region_el.set("stroke", "#AAA")
-    region_el.set("tful", FADE_IN)
-    region_el.set("tfll", FADE_IN)
-    region_el.set("ttul", FADE_OUT)
-    region_el.set("ttll", FADE_OUT)
-    region_el.set('sensitive', "true")
-    yi = -1
-    years = year2papers.keys()
-    years.sort()
-    dx = int(L1_REGION_WIDTH / (nbCol * 2))
-    xo = int(-L1_REGION_WIDTH*1.5 - dx)
-    dy = int(L1_REGION_HEIGHT / (nbRow * 2))
-    # 1.52 instead of 1.5 to slightly offset covers
-    # so that last row's labels fit in
-    y = int(L1_REGION_HEIGHT*1.52 + dy)
-    cover_width = int(dx * 1.45)
-    cover_height = int(dy * 1.45)
-    for row in range(nbRow):
-        y -= 2 * dy
-        x = xo
-        for col in range(nbCol):
-            x += 2 * dx
-            yi += 1
-            if yi < len(years):
-                year = years[yi]
-                log("Processing year %s" % year, 2)
-                f = "UIST%s.png" % year
-                f_path = "%s/covers/%s" % (SRC_DIR, f)
-                im = Image.open(f_path)
-                sz = im.size
-                mw = cover_width / sz[0]
-                mh = cover_height / sz[1]
-                minmf = min([mw, mh])
-                w = sz[0] * minmf
-                h = sz[1] * minmf
-                # image
-                object_el = ET.SubElement(region_el, "object")
-                object_el.set('id', "cover-%s" % year)
-                object_el.set('type', "image")
-                object_el.set('x', str(x))
-                object_el.set('y', str(y))
-                object_el.set('w', str(w))
-                object_el.set('h', str(h))
-                object_el.set('src', "covers/%s" % f)
-                figRegID = "procFigs-%s" % year
-                object_el.set('takesToRegion', figRegID)
-                # label
-                object_el = ET.SubElement(region_el, "object")
-                object_el.set('id', "yearLb-%s" % year)
-                object_el.set('type', "text")
-                object_el.set('x', str(x))
-                object_el.set('y', str(int(y-dy)))
-                object_el.set('scale', L1_YEAR_LABEL_SCALE_FACTOR)
-                object_el.text = year
-                object_el.set('fill', "#AAA")
-                object_el.set('takesToRegion', figRegID)
-                articles = year2papers.get(year)
-                layoutFigures(articles, figRegID, region_el.get('id'),\
-                              "proc", x, y, outputParent, year, False)
-            else:
-                break
 
 ################################################################################
 # Trace exec on std output
