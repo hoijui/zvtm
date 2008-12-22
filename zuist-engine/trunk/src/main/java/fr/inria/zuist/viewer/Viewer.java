@@ -103,7 +103,7 @@ public class Viewer implements Java2DPainter {
     static final String ovSpaceName = "Overlay Space";
     VirtualSpace mSpace, ovSpace;
     Camera mCamera;
-    String mCameraAltStr = "0";
+    String mCameraAltStr = Messages.ALTITUDE + "0";
     static final String mViewName = "ZUIST Viewer";
     View mView;
     ViewerEventHandler eh;
