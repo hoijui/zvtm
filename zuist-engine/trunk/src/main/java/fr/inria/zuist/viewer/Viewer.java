@@ -103,6 +103,7 @@ public class Viewer implements Java2DPainter {
     static final String ovSpaceName = "Overlay Space";
     VirtualSpace mSpace, ovSpace;
     Camera mCamera;
+    String mCameraAltStr = "0";
     static final String mViewName = "ZUIST Viewer";
     View mView;
     ViewerEventHandler eh;
@@ -446,6 +447,7 @@ public class Viewer implements Java2DPainter {
 	
     void altitudeChanged(){
         sm.updateLevel(mCamera.altitude);
+        mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
     }
     
     void updatePanelSize(){
@@ -502,7 +504,7 @@ public class Viewer implements Java2DPainter {
             13);
         g2d.drawString(usedMemRatio + "%", 50, 14);
         g2d.drawString(totalMemRatio + "%", 100, 14);
-        g2d.drawString(maxMem/1048576 + " Mb", 170, 14);	
+        g2d.drawString(maxMem/1048576 + " Mb", 160, 14);	
     }
 
     // consider 1000 as the maximum number of requests that can be in the queue at any given time
@@ -522,12 +524,27 @@ public class Viewer implements Java2DPainter {
         g2d.fillRect(viewWidth-Math.round(REQ_QUEUE_BAR_WIDTH * ratio)-10, 7, Math.round(REQ_QUEUE_BAR_WIDTH * ratio), REQ_QUEUE_BAR_HEIGHT);
         g2d.drawRect(viewWidth-REQ_QUEUE_BAR_WIDTH-10, 7, REQ_QUEUE_BAR_WIDTH, REQ_QUEUE_BAR_HEIGHT);
     }
+    
+    void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){        
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.fillRect(240,
+            3,
+            150,
+            13);
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect(240,
+            3,
+            150,
+            13);
+        g2d.drawString(mCameraAltStr, 250, 14);
+    }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!SHOW_MISC_INFO){return;}
 		g2d.setComposite(acST);
 		showMemoryUsage(g2d, viewWidth, viewHeight);
 		showReqQueueStatus(g2d, viewWidth, viewHeight);
+		showAltitude(g2d, viewWidth, viewHeight);
 		g2d.setComposite(Translucent.acO);
     }
 
