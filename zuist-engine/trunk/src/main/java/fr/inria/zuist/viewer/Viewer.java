@@ -127,6 +127,7 @@ public class Viewer implements Java2DPainter {
 			loadScene(xmlSceneFile);
 			getGlobalView();
 		}
+		ovm.toggleConsole();
     }
 
     void initGUI(boolean fullscreen, boolean antialiased){
@@ -463,7 +464,7 @@ public class Viewer implements Java2DPainter {
 	
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;	
-    boolean SHOW_MISC_INFO = false;
+    boolean SHOW_MISC_INFO = true;
 
     void toggleMiscInfoDisplay(){
         SHOW_MISC_INFO = !SHOW_MISC_INFO;
