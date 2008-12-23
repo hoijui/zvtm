@@ -548,7 +548,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                         object_el.set('fill', "black")
                         paperRegID = "R%s%s" % (idPrefix, paperIDs[yi].translate(id_trans))
                         object_el.set('takesToRegion', paperRegID)
-                        yl -= dy / 30
+                        yl -= META_REGION_HEIGHT / 100
                         lineI += 1
                     layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
                                 "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)), x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
@@ -636,7 +636,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('fill', "red")    
 
 ################################################################################
-# Get the number of papers for a given category (for a given team/author)
+# split title, first at <sep>, then for each split line when it is > 50 chars
 ################################################################################
 def splitTitleInLines(title, sep, keepSep):
     sepI = title.find(sep)
@@ -646,7 +646,16 @@ def splitTitleInLines(title, sep, keepSep):
         if keepSep:
             for i in range(len(lines)-1):
                 lines[i] = "%s%s" % (lines[i], sep)
-    return lines
+    res = []
+    for line in lines:
+        if len(line) > 50:
+            splitI = line.find(" ", len(line)/2)
+            if splitI != -1:
+                res.append(line[:splitI])
+                res.append(line[splitI+1:])
+        else:
+            res.append(line)
+    return res
 
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
