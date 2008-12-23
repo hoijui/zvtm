@@ -531,17 +531,25 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 if titleEL is None:
                     log("Error: could not find a title for paper %s" % paperIDs[yi])
                 else:
-                    #XXX: TBW if title is too long, break it into several lines
-                    object_el = ET.SubElement(region_el, "object")
-                    object_el.set('id', "%s%s" % (idPrefix, paperIDs[yi].translate(id_trans)))
-                    object_el.set('type', "text")
-                    object_el.set('x', str(int(x)))
-                    object_el.set('y', str(int(y)))
-                    object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
-                    object_el.text = titleEL.text
-                    object_el.set('fill', "black")
-                    paperRegID = "R%s%s" % (idPrefix, paperIDs[yi].translate(id_trans))
-                    object_el.set('takesToRegion', paperRegID)
+                    if len(titleEL.text) > 40:
+                        titleLines = splitTitleInLines(titleEL.text, ":", True)
+                    else:
+                        titleLines = [titleEL.text]
+                    lineI = 0
+                    yl = y
+                    for line in titleLines:
+                        object_el = ET.SubElement(region_el, "object")
+                        object_el.set('id', "%s%sline%s" % (idPrefix, paperIDs[yi].translate(id_trans), lineI))
+                        object_el.set('type', "text")
+                        object_el.set('x', str(int(x)))
+                        object_el.set('y', str(int(yl)))
+                        object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
+                        object_el.text = line
+                        object_el.set('fill', "black")
+                        paperRegID = "R%s%s" % (idPrefix, paperIDs[yi].translate(id_trans))
+                        object_el.set('takesToRegion', paperRegID)
+                        yl -= dy / 30
+                        lineI += 1
                     layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
                                 "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)), x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
             else:
@@ -626,7 +634,20 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('scale', NOPDF_LABEL_SCALE_FACTOR)
         object_el.text = "PDF not available"
         object_el.set('fill', "red")    
-                    
+
+################################################################################
+# Get the number of papers for a given category (for a given team/author)
+################################################################################
+def splitTitleInLines(title, sep, keepSep):
+    sepI = title.find(sep)
+    lines = [title,]
+    if sepI != -1:
+        lines = title.split(sep)
+        if keepSep:
+            for i in range(len(lines)-1):
+                lines[i] = "%s%s" % (lines[i], sep)
+    return lines
+
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
 ################################################################################
