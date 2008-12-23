@@ -3,7 +3,7 @@
 # $Id$
 
 import os, sys
-import math
+import math, string
 import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
@@ -39,11 +39,16 @@ TEAM_LABEL_SCALE_FACTOR = "1000000"
 CATEGORY_LABEL_SCALE_FACTOR = "40000"
 YEAR_LABEL_SCALE_FACTOR = "10000"
 TITLE_LABEL_SCALE_FACTOR = "200"
+NOPDF_LABEL_SCALE_FACTOR = "100"
 
 FADE_IN = "fadein"
 FADE_OUT = "fadeout"
 APPEAR = "appear"
 DISAPPEAR = "disappear"
+
+invalid_id_chars = ":/&'"
+replacement_id_chars  =   "----"
+id_trans = string.maketrans(invalid_id_chars, replacement_id_chars)
 
 ################################################################################
 # METADATA
@@ -76,7 +81,7 @@ TEAM_FIXES = [("alchemy archi", "ARCHI"),
     ("reseaux", "HIPERCOM"),    
     ("hipercom-lri", "HIPERCOM"),
     ("hipercom-", "HIPERCOM"),
-    ("tao", "I&A"),
+    ("tao", "IA"),
     ("graph-comb", "GRAPHCOMB"),
     ("alchemy", "ARCHI"),
     ("gemo", ""), # total (-1) overlap with IASI
@@ -429,7 +434,7 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
     y = yc + YEAR_REGION_HEIGHT * len(categoryKeys) / 2
     for ck in categoryKeys:
         object_el = ET.SubElement(region_el, "object")
-        object_el.set('id', "%s%s" % (idPrefix, ck))
+        object_el.set('id', "%s%s" % (idPrefix, ck.replace(" ", "")))
         object_el.set('type', "text")
         object_el.set('anchor', 'start')
         object_el.set('x', str(int(xc-CAT_REGION_WIDTH/2)))
@@ -437,10 +442,10 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('scale', CATEGORY_LABEL_SCALE_FACTOR)
         object_el.text = "%s (%s)" % (CATEGORIES_LRI_SEPTEMBRE_2008[ck.split(" ")[-1]], countItemsPerCat(categories[ck]))
         object_el.set('fill', "#AAA")
-        catRegID = "R%s%s" % (idPrefix, ck)
+        catRegID = "R%s%s" % (idPrefix, ck.replace(" ", ""))
         object_el.set('takesToRegion', catRegID)
         layoutYears(categories[ck], catRegID, region_el.get('id'),\
-                    "%s-%s-years" % (idPrefix, ck), xc, y, outputParent, "%s / %s / Years" % (idPrefix, ck))
+                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), xc, y, outputParent, "%s / %s / Years" % (idPrefix, ck))
         y -= 1.1 * YEAR_REGION_HEIGHT
         
 ################################################################################
@@ -528,17 +533,17 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 else:
                     #XXX: TBW if title is too long, break it into several lines
                     object_el = ET.SubElement(region_el, "object")
-                    object_el.set('id', "%s%s" % (idPrefix, paperIDs[yi]))
+                    object_el.set('id', "%s%s" % (idPrefix, paperIDs[yi].translate(id_trans)))
                     object_el.set('type', "text")
                     object_el.set('x', str(int(x)))
                     object_el.set('y', str(int(y)))
                     object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
                     object_el.text = titleEL.text
                     object_el.set('fill', "black")
-                    paperRegID = "R%s%s" % (idPrefix, paperIDs[yi])
+                    paperRegID = "R%s%s" % (idPrefix, paperIDs[yi].translate(id_trans))
                     object_el.set('takesToRegion', paperRegID)
                     layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
-                                "%s-%s-pages" % (idPrefix, paperIDs[yi]), x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi]))
+                                "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)), x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
             else:
                 break
     
@@ -584,25 +589,43 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                 object_el.set('stroke', "#AAA")
                 x += PPW * 1.2
         else:
-            pass
-#            colRow = matrixLayout(len(paperIDs))
-#            nbCol = colRow[0]
-#            nbRow = colRow[1]
-#            yi = -1
-#            dx = int(META_REGION_WIDTH / (nbCol * 2))
-#            xo = int(xc-META_REGION_WIDTH/2-dx)
-#            dy = int(META_REGION_HEIGHT / (nbRow * 2))
-#            y = int(yc+META_REGION_HEIGHT/2+dy)
-#            for row in range(nbRow):
-#                x = xo
-#                y -= 2 * dy
-#                for col in range(nbCol):
-#                    x += 2 * dx
-#                    yi += 1
-#                    if yi < len(paperIDs):            
+            colRow = matrixLayout(len(PNGfiles))
+            nbCol = colRow[0]
+            nbRow = colRow[1]
+            yi = -1
+            dx = int(PAPER_REGION_WIDTH / (nbCol * 2))
+            xo = int(xc-PAPER_REGION_WIDTH/2-dx)
+            dy = int(PAPER_REGION_HEIGHT / (nbRow * 2))
+            y = int(yc+PAPER_REGION_HEIGHT/2+dy)
+            for row in range(nbRow):
+                x = xo
+                y -= 2 * dy
+                for col in range(nbCol):
+                    x += 2 * dx
+                    yi += 1
+                    if yi < len(PNGfiles):
+                        pageSrc = "%s/%s" % (paperID, PNGfiles[yi])
+                        object_el = ET.SubElement(region_el, "object")
+                        object_el.set('id', "%sp%s" % (idPrefix, yi+1))
+                        object_el.set('type', "image")
+                        object_el.set('x', str(int(x)))
+                        object_el.set('y', str(int(y)))
+                        object_el.set('w', str(PPW))
+                        object_el.set('h', str(PPH))
+                        object_el.set('src', pageSrc)
+                        object_el.set('stroke', "#AAA")
+                    else:
+                        break            
     else:
-        log("Warning: could not find a PNG directory for paper %s" % paperID, 3)
-    
+        log("Warning: could not find a PNG directory for paper %s" % paperID, 4)
+        object_el = ET.SubElement(region_el, "object")
+        object_el.set('id', "%s_NOPDF" % idPrefix)
+        object_el.set('type', "text")
+        object_el.set('x', str(int(xc)))
+        object_el.set('y', str(int(yc)))
+        object_el.set('scale', NOPDF_LABEL_SCALE_FACTOR)
+        object_el.text = "PDF not available"
+        object_el.set('fill', "red")    
                     
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
