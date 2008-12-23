@@ -509,7 +509,6 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     xo = int(xc-META_REGION_WIDTH/2-dx)
     dy = int(META_REGION_HEIGHT / (nbRow * 2))
     y = int(yc+META_REGION_HEIGHT/2+dy)
-    processedKeys = {}
     for row in range(nbRow):
         x = xo
         y -= 2 * dy
@@ -546,7 +545,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
 ################################################################################
 # Build scene subtree that corresponds to pages
 ################################################################################
-def layoutPages(referenceEL, regionID, parentRegionID, idPrefix, xc, yc,\
+def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
          		outputParent, regionTitle):
     region_el = ET.SubElement(outputParent, "region")
     region_el.set("x", str(int(xc)))
@@ -563,6 +562,47 @@ def layoutPages(referenceEL, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
     region_el.set("sensitive", "true")
+    #referenceEL = id2paper[paperID]
+    paperDir = "%s/lri4z/%s" % (SRC_DIR, paperID)
+    if os.path.exists(paperDir):
+        PNGfiles = os.listdir(paperDir)
+        PNGfiles.sort(pageSorter)
+        if len(PNGfiles) <= 10:
+            x = xc - PPW * 1.2 * len(PNGfiles) / 2
+            i = 0
+            for PNGfile in PNGfiles:
+                i += 1
+                pageSrc = "%s/%s" % (paperID, PNGfile)
+                object_el = ET.SubElement(region_el, "object")
+                object_el.set('id', "%sp%s" % (idPrefix, i))
+                object_el.set('type', "image")
+                object_el.set('x', str(int(x)))
+                object_el.set('y', str(int(yc)))
+                object_el.set('w', str(PPW))
+                object_el.set('h', str(PPH))
+                object_el.set('src', pageSrc)
+                object_el.set('stroke', "#AAA")
+                x += PPW * 1.2
+        else:
+            pass
+#            colRow = matrixLayout(len(paperIDs))
+#            nbCol = colRow[0]
+#            nbRow = colRow[1]
+#            yi = -1
+#            dx = int(META_REGION_WIDTH / (nbCol * 2))
+#            xo = int(xc-META_REGION_WIDTH/2-dx)
+#            dy = int(META_REGION_HEIGHT / (nbRow * 2))
+#            y = int(yc+META_REGION_HEIGHT/2+dy)
+#            for row in range(nbRow):
+#                x = xo
+#                y -= 2 * dy
+#                for col in range(nbCol):
+#                    x += 2 * dx
+#                    yi += 1
+#                    if yi < len(paperIDs):            
+    else:
+        log("Warning: could not find a PNG directory for paper %s" % paperID, 3)
+    
                     
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
@@ -587,6 +627,19 @@ def buildAuthorTree(outputParent, metadataRoot, colRow):
 def authorSorter(a1, a2):
     a1l = a1.split(" ")[-1]
     a2l = a2.split(" ")[-1]
+    if  a1l < a2l:
+        return -1
+    elif a1l > a2l:
+        return 1
+    else:
+        return 0
+        
+################################################################################
+# Page sorter
+################################################################################
+def pageSorter(a1, a2):
+    a1l = int(a1.split("_p")[-1][:-4])
+    a2l = int(a2.split("_p")[-1][:-4])
     if  a1l < a2l:
         return -1
     elif a1l > a2l:
