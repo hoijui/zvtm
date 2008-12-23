@@ -36,6 +36,8 @@ PAPER_LEVEL_FLOOR = "0"
 
 L0_LABEL_SCALE_FACTOR = "4000000"
 TEAM_LABEL_SCALE_FACTOR = "1000000"
+CATEGORY_LABEL_SCALE_FACTOR = "40000"
+YEAR_LABEL_SCALE_FACTOR = "10000"
 
 FADE_IN = "fadein"
 FADE_OUT = "fadeout"
@@ -69,32 +71,32 @@ TEAM_FIXES = {"grand large": "grandlarge",
 
 # from zbib/bib2xml/moulinette/lib/bibliography/aeres.py
 CATEGORIES_LRI_SEPTEMBRE_2008 = {
-    u"1":u"Articles dans des revues internationales ou nationales avec comité de lecture répertoriées dans les bases de données internationales [ACL]", # Titre
+    u"1":u"Articles dans des revues internationales ou nationales avec comité de lecture répertoriées dans les bases de données internationales", # Titre
     u"1.1":u"Revues internationales majeures avec comité de lecture",
     u"1.2":u"Autres revues avec comité de lecture",
     # -----------------
     u"2":u"Conférences données à l’invitation du Comité d’organisation dans un congrès national ou international",
     # -----------------
-    u"3":u"Communications avec actes dans un congrès international ou national [ACT]", # Titre
+    u"3":u"Communications avec actes dans un congrès international ou national", # Titre
     u"3.1":u"Conférences et workshops internationaux majeurs avec actes et comité de lecture",
     u"3.2":u"Conférences et workshops nationaux majeurs avec actes et comité de lecture",
     u"3.3":u"Autres conférences et workshops",
     # -----------------
-    u"4":u"Communications orales [COM] et par affiche [AFF], autres communications dans les conférences et workshops",
+    u"4":u"Communications orales et par affiche, autres communications dans les conférences et workshops",
     # -----------------
-    u"5":u"Ouvrages scientifiques (ou chapitres de ces ouvrages) [OS]",
+    u"5":u"Ouvrages scientifiques (ou chapitres de ces ouvrages)",
     # -----------------
-    u"6":u"Directions d’ouvrages [DO]",
+    u"6":u"Directions d’ouvrages",
     # -----------------
-    u"7":u"Ouvrages de vulgarisation (ou chapitres de ces ouvrages) [OV], diffusion de la connaissance",
+    u"7":u"Ouvrages de vulgarisation (ou chapitres de ces ouvrages), diffusion de la connaissance",
     # -----------------
-    u"8":u"Autres publications [AP]",
+    u"8":u"Autres publications",
     # -----------------
-    u"9":u"Thèses [TH] et habilitations soutenues",
+    u"9":u"Thèses et habilitations soutenues",
     # -----------------
     u"xx":u"Type et/ou support non renseigné(s)" # Important: garder "xx" pour texreport
     }
-        
+
 ################################################################################
 # Walk the hierarchy of UIST proceedings and generate XML scene description
 ################################################################################
@@ -224,7 +226,7 @@ def buildScene(metadataFile, outputSceneFile):
     object_el.text = "By author"
 
 
-    buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH)
+    buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
 #    buildAuthorTree(outputroot, metadataRoot, matrixLayout(prCount))
     
     # serialize the tree
@@ -359,10 +361,10 @@ def buildTeamTree(outputParent, xc, yc, w, h):
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
     region_el.set("sensitive", "true")
-    y = yc + CAT_REGION_HEIGHT * len(tcy2id.keys()) / 2
     teams = tcy2id.keys()
     teams.sort()
-    for team in tcy2id.keys():
+    y = yc + CAT_REGION_HEIGHT * 1.5 * len(teams) / 2
+    for team in teams:
         log("Processing team %s" % team, 2)
         # label
         object_el = ET.SubElement(region_el, "object")
@@ -373,15 +375,18 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
         object_el.text = team
         object_el.set('fill', "#AAA")
-        catRegID = "%s-team-categories" % (team)
+        catRegID = "R%s-team-categories" % (team)
         object_el.set('takesToRegion', catRegID)
         categories = tcy2id.get(team)
         layoutCategories(categories, catRegID, region_el.get('id'),\
-                         "cats", xc, y, outputParent, "%s / Categories" % team)
-        y -= CAT_REGION_HEIGHT
+                         "%s-cats-" % team, xc, y, outputParent, "%s / Categories" % team)
+        y -= 1.5 * CAT_REGION_HEIGHT
         
-        
-def layoutCategories(articles, regionID, parentRegionID, idPrefix, xc, yc,\
+################################################################################
+# Build scene subtree that corresponds to categories
+# (contains papers organized by year)
+################################################################################
+def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
          			 outputParent, regionTitle):
     region_el = ET.SubElement(outputParent, "region")
     region_el.set("x", str(int(xc)))
@@ -391,14 +396,79 @@ def layoutCategories(articles, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("levels", "2")
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
-    region_el.set("containedIn", "root")
+    region_el.set("containedIn", parentRegionID)
     region_el.set("stroke", "green")
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
     region_el.set("sensitive", "true")
-    
+    categoryKeys = categories.keys()
+    categoryKeys.sort()
+    y = yc + YEAR_REGION_HEIGHT * len(categoryKeys) / 2
+    for ck in categoryKeys:
+        object_el = ET.SubElement(region_el, "object")
+        object_el.set('id', "%s%s" % (idPrefix, ck))
+        object_el.set('type', "text")
+        object_el.set('anchor', 'start')
+        object_el.set('x', str(int(xc-CAT_REGION_WIDTH/2)))
+        object_el.set('y', str(int(y)))
+        object_el.set('scale', CATEGORY_LABEL_SCALE_FACTOR)
+        object_el.text = "%s (%s)" % (CATEGORIES_LRI_SEPTEMBRE_2008[ck.split(" ")[-1]], countItemsPerCat(categories[ck]))
+        object_el.set('fill', "#AAA")
+        catRegID = "R%s%s" % (idPrefix, ck)
+        object_el.set('takesToRegion', catRegID)
+        layoutYears(categories[ck], catRegID, region_el.get('id'),\
+                    "%s-%s-years-" % (idPrefix, ck), xc, y, outputParent, "%s / %s / Years" % (idPrefix, ck))
+        y -= 1.1 * YEAR_REGION_HEIGHT
+        
+################################################################################
+# Build scene subtree that corresponds to categories
+# (contains papers organized by year)
+################################################################################
+def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
+         		outputParent, regionTitle):
+    region_el = ET.SubElement(outputParent, "region")
+    region_el.set("x", str(int(xc)))
+    region_el.set("y", str(int(yc)))
+    region_el.set("w", str(YEAR_REGION_WIDTH))
+    region_el.set("h", str(YEAR_REGION_HEIGHT))
+    region_el.set("levels", "3")
+    region_el.set("id", regionID)
+    region_el.set("title", regionTitle)
+    region_el.set("containedIn", parentRegionID)
+    region_el.set("stroke", "orange")
+    region_el.set("tful", FADE_IN)
+    region_el.set("tfll", FADE_IN)
+    region_el.set("ttul", FADE_OUT)
+    region_el.set("ttll", FADE_OUT)
+    region_el.set("sensitive", "true")
+    yearKeys = years.keys()
+    yearKeys.sort()
+    x = xc - META_REGION_WIDTH * len(yearKeys) / 2.4
+    for yk in yearKeys:
+        object_el = ET.SubElement(region_el, "object")
+        object_el.set('id', "%s%s" % (idPrefix, yk))
+        object_el.set('type', "text")
+        object_el.set('x', str(int(x)))
+        object_el.set('y', str(int(yc)))
+        object_el.set('scale', YEAR_LABEL_SCALE_FACTOR)
+        object_el.text = yk
+        object_el.set('fill', "#AAA")
+        yearRegID = "R%s%s" % (idPrefix, yk)
+        object_el.set('takesToRegion', yearRegID)
+#        layoutPapers(years[yk], yearRegID, region_el.get('id'),\
+#                     "%s-papers-" % idPrefix, x, yc, outputParent, "%s / %s / Papers" % (idPrefix, yk))
+        x += 1.1 * META_REGION_WIDTH
+        
+################################################################################
+# Get the number of papers for a given category (for a given team/author)
+################################################################################
+def countItemsPerCat(years):
+    count = 0
+    for year in years.values():
+        count += len(year)
+    return count
 
 ################################################################################
 # Build scene subtree that corresponds to browsing papers per author/categ./year
