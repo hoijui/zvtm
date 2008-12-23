@@ -38,6 +38,7 @@ L0_LABEL_SCALE_FACTOR = "4000000"
 TEAM_LABEL_SCALE_FACTOR = "1000000"
 CATEGORY_LABEL_SCALE_FACTOR = "40000"
 YEAR_LABEL_SCALE_FACTOR = "10000"
+TITLE_LABEL_SCALE_FACTOR = "200"
 
 FADE_IN = "fadein"
 FADE_OUT = "fadeout"
@@ -56,20 +57,38 @@ acy2id = {}
 # paper directory names in lri4z/
 availablePDFs = []
 
-TEAM_FIXES = {"grand large": "grandlarge",
-    "grand large": "PARALL",
-    "proval": "DEMONS",
-    "reseaux": "HIPERCOM",
-    "hipercom-lri": "HIPERCOM",
-    "tao": "I&A",
-    "graph-comb": "GRAPHCOMB",
-    "alchemy": "ARCHI",
-    "gemo": "", # total (-1) overlap with IASI
-    "aviz": "",
-    "compsys": "",
-    "caps": ""}
+################################################################################
+# EXCEPTIONS
+################################################################################
+TEAM_FIXES = [("alchemy archi", "ARCHI"),
+    ("gemo i&a iasi tao", "iasi I&A"),
+    ("grandlarge graphcomb parall", "graphcomb parall"),
+    ("grandlarge parall", "PARALL"),
+    ("grand large parall", "PARALL"),
+    ("grand large", "PARALL"),
+    ("grandlarge", "PARALL"),
+    ("demons ext proval", "DEMONS EXT"),
+    ("demons proval", "DEMONS"),
+    ("proval demons", "DEMONS"),
+    ("proval", "DEMONS"),
+    ("reseaux", "HIPERCOM"),
+    ("hipercom-lri", "HIPERCOM"),
+    ("hipercom-", "HIPERCOM"),
+    ("tao", "I&A"),
+    ("graph-comb", "GRAPHCOMB"),
+    ("alchemy", "ARCHI"),
+    ("gemo", ""), # total (-1) overlap with IASI
+    ("aviz", ""),
+    ("compsys", ""),
+    ("caps", ""),
+    ("lri", "")]
 
+TITLE_ELEMS = ['bibentry/title', 'bibentry/title', 'xtradata/description']
+    
+################################################################################
+# TRANSLATIONS
 # from zbib/bib2xml/moulinette/lib/bibliography/aeres.py
+################################################################################
 CATEGORIES_LRI_SEPTEMBRE_2008 = {
     u"1":u"Articles dans des revues internationales ou nationales avec comité de lecture répertoriées dans les bases de données internationales", # Titre
     u"1.1":u"Revues internationales majeures avec comité de lecture",
@@ -156,7 +175,7 @@ def buildScene(metadataFile, outputSceneFile):
     
     # compute dimensions of a region containing all years for a given category
     # (all years put on a single column ; there are only five)
-    YEAR_REGION_WIDTH = int(META_REGION_WIDTH * mpyCount * 1.1)
+    YEAR_REGION_WIDTH = int(META_REGION_WIDTH * mpyCount * 1.5)
     YEAR_REGION_HEIGHT = int(META_REGION_HEIGHT * mpyCount * 1.1)
     log("Year region: %s x %s" % (YEAR_REGION_WIDTH, YEAR_REGION_HEIGHT), 2)
     
@@ -224,8 +243,7 @@ def buildScene(metadataFile, outputSceneFile):
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.text = "By author"
-
-
+    
     buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
 #    buildAuthorTree(outputroot, metadataRoot, matrixLayout(prCount))
     
@@ -249,7 +267,7 @@ def generateAbstractTree():
             if page_count > max_page_count:
                 max_page_count = page_count
         else:
-            log("Warning: could not find a PDF for %s" % pid, 3)
+            log("Warning: could not find a PDF for %s" % pid, 4)
         # team / cat / year
         teamsEL = referenceEL.find('bibentry/x-equipes')
         if teamsEL is None:
@@ -311,18 +329,19 @@ def storeTeamPaper(team, refEL):
     global tcy2id
     category = refEL.find('xtradata/category').text
     year = refEL.find('bibentry/year').text
+    aa = refEL.get('key')
     if tcy2id.has_key(team):
         categories = tcy2id[team]
         if categories.has_key(category):
             years = categories[category]
             if years.has_key(year):
-                years.get(year).append(refEL)
+                years.get(year).append(refEL.get('key'))
             else:
-                years[year] = [refEL,]
+                years[year] = [refEL.get('key'),]
         else:
-            categories[category] = {year: [refEL,]}
+            categories[category] = {year: [refEL.get('key'),]}
     else:
-        tcy2id[team] = {category:{year:[refEL,]}}
+        tcy2id[team] = {category:{year:[refEL.get('key'),]}}
     
 def storeAuthorPaper(author, refEL):
     global acy2id
@@ -333,13 +352,13 @@ def storeAuthorPaper(author, refEL):
         if categories.has_key(category):
             years = categories[category]
             if years.has_key(year):
-                years.get(year).append(refEL)
+                years.get(year).append(refEL.get('key'))
             else:
-                years[year] = [refEL,]
+                years[year] = [refEL.get('key'),]
         else:
-            categories[category] = {year: [refEL,]}
+            categories[category] = {year: [refEL.get('key'),]}
     else:
-        acy2id[author] = {category:{year:[refEL,]}}
+        acy2id[author] = {category:{year:[refEL.get('key'),]}}
 
 ################################################################################
 # Build scene subtree that corresponds to browsing papers per team/categ./year
@@ -379,7 +398,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         object_el.set('takesToRegion', catRegID)
         categories = tcy2id.get(team)
         layoutCategories(categories, catRegID, region_el.get('id'),\
-                         "%s-cats-" % team, xc, y, outputParent, "%s / Categories" % team)
+                         "%s-cats" % team, xc, y, outputParent, "%s / Categories" % team)
         y -= 1.5 * CAT_REGION_HEIGHT
         
 ################################################################################
@@ -419,12 +438,11 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
         catRegID = "R%s%s" % (idPrefix, ck)
         object_el.set('takesToRegion', catRegID)
         layoutYears(categories[ck], catRegID, region_el.get('id'),\
-                    "%s-%s-years-" % (idPrefix, ck), xc, y, outputParent, "%s / %s / Years" % (idPrefix, ck))
+                    "%s-%s-years" % (idPrefix, ck), xc, y, outputParent, "%s / %s / Years" % (idPrefix, ck))
         y -= 1.1 * YEAR_REGION_HEIGHT
         
 ################################################################################
-# Build scene subtree that corresponds to categories
-# (contains papers organized by year)
+# Build scene subtree that corresponds to years
 ################################################################################
 def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
          		outputParent, regionTitle):
@@ -457,10 +475,93 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('fill', "#AAA")
         yearRegID = "R%s%s" % (idPrefix, yk)
         object_el.set('takesToRegion', yearRegID)
-#        layoutPapers(years[yk], yearRegID, region_el.get('id'),\
-#                     "%s-papers-" % idPrefix, x, yc, outputParent, "%s / %s / Papers" % (idPrefix, yk))
-        x += 1.1 * META_REGION_WIDTH
-        
+        layoutPapers(years[yk], yearRegID, region_el.get('id'),\
+                     "%s-%s-papers" % (idPrefix, yk), x, yc, outputParent, "%s / %s / Papers" % (idPrefix, yk))
+        x += 1.3 * META_REGION_WIDTH
+
+################################################################################
+# Build scene subtree that corresponds to papers
+################################################################################
+def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
+         		 outputParent, regionTitle):
+    region_el = ET.SubElement(outputParent, "region")
+    region_el.set("x", str(int(xc)))
+    region_el.set("y", str(int(yc)))
+    region_el.set("w", str(META_REGION_WIDTH))
+    region_el.set("h", str(META_REGION_HEIGHT))
+    region_el.set("levels", "4")
+    region_el.set("id", regionID)
+    region_el.set("title", regionTitle)
+    region_el.set("containedIn", parentRegionID)
+    region_el.set("stroke", "blue")
+    region_el.set("tful", FADE_IN)
+    region_el.set("tfll", FADE_IN)
+    region_el.set("ttul", FADE_OUT)
+    region_el.set("ttll", FADE_OUT)
+    region_el.set("sensitive", "true")
+    colRow = matrixLayout(len(paperIDs))
+    nbCol = colRow[0]
+    nbRow = colRow[1]
+    yi = -1
+    dx = int(META_REGION_WIDTH / (nbCol * 2))
+    xo = int(xc-META_REGION_WIDTH/2-dx)
+    dy = int(META_REGION_HEIGHT / (nbRow * 2))
+    y = int(yc+META_REGION_HEIGHT/2+dy)
+    processedKeys = {}
+    for row in range(nbRow):
+        x = xo
+        y -= 2 * dy
+        for col in range(nbCol):
+            x += 2 * dx
+            yi += 1
+            if yi < len(paperIDs):
+                j = 0
+                titleEL = None
+                while titleEL is None and j < len(TITLE_ELEMS):
+                    titleEL = id2paper[paperIDs[yi]].find(TITLE_ELEMS[j])
+                    if (j > 0 and titleEL is None):
+                        log("Warning: could not find a %s for paper %s, attempting fallback" % (TITLE_ELEMS[j], paperIDs[yi]), 2)
+                    j += 1
+                if titleEL is None:
+                    log("Error: could not find a title for paper %s" % paperIDs[yi])
+                else:
+                    #XXX: TBW if title is too long, break it into several lines
+                    object_el = ET.SubElement(region_el, "object")
+                    object_el.set('id', "%s%s" % (idPrefix, paperIDs[yi]))
+                    object_el.set('type', "text")
+                    object_el.set('x', str(int(x)))
+                    object_el.set('y', str(int(y)))
+                    object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
+                    object_el.text = titleEL.text
+                    object_el.set('fill', "black")
+                    paperRegID = "R%s%s" % (idPrefix, paperIDs[yi])
+                    object_el.set('takesToRegion', paperRegID)
+                    layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
+                                "%s-%s-pages" % (idPrefix, paperIDs[yi]), x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi]))
+            else:
+                break
+    
+################################################################################
+# Build scene subtree that corresponds to pages
+################################################################################
+def layoutPages(referenceEL, regionID, parentRegionID, idPrefix, xc, yc,\
+         		outputParent, regionTitle):
+    region_el = ET.SubElement(outputParent, "region")
+    region_el.set("x", str(int(xc)))
+    region_el.set("y", str(int(yc)))
+    region_el.set("w", str(PAPER_REGION_WIDTH))
+    region_el.set("h", str(PAPER_REGION_HEIGHT))
+    region_el.set("levels", "5")
+    region_el.set("id", regionID)
+    region_el.set("title", regionTitle)
+    region_el.set("containedIn", parentRegionID)
+    region_el.set("stroke", "red")
+    region_el.set("tful", FADE_IN)
+    region_el.set("tfll", FADE_IN)
+    region_el.set("ttul", FADE_OUT)
+    region_el.set("ttll", FADE_OUT)
+    region_el.set("sensitive", "true")
+                    
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
 ################################################################################
@@ -496,9 +597,9 @@ def authorSorter(a1, a2):
 ################################################################################
 def normalizeTeams(teams):
     teams = teams.lower()
-    for tf in TEAM_FIXES.keys():
-        if teams.find(tf) != -1:
-            teams = teams.replace(tf, TEAM_FIXES[tf])
+    for tf in TEAM_FIXES:
+        if teams.find(tf[0]) != -1:
+            teams = teams.replace(tf[0], tf[1])
     return teams.split(" ")
 
 ################################################################################
