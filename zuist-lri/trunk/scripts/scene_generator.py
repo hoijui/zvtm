@@ -7,6 +7,7 @@ import math, string
 import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
+DEBUG_SCENE = 0
 
 XML_SCENE_FILE_NAME = "scene.xml"
 
@@ -235,7 +236,7 @@ def buildScene(metadataFile, outputSceneFile):
     L0_RW = L0_RH * 2.4
     root_region_el.set('w', str(int(L0_RW)))
     root_region_el.set('h', str(int(L0_RH)))
-    root_region_el.set('stroke', "red")
+    root_region_el.set('stroke', getStroke("red"))
     root_region_el.set('sensitive', "true")
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryTeamLb")
@@ -384,7 +385,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
     region_el.set("id", "teams")
     region_el.set("title", "Teams")
     region_el.set("containedIn", "root")
-    region_el.set("stroke", "blue")
+    region_el.set("stroke", getStroke("blue"))
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
@@ -426,7 +427,7 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
-    region_el.set("stroke", "green")
+    region_el.set("stroke", getStroke("green"))
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
@@ -465,7 +466,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
-    region_el.set("stroke", "orange")
+    region_el.set("stroke", getStroke("orange"))
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
@@ -503,7 +504,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
-    region_el.set("stroke", "blue")
+    region_el.set("stroke", getStroke("blue"))
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
@@ -540,6 +541,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                         titleLines = [titleEL.text]
                     lineI = 0
                     yl = y
+                    zuistObjects = []
                     for line in titleLines:
                         object_el = ET.SubElement(region_el, "object")
                         object_el.set('id', "%s%sline%s" % (idPrefix, paperIDs[yi].translate(id_trans), lineI))
@@ -548,13 +550,20 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                         object_el.set('y', str(int(yl)))
                         object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
                         object_el.text = line
-                        object_el.set('fill', "black")
                         paperRegID = "R%s%s" % (idPrefix, paperIDs[yi].translate(id_trans))
                         object_el.set('takesToRegion', paperRegID)
                         yl -= META_REGION_HEIGHT / 100
                         lineI += 1
-                    layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
-                                "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)), x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
+                        zuistObjects.append(object_el)
+                    pdfAvailable = layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
+                                               "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)),\
+                                               x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
+                    if pdfAvailable:
+                        for zo in zuistObjects:
+                            zo.set('fill', "black")
+                    else:
+                        for zo in zuistObjects:
+                            zo.set('fill', "#777")
             else:
                 break
     
@@ -572,7 +581,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
-    region_el.set("stroke", "red")
+    region_el.set("stroke", getStroke("red"))
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
@@ -626,7 +635,8 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                         object_el.set('src', pageSrc)
                         object_el.set('stroke', "#AAA")
                     else:
-                        break            
+                        break
+        return True
     else:
         log("Warning: could not find a PNG directory for paper %s" % paperID, 4)
         object_el = ET.SubElement(region_el, "object")
@@ -636,7 +646,8 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('y', str(int(yc)))
         object_el.set('scale', NOPDF_LABEL_SCALE_FACTOR)
         object_el.text = "PDF not available"
-        object_el.set('fill', "red")    
+        object_el.set('fill', "red")
+        return False
 
 ################################################################################
 # split title, first at <sep>, then for each split line when it is > 50 chars
@@ -726,6 +737,16 @@ def matrixLayout(nbItems):
     return (nbCol, nbRow)
 
 ################################################################################
+# compute smallest almost square matrix that can accomodate a given number
+# of items
+################################################################################
+def getStroke(color):
+    if DEBUG_SCENE:
+        return color
+    else:
+        return "white"
+
+################################################################################
 # Trace exec on std output
 ################################################################################
 def log(msg, level=0):
@@ -739,6 +760,8 @@ if len(sys.argv) > 1:
     SRC_DIR = os.path.realpath(sys.argv[1])
     if len(sys.argv) > 2:
         TRACE_LEVEL = int(sys.argv[2])
+        if len(sys.argv) > 3:
+            DEBUG_SCENE = int(sys.argv[3])
 else:
     sys.exit(0)
 
