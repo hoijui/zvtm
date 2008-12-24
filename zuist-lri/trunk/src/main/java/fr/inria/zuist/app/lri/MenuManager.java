@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: MenuManager.java,v 1.11 2007/10/15 12:33:33 pietriga Exp $
@@ -79,7 +79,7 @@ public class MenuManager {
     VRectangleST breadcrumbsBox;
     
     /* Name of item also stored in box's type field */
-    static final String[] navMenuItems = {LRIExplorer.NAV_MODE_DEFAULT_STR, LRIExplorer.NAV_MODE_FISHEYE_STR, LRIExplorer.NAV_MODE_FISHEYE2_STR, LRIExplorer.NAV_MODE_SS_STR};
+    static final String[] navMenuItems = {LRIExplorer.NAV_MODE_DEFAULT_STR, LRIExplorer.NAV_MODE_FISHEYE_STR, LRIExplorer.NAV_MODE_SS_STR};
     VRectangleST[] navMenuItemBoxes = new VRectangleST[navMenuItems.length];
     VText[] navMenuItemLabels = new VText[navMenuItems.length];
     

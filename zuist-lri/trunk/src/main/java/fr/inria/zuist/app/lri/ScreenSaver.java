@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: ScreenSaver.java,v 1.4 2007/10/09 11:44:05 pietriga Exp $

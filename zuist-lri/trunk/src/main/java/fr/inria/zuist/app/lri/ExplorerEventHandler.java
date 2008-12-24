@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: ExplorerEventHandler.java,v 1.23 2007/10/15 12:33:33 pietriga Exp $
@@ -97,21 +97,6 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
                 dragging = false;
                 break;
             }
-            case LRIExplorer.NAV_MODE_FISHEYE2:{
-                if (lensType != NO_LENS){
-                    application.flattenLens();
-                }
-                else {
-                    if (cursorNearBorder){
-                        // do not activate the lens when cursor is near the border
-                        return;
-                    }
-                    application.activateLens(jpx, jpy-LRIExplorer.LENS_R1);
-                }
-                // just in case free mode was left without this becoming false
-                dragging = false;
-                break;
-            }
             case LRIExplorer.NAV_MODE_DEFAULT:{
                 dragging = true;
                 break;
@@ -143,12 +128,6 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         }
         switch(application.NAV_MODE){
             case LRIExplorer.NAV_MODE_FISHEYE:{
-                if (lensType != NO_LENS){
-                    application.flattenLens();
-                }
-                break;
-            }
-            case LRIExplorer.NAV_MODE_FISHEYE2:{
                 if (lensType != NO_LENS){
                     application.flattenLens();
                 }
@@ -287,12 +266,6 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         }
         switch(application.NAV_MODE){
             case LRIExplorer.NAV_MODE_FISHEYE:{
-                if (lensType != NO_LENS && application.lens != null){
-                    application.moveLens(jpx, jpy-LRIExplorer.LENS_R1);
-                }
-                break;
-            }
-            case LRIExplorer.NAV_MODE_FISHEYE2:{
                 if (lensType != NO_LENS && application.lens != null){
                     application.moveLens(jpx, jpy-LRIExplorer.LENS_R1);
                 }
