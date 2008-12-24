@@ -8,6 +8,8 @@ import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
 
+XML_SCENE_FILE_NAME = "scene.xml"
+
 # paper page width and height
 PPW = 1224
 PPH = 1584
@@ -147,7 +149,8 @@ def buildScene(metadataFile, outputSceneFile):
     log("Found %s papers in metadata" % len(id2paper.keys()), 2)
     availablePDFs = os.listdir("%s/lri4z" % SRC_DIR)
     # directory contains one subdir per paper, plus scene.xml (which is obvisouly not a PDF)
-    availablePDFs.remove("scene.xml")
+    if availablePDFs.count(XML_SCENE_FILE_NAME):
+        availablePDFs.remove(XML_SCENE_FILE_NAME)
     log ("Found %s papers in PDF directory" % len(availablePDFs), 2)
     # retrieve some global information from hierarchy to compute layout
     t = generateAbstractTree()
@@ -740,5 +743,5 @@ else:
     sys.exit(0)
 
 METADATA_FILE = "%s/%s" % (SRC_DIR, "bibdata.xml")
-XML_SCENE_FILE = "%s/%s" % (SRC_DIR, "lri4z/scene.xml")
+XML_SCENE_FILE = "%s/%s" % (SRC_DIR, "lri4z/%s" % XML_SCENE_FILE_NAME)
 buildScene(METADATA_FILE, XML_SCENE_FILE)
