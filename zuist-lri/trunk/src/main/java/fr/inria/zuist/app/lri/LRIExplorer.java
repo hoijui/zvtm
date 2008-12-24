@@ -93,6 +93,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     static final String ovSpaceName = "Overlay Space";
     VirtualSpace mSpace, mnSpace, ovSpace;
     Camera mCamera, mnCamera, ovCamera;
+    String mCameraAltStr = "0";
     static final String mViewName = "ZUIST-LRI";
     View mView;
     ExplorerEventHandler eh;
@@ -390,6 +391,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     }
 
     void goToRegion(String regionID, float focusScaleFactor){
+        System.out.println("Going to region "+regionID);
         Region r = sm.getRegion(regionID);
         if (r!=null && r.getBounds()!=null){
 			sm.setUpdateLevel(false);
@@ -409,7 +411,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     }
 
     void goToObject(ObjectDescription od, boolean preload, Float atAltitude){
-        System.out.println("going to "+od.getID());
+        System.out.println("Going to object "+od.getID());
         
         final Glyph g = od.getGlyph();
         // g might be null if in a very different location than the region observed right now
@@ -483,19 +485,23 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 
 	void clickedOnRegion(Region r, Glyph g, boolean updateVisibilityWhileMoving){
 		System.err.println("Clicked region "+r.getID()+ " level= "+sm.getCurrentLevel());
-
-		if (sm.getCurrentLevel() == 0 || r.getID().startsWith("ABLr")){
-			rememberLocation(mCamera.getLocation());
-			sm.setUpdateLevel(false);
-			vsm.centerOnGlyph(g, mCamera, ANIM_MOV_LENGTH, true, DEFAULT_FOCUS_SCALE_FACTOR_FOR_REGIONS, new PostAnimationAdapter(){
-				public void animationEnded(Object target, short type, String dimension){
-					sm.setUpdateLevel(true);
-					sm.updateLevel(mCamera.altitude);
-				}
-				});
-		}
-		else if (sm.getCurrentLevel() == 1 && r.getID().equals("root")){
-		    goHome();
+//		if (sm.getCurrentLevel() == 0 || r.getID().startsWith("ABLr")){
+//			rememberLocation(mCamera.getLocation());
+//			sm.setUpdateLevel(false);
+//			vsm.centerOnGlyph(g, mCamera, ANIM_MOV_LENGTH, true, DEFAULT_FOCUS_SCALE_FACTOR_FOR_REGIONS, new PostAnimationAdapter(){
+//				public void animationEnded(Object target, short type, String dimension){
+//					sm.setUpdateLevel(true);
+//					sm.updateLevel(mCamera.altitude);
+//				}
+//				});
+//		}
+		if (sm.getCurrentLevel() <= 1){
+		    if (r.getID().equals("teams")){
+		        goToRegion(r.getID());
+		    }
+		    else {
+    		    goHome();		        
+		    }
 		}
 		else {
 			goUp();
@@ -510,7 +516,6 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             // clicked twice on an object, go to the region where it "takesTo"
             String ttID = od.takesTo();
             short ttT = od.takesToType();
-            System.out.println(ttID+"  [[]]  "+ttT);
             if (ttID != null && ttT == SceneManager.TAKES_TO_REGION){
 				rememberLocation(mCamera.getLocation());
                 sm.setUpdateLevel(false);
@@ -551,9 +556,36 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             return DEFAULT_FOCUS_SCALE_FACTOR_FOR_OBJECTS;
 //        }
     }
+    
+    static final float TEAM_CAMERA_ALTITUDE = 10000000.0f;
+
+    static final String TEAM_LABEL_ID_PREFIX = "teamLb";
 
     void clickedText(TextDescription td){
-        //XXX:TBW
+        System.err.println("Clicked text "+td.getID());
+        String ID = td.getID();
+        if (td == justCenteredOnObject){
+			// clicked twice on an object, go to the region where it "takesTo"
+			String ttID = td.takesTo();
+			short ttT = td.takesToType();
+			if (ttT == SceneManager.TAKES_TO_REGION){
+				rememberLocation(mCamera.getLocation());
+				goToRegion(ttID);					
+			}
+			justCenteredOnObject = null;
+		}
+		else {
+            if (ID.startsWith(TEAM_LABEL_ID_PREFIX)){
+    			rememberLocation(mCamera.getLocation());
+    			goToObject(td, false, TEAM_CAMERA_ALTITUDE);
+    			justCenteredOnObject = td;
+            }
+            else {
+    			rememberLocation(mCamera.getLocation());
+    			goToObject(td, false, null);
+    			justCenteredOnObject = td;                
+            }
+		}
     }
 
 	void rememberLocation(){
@@ -573,7 +605,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		else {previousLocations.add(l);}
 	}
 
-	void moveBack(){		
+	void moveBack(){
 		if (previousLocations.size()>0){
 			Location newlc = (Location)previousLocations.lastElement();
 			Location currentlc = mSpace.getCamera(0).getLocation();
@@ -591,16 +623,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		}
 	}
 
-//    float getAltitudeDelta(Region r){
-//	if (r.getID().startsWith("paper-")){
-//	    return -0.5f;
-//	}
-//	else {
-//	    return -0.25f;
-//	}
-//    }
-
     void altitudeChanged(){
+        mCameraAltStr = String.valueOf(mCamera.getAltitude());
 	    sm.updateLevel(mCamera.altitude);
     }
     
@@ -721,7 +745,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             15);
         g2d.drawString(usedMemRatio + "%", 50, viewHeight - 28);
         g2d.drawString(totalMemRatio + "%", 100, viewHeight - 28);
-        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);	
+        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);
+        g2d.drawString(mCameraAltStr, 250, viewHeight - 28);
     }
     
     // consider 1000 as the maximum number of requests that can be in the queue at any given time

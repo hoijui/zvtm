@@ -65,8 +65,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     boolean dragging = false;
     
     ExplorerEventHandler(LRIExplorer app){
-	this.application = app;
-	oldCameraAltitude = this.application.mCamera.getAltitude();
+        this.application = app;
+        oldCameraAltitude = this.application.mCamera.getAltitude();
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -310,6 +310,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code == KeyEvent.VK_HOME){application.vsm.getGlobalView(application.mCamera, 500);}
+        else if (code == KeyEvent.VK_B){application.moveBack();}
         else if (code == KeyEvent.VK_M){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_G){application.gc();}
         else if (code == KeyEvent.VK_A){application.toggleAntialiasing();}
@@ -360,7 +361,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
     
     void clickedText(TextDescription td){
-	application.clickedText(td);
+	    application.clickedText(td);
     }
 
     void clickedObject(Glyph gl){
