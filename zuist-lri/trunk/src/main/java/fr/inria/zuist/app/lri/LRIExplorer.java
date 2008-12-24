@@ -557,15 +557,18 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 //        }
     }
     
-    static final float TEAM_CAMERA_ALTITUDE = 10000000.0f;
+    static final float TEAM_CAMERA_ALTITUDE = 9000000.0f;
 
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
+    static final String CATEGORY_LABEL_ID_PREFIX = "catLb";
+    static final String YEAR_LABEL_ID_PREFIX = "yearLb";
 
     void clickedText(TextDescription td){
         System.err.println("Clicked text "+td.getID());
         String ID = td.getID();
-        if (td == justCenteredOnObject){
-			// clicked twice on an object, go to the region where it "takesTo"
+        if (ID.startsWith(CATEGORY_LABEL_ID_PREFIX) || ID.startsWith(YEAR_LABEL_ID_PREFIX) || td == justCenteredOnObject){
+            // objects for which we go directly to "takesTo" region, or when
+			// clicked twice on the object, go to the region where it "takesTo"
 			String ttID = td.takesTo();
 			short ttT = td.takesToType();
 			if (ttT == SceneManager.TAKES_TO_REGION){
@@ -575,16 +578,14 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 			justCenteredOnObject = null;
 		}
 		else {
+			rememberLocation(mCamera.getLocation());
             if (ID.startsWith(TEAM_LABEL_ID_PREFIX)){
-    			rememberLocation(mCamera.getLocation());
     			goToObject(td, false, TEAM_CAMERA_ALTITUDE);
-    			justCenteredOnObject = td;
             }
             else {
-    			rememberLocation(mCamera.getLocation());
     			goToObject(td, false, null);
-    			justCenteredOnObject = td;                
             }
+			justCenteredOnObject = td;
 		}
     }
 
