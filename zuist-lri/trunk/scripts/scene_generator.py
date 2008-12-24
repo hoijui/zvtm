@@ -405,11 +405,11 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
         object_el.text = team
         object_el.set('fill', "#AAA")
-        catRegID = "R%s-team-categories" % (team)
+        catRegID = "R-%s-categories" % (team)
         object_el.set('takesToRegion', catRegID)
         categories = tcy2id.get(team)
         layoutCategories(categories, catRegID, region_el.get('id'),\
-                         "%s-cats" % team, xc, y, outputParent, "%s / Categories" % team)
+                         "%s-categories" % team, xc, y, outputParent, "%s / Categories" % team)
         y -= 1.5 * CAT_REGION_HEIGHT
         
 ################################################################################
@@ -438,18 +438,18 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
     y = yc + YEAR_REGION_HEIGHT * len(categoryKeys) / 2
     for ck in categoryKeys:
         object_el = ET.SubElement(region_el, "object")
-        object_el.set('id', "%s%s" % (idPrefix, ck.replace(" ", "")))
+        object_el.set('id', "catLb-%s%s" % (idPrefix, ck.replace(" ", "")))
         object_el.set('type', "text")
         object_el.set('anchor', 'start')
-        object_el.set('x', str(int(xc-CAT_REGION_WIDTH/2)))
+        object_el.set('x', str(int(xc-CAT_REGION_WIDTH/2.2)))
         object_el.set('y', str(int(y)))
         object_el.set('scale', CATEGORY_LABEL_SCALE_FACTOR)
         object_el.text = "%s (%s)" % (CATEGORIES_LRI_SEPTEMBRE_2008[ck.split(" ")[-1]], countItemsPerCat(categories[ck]))
         object_el.set('fill', "#AAA")
-        catRegID = "R%s%s" % (idPrefix, ck.replace(" ", ""))
+        catRegID = "R-%s-%s" % (idPrefix, ck.replace(" ", ""))
         object_el.set('takesToRegion', catRegID)
         layoutYears(categories[ck], catRegID, region_el.get('id'),\
-                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), int(xc-CAT_REGION_WIDTH/2+YEAR_REGION_WIDTH), y,\
+                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), int(xc-CAT_REGION_WIDTH/2.2+YEAR_REGION_WIDTH), y,\
                     outputParent, "%s / %s / Years" % (idPrefix, ck))
         y -= 1.1 * YEAR_REGION_HEIGHT
         
@@ -478,14 +478,14 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
     x = xc - META_REGION_WIDTH * len(yearKeys) / 2.4
     for yk in yearKeys:
         object_el = ET.SubElement(region_el, "object")
-        object_el.set('id', "%s%s" % (idPrefix, yk))
+        object_el.set('id', "yearLb-%s%s" % (idPrefix, yk))
         object_el.set('type', "text")
         object_el.set('x', str(int(x)))
         object_el.set('y', str(int(yc)))
         object_el.set('scale', YEAR_LABEL_SCALE_FACTOR)
         object_el.text = yk
         object_el.set('fill', "#AAA")
-        yearRegID = "R%s%s" % (idPrefix, yk)
+        yearRegID = "R-%s-%s" % (idPrefix, yk)
         object_el.set('takesToRegion', yearRegID)
         layoutPapers(years[yk], yearRegID, region_el.get('id'),\
                      "%s-%s-papers" % (idPrefix, yk), x, yc, outputParent, "%s / %s / Papers" % (idPrefix, yk))
@@ -545,13 +545,13 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                     zuistObjects = []
                     for line in titleLines:
                         object_el = ET.SubElement(region_el, "object")
-                        object_el.set('id', "%s%sline%s" % (idPrefix, paperIDs[yi].translate(id_trans), lineI))
+                        object_el.set('id', "titleLine%s%s-%s" % (idPrefix, paperIDs[yi].translate(id_trans), lineI))
                         object_el.set('type', "text")
                         object_el.set('x', str(int(x)))
                         object_el.set('y', str(int(yl)))
                         object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
                         object_el.text = line
-                        paperRegID = "R%s%s" % (idPrefix, paperIDs[yi].translate(id_trans))
+                        paperRegID = "R-%s-%s" % (idPrefix, paperIDs[yi].translate(id_trans))
                         object_el.set('takesToRegion', paperRegID)
                         yl -= META_REGION_HEIGHT / 100
                         lineI += 1
