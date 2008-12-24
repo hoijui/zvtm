@@ -449,7 +449,8 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
         catRegID = "R%s%s" % (idPrefix, ck.replace(" ", ""))
         object_el.set('takesToRegion', catRegID)
         layoutYears(categories[ck], catRegID, region_el.get('id'),\
-                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), xc, y, outputParent, "%s / %s / Years" % (idPrefix, ck))
+                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), int(xc-CAT_REGION_WIDTH/2+YEAR_REGION_WIDTH), y,\
+                    outputParent, "%s / %s / Years" % (idPrefix, ck))
         y -= 1.1 * YEAR_REGION_HEIGHT
         
 ################################################################################
