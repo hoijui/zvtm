@@ -1029,100 +1029,103 @@ public class VirtualSpaceManager implements AWTEventListener {
     }
 
     /**translates and (un)zooms a camera in order to focus on glyph g
-     *@param g Glyph of interest
-     *@param c Camera to be moved
-     *@param d duration of the animation in ms
-     *@param z if false, do not (un)zoom, just translate (default is true)
-     *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
-     *@param paa post animation action to execute after camera reachers its final position
-     *@return the final camera location
-     */
+        *@param g Glyph of interest
+        *@param c Camera to be moved
+        *@param d duration of the animation in ms
+        *@param z if false, do not (un)zoom, just translate (default is true)
+        *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
+        *@param paa post animation action to execute after camera reachers its final position
+        *@return the final camera location
+        */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, PostAnimationAction paa){
-	View v=null;
-	try {
-	    v=c.getOwningView();
-	    if (v!=null){
-		long dx;
-		long dy;
-		if (g instanceof VText){
-		    VText t=(VText)g;
-		    LongPoint p=t.getBounds(c.getIndex());
-		    if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){
-			dx=g.vx+p.x/2-c.posx;
-			dy=g.vy+p.y/2-c.posy;
-		    }
-		    else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){
-			dx=g.vx-c.posx;
-			dy=g.vy-c.posy;
-		    }
-		    else {
-			dx=g.vx-p.x/2-c.posx;
-			dy=g.vy-p.y/2-c.posy;
-		    }
-		}
-		else if (g instanceof VPath){
-		    VPath p=(VPath)g;
-		    dx=p.realHotSpot.x-c.posx;
-		    dy=p.realHotSpot.y-c.posy;
-		}
-		else {
-		    dx=g.vx-c.posx;
-		    dy=g.vy-c.posy;
-		}
-		float currentAlt=c.getAltitude()+c.getFocal();
-		if (z){
-		    long[] regBounds=v.getVisibleRegion(c);
-		    // region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
-		    // we only take left and down because ratios are equals for left and right, up and down
-		    long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};
-		    float ratio=0;
-		    //compute the mult factor for altitude to see glyph g entirely
-		    if (trRegBounds[0]!=0){
-			if (g instanceof VText){
-			    ratio = ((float)(((VText)g).getBounds(0).x)) / ((float)(g.vx-trRegBounds[0]));
-			}
-			else if (g instanceof RectangularShape){
-			    ratio = ((float)(((RectangularShape)g).getWidth())) / ((float)(g.vx-trRegBounds[0]));
-			}
-			else {
-			    ratio = g.getSize() / ((float)(g.vx-trRegBounds[0]));
-			}
-		    }
-		    //same for Y ; take the max of both
-		    if (trRegBounds[1]!=0){
-			float tmpRatio;
-			if (g instanceof RectangularShape){
-			    tmpRatio = ((float)(((RectangularShape)g).getHeight())) / ((float)(g.vy-trRegBounds[1]));
-			}
-			else {
-			    tmpRatio = (g.getSize())/((float)(g.vy-trRegBounds[1]));
-			}
-			if (tmpRatio>ratio){ratio=tmpRatio;}
-		    }
-		    ratio *= mFactor;
-		    float newAlt=currentAlt*Math.abs(ratio);
-		    float dAlt=newAlt-currentAlt;
-		    Vector prms=new Vector();
-		    prms.add(new Float(dAlt));prms.add(new LongPoint(dx,dy));
-		    animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID(), paa);
-		    return new Location(g.vx,g.vy,newAlt);
-		}
-		else {
-		    animator.createCameraAnimation(d,AnimManager.CA_TRANS_SIG,new LongPoint(dx,dy),c.getID(), paa);
-		    return new Location(g.vx,g.vy,currentAlt);
-		}
-	    }
-	    else return null;
-	}
-	catch (NullPointerException e){
-	    System.err.println("Error:VirtualSpaceManager:centerOnGlyph: ");
-	    System.err.println("Glyph g="+g);
-	    System.err.println("Camera c="+c);
-	    System.err.println("View v="+v);
-	    if (debug){e.printStackTrace();}
-	    else {System.err.println(e);}
-	    return null;
-	}
+        View v=null;
+        try {
+            v=c.getOwningView();
+            if (v!=null){
+                long dx;
+                long dy;
+                if (g instanceof VText){
+                    VText t=(VText)g;
+                    LongPoint p=t.getBounds(c.getIndex());
+                    if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){
+                        dx=g.vx+p.x/2-c.posx;
+                        dy=g.vy+p.y/2-c.posy;
+                    }
+                    else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){
+                        dx=g.vx-c.posx;
+                        dy=g.vy-c.posy;
+                    }
+                    else {
+                        dx=g.vx-p.x/2-c.posx;
+                        dy=g.vy-p.y/2-c.posy;
+                    }
+                }
+                else if (g instanceof VPath){
+                    VPath p=(VPath)g;
+                    dx=p.realHotSpot.x-c.posx;
+                    dy=p.realHotSpot.y-c.posy;
+                }
+                else {
+                    dx=g.vx-c.posx;
+                    dy=g.vy-c.posy;
+                }
+                float currentAlt=c.getAltitude()+c.getFocal();
+                if (z){
+                    long[] regBounds=v.getVisibleRegion(c);
+                    // region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
+                    // we only take left and down because ratios are equals for left and right, up and down
+                    long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};
+                    float ratio=0;
+                    //compute the mult factor for altitude to see glyph g entirely
+                    if (trRegBounds[0]!=0){
+                        if (g instanceof VText){
+                            ratio = ((float)(((VText)g).getBounds(c.getIndex()).x)) / ((float)(g.vx-trRegBounds[0]));
+                        }
+                        else if (g instanceof RectangularShape){
+                            ratio = ((float)(((RectangularShape)g).getWidth())) / ((float)(g.vx-trRegBounds[0]));
+                        }
+                        else {
+                            ratio = g.getSize() / ((float)(g.vx-trRegBounds[0]));
+                        }
+                    }
+                    //same for Y ; take the max of both
+                    if (trRegBounds[1]!=0){
+                        float tmpRatio;
+                        if (g instanceof VText){
+                            tmpRatio = ((float)(((VText)g).getBounds(c.getIndex()).y)) / ((float)(g.vy-trRegBounds[1]));
+                        }
+                        else if (g instanceof RectangularShape){
+                            tmpRatio = ((float)(((RectangularShape)g).getHeight())) / ((float)(g.vy-trRegBounds[1]));
+                        }
+                        else {
+                            tmpRatio = (g.getSize())/((float)(g.vy-trRegBounds[1]));
+                        }
+                        if (tmpRatio>ratio){ratio=tmpRatio;}
+                    }
+                    ratio *= mFactor;
+                    float newAlt=currentAlt*Math.abs(ratio);
+                    float dAlt=newAlt-currentAlt;
+                    Vector prms=new Vector();
+                    prms.add(new Float(dAlt));prms.add(new LongPoint(dx,dy));
+                    animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID(), paa);
+                    return new Location(g.vx,g.vy,newAlt);
+                }
+                else {
+                    animator.createCameraAnimation(d,AnimManager.CA_TRANS_SIG,new LongPoint(dx,dy),c.getID(), paa);
+                    return new Location(g.vx,g.vy,currentAlt);
+                }
+            }
+            else return null;
+        }
+        catch (NullPointerException e){
+            System.err.println("Error:VirtualSpaceManager:centerOnGlyph: ");
+            System.err.println("Glyph g="+g);
+            System.err.println("Camera c="+c);
+            System.err.println("View v="+v);
+            if (debug){e.printStackTrace();}
+            else {System.err.println(e);}
+            return null;
+        }
     }
 
 	/**translates and (un)zooms a camera in order to focus on a specific rectangular region
