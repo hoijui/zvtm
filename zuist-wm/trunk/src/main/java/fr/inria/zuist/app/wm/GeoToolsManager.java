@@ -55,7 +55,7 @@ class GeoToolsManager {
                                                     1, transitions, Region.ORDERING_DISTANCE_STR,
                                                     false, null, null);
 
-        load(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
+//        load(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
 //        load(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
 //        load(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
 //        load(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);

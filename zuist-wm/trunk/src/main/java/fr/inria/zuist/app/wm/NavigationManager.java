@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: GeoToolsManager.java 1030 2007-12-09 16:44:48Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.app.wm;
