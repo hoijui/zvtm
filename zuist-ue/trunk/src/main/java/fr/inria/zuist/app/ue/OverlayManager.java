@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: OverlayManager.java,v 1.5 2007/10/07 13:36:24 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.app.ue;

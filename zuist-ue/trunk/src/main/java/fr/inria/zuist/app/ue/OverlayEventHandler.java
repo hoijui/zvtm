@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: OverlayEventHandler.java,v 1.6 2007/10/15 12:33:33 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.app.ue;
