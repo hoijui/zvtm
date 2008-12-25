@@ -37,12 +37,16 @@ META_LEVEL_FLOOR = "4200"
 PAPER_LEVEL_CEILING = "4200"
 PAPER_LEVEL_FLOOR = "0"
 
-L0_LABEL_SCALE_FACTOR = "4000000"
+L0_LABEL_SCALE_FACTOR = "3000000"
 TEAM_LABEL_SCALE_FACTOR = "1000000"
 CATEGORY_LABEL_SCALE_FACTOR = "40000"
 YEAR_LABEL_SCALE_FACTOR = "10000"
 TITLE_LABEL_SCALE_FACTOR = "200"
 NOPDF_LABEL_SCALE_FACTOR = "100"
+
+MAIN_LABEL_COLOR = "#777"
+MISSING_PAPER_TITLE_COLOR = "#AAA"
+MISSING_PAPER_COLOR = "red"
 
 FADE_IN = "fadein"
 FADE_OUT = "fadeout"
@@ -239,21 +243,32 @@ def buildScene(metadataFile, outputSceneFile):
     root_region_el.set('stroke', getStroke("red"))
     root_region_el.set('sensitive', "true")
     object_el = ET.SubElement(root_region_el, "object")
+    object_el.set('id', "mainLb")
+    object_el.set('type', "text")
+    object_el.set('x', str(0))
+    object_el.set('y', str(int(L0_RH/1.5)))
+    object_el.set('fill', MAIN_LABEL_COLOR)
+    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
+    object_el.set('sensitive', "false")
+    object_el.text = "Browse LRI publications (2005-2008)"
+    object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryTeamLb")
     object_el.set('type', "text")
     object_el.set('x', str(int(-L0_RH*0.6)))
     object_el.set('y', str(0))
+    object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
-    object_el.text = "By team"
+    object_el.text = "by team"
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryAuthorLb")
     object_el.set('type', "text")
     object_el.set('x', str(int(L0_RH*0.6)))
     object_el.set('y', str(0))
+    object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
-    object_el.text = "By author"
+    object_el.text = "by author"
     
     buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
 #    buildAuthorTree(outputroot, metadataRoot, matrixLayout(prCount))
@@ -404,7 +419,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         object_el.set('y', str(int(y)))
         object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
         object_el.text = team
-        object_el.set('fill', "#AAA")
+        object_el.set('fill', MAIN_LABEL_COLOR)
         catRegID = "R-%s-categories" % (team)
         object_el.set('takesToRegion', catRegID)
         categories = tcy2id.get(team)
@@ -445,7 +460,7 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('y', str(int(y)))
         object_el.set('scale', CATEGORY_LABEL_SCALE_FACTOR)
         object_el.text = "%s (%s)" % (CATEGORIES_LRI_SEPTEMBRE_2008[ck.split(" ")[-1]], countItemsPerCat(categories[ck]))
-        object_el.set('fill', "#AAA")
+        object_el.set('fill', MAIN_LABEL_COLOR)
         catRegID = "R-%s-%s" % (idPrefix, ck.replace(" ", ""))
         object_el.set('takesToRegion', catRegID)
         layoutYears(categories[ck], catRegID, region_el.get('id'),\
@@ -484,7 +499,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('y', str(int(yc)))
         object_el.set('scale', YEAR_LABEL_SCALE_FACTOR)
         object_el.text = yk
-        object_el.set('fill', "#AAA")
+        object_el.set('fill', MAIN_LABEL_COLOR)
         yearRegID = "R-%s-%s" % (idPrefix, yk)
         object_el.set('takesToRegion', yearRegID)
         layoutPapers(years[yk], yearRegID, region_el.get('id'),\
@@ -561,10 +576,10 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                                                x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
                     if pdfAvailable:
                         for zo in zuistObjects:
-                            zo.set('fill', "black")
+                            zo.set('fill', MAIN_LABEL_COLOR)
                     else:
                         for zo in zuistObjects:
-                            zo.set('fill', "#777")
+                            zo.set('fill', MISSING_PAPER_TITLE_COLOR)
             else:
                 break
     
@@ -647,7 +662,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('y', str(int(yc)))
         object_el.set('scale', NOPDF_LABEL_SCALE_FACTOR)
         object_el.text = "PDF not available"
-        object_el.set('fill', "red")
+        object_el.set('fill', MISSING_PAPER_COLOR)
         return False
 
 ################################################################################
