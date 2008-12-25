@@ -232,14 +232,14 @@ public class OverlayManager {
         if (!showingAbout){
             fadeAbout = new VRectangleST(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.95f);
-            aboutLine1 = new VText(0, 150, 0, Color.WHITE, "ZUIST-LRI", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
+            aboutLine1 = new VText(0, 170, 0, Color.WHITE, "ZUIST-LRI", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
             aboutLine2 = new VText(0, 80, 0, Color.WHITE, "Emmanuel Pietriga", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLine3 = new VText(0, 50, 0, Color.WHITE, "Nicolas Roussel", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLine4 = new VText(0, 20, 0, Color.WHITE, "Michel Beaudouin-Lafon", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
             insituLogo = new RImage(0, -40, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
-            aboutLine5 = new VText(0, -140, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLine6 = new VText(0, -170, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLine5 = new VText(0, -180, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLine6 = new VText(0, -210, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLine6.setSpecialFont(LRIExplorer.MONOSPACE_FONT);
             application.vsm.addGlyph(fadeAbout, application.ovSpace);
             application.vsm.addGlyph(aboutLine1, application.ovSpace);
