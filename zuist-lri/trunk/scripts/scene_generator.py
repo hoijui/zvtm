@@ -551,35 +551,22 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 if titleEL is None:
                     log("Error: could not find a title for paper %s" % paperIDs[yi])
                 else:
-                    if len(titleEL.text) > 40:
-                        titleLines = splitTitleInLines(titleEL.text, ":", True)
-                    else:
-                        titleLines = [titleEL.text]
-                    lineI = 0
-                    yl = y
-                    zuistObjects = []
-                    for line in titleLines:
-                        object_el = ET.SubElement(region_el, "object")
-                        object_el.set('id', "titleLine%s%s-%s" % (idPrefix, paperIDs[yi].translate(id_trans), lineI))
-                        object_el.set('type', "text")
-                        object_el.set('x', str(int(x)))
-                        object_el.set('y', str(int(yl)))
-                        object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
-                        object_el.text = line
-                        paperRegID = "R-%s-%s" % (idPrefix, paperIDs[yi].translate(id_trans))
-                        object_el.set('takesToRegion', paperRegID)
-                        yl -= META_REGION_HEIGHT / 100
-                        lineI += 1
-                        zuistObjects.append(object_el)
+                    object_el = ET.SubElement(region_el, "object")
+                    object_el.set('id', "titleLb%s%s" % (idPrefix, paperIDs[yi].translate(id_trans)))
+                    object_el.set('type', "text")
+                    object_el.set('x', str(int(x)))
+                    object_el.set('y', str(int(y)))
+                    object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
+                    object_el.text = titleEL.text
+                    paperRegID = "R-%s-%s" % (idPrefix, paperIDs[yi].translate(id_trans))
+                    object_el.set('takesToRegion', paperRegID)
                     pdfAvailable = layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
                                                "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)),\
                                                x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
                     if pdfAvailable:
-                        for zo in zuistObjects:
-                            zo.set('fill', MAIN_LABEL_COLOR)
+                        object_el.set('fill', MAIN_LABEL_COLOR)
                     else:
-                        for zo in zuistObjects:
-                            zo.set('fill', MISSING_PAPER_TITLE_COLOR)
+                        object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
             else:
                 break
     
