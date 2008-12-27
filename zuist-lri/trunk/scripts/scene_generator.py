@@ -450,13 +450,14 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("sensitive", "true")
     categoryKeys = categories.keys()
     categoryKeys.sort()
+    x = int(xc-CAT_REGION_WIDTH/2.2)
     y = yc + YEAR_REGION_HEIGHT * len(categoryKeys) / 2
     for ck in categoryKeys:
         object_el = ET.SubElement(region_el, "object")
         object_el.set('id', "catLb-%s%s" % (idPrefix, ck.replace(" ", "")))
         object_el.set('type', "text")
         object_el.set('anchor', 'start')
-        object_el.set('x', str(int(xc-CAT_REGION_WIDTH/2.2)))
+        object_el.set('x', str(x))
         object_el.set('y', str(int(y)))
         object_el.set('scale', CATEGORY_LABEL_SCALE_FACTOR)
         object_el.text = "%s (%s)" % (CATEGORIES_LRI_SEPTEMBRE_2008[ck.split(" ")[-1]], countItemsPerCat(categories[ck]))
@@ -464,7 +465,7 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
         catRegID = "R-%s-%s" % (idPrefix, ck.replace(" ", ""))
         object_el.set('takesToRegion', catRegID)
         layoutYears(categories[ck], catRegID, region_el.get('id'),\
-                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), int(xc-CAT_REGION_WIDTH/2.2+YEAR_REGION_WIDTH), y,\
+                    "%s-%s-years" % (idPrefix, ck.replace(" ", "")), int(x+YEAR_REGION_WIDTH), y,\
                     outputParent, "%s / %s / Years" % (idPrefix, ck))
         y -= 1.1 * YEAR_REGION_HEIGHT
         
@@ -603,7 +604,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                 i += 1
                 pageSrc = "%s/%s" % (paperID, PNGfile)
                 object_el = ET.SubElement(region_el, "object")
-                object_el.set('id', "%sp%s" % (idPrefix, i))
+                object_el.set('id', "%s_p%s" % (idPrefix, i))
                 object_el.set('type', "image")
                 object_el.set('x', str(int(x)))
                 object_el.set('y', str(int(yc)))
