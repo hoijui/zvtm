@@ -595,8 +595,9 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
     if os.path.exists(paperDir):
         PNGfiles = os.listdir(paperDir)
         PNGfiles.sort(pageSorter)
+        dx = int(PPW * 1.1)
         if len(PNGfiles) <= 10:
-            x = xc - PPW * 1.2 * len(PNGfiles) / 2
+            x = xc - PPW * 1.1 * len(PNGfiles) / 2
             i = 0
             for PNGfile in PNGfiles:
                 i += 1
@@ -610,26 +611,26 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                 object_el.set('h', str(PPH))
                 object_el.set('src', pageSrc)
                 object_el.set('stroke', "#AAA")
-                x += PPW * 1.2
+                x += dx
         else:
             colRow = matrixLayout(len(PNGfiles))
             nbCol = colRow[0]
             nbRow = colRow[1]
             yi = -1
-            dx = int(PAPER_REGION_WIDTH / (nbCol * 2))
-            xo = int(xc-PAPER_REGION_WIDTH/2-dx)
-            dy = int(PAPER_REGION_HEIGHT / (nbRow * 2))
-            y = int(yc+PAPER_REGION_HEIGHT/2+dy)
+            dx = int(PPW * 1.1)
+            xo = int(xc-PAPER_REGION_WIDTH/2+dx/2)
+            dy = int(PPH * 1.1)
+            y = int(yc+PAPER_REGION_HEIGHT/2-dy/2)
             for row in range(nbRow):
                 x = xo
-                y -= 2 * dy
+                y -= dy
                 for col in range(nbCol):
-                    x += 2 * dx
+                    x += dx
                     yi += 1
                     if yi < len(PNGfiles):
                         pageSrc = "%s/%s" % (paperID, PNGfiles[yi])
                         object_el = ET.SubElement(region_el, "object")
-                        object_el.set('id', "%sp%s" % (idPrefix, yi+1))
+                        object_el.set('id', "%s_p%s" % (idPrefix, yi+1))
                         object_el.set('type', "image")
                         object_el.set('x', str(int(x)))
                         object_el.set('y', str(int(y)))
