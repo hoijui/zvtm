@@ -102,8 +102,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 
     /* misc. lens settings */
     Lens lens;
-    static int LENS_R1 = 120;
-    static int LENS_R2 = 60;
+    static int LENS_R1 = 180;
+    static int LENS_R2 = 90;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 2.0;
