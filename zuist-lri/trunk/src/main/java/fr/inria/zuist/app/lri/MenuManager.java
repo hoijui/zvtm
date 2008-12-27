@@ -35,7 +35,7 @@ public class MenuManager {
     static final int BACK_BT_WIDTH = 12;
     static final int BACK_BT_HEIGHT = NAV_MENU_ITEM_HEIGHT;
 
-    static final int ABOUT_BT_WIDTH = 42;
+    static final int ABOUT_BT_WIDTH = 32;
     static final int ABOUT_BT_HEIGHT = NAV_MENU_ITEM_HEIGHT;
     
     static final int MENU_TITLE_HOFFSET = 10;
@@ -123,7 +123,7 @@ public class MenuManager {
         application.vsm.addGlyph(backBtIcon, application.mnSpace);
         aboutBtBox = new VRectangleST(0, 0, 0, ABOUT_BT_WIDTH, ABOUT_BT_HEIGHT,
             MENU_FILL_COLOR, MENU_BORDER_COLOR, MENU_TRANSLUCENCE);
-        aboutBtLabel = new VText(0, 0, 0, MENU_BORDER_COLOR, "About ZUIST...", VText.TEXT_ANCHOR_MIDDLE);
+        aboutBtLabel = new VText(0, 0, 0, MENU_BORDER_COLOR, "About ...", VText.TEXT_ANCHOR_MIDDLE);
         application.vsm.addGlyph(aboutBtBox, application.mnSpace);
         application.vsm.addGlyph(aboutBtLabel, application.mnSpace);
         breadcrumbsBox = new VRectangleST(0, 0, 0, (LRIExplorer.VIEW_MAX_W-MENU_ZONE_WIDTH)/2, UP_BT_HEIGHT,
