@@ -61,6 +61,9 @@ import net.claribole.zvtm.engine.PostAnimationAdapter;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.Level;
+import fr.inria.zuist.engine.RegionListener;
+import fr.inria.zuist.engine.LevelListener;
 import fr.inria.zuist.engine.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
 
@@ -75,7 +78,7 @@ import org.xml.sax.SAXException;
  * @author Emmanuel Pietriga
  */
 
-public class Viewer implements Java2DPainter {
+public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     
     File SCENE_FILE, SCENE_FILE_DIR;
         
@@ -121,6 +124,8 @@ public class Viewer implements Java2DPainter {
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
+        sm.setRegionListener(this);
+        sm.setLevelListener(this);
 		previousLocations = new Vector();
 		ovm.initConsole();
         if (xmlSceneFile != null){
@@ -461,6 +466,22 @@ public class Viewer implements Java2DPainter {
 	}
 
 	/* ---- Debug information ----*/
+	
+	public void enteredRegion(Region r){
+	    ovm.sayInConsole("Entered region "+r.getID()+"\n");
+	}
+
+	public void exitedRegion(Region r){
+	    ovm.sayInConsole("Exited region "+r.getID()+"\n");
+	}
+
+	public void enteredLevel(int depth){
+	    ovm.sayInConsole("Entered level "+depth+"\n");
+	}
+
+	public void exitedLevel(int depth){
+	    ovm.sayInConsole("Exited level "+depth+"\n");
+	}
 	
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;	
