@@ -649,8 +649,14 @@ public class SceneManager {
     }
 
     void updateVisibleRegions(int level, short transition){
-        for (int i=0;i<levels[level].regions.length;i++){
-            levels[level].regions[i].updateVisibility(sceneCameraBounds[levels[level].regions[i].li], currentLevel, transition, regionListener);
+        try {
+	        for (int i=0;i<levels[level].regions.length;i++){
+	            levels[level].regions[i].updateVisibility(sceneCameraBounds[levels[level].regions[i].li], currentLevel, transition, regionListener);
+	        }
+        }
+        catch ( Exception e) { 
+	        System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level.");
+            e.printStackTrace();
         }
     }
 
