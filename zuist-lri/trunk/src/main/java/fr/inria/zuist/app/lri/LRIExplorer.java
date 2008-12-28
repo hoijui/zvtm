@@ -14,7 +14,13 @@ import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.AlphaComposite;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.SwingUtilities;
 
 import java.util.Vector;
@@ -48,6 +54,7 @@ import net.claribole.zvtm.engine.GlyphKillAction;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.glyphs.VTextST;
 import net.claribole.zvtm.lens.*;
+import net.claribole.zvtm.widgets.TranslucentButton;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -67,7 +74,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListener, RegionListener {
+public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListener, RegionListener, ActionListener {
 
     String PATH_TO_HIERARCHY = "data/zbib/output/lri";
     String PATH_TO_SCENE_DIR = PATH_TO_HIERARCHY + "/lri4z";
@@ -156,6 +163,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 
 	Vector previousLocations;
 	static final int MAX_PREV_LOC = 100;
+
+    TranslucentButton prevPageBt, nextPageBt;
     
     static final boolean SHOW_STATUS_BAR = false;
     
@@ -239,6 +248,23 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         mnCamera.setAltitude(0);
         ovCamera.setAltitude(0);
 	    previousLocations = new Vector();
+	    JFrame f = (JFrame)mView.getFrame();
+        JLayeredPane lp = f.getRootPane().getLayeredPane();
+        prevPageBt = new TranslucentButton("Previous page");
+        lp.add(prevPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        prevPageBt.setBounds(panelWidth/2-160, panelHeight-30, 150, 20);
+        nextPageBt = new TranslucentButton("Next page");
+        prevPageBt.setVisible(false);
+        nextPageBt.setVisible(false);
+        prevPageBt.addActionListener(this);
+        nextPageBt.addActionListener(this);
+        MouseListener m0 = new MouseAdapter(){
+            public void mouseExited(MouseEvent e){mView.getFrame().requestFocus();}
+        };
+        prevPageBt.addMouseListener(m0);
+        nextPageBt.addMouseListener(m0);
+        lp.add(nextPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        nextPageBt.setBounds(panelWidth/2+10, panelHeight-30, 150, 20);
 	    System.out.println("View size: "+panelWidth+"x"+panelHeight);
         //  	vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(-10000000L, 0, 0, Color.BLACK, 10000000L, 0), mSpace);
         //  	vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(0, -10000000L, 0, Color.BLACK, 0, 10000000L), mSpace);
@@ -409,8 +435,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     }
 
     void goToObject(ObjectDescription od, boolean preload, Float atAltitude){
-        System.out.println("Going to object "+od.getID());
-        
+        String id = od.getID();
+        System.out.println("Going to object "+id);
         final Glyph g = od.getGlyph();
         // g might be null if in a very different location than the region observed right now
         if (g != null){
@@ -435,6 +461,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
                         });}});
             }
             justCenteredOnObject = od;
+            currentPageID = (id.contains("pages_p")) ? id : null;
         }
         // in which case we attempt to preload the object
         else if (preload){
@@ -644,10 +671,67 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     
     public void enteredLevel(int depth){
         updateBreadcrumbs();
+        if (depth == 5){
+            showPageNavigation();
+        }
     }
     
     /* exiting a level means we have entered another one, taking care of breadcrumb update in there*/
-    public void exitedLevel(int depth){}
+    public void exitedLevel(int depth){
+        if (depth == 5){
+            hidePageNavigation();
+        }
+    }
+    
+    /* --------- Page navigation -------- */
+    
+    String currentPageID = null;
+    
+    void showPageNavigation(){
+        prevPageBt.setVisible(true);
+        nextPageBt.setVisible(true);
+    }
+    
+    void hidePageNavigation(){
+        prevPageBt.setVisible(false);
+        nextPageBt.setVisible(false);
+        mView.getFrame().requestFocus();
+    }
+    
+    public void actionPerformed(ActionEvent e){
+        if (e.getSource() == prevPageBt){
+            goToPreviousPage();
+        }
+        else {
+            // nextPageBt
+            goToNextPage();
+        }
+    }
+    
+    int getPage(String pageID){
+        return Integer.parseInt(pageID.substring(pageID.indexOf("pages_p")+7));
+    }
+    
+    String getIdWithoutPage(String pageID){
+        return pageID.substring(0, pageID.indexOf("pages_p")+7);
+    }
+    
+    void goToPreviousPage(){
+        if (currentPageID != null){
+            int pp = getPage(currentPageID);
+            if (pp > 1){
+                // following line does not seem to yield an existing ID... goToObject(getIdWithoutPage(currentPageID)+(pp-1), false, null);
+            }
+        }
+    }
+    
+    void goToNextPage(){
+        if (currentPageID != null){
+            //XXX:TBW
+        }        
+    }
+    
+    /* ---------- Breadcrumbs ------------ */
     
     String breadcrumbs = EMPTY_STRING;
     static final String BREADCRUMBS_SEPARATOR = " > ";
@@ -676,6 +760,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         g2d.setColor(BREADCRUMB_COLOR);
         g2d.drawString(breadcrumbs, MenuManager.MENU_ZONE_WIDTH+MenuManager.MENU_TITLE_HOFFSET, 14);
     }
+
+    /* ---------- Graphics ------------ */
 
     void updatePanelSize(){
         Dimension d = mView.getPanel().getSize();
