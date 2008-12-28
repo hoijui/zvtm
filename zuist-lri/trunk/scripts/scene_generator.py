@@ -29,8 +29,8 @@ L0_FLOOR = "200000000"
 L1_CEILING = "200000000"
 L1_FLOOR = "10000000"
 CAT_LEVEL_CEILING = "10000000"
-CAT_LEVEL_FLOOR = "700000"
-YEAR_LEVEL_CEILING = "700000"
+CAT_LEVEL_FLOOR = "800000"
+YEAR_LEVEL_CEILING = "800000"
 YEAR_LEVEL_FLOOR = "150000"
 META_LEVEL_CEILING = "150000"
 META_LEVEL_FLOOR = "50000"
@@ -181,8 +181,8 @@ def buildScene(metadataFile, outputSceneFile):
     PAPER_REGION_HEIGHT = int(nbColRow[1] * PPH * 1.1)
     
     # compute dimensions of a region containing all papers for a given year
-    META_REGION_HEIGHT = int(PAPER_REGION_HEIGHT * mppCount)
-    META_REGION_WIDTH = int(META_REGION_HEIGHT * 1.2)
+    META_REGION_HEIGHT = int(PAPER_REGION_HEIGHT * (mppCount+1) * 1.1)
+    META_REGION_WIDTH = int(META_REGION_HEIGHT * 1.1)
     log("Meta region: %s x %s" % (META_REGION_WIDTH, META_REGION_HEIGHT), 2)
     
     # compute dimensions of a region containing all years for a given category
@@ -488,7 +488,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("sensitive", "true")
     yearKeys = years.keys()
     yearKeys.sort()
-    x = xc - META_REGION_WIDTH * len(yearKeys) / 2.4
+    x = xc - META_REGION_WIDTH * (len(yearKeys) / 2.4)
     for yk in yearKeys:
         object_el = ET.SubElement(region_el, "object")
         object_el.set('id', "yearLb-%s%s" % (idPrefix, yk))
@@ -528,15 +528,10 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     nbCol = colRow[0]
     nbRow = colRow[1]
     x = int(xc-META_REGION_WIDTH/2.2)
-    y = yc + PAPER_REGION_HEIGHT * len(paperIDs) / 2
+    y = yc + PAPER_REGION_HEIGHT * (len(paperIDs) / 2 + 1)
+    paperIDs.sort(paperSorter)
     for paperID in paperIDs:
-        j = 0
-        titleEL = None
-        while titleEL is None and j < len(TITLE_ELEMS):
-            titleEL = id2paper[paperID].find(TITLE_ELEMS[j])
-            if (j > 0 and titleEL is None):
-                log("Warning: could not find a %s for paper %s, attempting fallback" % (TITLE_ELEMS[j], paperID), 2)
-            j += 1
+        titleEL = getTitle(paperID)
         if titleEL is None:
             log("Error: could not find a title for paper %s" % paperID)
         else:
@@ -549,14 +544,22 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
             object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
             object_el.text = titleEL.text
             paperRegID = "R-%s-%s" % (idPrefix, paperID.translate(id_trans))
-            object_el.set('takesToRegion', paperRegID)
+            idp = "%s-%s-pages" % (idPrefix, paperID.translate(id_trans))
+            # Layout region slightly on the left w.r.t title to avoid
+            # seeing one or two huge chars from the paper's title for a few moments.
+            # This happens when the system takes some time processing all PDF page load requests,
+            # which delays the processing of the upper level's unload requests.
             pdfAvailable = layoutPages(paperID, paperRegID, region_el.get('id'),\
-                                       "%s-%s-pages" % (idPrefix, paperID.translate(id_trans)),\
-                                       x+PAPER_REGION_WIDTH, y,\
+                                       idp, x-PAPER_REGION_WIDTH, y,\
                                        outputParent, "%s / %s / Pages" % (idPrefix, paperID.translate(id_trans)))
             if pdfAvailable:
+                # if PDF is available, clicking on title takes to first page of paper
+                object_el.set('takesToObject', "%s_p1" % idp)
                 object_el.set('fill', MAIN_LABEL_COLOR)
             else:
+                # if not, takes to the region containing all (missing) pages,
+                # which contains a msg indicating that the PDF is missing
+                object_el.set('takesToRegion', paperRegID)
                 object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
         y -= 1.1 * PAPER_REGION_HEIGHT
     
@@ -643,27 +646,40 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('fill', MISSING_PAPER_COLOR)
         return False
 
+#################################################################################
+## split title, first at <sep>, then for each split line when it is > 50 chars
+#################################################################################
+#def splitTitleInLines(title, sep, keepSep):
+#    sepI = title.find(sep)
+#    lines = [title,]
+#    if sepI != -1:
+#        lines = title.split(sep)
+#        if keepSep:
+#            for i in range(len(lines)-1):
+#                lines[i] = "%s%s" % (lines[i], sep)
+#    res = []
+#    for line in lines:
+#        if len(line) > 50:
+#            splitI = line.find(" ", len(line)/2)
+#            if splitI != -1:
+#                res.append(line[:splitI])
+#                res.append(line[splitI+1:])
+#        else:
+#            res.append(line)
+#    return res
+
 ################################################################################
-# split title, first at <sep>, then for each split line when it is > 50 chars
+# Return the title of a paper
 ################################################################################
-def splitTitleInLines(title, sep, keepSep):
-    sepI = title.find(sep)
-    lines = [title,]
-    if sepI != -1:
-        lines = title.split(sep)
-        if keepSep:
-            for i in range(len(lines)-1):
-                lines[i] = "%s%s" % (lines[i], sep)
-    res = []
-    for line in lines:
-        if len(line) > 50:
-            splitI = line.find(" ", len(line)/2)
-            if splitI != -1:
-                res.append(line[:splitI])
-                res.append(line[splitI+1:])
-        else:
-            res.append(line)
-    return res
+def getTitle(paperID):
+    j = 0
+    titleEL = None
+    while titleEL is None and j < len(TITLE_ELEMS):
+        titleEL = id2paper[paperID].find(TITLE_ELEMS[j])
+        if (j > 0 and titleEL is None):
+            log("Warning: could not find a %s for paper %s, attempting fallback" % (TITLE_ELEMS[j], paperID), 2)
+        j += 1
+    return titleEL
 
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
@@ -704,6 +720,19 @@ def pageSorter(a1, a2):
     if  a1l < a2l:
         return -1
     elif a1l > a2l:
+        return 1
+    else:
+        return 0
+
+################################################################################
+# Paper sorter
+################################################################################
+def paperSorter(a1, a2):
+    a1t = getTitle(a1)
+    a2t = getTitle(a2)
+    if  a1t < a2t:
+        return -1
+    elif a1t > a2t:
         return 1
     else:
         return 0

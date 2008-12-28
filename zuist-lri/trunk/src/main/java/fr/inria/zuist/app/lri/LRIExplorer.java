@@ -561,18 +561,24 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
     static final String CATEGORY_LABEL_ID_PREFIX = "catLb";
     static final String YEAR_LABEL_ID_PREFIX = "yearLb";
+    static final String TITLE_LABEL_ID_PREFIX = "titleLb";
 
     void clickedText(TextDescription td){
         System.err.println("Clicked text "+td.getID());
         String ID = td.getID();
-        if (ID.startsWith(CATEGORY_LABEL_ID_PREFIX) || ID.startsWith(YEAR_LABEL_ID_PREFIX) || td == justCenteredOnObject){
+        if (ID.startsWith(CATEGORY_LABEL_ID_PREFIX) || ID.startsWith(YEAR_LABEL_ID_PREFIX)
+            || ID.startsWith(TITLE_LABEL_ID_PREFIX) || td == justCenteredOnObject){
             // objects for which we go directly to "takesTo" region, or when
 			// clicked twice on the object, go to the region where it "takesTo"
 			String ttID = td.takesTo();
 			short ttT = td.takesToType();
 			if (ttT == SceneManager.TAKES_TO_REGION){
 				rememberLocation(mCamera.getLocation());
-				goToRegion(ttID);					
+				goToRegion(ttID);
+			}
+			else if (ttT == SceneManager.TAKES_TO_OBJECT){
+				rememberLocation(mCamera.getLocation());
+				goToObject(ttID, true, null);
 			}
 			justCenteredOnObject = null;
 		}
