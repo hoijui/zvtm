@@ -24,24 +24,24 @@ YEAR_REGION_HEIGHT = 0
 CAT_REGION_WIDTH = 0
 CAT_REGION_HEIGHT = 0
 
-L0_CEILING = "100000000"
-L0_FLOOR = "60000000"
-L1_CEILING = "60000000"
-L1_FLOOR = "5000000"
-CAT_LEVEL_CEILING = "5000000"
-CAT_LEVEL_FLOOR = "810000"
-YEAR_LEVEL_CEILING = "810000"
-YEAR_LEVEL_FLOOR = "45000"
-META_LEVEL_CEILING = "45000"
-META_LEVEL_FLOOR = "4200"
-PAPER_LEVEL_CEILING = "4200"
+L0_CEILING = "500000000"
+L0_FLOOR = "200000000"
+L1_CEILING = "200000000"
+L1_FLOOR = "10000000"
+CAT_LEVEL_CEILING = "10000000"
+CAT_LEVEL_FLOOR = "700000"
+YEAR_LEVEL_CEILING = "700000"
+YEAR_LEVEL_FLOOR = "150000"
+META_LEVEL_CEILING = "150000"
+META_LEVEL_FLOOR = "50000"
+PAPER_LEVEL_CEILING = "50000"
 PAPER_LEVEL_FLOOR = "0"
 
-L0_LABEL_SCALE_FACTOR = "3000000"
-TEAM_LABEL_SCALE_FACTOR = "1000000"
-CATEGORY_LABEL_SCALE_FACTOR = "40000"
-YEAR_LABEL_SCALE_FACTOR = "10000"
-TITLE_LABEL_SCALE_FACTOR = "200"
+L0_LABEL_SCALE_FACTOR = "9000000"
+TEAM_LABEL_SCALE_FACTOR = "4000000"
+CATEGORY_LABEL_SCALE_FACTOR = "150000"
+YEAR_LABEL_SCALE_FACTOR = "30000"
+TITLE_LABEL_SCALE_FACTOR = "2000"
 NOPDF_LABEL_SCALE_FACTOR = "100"
 
 MAIN_LABEL_COLOR = "#777"
@@ -181,11 +181,8 @@ def buildScene(metadataFile, outputSceneFile):
     PAPER_REGION_HEIGHT = int(nbColRow[1] * PPH * 1.1)
     
     # compute dimensions of a region containing all papers for a given year
-    nbColRow = matrixLayout(mppCount)
-    log("Largest matrix of papers will be %sx%s" % nbColRow)
-    META_REGION_WIDTH = int(PAPER_REGION_WIDTH * (2 * nbColRow[0]))
-	# (consider width instead of height as we lay out objects in a square matrix)
-    META_REGION_HEIGHT = int(PAPER_REGION_WIDTH * (2 * nbColRow[1]))
+    META_REGION_HEIGHT = int(PAPER_REGION_HEIGHT * mppCount)
+    META_REGION_WIDTH = int(META_REGION_HEIGHT * 1.2)
     log("Meta region: %s x %s" % (META_REGION_WIDTH, META_REGION_HEIGHT), 2)
     
     # compute dimensions of a region containing all years for a given category
@@ -530,46 +527,38 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     colRow = matrixLayout(len(paperIDs))
     nbCol = colRow[0]
     nbRow = colRow[1]
-    yi = -1
-    dx = int(META_REGION_WIDTH / (nbCol * 2))
-    xo = int(xc-META_REGION_WIDTH/2-dx)
-    dy = int(META_REGION_HEIGHT / (nbRow * 2))
-    y = int(yc+META_REGION_HEIGHT/2+dy)
-    for row in range(nbRow):
-        x = xo
-        y -= 2 * dy
-        for col in range(nbCol):
-            x += 2 * dx
-            yi += 1
-            if yi < len(paperIDs):
-                j = 0
-                titleEL = None
-                while titleEL is None and j < len(TITLE_ELEMS):
-                    titleEL = id2paper[paperIDs[yi]].find(TITLE_ELEMS[j])
-                    if (j > 0 and titleEL is None):
-                        log("Warning: could not find a %s for paper %s, attempting fallback" % (TITLE_ELEMS[j], paperIDs[yi]), 2)
-                    j += 1
-                if titleEL is None:
-                    log("Error: could not find a title for paper %s" % paperIDs[yi])
-                else:
-                    object_el = ET.SubElement(region_el, "object")
-                    object_el.set('id', "titleLb%s%s" % (idPrefix, paperIDs[yi].translate(id_trans)))
-                    object_el.set('type', "text")
-                    object_el.set('x', str(int(x)))
-                    object_el.set('y', str(int(y)))
-                    object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
-                    object_el.text = titleEL.text
-                    paperRegID = "R-%s-%s" % (idPrefix, paperIDs[yi].translate(id_trans))
-                    object_el.set('takesToRegion', paperRegID)
-                    pdfAvailable = layoutPages(paperIDs[yi], paperRegID, region_el.get('id'),\
-                                               "%s-%s-pages" % (idPrefix, paperIDs[yi].translate(id_trans)),\
-                                               x, y, outputParent, "%s / %s / Pages" % (idPrefix, paperIDs[yi].translate(id_trans)))
-                    if pdfAvailable:
-                        object_el.set('fill', MAIN_LABEL_COLOR)
-                    else:
-                        object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
+    x = int(xc-META_REGION_WIDTH/2.2)
+    y = yc + PAPER_REGION_HEIGHT * len(paperIDs) / 2
+    for paperID in paperIDs:
+        j = 0
+        titleEL = None
+        while titleEL is None and j < len(TITLE_ELEMS):
+            titleEL = id2paper[paperID].find(TITLE_ELEMS[j])
+            if (j > 0 and titleEL is None):
+                log("Warning: could not find a %s for paper %s, attempting fallback" % (TITLE_ELEMS[j], paperID), 2)
+            j += 1
+        if titleEL is None:
+            log("Error: could not find a title for paper %s" % paperID)
+        else:
+            object_el = ET.SubElement(region_el, "object")
+            object_el.set('id', "titleLb%s%s" % (idPrefix, paperID.translate(id_trans)))
+            object_el.set('type', "text")
+            object_el.set('x', str(int(x)))
+            object_el.set('y', str(int(y)))
+            object_el.set('anchor', 'start')
+            object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
+            object_el.text = titleEL.text
+            paperRegID = "R-%s-%s" % (idPrefix, paperID.translate(id_trans))
+            object_el.set('takesToRegion', paperRegID)
+            pdfAvailable = layoutPages(paperID, paperRegID, region_el.get('id'),\
+                                       "%s-%s-pages" % (idPrefix, paperID.translate(id_trans)),\
+                                       x+PAPER_REGION_WIDTH, y,\
+                                       outputParent, "%s / %s / Pages" % (idPrefix, paperID.translate(id_trans)))
+            if pdfAvailable:
+                object_el.set('fill', MAIN_LABEL_COLOR)
             else:
-                break
+                object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
+        y -= 1.1 * PAPER_REGION_HEIGHT
     
 ################################################################################
 # Build scene subtree that corresponds to pages

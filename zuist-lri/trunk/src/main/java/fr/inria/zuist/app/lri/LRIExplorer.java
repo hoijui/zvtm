@@ -119,8 +119,6 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 
     static final float FLOOR_ALTITUDE = 0.0f;
 
-    static final Float AUTHOR_CAMERA_ALTITUDE = new Float(220000.0f);
-
 	static final int ANIM_MOV_LENGTH = 300;
 
     static final Font MAIN_FONT = new Font("Arial", Font.PLAIN, 10);
@@ -558,7 +556,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 //        }
     }
     
-    static final float TEAM_CAMERA_ALTITUDE = 9000000.0f;
+    static final float TEAM_CAMERA_ALTITUDE = 40000000.0f;
 
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
     static final String CATEGORY_LABEL_ID_PREFIX = "catLb";
