@@ -186,7 +186,7 @@ def buildScene(metadataFile, outputSceneFile):
     log("Meta region: %s x %s" % (META_REGION_WIDTH, META_REGION_HEIGHT), 2)
     
     # compute dimensions of a region containing all years for a given category
-    # (all years put on a single column ; there are only five)
+    # (all years put on a single column ; there should be only four for the 2005-2008 version)
     YEAR_REGION_WIDTH = int(META_REGION_WIDTH * mpyCount * 1.5)
     YEAR_REGION_HEIGHT = int(META_REGION_HEIGHT * mpyCount * 1.1)
     log("Year region: %s x %s" % (YEAR_REGION_WIDTH, YEAR_REGION_HEIGHT), 2)
@@ -488,7 +488,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("sensitive", "true")
     yearKeys = years.keys()
     yearKeys.sort()
-    x = xc - META_REGION_WIDTH * (len(yearKeys) / 2.4)
+    x = xc - (META_REGION_WIDTH * 1.5 * (len(yearKeys)-1)) / 2
     for yk in yearKeys:
         object_el = ET.SubElement(region_el, "object")
         object_el.set('id', "yearLb-%s%s" % (idPrefix, yk))
@@ -502,7 +502,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('takesToRegion', yearRegID)
         layoutPapers(years[yk], yearRegID, region_el.get('id'),\
                      "%s-%s-papers" % (idPrefix, yk), x, yc, outputParent, "%s / %s / Papers" % (idPrefix, yk))
-        x += 1.3 * META_REGION_WIDTH
+        x += 1.5 * META_REGION_WIDTH
 
 ################################################################################
 # Build scene subtree that corresponds to papers
