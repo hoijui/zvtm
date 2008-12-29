@@ -55,6 +55,7 @@ import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.glyphs.VTextST;
 import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.widgets.TranslucentButton;
+import net.claribole.zvtm.widgets.TranslucentTextField;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -165,6 +166,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 	static final int MAX_PREV_LOC = 100;
 
     TranslucentButton prevPageBt, nextPageBt;
+    TranslucentTextField pageInfoTf;
     
     static final boolean SHOW_STATUS_BAR = false;
     
@@ -250,15 +252,22 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 	    previousLocations = new Vector();
 	    JFrame f = (JFrame)mView.getFrame();
         JLayeredPane lp = f.getRootPane().getLayeredPane();
-        prevPageBt = new TranslucentButton("Previous page");
+        prevPageBt = new TranslucentButton("Previous");
         prevPageBt.setFont(MAIN_FONT);
         lp.add(prevPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
-        prevPageBt.setBounds(panelWidth/2-160, panelHeight-30, 150, 20);
-        nextPageBt = new TranslucentButton("Next page");
+        prevPageBt.setBounds(panelWidth/2-170, panelHeight-30, 90, 20);
+        pageInfoTf = new TranslucentTextField(NO_PAGE);
+        pageInfoTf.setFont(MAIN_FONT);
+        pageInfoTf.setBorder(null);
+        pageInfoTf.setHorizontalAlignment(TranslucentTextField.CENTER);
+        lp.add(pageInfoTf, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        pageInfoTf.setBounds(panelWidth/2-80, panelHeight-30, 140, 20);
+        nextPageBt = new TranslucentButton("Next");
         lp.add(nextPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
         nextPageBt.setFont(MAIN_FONT);
-        nextPageBt.setBounds(panelWidth/2+10, panelHeight-30, 150, 20);
+        nextPageBt.setBounds(panelWidth/2+60, panelHeight-30, 90, 20);
         prevPageBt.setVisible(false);
+        pageInfoTf.setVisible(false);
         nextPageBt.setVisible(false);
         prevPageBt.addActionListener(this);
         nextPageBt.addActionListener(this);
@@ -463,7 +472,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
                         });}});
             }
             justCenteredOnObject = od;
-            currentPageID = (id.contains("pages_p")) ? id : null;
+            updateCurrentPageID(id);
         }
         // in which case we attempt to preload the object
         else if (preload){
@@ -486,6 +495,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 	void goHome(){
 		rememberLocation(mCamera.getLocation());
 		sm.setUpdateLevel(false);
+		updateCurrentPageID("");
 		vsm.centerOnGlyph(sm.getRegion("root").getBounds(), mCamera, ANIM_MOV_LENGTH, true, DEFAULT_FOCUS_SCALE_FACTOR_FOR_OBJECTS, new PostAnimationAdapter(){
             public void animationEnded(Object target, short type, String dimension){
                 sm.setUpdateLevel(true);
@@ -499,6 +509,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		Region r = sm.getClosestRegionAtCurrentLevel(new LongPoint(mCamera.posx, mCamera.posy));
 		if (r != null && r.getContainingRegion() != null){
 			sm.setUpdateLevel(false);
+			updateCurrentPageID("");
 			vsm.centerOnGlyph(r.getContainingRegion().getBounds(), mCamera, ANIM_MOV_LENGTH, true, DEFAULT_FOCUS_SCALE_FACTOR_FOR_REGIONS, new PostAnimationAdapter(){
                 public void animationEnded(Object target, short type, String dimension){
                     sm.setUpdateLevel(true);
@@ -562,7 +573,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 			rememberLocation(mCamera.getLocation());
 			vsm.centerOnGlyph(g, mCamera, ANIM_MOV_LENGTH, true, getFocusScaleFactorForObjectType(od.getID()));
 			justCenteredOnObject = od;
-			currentPageID = (id.contains("pages_p")) ? id : null;
+			updateCurrentPageID(id);
 		}
     }
     
@@ -689,15 +700,18 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     
     /* --------- Page navigation -------- */
     
+    static final String NO_PAGE = "No page to display";
     String currentPageID = null;
     
     void showPageNavigation(){
         prevPageBt.setVisible(true);
+        pageInfoTf.setVisible(true);
         nextPageBt.setVisible(true);
     }
     
     void hidePageNavigation(){
         prevPageBt.setVisible(false);
+        pageInfoTf.setVisible(false);
         nextPageBt.setVisible(false);
         mView.getFrame().requestFocus();
     }
@@ -713,7 +727,11 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     }
     
     int getPage(String pageID){
-        return Integer.parseInt(pageID.substring(pageID.indexOf("pages_p")+7));
+        return Integer.parseInt(pageID.substring(pageID.indexOf("pages_p")+7, pageID.indexOf("_", pageID.indexOf("pages_p")+7)));
+    }
+    
+    int getPageCount(String pageID){
+        return Integer.parseInt(pageID.substring(pageID.lastIndexOf("_")+1));
     }
     
     String getIdWithoutPage(String pageID){
@@ -723,8 +741,9 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     void goToPreviousPage(){
         if (currentPageID != null){
             int pp = getPage(currentPageID);
+            int pc = getPageCount(currentPageID);
             if (pp > 1){
-                goToObject(getIdWithoutPage(currentPageID)+(pp-1), false, null);
+                goToObject(getIdWithoutPage(currentPageID)+(pp-1)+"_"+(pc), false, null);
             }
         }
     }
@@ -732,10 +751,21 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     void goToNextPage(){
         if (currentPageID != null){
             int pp = getPage(currentPageID);
+            int pc = getPageCount(currentPageID);
             // check that object exists is done in goToObject()
             // (page might not exist, we don't know how many pages the document contains)
-            goToObject(getIdWithoutPage(currentPageID)+(pp+1), false, null);
+            goToObject(getIdWithoutPage(currentPageID)+(pp+1)+"_"+(pc), false, null);
         }        
+    }
+    
+    void updateCurrentPageID(String id){
+        currentPageID = (id.contains("pages_p")) ? id : null;
+        if (currentPageID != null){
+            pageInfoTf.setText("Page "+getPage(currentPageID)+" of "+getPageCount(currentPageID)+" ");
+        }
+        else {
+            pageInfoTf.setText(NO_PAGE);
+        }
     }
     
     /* ---------- Breadcrumbs ------------ */
