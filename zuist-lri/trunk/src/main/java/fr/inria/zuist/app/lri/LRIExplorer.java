@@ -537,7 +537,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     ObjectDescription justCenteredOnObject = null;
 
     void clickedOnObject(ObjectDescription od, Glyph g, boolean updateVisibilityWhileMoving){
-        System.err.println("Clicked object "+od.getID());
+        String id = od.getID();
+        System.err.println("Clicked object "+id);
         if (od == justCenteredOnObject){
             // clicked twice on an object, go to the region where it "takesTo"
             String ttID = od.takesTo();
@@ -559,6 +560,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 			rememberLocation(mCamera.getLocation());
 			vsm.centerOnGlyph(g, mCamera, ANIM_MOV_LENGTH, true, getFocusScaleFactorForObjectType(od.getID()));
 			justCenteredOnObject = od;
+			currentPageID = (id.contains("pages_p")) ? id : null;
 		}
     }
     
@@ -720,14 +722,17 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         if (currentPageID != null){
             int pp = getPage(currentPageID);
             if (pp > 1){
-                // following line does not seem to yield an existing ID... goToObject(getIdWithoutPage(currentPageID)+(pp-1), false, null);
+                goToObject(getIdWithoutPage(currentPageID)+(pp-1), false, null);
             }
         }
     }
     
     void goToNextPage(){
         if (currentPageID != null){
-            //XXX:TBW
+            int pp = getPage(currentPageID);
+            // check that object exists is done in goToObject()
+            // (page might not exist, we don't know how many pages the document contains)
+            goToObject(getIdWithoutPage(currentPageID)+(pp+1), false, null);
         }        
     }
     
