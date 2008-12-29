@@ -544,17 +544,16 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
             object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
             object_el.text = titleEL.text
             paperRegID = "R-%s-%s" % (idPrefix, paperID.translate(id_trans))
-            idp = "%s-%s-pages" % (idPrefix, paperID.translate(id_trans))
             # Layout region slightly on the left w.r.t title to avoid
             # seeing one or two huge chars from the paper's title for a few moments.
             # This happens when the system takes some time processing all PDF page load requests,
             # which delays the processing of the upper level's unload requests.
-            pdfAvailable = layoutPages(paperID, paperRegID, region_el.get('id'),\
-                                       idp, x-PAPER_REGION_WIDTH, y,\
-                                       outputParent, "%s / %s / Pages" % (idPrefix, paperID.translate(id_trans)))
-            if pdfAvailable:
+            firstPageID = layoutPages(paperID, paperRegID, region_el.get('id'),\
+                                      "%s-%s-pages" % (idPrefix, paperID.translate(id_trans)), x-PAPER_REGION_WIDTH, y,\
+                                      outputParent, "%s / %s / Pages" % (idPrefix, paperID.translate(id_trans)))
+            if len(firstPageID):
                 # if PDF is available, clicking on title takes to first page of paper
-                object_el.set('takesToObject', "%s_p1" % idp)
+                object_el.set('takesToObject', firstPageID)
                 object_el.set('fill', MAIN_LABEL_COLOR)
             else:
                 # if not, takes to the region containing all (missing) pages,
@@ -596,7 +595,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                 i += 1
                 pageSrc = "%s/%s" % (paperID, PNGfile)
                 object_el = ET.SubElement(region_el, "object")
-                object_el.set('id', "%s_p%s" % (idPrefix, i))
+                object_el.set('id', "%s_p%s_%s" % (idPrefix, i, len(PNGfiles)))
                 object_el.set('type', "image")
                 object_el.set('x', str(int(x)))
                 object_el.set('y', str(int(yc)))
@@ -623,7 +622,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                     if yi < len(PNGfiles):
                         pageSrc = "%s/%s" % (paperID, PNGfiles[yi])
                         object_el = ET.SubElement(region_el, "object")
-                        object_el.set('id', "%s_p%s" % (idPrefix, yi+1))
+                        object_el.set('id', "%s_p%s_%s" % (idPrefix, yi+1, len(PNGfiles)))
                         object_el.set('type', "image")
                         object_el.set('x', str(int(x)))
                         object_el.set('y', str(int(y)))
@@ -633,7 +632,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                         object_el.set('stroke', "#AAA")
                     else:
                         break
-        return True
+        return "%s_p1_%s" % (idPrefix, len(PNGfiles))
     else:
         log("Warning: could not find a PNG directory for paper %s" % paperID, 4)
         object_el = ET.SubElement(region_el, "object")
@@ -644,7 +643,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         object_el.set('scale', NOPDF_LABEL_SCALE_FACTOR)
         object_el.text = "PDF not available"
         object_el.set('fill', MISSING_PAPER_COLOR)
-        return False
+        return ""
 
 #################################################################################
 ## split title, first at <sep>, then for each split line when it is > 50 chars
