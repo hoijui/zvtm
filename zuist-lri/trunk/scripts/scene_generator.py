@@ -730,6 +730,14 @@ def pageSorter(a1, a2):
 def paperSorter(a1, a2):
     a1t = getTitle(a1)
     a2t = getTitle(a2)
+    if a1t is None:
+        a1t = ""
+    else:
+        a1t = a1t.text.lower()
+    if a2t is None:
+        a2t = ""
+    else:
+        a2t = a2t.text.lower()
     if  a1t < a2t:
         return -1
     elif a1t > a2t:
