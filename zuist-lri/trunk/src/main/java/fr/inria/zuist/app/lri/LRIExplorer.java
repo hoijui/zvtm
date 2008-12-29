@@ -251,9 +251,13 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 	    JFrame f = (JFrame)mView.getFrame();
         JLayeredPane lp = f.getRootPane().getLayeredPane();
         prevPageBt = new TranslucentButton("Previous page");
+        prevPageBt.setFont(MAIN_FONT);
         lp.add(prevPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
         prevPageBt.setBounds(panelWidth/2-160, panelHeight-30, 150, 20);
         nextPageBt = new TranslucentButton("Next page");
+        lp.add(nextPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        nextPageBt.setFont(MAIN_FONT);
+        nextPageBt.setBounds(panelWidth/2+10, panelHeight-30, 150, 20);
         prevPageBt.setVisible(false);
         nextPageBt.setVisible(false);
         prevPageBt.addActionListener(this);
@@ -263,8 +267,6 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         };
         prevPageBt.addMouseListener(m0);
         nextPageBt.addMouseListener(m0);
-        lp.add(nextPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
-        nextPageBt.setBounds(panelWidth/2+10, panelHeight-30, 150, 20);
 	    System.out.println("View size: "+panelWidth+"x"+panelHeight);
         //  	vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(-10000000L, 0, 0, Color.BLACK, 10000000L, 0), mSpace);
         //  	vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(0, -10000000L, 0, Color.BLACK, 0, 10000000L), mSpace);
