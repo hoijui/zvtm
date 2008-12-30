@@ -165,7 +165,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 	Vector previousLocations;
 	static final int MAX_PREV_LOC = 100;
 
-    TranslucentButton prevPageBt, nextPageBt;
+    TranslucentButton prevPageBt, nextPageBt, firstPageBt, lastPageBt;
     TranslucentTextField pageInfoTf;
     
     static final boolean SHOW_STATUS_BAR = false;
@@ -252,10 +252,14 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 	    previousLocations = new Vector();
 	    JFrame f = (JFrame)mView.getFrame();
         JLayeredPane lp = f.getRootPane().getLayeredPane();
+        firstPageBt = new TranslucentButton("|<");
+        firstPageBt.setFont(MAIN_FONT);
+        lp.add(firstPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        firstPageBt.setBounds(panelWidth/2-200, panelHeight-30, 60, 20);
         prevPageBt = new TranslucentButton("<");
         prevPageBt.setFont(MAIN_FONT);
         lp.add(prevPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
-        prevPageBt.setBounds(panelWidth/2-130, panelHeight-30, 50, 20);
+        prevPageBt.setBounds(panelWidth/2-140, panelHeight-30, 60, 20);
         pageInfoTf = new TranslucentTextField(NO_PAGE);
         pageInfoTf.setFont(MAIN_FONT);
         pageInfoTf.setBorder(null);
@@ -266,17 +270,27 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         nextPageBt = new TranslucentButton(">");
         lp.add(nextPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
         nextPageBt.setFont(MAIN_FONT);
-        nextPageBt.setBounds(panelWidth/2+60, panelHeight-30, 50, 20);
+        nextPageBt.setBounds(panelWidth/2+60, panelHeight-30, 60, 20);
+        lastPageBt = new TranslucentButton(">|");
+        lp.add(lastPageBt, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        lastPageBt.setFont(MAIN_FONT);
+        lastPageBt.setBounds(panelWidth/2+120, panelHeight-30, 60, 20);
+        firstPageBt.setVisible(false);
         prevPageBt.setVisible(false);
         pageInfoTf.setVisible(false);
         nextPageBt.setVisible(false);
+        lastPageBt.setVisible(false);
+        firstPageBt.addActionListener(this);
         prevPageBt.addActionListener(this);
         nextPageBt.addActionListener(this);
+        lastPageBt.addActionListener(this);
         MouseListener m0 = new MouseAdapter(){
             public void mouseExited(MouseEvent e){mView.getFrame().requestFocus();}
         };
+        firstPageBt.addMouseListener(m0);
         prevPageBt.addMouseListener(m0);
         nextPageBt.addMouseListener(m0);
+        lastPageBt.addMouseListener(m0);
 	    System.out.println("View size: "+panelWidth+"x"+panelHeight);
         //  	vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(-10000000L, 0, 0, Color.BLACK, 10000000L, 0), mSpace);
         //  	vsm.addGlyph(new com.xerox.VTM.glyphs.VSegment(0, -10000000L, 0, Color.BLACK, 0, 10000000L), mSpace);
@@ -540,7 +554,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		        goToRegion(r.getID());
 		    }
 		    else {
-    		    goHome();		        
+    		    goHome();
 		    }
 		}
 		else {
@@ -705,15 +719,19 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     String currentPageID = null;
     
     void showPageNavigation(){
+        firstPageBt.setVisible(true);
         prevPageBt.setVisible(true);
         pageInfoTf.setVisible(true);
         nextPageBt.setVisible(true);
+        lastPageBt.setVisible(true);
     }
     
     void hidePageNavigation(){
+        firstPageBt.setVisible(false);
         prevPageBt.setVisible(false);
         pageInfoTf.setVisible(false);
         nextPageBt.setVisible(false);
+        lastPageBt.setVisible(false);
         mView.getFrame().requestFocus();
     }
     
@@ -721,9 +739,14 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         if (e.getSource() == prevPageBt){
             goToPreviousPage();
         }
-        else {
-            // nextPageBt
+        else if (e.getSource() == nextPageBt){
             goToNextPage();
+        }
+        else if (e.getSource() == lastPageBt){
+            goToLastPage();
+        }
+        else if (e.getSource() == firstPageBt){
+            goToFirstPage();
         }
     }
     
@@ -758,7 +781,21 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             goToObject(getIdWithoutPage(currentPageID)+(pp+1)+"_"+(pc), false, null);
         }        
     }
-    
+
+    void goToFirstPage(){
+        if (currentPageID != null){
+            int pc = getPageCount(currentPageID);
+            goToObject(getIdWithoutPage(currentPageID)+"1_"+(pc), false, null);
+        }
+    }
+
+    void goToLastPage(){
+        if (currentPageID != null){
+            int pc = getPageCount(currentPageID);
+            goToObject(getIdWithoutPage(currentPageID)+(pc)+"_"+(pc), false, null);
+        }
+    }
+        
     void updateCurrentPageID(String id){
         currentPageID = (id.contains("pages_p")) ? id : null;
         if (currentPageID != null){
