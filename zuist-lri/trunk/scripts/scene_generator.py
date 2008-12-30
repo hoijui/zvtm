@@ -268,7 +268,7 @@ def buildScene(metadataFile, outputSceneFile):
     object_el.text = "by author"
     
     buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
-#    buildAuthorTree(outputroot, metadataRoot, matrixLayout(prCount))
+    buildAuthorTree(outputroot, L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
     
     # serialize the tree
     tree = ET.ElementTree(outputroot)
@@ -397,7 +397,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
     region_el.set("id", "teams")
     region_el.set("title", "Teams")
     region_el.set("containedIn", "root")
-    region_el.set("stroke", getStroke("blue"))
+    region_el.set("stroke", MAIN_LABEL_COLOR)
     region_el.set("tful", FADE_IN)
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
@@ -423,7 +423,28 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         layoutCategories(categories, catRegID, region_el.get('id'),\
                          "%s-categories" % team, xc, y, outputParent, "%s / Categories" % team)
         y -= 1.5 * CAT_REGION_HEIGHT
-        
+
+################################################################################
+# Build scene subtree that corresponds to browsing papers per author/categ./year
+################################################################################
+def buildAuthorTree(outputParent, xc, yc, w, h):
+    log("Building team tree", 1)
+    region_el = ET.SubElement(outputParent, "region")
+    region_el.set("x", str(int(xc)))
+    region_el.set("y", str(int(yc)))
+    region_el.set("w", str(int(w)))
+    region_el.set("h", str(int(h)))
+    region_el.set("levels", "1")
+    region_el.set("id", "authors")
+    region_el.set("title", "Authors")
+    region_el.set("containedIn", "root")
+    region_el.set("stroke", MAIN_LABEL_COLOR)
+    region_el.set("tful", FADE_IN)
+    region_el.set("tfll", FADE_IN)
+    region_el.set("ttul", FADE_OUT)
+    region_el.set("ttll", FADE_OUT)
+    region_el.set("sensitive", "true")
+
 ################################################################################
 # Build scene subtree that corresponds to categories
 # (contains papers organized by year)
@@ -444,7 +465,7 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
-    region_el.set("sensitive", "true")
+    region_el.set("sensitive", "false")
     categoryKeys = categories.keys()
     categoryKeys.sort()
     x = int(xc-CAT_REGION_WIDTH/2.2)
@@ -485,7 +506,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
-    region_el.set("sensitive", "true")
+    region_el.set("sensitive", "false")
     yearKeys = years.keys()
     yearKeys.sort()
     x = xc - (META_REGION_WIDTH * 1.5 * (len(yearKeys)-1)) / 2
@@ -523,7 +544,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
-    region_el.set("sensitive", "true")
+    region_el.set("sensitive", "false")
     colRow = matrixLayout(len(paperIDs))
     nbCol = colRow[0]
     nbRow = colRow[1]
@@ -581,7 +602,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("tfll", FADE_IN)
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
-    region_el.set("sensitive", "true")
+    region_el.set("sensitive", "false")
     #referenceEL = id2paper[paperID]
     paperDir = "%s/lri4z/%s" % (SRC_DIR, paperID)
     if os.path.exists(paperDir):
@@ -688,14 +709,6 @@ def countItemsPerCat(years):
     for year in years.values():
         count += len(year)
     return count
-
-################################################################################
-# Build scene subtree that corresponds to browsing papers per author/categ./year
-################################################################################
-def buildAuthorTree(outputParent, metadataRoot, colRow):
-    #    authors = acy2id.keys()
-    #    authors.sort(authorSorter)
-    return
 
 ################################################################################
 # Author sorter
