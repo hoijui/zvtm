@@ -37,7 +37,7 @@ META_LEVEL_FLOOR = "50000"
 PAPER_LEVEL_CEILING = "50000"
 PAPER_LEVEL_FLOOR = "0"
 
-L0_LABEL_SCALE_FACTOR = "9000000"
+L0_LABEL_SCALE_FACTOR = "12000000"
 TEAM_LABEL_SCALE_FACTOR = "4000000"
 CATEGORY_LABEL_SCALE_FACTOR = "150000"
 YEAR_LABEL_SCALE_FACTOR = "30000"
@@ -234,7 +234,7 @@ def buildScene(metadataFile, outputSceneFile):
     root_region_el.set('x', '0')
     root_region_el.set('y', '0')
     L0_RH = int(2 * len(tcy2id.keys()) * CAT_REGION_HEIGHT)
-    L0_RW = L0_RH * 2.4
+    L0_RW = L0_RH * 3
     root_region_el.set('w', str(int(L0_RW)))
     root_region_el.set('h', str(int(L0_RH)))
     root_region_el.set('stroke', getStroke("red"))
@@ -243,7 +243,7 @@ def buildScene(metadataFile, outputSceneFile):
     object_el.set('id', "mainLb")
     object_el.set('type', "text")
     object_el.set('x', str(0))
-    object_el.set('y', str(int(L0_RH/1.5)))
+    object_el.set('y', str(int(L0_RH/1.4)))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
@@ -251,7 +251,7 @@ def buildScene(metadataFile, outputSceneFile):
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryTeamLb")
     object_el.set('type', "text")
-    object_el.set('x', str(int(-L0_RH*0.6)))
+    object_el.set('x', str(int(-L0_RH*0.8)))
     object_el.set('y', str(0))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
@@ -260,15 +260,15 @@ def buildScene(metadataFile, outputSceneFile):
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryAuthorLb")
     object_el.set('type', "text")
-    object_el.set('x', str(int(L0_RH*0.6)))
+    object_el.set('x', str(int(L0_RH*0.8)))
     object_el.set('y', str(0))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.text = "by author"
     
-    buildTeamTree(outputroot, -L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
-    buildAuthorTree(outputroot, L0_RH*0.6, 0, L0_RH, L0_RH*0.9)
+    buildTeamTree(outputroot, -L0_RH*0.8, 0, 1.25*L0_RH, L0_RH*0.9)
+    buildAuthorTree(outputroot, L0_RH*0.8, 0, 1.25*L0_RH, L0_RH*0.9)
     
     # serialize the tree
     tree = ET.ElementTree(outputroot)
@@ -405,7 +405,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
     region_el.set("sensitive", "true")
     teams = tcy2id.keys()
     teams.sort()
-    y = yc + CAT_REGION_HEIGHT * 1.5 * len(teams) / 2
+    y = yc + CAT_REGION_HEIGHT * 1.5 * (len(teams)-1) / 2
     for team in teams:
         log("Processing team %s" % team, 2)
         # label
