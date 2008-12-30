@@ -767,7 +767,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             int pp = getPage(currentPageID);
             int pc = getPageCount(currentPageID);
             if (pp > 1){
-                goToObject(getIdWithoutPage(currentPageID)+(pp-1)+"_"+(pc), false, null);
+                goToObject(getIdWithoutPage(currentPageID)+(pp-1)+"_"+(pc), true, null);
             }
         }
     }
@@ -778,21 +778,21 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             int pc = getPageCount(currentPageID);
             // check that object exists is done in goToObject()
             // (page might not exist, we don't know how many pages the document contains)
-            goToObject(getIdWithoutPage(currentPageID)+(pp+1)+"_"+(pc), false, null);
+            goToObject(getIdWithoutPage(currentPageID)+(pp+1)+"_"+(pc), true, null);
         }        
     }
 
     void goToFirstPage(){
         if (currentPageID != null){
             int pc = getPageCount(currentPageID);
-            goToObject(getIdWithoutPage(currentPageID)+"1_"+(pc), false, null);
+            goToObject(getIdWithoutPage(currentPageID)+"1_"+(pc), true, null);
         }
     }
 
     void goToLastPage(){
         if (currentPageID != null){
             int pc = getPageCount(currentPageID);
-            goToObject(getIdWithoutPage(currentPageID)+(pc)+"_"+(pc), false, null);
+            goToObject(getIdWithoutPage(currentPageID)+(pc)+"_"+(pc), true, null);
         }
     }
         
