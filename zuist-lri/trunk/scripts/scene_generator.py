@@ -588,28 +588,27 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
 ################################################################################
 def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
          		outputParent, regionTitle):
-    region_el = ET.SubElement(outputParent, "region")
-    region_el.set("x", str(int(xc)))
-    region_el.set("y", str(int(yc)))
-    region_el.set("w", str(PAPER_REGION_WIDTH))
-    region_el.set("h", str(PAPER_REGION_HEIGHT))
-    region_el.set("levels", "5")
-    region_el.set("id", regionID)
-    region_el.set("title", regionTitle)
-    region_el.set("containedIn", parentRegionID)
-    region_el.set("stroke", getStroke("red"))
-    region_el.set("tful", FADE_IN)
-    region_el.set("tfll", FADE_IN)
-    region_el.set("ttul", FADE_OUT)
-    region_el.set("ttll", FADE_OUT)
-    region_el.set("sensitive", "false")
-    #referenceEL = id2paper[paperID]
     paperDir = "%s/lri4z/%s" % (SRC_DIR, paperID)
     if os.path.exists(paperDir):
         PNGfiles = os.listdir(paperDir)
         PNGfiles.sort(pageSorter)
         dx = int(PPW * 1.1)
         if len(PNGfiles) <= 10:
+            region_el = ET.SubElement(outputParent, "region")
+            region_el.set("x", str(int(xc)))
+            region_el.set("y", str(int(yc)))
+            region_el.set("w", str(PAPER_REGION_WIDTH))
+            region_el.set("h", str(PAPER_REGION_HEIGHT))
+            region_el.set("levels", "5")
+            region_el.set("id", regionID)
+            region_el.set("title", regionTitle)
+            region_el.set("containedIn", parentRegionID)
+            region_el.set("stroke", getStroke("red"))
+            region_el.set("tful", FADE_IN)
+            region_el.set("tfll", FADE_IN)
+            region_el.set("ttul", FADE_OUT)
+            region_el.set("ttll", FADE_OUT)
+            region_el.set("sensitive", "false")
             x = xc - PPW * 1.1 * len(PNGfiles) / 2
             i = 0
             for PNGfile in PNGfiles:
@@ -637,6 +636,21 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
             for row in range(nbRow):
                 x = xo
                 y -= dy
+                region_el = ET.SubElement(outputParent, "region")
+                region_el.set("x", str(int(xo+dx*(nbCol+1)/2)))
+                region_el.set("y", str(int(y)))
+                region_el.set("w", str(dx * (nbCol)))
+                region_el.set("h", str(PPH))
+                region_el.set("levels", "5")
+                region_el.set("id", "%s-line%s" % (regionID, yi))
+                region_el.set("title", regionTitle)
+                region_el.set("containedIn", parentRegionID)
+                region_el.set("stroke", getStroke("orange"))
+                region_el.set("tful", FADE_IN)
+                region_el.set("tfll", FADE_IN)
+                region_el.set("ttul", FADE_OUT)
+                region_el.set("ttll", FADE_OUT)
+                region_el.set("sensitive", "false")
                 for col in range(nbCol):
                     x += dx
                     yi += 1
@@ -656,6 +670,21 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         return "%s_p1_%s" % (idPrefix, len(PNGfiles))
     else:
         log("Warning: could not find a PNG directory for paper %s" % paperID, 4)
+        region_el = ET.SubElement(outputParent, "region")
+        region_el.set("x", str(int(xc)))
+        region_el.set("y", str(int(yc)))
+        region_el.set("w", str(PAPER_REGION_WIDTH))
+        region_el.set("h", str(PAPER_REGION_HEIGHT))
+        region_el.set("levels", "5")
+        region_el.set("id", regionID)
+        region_el.set("title", regionTitle)
+        region_el.set("containedIn", parentRegionID)
+        region_el.set("stroke", getStroke("red"))
+        region_el.set("tful", FADE_IN)
+        region_el.set("tfll", FADE_IN)
+        region_el.set("ttul", FADE_OUT)
+        region_el.set("ttll", FADE_OUT)
+        region_el.set("sensitive", "false")
         object_el = ET.SubElement(region_el, "object")
         object_el.set('id', "%s_NOPDF" % idPrefix)
         object_el.set('type', "text")
