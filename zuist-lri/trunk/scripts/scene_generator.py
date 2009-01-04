@@ -68,6 +68,12 @@ tcy2id = {}
 acy2id = {}
 # paper directory names in lri4z/
 availablePDFs = []
+# author canonical name -> (first name, last name)
+canonical_authors = {}
+# author key -> author canonical name
+author2canonical_author = {}
+# author canonical name -> None (contains only authors from LRI)
+authors_LRI = {}
 
 ################################################################################
 # EXCEPTIONS
@@ -133,7 +139,7 @@ CATEGORIES_LRI_SEPTEMBRE_2008 = {
 ################################################################################
 # Walk the hierarchy of UIST proceedings and generate XML scene description
 ################################################################################
-def buildScene(metadataFile, outputSceneFile):
+def buildScene(metadataFile, authorsFile, outputSceneFile):
     global PAPER_REGION_WIDTH
     global PAPER_REGION_HEIGHT
     global META_REGION_WIDTH
@@ -157,6 +163,8 @@ def buildScene(metadataFile, outputSceneFile):
     if availablePDFs.count(XML_SCENE_FILE_NAME):
         availablePDFs.remove(XML_SCENE_FILE_NAME)
     log ("Found %s papers in PDF directory" % len(availablePDFs), 2)
+    # get canonical authors
+    parseAuthors(authorsFile)
     # retrieve some global information from hierarchy to compute layout
     t = generateAbstractTree()
     # maximum number of pages in a paper
@@ -266,14 +274,40 @@ def buildScene(metadataFile, outputSceneFile):
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.text = "by author"
-    
+    # team tree
     buildTeamTree(outputroot, -L0_RH*0.8, 0, 1.25*L0_RH, L0_RH*0.9)
+    # author tree
     buildAuthorTree(outputroot, L0_RH*0.8, 0, 1.25*L0_RH, L0_RH*0.9)
-    
     # serialize the tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
     tree.write(outputSceneFile, encoding='utf-8') # was iso-8859-1
+
+
+################################################################################
+# Canonical authors (list built manually)
+################################################################################
+def parseAuthors(authorsFile):
+    global canonical_authors
+    global author2canonical_author
+    global authors_LRI
+    f = open(authorsFile, 'r')
+    i = 0
+    for line in f.readlines():
+        author = line.split(",")
+        # author is from an LRI team
+        if len(author[1]) > 0:
+            # name is not canonical, store mapping to canonical name
+            author2canonical_author[author[0]] = author[1]
+            if len(author[7]) > 0:
+                authors_LRI[author[1]] = None
+        else:
+            # name is a canonical one
+            i += 1
+            canonical_authors[author[0]] = (author[3], author[2])
+            if len(author[7]) > 0:
+                authors_LRI[author[0]] = None
+    log("Found %s authors, among which %s are from LRI" % (len(canonical_authors.keys()), len(authors_LRI.keys())), 0)
 
 ################################################################################
 # Abstract tree that will be wlaked to generate the actual ZUIST scene
@@ -838,5 +872,6 @@ else:
     sys.exit(0)
 
 METADATA_FILE = "%s/%s" % (SRC_DIR, "bibdata.xml")
+AUTHORS_FILE = "%s/%s" % (SRC_DIR, "authors.csv")
 XML_SCENE_FILE = "%s/%s" % (SRC_DIR, "lri4z/%s" % XML_SCENE_FILE_NAME)
-buildScene(METADATA_FILE, XML_SCENE_FILE)
+buildScene(METADATA_FILE, AUTHORS_FILE, XML_SCENE_FILE)
