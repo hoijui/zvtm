@@ -308,6 +308,7 @@ def parseAuthors(authorsFile):
             if len(author[7]) > 0:
                 authors_LRI[author[0]] = None
     log("Found %s authors, among which %s are from LRI" % (len(canonical_authors.keys()), len(authors_LRI.keys())), 0)
+    log("%s author names have been canonicalized" % len(author2canonical_author.keys()), 2)
 
 ################################################################################
 # Abstract tree that will be wlaked to generate the actual ZUIST scene
