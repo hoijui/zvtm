@@ -1,10 +1,11 @@
 #!/usr/bin/python
-# -*- coding: UTF-8 -*-
+# -*- coding: UTF-8-*-
 # $Id$
 
 import os, sys
 import math, string
 import elementtree.ElementTree as ET
+import unicodedata
 
 TRACE_LEVEL = 1
 DEBUG_SCENE = 0
@@ -64,7 +65,7 @@ id_trans = string.maketrans(invalid_id_chars, replacement_id_chars)
 id2paper = {}
 # paper team -> {cat:{year:[paper id]}}
 tcy2id = {}
-# paper author (authors/author/first+authors/author/last) -> {cat:{year:[paper id]}}
+# paper author (authors/author/first + authors/author/last) -> {cat:{year:[paper id]}}
 acy2id = {}
 # paper directory names in lri4z/
 availablePDFs = []
@@ -293,23 +294,26 @@ def parseAuthors(authorsFile):
     global authors_LRI
     f = open(authorsFile, 'r')
     i = 0
-    for line in f.readlines():
+    for line in f.readlines()[1:]:
         author = line.split(",")
         # author is from an LRI team
         if len(author[1]) > 0:
+            uauthor0 = unicode(author[0], 'utf-8')
+            uauthor1 = unicode(author[1], 'utf-8')
             # name is not canonical, store mapping to canonical name
-            author2canonical_author[author[0]] = author[1]
+            author2canonical_author[unicodedata.normalize('NFD', uauthor0)] = unicodedata.normalize('NFD', uauthor1)
             if len(author[7]) > 0:
-                authors_LRI[author[1]] = None
+                authors_LRI[unicodedata.normalize('NFD', uauthor1)] = None
         else:
             # name is a canonical one
             i += 1
-            canonical_authors[author[0]] = (author[3], author[2])
+            uauthor = unicode(author[0], 'utf-8')
+            canonical_authors[unicodedata.normalize('NFD', uauthor)] = (author[3], author[2])
             if len(author[7]) > 0:
-                authors_LRI[author[0]] = None
+                authors_LRI[unicodedata.normalize('NFD', uauthor)] = None
     log("Found %s authors, among which %s are from LRI" % (len(canonical_authors.keys()), len(authors_LRI.keys())), 0)
     log("%s author names have been canonicalized" % len(author2canonical_author.keys()), 2)
-
+    
 ################################################################################
 # Abstract tree that will be wlaked to generate the actual ZUIST scene
 ################################################################################
@@ -403,20 +407,30 @@ def storeTeamPaper(team, refEL):
     
 def storeAuthorPaper(author, refEL):
     global acy2id
-    category = refEL.find('xtradata/category').text
-    year = refEL.find('bibentry/year').text
-    if acy2id.has_key(author):
-        categories = acy2id[author]
-        if categories.has_key(category):
-            years = categories[category]
-            if years.has_key(year):
-                years.get(year).append(refEL.get('key'))
-            else:
-                years[year] = [refEL.get('key'),]
-        else:
-            categories[category] = {year: [refEL.get('key'),]}
+    author = unicodedata.normalize('NFD', unicode(author))
+    canonical_author = author
+    if canonical_authors.has_key(author):
+        pass
+    elif author2canonical_author.has_key(author):
+        canonical_author = author2canonical_author.get(author)
     else:
-        acy2id[author] = {category:{year:[refEL.get('key'),]}}
+        log("Missing author %s" % author.encode('utf-8'), 3)
+        return
+    if authors_LRI.has_key(canonical_author):
+        category = refEL.find('xtradata/category').text
+        year = refEL.find('bibentry/year').text
+        if acy2id.has_key(canonical_author):
+            categories = acy2id[canonical_author]
+            if categories.has_key(category):
+                years = categories[category]
+                if years.has_key(year):
+                    years.get(year).append(refEL.get('key'))
+                else:
+                    years[year] = [refEL.get('key'),]
+            else:
+                categories[category] = {year: [refEL.get('key'),]}
+        else:
+            acy2id[canonical_author] = {category:{year:[refEL.get('key'),]}}
 
 ################################################################################
 # Build scene subtree that corresponds to browsing papers per team/categ./year
