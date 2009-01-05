@@ -25,7 +25,7 @@ YEAR_REGION_HEIGHT = 0
 CAT_REGION_WIDTH = 0
 CAT_REGION_HEIGHT = 0
 
-L0_CEILING = "500000000"
+L0_CEILING = "800000000"
 L0_FLOOR = "200000000"
 L1_CEILING = "200000000"
 L1_FLOOR = "10000000"
@@ -40,6 +40,7 @@ PAPER_LEVEL_FLOOR = "0"
 
 L0_LABEL_SCALE_FACTOR = "12000000"
 TEAM_LABEL_SCALE_FACTOR = "4000000"
+AUTHOR_LABEL_SCALE_FACTOR = "500000"
 CATEGORY_LABEL_SCALE_FACTOR = "150000"
 YEAR_LABEL_SCALE_FACTOR = "30000"
 TITLE_LABEL_SCALE_FACTOR = "2000"
@@ -242,17 +243,28 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     root_region_el.set("ttll", FADE_OUT)
     root_region_el.set('x', '0')
     root_region_el.set('y', '0')
-    L0_RH = int(2 * len(tcy2id.keys()) * CAT_REGION_HEIGHT)
-    L0_RW = L0_RH * 3
-    root_region_el.set('w', str(int(L0_RW)))
-    root_region_el.set('h', str(int(L0_RH)))
+    A_RW = int(25 * CAT_REGION_HEIGHT)
+    A_RH = A_RW * 4 / 3
+    object_el = ET.SubElement(root_region_el, "object")
+    object_el.set('id', "entryAuthorLb")
+    object_el.set('type', "text")
+    object_el.set('x', str(int(A_RH*0.8)))
+    object_el.set('y', str(0))
+    object_el.set('fill', MAIN_LABEL_COLOR)
+    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
+    object_el.set('sensitive', "false")
+    object_el.text = "by author"
+    T_RW = A_RW
+    T_RH = A_RH
+    root_region_el.set('w', str(int(T_RW)))
+    root_region_el.set('h', str(int(T_RH)))
     root_region_el.set('stroke', getStroke("red"))
     root_region_el.set('sensitive', "true")
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "mainLb")
     object_el.set('type', "text")
     object_el.set('x', str(0))
-    object_el.set('y', str(int(L0_RH/1.4)))
+    object_el.set('y', str(int(T_RH/1.4)))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
@@ -260,25 +272,18 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryTeamLb")
     object_el.set('type', "text")
-    object_el.set('x', str(int(-L0_RH*0.8)))
+    object_el.set('x', str(int(-T_RH*0.8)))
     object_el.set('y', str(0))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.text = "by team"
-    object_el = ET.SubElement(root_region_el, "object")
-    object_el.set('id', "entryAuthorLb")
-    object_el.set('type', "text")
-    object_el.set('x', str(int(L0_RH*0.8)))
-    object_el.set('y', str(0))
-    object_el.set('fill', MAIN_LABEL_COLOR)
-    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
-    object_el.set('sensitive', "false")
-    object_el.text = "by author"
+
+
     # team tree
-    buildTeamTree(outputroot, -L0_RH*0.8, 0, 1.25*L0_RH, L0_RH*0.9)
+    buildTeamTree(outputroot, -T_RH*0.8, 0, 1.25*T_RH, T_RH*0.9)
     # author tree
-    buildAuthorTree(outputroot, L0_RH*0.8, 0, 1.25*L0_RH, L0_RH*0.9)
+    buildAuthorTree(outputroot, A_RH*0.8, 0, 1.25*A_RH, A_RH*0.9)
     # serialize the tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
@@ -476,8 +481,68 @@ def buildTeamTree(outputParent, xc, yc, w, h):
 ################################################################################
 # Build scene subtree that corresponds to browsing papers per author/categ./year
 ################################################################################
+# ('ref letter for horizontal positioning', next to its west (0) or east (2) bound,
+#  'ref letter for vertical positioning', next to its north (1) or south (3) bound,
+#  horizontal offset, vertical offset factors * dx or dy)
+RPIF = [
+# A
+('fake'),
+# B
+('A', 2, 'A', 1, 1, 0),
+# C
+('B', 2, 'B', 1, 1, 0),
+# D
+('C', 2, 'C', 1, 1, 0),
+# E
+('A', 0, 'A', 3, 0, -0.5),
+# F
+('E', 0, 'E', 3, 0, -0.5),
+# G
+('F', 2, 'B', 3, 1.5, -0.4),
+# H
+('G', 2, 'G', 1, 1, 0.5),
+# I
+('D', 0, 'D', 3, 0, -0.5),
+# J
+('I', 2, 'D', 3, 0.5, -0.5),
+# K
+('I', 0, 'I', 3, 0, -0.5),
+# L
+('F', 0, 'F', 3, 0, -0.5),
+# M
+('L', 2, 'G', 3, 1, -0.2),
+# N
+('M', 2, 'H', 3, 1, -0.5),
+# O
+('N', 0, 'N', 3, 0, -0.5),
+# P
+('N', 2, 'N', 1, 0.5, 0),
+# Q
+('O', 2, 'P', 3, 1, -0.4),
+# R
+('L', 0, 'L', 3, 0, -0.5),
+# S
+('R', 2, 'M', 3, 1, -0.5),
+# T
+('S', 2, 'O', 3, 1, -0.4),
+# V
+('T', 2, 'T', 1, 1, 0),
+# W
+('Q', 2, 'P', 3, 0.5, -0.5),
+# X
+('W', 0, 'W', 3, 0, -0.4),
+# Y
+('X', 2, 'X', 1, 0.5, 0),
+# Z
+('X', 0, 'X', 3, 0, -0.4),
+# fake
+('Z', 0, 'Z', 0, 0, 0)
+]
+
+REGION_BOUNDS_IN_FLOW = {}
+
 def buildAuthorTree(outputParent, xc, yc, w, h):
-    log("Building team tree", 1)
+    log("Building author tree", 1)
     region_el = ET.SubElement(outputParent, "region")
     region_el.set("x", str(int(xc)))
     region_el.set("y", str(int(yc)))
@@ -493,6 +558,123 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
     region_el.set("ttul", FADE_OUT)
     region_el.set("ttll", FADE_OUT)
     region_el.set("sensitive", "true")
+    authors = authors_LRI.keys()
+    authors.remove("XXX")
+    authors.remove("xxx")
+    authors.sort(authorSorter)
+    lastFirstChar = ""
+    # [('A', [authorID1, ...]), ('B', [authorIDN, ...]), ...]
+    authors_by_letter = []
+    for authorID in authors:
+        authorName = canonical_authors.get(authorID)
+        if len(authorName[0]) == 0 and len(authorName[1]) == 0:
+            continue
+        firstChar = authorName[1][0].lower()
+        if firstChar == lastFirstChar:
+            authors_by_letter[-1][1].append(authorID)
+        else:
+            authors_by_letter.append((firstChar.upper(), [authorID]))
+            lastFirstChar = firstChar
+    colRow = matrixLayout(len(authors))
+    # compute distance between names as if they were to be laid out in a single square matrix
+    dx = int(w / (colRow[0]))
+    dy = int(h / (colRow[1]))
+    xo = int(xc - w + dx)
+    yo = int(yc + h - dy)
+    mx = xo + dx + w / 6
+    my = yo - dy - h / 6
+    li = 0
+    pi = 0
+    # gray = False
+    for letter in authors_by_letter:
+        nbColRowForL = matrixLayout(len(letter[1]))
+        nbColForL = nbColRowForL[0]
+        nbRowForL = nbColRowForL[1]
+        ai = -1
+        x = mx
+        west = mx
+        north = my
+        lregion_el = ET.SubElement(outputParent, "region")
+        lregion_el.set("levels", "1")
+        lregion_el.set("id", "ABLr-%s" % letter[0])
+        lregion_el.set("title", "Authors - %s" % letter[0])
+        lregion_el.set("containedIn", "authors")
+        lregion_el.set("stroke", "#AAA")
+        lregion_el.set("tful", APPEAR)
+        lregion_el.set("tfll", APPEAR)
+        lregion_el.set("ttul", DISAPPEAR)
+        lregion_el.set("ttll", DISAPPEAR)
+        lregion_el.set('sensitive', "true")
+        fareast = mx
+        farsouth = my
+        for col in range(nbColForL):
+            x += dx
+            y = my
+            if x > fareast:
+                fareast = x
+            for row in range(nbRowForL):
+                y -= dy
+                if y < farsouth:
+                    farsouth = y
+                ai += 1
+                if ai < len(letter[1]):
+                    pi += 1
+                    authorID = letter[1][ai]
+                    log(("Processing author %s" % authorID).encode('utf-8'), 4)
+                    fnln = canonical_authors.get(authorID)
+                    # surname on a first line
+                    objectln_el = ET.SubElement(lregion_el, "object")
+                    authorID4id = authorID.replace(" ", "")
+                    objectln_el.set('id', "authorLbLN-%s" % authorID4id)
+                    objectln_el.set('type', "text")
+                    objectln_el.set('x', str(int(x)))
+                    objectln_el.set('y', str(int(y)))
+                    objectln_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)
+                    objectln_el.text = unicode(fnln[1], 'utf-8')
+                    # firstname on a second line
+                    objectfn_el = ET.SubElement(lregion_el, "object")
+                    objectfn_el.set('id', "authorLbFN-%s" % authorID4id)
+                    objectfn_el.set('type', "text")
+                    objectfn_el.set('x', str(int(x)))
+                    objectfn_el.set('y', str(int(y+dy/5)))
+                    objectfn_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)                    
+                    objectfn_el.text = unicode(fnln[0], 'utf-8')
+                    categories = acy2id.get(authorID)
+                    if categories is None:
+                        log("Warning: no paper for author %s" % authorID.encode('utf-8'), 2)
+                    else:
+                        catRegID = "R-%s-categories" % authorID4id
+                        objectfn_el.set('takesToRegion', catRegID)
+                        objectln_el.set('takesToRegion', catRegID)
+                        layoutCategories(categories, catRegID, lregion_el.get('id'),\
+                                         "%s-categories" % authorID4id, x, y, outputParent, "%s / Categories" % authorID4id)
+                    if pi and pi % 50 == 0:
+                       log("Processed %s authors" % pi, 2)
+                else:
+                    break
+        east = fareast + dx
+        south = farsouth - dy
+        rcx = int((west+east)/2.0)
+        rcy = int((north+south)/2.0)
+        rcw = int(east-west)
+        rch = int(north-south)
+        lregion_el.set("x", str(rcx))
+        lregion_el.set("y", str(rcy))
+        lregion_el.set("w", str(rcw))
+        lregion_el.set("h", str(rch))
+        object_el = ET.SubElement(region_el, "object")
+        object_el.set('id', "ABLo-%s" % letter[0])
+        object_el.set('type', "text")
+        object_el.set('x', str(rcx))
+        object_el.set('y', str(int(rcy-0.5*dy)))
+        object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
+        object_el.set('takesToRegion', "ABLr-%s" % letter[0])
+        object_el.text = letter[0]
+        REGION_BOUNDS_IN_FLOW[letter[0]] = (west, north, east, south)
+        li += 1
+        RPIFe = RPIF[li]
+        mx = REGION_BOUNDS_IN_FLOW.get(RPIFe[0])[RPIFe[1]] + RPIFe[4] * dx
+        my = REGION_BOUNDS_IN_FLOW.get(RPIFe[2])[RPIFe[3]] + RPIFe[5] * dy
 
 ################################################################################
 # Build scene subtree that corresponds to categories
@@ -792,14 +974,19 @@ def countItemsPerCat(years):
 # Author sorter
 ################################################################################
 def authorSorter(a1, a2):
-    a1l = a1.split(" ")[-1]
-    a2l = a2.split(" ")[-1]
-    if  a1l < a2l:
+    a1l = canonical_authors[a1]
+    a2l = canonical_authors[a2]
+    if  a1l[1].lower() < a2l[1].lower():
         return -1
-    elif a1l > a2l:
+    elif a1l[1].lower() > a2l[1].lower():
         return 1
     else:
-        return 0
+        if  a1l[0].lower() < a2l[0].lower():
+            return -1
+        elif a1l[0].lower() > a2l[0].lower():
+            return 1
+        else:
+            return 0
         
 ################################################################################
 # Page sorter
