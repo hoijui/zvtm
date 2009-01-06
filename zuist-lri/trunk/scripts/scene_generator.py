@@ -28,7 +28,7 @@ CAT_REGION_HEIGHT = 0
 L0_CEILING = "800000000"
 L0_FLOOR = "300000000"
 L1_CEILING = "300000000"
-L1_FLOOR = "10000000"
+TREEMAP_CEILING = "70000000"
 CAT_LEVEL_CEILING = "10000000"
 CAT_LEVEL_FLOOR = "800000"
 YEAR_LEVEL_CEILING = "800000"
@@ -216,21 +216,25 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     level_1 = ET.SubElement(outputroot, "level")
     level_1.set("depth", "1")
     level_1.set("ceiling", L1_CEILING)
-    level_1.set("floor", L1_FLOOR)
+    level_1.set("floor", TREEMAP_CEILING)
+    level_tm = ET.SubElement(outputroot, "level")
+    level_tm.set("depth", "2")
+    level_tm.set("ceiling", TREEMAP_CEILING)
+    level_tm.set("floor", CAT_LEVEL_CEILING)
     level_cat = ET.SubElement(outputroot, "level")
-    level_cat.set("depth", "2")
+    level_cat.set("depth", "3")
     level_cat.set("ceiling", CAT_LEVEL_CEILING)
     level_cat.set("floor", CAT_LEVEL_FLOOR)
     level_year = ET.SubElement(outputroot, "level")
-    level_year.set("depth", "3")
+    level_year.set("depth", "4")
     level_year.set("ceiling", YEAR_LEVEL_CEILING)
     level_year.set("floor", YEAR_LEVEL_FLOOR)
     level_meta = ET.SubElement(outputroot, "level")
-    level_meta.set("depth", "4")
+    level_meta.set("depth", "5")
     level_meta.set("ceiling", META_LEVEL_CEILING)
     level_meta.set("floor", META_LEVEL_FLOOR)
     level_paper = ET.SubElement(outputroot, "level")
-    level_paper.set("depth", "5")
+    level_paper.set("depth", "6")
     level_paper.set("ceiling", PAPER_LEVEL_CEILING)
     level_paper.set("floor", PAPER_LEVEL_FLOOR)
     # high level regions
@@ -276,7 +280,6 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.set('anchor', "start")
-    
     object_el.text = "Browse LRI publications (2005-2008)"
     # team tree
     buildTeamTree(outputroot, -L0_RW*0.55, 0, L0_RW, L0_RH)
@@ -285,7 +288,7 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     # serialize the tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
-    tree.write(outputSceneFile, encoding='utf-8') # was iso-8859-1
+    tree.write(outputSceneFile, encoding='utf-8')
 
 
 ################################################################################
@@ -445,7 +448,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
     region_el.set("y", str(int(yc)))
     region_el.set("w", str(int(w)))
     region_el.set("h", str(int(h)))
-    region_el.set("levels", "1")
+    region_el.set("levels", "1;2")
     region_el.set("id", "teams")
     region_el.set("title", "Teams")
     region_el.set("containedIn", "root")
@@ -591,7 +594,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
         west = mx
         north = my
         lregion_el = ET.SubElement(outputParent, "region")
-        lregion_el.set("levels", "1")
+        lregion_el.set("levels", "2")
         lregion_el.set("id", "ABLr-%s" % letter[0])
         lregion_el.set("title", "Authors - %s" % letter[0])
         lregion_el.set("containedIn", "authors")
@@ -686,7 +689,7 @@ def layoutCategories(categories, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("y", str(int(yc)))
     region_el.set("w", str(CAT_REGION_WIDTH))
     region_el.set("h", str(CAT_REGION_HEIGHT))
-    region_el.set("levels", "2")
+    region_el.set("levels", "3")
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
@@ -727,7 +730,7 @@ def layoutYears(years, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("y", str(int(yc)))
     region_el.set("w", str(YEAR_REGION_WIDTH))
     region_el.set("h", str(YEAR_REGION_HEIGHT))
-    region_el.set("levels", "3")
+    region_el.set("levels", "4")
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
@@ -765,7 +768,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     region_el.set("y", str(int(yc)))
     region_el.set("w", str(META_REGION_WIDTH))
     region_el.set("h", str(META_REGION_HEIGHT))
-    region_el.set("levels", "4")
+    region_el.set("levels", "5")
     region_el.set("id", regionID)
     region_el.set("title", regionTitle)
     region_el.set("containedIn", parentRegionID)
@@ -829,7 +832,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
             region_el.set("y", str(int(yc)))
             region_el.set("w", str(PAPER_REGION_WIDTH))
             region_el.set("h", str(PAPER_REGION_HEIGHT))
-            region_el.set("levels", "5")
+            region_el.set("levels", "6")
             region_el.set("id", regionID)
             region_el.set("title", regionTitle)
             region_el.set("containedIn", parentRegionID)
@@ -871,7 +874,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                 region_el.set("y", str(int(y)))
                 region_el.set("w", str(dx * (nbCol)))
                 region_el.set("h", str(PPH))
-                region_el.set("levels", "5")
+                region_el.set("levels", "6")
                 region_el.set("id", "%s-line%s" % (regionID, yi))
                 region_el.set("title", regionTitle)
                 region_el.set("containedIn", parentRegionID)
@@ -905,7 +908,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
         region_el.set("y", str(int(yc)))
         region_el.set("w", str(PAPER_REGION_WIDTH))
         region_el.set("h", str(PAPER_REGION_HEIGHT))
-        region_el.set("levels", "5")
+        region_el.set("levels", "6")
         region_el.set("id", regionID)
         region_el.set("title", regionTitle)
         region_el.set("containedIn", parentRegionID)
