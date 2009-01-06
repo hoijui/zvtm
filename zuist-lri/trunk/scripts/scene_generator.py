@@ -26,8 +26,8 @@ CAT_REGION_WIDTH = 0
 CAT_REGION_HEIGHT = 0
 
 L0_CEILING = "800000000"
-L0_FLOOR = "200000000"
-L1_CEILING = "200000000"
+L0_FLOOR = "300000000"
+L1_CEILING = "300000000"
 L1_FLOOR = "10000000"
 CAT_LEVEL_CEILING = "10000000"
 CAT_LEVEL_FLOOR = "800000"
@@ -38,8 +38,8 @@ META_LEVEL_FLOOR = "50000"
 PAPER_LEVEL_CEILING = "50000"
 PAPER_LEVEL_FLOOR = "0"
 
-L0_LABEL_SCALE_FACTOR = "12000000"
-TEAM_LABEL_SCALE_FACTOR = "4000000"
+L0_LABEL_SCALE_FACTOR = "20000000"
+TEAM_LABEL_SCALE_FACTOR = "6000000"
 AUTHOR_LABEL_SCALE_FACTOR = "500000"
 CATEGORY_LABEL_SCALE_FACTOR = "150000"
 YEAR_LABEL_SCALE_FACTOR = "30000"
@@ -243,47 +243,45 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     root_region_el.set("ttll", FADE_OUT)
     root_region_el.set('x', '0')
     root_region_el.set('y', '0')
-    A_RW = int(25 * CAT_REGION_HEIGHT)
-    A_RH = A_RW * 4 / 3
+    root_region_el.set('stroke', getStroke("red"))
+    root_region_el.set('sensitive', "true")
+    L0_RW = int(50 * CAT_REGION_HEIGHT)
+    L0_RH = L0_RW * 3 / 5
+    root_region_el.set('w', str(int(2.2*L0_RW)))
+    root_region_el.set('h', str(int(1.2*L0_RH)))
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryAuthorLb")
     object_el.set('type', "text")
-    object_el.set('x', str(int(A_RH*0.8)))
+    object_el.set('x', str(int(L0_RW*0.55)))
     object_el.set('y', str(0))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.text = "by author"
-    T_RW = A_RW
-    T_RH = A_RH
-    root_region_el.set('w', str(int(T_RW)))
-    root_region_el.set('h', str(int(T_RH)))
-    root_region_el.set('stroke', getStroke("red"))
-    root_region_el.set('sensitive', "true")
-    object_el = ET.SubElement(root_region_el, "object")
-    object_el.set('id', "mainLb")
-    object_el.set('type', "text")
-    object_el.set('x', str(0))
-    object_el.set('y', str(int(T_RH/1.4)))
-    object_el.set('fill', MAIN_LABEL_COLOR)
-    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
-    object_el.set('sensitive', "false")
-    object_el.text = "Browse LRI publications (2005-2008)"
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "entryTeamLb")
     object_el.set('type', "text")
-    object_el.set('x', str(int(-T_RH*0.8)))
+    object_el.set('x', str(int(-L0_RW*0.55)))
     object_el.set('y', str(0))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
     object_el.text = "by team"
-
-
+    object_el = ET.SubElement(root_region_el, "object")
+    object_el.set('id', "mainLb")
+    object_el.set('type', "text")
+    object_el.set('x', str(int(-L0_RW*0.55)))
+    object_el.set('y', str(int(L0_RH/1.4)))
+    object_el.set('fill', MAIN_LABEL_COLOR)
+    object_el.set('scale', L0_LABEL_SCALE_FACTOR)
+    object_el.set('sensitive', "false")
+    object_el.set('anchor', "start")
+    
+    object_el.text = "Browse LRI publications (2005-2008)"
     # team tree
-    buildTeamTree(outputroot, -T_RH*0.8, 0, 1.25*T_RH, T_RH*0.9)
+    buildTeamTree(outputroot, -L0_RW*0.55, 0, L0_RW, L0_RH)
     # author tree
-    buildAuthorTree(outputroot, A_RH*0.8, 0, 1.25*A_RH, A_RH*0.9)
+    buildAuthorTree(outputroot, L0_RW*0.55, 0, L0_RW, L0_RH)
     # serialize the tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
@@ -459,7 +457,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
     region_el.set("sensitive", "true")
     teams = tcy2id.keys()
     teams.sort()
-    y = yc + CAT_REGION_HEIGHT * 1.5 * (len(teams)-1) / 2
+    y = yc + CAT_REGION_HEIGHT * 2.5 * (len(teams)-1) / 2
     for team in teams:
         log("Processing team %s" % team, 2)
         # label
@@ -476,7 +474,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         categories = tcy2id.get(team)
         layoutCategories(categories, catRegID, region_el.get('id'),\
                          "%s-categories" % team, xc, y, outputParent, "%s / Categories" % team)
-        y -= 1.5 * CAT_REGION_HEIGHT
+        y -= 2.5 * CAT_REGION_HEIGHT
 
 ################################################################################
 # Build scene subtree that corresponds to browsing papers per author/categ./year
@@ -577,12 +575,12 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
             lastFirstChar = firstChar
     colRow = matrixLayout(len(authors))
     # compute distance between names as if they were to be laid out in a single square matrix
-    dx = int(w / (colRow[0]))
-    dy = int(h / (colRow[1]))
-    xo = int(xc - w + dx)
-    yo = int(yc + h - dy)
-    mx = xo + dx + w / 6
-    my = yo - dy - h / 6
+    dx = int(w / (1.6 * (colRow[0])))
+    dy = int(h / (1.6 * (colRow[1])))
+    xo = int(xc - w/2 + dx)
+    yo = int(yc + h/2 - dy)
+    mx = xo #+ dx + w / 6
+    my = yo #- dy - h / 6
     li = 0
     pi = 0
     # gray = False
@@ -639,7 +637,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
                     objectfn_el.set('id', "authorLbFN-%s" % authorID4id)
                     objectfn_el.set('type', "text")
                     objectfn_el.set('x', str(int(x)))
-                    objectfn_el.set('y', str(int(y+dy/5)))
+                    objectfn_el.set('y', str(int(y+dy/9)))
                     objectfn_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)                    
                     objectfn_el.text = unicode(fnln[0], 'utf-8')
                     categories = acy2id.get(authorID)
