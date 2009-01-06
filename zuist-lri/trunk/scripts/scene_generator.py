@@ -624,7 +624,10 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
                     fnln = canonical_authors.get(authorID)
                     # surname on a first line
                     objectln_el = ET.SubElement(lregion_el, "object")
-                    authorID4id = authorID.replace(" ", "")
+                    # take the rank of the author in the sorted list of authors
+                    # as a basis for computing a unique ID, so as to avoid having
+                    # to deal with utf-8 char escaping in XML ID attributes
+                    authorID4id = "author%s" % authors.index(authorID)
                     objectln_el.set('id', "authorLbLN-%s" % authorID4id)
                     objectln_el.set('type', "text")
                     objectln_el.set('x', str(int(x)))
