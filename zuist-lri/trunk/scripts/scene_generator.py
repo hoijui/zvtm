@@ -40,7 +40,7 @@ PAPER_LEVEL_FLOOR = "0"
 
 L0_LABEL_SCALE_FACTOR = "20000000"
 TEAM_LABEL_SCALE_FACTOR = "6000000"
-AUTHOR_LABEL_SCALE_FACTOR = "500000"
+AUTHOR_LABEL_SCALE_FACTOR = "800000"
 CATEGORY_LABEL_SCALE_FACTOR = "150000"
 YEAR_LABEL_SCALE_FACTOR = "30000"
 TITLE_LABEL_SCALE_FACTOR = "2000"
@@ -581,7 +581,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
     dx = int(w / (1.6 * (colRow[0])))
     dy = int(h / (1.6 * (colRow[1])))
     mx = int(xc - w/2 + dx)
-    my = int(yc + h/2 - dy)
+    my = int(yc + h/2 - 2 * dy)
     li = 0
     pi = 0
     # gray = False
@@ -638,7 +638,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
                     objectfn_el.set('id', "authorLbFN-%s" % authorID4id)
                     objectfn_el.set('type', "text")
                     objectfn_el.set('x', str(int(x)))
-                    objectfn_el.set('y', str(int(y+dy/9)))
+                    objectfn_el.set('y', str(int(y+dy/8)))
                     objectfn_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)
                     objectfn_el.text = unicode(fnln[0], 'utf-8')
                     categories = acy2id.get(authorID)
