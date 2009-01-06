@@ -275,7 +275,7 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     object_el.set('id', "mainLb")
     object_el.set('type', "text")
     object_el.set('x', str(int(-L0_RW*0.6)))
-    object_el.set('y', str(int(L0_RH/1.4)))
+    object_el.set('y', str(int(L0_RH/1.2)))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
     object_el.set('sensitive', "false")
