@@ -701,14 +701,14 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     
     public void enteredLevel(int depth){
         updateBreadcrumbs();
-        if (depth == 5){
+        if (depth == 6){
             showPageNavigation();
         }
     }
     
     /* exiting a level means we have entered another one, taking care of breadcrumb update in there*/
     public void exitedLevel(int depth){
-        if (depth == 5){
+        if (depth == 6){
             hidePageNavigation();
         }
     }
