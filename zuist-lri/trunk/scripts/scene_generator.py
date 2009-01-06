@@ -489,19 +489,19 @@ RPIF = [
 # A
 ('fake'),
 # B
-('A', 2, 'A', 1, 1, 0),
+('A', 2, 'A', 1, .5, 0),
 # C
-('B', 2, 'B', 1, 1, 0),
+('B', 2, 'B', 1, .5, 0),
 # D
-('C', 2, 'C', 1, 1, 0),
+('C', 2, 'C', 1, .5, 0),
 # E
-('A', 0, 'A', 3, 0, -0.5),
+('A', 0, 'A', 3, 0, -0.8),
 # F
-('E', 0, 'E', 3, 0, -0.5),
+('E', 0, 'E', 3, 0, -0.8),
 # G
-('F', 2, 'B', 3, 1.5, -0.4),
+('F', 2, 'B', 3, .5, -0.7),
 # H
-('G', 2, 'G', 1, 1, 0.5),
+('G', 2, 'G', 1, .5, 0.5),
 # I
 ('D', 0, 'D', 3, 0, -0.5),
 # J
@@ -509,25 +509,25 @@ RPIF = [
 # K
 ('I', 0, 'I', 3, 0, -0.5),
 # L
-('F', 0, 'F', 3, 0, -0.5),
+('F', 0, 'G', 3, 0, -0.5),
 # M
-('L', 2, 'G', 3, 1, -0.2),
+('L', 2, 'G', 3, .5, -0.8),
 # N
-('M', 2, 'H', 3, 1, -0.5),
+('M', 2, 'H', 3, .5, -0.5),
 # O
 ('N', 0, 'N', 3, 0, -0.5),
 # P
 ('N', 2, 'N', 1, 0.5, 0),
 # Q
-('O', 2, 'P', 3, 1, -0.4),
+('O', 2, 'P', 3, .5, -0.4),
 # R
-('L', 0, 'L', 3, 0, -0.5),
+('L', 0, 'L', 3, 0, -0.8),
 # S
-('R', 2, 'M', 3, 1, -0.5),
+('R', 2, 'M', 3, .5, -0.8),
 # T
-('S', 2, 'O', 3, 1, -0.4),
+('S', 2, 'O', 3, .5, -0.4),
 # V
-('T', 2, 'T', 1, 1, 0),
+('T', 2, 'T', 1, .5, 0),
 # W
 ('Q', 2, 'P', 3, 0.5, -0.5),
 # X
@@ -595,7 +595,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
         north = my
         lregion_el = ET.SubElement(outputParent, "region")
         lregion_el.set("levels", "2")
-        lregion_el.set("id", "ABLr-%s" % letter[0])
+        lregion_el.set("id", "R-letter-%s" % letter[0])
         lregion_el.set("title", "Authors - %s" % letter[0])
         lregion_el.set("containedIn", "authors")
         lregion_el.set("stroke", "#AAA")
@@ -665,12 +665,12 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
         lregion_el.set("w", str(rcw))
         lregion_el.set("h", str(rch))
         object_el = ET.SubElement(region_el, "object")
-        object_el.set('id', "ABLo-%s" % letter[0])
+        object_el.set('id', "letterLb-%s" % letter[0])
         object_el.set('type', "text")
         object_el.set('x', str(rcx))
         object_el.set('y', str(int(rcy-0.5*dy)))
         object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
-        object_el.set('takesToRegion', "ABLr-%s" % letter[0])
+        object_el.set('takesToRegion', "R-letter-%s" % letter[0])
         object_el.text = letter[0]
         REGION_BOUNDS_IN_FLOW[letter[0]] = (west, north, east, south)
         li += 1
