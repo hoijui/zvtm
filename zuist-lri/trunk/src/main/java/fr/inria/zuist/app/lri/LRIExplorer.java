@@ -550,7 +550,8 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 //		}
 		if (sm.getCurrentLevel() <= 1){
 		    if (sm.getCurrentLevel() == 0 && r.getID().equals("teams") ||
-		        sm.getCurrentLevel() == 0 && r.getID().equals("authors")){
+		        sm.getCurrentLevel() == 0 && r.getID().equals("authors") ||
+		        r.getID().startsWith(LETTER_REGION_ID_PREFIX)){
 		        goToRegion(r.getID());
 		    }
 		    else {
@@ -614,11 +615,14 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     }
     
     static final float TEAM_CAMERA_ALTITUDE = 40000000.0f;
+    static final float AUTHOR_CAMERA_ALTITUDE = 22000000.0f;
 
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
     static final String CATEGORY_LABEL_ID_PREFIX = "catLb";
     static final String YEAR_LABEL_ID_PREFIX = "yearLb";
     static final String TITLE_LABEL_ID_PREFIX = "titleLb";
+    static final String AUTHOR_LABEL_ID_PREFIX = "authorLb";
+    static final String LETTER_REGION_ID_PREFIX = "R-letter";
 
     void clickedText(TextDescription td){
         System.err.println("Clicked text "+td.getID());
@@ -643,6 +647,9 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 			rememberLocation(mCamera.getLocation());
             if (ID.startsWith(TEAM_LABEL_ID_PREFIX)){
     			goToObject(td, false, TEAM_CAMERA_ALTITUDE);
+            }
+            else if (ID.startsWith(AUTHOR_LABEL_ID_PREFIX)){
+    			goToObject(td, false, AUTHOR_CAMERA_ALTITUDE);
             }
             else {
     			goToObject(td, false, null);
