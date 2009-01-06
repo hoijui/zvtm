@@ -44,6 +44,7 @@ AUTHOR_LABEL_SCALE_FACTOR = "800000"
 CATEGORY_LABEL_SCALE_FACTOR = "150000"
 YEAR_LABEL_SCALE_FACTOR = "30000"
 TITLE_LABEL_SCALE_FACTOR = "2000"
+SUBTITLE_LABEL_SCALE_FACTOR = "1200"
 NOPDF_LABEL_SCALE_FACTOR = "100"
 
 MAIN_LABEL_COLOR = "#777"
@@ -806,6 +807,14 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
             object_el.set('anchor', 'start')
             object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
             object_el.text = titleEL.text
+            sobject_el = ET.SubElement(region_el, "object")
+            sobject_el.set('id', "titleAuthLb%s%s" % (idPrefix, paperID.translate(id_trans)))
+            sobject_el.set('type', "text")
+            sobject_el.set('x', str(int(x)))
+            sobject_el.set('y', str(int(y-PAPER_REGION_HEIGHT * .45)))
+            sobject_el.set('anchor', 'start')
+            sobject_el.set('scale', SUBTITLE_LABEL_SCALE_FACTOR)
+            sobject_el.text = getAuthors(paperID)
             paperRegID = "R-%s-%s" % (idPrefix, paperID.translate(id_trans))
             # Layout region slightly on the left w.r.t title to avoid
             # seeing one or two huge chars from the paper's title for a few moments.
@@ -818,11 +827,13 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 # if PDF is available, clicking on title takes to first page of paper
                 object_el.set('takesToObject', firstPageID)
                 object_el.set('fill', MAIN_LABEL_COLOR)
+                sobject_el.set('fill', MAIN_LABEL_COLOR)
             else:
                 # if not, takes to the region containing all (missing) pages,
                 # which contains a msg indicating that the PDF is missing
                 object_el.set('takesToRegion', paperRegID)
                 object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
+                sobject_el.set('fill', MISSING_PAPER_TITLE_COLOR)
         y -= 1.1 * PAPER_REGION_HEIGHT
     
 ################################################################################
@@ -971,6 +982,12 @@ def getTitle(paperID):
             log("Warning: could not find a %s for paper %s, attempting fallback" % (TITLE_ELEMS[j], paperID), 2)
         j += 1
     return titleEL
+    
+################################################################################
+# Return the authors of a paper
+################################################################################
+def getAuthors(paperID):
+    return "Authors..."
 
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
