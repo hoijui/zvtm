@@ -598,7 +598,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
         lregion_el.set("id", "R-letter-%s" % letter[0])
         lregion_el.set("title", "Authors - %s" % letter[0])
         lregion_el.set("containedIn", "authors")
-        lregion_el.set("stroke", "#AAA")
+        lregion_el.set("stroke", "white")
         lregion_el.set("tful", APPEAR)
         lregion_el.set("tfll", APPEAR)
         lregion_el.set("ttul", DISAPPEAR)
@@ -672,6 +672,15 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
         object_el.set('scale', TEAM_LABEL_SCALE_FACTOR)
         object_el.set('takesToRegion', "R-letter-%s" % letter[0])
         object_el.text = letter[0]
+        object_el = ET.SubElement(region_el, "object")
+        object_el.set('id', "letterBB-%s" % letter[0])
+        object_el.set('type', "rect")
+        object_el.set("x", str(rcx))
+        object_el.set("y", str(rcy))
+        object_el.set("w", str(rcw))
+        object_el.set("h", str(rch))
+        object_el.set('stroke', "#AAA")
+        object_el.set('sensitive', "false")
         REGION_BOUNDS_IN_FLOW[letter[0]] = (west, north, east, south)
         li += 1
         RPIFe = RPIF[li]
