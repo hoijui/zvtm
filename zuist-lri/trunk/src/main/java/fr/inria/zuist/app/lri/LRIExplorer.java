@@ -551,8 +551,11 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		if (sm.getCurrentLevel() <= 1){
 		    if (sm.getCurrentLevel() == 0 && r.getID().equals("teams") ||
 		        sm.getCurrentLevel() == 0 && r.getID().equals("authors") ||
-		        r.getID().startsWith(LETTER_REGION_ID_PREFIX)){
+		        sm.getCurrentLevel() == 1 && r.getID().startsWith(LETTER_REGION_ID_PREFIX)){
 		        goToRegion(r.getID());
+		    }
+		    else if (sm.getCurrentLevel() == 0 && r.getID().startsWith(LETTER_REGION_ID_PREFIX)){
+		        goToRegion("authors");
 		    }
 		    else {
     		    goHome();
