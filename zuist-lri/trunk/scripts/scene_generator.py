@@ -270,7 +270,7 @@ def buildScene(metadataFile, authorsFile, outputSceneFile):
     object_el = ET.SubElement(root_region_el, "object")
     object_el.set('id', "mainLb")
     object_el.set('type', "text")
-    object_el.set('x', str(int(-L0_RW*0.55)))
+    object_el.set('x', str(int(-L0_RW*0.6)))
     object_el.set('y', str(int(L0_RH/1.4)))
     object_el.set('fill', MAIN_LABEL_COLOR)
     object_el.set('scale', L0_LABEL_SCALE_FACTOR)
@@ -577,10 +577,8 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
     # compute distance between names as if they were to be laid out in a single square matrix
     dx = int(w / (1.6 * (colRow[0])))
     dy = int(h / (1.6 * (colRow[1])))
-    xo = int(xc - w/2 + dx)
-    yo = int(yc + h/2 - dy)
-    mx = xo #+ dx + w / 6
-    my = yo #- dy - h / 6
+    mx = int(xc - w/2 + dx)
+    my = int(yc + h/2 - dy)
     li = 0
     pi = 0
     # gray = False
@@ -638,7 +636,7 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
                     objectfn_el.set('type', "text")
                     objectfn_el.set('x', str(int(x)))
                     objectfn_el.set('y', str(int(y+dy/9)))
-                    objectfn_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)                    
+                    objectfn_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)
                     objectfn_el.text = unicode(fnln[0], 'utf-8')
                     categories = acy2id.get(authorID)
                     if categories is None:
