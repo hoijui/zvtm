@@ -6,6 +6,7 @@ import os, sys
 import math, string
 import elementtree.ElementTree as ET
 import unicodedata
+import csv
 
 TRACE_LEVEL = 1
 DEBUG_SCENE = 0
@@ -40,7 +41,8 @@ PAPER_LEVEL_FLOOR = "0"
 
 L0_LABEL_SCALE_FACTOR = "20000000"
 TEAM_LABEL_SCALE_FACTOR = "6000000"
-AUTHOR_LABEL_SCALE_FACTOR = "800000"
+AUTHOR_LABEL_SCALE_FACTOR = "700000"
+AUTHOR_TEAM_LABEL_SCALE_FACTOR = "600000"
 CATEGORY_LABEL_SCALE_FACTOR = "150000"
 YEAR_LABEL_SCALE_FACTOR = "30000"
 TITLE_LABEL_SCALE_FACTOR = "2000"
@@ -77,12 +79,18 @@ canonical_authors = {}
 author2canonical_author = {}
 # author canonical name -> None (contains only authors from LRI)
 authors_LRI = {}
+# author canonical name -> team name
+author2team = {}
 
 ################################################################################
 # EXCEPTIONS
 ################################################################################
+# order is important, lookup for replacements in a string of teams occurs as declared here
 TEAM_FIXES = [("alchemy archi", "ARCHI"),
-    ("gemo i&a iasi tao", "iasi I&A"),
+    ("gemo i&a iasi tao", "iasi IAO"),
+    ("iasi", "IASI"),
+    ("ia", "IAO"),
+    ("i&a", "IAO"),
     ("grandlarge graphcomb parall", "graphcomb parall"),
     ("grandlarge parall", "PARALL"),
     ("grand large parall", "PARALL"),
@@ -97,7 +105,7 @@ TEAM_FIXES = [("alchemy archi", "ARCHI"),
     ("reseaux", "HIPERCOM"),    
     ("hipercom-lri", "HIPERCOM"),
     ("hipercom-", "HIPERCOM"),
-    ("tao", "IA"),
+    ("tao", "IAO"),
     ("graph-comb", "GRAPHCOMB"),
     ("alchemy", "ARCHI"),
     ("gemo", ""), # total (-1) overlap with IASI
@@ -299,25 +307,34 @@ def parseAuthors(authorsFile):
     global canonical_authors
     global author2canonical_author
     global authors_LRI
-    f = open(authorsFile, 'r')
+    global author2team
+    firstLine = 1
+    csvFile = open(authorsFile, 'r')
+    csvreader = csv.reader(csvFile, dialect="excel", delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     i = 0
-    for line in f.readlines()[1:]:
-        author = line.split(",")
-        # author is from an LRI team
+    for author in csvreader:
+        # first line is the table's headers
+        if firstLine:
+            firstLine = False
+            continue
         if len(author[1]) > 0:
             uauthor0 = unicode(author[0], 'utf-8')
             uauthor1 = unicode(author[1], 'utf-8')
             # name is not canonical, store mapping to canonical name
             author2canonical_author[unicodedata.normalize('NFD', uauthor0)] = unicodedata.normalize('NFD', uauthor1)
+            # author is from an LRI team
             if len(author[7]) > 0:
                 authors_LRI[unicodedata.normalize('NFD', uauthor1)] = None
+                author2team[unicodedata.normalize('NFD', uauthor1)] = author[7]
         else:
             # name is a canonical one
             i += 1
             uauthor = unicode(author[0], 'utf-8')
             canonical_authors[unicodedata.normalize('NFD', uauthor)] = (author[3], author[2])
+            # author is from an LRI team
             if len(author[7]) > 0:
                 authors_LRI[unicodedata.normalize('NFD', uauthor)] = None
+                author2team[unicodedata.normalize('NFD', uauthor)] = author[7]
     log("Found %s authors, among which %s are from LRI" % (len(canonical_authors.keys()), len(authors_LRI.keys())), 0)
     log("%s author names have been canonicalized" % len(author2canonical_author.keys()), 2)
     
@@ -466,7 +483,7 @@ def buildTeamTree(outputParent, xc, yc, w, h):
         log("Processing team %s" % team, 2)
         # label
         object_el = ET.SubElement(region_el, "object")
-        object_el.set('id', "teamLb-%s" % team)
+        object_el.set('id', "teamLb-%s" % team.lower())
         object_el.set('type', "text")
         object_el.set('x', str(int(xc)))
         object_el.set('y', str(int(y)))
@@ -642,6 +659,16 @@ def buildAuthorTree(outputParent, xc, yc, w, h):
                     objectfn_el.set('y', str(int(y+dy/8)))
                     objectfn_el.set('scale', AUTHOR_LABEL_SCALE_FACTOR)
                     objectfn_el.text = unicode(fnln[0], 'utf-8')
+                    # team on yet another line
+                    objecttm_el = ET.SubElement(lregion_el, "object")
+                    objecttm_el.set('id', "authorTeamLb-%s" % authorID4id)
+                    objecttm_el.set('type', "text")
+                    objecttm_el.set('x', str(int(x)))
+                    objecttm_el.set('y', str(int(y-dy/8)))
+                    objecttm_el.set('scale', AUTHOR_TEAM_LABEL_SCALE_FACTOR)
+                    objecttm_el.set('takesToObject', "teamLb-%s" % author2team[authorID].lower())
+                    objecttm_el.text = unicode("(%s)" % author2team[authorID], 'utf-8')
+                    # papers
                     categories = acy2id.get(authorID)
                     if categories is None:
                         log("Warning: no paper for author %s" % authorID.encode('utf-8'), 2)

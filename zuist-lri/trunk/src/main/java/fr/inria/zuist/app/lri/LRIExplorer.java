@@ -617,7 +617,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 //        }
     }
     
-    static final float TEAM_CAMERA_ALTITUDE = 40000000.0f;
+    static final float TEAM_CAMERA_ALTITUDE = 50000000.0f;
     static final float AUTHOR_CAMERA_ALTITUDE = 22000000.0f;
 
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
@@ -625,6 +625,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     static final String YEAR_LABEL_ID_PREFIX = "yearLb";
     static final String TITLE_LABEL_ID_PREFIX = "titleLb";
     static final String AUTHOR_LABEL_ID_PREFIX = "authorLb";
+    static final String AUTHOR_TEAM_LABEL_ID_PREFIX = "authorTeamLb";
     static final String LETTER_REGION_ID_PREFIX = "R-letter";
 
     void clickedText(TextDescription td){
@@ -645,6 +646,15 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 				goToObject(ttID, true, null);
 			}
 			justCenteredOnObject = null;
+		}
+        else if (ID.startsWith(AUTHOR_TEAM_LABEL_ID_PREFIX)){
+            // objects for which we go directly to "takesTo" region, or when
+			// clicked twice on the object, go to the region where it "takesTo"
+			String ttID = td.takesTo();
+			short ttT = td.takesToType();
+			rememberLocation(mCamera.getLocation());
+			goToObject(ttID, true, TEAM_CAMERA_ALTITUDE);
+			justCenteredOnObject = sm.getObject(ttID);
 		}
 		else {
 			rememberLocation(mCamera.getLocation());
