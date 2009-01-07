@@ -81,6 +81,8 @@ author2canonical_author = {}
 authors_LRI = {}
 # author canonical name -> team name
 author2team = {}
+# paper id -> [(author canonical name, 1 or 0 depending on whether author is from LRI or not)]
+paper2authors = {}
 
 ################################################################################
 # EXCEPTIONS
@@ -342,6 +344,7 @@ def parseAuthors(authorsFile):
 # Abstract tree that will be wlaked to generate the actual ZUIST scene
 ################################################################################
 def generateAbstractTree():
+    global paper2authors
     # pages per paper, papers per year/team/author
     max_page_count = 0
     missing_team_paper_ids = []
@@ -365,18 +368,20 @@ def generateAbstractTree():
                 if team != "" and team != "EXT":
                     storeTeamPaper(team, referenceEL)
         # author / cat / year
+        ordered_authors = []
         for authorEL in referenceEL.findall('bibentry/authors/author'):
             fn = authorEL.find('first')
             ln = authorEL.find('last')
             if not fn is None and not ln is None:
                 author = "%s %s" % (fn.text.lower(), ln.text.lower())
-                storeAuthorPaper(author, referenceEL)
+                ordered_authors.append(storeAuthorPaper(author, referenceEL))
             elif not ln is None:
                 author = ln.text.lower()
-                storeAuthorPaper(author, referenceEL)
+                ordered_authors.append(storeAuthorPaper(author, referenceEL))
             elif not fn is None:
                 author = fn.text.lower()
-                storeAuthorPaper(author, referenceEL)
+                ordered_authors.append(storeAuthorPaper(author, referenceEL))
+        paper2authors[referenceEL.get('key')] = ordered_authors
     # max population per level
     max_paper_per_tcy = 0
     max_year_per_tc = 0
@@ -428,7 +433,8 @@ def storeTeamPaper(team, refEL):
             categories[category] = {year: [refEL.get('key'),]}
     else:
         tcy2id[team] = {category:{year:[refEL.get('key'),]}}
-    
+
+# returns (author, lri_member)
 def storeAuthorPaper(author, refEL):
     global acy2id
     author = unicodedata.normalize('NFD', unicode(author))
@@ -455,6 +461,9 @@ def storeAuthorPaper(author, refEL):
                 categories[category] = {year: [refEL.get('key'),]}
         else:
             acy2id[canonical_author] = {category:{year:[refEL.get('key'),]}}
+        return (canonical_author, 1)
+    else:
+        return (canonical_author, 0)
 
 ################################################################################
 # Build scene subtree that corresponds to browsing papers per team/categ./year
@@ -835,14 +844,17 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
             object_el.set('anchor', 'start')
             object_el.set('scale', TITLE_LABEL_SCALE_FACTOR)
             object_el.text = titleEL.text
-            sobject_el = ET.SubElement(region_el, "object")
-            sobject_el.set('id', "titleAuthLb%s%s" % (idPrefix, paperID.translate(id_trans)))
-            sobject_el.set('type', "text")
-            sobject_el.set('x', str(int(x)))
-            sobject_el.set('y', str(int(y-PAPER_REGION_HEIGHT * .45)))
-            sobject_el.set('anchor', 'start')
-            sobject_el.set('scale', SUBTITLE_LABEL_SCALE_FACTOR)
-            sobject_el.text = getAuthors(paperID)
+            authors = getAuthors(paperID)
+            sobject_el = None
+            if authors is not None:
+                sobject_el = ET.SubElement(region_el, "object")
+                sobject_el.set('id', "titleAuthLb%s%s" % (idPrefix, paperID.translate(id_trans)))
+                sobject_el.set('type', "text")
+                sobject_el.set('x', str(int(x)))
+                sobject_el.set('y', str(int(y-PAPER_REGION_HEIGHT * .45)))
+                sobject_el.set('anchor', 'start')
+                sobject_el.set('scale', SUBTITLE_LABEL_SCALE_FACTOR)
+                sobject_el.text = authors
             paperRegID = "R-%s-%s" % (idPrefix, paperID.translate(id_trans))
             # Layout region slightly on the left w.r.t title to avoid
             # seeing one or two huge chars from the paper's title for a few moments.
@@ -855,13 +867,15 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 # if PDF is available, clicking on title takes to first page of paper
                 object_el.set('takesToObject', firstPageID)
                 object_el.set('fill', MAIN_LABEL_COLOR)
-                sobject_el.set('fill', MAIN_LABEL_COLOR)
+                if sobject_el is not None:
+                    sobject_el.set('fill', MAIN_LABEL_COLOR)
             else:
                 # if not, takes to the region containing all (missing) pages,
                 # which contains a msg indicating that the PDF is missing
                 object_el.set('takesToRegion', paperRegID)
                 object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
-                sobject_el.set('fill', MISSING_PAPER_TITLE_COLOR)
+                if sobject_el is not None:
+                    sobject_el.set('fill', MISSING_PAPER_TITLE_COLOR)
         y -= 1.1 * PAPER_REGION_HEIGHT
     
 ################################################################################
@@ -1015,7 +1029,25 @@ def getTitle(paperID):
 # Return the authors of a paper
 ################################################################################
 def getAuthors(paperID):
-    return "Authors..."
+    authors = ""
+    if paper2authors.has_key(paperID):
+        for author in paper2authors[paperID]:
+            if author is not None:
+                if authors_LRI.has_key(author[0]) and canonical_authors.has_key(author[0]):
+                    # take canonical names for people from LRI
+                    fnln = canonical_authors[author[0]]
+                    authors += "%s %s, " % (fnln[0], fnln[1])
+                else:
+                    # use the only information we have from bibtex for other people
+                    authors += "%s, " % author[0].encode('utf-8')
+        if len(authors) > 0:
+            authors = authors[:-2]
+        else:
+            authors = None
+    else:
+        authors = None
+        log("Error, could not find any author for %s" % paperID, 1)
+    return authors
 
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
