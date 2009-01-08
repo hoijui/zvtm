@@ -618,8 +618,9 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     
     static final float TEAM_CAMERA_ALTITUDE = 50000000.0f;
     static final float AUTHOR_CAMERA_ALTITUDE = 22000000.0f;
-    static final float PAPER_CAMERA_ALTITUDE = 500.0f;
-    static final long PAPER_CAMERA_XOFFSET = 2000;
+    static final float PAPER_CAMERA_ALTITUDE = 700.0f;
+    static final long PAPER_CAMERA_XOFFSET = 3350;
+    static final long PAPER_CAMERA_YOFFSET = -2000;
 
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
     static final String CATEGORY_LABEL_ID_PREFIX = "catLb";
@@ -654,8 +655,9 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		    // when zooming on the pages of a paper from the paper's title,
 		    // show the first few pages of that paper, not just the first page
 		    // do it only if there are more than 3 pages
-			if (Integer.parseInt(ttID.substring(ttID.indexOf("_p1_")+4)) > 3){
-			    goToObject(ttID, true, PAPER_CAMERA_ALTITUDE, PAPER_CAMERA_XOFFSET, 0);
+		    int pageCount = Integer.parseInt(ttID.substring(ttID.indexOf("_p1_")+4));
+			if (pageCount > 3){
+			    goToObject(ttID, true, PAPER_CAMERA_ALTITUDE, PAPER_CAMERA_XOFFSET, (pageCount > 10) ? PAPER_CAMERA_YOFFSET : 0);
 			}
 			else {
     			goToObject(ttID, true, null);			    
