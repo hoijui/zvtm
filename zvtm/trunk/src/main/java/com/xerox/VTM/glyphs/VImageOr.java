@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Jan 09 2001
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Stroke;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
@@ -151,137 +152,155 @@ public class VImageOr extends VImage {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].ch>1)){
-	    if (zoomSensitive){
-		trueCoef = scaleFactor*coef;
-	    }
-	    else{
-		trueCoef = scaleFactor;
-	    }
-	    // a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
-	    if (trueCoef!=1.0f){
-		// translate
-		at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
-		if (orient != 0){
-		    // rotate
-		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
-		}
-		// rescale
-		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
-		// draw
-		g.drawImage(image,at,null);
-		if (drawBorder==1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawPolygon(pc[i].p);
-		    }
-		}
-		else if (drawBorder==2){
-		    g.setColor(borderColor);
-		    g.drawPolygon(pc[i].p);
-		}
-	    }
-	    else {
-		if (orient==0){// no rotating, no rescaling, just draw after implicit translation
-		    g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-		}
-		else {// translate
-		    at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
-		    // rotate
-		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
-		    // draw
-		    g.drawImage(image,at,null);
-		}
-		if (drawBorder==1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawPolygon(pc[i].p);
-		    }
-		}
-		else if (drawBorder==2){
-		    g.setColor(borderColor);
-		    g.drawPolygon(pc[i].p);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.borderColor);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
-	}
+        if ((pc[i].cw>1) && (pc[i].ch>1)){
+            if (zoomSensitive){
+                trueCoef = scaleFactor*coef;
+            }
+            else{
+                trueCoef = scaleFactor;
+            }
+            // a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
+            if (trueCoef!=1.0f){
+                // translate
+                at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
+                if (orient != 0){
+                    // rotate
+                    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
+                }
+                // rescale
+                at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                // draw
+                if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(image,at,null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(image,at,null);
+                }
+                if (drawBorder==1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawPolygon(pc[i].p);
+                    }
+                }
+                else if (drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawPolygon(pc[i].p);
+                }
+            }
+            else {
+                if (orient==0){
+                    // no rotating, no rescaling, just draw after implicit translation
+                    g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                }
+                else {
+                    // translate
+                    at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
+                    // rotate
+                    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].cw,(float)pc[i].ch));
+                    // draw
+                    g.drawImage(image,at,null);
+                }
+                if (drawBorder==1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawPolygon(pc[i].p);
+                    }
+                }
+                else if (drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawPolygon(pc[i].p);
+                }
+            }
+        }
+        else {
+            g.setColor(this.borderColor);
+            g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lcw>1) && (pc[i].lch>1)){
-	    if (zoomSensitive){
-		trueCoef=scaleFactor*coef;
-	    }
-	    else{
-		trueCoef=scaleFactor;
-	    }
-	    //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} 
-	    if (trueCoef!=1.0f){
-		// translate
-		at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
-		if (orient!=0){
-		    // rotate
-		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));
-		}
-		// rescale
-		at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
-		// draw
-		g.drawImage(image,at,null);
-		if (drawBorder==1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawPolygon(pc[i].lp);
-		    }
-		}
-		else if (drawBorder==2){
-		    g.setColor(borderColor);
-		    g.drawPolygon(pc[i].lp);
-		}
-	    }
-	    else {
-		if (orient==0){// no rotating, no rescaling, just draw after implicit translation
-		    g.drawImage(image,dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,null);
-		}
-		else {// translate
-		    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
-		    // rotate
-		    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));
-		    // draw
-		    g.drawImage(image,at,null);
-		}
-		if (drawBorder==1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawPolygon(pc[i].lp);
-		    }
-		}
-		else if (drawBorder==2){
-		    g.setColor(borderColor);
-		    g.drawPolygon(pc[i].lp);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.borderColor);
-	    g.fillRect(dx+dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if ((pc[i].lcw>1) && (pc[i].lch>1)){
+            if (zoomSensitive){
+                trueCoef=scaleFactor*coef;
+            }
+            else{
+                trueCoef=scaleFactor;
+            }
+            //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} 
+            if (trueCoef!=1.0f){
+                // translate
+                at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
+                if (orient!=0){
+                    // rotate
+                    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));
+                }
+                // rescale
+                at.concatenate(AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                // draw
+                if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(image,at,null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(image,at,null);
+                }
+                if (drawBorder==1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawPolygon(pc[i].lp);
+                    }
+                }
+                else if (drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawPolygon(pc[i].lp);
+                }
+            }
+            else {
+                if (orient==0){
+                    // no rotating, no rescaling, just draw after implicit translation
+                    g.drawImage(image,dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,null);
+                }
+                else {
+                    // translate
+                    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
+                    // rotate
+                    at.concatenate(AffineTransform.getRotateInstance(-orient,(float)pc[i].lcw,(float)pc[i].lch));
+                    // draw
+                    g.drawImage(image,at,null);
+                }
+                if (drawBorder==1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawPolygon(pc[i].lp);
+                    }
+                }
+                else if (drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawPolygon(pc[i].lp);
+                }
+            }
+        }
+        else {
+            g.setColor(this.borderColor);
+            g.fillRect(dx+dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+        }
     }
 
     public Object clone(){
-	VImageOr res=new VImageOr(vx,vy,0,image,orient);
-	res.setWidth(vw);
-	res.setHeight(vh);
-	res.borderColor=this.borderColor;
-	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	res.setDrawBorderPolicy(drawBorder);
-	res.setZoomSensitive(zoomSensitive);
-	return res;
+        VImageOr res=new VImageOr(vx,vy,0,image,orient);
+        res.setWidth(vw);
+        res.setHeight(vh);
+        res.borderColor=this.borderColor;
+        res.mouseInsideColor=this.mouseInsideColor;
+        res.bColor=this.bColor;
+        res.setDrawBorderPolicy(drawBorder);
+        res.setZoomSensitive(zoomSensitive);
+        return res;
     }
 
 }

@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Stroke;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 
 import net.claribole.zvtm.glyphs.projection.RProjectedCoordsP;
@@ -344,91 +345,123 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].ch>1)){
-	    if (zoomSensitive){
-		trueCoef = scaleFactor*coef;
-	    }
-	    else{
-		trueCoef = scaleFactor;
-	    }
-	    //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
-	    if (trueCoef!=1.0f){
-		// translate
-		at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
-		g.setTransform(at);
-		// rescale and draw
-		g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-		g.setTransform(stdT);
-		if (drawBorder==1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-		    }
-		}
-		else if (drawBorder==2){
-		    g.setColor(borderColor);
-		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-		}
-	    }
-	    else {
-		g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-		if (drawBorder == 1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-		    }
-		}
-		else if (drawBorder == 2){
-		    g.setColor(borderColor);
-		    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.borderColor);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if ((pc[i].cw>1) && (pc[i].ch>1)){
+            if (zoomSensitive){
+                trueCoef = scaleFactor*coef;
+            }
+            else{
+                trueCoef = scaleFactor;
+            }
+            //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
+            if (trueCoef!=1.0f){
+                // translate
+                at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
+                g.setTransform(at);
+                // rescale and draw
+                if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);		    
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);		    
+                }
+                g.setTransform(stdT);
+                if (drawBorder==1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                    }
+                }
+                else if (drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                }
+            }
+            else {
+                g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                if (drawBorder == 1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                    }
+                }
+                else if (drawBorder == 2){
+                    g.setColor(borderColor);
+                    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                }
+            }
+        }
+        else {
+            g.setColor(this.borderColor);
+            g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
-	    if (zoomSensitive){trueCoef=scaleFactor*coef;}
-	    else {trueCoef=scaleFactor;}
-	    if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-	    if (trueCoef!=1.0f){
-		g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
-		g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-		g.setTransform(stdT);
-		if (drawBorder==1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-		    }
-		}
-		else if (drawBorder==2){
-		    g.setColor(borderColor);
-		    g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-		}
-	    }
-	    else {
-		g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-		if (drawBorder == 1){
-		    if (pc[i].prevMouseIn){
-			g.setColor(borderColor);
-			g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-		    }
-		}
-		else if (drawBorder == 2){
-		    g.setColor(borderColor);
-		    g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.borderColor);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
+            if (zoomSensitive){trueCoef=scaleFactor*coef;}
+            else {trueCoef=scaleFactor;}
+            // a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
+            if (trueCoef!=1.0f){
+                g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
+                if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);
+                }
+                g.setTransform(stdT);
+                if (drawBorder==1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                    }
+                }
+                else if (drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                }
+            }
+            else {
+                g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                if (drawBorder == 1){
+                    if (pc[i].prevMouseIn){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                    }
+                }
+                else if (drawBorder == 2){
+                    g.setColor(borderColor);
+                    g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                }
+            }
+        }
+        else {
+            g.setColor(this.borderColor);
+            g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+        }
+    }
+    
+    /** For internal use. Made public for easier outside package subclassing. */
+    public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+    
+    /** Specify how image should be interpolated when drawn at a scale different from its original scale.
+        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        */
+    public void setInterpolationMethod(Object im){
+        interpolationMethod = im;
+    }
+    
+    /** Get information about how image should be interpolated when drawn at a scale different from its original scale.
+        *@return one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        */
+    public Object getInterpolationMethod(){
+        return interpolationMethod;
     }
 
     public Object clone(){
