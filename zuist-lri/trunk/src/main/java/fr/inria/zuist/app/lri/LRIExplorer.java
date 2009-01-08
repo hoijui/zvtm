@@ -452,26 +452,37 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
                 }});
         }
     }
-
+    
     void goToObject(String objectID, boolean preload, Float atAltitude){
         if (objectID == null){return;}
         ObjectDescription od = (ObjectDescription)sm.getObject(objectID);
         if (od != null){
-            goToObject(od, preload, atAltitude);
+            goToObject(od, preload, atAltitude, 0, 0);
+        }
+    }
+    
+    void goToObject(String objectID, boolean preload, Float atAltitude, long xoffset, long yoffset){
+        if (objectID == null){return;}
+        ObjectDescription od = (ObjectDescription)sm.getObject(objectID);
+        if (od != null){
+            goToObject(od, preload, atAltitude, xoffset, yoffset);
         }
     }
 
     void goToObject(ObjectDescription od, boolean preload, Float atAltitude){
+        goToObject(od, preload, atAltitude, 0, 0);
+    }
+
+    void goToObject(ObjectDescription od, boolean preload, Float atAltitude, long xoffset, long yoffset){
         String id = od.getID();
-        System.out.println("Going to object "+id);
         final Glyph g = od.getGlyph();
         // g might be null if in a very different location than the region observed right now
         if (g != null){
             sm.setUpdateLevel(false);
-            if (atAltitude != null){
+            if (atAltitude != null || xoffset != 0 || yoffset != 0){
                 Vector data = new Vector();
-                data.add(new Float(atAltitude-mCamera.getAltitude()));
-                data.add(new LongPoint(g.vx-mCamera.posx, g.vy-mCamera.posy));
+                data.add((atAltitude != null) ? new Float(atAltitude-mCamera.getAltitude()) : new Float(mCamera.getAltitude()));
+                data.add(new LongPoint(g.vx-mCamera.posx+xoffset, g.vy-mCamera.posy+yoffset));
                 vsm.animator.createCameraAnimation(ANIM_MOV_LENGTH, AnimManager.CA_ALT_TRANS_SIG, data, mCamera.getID(), new PostAnimationAdapter(){
                     public void animationEnded(Object target, short type, String dimension){
                         sm.setUpdateLevel(true);
@@ -494,7 +505,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         else if (preload){
             // called from main thread, no need to synchronize with ZUIST engine's GlyphLoader
             od.createObject(mSpace, vsm, false);
-            goToObject(od, false, atAltitude);
+            goToObject(od, false, atAltitude, xoffset, yoffset);
         }
     }
     
@@ -538,7 +549,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     Region justCenteredOnRegion = null;
 
 	void clickedOnRegion(Region r, Glyph g, boolean updateVisibilityWhileMoving){
-		System.err.println("Clicked region "+r.getID()+ " level= "+sm.getCurrentLevel());
+		System.out.println("Clicked region "+r.getID()+ " level= "+sm.getCurrentLevel());
 //		if (sm.getCurrentLevel() == 0 || r.getID().startsWith("ABLr")){
 //			rememberLocation(mCamera.getLocation());
 //			sm.setUpdateLevel(false);
@@ -571,7 +582,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 
     void clickedOnObject(ObjectDescription od, Glyph g, boolean updateVisibilityWhileMoving){
         String id = od.getID();
-        System.err.println("Clicked object "+id);
+        System.out.println("Clicked object "+id);
         if (od == justCenteredOnObject){
             // clicked twice on an object, go to the region where it "takesTo"
             String ttID = od.takesTo();
@@ -601,25 +612,13 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     float DEFAULT_FOCUS_SCALE_FACTOR_FOR_REGIONS = 1.05f;
     
     float getFocusScaleFactorForObjectType(String type){
-//        if (type.startsWith("procFig") ||
-//            type.startsWith("au") && type.contains("Fig") ||
-//            type.startsWith("atom") && type.contains("-Fig")){
-//            // figure objects
-//            return 1.5f;
-//        }
-//        else if (type.startsWith("procPage") ||
-//            type.startsWith("au") && type.contains("Page") ||
-//            type.startsWith("atom") && type.contains("-Page")){
-//            // page objects                
-//            return 1.0f;
-//        }
-//        else {
-            return DEFAULT_FOCUS_SCALE_FACTOR_FOR_OBJECTS;
-//        }
+        return DEFAULT_FOCUS_SCALE_FACTOR_FOR_OBJECTS;
     }
     
     static final float TEAM_CAMERA_ALTITUDE = 50000000.0f;
     static final float AUTHOR_CAMERA_ALTITUDE = 22000000.0f;
+    static final float PAPER_CAMERA_ALTITUDE = 500.0f;
+    static final long PAPER_CAMERA_XOFFSET = 2000;
 
     static final String TEAM_LABEL_ID_PREFIX = "teamLb";
     static final String CATEGORY_LABEL_ID_PREFIX = "catLb";
@@ -630,10 +629,10 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     static final String LETTER_REGION_ID_PREFIX = "R-letter";
 
     void clickedText(TextDescription td){
-        System.err.println("Clicked text "+td.getID());
+        System.out.println("Clicked text "+td.getID());
         String ID = td.getID();
         if (ID.startsWith(CATEGORY_LABEL_ID_PREFIX) || ID.startsWith(YEAR_LABEL_ID_PREFIX)
-            || ID.startsWith(TITLE_LABEL_ID_PREFIX) || td == justCenteredOnObject){
+            || td == justCenteredOnObject){
             // objects for which we go directly to "takesTo" region, or when
 			// clicked twice on the object, go to the region where it "takesTo"
 			String ttID = td.takesTo();
@@ -646,6 +645,14 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 				rememberLocation(mCamera.getLocation());
 				goToObject(ttID, true, null);
 			}
+			justCenteredOnObject = null;
+		}
+		else if (ID.startsWith(TITLE_LABEL_ID_PREFIX)){
+		    // when zooming on the pages of a paper from the paper's title,
+		    // show the first few pages of that paper, not just the first page
+		    String ttID = td.takesTo();
+			rememberLocation(mCamera.getLocation());
+			goToObject(ttID, true, PAPER_CAMERA_ALTITUDE, PAPER_CAMERA_XOFFSET, 0);
 			justCenteredOnObject = null;
 		}
         else if (ID.startsWith(AUTHOR_TEAM_LABEL_ID_PREFIX)){
