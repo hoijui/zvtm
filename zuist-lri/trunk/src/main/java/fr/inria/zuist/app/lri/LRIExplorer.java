@@ -475,6 +475,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 
     void goToObject(ObjectDescription od, boolean preload, Float atAltitude, long xoffset, long yoffset){
         String id = od.getID();
+        System.out.println("Going to object "+id);
         final Glyph g = od.getGlyph();
         // g might be null if in a very different location than the region observed right now
         if (g != null){
@@ -648,11 +649,17 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 			justCenteredOnObject = null;
 		}
 		else if (ID.startsWith(TITLE_LABEL_ID_PREFIX)){
-		    // when zooming on the pages of a paper from the paper's title,
-		    // show the first few pages of that paper, not just the first page
 		    String ttID = td.takesTo();
 			rememberLocation(mCamera.getLocation());
-			goToObject(ttID, true, PAPER_CAMERA_ALTITUDE, PAPER_CAMERA_XOFFSET, 0);
+		    // when zooming on the pages of a paper from the paper's title,
+		    // show the first few pages of that paper, not just the first page
+		    // do it only if there are more than 3 pages
+			if (Integer.parseInt(ttID.substring(ttID.indexOf("_p1_")+4)) > 3){
+			    goToObject(ttID, true, PAPER_CAMERA_ALTITUDE, PAPER_CAMERA_XOFFSET, 0);
+			}
+			else {
+    			goToObject(ttID, true, null);			    
+			}
 			justCenteredOnObject = null;
 		}
         else if (ID.startsWith(AUTHOR_TEAM_LABEL_ID_PREFIX)){
