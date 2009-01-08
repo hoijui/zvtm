@@ -1036,10 +1036,12 @@ def getAuthors(paperID):
                 if authors_LRI.has_key(author[0]) and canonical_authors.has_key(author[0]):
                     # take canonical names for people from LRI
                     fnln = canonical_authors[author[0]]
-                    authors += "%s %s, " % (fnln[0], fnln[1])
+                    if len(fnln[0]) > 0 or len(fnln[1]) > 0:
+                        # make sure lastname is written with proper case pattern: Xxxx  (we get XXXX from the data source)
+                        authors += "%s %s%s, " % (fnln[0], fnln[1][0].upper(), fnln[1][1:].lower())
                 else:
                     # use the only information we have from bibtex for other people
-                    authors += "%s, " % author[0].encode('utf-8')
+                    authors += "%s, " % normalizeAuthorCase(author[0]).encode('utf-8')
         if len(authors) > 0:
             authors = authors[:-2]
         else:
@@ -1048,6 +1050,16 @@ def getAuthors(paperID):
         authors = None
         log("Error, could not find any author for %s" % paperID, 1)
     return authors
+
+################################################################################
+# capitalize first letter of each first name and last name
+################################################################################
+def normalizeAuthorCase(authors):
+    names = authors.split(" ")
+    res = ""
+    for name in names:
+        res += "%s%s " % (name[0].upper(), name[1:].lower())
+    return res[:-1]
 
 ################################################################################
 # Get the number of papers for a given category (for a given team/author)
