@@ -854,7 +854,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 sobject_el.set('y', str(int(y-PAPER_REGION_HEIGHT * .45)))
                 sobject_el.set('anchor', 'start')
                 sobject_el.set('scale', SUBTITLE_LABEL_SCALE_FACTOR)
-                sobject_el.text = authors
+                sobject_el.text = unicode(authors, 'utf-8')
             paperRegID = "R-%s-%s" % (idPrefix, paperID.translate(id_trans))
             # Layout region slightly on the left w.r.t title to avoid
             # seeing one or two huge chars from the paper's title for a few moments.
