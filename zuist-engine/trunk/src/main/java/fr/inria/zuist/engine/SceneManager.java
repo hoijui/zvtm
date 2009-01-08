@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: SceneManager.java,v 1.24 2007/10/03 06:37:20 pietriga Exp $
@@ -9,6 +9,7 @@ package fr.inria.zuist.engine;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 import java.io.File;
 import java.util.Hashtable;
@@ -87,6 +88,10 @@ public class SceneManager {
     static final String _anchor = "anchor";
     static final String _layer = "layer";
     static final String _zindex = "z-index";
+    static final String _interpolation = "interpolation";
+    static final String _nearestNeighbor = "nearestNeighbor";
+    static final String _bilinear = "bilinear";
+    static final String _bicubic = "bicubic";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -481,19 +486,41 @@ public class SceneManager {
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
 		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
-		ImageDescription od = createImageDescription(x, y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke);
+		Object interpolation = (objectEL.hasAttribute(_interpolation)) ? parseInterpolation(objectEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+		ImageDescription od = createImageDescription(x, y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
         return od;
-    }
+    }    
 
     /** Creates an image and adds it to a region.
-     *
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param zindex z-index (layer)
+        *@param w width in scene
+        *@param h height in scene
+        *@param imagePath path to bitmap resource
+        *@param stroke border color
+        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        *@param region parent Region in scene
      */
     public ImageDescription createImageDescription(long x, long y, long w, long h, String id, int zindex, Region region,
-                                                   String imagePath, boolean sensitivity, Color stroke){
-        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imagePath, stroke, region);
+                                                   String imagePath, boolean sensitivity, Color stroke, Object im){
+        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imagePath, stroke, im, region);
         imd.setSensitive(sensitivity);
         region.addObject(imd);
         return imd;
+    }
+    
+    Object parseInterpolation(String im){
+        if (im.equals(_bilinear)){
+            return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
+        }
+        else if (im.equals(_bicubic)){
+            return RenderingHints.VALUE_INTERPOLATION_BICUBIC;
+        }
+        else {
+            return RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+        }
     }
     
     /**

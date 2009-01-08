@@ -39,6 +39,7 @@
                  scale CDATA #IMPLIED
                  stroke CDATA #IMPLIED
                  fill CDATA #IMPLIED
+                 interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
                  takesToObject IDREF #IMPLIED
                  takesToRegion IDREF #IMPLIED
                  sensitive (true|false) "true"

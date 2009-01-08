@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: ImageDescription.java,v 1.9 2007/10/04 13:59:00 pietriga Exp $
@@ -9,6 +9,7 @@ package fr.inria.zuist.engine;
 
 import java.awt.Image;
 import java.awt.Color;
+import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -30,9 +31,22 @@ public class ImageDescription extends ObjectDescription {
     long vw, vh;
     String path;
     Color strokeColor;
+    Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
     VImageST glyph;
 
+    /** Constructs the description of an image (VImageST).
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param z z-index (layer)
+        *@param w width in scene
+        *@param h height in scene
+        *@param p path to bitmap resource
+        *@param sc border color
+        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        *@param pr parent Region in scene
+        */
     ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){
         this.id = id;
         this.vx = x;
@@ -42,6 +56,31 @@ public class ImageDescription extends ObjectDescription {
         this.vh = h;
         this.path = p;
         this.strokeColor = sc;
+        this.parentRegion = pr;
+    }
+    
+    /** Constructs the description of an image (VImageST).
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param z z-index (layer)
+        *@param w width in scene
+        *@param h height in scene
+        *@param p path to bitmap resource
+        *@param sc border color
+        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        *@param pr parent Region in scene
+        */
+    ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Object im, Region pr){
+        this.id = id;
+        this.vx = x;
+        this.vy = y;
+        this.zindex = z;
+        this.vw = w;
+        this.vh = h;
+        this.path = p;
+        this.strokeColor = sc;
+        this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
     }
 
@@ -58,6 +97,7 @@ public class ImageDescription extends ObjectDescription {
                     glyph.setDrawBorderPolicy(VImageST.DRAW_BORDER_ALWAYS);
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
+                glyph.setInterpolationMethod(interpolationMethod);
                 vsm.addGlyph(glyph, vs);
                 vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
@@ -69,6 +109,7 @@ public class ImageDescription extends ObjectDescription {
                     glyph.setDrawBorderPolicy(VImageST.DRAW_BORDER_ALWAYS);
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
+                glyph.setInterpolationMethod(interpolationMethod);
                 vsm.addGlyph(glyph, vs);
             }
             glyph.setOwner(this);
