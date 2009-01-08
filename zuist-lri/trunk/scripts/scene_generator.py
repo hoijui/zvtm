@@ -829,7 +829,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
     nbCol = colRow[0]
     nbRow = colRow[1]
     x = int(xc-META_REGION_WIDTH/2.2)
-    y = yc + PAPER_REGION_HEIGHT * (len(paperIDs) / 2 + 1)
+    y = yc + META_REGION_HEIGHT/2 - 0.5 * META_REGION_HEIGHT / len(paperIDs)
     paperIDs.sort(paperSorter)
     for paperID in paperIDs:
         titleEL = getTitle(paperID)
@@ -876,7 +876,7 @@ def layoutPapers(paperIDs, regionID, parentRegionID, idPrefix, xc, yc,\
                 object_el.set('fill', MISSING_PAPER_TITLE_COLOR)
                 if sobject_el is not None:
                     sobject_el.set('fill', MISSING_PAPER_TITLE_COLOR)
-        y -= 1.1 * PAPER_REGION_HEIGHT
+        y -= META_REGION_HEIGHT / len(paperIDs)
     
 ################################################################################
 # Build scene subtree that corresponds to pages
