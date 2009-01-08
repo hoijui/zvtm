@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -26,9 +26,11 @@ public class ClosedShapeDescription extends ObjectDescription {
     ClosedShape glyph;
     boolean inSpace = false;
 
-    /**
-     *@param g any ClosedShape. It must implement com.xerox.VTM.glyphs.Translucent if fade in/out transitions are used in the parent region.
-     */
+    /** Constructs the description of an image (VImageST).
+        *@param id ID of object in scene
+        *@param g any ClosedShape. It must implement com.xerox.VTM.glyphs.Translucent if fade in/out transitions are used in the parent region.
+        *@param pr parent Region in scene
+        */
     ClosedShapeDescription(String id, ClosedShape g, Region pr, boolean sensitive){
         this.id = id;
         this.glyph = g;

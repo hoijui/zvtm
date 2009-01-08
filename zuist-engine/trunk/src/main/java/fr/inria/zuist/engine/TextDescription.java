@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: TextDescription.java,v 1.11 2007/10/04 13:59:00 pietriga Exp $
@@ -40,6 +40,15 @@ public class TextDescription extends ObjectDescription {
     
     VTextST glyph;
 
+    /** Constructs the description of an image (VTextST).
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param s scale factor
+        *@param tx text label
+        *@param c text color
+        *@param pr parent Region in scene
+        */
     TextDescription(String id, long x, long y, float s, String tx, Color c, Region pr){
         this.id = id;
         this.vx = x;
@@ -50,6 +59,17 @@ public class TextDescription extends ObjectDescription {
         this.parentRegion = pr;
     }
 
+    /** Constructs the description of an image (VTextST).
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param z z-index (layer)
+        *@param s scale factor
+        *@param tx text label
+        *@param c text color
+        *@param ta text alignment, one of VText.TEXT_ANCHOR_*
+        *@param pr parent Region in scene
+        */
     TextDescription(String id, long x, long y, int z, float s, String tx, Color c, short ta, Region pr){
         this.id = id;
         this.vx = x;
