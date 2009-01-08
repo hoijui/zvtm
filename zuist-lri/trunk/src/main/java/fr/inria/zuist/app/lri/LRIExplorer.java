@@ -195,13 +195,10 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
         sm.setRegionListener(this);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_SCENE_DIR), this);
-
+        System.out.println("Loaded "+sm.getObjectCount()+" objects into "+sm.getRegionCount()+" regions");
         Location l = vsm.getGlobalView(mCamera);
         mCamera.setLocation(l);
         sm.updateLevel(l.alt);
-
-//        postProcessLabels();
-//        loadMetadata();
         setShowLoadProgress(false);
         TransitionManager.fadeIn(mView, 500, vsm);
         System.gc();
