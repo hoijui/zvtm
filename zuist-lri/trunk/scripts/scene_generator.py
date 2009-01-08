@@ -16,6 +16,7 @@ XML_SCENE_FILE_NAME = "scene.xml"
 # paper page width and height
 PPW = 1224
 PPH = 1584
+PAGE_INTERPOLATION_METHOD = "bilinear"
 
 PAPER_REGION_WIDTH = 0
 PAPER_REGION_HEIGHT = 0
@@ -918,6 +919,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                 object_el.set('h', str(PPH))
                 object_el.set('src', pageSrc)
                 object_el.set('stroke', "#AAA")
+                object_el.set('interpolation', PAGE_INTERPOLATION_METHOD)
                 x += dx
         else:
             colRow = matrixLayout(len(PNGfiles))
@@ -960,6 +962,7 @@ def layoutPages(paperID, regionID, parentRegionID, idPrefix, xc, yc,\
                         object_el.set('h', str(PPH))
                         object_el.set('src', pageSrc)
                         object_el.set('stroke', "#AAA")
+                        object_el.set('interpolation', PAGE_INTERPOLATION_METHOD)
                     else:
                         break
         return "%s_p1_%s" % (idPrefix, len(PNGfiles))
