@@ -454,6 +454,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     }
 
     void goToObject(String objectID, boolean preload, Float atAltitude){
+        if (objectID == null){return;}
         ObjectDescription od = (ObjectDescription)sm.getObject(objectID);
         if (od != null){
             goToObject(od, preload, atAltitude);
