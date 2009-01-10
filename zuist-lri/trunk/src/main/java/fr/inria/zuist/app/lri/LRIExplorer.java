@@ -171,6 +171,11 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
     static final boolean SHOW_STATUS_BAR = false;
     
     public LRIExplorer(short viewtype, boolean fullscreen, String pth){
+	   if (fullscreen) { /* NR */
+		  VIEW_MAX_W = SCREEN_WIDTH;
+		  VIEW_MAX_H = SCREEN_HEIGHT;
+	   }
+
         if (pth != null){
             PATH_TO_HIERARCHY = pth;
             PATH_TO_SCENE_DIR = PATH_TO_HIERARCHY + "/lri4z";
@@ -298,8 +303,11 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
             VIEW_X = VIEW_Y = 0;
         }
         else if (Utilities.osIsMacOS()){
+            VIEW_X = VIEW_Y = 0; /* NR */
+		  /* NR
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
+		  */
         }
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
