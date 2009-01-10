@@ -4,9 +4,13 @@
 
 import os, sys
 import math, string
-import elementtree.ElementTree as ET
 import unicodedata
 import csv
+
+try:
+    import elementtree.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 
 TRACE_LEVEL = 1
 DEBUG_SCENE = 0
