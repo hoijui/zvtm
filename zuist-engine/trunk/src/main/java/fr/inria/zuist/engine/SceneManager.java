@@ -623,9 +623,9 @@ public class SceneManager {
             // it is important that exitLevel() gets called before enterLevel()
             // because of regions spanning multiple levels that get checked in exitLevel()
             if (previousLevel >= 0){
-                exitLevel(previousLevel, currentLevel > previousLevel);
+                exitLevel(previousLevel, currentLevel);
             }
-            enterLevel(currentLevel, currentLevel > previousLevel);
+            enterLevel(currentLevel, previousLevel);
             previousLevel = currentLevel;
         }
         else {
@@ -642,18 +642,20 @@ public class SceneManager {
 	return currentLevel;
     }
 
-    void enterLevel(int depth, boolean arrivingFromHigherAltLevel){
+    void enterLevel(int depth, int prev_depth){
+        boolean arrivingFromHigherAltLevel = depth > prev_depth;
 	    updateVisibleRegions(depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
 	    if (levelListener != null){
 	        levelListener.enteredLevel(depth);
 	    }
     }
 
-    void exitLevel(int depth, boolean goingToLowerAltLevel){
-        for (int i=0;i<levels[depth].regions.length;i++){
+    void exitLevel(int depth, int new_depth){
+        boolean goingToLowerAltLevel = new_depth > depth;
+        for (int i=0;i<levels[depth].regions.length;i++){            
             // hide only if region does not span the level where we are going
-            if ((goingToLowerAltLevel && !levels[depth+1].contains(levels[depth].regions[i]))
-                || (!goingToLowerAltLevel && !levels[depth-1].contains(levels[depth].regions[i]))){
+            if ((goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
+                || (!goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))){
                     levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
                         sceneCameras[levels[depth].regions[i].li].posx, sceneCameras[levels[depth].regions[i].li].posy);
             }
