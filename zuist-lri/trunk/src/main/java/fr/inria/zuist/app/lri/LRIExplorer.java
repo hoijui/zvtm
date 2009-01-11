@@ -582,6 +582,7 @@ public class LRIExplorer implements Java2DPainter, ProgressListener, LevelListen
 		else {
 			goUp();
 		}
+		justCenteredOnObject = null;
 	}
 
     ObjectDescription justCenteredOnObject = null;
