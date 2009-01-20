@@ -762,7 +762,7 @@ public class VCursor {
 		if (dynaSpotActivated && showDynarea){
 			g.setColor(DYNASPOT_COLOR);
 			switch(dynaSpotVisibility){
-				case DYNASPOT_VISIBILITY_VISIBLE:{g.setComposite(acST);break;}
+				case DYNASPOT_VISIBILITY_VISIBLE:{g.setComposite(dsST);break;}
 				case DYNASPOT_VISIBILITY_FADEIN:{g.setComposite(Translucency.acs[(int)Math.round((1-opacity) * DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
 				case DYNASPOT_VISIBILITY_FADEOUT:{g.setComposite(Translucency.acs[(int)Math.round(opacity * DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
 			}
@@ -774,8 +774,8 @@ public class VCursor {
 	/* ---- DynaSpot implementation ---- */
 	
 	Color DYNASPOT_COLOR = Color.LIGHT_GRAY;
-	double DYNASPOT_MAX_TRANSLUCENCY = 0.3;
-	AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
+	float DYNASPOT_MAX_TRANSLUCENCY = 0.3f;
+	AlphaComposite dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
 	
 	/** The DynaSpot area is never displayed. */
 	public static final short DYNASPOT_VISIBILITY_INVISIBLE = 0;
@@ -795,10 +795,38 @@ public class VCursor {
 		dynaSpotVisibility = v;
 		showDynarea = dynaSpotVisibility != DYNASPOT_VISIBILITY_INVISIBLE;
 	}
+
+	/** Set the color of the dynaspot area.
+        *@param c color of dynaspot area
+        */	
+	public void setDynaSpotColor(Color c){
+	    DYNASPOT_COLOR = c;
+	}
+	
+	/** Get the color of the dynaspot area.
+        */	
+	public Color getDynaSpotColor(){
+	    return DYNASPOT_COLOR;
+	}
+
+	/** Set the translucence level of the dynaspot area.
+        *@param a alpha value in [0.0-1.0]
+        */	
+	public void setDynaSpotTranslucence(float a){
+	    DYNASPOT_MAX_TRANSLUCENCY = a;
+	    dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
+	}
+	
+	/** Get the translucence level of the dynaspot area.
+        *@return an alpha value in [0.0-1.0]
+        */	
+	public float getDynaSpotTranslucence(){
+	    return DYNASPOT_MAX_TRANSLUCENCY;
+	}
 	
 	int DYNASPOT_MAX_RADIUS = 32;
 	int dynaSpotRadius = 0;
-	
+		
 	boolean dynaSpotActivated = false;
 	
 	boolean showDynarea = true;
