@@ -58,7 +58,7 @@ public class DynaSpotDemo {
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
         demoView = vsm.addExternalView(cameras, "DynaSpot Demo", vt, 800, 600, false, true);
-        demoView.setBackgroundColor(Color.LIGHT_GRAY);
+        demoView.setBackgroundColor(Color.WHITE);
         demoView.setEventHandler(eh);
         demoView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
