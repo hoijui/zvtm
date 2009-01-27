@@ -748,7 +748,8 @@ public abstract class Glyph implements Cloneable {
      */
     public abstract boolean fillsView(long w,long h,int camIndex);
 
-	/** Find out if a glyph is visible in a circular area (not implemented yet for most glyph classes).
+	/** Find out if a glyph is visible in a circular area. Not implemented yet for most glyph classes.
+	 * Used for instance to implement DynaSpot picking.
 	 */
 	public boolean visibleInDisc(long vx, long vy, long radius, int camIndex){
 		return false;
