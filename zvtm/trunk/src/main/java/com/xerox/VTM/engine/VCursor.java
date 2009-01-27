@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,9 @@ import java.awt.AlphaComposite;
 import java.awt.geom.GeneralPath;
 
 import java.util.Vector;
+import java.util.Hashtable;
 import java.util.Arrays;
+import java.util.Set;
 
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
@@ -62,10 +64,12 @@ import java.awt.Point;
  * 
  * <p>In your ViewEventHandler's mouseMoved() method, call:</p>
  * <ol>
- *  <li>v.getMouse().updateDynaSpotFrequency(e.getWhen());</li>
- *  <li>v.getMouse().updateDynaSpot(jpx, jpy);</li>
+ *  <li>v.getMouse().updateDynaSpot(e.getWhen(), jpx, jpy);</li>
+ *  <li>v.getMouse().dynaPick(c); // where c is the active camera</li>
  * </ol>
- * 
+ * <p>The first line updates DynaSpot's parameters depending on the cursor's dynamics;
+ *    the second line updates the list of glyphs intersected by the DynaSpot disc, and
+ *    identifies the one glyph actually selected (which is returned).</p>
  */
 
 public class VCursor {
@@ -773,9 +777,14 @@ public class VCursor {
 
 	/* ---- DynaSpot implementation ---- */
 	
+	/* Glyphs in DynaSpot area */
+	Hashtable gida = new Hashtable(20);
+	
 	Color DYNASPOT_COLOR = Color.LIGHT_GRAY;
 	float DYNASPOT_MAX_TRANSLUCENCY = 0.3f;
 	AlphaComposite dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
+	
+	boolean highlightCurrentDynaSpotSelection = true;
 	
 	/** The DynaSpot area is never displayed. */
 	public static final short DYNASPOT_VISIBILITY_INVISIBLE = 0;
@@ -856,7 +865,12 @@ public class VCursor {
 		cursorStillDSUpdater = new DynaSpotTimer(this);
 		dstimer.scheduleAtFixedRate(cursorStillDSUpdater, 40, 20);
 	}
-	
+
+	public void updateDynaSpot(long currentTime, int cx, int cy){
+         updateDynaSpotFrequency(currentTime);
+         updateDynaSpotArea(cx, cy);
+    }
+    	
 	public void updateDynaSpotFrequency(){
 		updateDynaSpotFrequency(System.currentTimeMillis());
 	}
@@ -873,11 +887,12 @@ public class VCursor {
 		mLastSampleTime = currentTime;
 	}
 	
-	public void updateDynaSpot(int cx, int cy){
+	public void updateDynaSpotArea(int cx, int cy){
 		parentPos.setLocation(cx, cy);
+		updateDynaSpotArea();
 	}
 	
-	public void updateDynaSpot(){
+	public void updateDynaSpotArea(){
 		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
 		distAway = targetPos.distance(currentPos);
 		double maxDist = 2 * Math.abs(xOffset);
@@ -958,116 +973,100 @@ public class VCursor {
 		return new Point(xOffset, yOffset);
 	}
 	
-	/** Get the glyph picked by the dynaspot cursor.
-	 * If several glyphs are picked by the dynaspot cursor, the best picked glyph is returned.
+	public void setHighlightCurrentDynaSpotSelection(boolean b){
+	    highlightCurrentDynaSpotSelection = b;
+	}
+
+    Camera refToCam4DynaPick = null;
+
+	/** Compute the list of glyphs picked by the dynaspot cursor.
+	 * The best picked glyph is returned.
+	 *@see #dynaPick(Camera c)
+	 */
+	void dynaPick(){
+        dynaPick(refToCam4DynaPick);
+    }
+    
+    Glyph lastDynaPicked = null;
+    
+	/** Compute the list of glyphs picked by the dynaspot cursor.
+	 * The best picked glyph is returned.
 	 *@return null if the dynaspot cursor does not pick anything.
-     *@see #getGlyphsInDynaSpotRegion(Glyph[] res, Camera c)
+     *@see #dynaPick()
 	 */
 	public Glyph dynaPick(Camera c){
+	    if (c == null){
+	        return null;
+	    }
+	    refToCam4DynaPick = c;
 		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-		Glyph res = null;
+		Glyph selectedGlyph = null;
+	    // initialized at -1 because we don't know have any easy way to compute some sort of "initial" distance for comparison
+	    // when == 0, means that the cursor's hotspot is actually inside the glyph
+	    // if > 0 at the end of the loop, dynaspot intersects at least one glyph (but cursor hotspot is not inside any glyph)
+	    // if == -1, nothing is intersected by the dynaspot area
+		double distanceToSelectedGlyph = -1;
 		Glyph g;
 		int gumIndex = -1;
 		int cgumIndex = -1;
-		for (int i=0;i<drawnGlyphs.size();i++){
-			g = (Glyph)drawnGlyphs.elementAt(i);
-			// check if cursor hotspot is inside glyph
-			// if hotspot in several glyphs, take last glyph entered (according to glyphsUnderMouse)
-			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
-			if (cgumIndex > -1){
-				if (cgumIndex > gumIndex){
-					gumIndex = cgumIndex;
-					res = g;
-					if (gumIndex == maxIndex){
-						// minor optimization: don't look at remaining drawnGlyphs if the one just tested
-						// positive is the last glyph entered (won't be overridden anyway)
-						break;
-					}
-				}
-			}
-		}
-		if (res == null){
-			// if cursor not inside any glyph look at dynaspot area
-		    long unprojectedDSRadius = Math.round((((double)c.focal+(double)c.altitude) / (double)c.focal) * dynaSpotRadius);
-			dynawnes[0] = vx - unprojectedDSRadius; // west bound
-			dynawnes[1] = vy + unprojectedDSRadius; // north bound
-			dynawnes[2] = vx + unprojectedDSRadius; // east bound
-			dynawnes[3] = vy - unprojectedDSRadius; // south bound
-			for (int i=0;i<drawnGlyphs.size();i++){
-				g = (Glyph)drawnGlyphs.elementAt(i);
-				// first check bounding boxes intersect (both Glyph's and DynaSpot's), and if positive perform
-				// a finer grain chec with Areas
-				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
-				 	g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
-						// return something only if dynapost area intersects only one glyph
-						if (res == null){
-							res = g;
-						}
-						// if dynapost area intersects more than one glyph, selection is ambiguous
-						// our current policy is to select nothing
-						// (hence the check of the entire array of drawnGlyphs without any break condition)
-						else {
-							return null;
-						}
-				}
-			}
-		}		
-		return res;
-	}
-
-	/** Get the set of glyphs intersected by the cursor's dynaspot region.
-	 *@param res the array to be filled with glyphs interesecting the region.
-	 * If len(res) &gt; count(glyphs), then the last len(res)-count(glyphs) cells are empty.
-	 * If len(res) &lt; count(glyphs), only the first len(res) glyphs are returned (meaning that some interesecting glyphs are not returned).
-	 * If res is null, an array of adequate length is instantiated and returned.
-	 *@return an empty array if the DynaSpot is not activated.
-	 *@see #dynaPick(Camera c)
-	 */
-	public Glyph[] getGlyphsInDynaSpotRegion(Glyph[] res, Camera c){
-		Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-		Glyph g;
 	    long unprojectedDSRadius = Math.round((((double)c.focal+(double)c.altitude) / (double)c.focal) * dynaSpotRadius);
 		dynawnes[0] = vx - unprojectedDSRadius; // west bound
 		dynawnes[1] = vy + unprojectedDSRadius; // north bound
 		dynawnes[2] = vx + unprojectedDSRadius; // east bound
 		dynawnes[3] = vy - unprojectedDSRadius; // south bound
-		if (res != null){
-			int gCount = 0;
-			for (int i=0;i<drawnGlyphs.size();i++){
-				g = (Glyph)drawnGlyphs.elementAt(i);
-				// first check bounding boxes intersect (both Glyph's and DynaSpot's)
-				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
-					// then check circle and actual object shape
-					if (g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
-						res[gCount++] = g;
-					}
+		for (int i=0;i<drawnGlyphs.size();i++){
+			g = (Glyph)drawnGlyphs.elementAt(i);
+			// check if cursor hotspot is inside glyph
+			// if hotspot in several glyphs, selected glyph will be the last glyph entered (according to glyphsUnderMouse)
+			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
+			if (cgumIndex > -1){
+				if (cgumIndex > gumIndex){
+					gumIndex = cgumIndex;
+					selectedGlyph = g;
+					distanceToSelectedGlyph = 0;
 				}
-				if (gCount >= res.length){
-					// if the provided array has been filled, ignore remaining glyphs
-					// (won't be returned anyway)
-					break;
-				}
+				gida.put(g.getID(), g);
 			}
-			if (gCount < res.length){
-				// nullify unfilled slots (if any)
-				Arrays.fill(res, gCount, res.length-1, null);
+			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
+			// if they do intersect, peform a finer-grain chec with Areas
+			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
+			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
+                // glyph intersects dynaspot area    
+                gida.put(g.getID(), g);
+                double d = Math.sqrt(Math.pow(g.vx-vx,2)+Math.pow(g.vy-vy,2));
+                if (distanceToSelectedGlyph == -1 || d < distanceToSelectedGlyph){
+                    selectedGlyph = g;
+                    distanceToSelectedGlyph = d;
+                }
+			}
+			else {
+			    // glyph does not intersect dynaspot area
+			    if (gida.containsKey(g.getID())){
+    		        gida.remove(g.getID());
+    		        if (highlightCurrentDynaSpotSelection){
+    		            g.highlight(false, null);
+    		        }
+			    }
 			}
 		}
-		else {
-			Vector tres = new Vector();
-			for (int i=0;i<drawnGlyphs.size();i++){
-				g = (Glyph)drawnGlyphs.elementAt(i);
-				// first check bounding boxes intersect (both Glyph's and DynaSpot's)
-				if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex())){
-					// then check circle and actual object shape
-					if (g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
-						tres.add(g);
-					}
-				}				
-			}
-			res = (Glyph[])tres.toArray(new Glyph[tres.size()]);
-		}		
-		return res;
+		if (highlightCurrentDynaSpotSelection){
+		    if (selectedGlyph != null){
+    		    selectedGlyph.highlight(true, null);		        
+		    }
+		    if (lastDynaPicked != null && selectedGlyph != lastDynaPicked){
+		        lastDynaPicked.highlight(false, null);
+		    }
+		}
+		lastDynaPicked = selectedGlyph;
+		return selectedGlyph;
+	}
+
+	/** Get the set of glyphs intersected by the cursor's dynaspot region.
+	 *@return a set of Glyph IDs
+	 *@see #dynaPick(Camera c)
+	 */
+	public Set getGlyphsInDynaSpotRegion(Camera c){
+		return gida.keySet();
 	}
 
 }
@@ -1092,7 +1091,8 @@ class DynaSpotTimer extends TimerTask{
 	
 	public void run(){
 		if (enabled){
-			c.updateDynaSpot();
+			c.updateDynaSpotArea();
+			c.dynaPick();
 		}
 	}
 	
