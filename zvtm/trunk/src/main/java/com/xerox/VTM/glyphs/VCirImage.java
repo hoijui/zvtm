@@ -217,6 +217,10 @@ public class VCirImage extends ClosedShape {
 	if (Math.sqrt(Math.pow(x-pc[camIndex].cx,2)+Math.pow(y-pc[camIndex].cy,2))<=pc[camIndex].cs){return true;}
 	else {return false;}
     }
+    
+    public boolean visibleInDisc(long dvx, long dvy, long dradius, int camIndex){
+		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dradius + vs);
+	}
 
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph

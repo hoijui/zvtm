@@ -182,6 +182,10 @@ public class VCirShape extends ClosedShape {
 	else {return false;}
     }
 
+    public boolean visibleInDisc(long dvx, long dvy, long dradius, int camIndex){
+		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dradius + vs);
+	}
+	
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
