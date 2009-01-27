@@ -540,7 +540,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 		}
 	    }
 	}
-	catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousemoved "+ex);}}
+	catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousemoved "+ex);ex.printStackTrace();}}
     }
     
     /**send event to application event handler*/
