@@ -48,8 +48,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     public long vw;
     /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
     public long vh;
-    /*aspect ratio (width divided by height)*/
-    float ar;
+    /* For internal use. Made public for easier outside package subclassing. Aspect ratio (width divided by height). */
+    public float ar;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public RProjectedCoordsP[] pc;

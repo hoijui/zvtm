@@ -30,21 +30,22 @@ import com.xerox.VTM.engine.Camera;
 
 public class VRoundRect extends ClosedShape implements RectangularShape  {
 
-    /*half width and height in virtual space*/
-    long vw,vh;
+    /* Half width and height in virtual space. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING. */
+    public long vw,vh;
     /*aspect ratio (width divided by height)*/
     float ar;
 
-    ProjRoundRect[] pc;
+    /**MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING.*/
+    public ProjRoundRect[] pc;
 
     /**
-     * horizontal diameter of the arc at the four corners
+     * Horizontal diameter of the arc at the four corners. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING.
      */
-    int arcWidth;
+    public int arcWidth;
     /**
-     * vertical diameter of the arc at the four corners
+     * Vertical diameter of the arc at the four corners. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING.
      */
-    int arcHeight;
+    public int arcHeight;
 
     public VRoundRect(){
 	vx=0;
