@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
@@ -298,6 +299,19 @@ public class VText extends Glyph {
 	return false;
     }
 
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
+	    if (text_anchor==TEXT_ANCHOR_START){
+    		return dvs.intersects(vx, vy, pc[camIndex].cw, pc[camIndex].ch);
+        }
+        else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+    		return dvs.intersects(vx-pc[camIndex].cw/2, vy, pc[camIndex].cw, pc[camIndex].ch);
+        }
+        else {
+            //TEXT_ANCHOR_END
+    		return dvs.intersects(vx-pc[camIndex].cw, vy, pc[camIndex].cw, pc[camIndex].ch);
+        }	    
+	}
+
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
     }
@@ -470,6 +484,27 @@ public class VText extends Glyph {
 	return res;
     }
 
-    public void highlight(boolean b, Color selectedColor){}
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){
+        boolean update = false;
+        if (b){
+            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+        }
+        else {
+            if (isSelected() && selectedColor != null){
+                color = selectedColor;
+                update = true;
+            }
+            else {
+                if (mouseInsideColor != null){color = fColor;update = true;}
+            }
+        }
+        if (update){
+            try {
+                vsm.repaintNow();
+            }
+            catch(NullPointerException ex){}
+        }
+    }
 
 }

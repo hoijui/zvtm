@@ -860,6 +860,8 @@ public class VCursor {
 
 	long[] dynawnes = new long[4];
 	
+	Ellipse2D dynaspotVSshape = new Ellipse2D.Double(0, 0, 1, 1);
+	
 	void initDynaSpotTimer(){
 		dstimer = new Timer();
 		cursorStillDSUpdater = new DynaSpotTimer(this);
@@ -1014,6 +1016,7 @@ public class VCursor {
 		dynawnes[1] = vy + unprojectedDSRadius; // north bound
 		dynawnes[2] = vx + unprojectedDSRadius; // east bound
 		dynawnes[3] = vy - unprojectedDSRadius; // south bound
+		dynaspotVSshape.setFrame(dynawnes[0], dynawnes[3], 2*unprojectedDSRadius, 2*unprojectedDSRadius);
 		for (int i=0;i<drawnGlyphs.size();i++){
 			g = (Glyph)drawnGlyphs.elementAt(i);
 			// check if cursor hotspot is inside glyph
@@ -1030,7 +1033,7 @@ public class VCursor {
 			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
 			// if they do intersect, peform a finer-grain chec with Areas
 			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
-			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, c.getIndex())){
+			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex())){
                 // glyph intersects dynaspot area    
                 gida.put(g.getID(), g);
                 double d = Math.sqrt(Math.pow(g.vx-vx,2)+Math.pow(g.vy-vy,2));

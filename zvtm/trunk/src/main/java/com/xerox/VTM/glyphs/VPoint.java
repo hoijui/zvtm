@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.Shape;
 
 import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 
@@ -139,8 +140,8 @@ public class VPoint extends Glyph {
 	else {return false;}
     }
 
-    public boolean visibleInDisc(long dvx, long dvy, long dradius, int camIndex){
-		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < dradius;
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
+		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < dvr;
 	}
 	
     public short mouseInOut(int x,int y,int camIndex){

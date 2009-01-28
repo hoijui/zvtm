@@ -28,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.Shape;
 
 import net.claribole.zvtm.glyphs.projection.BProjectedCoords;
 
@@ -201,8 +202,8 @@ public class VCircle extends ClosedShape {
 	}
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dradius, int camIndex){
-		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dradius + vr);
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
+		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr);
 	}
 
     public void project(Camera c, Dimension d){

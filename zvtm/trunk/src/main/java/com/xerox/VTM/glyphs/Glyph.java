@@ -30,6 +30,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.Shape;
 
 import net.claribole.zvtm.glyphs.CGlyph;
 
@@ -751,7 +752,7 @@ public abstract class Glyph implements Cloneable {
 	/** Find out if a glyph is visible in a circular area. Not implemented yet for most glyph classes.
 	 * Used for instance to implement DynaSpot picking.
 	 */
-	public boolean visibleInDisc(long vx, long vy, long radius, int camIndex){
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
 		return false;
 	}
 	
