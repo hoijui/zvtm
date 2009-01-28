@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
@@ -97,6 +98,11 @@ public class VRectangleOr extends VRectangle {
 	    else {return false;}
 	}
     }
+
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+	}
 
     public boolean coordInside(int x,int y,int camIndex){
 	if (orient==0){

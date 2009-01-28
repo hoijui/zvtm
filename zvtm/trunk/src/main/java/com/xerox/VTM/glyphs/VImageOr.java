@@ -24,6 +24,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Polygon;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 
@@ -77,6 +78,11 @@ public class VImageOr extends VImage {
 	if (pc[camIndex].p.contains(x,y)){return true;}
 	else {return false;}
     }
+    
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+	}
 
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();

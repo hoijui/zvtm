@@ -299,7 +299,7 @@ public class VText extends Glyph {
 	return false;
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 	    if (text_anchor==TEXT_ANCHOR_START){
     		return dvs.intersects(vx, vy, pc[camIndex].cw, pc[camIndex].ch);
         }

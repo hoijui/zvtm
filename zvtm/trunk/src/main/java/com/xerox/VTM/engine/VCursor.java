@@ -1033,7 +1033,7 @@ public class VCursor {
 			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
 			// if they do intersect, peform a finer-grain chec with Areas
 			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
-			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex())){
+			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), mx, my, dynaSpotRadius)){
                 // glyph intersects dynaspot area    
                 gida.put(g.getID(), g);
                 double d = Math.sqrt(Math.pow(g.vx-vx,2)+Math.pow(g.vy-vy,2));

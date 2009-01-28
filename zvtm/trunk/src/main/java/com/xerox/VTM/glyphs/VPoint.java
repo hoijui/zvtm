@@ -140,7 +140,7 @@ public class VPoint extends Glyph {
 	else {return false;}
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < dvr;
 	}
 	

@@ -208,7 +208,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	else {return false;}
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex){
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
 	}
 
