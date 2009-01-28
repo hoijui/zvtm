@@ -9,7 +9,7 @@
 
 package net.claribole.eval.to;
 
-import com.xerox.VTM.glyphs.ZCircle;
+import net.claribole.eval.glyphs.ZCircle;
 
 public class AcquireBlock {
 

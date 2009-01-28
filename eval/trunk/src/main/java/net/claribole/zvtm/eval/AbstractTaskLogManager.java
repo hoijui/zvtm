@@ -30,7 +30,7 @@ import net.claribole.zvtm.engine.Java2DPainter;
 
 import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.ZRoundRect;
+import net.claribole.eval.glyphs.ZRoundRect;
 
 class AbstractTaskLogManager implements Java2DPainter {
 

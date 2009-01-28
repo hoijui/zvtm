@@ -26,7 +26,7 @@ import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.ZCircle;
+import net.claribole.eval.glyphs.ZCircle;
 
 public class AcquireEval implements TOWApplication, RepaintListener {
 

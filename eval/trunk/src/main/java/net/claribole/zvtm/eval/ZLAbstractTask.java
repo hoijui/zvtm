@@ -37,7 +37,7 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.ZRoundRect;
+import net.claribole.eval.glyphs.ZRoundRect;
 import com.xerox.VTM.glyphs.ZSegment;
 
 public class ZLAbstractTask implements PostAnimationAction, Java2DPainter {

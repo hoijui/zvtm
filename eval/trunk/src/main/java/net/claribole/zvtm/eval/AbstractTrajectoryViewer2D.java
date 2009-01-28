@@ -39,7 +39,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.ZRoundRect;
+import net.claribole.eval.glyphs.ZRoundRect;
 
 public class AbstractTrajectoryViewer2D implements Java2DPainter {
 

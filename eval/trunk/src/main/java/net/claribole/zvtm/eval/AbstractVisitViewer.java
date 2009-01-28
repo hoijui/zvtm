@@ -34,7 +34,7 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.ZRoundRect;
+import net.claribole.eval.glyphs.ZRoundRect;
 
 public class AbstractVisitViewer implements Java2DPainter {
 
