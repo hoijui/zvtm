@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Oct 14 2001
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import net.claribole.zvtm.glyphs.projection.ProjEllipse;
@@ -205,6 +206,11 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	if (pc[camIndex].ellipse.contains(x,y)){return true;}
 	else {return false;}
     }
+
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return pc[camIndex].ellipse.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+	}
 
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
