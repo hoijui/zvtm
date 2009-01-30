@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import net.claribole.zvtm.glyphs.projection.ProjSlice;
@@ -339,6 +340,19 @@ public class VSlice extends ClosedShape {
 	}
     }
 
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr)){
+		    if (angle < Math.PI && pc[camIndex].boundingPolygon.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr) ||
+    		    angle > Math.PI && !pc[camIndex].boundingPolygon.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr) ||
+    		    angle == Math.PI && coordInsideHemisphere(jpx, jpy, camIndex)){
+    		        //XXX last test for case when slice is a hemisphere is not sufficient, only covers case of 1px disc
+    		        return true;
+    	    }
+		}
+	    return false;
+	}
+	
     public short mouseInOut(int x,int y,int camIndex){
 	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
 	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph

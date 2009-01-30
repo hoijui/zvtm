@@ -108,17 +108,17 @@ public class VRingST extends VRing implements Translucent {
 				innerSlice.setFrame(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius);
 				// actually combine both to create the ring (subtraction)
-				ring = new Area(outerSlice);
+				pr[i].ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
-				ring.subtract(subring);
+				pr[i].ring.subtract(subring);
 				// draw that area
 				g.setColor(this.color);
 				if (alpha < 1.0f){
 					g.setComposite(acST);
-					g.fill(ring);
+					g.fill(pr[i].ring);
 					g.setComposite(acO);
 				}
-				else {g.fill(ring);}
+				else {g.fill(pr[i].ring);}
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
@@ -126,19 +126,19 @@ public class VRingST extends VRing implements Translucent {
 					g.setStroke(stroke);
 					if (alpha < 1.0f){
 						g.setComposite(acST);
-						g.draw(ring);
+						g.draw(pr[i].ring);
 						g.setComposite(acO);
 					}
-					else {g.draw(ring);}
+					else {g.draw(pr[i].ring);}
 					g.setStroke(stdS);
 				}
 				else {
 					if (alpha < 1.0f){
 						g.setComposite(acST);
-						g.draw(ring);
+						g.draw(pr[i].ring);
 						g.setComposite(acO);
 					}
-					else {g.draw(ring);}
+					else {g.draw(pr[i].ring);}
 				}
 			}
 		}
@@ -161,17 +161,17 @@ public class VRingST extends VRing implements Translucent {
 				innerSlice.setFrame(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
 					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius);
 				// actually combine both to create the ring (subtraction)
-				ring = new Area(outerSlice);
+				pr[i].lring = new Area(outerSlice);
 				subring = new Area(innerSlice);
-				ring.subtract(subring);
+				pr[i].lring.subtract(subring);
 				// draw that area
 				g.setColor(this.color);
 				if (alpha < 1.0f){
 					g.setComposite(acST);
-					g.fill(ring);
+					g.fill(pr[i].lring);
 					g.setComposite(acO);
 				}
-				else {g.fill(ring);}				
+				else {g.fill(pr[i].lring);}				
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
@@ -179,19 +179,19 @@ public class VRingST extends VRing implements Translucent {
 					g.setStroke(stroke);
 					if (alpha < 1.0f){
 						g.setComposite(acST);
-						g.draw(ring);
+						g.draw(pr[i].lring);
 						g.setComposite(acO);
 					}
-					else {g.draw(ring);}
+					else {g.draw(pr[i].lring);}
 					g.setStroke(stdS);
 				}
 				else {
 					if (alpha < 1.0f){
 						g.setComposite(acST);
-						g.draw(ring);
+						g.draw(pr[i].lring);
 						g.setComposite(acO);
 					}
-					else {g.draw(ring);}
+					else {g.draw(pr[i].lring);}
 				}
 			}
 		}

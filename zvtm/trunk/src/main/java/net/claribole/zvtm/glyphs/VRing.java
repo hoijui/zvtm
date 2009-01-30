@@ -143,13 +143,21 @@ public class VRing extends VSlice {
 
 	public boolean coordInside(int x,int y,int camIndex){
 		if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
-			if (ring.contains(x,y)){
+			if (pr[camIndex].ring.contains(x,y)){
 				return true;
 			}
 		}
 		return false;
 	}
     
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr)){
+		    return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+		}
+	    return false;
+	}
+	
 	public void project(Camera c, Dimension d){
 		int i = c.getIndex();
 		coef = (float)(c.focal / (c.focal + c.altitude));
@@ -178,7 +186,7 @@ public class VRing extends VSlice {
 	
 	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
 	Ellipse2D innerSlice = new Ellipse2D.Double();
-    Area ring, subring;
+	Area subring;
 	
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
 		if (pc[i].outerCircleRadius > 2){
@@ -191,22 +199,22 @@ public class VRing extends VSlice {
 				innerSlice.setFrame(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius);
 				// actually combine both to create the ring (subtraction)
-				ring = new Area(outerSlice);
+				pr[i].ring = new Area(outerSlice);
 				subring = new Area(innerSlice);
-				ring.subtract(subring);
+				pr[i].ring.subtract(subring);
 				// draw that area
 				g.setColor(this.color);
-				g.fill(ring);
+				g.fill(pr[i].ring);
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
 				if (stroke != null){
 					g.setStroke(stroke);
-				  	g.draw(ring);
+				  	g.draw(pr[i].ring);
 					g.setStroke(stdS);
 				}
 				else {
-				  g.draw(ring);
+				  g.draw(pr[i].ring);
 				}
 			}
 		}
@@ -228,22 +236,22 @@ public class VRing extends VSlice {
 				innerSlice.setFrame(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,
 					2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius);
 				// actually combine both to create the ring (subtraction)
-				ring = new Area(outerSlice);
+				pr[i].lring = new Area(outerSlice);
 				subring = new Area(innerSlice);
-				ring.subtract(subring);
+				pr[i].lring.subtract(subring);
 				// draw that area
 				g.setColor(this.color);
-				g.fill(ring);
+				g.fill(pr[i].lring);
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
 				if (stroke != null){
 					g.setStroke(stroke);
-				  	g.draw(ring);
+				  	g.draw(pr[i].lring);
 					g.setStroke(stdS);
 				}
 				else {
-				  g.draw(ring);
+				  g.draw(pr[i].lring);
 				}
 			}
 		}

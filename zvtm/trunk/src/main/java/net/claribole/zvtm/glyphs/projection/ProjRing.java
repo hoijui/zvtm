@@ -7,6 +7,8 @@
 
 package net.claribole.zvtm.glyphs.projection;
 
+import java.awt.geom.Area;
+
 /**project coordinates of a ring slice
  * @author Emmanuel Pietriga
  */
@@ -16,5 +18,7 @@ public class ProjRing extends ProjSlice {
     public int innerRingRadius;
 
     public int linnerRingRadius;
+    
+    public Area ring, lring;
     
 }
