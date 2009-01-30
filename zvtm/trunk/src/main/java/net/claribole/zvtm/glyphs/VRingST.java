@@ -98,11 +98,11 @@ public class VRingST extends VRing implements Translucent {
 
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
 		if (alpha == 0){return;}
-		if (pc[i].innerCircleRadius > 2){
+		if (pc[i].outerCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
-				outerSlice.setArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-					2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+				outerSlice.setArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+					2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
 				innerSlice.setFrame(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
@@ -151,11 +151,11 @@ public class VRingST extends VRing implements Translucent {
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (alpha == 0){return;}
-		if (pc[i].linnerCircleRadius > 2){
+		if (pc[i].louterCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
-				outerSlice.setArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-					2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+				outerSlice.setArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+					2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
 				innerSlice.setFrame(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,

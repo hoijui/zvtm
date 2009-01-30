@@ -31,11 +31,11 @@ import java.awt.Polygon;
 public class ProjSlice extends ProjectedCoords {
 
     public Polygon boundingPolygon;
-    public int innerCircleRadius;
+    public int outerCircleRadius;
     public int p1x,p1y,p2x,p2y;
 
     public Polygon lboundingPolygon;
-    public int linnerCircleRadius;
+    public int louterCircleRadius;
     public int lp1x,lp1y,lp2x,lp2y;
     
 }

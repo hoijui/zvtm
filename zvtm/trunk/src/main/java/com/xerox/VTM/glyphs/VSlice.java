@@ -308,7 +308,7 @@ public class VSlice extends ClosedShape {
     }
 
     public boolean coordInside(int x,int y,int camIndex){
-	if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].innerCircleRadius){
+	if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
 	    // see computePolygonEdges() for an explanation of the following tests
 	    if (angle < Math.PI && pc[camIndex].boundingPolygon.contains(x, y) ||
 		angle > Math.PI && !pc[camIndex].boundingPolygon.contains(x, y) ||
@@ -388,7 +388,7 @@ public class VSlice extends ClosedShape {
 	    }
 	    pc[i].boundingPolygon.invalidate();
 	}
-	pc[i].innerCircleRadius = Math.round(size * coef);
+	pc[i].outerCircleRadius = Math.round(size * coef);
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
@@ -421,31 +421,31 @@ public class VSlice extends ClosedShape {
 	    }
 	    pc[i].lboundingPolygon.invalidate();
 	}
-	pc[i].linnerCircleRadius = Math.round(size * coef);
+	pc[i].louterCircleRadius = Math.round(size * coef);
     }
 
     public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
- 	if (pc[i].innerCircleRadius > 2){//paint a dot if too small
+ 	if (pc[i].outerCircleRadius > 2){//paint a dot if too small
 	    if (filled){
 		g.setColor(this.color);    
-		g.fillArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+		g.fillArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+			  2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 			  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 	    }
 	    if (paintBorder){
 		g.setColor(borderColor);
 		if (stroke != null){
 		    g.setStroke(stroke);
-		    g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+		    g.drawArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+			      2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
 		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+		    g.drawArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+			      2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
 		    g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
@@ -459,27 +459,27 @@ public class VSlice extends ClosedShape {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
- 	if (pc[i].linnerCircleRadius > 2){//paint a dot if too small
+ 	if (pc[i].louterCircleRadius > 2){//paint a dot if too small
 	    if (filled){
 		g.setColor(this.color);    
-		g.fillArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+		g.fillArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+			  2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 			  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 	    }
 	    if (paintBorder){
 		g.setColor(borderColor);
 		if (stroke != null){
 		    g.setStroke(stroke);
-		    g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+		    g.drawArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+			      2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
 		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
 		    g.setStroke(stdS);
 		}
 		else {
-		    g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+		    g.drawArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+			      2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
 		    g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);

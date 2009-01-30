@@ -142,7 +142,7 @@ public class VRing extends VSlice {
 	}
 
 	public boolean coordInside(int x,int y,int camIndex){
-		if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].innerCircleRadius){
+		if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
 			if (ring.contains(x,y)){
 				return true;
 			}
@@ -159,7 +159,7 @@ public class VRing extends VSlice {
 		int hh = d.height/2;
 		pc[i].cx = hw + Math.round((vx-c.posx) * coef);
 		pc[i].cy = hh - Math.round((vy-c.posy) * coef);
-		pc[i].innerCircleRadius = Math.round(size * coef);
+		pc[i].outerCircleRadius = Math.round(size * coef);
 		pr[i].innerRingRadius = Math.round(size * irr_p * coef);
 	}
 
@@ -172,7 +172,7 @@ public class VRing extends VSlice {
 		int hh = lensHeight/2;
 		pc[i].lcx = hw + Math.round((vx-lensx) * coef);
 		pc[i].lcy = hh - Math.round((vy-lensy) * coef);
-		pc[i].linnerCircleRadius = Math.round(size * coef);
+		pc[i].louterCircleRadius = Math.round(size * coef);
 		pr[i].linnerRingRadius = Math.round(size * irr_p * coef);
 	}
 	
@@ -181,11 +181,11 @@ public class VRing extends VSlice {
     Area ring, subring;
 	
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
-		if (pc[i].innerCircleRadius > 2){
+		if (pc[i].outerCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
-				outerSlice.setArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-					2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+				outerSlice.setArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+					2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
 				innerSlice.setFrame(dx+pc[i].cx - pr[i].innerRingRadius, dy+pc[i].cy - pr[i].innerRingRadius,
@@ -218,11 +218,11 @@ public class VRing extends VSlice {
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		if (pc[i].linnerCircleRadius > 2){
+		if (pc[i].louterCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
-				outerSlice.setArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-					2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+				outerSlice.setArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+					2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
 				// smaller pie slice to remove to create the ring
 				innerSlice.setFrame(dx+pc[i].lcx - pr[i].linnerRingRadius, dy+pc[i].lcy - pr[i].linnerRingRadius,

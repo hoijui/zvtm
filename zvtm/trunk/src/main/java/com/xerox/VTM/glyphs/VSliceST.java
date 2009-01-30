@@ -93,29 +93,29 @@ public class VSliceST extends VSlice implements Translucent {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (alpha == 0){return;}
- 	if (pc[i].innerCircleRadius > 2){//paint a dot if too small
+ 	if (pc[i].outerCircleRadius > 2){//paint a dot if too small
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
 		if (filled){
 		    g.setColor(this.color);
-		    g.fillArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+		    g.fillArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+			      2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		}
 		if (paintBorder){
 		    g.setColor(borderColor);
 		    if (stroke != null){
 			g.setStroke(stroke);
-			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+			g.drawArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+				  2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
 			g.setStroke(stdS);
 		    }
 		    else {
-			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+			g.drawArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+				  2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
@@ -126,24 +126,24 @@ public class VSliceST extends VSlice implements Translucent {
 	    else {
 		if (filled){
 		    g.setColor(this.color);
-		    g.fillArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-			      2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+		    g.fillArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+			      2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		}
 		if (paintBorder){
 		    g.setColor(borderColor);
 		    if (stroke != null){
 			g.setStroke(stroke);
-			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+			g.drawArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+				  2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
 			g.setStroke(stdS);
 		    }
 		    else {
-			g.drawArc(dx+pc[i].cx - pc[i].innerCircleRadius, dy+pc[i].cy - pc[i].innerCircleRadius,
-				  2 * pc[i].innerCircleRadius, 2 * pc[i].innerCircleRadius,
+			g.drawArc(dx+pc[i].cx - pc[i].outerCircleRadius, dy+pc[i].cy - pc[i].outerCircleRadius,
+				  2 * pc[i].outerCircleRadius, 2 * pc[i].outerCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p1x, pc[i].p1y);
 			g.drawLine(dx+pc[i].cx, dy+pc[i].cy, pc[i].p2x, pc[i].p2y);
@@ -166,29 +166,29 @@ public class VSliceST extends VSlice implements Translucent {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (alpha == 0){return;}
- 	if (pc[i].linnerCircleRadius > 2){//paint a dot if too small
+ 	if (pc[i].louterCircleRadius > 2){//paint a dot if too small
 	    if (alpha < 1.0f){
 		g.setComposite(acST);
 		if (filled){
 		    g.setColor(this.color);
-		    g.fillArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+		    g.fillArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+			      2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		}
 		if (paintBorder){
 		    g.setColor(borderColor);
 		    if (stroke != null){
 			g.setStroke(stroke);
-			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+			g.drawArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+				  2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
 			g.setStroke(stdS);
 		    }
 		    else {
-			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+			g.drawArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+				  2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
@@ -199,24 +199,24 @@ public class VSliceST extends VSlice implements Translucent {
 	    else {
 		if (filled){
 		    g.setColor(this.color);
-		    g.fillArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-			      2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+		    g.fillArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+			      2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 			      (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 		}
 		if (paintBorder){
 		    g.setColor(borderColor);
 		    if (stroke != null){
 			g.setStroke(stroke);
-			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+			g.drawArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+				  2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
 			g.setStroke(stdS);
 		    }
 		    else {
-			g.drawArc(dx+pc[i].lcx - pc[i].linnerCircleRadius, dy+pc[i].lcy - pc[i].linnerCircleRadius,
-				  2 * pc[i].linnerCircleRadius, 2 * pc[i].linnerCircleRadius,
+			g.drawArc(dx+pc[i].lcx - pc[i].louterCircleRadius, dy+pc[i].lcy - pc[i].louterCircleRadius,
+				  2 * pc[i].louterCircleRadius, 2 * pc[i].louterCircleRadius,
 				  (int)Math.round(orientDeg-angleDeg/2.0), angleDeg-1);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp1x, pc[i].lp1y);
 			g.drawLine(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lp2x, pc[i].lp2y);
