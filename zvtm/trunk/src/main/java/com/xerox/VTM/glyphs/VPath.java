@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
@@ -450,6 +451,11 @@ public class VPath extends Glyph {
 	}
     }
 
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return path.intersects(dvx-dvr, -dvy-dvr, 2*dvr, 2*dvr) &&
+			   !path.contains(dvx-dvr, -dvy-dvr, 2*dvr, 2*dvr);
+	}
 
     /** Set the threshold below which the path should be drawn. Default is 1.2.
      *@see #setForcedDrawing(boolean b)
