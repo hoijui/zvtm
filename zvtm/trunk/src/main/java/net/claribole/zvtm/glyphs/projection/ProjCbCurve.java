@@ -31,7 +31,7 @@ import java.awt.geom.Point2D;
 public class ProjCbCurve extends BProjectedCoords {
 
     /**curve*/
-    public CubicCurve2D.Double quad=new CubicCurve2D.Double();
+    public CubicCurve2D.Double curve=new CubicCurve2D.Double();
     /**start point*/
     public Point2D.Double start=new Point2D.Double();
     /**end point*/
@@ -42,7 +42,7 @@ public class ProjCbCurve extends BProjectedCoords {
     public Point2D.Double ctrlEnd=new Point2D.Double();
 
     /**curve*/
-    public CubicCurve2D.Double lquad=new CubicCurve2D.Double();
+    public CubicCurve2D.Double lcurve=new CubicCurve2D.Double();
     /**start point*/
     public Point2D.Double lstart=new Point2D.Double();
     /**end point*/

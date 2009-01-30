@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import net.claribole.zvtm.glyphs.projection.ProjQdCurve;
@@ -163,6 +164,11 @@ public class VQdCurve extends Glyph {
 	return false;
     }
 
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return pc[camIndex].curve.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+	}
+	
     /** The cursor is never considered as being inside a cubic curve. Glyph entry/exit are never fired by a VQdCurve. */
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
@@ -181,7 +187,7 @@ public class VQdCurve extends Glyph {
 	    pc[i].start.setLocation(pc[i].cx+pc[i].cr*Math.cos(orient),pc[i].cy+pc[i].cr*Math.sin(orient));
 	    pc[i].end.setLocation(pc[i].cx-pc[i].cr*Math.cos(orient),pc[i].cy-pc[i].cr*Math.sin(orient));
 	    pc[i].ctrl.setLocation(pc[i].cx+(int)Math.round(coef*vrad*Math.cos(orient-ang)),pc[i].cy+(int)Math.round(coef*vrad*Math.sin(orient-ang)));
-	    pc[i].quad.setCurve(pc[i].start,pc[i].ctrl,pc[i].end);
+	    pc[i].curve.setCurve(pc[i].start,pc[i].ctrl,pc[i].end);
 	}
     }
 
@@ -198,7 +204,7 @@ public class VQdCurve extends Glyph {
 	    pc[i].lstart.setLocation(pc[i].lcx+pc[i].lcr*Math.cos(orient),pc[i].lcy+pc[i].lcr*Math.sin(orient));
 	    pc[i].lend.setLocation(pc[i].lcx-pc[i].lcr*Math.cos(orient),pc[i].lcy-pc[i].lcr*Math.sin(orient));
 	    pc[i].lctrl.setLocation(pc[i].lcx+(int)Math.round(coef*vrad*Math.cos(orient-ang)),pc[i].lcy+(int)Math.round(coef*vrad*Math.sin(orient-ang)));
-	    pc[i].lquad.setCurve(pc[i].lstart,pc[i].lctrl,pc[i].lend);
+	    pc[i].lcurve.setCurve(pc[i].lstart,pc[i].lctrl,pc[i].lend);
 	}
     }
 
@@ -208,13 +214,13 @@ public class VQdCurve extends Glyph {
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx, dy);
-		g.draw(pc[i].quad);
+		g.draw(pc[i].curve);
 		g.translate(-dx, -dy);
 		g.setStroke(stdS);
 	    }
 	    else {
 		g.translate(dx, dy);
-		g.draw(pc[i].quad);
+		g.draw(pc[i].curve);
 		g.translate(-dx, -dy);
 	    }
 	}
@@ -229,13 +235,13 @@ public class VQdCurve extends Glyph {
 	    if (stroke!=null) {
 		g.setStroke(stroke);
 		g.translate(dx, dy);
-		g.draw(pc[i].lquad);
+		g.draw(pc[i].lcurve);
 		g.translate(-dx, -dy);
 		g.setStroke(stdS);
 	    }
 	    else {
 		g.translate(dx, dy);
-		g.draw(pc[i].lquad);
+		g.draw(pc[i].lcurve);
 		g.translate(-dx, -dy);
 	    }
 	}

@@ -31,7 +31,7 @@ import java.awt.geom.QuadCurve2D;
 public class ProjQdCurve extends BProjectedCoords {
 
     /**curve*/
-    public QuadCurve2D.Double quad=new QuadCurve2D.Double();
+    public QuadCurve2D.Double curve=new QuadCurve2D.Double();
     /**start point*/
     public Point2D.Double start=new Point2D.Double();
     /**end point*/
@@ -40,7 +40,7 @@ public class ProjQdCurve extends BProjectedCoords {
     public Point2D.Double ctrl=new Point2D.Double();
 
     /**curve*/
-    public QuadCurve2D.Double lquad=new QuadCurve2D.Double();
+    public QuadCurve2D.Double lcurve=new QuadCurve2D.Double();
     /**start point*/
     public Point2D.Double lstart=new Point2D.Double();
     /**end point*/
