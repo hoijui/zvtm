@@ -27,6 +27,8 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
 import java.awt.geom.AffineTransform;
 
 import net.claribole.zvtm.glyphs.projection.RProjectedCoords;
@@ -272,39 +274,18 @@ public class VSegment extends Glyph implements RectangularShape {
     /** Detects whether the point (x,y) lies on the segment or not.
      *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewEventHandler's mouse methods as jpx)
      *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewEventHandler's mouse methods as jpy)
-     *@param tolerance the segment's thickness in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
+     *@param tolerance the segment's clickable thickness in pixels, not virtual space units
      *@param camIndex camera index (obtained through Camera.getIndex())
      */
     public boolean intersects(int x, int y, int tolerance, int camIndex){
-	LongPoint[] endPoints = this.getEndPoints();
-	double a = (endPoints[1].y - endPoints[0].y) / ((float)(endPoints[1].x - endPoints[0].x));
-	if (Math.abs(a) > 1){
-	    // slope is superior to 45 deg, expand segment thickness on X axis
-	    int[] xcoords = {pc[camIndex].cx-pc[camIndex].cw+tolerance,
-			     pc[camIndex].cx+pc[camIndex].cw+tolerance,
-			     pc[camIndex].cx+pc[camIndex].cw-tolerance,
-			     pc[camIndex].cx-pc[camIndex].cw-tolerance};
-	    int[] ycoords = {pc[camIndex].cy+pc[camIndex].ch,
-			     pc[camIndex].cy-pc[camIndex].ch,
-			     pc[camIndex].cy-pc[camIndex].ch,
-			     pc[camIndex].cy+pc[camIndex].ch};
-	    Polygon p = new Polygon(xcoords, ycoords, 4);
-	    return p.contains(x, y);
-	}
-	else {
-	    // slope is inferior to 45 deg, expand segment thickness on Y axis
-	    int[] xcoords = {pc[camIndex].cx-pc[camIndex].cw,
-			     pc[camIndex].cx+pc[camIndex].cw,
-			     pc[camIndex].cx+pc[camIndex].cw,
-			     pc[camIndex].cx-pc[camIndex].cw};
-	    int[] ycoords = {pc[camIndex].cy+pc[camIndex].ch+tolerance,
-			     pc[camIndex].cy-pc[camIndex].ch+tolerance,
-			     pc[camIndex].cy-pc[camIndex].ch-tolerance,
-			     pc[camIndex].cy+pc[camIndex].ch-tolerance};
-	    Polygon p = new Polygon(xcoords, ycoords, 4);
-	    return p.contains(x, y);
-	}
+	    return Line2D.ptSegDist(pc[camIndex].cx-pc[camIndex].cw, pc[camIndex].cy+pc[camIndex].ch,
+	                            pc[camIndex].cx+pc[camIndex].cw, pc[camIndex].cy-pc[camIndex].ch,
+	                            x, y) <= tolerance;
     }
+    
+    public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return Line2D.ptSegDist(vx-vw, vy-vh, vx+vw, vy+vh, dvx, dvy) <= dvr;
+	}
 
     public short mouseInOut(int x,int y,int camIndex){
 	return Glyph.NO_CURSOR_EVENT;
@@ -364,6 +345,27 @@ public class VSegment extends Glyph implements RectangularShape {
 	return res;
     }
 
-    public void highlight(boolean b, Color selectedColor){}
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){
+        boolean update = false;
+        if (b){
+            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+        }
+        else {
+            if (isSelected() && selectedColor != null){
+                color = selectedColor;
+                update = true;
+            }
+            else {
+                if (mouseInsideColor != null){color = fColor;update = true;}
+            }
+        }
+        if (update){
+            try {
+                vsm.repaintNow();
+            }
+            catch(NullPointerException ex){}
+        }
+    }
 
 }

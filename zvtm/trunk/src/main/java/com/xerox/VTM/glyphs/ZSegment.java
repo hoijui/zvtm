@@ -14,6 +14,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
@@ -85,6 +87,12 @@ public class ZSegment extends VRectangle {
 	return false;
     }
 
+    public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return Line2D.ptSegDist(pc[camIndex].cx, pc[camIndex].cy,
+		                        pc[camIndex].cx+pc[camIndex].cw, pc[camIndex].cy+pc[camIndex].ch,
+		                        jpx, jpy) <= dpr;
+	}
+	
     public void project(Camera c, Dimension d){
 	int i = c.getIndex();
 	coef = (float)(c.focal/(c.focal+c.altitude));
