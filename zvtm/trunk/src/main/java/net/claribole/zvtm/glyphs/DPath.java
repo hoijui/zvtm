@@ -72,6 +72,9 @@ public class DPath extends Glyph implements RectangularShape {
     public long vw;
     /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
     public long vh;
+    
+    /** Java2D general path that represents this DPath */
+    GeneralPath gp;
 
 	public DPath(){
 		spx = 0;
@@ -82,6 +85,7 @@ public class DPath extends Glyph implements RectangularShape {
 		vy = spy;
 		elements = new PathElement[0];
 		computeBounds();
+		updateJava2DGeneralPath();
 		sensit = false;
 		setColor(Color.BLACK);
 	}
@@ -101,6 +105,7 @@ public class DPath extends Glyph implements RectangularShape {
 		vy = spy;
 		elements = new PathElement[0];
 		computeBounds();
+		updateJava2DGeneralPath();
 		sensit = false;
 		setColor(c);
 	}
@@ -151,6 +156,7 @@ public class DPath extends Glyph implements RectangularShape {
 			pi.next();
 	    }
 		computeBounds();
+		updateJava2DGeneralPath();
 		sensit = false;
 		setColor(c);
     }
@@ -180,6 +186,7 @@ public class DPath extends Glyph implements RectangularShape {
 		Arrays.fill(elements, null);
 		elements = tmp;
 		computeBounds();
+		updateJava2DGeneralPath();
 	}
 
 	/** Add a new quadratic curve to the path, from current point to point (x,y), controlled by (x1,y1)
@@ -205,6 +212,7 @@ public class DPath extends Glyph implements RectangularShape {
 		Arrays.fill(elements, null);
 		elements = tmp;
 		computeBounds();
+		updateJava2DGeneralPath();
 	}
 
 	/** Add a new segment to the path, from current point to point (x,y).
@@ -221,6 +229,7 @@ public class DPath extends Glyph implements RectangularShape {
 		Arrays.fill(elements, null);
 		elements = tmp;
 		computeBounds();
+		updateJava2DGeneralPath();
 	}
 
 	/** Add a new 'gap' to the path (move without drawing anything), from current point to point (x,y).
@@ -245,6 +254,7 @@ public class DPath extends Glyph implements RectangularShape {
 			elements = tmp;			
 		}
 		computeBounds();
+		updateJava2DGeneralPath();
 	}
 
 	/* ------------- implementation of RectangularShape --------------- */
@@ -506,12 +516,38 @@ public class DPath extends Glyph implements RectangularShape {
 		return false;
     }
 
+    /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return gp.intersects(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr) && !gp.contains(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr);
+	}
+	
     /** Not implemented yet. */
     public Object clone(){
 		return null;
     }
 
-    public void highlight(boolean b, Color selectedColor){}
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){
+        boolean update = false;
+        if (b){
+            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+        }
+        else {
+            if (isSelected() && selectedColor != null){
+                color = selectedColor;
+                update = true;
+            }
+            else {
+                if (mouseInsideColor != null){color = fColor;update = true;}
+            }
+        }
+        if (update){
+            try {
+                vsm.repaintNow();
+            }
+            catch(NullPointerException ex){}
+        }
+    }
     
 	/**
 		* Edit coordinates of start, end and control points of the element in DPath
@@ -592,6 +628,7 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 		}
 		computeBounds();
+		updateJava2DGeneralPath();
 		try{vsm.repaintNow();}catch(NullPointerException e){}
 	}
 
@@ -679,6 +716,7 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 		}
 		computeBounds();
+		updateJava2DGeneralPath();
 		try{vsm.repaintNow();}catch(NullPointerException e){}
 	}
 
@@ -944,62 +982,42 @@ public class DPath extends Glyph implements RectangularShape {
 		return res.getPathIterator(null);
 	}
 	
-	/** Get a Java2D path iterator for this DPath. */
-    public PathIterator getJava2DPathIterator(){
-		GeneralPath res = new GeneralPath();
-		res.moveTo(spx, spy);
+	/** Update the Java2D GeneralPath representing this DPath. */
+	public void updateJava2DGeneralPath(){
+	    gp = new GeneralPath();
+        gp.moveTo(spx, spy);
 		for (int i = 0; i < this.getElementsCount(); i++){
 			int elType = this.getElementType(i);
 			LongPoint[] pts = this.getElementPointsCoordinates(i);
 			switch(elType){
 				case DPath.CBC:{
-					res.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
+					gp.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
 					break;
 				}
 				case DPath.QDC:{
-					res.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
+					gp.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
 					break;
 				}
 				case DPath.SEG:{
-					res.lineTo(pts[1].x, pts[1].y);
+					gp.lineTo(pts[1].x, pts[1].y);
 					break;
 				}
 				case DPath.MOV:{
-					res.moveTo(pts[1].x, pts[1].y);
+					gp.moveTo(pts[1].x, pts[1].y);
 					break;
 				}
 			}
 		}
-		return res.getPathIterator(null);
-	}
+    }
     
-	/** Get a Java2D GeneralPath iterator for this DPath. */
+	/** Get the Java2D GeneralPath representing this DPath. */
 	public GeneralPath getJava2DGeneralPath(){
-		GeneralPath res = new GeneralPath();
-		res.moveTo(spx, spy);
-		for (int i = 0; i < this.getElementsCount(); i++){
-			int elType = this.getElementType(i);
-			LongPoint[] pts = this.getElementPointsCoordinates(i);
-			switch(elType){
-				case DPath.CBC:{
-					res.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
-					break;
-				}
-				case DPath.QDC:{
-					res.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
-					break;
-				}
-				case DPath.SEG:{
-					res.lineTo(pts[1].x, pts[1].y);
-					break;
-				}
-				case DPath.MOV:{
-					res.moveTo(pts[1].x, pts[1].y);
-					break;
-				}
-			}
-		}
-		return res;
+        return gp;
+	}
+
+	/** Get the Java2D path iterator representing this DPath. */
+    public PathIterator getJava2DPathIterator(){
+		return gp.getPathIterator(null);
 	}
 
     /**
