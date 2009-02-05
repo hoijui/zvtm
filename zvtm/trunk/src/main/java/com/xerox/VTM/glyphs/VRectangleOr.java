@@ -101,7 +101,12 @@ public class VRectangleOr extends VRectangle {
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+		if (orient == 0){
+    		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+		}
+		else {
+    		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);		    
+		}
 	}
 
     public boolean coordInside(int x,int y,int camIndex){
