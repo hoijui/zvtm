@@ -195,6 +195,27 @@ public class VPoint extends Glyph {
 	return res;
     }
 
-    public void highlight(boolean b, Color selectedColor){}
+    /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    public void highlight(boolean b, Color selectedColor){
+        boolean update = false;
+        if (b){
+            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+        }
+        else {
+            if (isSelected() && selectedColor != null){
+                color = selectedColor;
+                update = true;
+            }
+            else {
+                if (mouseInsideColor != null){color = fColor;update = true;}
+            }
+        }
+        if (update){
+            try {
+                vsm.repaintNow();
+            }
+            catch(NullPointerException ex){}
+        }
+    }
 
 }
