@@ -452,6 +452,8 @@ public class VirtualSpace {
         * Important: this might affect the glyph's z-index.
         */
     public void above(Glyph g1, Glyph g2){
+	if(g1 == g2) return;
+
         if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
             removeGlyphFromDrawingList(g1);
             int i = glyphIndexInDrawingList(g2);
@@ -464,6 +466,8 @@ public class VirtualSpace {
         * Important: this might affect the glyph's z-index.
         */
     public void below(Glyph g1, Glyph g2){
+	if(g1 == g2) return;
+
         if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
             removeGlyphFromDrawingList(g1);
             int i = glyphIndexInDrawingList(g2);
