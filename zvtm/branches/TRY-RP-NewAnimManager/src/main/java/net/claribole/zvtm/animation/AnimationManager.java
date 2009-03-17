@@ -7,7 +7,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class AnimationManager {
 
-    //should be called by VSM only
+    //should be called by VSM only, but for the time being
+    //clients will create it manually (until we merge that change
+    //with the trunk)
     public AnimationManager(){
 	inactiveAnims = new LinkedList();
 	pendingAnims = new LinkedList();
@@ -15,8 +17,9 @@ public class AnimationManager {
 	listsLock = new ReentrantLock();
     }
 
-    //our QueuedAnimations are Animators that are limited to 
-    //a single target
+    /**
+     * Enqueue an animation, needs to be done before starting it
+     */
     public void addAnimation(Animation anim){
 	listsLock.lock();
 	try{
@@ -49,12 +52,11 @@ public class AnimationManager {
     public void stopAnimation(Animation anim){
 	listsLock.lock();
 	try{
-	    if(runningAnims.indexOf(anim) != -1)
+	    if(runningAnims.indexOf(anim) != -1)//!!!!!!!!
 		return;
 
 	    anim.stop();
 	    runningAnims.remove(anim);
-	    startEligibleAnimations();
 	} finally {
 	    listsLock.unlock();
 	}
@@ -85,11 +87,29 @@ public class AnimationManager {
 	anim.resume();
     }
 
+    void onAnimationEnded(Animation anim){
+	listsLock.lock();
+	try{
+	    //remove animation from the running list
+	    assert(runningAnims.indexOf(anim) != -1);
+	    runningAnims.remove(anim);
+
+	    startEligibleAnimations();
+	} finally {
+	    listsLock.unlock();
+	}
+    }
+
     private void startEligibleAnimations(){
 	listsLock.lock();
 	try{
 	    //XXX lists may not be the best data structure for
 	    //queued animations, perhaps a hash table is better
+	    for(Animation pending: pendingAnims){
+		for(Animation running: runningAnims){
+		    
+		}
+	    }
 
 	} finally {
 	    listsLock.unlock();

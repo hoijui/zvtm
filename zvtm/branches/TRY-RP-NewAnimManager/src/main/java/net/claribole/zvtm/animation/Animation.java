@@ -6,23 +6,44 @@ import org.jdesktop.animation.timing.TimingTarget;
 /**
  * An animator that has a single timing target.
  * Animations should be started, stopped or paused from the AnimationManager.
+ * An Animation has a subject (object that will be animated e.g. Glyph,
+ * Camera, Portal...) and a dimension (characteristic that will be animated
+ * e.g. position, color, altitude...)
  */
 public class Animation {
+    public static enum Dimension {POSITION, ALTITUDE, SIZE,                  
+	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH};    
     
-    public Animation(int duration, 
-		     double repeatCount, 
-		     Animator.RepeatBehavior repeatBehavior, 
-		     TimingSubject subject){
-	animator = new Animator(duration, repeatCount, repeatBehavior, subject);
-    }
+    //package-level ctor, to be used from AnimationManager
+    //(not publicly visible)
+    Animation(AnimationManager parent,
+	      int duration, 
+	      double repeatCount, 
+	      Animator.RepeatBehavior repeatBehavior, 
+	      Object subject,
+	      Dimension dimension,
+	      TimingHandler handler){
+	this.parent = parent;
+	this.subject = subject;
+	this.dimension = dimension;
+	this.handler = handler;
 
-    public Animation(int duration, TimingSubject subject){
-	animator = new Animator(duration, subject);
+	timingInterceptor = new TimingInterceptor(this);
+	animator = new Animator(duration, repeatCount, repeatBehavior, timingInterceptor);
     }
-
-    public boolean orthogonalWith(Animation other){
-	return subject.orthogonalWith(other.subject);
-    }
+    
+    /**
+     * Two or more Animations can be run concurrently if and only if they
+     * are orthogonal. Two Animations are said to be orthogonal if they either
+     * target different subjects or have different dimensions.
+     *
+     * Non-orthogonal animations get queued and run in the order in which
+     * they were started.
+     */
+    boolean orthogonalWith(Animation other){                      
+     return ( !((subject == other.subject) &&                            
+                (dimension == other.dimension)) );                       
+    }   
 
     void start(){
 	animator.start();
@@ -44,10 +65,63 @@ public class Animation {
 	animator.resume();
     }
 
+    //called back from timingInterceptor, propagate to parent AnimManager
+    void onAnimationEnded(){
+	parent.onAnimationEnded(this);
+    }
+
     //note to self: do *not* provide addTarget, removeTarget
     //Also, start(), cancel(), stop()... should have package access
 
+    final AnimationManager parent;
+
     private final Animator animator;
-    private TimingSubject subject; //this implies some redundancy, so a better
-    //solution should be found (...)
+
+    //intercepts TimingTarget events and propagates them to
+    //TimingHandlers and to the parent class for queuing and
+    //housekeeping tasks
+    private final TimingTarget timingInterceptor; 
+
+    //real, destination handler that is provided by client code
+    TimingHandler handler;
+
+    //object that gets animated, e.g. Glyph, Camera, Portal...
+    final Object subject;
+
+    //characteristic of the animation e.g. color, altitude, position, size...
+    final Dimension dimension;
+    
+}
+
+//This class is not really conceptually separate from "Animation",
+//it is mailny a trick to avoid exposing its TimingTarget inheritance
+//to clients (and providing public callback methods, et caetera).
+class TimingInterceptor implements TimingTarget {
+    TimingInterceptor(Animation parent){
+	this.parent = parent;
+    }
+
+    public void begin(){
+	parent.handler.begin(parent.subject, parent.dimension);
+    }
+
+    public void end(){
+	parent.handler.end(parent.subject, parent.dimension);
+
+	//should do useful stuff like queue management
+	//note that the order of call is important: the end action of
+	//the animation should have ended before we process the animation
+	//queue, and potentially run a new animation
+	parent.onAnimationEnded();
+    }
+
+    public void repeat(){
+	parent.handler.repeat(parent.subject, parent.dimension);
+    }
+
+    public void timingEvent(float fraction){
+	parent.handler.timingEvent(fraction, parent.subject, parent.dimension);
+    }
+
+    private Animation parent;
 }
