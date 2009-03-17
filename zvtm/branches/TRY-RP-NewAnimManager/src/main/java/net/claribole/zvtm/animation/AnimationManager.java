@@ -1,3 +1,9 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package net.claribole.zvtm.animation;
 
 import java.util.List;
@@ -22,6 +28,7 @@ public class AnimationManager {
     /**
      * Creates a new Animation object that will be handled 
      * by this AnimationManager.
+     * @param duration duration of the animation, in milliseconds
      */
     public Animation createAnimation(int duration, 
 				     double repeatCount, //opt
