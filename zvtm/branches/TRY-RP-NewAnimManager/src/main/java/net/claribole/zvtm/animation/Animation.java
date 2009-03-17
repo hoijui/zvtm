@@ -6,6 +6,7 @@
  */ 
 package net.claribole.zvtm.animation;
 
+import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 
@@ -17,6 +18,7 @@ import org.jdesktop.animation.timing.TimingTarget;
  * e.g. position, color, altitude...)
  */
 public class Animation {
+
     public static enum Dimension {POSITION, ALTITUDE, SIZE,                  
 	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH};    
     
@@ -36,6 +38,10 @@ public class Animation {
 
 	timingInterceptor = new TimingInterceptor(this);
 	animator = new Animator(duration, repeatCount, repeatBehavior, timingInterceptor);
+    }
+
+    public void setInterpolator(Interpolator interpolator){
+	animator.setInterpolator(interpolator);
     }
     
     /**
@@ -78,8 +84,7 @@ public class Animation {
 
     //note to self: do *not* provide addTarget, removeTarget
     //Also, start(), cancel(), stop()... should have package access
-
-    final AnimationManager parent;
+    private final AnimationManager parent;
 
     private final Animator animator;
 

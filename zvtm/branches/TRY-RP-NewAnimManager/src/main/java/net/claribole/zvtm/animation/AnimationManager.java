@@ -12,6 +12,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.interpolation.Interpolator;
 
 public class AnimationManager {
 
@@ -31,14 +32,46 @@ public class AnimationManager {
      * @param duration duration of the animation, in milliseconds
      */
     public Animation createAnimation(int duration, 
-				     double repeatCount, //opt
-				     Animator.RepeatBehavior repeatBehavior, //opt
 				     Object subject,
 				     Animation.Dimension dimension,
-				     TimingHandler handler){//interpolator opt
+				     TimingHandler handler){
+	return createAnimation(duration, 1.0, Animator.RepeatBehavior.LOOP,
+			       subject, dimension, handler);
+    }
+
+    /**
+     * Creates a new Animation object that will be handled 
+     * by this AnimationManager.
+     * @param duration duration of the animation, in milliseconds
+     */
+    public Animation createAnimation(int duration, 
+				     double repeatCount, 
+				     Animator.RepeatBehavior repeatBehavior,
+				     Object subject,
+				     Animation.Dimension dimension,
+				     TimingHandler handler){
 	return new Animation(this, duration, repeatCount,
 			     repeatBehavior, subject,
 			     dimension, handler);
+    }
+
+    /**
+     * Creates a new Animation object that will be handled 
+     * by this AnimationManager.
+     * @param duration duration of the animation, in milliseconds
+     */
+    public Animation createAnimation(int duration, 
+				     double repeatCount, 
+				     Animator.RepeatBehavior repeatBehavior,
+				     Object subject,
+				     Animation.Dimension dimension,
+				     TimingHandler handler,
+				     Interpolator interpolator){
+	Animation retval = new Animation(this, duration, repeatCount,
+					 repeatBehavior, subject,
+					 dimension, handler);
+	retval.setInterpolator(interpolator);
+	return retval;
     }
 
     /**

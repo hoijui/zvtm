@@ -33,6 +33,7 @@ import net.claribole.zvtm.widgets.*;
 
 import net.claribole.zvtm.animation.*;
 import org.jdesktop.animation.timing.*;
+import org.jdesktop.animation.timing.interpolation.*;
 
 public class TestCircle {
 
@@ -45,7 +46,6 @@ public class TestCircle {
     TestCircle(short ogl){
         vsm=new VirtualSpaceManager();
         vsm.setDebug(true);
-        //vsm.setDefaultMultiFills(true);
         initTest(ogl);
     }
 
@@ -86,7 +86,8 @@ public class TestCircle {
 	Glyph g = (Glyph)subject;
 	g.moveTo(100 - Float.valueOf(400*fraction).longValue(), 0);
     }
-						});
+						},
+						new SplineInterpolator(0.7f,0.1f,0.3f,0.9f));
 	    am.addAnimation(anim);
 	    am.startAnimation(anim, false);
 	}
