@@ -31,6 +31,9 @@ import net.claribole.zvtm.engine.*;
 import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.widgets.*;
 
+import net.claribole.zvtm.animation.*;
+import org.jdesktop.animation.timing.*;
+
 public class TestCircle {
 
     VirtualSpaceManager vsm;
@@ -62,9 +65,70 @@ public class TestCircle {
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
+	final Glyph circle = new VCircle(100,0,0,40,Color.WHITE);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-		vsm.addGlyph(new VCircle(0,0,0,100,Color.WHITE), "src");
+	vsm.addGlyph(circle, "src");
         vsm.repaintNow();
+
+	AnimationManager am = new AnimationManager();
+	for(int i=0; i<4; ++i){
+	    Animation anim = am.createAnimation(2000, //2 seconds
+						1.0,
+						Animator.RepeatBehavior.LOOP,
+						circle,
+						Animation.Dimension.POSITION,
+						new TimingHandler(){
+						    public void begin(Object subject, Animation.Dimension dim){}
+						    public void end(Object subject, Animation.Dimension dim){}
+						    public void repeat(Object subject, Animation.Dimension dim){}
+    public void timingEvent(float fraction, 
+			    Object subject, Animation.Dimension dim){
+	Glyph g = (Glyph)subject;
+	g.moveTo(100 - Float.valueOf(100*fraction).longValue(), 0);
+    }
+						});
+	    am.addAnimation(anim);
+	    am.startAnimation(anim, false);
+	}
+
+	 Animation anim = am.createAnimation(8000, 
+						1.0,
+						Animator.RepeatBehavior.LOOP,
+						circle,
+						Animation.Dimension.FILLCOLOR,
+						new TimingHandler(){
+						    public void begin(Object subject, Animation.Dimension dim){}
+						    public void end(Object subject, Animation.Dimension dim){}
+						    public void repeat(Object subject, Animation.Dimension dim){}
+    public void timingEvent(float fraction, 
+			    Object subject, Animation.Dimension dim){
+	Glyph g = (Glyph)subject;
+	g.setColor(new Color(0,
+			     0,
+			     Float.valueOf(255*fraction).intValue()));
+    }
+						});
+	    am.addAnimation(anim);
+	    am.startAnimation(anim, false);
+
+	 Animation anim2 = am.createAnimation(4000, 
+					      1.0,
+					      Animator.RepeatBehavior.LOOP,
+					      circle,
+					      Animation.Dimension.SIZE,
+					      new TimingHandler(){
+						 public void begin(Object subject, Animation.Dimension dim){}
+						 public void end(Object subject, Animation.Dimension dim){}
+						 public void repeat(Object subject, Animation.Dimension dim){}
+    public void timingEvent(float fraction, 
+			    Object subject, Animation.Dimension dim){
+	Glyph g = (Glyph)subject;
+	g.sizeTo(40+60*fraction);
+    }
+					      });
+	 am.addAnimation(anim2);
+	    am.startAnimation(anim2, false);
+
     }
     
     public static void main(String[] args){

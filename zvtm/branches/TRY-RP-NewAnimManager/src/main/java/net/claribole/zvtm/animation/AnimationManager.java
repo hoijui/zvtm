@@ -5,16 +5,29 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.jdesktop.animation.timing.Animator;
+
 public class AnimationManager {
 
     //should be called by VSM only, but for the time being
     //clients will create it manually (until we merge that change
     //with the trunk)
     public AnimationManager(){
-	inactiveAnims = new LinkedList();
-	pendingAnims = new LinkedList();
-	runningAnims = new LinkedList();
+	inactiveAnims = new LinkedList<Animation>();
+	pendingAnims = new LinkedList<Animation>();
+	runningAnims = new LinkedList<Animation>();
 	listsLock = new ReentrantLock();
+    }
+
+    public Animation createAnimation(int duration, 
+				     double repeatCount, 
+				     Animator.RepeatBehavior repeatBehavior, 
+				     Object subject,
+				     Animation.Dimension dimension,
+				     TimingHandler handler){
+	return new Animation(this, duration, repeatCount,
+			     repeatBehavior, subject,
+			     dimension, handler);
     }
 
     /**
@@ -34,12 +47,18 @@ public class AnimationManager {
 	}
     }
 
-    //throws exception if animation was not previously added
     //if "force" is true, the animation will cancel any previously running
     //animation that target the same dimension on the same object
     public void startAnimation(Animation anim, boolean force){
+	//!!! force
 	listsLock.lock();
 	try{
+	    if(inactiveAnims.indexOf(anim) == -1)
+		return;
+	    inactiveAnims.remove(anim);
+	    pendingAnims.add(anim);
+	    
+	    //*moves and starts* eligible animations
 	    startEligibleAnimations();
 	} finally {
 	    listsLock.unlock();
@@ -52,7 +71,7 @@ public class AnimationManager {
     public void stopAnimation(Animation anim){
 	listsLock.lock();
 	try{
-	    if(runningAnims.indexOf(anim) != -1)//!!!!!!!!
+	    if(runningAnims.indexOf(anim) == -1)
 		return;
 
 	    anim.stop();
@@ -102,13 +121,29 @@ public class AnimationManager {
 
     private void startEligibleAnimations(){
 	listsLock.lock();
-	try{
+	try{  
 	    //XXX lists may not be the best data structure for
 	    //queued animations, perhaps a hash table is better
+	    List<Animation> transfer = new LinkedList<Animation>();
 	    for(Animation pending: pendingAnims){
+		boolean conflicts = false;
 		for(Animation running: runningAnims){
-		    
+		    if(!pending.orthogonalWith(running))
+			conflicts = true;
 		}
+		for(Animation willRun: transfer){
+		    if(!pending.orthogonalWith(willRun))
+			conflicts = true;
+		}
+		if(!conflicts){
+		    transfer.add(pending);
+		}
+	    }
+
+	    pendingAnims.removeAll(transfer);
+	    runningAnims.addAll(transfer);
+	    for(Animation a: transfer){
+		a.start();
 	    }
 
 	} finally {

@@ -90,7 +90,6 @@ public class Animation {
 
     //characteristic of the animation e.g. color, altitude, position, size...
     final Dimension dimension;
-    
 }
 
 //This class is not really conceptually separate from "Animation",
