@@ -19,19 +19,23 @@ public class AnimationManager {
 	listsLock = new ReentrantLock();
     }
 
+    /**
+     * Creates a new Animation object that will be handled 
+     * by this AnimationManager.
+     */
     public Animation createAnimation(int duration, 
-				     double repeatCount, 
-				     Animator.RepeatBehavior repeatBehavior, 
+				     double repeatCount, //opt
+				     Animator.RepeatBehavior repeatBehavior, //opt
 				     Object subject,
 				     Animation.Dimension dimension,
-				     TimingHandler handler){
+				     TimingHandler handler){//interpolator opt
 	return new Animation(this, duration, repeatCount,
 			     repeatBehavior, subject,
 			     dimension, handler);
     }
 
     /**
-     * Enqueue an animation, needs to be done before starting it
+     * Enqueues an animation, needs to be done before starting it
      */
     public void addAnimation(Animation anim){
 	listsLock.lock();

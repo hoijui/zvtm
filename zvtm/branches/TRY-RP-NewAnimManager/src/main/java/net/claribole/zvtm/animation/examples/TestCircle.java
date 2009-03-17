@@ -72,7 +72,7 @@ public class TestCircle {
 
 	AnimationManager am = new AnimationManager();
 	for(int i=0; i<4; ++i){
-	    Animation anim = am.createAnimation(2000, //2 seconds
+	    Animation anim = am.createAnimation(3000, //2 seconds
 						1.0,
 						Animator.RepeatBehavior.LOOP,
 						circle,
@@ -84,7 +84,7 @@ public class TestCircle {
     public void timingEvent(float fraction, 
 			    Object subject, Animation.Dimension dim){
 	Glyph g = (Glyph)subject;
-	g.moveTo(100 - Float.valueOf(100*fraction).longValue(), 0);
+	g.moveTo(100 - Float.valueOf(400*fraction).longValue(), 0);
     }
 						});
 	    am.addAnimation(anim);
@@ -127,7 +127,7 @@ public class TestCircle {
     }
 					      });
 	 am.addAnimation(anim2);
-	    am.startAnimation(anim2, false);
+	 am.startAnimation(anim2, false);
 
     }
     
