@@ -1,4 +1,4 @@
-/*   FILE: TestCircle.java
+/*   FILE: TestDefaultHandler.java
  *   DATE OF CREATION:   Jul 11 2000
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Romain Primet
@@ -138,7 +138,7 @@ public class TestDefaultHandler {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        new TestCircle((args.length > 0) ? Short.parseShort(args[0]) : 0);
+        new TestDefaultHandler((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
     
 }
