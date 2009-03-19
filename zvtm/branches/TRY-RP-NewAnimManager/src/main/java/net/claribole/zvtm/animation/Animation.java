@@ -16,6 +16,9 @@ import org.jdesktop.animation.timing.TimingTarget;
  * An Animation has a subject (object that will be animated e.g. Glyph,
  * Camera, Portal...) and a dimension (characteristic that will be animated
  * e.g. position, color, altitude...)
+ *
+ * @see TimingHandler
+ * @author Romain Primet
  */
 public class Animation {
 
@@ -42,6 +45,17 @@ public class Animation {
 
     public void setInterpolator(Interpolator interpolator){
 	animator.setInterpolator(interpolator);
+    }
+
+    /**
+     * Sets the initial fraction at which the first animation cycle will begin. The default value is 0.
+     * @param startFraction initial fraction.
+     * @throws IllegalArgumentException if startFraction is less than 0 or greater than 1 
+     * @throws IllegalStateException if animation is already running; this parameter may only 
+     * be changed prior to starting the animation or after the animation has ended
+     */
+    public void setStartFraction(float startFraction){
+	animator.setStartFraction(startFraction);
     }
     
     /**

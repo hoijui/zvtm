@@ -22,6 +22,7 @@ package net.claribole.zvtm.animation.examples;
 import java.awt.*;
 import javax.swing.*;
 
+import java.util.Random;
 import java.util.Vector;
 
 import java.awt.event.KeyEvent;
@@ -76,8 +77,12 @@ public class TestMultipleGlyphs {
 	final int NB_GLYPHS = 100;
 	java.util.List<Glyph> circles = new java.util.ArrayList<Glyph>();
 
+	Random rnd = new Random();
+
 	for(int i=0; i<NB_GLYPHS;++i){
-	    final Glyph circle = new VCircle((60+3)*i,30*i,0,30,Color.getHSBColor(0.4f,0.3f,0.3f));
+	    final Glyph circle = new VCircle((60+3)*i,30*i,0,30,Color.getHSBColor(rnd.nextFloat(),
+										  rnd.nextFloat(),
+										  rnd.nextFloat()));
 	    circles.add(circle);
 	    vsm.addGlyph(circle, "src");
 
@@ -99,6 +104,8 @@ public class TestMultipleGlyphs {
 						    }
 						},
 						new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
+	    anim.setStartFraction(rnd.nextFloat());
+
 	    am.addAnimation(anim);
 	    am.startAnimation(anim, false);
 	}
