@@ -11,13 +11,15 @@ import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTarget;
 
 /**
- * An animator that has a single timing target.
- * Animations should be started, stopped or paused from the AnimationManager.
+ * This class represents an animation.
  * An Animation has a subject (object that will be animated e.g. Glyph,
  * Camera, Portal...) and a dimension (characteristic that will be animated
- * e.g. position, color, altitude...)
+ * e.g. position, color, altitude...).
+ * Animation management (creating, starting, stopping, pausing or cancelling animations)
+ * is done by the {@link AnimationManager}.
  *
  * @see TimingHandler
+ * @see AnimationManager
  * @author Romain Primet
  */
 public class Animation {
