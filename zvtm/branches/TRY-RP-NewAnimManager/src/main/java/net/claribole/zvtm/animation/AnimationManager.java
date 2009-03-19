@@ -14,13 +14,16 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 
+/**
+ * A class that manages Animation instances.
+ * @author Romain Primet
+ */
 public class AnimationManager {
 
     //should be called by VSM only, but for the time being
     //clients will create it manually (until we merge that change
     //with the trunk)
     public AnimationManager(){
-	inactiveAnims = new LinkedList<Animation>();
 	pendingAnims = new LinkedList<Animation>();
 	runningAnims = new LinkedList<Animation>();
 	listsLock = new ReentrantLock();
@@ -30,6 +33,11 @@ public class AnimationManager {
      * Creates a new Animation object that will be handled 
      * by this AnimationManager.
      * @param duration duration of the animation, in milliseconds
+     * @param subject object that will be animated
+     * @param dimension dimension of the animation
+     * @param handler timing handler that will receive callbacks for each animation event. The 
+     * handler is responsible for implementing the animation code itself (e.g. move a Camera or
+     * change the color of a Glyph).
      */
     public Animation createAnimation(int duration, 
 				     Object subject,
@@ -74,32 +82,16 @@ public class AnimationManager {
 	return retval;
     }
 
-    /**
-     * Enqueues an animation, needs to be done before starting it
-     */
-    public void addAnimation(Animation anim){
-	listsLock.lock();
-	try{
-	    if((inactiveAnims.indexOf(anim) != -1) ||
-	       (pendingAnims.indexOf(anim) != -1) ||
-	       (runningAnims.indexOf(anim) != -1)) 
-		return;
-
-	    inactiveAnims.add(anim);
-	} finally {
-	    listsLock.unlock();
-	}
-    }
-
     //if "force" is true, the animation will cancel any previously running
     //animation that target the same dimension on the same object
+    /**
+     * Starts an animation. If the animation was not previously added to 
+     * the animtion queue, add it to the pending queue.
+     */
     public void startAnimation(Animation anim, boolean force){
 	//!!! force
 	listsLock.lock();
 	try{
-	    if(inactiveAnims.indexOf(anim) == -1)
-		return;
-	    inactiveAnims.remove(anim);
 	    pendingAnims.add(anim);
 	    
 	    //*moves and starts* eligible animations
@@ -195,16 +187,11 @@ public class AnimationManager {
 	}
     }
 
-    //new animations are added here
-    //the key (instance of Object) is the subject of the animation
-    //(i.e. Glyph, Camera, Portal, DPath...). It is only used for identity.
-    private final List<Animation> inactiveAnims;
-
-    //animations are moved here when the user calls startAnimation()
+    //animations are added here when the user calls startAnimation()
     private final List<Animation> pendingAnims;
 
     //animations are moved here when they are running. Paused animations
-    //also stay here (ie a paused animation still prevents candidates 
+    //also stay here (ie a paused animation still prevents conflicting candidates 
     //from running)
     private final List<Animation> runningAnims;
 

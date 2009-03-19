@@ -85,7 +85,6 @@ public class TestDefaultHandler {
 						    }
 						},
 						new SplineInterpolator(0.7f,0.1f,0.3f,0.9f));
-	    am.addAnimation(anim);
 	    am.startAnimation(anim, false);
 	}
 
@@ -103,23 +102,21 @@ public class TestDefaultHandler {
 									     Float.valueOf(255*fraction).intValue()));
 						    }
 						});
-	 am.addAnimation(anim);
 	 am.startAnimation(anim, false);
 	 
-	 Animation anim2 = am.createAnimation(4000, 
-					      1.0,
-					      Animator.RepeatBehavior.LOOP,
-					      circle,
-					      Animation.Dimension.SIZE,
-					      new DefaultTimingHandler(){
-						  public void timingEvent(float fraction, 
-									  Object subject, Animation.Dimension dim){
-						      Glyph g = (Glyph)subject;
-						      g.sizeTo(40+60*fraction);
-						  }
-					      });
-	 am.addAnimation(anim2);
-	 am.startAnimation(anim2, false);
+	 Animation animSize = am.createAnimation(4000, 
+						 1.0,
+						 Animator.RepeatBehavior.LOOP,
+						 circle,
+						 Animation.Dimension.SIZE,
+						 new DefaultTimingHandler(){
+						     public void timingEvent(float fraction, 
+									     Object subject, Animation.Dimension dim){
+							 Glyph g = (Glyph)subject;
+							 g.sizeTo(40+60*fraction);
+						     }
+						 });
+	 am.startAnimation(animSize, false);
 
     }
     

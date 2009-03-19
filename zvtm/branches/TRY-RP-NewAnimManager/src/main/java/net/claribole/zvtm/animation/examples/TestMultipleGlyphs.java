@@ -105,8 +105,6 @@ public class TestMultipleGlyphs {
 						},
 						new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 	    anim.setStartFraction(rnd.nextFloat());
-
-	    am.addAnimation(anim);
 	    am.startAnimation(anim, false);
 	}
     }
