@@ -833,28 +833,27 @@ public class VCursor {
 	    return DYNASPOT_MAX_TRANSLUCENCY;
 	}
 	
-	int DYNASPOT_MAX_RADIUS = 32;
+	int DYNASPOT_MAX_RADIUS = 16;
+
+	int LAG_TIME = 120;
+	int REDUC_TIME = 180;
+	
+	int MIN_SPEED = 100;
+	int MAX_SPEED = 300;
+	
+	float ds_aa = DYNASPOT_MAX_RADIUS / (float)(MAX_SPEED-MIN_SPEED);
+	float ds_ab = -DYNASPOT_MAX_RADIUS * MIN_SPEED / (float)(MAX_SPEED-MIN_SPEED);
+	float ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
+	float ds_rb = DYNASPOT_MAX_RADIUS;
+	
 	int dynaSpotRadius = 0;
 		
 	boolean dynaSpotActivated = false;
 	
 	boolean showDynarea = true;
 	
-	/* Low-pass filter variables */
-	double frequency = -1;
-	long mLastSampleTime = -1;
-	int xOffset = 10;
-	int yOffset = 10;
-	double maxDist = 2 * Math.abs(xOffset);
-	LowPassFilter filter = new LowPassFilter();
-	Point2D currentPos = new Point2D.Double(0, 0);
-	Point2D parentPos = new Point2D.Double(0, 0);
-	Point2D targetPos = new Point2D.Double(0, 0);
 	Timer dstimer;
 	DynaSpotTimer cursorStillDSUpdater;
-	double cutoffParamA = 3; // decrease to make the region stay at max radius longer before shrinking
-	double cutoffParamB = 0.0001;
-	double distAway = 0;	 
 
 	double opacity = 1.0f;
 
@@ -867,45 +866,97 @@ public class VCursor {
 		cursorStillDSUpdater = new DynaSpotTimer(this);
 		dstimer.scheduleAtFixedRate(cursorStillDSUpdater, 40, 20);
 	}
+	
+	static final int NB_SPEED_POINTS = 4;
+	
+	long[] cursor_time = new long[NB_SPEED_POINTS];
+	int[] cursor_x = new int[NB_SPEED_POINTS];
+	int[] cursor_y = new int[NB_SPEED_POINTS];
 
-	public void updateDynaSpot(long currentTime, int cx, int cy){
-         updateDynaSpotFrequency(currentTime);
-         updateDynaSpotArea(cx, cy);
-    }
-    	
-	public void updateDynaSpotFrequency(){
-		updateDynaSpotFrequency(System.currentTimeMillis());
-	}
+	float[] speeds = new float[NB_SPEED_POINTS-1];
+	
+	float mean_speed = 0;
+	
+	boolean dynaspot_triggered = false;
+	
+	long lastTimeAboveMinSpeed = -1;
+	
+	boolean reducing = false;
+	long reducStartTime = 0;
 
-	public void updateDynaSpotFrequency(long currentTime){
-		if (frequency == -1){
-			frequency = 1;
+	public synchronized void updateDynaSpot(long currentTime){
+		// compute mean speed over last 3 points
+		for (int i=1;i<NB_SPEED_POINTS;i++){
+			cursor_time[i-1] = cursor_time[i];
+			cursor_x[i-1] = cursor_x[i];
+			cursor_y[i-1] = cursor_y[i];
+		}
+		cursor_time[NB_SPEED_POINTS-1] = currentTime;
+		cursor_x[NB_SPEED_POINTS-1] = this.mx;
+		cursor_y[NB_SPEED_POINTS-1] = this.my;
+		for (int i=0;i<speeds.length;i++){
+			//XXX:TODO avoid unnecessary sqrt computation for distance by using a speed threshold expressed as v=d^2/t (instead of v=d/t)
+			speeds[i] = (float)Math.sqrt(Math.pow(cursor_x[i+1]-cursor_x[i],2)+Math.pow(cursor_y[i+1]-cursor_y[i],2)) / (float)(cursor_time[i+1]-cursor_time[i]);
+		}
+		mean_speed = 0;
+		for (int i=0;i<speeds.length;i++){
+			mean_speed += speeds[i];
+		}
+		mean_speed = mean_speed / (float)speeds.length * 1000;
+		// adapt dynaspot area accordingly
+		if (dynaspot_triggered){
+		 	if (mean_speed > MIN_SPEED){
+				lastTimeAboveMinSpeed = System.currentTimeMillis();
+				if (mean_speed > MAX_SPEED){
+					if (dynaSpotRadius < DYNASPOT_MAX_RADIUS){
+						updateDynaSpotArea(DYNASPOT_MAX_RADIUS);
+					}				
+				}
+				else {
+					updateDynaSpotArea(Math.round(ds_aa*mean_speed+ds_ab));
+				}
+			}
+			else {
+				if (lastTimeAboveMinSpeed > 0 && currentTime - lastTimeAboveMinSpeed >= LAG_TIME){
+					lastTimeAboveMinSpeed = -1;
+					reducing = true;
+					reducStartTime = currentTime;
+					dynaspot_triggered = false;
+				}
+			}		
 		}
 		else {
-			if (currentTime != mLastSampleTime){
-				frequency = 1000.0 / ((double)(currentTime - mLastSampleTime));
+		 	if (mean_speed > MIN_SPEED){
+				lastTimeAboveMinSpeed = System.currentTimeMillis();
+				dynaspot_triggered = true;
+				if (mean_speed > MAX_SPEED){
+					if (dynaSpotRadius < DYNASPOT_MAX_RADIUS){
+						updateDynaSpotArea(DYNASPOT_MAX_RADIUS);
+					}				
+				}
+				else {
+					updateDynaSpotArea(Math.round(ds_aa*mean_speed+ds_ab));
+				}
+			}
+			else if (reducing){
+				if (currentTime-reducStartTime >= REDUC_TIME){
+					updateDynaSpotArea(0);
+					reducing = false;
+				}
+				else {
+					updateDynaSpotArea(Math.round(ds_ra*(currentTime-reducStartTime)+ds_rb));					
+				}
 			}
 		}
-		mLastSampleTime = currentTime;
-	}
-	
-	public void updateDynaSpotArea(int cx, int cy){
-		parentPos.setLocation(cx, cy);
-		updateDynaSpotArea();
-	}
-	
-	public void updateDynaSpotArea(){
-		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-		distAway = targetPos.distance(currentPos);
-		double maxDist = 2 * Math.abs(xOffset);
-		opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
-		currentPos = filter.apply(targetPos, frequency);
-		dynaSpotRadius = (int)Math.round(DYNASPOT_MAX_RADIUS * (1.0-opacity));
+		owningView.repaintNow();
+    }
+    
+	public void updateDynaSpotArea(int r){
+		//System.out.println(r);
+		dynaSpotRadius = r;
 		if (dsl != null){
 			dsl.spotSizeChanged(this, dynaSpotRadius);
 		}
-		owningView.repaintNow();
 	}
 	
 	DynaSpotListener dsl;
@@ -918,11 +969,6 @@ public class VCursor {
 		return dsl;
 	}
 	
-	/** Set to true if the dynaspot selection region should be updated when the cursor does not move. Default is true. */
-	public void setDynaSpotUpdateWhenCursorStill(boolean b){
-		cursorStillDSUpdater.setEnabled(b);
-	}
-
 	/** Activate or deactivate DynaSpot behavior. */
 	public void activateDynaSpot(boolean b){
 		dynaSpotActivated = b;
@@ -950,31 +996,7 @@ public class VCursor {
 	public int getDynaSpotMaxRadius(){
 		return DYNASPOT_MAX_RADIUS;
 	}
-	
-	/** Set the low-pass filter's parameters. */
-	public void setCutoffFrequencyParameters(double a, double b){
-		cutoffParamA = a;
-		cutoffParamB = b;
-	}
-	
-	public double getCutoffFrequencyParameterA(){
-		return cutoffParamA;
-	}
 
-	public double getCutoffFrequencyParameterB(){
-		return cutoffParamB;
-	}
-	
-	/** Higher values make it more difficult to reach the max radius. Speed of cursor has to be higher.*/
-	public void setOffsets(int x, int y){
-		xOffset = x;
-		yOffset = y;
-	}
-	
-	public Point getOffsets(){
-		return new Point(xOffset, yOffset);
-	}
-	
 	public void setHighlightCurrentDynaSpotSelection(boolean b){
 	    highlightCurrentDynaSpotSelection = b;
 	}
@@ -1084,19 +1106,8 @@ class DynaSpotTimer extends TimerTask{
 		this.c = c;
 	}
 	
-	public void setEnabled(boolean b){
-		enabled = b;
-	}
-	
-	public boolean isEnabled(){
-		return enabled;
-	}
-	
 	public void run(){
-		if (enabled){
-			c.updateDynaSpotArea();
-			c.dynaPick();
-		}
+		c.updateDynaSpot(System.currentTimeMillis());
 	}
 	
 }
