@@ -60,16 +60,16 @@ import java.awt.Point;
  *
  * <h4>Using DynaSpot</h4>
  * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
- * <ul><li>activateDynaSpot(boolean b)</li></ul>
+ * <ul><li>VCursor.activateDynaSpot(boolean b)</li></ul>
  * 
- * <p>In your ViewEventHandler's mouseMoved() method, call:</p>
- * <ol>
- *  <li>v.getMouse().updateDynaSpot(e.getWhen(), jpx, jpy);</li>
+ * <p>In your ViewEventHandler, simply call VCursor.dynaPick(Camera c) wherever this makes sense. Usually this will be mouseMoved(...):</p>
+ * <ul>
  *  <li>v.getMouse().dynaPick(c); // where c is the active camera</li>
- * </ol>
- * <p>The first line updates DynaSpot's parameters depending on the cursor's dynamics;
- *    the second line updates the list of glyphs intersected by the DynaSpot disc, and
- *    identifies the one glyph actually selected (which is returned).</p>
+ * </ul>
+ * <p>This updates the list of glyphs intersected by the DynaSpot disc, and
+ *    identifies the one glyph actually selected (which is returned). The method
+ *    also takes care of highlighting/unhighlighting the selected glyph.</p>
+ * <p><strong>Note:</strong> dynaPick() also gets called internally when DynaSpot's size changes.</p>
  */
 
 public class VCursor {
@@ -853,7 +853,7 @@ public class VCursor {
 	boolean showDynarea = true;
 	
 	Timer dstimer;
-	DynaSpotTimer cursorStillDSUpdater;
+	DynaSpotTimer dynaspotTimer;
 
 	double opacity = 1.0f;
 
@@ -863,8 +863,8 @@ public class VCursor {
 	
 	void initDynaSpotTimer(){
 		dstimer = new Timer();
-		cursorStillDSUpdater = new DynaSpotTimer(this);
-		dstimer.scheduleAtFixedRate(cursorStillDSUpdater, 40, 20);
+		dynaspotTimer = new DynaSpotTimer(this);
+		dstimer.scheduleAtFixedRate(dynaspotTimer, 40, 20);
 	}
 	
 	static final int NB_SPEED_POINTS = 4;
@@ -949,6 +949,7 @@ public class VCursor {
     
 	void updateDynaSpotArea(int r){
 		dynaSpotRadius = r;
+		dynaPick();
 		if (dsl != null){
 			dsl.spotSizeChanged(this, dynaSpotRadius);
 		}
@@ -1103,7 +1104,6 @@ class DynaSpotTimer extends TimerTask{
 	
 	public void run(){
 		c.updateDynaSpot(System.currentTimeMillis());
-		c.dynaPick();
 	}
 	
 }
