@@ -895,7 +895,6 @@ public class VCursor {
 		cursor_x[NB_SPEED_POINTS-1] = this.mx;
 		cursor_y[NB_SPEED_POINTS-1] = this.my;
 		for (int i=0;i<speeds.length;i++){
-			//XXX:TODO avoid unnecessary sqrt computation for distance by using a speed threshold expressed as v=d^2/t (instead of v=d/t)
 			speeds[i] = (float)Math.sqrt(Math.pow(cursor_x[i+1]-cursor_x[i],2)+Math.pow(cursor_y[i+1]-cursor_y[i],2)) / (float)(cursor_time[i+1]-cursor_time[i]);
 		}
 		mean_speed = 0;
@@ -911,9 +910,6 @@ public class VCursor {
 					if (dynaSpotRadius < DYNASPOT_MAX_RADIUS){
 						updateDynaSpotArea(DYNASPOT_MAX_RADIUS);
 					}				
-				}
-				else {
-					updateDynaSpotArea(Math.round(ds_aa*mean_speed+ds_ab));
 				}
 			}
 			else {
@@ -951,8 +947,7 @@ public class VCursor {
 		owningView.repaintNow();
     }
     
-	public void updateDynaSpotArea(int r){
-		//System.out.println(r);
+	void updateDynaSpotArea(int r){
 		dynaSpotRadius = r;
 		if (dsl != null){
 			dsl.spotSizeChanged(this, dynaSpotRadius);
@@ -1108,6 +1103,7 @@ class DynaSpotTimer extends TimerTask{
 	
 	public void run(){
 		c.updateDynaSpot(System.currentTimeMillis());
+		c.dynaPick();
 	}
 	
 }
