@@ -1037,6 +1037,9 @@ public class VCursor {
 		dynaspotVSshape.setFrame(dynawnes[0], dynawnes[3], 2*unprojectedDSRadius, 2*unprojectedDSRadius);
 		for (int i=0;i<drawnGlyphs.size();i++){
 			g = (Glyph)drawnGlyphs.elementAt(i);
+			if (!g.isSensitive()){
+			    continue;
+			}
 			// check if cursor hotspot is inside glyph
 			// if hotspot in several glyphs, selected glyph will be the last glyph entered (according to glyphsUnderMouse)
 			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
