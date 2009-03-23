@@ -74,9 +74,9 @@ public class VImageOr extends VImage {
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	if (pc[camIndex].p.contains(x,y)){return true;}
-	else {return false;}
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (pc[camIndex].p.contains(jpx, jpy)){return true;}
+        else {return false;}
     }
     
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */

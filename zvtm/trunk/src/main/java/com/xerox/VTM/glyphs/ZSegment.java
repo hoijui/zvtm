@@ -69,8 +69,8 @@ public class ZSegment extends VRectangle {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	return false;
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return false;
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){

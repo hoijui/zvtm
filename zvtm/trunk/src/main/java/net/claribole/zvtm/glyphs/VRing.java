@@ -141,9 +141,9 @@ public class VRing extends VSlice {
 		}
 	}
 
-	public boolean coordInside(int x,int y,int camIndex){
-		if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
-			if (pr[camIndex].ring.contains(x,y)){
+	public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+		if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx, 2)+Math.pow(jpy-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
+			if (pr[camIndex].ring.contains(jpx, jpy)){
 				return true;
 			}
 		}
