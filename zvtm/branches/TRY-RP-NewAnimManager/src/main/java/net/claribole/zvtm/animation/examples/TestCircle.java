@@ -72,7 +72,7 @@ public class TestCircle {
 
 	AnimationManager am = new AnimationManager();
 	for(int i=0; i<4; ++i){
-	    Animation anim = am.createAnimation(3000, //2 seconds
+	    Animation anim = am.createAnimation(3000, //milliseconds
 						1.0,
 						Animator.RepeatBehavior.LOOP,
 						circle,
