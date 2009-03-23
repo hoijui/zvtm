@@ -596,8 +596,16 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}
     }
 
-    /**get mouse as VCursor*/
-    public VCursor getMouse(){return parent.mouse;}
+    /** Get VCursor instance associated with the parent view.
+        *@deprecated As of ZVTM 0.9.8, use getVCursor()
+        *@see #getVCursor()
+        */
+    public VCursor getMouse(){return parent.getCursor();}
+
+    /** Get VCursor instance associated with the parent view.*/
+    public VCursor getVCursor(){
+        return parent.getCursor();
+    }
 
     /**last glyph the mouse entered in  (for this view and current active layer)*/
     public Glyph lastGlyphEntered(){
