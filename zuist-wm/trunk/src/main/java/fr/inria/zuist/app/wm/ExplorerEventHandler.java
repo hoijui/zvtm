@@ -107,8 +107,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getMouse().vx;
-    	lastVY = v.getMouse().vy;
+        lastVX = v.getVCursor().vx;
+    	lastVY = v.getVCursor().vy;
     	if (nm.lensType != NavigationManager.NO_LENS){
     	    nm.zoomInPhase2(lastVX, lastVY);
     	}
@@ -133,8 +133,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        lastVX = v.getMouse().vx;
-        lastVY = v.getMouse().vy;
+        lastVX = v.getVCursor().vx;
+        lastVY = v.getVCursor().vy;
         if (nm.lensType != NavigationManager.NO_LENS){
             nm.zoomOutPhase2();
         }
@@ -148,7 +148,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-//        System.err.println(v.getMouse().vx+" "+v.getMouse().vy);
+//        System.err.println(v.getVCursor().vx+" "+v.getVCursor().vy);
     	if ((jpx-NavigationManager.LENS_R1) < 0){
     	    jpx = NavigationManager.LENS_R1;
     	    cursorNearBorder = true;
