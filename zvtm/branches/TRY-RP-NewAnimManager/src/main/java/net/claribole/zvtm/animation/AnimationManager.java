@@ -13,6 +13,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.jcip.annotations.*;
+
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.TimingSource;
@@ -82,6 +84,17 @@ public class AnimationManager {
      * Creates a new Animation object that will be handled 
      * by this AnimationManager.
      * @param duration duration of the animation, in milliseconds
+     * @param repeatCount the number of times this Animation will
+     * be repeated. This is not necessarily an integer, i.e. an animation may
+     * be repeated 2.5 times
+     * @param repeatBehavior controls whether an animation loops or reverse
+     * when repeating
+     * @param subject object that will be animated
+     * @param dimension dimension of the animation
+     * @param handler timing handler that will receive callbacks 
+     * for each animation event. The handler is responsible for 
+     * implementing the animation code itself (e.g. move a Camera or
+     * change the color of a Glyph).
      */
     public Animation createAnimation(int duration, 
 				     double repeatCount, 
@@ -100,6 +113,22 @@ public class AnimationManager {
      * Creates a new Animation object that will be handled 
      * by this AnimationManager.
      * @param duration duration of the animation, in milliseconds
+     * @param repeatCount the number of times this Animation will
+     * be repeated. This is not necessarily an integer, i.e. an animation may
+     * be repeated 2.5 times
+     * @param repeatBehavior controls whether an animation loops or reverse
+     * when repeating
+     * @param subject object that will be animated
+     * @param dimension dimension of the animation
+     * @param handler timing handler that will receive callbacks 
+     * for each animation event. The handler is responsible for 
+     * implementing the animation code itself (e.g. move a Camera or
+     * change the color of a Glyph).
+     * @param interpolator an Interpolator, ie a functor that takes a float between 0 and 1
+     * and returns a float between 0 and 1. By default a linear Interpolator is
+     * used, but spline interpolators may be used to provide different animation
+     * behaviors: slow in/slow out, fast in/slow out et caetera. You may also
+     * provide your own interpolator.
      */
     public Animation createAnimation(int duration, 
 				     double repeatCount, 
@@ -138,9 +167,11 @@ public class AnimationManager {
 	}
     }
 
-    //throws exception if animation was not previously added
-    //the "end" action will be executed
-    //No effect if "anim" is not running
+    /**
+     * Stops an animation.
+     * @param anim animation to stop (must have been created by 
+     * calling createAnimation on the same AnimationManager).
+     */
     public void stopAnimation(Animation anim){
 	listsLock.lock();
 	try{
@@ -243,12 +274,12 @@ public class AnimationManager {
     }
 
     //animations are added here when the user calls startAnimation()
-    private final List<Animation> pendingAnims;
+    @GuardedBy("listsLock") private final List<Animation> pendingAnims;
 
     //animations are moved here when they are running. Paused animations
     //also stay here (ie a paused animation still prevents conflicting 
     //candidates from running)
-    private final List<Animation> runningAnims;
+    @GuardedBy("listsLock") private final List<Animation> runningAnims;
 
     private final Lock listsLock;
 

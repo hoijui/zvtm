@@ -6,6 +6,8 @@
  */ 
 package net.claribole.zvtm.animation;
 
+import net.jcip.annotations.*;
+
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingSource;
@@ -23,6 +25,7 @@ import org.jdesktop.animation.timing.TimingTarget;
  * @see AnimationManager
  * @author Romain Primet
  */
+@ThreadSafe
 public class Animation {
 
     public static enum Dimension {POSITION, ALTITUDE, SIZE,                 
@@ -116,7 +119,7 @@ public class Animation {
     private final TimingTarget timingInterceptor; 
 
     //real, destination handler that is provided by client code
-    TimingHandler handler;
+    final TimingHandler handler;
 
     //object that gets animated, e.g. Glyph, Camera, Portal...
     final Object subject;
