@@ -73,6 +73,7 @@ public class TestMultipleGlyphs {
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 
 	AnimationManager am = new AnimationManager();
+	am.start();
 
 	final int NB_GLYPHS = 100;
 	java.util.List<Glyph> circles = new java.util.ArrayList<Glyph>();

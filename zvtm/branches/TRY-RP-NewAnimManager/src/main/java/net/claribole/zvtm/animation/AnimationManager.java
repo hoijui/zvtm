@@ -9,6 +9,7 @@ package net.claribole.zvtm.animation;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -31,7 +32,31 @@ public class AnimationManager {
 	pendingAnims = new LinkedList<Animation>();
 	runningAnims = new LinkedList<Animation>();
 	listsLock = new ReentrantLock();
-	tickSource = new TickSource();
+	tickThread = new TickThread("tickThread");
+    }
+
+    /**
+     * Starts this AnimationManager.
+     * This method must be called for animations to start.
+     * This method must be called once and only once, otherwise AnimationManager
+     * will complain loudly (i.e. throw an IllegalThreadStateException).
+     *
+     * @throws java.lang.IllegalStateException if called more than once
+     */
+    public void start(){
+	tickThread.start();
+    }
+
+    /**
+     * Stops this AnimationManager
+     * After calling this method, all animations handled by this AnimationManager will stop.
+     * This method must be called once and only once, otherwise AnimationManager
+     * will complain loudly (i.e. throw an IllegalThreadStateException).
+     *
+     * @throws java.lang.IllegalStateException if called more than once
+     */
+    public void stop(){
+	tickThread.requestStop();
     }
 
     /**
@@ -67,7 +92,7 @@ public class AnimationManager {
 	Animation retval =  new Animation(this, duration, repeatCount,
 					  repeatBehavior, subject,
 					  dimension, handler);
-	retval.setTimer(tickSource);
+	retval.setTimer(new TickSource(tickThread));
 	return retval;
     }
 
@@ -86,7 +111,7 @@ public class AnimationManager {
 	Animation retval = new Animation(this, duration, repeatCount,
 					 repeatBehavior, subject,
 					 dimension, handler);
-	retval.setTimer(tickSource);
+	retval.setTimer(new TickSource(tickThread));
 	retval.setInterpolator(interpolator);
 	return retval;
     }
@@ -101,7 +126,7 @@ public class AnimationManager {
      * they target the same subject and animate the same dimension.
      */
     public void startAnimation(Animation anim, boolean force){
-	//!!! force
+	//XXX implement forced startAnimation
 	listsLock.lock();
 	try{
 	    pendingAnims.add(anim);
@@ -169,7 +194,7 @@ public class AnimationManager {
      * resolution.
      */
     public void setResolution(int resolution){
-	tickSource.setResolution(resolution);
+	tickThread.setResolution(resolution);
     }
 
     void onAnimationEnded(Animation anim){
@@ -227,82 +252,98 @@ public class AnimationManager {
 
     private final Lock listsLock;
 
-    private final TickSource tickSource;
+    private final TickThread tickThread;
 }
 
-// A custom tick source to replace the one provided by the Timing Framework.
-// A single TickSource is shared by every animation managed by 
-//an AnimationManager.
+//A custom tick source to replace the one provided by the Timing Framework.
+//NOTE: setResolution() has no effect (the resolution will always be the one supplied by the TickThread)
+//Every animation has its own TickSource (that way they can be started or stopped independently)
+//but all tick sources share the same TickThread (enforced by AnimationManager)
+//@ThreadSafe
 class TickSource extends TimingSource {
     private TickThread tickThread;
-    //@GuardedBy("this")
-    private boolean started = false;
     
-    public TickSource(){
-	tickThread = new TickThread("tickThread");
+    public TickSource(TickThread tickThread){
+	this.tickThread = tickThread;
     }
     
-    public synchronized void setResolution(int resolution){
-	tickThread.setResolution(resolution);
+    public void setResolution(int resolution){
+	//This has purposely no effect. Animation resolution is set globally,
+	//see AnimationManager#setResolution.
     }
 
     public void setStartDelay(int delay){
-	//This has purposely no effect. We do not provide a start
-	//delay for animations.
+	//This has purposely no effect. We do not currently provide a start
+	//delay for animations, altough this could be done.
     }
 
-    public synchronized void start(){
-	if(!started){
-	    started = true;
-	    tickThread.start();
-	}
+    public void start(){
+	tickThread.addSubscriber(this);
     }
+
     public void stop(){
-	//XXX test that sharing the tick source does not have adverse consequences
-	//(ie we do not want to stop all animations at once)
-	tickThread.requestStop();
+	tickThread.removeSubscriber(this);
     }
 
-    class TickThread extends Thread{
-	private volatile boolean stopped = false;
-	private AtomicInteger resolution; //milliseconds
+    //called by TickThread instance, which needs at least package acccess
+    void tick(){
+	timingEvent();
+    }
+}
 
-	public TickThread(String name){
-	    super(name);
+//@ThreadSafe
+class TickThread extends Thread{
+    private volatile boolean stopped = false;
+    private AtomicInteger resolution; //milliseconds
 
-	    //Warning! This value will get clobbered by the timing framework
-	    //(see source of Animator#setTimer). They do not share that tidbit in their
-	    //documentation, though...
-	    resolution = new AtomicInteger(20);
-	}
+    //receivers is traversed a *lot* more often than it is mutated
+    private final List<TickSource> receivers = new CopyOnWriteArrayList<TickSource>();
 
-	public void setResolution(int res){
-	    resolution.set(res);
-	}
+    public TickThread(String name){
+	super(name);
+
+	resolution = new AtomicInteger(25);
+    }
+
+    public void setResolution(int res){
+	resolution.set(res);
+    }
+
+    public void addSubscriber(TickSource ts){
+	receivers.add(ts);
+    }
+
+    public void removeSubscriber(TickSource ts){
+	receivers.remove(ts);
+    }
 	
-	public void requestStop(){
-	    stopped = true;
-	}
+    public void requestStop(){
+	stopped = true;
+    }
 
-	public void run(){
-	    long startEventProcessing;
-	    long endEventProcessing;
-	    long NS_IN_MS = 1000000; //nanoseconds in a millisecond
-	    while(!stopped){
-		try{
-		    startEventProcessing = System.nanoTime();
-		    timingEvent();
-		    endEventProcessing = System.nanoTime();
+    public void run(){
+	long startEventProcessing;
+	long endEventProcessing;
+	long NS_IN_MS = 1000000; //nanoseconds in a millisecond
+	while(!stopped){
+	    try{
+		startEventProcessing = System.nanoTime();
 
-		    sleep(Math.max(0,
-				   resolution.get() - (endEventProcessing - startEventProcessing)/NS_IN_MS));
-		} catch(InterruptedException ex){
-		    //Swallowing this exception should be okay
-		    //because TickThread is only ever used by
-		    //AnimationManager, which will not require its
-		    //interruption (method stop provides this).
+		for(TickSource ts: receivers){
+		    ts.tick();
 		}
+
+		endEventProcessing = System.nanoTime();
+
+		sleep(Math.max(0,
+			       resolution.get() - (endEventProcessing - startEventProcessing)/NS_IN_MS));
+	    } catch(InterruptedException ex){
+		//Swallowing this exception should be okay
+		//because TickThread is only ever used by
+		//AnimationManager, which will not require its
+		//interruption (method stop provides this).
 	    }
 	}
     }
 }
+

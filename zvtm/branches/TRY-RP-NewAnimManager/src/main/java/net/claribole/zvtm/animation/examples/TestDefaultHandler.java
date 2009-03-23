@@ -71,6 +71,8 @@ public class TestDefaultHandler {
         vsm.repaintNow();
 
 	AnimationManager am = new AnimationManager();
+	am.start();
+
 	for(int i=0; i<4; ++i){
 	    Animation anim = am.createAnimation(3000, 
 						1.0,
