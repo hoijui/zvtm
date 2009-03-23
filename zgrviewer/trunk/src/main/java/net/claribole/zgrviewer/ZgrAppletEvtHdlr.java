@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Fri May 09 10:09:49 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */ 
 
@@ -72,8 +72,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 		}
 		else if (mod == ALT_MOD){
 		    zoomingInRegion=true;
-		    x1=v.getMouse().vx;
-		    y1=v.getMouse().vy;
+		    x1=v.getVCursor().vx;
+		    y1=v.getVCursor().vy;
 		    v.setDrawRect(true);
 		}
 	    }
@@ -91,8 +91,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    }
 	    if (zoomingInRegion){
 		v.setDrawRect(false);
-		x2=v.getMouse().vx;
-		y2=v.getMouse().vy;
+		x2=v.getVCursor().vx;
+		y2=v.getVCursor().vy;
 		if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 		    grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 		}
@@ -118,8 +118,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
-		lastVX = v.getMouse().vx;
-		lastVY = v.getMouse().vy;
+		lastVX = v.getVCursor().vx;
+		lastVY = v.getVCursor().vy;
 		if (grMngr.lensType != GraphicsManager.NO_LENS){
 		    grMngr.zoomInPhase2(lastVX, lastVY);
 		}
@@ -138,7 +138,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 		else {
 		    Glyph g = v.lastGlyphEntered();
 		    if (mod == SHIFT_MOD){
-			grMngr.highlightElement(g, v.cams[0], v.getMouse(), true);
+			grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true);
 		    }
 		    else {
 			if (g != null && g != grMngr.boundingBox){
@@ -163,7 +163,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
             if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
         }
         else {
-            attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
+            attemptDisplayEdgeURL(v.getVCursor(),v.cams[0]);
         }
     }
 
@@ -185,8 +185,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
-		lastVX = v.getMouse().vx;
-		lastVY = v.getMouse().vy;
+		lastVX = v.getVCursor().vx;
+		lastVY = v.getVCursor().vy;
 		if (grMngr.lensType != GraphicsManager.NO_LENS){
 		    grMngr.zoomOutPhase2();
 		}

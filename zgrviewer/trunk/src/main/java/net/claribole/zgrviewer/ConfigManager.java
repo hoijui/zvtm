@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -78,6 +78,7 @@ class ConfigManager {
     static boolean SAVE_WINDOW_LAYOUT=false;
     static boolean DELETE_TEMP_FILES=true;
     static boolean ANTIALIASING=false;
+    static boolean DYNASPOT=false;
     /*add -q option in command line args, forcing dot/neato to remain silent
       (do not issue warnings or errors that cause Java's runtime exec never to terminate)*/
     static boolean FORCE_SILENT = true;
@@ -199,6 +200,10 @@ class ConfigManager {
 				catch (Exception ex){}
 				try {
 					ConfigManager.ANTIALIASING=((new Boolean(e.getAttribute("antialiasing"))).booleanValue());
+				}
+				catch (Exception ex){}
+				try {
+					ConfigManager.DYNASPOT=((new Boolean(e.getAttribute("dynaspot"))).booleanValue());
 				}
 				catch (Exception ex){}
 				try {
@@ -342,6 +347,7 @@ class ConfigManager {
 		rt.appendChild(consts);
 		// 	consts.setAttribute("graphOrient",ConfigManager.GRAPH_ORIENTATION);
 		consts.setAttribute("antialiasing",String.valueOf(ConfigManager.ANTIALIASING));
+		consts.setAttribute("dynaspot",String.valueOf(ConfigManager.DYNASPOT));
 		consts.setAttribute("highlightColor", Integer.toString(HIGHLIGHT_COLOR.getRGB()));
 		consts.setAttribute("silent", String.valueOf(ConfigManager.FORCE_SILENT));
 		consts.setAttribute("saveWindowLayout",String.valueOf(ConfigManager.SAVE_WINDOW_LAYOUT));

@@ -3,7 +3,7 @@
 	*   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
 	*   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
 	*   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
-	*   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+	*   Copyright (c) INRIA, 2004-2009. All Rights Reserved
 	*   Licensed under the GNU LGPL. For full terms see the file COPYING.
 	*   $Id$
 	*/ 
@@ -84,8 +84,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				}
 				else if (mod == ALT_MOD){
 					zoomingInRegion=true;
-					x1=v.getMouse().vx;
-					y1=v.getMouse().vy;
+					x1=v.getVCursor().vx;
+					y1=v.getVCursor().vy;
 					v.setDrawRect(true);
 				}
 			}
@@ -106,8 +106,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			}
 			if (zoomingInRegion){
 				v.setDrawRect(false);
-				x2=v.getMouse().vx;
-				y2=v.getMouse().vy;
+				x2=v.getVCursor().vx;
+				y2=v.getVCursor().vy;
 				if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 					System.out.println("a");
 					
@@ -136,8 +136,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
-				lastVX = v.getMouse().vx;
-				lastVY = v.getMouse().vy;
+				lastVX = v.getVCursor().vx;
+				lastVY = v.getVCursor().vy;
 				if (grMngr.lensType != GraphicsManager.NO_LENS){
 					grMngr.zoomInPhase2(lastVX, lastVY);
 				}
@@ -157,12 +157,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				else {
 					Glyph g = v.lastGlyphEntered();
 					if (mod == SHIFT_MOD){
-						grMngr.highlightElement(g, v.cams[0], v.getMouse(), true);
+						grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true);
 					}
 					else {
 						if (g != null && g != grMngr.boundingBox){
-							System.out.println("b");
-							
 							grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
 						}
 					}
@@ -185,11 +183,12 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			}
 		}
 		else {
-			attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
+			attemptDisplayEdgeURL(v.getVCursor(),v.cams[0]);
 		}
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    grMngr.activateDynaSpot(false);
 		if (toolPaletteIsActive){return;}
 		else {
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
@@ -204,9 +203,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    grMngr.activateDynaSpot(true);
 		if (toolPaletteIsActive){return;}
 		else {
-			Glyph g = v.getMouse().lastGlyphEntered;
+			Glyph g = v.getVCursor().lastGlyphEntered;
 			if (g != null && g.getType() == Messages.PM_ENTRY){
 				application.pieMenuEvent(g);
 			}
@@ -226,8 +226,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
-				lastVX = v.getMouse().vx;
-				lastVY = v.getMouse().vy;
+				lastVX = v.getVCursor().vx;
+				lastVY = v.getVCursor().vy;
 				if (grMngr.lensType != GraphicsManager.NO_LENS){
 					grMngr.zoomOutPhase2();
 				}
@@ -275,6 +275,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				if (grMngr.tp.isShowing()){grMngr.tp.hide();}
 			}
 		}
+		if (ConfigManager.DYNASPOT){
+		    v.getVCursor().dynaPick(grMngr.mainCamera);
+	    }
 	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -352,8 +355,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		}
 		else {
 			tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
-			mvx = v.getMouse().vx;
-			mvy = v.getMouse().vy;
+			mvx = v.getVCursor().vx;
+			mvy = v.getVCursor().vy;
 			if (wheelDirection == WHEEL_UP){
 				// zooming in
 				grMngr.mainCamera.posx -= Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
@@ -465,7 +468,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
 			}
 			else {
-				attemptDisplayEdgeURL(v.getMouse(),v.cams[0]);
+				attemptDisplayEdgeURL(v.getVCursor(),v.cams[0]);
 			}
 		}
 	}

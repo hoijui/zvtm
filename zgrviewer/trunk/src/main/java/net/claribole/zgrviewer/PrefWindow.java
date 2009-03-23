@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *   $Id$
  */
@@ -59,8 +59,8 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
     JButton okPrefs,savePrefs;
 
     //Misc prefs
-    JCheckBox saveWindowLayoutCb;
-    JCheckBox antialiascb, silentCb; //set antialias rendering, -q option
+    JCheckBox saveWindowLayoutCb, dynaspotCb;
+    JCheckBox antialiascb, silentCb;
     JTextField cmdLOptsTf;
     JCheckBox sdZoomCb;
     JSlider sdZoomSlider;
@@ -102,29 +102,35 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
 	buildConstraints(constraints0,0,0,2,1,100,10);
 	gridBag0.setConstraints(saveWindowLayoutCb,constraints0);
 	miscPane.add(saveWindowLayoutCb);
+	// activate dynaspot pointing 
+	dynaspotCb = new JCheckBox("Activate DynaSpot pointing", ConfigManager.DYNASPOT);
+	dynaspotCb.addActionListener(this);
+	buildConstraints(constraints0,0,1,2,1,100,10);
+	gridBag0.setConstraints(dynaspotCb,constraints0);
+	miscPane.add(dynaspotCb);
 	//antialiasing
 	antialiascb=new JCheckBox("Antialiasing",ConfigManager.ANTIALIASING);
 	antialiascb.addActionListener(this);
-	buildConstraints(constraints0,0,1,2,1,100,10);
+	buildConstraints(constraints0,0,2,2,1,100,10);
 	gridBag0.setConstraints(antialiascb,constraints0);
 	miscPane.add(antialiascb);
 	// -q option
 	silentCb = new JCheckBox("GraphViz programs should not issue warnings (v1.10 and above)", ConfigManager.FORCE_SILENT);
 	silentCb.addActionListener(this);
-	buildConstraints(constraints0, 0, 2, 2, 1, 100, 10);
+	buildConstraints(constraints0, 0, 3, 2, 1, 100, 10);
 	gridBag0.setConstraints(silentCb,constraints0);
 	miscPane.add(silentCb);
 	//command line options
 	JLabel cmdLOptsLb=new JLabel("dot/neato command line options (-T will be ignored)");
-	buildConstraints(constraints0,0,3,2,1,100,10);
+	buildConstraints(constraints0,0,4,2,1,100,10);
 	gridBag0.setConstraints(cmdLOptsLb,constraints0);
 	miscPane.add(cmdLOptsLb);
 	cmdLOptsTf=new JTextField(ConfigManager.CMD_LINE_OPTS);
-	buildConstraints(constraints0,0,4,2,1,100,10);
+	buildConstraints(constraints0,0,5,2,1,100,10);
 	gridBag0.setConstraints(cmdLOptsTf,constraints0);
 	miscPane.add(cmdLOptsTf);
 	sdZoomCb = new JCheckBox("Enable speed-dependent automatic zooming");
-	buildConstraints(constraints0,0,5,2,1,100,10);
+	buildConstraints(constraints0,0,6,2,1,100,10);
 	gridBag0.setConstraints(sdZoomCb,constraints0);
 	miscPane.add(sdZoomCb);
 	sdZoomCb.setSelected(application.cfgMngr.isSDZoomEnabled());
@@ -143,7 +149,7 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
 	sdZoomSlider.setSnapToTicks(true);
 	sdZoomSlider.setPaintTrack(true);
 	sdZoomSlider.setEnabled(application.cfgMngr.isSDZoomEnabled());
-	buildConstraints(constraints0,0,6,2,1,100,10);
+	buildConstraints(constraints0,0,7,2,1,100,10);
 	gridBag0.setConstraints(sdZoomSlider,constraints0);
 	miscPane.add(sdZoomSlider);
 	ChangeListener cl0 = new ChangeListener(){
@@ -153,28 +159,28 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
 	    };
 	sdZoomSlider.addChangeListener(cl0);
 	JLabel mFactorLabel = new JLabel("Magnification factor when focusing on a node");
-	buildConstraints(constraints0, 0, 7, 1, 1, 60, 10);
+	buildConstraints(constraints0, 0, 8, 1, 1, 60, 10);
 	gridBag0.setConstraints(mFactorLabel, constraints0);
 	miscPane.add(mFactorLabel);
 	mFactorSpinner = new JSpinner(new SpinnerNumberModel((float)ConfigManager.MAG_FACTOR, 0.1, 10, 0.1));
-	buildConstraints(constraints0, 1, 7, 1, 1, 40, 0);
+	buildConstraints(constraints0, 1, 8, 1, 1, 40, 0);
 	gridBag0.setConstraints(mFactorSpinner, constraints0);
 	miscPane.add(mFactorSpinner);
 
 
 	JLabel highlightLb = new JLabel("Color of highlighted elements");
-	buildConstraints(constraints0, 0, 8, 1, 1, 60, 10);
+	buildConstraints(constraints0, 0, 9, 1, 1, 60, 10);
 	gridBag0.setConstraints(highlightLb, constraints0);
 	miscPane.add(highlightLb);
 	highlightColor = new ColorIndicator(ConfigManager.HIGHLIGHT_COLOR);
-	buildConstraints(constraints0, 1, 8, 1, 1, 40, 0);
+	buildConstraints(constraints0, 1, 9, 1, 1, 40, 0);
 	gridBag0.setConstraints(highlightColor, constraints0);
 	miscPane.add(highlightColor);
 	highlightColor.addMouseListener(this);
 
 	//blank panel to fill remaining part of the tab
 	JPanel p1=new JPanel();
-	buildConstraints(constraints0,0,7,1,1,100,50);
+	buildConstraints(constraints0,0,10,1,1,100,50);
 	gridBag0.setConstraints(p1,constraints0);
 	miscPane.add(p1);
 	//add tab to panel
@@ -549,7 +555,7 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
 	this.addWindowListener(w0);
 	this.setTitle("Preferences");
 	this.pack();
-	this.setSize(400,340);
+	this.setSize(400,360);
     }
 
     private JComponent initPluginPane(){
@@ -618,125 +624,131 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
     }
 
     public void actionPerformed(ActionEvent e){
-	JFileChooser fc;
-	int returnVal;
-	Object o=e.getSource();
-	if (o==browseTmpDirBt){//tmp directory browse button
-	    fc=new JFileChooser(ConfigManager.m_TmpDir);
- 	    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //does not work well with JVM 1.3.x (works fine in 1.4)
-	    returnVal= fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_TmpDir=fc.getSelectedFile();
-		tmpDirTF.setText(ConfigManager.m_TmpDir.toString());
-	    }
-	}
-	else if (o==browseGraphDirBt){
-	    fc=new JFileChooser(ConfigManager.m_PrjDir);
- 	    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //does not work well with JVM 1.3.x (works fine in 1.4)
-	    returnVal= fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_PrjDir=fc.getSelectedFile();
-		graphDirTF.setText(ConfigManager.m_PrjDir.toString());
-	    }
-	}
-	else if (o==browseDotBt){
-	    fc=new JFileChooser(ConfigManager.m_DotPath);
-	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	    returnVal= fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_DotPath=fc.getSelectedFile();
-		dotPathTF.setText(ConfigManager.m_DotPath.toString());
-	    }
-	}
-	else if (o==browseNeatoBt){
-	    fc=new JFileChooser(ConfigManager.m_NeatoPath);
-	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	    returnVal= fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_NeatoPath=fc.getSelectedFile();
-		neatoPathTF.setText(ConfigManager.m_NeatoPath.toString());
-	    }
-	}
-	else if (o == browseCircoBt){
-	    fc = new JFileChooser(ConfigManager.m_CircoPath);
-	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	    returnVal = fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_CircoPath = fc.getSelectedFile();
-		circoPathTF.setText(ConfigManager.m_CircoPath.toString());
-	    }
-	}
-	else if (o==browseTwopiBt){
-	    fc = new JFileChooser(ConfigManager.m_TwopiPath);
-	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	    returnVal = fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_TwopiPath = fc.getSelectedFile();
-		twopiPathTF.setText(ConfigManager.m_TwopiPath.toString());
-	    }
-	}
-	else if (o==browseFontDirBt){
-	    fc=new JFileChooser(ConfigManager.m_GraphVizFontDir);
- 	    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //does not work well with JVM 1.3.x (works fine in 1.4)
-	    returnVal= fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.m_GraphVizFontDir=fc.getSelectedFile();
-		fontDirTF.setText(ConfigManager.m_GraphVizFontDir.toString());
-	    }
-	}
-	else if (o==cb1){
-	    if (cb1.isSelected()){ConfigManager.DELETE_TEMP_FILES=true;}
-	    else {ConfigManager.DELETE_TEMP_FILES=false;}
-	}
-	else if (o==detectBrowserBt){
-	    if (detectBrowserBt.isSelected()){//automatically detect browser
-		ConfigManager.autoDetectBrowser=true;
-		browserPathTf.setEnabled(false);
-		brw6.setEnabled(false);
-		browserOptsTf.setEnabled(false);
-		pathLb.setEnabled(false);
-		optLb.setEnabled(false);
-	    }
-	}
-	else if (o==specifyBrowserBt){
-	    if (specifyBrowserBt.isSelected()){//specify browser
-		ConfigManager.autoDetectBrowser=false;
-		browserPathTf.setEnabled(true);
-		brw6.setEnabled(true);
-		browserOptsTf.setEnabled(true);
-		pathLb.setEnabled(true);
-		optLb.setEnabled(true);
-	    }
-	}
-	else if (o==brw6){
-	    fc=new JFileChooser(ConfigManager.browserPath);
-	    fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	    returnVal= fc.showOpenDialog(this);
-	    if (returnVal == JFileChooser.APPROVE_OPTION){
-		ConfigManager.browserPath=fc.getSelectedFile();
-		browserPathTf.setText(ConfigManager.browserPath.toString());
-	    }
-	}
-	else if (o==webHelpBt){
-	    Dimension screenSize=java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-	    TextViewer help=new TextViewer(new StringBuffer(Messages.webBrowserHelpText),"Web Browser Configuration",0,(screenSize.width-400)/2,(screenSize.height-300)/2,400,300,false);
-	}
-	else if (o==useProxyCb){
-	    proxyHostLb.setEnabled(useProxyCb.isSelected());
-	    proxyPortLb.setEnabled(useProxyCb.isSelected());
-	    proxyHostTf.setEnabled(useProxyCb.isSelected());
-	    proxyPortTf.setEnabled(useProxyCb.isSelected());
-	}
-	else if (o==proxyHelpBt){
-	    Dimension screenSize=java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-	    TextViewer help=new TextViewer(new StringBuffer(Messages.proxyHelpText),"Proxy Configuration",0,(screenSize.width-400)/2,(screenSize.height-300)/2,400,300,false);
-	}
-	else if (o==okPrefs){updateVars();this.dispose();}
-	else if (o==savePrefs){updateVars();application.saveConfiguration();}
-	else if (o==antialiascb){
-	    if (antialiascb.isSelected()){javax.swing.JOptionPane.showMessageDialog(this,Messages.antialiasingWarning);}
-	    grMngr.setAntialiasing(antialiascb.isSelected());
-	}
+        JFileChooser fc;
+        int returnVal;
+        Object o=e.getSource();
+        if (o==browseTmpDirBt){
+            //tmp directory browse button
+            fc=new JFileChooser(ConfigManager.m_TmpDir);
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            returnVal= fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_TmpDir=fc.getSelectedFile();
+                tmpDirTF.setText(ConfigManager.m_TmpDir.toString());
+            }
+        }
+        else if (o==browseGraphDirBt){
+            fc=new JFileChooser(ConfigManager.m_PrjDir);
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            returnVal= fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_PrjDir=fc.getSelectedFile();
+                graphDirTF.setText(ConfigManager.m_PrjDir.toString());
+            }
+        }
+        else if (o==browseDotBt){
+            fc=new JFileChooser(ConfigManager.m_DotPath);
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            returnVal= fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_DotPath=fc.getSelectedFile();
+                dotPathTF.setText(ConfigManager.m_DotPath.toString());
+            }
+        }
+        else if (o==browseNeatoBt){
+            fc=new JFileChooser(ConfigManager.m_NeatoPath);
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            returnVal= fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_NeatoPath=fc.getSelectedFile();
+                neatoPathTF.setText(ConfigManager.m_NeatoPath.toString());
+            }
+        }
+        else if (o == browseCircoBt){
+            fc = new JFileChooser(ConfigManager.m_CircoPath);
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            returnVal = fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_CircoPath = fc.getSelectedFile();
+                circoPathTF.setText(ConfigManager.m_CircoPath.toString());
+            }
+        }
+        else if (o==browseTwopiBt){
+            fc = new JFileChooser(ConfigManager.m_TwopiPath);
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            returnVal = fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_TwopiPath = fc.getSelectedFile();
+                twopiPathTF.setText(ConfigManager.m_TwopiPath.toString());
+            }
+        }
+        else if (o==browseFontDirBt){
+            fc=new JFileChooser(ConfigManager.m_GraphVizFontDir);
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            returnVal= fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.m_GraphVizFontDir=fc.getSelectedFile();
+                fontDirTF.setText(ConfigManager.m_GraphVizFontDir.toString());
+            }
+        }
+        else if (o==cb1){
+            if (cb1.isSelected()){ConfigManager.DELETE_TEMP_FILES=true;}
+            else {ConfigManager.DELETE_TEMP_FILES=false;}
+        }
+        else if (o==detectBrowserBt){
+            if (detectBrowserBt.isSelected()){
+                //automatically detect browser
+                ConfigManager.autoDetectBrowser=true;
+                browserPathTf.setEnabled(false);
+                brw6.setEnabled(false);
+                browserOptsTf.setEnabled(false);
+                pathLb.setEnabled(false);
+                optLb.setEnabled(false);
+            }
+        }
+        else if (o==specifyBrowserBt){
+            if (specifyBrowserBt.isSelected()){
+                //specify browser
+                ConfigManager.autoDetectBrowser=false;
+                browserPathTf.setEnabled(true);
+                brw6.setEnabled(true);
+                browserOptsTf.setEnabled(true);
+                pathLb.setEnabled(true);
+                optLb.setEnabled(true);
+            }
+        }
+        else if (o==brw6){
+            fc=new JFileChooser(ConfigManager.browserPath);
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            returnVal= fc.showOpenDialog(this);
+            if (returnVal == JFileChooser.APPROVE_OPTION){
+                ConfigManager.browserPath=fc.getSelectedFile();
+                browserPathTf.setText(ConfigManager.browserPath.toString());
+            }
+        }
+        else if (o==webHelpBt){
+            Dimension screenSize=java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+            TextViewer help=new TextViewer(new StringBuffer(Messages.webBrowserHelpText),"Web Browser Configuration",0,(screenSize.width-400)/2,(screenSize.height-300)/2,400,300,false);
+        }
+        else if (o==useProxyCb){
+            proxyHostLb.setEnabled(useProxyCb.isSelected());
+            proxyPortLb.setEnabled(useProxyCb.isSelected());
+            proxyHostTf.setEnabled(useProxyCb.isSelected());
+            proxyPortTf.setEnabled(useProxyCb.isSelected());
+        }
+        else if (o==proxyHelpBt){
+            Dimension screenSize=java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+            TextViewer help=new TextViewer(new StringBuffer(Messages.proxyHelpText),"Proxy Configuration",0,(screenSize.width-400)/2,(screenSize.height-300)/2,400,300,false);
+        }
+        else if (o==okPrefs){updateVars();this.dispose();}
+        else if (o==savePrefs){updateVars();application.saveConfiguration();}
+        else if (o==antialiascb){
+            if (antialiascb.isSelected()){javax.swing.JOptionPane.showMessageDialog(this,Messages.antialiasingWarning);}
+            grMngr.setAntialiasing(antialiascb.isSelected());
+        }
+        else if (o==dynaspotCb){
+            grMngr.activateDynaSpot(dynaspotCb.isSelected());
+        }
     }
 
     public void mouseClicked(MouseEvent e){

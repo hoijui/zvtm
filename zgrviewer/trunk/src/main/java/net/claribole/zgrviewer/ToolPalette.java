@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Wed Aug 30 12:02:31 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -128,35 +128,46 @@ public class ToolPalette {
     }
 
     void selectButton(VImage icon){
-	boolean newIconSelected = false;
-	int oldSelectedIconIndex = selectedIconIndex;
-	for (int i=0;i<buttons.length;i++){// only try to find it in the list of unselected buttons
-	    if (buttons[i] == icon){// this way we are sure it is not the one already selected
-		paletteSpace.show(selectedButtons[i]);
-		paletteSpace.hide(buttons[i]);
-		selectedIconIndex = i;
-		newIconSelected = true;
-	    }
-	}
-	if (newIconSelected){// if a new button has been selected,
-	    for (int i=0;i<selectedIconIndex;i++){// unselect other buttons
-		paletteSpace.hide(selectedButtons[i]);
-		paletteSpace.show(buttons[i]);
-	    }
-	    for (int i=selectedIconIndex+1;i<buttons.length;i++){
-		paletteSpace.hide(selectedButtons[i]);
-		paletteSpace.show(buttons[i]);
-	    }
-	    if (oldSelectedIconIndex == DM_NAV_MODE){
-		grMngr.killDM();
-	    }
-		else if (oldSelectedIconIndex == BRING_AND_GO_MODE){
-			grMngr.exitBringAndGoMode();
-		}
-		if (selectedIconIndex == BRING_AND_GO_MODE){
-			grMngr.enterBringAndGoMode();
-		}
-	}
+        boolean newIconSelected = false;
+        int oldSelectedIconIndex = selectedIconIndex;
+        for (int i=0;i<buttons.length;i++){
+            // only try to find it in the list of unselected buttons
+            if (buttons[i] == icon){
+                // this way we are sure it is not the one already selected
+                paletteSpace.show(selectedButtons[i]);
+                paletteSpace.hide(buttons[i]);
+                selectedIconIndex = i;
+                newIconSelected = true;
+            }
+        }
+        if (newIconSelected){
+            // if a new button has been selected,
+            for (int i=0;i<selectedIconIndex;i++){
+                // unselect other buttons
+                paletteSpace.hide(selectedButtons[i]);
+                paletteSpace.show(buttons[i]);
+            }
+            for (int i=selectedIconIndex+1;i<buttons.length;i++){
+                paletteSpace.hide(selectedButtons[i]);
+                paletteSpace.show(buttons[i]);
+            }
+            if (oldSelectedIconIndex == DM_NAV_MODE){
+                grMngr.killDM();
+            }
+            else if (oldSelectedIconIndex == BRING_AND_GO_MODE){
+                grMngr.exitBringAndGoMode();
+            }
+            else if (oldSelectedIconIndex == STD_NAV_MODE){
+                grMngr.mainView.getCursor().activateDynaSpot(false);
+            }
+            if (selectedIconIndex == BRING_AND_GO_MODE){
+                grMngr.enterBringAndGoMode();
+            }
+            else if (selectedIconIndex == STD_NAV_MODE){
+                try {grMngr.mainView.getCursor().activateDynaSpot(true);}
+                catch (NullPointerException ex){}
+            }
+        }
     }
 
     /* Called with false when resizing the main view to temporarily hide the palette

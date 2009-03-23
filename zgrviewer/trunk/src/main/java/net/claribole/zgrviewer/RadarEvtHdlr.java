@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Wed Nov 24 09:41:02 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -50,7 +50,7 @@ public class RadarEvtHdlr implements ViewEventHandler {
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		LongPoint lp = v.getMouse().getLocation();
+		LongPoint lp = v.getVCursor().getLocation();
 		Camera c = grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(0);
 		grMngr.vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, new LongPoint(lp.x-c.posx, lp.y-c.posy), c.getID());
 	}

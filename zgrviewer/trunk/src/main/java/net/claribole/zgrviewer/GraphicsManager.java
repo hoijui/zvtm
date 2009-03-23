@@ -1,7 +1,7 @@
 /*   FILE: GraphicsManager.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -257,6 +257,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	mainView.setJava2DPainter(paMngr, Java2DPainter.AFTER_PORTALS);
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
+    activateDynaSpot(ConfigManager.DYNASPOT);
+    mainView.getCursor().setDynaSpotColor(Color.RED);        
+
 	mainViewPanel = mainView.getPanel();
 	setAntialiasing(ConfigManager.ANTIALIASING);
 
@@ -264,6 +267,11 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	updatePanelSize();
 	previousLocations=new Vector();
 
+    }
+
+    void activateDynaSpot(boolean b){
+        ConfigManager.DYNASPOT = b;
+        mainView.getCursor().activateDynaSpot(ConfigManager.DYNASPOT);
     }
 
     void setConfigManager(ConfigManager cm){
@@ -328,10 +336,12 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 		// If they are, then it is very likely that the rectangle is a bounding box.
 		boundingBox = largestRectangle;
 		boundingBox.setVisible(false);
+		boundingBox.setSensitivity(false);
 	}
 
-    boolean bigger(VRectangleOr r1, VRectangleOr r2){// returns true if r1 bigger than r2
-	return (r1.getWidth()*r1.getHeight() > r2.getWidth()*r2.getHeight());
+    boolean bigger(VRectangleOr r1, VRectangleOr r2){
+        // returns true if r1 bigger than r2
+	    return (r1.getWidth()*r1.getHeight() > r2.getWidth()*r2.getHeight());
     }
 
     boolean containedIn(Glyph g, VRectangle r){
