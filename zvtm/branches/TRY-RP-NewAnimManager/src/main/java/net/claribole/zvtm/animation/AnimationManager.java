@@ -322,7 +322,7 @@ class TickSource extends TimingSource {
     }
 }
 
-//@ThreadSafe
+@ThreadSafe
 class TickThread extends Thread{
     private volatile boolean stopped = false;
     private AtomicInteger resolution; //milliseconds
