@@ -199,15 +199,15 @@ public class CGlyph extends Glyph implements Cloneable {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
 	return false;
     }
 
     /**A composite glyph does not by itself fire cursor entry/exit events.
      * Its components do (as normal standalone glyphs).
      */
-    public short mouseInOut(int x,int y,int camIndex){
-	return Glyph.NO_CURSOR_EVENT;
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return Glyph.NO_CURSOR_EVENT;
     }
 
     public void project(Camera c, Dimension d){}

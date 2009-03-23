@@ -203,9 +203,10 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	else {return false;}
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	if ((x>=(pc[camIndex].cx-pc[camIndex].cw)) && (x<=(pc[camIndex].cx+pc[camIndex].cw)) && (y>=(pc[camIndex].cy-pc[camIndex].ch)) && (y<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
-	else {return false;}
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
+            (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
+        else {return false;}
     }
 
 	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
@@ -218,23 +219,28 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	public long[] getBounds(){
 		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
-	}
+    }
 
-    public short mouseInOut(int x,int y,int camIndex){
-	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
-	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
-		pc[camIndex].prevMouseIn=true;
-		return Glyph.ENTERED_GLYPH;
-	    }
-	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was inside last time, nothing has changed
-	}
-	else{//if the mouse is not inside the glyph
-	    if (pc[camIndex].prevMouseIn){//if it was inside it last time, mouse has exited the glyph
-		pc[camIndex].prevMouseIn=false;
-		return Glyph.EXITED_GLYPH;
-	    }
-	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was not inside last time, nothing has changed
-	}
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
+            //if the mouse is inside the glyph
+            if (!pc[camIndex].prevMouseIn){
+                //if it was not inside it last time, mouse has entered the glyph
+                pc[camIndex].prevMouseIn=true;
+                return Glyph.ENTERED_GLYPH;
+            }
+            //if it was inside last time, nothing has changed
+            else {return Glyph.NO_CURSOR_EVENT;}  
+        }
+        else{
+            //if the mouse is not inside the glyph
+            if (pc[camIndex].prevMouseIn){
+                //if it was inside it last time, mouse has exited the glyph
+                pc[camIndex].prevMouseIn=false;
+                return Glyph.EXITED_GLYPH;
+            }//if it was not inside last time, nothing has changed
+            else {return Glyph.NO_CURSOR_EVENT;}
+        }
     }
 
     public void project(Camera c, Dimension d){

@@ -679,11 +679,13 @@ public abstract class Glyph implements Cloneable {
      */
     public abstract void removeCamera(int index);
 
-    /** Detect whether the given point is inside this glyph or not. 
-     *@param x provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param y provide projected JPanel coordinates of the associated view, not virtual space coordinates
+    /** Detect whether the given point is inside this glyph or not.
+     *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param cvx provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param cvy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      */
-    public abstract boolean coordInside(int x,int y,int camIndex);
+    public abstract boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy);
 
     /** Reset memory of cursor being inside the glyph. */
     public abstract void resetMouseIn();
@@ -692,9 +694,13 @@ public abstract class Glyph implements Cloneable {
     public abstract void resetMouseIn(int i);
     
     /** Method used internally for firing picking-related events.
+     *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param cvx provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param cvy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@return VCurcor.ENTERED_GLYPH if cursor has entered the glyph, VCurcor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
      */
-    public abstract short mouseInOut(int x,int y,int camIndex);
+    public abstract short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy);
 
     /** Method used internally to find out if it is necessary to project and draw this glyph for a given camera.
      *@return true if the glyph is currently visible in the region delimited by wb, nb, eb, sb, symbolising the region seen through a camera

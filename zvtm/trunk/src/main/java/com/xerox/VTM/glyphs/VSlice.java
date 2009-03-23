@@ -308,16 +308,16 @@ public class VSlice extends ClosedShape {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	if (Math.sqrt(Math.pow(x-pc[camIndex].cx, 2)+Math.pow(y-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
-	    // see computePolygonEdges() for an explanation of the following tests
-	    if (angle < Math.PI && pc[camIndex].boundingPolygon.contains(x, y) ||
-		angle > Math.PI && !pc[camIndex].boundingPolygon.contains(x, y) ||
-		angle == Math.PI && coordInsideHemisphere(x, y, camIndex)){
-		return true;
-	    }
-	}
-	return false;
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx, 2)+Math.pow(jpy-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
+            // see computePolygonEdges() for an explanation of the following tests
+            if (angle < Math.PI && pc[camIndex].boundingPolygon.contains(jpx, jpy) ||
+                angle > Math.PI && !pc[camIndex].boundingPolygon.contains(jpx, jpy) ||
+            angle == Math.PI && coordInsideHemisphere(jpx, jpy, camIndex)){
+                return true;
+            }
+        }
+        return false;
     }
     
     public boolean coordInsideHemisphere(int x, int y, int camIndex){
@@ -353,21 +353,26 @@ public class VSlice extends ClosedShape {
 	    return false;
 	}
 	
-    public short mouseInOut(int x,int y,int camIndex){
-	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
-	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
-		pc[camIndex].prevMouseIn=true;
-		return Glyph.ENTERED_GLYPH;
-	    }
-	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was inside last time, nothing has changed
-	}
-	else{//if the mouse is not inside the glyph
-	    if (pc[camIndex].prevMouseIn){//if it was inside it last time, mouse has exited the glyph
-		pc[camIndex].prevMouseIn=false;
-		return Glyph.EXITED_GLYPH;
-	    }
-	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was not inside last time, nothing has changed
-	}
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
+            //if the mouse is inside the glyph
+            if (!pc[camIndex].prevMouseIn){
+                //if it was not inside it last time, mouse has entered the glyph
+                pc[camIndex].prevMouseIn=true;
+                return Glyph.ENTERED_GLYPH;
+            }
+            //if it was inside last time, nothing has changed
+            else {return Glyph.NO_CURSOR_EVENT;}  
+        }
+        else{
+            //if the mouse is not inside the glyph
+            if (pc[camIndex].prevMouseIn){
+                //if it was inside it last time, mouse has exited the glyph
+                pc[camIndex].prevMouseIn=false;
+                return Glyph.EXITED_GLYPH;
+            }//if it was not inside last time, nothing has changed
+            else {return Glyph.NO_CURSOR_EVENT;}
+        }
     }
 
     //XXX: visibleInRegion() could be slightly optimized for VSlice (what about containedInRegion() ?)
