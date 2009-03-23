@@ -8,6 +8,7 @@ package net.claribole.zvtm.animation;
 
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.TimingSource;
 import org.jdesktop.animation.timing.TimingTarget;
 
 /**
@@ -24,8 +25,8 @@ import org.jdesktop.animation.timing.TimingTarget;
  */
 public class Animation {
 
-    public static enum Dimension {POSITION, ALTITUDE, SIZE,                  
-	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH};    
+    public static enum Dimension {POSITION, ALTITUDE, SIZE,                 
+	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH};
     
     //package-level ctor, to be used from AnimationManager
     //(not publicly visible)
@@ -72,6 +73,11 @@ public class Animation {
      return ( !((subject == other.subject) &&                            
                 (dimension == other.dimension)) );                       
     }   
+
+    //called by parent AnimationManager (owns the tick source)
+    void setTimer(TimingSource timingSource){
+	animator.setTimer(timingSource);
+    }
 
     void start(){
 	animator.start();
