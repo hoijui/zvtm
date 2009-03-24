@@ -4,12 +4,14 @@
 
 import os, sys, math
 from copy import copy
+# http://www.pythonware.com/products/pil/
 from PIL import Image
+# http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
 
-GENERATE_TILES = False
+GENERATE_TILES = True
 
 SRC_TILE_NAMES = ["A1", "B1", "C1", "D1",\
               "A2", "B2", "C2", "D2"]
@@ -130,6 +132,7 @@ def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRe
             objectEL.set("h", str(ch))
             objectEL.set("src", tileFileName)
             objectEL.set("z-index", str(level))
+            objectEL.set("sensitive", "false")
             # calls to ImageMagick
             if os.path.exists(tilePath) or not GENERATE_TILES:
                 log("%s already exists (skipped)" % tilePath, 2)
