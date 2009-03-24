@@ -174,12 +174,20 @@ public class AnimationManager {
 
     /**
      * Stops an animation.
+     * The end() action of an animation will be executed if the animation has
+     * been started beforehand.
      * @param anim animation to stop (must have been created by 
      * calling createAnimation on the same AnimationManager).
      */
     public void stopAnimation(Animation anim){
 	listsLock.lock();
 	try{
+	    if(pendingAnims.remove(anim)){
+		//XXX try to reunite with TimingInterceptor.end()?
+		anim.handler.end(anim.subject, anim.dimension);
+		return;
+	    }
+
 	    if(runningAnims.indexOf(anim) == -1)
 		return;
 
@@ -217,16 +225,39 @@ public class AnimationManager {
     /**
      * Pauses an animation. An animation that is paused
      * still prevents conflicting animations to run.
+     * @param anim animation to pause
+     * @returns true if the animation was actually paused (ie was running
+     * prior to the user call), false otherwise.
      */
-    public void pauseAnimation(Animation anim){
-	anim.pause();
+    public boolean pauseAnimation(Animation anim){
+	listsLock.lock();
+	try{
+	    if(anim.isRunning()){
+		anim.pause();
+		return true;
+	    }
+	    return false;
+	} finally {
+	    listsLock.unlock();
+	}
     }
 
     /**
      * Resumes an animation.
+     * @param anim animation to resume
+     * @returns true if the animation was actually resumed, false otherwise.
      */
-    public void resumeAnimation(Animation anim){
-	anim.resume();
+    public boolean resumeAnimation(Animation anim){
+	listsLock.lock();
+	try{
+	    if(anim.isRunning()){
+		anim.resume();
+		return true;
+	    }
+	    return false;
+	} finally {
+	    listsLock.unlock();
+	}
     }
 
     /**

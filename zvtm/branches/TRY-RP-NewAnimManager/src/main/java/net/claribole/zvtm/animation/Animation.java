@@ -102,6 +102,10 @@ public class Animation {
 	animator.resume();
     }
 
+    boolean isRunning(){
+	return animator.isRunning();
+    }
+
     //called back from timingInterceptor, propagate to parent AnimManager
     void onAnimationEnded(){
 	parent.onAnimationEnded(this);
