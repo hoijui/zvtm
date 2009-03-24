@@ -155,9 +155,12 @@ public class AnimationManager {
      * they target the same subject and animate the same dimension.
      */
     public void startAnimation(Animation anim, boolean force){
-	//XXX implement forced startAnimation
 	listsLock.lock();
 	try{
+	    if(force){
+		cancelConflictingAnimations(anim);
+	    }
+
 	    pendingAnims.add(anim);
 	    
 	    //*moves and starts* eligible animations
@@ -200,7 +203,6 @@ public class AnimationManager {
 	}
     }
 
-    //pausing a non-running animation has no effect
     /**
      * Pauses an animation. An animation that is paused
      * still prevents conflicting animations to run.
@@ -209,7 +211,6 @@ public class AnimationManager {
 	anim.pause();
     }
 
-    //resuming an animation that is not paused has no effect
     /**
      * Resumes an animation.
      */
@@ -268,6 +269,39 @@ public class AnimationManager {
 		a.start();
 	    }
 
+	} finally {
+	    listsLock.unlock();
+	}
+    }
+
+    private void cancelConflictingAnimations(Animation anim){
+	listsLock.lock();
+	try{
+	    //any number of pending animations may conflict with anim.
+	    //remove them
+	    List<Animation> remove = new LinkedList<Animation>();
+	    for(Animation pending: pendingAnims){
+		if(!anim.orthogonalWith(pending)){
+		    remove.add(pending);
+		}
+	    }
+	    pendingAnims.removeAll(remove);
+
+	    //at most one running animation may conflict with anim
+	    //(class invariant). cancel it.
+	    Animation cancel = null;
+	    for(Animation running: runningAnims){
+		if(!anim.orthogonalWith(running)){
+		    assert(null == cancel);
+		    cancel = running;
+		}
+	    }
+	    
+	    if(null != cancel){
+		cancel.cancel();
+		runningAnims.remove(cancel);
+	    }
+	    
 	} finally {
 	    listsLock.unlock();
 	}
