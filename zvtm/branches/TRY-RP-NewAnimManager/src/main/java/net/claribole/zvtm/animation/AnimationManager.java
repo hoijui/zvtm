@@ -153,6 +153,8 @@ public class AnimationManager {
      * animations will be cancelled. Queued conflicting animations 
      * that did not yet start are cancelled. Two animations conflict if
      * they target the same subject and animate the same dimension.
+     * Note that the end() action of a cancelled animation will <b>not</b>
+     * be executed.
      */
     public void startAnimation(Animation anim, boolean force){
 	listsLock.lock();
@@ -188,10 +190,19 @@ public class AnimationManager {
 	}
     }
 
-    //cancel means the "end" action will not be executed
+    /**
+     * Cancels an animation.
+     * @param anim animation to cancel (must have been created by 
+     * calling createAnimation on the same AnimationManager).
+     * Note that the end() action of a cancelled animation will not
+     * be executed.
+     */
     public void cancelAnimation(Animation anim){
 	listsLock.lock();
 	try{
+	    if(pendingAnims.remove(anim))
+		return;
+
 	    if(runningAnims.indexOf(anim) != -1)
 		return;
 
