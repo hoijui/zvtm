@@ -144,7 +144,7 @@ public class WorldExplorer implements Java2DPainter {
         cameras.add(mCamera);
         cameras.add(bCamera);
         mCamera.stick(bCamera, true);
-        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
+        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, true, null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -157,6 +157,8 @@ public class WorldExplorer implements Java2DPainter {
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
+		mView.getCursor().setDynaSpotColor(Color.WHITE);
+		mView.getCursor().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();

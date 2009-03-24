@@ -171,6 +171,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     	if (nm.lensType != 0 && nm.lens != null){
     	    nm.moveLens(jpx, jpy, e.getWhen());
     	}
+    	v.getVCursor().dynaPick(application.mCamera);
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -288,12 +289,14 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
 	/* Overview Portal */
 	public void enterPortal(Portal p){
+	    application.mView.getCursor().activateDynaSpot(false);
 		inPortal = true;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_INSIDE_BORDER_COLOR);
 		application.vsm.repaintNow();
 	}
 
 	public void exitPortal(Portal p){
+	    application.mView.getCursor().activateDynaSpot(true);
 		inPortal = false;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_BORDER_COLOR);
 		application.vsm.repaintNow();

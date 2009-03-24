@@ -55,15 +55,17 @@ class GeoToolsManager {
                                                     1, transitions, Region.ORDERING_DISTANCE_STR,
                                                     false, null, null);
 
-//        load(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
-//        load(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
-//        load(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
-//        load(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
-//        load(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
-//        load(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
+        loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
+//        loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
+//        loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
+//        loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
+//        loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
+//        loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
+
+        loadEntities();
     }
 
-    void load(File shapeFile, String msg, Region region, Color shapeColor){
+    void loadShapes(File shapeFile, String msg, Region region, Color shapeColor){
         int progress = 0;
         application.gp.setValue(0);
         application.gp.setLabel(msg);
@@ -84,7 +86,6 @@ class GeoToolsManager {
                     Geometry geometry = feature.getDefaultGeometry();                    
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     for (int k=0;k<polygons.length;k++){
-                    
                         Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.01);
                         //Geometry simplifiedPolygon = (Geometry)polygons[k];
                         PathIterator pi = (new LiteShape(simplifiedPolygon, null, false)).getPathIterator(null);
@@ -145,6 +146,10 @@ class GeoToolsManager {
     
     void toggleBoundaryDisplay(){
         application.bCamera.setEnabled(!application.bCamera.isEnabled());
+    }
+    
+    void loadEntities(){
+        for (int )
     }
 
 }
