@@ -226,7 +226,7 @@ public class AnimationManager {
      * Pauses an animation. An animation that is paused
      * still prevents conflicting animations to run.
      * @param anim animation to pause
-     * @returns true if the animation was actually paused (ie was running
+     * @return true if the animation was actually paused (ie was running
      * prior to the user call), false otherwise.
      */
     public boolean pauseAnimation(Animation anim){
@@ -245,7 +245,7 @@ public class AnimationManager {
     /**
      * Resumes an animation.
      * @param anim animation to resume
-     * @returns true if the animation was actually resumed, false otherwise.
+     * @return true if the animation was actually resumed, false otherwise.
      */
     public boolean resumeAnimation(Animation anim){
 	listsLock.lock();
