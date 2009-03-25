@@ -156,8 +156,8 @@ public class TestCameraPosition {
 	    //over the course of a second
 	    final long sx = vsm.getVirtualSpace("src").getCamera(0).posx;
 	    final long sy = vsm.getVirtualSpace("src").getCamera(0).posy;
-	    final long ex = v.getMouse().vx;
-	    final long ey = v.getMouse().vy;
+	    final long ex = v.getVCursor().vx;
+	    final long ey = v.getVCursor().vy;
 
 	    Animation trans = am.createAnimation(1000, 1f, Animator.RepeatBehavior.LOOP,
 						 vsm.getVirtualSpace("src").getCamera(0),
