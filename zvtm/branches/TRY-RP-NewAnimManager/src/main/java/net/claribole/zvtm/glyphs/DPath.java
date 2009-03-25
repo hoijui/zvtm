@@ -86,7 +86,7 @@ public class DPath extends Glyph implements RectangularShape {
 		elements = new PathElement[0];
 		computeBounds();
 		updateJava2DGeneralPath();
-		sensit = false;
+		sensit = true;
 		setColor(Color.BLACK);
 	}
 
@@ -106,7 +106,7 @@ public class DPath extends Glyph implements RectangularShape {
 		elements = new PathElement[0];
 		computeBounds();
 		updateJava2DGeneralPath();
-		sensit = false;
+		sensit = true;
 		setColor(c);
 	}
 
@@ -157,7 +157,7 @@ public class DPath extends Glyph implements RectangularShape {
 	    }
 		computeBounds();
 		updateJava2DGeneralPath();
-		sensit = false;
+		sensit = true;
 		setColor(c);
     }
 
@@ -406,12 +406,12 @@ public class DPath extends Glyph implements RectangularShape {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	return false;
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return false;
     }
 
-    public short mouseInOut(int x,int y,int camIndex){
-	return Glyph.NO_CURSOR_EVENT;
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return Glyph.NO_CURSOR_EVENT;
     }
 
     int hw, hh, lhw, lhh;

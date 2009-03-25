@@ -202,9 +202,9 @@ public class VShape extends ClosedShape {
 	else {return false;}
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	if (pc[camIndex].p.contains(x,y)){return true;}
-	else {return false;}
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (pc[camIndex].p.contains(jpx, jpy)){return true;}
+        else {return false;}
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
@@ -212,21 +212,26 @@ public class VShape extends ClosedShape {
 		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
-    public short mouseInOut(int x,int y,int camIndex){
-	if (coordInside(x,y,camIndex)){//if the mouse is inside the glyph
-	    if (!pc[camIndex].prevMouseIn){//if it was not inside it last time, mouse has entered the glyph
-		pc[camIndex].prevMouseIn=true;
-		return Glyph.ENTERED_GLYPH;
-	    }
-	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was inside last time, nothing has changed
-	}
-	else{//if the mouse is not inside the glyph
-	    if (pc[camIndex].prevMouseIn){//if it was inside it last time, mouse has exited the glyph
-		pc[camIndex].prevMouseIn=false;
-		return Glyph.EXITED_GLYPH;
-	    }
-	    else {return Glyph.NO_CURSOR_EVENT;}  //if it was not inside last time, nothing has changed
-	}
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
+            //if the mouse is inside the glyph
+            if (!pc[camIndex].prevMouseIn){
+                //if it was not inside it last time, mouse has entered the glyph
+                pc[camIndex].prevMouseIn=true;
+                return Glyph.ENTERED_GLYPH;
+            }
+            //if it was inside last time, nothing has changed
+            else {return Glyph.NO_CURSOR_EVENT;}  
+        }
+        else{
+            //if the mouse is not inside the glyph
+            if (pc[camIndex].prevMouseIn){
+                //if it was inside it last time, mouse has exited the glyph
+                pc[camIndex].prevMouseIn=false;
+                return Glyph.EXITED_GLYPH;
+            }//if it was not inside last time, nothing has changed
+            else {return Glyph.NO_CURSOR_EVENT;}
+        }
     }
 
     /** Get the list of vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */

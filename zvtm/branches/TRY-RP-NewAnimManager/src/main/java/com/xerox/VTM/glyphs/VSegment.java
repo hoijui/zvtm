@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -258,8 +258,8 @@ public class VSegment extends Glyph implements RectangularShape {
 	vh=(long)Math.round(size*Math.sin(orient));
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	return false;
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return false;
     }
 
     /** Detects whether the point (x,y) lies on the segment or not. Default tolerance of 2 pixels.
@@ -287,8 +287,8 @@ public class VSegment extends Glyph implements RectangularShape {
 		return Line2D.ptSegDist(vx-vw, vy-vh, vx+vw, vy+vh, dvx, dvy) <= dvr;
 	}
 
-    public short mouseInOut(int x,int y,int camIndex){
-	return Glyph.NO_CURSOR_EVENT;
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return Glyph.NO_CURSOR_EVENT;
     }
 
     public void project(Camera c, Dimension d){

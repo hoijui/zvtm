@@ -109,15 +109,16 @@ public class VRectangleOr extends VRectangle {
 		}
 	}
 
-    public boolean coordInside(int x,int y,int camIndex){
-	if (orient==0){
-	    if ((x>=(pc[camIndex].cx-pc[camIndex].cw)) && (x<=(pc[camIndex].cx+pc[camIndex].cw)) && (y>=(pc[camIndex].cy-pc[camIndex].ch)) && (y<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
-	    else {return false;}
-	}
-	else {
-	    if (pc[camIndex].p.contains(x,y)){return true;}
-	    else {return false;}
-	}
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        if (orient==0){
+            if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
+                (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
+            else {return false;}
+        }
+        else {
+            if (pc[camIndex].p.contains(jpx, jpy)){return true;}
+            else {return false;}
+        }
     }
 
     public void project(Camera c, Dimension d){

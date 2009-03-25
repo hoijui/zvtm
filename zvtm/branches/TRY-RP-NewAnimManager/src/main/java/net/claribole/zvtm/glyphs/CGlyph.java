@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) E. Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,6 +16,8 @@
  * Lesser General Public License for more details.
  *
  * For full terms see the file COPYING.
+ *
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs;
@@ -199,15 +202,15 @@ public class CGlyph extends Glyph implements Cloneable {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
 	return false;
     }
 
     /**A composite glyph does not by itself fire cursor entry/exit events.
      * Its components do (as normal standalone glyphs).
      */
-    public short mouseInOut(int x,int y,int camIndex){
-	return Glyph.NO_CURSOR_EVENT;
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return Glyph.NO_CURSOR_EVENT;
     }
 
     public void project(Camera c, Dimension d){}

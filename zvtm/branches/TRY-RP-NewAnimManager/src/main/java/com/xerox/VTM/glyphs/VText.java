@@ -102,7 +102,6 @@ public class VText extends Glyph {
 	vx=0;
 	vy=0;
 	vz=0;
-	sensit=false;
 	text=t;
 	setColor(Color.white);
     }
@@ -118,7 +117,6 @@ public class VText extends Glyph {
 	vx=x;
 	vy=y;
 	vz=z;
-	sensit=false;
 	text=t;
 	setColor(c);
     }
@@ -135,7 +133,6 @@ public class VText extends Glyph {
 	vx=x;
 	vy=y;
 	vz=z;
-	sensit=false;
 	text=t;
 	setColor(c);
 	text_anchor=ta;
@@ -154,7 +151,6 @@ public class VText extends Glyph {
 	vx=x;
 	vy=y;
 	vz=z;
-	sensit=false;
 	text=t;
 	setColor(c);
 	text_anchor=ta;
@@ -295,8 +291,22 @@ public class VText extends Glyph {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	return false;
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+        boolean res=false;
+        switch (text_anchor){
+            case VText.TEXT_ANCHOR_START:{
+                if ((cvx>=vx) && (cvy>=vy) && (cvx<=(vx+pc[camIndex].cw)) && (cvy<=(vy+pc[camIndex].ch))){res=true;}
+                break;
+            }
+            case VText.TEXT_ANCHOR_MIDDLE:{
+                if ((cvx>=vx-pc[camIndex].cw/2) && (cvy>=vy) && (cvx<=(vx+pc[camIndex].cw/2)) && (cvy<=(vy+pc[camIndex].ch))){res=true;}
+                break;
+            }
+            default:{
+                if ((cvx<=vx) && (cvy>=vy) && (cvx>=(vx-pc[camIndex].cw)) && (cvy<=(vy+pc[camIndex].ch))){res=true;}
+            }
+        }
+        return res;
     }
 
 	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
@@ -312,8 +322,26 @@ public class VText extends Glyph {
         }	    
 	}
 
-    public short mouseInOut(int x,int y,int camIndex){
-	return Glyph.NO_CURSOR_EVENT;
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
+             //if the mouse is inside the glyph
+             if (!pc[camIndex].prevMouseIn){
+                 //if it was not inside it last time, mouse has entered the glyph
+                 pc[camIndex].prevMouseIn=true;
+                 return Glyph.ENTERED_GLYPH;
+             }
+             //if it was inside last time, nothing has changed
+             else {return Glyph.NO_CURSOR_EVENT;}  
+         }
+         else{
+             //if the mouse is not inside the glyph
+             if (pc[camIndex].prevMouseIn){
+                 //if it was inside it last time, mouse has exited the glyph
+                 pc[camIndex].prevMouseIn=false;
+                 return Glyph.EXITED_GLYPH;
+             }//if it was not inside last time, nothing has changed
+             else {return Glyph.NO_CURSOR_EVENT;}
+         }
     }
 
     public void project(Camera c, Dimension d){

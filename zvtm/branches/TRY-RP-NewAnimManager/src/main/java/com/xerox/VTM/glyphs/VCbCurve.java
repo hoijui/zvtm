@@ -182,8 +182,8 @@ public class VCbCurve extends Glyph {
 	return false;
     }
 
-    public boolean coordInside(int x,int y,int camIndex){
-	return false;
+    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return false;
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
@@ -192,8 +192,8 @@ public class VCbCurve extends Glyph {
 	}
 
     /** The cursor is never considered as being inside a cubic curve. Glyph entry/exit are never fired by a VCbCurve. */
-    public short mouseInOut(int x,int y,int camIndex){
-	return Glyph.NO_CURSOR_EVENT;
+    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	    return Glyph.NO_CURSOR_EVENT;
     }
 
     public void project(Camera c, Dimension d){
