@@ -176,8 +176,32 @@ public class TestCameraPosition {
 								   (long)(fraction*(endY-startY))+startY);
 						      }},
 						 SlowInSlowOutInterpolator.getInstance());
+
+	    Animation altitude = am.createAnimation(1000,
+						    vsm.getVirtualSpace("src").getCamera(0),
+						    Animation.Dimension.ALTITUDE,
+						    new DefaultTimingHandler(){
+							final float initZ = vsm.getVirtualSpace("src").getCamera(0).getAltitude();
+							public void timingEvent(float fraction, 
+										Object subject, Animation.Dimension dim){
+							    Camera c = (Camera)subject;
+							    
+							    c.setAltitude((float)(initZ + 0.25*initZ*Math.sin(Math.PI * fraction)));
+							}
+
+							public void end(float fraction, 
+									Object subject, Animation.Dimension dim){
+							    Camera c = (Camera)subject;
+							    c.setAltitude(initZ);
+							}
+						    }
+						    );
 	    am.startAnimation(trans, true); //force anim start
-						 }
+	    //XXX I think this makes a case that we should be able to request 
+	    //bypassed animations to execute their end action when forcing 
+	    //a new animation to start
+	    am.startAnimation(altitude, true);
+	}
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 
