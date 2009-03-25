@@ -35,6 +35,7 @@ import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.widgets.*;
 
 import net.claribole.zvtm.animation.*;
+import net.claribole.zvtm.animation.interpolation.*;
 import org.jdesktop.animation.timing.*;
 import org.jdesktop.animation.timing.interpolation.*;
 
@@ -118,7 +119,7 @@ public class TestCameraAnim {
 	Animation cameraPos = am.createAnimation(4000, 
 						 2f,
 						 Animator.RepeatBehavior.LOOP,
-						 vsm.getActiveCamera(),
+						 vsm.getVirtualSpace("src").getCamera(0),
 						 Animation.Dimension.POSITION,
 						 new DefaultTimingHandler(){
 						     						     
@@ -134,7 +135,7 @@ public class TestCameraAnim {
 							 circle.setColor(Color.RED);
 						     }
 						 },
-						 new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));;
+						 SlowInSlowOutInterpolator.getInstance());
 	
 	Animation cameraAlt = am.createAnimation(4000, 
 						 2f,
@@ -146,14 +147,14 @@ public class TestCameraAnim {
 						     public void timingEvent(float fraction, 
 									     Object subject, Animation.Dimension dim){
 							 Camera c = (Camera)subject;
-							 c.setAltitude(100+Float.valueOf(fraction*50).longValue());
+							 c.setAltitude(25+Float.valueOf(fraction*50).longValue());
 						     }
 
 						     public void end(Object subject, Animation.Dimension dim){
 							 circle2.setColor(Color.RED);
 						     }
 						 },
-					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));;
+						 ConstantAccInterpolator.getInstance());
 	
 	am.startAnimation(cameraPos, false);
 	am.startAnimation(anim, false);
