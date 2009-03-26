@@ -45,7 +45,7 @@ public class Animation {
 	this.dimension = dimension;
 	this.handler = handler;
 
-	timingInterceptor = new TimingInterceptor(this);
+	timingInterceptor = new TimingInterceptor();
 	animator = new Animator(duration, repeatCount, repeatBehavior, timingInterceptor);
     }
 
@@ -130,37 +130,33 @@ public class Animation {
 
     //characteristic of the animation e.g. color, altitude, position, size...
     final Dimension dimension;
-}
 
-//This class is not really conceptually separate from "Animation",
-//it is mailny a trick to avoid exposing its TimingTarget inheritance
-//to clients (and providing public callback methods, et caetera).
-class TimingInterceptor implements TimingTarget {
-    TimingInterceptor(Animation parent){
-	this.parent = parent;
+    //This class is not really conceptually separate from "Animation",
+    //it is mailny a trick to avoid exposing its TimingTarget inheritance
+    //to clients (and providing public callback methods, et caetera).
+    private class TimingInterceptor implements TimingTarget {
+	TimingInterceptor(){}
+
+	public void begin(){
+	    handler.begin(subject, dimension);
+	}
+
+	public void end(){
+	    handler.end(subject, dimension);
+
+	    //should do useful stuff like queue management
+	    //note that the order of call is important: the end action of
+	    //the animation should have ended before we process the animation
+	    //queue, and potentially run a new animation
+	    onAnimationEnded();
+	}
+
+	public void repeat(){
+	    handler.repeat(subject, dimension);
+	}
+
+	public void timingEvent(float fraction){
+	    handler.timingEvent(fraction, subject, dimension);
+	}
     }
-
-    public void begin(){
-	parent.handler.begin(parent.subject, parent.dimension);
-    }
-
-    public void end(){
-	parent.handler.end(parent.subject, parent.dimension);
-
-	//should do useful stuff like queue management
-	//note that the order of call is important: the end action of
-	//the animation should have ended before we process the animation
-	//queue, and potentially run a new animation
-	parent.onAnimationEnded();
-    }
-
-    public void repeat(){
-	parent.handler.repeat(parent.subject, parent.dimension);
-    }
-
-    public void timingEvent(float fraction){
-	parent.handler.timingEvent(fraction, parent.subject, parent.dimension);
-    }
-
-    private Animation parent;
 }
