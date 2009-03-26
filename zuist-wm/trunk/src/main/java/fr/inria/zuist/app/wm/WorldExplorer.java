@@ -153,6 +153,7 @@ public class WorldExplorer implements Java2DPainter {
         }
         eh = new ExplorerEventHandler(this);
         mView.setEventHandler(eh, 0);
+        mView.setEventHandler(eh, 1);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.getCursor().setColor(Color.WHITE);
@@ -162,6 +163,7 @@ public class WorldExplorer implements Java2DPainter {
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();
+        mView.setActiveLayer(1);
     }
 
     void windowLayout(){

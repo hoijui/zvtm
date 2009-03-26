@@ -32,6 +32,7 @@ import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 import com.xerox.VTM.glyphs.VPolygonST;
+import com.xerox.VTM.glyphs.RectangleNR;
 import com.xerox.VTM.engine.LongPoint;
 
 import fr.inria.zuist.engine.Region;
@@ -55,7 +56,7 @@ class GeoToolsManager {
                                                     1, transitions, Region.ORDERING_DISTANCE_STR,
                                                     false, null, null);
 
-        loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
+        //loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
 //        loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
@@ -149,7 +150,11 @@ class GeoToolsManager {
     }
     
     void loadEntities(){
-        for (int )
+        for (int i=0;i<10;i++){
+            for (int j=0;j<10;j++){
+                application.vsm.addGlyph(new RectangleNR(i*1500, j*1500, 1, 3, 3, Color.RED), application.bSpace);
+            }      
+        }
     }
 
 }

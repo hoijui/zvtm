@@ -171,7 +171,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     	if (nm.lensType != 0 && nm.lens != null){
     	    nm.moveLens(jpx, jpy, e.getWhen());
     	}
-    	v.getVCursor().dynaPick(application.mCamera);
+    	v.getVCursor().dynaPick(application.bCamera);
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
