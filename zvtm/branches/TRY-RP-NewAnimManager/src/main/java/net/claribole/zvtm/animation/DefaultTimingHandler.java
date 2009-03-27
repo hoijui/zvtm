@@ -12,7 +12,10 @@ package net.claribole.zvtm.animation;
  * This is because a handler that does not respond to timing events is 
  * likely useless.
  * Users should override any TimingHandler methods that they
- * need (and are compelled to provide an implementation for timingEvent)
+ * need (and are compelled to provide an implementation for timingEvent).
+ * <br />
+ * Note: it is heartily advised to annotate all method overrides in subclasses
+ * with @Override, which could help avoid much frustration.
  * @see TimingHandler
  * @see Animation
  * @author Romain Primet
