@@ -28,8 +28,10 @@ import org.jdesktop.animation.timing.TimingTarget;
 @ThreadSafe
 public class Animation {
 
+    //LENS_MAG_OUT: animate both lens outer radius and magnification
     public static enum Dimension {POSITION, ALTITUDE, SIZE, ORIENTATION,                
-	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH};
+	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH, LENS_MAG,
+	    LENS_INNER_RADIUS, LENS_OUTER_RADIUS, LENS_MAG_OUT};
     
     //package-level ctor, to be used from AnimationManager
     //(not publicly visible)
