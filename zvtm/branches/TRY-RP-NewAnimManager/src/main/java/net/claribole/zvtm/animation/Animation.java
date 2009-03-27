@@ -28,7 +28,7 @@ import org.jdesktop.animation.timing.TimingTarget;
 @ThreadSafe
 public class Animation {
 
-    public static enum Dimension {POSITION, ALTITUDE, SIZE,                 
+    public static enum Dimension {POSITION, ALTITUDE, SIZE, ORIENTATION,                
 	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH};
     
     //package-level ctor, to be used from AnimationManager
