@@ -6,11 +6,15 @@
  */ 
 package net.claribole.zvtm.animation;
 
+import net.jcip.annotations.*;
+
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.Translucent;
 
 /**
  * A class that provides creation methods for animations.
@@ -19,6 +23,7 @@ import com.xerox.VTM.engine.LongPoint;
  * (but offer less flexibility and only cover the most common animation 
  * cases).
  */
+@Immutable
 public class AnimationFactory {
 
     //AnimationFactories are created by AnimationManagers
@@ -119,20 +124,20 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createCameraTranslation(final int duration, final Camera subject, 
+    public Animation createCameraTranslation(final int duration, final Camera camera, 
 					     final LongPoint data, final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
-			       subject,
+			       camera,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
-				   private final long startX = subject.getLocation().vx;
-				   private final long startY = subject.getLocation().vy;
+				   private final long startX = camera.getLocation().vx;
+				   private final long startY = camera.getLocation().vy;
 				   private final long endX = 
-				       relative? subject.getLocation().vx + data.x : data.x;
+				       relative? camera.getLocation().vx + data.x : data.x;
 				   private final long endY = 
-				       relative? subject.getLocation().vy + data.y : data.y;
+				       relative? camera.getLocation().vy + data.y : data.y;
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -144,9 +149,8 @@ public class AnimationFactory {
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       Camera cam = (Camera)subject;
-				       cam.moveTo(startX + (long)(fraction*(endX - startX)),
-						  startY + (long)(fraction*(endY - startY)));
+				       camera.moveTo(startX + (long)(fraction*(endX - startX)),
+						     startY + (long)(fraction*(endY - startY)));
 				   }
 			       },
 			       interpolator);
@@ -156,7 +160,7 @@ public class AnimationFactory {
      * Creates and returns a linear camera altitude animation
      * that will not repeat.
      * @param duration duration of the animation, in milliseconds.
-     * @param subject camera to animate
+     * @param camera camera to animate
      * @param data animation data, interpreted according to the
      * 'relative' boolean argument. If 'relative' is false, then
      * 'data' will be interpreted as an absolute target altitude, 
@@ -164,19 +168,123 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createCameraAltAnim(final int duration, final Camera subject, 
+    public Animation createCameraAltAnim(final int duration, final Camera camera, 
 					 final float data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
 	
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
-			       subject,
+			       camera,
 			       Animation.Dimension.ALTITUDE,
 			       new DefaultTimingHandler(){
-				   private final float startZ = subject.getAltitude();
+				   private final float startZ = camera.getAltitude();
 				   private final float endZ = 
-				       relative? subject.getAltitude() + data : data;
-				   private final Camera cam = subject;
+				       relative? camera.getAltitude() + data : data;
+		
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       camera.setAltitude(startZ + fraction*(endZ - startZ));
+				   }
+			       },
+			       interpolator);
+     }
+
+    /**
+     * Creates and returns a linear glyph translation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param subject glyph to animate
+     * @param data animation data, interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as absolute target coordinates, 
+     * otherwise it will be interpreted as an offset.
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
+    public Animation createGlyphTranslation(final int duration, final Glyph glyph,
+					    final LongPoint data, final boolean relative,
+					    final Interpolator interpolator,
+					    final EndAction endAction){
+	 return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+				glyph,
+				Animation.Dimension.POSITION,
+				new DefaultTimingHandler(){
+				    private final long startX = glyph.getLocation().x;
+				    private final long startY = glyph.getLocation().y;
+				    private final long endX = 
+					relative? glyph.getLocation().x + data.x : data.x;
+				    private final long endY = 
+					relative? glyph.getLocation().y + data.y : data.y;
+			
+				    @Override
+				    public void end(Object subject, Animation.Dimension dim){
+					if(null != endAction){
+					    endAction.execute(subject, dim);
+					}
+				    }
+				    
+				    @Override
+				    public void timingEvent(float fraction, 
+							    Object subject, Animation.Dimension dim){
+					glyph.moveTo(startX + (long)(fraction*(endX - startX)),
+						     startY + (long)(fraction*(endY - startY)));
+				    }
+				    
+				},
+				interpolator);
+     }
+
+    public Animation createGlyphSizeAnim(final int duration, final Glyph glyph,
+					 final float data, final boolean relative,
+					 final Interpolator interpolator,
+					 final EndAction endAction){
+	final float startSize = glyph.getSize();
+	final float endSize = relative? glyph.getSize() + data : data;
+	
+	//throw if this animation would cause the size to become negative
+	if(endSize < 0f){
+	    throw new IllegalArgumentException("Cannot animate a Glyph size to a negative value");
+	}
+
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       glyph,
+			       Animation.Dimension.SIZE,
+			       new DefaultTimingHandler(){
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       glyph.sizeTo(startSize + fraction*(endSize - startSize));
+				   }
+			       },
+			       interpolator);
+     }
+
+    public Animation createGlyphOrientationAnim(final int duration, final Glyph glyph,
+						final float data, final boolean relative,
+						final Interpolator interpolator,
+						final EndAction endAction){
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       glyph,
+			       Animation.Dimension.ORIENTATION,
+			       new DefaultTimingHandler(){
+				   private final float startAngle = glyph.getOrient();
+				   private final float endAngle = 
+				       relative? glyph.getOrient() + data : data;
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -188,24 +296,111 @@ public class AnimationFactory {
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       cam.setAltitude(startZ + fraction*(endZ - startZ));
+				       glyph.orientTo(startAngle + fraction*(endAngle - startAngle));
 				   }
-			       },
-			       interpolator);
-     }
+			       });
+	
+    }
 
-//     public Animation createGlyphTranslation(){
-// 	return null;
-//     }
+    //XXX might want to combine dimensions (FillColor | BorderColor) ??
+    public Animation createGlyphFillColorAnim(final int duration, final Glyph glyph,
+					      final float[] data, final boolean relative,
+					      final Interpolator interpolator,
+					      final EndAction endAction){
+	final float[] startColor = glyph.getHSVColor();
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       glyph,
+			       Animation.Dimension.FILLCOLOR,
+			       new DefaultTimingHandler(){
+				   private final float startH = startColor[0];
+				   private final float startS = startColor[1];
+				   private final float startV = startColor[2];
+				   private final float endH = 
+				       relative? startH + data[0] : data[0];
+				   private final float endS = 
+				       relative? startS + data[1] : data[1];
+				   private final float endV = 
+				       relative? startV + data[2]: data[2];
 
-//     public Animation createGlyphSizeAnim(){
-// 	//throw if this animation would cause the size to become negative
-// 	return null;
-//     }
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
 
-//     public Animation createGlyphOrientationAnim(){
-// 	return null;
-//     }
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       glyph.setHSVColor(startH + fraction*(endH - startH),
+							 startS + fraction*(endS - startS),
+							 startV + fraction*(endV - startV));
+				   }
+			       });
+    }
+
+    public Animation createGlyphBorderColorAnim(final int duration, final Glyph glyph,
+						final float[] data, final boolean relative,
+						final Interpolator interpolator,
+						final EndAction endAction){
+	final float[] startColor = glyph.getHSVbColor();
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       glyph,
+			       Animation.Dimension.BORDERCOLOR,
+			       new DefaultTimingHandler(){
+				   private final float startH = startColor[0];
+				   private final float startS = startColor[1];
+				   private final float startV = startColor[2];
+				   private final float endH = 
+				       relative? startH + data[0] : data[0];
+				   private final float endS = 
+				       relative? startS + data[1] : data[1];
+				   private final float endV = 
+				       relative? startV + data[2] : data[2];
+
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       glyph.setHSVbColor(startH + fraction*(endH - startH),
+							  startS + fraction*(endS - startS),
+							  startV + fraction*(endV - startV));
+				   }
+			       });
+    }
+
+
+    public Animation createTranslucencyAnim(final int duration, final Translucent translucent,
+					    final float data, final boolean relative,
+					    final Interpolator interpolator,
+					    final EndAction endAction){
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       translucent,
+			       Animation.Dimension.TRANSLUCENCY,
+			       new DefaultTimingHandler(){
+				   private final float startA = translucent.getTranslucencyValue();
+				   private final float endA = relative? startA + data : data;
+
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       translucent.setTranslucencyValue(startA + fraction*(endA - startA));
+				   }
+			       });
+    }
 
     private final AnimationManager animationManager;
 }
