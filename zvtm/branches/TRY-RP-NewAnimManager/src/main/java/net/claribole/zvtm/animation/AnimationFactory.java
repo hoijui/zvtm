@@ -6,6 +6,8 @@
  */ 
 package net.claribole.zvtm.animation;
 
+import java.awt.Point;
+
 import net.jcip.annotations.*;
 
 import org.jdesktop.animation.timing.Animator;
@@ -15,6 +17,8 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
+
+import net.claribole.zvtm.engine.Portal;
 
 /**
  * A class that provides creation methods for animations.
@@ -410,13 +414,14 @@ public class AnimationFactory {
 			       portal,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
-				   private final long startX = portal.x;
-				   private final long startY = portal.y;
-				   private final long endX = 
+				   private final int startX = portal.x;
+				   private final int startY = portal.y;
+				   private final int endX = 
 				       relative? portal.x + data.x : data.x;
-				   private final long endY = 
+				   private final int endY = 
 				       relative? portal.y + data.y : data.y;
-				   				    @Override
+
+				   @Override
 				    public void end(Object subject, Animation.Dimension dim){
 					if(null != endAction){
 					    endAction.execute(subject, dim);
@@ -426,18 +431,16 @@ public class AnimationFactory {
 				    @Override
 				    public void timingEvent(float fraction, 
 							    Object subject, Animation.Dimension dim){
-					portal.moveTo(startX + (long)(fraction*(endX - startX)),
-						     startY + (long)(fraction*(endY - startY)));
+					portal.moveTo(startX + (int)(fraction*(endX - startX)),
+						      startY + (int)(fraction*(endY - startY)));
 				    }
 
 			       },
-			       interpolator){
-	    
-	}
+			       interpolator);
     }
 
-    public Animation createPortalSizeAnim(){
-    }
+   //   public Animation createPortalSizeAnim(){
+//      }
 
 
     private final AnimationManager animationManager;
