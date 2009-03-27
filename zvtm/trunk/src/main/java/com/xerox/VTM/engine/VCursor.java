@@ -982,6 +982,10 @@ public class VCursor {
 			catch (NullPointerException ex){}
 		}
 	}
+	
+	public boolean isDynaSpotActivated(){
+	    return dynaSpotActivated;
+	}
 
 	/** Set maximum size of DynaSpot selection region. */
 	public void setDynaSpotMaxRadius(int r){
