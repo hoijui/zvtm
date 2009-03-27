@@ -1,3 +1,9 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package net.claribole.zvtm.animation.interpolation;
 
 import net.jcip.annotations.*;
@@ -6,7 +12,8 @@ import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.interpolation.SplineInterpolator;
 
 /**
- * A class that implements constant acceleration interpolation.
+ * A class that implements constant acceleration ('slow in, fast out') interpolation.
+ * @author Romain Primet
  */
 @Immutable
 public class ConstantAccInterpolator{
