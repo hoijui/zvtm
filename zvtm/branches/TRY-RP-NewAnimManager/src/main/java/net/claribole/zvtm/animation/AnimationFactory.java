@@ -402,5 +402,43 @@ public class AnimationFactory {
 			       });
     }
 
+    public Animation createPortalTranslation(final int duration, final Portal portal,
+					     final Point data, final boolean relative,
+					     final Interpolator interpolator,
+					     final EndAction endAction){
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       portal,
+			       Animation.Dimension.POSITION,
+			       new DefaultTimingHandler(){
+				   private final long startX = portal.x;
+				   private final long startY = portal.y;
+				   private final long endX = 
+				       relative? portal.x + data.x : data.x;
+				   private final long endY = 
+				       relative? portal.y + data.y : data.y;
+				   				    @Override
+				    public void end(Object subject, Animation.Dimension dim){
+					if(null != endAction){
+					    endAction.execute(subject, dim);
+					}
+				    }
+				    
+				    @Override
+				    public void timingEvent(float fraction, 
+							    Object subject, Animation.Dimension dim){
+					portal.moveTo(startX + (long)(fraction*(endX - startX)),
+						     startY + (long)(fraction*(endY - startY)));
+				    }
+
+			       },
+			       interpolator){
+	    
+	}
+    }
+
+    public Animation createPortalSizeAnim(){
+    }
+
+
     private final AnimationManager animationManager;
 }
