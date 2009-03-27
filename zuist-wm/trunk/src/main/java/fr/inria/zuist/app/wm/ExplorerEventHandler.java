@@ -33,6 +33,8 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
+import org.geonames.Toponym;
+
 class ExplorerEventHandler implements ViewEventHandler, AnimationListener, ComponentListener, PortalEventHandler {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
@@ -66,6 +68,10 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     boolean panning = false;
     
 	DelayedUpdateTimer dut;
+	
+	// region selection
+	boolean selectingRegion = false;
+	long x1, y1, x2, y2;
 
     ExplorerEventHandler(WorldExplorer app){
         this.application = app;
@@ -97,54 +103,80 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 			}
 		}
 		else {
-	        panning = true;			
+		    if (v.getVCursor().getDynaSpotRadius() > 0){return;}
+		    selectingRegion = true;
+			x1 = v.getVCursor().vx;
+			y1 = v.getVCursor().vy;
+			v.setDrawRect(true);
 		}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		panning = false;
+        if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
 		regionStickedToMouse = false;
+	    if (selectingRegion){
+			v.setDrawRect(false);
+			x2 = v.getVCursor().vx;
+			y2 = v.getVCursor().vy;
+			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
+				application.vsm.centerOnRegion(application.mCamera, WorldExplorer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
+			}
+			selectingRegion = false;
+		}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastVX = v.getVCursor().vx;
     	lastVY = v.getVCursor().vy;
-    	if (nm.lensType != NavigationManager.NO_LENS){
-    	    nm.zoomInPhase2(lastVX, lastVY);
-    	}
-    	else {
-    	    if (cursorNearBorder){// do not activate the lens when cursor is near the border
-    		return;
-    	    }
-    	    nm.zoomInPhase1(jpx, jpy);
-    	}
+    	Glyph g = v.getVCursor().dynaPick(application.bCamera);
+    	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);
+//    	if (nm.lensType != NavigationManager.NO_LENS){
+//    	    nm.zoomInPhase2(lastVX, lastVY);
+//    	}
+//    	else {
+//    	    if (cursorNearBorder){// do not activate the lens when cursor is near the border
+//    		return;
+//    	    }
+//    	    nm.zoomInPhase1(jpx, jpy);
+//    	}
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+    }
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        lastVX = v.getVCursor().vx;
-        lastVY = v.getVCursor().vy;
-        if (nm.lensType != NavigationManager.NO_LENS){
-            nm.zoomOutPhase2();
+        if (!inPortal){
+            panning = true;
         }
-        else {
-            if (cursorNearBorder){
-                // do not activate the lens when cursor is near the border
-                return;
-            }
-            nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
-        }
+    }
+
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        panning = false;
+        if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+    }
+
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+//        lastJPX = jpx;
+//        lastJPY = jpy;
+//        lastVX = v.getVCursor().vx;
+//        lastVY = v.getVCursor().vy;
+//        if (nm.lensType != NavigationManager.NO_LENS){
+//            nm.zoomOutPhase2();
+//        }
+//        else {
+//            if (cursorNearBorder){
+//                // do not activate the lens when cursor is near the border
+//                return;
+//            }
+//            nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+//        }
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
@@ -176,6 +208,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (panning){
+            if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
             float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
@@ -193,6 +226,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 			dut.requestUpdate();
 			lastJPX = jpx;
 			lastJPY = jpy;
+		}
+		else if (selectingRegion){
+		    if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
 		}
     }
 

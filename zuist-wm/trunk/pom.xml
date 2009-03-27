@@ -75,6 +75,11 @@ $Id$
 		<artifactId>gt2-epsg-wkt</artifactId>
 		<version>2.4.3</version>
 	</dependency>
+	<dependency>
+		<groupId>org.geonames</groupId>
+		<artifactId>geonames</artifactId>
+		<version>1.0</version>
+	</dependency>
   </dependencies>
   
   <!-- Build -->
@@ -121,8 +126,8 @@ $Id$
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
 		  <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>

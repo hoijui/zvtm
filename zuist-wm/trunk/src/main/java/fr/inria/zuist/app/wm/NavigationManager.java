@@ -87,7 +87,7 @@ class NavigationManager {
 	static final int OVERVIEW_HEIGHT = 100;
 	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
 	static final float OBSERVED_REGION_ALPHA = 0.5f;
-	static final Color OV_BORDER_COLOR = Color.GREEN;
+	static final Color OV_BORDER_COLOR = Color.WHITE;
 	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
 	
 	OverviewPortal ovPortal;

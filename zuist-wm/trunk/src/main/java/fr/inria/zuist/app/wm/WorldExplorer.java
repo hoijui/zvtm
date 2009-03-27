@@ -25,6 +25,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
 import javax.swing.ImageIcon;
 
 import java.util.Vector;
@@ -39,8 +40,11 @@ import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.VImage;
 import net.claribole.zvtm.engine.Java2DPainter;
+import net.claribole.zvtm.widgets.TranslucentTextArea;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -53,6 +57,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import org.geotools.factory.GeoTools;
+
+import org.geonames.Toponym;
+import org.geonames.InsufficientStyleException;
 
 /**
  * @author Emmanuel Pietriga
@@ -81,7 +88,7 @@ public class WorldExplorer implements Java2DPainter {
     boolean UPDATE_MAPS = true;
     
     /* Navigation constants */
-    static final int ANIM_MOVE_LENGTH = 300;
+    static final int ANIM_MOVE_DURATION = 300;
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
@@ -102,6 +109,8 @@ public class WorldExplorer implements Java2DPainter {
     NavigationManager nm;
     
     WEGlassPane gp;
+    
+    TranslucentTextArea console;
 
     public WorldExplorer(boolean fullscreen, boolean grid, String dir){
         if (dir != null){
@@ -127,9 +136,10 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(9000.0f);
-        vsm.getGlobalView(mCamera, ANIM_MOVE_LENGTH);
+        vsm.getGlobalView(mCamera, ANIM_MOVE_DURATION);
         eh.cameraMoved();
 		nm.createOverview();
+        console.setVisible(true);
     }
 
     void initGUI(boolean fullscreen){
@@ -159,10 +169,20 @@ public class WorldExplorer implements Java2DPainter {
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
 		mView.getCursor().setDynaSpotColor(Color.WHITE);
+        mView.getCursor().setDynaSpotLagTime(200);
 		mView.getCursor().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         vsm.animator.setAnimationListener(eh);
         updatePanelSize();
+        // console
+        JLayeredPane lp = ((JFrame)mView.getFrame()).getRootPane().getLayeredPane();
+        console = new TranslucentTextArea(2, 80);
+        console.setForeground(Color.WHITE);
+        console.setBackground(Color.BLACK);
+        lp.add(console, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+        console.setBounds(20, panelHeight-100, panelWidth-250, 96);
+        console.setMargin(new java.awt.Insets(5,5,5,5));
+        console.setVisible(false);
         mView.setActiveLayer(1);
     }
 
@@ -191,22 +211,53 @@ public class WorldExplorer implements Java2DPainter {
         }
     }
     
+    ClosedShape selectedFeature = null;
+    
+    void displayFeatureInfo(Toponym feature, Glyph g){
+        if (feature != null){
+            String t = feature.getName()+", "+feature.getCountryName()+
+                       "\nLatitude: "+feature.getLatitude()+
+                       "\nLongitude: "+feature.getLongitude();
+            try {
+                if (feature.getPopulation() != null){
+                    t += "\nPopulation: "+feature.getPopulation();
+                }
+            }
+            catch (InsufficientStyleException e){}
+            unselectOldFeature();
+            selectedFeature = (ClosedShape)g;
+            selectedFeature.setColor(GeoNamesParser.SELECTED_FEATURE_COLOR);
+            console.setText(t);
+        }
+        else {
+            console.setText(null);
+            unselectOldFeature();
+        }
+    }
+    
+    void unselectOldFeature(){
+        if (selectedFeature != null){
+            selectedFeature.setColor(GeoNamesParser.FEATURE_COLOR);
+            selectedFeature = null;
+        }
+    }
+    
     /*-------------     Navigation       -------------*/
 
     void getGlobalView(){
-        vsm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_LENGTH);
+        vsm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION);
     }
 
     /* Higher view */
     void getHigherView(){
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
     }
 
     /* Higher view */
     void getLowerView(){
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
     }
 
     /* Direction should be one of WorldExplorer.MOVE_* */
@@ -230,7 +281,7 @@ public class WorldExplorer implements Java2DPainter {
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
-        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
     }
     
     void altitudeChanged(){

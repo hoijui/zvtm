@@ -37,6 +37,11 @@ import com.xerox.VTM.engine.LongPoint;
 
 import fr.inria.zuist.engine.Region;
 
+import org.geonames.ToponymSearchCriteria;
+import org.geonames.ToponymSearchResult;
+import org.geonames.Toponym;
+import org.geonames.WebService;
+
 class GeoToolsManager {
     
     static final double CC = 21600 * 2 / 180.0;
@@ -45,6 +50,7 @@ class GeoToolsManager {
     static final Color ADMIN_DIV_1_COLOR = Color.GREEN;
 
     WorldExplorer application;
+    GeoNamesParser gnp;
     
     static final String[] transitions = {Region.APPEAR_STR, Region.APPEAR_STR, Region.DISAPPEAR_STR, Region.DISAPPEAR_STR};
 
@@ -62,7 +68,7 @@ class GeoToolsManager {
 //        loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
-
+        gnp = new GeoNamesParser(application);
         loadEntities();
     }
 
@@ -150,11 +156,10 @@ class GeoToolsManager {
     }
     
     void loadEntities(){
-        for (int i=0;i<10;i++){
-            for (int j=0;j<10;j++){
-                application.vsm.addGlyph(new RectangleNR(i*1500, j*1500, 1, 3, 3, Color.RED), application.bSpace);
-            }      
-        }
+        application.gp.setValue(10);
+        application.gp.setLabel("Loading GeoNames features");
+        gnp.loadFeatures();
+        application.gp.setValue(100);
     }
 
 }
