@@ -80,7 +80,7 @@ public class TestCameraAnim {
 	final Glyph circle2 = new VCircle(60,200,0,30,Color.GREEN);
 	vsm.addGlyph(circle2, "src");
 	
-	Animation anim = am.createAnimation(3000, 
+	Animation anim = am.getAnimationFactory().createAnimation(3000, 
 					    Animator.INFINITE,
 					    Animator.RepeatBehavior.REVERSE,
 					    circle,
@@ -98,7 +98,7 @@ public class TestCameraAnim {
 					    },
 					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 	
-	Animation anim2 = am.createAnimation(3000, 
+	Animation anim2 = am.getAnimationFactory().createAnimation(3000, 
 					     Animator.INFINITE,
 					     Animator.RepeatBehavior.REVERSE,
 					     circle2,
@@ -116,7 +116,7 @@ public class TestCameraAnim {
 					     },
 					     new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 
-	Animation cameraPos = am.createAnimation(4000, 
+	Animation cameraPos = am.getAnimationFactory().createAnimation(4000, 
 						 2f,
 						 Animator.RepeatBehavior.LOOP,
 						 vsm.getVirtualSpace("src").getCamera(0),
@@ -137,7 +137,7 @@ public class TestCameraAnim {
 						 },
 						 SlowInSlowOutInterpolator.getInstance());
 	
-	Animation cameraAlt = am.createAnimation(4000, 
+	Animation cameraAlt = am.getAnimationFactory().createAnimation(4000, 
 						 2f,
 						 Animator.RepeatBehavior.REVERSE,
 						 vsm.getVirtualSpace("src").getCamera(0),

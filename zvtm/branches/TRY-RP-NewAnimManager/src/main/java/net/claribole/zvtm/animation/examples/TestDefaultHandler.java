@@ -74,7 +74,7 @@ public class TestDefaultHandler {
 	am.start();
 
 	for(int i=0; i<4; ++i){
-	    Animation anim = am.createAnimation(3000, 
+	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
 						1.0,
 						Animator.RepeatBehavior.LOOP,
 						circle,
@@ -90,7 +90,7 @@ public class TestDefaultHandler {
 	    am.startAnimation(anim, false);
 	}
 
-	 Animation anim = am.createAnimation(8000, 
+	 Animation anim = am.getAnimationFactory().createAnimation(8000, 
 						1.0,
 						Animator.RepeatBehavior.LOOP,
 						circle,
@@ -106,7 +106,7 @@ public class TestDefaultHandler {
 						});
 	 am.startAnimation(anim, false);
 	 
-	 Animation animSize = am.createAnimation(4000, 
+	 Animation animSize = am.getAnimationFactory().createAnimation(4000, 
 						 1.0,
 						 Animator.RepeatBehavior.LOOP,
 						 circle,

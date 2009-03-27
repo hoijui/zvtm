@@ -35,6 +35,35 @@ public class AnimationManager {
 	runningAnims = new LinkedList<Animation>();
 	listsLock = new ReentrantLock();
 	tickThread = new TickThread("tickThread");
+	animationFactory = new AnimationFactory(this);
+    }
+
+    Animation createAnimation(int duration, 
+			      double repeatCount, 
+			      Animator.RepeatBehavior repeatBehavior,
+			      Object subject,
+			      Animation.Dimension dimension,
+			      TimingHandler handler,
+			      Interpolator interpolator){
+	Animation retval = new Animation(this, duration, repeatCount,
+					 repeatBehavior, subject,
+					 dimension, handler);
+	retval.setTimer(new TickSource(tickThread));
+	retval.setInterpolator(interpolator);
+	return retval;
+    }
+
+    Animation createAnimation(int duration, 
+			      double repeatCount, 
+			      Animator.RepeatBehavior repeatBehavior,
+			      Object subject,
+			      Animation.Dimension dimension,
+				     TimingHandler handler){
+	Animation retval =  new Animation(this, duration, repeatCount,
+					  repeatBehavior, subject,
+					  dimension, handler);
+	retval.setTimer(new TickSource(tickThread));
+	return retval;
     }
 
     /**
@@ -62,87 +91,10 @@ public class AnimationManager {
     }
 
     /**
-     * Creates a new Animation object that will be handled 
-     * by this AnimationManager.
-     * @param duration duration of the animation, in milliseconds
-     * @param subject object that will be animated
-     * @param dimension dimension of the animation
-     * @param handler timing handler that will receive callbacks 
-     * for each animation event. The handler is responsible for 
-     * implementing the animation code itself (e.g. move a Camera or
-     * change the color of a Glyph).
+     * Returns the AnimationFactory associated with this AnimationManager
      */
-    public Animation createAnimation(int duration, 
-				     Object subject,
-				     Animation.Dimension dimension,
-				     TimingHandler handler){
-	return createAnimation(duration, 1.0, Animator.RepeatBehavior.LOOP,
-			       subject, dimension, handler);
-    }
-
-    /**
-     * Creates a new Animation object that will be handled 
-     * by this AnimationManager.
-     * @param duration duration of the animation, in milliseconds
-     * @param repeatCount the number of times this Animation will
-     * be repeated. This is not necessarily an integer, i.e. an animation may
-     * be repeated 2.5 times
-     * @param repeatBehavior controls whether an animation loops or reverse
-     * when repeating
-     * @param subject object that will be animated
-     * @param dimension dimension of the animation
-     * @param handler timing handler that will receive callbacks 
-     * for each animation event. The handler is responsible for 
-     * implementing the animation code itself (e.g. move a Camera or
-     * change the color of a Glyph).
-     */
-    public Animation createAnimation(int duration, 
-				     double repeatCount, 
-				     Animator.RepeatBehavior repeatBehavior,
-				     Object subject,
-				     Animation.Dimension dimension,
-				     TimingHandler handler){
-	Animation retval =  new Animation(this, duration, repeatCount,
-					  repeatBehavior, subject,
-					  dimension, handler);
-	retval.setTimer(new TickSource(tickThread));
-	return retval;
-    }
-
-    /**
-     * Creates a new Animation object that will be handled 
-     * by this AnimationManager.
-     * @param duration duration of the animation, in milliseconds
-     * @param repeatCount the number of times this Animation will
-     * be repeated. This is not necessarily an integer, i.e. an animation may
-     * be repeated 2.5 times
-     * @param repeatBehavior controls whether an animation loops or reverse
-     * when repeating
-     * @param subject object that will be animated
-     * @param dimension dimension of the animation
-     * @param handler timing handler that will receive callbacks 
-     * for each animation event. The handler is responsible for 
-     * implementing the animation code itself (e.g. move a Camera or
-     * change the color of a Glyph).
-     * @param interpolator an Interpolator, ie a functor that takes a float between 0 and 1
-     * and returns a float between 0 and 1. By default a linear Interpolator is
-     * used, but spline interpolators may be used to provide different animation
-     * behaviors: slow in/slow out, fast in/slow out et caetera. You may also
-     * provide your own interpolator.
-     */
-    public Animation createAnimation(int duration, 
-				     double repeatCount, 
-				     Animator.RepeatBehavior repeatBehavior,
-				     Object subject,
-				     Animation.Dimension dimension,
-				     TimingHandler handler,
-				     Interpolator interpolator){
-	Animation retval = new Animation(this, duration, repeatCount,
-					 repeatBehavior, subject,
-					 dimension, handler);
-	retval.setTimer(new TickSource(tickThread));
-	retval.setInterpolator(interpolator);
-	return retval;
+    public AnimationFactory getAnimationFactory(){
+	return animationFactory;
     }
 
     /**
@@ -360,6 +312,8 @@ public class AnimationManager {
     private final Lock listsLock;
 
     private final TickThread tickThread;
+
+    private final AnimationFactory animationFactory;
 }
 
 //A custom tick source to replace the one provided by the Timing Framework.

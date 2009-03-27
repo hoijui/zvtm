@@ -58,8 +58,8 @@ public class TestCircle {
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         short vt = View.STD_VIEW;
         switch(ogl){
-            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-            case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
+	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
+	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
         }
         testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
@@ -74,60 +74,63 @@ public class TestCircle {
 	am.start();
 
 	for(int i=0; i<4; ++i){
-	    Animation anim = am.createAnimation(3000, //milliseconds
-						1.0,
-						Animator.RepeatBehavior.LOOP,
-						circle,
-						Animation.Dimension.POSITION,
-						new TimingHandler(){
-						    public void begin(Object subject, Animation.Dimension dim){}
-						    public void end(Object subject, Animation.Dimension dim){}
-						    public void repeat(Object subject, Animation.Dimension dim){}
-    public void timingEvent(float fraction, 
-			    Object subject, Animation.Dimension dim){
-	Glyph g = (Glyph)subject;
-	g.moveTo(100 - Float.valueOf(400*fraction).longValue(), 0);
-    }
-						},
-						new SplineInterpolator(0.7f,0.1f,0.3f,0.9f));
+	    Animation anim = 
+		am.getAnimationFactory().createAnimation(3000, //milliseconds
+							 1.0,
+							 Animator.RepeatBehavior.LOOP,
+							 circle,
+							 Animation.Dimension.POSITION,
+							 new TimingHandler(){
+							     public void begin(Object subject, Animation.Dimension dim){}
+							     public void end(Object subject, Animation.Dimension dim){}
+							     public void repeat(Object subject, Animation.Dimension dim){}
+							     public void timingEvent(float fraction, 
+										     Object subject, Animation.Dimension dim){
+								 Glyph g = (Glyph)subject;
+								 g.moveTo(100 - Float.valueOf(400*fraction).longValue(), 0);
+							     }
+							 },
+							 new SplineInterpolator(0.7f,0.1f,0.3f,0.9f));
 	    am.startAnimation(anim, false);
 	}
 
-	 Animation anim = am.createAnimation(8000, 
-						1.0,
-						Animator.RepeatBehavior.LOOP,
-						circle,
-						Animation.Dimension.FILLCOLOR,
-						new TimingHandler(){
-						    public void begin(Object subject, Animation.Dimension dim){}
-						    public void end(Object subject, Animation.Dimension dim){}
-						    public void repeat(Object subject, Animation.Dimension dim){}
-    public void timingEvent(float fraction, 
-			    Object subject, Animation.Dimension dim){
-	Glyph g = (Glyph)subject;
-	g.setColor(new Color(0,
-			     0,
-			     Float.valueOf(255*fraction).intValue()));
-    }
-						});
-	 am.startAnimation(anim, false);
-
-	 Animation animSize = am.createAnimation(4000, 
-						 1.0,
-						 Animator.RepeatBehavior.LOOP,
-						 circle,
-						 Animation.Dimension.SIZE,
-						 new TimingHandler(){
-						     public void begin(Object subject, Animation.Dimension dim){}
-						     public void end(Object subject, Animation.Dimension dim){}
-						     public void repeat(Object subject, Animation.Dimension dim){}
-						     public void timingEvent(float fraction, 
-									     Object subject, Animation.Dimension dim){
-							 Glyph g = (Glyph)subject;
-							 g.sizeTo(40+60*fraction);
-						     }
-						 });
-	 am.startAnimation(animSize, false);
+	Animation anim = 
+	    am.getAnimationFactory().createAnimation(8000, 
+						     1.0,
+						     Animator.RepeatBehavior.LOOP,
+						     circle,
+						     Animation.Dimension.FILLCOLOR,
+						     new TimingHandler(){
+							 public void begin(Object subject, Animation.Dimension dim){}
+							 public void end(Object subject, Animation.Dimension dim){}
+							 public void repeat(Object subject, Animation.Dimension dim){}
+							 public void timingEvent(float fraction, 
+										 Object subject, Animation.Dimension dim){
+							     Glyph g = (Glyph)subject;
+							     g.setColor(new Color(0,
+										  0,
+										  Float.valueOf(255*fraction).intValue()));
+							 }
+						     });
+	am.startAnimation(anim, false);
+	 
+	Animation animSize = 
+	    am.getAnimationFactory().createAnimation(4000, 
+						     1.0,
+						     Animator.RepeatBehavior.LOOP,
+						     circle,
+						     Animation.Dimension.SIZE,
+						     new TimingHandler(){
+							 public void begin(Object subject, Animation.Dimension dim){}
+							 public void end(Object subject, Animation.Dimension dim){}
+							 public void repeat(Object subject, Animation.Dimension dim){}
+							 public void timingEvent(float fraction, 
+										 Object subject, Animation.Dimension dim){
+							     Glyph g = (Glyph)subject;
+							     g.sizeTo(40+60*fraction);
+							 }
+						     });
+	am.startAnimation(animSize, false);
 	 
     }
     

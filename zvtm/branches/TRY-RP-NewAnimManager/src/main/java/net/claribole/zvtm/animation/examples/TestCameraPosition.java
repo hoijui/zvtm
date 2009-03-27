@@ -88,7 +88,7 @@ public class TestCameraPosition {
 	    circles.add(circle);
 	    vsm.addGlyph(circle, "src");
 
-	    Animation anim = am.createAnimation(3000, 
+	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
 						Animator.INFINITE,
 						Animator.RepeatBehavior.REVERSE,
 						circle,
@@ -159,7 +159,7 @@ public class TestCameraPosition {
 	    final long ex = v.getVCursor().vx;
 	    final long ey = v.getVCursor().vy;
 
-	    Animation trans = am.createAnimation(1000, 1f, Animator.RepeatBehavior.LOOP,
+	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animator.RepeatBehavior.LOOP,
 						 vsm.getVirtualSpace("src").getCamera(0),
 						 Animation.Dimension.POSITION,
 						  new DefaultTimingHandler(){
@@ -177,7 +177,7 @@ public class TestCameraPosition {
 						      }},
 						 SlowInSlowOutInterpolator.getInstance());
 
-	    Animation altitude = am.createAnimation(1000,
+	    Animation altitude = am.getAnimationFactory().createAnimation(1000,
 						    vsm.getVirtualSpace("src").getCamera(0),
 						    Animation.Dimension.ALTITUDE,
 						    new DefaultTimingHandler(){
