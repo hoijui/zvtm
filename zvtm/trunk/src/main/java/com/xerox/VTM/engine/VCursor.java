@@ -136,6 +136,7 @@ public class VCursor {
         hcolor = Color.black;
         stickedGlyphs = new Glyph[0];
         sync=true;
+        computeDynaSpotParams();
     }
 
     /**Set size of cursor (crosshair length).*/
@@ -838,13 +839,38 @@ public class VCursor {
 	int LAG_TIME = 120;
 	int REDUC_TIME = 180;
 	
+	public void setDynaSpotLagTime(int t){
+	    LAG_TIME = t;
+	}
+
+	public int getDynaSpotLagTime(){
+	    return LAG_TIME;
+	}
+
+	public void setDynaSpotReducTime(int t){
+	    REDUC_TIME = t;
+	    computeDynaSpotParams();
+	}
+
+	public int getDynaSpotReducTime(){
+	    return REDUC_TIME;
+	}
+	
 	int MIN_SPEED = 100;
 	int MAX_SPEED = 300;
 	
-	float ds_aa = DYNASPOT_MAX_RADIUS / (float)(MAX_SPEED-MIN_SPEED);
-	float ds_ab = -DYNASPOT_MAX_RADIUS * MIN_SPEED / (float)(MAX_SPEED-MIN_SPEED);
-	float ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
-	float ds_rb = DYNASPOT_MAX_RADIUS;
+	/* dynaspot parameters */
+	float ds_aa;
+	float ds_ab;
+	float ds_ra;
+	float ds_rb;
+	
+	void computeDynaSpotParams(){
+	    ds_aa = DYNASPOT_MAX_RADIUS / (float)(MAX_SPEED-MIN_SPEED);
+    	ds_ab = -DYNASPOT_MAX_RADIUS * MIN_SPEED / (float)(MAX_SPEED-MIN_SPEED);
+    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
+    	ds_rb = DYNASPOT_MAX_RADIUS;
+	}
 	
 	int dynaSpotRadius = 0;
 		
@@ -955,6 +981,10 @@ public class VCursor {
 		}
 	}
 	
+	public int getDynaSpotRadius(){
+	    return dynaSpotRadius;
+	}
+	
 	DynaSpotListener dsl;
 
 	public void setDynaSpotListener(DynaSpotListener dsl){
@@ -990,6 +1020,7 @@ public class VCursor {
 	/** Set maximum size of DynaSpot selection region. */
 	public void setDynaSpotMaxRadius(int r){
 		DYNASPOT_MAX_RADIUS = (r < 0) ? 0 : r;
+		computeDynaSpotParams();
 	}
 
 	/** Get maximum size of DynaSpot selection region. */
