@@ -479,6 +479,9 @@ public class AnimationFactory {
 				       final Interpolator interpolator,
 				       final EndAction endAction){
 
+	//XXX throw an exception if the animation causes the
+	//magnification factor to become < 0
+
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG,
@@ -531,7 +534,11 @@ public class AnimationFactory {
 					     final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
- 
+
+	//XXX throw an exception if the animation causes the inner radius to 
+	//get bigger than the outer radius or if it causes the magnification
+	//factor to become < 0
+
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG_RADIUS,
@@ -568,18 +575,63 @@ public class AnimationFactory {
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       lens.setMaximumMagnification(startMag + 
-								    fraction * (endMag - startMag));
-				       lens.setInnerRadius(startIr + (int)(fraction*(endIr - startIr)));
-				       lens.setOuterRadius(startOr + (int)(fraction*(endOr - startOr)));
+				       lens.setMMandRadii(startMag + fraction * (endMag - startMag),
+							  startOr + (int)(fraction*(endOr - startOr)),
+							  startIr + (int)(fraction*(endIr - startIr)));
 				   }
 			       },
 			       interpolator);
     }
 
-//     public Animation createLensRadiusAnim(){
-// 	//re-compute buffer size
-//     }
+    public Animation createLensRadiusAnim(final int duration, final FixedSizeLens lens,
+					  final int orData, final int irData,
+					  final boolean relative,
+					  final Interpolator interpolator,
+					  final EndAction endAction){
+	//XXX throw an exception if the animation causes the inner radius to 
+	//get bigger than the outer radius
+
+ 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       lens,
+			       Animation.Dimension.LENS_RADIUS,
+			       new DefaultTimingHandler(){
+				   final float mag = lens.getMaximumMagnification();
+				   final int startOr = lens.getOuterRadius();
+				   final int endOr = relative? startOr + orData : orData;
+				   final int startIr = lens.getInnerRadius();
+				   final int endIr = relative? startIr + irData : irData;
+				   final int startBufSize = Math.round(2*mag*startOr);
+				   final int endBufSize = Math.round(2*mag*endOr);
+
+				   @Override
+				   public void begin(Object subject, Animation.Dimension dim){
+				       //allocate a buffer big enough to store the final lens data
+				       if(endBufSize > startBufSize){
+					   lens.setMagRasterDimensions(endBufSize);
+				       }
+				   }
+
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				       
+				       //shrink buffer size
+				       if(endBufSize < startBufSize){
+					   lens.setMagRasterDimensions(endBufSize);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       lens.setRadii(startOr + (int)(fraction*(endOr - startOr)),
+						     startIr + (int)(fraction*(endIr - startIr)));
+				   }
+			       },
+			       interpolator);
+    }
 
     private final AnimationManager animationManager;
 }
