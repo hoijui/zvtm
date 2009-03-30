@@ -19,7 +19,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
 
 import net.claribole.zvtm.engine.Portal;
-import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.lens.FixedSizeLens;
 
 /**
  * A class that provides creation methods for animations.
@@ -473,23 +473,24 @@ public class AnimationFactory {
 			       interpolator);
     }
     
-    public Animation createLensMagAnim(final int duration, final Lens lens,
+    
+    public Animation createLensMagAnim(final int duration, final FixedSizeLens lens,
 				       final float data, final boolean relative,
 				       final Interpolator interpolator,
 				       final EndAction endAction){
-
-	final float startMag = lens.getMaximumMagnification();
-	final float endMag = relative? startMag + data : data;
 
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG,
 			       new DefaultTimingHandler(){
+				   final float startMag = lens.getMaximumMagnification();
+				   final float endMag = relative? startMag + data : data;
+
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
 				       //allocate a buffer big enough to store the final lens data
 				       if(endMag > startMag){
-					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getRadius()));
+					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getOuterRadius()));
 				       }
 				   }
 
@@ -499,9 +500,9 @@ public class AnimationFactory {
 					   endAction.execute(subject, dim);
 				       }
 
-				       //shrink buffer size since magnification factor has shrunk
+				       //shrink buffer size
 				       if(endMag < startMag){
-					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getRadius()));
+					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getOuterRadius()));
 				       }
 				   }
 
@@ -515,9 +516,66 @@ public class AnimationFactory {
 			       interpolator);
     }
 
-//     public Animation createLensMagRadiusAnim(){
-// 	//re-compute buffer size
-//     }
+    /**
+     *
+     * @param magData target magnification factor (absolute value or offset, depending on 'relative')
+     * @param orData target outer radius (absolute value or offset, depending on 'relative')
+     * @param irData target inner radius (absolute value or offset, depending on 'relative')
+     * Warning: outer radius and magnification should change in the same direction
+     * (both should either increase or decrease), otherwise the behavior of the 
+     * resulting Animation is undefined
+     */
+    public Animation createLensMagRadiusAnim(final int duration, final FixedSizeLens lens,
+					     final float magData, final int orData,
+					     final int irData,
+					     final boolean relative,
+					     final Interpolator interpolator,
+					     final EndAction endAction){
+ 
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       lens,
+			       Animation.Dimension.LENS_MAG_RADIUS,
+			       new DefaultTimingHandler(){
+				   final float startMag = lens.getMaximumMagnification();
+				   final float endMag = relative? startMag + magData : magData;
+				   final int startOr = lens.getOuterRadius();
+				   final int endOr = relative? startOr + orData : orData;
+				   final int startIr = lens.getInnerRadius();
+				   final int endIr = relative? startIr + irData : irData;
+				   final int startBufSize = Math.round(2*startMag*startOr);
+				   final int endBufSize = Math.round(2*endMag*endOr);
+
+				   @Override
+				   public void begin(Object subject, Animation.Dimension dim){
+				       //allocate a buffer big enough to store the final lens data
+				       if(endBufSize > startBufSize){
+					   lens.setMagRasterDimensions(endBufSize);
+				       }
+				   }
+
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				       
+				       //shrink buffer size
+				       if(endBufSize < startBufSize){
+					   lens.setMagRasterDimensions(endBufSize);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       lens.setMaximumMagnification(startMag + 
+								    fraction * (endMag - startMag));
+				       lens.setInnerRadius(startIr + (int)(fraction*(endIr - startIr)));
+				       lens.setOuterRadius(startOr + (int)(fraction*(endOr - startOr)));
+				   }
+			       },
+			       interpolator);
+    }
 
 //     public Animation createLensRadiusAnim(){
 // 	//re-compute buffer size
