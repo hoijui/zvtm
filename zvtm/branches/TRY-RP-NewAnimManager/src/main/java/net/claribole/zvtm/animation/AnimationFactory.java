@@ -19,6 +19,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
 
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.lens.Lens;
 
 /**
  * A class that provides creation methods for animations.
@@ -472,6 +473,55 @@ public class AnimationFactory {
 			       interpolator);
     }
     
+    public Animation createLensMagAnim(final int duration, final Lens lens,
+				       final float data, final boolean relative,
+				       final Interpolator interpolator,
+				       final EndAction endAction){
+
+	final float startMag = lens.getMaximumMagnification();
+	final float endMag = relative? startMag + data : data;
+
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       lens,
+			       Animation.Dimension.LENS_MAG,
+			       new DefaultTimingHandler(){
+				   @Override
+				   public void begin(Object subject, Animation.Dimension dim){
+				       //allocate a buffer big enough to store the final lens data
+				       if(endMag > startMag){
+					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getRadius()));
+				       }
+				   }
+
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+
+				       //shrink buffer size since magnification factor has shrunk
+				       if(endMag < startMag){
+					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getRadius()));
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       lens.setMaximumMagnification(startMag + 
+								    fraction * (endMag - startMag));
+				   }
+			       },
+			       interpolator);
+    }
+
+//     public Animation createLensMagRadiusAnim(){
+// 	//re-compute buffer size
+//     }
+
+//     public Animation createLensRadiusAnim(){
+// 	//re-compute buffer size
+//     }
 
     private final AnimationManager animationManager;
 }
