@@ -120,7 +120,7 @@ public class AnimationFactory {
      * Creates and returns a linear camera translation that will
      * not repeat.
      * @param duration duration of the animation, in milliseconds.
-     * @param subject camera to animate
+     * @param camera camera to animate
      * @param data animation data, interpreted according to the
      * 'relative' boolean argument. If 'relative' is false, then
      * 'data' will be interpreted as absolute target coordinates, 
@@ -205,7 +205,7 @@ public class AnimationFactory {
      * Creates and returns a linear glyph translation
      * that will not repeat.
      * @param duration duration of the animation, in milliseconds.
-     * @param subject glyph to animate
+     * @param glyph glyph to animate
      * @param data animation data, interpreted according to the
      * 'relative' boolean argument. If 'relative' is false, then
      * 'data' will be interpreted as absolute target coordinates, 
@@ -306,7 +306,6 @@ public class AnimationFactory {
 	
     }
 
-    //XXX might want to combine dimensions (FillColor | BorderColor) ??
     public Animation createGlyphFillColorAnim(final int duration, final Glyph glyph,
 					      final float[] data, final boolean relative,
 					      final Interpolator interpolator,
@@ -434,14 +433,45 @@ public class AnimationFactory {
 					portal.moveTo(startX + (int)(fraction*(endX - startX)),
 						      startY + (int)(fraction*(endY - startY)));
 				    }
-
+				   
 			       },
 			       interpolator);
     }
+    
+    public Animation createPortalSizeAnim(final int duration, final Portal portal,
+					  final int wdata, final int hdata, 
+					  final boolean relative,
+					  final Interpolator interpolator,
+					  final EndAction endAction){
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       portal,
+			       Animation.Dimension.SIZE,
+			       new DefaultTimingHandler(){
+				   private final int startW = portal.w;
+				   private final int startH = portal.h;
+				   private final int endW = 
+				       relative? startW + wdata : wdata;
+				   private final int endH = 
+				       relative? startH + hdata : hdata;
 
-   //   public Animation createPortalSizeAnim(){
-//      }
-
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
+				   
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       portal.sizeTo(startW + (int)(fraction*(endW - startW)),
+						     startH + (int)(fraction*(endH - startH)));
+				   }
+				   
+			       },
+			       interpolator);
+    }
+    
 
     private final AnimationManager animationManager;
 }
