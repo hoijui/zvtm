@@ -18,6 +18,7 @@ import java.awt.Rectangle;
 import java.awt.Point;
 import java.awt.GradientPaint;
 import java.awt.Font;
+import java.awt.BasicStroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
@@ -41,6 +42,7 @@ import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.engine.AnimationListener;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.engine.SelectionListener;
 
 import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
@@ -66,7 +68,7 @@ import net.claribole.zvtm.engine.TransitionManager;
 
 /* Multiscale feature manager */
 
-public class GraphicsManager implements ComponentListener, AnimationListener, Java2DPainter {
+public class GraphicsManager implements ComponentListener, AnimationListener, Java2DPainter, SelectionListener {
 
     static final Color FADE_COLOR = Color.WHITE;
 
@@ -258,7 +260,8 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
     activateDynaSpot(ConfigManager.DYNASPOT);
-    mainView.getCursor().setDynaSpotColor(Color.RED);        
+    mainView.getCursor().setDynaSpotColor(Color.RED);
+    mainView.getCursor().setSelectionListener(this);
 
 	mainViewPanel = mainView.getPanel();
 	setAntialiasing(ConfigManager.ANTIALIASING);
@@ -900,11 +903,16 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     /* ------------- Highlighting ----------------- */
 
+    static final BasicStroke HIGHLIGHT_STROKE = new BasicStroke(2.0f);
+
     Vector highlightedEdges = new Vector();
     Vector originalEdgeColor = new Vector();
+    Vector originalEdgeStroke = new Vector();
+    
     Vector highlightedNodes = new Vector();
     Vector originalNodeBorderColor = new Vector();
     Vector originalNodeFillColor = new Vector();
+    Vector originalNodeStroke = new Vector();
 
     void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
 	Object o = null;
@@ -1024,77 +1032,87 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
     }
 
     void highlightNodeGlyph(Glyph g){
-	if (g instanceof ClosedShape){
-	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
-	    originalNodeBorderColor.add(((ClosedShape)g).getDefaultBorderColor());
-	    if (g.isBorderDrawn()){
-		g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
-	    }
-	}
-	else {
-	    originalNodeFillColor.add(null); // keep both originalXXXColor vectors at the same length/indexes for a given glyph
-	    originalNodeBorderColor.add(g.getDefaultColor());
-	    g.setColor(ConfigManager.HIGHLIGHT_COLOR);
-	}
+        originalNodeStroke.add(g.getStroke());
+        if (g instanceof ClosedShape){
+            // keep both originalXXXColor vectors at the same length/indexes for a given glyph
+            originalNodeFillColor.add(null);
+            originalNodeBorderColor.add(((ClosedShape)g).getDefaultBorderColor());
+            if (g.isBorderDrawn()){
+                g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
+            }
+        }
+        else {
+            // keep both originalXXXColor vectors at the same length/indexes for a given glyph
+            originalNodeFillColor.add(null);
+            originalNodeBorderColor.add(g.getDefaultColor());
+            g.setColor(ConfigManager.HIGHLIGHT_COLOR);
+        }
+        g.setStroke(HIGHLIGHT_STROKE);
     }
-
+    
     void highlightEdgeGlyph(Glyph g){
-	originalEdgeColor.add(g.getDefaultColor());
-	if (g instanceof ClosedShape){
-	    if (g.isFilled()){
-		g.setColor(ConfigManager.HIGHLIGHT_COLOR); // use border color to fill arrow head shape
-	    }
-	    if (g.isBorderDrawn()){
-		g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
-	    }
-	}
-	else {
-	    g.setColor(ConfigManager.HIGHLIGHT_COLOR);	    
-	}
+        originalEdgeColor.add(g.getDefaultColor());
+        originalEdgeStroke.add(g.getStroke());
+        if (g instanceof ClosedShape){
+            if (g.isFilled()){
+                // use border color to fill arrow head shape
+                g.setColor(ConfigManager.HIGHLIGHT_COLOR);
+            }
+            if (g.isBorderDrawn()){
+                g.setBorderColor(ConfigManager.HIGHLIGHT_COLOR);
+            }
+        }
+        else {
+            g.setColor(ConfigManager.HIGHLIGHT_COLOR);	    
+        }
+        g.setStroke(HIGHLIGHT_STROKE);
     }
 
     void unhighlightAll(){
-	unhighlightAllEdges();
-	unhighlightAllNodes();
+        unhighlightAllEdges();
+        unhighlightAllNodes();
     }
 
     void unhighlightAllNodes(){
-	Glyph g;
-	for (int i=0;i<highlightedNodes.size();i++){
-	    g = (Glyph)highlightedNodes.elementAt(i);
-	    if (g instanceof ClosedShape){
-		if (g.isBorderDrawn()){
-		    g.setBorderColor((Color)originalNodeBorderColor.elementAt(i));
-		}
-	    }
-	    else {
-		g.setColor((Color)originalNodeBorderColor.elementAt(i));
-	    }
-
-	}
-	highlightedNodes.removeAllElements();
-	originalNodeBorderColor.removeAllElements();
-	originalNodeFillColor.removeAllElements();
+        Glyph g;
+        for (int i=0;i<highlightedNodes.size();i++){
+            g = (Glyph)highlightedNodes.elementAt(i);
+            if (g instanceof ClosedShape){
+                if (g.isBorderDrawn()){
+                    g.setBorderColor((Color)originalNodeBorderColor.elementAt(i));
+                }
+            }
+            else {
+                g.setColor((Color)originalNodeBorderColor.elementAt(i));
+            }
+            g.setStroke((BasicStroke)originalNodeStroke.elementAt(i));
+        }
+        highlightedNodes.removeAllElements();
+        originalNodeBorderColor.removeAllElements();
+        originalNodeFillColor.removeAllElements();
+        originalNodeStroke.removeAllElements();
     }
 
     void unhighlightAllEdges(){
-	Glyph g;
-	for (int i=0;i<highlightedEdges.size();i++){
-	    g = (Glyph)highlightedEdges.elementAt(i);
-	    if (g instanceof ClosedShape){
-		if (g.isFilled()){
-		    g.setColor((Color)originalEdgeColor.elementAt(i));
-		}
-		if (g.isBorderDrawn()){
-		    g.setBorderColor((Color)originalEdgeColor.elementAt(i));
-		}
-	    }
-	    else {
-		g.setColor((Color)originalEdgeColor.elementAt(i));
-	    }
-	}
-	highlightedEdges.removeAllElements();
-	originalEdgeColor.removeAllElements();
+        Glyph g;
+        for (int i=0;i<highlightedEdges.size();i++){
+            g = (Glyph)highlightedEdges.elementAt(i);
+            if (g instanceof ClosedShape){
+                if (g.isFilled()){
+                    g.setColor((Color)originalEdgeColor.elementAt(i));
+                }
+                if (g.isBorderDrawn()){
+                    g.setBorderColor((Color)originalEdgeColor.elementAt(i));
+                }
+            }
+            else {
+                g.setColor((Color)originalEdgeColor.elementAt(i));
+            }
+            g.setStroke((BasicStroke)originalEdgeStroke.elementAt(i));
+        }
+        highlightedEdges.removeAllElements();
+        originalEdgeColor.removeAllElements();
+        originalEdgeStroke.removeAllElements();
     }
 
 	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
@@ -1298,6 +1316,13 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	void sendBack(BroughtElement be){
 		be.restorePreviousState(vsm.animator, BRING_ANIM_DURATION);
 		broughtElements.remove(be);
+	}
+	
+	public void glyphSelected(Glyph g, boolean b){
+	    Object o = g.getOwner();
+	    if (o instanceof LEdge){
+	        highlightEdge((LEdge)o, b);
+	    }
 	}
 
 }
