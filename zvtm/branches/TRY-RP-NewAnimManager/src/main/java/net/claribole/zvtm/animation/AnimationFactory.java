@@ -19,6 +19,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
 
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.lens.FixedSizeLens;
 
 /**
@@ -628,6 +629,50 @@ public class AnimationFactory {
 							   Object subject, Animation.Dimension dim){
 				       lens.setRadii(startOr + (int)(fraction*(endOr - startOr)),
 						     startIr + (int)(fraction*(endIr - startIr)));
+				   }
+			       },
+			       interpolator);
+    }
+
+    public Animation createPathAnim(final int duration, final DPath path,
+				    final LongPoint[] data, final boolean relative,
+				    final Interpolator interpolator,
+				    final EndAction endAction){
+
+	if(data.length != path.getElementsCount()){
+	    throw new IllegalArgumentException("'data' element count must be equal to the path element count");
+	}
+
+	final LongPoint[] startPoints = new LongPoint[path.getElementsCount()];
+	final LongPoint[] endPoints = new LongPoint[path.getElementsCount()];
+	LongPoint[] coords = path.getAllPointsCoordinates();
+	System.arraycopy(coords, 0, startPoints, 0, coords.length);
+	for(int i=0; i<startPoints.length; ++i){
+	    endPoints[i].x = relative ? startPoints[i].x + data[i].x : data[i].x;
+	    endPoints[i].y = relative ? startPoints[i].y + data[i].y : data[i].y;
+	}
+
+	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+			       path,
+			       Animation.Dimension.PATH,
+			       new DefaultTimingHandler(){
+				   private final LongPoint[] tempPoints = new LongPoint[path.getElementsCount()];
+				   @Override
+				   public void end(Object subject, Animation.Dimension dim){
+				       if(null != endAction){
+					   endAction.execute(subject, dim);
+				       }
+				   }
+
+				   @Override
+				   public void timingEvent(float fraction, 
+							   Object subject, Animation.Dimension dim){
+				       
+				       for(int i=0; i<tempPoints.length; ++i){
+					   tempPoints[i].x = startPoints[i].x + (long)(fraction*(endPoints[i].x - startPoints[i].x));
+					   tempPoints[i].y = startPoints[i].y + (long)(fraction*(endPoints[i].y - startPoints[i].y));
+					   path.edit(tempPoints, true); //absolute coordinates
+				       }
 				   }
 			       },
 			       interpolator);
