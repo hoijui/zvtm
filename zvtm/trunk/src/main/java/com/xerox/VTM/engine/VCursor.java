@@ -49,8 +49,8 @@ import java.util.TimerTask;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
-import net.claribole.zvtm.engine.LowPassFilter;
 import net.claribole.zvtm.engine.DynaSpotListener;
+import net.claribole.zvtm.engine.SelectionListener;
 import net.claribole.zvtm.glyphs.Translucency;
 import java.awt.Point;
 
@@ -137,6 +137,7 @@ public class VCursor {
         stickedGlyphs = new Glyph[0];
         sync=true;
         computeDynaSpotParams();
+        setSelectionListener(new DefaultSelectionAction());
     }
 
     /**Set size of cursor (crosshair length).*/
@@ -1044,6 +1045,22 @@ public class VCursor {
     
     Glyph lastDynaPicked = null;
     
+    SelectionListener sl;
+    
+    /** Set a Selection Listener callback triggered when a glyph gets selected/unselected by DynaSpot.
+        *@param sl set to null to remove
+        */
+    public void setSelectionListener(SelectionListener sl){
+        this.sl = sl;
+    }
+    
+    /** Get the Selection Listener callback triggered when a glyph gets selected/unselected by DynaSpot.
+        *@return null if none set.
+        */
+    public SelectionListener getSelectionListener(){
+        return this.sl;
+    }
+    
 	/** Compute the list of glyphs picked by the dynaspot cursor.
 	 * The best picked glyph is returned.
 	 *@return null if the dynaspot cursor does not pick anything.
@@ -1109,11 +1126,11 @@ public class VCursor {
 			}
 		}
 		if (highlightCurrentDynaSpotSelection){
-		    if (selectedGlyph != null){
-    		    selectedGlyph.highlight(true, null);		        
+		    if (selectedGlyph != null && sl != null){
+                sl.glyphSelected(selectedGlyph, true);
 		    }
-		    if (lastDynaPicked != null && selectedGlyph != lastDynaPicked){
-		        lastDynaPicked.highlight(false, null);
+		    if (lastDynaPicked != null && selectedGlyph != lastDynaPicked && sl != null){
+                sl.glyphSelected(lastDynaPicked, false);
 		    }
 		}
 		lastDynaPicked = selectedGlyph;
@@ -1144,4 +1161,12 @@ class DynaSpotTimer extends TimerTask{
 		c.updateDynaSpot(System.currentTimeMillis());
 	}
 	
+}
+
+class DefaultSelectionAction implements SelectionListener {
+    
+    public void glyphSelected(Glyph g, boolean b){
+        g.highlight(b, null);        
+    }
+    
 }
