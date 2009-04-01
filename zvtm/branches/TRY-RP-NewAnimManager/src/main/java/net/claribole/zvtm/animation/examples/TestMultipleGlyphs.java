@@ -55,7 +55,7 @@ public class TestMultipleGlyphs {
     }
 
     public void initTest(short ogl){
-        eh=new MyEventHandler(this);
+        eh=new TestMultipleGlyphs.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
         vsm.setZoomLimit(-90);
         vsm.addCamera("src");
@@ -63,8 +63,8 @@ public class TestMultipleGlyphs {
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         short vt = View.STD_VIEW;
         switch(ogl){
-            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-            case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
+	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
+	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
         }
         testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
@@ -72,8 +72,7 @@ public class TestMultipleGlyphs {
         testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 
-	AnimationManager am = new AnimationManager();
-	am.start();
+	AnimationManager am = vsm.getAnimationManager();
 
 	final int NB_GLYPHS = 100;
 	java.util.List<Glyph> circles = new java.util.ArrayList<Glyph>();
@@ -88,23 +87,23 @@ public class TestMultipleGlyphs {
 	    vsm.addGlyph(circle, "src");
 
 	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
-						Animator.INFINITE,
-						Animator.RepeatBehavior.REVERSE,
-						circle,
-						Animation.Dimension.POSITION,
-						new DefaultTimingHandler(){
-						    final long initX = circle.vx;
-						    final long initY = circle.vy;
+								      Animator.INFINITE,
+								      Animator.RepeatBehavior.REVERSE,
+								      circle,
+								      Animation.Dimension.POSITION,
+								      new DefaultTimingHandler(){
+									  final long initX = circle.vx;
+									  final long initY = circle.vy;
 
-						    public void timingEvent(float fraction, 
-									    Object subject, Animation.Dimension dim){
-							Glyph g = (Glyph)subject;
+									  public void timingEvent(float fraction, 
+												  Object subject, Animation.Dimension dim){
+									      Glyph g = (Glyph)subject;
 							
-							g.moveTo(initX,
-								 Float.valueOf((1-fraction)*initY).longValue());
-						    }
-						},
-						new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
+									      g.moveTo(initX,
+										       Float.valueOf((1-fraction)*initY).longValue());
+									  }
+								      },
+								      new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 	    anim.setStartFraction(rnd.nextFloat());
 	    am.startAnimation(anim, false);
 	}
@@ -127,118 +126,117 @@ public class TestMultipleGlyphs {
         System.out.println("-----------------");
         new TestMultipleGlyphs((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
+
+    class MyEventHandler implements ViewEventHandler{
+	TestMultipleGlyphs application;
+
+	long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+
+	MyEventHandler(TestMultipleGlyphs appli){
+	    application=appli;
+	}
+
+	long x1,x2,y1,y2;
+
+	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+
+	}
+
+	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	}
+
+	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	}
+
+	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    //application.vsm.setSync(false);
+	    lastJPX=jpx;
+	    lastJPY=jpy;
+
+	    v.setDrawDrag(true);
+	    application.vsm.activeView.mouse.setSensitivity(false);
+	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	}
+
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    application.vsm.getAnimationManager().setXspeed(0);
+	    application.vsm.getAnimationManager().setYspeed(0);
+	    application.vsm.getAnimationManager().setZspeed(0);
+	    v.setDrawDrag(false);
+	    application.vsm.activeView.mouse.setSensitivity(true);
+	}
+
+	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+	    if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+		Camera c=application.vsm.getActiveCamera();
+		float a=(c.focal+Math.abs(c.altitude))/c.focal;
+		if (mod == META_SHIFT_MOD) {
+		    application.vsm.getAnimationManager().setXspeed(0);
+		    application.vsm.getAnimationManager().setYspeed(0);
+		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    //50 is just a speed factor (too fast otherwise)
+		}
+		else {
+		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    application.vsm.getAnimationManager().setZspeed(0);
+		}
+	    }
+	}
+
+	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+	    Camera c=application.vsm.getActiveCamera();
+	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	    if (wheelDirection == WHEEL_UP){
+		c.altitudeOffset(-a*5);
+		application.vsm.repaintNow();
+	    }
+	    else {
+		c.altitudeOffset(a*5);
+		application.vsm.repaintNow();
+	    }
+	}
+
+	public void enterGlyph(Glyph g){
+	    g.highlight(true, null);
+	}
+
+	public void exitGlyph(Glyph g){
+	    g.highlight(false, null);
+	}
+
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
-}
-
-class MyEventHandler implements ViewEventHandler{
-   TestMultipleGlyphs application;
-
-    long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-
-    MyEventHandler(TestMultipleGlyphs appli){
-        application=appli;
-    }
-
-    long x1,x2,y1,y2;
-
-    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-
-    }
-
-    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-
-    }
-
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-
-    }
-
-    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-
-    }
-
-    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-    }
-
-    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-    }
-
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        //application.vsm.setSync(false);
-        lastJPX=jpx;
-        lastJPY=jpy;
-
-        v.setDrawDrag(true);
-        application.vsm.activeView.mouse.setSensitivity(false);
-        //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-    }
-
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        application.vsm.animator.Xspeed=0;
-        application.vsm.animator.Yspeed=0;
-        application.vsm.animator.Aspeed=0;
-        v.setDrawDrag(false);
-        application.vsm.activeView.mouse.setSensitivity(true);
-    }
-
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-
-    }
-
-    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-            Camera c=application.vsm.getActiveCamera();
-            float a=(c.focal+Math.abs(c.altitude))/c.focal;
-            if (mod == META_SHIFT_MOD) {
-                application.vsm.animator.Xspeed=0;
-                application.vsm.animator.Yspeed=0;
-                application.vsm.animator.Aspeed=(c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
-                //50 is just a speed factor (too fast otherwise)
-            }
-            else {
-                application.vsm.animator.Xspeed=(c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50));
-                application.vsm.animator.Yspeed=(c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
-                application.vsm.animator.Aspeed=0;
-            }
-        }
-    }
-
-    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        Camera c=application.vsm.getActiveCamera();
-        float a=(c.focal+Math.abs(c.altitude))/c.focal;
-        if (wheelDirection == WHEEL_UP){
-            c.altitudeOffset(-a*5);
-            application.vsm.repaintNow();
-        }
-        else {
-            c.altitudeOffset(a*5);
-            application.vsm.repaintNow();
-        }
-    }
-
-    public void enterGlyph(Glyph g){
-        g.highlight(true, null);
-    }
-
-    public void exitGlyph(Glyph g){
-        g.highlight(false, null);
-    }
-
-    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
-    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-    public void viewActivated(View v){}
+	public void viewActivated(View v){}
 
-    public void viewDeactivated(View v){}
+	public void viewDeactivated(View v){}
 
-    public void viewIconified(View v){}
+	public void viewIconified(View v){}
 
-    public void viewDeiconified(View v){}
+	public void viewDeiconified(View v){}
 
-    public void viewClosing(View v){System.exit(0);}
+	public void viewClosing(View v){System.exit(0);}
+    }   
 }

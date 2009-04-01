@@ -53,7 +53,7 @@ public class TestCameraPosition {
 
     TestCameraPosition(){
         vsm=new VirtualSpaceManager();
-	am = new AnimationManager();
+	am = vsm.getAnimationManager();
         vsm.setDebug(true);
     }
 
@@ -73,8 +73,6 @@ public class TestCameraPosition {
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
-
-	am.start();
 
 	final int NB_GLYPHS = 100;
 	java.util.List<Glyph> circles = new java.util.ArrayList<Glyph>();
@@ -224,9 +222,9 @@ public class TestCameraPosition {
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    application.vsm.animator.Xspeed=0;
-	    application.vsm.animator.Yspeed=0;
-	    application.vsm.animator.Aspeed=0;
+	    application.vsm.getAnimationManager().setXspeed(0);
+	    application.vsm.getAnimationManager().setYspeed(0);
+	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
 	    application.vsm.activeView.mouse.setSensitivity(true);
 	}

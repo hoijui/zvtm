@@ -23,6 +23,9 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+
 /**A portal showing what is seen through a camera. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
 

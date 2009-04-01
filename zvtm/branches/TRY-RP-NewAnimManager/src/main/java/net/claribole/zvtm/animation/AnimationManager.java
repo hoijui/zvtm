@@ -234,6 +234,27 @@ public class AnimationManager {
 	tickThread.setResolution(resolution);
     }
 
+    /**
+     * Sets the active camera X speed
+     */
+    public void setXspeed(double dx){
+	currentCamAnim.setXspeed(dx);
+    }
+
+    /**
+     * Sets the active camera Y speed
+     */
+    public void setYspeed(double dy){
+	currentCamAnim.setYspeed(dy);
+    }
+
+    /**
+     * Sets the active camera Z speed
+     */
+    public void setZspeed(float dz){
+	currentCamAnim.setZspeed(dz);
+    }
+
     void onAnimationEnded(Animation anim){
 	listsLock.lock();
 	try{

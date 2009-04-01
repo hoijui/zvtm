@@ -113,121 +113,121 @@ public class Explanation {
     }
 
     void zip1(){
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), cseg.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 50), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(-Math.PI/4.0f), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(Math.sqrt(2)), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 50), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(Math.PI/4.0f), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(Math.sqrt(2)), rcur.getID());
-	curve();
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), cseg.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 50), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(-Math.PI/4.0f), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(Math.sqrt(2)), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 50), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(Math.PI/4.0f), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(Math.sqrt(2)), rcur.getID());
+// 	curve();
     }
 
     void zip2(){
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), lseg.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), rseg.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 50), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(Math.PI/4.0f), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(1/Math.sqrt(2)), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 50), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(-Math.PI/4.0f), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(1/Math.sqrt(2)), rcur.getID());
-	uncurve();
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), caseg1.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), caseg2.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), caseg3.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, 100), caseg4.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), lseg.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), rseg.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 50), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(Math.PI/4.0f), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(1/Math.sqrt(2)), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 50), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(-Math.PI/4.0f), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(1/Math.sqrt(2)), rcur.getID());
+// 	uncurve();
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), caseg1.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), caseg2.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), caseg3.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, 100), caseg4.getID());
     }
 
     void zop1(){
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), lseg.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), rseg.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -50), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(-Math.PI/4.0f), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(Math.sqrt(2)), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -50), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(Math.PI/4.0f), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(Math.sqrt(2)), rcur.getID());
-	curve();
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), caseg1.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), caseg2.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), caseg3.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), caseg4.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), lseg.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), rseg.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -50), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(-Math.PI/4.0f), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(Math.sqrt(2)), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -50), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(Math.PI/4.0f), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(Math.sqrt(2)), rcur.getID());
+// 	curve();
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), caseg1.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), caseg2.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), caseg3.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), caseg4.getID());
     }
 
     void zop2(){
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -100), cseg.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -50), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(Math.PI/4.0f), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(1/Math.sqrt(2)), lcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
-					  new LongPoint(0, -50), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
-					  new Float(-Math.PI/4.0f), rcur.getID());
-	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
-					  new Float(1/Math.sqrt(2)), rcur.getID());
-	uncurve();
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -100), cseg.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -50), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(Math.PI/4.0f), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(1/Math.sqrt(2)), lcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_TRANS_LIN,
+// 					  new LongPoint(0, -50), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_ROT_LIN,
+// 					  new Float(-Math.PI/4.0f), rcur.getID());
+// 	vsm.animator.createGlyphAnimation(ANIM_LENGTH, 0, AnimManager.GL_SZ_LIN,
+// 					  new Float(1/Math.sqrt(2)), rcur.getID());
+//	uncurve();
     }
 
     void curve(){
-	Vector vl = new Vector();
-	vl.add(new PolarCoords(50, 0));
-	vl.add(new PolarCoords(50, 0));
-	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
-						  vl, lcur.getID(), null);
-	Vector vr = new Vector();
-	vr.add(new PolarCoords(50, 0));
-	vr.add(new PolarCoords(50, 0));
-	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
-						  vr, rcur.getID(), null);
+// 	Vector vl = new Vector();
+// 	vl.add(new PolarCoords(50, 0));
+// 	vl.add(new PolarCoords(50, 0));
+// 	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
+// 						  vl, lcur.getID(), null);
+// 	Vector vr = new Vector();
+// 	vr.add(new PolarCoords(50, 0));
+// 	vr.add(new PolarCoords(50, 0));
+// 	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
+// 						  vr, rcur.getID(), null);
     }
 
     void uncurve(){
-	Vector vl = new Vector();
-	vl.add(new PolarCoords(-50, 0));
-	vl.add(new PolarCoords(-50, 0));
-	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
-						  vl, lcur.getID(), null);
-	Vector vr = new Vector();
-	vr.add(new PolarCoords(-50, 0));
-	vr.add(new PolarCoords(-50, 0));
-	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
-						  vr, rcur.getID(), null);
+// 	Vector vl = new Vector();
+// 	vl.add(new PolarCoords(-50, 0));
+// 	vl.add(new PolarCoords(-50, 0));
+// 	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
+// 						  vl, lcur.getID(), null);
+// 	Vector vr = new Vector();
+// 	vr.add(new PolarCoords(-50, 0));
+// 	vr.add(new PolarCoords(-50, 0));
+// 	vsm.animator.createCbCurveCtrlPtAnimation(ANIM_LENGTH, AnimManager.GL_CP_TRANS_LIN,
+// 						  vr, rcur.getID(), null);
     }
 
     public static void main(String[] args){

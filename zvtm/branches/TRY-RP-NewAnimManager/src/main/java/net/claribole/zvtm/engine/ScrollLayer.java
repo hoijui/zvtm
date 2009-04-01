@@ -20,6 +20,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.View;
 
 import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.AnimationFactory;
 import net.claribole.zvtm.animation.AnimationManager;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 
@@ -376,18 +377,18 @@ public class ScrollLayer implements ComponentListener {
      * Make sure glyphs used to represent scrollbar widgets implement the Translucent interface.
      */
     public void fade(AnimationManager am, int duration, float alphaOffset) throws ClassCastException {
-	AnimationFactory fac = am.getAnimationManager().getAnimationFactory();
+	AnimationFactory fac = am.getAnimationFactory();
 	
 	final Glyph[] wids = {vgutter, vslider, upBt, downBt, hgutter, hslider,
 			      rightBt, leftBt};
 	
 	for(Glyph g: wids){
-	    fac.createTranslucencyAnim(duration, (Translucent)g, //may throw CCE
-				       alphaOffset, true,
-				       IdentityInterpolator.getInstance(),
-				       null);
+	    Animation anim = fac.createTranslucencyAnim(duration, (Translucent)g, //may throw CCE
+							alphaOffset, true,
+							IdentityInterpolator.getInstance(),
+							null);
 	    
-	    am.getAnimationManager().startAnimation(anim, false);
+	    am.startAnimation(anim, false);
 	}
     }
     

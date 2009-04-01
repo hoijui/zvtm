@@ -25,6 +25,10 @@ import javax.swing.*;
 
 import java.util.Vector;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
@@ -50,7 +54,7 @@ public class TestDefaultHandler {
     }
 
     public void initTest(short ogl){
-        eh=new EventHandlerTestDTH(this);
+        eh=new TestDefaultHandler.EventHandlerTestDTH(this);
         vs = vsm.addVirtualSpace("src");
         vsm.setZoomLimit(-90);
         vsm.addCamera("src");
@@ -58,8 +62,8 @@ public class TestDefaultHandler {
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         short vt = View.STD_VIEW;
         switch(ogl){
-            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-            case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
+	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
+	case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
         }
         testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
@@ -70,55 +74,54 @@ public class TestDefaultHandler {
 	vsm.addGlyph(circle, "src");
         vsm.repaintNow();
 
-	AnimationManager am = new AnimationManager();
-	am.start();
+	AnimationManager am = vsm.getAnimationManager();
 
 	for(int i=0; i<4; ++i){
 	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
-						1.0,
-						Animator.RepeatBehavior.LOOP,
-						circle,
-						Animation.Dimension.POSITION,
-						new DefaultTimingHandler(){
-						    public void timingEvent(float fraction, 
-									    Object subject, Animation.Dimension dim){
-							Glyph g = (Glyph)subject;
-							g.moveTo(100 - Float.valueOf(600*fraction).longValue(), 0);
-						    }
-						},
-						new SplineInterpolator(0.7f,0.1f,0.3f,0.9f));
+								      1.0,
+								      Animator.RepeatBehavior.LOOP,
+								      circle,
+								      Animation.Dimension.POSITION,
+								      new DefaultTimingHandler(){
+									  public void timingEvent(float fraction, 
+												  Object subject, Animation.Dimension dim){
+									      Glyph g = (Glyph)subject;
+									      g.moveTo(100 - Float.valueOf(600*fraction).longValue(), 0);
+									  }
+								      },
+								      new SplineInterpolator(0.7f,0.1f,0.3f,0.9f));
 	    am.startAnimation(anim, false);
 	}
 
-	 Animation anim = am.getAnimationFactory().createAnimation(8000, 
-						1.0,
-						Animator.RepeatBehavior.LOOP,
-						circle,
-						Animation.Dimension.FILLCOLOR,
-						new DefaultTimingHandler(){
-						    public void timingEvent(float fraction, 
-									    Object subject, Animation.Dimension dim){
-							Glyph g = (Glyph)subject;
-							g.setColor(new Color(0,
-									     0,
-									     Float.valueOf(255*fraction).intValue()));
-						    }
-						});
-	 am.startAnimation(anim, false);
+	Animation anim = am.getAnimationFactory().createAnimation(8000, 
+								  1.0,
+								  Animator.RepeatBehavior.LOOP,
+								  circle,
+								  Animation.Dimension.FILLCOLOR,
+								  new DefaultTimingHandler(){
+								      public void timingEvent(float fraction, 
+											      Object subject, Animation.Dimension dim){
+									  Glyph g = (Glyph)subject;
+									  g.setColor(new Color(0,
+											       0,
+											       Float.valueOf(255*fraction).intValue()));
+								      }
+								  });
+	am.startAnimation(anim, false);
 	 
-	 Animation animSize = am.getAnimationFactory().createAnimation(4000, 
-						 1.0,
-						 Animator.RepeatBehavior.LOOP,
-						 circle,
-						 Animation.Dimension.SIZE,
-						 new DefaultTimingHandler(){
-						     public void timingEvent(float fraction, 
-									     Object subject, Animation.Dimension dim){
-							 Glyph g = (Glyph)subject;
-							 g.sizeTo(40+60*fraction);
-						     }
-						 });
-	 am.startAnimation(animSize, false);
+	Animation animSize = am.getAnimationFactory().createAnimation(4000, 
+								      1.0,
+								      Animator.RepeatBehavior.LOOP,
+								      circle,
+								      Animation.Dimension.SIZE,
+								      new DefaultTimingHandler(){
+									  public void timingEvent(float fraction, 
+												  Object subject, Animation.Dimension dim){
+									      Glyph g = (Glyph)subject;
+									      g.sizeTo(40+60*fraction);
+									  }
+								      });
+	am.startAnimation(animSize, false);
 
     }
     
@@ -140,4 +143,121 @@ public class TestDefaultHandler {
         new TestDefaultHandler((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
     
+    class EventHandlerTestDTH implements ViewEventHandler{
+
+	TestDefaultHandler application;
+
+	long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+
+	EventHandlerTestDTH(TestDefaultHandler appli){
+	    application=appli;
+	}
+
+	long x1,x2,y1,y2;
+
+	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+
+	}
+
+	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	}
+
+	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	}
+
+	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    //application.vsm.setSync(false);
+	    lastJPX=jpx;
+	    lastJPY=jpy;
+	    //application.vsm.animator.setActiveCam(v.cams[0]);
+	    v.setDrawDrag(true);
+	    application.vsm.activeView.mouse.setSensitivity(false);
+	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	}
+
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    application.vsm.getAnimationManager().setXspeed(0);
+	    application.vsm.getAnimationManager().setYspeed(0);
+	    application.vsm.getAnimationManager().setZspeed(0);
+	    v.setDrawDrag(false);
+	    application.vsm.activeView.mouse.setSensitivity(true);
+	    /*Camera c=v.cams[0];
+	      application.vsm.getAnimationManager().createCameraAnimation(500,2,new LongPoint(lastX-application.vsm.mouse.vx,lastY-application.vsm.mouse.vy),c.getID());*/
+	}
+
+	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+
+	}
+
+	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+	    if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+		Camera c=application.vsm.getActiveCamera();
+		float a=(c.focal+Math.abs(c.altitude))/c.focal;
+		if (mod == META_SHIFT_MOD) {
+		    application.vsm.getAnimationManager().setXspeed(0);
+		    application.vsm.getAnimationManager().setYspeed(0);
+		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    //50 is just a speed factor (too fast otherwise)
+		}
+		else {
+		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    application.vsm.getAnimationManager().setZspeed(0);
+		}
+	    }
+	}
+
+	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+	    Camera c=application.vsm.getActiveCamera();
+	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	    if (wheelDirection == WHEEL_UP){
+		c.altitudeOffset(-a*5);
+		application.vsm.repaintNow();
+	    }
+	    else {
+		//wheelDirection == WHEEL_DOWN
+		c.altitudeOffset(a*5);
+		application.vsm.repaintNow();
+	    }
+	}
+
+	public void enterGlyph(Glyph g){
+	    g.highlight(true, null);
+	}
+
+	public void exitGlyph(Glyph g){
+	    g.highlight(false, null);
+	}
+
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    
+	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+	public void viewActivated(View v){}
+
+	public void viewDeactivated(View v){}
+
+	public void viewIconified(View v){}
+
+	public void viewDeiconified(View v){}
+
+	public void viewClosing(View v){System.exit(0);}
+
+    }
 }

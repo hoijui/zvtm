@@ -16,6 +16,10 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+
 public abstract class PieMenu {
 
     boolean orientText = false;
@@ -55,12 +59,12 @@ public abstract class PieMenu {
 							     false,
 							     IdentityInterpolator.getInstance(),
 							     new EndAction(){
-								 void execute(Object subject,
-									      Animation.Dimension dimension){
-								     vs.vsm.removeGlyph((Glyph)subject);
+								 public void execute(Object subject,
+										     Animation.Dimension dimension){
+								     vs.removeGlyph((Glyph)subject);
 								 }
 							     });
-				    vs.vsm.getAnimationManager().startAnimation(sizeAnim);
+				    vs.vsm.getAnimationManager().startAnimation(sizeAnim, false);
 				}   
 			}
 		}
