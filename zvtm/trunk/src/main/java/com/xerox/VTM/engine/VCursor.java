@@ -786,8 +786,6 @@ public class VCursor {
 	float DYNASPOT_MAX_TRANSLUCENCY = 0.3f;
 	AlphaComposite dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
 	
-	boolean highlightCurrentDynaSpotSelection = true;
-	
 	/** The DynaSpot area is never displayed. */
 	public static final short DYNASPOT_VISIBILITY_INVISIBLE = 0;
 	/** The DynaSpot area is always displayed. */
@@ -1029,10 +1027,6 @@ public class VCursor {
 		return DYNASPOT_MAX_RADIUS;
 	}
 
-	public void setHighlightCurrentDynaSpotSelection(boolean b){
-	    highlightCurrentDynaSpotSelection = b;
-	}
-
     Camera refToCam4DynaPick = null;
 
 	/** Compute the list of glyphs picked by the dynaspot cursor.
@@ -1119,22 +1113,20 @@ public class VCursor {
 			    // glyph does not intersect dynaspot area
 			    if (gida.containsKey(g.getID())){
     		        gida.remove(g.getID());
-    		        if (highlightCurrentDynaSpotSelection){
-    		            g.highlight(false, null);
+    		        if (sl != null){
+    		            sl.glyphSelected(lastDynaPicked, false);
     		        }
 			    }
 			}
 		}
-		if (highlightCurrentDynaSpotSelection){
-		    if (selectedGlyph != null && sl != null){
-                sl.glyphSelected(selectedGlyph, true);
-		    }
-		    if (lastDynaPicked != null && selectedGlyph != lastDynaPicked && sl != null){
-                sl.glyphSelected(lastDynaPicked, false);
-		    }
-		}
-		lastDynaPicked = selectedGlyph;
-		return selectedGlyph;
+        if (selectedGlyph != null && sl != null){
+            sl.glyphSelected(selectedGlyph, true);
+        }
+        if (lastDynaPicked != null && selectedGlyph != lastDynaPicked && sl != null){
+            sl.glyphSelected(lastDynaPicked, false);
+        }
+        lastDynaPicked = selectedGlyph;
+        return selectedGlyph;
 	}
 
 	/** Get the set of glyphs intersected by the cursor's dynaspot region.
