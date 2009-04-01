@@ -867,7 +867,10 @@ public class VCursor {
 	void computeDynaSpotParams(){
 	    ds_aa = DYNASPOT_MAX_RADIUS / (float)(MAX_SPEED-MIN_SPEED);
     	ds_ab = -DYNASPOT_MAX_RADIUS * MIN_SPEED / (float)(MAX_SPEED-MIN_SPEED);
-    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
+    	// linear drop-off
+//    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
+        // co-exponential drop-off
+    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)Math.pow(REDUC_TIME,2);
     	ds_rb = DYNASPOT_MAX_RADIUS;
 	}
 	
@@ -965,7 +968,10 @@ public class VCursor {
 					reducing = false;
 				}
 				else {
-					updateDynaSpotArea(Math.round(ds_ra*(currentTime-reducStartTime)+ds_rb));					
+				    // linear drop-off
+//					updateDynaSpotArea(Math.round(ds_ra*(currentTime-reducStartTime)+ds_rb));
+                    // co-exponential drop-off
+					updateDynaSpotArea(Math.round(ds_ra*(float)Math.pow(currentTime-reducStartTime,2)+ds_rb));
 				}
 			}
 		}
