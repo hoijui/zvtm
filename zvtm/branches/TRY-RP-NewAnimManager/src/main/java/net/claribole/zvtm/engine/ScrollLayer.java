@@ -17,8 +17,12 @@ import javax.swing.ImageIcon;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.View;
+
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.AnimationManager;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.glyphs.*;
 
@@ -367,21 +371,26 @@ public class ScrollLayer implements ComponentListener {
     /** Get the glyph that represents the RIGHT button. */
     public Glyph getRightButton(){return rightBt;}
 
-    /** Make scroll bars fade in/out (gradually appear/disappear).
+    /** 
+     * Make scroll bars fade in/out (gradually appear/disappear).
      * Make sure glyphs used to represent scrollbar widgets implement the Translucent interface.
      */
-    public void fade(AnimManager am, int duration, float alphaOffset) throws ClassCastException {
-	float[] FADE_IN_DATA = {0, 0, 0, 0, 0, 0, alphaOffset};
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, vgutter.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, vslider.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, upBt.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, downBt.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, hgutter.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, hslider.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, rightBt.getID());
-	am.createGlyphAnimation(duration, AnimManager.GL_COLOR_LIN, FADE_IN_DATA, leftBt.getID());
+    public void fade(AnimationManager am, int duration, float alphaOffset) throws ClassCastException {
+	AnimationFactory fac = am.getAnimationManager().getAnimationFactory();
+	
+	final Glyph[] wids = {vgutter, vslider, upBt, downBt, hgutter, hslider,
+			      rightBt, leftBt};
+	
+	for(Glyph g: wids){
+	    fac.createTranslucencyAnim(duration, (Translucent)g, //may throw CCE
+				       alphaOffset, true,
+				       IdentityInterpolator.getInstance(),
+				       null);
+	    
+	    am.getAnimationManager().startAnimation(anim, false);
+	}
     }
-
+    
     /** For internal use. */
     public void componentHidden(ComponentEvent e){}
     /** For internal use. */

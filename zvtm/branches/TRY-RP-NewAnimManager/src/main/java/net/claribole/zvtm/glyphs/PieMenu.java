@@ -10,9 +10,6 @@
 
 package net.claribole.zvtm.glyphs;
 
-import net.claribole.zvtm.engine.GlyphKillAction;
-
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.Glyph;
@@ -39,8 +36,8 @@ public abstract class PieMenu {
     }
 
 	/**destroy the pie menu (remove glyphs from virtual space)
-		*@param animLength duration of collapse animation in ms (0 if no animation)
-		*/
+	 *@param animLength duration of collapse animation in ms (0 if no animation)
+	 */
 	public void destroy(int animLength){
 		vs.removeGlyph(boundary);
 		for (int i=0;i<labels.length;i++){
@@ -51,8 +48,19 @@ public abstract class PieMenu {
 		if (animLength > 0){
 			for (int i=0;i<items.length;i++){
 				if (items[i] != null){
-					vs.vsm.animator.createGlyphAnimation(animLength, AnimManager.GL_SZ_LIN, new Float(0.1f),
-						items[i].getID(), new GlyphKillAction(vs.vsm));
+				    Animation sizeAnim = vs.vsm.getAnimationManager().getAnimationFactory()
+					.createGlyphSizeAnim(animLength, 
+							     items[i], 
+							     0.1f, 
+							     false,
+							     IdentityInterpolator.getInstance(),
+							     new EndAction(){
+								 void execute(Object subject,
+									      Animation.Dimension dimension){
+								     vs.vsm.removeGlyph((Glyph)subject);
+								 }
+							     });
+				    vs.vsm.getAnimationManager().startAnimation(sizeAnim);
 				}   
 			}
 		}

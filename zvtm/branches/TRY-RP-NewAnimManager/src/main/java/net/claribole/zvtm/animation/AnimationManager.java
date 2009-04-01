@@ -8,6 +8,7 @@ package net.claribole.zvtm.animation;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -18,6 +19,10 @@ import net.jcip.annotations.*;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.TimingSource;
+
+//for active Camera animation
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.Camera;
 
 /**
  * A class that manages Animation instances.
@@ -30,12 +35,16 @@ public class AnimationManager {
      * by calling the appropriate operation on their application's VirtualSpaceManager, and
      * not to create an AnimationManager themselves.
      */
-    public AnimationManager(){
+    public AnimationManager(VirtualSpaceManager vsm){
 	pendingAnims = new LinkedList<Animation>();
 	runningAnims = new LinkedList<Animation>();
 	listsLock = new ReentrantLock();
 	tickThread = new TickThread("tickThread");
 	animationFactory = new AnimationFactory(this);
+	started = new AtomicBoolean(false);
+
+	//vsm is only useful for currentCamAnim
+	currentCamAnim = new InteractiveCameraAnimation(vsm);
     }
 
     Animation createAnimation(int duration, 
@@ -69,13 +78,14 @@ public class AnimationManager {
     /**
      * Starts this AnimationManager.
      * This method must be called for animations to start.
-     * This method must be called once and only once, otherwise AnimationManager
-     * will complain loudly (i.e. throw an IllegalThreadStateException).
-     *
-     * @throws java.lang.IllegalStateException if called more than once
+     * This method may be called multiple times from multiple threads;
+     * only the first one will be taken in consideration, and subsequent 
+     * calls will have no effect.
      */
     public void start(){
-	tickThread.start();
+	if(started.compareAndSet(false, true)){
+	    tickThread.start();
+	}
     }
 
     /**
@@ -83,6 +93,7 @@ public class AnimationManager {
      * After calling this method, all animations handled by this AnimationManager will stop.
      * This method must be called once and only once, otherwise AnimationManager
      * will complain loudly (i.e. throw an IllegalThreadStateException).
+     * This AnimationManager should not be used after stop() has been called.
      *
      * @throws java.lang.IllegalStateException if called more than once
      */
@@ -314,7 +325,68 @@ public class AnimationManager {
     private final TickThread tickThread;
 
     private final AnimationFactory animationFactory;
+
+    //infinite animation that handles the current camera x-y-speed and altitude
+    //typically used to implement user-directed camera movement (mouse handlers...)
+    private final InteractiveCameraAnimation currentCamAnim; 
+
+    private final AtomicBoolean started;
+
+    /**
+     * A class that represents an indefinite, interactive
+     * camera animation. The user interacts with this 
+     * animation by providing instantaneous camera speeds.
+     */
+    class InteractiveCameraAnimation extends DefaultTimingHandler {
+	InteractiveCameraAnimation(VirtualSpaceManager vsm){
+	    this.vsm = vsm;
+	    dx = 0d;
+	    dy = 0d;
+	    dz = 0f;
+	}
+
+	@Override public void timingEvent(float fraction, 
+					  Object subject, 
+					  Animation.Dimension dim){
+	    Camera cam = vsm.getActiveCamera();
+	    if(null != cam){
+		//cam.move(dx, dy);
+		cam.altitudeOffset(dz);
+	    }
+	}
+
+	public void setXspeed(double dx){
+	    this.dx = dx;
+	}
+
+	public void setYspeed(double dy){
+	    this.dy = dy;
+	}
+
+	public void setZspeed(float dz){
+	    this.dz = dz;
+	}
+
+	public double getXspeed(){
+	    return dx;
+	}
+
+	public double getYspeed(){
+	    return dy;
+	}
+
+	public float getZspeed(){
+	    return dz;
+	}
+
+	private final VirtualSpaceManager vsm;
+	private volatile double dx;
+	private volatile double dy;
+	private volatile float dz;
+    }
+
 }
+
 
 //A custom tick source to replace the one provided by the Timing Framework.
 //NOTE: setResolution() has no effect (the resolution will always be the one supplied by the TickThread)
