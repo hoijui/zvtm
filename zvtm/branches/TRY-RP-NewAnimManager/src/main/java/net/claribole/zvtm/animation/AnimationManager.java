@@ -45,6 +45,12 @@ public class AnimationManager {
 
 	//vsm is only useful for currentCamAnim
 	currentCamAnim = new InteractiveCameraAnimation(vsm);
+	Animation anim = createAnimation(Animator.INFINITE, 1d,
+					 Animator.RepeatBehavior.LOOP,
+					 currentCamAnim, //DUMMY subject: avoids conflicts
+					 Animation.Dimension.POSITION,
+					 currentCamAnim);
+	startAnimation(anim, true);
     }
 
     Animation createAnimation(int duration, 
@@ -67,7 +73,7 @@ public class AnimationManager {
 			      Animator.RepeatBehavior repeatBehavior,
 			      Object subject,
 			      Animation.Dimension dimension,
-				     TimingHandler handler){
+			      TimingHandler handler){
 	Animation retval =  new Animation(this, duration, repeatCount,
 					  repeatBehavior, subject,
 					  dimension, handler);
@@ -371,7 +377,7 @@ public class AnimationManager {
 					  Animation.Dimension dim){
 	    Camera cam = vsm.getActiveCamera();
 	    if(null != cam){
-		//cam.move(dx, dy);
+		cam.move((long)dx, (long)dy); //XXX change to double
 		cam.altitudeOffset(dz);
 	    }
 	}
