@@ -377,7 +377,7 @@ public class AnimationManager {
 					  Animation.Dimension dim){
 	    Camera cam = vsm.getActiveCamera();
 	    if(null != cam){
-		cam.move((long)dx, (long)dy); //XXX change to double
+		cam.move(dx, dy);
 		cam.altitudeOffset(dz);
 	    }
 	}
