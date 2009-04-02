@@ -37,13 +37,10 @@ public class DynaSpotDemo {
 
     View demoView;
 
-	DynaSpotDemoControlPanel cp;
-
     DynaSpotDemo(short ogl){
         vsm=new VirtualSpaceManager();
         vsm.setDebug(true);
         initTest(ogl);
-		cp = new DynaSpotDemoControlPanel(this);
     }
 
     public void initTest(short ogl){
@@ -65,10 +62,6 @@ public class DynaSpotDemo {
 		vsm.addGlyph(new VCircle(-300,0,0,4,Color.BLACK), "src");
 		vsm.addGlyph(new VCircle(300,0,0,4,Color.BLACK), "src");
         vsm.repaintNow();
-		// DynaSpot setup and activation
-		demoView.getCursor().setDynaSpotMaxRadius(20);
-		demoView.getCursor().setCutoffFrequencyParameters(1.3, 0.01);
-		demoView.getCursor().setOffsets(20, 20);
 		demoView.getCursor().activateDynaSpot(true);
     }
 
@@ -87,73 +80,3 @@ public class DynaSpotDemo {
     
 }
 
-class DynaSpotDemoControlPanel extends JFrame implements ChangeListener {
-	
-	DynaSpotDemo application;
-	JSpinner cutOffA, cutOffB, offset, maxRadius;
-	JRadioButton visInvisCb, visVisCb, visFadeinCb, visFadeoutCb;
-	
-	DynaSpotDemoControlPanel(DynaSpotDemo app){
-		this.application = app;
-		Container cpane = getContentPane();
-		cpane.setLayout(new GridLayout(13, 1));
-		
-		cutOffA = new JSpinner(new SpinnerNumberModel(application.demoView.getCursor().getCutoffFrequencyParameterA(), 0.1, 5.0, 0.1));
-		cutOffB = new JSpinner(new SpinnerNumberModel(application.demoView.getCursor().getCutoffFrequencyParameterB(), 0.0001, 1, 0.001));
-		offset = new JSpinner(new SpinnerNumberModel(application.demoView.getCursor().getDynaSpotMaxRadius(), 0, 50, 1));
-		maxRadius = new JSpinner(new SpinnerNumberModel(application.demoView.getCursor().getOffsets().x, 1, 100, 1));
-		
-		cpane.add(new JLabel("Low-pass filter cutoff param A"));
-		cpane.add(cutOffA);
-		cpane.add(new JLabel("Low-pass filter cutoff param B"));
-		cpane.add(cutOffB);
-		cpane.add(new JLabel("Distance offset"));
-		cpane.add(offset);
-		cpane.add(new JLabel("DynaSpot maximum Radius"));
-		cpane.add(maxRadius);
-		cpane.add(new JLabel("Visibility"));
-		ButtonGroup visBg = new ButtonGroup();
-		visInvisCb = new JRadioButton("Invisible");
-		visVisCb = new JRadioButton("Visible", true);
-		visFadeinCb = new JRadioButton("Fade In");
-		visFadeoutCb = new JRadioButton("Fade Out");
-		cpane.add(visInvisCb);
-		cpane.add(visVisCb);
-		cpane.add(visFadeinCb);
-		cpane.add(visFadeoutCb);
-		visBg.add(visInvisCb);
-		visBg.add(visVisCb);
-		visBg.add(visFadeinCb);
-		visBg.add(visFadeoutCb);
-		cutOffA.addChangeListener(this);
-		cutOffB.addChangeListener(this);
-		offset.addChangeListener(this);
-		maxRadius.addChangeListener(this);
-		visInvisCb.addChangeListener(this);
-		visVisCb.addChangeListener(this);
-		visFadeinCb.addChangeListener(this);
-		visFadeoutCb.addChangeListener(this);
-		WindowListener w0 = new WindowAdapter(){
-			public void windowClosing(WindowEvent e){System.exit(0);}
-		    };
-		this.addWindowListener(w0);
-		this.setLocation(900, 0);
-		this.setSize(400, 325);
-		this.setTitle("DynaSpot Parameters");
-		this.setVisible(true);
-		
-	}
-	
-	public void stateChanged(ChangeEvent e){
-		Object o = e.getSource();
-		if (o == cutOffA){application.demoView.getCursor().setCutoffFrequencyParameters(((Number)cutOffA.getValue()).doubleValue(), ((Number)cutOffB.getValue()).doubleValue());}
-		else if (o == cutOffB){application.demoView.getCursor().setCutoffFrequencyParameters(((Number)cutOffA.getValue()).doubleValue(), ((Number)cutOffB.getValue()).doubleValue());}
-		else if (o == offset){application.demoView.getCursor().setOffsets(((Number)offset.getValue()).intValue(), ((Number)offset.getValue()).intValue());}
-		else if (o == maxRadius){application.demoView.getCursor().setDynaSpotMaxRadius(((Number)maxRadius.getValue()).intValue());}
-		else if (o == visInvisCb && visInvisCb.isSelected()){application.setDynaSpotVisibility(VCursor.DYNASPOT_VISIBILITY_INVISIBLE);}
-		else if (o == visVisCb && visVisCb.isSelected()){application.setDynaSpotVisibility(VCursor.DYNASPOT_VISIBILITY_VISIBLE);}
-		else if (o == visFadeinCb && visFadeinCb.isSelected()){application.setDynaSpotVisibility(VCursor.DYNASPOT_VISIBILITY_FADEIN);}
-		else if (o == visFadeoutCb && visFadeoutCb.isSelected()){application.setDynaSpotVisibility(VCursor.DYNASPOT_VISIBILITY_FADEOUT);}
-	}
-	
-}
