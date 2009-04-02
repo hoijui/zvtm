@@ -136,6 +136,18 @@ public class Camera {
 	}
     }
 
+    /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
+    public void move(double x,double y){
+        dposx += x;
+        dposy += y;
+        posx = Math.round(dposx);
+        posy = Math.round(dposy);
+        propagateMove(posx, posy);  //take care of sticked glyphs
+        if (view != null){
+            parentSpace.vsm.repaintNow(view);
+        }
+    }
+    
 	/**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
 	public void moveTo(long x,long y){
 		posx = x;

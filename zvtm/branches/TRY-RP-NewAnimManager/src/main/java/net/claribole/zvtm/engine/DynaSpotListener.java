@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2008. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: $
+ * $Id$
  */
  
 package net.claribole.zvtm.engine;

@@ -49,8 +49,8 @@ import java.util.TimerTask;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
-import net.claribole.zvtm.engine.LowPassFilter;
 import net.claribole.zvtm.engine.DynaSpotListener;
+import net.claribole.zvtm.engine.SelectionListener;
 import net.claribole.zvtm.glyphs.Translucency;
 import java.awt.Point;
 
@@ -136,6 +136,8 @@ public class VCursor {
         hcolor = Color.black;
         stickedGlyphs = new Glyph[0];
         sync=true;
+        computeDynaSpotParams();
+        setSelectionListener(new DefaultSelectionAction());
     }
 
     /**Set size of cursor (crosshair length).*/
@@ -784,8 +786,6 @@ public class VCursor {
 	float DYNASPOT_MAX_TRANSLUCENCY = 0.3f;
 	AlphaComposite dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
 	
-	boolean highlightCurrentDynaSpotSelection = true;
-	
 	/** The DynaSpot area is never displayed. */
 	public static final short DYNASPOT_VISIBILITY_INVISIBLE = 0;
 	/** The DynaSpot area is always displayed. */
@@ -838,13 +838,41 @@ public class VCursor {
 	int LAG_TIME = 120;
 	int REDUC_TIME = 180;
 	
+	public void setDynaSpotLagTime(int t){
+	    LAG_TIME = t;
+	}
+
+	public int getDynaSpotLagTime(){
+	    return LAG_TIME;
+	}
+
+	public void setDynaSpotReducTime(int t){
+	    REDUC_TIME = t;
+	    computeDynaSpotParams();
+	}
+
+	public int getDynaSpotReducTime(){
+	    return REDUC_TIME;
+	}
+	
 	int MIN_SPEED = 100;
 	int MAX_SPEED = 300;
 	
-	float ds_aa = DYNASPOT_MAX_RADIUS / (float)(MAX_SPEED-MIN_SPEED);
-	float ds_ab = -DYNASPOT_MAX_RADIUS * MIN_SPEED / (float)(MAX_SPEED-MIN_SPEED);
-	float ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
-	float ds_rb = DYNASPOT_MAX_RADIUS;
+	/* dynaspot parameters */
+	float ds_aa;
+	float ds_ab;
+	float ds_ra;
+	float ds_rb;
+	
+	void computeDynaSpotParams(){
+	    ds_aa = DYNASPOT_MAX_RADIUS / (float)(MAX_SPEED-MIN_SPEED);
+    	ds_ab = -DYNASPOT_MAX_RADIUS * MIN_SPEED / (float)(MAX_SPEED-MIN_SPEED);
+    	// linear drop-off
+//    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
+        // co-exponential drop-off
+    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)Math.pow(REDUC_TIME,2);
+    	ds_rb = DYNASPOT_MAX_RADIUS;
+	}
 	
 	int dynaSpotRadius = 0;
 		
@@ -940,7 +968,10 @@ public class VCursor {
 					reducing = false;
 				}
 				else {
-					updateDynaSpotArea(Math.round(ds_ra*(currentTime-reducStartTime)+ds_rb));					
+				    // linear drop-off
+//					updateDynaSpotArea(Math.round(ds_ra*(currentTime-reducStartTime)+ds_rb));
+                    // co-exponential drop-off
+					updateDynaSpotArea(Math.round(ds_ra*(float)Math.pow(currentTime-reducStartTime,2)+ds_rb));
 				}
 			}
 		}
@@ -953,6 +984,10 @@ public class VCursor {
 		if (dsl != null){
 			dsl.spotSizeChanged(this, dynaSpotRadius);
 		}
+	}
+	
+	public int getDynaSpotRadius(){
+	    return dynaSpotRadius;
 	}
 	
 	DynaSpotListener dsl;
@@ -982,19 +1017,20 @@ public class VCursor {
 			catch (NullPointerException ex){}
 		}
 	}
+	
+	public boolean isDynaSpotActivated(){
+	    return dynaSpotActivated;
+	}
 
 	/** Set maximum size of DynaSpot selection region. */
 	public void setDynaSpotMaxRadius(int r){
 		DYNASPOT_MAX_RADIUS = (r < 0) ? 0 : r;
+		computeDynaSpotParams();
 	}
 
 	/** Get maximum size of DynaSpot selection region. */
 	public int getDynaSpotMaxRadius(){
 		return DYNASPOT_MAX_RADIUS;
-	}
-
-	public void setHighlightCurrentDynaSpotSelection(boolean b){
-	    highlightCurrentDynaSpotSelection = b;
 	}
 
     Camera refToCam4DynaPick = null;
@@ -1008,6 +1044,22 @@ public class VCursor {
     }
     
     Glyph lastDynaPicked = null;
+    
+    SelectionListener sl;
+    
+    /** Set a Selection Listener callback triggered when a glyph gets selected/unselected by DynaSpot.
+        *@param sl set to null to remove
+        */
+    public void setSelectionListener(SelectionListener sl){
+        this.sl = sl;
+    }
+    
+    /** Get the Selection Listener callback triggered when a glyph gets selected/unselected by DynaSpot.
+        *@return null if none set.
+        */
+    public SelectionListener getSelectionListener(){
+        return this.sl;
+    }
     
 	/** Compute the list of glyphs picked by the dynaspot cursor.
 	 * The best picked glyph is returned.
@@ -1067,22 +1119,20 @@ public class VCursor {
 			    // glyph does not intersect dynaspot area
 			    if (gida.containsKey(g.getID())){
     		        gida.remove(g.getID());
-    		        if (highlightCurrentDynaSpotSelection){
-    		            g.highlight(false, null);
+    		        if (sl != null){
+    		            sl.glyphSelected(lastDynaPicked, false);
     		        }
 			    }
 			}
 		}
-		if (highlightCurrentDynaSpotSelection){
-		    if (selectedGlyph != null){
-    		    selectedGlyph.highlight(true, null);		        
-		    }
-		    if (lastDynaPicked != null && selectedGlyph != lastDynaPicked){
-		        lastDynaPicked.highlight(false, null);
-		    }
-		}
-		lastDynaPicked = selectedGlyph;
-		return selectedGlyph;
+        if (selectedGlyph != null && sl != null){
+            sl.glyphSelected(selectedGlyph, true);
+        }
+        if (lastDynaPicked != null && selectedGlyph != lastDynaPicked && sl != null){
+            sl.glyphSelected(lastDynaPicked, false);
+        }
+        lastDynaPicked = selectedGlyph;
+        return selectedGlyph;
 	}
 
 	/** Get the set of glyphs intersected by the cursor's dynaspot region.
@@ -1109,4 +1159,12 @@ class DynaSpotTimer extends TimerTask{
 		c.updateDynaSpot(System.currentTimeMillis());
 	}
 	
+}
+
+class DefaultSelectionAction implements SelectionListener {
+    
+    public void glyphSelected(Glyph g, boolean b){
+        g.highlight(b, null);        
+    }
+    
 }
