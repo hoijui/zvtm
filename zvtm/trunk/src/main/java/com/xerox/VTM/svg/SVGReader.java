@@ -92,15 +92,29 @@ public class SVGReader {
     public static final String _g="g";
     public static final String _a="a";
     public static final String _title="title";
-    public static final String _fill="fill:";
-    public static final String _stroke="stroke:";
-    public static final String _strokewidth="stroke-width:";
-    public static final String _strokedasharray="stroke-dasharray:";
-    public static final String _fillopacity="fill-opacity:";
-    public static final String _fontfamily="font-family:";
-    public static final String _fontsize="font-size:";
-    public static final String _fontweight="font-weight:";
-    public static final String _fontstyle="font-style:";
+    
+    
+    public static final String _fill = "fill";
+    public static final String _stroke = "stroke";
+    public static final String _strokewidth = "stroke-width";
+    public static final String _strokedasharray = "stroke-dasharray";
+    public static final String _fillopacity = "fill-opacity";
+    public static final String _fontfamily = "font-family";
+    public static final String _fontsize = "font-size";
+    public static final String _fontweight = "font-weight";
+    public static final String _fontstyle = "font-style";
+
+    public static final String _fillCSS = _fill + ":";
+    public static final String _strokeCSS = _stroke + ":";
+    public static final String _strokewidthCSS = _strokewidth + ":";
+    public static final String _strokedasharrayCSS = _strokedasharray + ":";
+    public static final String _fillopacityCSS = _fillopacity + ":";
+    public static final String _fontfamilyCSS = _fontfamily + ":";
+    public static final String _fontsizeCSS = _fontsize + ":";
+    public static final String _fontweightCSS = _fontweight + ":";
+    public static final String _fontstyleCSS = _fontstyle + ":";
+    
+    
     public static final String _style="style";
     public static final String _class = "class";
     public static final String _cx="cx";
@@ -135,8 +149,11 @@ public class SVGReader {
     public static final String FILE_SCHEME = "file:/";
     public static final String FILE_PROTOCOL = "file";
 
+    public static final String EMPTY_STRING = "";
     public static final String COMMA_SEP = ",";
     public static final String SPACE_SEP = " ";
+    public static final String LINE_SEP = "\n";
+    static final String STYLING_INSTRUCTION_SEP = ";";
 
     static Hashtable fontCache = new Hashtable();
 
@@ -488,39 +505,105 @@ public class SVGReader {
         }
         catch (Exception ex){System.err.println("Error: SVGReader.getColor(): "+ex);return Color.WHITE;}
     }
+    
+    static final short fill_INDEX = 0;
+    static final short stroke_INDEX = 1;
+    static final short strokewidth_INDEX = 2;
+    static final short strokedasharray_INDEX = 3;
+    static final short fillopacity_INDEX = 4;
+    static final short fontfamily_INDEX = 5;
+    static final short fontsize_INDEX = 6;
+    static final short fontweight_INDEX = 7;
+    static final short fontstyle_INDEX = 8;
 
     /** Parse style information.
      *@param s the value of an SVG style attribute. Supported declarations are: fill, fill-opacity, font-family, font-size, font-weight, font-style, stroke, stroke-dasharray, stroke-width
      *@return styling attributes which can be interpreted by ZVTM
      */
-    public static SVGStyle getStyle(String s){
-        String[] ar=null;
-        if (s!=null){
-            s = s.replaceAll("\n", "");
-            s = s.replaceAll(" ", "");
-            StringTokenizer st=new StringTokenizer(s,";");
-            ar=new String[st.countTokens()];
-            int i=0;
+    public static SVGStyle getStyle(String s, Element e){
+        /* According to SVG 1.0 6.4 Specifying properties using the presentation attributes
+           http://www.w3.org/TR/SVG10/styling.html#UsingPresentationAttributes
+           CSS instructions in a style attribute override presentation attributes. The followig
+           code respects that by ignoring attributes of e if equivalent instructions exist in
+           the style attribute. */
+        SVGStyle ss = new SVGStyle();
+        boolean[] attributesSet = new boolean[9];
+        if (s != null){
+            s = s.replaceAll(LINE_SEP, EMPTY_STRING);
+            s = s.replaceAll(SPACE_SEP, EMPTY_STRING);
+            StringTokenizer st = new StringTokenizer(s, STYLING_INSTRUCTION_SEP);
+            // parse all CSS instructions in style attribute
             while (st.hasMoreTokens()){
-                ar[i++]=st.nextToken();
+                String instr = st.nextToken();
+                if (instr.startsWith(_fillCSS)){
+                    ss.setFillColor(getColor(instr.substring(5,instr.length())));
+                    attributesSet[fill_INDEX] = true;
+                }
+                else if (instr.startsWith(_strokeCSS)){
+                    ss.setStrokeColor(getColor(instr.substring(7,instr.length())));
+                    attributesSet[stroke_INDEX] = true;
+                }
+                else if (instr.startsWith(_strokewidthCSS)){
+                    ss.setStrokeWidth(instr.substring(13,instr.length()));
+                    attributesSet[strokewidth_INDEX] = true;
+                }
+                else if (instr.startsWith(_strokedasharrayCSS)){
+                    ss.setStrokeDashArray(instr.substring(17,instr.length()));
+                    attributesSet[strokedasharray_INDEX] = true;
+                }
+                else if (instr.startsWith(_fillopacityCSS)){
+                    ss.setAlphaTransparencyValue(new Float(instr.substring(13,instr.length())));
+                    attributesSet[fillopacity_INDEX] = true;
+                }
+                else if (instr.startsWith(_fontfamilyCSS)){
+                    ss.setFontFamily(instr.substring(12, instr.length()));
+                    attributesSet[fontfamily_INDEX] = true;
+                }
+                else if (instr.startsWith(_fontsizeCSS)){
+                    ss.setFontSize(instr.substring(10, instr.length()));
+                    attributesSet[fontsize_INDEX] = true;
+                }
+                else if (instr.startsWith(_fontweightCSS)){
+                    ss.setFontWeight(instr.substring(12, instr.length()));
+                    attributesSet[fontweight_INDEX] = true;
+                }
+                else if (instr.startsWith(_fontstyleCSS)){
+                    ss.setFontStyle(instr.substring(11,instr.length()));
+                    attributesSet[fontstyle_INDEX] = true;
+                }
             }
         }
-        if (ar!=null){
-            SVGStyle ss=new SVGStyle();
-            for (int i=0;i<ar.length;i++){
-                if (ar[i].startsWith(_fill)){ss.setFillColor(getColor(ar[i].substring(5,ar[i].length())));}
-                else if (ar[i].startsWith(_stroke)){ss.setStrokeColor(getColor(ar[i].substring(7,ar[i].length())));}
-                else if (ar[i].startsWith(_strokewidth)){ss.setStrokeWidth(ar[i].substring(13,ar[i].length()));}
-                else if (ar[i].startsWith(_strokedasharray)){ss.setStrokeDashArray(ar[i].substring(17,ar[i].length()));}
-                else if (ar[i].startsWith(_fillopacity)){ss.setAlphaTransparencyValue(new Float(ar[i].substring(13,ar[i].length())));}
-                else if (ar[i].startsWith(_fontfamily)){ss.setFontFamily(ar[i].substring(12, ar[i].length()));}
-                else if (ar[i].startsWith(_fontsize)){ss.setFontSize(ar[i].substring(10, ar[i].length()));}
-                else if (ar[i].startsWith(_fontweight)){ss.setFontWeight(ar[i].substring(12, ar[i].length()));}
-                else if (ar[i].startsWith(_fontstyle)){ss.setFontStyle(ar[i].substring(11,ar[i].length()));}
+        if (e != null){
+            // look for presentation attributes for instructions not in CSS style attribute
+            if (!attributesSet[fill_INDEX] && e.hasAttribute(_fill)){
+                ss.setFillColor(getColor(e.getAttribute(_fill)));
             }
-            return ss;
+            if (!attributesSet[stroke_INDEX] && e.hasAttribute(_stroke)){
+                ss.setStrokeColor(getColor(e.getAttribute(_stroke)));
+            }
+            if (!attributesSet[strokewidth_INDEX] && e.hasAttribute(_strokewidth)){
+                ss.setStrokeWidth(e.getAttribute(_strokewidth));
+            }
+            if (!attributesSet[strokedasharray_INDEX] && e.hasAttribute(_strokedasharray)){
+                ss.setStrokeDashArray(e.getAttribute(_strokedasharray));
+            }
+            if (!attributesSet[fillopacity_INDEX] && e.hasAttribute(_fillopacity)){
+                ss.setAlphaTransparencyValue(new Float(e.getAttribute(_fillopacity)));
+            }
+            if (!attributesSet[fontfamily_INDEX] && e.hasAttribute(_fontfamily)){
+                ss.setFontFamily(e.getAttribute(_fontfamily));
+            }
+            if (!attributesSet[fontsize_INDEX] && e.hasAttribute(_fontsize)){
+                ss.setFontSize(e.getAttribute(_fontsize));
+            }
+            if (!attributesSet[fontweight_INDEX] && e.hasAttribute(_fontweight)){
+                ss.setFontWeight(e.getAttribute(_fontweight));
+            }
+            if (!attributesSet[fontstyle_INDEX] && e.hasAttribute(_fontstyle)){
+                ss.setFontStyle(e.getAttribute(_fontstyle));
+            }            
         }
-        else return null;
+        return (ss.hasStylingInformation()) ? ss : null;
     }
 
     /** Translate an SVG polygon coordinates from the SVG space to the VTM space, taking position offset into account.
@@ -675,8 +758,8 @@ public class SVGReader {
         x += xoffset;
         y += yoffset;
         VEllipseST res;
-        if (e.hasAttribute(_style)){
-            SVGStyle ss=getStyle(e.getAttribute(_style));
+        SVGStyle ss=getStyle(e.getAttribute(_style), e);
+        if (ss != null){
             if (ss.hasTransparencyInformation()){
                 if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
                 else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f);}
@@ -754,8 +837,8 @@ public class SVGReader {
         x += xoffset;
         y += yoffset;
         VCircleST res;
-        if (e.hasAttribute(_style)){
-            SVGStyle ss=getStyle(e.getAttribute(_style));
+        SVGStyle ss=getStyle(e.getAttribute(_style), e);
+        if (ss != null){
             if (ss.hasTransparencyInformation()){
                 if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
                 else {res=new VCircleST(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
@@ -830,12 +913,8 @@ public class SVGReader {
             else if (tas.equals(_end)){ta=VTextST.TEXT_ANCHOR_END;}
             else if (tas.equals(_inherit)){System.err.println("SVGReader::'inherit' value for text-anchor attribute not supported yet");}
         }
-
-        SVGStyle ss = null;
-        if (e.hasAttribute(_style)){
-            ss = getStyle(e.getAttribute(_style));
-        }
         Color tc = Color.BLACK;
+        SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
         if (ss != null){
             if (ss.getStrokeColor() == null){
                 if (ss.getFillColor() != null){
@@ -927,8 +1006,8 @@ public class SVGReader {
             long x=pNE.x-w/2;
             long y=pNE.y-h/2;
             VRectangleOrST res;
-            if (e.hasAttribute(_style)){
-                SVGStyle ss=getStyle(e.getAttribute(_style));
+            SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
+            if (ss != null){
                 if (ss.hasTransparencyInformation()){
                     if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
                     else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, 0);}
@@ -1025,8 +1104,8 @@ public class SVGReader {
             long x=pNE.x-w/2;
             long y=pNE.y-h/2;
             VRoundRectST res;
-            if (e.hasAttribute(_style)){
-                SVGStyle ss=getStyle(e.getAttribute(_style));
+            SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
+            if (ss != null){
                 if (ss.hasTransparencyInformation()){
                     if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
                     else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
@@ -1111,8 +1190,8 @@ public class SVGReader {
         x += xoffset;
         y += yoffset;
         VRectangleOrST res;
-        if (e.hasAttribute(_style)){
-            SVGStyle ss=getStyle(e.getAttribute(_style));
+        SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
+        if (ss != null){
             if (ss.hasTransparencyInformation()){
                 if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
                 else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f, 0);}
@@ -1268,8 +1347,8 @@ public class SVGReader {
             coords2[i]=new LongPoint(lp.x,-lp.y);
         }
         VPolygonST res;
-        if (e.hasAttribute(_style)){
-            SVGStyle ss=getStyle(e.getAttribute(_style));
+        SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
+        if (ss != null){
             if (ss.hasTransparencyInformation()){
                 if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
                 else {res=new VPolygonST(coords2,ss.getFillColor(), Color.BLACK, 1.0f);}
@@ -1341,12 +1420,9 @@ public class SVGReader {
     public static VSegmentST[] createPolyline(Element e,Context ctx,boolean meta){
         Vector coords=new Vector();
         translateSVGPolygon(e.getAttribute(_points),coords);
-        VSegmentST[] res=new VSegmentST[coords.size()-1];
-        SVGStyle ss = null;
-        if (e.hasAttribute(_style)){
-            ss=getStyle(e.getAttribute(_style));
-        }
+        VSegmentST[] res=new VSegmentST[coords.size()-1];        
         Color border=Color.black;
+        SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
         if (ss != null){
             border = ss.getStrokeColor();
             if (border == null){border = (ss.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
@@ -1407,12 +1483,9 @@ public class SVGReader {
 		y1 += yoffset;
 		x2 += xoffset;
 		y2 += yoffset;
-		SVGStyle ss = null;
-		if (e.hasAttribute(_style)){
-			ss = getStyle(e.getAttribute(_style));
-		}
 		Color border = Color.black;
-		if (ss != null){
+        SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
+        if (ss != null){
 			border = ss.getStrokeColor();
 			if (border == null){border = (ss.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ss.hasTransparencyInformation()){
@@ -1476,18 +1549,16 @@ public class SVGReader {
                 Utilities.delLeadingSpaces(svg);
                 processNextSVGPathCommand(svg,ph,lastCommand);
             }
-            if (e.hasAttribute(_style)){
-                SVGStyle ss=getStyle(e.getAttribute(_style));
-                Color border=ss.getStrokeColor();
-                if (border != null){
+            SVGStyle ss=getStyle(e.getAttribute(_style), e);
+            if (ss != null && ss.hasStrokeColorInformation()){
+                    Color border = ss.getStrokeColor();
                     float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
                     ph.setHSVColor(hsv[0],hsv[1],hsv[2]);
                     if (ss.requiresSpecialStroke()){
                         assignStroke(ph, ss);
                     }
-                }
             }
-            else if (ctx!=null && ctx.getStrokeColor()!=null){
+            else if (ctx != null){
                 Color border=ctx.getStrokeColor();
                 if (border!=null){
                     float[] hsv=Color.RGBtoHSB(border.getRed(),border.getGreen(),border.getBlue(),new float[3]);
