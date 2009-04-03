@@ -83,13 +83,7 @@ public class Camera {
      * @param i camera index (wrt the owning virtual space)
      */
     Camera(long x,long y,float alt,float f,int i){
-	posx=x;
-	posy=y;
-	updatePrecisePosition();
-	altitude=alt;
-	focal=f;
-	index=i;
-	enabled=true;
+	this(x, y, alt, f, i, false);
     }
 
     /** 
