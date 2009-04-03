@@ -22,6 +22,10 @@
 
 package com.xerox.VTM.engine;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.Location;
 
 import com.xerox.VTM.glyphs.Glyph;
@@ -67,6 +71,9 @@ public class Camera {
 
     /**when in lazy mode, tells the camera to repaint next time the owning view goes through its paint loop*/
     boolean shouldRepaint=false;
+
+    //"listeners" is traversed a lot more often than it is mutated.
+    private final List<CameraListener> listeners = new CopyOnWriteArrayList<CameraListener>();
     
     /** 
      * @param x initial X coordinate
@@ -123,6 +130,7 @@ public class Camera {
 	if (view != null){
 	    parentSpace.vsm.repaintNow(view);
 	}
+	notifyMoved();
     }
 
     /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
@@ -134,6 +142,7 @@ public class Camera {
 	if (view != null){
 	    parentSpace.vsm.repaintNow(view);
 	}
+	notifyMoved();
     }
 
     /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
@@ -146,18 +155,20 @@ public class Camera {
         if (view != null){
             parentSpace.vsm.repaintNow(view);
         }
+	notifyMoved();
     }
     
-	/**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
-	public void moveTo(long x,long y){
-		posx = x;
-		posy = y;
-		updatePrecisePosition();
-		propagateMove(x-posx, y-posy);  //take care of sticked glyphs
-		if (view != null){
-			parentSpace.vsm.repaintNow(view);
-		}
+    /**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
+    public void moveTo(long x,long y){
+	posx = x;
+	posy = y;
+	updatePrecisePosition();
+	propagateMove(x-posx, y-posy);  //take care of sticked glyphs
+	if (view != null){
+	    parentSpace.vsm.repaintNow(view);
 	}
+	notifyMoved();
+    }
 
     /**
      * Set camera altitude (absolute value).
@@ -191,6 +202,7 @@ public class Camera {
 	if (repaint && view != null){
 	    parentSpace.vsm.repaintNow(view);
 	}
+	notifyMoved();
     }
 
     /**
@@ -206,6 +218,7 @@ public class Camera {
 	if (repaint && view != null){
 	    parentSpace.vsm.repaintNow(view);
 	}
+	notifyMoved();
     }
 
     /**
@@ -229,6 +242,7 @@ public class Camera {
         if (view != null){
             parentSpace.vsm.repaintNow(view);
         }
+	notifyMoved();
     }
 
     /**
@@ -236,6 +250,30 @@ public class Camera {
      */
     public Location getLocation(){
 	return new Location(posx,posy,altitude);
+    }
+    
+    /**
+     * Registers a CameraListener for this Camera
+     */
+    public void addListener(CameraListener listener){
+	listeners.add(listener);
+    }
+
+    /**
+     * Un-registers a CameraListener for this Camera
+     */
+    public void removeListener(CameraListener listener){
+	listeners.remove(listener);
+    }
+
+    /**
+     * Sends a notification to camera listeners currently
+     * observing this Camera instance of a camera movement
+     */
+    protected void notifyMoved(){
+	for(CameraListener listener: listeners){
+	    listener.cameraMoved(this, new LongPoint(posx, posy), altitude);
+	}
     }
 
     /**
