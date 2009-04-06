@@ -2,3 +2,64 @@
 %%%%%%%%%%%%%%%%%%%%
 \section{Basic Concepts}
 \label{sec:basic}
+
+%------------------------------------------------------------------------- 
+\subsection{Overview of concepts}
+\label{sec:concepts}
+
+The toolkit is based on the metaphor of infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} universes called {\em virtual spaces} that can be observed through movable and zoomable {\em cameras} and contain potentially large amounts of graphical objects called {\em glyphs}: geometrical shapes, bitmap images, text.
+
+\begin{figure}
+\begin{center}
+       \includegraphics[width=4cm,angle=-90]{images/vtmVS.pdf} 
+       \hspace{2cm}
+       \includegraphics[width=4cm,angle=-90]{images/vtmLayers.pdf}
+\end{center}
+       \caption{Schematic representation of virtual spaces, cameras, glyphs, views and layers}
+   \label{fig:vtmVS}
+\end{figure}
+
+All glyphs rely on the same polymorphic object model. A glyph belongs to a specific virtual space, but can be observed through different cameras simultaneously as each virtual space can contain multiple cameras as shown in Figure \ref{fig:vtmVS}-a. Cameras are associated with viewports called {\em views} which correspond to windows in the user interface. As we will see in section \ref{sec:lenses}, various types of magnification lenses can be activated in views. If more than one camera is associated with a given view, each camera draws its content on a transparent layer (Figure \ref{fig:vtmVS}-b). The glyph graphical model features alpha channel support; glyphs can therefore be opaque, translucent or transparent.
+
+Translucency is one of several orthogonal visual variables that define a glyph. Modifications to these variables can be animated using various temporal schemes (see section \ref{sec:animations}). Camera translations and altitude changes can also be animated, as well as magnification lens modifications, position and size of portals (views within views), etc.
+
+Input event handling is managed through high-level callbacks associated with each view. Each callback method provides context about the event such as the list of objects intersected by the cursor.
+
+On top of these concepts are implemented various interaction techniques that can easily be combined: zoomable user interfaces, superimposed translucent layers, fisheye lenses, rate-based scrolling, speed-dependent automatic zooming and more.
+
+%------------------------------------------------------------------------- 
+\subsection{Hiding low-level operations}
+\label{sec:concepts}
+
+Toolkits such as Java2D are powerful but difficult to use, requiring the programmer to deal with low-level graphical operations and implementation problems. ZVTM allows the programmer to consider the task at a more abstract level by automatically handling the following operations:
+
+{\bf Graphical Object Model: }ZVTM is a structured graphics toolkit. The developer manipulates actual graphical objects whose properties can be changed, not low-level primitives as found in Java2D's Graphics2D component. Operations can be performed on glyphs, either abruptly or through animations, and information about their status can easily be accessed.
+
+{\bf Clipping:} the toolkit is designed to handle many glyphs while maintaining an acceptable refresh rate. Two ZUI\footnote{Zoomable User Interface}-aware clipping algorithms contribute to this: an analytical clipping pass that determines whether each glyph should be projected and painted or not (based on its bounding box in virtual space), and an optional top-down pass that can detect some occlusion configurations and ignore glyphs that will not be visible in the final rendering (taking glyph translucency into account).
+
+{\bf Multi-threading and consistency:} multiple cameras associated with different views can exist simultaneously, observing the same or different regions of (possibly different) virtual space(s). A glyph observed through different cameras simultaneously is actually a single object with multiple projected coordinates. As a consequence, the synchronization and consistency of multiple views is automatic.
+
+{\bf Repaint requests:} views are refreshed lazily, i.e., only upon request. Such repaint requests are fired automatically, so that the programmer only has to assign new values to visual properties. Each camera is associated with a view that runs in its own thread. Each thread tries to provide a frame rate as close to 25 images per second as possible (unless specified otherwise).
+
+{\bf Animation management:} all camera, glyph, portal and lens animations are handled by the same module, which offers a simple and unified API based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/} for their declarative specification. The module manages a queue of pending animations and can handle concurrent animations affecting orthogonal visual variables of the same object.
+
+{\bf Hardware acceleration:} various graphics acceleration methods are available, such as Java Volatile Images and the OpenGL rendering pipeline. ZVTM features different types of views that provide hardware acceleration based on these methods while sharing the exact same API.
+
+%------------------------------------------------------------------------- 
+\subsection{Graphical Object Model}
+\label{sec:glyphs}
+
+As stated in \cite{Green96}, ``{\em data must be presented in a usable form before it becomes information, and the choice of representation affects the usability}''. The representation system, and thus the graphical object model, play a central role in converting data into information. Low-level graphical APIs provide large sets of powerful drawing primitives that address many programmers' and designers' needs. However, these primitives are often specific to the associated geometrical shape, and APIs suffer from the lack of a unified set of instructions for manipulating heterogeneous graphical objects. Moreover, these instructions often rely on machine-oriented models for encoding geometrical shapes. Such models have advantages (e.g. performance) but do not make the mapping of data to visual variables straightforward.
+
+ZVTM's graphical object model is inspired by Bertin's perceptual dimensions \cite{bertin83} and the Visual Abstract Machine's visual type system \cite{Vion-Dury97}. The model uses encapsulation to provide the programmer with a polymorphic instruction set for manipulating all graphical objects (glyphs), no matter their actual shape and appearance.
+
+All glyphs are defined by the following orthogonal attributes: the cartesian coordinates of the shape's centroid, the size of the shape's bounding circle, the shape's orientation, its border and fill colors, associated with an optional alpha channel for translucency. Basic predefined shapes are fully defined by these attributes. Other, more complex, shapes may require additional attributes. For instance, {\em VShape} glyphs support an arbitrary number of vertices, whose position within the bounding circle is represented by a normalized float (see \cite{Vion-Dury97} for more details); {\em VImage} requires a pointer to an actual bitmap resource; rectangular shapes require a width and height, or use the above-mentioned size in combination with an aspect ratio; curved paths ({\em DPath}, made of segments, quadratic curves and cubic curves) require a series of control points; etc. Glyphs can also be composed of other glyphs and still define polymorphic operations (resizing, reorienting, translating, coloring).
+
+\begin{figure}
+\centering
+   \includegraphics[width=8cm]{images/glyphFactory.pdf}
+   \caption{Direct manipulation interface for the instantiation of glyphs.}
+   \label{fig:vshape}
+\end{figure}
+
+The resulting representation system, with its orthogonal visual variables that mirror perceptual dimensions, makes mapping data to graphical attributes easy. A direct manipulation user interface (Figure \ref{fig:vshape}) facilitates the dynamic definition of glyphs, drawing a parallel with \cite{douglas99} which demonstrates the importance, for color selection, of a well-designed interface over the supposed intuitiveness of color models.
