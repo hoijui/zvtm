@@ -12,15 +12,53 @@ For now, only the Javadoc API documentation is available, along with code exampl
 %%%%%
 \subsubsection{UIST Archive Explorer}
 
-UIST Explorer is a ZUIST-based application that lets users navigate in 20 years of papers published at the ACM UIST conference from 1988 to 2007. It was one of the 20th Anniversary Interactive Visualization tools demonstrated during the 2007 conference. Users have access to 578 research papers, typically 4-to-10 page long. Papers can be browsed by year, by author, or by keywords. Overall, the multi-scale scene is composed of more than 80,000 graphical objects, most of them being 1224x1584 pixels compressed bitmap images (representing about 2GB of compressed data), loaded dynamically into memory. Running UIST Explorer typically requires less than 512MB of RAM. During the conference, the application ran on an Apple MacBook Pro laptop hooked to a SmartBoard 3000i (see pictures and videos below), with a Java heap size set to 1GB, of which it never used more than 50%.
+\begin{figure}[ht]
+\centering
+  \begin{tabular}{cc}
+    \fbox{\includegraphics[height=6cm]{images/zuist1.png}}
+&
+    \fbox{\includegraphics[height=6cm]{images/zuist2.png}}
+  \end{tabular}
+ \caption{ACM UIST Archive Explorer}
+\end{figure}
+
+UIST Explorer is a ZUIST-based application that lets users navigate in 20 years of papers published at the ACM UIST conference from 1988 to 2007. It was one of the 20th Anniversary Interactive Visualization tools demonstrated during the 2007 conference. Users have access to 578 research papers, typically 4-to-10 page long. Papers can be browsed by year, by author, or by keywords. Overall, the multi-scale scene is composed of more than 80,000 graphical objects, most of them being 1224x1584 pixels compressed bitmap images (representing about 2GB of compressed data), loaded dynamically into memory. Running UIST Explorer typically requires less than 512MB of RAM. During the conference, the application ran on an Apple MacBook Pro laptop hooked to a SmartBoard 3000i (see pictures and videos below), with a Java heap size set to 1GB, of which it never used more than 50\%.
 
 %%%%%
 \subsubsection{LRI Explorer}
+
+\begin{figure}[ht]
+\centering
+  \begin{tabular}{cc}
+    \fbox{\includegraphics[height=6cm]{images/zuist-lri1.png}}
+&
+    \fbox{\includegraphics[height=6cm]{images/zuist-lri2.png}}
+\\
+\\
+    \fbox{\includegraphics[height=6cm]{images/zuist-lri5.png}}
+&
+    \fbox{\includegraphics[height=6cm]{images/zuist-lri4.png}}
+  \end{tabular}
+  \caption{LRI Explorer}
+\end{figure}
 
 A similar application was developed to navigate in all research documents published by members of LRI, the computer science lab at Université Paris-Sud between 2005 and 2008, ranging from book chapters, journal and conference papers to PhD dissertations and tech reports. Documents can be browsed by author or by team, and are then organized by type of publication and year of publication, down to the level where the pages of each document appear (when a PDF version is available). The total number of documents is about 1,500. A PDF version of the document is available for 753 of them, amounting to about 15,000 pages actually readable directly within the application.
 
 %%%%%
 \subsubsection{Blue Marble Next Generation Explorer}
 
-Navigating in a multi-scale version of NASA's Blue Marble Next Generation world map: 86400 x 43200 pixels decomposed into 2730 tiles (1350x1350 each) arranged in a pyramid. The map is enriched with geographical data taken from the Geonames database and boundaries for countries and administrative regions publicly available as ESRI shapefiles.
+\begin{figure}[ht]
+\centering
+  \begin{tabular}{c}
+    \fbox{\includegraphics[height=5cm]{images/zuist3.png}}
+    \fbox{\includegraphics[height=5cm]{images/zuist4.png}}
+\\
+\vspace{-3mm}
+\\
+    \fbox{\includegraphics[height=5cm]{images/zuist-atc.png}}
+    \fbox{\includegraphics[height=5cm]{images/zuist-wm.png}}
+  \end{tabular}
+  \caption{Blue Marble Next Generation Explorer}
+\end{figure}
 
+Navigating in a multi-scale version of NASA's Blue Marble Next Generation world map: 86400 x 43200 pixels decomposed into 2730 tiles (1350x1350 each) arranged in a pyramid. The map is enriched with geographical data taken from the Geonames database and boundaries for countries and administrative regions publicly available as ESRI shapefiles.
