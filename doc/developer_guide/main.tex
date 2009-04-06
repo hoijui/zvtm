@@ -20,32 +20,52 @@
 \parskip = 0.07in
 \parindent = 0.0in
 
-\allsectionsfont{\sffamily} 
+\allsectionsfont{\sffamily}
+
+\newcommand{\fref}[1]{\footnote{\url{#1}}}
+\newcommand{\cd}[1]{{\tt #1}}
+\newcommand{\codebox}[1]{\framebox[\columnwidth]{\cd{#1} \hfill}}
 
 \title{ZVTM - Developer's Guide}
-\author{}
-\date{\today{}}
+\author{Contributing authors: Emmanuel Pietriga, Romain Primet}
+\date{\vspace{4cm}\today{}}
 
 \begin{document}
 
+% First page
 \maketitle
+\thispagestyle{empty}
+
+\begin{center}
+\vspace{4cm}
+\url{http://zvtm.sf.net}
+\end{center}
+\vspace{2cm}
+\begin{center}
+\fbox{\includegraphics[width=14cm]{images/banner.png}}
+\end{center}
+
 \newpage
 
+% TOC
 \setcounter{tocdepth}{2}
 \tableofcontents
 \newpage
 
+% List of figures
 \listoffigures
-\newpage
 
 \input{introduction}
 \input{build}
 \input{basic}
 \input{animations}
+\input{advanced}
 
 \input{zuist}
 \input{layout}
 \input{pdf}
+
+\newpage
 
 \begin{small}
 \bibliographystyle{abbrv}

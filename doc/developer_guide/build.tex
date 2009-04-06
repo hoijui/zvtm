@@ -1,3 +1,70 @@
+\newpage
 %%%%%%%%%%%%%%%%%%%%
 \section{Getting and building ZVTM}
 \label{sec:build}
+
+\subsection{Getting source code}
+  
+The source code is available in each zvtm-sources release on SourceForge.net\fref{http://sourceforge.net/project/showfiles.php?group_id=63244&package_id=69949} and via the SVN repository\fref{http://zvtm.sourceforge.net/download.html\#svn}.
+  
+\subsection{Building with Maven 2.0}
+ 
+Maven is a very powerful management system. Visit the Maven web site to get more information\fref{http://maven.apache.org/guides/index.html}.
+    
+In the following we only give a brief summary of useful commands to compile and package ZVTM.
+
+The main \cd{zvtm} directory contains a \cd{pom.xml} file that contains the Maven configuration for ZVTM. All commands are issued from that directory.
+
+\subsubsection{Compile}
+
+The first command in the build lifecycle compiles the source code, creating a \cd{target} directory with classes stored in \cd{target/classes}. The source code itself is located in \cd{src/main/java} with additional resources such as image icons in \cd{src/main/resources}.
+
+\codebox{mvn compile}
+
+\subsubsection{Package}
+
+To build ZVTM's JAR file, issue the following command.
+
+\codebox{mvn package}
+
+If necessary, Maven will go through the compilation goal and all other intermediate goals before packaging. The resulting JAR file is put in directory \cd{target/}. As opposed to builds in earlier releases managed with Ant, the JAR file name now containsthe version number, such as \cd{zvtm-0.9.7.jar} or \cd{zvtm-0.9.8-SNAPSHOT.jar}.
+
+\subsubsection{Install ZVTM in local repository}
+
+You can install ZVTM in your local Maven repository (usually \cd{~/.m2/repository}) with the following command:
+
+\codebox{mvn install}
+
+\subsubsection{Clean}
+
+To recompile all classes, simply erase the target directory with the following command:
+
+\codebox{mvn clean}
+
+\subsubsection{Generating JavaDoc}
+
+ZVTM's javadoc can be generated with the following command:
+
+\codebox{mvn javadoc:javadoc}
+
+The resulting \cd{apidocs/} directory is put in \cd{target/site/}.
+
+\subsubsection{Declaring ZVTM as a dependency in your own Maven-managed project}
+
+Declare the following repository:
+\begin{verbatim}
+<repository>
+  <id>zvtm repository</id>
+  <url>http://zvtm.sourceforge.net/maven</url>
+</repository>
+\end{verbatim}
+
+and add the following dependency in your own \cd{pom.xml} file:
+
+\begin{verbatim}
+<dependency>
+  <groupId>net.claribole.zvtm</groupId>
+  <artifactId>zvtm</artifactId>
+  <version>0.9.7</version>
+</dependency>
+\end{verbatim}
