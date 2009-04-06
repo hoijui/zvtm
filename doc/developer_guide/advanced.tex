@@ -13,6 +13,134 @@
 \subsection{Focus+Context using the Sigma Lens Framework}
 \label{sec:lenses}
 
+\begin{center}
+ \includegraphics[width=16cm]{images/sigmaLensPanel2000.jpg}
+\end{center}
+
+ZVTM provides full support for Sigma Lenses, which are instantiated and programmatically manipulated in the same manner as distortion lenses described hereafter. See the Lens package API documentation for more information\fref{http://zvtm.sourceforge.net/apidocs/index.html?net/claribole/zvtm/lens/package-summary.html}. The CHI 2008 paper gives the theoretical background behind Sigma lenses. it is available from the ACM Digital Library\fref{http://doi.acm.org/10.1145/1357054.1357264} or the HAL-INRIA open archive\fref{http://hal.inria.fr/inria-00271301}. The companion video is available as a Quicktime movie\fref{http://www.lri.fr/~pietriga/2008/04/chi2008_sigma_lenses.mov}, and on YouTube\fref{http://www.youtube.com/watch?v=k3M7rty3WYs}.
+
+A demo applet is available\fref{http://zvtm.sourceforge.net/doc/tutorials/lenses/index.html}.
+
+Distortion lenses (also called graphical fisheye lenses) make it possible to create focus + context representations. They can be associated with any ZVTM external standard view (they cannot yet be associated with accelerated views). A lens provides a distorted representation of what is seen through all cameras of the view it is associated with.
+
+%%%%%
+\subsubsection{Lens types}
+
+\begin{figure}
+\centering
+ \includegraphics[width=10cm]{images/lens_profiles.png}
+   \caption{Lens magnification profiles}
+   \label{fig:lprof}
+\end{figure}
+
+Lenses are defined by three properties, as shown in Figure \ref{fig:lprof}:
+\begin{itemize}
+\item a maximum magnification factor, which represents the magnification factor set from the center of the lens to the lens' inner radius;
+\item an outer radius R1, beyond which no magnification is applied;
+\item an inner radius R2, which defines the distance to the lens' center from which magnification starts to decrease from the maximum factor down to no magnification (when reaching the outer radius).
+\end{itemize}
+
+Inner and outer radii are specified in pixels. The magnification function profile, i.e., the transition from maximum magnification to no magnification at all, is defined by the lens type. Figure \ref{fig:lprof} illustrates three profiles.
+
+The following table gives examples of available lens types. L(p) represents the distance function as defined in Carpendale and Montagnese's Framework for Unifying Presentation Space \cite{carpendale01}.
+
+
+\begin{tabular}{|p{1.4cm}|c|c|c|c|}
+\hline
+ & $L(1)$ & $L(2)$ & $L(3)$ & $L(\inf)$ \\
+\hline
+Gaussian &
+\includegraphics[width=3.6cm]{images/L1Gaussian.png} &
+\includegraphics[width=3.6cm]{images/L2Gaussian.png} &
+\includegraphics[width=3.6cm]{images/L3Gaussian.png} &
+\includegraphics[width=3.6cm]{images/LInfGaussian.png} \\
+\hline
+Linear &
+\includegraphics[width=3.6cm]{images/L1Linear.png} &
+\includegraphics[width=3.6cm]{images/L2Linear.png} &
+\includegraphics[width=3.6cm]{images/L3Linear.png} &
+\includegraphics[width=3.6cm]{images/LInfLinear.png} \\
+\hline
+\vspace{-0.7cm}Inverse Cosine &
+\includegraphics[width=3.6cm]{images/L1InvCos.png} &
+\includegraphics[width=3.6cm]{images/L2InvCos.png} &
+\includegraphics[width=3.6cm]{images/L3InvCos.png} &
+\includegraphics[width=3.6cm]{images/LInfInvCos.png} \\
+\hline
+Manhattan &
+\includegraphics[width=3.6cm]{images/L1Manhattan.png} &
+\includegraphics[width=3.6cm]{images/L2Manhattan.png} &
+\includegraphics[width=3.6cm]{images/L3Manhattan.png} &
+\includegraphics[width=3.6cm]{images/LInfManhattan.png} \\
+\hline
+\end{tabular}
+
+\subsubsection{Associating a lens with a View}
+
+A lens is associated with a View using the View.setLens(Lens l) method. Lenses can only be associated with standard external views or applet views for now (not with accelerated views). Here is an example of code creating a fixed size lens and associating it with a view:
+
+\begin{small}
+\begin{verbatim}
+VirtualSpaceManager vsm = ...;
+View v = vsm.addExternalView(...);
+// create a lens with a magnification factor of 4x, outer radius of 100px,
+// inner radius of 10px (flat-top is 40px-wide)
+Lens l = v.setLens(new FSGaussianLens(4.0f, 100, 20));
+\end{verbatim}
+\end{small}
+
+\subsubsection{Unsetting a lens}
+
+Removing a lens from a view is achieved by passing null to View.setLens(Lens l). Additionally, method dispose() should be called on the lens object to free any graphical resource used by the lens:
+
+\begin{small}
+\begin{verbatim}
+View v = ...;
+Lens l = ...;
+v.setLens(null);
+l.dispose();
+\end{verbatim}
+\end{small}
+
+\subsubsection{Lens animation}
+
+Each of the three lens properties (maximum magnification factor, inner and outer radii) can be changed dynamically. These changes can be animated using the Animation Manager. Here is an example of animating the previous lens' maximum magnification factor increase (from 4x to 8x in 500ms) using the linear temporal schema:
+
+\begin{small}
+\begin{verbatim}
+vsm.animator.createLensAnimation(500, AnimManager.LS_MM_LIN,
+                                 new Float(4.0f), l.getID(), false);
+\end{verbatim}
+\end{small}
+
+Maximum magnification factor and radius values can be animated simultaneously. See the API Documentation for details.
+
+\subsubsection{Using animations to achieve nice effects}
+
+When activating a lens, a nice effect consists in creating in flat and then animating its magnification factor to the wanted value using an animation. This way, the lens seems to emerge from the previously flat surface.
+
+\begin{small}
+\begin{verbatim}
+/* MAG_FACTOR is the magnification factor the lens should be set to */
+float MAG_FACTOR = 4.0f;
+Lens l = new LInfFSInverseCosineLens(1.0f, 100, 50);
+vsm.animator.createLensAnimation(500, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
+                                 l.getID(), null);
+\end{verbatim}
+\end{small}
+
+The opposite effect can be used when deactivatign a lens. The following animation will make it look like the lens is flattening itself. Note that in the following code we use a predefined PostAnimationAction to dispose of the lens after the animation has ended.
+
+\begin{small}
+\begin{verbatim}
+/* MAG_FACTOR is the magnification factor the lens has been set to */
+VirtualSpaceManager vsm = ...;
+Lens l = ...;
+vsm.animator.createLensAnimation(500, AnimManager.LS_MM_LIN, new Float(1-MAG_FACTOR),
+                                 l.getID(), new LensKillAction(vsm));
+\end{verbatim}
+\end{small}
+
 %%%%%%%%%%
 \subsection{DynaSpot: Speed Dependent Area Cursor}
 
