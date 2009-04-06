@@ -46,6 +46,27 @@ Toolkits such as Java2D are powerful but difficult to use, requiring the program
 {\bf Hardware acceleration:} various graphics acceleration methods are available, such as Java Volatile Images and the OpenGL rendering pipeline. ZVTM features different types of views that provide hardware acceleration based on these methods while sharing the exact same API.
 
 %------------------------------------------------------------------------- 
+\subsection{Virtual Space Manager}
+
+The virtual space manager \cl{com.xerox.VTM.engine.VirtualSpaceManager} is the main entry point in ZVTM. It is the first object instantiated by the client application. There is only one instance of it.
+
+\codebox{VirtualSpaceManager vsm = new VirtualSpaceManager(false);}
+
+The optional boolean feeded to the constructor should be set to \cd{true} when instantiating ZVTM within an applet.
+
+Many operations, such as creating virtual spaces, adding glyphs and cameras to them, will take place through the virtual space manager (which we abbreviate VSM from now on).
+
+%------------------------------------------------------------------------- 
+\subsection{Virtual Spaces}
+
+Graphical objects are put on infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{com.xerox.VTM.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
+
+There can be an arbitrary number of virtual spaces.
+
+%------------------------------------------------------------------------- 
+\subsection{Cameras, Views and Layers}
+
+%------------------------------------------------------------------------- 
 \subsection{Graphical Object Model}
 \label{sec:glyphs}
 
