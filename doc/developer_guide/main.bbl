@@ -1,0 +1,71 @@
+\begin{thebibliography}{10}
+
+\bibitem{chapuis09}
+O.~Chapuis, J.-B. Labrune, and E.~Pietriga.
+\newblock Dynaspot: Speed-dependent area cursor.
+\newblock In {\em CHI '09: Proceeding of the twenty-sixth annual CHI conference
+  on Human factors in computing systems}. ACM, 2009.
+\newblock To appear (10 pages).
+
+\bibitem{conesa08}
+A.~Conesa and S.~G\"{o}tz.
+\newblock Blast2go: A comprehensive suite for functional analysis in plant
+  genomics.
+\newblock {\em International journal of plant genomics}, 2008, 2008.
+
+\bibitem{moscovich09}
+T.~Moscovich, F.~Chevalier, N.~Henry, E.~Pietriga, and J.-D. Fekete.
+\newblock Topology-aware navigation in large networks.
+\newblock In {\em CHI '09: Proceeding of the twenty-sixth annual CHI conference
+  on Human factors in computing systems}. ACM, 2009.
+\newblock To appear (10 pages).
+
+\bibitem{pietriga02}
+E.~Pietriga.
+\newblock {I}sa{V}iz, a visual environment for browsing and authoring {RDF}.
+\newblock The 11th Int. World Wide Web Conference (WWW 2002) - Developer's Day:
+  The Semantic Web - \url{http://www.w3.org/2001/11/IsaViz/} (W3C), 2002.
+
+\bibitem{pietriga06}
+E.~Pietriga.
+\newblock Semantic web data visualization with graph style sheets.
+\newblock In {\em SoftVis '06: Proceedings of the 2006 ACM symposium on
+  Software visualization}, pages 177--178. ACM Press, 2006.
+
+\bibitem{pietriga08}
+E.~Pietriga and C.~Appert.
+\newblock Sigma lenses: focus-context transitions combining space, time and
+  translucence.
+\newblock In {\em CHI '08: Proceeding of the twenty-sixth annual CHI conference
+  on Human factors in computing systems}, pages 1343--1352. ACM, 2008.
+
+\bibitem{pietriga07}
+E.~Pietriga, C.~Appert, and M.~Beaudouin-Lafon.
+\newblock Pointing and beyond: an operationalization and preliminary evaluation
+  of multi-scale searching.
+\newblock In {\em CHI '07: Proceedings of the SIGCHI conference on Human
+  factors in computing systems}, pages 1215--1224. ACM Press, 2007.
+
+\bibitem{zuist}
+E.~Pietriga and M.~Beaudouin-Lafon.
+\newblock {ZUIST - UIST 2.0 Celebrating 20 Years of UIST}.
+\newblock \url{http://www.acm.org/uist/archive/uist2.0/ZUIST.html}, 2007.
+
+\bibitem{pietriga01}
+E.~Pietriga, J.-Y. Vion-Dury, and V.~Quint.
+\newblock Vxt: a visual approach to xml transformations.
+\newblock In {\em DocEng '01: Proceedings of the 2001 ACM Symposium on Document
+  engineering}, pages 1--10. ACM Press, 2001.
+
+\bibitem{robertson93}
+G.~G. Robertson, S.~K.Card, and J.~D.Mackinlay.
+\newblock {Information visualization using 3D interactive animation}.
+\newblock {\em Communication of the ACM}, 36(4):56--71, 1993.
+
+\bibitem{bluemarble}
+R.~Stockli, E.~Vermote, N.~Saleous, R.~Simmon, and D.~Herring.
+\newblock {The Blue Marble Next Generation - A true color earth dataset
+  including seasonal dynamics from MODIS}.
+\newblock Published by the NASA Earth Observatory, 2005.
+
+\end{thebibliography}

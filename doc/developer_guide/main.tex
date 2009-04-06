@@ -1,0 +1,55 @@
+\documentclass[10pt]{article}
+\usepackage{sectsty}
+\usepackage{times}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\textwidth = 6.8 in
+\textheight = 9.1 in
+\oddsidemargin = 0.0 in
+\evensidemargin = 0.0 in
+\topmargin = 0.0 in
+\headheight = 0.0 in
+\headsep = 0.0 in
+\parskip = 0.07in
+\parindent = 0.0in
+
+\allsectionsfont{\sffamily} 
+
+\title{ZVTM - Developer's Guide}
+\author{}
+\date{\today{}}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\setcounter{tocdepth}{2}
+\tableofcontents
+\newpage
+
+\listoffigures
+\newpage
+
+\input{introduction}
+\input{build}
+\input{basic}
+\input{animations}
+
+\input{zuist}
+\input{layout}
+\input{pdf}
+
+\begin{small}
+\bibliographystyle{abbrv}
+\bibliography{main}
+\end{small}
+
+\end{document}
