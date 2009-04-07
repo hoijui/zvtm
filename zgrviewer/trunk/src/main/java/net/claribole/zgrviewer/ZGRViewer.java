@@ -440,26 +440,26 @@ public class ZGRViewer implements ZGRApplication {
     static final String CURRENT_VERSION_URL = "http://zvtm.sourceforge.net/zgrviewer/currentVersion";
 
     public void checkVersion(){
-	try {
-	    String version = Utils.getTextContent(new URL(CURRENT_VERSION_URL), 10);
-	    if (version != null){
-		if (version.equals(Messages.VERSION)){
-		    // we should actually compare numbers
-		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.YOU_HAVE_THE_MOST_RECENT_VERSION,
-		                                  "Version Information", JOptionPane.INFORMATION_MESSAGE);
-		}
-		else {
-		    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.NEW_VERSION_AVAILABLE+version+"\n"+Messages.DOWNLOAD_URL,
-		                                  "Version Information", JOptionPane.INFORMATION_MESSAGE);
-		}
-	    }
-	    else {
-		JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.COULD_NOT_GET_VERSION_INFO, "Error", JOptionPane.ERROR_MESSAGE);
-	    }
-	}
-	catch (Exception ex){
-	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.COULD_NOT_GET_VERSION_INFO, "Error", JOptionPane.ERROR_MESSAGE);
-	}
+        try {
+            String version = Utils.getTextContent(new URL(CURRENT_VERSION_URL), 10).trim();
+            if (version != null){
+                if (version.equals(Messages.VERSION)){
+                    // we should actually compare numbers
+                    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.YOU_HAVE_THE_MOST_RECENT_VERSION,
+                        "Version Information", JOptionPane.INFORMATION_MESSAGE);
+                }
+                else {
+                    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.NEW_VERSION_AVAILABLE+version+"\n"+Messages.DOWNLOAD_URL,
+                        "Version Information", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.COULD_NOT_GET_VERSION_INFO, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        catch (Exception ex){
+            JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.COULD_NOT_GET_VERSION_INFO, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     void exit(){
