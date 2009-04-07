@@ -246,13 +246,14 @@ public class ZPDFPage extends ClosedShape implements RectangularShape {
 		return false; 
 	}
 
-	public boolean coordInside(int x,int y,int camIndex){
-		if ((x>=(pc[camIndex].cx-pc[camIndex].cw)) && (x<=(pc[camIndex].cx+pc[camIndex].cw)) && (y>=(pc[camIndex].cy-pc[camIndex].ch)) && (y<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
+	public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+		if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
+		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
 		else {return false;}
 	}
 
-	public short mouseInOut(int x,int y,int camIndex){
-		if (coordInside(x,y,camIndex)){
+	public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+		if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
 			//if the mouse is inside the glyph
 			if (!pc[camIndex].prevMouseIn){
 				//if it was not inside it last time, mouse has entered the glyph
