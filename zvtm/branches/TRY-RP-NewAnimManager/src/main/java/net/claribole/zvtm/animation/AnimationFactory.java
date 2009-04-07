@@ -25,7 +25,7 @@ import net.claribole.zvtm.lens.FixedSizeLens;
 /**
  * A class that provides creation methods for animations.
  * The createAnimation() methods are generic and flexible, while the
- * create[ObjectType][AnimationType] method are pre-made and easier to use
+ * create[TargetType][AnimationType] methods are pre-made and easier to use
  * (but offer less flexibility and only cover the most common animation 
  * cases).
  */
@@ -119,7 +119,7 @@ public class AnimationFactory {
     }
 
     /**
-     * Creates and returns a linear camera translation that will
+     * Creates and returns a camera translation that will
      * not repeat.
      * @param duration duration of the animation, in milliseconds.
      * @param camera camera to animate
@@ -138,12 +138,18 @@ public class AnimationFactory {
 			       camera,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
-				   private final long startX = camera.getLocation().vx;
-				   private final long startY = camera.getLocation().vy;
-				   private final long endX = 
-				       relative? camera.getLocation().vx + data.x : data.x;
-				   private final long endY = 
-				       relative? camera.getLocation().vy + data.y : data.y;
+				   private long startX = Long.MIN_VALUE;
+				   private long startY = Long.MIN_VALUE;
+				   private long endX = Long.MIN_VALUE;
+				   private long endY = Long.MIN_VALUE;
+				   
+				   @Override
+				   public void begin(Object subject, Animation.Dimension dim){
+				       startX = camera.getLocation().vx;
+				       startY = camera.getLocation().vy;
+				       endX = relative? camera.getLocation().vx + data.x : data.x;
+				       endY = relative? camera.getLocation().vy + data.y : data.y;
+				   }
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -163,7 +169,7 @@ public class AnimationFactory {
     }
     
     /**
-     * Creates and returns a linear camera altitude animation
+     * Creates and returns a camera altitude animation
      * that will not repeat.
      * @param duration duration of the animation, in milliseconds.
      * @param camera camera to animate
@@ -183,9 +189,14 @@ public class AnimationFactory {
 			       camera,
 			       Animation.Dimension.ALTITUDE,
 			       new DefaultTimingHandler(){
-				   private final float startZ = camera.getAltitude();
-				   private final float endZ = 
-				       relative? camera.getAltitude() + data : data;
+				   private float startZ = Float.MIN_VALUE;
+				   private float endZ = Float.MAX_VALUE;
+				   
+				   @Override
+				   public void begin(Object subject, Animation.Dimension dim){
+				       startZ = camera.getAltitude();
+				       endZ = relative? camera.getAltitude() + data : data;
+				   }
 		
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -204,7 +215,7 @@ public class AnimationFactory {
      }
 
     /**
-     * Creates and returns a linear glyph translation
+     * Creates and returns a glyph translation
      * that will not repeat.
      * @param duration duration of the animation, in milliseconds.
      * @param glyph glyph to animate
@@ -223,13 +234,19 @@ public class AnimationFactory {
 				glyph,
 				Animation.Dimension.POSITION,
 				new DefaultTimingHandler(){
-				    private final long startX = glyph.getLocation().x;
-				    private final long startY = glyph.getLocation().y;
-				    private final long endX = 
-					relative? glyph.getLocation().x + data.x : data.x;
-				    private final long endY = 
-					relative? glyph.getLocation().y + data.y : data.y;
-			
+				    private long startX = Long.MIN_VALUE;
+				    private long startY = Long.MIN_VALUE;
+				    private long endX = Long.MIN_VALUE;
+				    private long endY = Long.MIN_VALUE;
+
+				    @Override
+				    public void begin(Object subject, Animation.Dimension dim){
+					startX = glyph.getLocation().x;
+					startY = glyph.getLocation().y;
+					endX = relative? glyph.getLocation().x + data.x : data.x;
+					endY = relative? glyph.getLocation().y + data.y : data.y;
+				    }
+				    
 				    @Override
 				    public void end(Object subject, Animation.Dimension dim){
 					if(null != endAction){
@@ -252,18 +269,25 @@ public class AnimationFactory {
 					 final float data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
-	final float startSize = glyph.getSize();
-	final float endSize = relative? glyph.getSize() + data : data;
-	
-	//throw if this animation would cause the size to become negative
-	if(endSize < 0f){
-	    throw new IllegalArgumentException("Cannot animate a Glyph size to a negative value");
-	}
-
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
+				   private float startSize = Float.MIN_VALUE;
+				   private float endSize = Float.MIN_VALUE;
+
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       startSize = glyph.getSize();
+				       endSize = relative? glyph.getSize() + data : data;
+
+				       //throw if this animation would cause the size to become negative
+				       //XXX it might be better to silently clip size to zero 
+				       if(endSize < 0f){
+					   throw new IllegalStateException("Cannot animate a Glyph size to a negative value");
+				       }
+				   }
+
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
 				       if(null != endAction){
@@ -288,9 +312,14 @@ public class AnimationFactory {
 			       glyph,
 			       Animation.Dimension.ORIENTATION,
 			       new DefaultTimingHandler(){
-				   private final float startAngle = glyph.getOrient();
-				   private final float endAngle = 
-				       relative? glyph.getOrient() + data : data;
+				   private float startAngle = Float.MIN_VALUE;
+				   private float endAngle = Float.MIN_VALUE;
+				   
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       startAngle = glyph.getOrient();
+				       endAngle = relative? glyph.getOrient() + data : data;
+				   }
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -312,20 +341,27 @@ public class AnimationFactory {
 					      final float[] data, final boolean relative,
 					      final Interpolator interpolator,
 					      final EndAction endAction){
-	final float[] startColor = glyph.getHSVColor();
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.FILLCOLOR,
 			       new DefaultTimingHandler(){
-				   private final float startH = startColor[0];
-				   private final float startS = startColor[1];
-				   private final float startV = startColor[2];
-				   private final float endH = 
-				       relative? startH + data[0] : data[0];
-				   private final float endS = 
-				       relative? startS + data[1] : data[1];
-				   private final float endV = 
-				       relative? startV + data[2]: data[2];
+				   private float startH = Float.MIN_VALUE;
+				   private float startS = Float.MIN_VALUE;
+				   private float startV = Float.MIN_VALUE;
+				   private float endH = Float.MIN_VALUE;
+				   private float endS = Float.MIN_VALUE;
+				   private float endV = Float.MIN_VALUE;
+				   
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       final float[] startColor = glyph.getHSVColor();
+				       startH = startColor[0];
+				       startS = startColor[1];
+				       startV = startColor[2];
+				       endH = relative? startH + data[0] : data[0];
+				       endS = relative? startS + data[1] : data[1];
+				       endV = relative? startV + data[2]: data[2];
+				   }
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -348,20 +384,27 @@ public class AnimationFactory {
 						final float[] data, final boolean relative,
 						final Interpolator interpolator,
 						final EndAction endAction){
-	final float[] startColor = glyph.getHSVbColor();
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.BORDERCOLOR,
 			       new DefaultTimingHandler(){
-				   private final float startH = startColor[0];
-				   private final float startS = startColor[1];
-				   private final float startV = startColor[2];
-				   private final float endH = 
-				       relative? startH + data[0] : data[0];
-				   private final float endS = 
-				       relative? startS + data[1] : data[1];
-				   private final float endV = 
-				       relative? startV + data[2] : data[2];
+				   private float startH = Float.MIN_VALUE;
+				   private float startS = Float.MIN_VALUE;
+				   private float startV = Float.MIN_VALUE;
+				   private float endH = Float.MIN_VALUE;
+				   private float endS = Float.MIN_VALUE;
+				   private float endV = Float.MIN_VALUE;
+				   				   
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       final float[] startColor = glyph.getHSVbColor();
+				       startH = startColor[0];
+				       startS = startColor[1];
+				       startV = startColor[2];
+				       endH = relative? startH + data[0] : data[0];
+				       endS = relative? startS + data[1] : data[1];
+				       endV = relative? startV + data[2]: data[2];
+				   }
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -389,8 +432,14 @@ public class AnimationFactory {
 			       translucent,
 			       Animation.Dimension.TRANSLUCENCY,
 			       new DefaultTimingHandler(){
-				   private final float startA = translucent.getTranslucencyValue();
-				   private final float endA = relative? startA + data : data;
+				   private float startA = Float.MIN_VALUE;
+				   private float endA = Float.MIN_VALUE;
+
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       startA = translucent.getTranslucencyValue();
+				       endA = relative? startA + data : data;
+				   }
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -415,12 +464,18 @@ public class AnimationFactory {
 			       portal,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
-				   private final int startX = portal.x;
-				   private final int startY = portal.y;
-				   private final int endX = 
-				       relative? portal.x + data.x : data.x;
-				   private final int endY = 
-				       relative? portal.y + data.y : data.y;
+				   private int startX = Integer.MIN_VALUE;
+				   private int startY = Integer.MIN_VALUE;
+				   private int endX = Integer.MIN_VALUE;
+				   private int endY = Integer.MIN_VALUE;
+				   
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       startX = portal.x;
+				       startY = portal.y;
+				       endX = relative? portal.x + data.x : data.x;
+				       endY = relative? portal.y + data.y : data.y;
+				   }
 
 				   @Override
 				    public void end(Object subject, Animation.Dimension dim){
@@ -449,12 +504,18 @@ public class AnimationFactory {
 			       portal,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
-				   private final int startW = portal.w;
-				   private final int startH = portal.h;
-				   private final int endW = 
-				       relative? startW + wdata : wdata;
-				   private final int endH = 
-				       relative? startH + hdata : hdata;
+				   private int startW = Integer.MIN_VALUE;
+				   private int startH = Integer.MIN_VALUE;
+				   private int endW = Integer.MIN_VALUE;
+				   private int endH = Integer.MIN_VALUE;
+
+				   @Override
+		        	   public void begin(Object subject, Animation.Dimension dim){
+				       startW = portal.w;
+				       startH = portal.h;
+				       endW = relative? startW + wdata : wdata;
+				       endH = relative? startH + hdata : hdata;
+				   }
 
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
@@ -487,11 +548,14 @@ public class AnimationFactory {
 			       lens,
 			       Animation.Dimension.LENS_MAG,
 			       new DefaultTimingHandler(){
-				   final float startMag = lens.getMaximumMagnification();
-				   final float endMag = relative? startMag + data : data;
+				   private float startMag = Float.MIN_VALUE;
+				   private float endMag = Float.MIN_VALUE;
 
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
+				       startMag = lens.getMaximumMagnification();
+				       endMag = relative? startMag + data : data;
+
 				       //allocate a buffer big enough to store the final lens data
 				       if(endMag > startMag){
 					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getOuterRadius()));
@@ -544,17 +608,26 @@ public class AnimationFactory {
 			       lens,
 			       Animation.Dimension.LENS_MAG_RADIUS,
 			       new DefaultTimingHandler(){
-				   final float startMag = lens.getMaximumMagnification();
-				   final float endMag = relative? startMag + magData : magData;
-				   final int startOr = lens.getOuterRadius();
-				   final int endOr = relative? startOr + orData : orData;
-				   final int startIr = lens.getInnerRadius();
-				   final int endIr = relative? startIr + irData : irData;
-				   final int startBufSize = Math.round(2*startMag*startOr);
-				   final int endBufSize = Math.round(2*endMag*endOr);
+				   private float startMag = Float.MIN_VALUE;
+				   private float endMag = Float.MIN_VALUE;
+				   private int startOr = Integer.MIN_VALUE;
+				   private int endOr = Integer.MIN_VALUE;
+				   private int startIr = Integer.MIN_VALUE;
+				   private int endIr = Integer.MIN_VALUE;
+				   private int startBufSize = Integer.MIN_VALUE;
+				   private int endBufSize = Integer.MIN_VALUE;
 
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
+				       startMag = lens.getMaximumMagnification();
+				       endMag = relative? startMag + magData : magData;
+				       startOr = lens.getOuterRadius();
+				       endOr = relative? startOr + orData : orData;
+				       startIr = lens.getInnerRadius();
+				       endIr = relative? startIr + irData : irData;
+				       startBufSize = Math.round(2*startMag*startOr);
+				       endBufSize = Math.round(2*endMag*endOr);
+
 				       //allocate a buffer big enough to store the final lens data
 				       if(endBufSize > startBufSize){
 					   lens.setMagRasterDimensions(endBufSize);
@@ -596,16 +669,24 @@ public class AnimationFactory {
 			       lens,
 			       Animation.Dimension.LENS_RADIUS,
 			       new DefaultTimingHandler(){
-				   final float mag = lens.getMaximumMagnification();
-				   final int startOr = lens.getOuterRadius();
-				   final int endOr = relative? startOr + orData : orData;
-				   final int startIr = lens.getInnerRadius();
-				   final int endIr = relative? startIr + irData : irData;
-				   final int startBufSize = Math.round(2*mag*startOr);
-				   final int endBufSize = Math.round(2*mag*endOr);
+				   private float mag = Float.MIN_VALUE;
+				   private int startOr = Integer.MIN_VALUE;
+				   private int endOr = Integer.MIN_VALUE;
+				   private int startIr = Integer.MIN_VALUE;
+				   private int endIr = Integer.MIN_VALUE;
+				   private int startBufSize = Integer.MIN_VALUE;
+				   private int endBufSize = Integer.MIN_VALUE;
 
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
+				       mag = lens.getMaximumMagnification();
+				       startOr = lens.getOuterRadius();
+				       endOr = relative? startOr + orData : orData;
+				       startIr = lens.getInnerRadius();
+				       endIr = relative? startIr + irData : irData;
+				       startBufSize = Math.round(2*mag*startOr);
+				       endBufSize = Math.round(2*mag*endOr);
+
 				       //allocate a buffer big enough to store the final lens data
 				       if(endBufSize > startBufSize){
 					   lens.setMagRasterDimensions(endBufSize);
@@ -639,24 +720,32 @@ public class AnimationFactory {
 				    final Interpolator interpolator,
 				    final EndAction endAction){
 
-	if(data.length != path.getElementsCount()){
-	    throw new IllegalArgumentException("'data' element count must be equal to the path element count");
-	}
-
-	final LongPoint[] startPoints = new LongPoint[path.getElementsCount()];
-	final LongPoint[] endPoints = new LongPoint[path.getElementsCount()];
-	LongPoint[] coords = path.getAllPointsCoordinates();
-	System.arraycopy(coords, 0, startPoints, 0, coords.length);
-	for(int i=0; i<startPoints.length; ++i){
-	    endPoints[i].x = relative ? startPoints[i].x + data[i].x : data[i].x;
-	    endPoints[i].y = relative ? startPoints[i].y + data[i].y : data[i].y;
-	}
-
 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
 			       path,
 			       Animation.Dimension.PATH,
 			       new DefaultTimingHandler(){
-				   private final LongPoint[] tempPoints = new LongPoint[path.getElementsCount()];
+				   private LongPoint[] startPoints; 
+				   private LongPoint[] endPoints; 
+				   private LongPoint[] coords; 
+				   private LongPoint[] tempPoints; 
+
+				   @Override
+				   public void begin(Object subject, Animation.Dimension dim){
+				       if(data.length != path.getElementsCount()){
+					   throw new IllegalStateException("'data' element count must be equal to the path element count");
+				       }
+
+				       startPoints = new LongPoint[path.getElementsCount()];
+				       endPoints = new LongPoint[startPoints.length];
+				       tempPoints = new LongPoint[startPoints.length];
+				       coords = path.getAllPointsCoordinates();
+				       System.arraycopy(coords, 0, startPoints, 0, coords.length);
+				       for(int i=0; i<startPoints.length; ++i){
+					   endPoints[i].x = relative ? startPoints[i].x + data[i].x : data[i].x;
+					   endPoints[i].y = relative ? startPoints[i].y + data[i].y : data[i].y;
+				       }
+				   }
+
 				   @Override
 				   public void end(Object subject, Animation.Dimension dim){
 				       if(null != endAction){
