@@ -52,7 +52,7 @@ $Id$
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.9.8-SNAPSHOT</version>
+      <version>0.9.8</version>
     </dependency>
   </dependencies>
   
