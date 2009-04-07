@@ -37,7 +37,7 @@ class OverlayEventHandler implements ViewEventHandler {
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         if (application.ovm.showingLinks){
-            Vector labels = v.getMouse().getIntersectingTexts(application.ovCamera);
+            Vector labels = v.getVCursor().getIntersectingTexts(application.ovCamera);
             boolean clickedOnLink = false;
             if (labels != null){
                 g = (Glyph)labels.elementAt(0);
