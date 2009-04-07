@@ -164,8 +164,10 @@ public class ToolPalette {
                 grMngr.enterBringAndGoMode();
             }
             else if (selectedIconIndex == STD_NAV_MODE){
-                try {grMngr.mainView.getCursor().activateDynaSpot(true);}
-                catch (NullPointerException ex){}
+                if (ConfigManager.DYNASPOT){
+                    try {grMngr.mainView.getCursor().activateDynaSpot(true);}
+                    catch (NullPointerException ex){}                    
+                }
             }
         }
     }
