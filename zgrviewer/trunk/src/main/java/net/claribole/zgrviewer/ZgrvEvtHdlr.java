@@ -109,8 +109,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				x2=v.getVCursor().vx;
 				y2=v.getVCursor().vy;
 				if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-					System.out.println("a");
-					
 					grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 				}
 				zoomingInRegion=false;
@@ -188,7 +186,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(false);}
+	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(false, false);}
 		if (toolPaletteIsActive){return;}
 		else {
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
@@ -203,7 +201,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(true);}
+	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(true, false);}
 		if (toolPaletteIsActive){return;}
 		else {
 			Glyph g = v.getVCursor().lastGlyphEntered;

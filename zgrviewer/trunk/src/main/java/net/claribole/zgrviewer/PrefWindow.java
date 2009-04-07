@@ -747,7 +747,7 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
             grMngr.setAntialiasing(antialiascb.isSelected());
         }
         else if (o==dynaspotCb){
-            grMngr.activateDynaSpot(dynaspotCb.isSelected());
+            grMngr.activateDynaSpot(dynaspotCb.isSelected(), true);
         }
     }
 

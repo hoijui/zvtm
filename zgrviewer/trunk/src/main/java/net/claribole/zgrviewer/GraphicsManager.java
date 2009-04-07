@@ -259,7 +259,7 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 	mainView.setJava2DPainter(paMngr, Java2DPainter.AFTER_PORTALS);
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
-    activateDynaSpot(ConfigManager.DYNASPOT);
+    activateDynaSpot(ConfigManager.DYNASPOT, false);
     mainView.getCursor().setDynaSpotColor(Color.RED);
     mainView.getCursor().setSelectionListener(this);
 
@@ -272,9 +272,9 @@ public class GraphicsManager implements ComponentListener, AnimationListener, Ja
 
     }
 
-    void activateDynaSpot(boolean b){
-        ConfigManager.DYNASPOT = b;
-        mainView.getCursor().activateDynaSpot(ConfigManager.DYNASPOT);
+    void activateDynaSpot(boolean b, boolean updatePrefs){
+        if (updatePrefs){ConfigManager.DYNASPOT = b;}
+        mainView.getCursor().activateDynaSpot(b);
     }
 
     void setConfigManager(ConfigManager cm){
