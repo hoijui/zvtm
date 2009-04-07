@@ -107,8 +107,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 		else {
 			if (mod == ALT_MOD){
 				selectingRegion = true;
-				x1 = v.getMouse().vx;
-				y1 = v.getMouse().vy;
+				x1 = v.getVCursor().vx;
+				y1 = v.getVCursor().vy;
 				v.setDrawRect(true);
 			}
 			else {
@@ -123,8 +123,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 					case MODE_LINKSLIDER:{
 						Point location = e.getComponent().getLocationOnScreen();
 						relative = e.getPoint();
-						LS_SX = v.getMouse().vx;
-						LS_SY = v.getMouse().vy;
+						LS_SX = v.getVCursor().vx;
+						LS_SY = v.getVCursor().vy;
 						application.nm.attemptLinkSliding(LS_SX, LS_SY, location.x+relative.x, location.y+relative.y);
 						break;
 					}
@@ -142,8 +142,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 		}
 		else if (selectingRegion){
 			v.setDrawRect(false);
-			x2 = v.getMouse().vx;
-			y2 = v.getMouse().vy;
+			x2 = v.getVCursor().vx;
+			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 				application.vsm.centerOnRegion(application.mCamera, ATCExplorer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
 			}
@@ -153,8 +153,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getMouse().vx;
-    	lastVY = v.getMouse().vy;
+        lastVX = v.getVCursor().vx;
+    	lastVY = v.getVCursor().vy;
 //    	if (nm.lensType != NavigationManager.NO_LENS){
 //    	    nm.zoomInPhase2(lastVX, lastVY);
 //    	}
@@ -185,8 +185,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        lastVX = v.getMouse().vx;
-        lastVY = v.getMouse().vy;
+        lastVX = v.getVCursor().vx;
+        lastVY = v.getVCursor().vy;
 		Glyph g;
 		if ((g=v.lastGlyphEntered()) != null){
 			application.vsm.centerOnGlyph(g, application.mCamera, ATCExplorer.ANIM_MOVE_DURATION);
@@ -223,7 +223,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 		if (nm.isLinkSliding){
 			if (jpx != relative.x || jpy != relative.y){
 				// ignore events triggered by AWT robot
-				nm.linkSlider(v.getMouse().vx, v.getMouse().vy);
+				nm.linkSlider(v.getVCursor().vx, v.getVCursor().vy);
 				dut.requestUpdate();				
 			}				
 		}
