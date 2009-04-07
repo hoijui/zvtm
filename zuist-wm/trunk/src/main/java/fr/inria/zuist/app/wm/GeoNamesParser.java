@@ -29,8 +29,8 @@ import com.xerox.VTM.glyphs.RectangleNR;
 
 public class GeoNamesParser {
     
-    static final Color SELECTED_FEATURE_COLOR = Color.CYAN;
-    static final Color FEATURE_COLOR = Color.YELLOW;
+    static final Color SELECTED_FEATURE_COLOR = Color.ORANGE;
+    static final Color FEATURE_COLOR = Color.GRAY;
 
     static final String OUTPUT_CSV_SEP = "\t";
     static final String OUTPUT_FILE_ENCODING = "UTF-8";
