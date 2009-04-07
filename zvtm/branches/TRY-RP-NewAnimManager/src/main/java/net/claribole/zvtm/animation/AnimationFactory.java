@@ -333,7 +333,8 @@ public class AnimationFactory {
 							   Object subject, Animation.Dimension dim){
 				       glyph.orientTo(startAngle + fraction*(endAngle - startAngle));
 				   }
-			       });
+			       },
+			       interpolator);
 	
     }
 
@@ -377,7 +378,8 @@ public class AnimationFactory {
 							 startS + fraction*(endS - startS),
 							 startV + fraction*(endV - startV));
 				   }
-			       });
+			       },
+			       interpolator);
     }
 
     public Animation createGlyphBorderColorAnim(final int duration, final Glyph glyph,
@@ -420,7 +422,8 @@ public class AnimationFactory {
 							  startS + fraction*(endS - startS),
 							  startV + fraction*(endV - startV));
 				   }
-			       });
+			       },
+			       interpolator);
     }
 
 
@@ -453,7 +456,8 @@ public class AnimationFactory {
 							   Object subject, Animation.Dimension dim){
 				       translucent.setTranslucencyValue(startA + fraction*(endA - startA));
 				   }
-			       });
+			       },
+			       interpolator);
     }
 
     public Animation createPortalTranslation(final int duration, final Portal portal,
