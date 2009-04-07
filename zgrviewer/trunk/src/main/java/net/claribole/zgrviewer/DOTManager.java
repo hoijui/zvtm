@@ -267,7 +267,8 @@ class DOTManager {
         grMngr.gp.setMessage("Displaying...");
         grMngr.gp.setProgress(80);
         try {
-            SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURL().toString(), sourceDotFileParentDir.toURL().toString());
+            // going through URI and then URL as advised in JDK 1.6
+            SVGReader.load(svgDoc,grMngr.vsm,grMngr.mainSpace,true, svgF.toURI().toURL().toString(), sourceDotFileParentDir.toURI().toURL().toString());
             grMngr.seekBoundingBox();
             grMngr.buildLogicalStructure();
         }

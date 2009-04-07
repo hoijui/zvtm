@@ -568,7 +568,8 @@ class ConfigManager {
 	    //later dynamically to the classpath (through a new ClassLoader)
 	    for (int i=0;i<jars.length;i++){
 		try {
-		    urls[i] = jars[i].toURL();
+		    // going through URI and then URL as advised in JDK 1.6
+		    urls[i] = jars[i].toURI().toURL();
 		}
 		catch(MalformedURLException mue){System.err.println("Failed to instantiate a class loader for plug-ins: "+mue);}
 	    }
