@@ -42,16 +42,16 @@ public class ToolPalette {
 					"/images/dmnav24b.png",
 					"/images/plnav24b.png",
 					"/images/mlnav24b.png",
-					"/images/hl24b.png",
-					"/images/fl24b.png"};
+					"/images/hl24b.png"};//,
+					//"/images/fl24b.png"};
 
     static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
 						 "/images/flnav24g.png",
 						 "/images/dmnav24g.png",
 						 "/images/plnav24g.png",
 						 "/images/mlnav24g.png",
-						 "/images/hl24g.png",
-						 "/images/fl24g.png"};
+						 "/images/hl24g.png"};//,
+						 //"/images/fl24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
