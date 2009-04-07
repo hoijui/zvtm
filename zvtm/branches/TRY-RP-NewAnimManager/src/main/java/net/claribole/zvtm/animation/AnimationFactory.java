@@ -127,8 +127,12 @@ public class AnimationFactory {
      * 'relative' boolean argument. If 'relative' is false, then
      * 'data' will be interpreted as absolute target coordinates, 
      * otherwise it will be interpreted as an offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     * @see EndAction
      */
     public Animation createCameraTranslation(final int duration, final Camera camera, 
 					     final LongPoint data, final boolean relative,
@@ -177,6 +181,9 @@ public class AnimationFactory {
      * 'relative' boolean argument. If 'relative' is false, then
      * 'data' will be interpreted as an absolute target altitude, 
      * otherwise it will be interpreted as an offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
@@ -223,6 +230,9 @@ public class AnimationFactory {
      * 'relative' boolean argument. If 'relative' is false, then
      * 'data' will be interpreted as absolute target coordinates, 
      * otherwise it will be interpreted as an offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
@@ -265,6 +275,21 @@ public class AnimationFactory {
 				interpolator);
      }
 
+    /**
+     * Creates and returns a glyph size animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param glyph glyph to animate
+     * @param data animation data (size or size offset), interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute size, 
+     * otherwise it will be interpreted as a size offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createGlyphSizeAnim(final int duration, final Glyph glyph,
 					 final float data, final boolean relative,
 					 final Interpolator interpolator,
@@ -304,6 +329,22 @@ public class AnimationFactory {
 			       interpolator);
      }
 
+    /**
+     * Creates and returns a glyph orientation animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param glyph glyph to animate
+     * @param data animation data (angle or angle offset, in radian), 
+     * interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute orientation, 
+     * otherwise it will be interpreted as an orientation offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createGlyphOrientationAnim(final int duration, final Glyph glyph,
 						final float data, final boolean relative,
 						final Interpolator interpolator,
@@ -338,6 +379,25 @@ public class AnimationFactory {
 	
     }
 
+    /**
+     * Creates and returns a glyph fill color animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param glyph glyph to animate
+     * @param data animation data (color or color offset, in the HSV space), 
+     * interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute color, 
+     * otherwise it will be interpreted as a color offset.
+     * 'data' should be an array of size 3, containing the hue,
+     * saturation and brightness, in order. 
+     * H, S, and V are in the interval [0, 1]
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createGlyphFillColorAnim(final int duration, final Glyph glyph,
 					      final float[] data, final boolean relative,
 					      final Interpolator interpolator,
@@ -382,6 +442,25 @@ public class AnimationFactory {
 			       interpolator);
     }
 
+    /**
+     * Creates and returns a border fill color animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param glyph glyph to animate
+     * @param data animation data (color or color offset, in the HSV space), 
+     * interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute color, 
+     * otherwise it will be interpreted as a color offset.
+     * 'data' should be an array of size 3, containing the hue,
+     * saturation and brightness, in order. 
+     * H, S, and V are in the interval [0, 1]
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createGlyphBorderColorAnim(final int duration, final Glyph glyph,
 						final float[] data, final boolean relative,
 						final Interpolator interpolator,
@@ -426,7 +505,23 @@ public class AnimationFactory {
 			       interpolator);
     }
 
-
+    /**
+     * Creates and returns an animation that targets the
+     * alpha property of a Translucent object
+     * @param duration duration of the animation, in milliseconds.
+     * @param translucent Translucent object to animate
+     * @param data animation data (alpha value or offset, in [0, 1] - 
+     * 0 means transparent and 1 opaque), 
+     * interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute opacity, 
+     * otherwise it will be interpreted as an opacity offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createTranslucencyAnim(final int duration, final Translucent translucent,
 					    final float data, final boolean relative,
 					    final Interpolator interpolator,
@@ -460,6 +555,21 @@ public class AnimationFactory {
 			       interpolator);
     }
 
+    /**
+     * Creates and returns a portal translation animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param portal portal to animate
+     * @param data animation data, interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as absolute target coordinates, 
+     * otherwise it will be interpreted as an offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createPortalTranslation(final int duration, final Portal portal,
 					     final Point data, final boolean relative,
 					     final Interpolator interpolator,
@@ -499,6 +609,21 @@ public class AnimationFactory {
 			       interpolator);
     }
     
+    /**
+     * Creates and returns a portal size animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param portal portal to animate
+     * @param data animation data, interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute size, 
+     * otherwise it will be interpreted as an offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createPortalSizeAnim(final int duration, final Portal portal,
 					  final int wdata, final int hdata, 
 					  final boolean relative,
@@ -539,7 +664,21 @@ public class AnimationFactory {
 			       interpolator);
     }
     
-    
+    /**
+     * Creates and returns a lens magnification animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param lens lens to animate
+     * @param data animation data, interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'data' will be interpreted as an absolute maximum magnification factor, 
+     * otherwise it will be interpreted as an offset.
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createLensMagAnim(final int duration, final FixedSizeLens lens,
 				       final float data, final boolean relative,
 				       final Interpolator interpolator,
@@ -589,13 +728,23 @@ public class AnimationFactory {
     }
 
     /**
-     *
-     * @param magData target magnification factor (absolute value or offset, depending on 'relative')
-     * @param orData target outer radius (absolute value or offset, depending on 'relative')
-     * @param irData target inner radius (absolute value or offset, depending on 'relative')
+     * Creates and returns a lens magnification and radii animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param lens lens to animate
+     * @param magData target max magnification factor (absolute value or offset, depending on 'relative')
+     * @param orData target outer radius (absolute value or offset, depending on 'relative'),
+     * in view coordinates
+     * @param irData target inner radius (absolute value or offset, depending on 'relative'),
+     * in view coordinates
      * Warning: outer radius and magnification should change in the same direction
      * (both should either increase or decrease), otherwise the behavior of the 
      * resulting Animation is undefined
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
      */
     public Animation createLensMagRadiusAnim(final int duration, final FixedSizeLens lens,
 					     final float magData, final int orData,
@@ -661,6 +810,21 @@ public class AnimationFactory {
 			       interpolator);
     }
 
+    /**
+     * Creates and returns a lens radii animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param lens lens to animate
+     * @param orData target outer radius (absolute value or offset, depending on 'relative'),
+     * in view coordinates
+     * @param irData target inner radius (absolute value or offset, depending on 'relative'),
+     * in view coordinates
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createLensRadiusAnim(final int duration, final FixedSizeLens lens,
 					  final int orData, final int irData,
 					  final boolean relative,
@@ -719,6 +883,18 @@ public class AnimationFactory {
 			       interpolator);
     }
 
+    /**
+     * Creates and returns a path animation
+     * that will not repeat.
+     * @param duration duration of the animation, in milliseconds.
+     * @param path path to animate
+     * @param data path animation data
+     * @param relative true if 'data' is to be interpreted relatively.
+     * @param interpolator Interpolator that governs the time behavior of the
+     * animation (constant speed, constant acceleration, slow in/slow out...)
+     * @param endAction a functor that will be executed when the animation
+     * ends. May be set to null, in which case it is ignored.
+     */
     public Animation createPathAnim(final int duration, final DPath path,
 				    final LongPoint[] data, final boolean relative,
 				    final Interpolator interpolator,
