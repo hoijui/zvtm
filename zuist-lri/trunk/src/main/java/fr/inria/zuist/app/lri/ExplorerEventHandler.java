@@ -77,8 +77,8 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
         if (jpx <= MenuManager.MENU_ZONE_WIDTH && jpy <= MenuManager.MENU_ZONE_HEIGHT){
             return;
         }
-        lastVX = v.getMouse().vx;
-        lastVY = v.getMouse().vy;
+        lastVX = v.getVCursor().vx;
+        lastVY = v.getVCursor().vy;
         pJPX = jpx;
         pJPY = jpy;
         switch(application.NAV_MODE){
@@ -139,7 +139,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
                     // do not consider this as a click, user is actually panning
                     break;
                 }
-                Vector labels = v.getMouse().getIntersectingTexts(application.mCamera);
+                Vector labels = v.getVCursor().getIntersectingTexts(application.mCamera);
                 if (labels != null){
                     // clicked on a text string, like an author name, or a paper title
                     int i = 0;
@@ -173,9 +173,9 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        lastVX = v.getMouse().vx;
-        lastVY = v.getMouse().vy;
-        Vector labels = v.getMouse().getIntersectingTexts(application.mCamera);
+        lastVX = v.getVCursor().vx;
+        lastVY = v.getVCursor().vy;
+        Vector labels = v.getVCursor().getIntersectingTexts(application.mCamera);
         if (labels != null){
             // clicked on a text string, like an author name, or a paper title
             int i = 0;
@@ -217,7 +217,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
         if (LRIExplorer.SHOW_STATUS_BAR){
-            application.mView.setStatusBarText(v.getMouse().vx+" "+v.getMouse().vy
+            application.mView.setStatusBarText(v.getVCursor().vx+" "+v.getVCursor().vy
                 +" "+application.mCamera.posx+" "+application.mCamera.posy+" "+application.mCamera.altitude);
         }
         currentJPX = jpx;
