@@ -78,6 +78,9 @@ vsm.addGlyph(c, vs);
 %------------------------------------------------------------------------- 
 \subsection{Cameras, Views and Layers}
 
+%%%%%
+\subsubsection{Cameras}
+
 Even though we present them as 2D {\em surfaces} on which we put graphical objects, virtual spaces are logical constructs. They are not directly presented on screen. Instead, cameras \cl{com.xerox.VTM.engine.Camera} are associated with virtual spaces. A camera observes a virtual space, with the ``line of sight'' always perpendicular to the virtual space's surface. A camera has a position \cd{x,y} in the virtual space coordinate system, as well as an altitude \cd{alt}. See Figure \ref{fig:vtmVS}. Of course, each camera's position and altitude can be changed at any time, whether abruptly or through an animation (see Section \ref{sec:animations}).
 
 As for glyphs, cameras are added to virtual spaces:
@@ -90,13 +93,74 @@ or
 
 An arbitrary number of cameras can be added to each virtual space. One camera, however, can only belong to one virtual space.
 
+%%%%%
+\subsubsection{Views}
+
 Associating a camera with a virtual space is however not sufficient for creating a visual representation on screen. Cameras do not display anything by themselves. Rather, they define what region of the virtual space is observed through them when associated with a {\em view}. A view is an actual window displayed on screen to the user through the windowing system. It has a width and height. Together with the camera's position and altitude, these parameters define the rectangular region of the virtual space observed through the camera. See Figure \ref{fig:vtmVS}.
 
-There are three main types of views \cl{com.xerox.VTM.engine.View}: external views \cl{EView, GLEView, AccEView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{PView}\footnote{Formerly miscalled AppletView because it was used mostly within a Swing JApplet.}, which can be inserted in any Swing hierarchy; and internal views, which are put on a Java JDesktopPane \cl{IView,AccIView}. 
+There are three main types of views \cl{com.xerox.VTM.engine.View}: external views \cl{EView, GLEView, AccEView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{PView}\footnote{Formerly miscalled AppletView because it was used mostly within a Swing JApplet.}, which can be inserted in any Swing hierarchy; and internal views, which are put on a Java JDesktopPane \cl{IView,AccIView}.
+
+Views with the \cd{GL} prefix are OpenGL views (they use Java2D's OpenGL rendering pipeline). They require that pipeline to be enabled at runtime using the following flag:
+
+\codebox{-Dsun.java2d.opengl=true}
+
+Views with prefix \cd{Acc} are based on Java \cd{VolatileImage}. Other views (without a prefix) use standard \cd{BufferedImage}s to draw their content offscreen and the copy it to the display. The latter are the only views that support magnification lenses (Section \ref{sec:lenses}).
+
+A view is instantiated through the VSM:
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+Vector cameras = new Vector();
+cameras.add(foocam);
+View v = vsm.addExternalView(cameras, "fooview", View.STD_VIEW, 800, 600, true, true);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+There are a number of variations depending on whether you want to attach a menu bar and/or status bar to the view, make it decorated with a title bar or not, and make it visible or not at instantiation time.
+
+Special case of panel views:
+
+\fbox{JPanel p = vsm.addExternalView(cameras, "fooView", 800, 600);}
+
+This method returns the JPanel encapsulated by the view instead of returning the view itself, for straightforward (possible inlined) integration within a Swing component hierarchy. The \cd{View} instance itself can easily be retrieved by a call to:
+
+\codebox{View v = vsm.getView("fooview");}
+
+%%%%%
+\subsubsection{Layers}
+
+You may have noticed in the previous section that we are not passing the camera directly to the view construction method. Instead, we are putting it in a \cd{Vector}. The reason is that a view can be made of several cameras. Each camera is associated with a {\em layer} within the view.Each layer is independent from the others. Each camera can be moved independently from the others (they can also be sticked to one another). Layers (and thus cameras) can be switched on and off. Each layer is by default transparent. Graphical objects seen through the different cameras associated with each layer simply get painted on top of each others. As we will see in Section \ref{sec:glyphs}, glyphs can be translucent or even transparent, in which case glyphs on lower-level layers will show through them.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+Vector cameras = new Vector();
+cameras.add(foocam);
+cameras.add(barcam);
+cameras.add(lastcam);
+View v = vsm.addExternalView(cameras, "3_layer_view", View.STD_VIEW, 800, 600, true, true);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+Cameras belonging to different virtual spaces can be combined in the same view. A given camera can only be associated with one layer in one view (this restriction is actually not a hard one, we have however never tested the case where a camera was associated with more than one layer, so there might be unknown issues).
+
+Only one layer is active (has focus) at a given time. The following example gives focus to the 3rd camera in view \cd{v}:
+
+\codebox{v.setActiveLayer(2);}
+
+This makes the associated camera active (provided the view is the active one, i.e., the one which has input focus).
+
+%%%%%
+\subsubsection{Drawing stack and Glyph z-index}
 
 %------------------------------------------------------------------------- 
 \subsection{Portals}
 
+%%%%%%%%%%
+\subsection{Input events}
+
+It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{net.claribole.zvtm.engine.ViewEventHandler}. A convenience default implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
 
 %------------------------------------------------------------------------- 
 \subsection{Graphical Object Model}
@@ -117,5 +181,3 @@ All glyphs are defined by the following orthogonal attributes: the cartesian coo
 
 The resulting representation system, with its orthogonal visual variables that mirror perceptual dimensions, makes mapping data to graphical attributes easy. A direct manipulation user interface (Figure \ref{fig:vshape}) facilitates the dynamic definition of glyphs, drawing a parallel with \cite{douglas99} which demonstrates the importance, for color selection, of a well-designed interface over the supposed intuitiveness of color models.
 
-%%%%%
-\subsubsection{Drawing stack and z-index}
