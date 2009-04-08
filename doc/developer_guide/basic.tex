@@ -92,7 +92,7 @@ An arbitrary number of cameras can be added to each virtual space. One camera, h
 
 Associating a camera with a virtual space is however not sufficient for creating a visual representation on screen. Cameras do not display anything by themselves. Rather, they define what region of the virtual space is observed through them when associated with a {\em view}. A view is an actual window displayed on screen to the user through the windowing system. It has a width and height. Together with the camera's position and altitude, these parameters define the rectangular region of the virtual space observed through the camera. See Figure \ref{fig:vtmVS}.
 
-There are three main types of views \cl{com.xerox.VTM.engine.View}: external views \cl{*EView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{AppletView}, which can be inserted in any Swing hierarchy; and internal views, which are put on a Java JDesktopPane \cl{*IView}. 
+There are three main types of views \cl{com.xerox.VTM.engine.View}: external views \cl{EView, GLEView, AccEView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{PView}\footnote{Formerly miscalled AppletView because it was used mostly within a Swing JApplet.}, which can be inserted in any Swing hierarchy; and internal views, which are put on a Java JDesktopPane \cl{IView,AccIView}. 
 
 %------------------------------------------------------------------------- 
 \subsection{Portals}
