@@ -61,7 +61,19 @@ Many operations, such as creating virtual spaces, adding glyphs and cameras to t
 
 Graphical objects are put on infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{com.xerox.VTM.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
 
-There can be an arbitrary number of virtual spaces.
+There can be an arbitrary number of virtual spaces. This provides an easy logical separation between graphical scenes/repre\-sen\-tations that are independent from one another.
+
+The following creates a virtual space whose name is \cd{foo}.
+
+\codebox{VirtualSpace vs = vsm.addVirtualSpace("foo");}
+
+Glyphs are put on the surface of virtual spaces. A given glyph can only belong to one virtual space.
+
+\begin{SaveVerbatim}{CodeVerb}
+VCircle c = new VCircle(0, 0, 0, 10, Color.WHITE);
+vsm.addGlyph(c, vs);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 %------------------------------------------------------------------------- 
 \subsection{Cameras, Views and Layers}

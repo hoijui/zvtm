@@ -80,13 +80,14 @@ Manhattan &
 A lens is associated with a View using the View.setLens(Lens l) method. Lenses can only be associated with standard external views or applet views for now (not with accelerated views). Here is an example of code creating a fixed size lens and associating it with a view:
 
 \begin{small}
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 VirtualSpaceManager vsm = ...;
 View v = vsm.addExternalView(...);
 // create a lens with a magnification factor of 4x, outer radius of 100px,
 // inner radius of 10px (flat-top is 40px-wide)
 Lens l = v.setLens(new FSGaussianLens(4.0f, 100, 20));
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
 \subsubsection{Unsetting a lens}
@@ -94,12 +95,13 @@ Lens l = v.setLens(new FSGaussianLens(4.0f, 100, 20));
 Removing a lens from a view is achieved by passing null to View.setLens(Lens l). Additionally, method dispose() should be called on the lens object to free any graphical resource used by the lens:
 
 \begin{small}
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 View v = ...;
 Lens l = ...;
 v.setLens(null);
 l.dispose();
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
 \subsubsection{Lens animation}
@@ -107,10 +109,11 @@ l.dispose();
 Each of the three lens properties (maximum magnification factor, inner and outer radii) can be changed dynamically. These changes can be animated using the Animation Manager. Here is an example of animating the previous lens' maximum magnification factor increase (from 4x to 8x in 500ms) using the linear temporal schema:
 
 \begin{small}
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 vsm.animator.createLensAnimation(500, AnimManager.LS_MM_LIN,
                                  new Float(4.0f), l.getID(), false);
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
 Maximum magnification factor and radius values can be animated simultaneously. See the API Documentation for details.
@@ -120,25 +123,27 @@ Maximum magnification factor and radius values can be animated simultaneously. S
 When activating a lens, a nice effect consists in creating in flat and then animating its magnification factor to the wanted value using an animation. This way, the lens seems to emerge from the previously flat surface.
 
 \begin{small}
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 /* MAG_FACTOR is the magnification factor the lens should be set to */
 float MAG_FACTOR = 4.0f;
 Lens l = new LInfFSInverseCosineLens(1.0f, 100, 50);
 vsm.animator.createLensAnimation(500, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
                                  l.getID(), null);
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
 The opposite effect can be used when deactivatign a lens. The following animation will make it look like the lens is flattening itself. Note that in the following code we use a predefined PostAnimationAction to dispose of the lens after the animation has ended.
 
 \begin{small}
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 /* MAG_FACTOR is the magnification factor the lens has been set to */
 VirtualSpaceManager vsm = ...;
 Lens l = ...;
 vsm.animator.createLensAnimation(500, AnimManager.LS_MM_LIN, new Float(1-MAG_FACTOR),
                                  l.getID(), new LensKillAction(vsm));
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
 %%%%%%%%%%

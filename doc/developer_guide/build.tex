@@ -52,19 +52,21 @@ The resulting \cd{apidocs/} directory is put in \cd{target/site/}.
 \subsubsection{Declaring ZVTM as a dependency in your own Maven-managed project}
 
 Declare the following repository:
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 <repository>
   <id>zvtm repository</id>
   <url>http://zvtm.sourceforge.net/maven</url>
 </repository>
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 and add the following dependency in your own \cd{pom.xml} file:
 
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 <dependency>
   <groupId>net.claribole.zvtm</groupId>
   <artifactId>zvtm</artifactId>
   <version>0.9.7</version>
 </dependency>
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
