@@ -19,7 +19,7 @@ The toolkit is based on the metaphor of infinite\footnote{Actually bounded by th
    \label{fig:vtmVS}
 \end{figure}
 
-All glyphs rely on the same polymorphic object model. A glyph belongs to a specific virtual space, but can be observed through different cameras simultaneously as each virtual space can contain multiple cameras as shown in Figure \ref{fig:vtmVS}-a. Cameras are associated with viewports called {\em views} which correspond to windows in the user interface. As we will see in section \ref{sec:lenses}, various types of magnification lenses can be activated in views. If more than one camera is associated with a given view, each camera draws its content on a transparent layer (Figure \ref{fig:vtmVS}-b). The glyph graphical model features alpha channel support; glyphs can therefore be opaque, translucent or transparent.
+All glyphs rely on the same polymorphic object model. A glyph belongs to a specific virtual space, but can be observed through different cameras simultaneously as each virtual space can contain multiple cameras as shown in Figure \ref{fig:vtmVS}-a. Cameras are associated with viewports called {\em views} which correspond to windows in the user interface. As we will see in section \ref{sec:lenses}, various types of magnification lenses can be activated in views. If more than one camera is associated with a given view, each camera paints its content on a transparent layer (Figure \ref{fig:vtmVS}-b). The glyph graphical model features alpha channel support; glyphs can therefore be opaque, translucent or transparent.
 
 Translucency is one of several orthogonal visual variables that define a glyph. Modifications to these variables can be animated using various temporal schemes (see section \ref{sec:animations}). Camera translations and altitude changes can also be animated, as well as magnification lens modifications, position and size of portals (views within views), etc.
 
@@ -78,6 +78,26 @@ vsm.addGlyph(c, vs);
 %------------------------------------------------------------------------- 
 \subsection{Cameras, Views and Layers}
 
+Even though we present them as 2D {\em surfaces} on which we put graphical objects, virtual spaces are logical constructs. They are not directly presented on screen. Instead, cameras \cl{com.xerox.VTM.engine.Camera} are associated with virtual spaces. A camera observes a virtual space, with the ``line of sight'' always perpendicular to the virtual space's surface. A camera has a position \cd{x,y} in the virtual space coordinate system, as well as an altitude \cd{alt}. See Figure \ref{fig:vtmVS}. Of course, each camera's position and altitude can be changed at any time, whether abruptly or through an animation (see Section \ref{sec:animations}).
+
+As for glyphs, cameras are added to virtual spaces:
+
+\codebox{Camera foocam = vsm.addCamera(vs);}
+
+or 
+
+\codebox{Camera foocam = vsm.addCamera("foo");}
+
+An arbitrary number of cameras can be added to each virtual space. One camera, however, can only belong to one virtual space.
+
+Associating a camera with a virtual space is however not sufficient for creating a visual representation on screen. Cameras do not display anything by themselves. Rather, they define what region of the virtual space is observed through them when associated with a {\em view}. A view is an actual window displayed on screen to the user through the windowing system. It has a width and height. Together with the camera's position and altitude, these parameters define the rectangular region of the virtual space observed through the camera. See Figure \ref{fig:vtmVS}.
+
+There are three main types of views \cl{com.xerox.VTM.engine.View}: external views \cl{*EView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{AppletView}, which can be inserted in any Swing hierarchy; and internal views, which are put on a Java JDesktopPane \cl{*IView}. 
+
+%------------------------------------------------------------------------- 
+\subsection{Portals}
+
+
 %------------------------------------------------------------------------- 
 \subsection{Graphical Object Model}
 \label{sec:glyphs}
@@ -96,3 +116,6 @@ All glyphs are defined by the following orthogonal attributes: the cartesian coo
 \end{figure}
 
 The resulting representation system, with its orthogonal visual variables that mirror perceptual dimensions, makes mapping data to graphical attributes easy. A direct manipulation user interface (Figure \ref{fig:vshape}) facilitates the dynamic definition of glyphs, drawing a parallel with \cite{douglas99} which demonstrates the importance, for color selection, of a well-designed interface over the supposed intuitiveness of color models.
+
+%%%%%
+\subsubsection{Drawing stack and z-index}
