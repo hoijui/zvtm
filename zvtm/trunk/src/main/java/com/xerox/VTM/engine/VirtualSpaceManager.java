@@ -634,12 +634,13 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param h height of window in pixels
      */
     public JPanel addPanelView(Vector c,String name,int w,int h){
-	AppletView tvi=new AppletView(c,name,w,h,this);
-	tvi.mouse.setID(new Long(nextmID++));
-	addView(tvi);
-	tvi.setRepaintPolicy(generalRepaintPolicy);
-	if (!animator.started){animator.start();} //start animator only when a view is created
-	return tvi.panel;
+        PView tvi = new PView(c, name, w, h, this);
+        tvi.mouse.setID(new Long(nextmID++));
+        addView(tvi);
+        tvi.setRepaintPolicy(generalRepaintPolicy);
+        //start animator only when a view is created
+        if (!animator.started){animator.start();}
+        return tvi.panel;
     }
 
     /**adds a newly created view to the list of existing views*/
