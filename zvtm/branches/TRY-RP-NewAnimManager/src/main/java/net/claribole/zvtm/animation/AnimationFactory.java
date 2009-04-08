@@ -725,7 +725,7 @@ public class AnimationFactory {
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
 				       lens.setMaximumMagnification(startMag + 
-								    fraction * (endMag - startMag));
+								    fraction * (endMag - startMag), false);
 				   }
 			       },
 			       interpolator);
@@ -808,7 +808,7 @@ public class AnimationFactory {
 							   Object subject, Animation.Dimension dim){
 				       lens.setMMandRadii(startMag + fraction * (endMag - startMag),
 							  startOr + (int)(fraction*(endOr - startOr)),
-							  startIr + (int)(fraction*(endIr - startIr)));
+							  startIr + (int)(fraction*(endIr - startIr)), false);
 				   }
 			       },
 			       interpolator);
@@ -881,7 +881,7 @@ public class AnimationFactory {
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
 				       lens.setRadii(startOr + (int)(fraction*(endOr - startOr)),
-						     startIr + (int)(fraction*(endIr - startIr)));
+						     startIr + (int)(fraction*(endIr - startIr)), false);
 				   }
 			       },
 			       interpolator);
