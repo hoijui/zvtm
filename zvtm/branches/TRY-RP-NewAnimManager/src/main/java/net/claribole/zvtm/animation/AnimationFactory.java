@@ -614,9 +614,13 @@ public class AnimationFactory {
      * that will not repeat.
      * @param duration duration of the animation, in milliseconds.
      * @param portal portal to animate
-     * @param data animation data, interpreted according to the
+     * @param wdata animation data, interpreted according to the
      * 'relative' boolean argument. If 'relative' is false, then
-     * 'data' will be interpreted as an absolute size, 
+     * 'wdata' will be interpreted as an absolute width, 
+     * otherwise it will be interpreted as an offset.
+     * @param hdata animation data, interpreted according to the
+     * 'relative' boolean argument. If 'relative' is false, then
+     * 'hdata' will be interpreted as an absolute height, 
      * otherwise it will be interpreted as an offset.
      * @param relative true if 'data' is to be interpreted relatively.
      * @param interpolator Interpolator that governs the time behavior of the

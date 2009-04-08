@@ -50,6 +50,9 @@ public class Animation {
 	animator = new Animator(duration, repeatCount, repeatBehavior, timingInterceptor);
     }
 
+    /**
+     * Sets the interpolator for this Animation.
+     */
     public void setInterpolator(Interpolator interpolator){
 	animator.setInterpolator(interpolator);
     }

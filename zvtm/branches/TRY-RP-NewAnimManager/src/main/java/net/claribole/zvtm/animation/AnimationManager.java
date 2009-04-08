@@ -241,7 +241,8 @@ public class AnimationManager {
     }
 
     /**
-     * Sets the active camera X speed
+     * Sets the active camera X speed.
+     * @param dx active camera X speed
      */
     public void setXspeed(double dx){
 	currentCamAnim.setXspeed(dx);
@@ -249,6 +250,7 @@ public class AnimationManager {
 
     /**
      * Sets the active camera Y speed
+     * @param dy active camera Y speed
      */
     public void setYspeed(double dy){
 	currentCamAnim.setYspeed(dy);
@@ -256,6 +258,7 @@ public class AnimationManager {
 
     /**
      * Sets the active camera Z speed
+     * @param dz active camera Z speed
      */
     public void setZspeed(float dz){
 	currentCamAnim.setZspeed(dz);

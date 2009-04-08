@@ -45,9 +45,8 @@ public class TransitionManager {
      *@param duration duration of the fade out transition in milliseconds
      *@param fadeColor target color for the fade out
      *@param vsm hook to virtual space manager
-     *@param action fade out action. Specify a custom subclass of FadeOut if you need to execute specific actions after the fade out itself. See FadeOut to learn how to properly subclass it.
+     *@param action fade out action. 
      *@see #fadeOut(View v, int duration, Color fadeColor, VirtualSpaceManager vsm)
-     *@see net.claribole.zvtm.engine.FadeOut
      */
     public static void fadeOut(final View v, int duration, final Color fadeColor, 
 			       final VirtualSpaceManager vsm, final EndAction action){
@@ -86,7 +85,7 @@ public class TransitionManager {
      *@param v the view whose content will fade in
      *@param duration duration of the fade in transition in milliseconds
      *@param vsm hook to virtual space manager
-     *@see #fadeIn(View v, int duration, VirtualSpaceManager vsm, FadeIn actions)
+     *@see #fadeIn(View v, int duration, VirtualSpaceManager vsm, EndAction action)
      */
     public static void fadeIn(View v, int duration, VirtualSpaceManager vsm){
 	TransitionManager.fadeIn(v, duration, vsm, null);
@@ -97,9 +96,8 @@ public class TransitionManager {
      *@param v the view whose content will fade in
      *@param duration duration of the fade in transition in milliseconds
      *@param vsm hook to virtual space manager
-     *@param actions fade in action. Executed after the view fade-in.
+     *@param action fade-in action. Executed after the view fade-in.
      *@see #fadeIn(View v, int duration, VirtualSpaceManager vsm)
-     *@see net.claribole.zvtm.engine.FadeIn
      */
     public static void fadeIn(final View v, int duration, final VirtualSpaceManager vsm, 
 			      final EndAction action){
