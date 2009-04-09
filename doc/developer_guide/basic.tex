@@ -3,7 +3,7 @@
 \section{Basic Concepts}
 \label{sec:basic}
 
-%------------------------------------------------------------------------- 
+%%%%%%%%%%
 \subsection{Overview of concepts}
 \label{sec:concepts}
 
@@ -27,7 +27,7 @@ Input event handling is managed through high-level callbacks associated with eac
 
 On top of these concepts are implemented various interaction techniques that can easily be combined: zoomable user interfaces, superimposed translucent layers, fisheye lenses, rate-based scrolling, speed-dependent automatic zooming and more.
 
-%------------------------------------------------------------------------- 
+%%%%%%%%%%
 \subsection{Hiding low-level operations}
 \label{sec:lowlevel}
 
@@ -45,7 +45,7 @@ Toolkits such as Java2D are powerful but difficult to use, requiring the program
 
 {\bf Hardware acceleration:} various graphics acceleration methods are available, such as Java Volatile Images and the OpenGL rendering pipeline. ZVTM features different types of views that provide hardware acceleration based on these methods while sharing the exact same API.
 
-%------------------------------------------------------------------------- 
+%%%%%%%%%%
 \subsection{Virtual Space Manager}
 
 The virtual space manager \cl{com.xerox.VTM.engine.VirtualSpaceManager} is the main entry point in ZVTM. It is the first object instantiated by the client application. There is only one instance of it.
@@ -56,7 +56,7 @@ The optional boolean feeded to the constructor should be set to \cd{true} when i
 
 Many operations, such as creating virtual spaces, adding glyphs and cameras to them, will take place through the virtual space manager (which we abbreviate VSM from now on).
 
-%------------------------------------------------------------------------- 
+%%%%%%%%%%
 \subsection{Virtual Spaces}
 
 Graphical objects are put on infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{com.xerox.VTM.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
@@ -75,7 +75,7 @@ vsm.addGlyph(c, vs);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
-%------------------------------------------------------------------------- 
+%%%%%%%%%%
 \subsection{Cameras, Views and Layers}
 
 %%%%%
@@ -152,9 +152,37 @@ Only one layer is active (has focus) at a given time. The following example give
 This makes the associated camera active (provided the view is the active one, i.e., the one which has input focus).
 
 %%%%%
-\subsubsection{Drawing stack and Glyph z-index}
+\subsubsection{Drawing stack and Glyph z-index, and Java2D painters}
 
-%------------------------------------------------------------------------- 
+Glyphs in a view get drawn as follows:
+\begin{itemize}
+\item layers get drawn one after another, starting with the one of lowest index ;
+\item for a given layer, all glyphs seen through the camera (that belong to the associated virtual space) get drawn according to their position in that virtual space's drawing stack. Glyphs get drawn from the bottom of the stack (lowest index) to the top of the stack (highest index).
+\end{itemize}
+
+When adding a new glyph to a virtual space, it gets inserted at the top of the drawing stack. There are various methods that let you manage the position of glyphs in a drawing stack. \cd{VirtualSpace} has methods \cd{atBottom}, \cd{onTop}, \cd{above} and \cd{below} that let you change the position of a given glyph within the drawing stack.
+
+Position in the drawing stack can also be changed through the glyph's z-index. This is very convenient when managing groups of objects. A glyph's z-index is specified at instantiation time as a constructor parameter. Calling methods \cd{atBottom}, \cd{onTop}, \cd{above} and \cd{below} might affect a glyph's z-index.
+
+\begin{figure}
+\centering
+  \fbox{\includegraphics[width=10cm]{images/j2dp.png}}
+  \caption{Example of use of a Java2DPainter (logo in the bottom-right corner, memory gauge in the bottom-left corner)}
+  \label{fig:j2dp}
+\end{figure}
+
+ZVTM also provides developers with convenient callback methods for calling raw Java2D instructions at various stages of the rendering process, through the \cl{net.claribole.zvtm.engine.Java2DPainter} interface. This can be useful, e.g., for drawing a static label in a corner of the view, a logo or a memory  gauge (see Figure \ref{fig:j2dp}).
+
+Java2DPainter callbacks can be set at the following steps of the rendering process:
+\begin{itemize}
+\item \cd{BACKGROUND}: method gets called after background has been painted and before any glyph gets painted;
+\item \cd{FOREGROUND}: method gets called after all glyphs on all layers have been painted, but before any magnification lens is applied;
+\item \cd{AFTER\_LENSES}: method gets called after the magnified content of lenses has been painted;
+\item \cd{AFTER\_PORTALS}: method gets called after portals have been drawn.
+\end{itemize}
+
+
+%%%%%%%%%%
 \subsection{Portals}
 
 %%%%%%%%%%
@@ -162,7 +190,7 @@ This makes the associated camera active (provided the view is the active one, i.
 
 It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{net.claribole.zvtm.engine.ViewEventHandler}. A convenience default implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
 
-%------------------------------------------------------------------------- 
+%%%%%%%%%%
 \subsection{Graphical Object Model}
 \label{sec:glyphs}
 
