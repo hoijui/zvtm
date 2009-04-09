@@ -76,11 +76,14 @@ public class SVGStyle {
 
 	/** Fill color, then stroke/border color, then transparency. */
 	public SVGStyle(Color c1,Color c2,Float a){
-		fillColor=c1;
-		strokeColor=c2;
+		this(c1, c2);
 		alphaValue=a;
-		fillColorDefined = (fillColor != null);
-		strokeColorDefined = (strokeColor != null);
+	}
+	
+	/** Returns true if there is information about at least one styling attribute. */
+	public boolean hasStylingInformation(){
+	    return hasFillColorInformation() || hasStrokeColorInformation() || hasTransparencyInformation() ||
+	           requiresSpecialStroke() || font_family != null || font_size != null || font_weight != null || font_style != null;
 	}
 
     /**returns true if there is transparency information (the value does not matter)*/

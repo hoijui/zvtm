@@ -1,10 +1,10 @@
-/*   FILE: AppletView.java
+/*   FILE: AppletView.java/PView.java
  *   DATE OF CREATION:   Dec 27 2000
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Thu Feb 20 16:31:33 2003 by Emmanuel Pietriga
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
  * Lesser General Public License for more details.
  *
  * For full terms see the file COPYING.
+ *
+ * $Id:$
  */
 
 package com.xerox.VTM.engine;
@@ -29,11 +31,12 @@ import java.util.Vector;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
   /**
-   * An applet view is a panel and can be composed of one or several cameras superimposed (uses a standard JFrame)
+   * A PView (formerly AppletView) is based on a JPanel. It can be inserted anywhere in a Swing component hierarchy.
+   * It can be composed of one or several cameras superimposed.
    * @author Emmanuel Pietriga
    **/
 
-public class AppletView extends View implements KeyListener {
+public class PView extends View implements KeyListener {
 
 	/**
 		*@param v list of cameras
@@ -42,7 +45,7 @@ public class AppletView extends View implements KeyListener {
 		*@param panelHeight height of window in pixels
 		*@param vsm root VTM class
 		*/
-	protected AppletView(Vector v,String t,int panelWidth,int panelHeight,VirtualSpaceManager vsm){
+	protected PView(Vector v,String t,int panelWidth,int panelHeight,VirtualSpaceManager vsm){
 		mouse=new VCursor(this);
 		name=t;
 		parent=vsm;
