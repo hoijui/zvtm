@@ -13,12 +13,13 @@ package net.claribole.zgrviewer;
 import java.awt.Cursor;
 import javax.swing.ImageIcon;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.VImage;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 public class ToolPalette {
     
@@ -194,27 +195,35 @@ public class ToolPalette {
     }
 
     void show(){
-	if (!visible){
-	    visible = true;
-	    grMngr.meh.toolPaletteIsActive = true;
-	    grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
-							   new LongPoint(-2*buttons[0].getWidth()-5, 0),
-							   paletteCamera.getID(), null);
-	    grMngr.mainView.setCursorIcon(Cursor.HAND_CURSOR);
-	    grMngr.mainView.setActiveLayer(2);
-	}
+        if (!visible){
+            visible = true;
+            grMngr.meh.toolPaletteIsActive = true;
+//	    grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
+//							   new LongPoint(-2*buttons[0].getWidth()-5, 0),
+//							   paletteCamera.getID(), null);
+            Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
+                new LongPoint(-2*buttons[0].getWidth()-5, 0), true,
+                SlowInSlowOutInterpolator.getInstance(), null);
+            grMngr.vsm.getAnimationManager().startAnimation(a, false);
+            grMngr.mainView.setCursorIcon(Cursor.HAND_CURSOR);
+            grMngr.mainView.setActiveLayer(2);
+        }
     }
 
     void hide(){
-	if (visible){
-	    visible = false;
-	    grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
-							   new LongPoint(2*buttons[0].getWidth()+5, 0),
-							   paletteCamera.getID(), null);
-	    grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
-	    grMngr.mainView.setActiveLayer(0);	
-	    grMngr.meh.toolPaletteIsActive = false;
-	}
+        if (visible){
+            visible = false;
+//      grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
+//  						   new LongPoint(2*buttons[0].getWidth()+5, 0),
+//  						   paletteCamera.getID(), null);
+            Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
+                new LongPoint(2*buttons[0].getWidth()+5, 0), true,
+                SlowInSlowOutInterpolator.getInstance(), null);
+            grMngr.vsm.getAnimationManager().startAnimation(a, false);
+            grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+            grMngr.mainView.setActiveLayer(0);	
+            grMngr.meh.toolPaletteIsActive = false;
+        }
     }
 
     boolean insidePaletteTriggerZone(int jpx, int jpy){

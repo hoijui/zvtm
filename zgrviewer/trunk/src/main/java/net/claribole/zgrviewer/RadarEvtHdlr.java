@@ -15,11 +15,12 @@ import java.awt.event.KeyEvent;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.AnimManager;
+//import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
-
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import net.claribole.zvtm.animation.Animation;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -52,12 +53,15 @@ public class RadarEvtHdlr implements ViewEventHandler {
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		LongPoint lp = v.getVCursor().getLocation();
 		Camera c = grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(0);
-		grMngr.vsm.animator.createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, new LongPoint(lp.x-c.posx, lp.y-c.posy), c.getID());
+//		grMngr.vsm.animator.createCameraAnimation(, AnimManager.CA_TRANS_SIG, new LongPoint(lp.x-c.posx, lp.y-c.posy), c.getID());
+		Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, c,
+            new LongPoint(lp.x-c.posx, lp.y-c.posy), true, SlowInSlowOutInterpolator.getInstance(), null);
+        grMngr.vsm.getAnimationManager().startAnimation(a, false);
 	}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	grMngr.vsm.getGlobalView(grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(1),500);
-	grMngr.cameraMoved();
+	grMngr.cameraMoved(null, null, 0);
     }
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -91,11 +95,11 @@ public class RadarEvtHdlr implements ViewEventHandler {
 	float a=(c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(a*10);
-	    grMngr.cameraMoved();
+	    grMngr.cameraMoved(null, null, 0);
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(-a*10);
-	    grMngr.cameraMoved();
+	    grMngr.cameraMoved(null, null, 0);
 	}
     }
 

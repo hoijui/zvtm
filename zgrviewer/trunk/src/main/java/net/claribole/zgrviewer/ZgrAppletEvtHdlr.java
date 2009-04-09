@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.AnimManager;
+//import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VCursor;
 import com.xerox.VTM.engine.Utilities;
@@ -24,9 +24,10 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VImage;
-
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.Portal;
+import net.claribole.zvtm.animation.Animation;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -81,33 +82,33 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){return;}
-	else {
-	    draggingZoomWindow = false;
-	    draggingZoomWindowContent = false;
-	    if (draggingMagWindow){
-		draggingMagWindow = false;
-		grMngr.vsm.unstickFromMouse();
-	    }
-	    if (zoomingInRegion){
-		v.setDrawRect(false);
-		x2=v.getVCursor().vx;
-		y2=v.getVCursor().vy;
-		if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-		    grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
-		}
-		zoomingInRegion=false;
-	    }
-	    else if (manualLeftButtonMove){
-		grMngr.vsm.animator.Xspeed=0;
-		grMngr.vsm.animator.Yspeed=0;
-		grMngr.vsm.animator.Aspeed=0;
-		v.setDrawDrag(false);
-		grMngr.vsm.activeView.mouse.setSensitivity(true);
-		if (autoZooming){unzoom(v);}
-		manualLeftButtonMove=false;
-	    }
-	}
+        if (toolPaletteIsActive){return;}
+        else {
+            draggingZoomWindow = false;
+            draggingZoomWindowContent = false;
+            if (draggingMagWindow){
+                draggingMagWindow = false;
+                grMngr.vsm.unstickFromMouse();
+            }
+            if (zoomingInRegion){
+                v.setDrawRect(false);
+                x2=v.getVCursor().vx;
+                y2=v.getVCursor().vy;
+                if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
+                    grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
+                }
+                zoomingInRegion=false;
+            }
+            else if (manualLeftButtonMove){
+				grMngr.vsm.getAnimationManager().setXspeed(0);
+                grMngr.vsm.getAnimationManager().setYspeed(0);
+                grMngr.vsm.getAnimationManager().setZspeed(0);
+                v.setDrawDrag(false);
+                grMngr.vsm.activeView.mouse.setSensitivity(true);
+                if (autoZooming){unzoom(v);}
+                manualLeftButtonMove=false;
+            }
+        }
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -260,22 +261,32 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    else {
 		tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 		if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-		    grMngr.vsm.animator.Xspeed=0;
-		    grMngr.vsm.animator.Yspeed=0;
-		    grMngr.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
+//		    grMngr.vsm.animator.Xspeed=0;
+//		    grMngr.vsm.animator.Yspeed=0;
+//		    grMngr.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
+		    grMngr.vsm.getAnimationManager().setXspeed(0);
+            grMngr.vsm.getAnimationManager().setYspeed(0);
+            grMngr.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
 		    //50 is just a speed factor (too fast otherwise)
 		}
 		else {
 		    jpxD = jpx-lastJPX;
 		    jpyD = lastJPY-jpy;
-		    grMngr.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor));
-		    grMngr.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor));
-		    grMngr.vsm.animator.Aspeed=0;
+//		    grMngr.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor));
+//		    grMngr.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor));
+//		    grMngr.vsm.animator.Aspeed=0;
+		    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor)));
+            grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor)));
+            grMngr.vsm.getAnimationManager().setZspeed(0);
 		    if (application.cfgMngr.isSDZoomEnabled()){
 			dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
 			if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
 			    autoZooming = true;
-			    grMngr.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
+			    //grMngr.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
+			    Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
+                    new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
+                    IdentityInterpolator.getInstance(), null);
+                grMngr.vsm.getAnimationManager().startAnimation(a, false);
 			}
 		    }
 		}
@@ -287,36 +298,40 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-	if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
-	    if (wheelDirection  == ViewEventHandler.WHEEL_UP){
-		grMngr.magnifyFocus(GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
-	    }
-	    else {
-		grMngr.magnifyFocus(-GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
-	    }
-	}
-	else if (inZoomWindow){
-	    tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
-	    if (wheelDirection  == WHEEL_UP){// zooming in
-		grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
-	    }
-	    else {// wheelDirection == WHEEL_DOWN, zooming out
-		grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
-	    }
-	    grMngr.updateMagWindow();
-	    grMngr.vsm.repaintNow();
-	}
-	else {
-	    tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
-	    if (wheelDirection == WHEEL_UP){// zooming in
-		grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
-		grMngr.cameraMoved();
-	    }
-	    else {// wheelDirection == WHEEL_DOWN, zooming out
-		grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
-		grMngr.cameraMoved();
-	    }
-	}
+        if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
+            if (wheelDirection  == ViewEventHandler.WHEEL_UP){
+                grMngr.magnifyFocus(GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
+            }
+            else {
+                grMngr.magnifyFocus(-GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
+            }
+        }
+        else if (inZoomWindow){
+            tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
+            if (wheelDirection  == WHEEL_UP){
+                // zooming in
+                grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
+            }
+            else {
+                // wheelDirection == WHEEL_DOWN, zooming out
+                grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
+            }
+            grMngr.updateMagWindow();
+            grMngr.vsm.repaintNow();
+        }
+        else {
+            tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
+            if (wheelDirection == WHEEL_UP){
+                // zooming in
+                grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
+                grMngr.cameraMoved(null, null, 0);
+            }
+            else {
+                // wheelDirection == WHEEL_DOWN, zooming out
+                grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
+                grMngr.cameraMoved(null, null, 0);
+            }
+        }
     }
 
     public void enterGlyph(Glyph g){
@@ -395,9 +410,12 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 
     /*cancel a speed-dependant autozoom*/
     protected void unzoom(ViewPanel v){
-	grMngr.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
-	autoZooming = false;
+        //grMngr.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
+        Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
+            new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
+            IdentityInterpolator.getInstance(), null);
+        grMngr.vsm.getAnimationManager().startAnimation(a, false);
+        autoZooming = false;
     }
-
 
 }

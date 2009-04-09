@@ -109,7 +109,7 @@ class GVLoader {
 	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	    if (grMngr.rView != null){
 		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
-		grMngr.cameraMoved();
+		grMngr.cameraMoved(null, null, 0);
 	    }
 	}
     }
@@ -137,7 +137,7 @@ class GVLoader {
             if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
             if (grMngr.rView != null){
                 grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
-                grMngr.cameraMoved();
+                grMngr.cameraMoved(null, null, 0);
             }
             grMngr.gp.setVisible(false);
         }
@@ -188,7 +188,7 @@ class GVLoader {
 		if (grMngr.rView != null){
 		    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1), 100);
 		}
-		grMngr.cameraMoved();
+		grMngr.cameraMoved(null, null, 0);
 	    }
 	    else {
 		System.err.println("An error occured while loading file " + svgFileURL);
@@ -208,7 +208,7 @@ class GVLoader {
 	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	if (grMngr.rView != null){
 	    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
-	    grMngr.cameraMoved();
+	    grMngr.cameraMoved(null, null, 0);
 	}
     }
 
