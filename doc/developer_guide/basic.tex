@@ -164,7 +164,7 @@ When adding a new glyph to a virtual space, it gets inserted at the top of the d
 
 Position in the drawing stack can also be changed through the glyph's z-index. This is very convenient when managing groups of objects. A glyph's z-index is specified at instantiation time as a constructor parameter. Calling methods \cd{atBottom}, \cd{onTop}, \cd{above} and \cd{below} might affect a glyph's z-index.
 
-\begin{figure}
+\begin{figure}[!ht]
 \centering
   \fbox{\includegraphics[width=10cm]{images/j2dp.png}}
   \caption{Example of use of a Java2DPainter (logo in the bottom-right corner, memory gauge in the bottom-left corner)}
@@ -181,14 +181,53 @@ Java2DPainter callbacks can be set at the following steps of the rendering proce
 \item \cd{AFTER\_PORTALS}: method gets called after portals have been drawn.
 \end{itemize}
 
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+class D2P implements Java2DPainter {
+
+  public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+    g2d.drawString("aString", 10, viewHeight-20);
+  }
+
+}
+
+...
+  v.setJava2DPainter(new D2P(), Java2DPainter.FOREGROUND);
+...
+
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
 
 %%%%%%%%%%
 \subsection{Portals}
 
+A portal is a subregion of a view that displays something different. Typically, a portal will display what is seen through another camera than the camera associated with the main view\cl{net.claribole.zvtm.engine.CameraPortal}. Camera portals can be considered as smaller views inset within views. Figure \ref{fig:portal} shows an example of a camera portal displaying an overview of a virtual space containing a map. One camera (associated with the main view) observes Central America. This camera is moved freely by the user (position and altitude). A second fixed camera is positioned so as to observe the entire world (associated with the portal in the lower-left corner). See Section \ref{sec:bifocal} for more information about bi-focal displays.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+Camera detailCam = ...;
+Camera overviewCam = ...;
+Vector cams = new Vector();
+cams.add(detailCam);
+View v = vsm.addExternalView(cams, ...);
+Portal p = new CameraPortal(0, 0, 100, 50, overviewCam);
+vsm.addPortal(p, v);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+\begin{figure}[!ht]
+\centering
+  \fbox{\includegraphics[width=16cm]{images/portal.png}}
+  \caption{An overview implemented using a portal (lower-right inset)}
+  \label{fig:portal}
+\end{figure}
+
 %%%%%%%%%%
 \subsection{Input events}
 
-It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{net.claribole.zvtm.engine.ViewEventHandler}. A convenience default implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
+It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{net.claribole.zvtm.engine.ViewEventHandler}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
 
 %%%%%%%%%%
 \subsection{Graphical Object Model}
@@ -200,7 +239,7 @@ ZVTM's graphical object model is inspired by Bertin's perceptual dimensions \cit
 
 All glyphs are defined by the following orthogonal attributes: the cartesian coordinates of the shape's centroid, the size of the shape's bounding circle, the shape's orientation, its border and fill colors, associated with an optional alpha channel for translucency. Basic predefined shapes are fully defined by these attributes. Other, more complex, shapes may require additional attributes. For instance, {\em VShape} glyphs support an arbitrary number of vertices, whose position within the bounding circle is represented by a normalized float (see \cite{Vion-Dury97} for more details); {\em VImage} requires a pointer to an actual bitmap resource; rectangular shapes require a width and height, or use the above-mentioned size in combination with an aspect ratio; curved paths ({\em DPath}, made of segments, quadratic curves and cubic curves) require a series of control points; etc. Glyphs can also be composed of other glyphs and still define polymorphic operations (resizing, reorienting, translating, coloring).
 
-\begin{figure}
+\begin{figure}[!ht]
 \centering
    \includegraphics[width=8cm]{images/glyphFactory.pdf}
    \caption{Direct manipulation interface for the instantiation of glyphs.}
