@@ -46,8 +46,8 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     
     static float WHEEL_MM_STEP = 1.0f;
     
-	// update scene when panned from overview every 1.0s
-	static final int DELAYED_UPDATE_FREQUENCY = 1000;
+	// update scene when panned from overview every 0.5s
+	static final int DELAYED_UPDATE_FREQUENCY = 500;
 
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
@@ -317,6 +317,10 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     public void componentShown(ComponentEvent e){}
 
     public void cameraMoved(Camera cam, LongPoint coord, float a){
+        dut.requestUpdate();
+    }
+    
+    void cameraMoved(){
         // region seen through camera
         application.mView.getVisibleRegion(application.mCamera, wnes);
         float alt = application.mCamera.getAltitude();
@@ -327,9 +331,9 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
         }
         else {
             // camera movement was a simple translation
-			dut.cancelUpdate();
+			//dut.cancelUpdate();
             application.sm.updateVisibleRegions();
-        }
+        }        
     }
 
 	/* Overview Portal */
@@ -371,7 +375,7 @@ class DelayedUpdateTimer extends TimerTask {
 
 	public void run(){		
 		if (enabled && update){
-			eh.cameraMoved(null, null, 0);
+			eh.cameraMoved();
 			update = false;
 		}
 	}
