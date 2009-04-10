@@ -1,0 +1,46 @@
+<!-- $Id$ -->
+
+<!ELEMENT scene (level+,region+)>
+
+<!ELEMENT level EMPTY>
+<!ATTLIST level depth CDATA #REQUIRED
+                floor CDATA #REQUIRED
+                ceiling CDATA #REQUIRED>
+
+<!ELEMENT region (object)*>
+<!ATTLIST region levels CDATA #REQUIRED
+                 id ID #REQUIRED
+                 title CDATA #IMPLIED
+                 containedIn IDREF #IMPLIED
+                 x CDATA #REQUIRED
+                 y CDATA #REQUIRED
+                 w CDATA #REQUIRED
+                 h CDATA #REQUIRED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 tful (appear|disappear|fadein|fadeout) "appear"
+                 tfll (appear|disappear|fadein|fadeout) "appear"
+                 ttul (appear|disappear|fadein|fadeout) "disappear"
+                 ttll (appear|disappear|fadein|fadeout) "disappear"
+                 sensitive (true|false) "false"
+                 requestOrdering (decl|dist) "dist"
+                 layer CDATA #IMPLIED>
+
+<!ELEMENT object ANY>
+<!ATTLIST object id ID #REQUIRED
+                 type (image|text|rect|polygon) #REQUIRED
+                 x CDATA #REQUIRED
+                 y CDATA #REQUIRED
+                 z-index CDATA #IMPLIED
+                 w CDATA #IMPLIED
+                 h CDATA #IMPLIED
+                 points CDATA #IMPLIED
+                 src CDATA #IMPLIED
+                 scale CDATA #IMPLIED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
+                 takesToObject IDREF #IMPLIED
+                 takesToRegion IDREF #IMPLIED
+                 sensitive (true|false) "true"
+                 anchor (start|middle|end) "middle">
