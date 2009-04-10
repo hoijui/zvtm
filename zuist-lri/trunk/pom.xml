@@ -40,7 +40,7 @@ $Id: pom.xml 1313 2008-09-24 14:29:45Z epietrig $
 	<dependency>
       <groupId>net.claribole.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
-      <version>0.1.1-SNAPSHOT</version>
+      <version>0.1.1</version>
     </dependency>
   </dependencies>
   
