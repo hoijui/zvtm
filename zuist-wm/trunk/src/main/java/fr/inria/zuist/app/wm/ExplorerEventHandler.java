@@ -114,7 +114,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+        if (!inPortal && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
 		regionStickedToMouse = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
