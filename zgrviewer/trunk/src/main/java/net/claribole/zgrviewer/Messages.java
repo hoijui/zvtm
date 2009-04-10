@@ -22,7 +22,7 @@ public class Messages {
     
     static final String pngOnlyIn140SecondPart="\nDo you want to proceed anyway (this will probably cause an error)?";
 
-    static final String VERSION = "0.8.2";
+    static final String VERSION = "0.9.0-SNAPSHOT";
 
     static final String about = "ZGRViewer " + VERSION + "\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
 
