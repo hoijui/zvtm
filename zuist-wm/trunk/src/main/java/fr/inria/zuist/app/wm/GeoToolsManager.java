@@ -56,7 +56,7 @@ class GeoToolsManager {
 
     int polygonID = 0;
     
-    GeoToolsManager(WorldExplorer app){
+    GeoToolsManager(WorldExplorer app, boolean queryGN){
         this.application = app;
         Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, 4, "BR0", "Boundaries",
                                                     1, transitions, Region.ORDERING_DISTANCE_STR,
@@ -69,7 +69,9 @@ class GeoToolsManager {
 //        loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
         gnp = new GeoNamesParser(application);
-        loadEntities();
+        if (queryGN){
+            loadEntities();            
+        }
     }
 
     void loadShapes(File shapeFile, String msg, Region region, Color shapeColor){

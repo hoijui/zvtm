@@ -36,7 +36,6 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.glyphs.VSegment;
@@ -45,6 +44,8 @@ import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.VImage;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.widgets.TranslucentTextArea;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -74,8 +75,8 @@ public class WorldExplorer implements Java2DPainter {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1280;  // 1400
-    static int VIEW_MAX_H = 720;   // 1050
+    static int VIEW_MAX_W = 1024;  // 1400
+    static int VIEW_MAX_H = 768;   // 1050
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -112,7 +113,7 @@ public class WorldExplorer implements Java2DPainter {
     
     TranslucentTextArea console;
 
-    public WorldExplorer(boolean fullscreen, boolean grid, String dir){
+    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, String dir){
         if (dir != null){
             PATH_TO_HIERARCHY = dir;
             PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
@@ -132,14 +133,15 @@ public class WorldExplorer implements Java2DPainter {
         sm.setSceneCameraBounds(bCamera, eh.wnes);
         sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), gp);
         if (grid){buildGrid();}
-        gm = new GeoToolsManager(this);
+        gm = new GeoToolsManager(this, queryGN);
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(9000.0f);
         vsm.getGlobalView(mCamera, ANIM_MOVE_DURATION);
-        eh.cameraMoved();
+        eh.cameraMoved(null, null, 0);
 		nm.createOverview();
         console.setVisible(true);
+        mCamera.addListener(eh);
     }
 
     void initGUI(boolean fullscreen){
@@ -172,7 +174,6 @@ public class WorldExplorer implements Java2DPainter {
         mView.getCursor().setDynaSpotLagTime(200);
 		mView.getCursor().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
-        vsm.animator.setAnimationListener(eh);
         updatePanelSize();
         // console
         JLayeredPane lp = ((JFrame)mView.getFrame()).getRootPane().getLayeredPane();
@@ -251,13 +252,19 @@ public class WorldExplorer implements Java2DPainter {
     /* Higher view */
     void getHigherView(){
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
 
     /* Higher view */
     void getLowerView(){
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
 
     /* Direction should be one of WorldExplorer.MOVE_* */
@@ -281,7 +288,10 @@ public class WorldExplorer implements Java2DPainter {
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
-        vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
     
     void altitudeChanged(){
@@ -369,16 +379,18 @@ public class WorldExplorer implements Java2DPainter {
 
     public static void main(String[] args){
         String dir = (args.length > 0) ? args[0] : null;
-        boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
-        boolean grid = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
+        boolean queryGN = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
+        boolean fs = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
+        boolean grid = (args.length > 3) ? Boolean.parseBoolean(args[3]) : false;
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
 		if (dir == null){
-			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [fs] [grid]");
-			System.out.println("\n\tfs: fullscreen: true or false");
+			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [queryGN] [fs] [grid]");
+			System.out.println("\n\tqgn: query geonames.org Web service: true or false");
+			System.out.println("\tfs: fullscreen: true or false");
 			System.out.println("\tgrid: draw a grid on top of the map: true or false");
 			System.exit(0);
 		}
-        new WorldExplorer(fs, grid, dir);
+        new WorldExplorer(queryGN, fs, grid, dir);
     }
 
 }

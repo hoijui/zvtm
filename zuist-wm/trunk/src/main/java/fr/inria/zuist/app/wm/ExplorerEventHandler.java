@@ -19,12 +19,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.xerox.VTM.engine.VCursor;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.OverviewPortal;
 import net.claribole.zvtm.engine.PortalEventHandler;
@@ -35,7 +37,7 @@ import fr.inria.zuist.engine.TextDescription;
 
 import org.geonames.Toponym;
 
-class ExplorerEventHandler implements ViewEventHandler, AnimationListener, ComponentListener, PortalEventHandler {
+class ExplorerEventHandler implements ViewEventHandler, CameraListener, ComponentListener, PortalEventHandler {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -97,7 +99,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
 				double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
 				application.mCamera.moveTo(Math.round(a*(jpx-application.nm.ovPortal.x-application.nm.ovPortal.w/2)),
 				                           Math.round(-a*(jpy-application.nm.ovPortal.y-application.nm.ovPortal.h/2)));
-				cameraMoved();
+				cameraMoved(null, null, 0);
 				// position camera where user has pressed, and then allow seamless dragging
 				regionStickedToMouse = true;
 			}
@@ -214,7 +216,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
                 lastJPX = jpx;
                 lastJPY = jpy;
-                cameraMoved();
+                cameraMoved(null, null, 0);
             }
             if (nm.lensType != 0 && nm.lens != null){
         	    nm.moveLens(jpx, jpy, e.getWhen());
@@ -246,13 +248,13 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
             if (wheelDirection  == WHEEL_UP){
                 // zooming in
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-                cameraMoved();
+                dut.requestUpdate();
                 application.vsm.repaintNow();
             }
             else {
                 //wheelDirection == WHEEL_DOWN, zooming out
                 application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                cameraMoved();
+                dut.requestUpdate();
                 application.vsm.repaintNow();
             }
     	}
@@ -307,7 +309,7 @@ class ExplorerEventHandler implements ViewEventHandler, AnimationListener, Compo
     }
     public void componentShown(ComponentEvent e){}
 
-    public void cameraMoved(){
+    public void cameraMoved(Camera cam, LongPoint coord, float a){
         // region seen through camera
         application.mView.getVisibleRegion(application.mCamera, wnes);
         float alt = application.mCamera.getAltitude();
@@ -362,7 +364,7 @@ class DelayedUpdateTimer extends TimerTask {
 
 	public void run(){		
 		if (enabled && update){
-			eh.cameraMoved();
+			eh.cameraMoved(null, null, 0);
 			update = false;
 		}
 	}
