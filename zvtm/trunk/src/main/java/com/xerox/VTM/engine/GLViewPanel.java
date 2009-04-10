@@ -192,8 +192,8 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    parent.painters[Java2DPainter.FOREGROUND].paint(backBufferGraphics, size.width, size.height);
 		}
 		// call to after-distortion java2d painting hook
-		if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
-		    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(backBufferGraphics, size.width, size.height);
+		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
+		    parent.painters[Java2DPainter.AFTER_LENSES].paint(backBufferGraphics, size.width, size.height);
 		}
 		// paint portals associated with this view
 		for (int i=0;i<parent.portals.length;i++){

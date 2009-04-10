@@ -361,8 +361,8 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 						    size.width, size.height);
 				}
 				// call to after-distortion java2d painting hook
-				if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null) {
-				    parent.painters[Java2DPainter.AFTER_DISTORTION]
+				if (parent.painters[Java2DPainter.AFTER_LENSES] != null) {
+				    parent.painters[Java2DPainter.AFTER_LENSES]
 					    .paint(
 						    stableRefToBackBufferGraphics,
 						    size.width, size.height);

@@ -268,8 +268,8 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					    // this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
 					    if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
 					}
-					if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
-					    parent.painters[Java2DPainter.AFTER_DISTORTION].paint(stableRefToBackBufferGraphics, size.width, size.height);
+					if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
+					    parent.painters[Java2DPainter.AFTER_LENSES].paint(stableRefToBackBufferGraphics, size.width, size.height);
 					}
 					// paint portals associated with this view
 					for (int i=0;i<parent.portals.length;i++){
@@ -319,8 +319,8 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					parent.painters[Java2DPainter.FOREGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
 				    }
 				    // call to after-distortion java2d painting hook
-				    if (parent.painters[Java2DPainter.AFTER_DISTORTION] != null){
-					parent.painters[Java2DPainter.AFTER_DISTORTION].paint(stableRefToBackBufferGraphics, size.width, size.height);
+				    if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
+					parent.painters[Java2DPainter.AFTER_LENSES].paint(stableRefToBackBufferGraphics, size.width, size.height);
 				    }
 				    // paint portals associated with this view
 				    for (int i=0;i<parent.portals.length;i++){

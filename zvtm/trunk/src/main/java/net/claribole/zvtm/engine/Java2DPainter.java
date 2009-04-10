@@ -21,7 +21,7 @@ public interface Java2DPainter {
 
     public static final short BACKGROUND = 0;
     public static final short FOREGROUND = 1;
-    public static final short AFTER_DISTORTION = 2;
+    public static final short AFTER_LENSES = 2;
     /** Also painted when view is in blank mode. */
     public static final short AFTER_PORTALS = 3;
     
