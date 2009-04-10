@@ -132,24 +132,31 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     	lastVY = v.getVCursor().vy;
     	Glyph g = v.getVCursor().dynaPick(application.bCamera);
     	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);
-//    	if (nm.lensType != NavigationManager.NO_LENS){
-//    	    nm.zoomInPhase2(lastVX, lastVY);
-//    	}
-//    	else {
-//    	    if (cursorNearBorder){// do not activate the lens when cursor is near the border
-//    		return;
-//    	    }
-//    	    nm.zoomInPhase1(jpx, jpy);
-//    	}
     }
 
-    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+    }
 
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
     }
 
-    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        lastVX = v.getVCursor().vx;
+    	lastVY = v.getVCursor().vy;
+        if (nm.lensType != NavigationManager.NO_LENS){
+            nm.zoomInPhase2(lastVX, lastVY);
+        }
+        else {
+            if (cursorNearBorder){
+                // do not activate the lens when cursor is near the border
+                return;
+            }
+            nm.zoomInPhase1(jpx, jpy);
+        }
+    }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
@@ -165,20 +172,20 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-//        lastJPX = jpx;
-//        lastJPY = jpy;
-//        lastVX = v.getVCursor().vx;
-//        lastVY = v.getVCursor().vy;
-//        if (nm.lensType != NavigationManager.NO_LENS){
-//            nm.zoomOutPhase2();
-//        }
-//        else {
-//            if (cursorNearBorder){
-//                // do not activate the lens when cursor is near the border
-//                return;
-//            }
-//            nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
-//        }
+        lastJPX = jpx;
+        lastJPY = jpy;
+        lastVX = v.getVCursor().vx;
+        lastVY = v.getVCursor().vy;
+        if (nm.lensType != NavigationManager.NO_LENS){
+            nm.zoomOutPhase2();
+        }
+        else {
+            if (cursorNearBorder){
+                // do not activate the lens when cursor is near the border
+                return;
+            }
+            nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+        }
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
