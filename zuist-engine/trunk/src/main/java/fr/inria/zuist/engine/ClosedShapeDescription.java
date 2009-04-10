@@ -11,11 +11,12 @@ import java.awt.Color;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.Translucent;
-import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 
 /** Description of any ZVTM glyph to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -47,8 +48,11 @@ public class ClosedShapeDescription extends ObjectDescription {
                 vsm.addGlyph(glyph, vs);
                 //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
                 //        not necessarily 1.0f
-                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
-                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
+//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
+//                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
+                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, (Translucent)glyph,
+                    1.0f, false, IdentityInterpolator.getInstance(), null);
+                vsm.getAnimationManager().startAnimation(a, false);
             }
             else {
                 if (!sensitive){glyph.setSensitivity(false);}
@@ -64,9 +68,12 @@ public class ClosedShapeDescription extends ObjectDescription {
     public synchronized void destroyObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeOut){
         if (inSpace){
             if (fadeOut){
-                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
-                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
-                    new ClosedShapeHideAction(vs));
+//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
+//                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
+//                    new ClosedShapeHideAction(vs));
+                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, (Translucent)glyph,
+                    0.0f, false, IdentityInterpolator.getInstance(), new ClosedShapeHideAction(vs));
+                vsm.getAnimationManager().startAnimation(a, false);
             }
             else {
                 vs.removeGlyph(glyph);
@@ -90,7 +97,7 @@ public class ClosedShapeDescription extends ObjectDescription {
     
 }
 
-class ClosedShapeHideAction implements PostAnimationAction {
+class ClosedShapeHideAction implements EndAction {
     
     VirtualSpace vs;
     
@@ -98,24 +105,24 @@ class ClosedShapeHideAction implements PostAnimationAction {
 	this.vs = vs;
     }
     
-    public void animationEnded(Object target, short type, String dimension){
-	try {
-	    vs.removeGlyph((Glyph)target);
-	}
-	catch(ArrayIndexOutOfBoundsException ex){
-	    System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)target).getID() + " failed. Trying one more time.");
-	    recoverFailingAnimationEnded(target, type, dimension);
-	}
+    public void	execute(Object subject, Animation.Dimension dimension) {
+        try {
+            vs.removeGlyph((Glyph)subject);
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).getID() + " failed. Trying one more time.");
+            recoverFailingAnimationEnded(subject, dimension);
+        }
     }
 
-    public void recoverFailingAnimationEnded(Object target, short type, String dimension){
-	try {
-	    vs.removeGlyph((Glyph)target);
-	}
-	catch(ArrayIndexOutOfBoundsException ex){
-	    System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)target).getID() + " failed. Giving up.");
-	    recoverFailingAnimationEnded(target, type, dimension);
-	}
+    public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).getID() + " failed. Giving up.");
+            recoverFailingAnimationEnded(subject, dimension);
+        }
     }
     
 }

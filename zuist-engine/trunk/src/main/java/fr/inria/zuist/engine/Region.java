@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 

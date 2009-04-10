@@ -14,9 +14,10 @@ import javax.swing.ImageIcon;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import net.claribole.zvtm.glyphs.VImageST;
 
 /** Description of image objects to be loaded/unloaded in the scene.
@@ -99,8 +100,11 @@ public class ImageDescription extends ObjectDescription {
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
                 vsm.addGlyph(glyph, vs);
-                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
-                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
+//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
+//                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
+                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
+                    1.0f, false, IdentityInterpolator.getInstance(), null);
+                vsm.getAnimationManager().startAnimation(a, false);
             }
             else {
                 glyph = new VImageST(vx, vy, zindex, i, sf, 1.0f);
@@ -121,9 +125,12 @@ public class ImageDescription extends ObjectDescription {
     public synchronized void destroyObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
-                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
-                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
-                    new ImageHideAction(vs));
+//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
+//                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
+//                    new ImageHideAction(vs));
+                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                    0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
+                vsm.getAnimationManager().startAnimation(a, false);
             }
             else {
                 vs.removeGlyph(glyph);
@@ -148,7 +155,7 @@ public class ImageDescription extends ObjectDescription {
         
 }
 
-class ImageHideAction implements PostAnimationAction {
+class ImageHideAction implements EndAction {
     
     VirtualSpace vs;
     
@@ -156,25 +163,25 @@ class ImageHideAction implements PostAnimationAction {
 	this.vs = vs;
     }
     
-    public void animationEnded(Object target, short type, String dimension){
-	try {
-	    vs.removeGlyph((Glyph)target);
-	    ((VImageST)target).getImage().flush();
-	}
-	catch(ArrayIndexOutOfBoundsException ex){
-	    System.err.println("Warning: attempt at destroying image " + ((Glyph)target).getID() + " failed. Trying one more time.");
-	    recoverFailingAnimationEnded(target, type, dimension);
-	}
+    public void execute(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+            ((VImageST)subject).getImage().flush();
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).getID() + " failed. Trying one more time.");
+            recoverFailingAnimationEnded(subject, dimension);
+        }
     }
 
-    public void recoverFailingAnimationEnded(Object target, short type, String dimension){
-	try {
-	    vs.removeGlyph((Glyph)target);
-	    ((VImageST)target).getImage().flush();
-	}
-	catch(ArrayIndexOutOfBoundsException ex){
-	    System.err.println("Warning: attempt at destroying image " + ((Glyph)target).getID() + " failed. Giving up.");
-	}	
+    public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+            ((VImageST)subject).getImage().flush();
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).getID() + " failed. Giving up.");
+        }	
     }
-    
+
 }

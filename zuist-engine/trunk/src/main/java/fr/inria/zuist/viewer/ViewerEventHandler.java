@@ -14,8 +14,12 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
 import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.xerox.VTM.engine.VCursor;
+import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.Utilities;
@@ -23,14 +27,14 @@ import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.CameraListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewEventHandler, AnimationListener, ComponentListener {
+class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -38,6 +42,8 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
     
     static float WHEEL_MM_STEP = 1.0f;
+    
+    static final int CAMERA_MOTION_NOTIFICATION_PERIOD = 50;
     
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
@@ -57,9 +63,14 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     boolean dragging = false;
 
 	Glyph objectJustSelected = null;
+	
+	CameraMotionNotifier cmn;
     
     ViewerEventHandler(Viewer app){
         this.application = app;
+        cmn = new CameraMotionNotifier(this);
+    	Timer cmnTimer = new Timer();
+    	cmnTimer.scheduleAtFixedRate(cmn, CAMERA_MOTION_NOTIFICATION_PERIOD, CAMERA_MOTION_NOTIFICATION_PERIOD);
         oldCameraAltitude = this.application.mCamera.getAltitude();
     }
 
@@ -74,7 +85,7 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		Vector gum = v.getMouse().getIntersectingGlyphs(v.cams[0]);
+		Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
 		if (gum == null){
 			return;
 		}
@@ -135,7 +146,7 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
                 lastJPX = jpx;
                 lastJPY = jpy;
-                cameraMoved();
+                cameraMoved(null, null, 0);
             }
         }
     }
@@ -145,13 +156,13 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			cameraMoved();
+			cameraMoved(null, null, 0);
 			application.vsm.repaintNow();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			cameraMoved();
+			cameraMoved(null, null, 0);
 			application.vsm.repaintNow();
 		}
 	}
@@ -212,7 +223,11 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
     }
     public void componentShown(ComponentEvent e){}
 
-    public void cameraMoved(){
+    public void cameraMoved(Camera cam, LongPoint coord, float a){
+        cmn.notifyMove();
+    }
+    
+    void cameraMoved(){
         // region seen through camera
         application.mView.getVisibleRegion(application.mCamera, wnes);
         float alt = application.mCamera.getAltitude();
@@ -227,4 +242,27 @@ class ViewerEventHandler implements ViewEventHandler, AnimationListener, Compone
         }
     }
 
+}
+
+class CameraMotionNotifier extends TimerTask {
+	
+	ViewerEventHandler veh;
+	boolean notify = false;
+	
+	CameraMotionNotifier(ViewerEventHandler veh){
+		super();
+		this.veh = veh;
+	}
+	
+	void notifyMove(){
+	    notify = true;
+	}
+	
+	public void run(){
+		if (notify){
+		    veh.cameraMoved();
+		    notify = false;
+		}
+	}
+	
 }

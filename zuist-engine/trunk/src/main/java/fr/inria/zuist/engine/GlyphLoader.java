@@ -13,7 +13,7 @@ import java.util.Vector;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.animation.EndAction;
 
 /** Thread dedicated to the processing of load/unload requests.
  *@author Emmanuel Pietriga

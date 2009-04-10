@@ -47,7 +47,6 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.SwingWorker;
@@ -57,7 +56,9 @@ import net.claribole.zvtm.glyphs.PieMenu;
 import net.claribole.zvtm.glyphs.PieMenuFactory;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.engine.PostAnimationAdapter;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -132,6 +133,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			loadScene(xmlSceneFile);
 			getGlobalView();
 		}
+        mCamera.addListener(eh);
 		ovm.toggleConsole();
     }
 
@@ -166,15 +168,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
-        vsm.animator.setAnimationListener(eh);
 		mView.getPanel().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
 			}
 		};
-		mView.getFrame().addComponentListener(ca0);
-		
+		mView.getFrame().addComponentListener(ca0);		
     }
 
     JMenuItem infoMI, consoleMI;
@@ -330,7 +330,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
         sm.updateLevel(mCamera.altitude);
-        eh.cameraMoved();
+        eh.cameraMoved(null, null, 0);
 	}
     
     /*-------------     Navigation       -------------*/
@@ -355,14 +355,20 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void getHigherView(){
 		rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
 
     /* Higher view */
     void getLowerView(){
 		rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
 
     /* Direction should be one of Viewer.MOVE_* */
@@ -386,7 +392,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
-        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
 
 	void centerOnObject(String id){
@@ -435,18 +444,28 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	
 	void moveBack(){		
 		if (previousLocations.size()>0){
-			Location newlc = (Location)previousLocations.lastElement();
-			Location currentlc = mSpace.getCamera(0).getLocation();
-			Vector animParams = Location.getDifference(currentlc,newlc);
+			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
 			sm.setUpdateLevel(false);
-			vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
-				animParams, mSpace.getCamera(0).getID(),
-				new PostAnimationAdapter(){
-                    public void animationEnded(Object target, short type, String dimension){
-                        sm.setUpdateLevel(true);
-                        sm.updateLevel(mCamera.altitude);
-                    }
-                    });
+//			vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
+//				animParams, mSpace.getCamera(0).getID(),
+//				new PostAnimationAdapter(){
+//                    public void animationEnded(Object target, short type, String dimension){
+//                        sm.setUpdateLevel(true);
+//                        sm.updateLevel(mCamera.altitude);
+//                    }
+//                    });                    
+            class LevelUpdater implements EndAction {
+                public void execute(Object subject, Animation.Dimension dimension){
+                    sm.setUpdateLevel(true);
+                    sm.updateLevel(mCamera.altitude);
+                }
+            }
+            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+                (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
+            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+                (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
+            vsm.getAnimationManager().startAnimation(at, false);
+            vsm.getAnimationManager().startAnimation(aa, false);
 			previousLocations.removeElementAt(previousLocations.size()-1);
 		}
 	}

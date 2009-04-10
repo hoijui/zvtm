@@ -29,7 +29,6 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.glyphs.VTextST;
 import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.Camera;
