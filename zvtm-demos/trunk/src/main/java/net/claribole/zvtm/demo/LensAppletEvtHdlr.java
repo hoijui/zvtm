@@ -10,14 +10,16 @@
 
 package net.claribole.zvtm.demo;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.lens.FixedSizeLens;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -51,9 +53,9 @@ public class LensAppletEvtHdlr implements ViewEventHandler {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	LensApplet.vsm.animator.Xspeed=0;
-	LensApplet.vsm.animator.Yspeed=0;
-	LensApplet.vsm.animator.Aspeed=0;
+	LensApplet.vsm.getAnimationManager().setXspeed(0);
+	LensApplet.vsm.getAnimationManager().setYspeed(0);
+	LensApplet.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
 	LensApplet.vsm.activeView.mouse.setSensitivity(true);
     }
@@ -73,9 +75,9 @@ public class LensAppletEvtHdlr implements ViewEventHandler {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	LensApplet.vsm.animator.Xspeed=0;
-	LensApplet.vsm.animator.Yspeed=0;
-	LensApplet.vsm.animator.Aspeed=0;
+	LensApplet.vsm.getAnimationManager().setXspeed(0);
+	LensApplet.vsm.getAnimationManager().setYspeed(0);
+	LensApplet.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
 	LensApplet.vsm.activeView.mouse.setSensitivity(true);
     }
@@ -89,14 +91,14 @@ public class LensAppletEvtHdlr implements ViewEventHandler {
 	    Camera c=application.vsm.getActiveCamera();
 	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD) {
-		application.vsm.animator.Xspeed=0;
-		application.vsm.animator.Yspeed=0;
- 		application.vsm.animator.Aspeed=(c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
+		application.vsm.getAnimationManager().setXspeed(0);
+		application.vsm.getAnimationManager().setYspeed(0);
+ 		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.animator.Xspeed=(c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50));
-		application.vsm.animator.Yspeed=(c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
-		application.vsm.animator.Aspeed=0;
+		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
     }
@@ -130,12 +132,20 @@ public class LensAppletEvtHdlr implements ViewEventHandler {
 	    if (lensActivated){
 		lensActivated = false;
 		b[0] = -20; b[1] = -20;
-		application.vsm.animator.createLensAnimation(1000,AnimManager.LS_MM_LIN,b,application.lens.getID(),true);
+		
+		Animation animLens = application.vsm.getAnimationManager().getAnimationFactory()
+		    .createLensRadiusAnim(1000, (FixedSizeLens)application.lens, -20, -20, true,
+					  IdentityInterpolator.getInstance(), null);
+		application.vsm.getAnimationManager().startAnimation(animLens, true);
 	    }
 	    else {
 		lensActivated = true;
 		b[0] = 20; b[1] = 20;
-		application.vsm.animator.createLensAnimation(1000,AnimManager.LS_MM_LIN,b,application.lens.getID(),false);
+		
+		Animation animLens = application.vsm.getAnimationManager().getAnimationFactory()
+		    .createLensRadiusAnim(1000, (FixedSizeLens)application.lens, 20, 20, true,
+					  IdentityInterpolator.getInstance(), null);
+		application.vsm.getAnimationManager().startAnimation(animLens, true);
 	    }
 	    break;
 	}

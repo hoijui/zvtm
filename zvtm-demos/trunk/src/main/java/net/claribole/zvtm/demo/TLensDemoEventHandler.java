@@ -66,9 +66,9 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed = 0;
-	application.vsm.animator.Yspeed = 0;
-	application.vsm.animator.Aspeed = 0;
+	application.vsm.getAnimationManager().setXspeed(0);
+	application.vsm.getAnimationManager().setYspeed(0);
+	application.vsm.getAnimationManager().setZspeed(0);
 	application.vsm.activeView.mouse.setSensitivity(true);
 	v.setDrawDrag(false);
     }
@@ -101,9 +101,9 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed = 0;
-	application.vsm.animator.Yspeed = 0;
-	application.vsm.animator.Aspeed = 0;
+	application.vsm.getAnimationManager().setXspeed(0);
+	application.vsm.getAnimationManager().setYspeed(0);
+	application.vsm.getAnimationManager().setZspeed(0);
 	application.vsm.activeView.mouse.setSensitivity(true);
 	v.setDrawDrag(false);
     }
@@ -154,9 +154,9 @@ class TLensDemoEventHandler implements ViewEventHandler, ComponentListener {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
  	if (buttonNumber != 2){
 	    float a = (application.demoCamera.focal+Math.abs(application.demoCamera.altitude))/application.demoCamera.focal;
-	    application.vsm.animator.Xspeed = (jpx-lastJPX)*(a/DRAG_FACTOR);
-	    application.vsm.animator.Yspeed = (lastJPY-jpy)*(a/DRAG_FACTOR);
-	    application.vsm.animator.Aspeed = 0;
+	    application.vsm.getAnimationManager().setXspeed((jpx-lastJPX)*(a/DRAG_FACTOR));
+	    application.vsm.getAnimationManager().setYspeed((lastJPY-jpy)*(a/DRAG_FACTOR));
+	    application.vsm.getAnimationManager().setZspeed(0);
  	}
 	if (lensType != 0 && application.lens != null){
 	    application.moveLens(jpx, jpy, e.getWhen());

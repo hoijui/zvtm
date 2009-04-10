@@ -35,7 +35,6 @@ import javax.swing.SwingUtilities;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -69,9 +68,16 @@ import com.xerox.VTM.glyphs.VTriangleOr;
 import com.xerox.VTM.glyphs.VTriangleOrST;
 import com.xerox.VTM.glyphs.VTriangleST;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.ConstantAccInterpolator;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.TransitionManager;
 import net.claribole.zvtm.engine.Location;
+
+import org.jdesktop.animation.timing.interpolation.Interpolator;
 
 public class Introduction {
 
@@ -94,7 +100,7 @@ public class Introduction {
     ViewEventHandler eh;
 
     String animType = "orient";
-    String animScheme = "sig";
+    volatile String animScheme = "sig";
 
     int camNb=0;
 
@@ -138,12 +144,13 @@ public class Introduction {
     void cameraDemo(){
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
 	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
-				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
-				      public void animationEnded(Object target, short type, String dimension){
-					  super.animationEnded(target, type, dimension);
+				  new EndAction(){
+				      public void execute(Object subject,
+						   Animation.Dimension dimension){
 					  cameraDemoActions();
 				      }
-				  });
+				  }
+				  );
     }
 
     void cameraDemoActions(){
@@ -189,12 +196,13 @@ public class Introduction {
 
     void objectFamilies(){
 	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
-				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
-				      public void animationEnded(Object target, short type, String dimension){
-					  super.animationEnded(target, type, dimension);
+				  new EndAction(){
+				      public void execute(Object subject,
+							  Animation.Dimension dimension){
 					  objectFamiliesActions();
 				      }
-				  });
+				  }
+				  );
     }
 
     void objectFamiliesActions(){
@@ -268,12 +276,13 @@ public class Introduction {
 
     void objectAnim(){
 	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
-				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
-				      public void animationEnded(Object target, short type, String dimension){
-					  super.animationEnded(target, type, dimension);
+				  new EndAction(){
+				      public void execute(Object subject,
+							  Animation.Dimension dimension){
 					  objectAnimActions();
 				      }
-				  });
+				  }
+				  );
     }
 
     void objectAnimActions(){
@@ -376,37 +385,48 @@ public class Introduction {
     }
 
     void animate(Glyph g){
+	Interpolator inter = SlowInSlowOutInterpolator.getInstance();
+ 	if (animScheme.equals("lin")){inter = IdentityInterpolator.getInstance();}
+ 	else if (animScheme.equals("exp")){inter = ConstantAccInterpolator.getInstance();}
+ 	else if (animScheme.equals("sig")){inter = SlowInSlowOutInterpolator.getInstance();}
+
 	if (animType.equals("orient")){
-	    if (animScheme.equals("lin")){vsm.animator.createGlyphAnimation(5000,AnimManager.GL_ROT_LIN,new Float(10.0f),g.getID());}
-	    else if (animScheme.equals("exp")){vsm.animator.createGlyphAnimation(5000,AnimManager.GL_ROT_PAR,new Float(10.0f),g.getID());}
-	    else if (animScheme.equals("sig")){vsm.animator.createGlyphAnimation(5000,AnimManager.GL_ROT_SIG,new Float(10.0f),g.getID());}
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphOrientationAnim(1200, g, 10f, true, inter, null);
+	    vsm.getAnimationManager().startAnimation(anim, true);
 	}
 	else if (animType.equals("size")){
-	    if (animScheme.equals("lin")){vsm.animator.createGlyphAnimation(3000,AnimManager.GL_SZ_LIN,new Float(2.0f),g.getID());}
-	    else if (animScheme.equals("exp")){vsm.animator.createGlyphAnimation(3000,AnimManager.GL_SZ_PAR,new Float(2.0f),g.getID());}
-	    else if (animScheme.equals("sig")){vsm.animator.createGlyphAnimation(3000,AnimManager.GL_SZ_SIG,new Float(2.0f),g.getID());}
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(3000, g, 200f, true, inter, null);
+	    vsm.getAnimationManager().startAnimation(anim, true);
 	}
 	else if (animType.equals("col")){
-	    float[] fill = {0, -0.8f, -0.6f, 0, 0, 0};
-	    vsm.animator.createGlyphAnimation(2000, AnimManager.GL_COLOR_LIN, fill, g.getID());
-	    float[] fill2 = {0, 0.8f, 0.6f, 0, 0, 0};
-	    vsm.animator.createGlyphAnimation(2000, AnimManager.GL_COLOR_LIN, fill2, g.getID());
+	    float[] fill = {0, -0.8f, -0.6f};
+	    float[] fill2 = {0, 0.8f, 0.6f};
+	    
+	     Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphFillColorAnim(2000, g, fill, true, inter, null);
+	     Animation anim2 = vsm.getAnimationManager().getAnimationFactory()
+		 .createGlyphFillColorAnim(2000, g, fill2, true, inter, null);
+	     vsm.getAnimationManager().startAnimation(anim, false);
+	     vsm.getAnimationManager().startAnimation(anim2, false);
 	}
 	else if (animType.equals("trans")){
-	    if (animScheme.equals("lin")){vsm.animator.createGlyphAnimation(1000,AnimManager.GL_TRANS_LIN,new LongPoint(200,100),g.getID());}
-	    else if (animScheme.equals("exp")){vsm.animator.createGlyphAnimation(1000,AnimManager.GL_TRANS_PAR,new LongPoint(200,100),g.getID());}
-	    else if (animScheme.equals("sig")){vsm.animator.createGlyphAnimation(1000,AnimManager.GL_TRANS_SIG,new LongPoint(200,100),g.getID());}
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(1000, g, new LongPoint(200,100), true, inter, null);
+	    vsm.getAnimationManager().startAnimation(anim, true);
 	}
     }
 
     void multiLayer(){
 	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
-				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
-				      public void animationEnded(Object target, short type, String dimension){
-					  super.animationEnded(target, type, dimension);
+				  new EndAction(){
+				      public void execute(Object subject,
+							  Animation.Dimension dimension){
 					  multiLayerActions();
 				      }
-				  });
+				  }
+				  );
     }
 
     void multiLayerActions(){
@@ -456,12 +476,13 @@ public class Introduction {
 
     void multiView(){
 	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
-				  new FadeOut(vsm.getView("Demo"), BLANK_COLOR, vsm.getVirtualSpace("vs1")){
-				      public void animationEnded(Object target, short type, String dimension){
-					  super.animationEnded(target, type, dimension);
+				  new EndAction(){
+				      public void execute(Object subject,
+							  Animation.Dimension dimension){
 					  multiViewActions();
 				      }
-				  });
+				  }
+				  );
     }
 
     void multiViewActions(){
@@ -515,20 +536,4 @@ public class Introduction {
         new Introduction();
     }
     
-}
-
-class FadeOut extends net.claribole.zvtm.engine.FadeOut {
-    
-    View view;
-    Color blankColor;
-    VirtualSpace spaceOwningFadeRect;
-    
-    FadeOut(View v, Color c, VirtualSpace vs){
-	super(v, c, vs);
-    }
-
-    public void animationEnded(Object target, short type, String dimension){
-	super.animationEnded(target, type, dimension);
-    }
-
 }

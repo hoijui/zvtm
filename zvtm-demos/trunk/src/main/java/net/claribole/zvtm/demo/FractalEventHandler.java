@@ -10,7 +10,6 @@
 
 package net.claribole.zvtm.demo;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
@@ -18,6 +17,8 @@ import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.Glyph;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
 import java.awt.event.KeyEvent;
@@ -74,9 +75,9 @@ public class FractalEventHandler implements ViewEventHandler {
 	    zoomingInRegion=false;
 	}
 	else if (manualLeftButtonMove){
-	    application.vsm.animator.Xspeed=0;
-	    application.vsm.animator.Yspeed=0;
-	    application.vsm.animator.Aspeed=0;
+	    application.vsm.getAnimationManager().setXspeed(0);
+	    application.vsm.getAnimationManager().setYspeed(0);
+	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
 	    application.vsm.activeView.mouse.setSensitivity(true);
 	    manualLeftButtonMove=false;
@@ -85,7 +86,11 @@ public class FractalEventHandler implements ViewEventHandler {
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
 	LongPoint lp = new LongPoint(v.getMouse().vx - v.cams[0].posx, v.getMouse().vy - v.cams[0].posy);
-	application.vsm.animator.createCameraAnimation(FractalDemo.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, lp, v.cams[0].getID());
+
+	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 
+				     lp, true, SlowInSlowOutInterpolator.getInstance(), null);
+	application.vsm.getAnimationManager().startAnimation(transAnim, true);
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -101,16 +106,20 @@ public class FractalEventHandler implements ViewEventHandler {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed=0;
-	application.vsm.animator.Yspeed=0;
-	application.vsm.animator.Aspeed=0;
+	application.vsm.getAnimationManager().setXspeed(0);
+	application.vsm.getAnimationManager().setYspeed(0);
+	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
 	application.vsm.activeView.mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
 	LongPoint lp = new LongPoint(v.getMouse().vx - v.cams[0].posx, v.getMouse().vy - v.cams[0].posy);
-	application.vsm.animator.createCameraAnimation(FractalDemo.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, lp, v.cams[0].getID());
+
+	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 
+				     lp, true, SlowInSlowOutInterpolator.getInstance(), null);
+	application.vsm.getAnimationManager().startAnimation(transAnim, true);
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
@@ -119,17 +128,17 @@ public class FractalEventHandler implements ViewEventHandler {
 	if (mod != ALT_MOD && (buttonNumber == 1 || buttonNumber == 3)){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-		application.vsm.animator.Xspeed=0;
-		application.vsm.animator.Yspeed=0;
-		application.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
+		application.vsm.getAnimationManager().setXspeed(0);
+		application.vsm.getAnimationManager().setYspeed(0);
+		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
 		//50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
 		jpxD = jpx-lastJPX;
 		jpyD = lastJPY-jpy;
-		application.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor));
-		application.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor));
-		application.vsm.animator.Aspeed=0;
+		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
     }

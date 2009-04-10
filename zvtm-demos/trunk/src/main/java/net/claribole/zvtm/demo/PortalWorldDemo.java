@@ -14,9 +14,12 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.util.Vector;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.TrailingOverview;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
@@ -95,11 +98,11 @@ public class PortalWorldDemo {
 
     public void init(short am){
 	eh = new PWEventHandler(this);
-	vsm.animator.setAnimationListener(eh);
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
 	vsm.setZoomLimit(0);
 	demoCamera = vsm.addCamera(mainVSname);
+	demoCamera.addListener(eh);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
 	demoView = vsm.addExternalView(cameras, "Portal World Demo", View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
@@ -158,8 +161,16 @@ public class PortalWorldDemo {
 
     void switchPortal(int x, int y){
 	if (portal != null){// portal is active, destroy it it
-	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(-0.5f),
-					       portal.getID(), new PortalKiller(this));
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createTranslucencyAnim(ANIM_MOVE_LENGTH, portal, -0.5f, true,
+				    IdentityInterpolator.getInstance(), 
+				    new EndAction(){
+					public void execute(Object subject,
+							    Animation.Dimension dimension){
+					    killPortal();
+					}
+				    });
+	    vsm.getAnimationManager().startAnimation(anim, true);
 	}
 	else {// portal not active, create it
 	    portal = getPortal(x, y);
@@ -168,8 +179,12 @@ public class PortalWorldDemo {
 	    portal.setObservedRegionListener(eh);
 	    vsm.addPortal(portal, demoView);
  	    portal.setBorder(Color.RED);
-	    vsm.animator.createPortalAnimation(ANIM_MOVE_LENGTH, AnimManager.PT_ALPHA_LIN, new Float(0.5f),
-					       portal.getID(), null);
+	    
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createTranslucencyAnim(ANIM_MOVE_LENGTH, portal, 0.5f, true,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, true);
+
 	    portalCamera.moveTo(0, 0);
 	    portalCamera.setAltitude(CONTRACTED_PORTAL_CEILING_ALTITUDE);
 	}
@@ -177,9 +192,10 @@ public class PortalWorldDemo {
 
     void getTo(int jpx, int jpy){
 	LongPoint res = portal.getVSCoordinates(jpx, jpy);
-	vsm.animator.createCameraAnimation(200, AnimManager.CA_TRANS_SIG,
-					   new LongPoint(res.x-demoCamera.posx, res.y-demoCamera.posy),
-					   demoCamera.getID(), null);
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(200, demoCamera, new LongPoint(res.x, res.y), false,
+				    SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     void getGlobalView(boolean inPortal){
@@ -197,7 +213,7 @@ public class PortalWorldDemo {
 	vsm.repaintNow();
     }
 
-    /*higher view*/
+    /*lower view*/
     void getFastLowerView(){
 	demoCamera.altitudeOffset(-(demoCamera.getAltitude()+demoCamera.getFocal())/4.0f);
 	vsm.repaintNow();
@@ -212,11 +228,14 @@ public class PortalWorldDemo {
 	else {
 	    c = demoCamera;
 	}
-	Float alt=new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=c.getAltitude()+c.getFocal();
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
-    /*higher view*/
+    /*lower view*/
     void getLowerView(boolean inPortal){
 	Camera c;
 	if (inPortal){
@@ -225,8 +244,11 @@ public class PortalWorldDemo {
 	else {
 	    c = demoCamera;
 	}
-	Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=-(c.getAltitude()+c.getFocal())/2.0f;
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     /*direction should be one of ZGRViewer.MOVE_* */
@@ -258,7 +280,10 @@ public class PortalWorldDemo {
 	    long qt=Math.round((rb[0]-rb[2])/2.4);
 	    trans=new LongPoint(qt,0);
 	}
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ANIM_MOVE_LENGTH, c, trans, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     public static void main(String[] args){

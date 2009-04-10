@@ -14,10 +14,11 @@ import java.awt.Color;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.SwingWorker;
@@ -136,7 +137,11 @@ public class ViewDemo {
 	    long qt=Math.round((rb[0]-rb[2])/2.4);
 	    trans=new LongPoint(qt,0);
 	}
-	vsm.animator.createCameraAnimation(ViewDemo.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, c.getID());
+	Animation transAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ViewDemo.ANIM_MOVE_LENGTH, c, trans, 
+				     true, SlowInSlowOutInterpolator.getInstance(), null);
+
+	vsm.getAnimationManager().startAnimation(transAnim, true);	
     }
 
     void getGlobalView(){
@@ -145,14 +150,22 @@ public class ViewDemo {
 
     void getHigherView(){
 	Camera c = vsm.getView(mainViewName).getCameraNumber(0);
-	Float alt = new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ViewDemo.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, c.getID());
+	float alt = c.getAltitude()+c.getFocal();
+
+	Animation altAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ViewDemo.ANIM_MOVE_LENGTH, c, alt, true, 
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(altAnim, true);
     }
     
     void getLowerView(){
 	Camera c = vsm.getView(mainViewName).getCameraNumber(0);
-	Float alt = new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ViewDemo.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, c.getID());
+	float alt = -(c.getAltitude()+c.getFocal())/2.0f;
+
+	Animation altAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ViewDemo.ANIM_MOVE_LENGTH, c, alt, true, 
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(altAnim, true);
     }
 
     void exit(){

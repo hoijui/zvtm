@@ -190,9 +190,9 @@ public class AnimationEvtHdlr implements ViewEventHandler {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed=0;
-	application.vsm.animator.Yspeed=0;
-	application.vsm.animator.Aspeed=0;
+	application.vsm.getAnimationManager().setXspeed(0);
+	application.vsm.getAnimationManager().setYspeed(0);
+	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
 	application.vsm.activeView.mouse.setSensitivity(true);
     }
@@ -205,14 +205,14 @@ public class AnimationEvtHdlr implements ViewEventHandler {
 	if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == META_SHIFT_MOD) {
-		application.vsm.animator.Xspeed=0;
-		application.vsm.animator.Yspeed=0;
- 		application.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
+		application.vsm.getAnimationManager().setXspeed(0);
+		application.vsm.getAnimationManager().setYspeed(0);
+ 		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)((jpx-lastJPX)*(tfactor/cfactor)) : (long)((jpx-lastJPX)/(tfactor*cfactor));
-		application.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
-		application.vsm.animator.Aspeed=0;
+		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)((jpx-lastJPX)*(tfactor/cfactor)) : (long)((jpx-lastJPX)/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
     }

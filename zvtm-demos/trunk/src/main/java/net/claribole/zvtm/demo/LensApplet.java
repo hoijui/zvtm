@@ -24,10 +24,12 @@ import javax.swing.JApplet;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.lens.FixedSizeLens;
 import net.claribole.zvtm.lens.FSLinearLens;
 import net.claribole.zvtm.lens.Lens;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -91,10 +93,21 @@ public class LensApplet extends JApplet {
 			LensApplet.this.view.repaintNow();
 			LensApplet.this.lens = view.setLens(new FSLinearLens(1.0f,100,20));
 			LensApplet.this.lens.setBufferThreshold(1.5f);
-			LensApplet.vsm.animator.createLensAnimation(1000,AnimManager.LS_MM_LIN,new Float(1.0f),LensApplet.this.lens.getID(),false);
+			
+			Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+			    .createLensMagAnim(1000, (FixedSizeLens)LensApplet.this.lens, 
+					       1f, true, 
+					       IdentityInterpolator.getInstance(), null);
+			vsm.getAnimationManager().startAnimation(lensAnim, true);
 		    }
 		    else {
-			LensApplet.vsm.animator.createLensAnimation(1000,AnimManager.LS_MM_LIN,new Float(-1.0f),LensApplet.this.lens.getID(),true);
+			//XXX remove lens from view? (view.setLens(null))
+			Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+			    .createLensMagAnim(1000, (FixedSizeLens)LensApplet.this.lens, 
+					       -1f, true, 
+					       IdentityInterpolator.getInstance(), null);
+			vsm.getAnimationManager().startAnimation(lensAnim, true);
+
 			LensApplet.this.lens = null;
 		    }
 		}

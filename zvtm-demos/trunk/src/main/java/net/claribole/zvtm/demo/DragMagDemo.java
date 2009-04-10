@@ -17,11 +17,12 @@ import java.util.Vector;
 import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.DraggableCameraPortal;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Location;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
@@ -109,7 +110,8 @@ public class DragMagDemo implements Java2DPainter {
 	demoView.setNotifyMouseMoved(true);
 	demoView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 	portalCamera = vsm.addCamera(mainVSname);
-	vsm.animator.setAnimationListener(eh);
+	portalCamera.addListener(eh);
+	
 	initMap();
 	initDM();
 	getGlobalView(false);
@@ -191,11 +193,20 @@ public class DragMagDemo implements Java2DPainter {
 
    void meetDM(){
        if (portal != null){
-	   Vector data = new Vector();
-	   data.add(new Float(portalCamera.getAltitude()-demoCamera.getAltitude()));
-	   // take dragmag's center as the context's center
-	   data.add(new LongPoint(portalCamera.posx-demoCamera.posx, portalCamera.posy-demoCamera.posy)); 
-	   vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_TRANS_SIG,data,demoCamera.getID());
+	   Animation transAnim = vsm.getAnimationManager().getAnimationFactory()
+	       .createCameraTranslation(ANIM_MOVE_LENGTH, demoCamera, 
+					new LongPoint(portalCamera.posx, portalCamera.posy), false,
+					SlowInSlowOutInterpolator.getInstance(),
+					null);
+	   Animation altAnim = vsm.getAnimationManager().getAnimationFactory()
+	       .createCameraAltAnim(ANIM_MOVE_LENGTH, demoCamera,
+				    portalCamera.getAltitude(), false,
+				    SlowInSlowOutInterpolator.getInstance(),
+				    null);
+	   vsm.getAnimationManager().startAnimation(transAnim, true);
+	   vsm.getAnimationManager().startAnimation(altAnim, true);
+	   
+
 	   vsm.destroyPortal(portal);
 	   portal = null;
 	   mainVS.hide(dmRegion);
@@ -242,8 +253,12 @@ public class DragMagDemo implements Java2DPainter {
 	else {
 	    c = demoCamera;
 	}
-	Float alt=new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=c.getAltitude()+c.getFocal();
+
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ScrollbarDemo.ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     /*higher view (multiply altitude by altitudeFactor)*/
@@ -255,8 +270,12 @@ public class DragMagDemo implements Java2DPainter {
 	else {
 	    c = demoCamera;
 	}
-	Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=-(c.getAltitude()+c.getFocal())/2.0f;
+
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ScrollbarDemo.ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     /*direction should be one of ZGRViewer.MOVE_* */
@@ -288,7 +307,11 @@ public class DragMagDemo implements Java2DPainter {
 	    long qt=Math.round((rb[0]-rb[2])/2.4);
 	    trans=new LongPoint(qt,0);
 	}
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
+	
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ScrollbarDemo.ANIM_MOVE_LENGTH, c, trans, true,
+				     SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     public static void main(String[] args){

@@ -15,18 +15,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import net.claribole.zvtm.engine.AnimationListener;
+import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.CameraPortal;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 
-class DMDEventHandler implements ViewEventHandler, PortalEventHandler, AnimationListener {
+class DMDEventHandler implements ViewEventHandler, PortalEventHandler, CameraListener {
 
     DragMagDemo application;
 
@@ -120,7 +121,7 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler, Animation
 						      Math.round(a*(jpy-lastJPY)));
 			lastJPX = jpx;
 			lastJPY = jpy;
-			cameraMoved();
+			//XXX FIXME previously there was a call to cameraMoved()
 		    }
 		}
 	    }
@@ -152,7 +153,6 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler, Animation
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
 	}
-	cameraMoved();
 	application.vsm.repaintNow();
     }
 
@@ -204,7 +204,7 @@ class DMDEventHandler implements ViewEventHandler, PortalEventHandler, Animation
 	application.vsm.repaintNow();
     }
 
-    public void cameraMoved(){
+    public void cameraMoved(Camera cam, LongPoint coord, float alt){
 	application.updateDMRegion();
     }
 

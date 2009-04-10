@@ -46,11 +46,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.lens.FixedSizeLens;
 import net.claribole.zvtm.lens.FSInverseCosineLens;
 import net.claribole.zvtm.lens.FSLinearLens;
 import net.claribole.zvtm.lens.Lens;
-
-import com.xerox.VTM.engine.AnimManager;
 
 public class IntroPanel  extends JFrame {
 
@@ -364,22 +366,35 @@ public class IntroPanel  extends JFrame {
 
     void setLens(String s){
 	if (s == NO_LENS && lens != null){
-	    application.vsm.animator.createLensAnimation(LENS_ANIM_TIME,AnimManager.LS_MM_LIN,
-							 new Float(-LENS_MM),
-							 lens.getID(),true);
+	    Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -LENS_MM, true,
+				   IdentityInterpolator.getInstance(), 
+				   new EndAction(){
+				       public void execute(Object subject,
+							   Animation.Dimension dimension){
+					   application.vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+					   ((Lens)subject).dispose();
+				       }
+				   }); //XXX kill lens?
+	    application.vsm.getAnimationManager().startAnimation(anim, true);
+
 	    lens = null;
 	}
 	else if (s == LINEAR_LENS){
 	    lens = application.vsm.getView("Demo").setLens(new FSLinearLens(1.0f,LENS_R1,1));
-	    application.vsm.animator.createLensAnimation(LENS_ANIM_TIME,AnimManager.LS_MM_LIN,
-							 new Float(LENS_MM),
-							 lens.getID(),false);
+
+	    Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, LENS_MM, true,
+				   IdentityInterpolator.getInstance(), null); 
+	    application.vsm.getAnimationManager().startAnimation(anim, true);
 	}
 	else if (s == INVERSE_COSINE_LENS){
 	    lens = application.vsm.getView("Demo").setLens(new FSInverseCosineLens(1.0f,LENS_R1, LENS_R2));
-	    application.vsm.animator.createLensAnimation(LENS_ANIM_TIME,AnimManager.LS_MM_LIN,
-							 new Float(LENS_MM),
-							 lens.getID(),false);
+	   
+	    Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, LENS_MM, true,
+				   IdentityInterpolator.getInstance(), null); 
+	    application.vsm.getAnimationManager().startAnimation(anim, true);
 	}
     }
 

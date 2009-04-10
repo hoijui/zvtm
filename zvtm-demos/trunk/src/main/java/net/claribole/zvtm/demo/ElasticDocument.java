@@ -19,8 +19,13 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.text.Style;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.Location;
+import net.claribole.zvtm.lens.FixedSizeLens;
 import net.claribole.zvtm.lens.FSGaussianLens;
 import net.claribole.zvtm.lens.FSInverseCosineLens;
 import net.claribole.zvtm.lens.FSLinearLens;
@@ -34,7 +39,6 @@ import net.claribole.zvtm.lens.LInfFSLinearLens;
 import net.claribole.zvtm.lens.LInfFSManhattanLens;
 import net.claribole.zvtm.lens.Lens;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
@@ -83,9 +87,9 @@ public class ElasticDocument implements Java2DPainter {
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
-    static double DEFAULT_MAG_FACTOR = 4.0;
-    static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
-    static double INV_MAG_FACTOR = 1/MAG_FACTOR;
+    static float DEFAULT_MAG_FACTOR = 4f;
+    static float MAG_FACTOR = DEFAULT_MAG_FACTOR;
+    static float INV_MAG_FACTOR = 1/MAG_FACTOR;
 
     /* lens distance and drop-off functions */
     static final short L1_Linear = 0;
@@ -142,7 +146,7 @@ public class ElasticDocument implements Java2DPainter {
 	demoView.setEventHandler(eh);
 	demoView.getPanel().addComponentListener(eh);
 	demoView.setNotifyMouseMoved(true);
- 	demoView.setJava2DPainter(this, Java2DPainter.AFTER_DISTORTION);
+ 	demoView.setJava2DPainter(this, Java2DPainter.AFTER_LENSES);
 	demoCamera.setAltitude(START_ALTITUDE);
 	loadDocument();
 	System.gc();
@@ -226,8 +230,12 @@ public class ElasticDocument implements Java2DPainter {
  	    lens = demoView.setLens(getLensDefinition(x, y));
 	    lens.setBufferThreshold(1.5f);
 	}
-	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-					 lens.getID(), null);
+
+	Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, MAG_FACTOR-1, true, 
+			       IdentityInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(lensAnim, true);
+
 	setLens(ElasticDocumentEventHandler.ZOOMIN_LENS);
     }
     
@@ -236,29 +244,45 @@ public class ElasticDocument implements Java2DPainter {
 	float cameraAbsAlt = demoCamera.getAltitude()+demoCamera.getFocal();
 	long c2x = Math.round(mx - INV_MAG_FACTOR * (mx - demoCamera.posx));
 	long c2y = Math.round(my - INV_MAG_FACTOR * (my - demoCamera.posy));
-	Vector cadata = new Vector();
 	// -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
-	Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
-	if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
-	    cadata.add(deltAlt);
-	    cadata.add(new LongPoint(c2x-demoCamera.posx, c2y-demoCamera.posy));
-	    // animate lens and camera simultaneously (lens will die at the end)
-	    vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-					     lens.getID(), new ElDocZP2LensAction(this));
-	    vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					       cadata, demoCamera.getID(), null);
+	float deltAlt = (cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR;
+	if (cameraAbsAlt + deltAlt > FLOOR_ALTITUDE){
+	    Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -MAG_FACTOR+1,
+				   true, IdentityInterpolator.getInstance(),
+				   new Zp2LensAction()); 
+	    Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraAltAnim(LENS_ANIM_TIME, demoCamera, cameraAbsAlt, false,
+				     IdentityInterpolator.getInstance(), null);
+	    Animation camTransAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraTranslation(LENS_ANIM_TIME, demoCamera, new LongPoint(c2x, c2y), false,
+					 IdentityInterpolator.getInstance(), null);
+
+	    vsm.getAnimationManager().startAnimation(lensAnim, true);
+	    vsm.getAnimationManager().startAnimation(camAltAnim, true);
+	    vsm.getAnimationManager().startAnimation(camTransAnim, true);
 	}
 	else {
-	    Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
-	    double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
-	    cadata.add(actualDeltAlt);
-	    cadata.add(new LongPoint(Math.round((c2x-demoCamera.posx)*ratio),
-				     Math.round((c2y-demoCamera.posy)*ratio)));
-	    // animate lens and camera simultaneously (lens will die at the end)
-	    vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-					     lens.getID(), new ElDocZP2LensAction(this));
-	    vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					       cadata, demoCamera.getID(), null);
+	    float actualDeltAlt = FLOOR_ALTITUDE - cameraAbsAlt;
+	    double ratio = actualDeltAlt / deltAlt;
+// 	    cadata.add(actualDeltAlt);
+// 	    cadata.add(new LongPoint(Math.round((c2x-demoCamera.posx)*ratio),
+// 				     Math.round((c2y-demoCamera.posy)*ratio)));
+
+	    Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -MAG_FACTOR+1,
+				   true, IdentityInterpolator.getInstance(),
+				   new Zp2LensAction()); 
+	    Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraAltAnim(LENS_ANIM_TIME, demoCamera, actualDeltAlt, true,
+				     IdentityInterpolator.getInstance(), null);
+	    Animation camTransAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraTranslation(LENS_ANIM_TIME, demoCamera, new LongPoint(c2x, c2y), false,
+					 IdentityInterpolator.getInstance(), null);
+
+	    vsm.getAnimationManager().startAnimation(lensAnim, true);
+	    vsm.getAnimationManager().startAnimation(camAltAnim, true);
+	    vsm.getAnimationManager().startAnimation(camTransAnim, true);
 	}
     }
 
@@ -267,36 +291,48 @@ public class ElasticDocument implements Java2DPainter {
 	float cameraAbsAlt = demoCamera.getAltitude()+demoCamera.getFocal();
 	long c2x = Math.round(mx - MAG_FACTOR * (mx - demoCamera.posx));
 	long c2y = Math.round(my - MAG_FACTOR * (my - demoCamera.posy));
-	Vector cadata = new Vector();
-	cadata.add(new Float(cameraAbsAlt*(MAG_FACTOR-1)));
-	cadata.add(new LongPoint(c2x-demoCamera.posx, c2y-demoCamera.posy));
+	
 	// create lens if it does not exist
 	if (lens == null){
 	    lens = demoView.setLens(getLensDefinition(x, y));
 	    lens.setBufferThreshold(1.5f);
 	}
 	// animate lens and camera simultaneously
-	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-					 lens.getID(), null);
-	vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					   cadata, demoCamera.getID(), null);
+	Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, MAG_FACTOR-1,
+			       true, IdentityInterpolator.getInstance(),
+				   null);
+	Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(LENS_ANIM_TIME, demoCamera, cameraAbsAlt*(MAG_FACTOR-1), false,
+				 IdentityInterpolator.getInstance(), null);
+	Animation camTransAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(LENS_ANIM_TIME, demoCamera, new LongPoint(c2x, c2y), false,
+				     IdentityInterpolator.getInstance(), null);
+
+	vsm.getAnimationManager().startAnimation(lensAnim, true);
+	vsm.getAnimationManager().startAnimation(camAltAnim, true);
+	vsm.getAnimationManager().startAnimation(camTransAnim, true);
+
 	setLens(ElasticDocumentEventHandler.ZOOMOUT_LENS);
     }
 
     void zoomOutPhase2(){
 	// make lens disappear (killing anim)
-	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-					 lens.getID(), new ElDocZP2LensAction(this));
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -MAG_FACTOR+1,
+			       true, IdentityInterpolator.getInstance(),
+			       new Zp2LensAction());
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
-    void setMagFactor(double m){
+    void setMagFactor(float m){
 	MAG_FACTOR = m;
 	INV_MAG_FACTOR = 1 / MAG_FACTOR;
     }
 
-    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
+    synchronized void magnifyFocus(float magOffset, int zooming, Camera ca){
 	synchronized (lens){
-	    double nmf = MAG_FACTOR + magOffset;
+	    float nmf = MAG_FACTOR + magOffset;
 	    if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
 		setMagFactor(nmf);
 		if (zooming == ElasticDocumentEventHandler.ZOOMOUT_LENS){
@@ -334,8 +370,11 @@ public class ElasticDocument implements Java2DPainter {
 				    -Math.round((a1-demoCamera.getAltitude())/demoCamera.getFocal()*lens.ly));
 		}
 		else {
-		    vsm.animator.createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
-						     lens.getID(), null);
+		    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+			.createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens, magOffset,
+					   true, IdentityInterpolator.getInstance(),
+					   null);
+		    vsm.getAnimationManager().startAnimation(anim, true);
 		}
 	    }
 	}
@@ -363,18 +402,26 @@ public class ElasticDocument implements Java2DPainter {
 	Location l=vsm.getGlobalView(demoCamera,ANIM_MOVE_LENGTH);
     }
 
-    /*higher view (multiply altitude by altitudeFactor)*/
+    /*higher view */
     void getHigherView(){
 	Camera c=demoView.getCameraNumber(0);
-	Float alt=new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=c.getAltitude()+c.getFocal();
+
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ANIM_MOVE_LENGTH, c, alt,
+			       true, SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
-    /*higher view (multiply altitude by altitudeFactor)*/
+    /*lower view */
     void getLowerView(){
 	Camera c=demoView.getCameraNumber(0);
-	Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=-(c.getAltitude()+c.getFocal())/2.0f;
+
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ANIM_MOVE_LENGTH, c, alt,
+			       true, SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     /*direction should be one of ZGRViewer.MOVE_* */
@@ -398,7 +445,10 @@ public class ElasticDocument implements Java2DPainter {
 	    long qt=Math.round((rb[0]-rb[2])/2.4);
 	    trans=new LongPoint(qt,0);
 	}
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ANIM_MOVE_LENGTH, c, trans,
+				     true, SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     void updatePanelSize(){
@@ -455,5 +505,15 @@ public class ElasticDocument implements Java2DPainter {
     public static void main(String[] args){
 	new ElasticDocument();
     }
-    
+
+    class Zp2LensAction implements EndAction{
+	public void execute(Object subject,
+			    Animation.Dimension dimension){
+	    vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+    	    ((Lens)subject).dispose();
+    	    setMagFactor(ElasticDocument.DEFAULT_MAG_FACTOR);
+    	    lens = null;
+    	    setLens(ElasticDocumentEventHandler.NO_LENS);
+	}
+    }
 }

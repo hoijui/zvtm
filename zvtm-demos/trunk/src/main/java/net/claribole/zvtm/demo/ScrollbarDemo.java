@@ -14,8 +14,8 @@ import java.awt.event.MouseWheelEvent;
 
 import java.util.Vector;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
+import net.claribole.zvtm.engine.CameraListener;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
@@ -23,14 +23,16 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.SwingWorker;
-import net.claribole.zvtm.engine.AnimationListener;
+
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.ScrollLayer;
 import net.claribole.zvtm.engine.DefaultScrollEventHandler;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 
-public class ScrollbarDemo implements AnimationListener {
+public class ScrollbarDemo implements CameraListener {
 
     VirtualSpaceManager vsm;
 
@@ -73,7 +75,7 @@ public class ScrollbarDemo implements AnimationListener {
 	demoView.setEventHandler(sbeh, 1);
 	demoView.setNotifyMouseMoved(true);
 	sl.setView(demoView);
-	vsm.animator.setAnimationListener(this);
+	mCamera.addListener(this);
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
 		    buildGlyphs();
@@ -121,7 +123,11 @@ public class ScrollbarDemo implements AnimationListener {
 	    long qt=Math.round((rb[0]-rb[2])/2.4);
 	    trans=new LongPoint(qt,0);
 	}
-	vsm.animator.createCameraAnimation(ScrollbarDemo.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, c.getID());
+
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ScrollbarDemo.ANIM_MOVE_LENGTH, c, trans, true,
+				     SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     void getGlobalView(){
@@ -130,17 +136,25 @@ public class ScrollbarDemo implements AnimationListener {
 
     void getHigherView(){
 	Camera c = demoView.getCameraNumber(0);
-	Float alt = new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ScrollbarDemo.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, c.getID());
+	float alt = c.getAltitude()+c.getFocal();
+	
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ScrollbarDemo.ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
     
     void getLowerView(){
 	Camera c = demoView.getCameraNumber(0);
-	Float alt = new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ScrollbarDemo.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, c.getID());
+	float alt = -(c.getAltitude()+c.getFocal())/2.0f;
+	
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ScrollbarDemo.ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
-    public void cameraMoved(){
+    public void cameraMoved(Camera cam, LongPoint coord, float alt){
 	sl.cameraUpdated();
     }
 
@@ -179,9 +193,9 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed = 0;
-	application.vsm.animator.Yspeed = 0;
-	application.vsm.animator.Aspeed = 0;
+	application.vsm.getAnimationManager().setXspeed(0);
+	application.vsm.getAnimationManager().setYspeed(0);
+	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
 	application.demoView.mouse.setSensitivity(true);
     }
@@ -215,14 +229,14 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
 	    Camera c = application.demoView.getCameraNumber(0);
 	    float a = (c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == SHIFT_MOD) {
-		application.vsm.animator.Xspeed = 0;
-		application.vsm.animator.Yspeed = 0;
-		application.vsm.animator.Aspeed = (c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
+		application.vsm.getAnimationManager().setXspeed(0);
+		application.vsm.getAnimationManager().setYspeed(0);
+		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.animator.Xspeed = (c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50));
-		application.vsm.animator.Yspeed = (c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
-		application.vsm.animator.Aspeed = 0;
+		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
     }
@@ -232,12 +246,10 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
 	float a = (c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.cameraMoved();
 	    application.vsm.repaintNow();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.cameraMoved();
 	    application.vsm.repaintNow();
 	}
     }

@@ -18,10 +18,13 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.lens.*;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
@@ -73,9 +76,9 @@ public class TLensDemo {
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
-    static double DEFAULT_MAG_FACTOR = 4.0;
-    static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
-    static double INV_MAG_FACTOR = 1/MAG_FACTOR;
+    static float DEFAULT_MAG_FACTOR = 4f;
+    static float MAG_FACTOR = DEFAULT_MAG_FACTOR;
+    static float INV_MAG_FACTOR = 1/MAG_FACTOR;
 
     /* lens distance and drop-off functions */
     static final short L1_Linear = 0;
@@ -259,8 +262,11 @@ public class TLensDemo {
  	    lens = demoView.setLens(getLensDefinition(x, y));
 	    lens.setBufferThreshold(1.5f);
 	}
-	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-					 lens.getID(), null);
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, (float)MAG_FACTOR-1, true, 
+			       IdentityInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
+
 	setLens(TLensDemoEventHandler.ZOOMIN_LENS);
     }
     
@@ -269,29 +275,40 @@ public class TLensDemo {
 	float cameraAbsAlt = demoCamera.getAltitude()+demoCamera.getFocal();
 	long c2x = Math.round(mx - INV_MAG_FACTOR * (mx - demoCamera.posx));
 	long c2y = Math.round(my - INV_MAG_FACTOR * (my - demoCamera.posy));
-	Vector cadata = new Vector();
-	// -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
-	Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
-	if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
-	    cadata.add(deltAlt);
-	    cadata.add(new LongPoint(c2x-demoCamera.posx, c2y-demoCamera.posy));
+	
+	float deltAlt = (cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR;
+	if (cameraAbsAlt + deltAlt > FLOOR_ALTITUDE){
 	    // animate lens and camera simultaneously (lens will die at the end)
-	    vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-					     lens.getID(), new TLensDemoZP2LensAction(this));
-	    vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					       cadata, demoCamera.getID());
+	    Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -MAG_FACTOR+1, true, 
+				   IdentityInterpolator.getInstance(), new ZP2LensAction());
+	    Animation camTransAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraTranslation(LENS_ANIM_TIME, demoCamera, new LongPoint(c2x, c2y),
+					 false, IdentityInterpolator.getInstance(), null);
+	    Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraAltAnim(LENS_ANIM_TIME, demoCamera, deltAlt, true,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(lensAnim, true);
+	    vsm.getAnimationManager().startAnimation(camTransAnim, true);
+	    vsm.getAnimationManager().startAnimation(camAltAnim, true);
 	}
 	else {
-	    Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
-	    double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
-	    cadata.add(actualDeltAlt);
-	    cadata.add(new LongPoint(Math.round((c2x-demoCamera.posx)*ratio),
-				     Math.round((c2y-demoCamera.posy)*ratio)));
-	    // animate lens and camera simultaneously (lens will die at the end)
-	    vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-					     lens.getID(), new TLensDemoZP2LensAction(this));
-	    vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					       cadata, demoCamera.getID());
+	    float actualDeltAlt = FLOOR_ALTITUDE - cameraAbsAlt;
+	    double ratio = actualDeltAlt / deltAlt;
+	    Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -MAG_FACTOR+1, true, 
+				   IdentityInterpolator.getInstance(), new ZP2LensAction());
+	    Animation camTransAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraTranslation(LENS_ANIM_TIME, demoCamera, 
+					 new LongPoint(Math.round((c2x-demoCamera.posx)*ratio),
+						       Math.round((c2y-demoCamera.posy)*ratio)),
+					 true, IdentityInterpolator.getInstance(), null);
+	    Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+		.createCameraAltAnim(LENS_ANIM_TIME, demoCamera, deltAlt, true,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(lensAnim, true);
+	    vsm.getAnimationManager().startAnimation(camTransAnim, true);
+	    vsm.getAnimationManager().startAnimation(camAltAnim, true);
 	}
     }
 
@@ -300,36 +317,45 @@ public class TLensDemo {
 	float cameraAbsAlt = demoCamera.getAltitude()+demoCamera.getFocal();
 	long c2x = Math.round(mx - MAG_FACTOR * (mx - demoCamera.posx));
 	long c2y = Math.round(my - MAG_FACTOR * (my - demoCamera.posy));
-	Vector cadata = new Vector();
-	cadata.add(new Float(cameraAbsAlt*(MAG_FACTOR-1)));
-	cadata.add(new LongPoint(c2x-demoCamera.posx, c2y-demoCamera.posy));
+
 	// create lens if it does not exist
 	if (lens == null){
 	    lens = demoView.setLens(getLensDefinition(x, y));
 	    lens.setBufferThreshold(1.5f);
 	}
 	// animate lens and camera simultaneously
-	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-					 lens.getID(), null);
-	vsm.animator.createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-					   cadata, demoCamera.getID(), null);
+	Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, MAG_FACTOR-1, true,
+			       IdentityInterpolator.getInstance(), null);
+	Animation camTransAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(LENS_ANIM_TIME, demoCamera, new LongPoint(c2x, c2y), false,
+				     IdentityInterpolator.getInstance(), null);
+	Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(LENS_ANIM_TIME, demoCamera, cameraAbsAlt*(MAG_FACTOR-1), false,
+				 IdentityInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(lensAnim, true);
+	vsm.getAnimationManager().startAnimation(camTransAnim, true);
+	vsm.getAnimationManager().startAnimation(camAltAnim, true);
+
 	setLens(TLensDemoEventHandler.ZOOMOUT_LENS);
     }
 
     void zoomOutPhase2(){
 	// make lens disappear (killing anim)
-	vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-					 lens.getID(), new TLensDemoZP2LensAction(this));
+	Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens, -MAG_FACTOR+1, true,
+			       IdentityInterpolator.getInstance(), new ZP2LensAction());
+	vsm.getAnimationManager().startAnimation(lensAnim, true);
     }
 
-    void setMagFactor(double m){
+    void setMagFactor(float m){
 	MAG_FACTOR = m;
 	INV_MAG_FACTOR = 1 / MAG_FACTOR;
     }
 
-    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
+    synchronized void magnifyFocus(float magOffset, int zooming, Camera ca){
 	synchronized (lens){
-	    double nmf = MAG_FACTOR + magOffset;
+	    float nmf = MAG_FACTOR + magOffset;
 	    if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
 		System.err.println(nmf);
 		setMagFactor(nmf);
@@ -368,8 +394,10 @@ public class TLensDemo {
 				    -Math.round((a1-demoCamera.getAltitude())/demoCamera.getFocal()*lens.ly));
 		}
 		else {
-		    vsm.animator.createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
-						     lens.getID(), null);
+		    Animation lensAnim = vsm.getAnimationManager().getAnimationFactory()
+			.createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens, magOffset, true,
+					   IdentityInterpolator.getInstance(), null);
+		    vsm.getAnimationManager().startAnimation(lensAnim, true);
 		}
 	    }
 	}
@@ -534,18 +562,28 @@ public class TLensDemo {
 	Location l=vsm.getGlobalView(demoCamera,ANIM_MOVE_LENGTH);
     }
 
-    /*higher view (multiply altitude by altitudeFactor)*/
+    /*higher view*/
     void getHigherView(){
 	Camera c=demoView.getCameraNumber(0);
-	Float alt=new Float(c.getAltitude()+c.getFocal());
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=c.getAltitude()+c.getFocal();
+
+	Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+
+	vsm.getAnimationManager().startAnimation(camAltAnim, true);
     }
 
-    /*higher view (multiply altitude by altitudeFactor)*/
+    /*lower view*/
     void getLowerView(){
 	Camera c=demoView.getCameraNumber(0);
-	Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
+	float alt=-(c.getAltitude()+c.getFocal())/2.0f;
+
+	Animation camAltAnim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(ANIM_MOVE_LENGTH, c, alt, true,
+				 SlowInSlowOutInterpolator.getInstance(), null);
+
+	vsm.getAnimationManager().startAnimation(camAltAnim, true);
     }
 
     /*direction should be one of ZGRViewer.MOVE_* */
@@ -569,7 +607,12 @@ public class TLensDemo {
 	    long qt=Math.round((rb[0]-rb[2])/2.4);
 	    trans=new LongPoint(qt,0);
 	}
-	vsm.animator.createCameraAnimation(ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
+
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ANIM_MOVE_LENGTH, c, trans, true,
+				     SlowInSlowOutInterpolator.getInstance(), null);
+
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     void updatePanelSize(){
@@ -583,4 +626,15 @@ public class TLensDemo {
         new TLensDemo(gridOnly);
     }
     
+    class ZP2LensAction implements EndAction{
+	public void execute(Object subject,
+			    Animation.Dimension dimension){
+	    vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+    	    ((Lens)subject).dispose();
+    	    setMagFactor(TLensDemo.DEFAULT_MAG_FACTOR);
+    	    lens = null;
+    	    setLens(TLensDemoEventHandler.NO_LENS);
+	}
+    }
+
 }

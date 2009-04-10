@@ -22,13 +22,14 @@
 
 package com.xerox.VTM.demo;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VSegment;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
 import java.awt.event.KeyEvent;
@@ -89,13 +90,17 @@ public class CameraDemoEvtHdlr implements ViewEventHandler {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed=0;
-	application.vsm.animator.Yspeed=0;
-	application.vsm.animator.Aspeed=0;
+	application.vsm.getAnimationManager().setXspeed(0);
+	application.vsm.getAnimationManager().setYspeed(0);
+	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawSegment(false);
 	application.vsm.activeView.mouse.setSensitivity(true);
 	if (autoZoomed){
-	    application.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(-2*v.cams[0].getAltitude()/3.0f), v.cams[0].getID());
+	    Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
+		.createCameraAltAnim(300, v.cams[0], -2*v.cams[0].getAltitude()/3.0f, true,
+				     IdentityInterpolator.getInstance(), null);
+	    application.vsm.getAnimationManager().startAnimation(anim, true);
+	    
 	    autoZoomed = false;
 	}
     }
@@ -111,19 +116,23 @@ public class CameraDemoEvtHdlr implements ViewEventHandler {
 	if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == META_SHIFT_MOD) {
-		application.vsm.animator.Xspeed=0;
-		application.vsm.animator.Yspeed=0;
- 		application.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
+		application.vsm.getAnimationManager().setXspeed(0);
+		application.vsm.getAnimationManager().setYspeed(0);
+ 		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)((jpx-lastJPX)*(tfactor/cfactor)) : (long)((jpx-lastJPX)/(tfactor*cfactor));
-		application.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
-		application.vsm.animator.Aspeed=0;
+		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)((jpx-lastJPX)*(tfactor/cfactor)) : (long)((jpx-lastJPX)/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setZspeed(0);
 		if (application.isAutoZoomEnabled()){
 		    drag = Math.sqrt(Math.pow(jpx-lastJPX, 2) + Math.pow(jpy-lastJPY, 2));
 		    if (!autoZoomed && drag > 300.0f){
 			autoZoomed = true;
-			application.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(2 * v.cams[0].getAltitude()), v.cams[0].getID());
+		
+			Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
+			    .createCameraAltAnim(300, v.cams[0], 2*v.cams[0].getAltitude(), true,
+						 IdentityInterpolator.getInstance(), null);
+			application.vsm.getAnimationManager().startAnimation(anim, true);
 		    }
 		}
 	    }

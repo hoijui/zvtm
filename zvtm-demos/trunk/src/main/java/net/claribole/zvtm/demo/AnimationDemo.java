@@ -34,19 +34,23 @@ import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.ConstantAccInterpolator;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.TransitionManager;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
 import net.claribole.zvtm.glyphs.VImageOrST;
 import net.claribole.zvtm.glyphs.VTextOrST;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VRectangleOrST;
 import com.xerox.VTM.glyphs.VSegmentST;
 import com.xerox.VTM.glyphs.VShapeST;
@@ -228,63 +232,114 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     void reset(){
 	// rectangle
 	if (rectangle.vx != COL1_X || rectangle.vy != ROW1_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL1_X-rectangle.vx, ROW1_Y-rectangle.vy), rectangle.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, rectangle, new LongPoint(COL1_X, ROW1_Y-rectangle.vy), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (rectangle.getSize() != RECTANGLE_SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(RECTANGLE_SIZE/rectangle.getSize()), rectangle.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, rectangle, RECTANGLE_SIZE, false, 
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// star
 	if (star.vx != COL2_X || star.vy != ROW1_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL2_X-star.vx, ROW1_Y-star.vy), star.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, star, new LongPoint(COL2_X, ROW1_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (star.getSize() != SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/star.getSize()), star.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, star, SIZE, false, 
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// triangle
 	if (triangle.vx != COL3_X || triangle.vy != ROW1_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL3_X-triangle.vx, ROW1_Y-triangle.vy), triangle.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, triangle, new LongPoint(COL3_X, ROW1_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (triangle.getSize() != SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/triangle.getSize()), triangle.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, triangle, SIZE, false, 
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// text
 	if (text.vx != COL1_X || text.vy != ROW2_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL1_X-text.vx, ROW2_Y-text.vy), text.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, text, new LongPoint(COL1_X, ROW2_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// image
 	if (image.vx != COL2_X || image.vy != ROW2_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL2_X-image.vx, ROW2_Y-image.vy), image.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, image, new LongPoint(COL2_X, ROW2_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (image.getSize() != IMAGE_SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(IMAGE_SIZE/image.getSize()), image.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, image, IMAGE_SIZE, false, 
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// shape
 	if (irregularShape.vx != COL3_X || irregularShape.vy != ROW2_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL3_X-irregularShape.vx, ROW2_Y-irregularShape.vy), irregularShape.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, irregularShape, new LongPoint(COL3_X, ROW2_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (irregularShape.getSize() != SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/irregularShape.getSize()), irregularShape.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, irregularShape, SIZE, false,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// composite 1
 	if (composite1.vx != COL1_X || composite1.vy != ROW3_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL1_X-composite1.vx, ROW3_Y-composite1.vy), composite1.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, composite1, new LongPoint(COL1_X, ROW3_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (composite1.getSize() != COMPOSITE_SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(COMPOSITE_SIZE/composite1.getSize()), composite1.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, composite1, COMPOSITE_SIZE, false,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// composite 2
 	if (composite2.vx != COL2_X || composite2.vy != ROW3_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL2_X-composite2.vx, ROW3_Y-composite2.vy), composite2.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, composite2, new LongPoint(COL2_X, ROW3_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (composite2.getSize() != COMPOSITE_SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(COMPOSITE_SIZE/composite2.getSize()), composite2.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, composite2, COMPOSITE_SIZE, false,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// segment
 	if (segment.vx != COL3_X || segment.vy != ROW3_Y){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_LIN, new LongPoint(COL3_X-segment.vx, ROW3_Y-segment.vy), segment.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(500, segment, new LongPoint(COL3_X, ROW3_Y), false,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	if (segment.getSize() != SIZE){
-	    vsm.animator.createGlyphAnimation(500, AnimManager.GL_SZ_LIN, new Float(SIZE/segment.getSize()), segment.getID());
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(500, segment, SIZE, false,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
     }
 
@@ -300,27 +355,63 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 
     /* ------------------  ORIENTATON ------------------------ */
 
-    static final Float ROTATE_DATA = new Float(-4*(float)Math.PI);
+    static final float ROTATE_DATA = -4*(float)Math.PI;
 
     void rotate(Glyph g, int d){
 	if (g.getCGlyph() != null){g = g.getCGlyph();}
 	switch(cmdPanel.getPacingFunction()){
-	case PACING_FUNCTION_LIN:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_ROT_LIN, ROTATE_DATA, g.getID());break;}
-	case PACING_FUNCTION_SIFO:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_ROT_PAR, ROTATE_DATA, g.getID());break;}
-	case PACING_FUNCTION_SISO:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_ROT_SIG, ROTATE_DATA, g.getID());break;}
+	case PACING_FUNCTION_LIN:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphOrientationAnim(d, g, ROTATE_DATA, true,
+					    IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
+	case PACING_FUNCTION_SIFO:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphOrientationAnim(d, g, ROTATE_DATA, true,
+					    ConstantAccInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
+	case PACING_FUNCTION_SISO:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphOrientationAnim(d, g, ROTATE_DATA, true,
+					    SlowInSlowOutInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
 	}
     }
 
-    static final Float RESIZE_DATA = new Float(1.5f);
+    static final float RESIZE_DATA = 1.5f;
 
     /* ------------------     SIZE    ------------------------ */
 
     void resize(Glyph g, int d){
 	if (g.getCGlyph() != null){g = g.getCGlyph();}
 	switch(cmdPanel.getPacingFunction()){
-	case PACING_FUNCTION_LIN:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_SZ_LIN, RESIZE_DATA, g.getID());break;}
-	case PACING_FUNCTION_SIFO:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_SZ_PAR, RESIZE_DATA, g.getID());break;}
-	case PACING_FUNCTION_SISO:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_SZ_SIG, RESIZE_DATA, g.getID());break;}
+	case PACING_FUNCTION_LIN:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(d, g, RESIZE_DATA, true,
+				     IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
+	case PACING_FUNCTION_SIFO:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(d, g, RESIZE_DATA, true,
+				     ConstantAccInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
+	case PACING_FUNCTION_SISO:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphSizeAnim(d, g, RESIZE_DATA, true,
+				     SlowInSlowOutInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
 	}
     }
 
@@ -331,9 +422,26 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     void translate(Glyph g, int d){
 	if (g.getCGlyph() != null){g = g.getCGlyph();}
 	switch(cmdPanel.getPacingFunction()){
-	case PACING_FUNCTION_LIN:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_TRANS_LIN, TRANSLATE_DATA, g.getID());break;}
-	case PACING_FUNCTION_SIFO:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_TRANS_PAR, TRANSLATE_DATA, g.getID());break;}
-	case PACING_FUNCTION_SISO:{vsm.animator.createGlyphAnimation(d, AnimManager.GL_TRANS_SIG, TRANSLATE_DATA, g.getID());break;}
+	case PACING_FUNCTION_LIN:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(d, g, TRANSLATE_DATA, true,
+					IdentityInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
+	case PACING_FUNCTION_SIFO:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(d, g, TRANSLATE_DATA, true,
+					ConstantAccInterpolator.getInstance(), null);
+	    break;
+	}
+	case PACING_FUNCTION_SISO:{
+	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
+		.createGlyphTranslation(d, g, TRANSLATE_DATA, true,
+					SlowInSlowOutInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(anim, false);
+	    break;
+	}
 	}
     }
 
@@ -343,23 +451,30 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	float mainColorSaturation = g.getHSVColor()[1];
 	float mainColorBrightness = g.getHSVColor()[2];
 	// animate to black
-	float[] COLOR_DATA = {0, -mainColorSaturation, -mainColorBrightness, 0, 0, 0};
-	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, COLOR_DATA, g.getID());
+	Animation anim1 = vsm.getAnimationManager().getAnimationFactory()
+	    .createGlyphFillColorAnim(d/2, g, new float[]{0, -mainColorSaturation, -mainColorBrightness}, true,
+				      IdentityInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim1, false);
 	// animate back to original color
-	float[] COLOR_DATA2 = {0, mainColorSaturation, mainColorBrightness, 0, 0, 0};
-	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, COLOR_DATA2, g.getID());
+	Animation anim2 = vsm.getAnimationManager().getAnimationFactory()
+	    .createGlyphFillColorAnim(d/2, g, new float[]{0, mainColorSaturation, mainColorBrightness}, true,
+				      IdentityInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim2, false);
     }
 
     /* ------------------ TRANSLUCENCY ------------------------ */
 
-    static float[] TRANSLUCENCY_DATA_1 = {0, 0, 0, 0, 0, 0, -1.0f};
-    static float[] TRANSLUCENCY_DATA_2 = {0, 0, 0, 0, 0, 0, 1.0f};
-
     void translucent(Glyph g, int d){
 	// animate to transparent
-	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, TRANSLUCENCY_DATA_1, g.getID());
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createTranslucencyAnim(d/2, (Translucent)g, -1f, true, 
+				    IdentityInterpolator.getInstance(), null);
 	// animate back to opaque
-	vsm.animator.createGlyphAnimation(d/2, AnimManager.GL_COLOR_LIN, TRANSLUCENCY_DATA_2, g.getID());
+	Animation anim2 = vsm.getAnimationManager().getAnimationFactory()
+	    .createTranslucencyAnim(d/2, (Translucent)g, 1f, true,
+				    IdentityInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, false);
+	vsm.getAnimationManager().startAnimation(anim2, false);
     }
 
 
