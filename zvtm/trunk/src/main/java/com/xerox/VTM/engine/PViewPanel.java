@@ -40,7 +40,7 @@ import java.util.Vector;
  * Each view runs in its own thread - uses double buffering - for use in JApplet only
  * @author Emmanuel Pietriga
  */
-public class AppletViewPanel extends ViewPanel implements Runnable {
+public class PViewPanel extends ViewPanel implements Runnable {
 
     /** Double Buffering uses a BufferedImage as the back buffer. */
     BufferedImage backBuffer;
@@ -52,7 +52,7 @@ public class AppletViewPanel extends ViewPanel implements Runnable {
     int backBufferW = 0;
     int backBufferH = 0;
 
-    public AppletViewPanel(Vector cameras,View v) {
+    public PViewPanel(Vector cameras,View v) {
 	addHierarchyListener(
 	    new HierarchyListener() {
 	       public void hierarchyChanged(HierarchyEvent e) {
