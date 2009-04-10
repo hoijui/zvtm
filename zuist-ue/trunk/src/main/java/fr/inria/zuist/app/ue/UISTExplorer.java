@@ -101,8 +101,8 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
 
     /* misc. lens settings */
     Lens lens;
-    static int LENS_R1 = 120;
-    static int LENS_R2 = 60;
+    static int LENS_R1 = 100;
+    static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 2.0;
@@ -114,8 +114,7 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
     static final short L2_Linear = 1;
     static final short LInf_Linear = 2;
     static final short LInf_Manhattan = 5;
-    static final short L2_HLinear = 6;
-    short lensFamily = L2_HLinear;
+    short lensFamily = L2_Gaussian;
 
     static final float FLOOR_ALTITUDE = 0.0f;
 
@@ -391,7 +390,7 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
         }
         else {
             NAV_MODE++;
-            if (NAV_MODE == NAV_MODE_FISHEYE){lensFamily = L2_HLinear;}
+            if (NAV_MODE == NAV_MODE_FISHEYE){lensFamily = L2_Linear;}
             else if (NAV_MODE == NAV_MODE_FISHEYE2){lensFamily = LInf_Linear;}
         }
         ovm.say("Navigation Mode: "+NAV_MODES_STR[NAV_MODE], SWITCHING_MODE_MSG_DURATION);
@@ -442,10 +441,10 @@ public class UISTExplorer implements Java2DPainter, ProgressListener, LevelListe
                 res = new LInfFSManhattanLens(1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
                 break;
             }
-            case L2_HLinear:{
-                res = new HLinearLens(1.0f, 0.4f, 1.0f, 300, 150, x - panelWidth/2, y - panelHeight/2);
-                break;
-            }
+//            case L2_HLinear:{
+//                res = new HLinearLens(1.0f, 0.4f, 1.0f, 300, 150, x - panelWidth/2, y - panelHeight/2);
+//                break;
+//            }
         }
         return res;
     }
