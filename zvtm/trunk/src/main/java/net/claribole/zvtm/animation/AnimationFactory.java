@@ -724,8 +724,12 @@ public class AnimationFactory {
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       lens.setMaximumMagnification(startMag + 
-								    fraction * (endMag - startMag), false);
+				       //synchronization is a less-than-ideal workaround
+				       //(should be done by the Lens itself if necessary)
+				       synchronized(lens){
+					   lens.setMaximumMagnification(startMag + 
+									fraction * (endMag - startMag), false);
+				       }
 				   }
 			       },
 			       interpolator);
@@ -787,7 +791,7 @@ public class AnimationFactory {
 
 				       //allocate a buffer big enough to store the final lens data
 				       if(endBufSize > startBufSize){
-					   lens.setMagRasterDimensions(endBufSize);
+					       lens.setMagRasterDimensions(endBufSize);
 				       }
 				   }
 
@@ -799,16 +803,22 @@ public class AnimationFactory {
 				       
 				       //shrink buffer size
 				       if(endBufSize < startBufSize){
-					   lens.setMagRasterDimensions(endBufSize);
+					   synchronized(lens){
+					       lens.setMagRasterDimensions(endBufSize);
+					   }
 				       }
 				   }
 
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       lens.setMMandRadii(startMag + fraction * (endMag - startMag),
-							  startOr + (int)(fraction*(endOr - startOr)),
-							  startIr + (int)(fraction*(endIr - startIr)), false);
+				       //synchronization is a less-than-ideal workaround
+				       //(should be done by the Lens itself if necessary)
+				       synchronized(lens){
+					   lens.setMMandRadii(startMag + fraction * (endMag - startMag),
+							      startOr + (int)(fraction*(endOr - startOr)),
+							      startIr + (int)(fraction*(endIr - startIr)), false);
+				       }
 				   }
 			       },
 			       interpolator);
@@ -880,8 +890,12 @@ public class AnimationFactory {
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       lens.setRadii(startOr + (int)(fraction*(endOr - startOr)),
-						     startIr + (int)(fraction*(endIr - startIr)), false);
+				       //synchronization is a less-than-ideal workaround
+				       //(should be done by the Lens itself if necessary)
+				       synchronized(lens){
+					   lens.setRadii(startOr + (int)(fraction*(endOr - startOr)),
+							 startIr + (int)(fraction*(endIr - startIr)), false);
+				       }
 				   }
 			       },
 			       interpolator);
