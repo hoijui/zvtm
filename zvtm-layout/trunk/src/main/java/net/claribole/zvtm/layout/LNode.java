@@ -1,17 +1,18 @@
 /*   FILE: LNode.java
  *   DATE OF CREATION:   July 4 2007
  *   AUTHOR :            Boris Trofimov (trofimov@lri.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$
+ * $Id:$
  */
 package net.claribole.zvtm.layout;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.engine.PostAnimationAction;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.glyphs.VBText;
 
@@ -394,7 +395,7 @@ public class LNode {
 		dpath[1] = new LongPoint();
 		dpath[2] = new LongPoint();
 		dpath[3] = new LongPoint(); // end point (to the child)
-		PostAnimationAction paa = null;
+		EndAction ea = null;
 
 		if (collapseTo != null) {
 			switch (treeOrientation){
@@ -434,12 +435,13 @@ public class LNode {
 
 			updateControlPoints(dpath);
 			switchToCollapsedView();
-			paa = new PostAnimationAction() {
-				public void animationEnded(Object target, short type, String dimension) {
+			class EdgeHider implements EndAction {
+			    public void execute(Object subject, Animation.Dimension dimension){
 					vText.visible = false;
 					inEdge.visible = false;
 				}
-			};
+			}
+			ea = new EdgeHider();
 			collapseTo = null;
 		}
 		else if (shouldExpand){
@@ -575,9 +577,11 @@ public class LNode {
 			}
 		}
 		LongPoint data = new LongPoint(textX - vText.vx, textY - vText.vy);
-		tree.vs.vsm.animator.createGlyphAnimation(500, AnimManager.GL_TRANS_SIG, data, vText.getID());
+		Animation an = tree.vs.vsm.getAnimationManager().getAnimationFactory().createGlyphTranslation(500, vText, data, true, SlowInSlowOutInterpolator.getInstance(), null);
+		tree.vs.vsm.getAnimationManager().startAnimation(an, false);
 		if (parent != null){
-			tree.vs.vsm.animator.createPathAnimation(500, AnimManager.DP_TRANS_SIG_ABS, dpath, inEdge.getID(), paa);
+			an = tree.vs.vsm.getAnimationManager().getAnimationFactory().createPathAnim(500, inEdge, dpath, false, SlowInSlowOutInterpolator.getInstance(), ea);
+			tree.vs.vsm.getAnimationManager().startAnimation(an, false);
 		}
 		for (LNode child : children) {
 			child.updateNode(treeOrientation, camIndex);

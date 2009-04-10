@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -18,13 +18,15 @@ import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 
 import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VSegmentST;
 import net.claribole.zvtm.glyphs.DPath;
 import net.claribole.zvtm.glyphs.DPathST;
 import net.claribole.zvtm.glyphs.VPathST;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.AnimationManager;
 
 import edu.uci.ics.jung.graph.Vertex;
 import edu.uci.ics.jung.graph.Edge;
@@ -168,10 +170,10 @@ public class EdgeTransformer {
 	 *@param l the layout that produced the graph's geometry
 	 *@param p the DPath representing this edge
 	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
-	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
+	 *@param animator the ZVTM AnimationManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.getAnimationManager(). Can be null if animDuration == 0.
 	 *@see #updateLine(Edge e, AbstractLayout l, VSegment s)
 	 */	
-	public static void updateLine(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
+	public static void updateLine(Edge e, AbstractLayout l, DPath p, int animDuration, AnimationManager animator){
 		Shape s = (new EdgeShape.Line()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
@@ -185,10 +187,11 @@ public class EdgeTransformer {
 		LongPoint[] coords = {new LongPoint(Math.round(tgt[0]),Math.round(tgt[1])),
 			                  new LongPoint(Math.round(tgt[2]),Math.round(tgt[3]))};
 		if (animDuration > 0){
-			animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+			Animation a = animator.getAnimationFactory().createPathAnim(animDuration, p, coords, true, SlowInSlowOutInterpolator.getInstance(), null);
+			animator.startAnimation(a, false);
 		}
 		else {
-			p.edit(coords, true);			
+			p.edit(coords, true);
 		}
 	}
 	
@@ -265,7 +268,7 @@ public class EdgeTransformer {
 	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
 	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
 	 */	
-	public static void updateQuadCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
+	public static void updateQuadCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimationManager animator){
 		Shape s = (new EdgeShape.QuadCurve()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
@@ -280,7 +283,8 @@ public class EdgeTransformer {
 			                  new LongPoint(Math.round(tgt[4]), Math.round(tgt[5])),
 							  new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
    	    if (animDuration > 0){
-   	    	animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+   	    	Animation a = animator.getAnimationFactory().createPathAnim(animDuration, p, coords, true, SlowInSlowOutInterpolator.getInstance(), null);
+   	    	animator.startAnimation(a, false);
    	    }
    	    else {
    	    	p.edit(coords, true);			
@@ -346,7 +350,7 @@ public class EdgeTransformer {
 	 *@param animDuration the duration of the animation to transition from the old position to the new one. Put 0 if no animation should be run.
 	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
 	 */	
-	public static void updateCubicCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator){
+	public static void updateCubicCurve(Edge e, AbstractLayout l, DPath p, int animDuration, AnimationManager animator){
 		Shape s = (new EdgeShape.CubicCurve()).getShape(e);
 		if (s instanceof Ellipse2D){
 			// special case of loops, represented as ellipses
@@ -363,7 +367,8 @@ public class EdgeTransformer {
                               new LongPoint(Math.round(tgt[6]), Math.round(tgt[7])),
 							  new LongPoint(Math.round(tgt[2]), Math.round(tgt[3]))};
    	    if (animDuration > 0){
-   	    	animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+   	    	Animation a = animator.getAnimationFactory().createPathAnim(animDuration, p, coords, true, SlowInSlowOutInterpolator.getInstance(), null);
+   	    	animator.startAnimation(a, false);
    	    }
    	    else {
    	    	p.edit(coords, true);			
@@ -404,7 +409,7 @@ public class EdgeTransformer {
 	 *@param animator the ZVTM AnimManager instantiated by VirtualSpaceManager. Usually VirtualSpaceManager.animator. Can be null if animDuration == 0.
 	 *@param s the shape already extracted from the Edge object
 	 */	
-	protected static void updateShape(Edge e, AbstractLayout l, DPath p, int animDuration, AnimManager animator, Shape s){
+	protected static void updateShape(Edge e, AbstractLayout l, DPath p, int animDuration, AnimationManager animator, Shape s){
 		LongPoint[] coords = new LongPoint[0];
 		PathIterator pi = s.getPathIterator(getTransform(e, l, s));
 		int type;
@@ -446,7 +451,8 @@ public class EdgeTransformer {
 			pi.next();
 		}
 		if (animDuration > 0){
-			animator.createPathAnimation(animDuration, AnimManager.DP_TRANS_SIG_ABS, coords, p.getID(), null);
+			Animation a = animator.getAnimationFactory().createPathAnim(animDuration, p, coords, true, SlowInSlowOutInterpolator.getInstance(), null);
+   	    	animator.startAnimation(a, false);
 		}
 		else {
 			p.edit(coords, true);			

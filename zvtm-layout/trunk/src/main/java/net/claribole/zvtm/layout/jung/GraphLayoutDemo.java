@@ -281,9 +281,9 @@ class GraphLayoutDemoEventHandler implements ViewEventHandler {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        application.vsm.animator.Xspeed=0;
-        application.vsm.animator.Yspeed=0;
-        application.vsm.animator.Aspeed=0;
+        application.vsm.getAnimationManager().setXspeed(0);
+        application.vsm.getAnimationManager().setYspeed(0);
+        application.vsm.getAnimationManager().setZspeed(0);
         v.setDrawDrag(false);
         application.vsm.activeView.mouse.setSensitivity(true);
     }
@@ -297,15 +297,15 @@ class GraphLayoutDemoEventHandler implements ViewEventHandler {
             Camera c=application.vsm.getActiveCamera();
             float a=(c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
-                application.vsm.animator.Xspeed=0;
-                application.vsm.animator.Yspeed=0;
-                application.vsm.animator.Aspeed=(c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
+                application.vsm.getAnimationManager().setXspeed(0);
+                application.vsm.getAnimationManager().setYspeed(0);
+                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.animator.Xspeed=(c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50));
-                application.vsm.animator.Yspeed=(c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50));
-                application.vsm.animator.Aspeed=0;
+                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setZspeed(0);
             }
         }
     }
