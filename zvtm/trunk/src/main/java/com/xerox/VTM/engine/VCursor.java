@@ -1148,7 +1148,6 @@ public class VCursor {
 class DynaSpotTimer extends TimerTask{
 
 	VCursor c;
-	private boolean enabled = true;
 	
 	DynaSpotTimer(VCursor c){
 		super();
