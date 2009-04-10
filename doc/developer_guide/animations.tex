@@ -15,7 +15,7 @@ ZVTM offers animation capabilities inspired by Stasko's path/transition paradigm
 \item portals' location within a view, their size, and translucence.
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[!ht]
 \centering
  \includegraphics[width=16cm]{images/animSchem.pdf}
   \includegraphics[width=5.5cm,angle=-90]{images/animSchemEx.pdf}
@@ -44,7 +44,32 @@ Dimensions are enumerated in the \cd{Animation.Dimension} enum.
 \subsection{Creating an Animation: the Flexible Way}
 The generic way to create an Animation is to use one of the three createAnimation() methods
 of AnimationFactory. We will examine the most generic one, since the other two are simply
-overloads that provide defaults.
+overloads that provide defaults. Here is an example:
+
+\begin{SaveVerbatim}{CodeVerb}
+Animation cameraAlt = am.getAnimationFactory().createAnimation(
+   4000, 
+   2f,
+   Animator.RepeatBehavior.REVERSE,
+   vsm.getVirtualSpace("src").getCamera(0),
+   Animation.Dimension.ALTITUDE,
+   new DefaultTimingHandler(){
+      public void timingEvent(float fraction, 
+                                            Object subject, 
+                                            Animation.Dimension dim){
+         Camera c = (Camera)subject;
+         c.setAltitude(25+Float.valueOf(fraction*50).longValue());
+   }
+                                             
+      public void end(Object subject, Animation.Dimension dim){
+         circle2.setColor(Color.RED);
+      }
+   },
+   ConstantAccInterpolator.getInstance()
+);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
 
 \subsection{Creating an Animation: the Easy Way}
 Ready-made Animation factory methods are provided as a convenience, to cover the most common
@@ -63,7 +88,7 @@ Once created, animations need to be started to start taking effect.
 Animations will automatically stop after their programmed duration, but it is possible
 to force an animation to stop early or cancel it completely.
 
-\subsubsection{The Queue system}
+\subsubsection{The Queue System}
 Animations have a dimension property and a subject (the object being animated).
 Two animations are said to conflict if they target the same subject \emph{and} have the same dimension.
 Conflicting animations are executed in sequence, while orthogonal animations (those that do not conflict)
@@ -86,6 +111,12 @@ or cancel all conflicting animations prior to enqueing \cd{anim} if set to true,
 ensuring that the animation will start immediately. 
   
 \subsubsection{Stopping or Cancelling an Animation}
+If you want an animation to end without waiting for completion, you may use the
+AnimationManager \cd{stopAnimation} and \cd{cancelAnimation} methods.
+Both take a single parameter: a reference to the \cd{Animation} that must be stopped or cancelled.
+The difference between stopping and cancelling an Animation is that the end action (\cd{end} method
+of a \cd{TimingHandler} or \cd{execute} method of an \cd{EndAction} will be executed if the animation
+is stopped, but not if it is cancelled.
 
 \subsubsection{Pausing and Resuming an Animation}
 In addition to starting, stopping and cancelling Animations, it is possible to put them on hold.
