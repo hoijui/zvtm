@@ -37,9 +37,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.AnimationManager;
+import net.claribole.zvtm.animation.EndAction;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.Portal;
-import net.claribole.zvtm.engine.PostAnimationAction;
 import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.lens.Lens;
@@ -48,7 +51,6 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.RectangularShape;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VText;
-// import EDU.Washington.grad.gjb.cassowary.*;
 
 /**
  * Virtual space manager. This is the main entry point to the toolkit. Virtual spaces, cameras, glyphs and views are instanciated from here.
@@ -131,7 +133,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public boolean mouseSync;
 
     /**Animation Manager*/
-    public AnimManager animator;
+    private final AnimationManager animationManager;
 
     /**allow negative camera altitudes (zoom beyond the standard size=magnification) ; this is actually a hack to decrease focal value automatically when the altitude is 0*/
     protected int zoomFloor=0;
@@ -145,22 +147,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * Only for use with stand-alone Java applications (use other constructor with applet=true if running inside a JApplet)
      */
     public VirtualSpaceManager(){
-	if (debug){System.out.println("Debug mode ON");}
-	nextID=1;
-	nextcID=1;
-	nextpID=1;
-	nextlID=1;
-	nextmID=1;
-	allGlyphs=new Hashtable();
-	allCameras=new Hashtable();
-	allPortals = new Hashtable();
-	allLenses=new Hashtable();
-	allVirtualSpaces=new Hashtable();
-	allViews = new View[0];
-	name2viewIndex = new Hashtable();
-	animator=new AnimManager(this);  //started only when a view is created
-	mouseSync=true;
-	java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);
+	this(false);
     }
 
     /**
@@ -173,6 +160,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	nextpID=1;
 	nextlID=1;
 	nextmID=1;
+	animationManager = new AnimationManager(this);
 	allGlyphs=new Hashtable();
 	allCameras=new Hashtable();
 	allPortals=new Hashtable();
@@ -180,7 +168,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	allVirtualSpaces=new Hashtable();
 	allViews = new View[0];
 	name2viewIndex = new Hashtable();
-	animator=new AnimManager(this);  //started only when a view is created
 	mouseSync=true;
 	if (!applet){java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);}
     }
@@ -192,6 +179,14 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**get debug mode state (ON or OFF)*/
     public static boolean debugModeON(){return debug;}
+
+    /**
+     * Returns a reference to the AnimationManager associated
+     * with this VirtualSpaceManager.
+     */
+    public AnimationManager getAnimationManager(){
+	return animationManager;
+    }
 
     /**set policy for view repainting - true means all views are repainted even if ((not active) or (mouse not inside the view)) - policy is forwarded to all existing views (no matter its current policy) and will be applied to future ones (but it can be changed for each single view)*/
     public void setRepaintPolicy(boolean b){
@@ -524,7 +519,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
-	    if (!animator.started){animator.start();} //start animator only when a view is created
 	    break;
 	}
 	case View.OPENGL_VIEW:{
@@ -532,7 +526,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
-	    if (!animator.started){animator.start();} //start animator only when a view is created
 	    break;
 	}
 	case View.VOLATILE_VIEW:{
@@ -540,7 +533,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
-	    if (!animator.started){animator.start();} //start animator only when a view is created
 	    break;
 	}   
 	}
@@ -591,7 +583,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	tvi.mouse.setID(new Long(nextmID++));
 	addView(tvi);
 	tvi.setRepaintPolicy(generalRepaintPolicy);
-	if (!animator.started){animator.start();} //start animator only when a view is created
 	return tvi;
     }
 
@@ -611,7 +602,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	tvi.mouse.setID(new Long(nextmID++));
 	addView(tvi);
 	tvi.setRepaintPolicy(generalRepaintPolicy);
-	if (!animator.started){animator.start();} //start animator only when a view is created
 	return tvi;
     }
 
@@ -638,19 +628,20 @@ public class VirtualSpaceManager implements AWTEventListener {
         tvi.mouse.setID(new Long(nextmID++));
         addView(tvi);
         tvi.setRepaintPolicy(generalRepaintPolicy);
-        //start animator only when a view is created
-        if (!animator.started){animator.start();}
         return tvi.panel;
     }
 
-    /**adds a newly created view to the list of existing views*/
+    /**
+     * Adds a newly created view to the list of existing views
+     * Side-effect: attempts to start the animation manager
+     */
     protected void addView(View v){
 	View[] tmpA = new View[allViews.length+1];
 	System.arraycopy(allViews, 0, tmpA, 0, allViews.length);
 	tmpA[allViews.length] = v;
 	allViews = tmpA;
 	name2viewIndex.put(v.name, new Integer(allViews.length-1));
-	animator.registerView();
+	animationManager.start(); //starts animationManager if not already running
     }
 
      /**
@@ -684,7 +675,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	v.mouse.setID(new Long(nextmID++));
 	addView(v);
 	v.setRepaintPolicy(generalRepaintPolicy);
-	if (!animator.started){animator.start();} //start animator only when a view is created
 	return v;
      }
 
@@ -709,7 +699,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**Destroy a view identified by its index in the list of views.*/
     protected void destroyView(int i){
-	animator.unregisterView(i);
 	View[] tmpA = new View[allViews.length-1];
 	if (tmpA.length > 0){
 	    System.arraycopy(allViews, 0, tmpA, 0, i);
@@ -974,15 +963,26 @@ public class VirtualSpaceManager implements AWTEventListener {
 	public Location getGlobalView(Camera c, int d, float mFactor){
 		Location l = getGlobalView(c, mFactor);
 		if (l != null){
-			float dAlt = l.alt - c.getAltitude();
-			Vector prms = new Vector();
-			prms.add(new Float(dAlt));
-			prms.add(new LongPoint(l.vx-c.posx, l.vy-c.posy));
-			animator.createCameraAnimation(d, AnimManager.CA_ALT_TRANS_SIG, prms, c.getID());
+		    Animation trans = 
+			animationManager.getAnimationFactory().createCameraTranslation(d,c,
+										       new LongPoint(l.vx,l.vy),
+										       false,
+										       IdentityInterpolator.getInstance(),
+										       null);
+		    
+		    Animation alt = 
+			animationManager.getAnimationFactory().createCameraAltAnim(d,c,
+										   l.alt,
+										   false,
+										   IdentityInterpolator.getInstance(),
+										   null);
+		    
+		    animationManager.startAnimation(trans, false);
+		    animationManager.startAnimation(alt, false);
 		}
 		return l;
 	}
-
+    
     /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in virtual space s*/
     public static long[] findFarmostGlyphCoords(VirtualSpace s){
 	return findFarmostGlyphCoords(s, new long[4]);
@@ -1035,10 +1035,10 @@ public class VirtualSpaceManager implements AWTEventListener {
         *@param d duration of the animation in ms
         *@param z if false, do not (un)zoom, just translate (default is true)
         *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
-        *@param paa post animation action to execute after camera reachers its final position
+        *@param endAction end action to execute after camera reaches its final position
         *@return the final camera location
         */
-    public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, PostAnimationAction paa){
+    public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, EndAction endAction){
         View v=null;
         try {
             v=c.getOwningView();
@@ -1070,6 +1070,17 @@ public class VirtualSpaceManager implements AWTEventListener {
                     dx=g.vx-c.posx;
                     dy=g.vy-c.posy;
                 }
+
+		//relative translation
+		Animation trans = 
+		    animationManager.getAnimationFactory().
+		    createCameraTranslation(d, c,
+					    new LongPoint(dx,dy),
+					    true,
+					    IdentityInterpolator.getInstance(),
+					    endAction);
+		animationManager.startAnimation(trans, false);
+
                 float currentAlt=c.getAltitude()+c.getFocal();
                 if (z){
                     long[] regBounds=v.getVisibleRegion(c);
@@ -1105,15 +1116,19 @@ public class VirtualSpaceManager implements AWTEventListener {
                     }
                     ratio *= mFactor;
                     float newAlt=currentAlt*Math.abs(ratio);
-                    float dAlt=newAlt-currentAlt;
-                    Vector prms=new Vector();
-                    prms.add(new Float(dAlt));prms.add(new LongPoint(dx,dy));
-                    animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID(), paa);
+		 
+		    Animation altAnim = 
+			animationManager.getAnimationFactory().
+			createCameraAltAnim(d, c, 
+					    newAlt, false,
+					    IdentityInterpolator.getInstance(),
+					    null);
+		    animationManager.startAnimation(altAnim, false);
+
                     return new Location(g.vx,g.vy,newAlt);
                 }
                 else {
-                    animator.createCameraAnimation(d,AnimManager.CA_TRANS_SIG,new LongPoint(dx,dy),c.getID(), paa);
-                    return new Location(g.vx,g.vy,currentAlt);
+		    return new Location(g.vx,g.vy,currentAlt);
                 }
             }
             else return null;
@@ -1164,10 +1179,22 @@ public class VirtualSpaceManager implements AWTEventListener {
 					if (tmpRatio>ratio){ratio=tmpRatio;}
 				}
 				float newAlt=currentAlt*Math.abs(ratio);
-				float dAlt=newAlt-currentAlt;
-				Vector prms=new Vector();
-				prms.add(new Float(dAlt));prms.add(new LongPoint(dx-c.posx,dy-c.posy));
-				animator.createCameraAnimation(d,AnimManager.CA_ALT_TRANS_SIG,prms,c.getID());
+			
+				Animation trans = 
+				    animationManager.getAnimationFactory().
+				    createCameraTranslation(d, c, new LongPoint(dx, dy), false,
+							    IdentityInterpolator.getInstance(),
+							    null);
+				
+				Animation altAnim = 
+				    animationManager.getAnimationFactory().
+				    createCameraAltAnim(d, c, newAlt, false,
+							IdentityInterpolator.getInstance(),
+							null);
+
+				animationManager.startAnimation(trans, false);
+				animationManager.startAnimation(altAnim, false);
+				
 				return new Location(dx,dy,newAlt);
 			}
 			else return null;

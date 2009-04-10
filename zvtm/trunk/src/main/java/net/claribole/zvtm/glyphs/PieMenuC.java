@@ -13,7 +13,6 @@ package net.claribole.zvtm.glyphs;
 import java.awt.Color;
 import java.awt.Font;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -22,6 +21,9 @@ import com.xerox.VTM.glyphs.VSlice;
 import com.xerox.VTM.glyphs.VSliceST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
+
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class PieMenuC extends PieMenu {
 
@@ -47,7 +49,7 @@ public class PieMenuC extends PieMenu {
                     String vsName, VirtualSpaceManager vsm,
                     long radius, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
-                    long animDuration, double sensitRadius, Font font){
+                    int animDuration, double sensitRadius, Font font){
         this.vs = vsm.getVirtualSpace(vsName);
         long vx = menuCenterCoordinates.x;
         long vy = menuCenterCoordinates.y;
@@ -94,8 +96,13 @@ public class PieMenuC extends PieMenu {
         }
         if (animDuration > 0){
             for (int i=0;i<items.length;i++){
-                vsm.animator.createGlyphAnimation(animDuration, AnimManager.GL_SZ_LIN,
-                    new Float(pieMenuRadius / (float)animStartSize), items[i].getID());
+		Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
+		    .createGlyphSizeAnim(animDuration, items[i],
+					 (float)pieMenuRadius,
+					 false,
+					 IdentityInterpolator.getInstance(),
+					 null);
+		vsm.getAnimationManager().startAnimation(sizeAnim, false);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
@@ -124,7 +131,7 @@ public class PieMenuC extends PieMenu {
                     String vsName, VirtualSpaceManager vsm,
                     long radius, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
-                    long animDuration, double sensitRadius, Font font){
+                    int animDuration, double sensitRadius, Font font){
         this.vs = vsm.getVirtualSpace(vsName);
         long vx = menuCenterCoordinates.x;
         long vy = menuCenterCoordinates.y;
@@ -171,8 +178,13 @@ public class PieMenuC extends PieMenu {
         }
         if (animDuration > 0){
             for (int i=0;i<items.length;i++){
-                vsm.animator.createGlyphAnimation(animDuration, AnimManager.GL_SZ_LIN,
-                    new Float(pieMenuRadius / (float)animStartSize), items[i].getID());
+		Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
+		    .createGlyphSizeAnim(animDuration, items[i],
+					 (float)pieMenuRadius,
+					 false,
+					 IdentityInterpolator.getInstance(),
+					 null);
+		vsm.getAnimationManager().startAnimation(sizeAnim, false);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
@@ -202,7 +214,7 @@ public class PieMenuC extends PieMenu {
                     String vsName, VirtualSpaceManager vsm,
                     long radius, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
-                    long animDuration, double sensitRadius, Font font, LongPoint[] labelOffsets){
+                    int animDuration, double sensitRadius, Font font, LongPoint[] labelOffsets){
         this.vs = vsm.getVirtualSpace(vsName);
         long vx = menuCenterCoordinates.x;
         long vy = menuCenterCoordinates.y;
@@ -249,8 +261,13 @@ public class PieMenuC extends PieMenu {
         }
         if (animDuration > 0){
             for (int i=0;i<items.length;i++){
-                vsm.animator.createGlyphAnimation(animDuration, AnimManager.GL_SZ_LIN,
-                    new Float(pieMenuRadius / (float)animStartSize), items[i].getID());
+		Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
+		    .createGlyphSizeAnim(animDuration, items[i],
+					 (float)pieMenuRadius,
+					 false,
+					 IdentityInterpolator.getInstance(),
+					 null);
+		vsm.getAnimationManager().startAnimation(sizeAnim, false);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
@@ -280,7 +297,7 @@ public class PieMenuC extends PieMenu {
                     String vsName, VirtualSpaceManager vsm,
                     long radius, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
-                    long animDuration, double sensitRadius, Font font, LongPoint[] labelOffsets){
+                    int animDuration, double sensitRadius, Font font, LongPoint[] labelOffsets){
         this.vs = vsm.getVirtualSpace(vsName);
         long vx = menuCenterCoordinates.x;
         long vy = menuCenterCoordinates.y;
@@ -327,8 +344,13 @@ public class PieMenuC extends PieMenu {
         }
         if (animDuration > 0){
             for (int i=0;i<items.length;i++){
-                vsm.animator.createGlyphAnimation(animDuration, AnimManager.GL_SZ_LIN,
-                    new Float(pieMenuRadius / (float)animStartSize), items[i].getID());
+               	Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
+		    .createGlyphSizeAnim(animDuration, items[i],
+					 (float)pieMenuRadius,
+					 false,
+					 IdentityInterpolator.getInstance(),
+					 null);
+		vsm.getAnimationManager().startAnimation(sizeAnim, false);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);

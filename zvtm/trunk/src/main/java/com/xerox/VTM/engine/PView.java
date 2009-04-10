@@ -18,7 +18,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */
 
 package com.xerox.VTM.engine;

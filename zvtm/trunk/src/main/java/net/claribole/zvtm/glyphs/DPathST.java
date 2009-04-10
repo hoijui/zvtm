@@ -16,8 +16,6 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 
-import net.claribole.zvtm.engine.PostAnimationAction;
-
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VPath;
@@ -33,7 +31,6 @@ import com.xerox.VTM.glyphs.VPath;
  *@see com.xerox.VTM.glyphs.VSegment
  *@see com.xerox.VTM.glyphs.VSegmentST
  *@see com.xerox.VTM.engine.VCursor#intersectsVPath(VPath p)
- *@see com.xerox.VTM.engine.AnimManager#createPathAnimation(long duration, short type, LongPoint[] data, Long gID, PostAnimationAction paa)
  */
 
 public class DPathST extends DPath implements Translucent {

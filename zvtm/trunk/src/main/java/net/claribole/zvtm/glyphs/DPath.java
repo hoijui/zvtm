@@ -45,7 +45,6 @@ import java.util.Arrays;
  *@see com.xerox.VTM.glyphs.VSegment
  *@see com.xerox.VTM.glyphs.VSegmentST
  *@see com.xerox.VTM.engine.VCursor#intersectsVPath(VPath p)
- *@see com.xerox.VTM.engine.AnimManager#createPathAnimation(long duration, short type, LongPoint[] data, Long gID,net.claribole.zvtm.engine.PostAnimationAction paa)
  */
 
 public class DPath extends Glyph implements RectangularShape {

@@ -17,7 +17,7 @@
  *
  * For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */
 
 package net.claribole.zvtm.glyphs;

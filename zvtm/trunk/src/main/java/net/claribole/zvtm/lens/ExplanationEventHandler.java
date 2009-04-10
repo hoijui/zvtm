@@ -35,7 +35,7 @@ class ExplanationEventHandler implements ViewEventHandler {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.animator.Xspeed = 0;
+	application.vsm.getAnimationManager().setXspeed(0);
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -53,7 +53,7 @@ class ExplanationEventHandler implements ViewEventHandler {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (buttonNumber == 1){
 	    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-	    application.vsm.animator.Xspeed = (application.mCamera.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50));
+	    application.vsm.getAnimationManager().setXspeed((application.mCamera.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
 	}
     }
 

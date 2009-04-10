@@ -16,13 +16,15 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
+
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 
 /**A portal showing what is seen through a camera. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
@@ -160,10 +162,21 @@ public class CameraPortal extends Portal {
      */
     public Location getGlobalView(int d, VirtualSpaceManager vsm){
 	Location l = getGlobalView();
-	float dAlt = l.alt - camera.getAltitude() - camera.getFocal();
-	Vector prms=new Vector();
-	prms.add(new Float(dAlt));prms.add(new LongPoint(l.vx-camera.posx, l.vy-camera.posy));
-	vsm.animator.createCameraAnimation(d, AnimManager.CA_ALT_TRANS_SIG, prms, camera.getID());
+
+	Animation trans = 
+	    vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(d, camera, new LongPoint(l.vx, l.vy), false,
+				     IdentityInterpolator.getInstance(),
+				     null);
+	Animation altAnim = 
+	    vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraAltAnim(d, camera, l.alt, false,
+				 IdentityInterpolator.getInstance(),
+				 null);
+
+	vsm.getAnimationManager().startAnimation(trans, false);
+	vsm.getAnimationManager().startAnimation(altAnim, false);
+
 	return l;
     }
 

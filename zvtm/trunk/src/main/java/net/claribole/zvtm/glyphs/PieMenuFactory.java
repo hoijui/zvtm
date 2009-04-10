@@ -40,7 +40,7 @@ public abstract class PieMenuFactory {
      *@param v View in which the pie menu will appear
      *@param vsm instance of VirtualSpaceManager
      */
-    public static PieMenu createPieMenu(String[] labels, long animLength, View v, VirtualSpaceManager vsm){
+    public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm){
 	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
 			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
@@ -61,7 +61,7 @@ public abstract class PieMenuFactory {
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPieMenu(String[] labels, long animLength, View v, VirtualSpaceManager vsm,
+    public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
 	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
@@ -80,7 +80,7 @@ public abstract class PieMenuFactory {
      *@param v View in which the pie menu will appear
      *@param vsm instance of VirtualSpaceManager
      */
-    public static PieMenu createPieMenu(String[] labels, LongPoint[] labelOffsets, long animLength, View v, VirtualSpaceManager vsm){
+    public static PieMenu createPieMenu(String[] labels, LongPoint[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm){
 	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),
 			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
@@ -102,7 +102,7 @@ public abstract class PieMenuFactory {
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPieMenu(String[] labels, LongPoint[] labelOffsets, long animLength, View v, VirtualSpaceManager vsm,
+    public static PieMenu createPieMenu(String[] labels, LongPoint[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
 	return new PieMenuR(labels, new LongPoint(v.mouse.vx, v.mouse.vy),

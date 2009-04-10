@@ -91,7 +91,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     ViewEventHandler[] evHs;
 
     /**repaint only if necessary (when there are animations, when the mouse moves...)*/
-    boolean repaintNow=true;
+    volatile boolean repaintNow=true;
     RepaintListener repaintListener;
 
     /**only repaint mouse cursor (using XOR mode)*/

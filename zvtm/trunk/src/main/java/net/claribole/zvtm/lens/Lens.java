@@ -86,7 +86,7 @@ public abstract class Lens {
     // left up right down coordinates of the lens buffer boundaries
     int[] lurd = new int[4];
 
-    public float MM = 2.0f;
+    public volatile float MM = 2.0f;
 
     /*beyond which magnification should pixels be taken from the magnified buffer
       rather than from the source buffer*/
