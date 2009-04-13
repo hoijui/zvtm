@@ -54,6 +54,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     static final String CENTER_ON_LABEL_PARAM = "centerOnLabel";
     static final String ANTIALIASING_PARAM = "antialiased";
     static final String DISPLAY_OVERVIEW_PARAM = "displayOverview";
+    static final String FOCUS_NODE_MAG_FACTOR_PARAM = "focusNodeMagFactor";
 
     static final String HTTP_PROTOCOL = "http://";
     static final String HTTPS_PROTOCOL = "https://";
@@ -176,6 +177,13 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 	    }
 	}
 	catch(Exception ex){ConfigManager.HIGHLIGHT_COLOR = Color.RED;}
+	try {
+	    String s = getParameter(FOCUS_NODE_MAG_FACTOR_PARAM);
+	    if (s != null){
+		    ConfigManager.MAG_FACTOR = Float.parseFloat(s);
+	    }
+	}
+	catch(Exception ex){ConfigManager.MAG_FACTOR = 2.0f;}
 	AppletUtils.initLookAndFeel();
 	Container cpane = getContentPane();
 	this.setSize(appletWindowWidth-10, appletWindowHeight-10);
