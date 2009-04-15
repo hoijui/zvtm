@@ -14,6 +14,10 @@ $Id: pom.xml 1313 2008-09-24 14:29:45Z epietrig $
   <version>0.1.0</version>
   <url>http://zvtm.sourceforge.net/zuist/</url>
   
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <!-- Repositories -->
   <repositories>
 	<repository>
