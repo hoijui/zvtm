@@ -24,7 +24,11 @@ $Id$
   <scm>
     <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm/zgrviewer/</url>
   </scm>
-  
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <!-- Repositories -->
   <repositories>
 	<repository>
