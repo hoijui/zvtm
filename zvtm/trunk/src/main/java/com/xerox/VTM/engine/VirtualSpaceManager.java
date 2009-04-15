@@ -40,7 +40,7 @@ import javax.swing.JFrame;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.AnimationManager;
 import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.RepaintListener;
@@ -967,14 +967,14 @@ public class VirtualSpaceManager implements AWTEventListener {
 			animationManager.getAnimationFactory().createCameraTranslation(d,c,
 										       new LongPoint(l.vx,l.vy),
 										       false,
-										       IdentityInterpolator.getInstance(),
+										       SlowInSlowOutInterpolator.getInstance(),
 										       null);
 		    
 		    Animation alt = 
 			animationManager.getAnimationFactory().createCameraAltAnim(d,c,
 										   l.alt,
 										   false,
-										   IdentityInterpolator.getInstance(),
+										   SlowInSlowOutInterpolator.getInstance(),
 										   null);
 		    
 		    animationManager.startAnimation(trans, false);
@@ -1077,7 +1077,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 		    createCameraTranslation(d, c,
 					    new LongPoint(dx,dy),
 					    true,
-					    IdentityInterpolator.getInstance(),
+					    SlowInSlowOutInterpolator.getInstance(),
 					    endAction);
 		animationManager.startAnimation(trans, false);
 
@@ -1121,7 +1121,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 			animationManager.getAnimationFactory().
 			createCameraAltAnim(d, c, 
 					    newAlt, false,
-					    IdentityInterpolator.getInstance(),
+					    SlowInSlowOutInterpolator.getInstance(),
 					    null);
 		    animationManager.startAnimation(altAnim, false);
 
@@ -1183,13 +1183,13 @@ public class VirtualSpaceManager implements AWTEventListener {
 				Animation trans = 
 				    animationManager.getAnimationFactory().
 				    createCameraTranslation(d, c, new LongPoint(dx, dy), false,
-							    IdentityInterpolator.getInstance(),
+							    SlowInSlowOutInterpolator.getInstance(),
 							    null);
 				
 				Animation altAnim = 
 				    animationManager.getAnimationFactory().
 				    createCameraAltAnim(d, c, newAlt, false,
-							IdentityInterpolator.getInstance(),
+							SlowInSlowOutInterpolator.getInstance(),
 							null);
 
 				animationManager.startAnimation(trans, false);
