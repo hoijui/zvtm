@@ -13,6 +13,20 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <name>ZVTM-PDF</name>
   <version>0.1.0-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   
   <!-- Repositories -->
   <repositories>
