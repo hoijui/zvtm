@@ -229,6 +229,10 @@ vsm.addPortal(p, v);
 
 It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{net.claribole.zvtm.engine.ViewEventHandler}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
 
+\cd{ViewEventHandler} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
+
+Portals have their own event interface \cl{net.claribole.zvtm.engine.PortalEventHandler}, that is used to listen for cursor entry/exit.
+
 %%%%%%%%%%
 \subsection{Graphical Object Model}
 \label{sec:glyphs}
