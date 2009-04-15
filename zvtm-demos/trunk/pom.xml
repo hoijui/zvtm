@@ -25,6 +25,10 @@ $Id$
     <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
   </scm>
   
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <!-- Repositories -->
   <repositories>
 	<repository>
