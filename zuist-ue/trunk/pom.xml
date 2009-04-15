@@ -14,6 +14,10 @@ $Id$
   <version>0.1.1</version>
   <url>http://zvtm.sourceforge.net/zuist/</url>
   
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <!-- Repositories -->
   <repositories>
 	<repository>
