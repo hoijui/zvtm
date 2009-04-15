@@ -136,7 +136,7 @@ $Id$
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <aggregate>true</aggregate>
+          <code>javadoc:aggregate</code>
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
           <bottom><![CDATA[<i>Copyright &#169; 2000-2002 Xerox Corporation. All Rights Reserved<br />Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2009 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
