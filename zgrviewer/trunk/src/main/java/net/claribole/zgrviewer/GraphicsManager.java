@@ -38,11 +38,14 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VCursor;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.DraggableCameraPortal;
-import net.claribole.zvtm.lens.*;
+import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.lens.FixedSizeLens;
+import net.claribole.zvtm.lens.LInfSCBLens;
+import net.claribole.zvtm.lens.SCBLens;
+import net.claribole.zvtm.lens.BGaussianLens;
+import net.claribole.zvtm.lens.FSGaussianLens;
 import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.Java2DPainter;
-//import net.claribole.zvtm.engine.PostAnimationAction;
-//import com.xerox.VTM.engine.AnimManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.SwingWorker;
@@ -98,7 +101,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     
     /* misc. lens settings */
     Lens lens;
-    TFadingLens fLens;
+    SCBLens fLens;
     static int LENS_R1 = 100;
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
@@ -731,11 +734,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Lens getLensDefinition(int x, int y){
 	Lens res;
 	if (tp.isFadingLensNavMode()){
-	    fLens = new LInfTFadingLens(1.0f, 0.0f, 0.95f, 100, x - panelWidth/2, y - panelHeight/2);
+	    fLens = new LInfSCBLens(1.0f, 0.0f, 0.95f, 100, x - panelWidth/2, y - panelHeight/2);
 	    res = fLens;
 	}
 	else if (tp.isMeltingLensNavMode()){
-	    res = new TGaussianLens(1.0f, 0.0f, 0.90f, 150, 50, x - panelWidth/2, y - panelHeight/2);
+	    res = new BGaussianLens(1.0f, 0.0f, 0.90f, 150, 50, x - panelWidth/2, y - panelHeight/2);
 	    fLens = null;
 	}
 	else {// isProbingLensNavMode()
