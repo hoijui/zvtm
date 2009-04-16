@@ -14,12 +14,12 @@ import net.claribole.zvtm.glyphs.Translucency;
 
 /**Profile: linear - Distance metric: L(Inf) (square shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
-public class LInfDInverseCosineLens extends DInverseCosineLens {
+public class LInfSCFLinearLens extends SCFLinearLens {
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public LInfDInverseCosineLens(){
+    public LInfSCFLinearLens(){
 	super();
     }
 
@@ -28,7 +28,7 @@ public class LInfDInverseCosineLens extends DInverseCosineLens {
      *
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
-    public LInfDInverseCosineLens(float mm){
+    public LInfSCFLinearLens(float mm){
 	super(mm);
     }
 
@@ -39,7 +39,7 @@ public class LInfDInverseCosineLens extends DInverseCosineLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public LInfDInverseCosineLens(float mm, int outerRadius, int innerRadius){
+    public LInfSCFLinearLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
     }
 
@@ -52,7 +52,7 @@ public class LInfDInverseCosineLens extends DInverseCosineLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public LInfDInverseCosineLens(float mm, int outerRadius, int innerRadius, int x, int y){
+    public LInfSCFLinearLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
     }
 
@@ -61,7 +61,7 @@ public class LInfDInverseCosineLens extends DInverseCosineLens {
 	if (d <= LR2)
 	    g[0] = g[1] = dMM;
 	else if (d <= LR1)
-	    g[0] = g[1] = dMM-c*(float)Math.acos(Math.pow(d*a+b-1,2));
+	    g[0] = g[1] = a * (float)d + b;
 	else
 	    g[0] = g[1] = 1;
     }

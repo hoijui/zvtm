@@ -21,7 +21,7 @@ import net.claribole.zvtm.engine.LowPassFilter;
 
 /**Profile: inverse cosine - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
-public class DInverseCosineLens extends FSInverseCosineLens implements TemporalLens {
+public class SCFInverseCosineLens extends FSInverseCosineLens implements TemporalLens {
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -44,7 +44,7 @@ public class DInverseCosineLens extends FSInverseCosineLens implements TemporalL
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public DInverseCosineLens(){
+    public SCFInverseCosineLens(){
 	super();
 	initTimer();
     }
@@ -54,7 +54,7 @@ public class DInverseCosineLens extends FSInverseCosineLens implements TemporalL
      *
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
-    public DInverseCosineLens(float mm){
+    public SCFInverseCosineLens(float mm){
 	super(mm);
 	dMM = MM;
 	initTimer();
@@ -67,7 +67,7 @@ public class DInverseCosineLens extends FSInverseCosineLens implements TemporalL
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public DInverseCosineLens(float mm, int outerRadius, int innerRadius){
+    public SCFInverseCosineLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
 	dMM = MM;
 	initTimer();
@@ -82,7 +82,7 @@ public class DInverseCosineLens extends FSInverseCosineLens implements TemporalL
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public DInverseCosineLens(float mm, int outerRadius, int innerRadius, int x, int y){
+    public SCFInverseCosineLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
 	dMM = MM;
 	initTimer();

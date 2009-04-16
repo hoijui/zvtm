@@ -14,12 +14,12 @@ import net.claribole.zvtm.glyphs.Translucency;
 
 /**Profile: linear - Distance metric: L(Inf) (square shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
-public class LInfDLinearLens extends DLinearLens {
+public class LInfSCFInverseCosineLens extends SCFInverseCosineLens {
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public LInfDLinearLens(){
+    public LInfSCFInverseCosineLens(){
 	super();
     }
 
@@ -28,7 +28,7 @@ public class LInfDLinearLens extends DLinearLens {
      *
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
-    public LInfDLinearLens(float mm){
+    public LInfSCFInverseCosineLens(float mm){
 	super(mm);
     }
 
@@ -39,7 +39,7 @@ public class LInfDLinearLens extends DLinearLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public LInfDLinearLens(float mm, int outerRadius, int innerRadius){
+    public LInfSCFInverseCosineLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
     }
 
@@ -52,7 +52,7 @@ public class LInfDLinearLens extends DLinearLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public LInfDLinearLens(float mm, int outerRadius, int innerRadius, int x, int y){
+    public LInfSCFInverseCosineLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
     }
 
@@ -61,7 +61,7 @@ public class LInfDLinearLens extends DLinearLens {
 	if (d <= LR2)
 	    g[0] = g[1] = dMM;
 	else if (d <= LR1)
-	    g[0] = g[1] = a * (float)d + b;
+	    g[0] = g[1] = dMM-c*(float)Math.acos(Math.pow(d*a+b-1,2));
 	else
 	    g[0] = g[1] = 1;
     }
