@@ -1,4 +1,4 @@
-/*   FILE: TFadingLens.java
+/*   FILE: SCBLens.java
  *   DATE OF CREATION:  Fri Oct 06 08:41:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -25,7 +25,7 @@ import net.claribole.zvtm.glyphs.Translucency;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class TFadingLens extends TLens implements TemporalLens {
+public class SCBLens extends TLens implements TemporalLens {
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -59,7 +59,7 @@ public class TFadingLens extends TLens implements TemporalLens {
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public TFadingLens(){
+    public SCBLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
 	computeOpacityFactors(0, 1);
@@ -71,7 +71,7 @@ public class TFadingLens extends TLens implements TemporalLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public TFadingLens(float mm){
+    public SCBLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
 	computeOpacityFactors(0, 1);
@@ -86,7 +86,7 @@ public class TFadingLens extends TLens implements TemporalLens {
      *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public TFadingLens(float mm, float minT, float maxT, int innerRadius){
+    public SCBLens(float mm, float minT, float maxT, int innerRadius){
 	this.MM = mm;
 	this.LR2 = innerRadius;
 	this.MMTf = maxT;
@@ -105,7 +105,7 @@ public class TFadingLens extends TLens implements TemporalLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public TFadingLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
+    public SCBLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
 	this.MM = mm;
 	this.LR2 = innerRadius;
 	this.MMTf = maxT;
@@ -304,7 +304,7 @@ class TTrailingTimer extends TimerTask {
     TemporalLens lens;
     private boolean enabled = true;
 
-    TTrailingTimer(TFadingLens l){
+    TTrailingTimer(SCBLens l){
 	super();
 	this.lens = l;
     }

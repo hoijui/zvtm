@@ -1,4 +1,4 @@
-/*   FILE: LInfTFadingLens.java
+/*   FILE: LInfSCBLens.java
  *   DATE OF CREATION:  Fri Oct 06 08:41:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -18,12 +18,12 @@ import net.claribole.zvtm.glyphs.Translucency;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(Inf) (rectangular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class LInfTFadingLens extends TFadingLens {
+public class LInfSCBLens extends SCBLens {
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public LInfTFadingLens(){
+    public LInfSCBLens(){
 	super();
     }
 
@@ -32,7 +32,7 @@ public class LInfTFadingLens extends TFadingLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public LInfTFadingLens(float mm){
+    public LInfSCBLens(float mm){
 	super(mm);
     }
 
@@ -44,7 +44,7 @@ public class LInfTFadingLens extends TFadingLens {
      *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public LInfTFadingLens(float mm, float minT, float maxT, int innerRadius){
+    public LInfSCBLens(float mm, float minT, float maxT, int innerRadius){
 	super(mm, minT, maxT, innerRadius);
     }
 
@@ -58,7 +58,7 @@ public class LInfTFadingLens extends TFadingLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public LInfTFadingLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
+    public LInfSCBLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
 	super(mm, minT, maxT, innerRadius, x, y);
     }
 
