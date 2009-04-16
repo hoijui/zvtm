@@ -21,7 +21,7 @@ import net.claribole.zvtm.engine.LowPassFilter;
 
 /**Profile: gaussian - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
-public class SCFLens extends FSGaussianLens implements TemporalLens {
+public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -44,7 +44,7 @@ public class SCFLens extends FSGaussianLens implements TemporalLens {
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public SCFLens(){
+    public SCFGaussianLens(){
 	super();
 	initTimer();
     }
@@ -54,7 +54,7 @@ public class SCFLens extends FSGaussianLens implements TemporalLens {
      *
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
-    public SCFLens(float mm){
+    public SCFGaussianLens(float mm){
 	super(mm);
 	dMM = MM;
 	initTimer();
@@ -67,7 +67,7 @@ public class SCFLens extends FSGaussianLens implements TemporalLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public SCFLens(float mm, int outerRadius, int innerRadius){
+    public SCFGaussianLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
 	dMM = MM;
 	initTimer();
@@ -82,7 +82,7 @@ public class SCFLens extends FSGaussianLens implements TemporalLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public SCFLens(float mm, int outerRadius, int innerRadius, int x, int y){
+    public SCFGaussianLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
 	dMM = MM;
 	initTimer();

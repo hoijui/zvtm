@@ -14,12 +14,12 @@ import net.claribole.zvtm.glyphs.Translucency;
 
 /**Profile: linear - Distance metric: L(Inf) (square shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
-public class LInfSCFLens extends SCFLens {
+public class LInfSCFGaussianLens extends SCFGaussianLens {
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public LInfSCFLens(){
+    public LInfSCFGaussianLens(){
 	super();
     }
 
@@ -28,7 +28,7 @@ public class LInfSCFLens extends SCFLens {
      *
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
-    public LInfSCFLens(float mm){
+    public LInfSCFGaussianLens(float mm){
 	super(mm);
     }
 
@@ -39,7 +39,7 @@ public class LInfSCFLens extends SCFLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public LInfSCFLens(float mm, int outerRadius, int innerRadius){
+    public LInfSCFGaussianLens(float mm, int outerRadius, int innerRadius){
 	super(mm, outerRadius, innerRadius);
     }
 
@@ -52,7 +52,7 @@ public class LInfSCFLens extends SCFLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public LInfSCFLens(float mm, int outerRadius, int innerRadius, int x, int y){
+    public LInfSCFGaussianLens(float mm, int outerRadius, int innerRadius, int x, int y){
 	super(mm, outerRadius, innerRadius, x, y);
     }
 
