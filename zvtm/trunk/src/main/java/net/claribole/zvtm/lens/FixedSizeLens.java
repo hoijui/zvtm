@@ -166,11 +166,12 @@ public abstract class FixedSizeLens extends Lens {
                     if (gain[0] > mSwitchThreshold || gain[1] > mSwitchThreshold){
                         /* following 3 commented lines left here for documentation of what the actual
                             single instruction means, x0 and y0 being mere int variables */
-                            //x0 = Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f);
+                        //x0 = Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f);
                         //y0 = Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f);
                         //tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsI[Math.round(y0*mbw+x0)];
                         tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                            mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f+OY)*mbw + Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)+OX];
+                            mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw + Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+//                        mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f+OY)*mbw + Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)+OX];
                     }
                     else {
                         //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);
@@ -200,7 +201,7 @@ public abstract class FixedSizeLens extends Lens {
                 if (gain[0] > mSwitchThreshold || gain[1] > mSwitchThreshold){
                     /* following 3 commented lines left here for documentation of what the actual
                         single instruction means, x0 and y0 being mere int variables */
-                        //x0 = Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f);
+                    //x0 = Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f);
                     //y0 = Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f);
                     //tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsS[Math.round(y0*mbw+x0];
                     tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
@@ -233,7 +234,7 @@ public abstract class FixedSizeLens extends Lens {
                 if (gain[0] > mSwitchThreshold || gain[1] > mSwitchThreshold){
                     /* following 3 commented lines left here for documentation of what the actual
                         single instruction means, x0 and y0 being mere int variables */
-                        //x0 = Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f);
+                    //x0 = Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f);
                     //y0 = Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f);
                     //tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsB[Math.round(y0*mbw+x0];
                     tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
