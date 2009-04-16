@@ -13,7 +13,7 @@ import java.awt.image.WritableRaster;
 
 /**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class HLinearLens extends TLinearLens {
+public class HLinearLens extends BLinearLens {
 
     // spatial gain function parameters
     protected float a = 0;

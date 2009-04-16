@@ -29,7 +29,10 @@ import java.util.Vector;
 import com.xerox.VTM.engine.*;
 import com.xerox.VTM.glyphs.*;
 import net.claribole.zvtm.engine.*;
+import net.claribole.zvtm.animation.*;
+import net.claribole.zvtm.animation.interpolation.*;
 import net.claribole.zvtm.glyphs.*;
+import net.claribole.zvtm.lens.*;
 import net.claribole.zvtm.widgets.*;
 
 public class Test {
@@ -40,6 +43,11 @@ public class Test {
 
     View testView;
 
+    static int LENS_R1 = 100;
+    static int LENS_R2 = 50;
+    static final int LENS_ANIM_TIME = 300;
+    static double MAG_FACTOR = 8.0;
+    
     Test(short ogl){
         vsm=new VirtualSpaceManager();
         vsm.setDebug(true);
@@ -64,10 +72,42 @@ public class Test {
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-		vsm.addGlyph(new VCircle(0,0,0,100,Color.WHITE), "src");
+        for (int i=0;i<10;i++){
+            for (int j=0;j<10;j++){
+        		vsm.addGlyph(new VRectangle(i*30,j*30,0,10,10,Color.WHITE), "src");            
+            }
+        }
         vsm.repaintNow();
     }
     
+    FSOLens lens;
+    
+    void setLens(int x, int y){
+        lens = (FSOLens)testView.setLens(getLensDefinition(x, y));
+        lens.setBufferThreshold(1.5f);
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    Lens getLensDefinition(int x, int y){
+        return new FSOLinearLens(1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
+    }
+    
+    void moveLens(int x, int y){
+        if (lens == null){return;}
+        lens.setAbsolutePosition(x, y);
+        vsm.repaintNow();
+    }
+    
+    void incX(){
+        lens.setXfocusOffset(lens.getXfocusOffset()+1);
+    }
+
+    void incY(){
+        lens.setYfocusOffset(lens.getYfocusOffset()+1);
+    }
+
     public static void main(String[] args){
 //		try{UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");}
 //		catch (Exception ex){ex.printStackTrace();}

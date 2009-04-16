@@ -43,7 +43,7 @@ public class EventHandlerTest implements ViewEventHandler{
     long x1,x2,y1,y2;
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-
+        application.setLens(jpx, jpy);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -87,7 +87,7 @@ public class EventHandlerTest implements ViewEventHandler{
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-
+        application.moveLens(jpx, jpy);
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -132,7 +132,11 @@ public class EventHandlerTest implements ViewEventHandler{
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (c == 'a'){application.incX();}
+        else if (c == 's'){application.incY();}
+        
+    }
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

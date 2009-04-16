@@ -1,4 +1,4 @@
-/*   FILE: TLens.java
+/*   FILE: BlendingLens.java
  *   DATE OF CREATION:  Thu Oct 05 14:00:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -16,7 +16,7 @@ import java.awt.image.WritableRaster;
 
 /**Translucent lens.*/
 
-public abstract class TLens extends FixedSizeLens {
+public abstract class BlendingLens extends FixedSizeLens {
 
     // half the width and height of region seen through lens in virtual space, depending on MM, for perf optim (used in drawBoundary)
     int lensProjectedWidth = 0;

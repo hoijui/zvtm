@@ -13,7 +13,7 @@ import java.awt.image.WritableRaster;
 
 /**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class HWaveLens extends HLinearLens {
+public class HWaveLens extends BLinearLens {
     
     float N = 5.0f;
 

@@ -1,5 +1,5 @@
-/*   FILE: LInfTLinearLens.java
- *   DATE OF CREATION:  Thu Oct 05 14:37:04 2006
+/*   FILE: LInfBInverseCosineLens.java
+ *   DATE OF CREATION:  Thu Oct 05 14:45:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
@@ -12,14 +12,14 @@
 package net.claribole.zvtm.lens;
 
 
-/**Translucent lens. Profile: linear - Distance metric: L(Inf) (square shape)<br>Size expressed as an absolute value in pixels*/
+/**Translucent lens. Profile: inverse cosine - Distance metric: L(Inf) (square shape)<br>Size expressed as an absolute value in pixels*/
 
-public class LInfTLinearLens extends TLinearLens {
+public class LInfBInverseCosineLens extends BInverseCosineLens {
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public LInfTLinearLens(){
+    public LInfBInverseCosineLens(){
 	super();
     }
 
@@ -28,7 +28,7 @@ public class LInfTLinearLens extends TLinearLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public LInfTLinearLens(float mm){
+    public LInfBInverseCosineLens(float mm){
 	super(mm);
     }
 
@@ -41,7 +41,7 @@ public class LInfTLinearLens extends TLinearLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public LInfTLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
+    public LInfBInverseCosineLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
 	super(mm, tc, tf, outerRadius, innerRadius);
     }
 
@@ -56,7 +56,7 @@ public class LInfTLinearLens extends TLinearLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public LInfTLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
+    public LInfBInverseCosineLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
 	super(mm, tc, tf, outerRadius, innerRadius, x, y);
     }
 
@@ -73,7 +73,7 @@ public class LInfTLinearLens extends TLinearLens {
         if (d <= LR2)
             g[0] = MMTf;
         else if (d <= LR1)
-            g[0] = aT * (float)d + bT;
+            g[0] = MMTf-cT*(float)Math.acos(Math.pow(d*aT+bT-1,2));
         else
             g[0] = 0;
     }

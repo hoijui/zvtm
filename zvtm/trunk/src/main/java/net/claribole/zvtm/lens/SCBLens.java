@@ -25,7 +25,7 @@ import net.claribole.zvtm.glyphs.Translucency;
 
 /**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class SCBLens extends TLens implements TemporalLens {
+public class SCBLens extends BlendingLens implements TemporalLens {
 
     double frequency = -1;
     long mLastSampleTime = -1;

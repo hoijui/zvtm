@@ -1,4 +1,4 @@
-/*   FILE: TLinearLens.java
+/*   FILE: BLinearLens.java
  *   DATE OF CREATION:  Thu Oct 05 09:19:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -14,7 +14,7 @@ package net.claribole.zvtm.lens;
 
 /**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class TLinearLens extends TLens {
+public class BLinearLens extends BlendingLens {
 
     /* gain function parameters (transition in translucence space) */
     protected float aT = 0;
@@ -23,7 +23,7 @@ public class TLinearLens extends TLens {
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public TLinearLens(){
+    public BLinearLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
 	computeDropoffFactors();
@@ -34,7 +34,7 @@ public class TLinearLens extends TLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public TLinearLens(float mm){
+    public BLinearLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
 	computeDropoffFactors();
@@ -49,7 +49,7 @@ public class TLinearLens extends TLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public TLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
+    public BLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
 	this.MM = mm;
 	this.LR1 = outerRadius;
 	this.LR2 = innerRadius;
@@ -70,7 +70,7 @@ public class TLinearLens extends TLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public TLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
+    public BLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
 	this.MM = mm;
 	this.LR1 = outerRadius;
 	this.LR2 = innerRadius;

@@ -15,7 +15,7 @@ import java.awt.image.WritableRaster;
 
 /**Profile: linear - Distance metric: L(2) (circular shape)<br>Rendering enhanced through alpha blending between focus and context in spatially-distorted transition zone.<br>Size expressed as an absolute value in pixels*/
 
-public class XLinearLens extends TLinearLens {
+public class XLinearLens extends BLinearLens {
 
     int[] tmPixelsI, toPixelsI;
     short[] tmPixelsS, toPixelsS;

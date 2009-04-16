@@ -1,5 +1,5 @@
-/*   FILE: TInverseCosineLens.java
- *   DATE OF CREATION:  Thu Oct 05 11:35:04 2006
+/*   FILE: BGaussianLens.java
+ *   DATE OF CREATION:  Fri Oct 06 08:41:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
@@ -12,19 +12,20 @@
 package net.claribole.zvtm.lens;
 
 
-/**Translucent lens. Profile: inverse cosine - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
+/**Translucent lens. Profile: gaussian - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class TInverseCosineLens extends TLens {
+public class BGaussianLens extends BlendingLens {
 
     /* gain function parameters (transition in translucence space) */
-    protected float aT = 0;
-    protected float bT = 0;
-    protected float cT = 0;
+    protected double aT = 0;
+    protected double bT = 0;
+    protected double cT = 0;
+    protected double eT = 0;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public TInverseCosineLens(){
+    public BGaussianLens(){
 	this.MM = 2.0f;
 	updateMagBufferWorkingDimensions();
 	computeDropoffFactors();
@@ -35,7 +36,7 @@ public class TInverseCosineLens extends TLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public TInverseCosineLens(float mm){
+    public BGaussianLens(float mm){
 	this.MM = mm;
 	updateMagBufferWorkingDimensions();
 	computeDropoffFactors();
@@ -50,7 +51,7 @@ public class TInverseCosineLens extends TLens {
      *@param outerRadius outer radius (beyond which no magnification is applied - outward)
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public TInverseCosineLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
+    public BGaussianLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
 	this.MM = mm;
 	this.LR1 = outerRadius;
 	this.LR2 = innerRadius;
@@ -71,7 +72,7 @@ public class TInverseCosineLens extends TLens {
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public TInverseCosineLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
+    public BGaussianLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
 	this.MM = mm;
 	this.LR1 = outerRadius;
 	this.LR2 = innerRadius;
@@ -156,11 +157,12 @@ public class TInverseCosineLens extends TLens {
 	super.setMaximumMagnification(mm, forceRaster);
 	computeDropoffFactors();
     }
-    
+
     void computeDropoffFactors(){
-	aT = 1/(float)(LR1-LR2);
-	bT = (float)LR2/(float)(LR2-LR1);
-	cT = (2/(float)Math.PI)*(MMTf-MMTc);
+	aT = Math.PI/(LR1-LR2);
+	bT = - Math.PI*LR2/(LR1-LR2);
+	cT = (MMTf-MMTc)/2;
+	eT = (MMTf+MMTc)/2;	
     }
 
     public void gfT(float x, float y, float[] g){
@@ -168,7 +170,7 @@ public class TInverseCosineLens extends TLens {
         if (d <= LR2)
             g[0] = MMTf;
         else if (d <= LR1)
-            g[0] = MMTf-cT*(float)Math.acos(Math.pow(d*aT+bT-1,2));
+            g[0] = (float)(cT * Math.cos(aT*d+bT) + eT);
         else
             g[0] = 0;
     }
