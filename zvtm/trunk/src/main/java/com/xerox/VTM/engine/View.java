@@ -449,19 +449,19 @@ public abstract class View {
     }
 
     /**Call this if you want to repaint this view at once.
-     *@see #repaintNow(RepaintListener rl)
-     */
+        *@see #repaintNow(RepaintListener rl)
+        */
     public void repaintNow(){
-	panel.repaintNow=true;
+        panel.repaintNow = true;
     }
 
     /**Call this if you want to repaint this view at once.
-     *@param rl a repaint listener to be notified when this repaint cycle is completed (it must be removed manually if you are not interested in being notified about following repaint cycles)
-     *@see #repaintNow()
-     *@see #removeRepaintListener()     */
+        *@param rl a repaint listener to be notified when this repaint cycle is completed (it must be removed manually if you are not interested in being notified about following repaint cycles)
+        *@see #repaintNow()
+        *@see #removeRepaintListener()     */
     public void repaintNow(RepaintListener rl){
-	panel.repaintListener = rl;
-	panel.repaintNow = true;
+        panel.repaintListener = rl;
+        repaintNow();
     }
 
     /**Remove the repaint listener associated with this view.
