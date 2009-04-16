@@ -305,9 +305,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			else {
 				tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 				if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-					//grMngr.vsm.animator.Xspeed=0;
-					//grMngr.vsm.animator.Yspeed=0;
-					//grMngr.vsm.animator.Aspeed=(activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor));
 					grMngr.vsm.getAnimationManager().setXspeed(0);
                     grMngr.vsm.getAnimationManager().setYspeed(0);
                     grMngr.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
@@ -316,9 +313,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				else {
 					jpxD = jpx-lastJPX;
 					jpyD = lastJPY-jpy;
-//					grMngr.vsm.animator.Xspeed=(activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor));
-//					grMngr.vsm.animator.Yspeed=(activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor));
-//					grMngr.vsm.animator.Aspeed=0;
                     grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor)));
                     grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor)));
                     grMngr.vsm.getAnimationManager().setZspeed(0);
@@ -326,7 +320,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 						dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
 						if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
 							autoZooming = true;
-							//grMngr.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
 						    Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
                                 new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
                                 IdentityInterpolator.getInstance(), null);
@@ -525,7 +518,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 
 	/*cancel a speed-dependant autozoom*/
 	protected void unzoom(ViewPanel v){
-		//grMngr.vsm.animator.createCameraAnimation(300, AnimManager.CA_ALT_LIN, new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), v.cams[0].getID());
 		Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
             new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
             IdentityInterpolator.getInstance(), null);

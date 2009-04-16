@@ -256,7 +256,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	mainView.setEventHandler((ViewEventHandler)eh, 1);
 	mainView.setEventHandler((ViewEventHandler)eh, 2);
 	mainView.setNotifyMouseMoved(true);
-//	vsm.getAnimationManager().setAnimationListener(this);
     mainCamera.addListener(this);
 
 	mainView.setVisible(true);
@@ -406,7 +405,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Float alt=new Float(c.getAltitude()+c.getFocal());
-        //vsm.getAnimationManager().createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, c,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -417,7 +415,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-        //vsm.getAnimationManager().createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_ALT_SIG,alt,c.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, c,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -466,7 +463,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             long qt2=Math.round((rb[0]-rb[2])/2.4);
             trans=new LongPoint(qt,qt2);
         }
-        //vsm.getAnimationManager().createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH,AnimManager.CA_TRANS_SIG,trans,c.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, c,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -487,8 +483,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     void moveBack(){
         if (previousLocations.size()>0){
             Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
-//            vsm.getAnimationManager().createCameraAnimation(ConfigManager.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
-//                animParams, mSpace.getCamera(0).getID());
             Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
                 (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
             Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
@@ -580,8 +574,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             lens = mainView.setLens(getLensDefinition(x, y));
             lens.setBufferThreshold(1.5f);
         }
-        //        vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-        //            lens.getID(), null);
         Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -597,15 +589,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         // -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
         Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
         if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
-            //	    cadata.add(deltAlt);
-            //	    cadata.add(new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy));
-            // animate lens and camera simultaneously (lens will die at the end)
-            //	    vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-            //					     lens.getID(), new ZP2LensAction(this));
             Animation al = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            //	    vsm.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-            //					       cadata, mainCamera.getID(), null);
             Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
                 new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy), true, IdentityInterpolator.getInstance(), null);
             Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
@@ -617,16 +602,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         else {
             Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
             double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
-            //	    cadata.add(actualDeltAlt);
-            //	    cadata.add(new LongPoint(Math.round((c2x-mainCamera.posx)*ratio),
-            //				     Math.round((c2y-mainCamera.posy)*ratio)));
-            // animate lens and camera simultaneously (lens will die at the end)
-            //	    vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-            //					     lens.getID(), new ZP2LensAction(this));
             Animation al = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            //      vsm.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-            //  				       cadata, mainCamera.getID(), null);
             Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
                 new LongPoint(Math.round((c2x-mainCamera.posx)*ratio), Math.round((c2y-mainCamera.posy)*ratio)), true, IdentityInterpolator.getInstance(), null);
             Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
@@ -642,21 +619,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         float cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
         long c2x = Math.round(mx - MAG_FACTOR * (mx - mainCamera.posx));
         long c2y = Math.round(my - MAG_FACTOR * (my - mainCamera.posy));
-        //Vector cadata = new Vector();
-        //cadata.add(new Float(cameraAbsAlt*(MAG_FACTOR-1)));
-        //cadata.add(new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy));
         // create lens if it does not exist
         if (lens == null){
             lens = mainView.setLens(getLensDefinition(x, y));
             lens.setBufferThreshold(1.5f);
         }
         // animate lens and camera simultaneously
-//        vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
-//            lens.getID(), null);
         Animation al = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-//        vsm.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-//            cadata, mainCamera.getID(), null);
         Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
             new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy), true, IdentityInterpolator.getInstance(), null);
         Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
@@ -669,8 +639,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     void zoomOutPhase2(){
         // make lens disappear (killing anim)
-//        vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-//            lens.getID(), new ZP2LensAction(this));
         Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
         vsm.getAnimationManager().startAnimation(a, false);
@@ -721,8 +689,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                         -Math.round((a1-mainCamera.getAltitude())/mainCamera.getFocal()*lens.ly));
                 }
                 else {
-//                    vsm.getAnimationManager().createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
-//                        lens.getID(), null);
                     Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
                         new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
                     vsm.getAnimationManager().startAnimation(a, false);
@@ -775,8 +741,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         mSpace.onTop(magWindow);
         mSpace.show(magWindow);
         paintLinks = true;
-//        Point[] data = {new Point(GraphicsManager.DM_PORTAL_WIDTH-w, GraphicsManager.DM_PORTAL_HEIGHT-h),
-//            new Point(GraphicsManager.DM_PORTAL_INITIAL_X_OFFSET-w/2, GraphicsManager.DM_PORTAL_INITIAL_Y_OFFSET-h/2)};
         //vsm.getAnimationManager().createPortalAnimation(GraphicsManager.DM_PORTAL_ANIM_TIME, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
         Animation as = vsm.getAnimationManager().getAnimationFactory().createPortalSizeAnim(GraphicsManager.DM_PORTAL_ANIM_TIME, dmPortal,
             GraphicsManager.DM_PORTAL_WIDTH-w, GraphicsManager.DM_PORTAL_HEIGHT-h, true,
