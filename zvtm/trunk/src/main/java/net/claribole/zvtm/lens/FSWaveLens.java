@@ -20,34 +20,7 @@ public class FSWaveLens extends FixedSizeLens {
         * create a lens with a maximum magnification factor of 2.0
         */
     public FSWaveLens(){
-        this.MM = 2.0f;
-        updateMagBufferWorkingDimensions();
-    }
-
-    /**
-        * create a lens with a given maximum magnification factor
-        *
-        *@param mm maximum magnification factor, mm in [0,+inf[
-        */
-    public FSWaveLens(float mm, float n){
-        this.MM = mm;
-        this.N = n;
-        updateMagBufferWorkingDimensions();
-    }
-
-    /**
-        * create a lens with a given maximum magnification factor, inner and outer radii
-        *
-        *@param mm maximum magnification factor, mm in [0,+inf[
-        *@param outerRadius outer radius (beyond which no magnification is applied - outward)
-        *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
-        */
-    public FSWaveLens(float mm, int outerRadius, int innerRadius, float n){
-        this.MM = mm;
-        this.LR1 = outerRadius;
-        this.LR2 = innerRadius;
-        this.N = n;
-        updateMagBufferWorkingDimensions();
+        this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 3, 0, 0);
     }
 
     /**

@@ -27,8 +27,7 @@ public class FSManhattanLens extends FixedSizeLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public FSManhattanLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
+        this(2.0f, DEFAULT_LR1, 0, 0);
     }
 
     /**
@@ -37,8 +36,7 @@ public class FSManhattanLens extends FixedSizeLens {
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
     public FSManhattanLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
+        this(mm, DEFAULT_LR1, 0, 0);
     }
 
     /**
@@ -48,9 +46,7 @@ public class FSManhattanLens extends FixedSizeLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public FSManhattanLens(float mm, int innerRadius){
-	this.MM = mm;
-	this.LR2 = innerRadius;
-	updateMagBufferWorkingDimensions();
+        this(mm, innerRadius, 0, 0);
     }
 
     /**

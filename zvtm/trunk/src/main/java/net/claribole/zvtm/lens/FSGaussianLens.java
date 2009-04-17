@@ -27,12 +27,7 @@ public class FSGaussianLens extends FixedSizeLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public FSGaussianLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	a = Math.PI/(LR1-LR2);
-	b = - Math.PI*LR2/(LR1-LR2);
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+	    this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -41,12 +36,7 @@ public class FSGaussianLens extends FixedSizeLens {
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
     public FSGaussianLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	a = Math.PI/(LR1-LR2);
-	b = - Math.PI*LR2/(LR1-LR2);
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+	    this(mm, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -57,14 +47,7 @@ public class FSGaussianLens extends FixedSizeLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public FSGaussianLens(float mm, int outerRadius, int innerRadius){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	updateMagBufferWorkingDimensions();
-	a = Math.PI/(LR1-LR2);
-	b = - Math.PI*LR2/(LR1-LR2);
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+	    this(mm, outerRadius, innerRadius, 0, 0);
     }
 
     /**

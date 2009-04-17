@@ -25,9 +25,7 @@ public class BInverseCosineLens extends BlendingLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public BInverseCosineLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	computeDropoffFactors();
+	    this(2.0f, 0, 1.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -36,9 +34,7 @@ public class BInverseCosineLens extends BlendingLens {
      *@param mm magnification factor, mm in [0,+inf[
      */
     public BInverseCosineLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	computeDropoffFactors();
+	    this(mm, 0, 1.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -51,13 +47,7 @@ public class BInverseCosineLens extends BlendingLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public BInverseCosineLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	this.MMTc = tc;
-	this.MMTf = tf;
-	updateMagBufferWorkingDimensions();
-	computeDropoffFactors();
+	    this(2.0f, tc, tf, outerRadius, innerRadius, 0, 0);
     }
 
     /**

@@ -22,49 +22,7 @@ public class FSStepLens extends FixedSizeLens {
         * create a lens with a maximum magnification factor of 2.0 with 2 discrete transition steps
         */
     public FSStepLens(){
-        this.MM = 2.0f;
-        updateMagBufferWorkingDimensions();
-        this.nbSteps = 2;
-        Ri = new int[this.nbSteps];
-        Ai = new float[this.nbSteps];
-        Bi = new float[this.nbSteps];
-        updateSteps();
-    }
-
-    /**
-        * create a lens with a given maximum magnification factor
-        *
-        *@param mm maximum magnification factor, mm in [0,+inf[
-        *@param ns number of flat steps between context and focus
-        */
-    public FSStepLens(float mm, int ns){
-        this.MM = mm;
-        updateMagBufferWorkingDimensions();
-        this.nbSteps = ns*2+1;
-        Ri = new int[this.nbSteps];
-        Ai = new float[this.nbSteps];
-        Bi = new float[this.nbSteps];
-        updateSteps();
-    }
-
-    /**
-        * create a lens with a given maximum magnification factor, inner and outer radii
-        *
-        *@param mm maximum magnification factor, mm in [0,+inf[
-        *@param outerRadius outer radius (beyond which no magnification is applied - outward)
-        *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
-        *@param ns number of flat steps between context and focus
-        */
-    public FSStepLens(float mm, int outerRadius, int innerRadius, int ns){
-        this.MM = mm;
-        this.LR1 = outerRadius;
-        this.LR2 = innerRadius;
-        updateMagBufferWorkingDimensions();
-        this.nbSteps = ns*2+1;
-        Ri = new int[this.nbSteps];
-        Ai = new float[this.nbSteps];
-        Bi = new float[this.nbSteps];
-        updateSteps();
+        this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 2, 0, 0);
     }
 
     /**

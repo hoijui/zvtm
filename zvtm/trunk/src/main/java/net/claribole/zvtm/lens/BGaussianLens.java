@@ -26,9 +26,7 @@ public class BGaussianLens extends BlendingLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public BGaussianLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	computeDropoffFactors();
+	    this(2.0f, 0, 1.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -37,9 +35,7 @@ public class BGaussianLens extends BlendingLens {
      *@param mm magnification factor, mm in [0,+inf[
      */
     public BGaussianLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	computeDropoffFactors();
+	    this(mm, 0, 1.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -52,13 +48,7 @@ public class BGaussianLens extends BlendingLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public BGaussianLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	this.MMTc = tc;
-	this.MMTf = tf;
-	updateMagBufferWorkingDimensions();
-	computeDropoffFactors();
+	    this(2.0f, tc, tf, outerRadius, innerRadius, 0, 0);
     }
 
     /**

@@ -24,8 +24,11 @@ import com.xerox.VTM.engine.ViewPanel;
 public abstract class FixedSizeLens extends Lens {
 
     //lens radii
-    protected int LR1 = 100;
-    protected int LR2 = 50;
+    static final int DEFAULT_LR1 = 100;
+    static final int DEFAULT_LR2 = 50;
+
+    protected int LR1 = DEFAULT_LR1;
+    protected int LR2 = DEFAULT_LR2;
 
     /** Inner radius color (default is black, null if none) */
     Color r2Color = null;

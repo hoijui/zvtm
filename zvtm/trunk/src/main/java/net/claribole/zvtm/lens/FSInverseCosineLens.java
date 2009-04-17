@@ -25,9 +25,7 @@ public class FSInverseCosineLens extends FixedSizeLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public FSInverseCosineLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	c = (2/(float)Math.PI)*(MM-1);
+	    this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -36,9 +34,7 @@ public class FSInverseCosineLens extends FixedSizeLens {
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
     public FSInverseCosineLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	c = (2/(float)Math.PI)*(MM-1);
+	    this(mm, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -49,13 +45,7 @@ public class FSInverseCosineLens extends FixedSizeLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public FSInverseCosineLens(float mm, int outerRadius, int innerRadius){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	updateMagBufferWorkingDimensions();
-	c = (2/(float)Math.PI)*(MM-1);
-	a = 1/(float)(LR1-LR2);
-	b = (float)LR2/(float)(LR2-LR1);
+	    this(mm, outerRadius, innerRadius, 0, 0);
     }
 
     /**

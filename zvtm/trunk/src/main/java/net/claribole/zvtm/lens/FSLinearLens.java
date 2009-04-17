@@ -25,10 +25,7 @@ public class FSLinearLens extends FixedSizeLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public FSLinearLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	    this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -37,10 +34,7 @@ public class FSLinearLens extends FixedSizeLens {
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
     public FSLinearLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	    this(mm, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
@@ -51,12 +45,7 @@ public class FSLinearLens extends FixedSizeLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public FSLinearLens(float mm, int outerRadius, int innerRadius){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	updateMagBufferWorkingDimensions();
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	    this(mm, outerRadius, innerRadius, 0, 0);
     }
 
     /**

@@ -25,12 +25,7 @@ public class FSFresnelLens extends FixedSizeLens {
      * create a lens with a maximum magnification factor of 2.0 with 2 discrete transition steps
      */
     public FSFresnelLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	this.nbSteps = 2;
-	Ri = new int[this.nbSteps];
-	MMi = new float[this.nbSteps];
-	updateSteps();
+	    this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 2, 0, 0);
     }
 
     /**
@@ -40,12 +35,7 @@ public class FSFresnelLens extends FixedSizeLens {
      *@param ns number of discrete transition steps between context and focus
      */
     public FSFresnelLens(float mm, int ns){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	this.nbSteps = ns;
-	Ri = new int[this.nbSteps];
-	MMi = new float[this.nbSteps];
-	updateSteps();
+	    this(mm, DEFAULT_LR1, DEFAULT_LR2, ns, 0, 0);
     }
 
     /**
@@ -57,14 +47,7 @@ public class FSFresnelLens extends FixedSizeLens {
      *@param ns number of discrete transition steps between context and focus
      */
     public FSFresnelLens(float mm, int outerRadius, int innerRadius, int ns){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	updateMagBufferWorkingDimensions();
-	this.nbSteps = ns;
-	Ri = new int[this.nbSteps];
-	MMi = new float[this.nbSteps];
-	updateSteps();
+	    this(mm, outerRadius, innerRadius, ns, 0, 0);
     }
 
     /**

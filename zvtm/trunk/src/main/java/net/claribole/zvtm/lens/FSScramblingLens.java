@@ -26,41 +26,7 @@ public class FSScramblingLens extends FixedSizeLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public FSScramblingLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	a = (LR1-LR2)/Math.PI;
-	c = (MM-1)/2;
-	e = (1+MM)/2;
-    }
-
-    /**
-     * create a lens with a given maximum magnification factor
-     *
-     *@param mm maximum magnification factor, mm in [0,+inf[
-     */
-    public FSScramblingLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	a = (LR1-LR2)/Math.PI;
-	c = (MM-1)/2;
-	e = (1+MM)/2;
-    }
-
-    /**
-     * create a lens with a given maximum magnification factor, inner and outer radii
-     *
-     *@param mm maximum magnification factor, mm in [0,+inf[
-     *@param outerRadius outer radius (beyond which no magnification is applied - outward)
-     *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
-     */
-    public FSScramblingLens(float mm, int outerRadius, int innerRadius){
-	this.MM = mm;
-	this.LR1 = outerRadius;
-	this.LR2 = innerRadius;
-	updateMagBufferWorkingDimensions();
-	a = (LR1-LR2)/Math.PI;
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+        this(2.0f, DEFAULT_LR1, DEFAULT_LR2, 0, 0);
     }
 
     /**
