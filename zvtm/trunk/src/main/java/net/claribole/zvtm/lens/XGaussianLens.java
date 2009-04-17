@@ -126,7 +126,7 @@ public class XGaussianLens extends XLinearLens {
 			   (we do not want to compute the gain for pixels that won't be in the output) */
 			this.gf(x,y,gain);
 			tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			    mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
 			toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
 			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 			/* ALPHA BLENDING */
@@ -163,7 +163,7 @@ public class XGaussianLens extends XLinearLens {
 			   (we do not want to compute the gain for pixels that won't be in the output) */
 			this.gf(x,y,gain);
 			tmPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			    mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
 			toPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
 			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 			/* ALPHA BLENDING */

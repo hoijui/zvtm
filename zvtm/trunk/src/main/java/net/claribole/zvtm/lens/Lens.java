@@ -44,10 +44,14 @@ public abstract class Lens {
      * Reflects the region of the magnification buffer that is actually in use, not necessarily the buffer's actual width (might be bigger during an animation)
      */
     public int mbw;
+    // half this value, used for optimized pixel index computation in raster
+    float hmbw;
     /**Magnified buffer height.
      * Reflects the region of the magnification buffer that is actually in use, not necessarily the buffer's actual height (might be bigger during an animation)
      */
     public int mbh;
+    // half this value, used for optimized pixel index computation in raster
+    float hmbh;
 
     /**Lens' center horizontal coordinate within View.
        Expressed as an offset w.r.t the View's center, in JPanel coordinates.*/
@@ -269,14 +273,17 @@ public abstract class Lens {
     public abstract int getRadius();
 
     /**Update the width an height of region in magnification buffer that is actually used.
-     * Depends on the outer radius and maximum magnification.
-     */
+        * Depends on the outer radius and maximum magnification.
+        */
     void updateMagBufferWorkingDimensions(){
-	synchronized(this){// synchronized to manage concurrent access to the raster while
-	    //                animating the lens and transforming in the View thread (drawing)
-	    mbw = Math.round(2 * getRadius() * MM);
-	    mbh = Math.round(2 * getRadius() * MM);
-	}
+        synchronized(this){
+            // synchronized to manage concurrent access to the raster while
+            // animating the lens and transforming in the View thread (drawing)
+            hmbw = getRadius() * MM;
+            hmbh = getRadius() * MM;
+            mbw = Math.round(2 * hmbw);
+            mbh = Math.round(2 * hmbh);
+        }
     }
     
     /**Force the magnification buffer to a new width and height.

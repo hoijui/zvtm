@@ -69,7 +69,7 @@ public abstract class BlendingLens extends FixedSizeLens {
                     for (int y=lurd[1];y<lurd[3];y++){
                         //this.gf(x,y,gain);
                         // get pixel from lens raster
-                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / MM + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / MM + mbw/2.0f)];
+                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw)];
                         Rl = (Pl & BMl[0]) >>> BOl[0];
                         Gl = (Pl & BMl[1]) >>> BOl[1];
                         Bl = (Pl & BMl[2]) >>> BOl[2];
@@ -99,7 +99,7 @@ public abstract class BlendingLens extends FixedSizeLens {
                     for (int y=lurd[1];y<lurd[3];y++){
                         //this.gf(x,y,gain);
                         // get pixel from lens raster
-                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / MM + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / MM + mbw/2.0f)];
+                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw)];
                         Rl = (Pl & BMl[0]) >>> BOl[0];
                         Gl = (Pl & BMl[1]) >>> BOl[1];
                         Bl = (Pl & BMl[2]) >>> BOl[2];
@@ -148,7 +148,7 @@ public abstract class BlendingLens extends FixedSizeLens {
                 for (int y=lurd[1];y<lurd[3];y++){
                     //this.gf(x,y,gain);
                     // get pixel from lens raster
-                    Pl = mPixelsS[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / MM + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / MM + mbw/2.0f)];
+                    Pl = mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw)];
                     Rl = (Pl & BMl[0]) >>> BOl[0];
                     Gl = (Pl & BMl[1]) >>> BOl[1];
                     Bl = (Pl & BMl[2]) >>> BOl[2];

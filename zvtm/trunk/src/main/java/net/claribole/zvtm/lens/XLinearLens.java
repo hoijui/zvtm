@@ -180,7 +180,7 @@ public class XLinearLens extends BLinearLens {
 			this.gf(x,y,gain);
 			ti = (y-lurd[1])*(lensWidth)+(x-lurd[0]);
 			tmPixelsI[ti] =
-			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			    mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
 			toPixelsI[ti] =
 			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 			/* ALPHA BLENDING */
@@ -218,7 +218,7 @@ public class XLinearLens extends BLinearLens {
 			this.gf(x,y,gain);
 			ti = (y-lurd[1])*(lensWidth)+(x-lurd[0]);
 			tmPixelsI[ti] =
-			    mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			    mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
 			toPixelsI[ti] =
 			    oPixelsI[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 			/* ALPHA BLENDING */
@@ -275,7 +275,7 @@ public class XLinearLens extends BLinearLens {
 		    this.gf(x,y,gain);
 		    ti = (y-lurd[1])*(lensWidth)+(x-lurd[0]);
 		    tmPixelsS[ti] =
-			mPixelsS[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+			mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
 		    toPixelsS[ti] =
 			oPixelsS[(Math.round((((float)y-sh-ly)/gain[1])+sh+ly)-lurd[1])*(lensWidth)+(Math.round((((float)x-sw-lx)/gain[0])+sw+lx)-lurd[0])];
 		    /* ALPHA BLENDING */
