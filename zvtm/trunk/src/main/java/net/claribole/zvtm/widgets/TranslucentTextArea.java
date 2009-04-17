@@ -35,38 +35,37 @@ public class TranslucentTextArea extends JTextArea implements TranslucentWidget 
 	
 	public TranslucentTextArea(){
 		super();
-		setOpaque(false);
-		initColors();
+		init();
 	}
 	
 	public TranslucentTextArea(javax.swing.text.Document doc){
 		super(doc);
-		setOpaque(false);
-		initColors();
+		init();
 	}
 	
 	public TranslucentTextArea(javax.swing.text.Document doc, String text, int rows, int columns){
 		super(doc, text, rows, columns);
-		setOpaque(false);
-		initColors();
+		init();
 	}
 	
 	public TranslucentTextArea(int rows, int columns){
 		super(rows, columns);
-		setOpaque(false);
-		initColors();
+		init();
 	}
 	
 	public TranslucentTextArea(String text){
 		super(text);
-		setOpaque(false);
-		initColors();
+		init();
 	}
 
 	public TranslucentTextArea(String text, int rows, int columns){
 		super(text, rows, columns);
+		init();
+	}
+	
+	void init(){
 		setOpaque(false);
-		initColors();
+		initColors();	    
 	}
 	
 	void initColors(){

@@ -52,47 +52,35 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 	
 	public TranslucentButton(){
 		super();
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+		init();
 	}
 
 	public TranslucentButton(Action a){
 		super(a);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+		init();
 	}
 	
 	public TranslucentButton(Icon icon){
 		super(icon);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+		init();
 	}
 	
 	public TranslucentButton(String text){
 		super(text);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+		init();
 	}
 	
 	public TranslucentButton(String text, Icon icon){
 		super(text, icon);
+		init();
+	}
+	
+	void init(){
 		setOpaque(false);
 		setContentAreaFilled(false);
 		setBorderPainted(false);
 		initColors();	
-		initListeners();
+		initListeners();	    
 	}
 	
 	void initColors(){

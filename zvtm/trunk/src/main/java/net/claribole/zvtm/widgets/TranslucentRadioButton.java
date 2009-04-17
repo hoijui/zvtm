@@ -52,75 +52,50 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 	
 	public TranslucentRadioButton(){
 		super();
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
 	}
 	
 	public TranslucentRadioButton(Action a){
 		super(a);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
 	
 	public TranslucentRadioButton(Icon icon){
 		super(icon);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
 	
 	public TranslucentRadioButton(Icon icon, boolean selected){
 		super(icon, selected);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
 	
 	public TranslucentRadioButton(String text){
 		super(text);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
 	
 	public TranslucentRadioButton(String text, boolean selected){
 		super(text, selected);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
 	
 	public TranslucentRadioButton(String text, Icon icon){
 		super(text, icon);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
 	
 	public TranslucentRadioButton(String text, Icon icon, boolean selected){
 		super(text, icon, selected);
-		setOpaque(false);
-		setContentAreaFilled(false);
-		setBorderPainted(false);
-		initColors();
-		initListeners();
+        init();
 	}
+
+    void init(){
+        setOpaque(false);
+        setContentAreaFilled(false);
+        setBorderPainted(false);
+        initColors();
+        initListeners();
+    }
 		
 	void initColors(){
         setForeground(fgCol);

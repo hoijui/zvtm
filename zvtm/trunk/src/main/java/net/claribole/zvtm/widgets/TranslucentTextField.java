@@ -35,34 +35,34 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
 	
 	public TranslucentTextField(){
 		super();
-		setOpaque(false);
-		initColors();
+        init();
 	}
 	
 	public TranslucentTextField(javax.swing.text.Document doc, String text, int columns){
 		super(doc, text, columns);
-		setOpaque(false);
-		initColors();
+        init();
 	}
 	
 	public TranslucentTextField(int columns){
 		super(columns);
-		setOpaque(false);
-		initColors();
+        init();
 	}
 	
 	public TranslucentTextField(String text){
 		super(text);
-		setOpaque(false);
-		initColors();
+        init();
 	}
 
 	public TranslucentTextField(String text, int columns){
 		super(text, columns);
-		setOpaque(false);
-		initColors();
+        init();
 	}
-	
+
+    void init(){
+        setOpaque(false);
+        initColors();
+    }
+
 	void initColors(){
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
