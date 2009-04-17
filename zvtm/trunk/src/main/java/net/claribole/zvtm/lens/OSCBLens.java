@@ -1,29 +1,24 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
  */
 
-
 package net.claribole.zvtm.lens;
 
-import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
+import java.awt.image.SinglePixelPackedSampleModel;
 
-/**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
+/**Translucent lens. Lens that fades away when moving fast - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
-public class HLinearLens extends BLinearLens {
+public class OSCBLens extends SCBLens implements ParameterableFocusOffset {
 
-    // spatial gain function parameters
-    protected float a = 0;
-    protected float b = 0;
-    
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
-    public HLinearLens(){
-        super();
+    public OSCBLens(){
+        this(2.0f, 0, 1.0f, 100, 0, 0);
     }
 
     /**
@@ -31,63 +26,53 @@ public class HLinearLens extends BLinearLens {
      *
      *@param mm magnification factor, mm in [0,+inf[
      */
-    public HLinearLens(float mm){
-        super(mm);
+    public OSCBLens(float mm){
+        this(mm, 0, 1.0f, 100, 0, 0);
     }
 
     /**
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
      *@param mm magnification factor, mm in [0,+inf[
-     *@param tc translucency value (at junction between transition and context), tc in [0,1.0]
-     *@param tf translucency value (at junction between transition and focus), tf in [0,1.0]
-     *@param outerRadius outer radius (beyond which no magnification is applied - outward)
+     *@param minT translucency value (at junction between transition and focus), in [0,1.0]
+     *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
-    public HLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
-        super(mm, tc, tf, outerRadius, innerRadius);
+    public OSCBLens(float mm, float minT, float maxT, int innerRadius){
+        this(mm, minT, maxT, innerRadius, 0, 0);
     }
 
     /**
      * create a lens with a given maximum magnification factor, inner and outer radii
      *
      *@param mm magnification factor, mm in [0,+inf[
-     *@param tc translucency value (at junction between transition and context), tc in [0,1.0]
-     *@param tf translucency value (at junction between transition and focus), tf in [0,1.0]
-     *@param outerRadius outer radius (beyond which no magnification is applied - outward)
+     *@param minT translucency value (at junction between transition and focus), in [0,1.0]
+     *@param maxT translucency value (at junction between transition and focus), in [0,1.0]
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      *@param x horizontal coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
-    public HLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius, int x, int y){
-        super(mm, tc, tf, outerRadius, innerRadius, x, y);
+    public OSCBLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
+        super(mm, minT, maxT, innerRadius, x, y);
     }
 
-    void computeDropoffFactors(){
-    	a = (1-MM)/(float)(LR1 - LR2);
-    	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
-        aT = (MMTc-MMTf) / ((float)(LR1-LR2));
-        bT = (MMTf*LR1-MMTc*LR2) / ((float)(LR1-LR2));
+    int dx = 0;
+    int dy = 0;
+
+    public void setXfocusOffset(int x){
+        dx = x;
     }
 
-    public void gf(float x, float y, float[] g){
-        d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
-        if (d <= LR2)
-            g[0] = g[1] = MM;
-        else if (d <= LR1)
-            g[0] = g[1] = a * (float)d + b;
-        else
-            g[0] = g[1] = 1;
+    public void setYfocusOffset(int y){
+        dy = y;
     }
-
-    public void gfT(float x, float y, float[] g){
-        d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
-        if (d <= LR2)
-            g[0] = MMTf;
-        else if (d <= LR1)
-            g[0] = aT * (float)d + bT;
-        else
-            g[0] = 0;
+    
+    public int getXfocusOffset(){
+        return dx;
+    }
+    
+    public int getYfocusOffset(){
+        return dy;
     }
 
     synchronized void transformI(WritableRaster iwr, WritableRaster ewr){
@@ -111,9 +96,9 @@ public class HLinearLens extends BLinearLens {
                 // the sample model features four bands
                 for (int x=lurd[0];x<lurd[2];x++){
                     for (int y=lurd[1];y<lurd[3];y++){
-                        this.gf(x,y,gain);
+                        //this.gf(x,y,gain);
                         // get pixel from lens raster
-                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / MM + mbh/2.0f+dy)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / MM + mbw/2.0f+dx)];
                         Rl = (Pl & BMl[0]) >>> BOl[0];
                         Gl = (Pl & BMl[1]) >>> BOl[1];
                         Bl = (Pl & BMl[2]) >>> BOl[2];
@@ -141,9 +126,9 @@ public class HLinearLens extends BLinearLens {
                 // the sample model probably features 3 bands
                 for (int x=lurd[0];x<lurd[2];x++){
                     for (int y=lurd[1];y<lurd[3];y++){
-                        this.gf(x,y,gain);
+                        //this.gf(x,y,gain);
                         // get pixel from lens raster
-                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / MM + mbh/2.0f+dy)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / MM + mbw/2.0f+dx)];
                         Rl = (Pl & BMl[0]) >>> BOl[0];
                         Gl = (Pl & BMl[1]) >>> BOl[1];
                         Bl = (Pl & BMl[2]) >>> BOl[2];
@@ -190,9 +175,9 @@ public class HLinearLens extends BLinearLens {
             // transfer them to the target array taking the gain function into account
             for (int x=lurd[0];x<lurd[2];x++){
                 for (int y=lurd[1];y<lurd[3];y++){
-                    this.gf(x,y,gain);
+                    //this.gf(x,y,gain);
                     // get pixel from lens raster
-                    Pl = mPixelsS[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / gain[1] + mbh/2.0f)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / gain[0] + mbw/2.0f)];
+                    Pl = mPixelsS[Math.round(((y-lurd[1]) * MM - mbh/2.0f) / MM + mbh/2.0f+dy)*mbw+Math.round(((x-lurd[0]) * MM - mbw/2.0f) / MM + mbw/2.0f+dx)];
                     Rl = (Pl & BMl[0]) >>> BOl[0];
                     Gl = (Pl & BMl[1]) >>> BOl[1];
                     Bl = (Pl & BMl[2]) >>> BOl[2];
