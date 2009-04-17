@@ -31,10 +31,7 @@ public class XLinearLens extends BLinearLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public XLinearLens(){
-	super();
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
-
+	    this(2.0f, 0, 1, 100, 50, 0, 0);
     }
 
     /**
@@ -43,9 +40,7 @@ public class XLinearLens extends BLinearLens {
      *@param mm magnification factor, mm in [0,+inf[
      */
     public XLinearLens(float mm){
-	super(mm);
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	    this(mm, 0, 1, 100, 50, 0, 0);
     }
 
     /**
@@ -58,9 +53,7 @@ public class XLinearLens extends BLinearLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public XLinearLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
-	super(mm, tc, tf, outerRadius, innerRadius);
-	a = (1-MM)/(float)(LR1 - LR2);
-	b = (MM*LR1-LR2)/(float)(LR1 - LR2);
+	    this(mm, tc, tf, outerRadius, innerRadius, 0, 0);
     }
 
     /**

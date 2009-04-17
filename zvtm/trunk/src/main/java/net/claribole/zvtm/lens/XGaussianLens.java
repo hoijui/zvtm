@@ -24,11 +24,7 @@ public class XGaussianLens extends XLinearLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public XGaussianLens(){
-	super();
-	a = Math.PI/(LR1-LR2);
-	b = - Math.PI*LR2/(LR1-LR2);
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+	    this(2.0f, 0, 1, 100, 50, 0, 0);
     }
 
     /**
@@ -37,11 +33,7 @@ public class XGaussianLens extends XLinearLens {
      *@param mm magnification factor, mm in [0,+inf[
      */
     public XGaussianLens(float mm){
-	super(mm);
-	a = Math.PI/(LR1-LR2);
-	b = - Math.PI*LR2/(LR1-LR2);
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+	    this(mm, 0, 1, 100, 50, 0, 0);
     }
 
     /**
@@ -54,11 +46,7 @@ public class XGaussianLens extends XLinearLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public XGaussianLens(float mm, float tc, float tf, int outerRadius, int innerRadius){
-	super(mm, tc, tf, outerRadius, innerRadius);
-	a = Math.PI/(LR1-LR2);
-	b = - Math.PI*LR2/(LR1-LR2);
-	c = (MM-1)/2;
-	e = (1+MM)/2;
+	    this(mm, tc, tf, outerRadius, innerRadius, 0, 0);
     }
 
     /**

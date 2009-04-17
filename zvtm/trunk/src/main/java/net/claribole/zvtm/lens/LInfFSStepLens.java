@@ -22,28 +22,6 @@ public class LInfFSStepLens extends FSStepLens {
     }
 
     /**
-        * create a lens with a given maximum magnification factor
-        *
-        *@param mm maximum magnification factor, mm in [0,+inf[
-        *@param ns number of flat steps between context and focus
-        */
-    public LInfFSStepLens(float mm, int ns){
-        super(mm, ns);
-    }
-
-    /**
-        * create a lens with a given maximum magnification factor, inner and outer radii
-        *
-        *@param mm maximum magnification factor, mm in [0,+inf[
-        *@param outerRadius outer radius (beyond which no magnification is applied - outward)
-        *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
-        *@param ns number of flat steps between context and focus
-        */
-    public LInfFSStepLens(float mm, int outerRadius, int innerRadius, int ns){
-        super(mm, outerRadius, innerRadius, ns);
-    }
-
-    /**
         * create a lens with a given maximum magnification factor, inner and outer radii
         *
         *@param mm maximum magnification factor, mm in [0,+inf[

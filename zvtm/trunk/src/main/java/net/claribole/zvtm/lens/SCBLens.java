@@ -60,10 +60,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
      * create a lens with a maximum magnification factor of 2.0
      */
     public SCBLens(){
-	this.MM = 2.0f;
-	updateMagBufferWorkingDimensions();
-	computeOpacityFactors(0, 1);
-	initTimer();
+        this(2.0f, 0, 1, 100, 0, 0);
     }
 
     /**
@@ -72,10 +69,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
      *@param mm magnification factor, mm in [0,+inf[
      */
     public SCBLens(float mm){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	computeOpacityFactors(0, 1);
-	initTimer();
+        this(mm, 0, 1, 100, 0, 0);
     }
 
     /**
@@ -87,12 +81,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
      *@param innerRadius inner radius (beyond which maximum magnification is applied - inward)
      */
     public SCBLens(float mm, float minT, float maxT, int innerRadius){
-	this.MM = mm;
-	this.LR2 = innerRadius;
-	this.MMTf = maxT;
-	updateMagBufferWorkingDimensions();
-	computeOpacityFactors(minT, maxT);
-	initTimer();
+        this(mm, minT, maxT, innerRadius, 0, 0);
     }
 
     /**
