@@ -36,16 +36,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
     RProjectedCoords[] pc;
 
     public RectangleNR(){
-	vx=0;
-	vy=0;
-	vz=0;
-	vw=5;
-	vh=5;
-	computeSize();
-	ar=(float)vw/(float)vh;
-	orient=0;
-	setColor(Color.black);
-	setBorderColor(Color.black);
+	    this(0, 0, 0, 5, 5, Color.WHITE, Color.BLACK);
     }
 
     /**
@@ -57,18 +48,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
      *@param c fill color
      */
     public RectangleNR(long x,long y, int z,long w,long h,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=w;
-	vh=h;
-	computeSize();
-	if (vw==0 && vh==0){ar=1.0f;}
-	else {ar=(float)vw/(float)vh;}
-	//if (vh!=0){ar=vw/vh;}else{ar=0;}
-	orient=0;
-	setColor(c);
-	setBorderColor(Color.black);
+	    this(x, y, z, w, h, c, Color.BLACK);
     }
 
     /**

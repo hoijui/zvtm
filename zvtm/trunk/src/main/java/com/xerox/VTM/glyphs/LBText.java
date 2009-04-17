@@ -49,10 +49,7 @@ public class LBText extends LText {
      *@param t text string
      */
     public LBText(long x,long y, int z,Color c,String t){
-	super(x,y,z,c,t);
-	fillColorThroughLens = color;
-	borderColor = null;
-	borderColorThroughLens = null;
+	    this(x, y, z, c, t, TEXT_ANCHOR_START, 1.0f);
     }
 
     /**
@@ -64,10 +61,7 @@ public class LBText extends LText {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
     public LBText(long x,long y, int z,Color c,String t,short ta){
-	super(x,y,z,c,t,ta);
-	fillColorThroughLens = color;
-	borderColor = null;
-	borderColorThroughLens = null;
+	    this(x, y, z, c, t, ta, 1.0f);
     }
 
     /**

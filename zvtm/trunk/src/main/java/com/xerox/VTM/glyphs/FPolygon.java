@@ -52,26 +52,7 @@ public class FPolygon extends ClosedShape {
      *@param c fill color
      */
     public FPolygon(LongPoint[] v,Color c){
-	vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
-	vy=0;  //several lines below
-	vz=0;
-	xcoords=new long[v.length];
-	ycoords=new long[v.length];
-	for (int i=0;i<v.length;i++){
-	    xcoords[i]=v[i].x;
-	    ycoords[i]=v[i].y;
-	}
-	orient=0;
-	LongPoint ct=getCentroid();
-	vx=ct.x;
-	vy=ct.y;
-	for (int i=0;i<xcoords.length;i++){//translate to get relative coords w.r.t centroid
-	    xcoords[i]-=vx;
-	    ycoords[i]-=vy;
-	}
-	computeSize();
-	setColor(c);
-	setBorderColor(Color.black);
+	    this(v, c, Color.BLACK);
     }
 
     /**

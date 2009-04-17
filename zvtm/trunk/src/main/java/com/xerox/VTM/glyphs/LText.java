@@ -44,9 +44,8 @@ public class LText extends VText implements LensRendering {
      *@param t text string
      */
     public LText(long x,long y, int z,Color c,String t){
-	super(x,y,z,c,t);
-	fillColorThroughLens = color;
-    }
+	    this(x, y, z, c, t, TEXT_ANCHOR_START, 1.0f);
+	}
 
     /**
      *@param x coordinate in virtual space
@@ -57,8 +56,7 @@ public class LText extends VText implements LensRendering {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
     public LText(long x,long y, int z,Color c,String t,short ta){
-	super(x,y,z,c,t,ta);
-	fillColorThroughLens = color;
+	    this(x, y, z, c, t, TEXT_ANCHOR_START, 1.0f);
     }
 
     /**
