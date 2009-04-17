@@ -386,4 +386,25 @@ public abstract class Lens {
 	
     }
 
+    /*------------------- focus offset ------------------*/
+
+    int dx = 0;
+    int dy = 0;
+
+    public void setXfocusOffset(int x){
+        dx = x;
+    }
+
+    public void setYfocusOffset(int y){
+        dy = y;
+    }
+    
+    public int getXfocusOffset(){
+        return dx;
+    }
+    
+    public int getYfocusOffset(){
+        return dy;
+    }
+
 }

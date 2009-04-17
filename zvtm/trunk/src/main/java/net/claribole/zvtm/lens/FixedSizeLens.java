@@ -170,7 +170,7 @@ public abstract class FixedSizeLens extends Lens {
                         //y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
                         //tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsI[Math.round(y0*mbw+x0)];
                         tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                            mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw + Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
+                            mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*mbw + Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
                     }
                     else {
                         //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);
@@ -204,7 +204,7 @@ public abstract class FixedSizeLens extends Lens {
                     //y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
                     //tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsS[Math.round(y0*mbw+x0];
                     tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                        mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
+                        mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
                 }
                 else {
                     //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);
@@ -237,7 +237,7 @@ public abstract class FixedSizeLens extends Lens {
                     //y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
                     //tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsB[Math.round(y0*mbw+x0];
                     tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                        mPixelsB[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw)];
+                        mPixelsB[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
                 }
                 else {
                     //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);

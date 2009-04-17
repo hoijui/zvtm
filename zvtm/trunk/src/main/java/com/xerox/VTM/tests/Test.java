@@ -80,10 +80,10 @@ public class Test {
         vsm.repaintNow();
     }
     
-    FSOLens lens;
+    Lens lens;
     
     void setLens(int x, int y){
-        lens = (FSOLens)testView.setLens(getLensDefinition(x, y));
+        lens = testView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
         Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
@@ -91,7 +91,8 @@ public class Test {
     }
 
     Lens getLensDefinition(int x, int y){
-        return new FSOLinearLens(1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
+        //return new FSOLinearLens(1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
+        return new SCBLens(1.0f, 0.5f, 0.9f, LENS_R1, x - 400, y - 300);
     }
     
     void moveLens(int x, int y){
