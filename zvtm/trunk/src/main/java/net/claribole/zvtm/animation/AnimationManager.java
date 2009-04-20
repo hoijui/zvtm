@@ -380,8 +380,13 @@ public class AnimationManager {
 					  Animation.Dimension dim){
 	    Camera cam = vsm.getActiveCamera();
 	    if(null != cam){
-		cam.move(dx, dy);
-		cam.altitudeOffset(dz);
+		if((dx != 0) || (dy != 0)){
+		    cam.move(dx, dy);
+		}
+
+		if(dz != 0){
+		    cam.altitudeOffset(dz);
+		}
 	    }
 	}
 
