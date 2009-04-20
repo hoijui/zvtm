@@ -1,5 +1,6 @@
 \newpage
 %%%%%%%%%%%%%%%%%%%%
+
 \section{Animations}
 \label{sec:animations}
 
@@ -70,10 +71,9 @@ Animation cameraAlt = am.getAnimationFactory().createAnimation(
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
-
 \subsection{Creating an Animation: the Easy Way}
-Ready-made Animation factory methods are provided as a convenience, to cover the most common
-cases. These are part of the \cd{AnimationFactory} class. 
+Ready-made Animation factory methods are provided to cover the most common
+cases as part of the \cd{AnimationFactory} class. 
 These factories are named create[TargetType][AnimationType].
 For instance, a Glyph translation can be created by calling 
 
@@ -81,12 +81,29 @@ For instance, a Glyph translation can be created by calling
 
 (where \cd{vsm} is a reference to your application's \cd{VirtualSpaceManager})
 
+The target/type combinations provided are:
+\begin{itemize}
+  \item Camera altitude
+  \item Camera translation
+  \item Glyph border color
+  \item Glyph fill color
+  \item Glyph orientation
+  \item Glyph size
+  \item Glyph translation
+  \item Lens magnification
+  \item Lens radii
+  \item Path animation
+  \item Portal size
+  \item Portal translation
+  \item Translucency animation
+\end{itemize}
+
 \subsection{Controlling Animations}
 Animations are controlled from the AnimationManager.
 There is a unique animation manager per VirtualSpaceManager.
 Once created, animations need to be started to start taking effect.
-Animations will automatically stop after their programmed duration, but it is possible
-to force an animation to stop early or cancel it completely.
+Animations will automatically stop after their programmed duration, but may
+be stopped or cancelled early by the programmer.
 
 \subsubsection{The Queue System}
 Animations have a dimension property and a subject (the object being animated).
@@ -94,15 +111,15 @@ Two animations are said to conflict if they target the same subject \emph{and} h
 Conflicting animations are executed in sequence, while orthogonal animations (those that do not conflict)
 are executed concurrently.
 
-Conceptually, you can think of the queue system as a number of queues: one queue for each
-(subject, dimension) pair (although they are not implemented in that way). 
+The queue system can be thought of as a number of queues: one queue for each
+(subject, dimension) pair, although it is not implemented in that way for efficiency reasons. 
 Animations are put into those queues by calling AnimationManager.startAnimation().
-The first animation of the queue is running, and will leave the queue upon completion, 
-where if it will be replaced by the next animation in line (if it exists).
-  
+The first animation of the queue is run, and will leave the queue upon completion 
+when it will be replaced by the next animation in line, if it exists.
+
 \subsubsection{Starting an Animation}
-Suppose that you have a reference \cd{anim} to an Animation that was created using the AnimationManager factory,
-you may start it by calling
+Given a reference \cd{anim} to an Animation that was created using the AnimationManager factory,
+an Animation is started by calling
 
 \codebox{am.startAnimation(anim, false)}
 
@@ -111,8 +128,8 @@ or cancel all conflicting animations prior to enqueing \cd{anim} if set to true,
 ensuring that the animation will start immediately. 
   
 \subsubsection{Stopping or Cancelling an Animation}
-If you want an animation to end without waiting for completion, you may use the
-AnimationManager \cd{stopAnimation} and \cd{cancelAnimation} methods.
+Ending an Animation without waiting for completion is done through the
+AnimationManager's \cd{stopAnimation} and \cd{cancelAnimation} methods.
 Both take a single parameter: a reference to the \cd{Animation} that must be stopped or cancelled.
 The difference between stopping and cancelling an Animation is that the end action (\cd{end} method
 of a \cd{TimingHandler} or \cd{execute} method of an \cd{EndAction} will be executed if the animation
@@ -122,4 +139,20 @@ is stopped, but not if it is cancelled.
 In addition to starting, stopping and cancelling Animations, it is possible to put them on hold.
 This feature is seldom used in practice. 
 
-  
+\subsection{Current Camera Animation}  
+Parallel to the animation mechanism described above, the Animation Manager has a 
+built-in mechanism to animate the current Camera in an interactive fashion. This is
+typically used to implement rate-based scrolling and zooming.
+
+To directly animate the current Camera, set its X, Y, and Z speeds using the corresponding AnimationManager
+methods \cd{setXspeed}, \cd{setYspeed} and \cd{setZspeed}.
+The X, Y, and Z speed units are arbitrary, but the X and Y speed units are consistent
+(if the X speed and Y speed are equal, the camera will move at the same rate 
+and in the same direction along the X and Y axes).
+
+Examples of rate-based scrolling using the current camera animation are found in several places 
+throughout the code, for instance every Animation example (in 
+package \cd{net.claribole.zvtm.animation.examples}) implements it.
+
+The current camera animation never conflicts with animations in the queue system
+(i.e. it will run concurrently with any animation in the queue system).
