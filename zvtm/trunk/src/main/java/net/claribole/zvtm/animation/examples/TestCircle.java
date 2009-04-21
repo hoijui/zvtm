@@ -16,6 +16,7 @@
  *
  * For full terms see the file COPYING.
  *
+ * $Id$ 
  */
 
 package net.claribole.zvtm.animation.examples;
