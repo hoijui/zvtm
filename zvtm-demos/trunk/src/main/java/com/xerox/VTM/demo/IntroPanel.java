@@ -113,13 +113,16 @@ public class IntroPanel  extends JFrame {
 	this.setVisible(true);
     }
 
-    void demo0(){
+    interface FPtr {
+	public void execute();
+    }
+    
+    void setupDemoPane(String msg, FPtr demoFunction, final FPtr previousDemo, final FPtr nextDemo){
 	cpane.removeAll();
-	this.setSize(PANEL_WIDTH, PANEL_HEIGHT);
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
 	cpane.setLayout(gridBag);
-	JTextArea ta=new JTextArea(msg0);
+	JTextArea ta=new JTextArea(msg);
 	ta.setLineWrap(true);
 	ta.setWrapStyleWord(true);
 	ta.setEditable(false);
@@ -136,8 +139,8 @@ public class IntroPanel  extends JFrame {
 	ActionListener a0=new ActionListener(){
 		public void actionPerformed(ActionEvent e){
 		    JButton b=(JButton)e.getSource();
-		    if (b==prev){demo4();}
-		    else if (b==next){demo1();}
+		    if (b==prev){previousDemo.execute();}
+		    else if (b==next){nextDemo.execute();}
 		}
 	    };
 	prev.addActionListener(a0);
@@ -154,179 +157,48 @@ public class IntroPanel  extends JFrame {
 	gridBag.setConstraints(pn2,constraints);
 	cpane.add(pn2);
 	this.validate();
-	application.cameraDemo();
+	demoFunction.execute();
+    }
+
+    void demo0(){
+	this.setSize(PANEL_WIDTH, PANEL_HEIGHT);
+	setupDemoPane(msg0, 
+		      new FPtr(){ public void execute(){application.cameraDemo();} },
+		      new FPtr(){ public void execute(){demo4();} },
+		      new FPtr(){ public void execute(){demo1();} }
+		      );
     }
 
     void demo1(){
-	cpane.removeAll();
-	GridBagLayout gridBag=new GridBagLayout();
-	GridBagConstraints constraints=new GridBagConstraints();
-	cpane.setLayout(gridBag);
-	JTextArea ta=new JTextArea(msg1);
-	ta.setLineWrap(true);
-	ta.setWrapStyleWord(true);
-	ta.setEditable(false);
-	JScrollPane sp = new JScrollPane(ta);
-	sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	sp.setPreferredSize(new Dimension(300,200));
-	JPanel pn1 = initLensPanel();
-	JPanel pn2=new JPanel();
-	pn2.setLayout(new GridLayout(1,2));
-	final JButton prev=new JButton(new ImageIcon(this.getClass().getResource("/images/Back16b.gif")));   
-	final JButton next=new JButton(new ImageIcon(this.getClass().getResource("/images/Forward16b.gif")));
-	pn2.add(prev);
-	pn2.add(next);
-	ActionListener a0=new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    JButton b=(JButton)e.getSource();
-		    if (b==prev){demo0();}
-		    else if (b==next){demo2();}
-		}
-	    };
-	prev.addActionListener(a0);
-	next.addActionListener(a0);
-	constraints.fill=GridBagConstraints.BOTH;
-	constraints.anchor=GridBagConstraints.CENTER;
-	buildConstraints(constraints,0,0,1,1,100,98);
-	gridBag.setConstraints(sp,constraints);
-	cpane.add(sp);
-	buildConstraints(constraints,0,1,1,1,100,1);
-	gridBag.setConstraints(pn1,constraints);
-	cpane.add(pn1);
-	buildConstraints(constraints,0,2,1,1,100,1);
-	gridBag.setConstraints(pn2,constraints);
-	cpane.add(pn2);
-	this.validate();
-	application.objectFamilies();
+	setupDemoPane(msg1, 
+		      new FPtr(){ public void execute(){application.objectFamilies();} },
+		      new FPtr(){ public void execute(){demo0();} },
+		      new FPtr(){ public void execute(){demo2();} }
+		      );
     }
 
     void demo2(){
-	cpane.removeAll();
-	GridBagLayout gridBag=new GridBagLayout();
-	GridBagConstraints constraints=new GridBagConstraints();
-	cpane.setLayout(gridBag);
-	JTextArea ta=new JTextArea(msg2);
-	ta.setLineWrap(true);
-	ta.setWrapStyleWord(true);
-	ta.setEditable(false);
-	JScrollPane sp = new JScrollPane(ta);
-	sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	sp.setPreferredSize(new Dimension(300,200));
-	JPanel pn1 = initLensPanel();
-	JPanel pn2=new JPanel();
-	pn2.setLayout(new GridLayout(1,2));
-	final JButton prev=new JButton(new ImageIcon(this.getClass().getResource("/images/Back16b.gif")));   
-	final JButton next=new JButton(new ImageIcon(this.getClass().getResource("/images/Forward16b.gif")));
-	pn2.add(prev);
-	pn2.add(next);
-	ActionListener a0=new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    JButton b=(JButton)e.getSource();
-		    if (b==prev){demo1();}
-		    else if (b==next){demo3();}
-		}
-	    };
-	prev.addActionListener(a0);
-	next.addActionListener(a0);
-	constraints.fill=GridBagConstraints.BOTH;
-	constraints.anchor=GridBagConstraints.CENTER;
-	buildConstraints(constraints,0,0,1,1,100,98);
-	gridBag.setConstraints(sp,constraints);
-	cpane.add(sp);
-	buildConstraints(constraints,0,1,1,1,100,1);
-	gridBag.setConstraints(pn1,constraints);
-	cpane.add(pn1);
-	buildConstraints(constraints,0,2,1,1,100,1);
-	gridBag.setConstraints(pn2,constraints);
-	cpane.add(pn2);
-	this.validate();
-	application.objectAnim();
+	setupDemoPane(msg2, 
+		      new FPtr(){ public void execute(){application.objectAnim();} },
+		      new FPtr(){ public void execute(){demo1();} },
+		      new FPtr(){ public void execute(){demo3();} }
+		      );
     }
 
     void demo3(){
-	cpane.removeAll();
-	GridBagLayout gridBag=new GridBagLayout();
-	GridBagConstraints constraints=new GridBagConstraints();
-	cpane.setLayout(gridBag);
-	JTextArea ta=new JTextArea(msg3);
-	ta.setLineWrap(true);
-	ta.setWrapStyleWord(true);
-	ta.setEditable(false);
-	JScrollPane sp = new JScrollPane(ta);
-	sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	sp.setPreferredSize(new Dimension(300,200));
-	JPanel pn1 = initLensPanel();
-	JPanel pn2=new JPanel();
-	pn2.setLayout(new GridLayout(1,2));
-	final JButton prev=new JButton(new ImageIcon(this.getClass().getResource("/images/Back16b.gif")));   
-	final JButton next=new JButton(new ImageIcon(this.getClass().getResource("/images/Forward16b.gif")));
-	pn2.add(prev);
-	pn2.add(next);
-	ActionListener a0=new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    JButton b=(JButton)e.getSource();
-		    if (b==prev){demo2();}
-		    else if (b==next){demo4();}
-		}
-	    };
-	prev.addActionListener(a0);
-	next.addActionListener(a0);
-	constraints.fill=GridBagConstraints.BOTH;
-	constraints.anchor=GridBagConstraints.CENTER;
-	buildConstraints(constraints,0,0,1,1,100,98);
-	gridBag.setConstraints(sp,constraints);
-	cpane.add(sp);
-	buildConstraints(constraints,0,1,1,1,100,1);
-	gridBag.setConstraints(pn1,constraints);
-	cpane.add(pn1);
-	buildConstraints(constraints,0,2,1,1,100,1);
-	gridBag.setConstraints(pn2,constraints);
-	cpane.add(pn2);
-	this.validate();
-	application.multiLayer();
+	setupDemoPane(msg3, 
+		      new FPtr(){ public void execute(){application.multiLayer();} },
+		      new FPtr(){ public void execute(){demo2();} },
+		      new FPtr(){ public void execute(){demo4();} }
+		      );
     }
 
     void demo4(){
-	cpane.removeAll();
-	GridBagLayout gridBag=new GridBagLayout();
-	GridBagConstraints constraints=new GridBagConstraints();
-	cpane.setLayout(gridBag);
-	JTextArea ta=new JTextArea(msg4);
-	ta.setLineWrap(true);
-	ta.setWrapStyleWord(true);
-	ta.setEditable(false);
-	JScrollPane sp = new JScrollPane(ta);
-	sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	sp.setPreferredSize(new Dimension(300,200));
-	JPanel pn1 = initLensPanel();
-	JPanel pn2=new JPanel();
-	pn2.setLayout(new GridLayout(1,2));
-	final JButton prev=new JButton(new ImageIcon(this.getClass().getResource("/images/Back16b.gif")));   
-	final JButton next=new JButton(new ImageIcon(this.getClass().getResource("/images/Forward16b.gif")));
-	pn2.add(prev);
-	pn2.add(next);
-	ActionListener a0=new ActionListener(){
-		public void actionPerformed(ActionEvent e){
-		    JButton b=(JButton)e.getSource();
-		    if (b==prev){demo3();}
-		    else if (b==next){demo0();}
-		}
-	    };
-	prev.addActionListener(a0);
-	next.addActionListener(a0);
-	constraints.fill=GridBagConstraints.BOTH;
-	constraints.anchor=GridBagConstraints.CENTER;
-	buildConstraints(constraints,0,0,1,1,100,98);
-	gridBag.setConstraints(sp,constraints);
-	cpane.add(sp);
-	buildConstraints(constraints,0,1,1,1,100,1);
-	gridBag.setConstraints(pn1,constraints);
-	cpane.add(pn1);
-	buildConstraints(constraints,0,2,1,1,100,1);
-	gridBag.setConstraints(pn2,constraints);
-	cpane.add(pn2);
-	this.validate();
-	application.multiView();
+	setupDemoPane(msg4, 
+		      new FPtr(){ public void execute(){application.multiView();} },
+		      new FPtr(){ public void execute(){demo3();} },
+		      new FPtr(){ public void execute(){demo0();} }
+		      );
     }
 
     JPanel initLensPanel(){
