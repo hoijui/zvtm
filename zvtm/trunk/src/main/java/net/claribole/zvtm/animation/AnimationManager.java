@@ -220,11 +220,8 @@ public class AnimationManager {
     public boolean resumeAnimation(Animation anim){
 	listsLock.lock();
 	try{
-	    if(anim.isRunning()){
-		anim.resume();
-		return true;
-	    }
-	    return false;
+	    anim.resume();
+	    return anim.isRunning();
 	} finally {
 	    listsLock.unlock();
 	}

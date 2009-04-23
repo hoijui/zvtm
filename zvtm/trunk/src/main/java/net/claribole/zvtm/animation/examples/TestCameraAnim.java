@@ -49,6 +49,10 @@ public class TestCameraAnim {
 
     View testView;
 
+    AnimationManager am;
+    volatile boolean paused = false;
+    Animation anim2;
+
     TestCameraAnim(){
         vsm=new VirtualSpaceManager();
         vsm.setDebug(true);
@@ -72,7 +76,7 @@ public class TestCameraAnim {
         testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 
-	AnimationManager am = vsm.getAnimationManager();
+	am = vsm.getAnimationManager();
 
 	final Glyph circle = new VCircle(0,200,0,30,Color.BLUE);
 	vsm.addGlyph(circle, "src");
@@ -98,7 +102,7 @@ public class TestCameraAnim {
 					    },
 					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 	
-	Animation anim2 = am.getAnimationFactory().createAnimation(3000, 
+	anim2 = am.getAnimationFactory().createAnimation(3000, 
 					     Animator.INFINITE,
 					     Animator.RepeatBehavior.REVERSE,
 					     circle2,
@@ -155,7 +159,8 @@ public class TestCameraAnim {
 						     }
 						 },
 						 ConstantAccInterpolator.getInstance());
-	
+
+
 	am.startAnimation(cameraPos, false);
 	am.startAnimation(anim, false);
 	am.startAnimation(anim2, false);
@@ -170,6 +175,7 @@ public class TestCameraAnim {
 	am.stopAnimation(anim);
 
     }
+
     
     public static void main(String[] args){
         System.out.println("-----------------");
@@ -285,9 +291,20 @@ public class TestCameraAnim {
 	    g.highlight(false, null);
 	}
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+	    
+	}
     
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+	    if(KeyEvent.VK_SPACE == code){
+		if(!paused){
+		    am.pauseAnimation(anim2);
+		} else {
+		    am.resumeAnimation(anim2);
+		}
+		paused = !paused;
+	    }
+	}
     
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
