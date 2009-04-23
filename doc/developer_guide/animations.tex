@@ -37,15 +37,25 @@ From this framework, we borrow the concepts of Timing Sources, Interpolators and
 We discard the idea of an Animator targetting multiple receivers in favor of an Animation class
 that animates a single object (Glyph, Camera, Portal, Lens or Translucent).
 
-
-\subsection{The Animation Object}
-The Animation object encapsulates an animation that has a single target and dimension.
+\subsubsection{Animation}
+The Animation class encapsulates an animation that has a single target and dimension.
 Dimensions are enumerated in the \cd{Animation.Dimension} enum.
+
+\subsubsection{AnimationManager}
+The Animation manager is in charge of managing the queue system (more on that
+below) and of controlling animations ("normal" animations and the current camera 
+animation). 
+
+\subsubsection{AnimationFactory}
+This class provides a number of Animation creation methods.
+
+\subsubsection{TimingHandler Interface}
+The TimingHandler interface defines a number of callbacks that custom animation developers
+need to implement.
 
 \subsection{Creating an Animation: the Flexible Way}
 The generic way to create an Animation is to use one of the three createAnimation() methods
-of AnimationFactory. We will examine the most generic one, since the other two are simply
-overloads that provide defaults. Here is an example:
+of AnimationFactory. Here is an example:
 
 \begin{SaveVerbatim}{CodeVerb}
 Animation cameraAlt = am.getAnimationFactory().createAnimation(
@@ -70,6 +80,13 @@ Animation cameraAlt = am.getAnimationFactory().createAnimation(
 );
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+Creating an animation this way gives programmers freedom to implement 
+any animation path, side-effect... in their TimingHandler-derived class.
+
+For convenience, a \cd{DefaultTimingHandler} class is provided that overrides 
+the \cd{begin}, \cd{end} and \cd{repeat} methods, leaving only the 
+\cd{timingEvent} method to implement.
 
 \subsection{Creating an Animation: the Easy Way}
 Ready-made Animation factory methods are provided to cover the most common
@@ -137,7 +154,9 @@ is stopped, but not if it is cancelled.
 
 \subsubsection{Pausing and Resuming an Animation}
 In addition to starting, stopping and cancelling Animations, it is possible to put them on hold.
-This feature is seldom used in practice. 
+The relevant AnimationManager methods are \cd{pauseAnimation} and \cd{resumeAnimation}, 
+both of which take the animation to pause or resume as their only parameter, and return a boolean
+indicating whether the animation was successfully paused or resumed.
 
 \subsection{Current Camera Animation}  
 Parallel to the animation mechanism described above, the Animation Manager has a 
