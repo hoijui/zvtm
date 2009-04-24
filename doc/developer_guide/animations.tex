@@ -29,14 +29,14 @@ Animations are specified with a single instruction and do not require much more 
 Animations are managed by a dedicated thread that controls their timing precisely, skipping steps on the computed animation path if necessary. This mechanism ensures that an animation lasts the specified duration, and runs as smoothly as the system and hardware performance allow. Until v0.9.7, ZVTM was using its own animation engine. Since v0.10.0, the animation engine has been completely rewritten and is now based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/}, and now features additional capabilities in terms of animation management. The use of this more generic API should also make it easy for people already familiar with the Timing Framework to write animations in ZVTM. We only describe the new API in the following.
 
 \subsection{Animation Module: Overview}
-The Animation module in ZVTM is heavily based upon the Timing Framework (it can be seen
-as a subset of the Timing Framework augmented with convenience functions).
+The Animation module in ZVTM is heavily based upon the Timing Framework.
 
 From this framework, we borrow the concepts of Timing Sources, Interpolators and Timing Targets 
 (called Timing Handlers in our API). 
 We discard the idea of an Animator targetting multiple receivers in favor of an Animation class
 that animates a single object (Glyph, Camera, Portal, Lens or Translucent).
-
+Sun's Timing Framework also provides animation triggers, which are not
+replicated in our API.
 \subsubsection{Animation}
 The Animation class encapsulates an animation that has a single target and dimension.
 Dimensions are enumerated in the \cd{Animation.Dimension} enum.
@@ -52,7 +52,24 @@ This class provides a number of Animation creation methods.
 \subsubsection{TimingHandler Interface}
 The TimingHandler interface defines a number of callbacks that custom animation developers
 need to implement.
+It looks like this:
+\begin{SaveVerbatim}{CodeVerb}
+public interface TimingHandler {
+    public void begin(Object subject, Animation.Dimension dim);
 
+    public void end(Object subject, Animation.Dimension dim);
+
+    public void repeat(Object subject, Animation.Dimension dim);
+
+    public void timingEvent(float fraction, 
+			    Object subject, Animation.Dimension dim);
+}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\cd{begin} and \cd{end} are called once, respectively when the animation starts and ends. They are, of course, the ideal place for setup and teardown logic.
+\cd{repeat} is called each time the animation loops.
+\cd{timingEvent} is the "workhorse" method that implements most of the 
+animation's behavior. It is called repetitively during the animation and provides the elapsed fraction of the animation, between 0 and 1.
 \subsection{Creating an Animation: the Flexible Way}
 The generic way to create an Animation is to use one of the three createAnimation() methods
 of AnimationFactory. Here is an example:
@@ -85,8 +102,7 @@ Creating an animation this way gives programmers freedom to implement
 any animation path, side-effect... in their TimingHandler-derived class.
 
 For convenience, a \cd{DefaultTimingHandler} class is provided that overrides 
-the \cd{begin}, \cd{end} and \cd{repeat} methods, leaving only the 
-\cd{timingEvent} method to implement.
+the \cd{begin}, \cd{end} and \cd{repeat} methods with empty stubs, leaving only the \cd{timingEvent} method to implement.
 
 \subsection{Creating an Animation: the Easy Way}
 Ready-made Animation factory methods are provided to cover the most common
@@ -114,6 +130,26 @@ The target/type combinations provided are:
   \item Portal translation
   \item Translucency animation
 \end{itemize}
+
+An example of animation created in this way is:
+\begin{SaveVerbatim}{CodeVerb}
+Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
+		.createLensMagAnim(LENS_ANIM_TIME,
+				(FixedSizeLens)lens, 
+				-LENS_MM, 
+				true,
+				IdentityInterpolator.getInstance(), 
+				new EndAction(){
+		public void execute(Object subject,
+			Animation.Dimension dimension){
+		application.vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+		((Lens)subject).dispose();
+		}
+		}); 
+application.vsm.getAnimationManager().startAnimation(anim, true);
+		
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 \subsection{Controlling Animations}
 Animations are controlled from the AnimationManager.
