@@ -482,36 +482,36 @@ public class TLensDemo {
 	    break;
 	}
 	case L2_TGaussian:{
-	    res = new TGaussianLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = new BGaussianLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L2_TLinear:{
-	    res = new TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = new BLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case LInf_TLinear:{
-	    res = new LInfTLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = new LInfBLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L3_TLinear:{
-	    res = new L3TLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    res = new L3BLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
 	    tLens = null;
 	    break;
 	}
 	case L2_Fading:{
-	    tLens = new TFadingLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
-	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    tLens = new SCBLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((SCBLens)tLens).setBoundaryColor(Color.RED);
+	    ((SCBLens)tLens).setObservedRegionColor(Color.RED);
 	    res = (Lens)tLens;
 	    break;
 	}
 	case LInf_Fading:{
-	    tLens = new LInfTFadingLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-	    ((TFadingLens)tLens).setBoundaryColor(Color.RED);
-	    ((TFadingLens)tLens).setObservedRegionColor(Color.RED);
+	    tLens = new LInfSCBLens(1.0f, 0.0f, 0.98f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+	    ((SCBLens)tLens).setBoundaryColor(Color.RED);
+	    ((SCBLens)tLens).setObservedRegionColor(Color.RED);
 	    res = (Lens)tLens;
 	    break;
 	}
@@ -541,9 +541,9 @@ public class TLensDemo {
 	    break;
 	}
 	case L2_DLinear:{
-	    tLens = new DLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-	    ((DLinearLens)tLens).setInnerRadiusColor(Color.RED);
-	    ((DLinearLens)tLens).setOuterRadiusColor(Color.RED);
+	    tLens = new SCFLinearLens(1.0f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+	    ((SCFLinearLens)tLens).setInnerRadiusColor(Color.RED);
+	    ((SCFLinearLens)tLens).setOuterRadiusColor(Color.RED);
 	    res = (Lens)tLens;
 	    break;
 	}
