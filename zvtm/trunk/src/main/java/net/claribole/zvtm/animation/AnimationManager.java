@@ -181,7 +181,7 @@ public class AnimationManager {
 	    if(pendingAnims.remove(anim))
 		return;
 
-	    if(runningAnims.indexOf(anim) != -1)
+	    if(runningAnims.indexOf(anim) == -1)
 		return;
 
 	    anim.cancel();
