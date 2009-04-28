@@ -142,7 +142,7 @@ $Id$
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <aggregate>true</aggregate>
+          <code>javadoc:aggregate</code>
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZUIST API documentation</h1>]]></doctitle>
           <bottom><![CDATA[<i>Copyright &#169; 2007-2009 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
