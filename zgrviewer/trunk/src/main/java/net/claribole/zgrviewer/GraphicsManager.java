@@ -1143,209 +1143,36 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         originalEdgeStroke.removeAllElements();
     }
 
-//	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
-//	
-//	static final int BRING_ANIM_DURATION = 300;
-//	static final double BRING_DISTANCE_FACTOR = 1.5;
-//	
-//	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.1f;
-//	static final float[] FADE_IN_ANIM = {0,0,0,0,0,0,1-FADED_ELEMENTS_TRANSLUCENCY};
-//	static final float[] FADE_OUT_ANIM = {0,0,0,0,0,0,FADED_ELEMENTS_TRANSLUCENCY-1};
-//	static final float SECOND_STEP_TRANSLUCENCY = 0.4f;
-//	
+	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
+	
+	static final int BRING_ANIM_DURATION = 300;
+	static final double BRING_DISTANCE_FACTOR = 1.5;
+	
 	boolean isBringingAndGoing = false;
-//	
-//	Vector broughtElements = new Vector();
-//	Vector allElements;
-//	float[] allElementsAlpha;
-//	
-	void enterBringAndGoMode(){
-//		System.out.println("Entering BG mode");
-//		
+	
+	Vector allElements;
+
+	void enterBringAndGoMode(){}
+	
+	void exitBringAndGoMode(){}
+	
+	void startBringAndGo(Glyph g){
+		isBringingAndGoing = true;
+		LNode n = LogicalStructure.getNode(g);
+		if (n == null){return;}
+		allElements = (Vector)mSpace.getAllGlyphs().clone();
+		allElements.remove(magWindow);
+		ClosedShape thisEndShape = n.getShape();
+		Glyph[] glyphs = n.getGlyphs();
+		for (int i=0;i<glyphs.length;i++){
+			allElements.remove(glyphs[i]);
+		}		
 	}
 	
-	void exitBringAndGoMode(){
-//		System.out.println("Exiting BG mode");
-//		
-	}
-//	
-	void startBringAndGo(Glyph g){
-//		isBringingAndGoing = true;
-//		LNode n = LogicalStructure.getNode(g);
-//		if (n == null){return;}
-//		allElements = (Vector)mSpace.getAllGlyphs().clone();
-//		allElements.remove(magWindow);
-//		ClosedShape thisEndShape = n.getShape();
-//		Glyph[] glyphs = n.getGlyphs();
-//		for (int i=0;i<glyphs.length;i++){
-//			allElements.remove(glyphs[i]);
-//		}		
-//		double thisEndBoundingCircleRadius = thisEndShape.getSize();
-//		// distance between two rings
-//		double RING_STEP = 4 * thisEndBoundingCircleRadius;
-//		LEdge[] arcs = n.getAllArcs();
-//		// sort them according to distance from start node
-//		// (so as to try to keep the closest ones closer to the start node)
-//		Arrays.sort(arcs, new DistanceComparator(n));
-//		Hashtable node2bposition = new Hashtable();
-//		RingManager rm = new RingManager();
-//		// compute the position of nodes to be brought
-//		for (int i=0;i<arcs.length;i++){
-//			if (arcs[i].isLoop()){continue;}
-//			LNode otherEnd = arcs[i].getOtherEnd(n);
-//			ClosedShape otherEndShape = otherEnd.getShape();
-//			double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
-//			Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), otherEndShape.getSize(), RING_STEP);
-//			double bd = ring.rank * RING_STEP;			
-//			double ratio = bd / d;
-//			long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
-//			long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
-//			node2bposition.put(otherEnd, new LongPoint(bx, by));
-//		}
-//		// actually bring the arcs and nodes
-//		for (int i=0;i<arcs.length;i++){
-//			if (arcs[i].isLoop()){continue;}
-//			LNode otherEnd = arcs[i].getOtherEnd(n);
-//			ClosedShape otherEndShape = otherEnd.getShape();
-//			bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
-//		}
-//		// make edges translucent
-//		allElementsAlpha = new float[allElements.size()];
-//		Translucent t;
-//		for (int i=0;i<allElements.size();i++){
-//			try {
-//				t = (Translucent)allElements.elementAt(i);
-//				allElementsAlpha[i] = t.getTranslucencyValue();
-//				//t.setTranslucencyValue(FADED_ELEMENTS_TRANSLUCENCY);
-//				vsm.getAnimationManager().createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_OUT_ANIM, ((Glyph)t).getID());
-//			}
-//			catch ( ClassCastException e) {}
-//		}
-	}
-//	
 	void endBringAndGo(Glyph g){
-//		//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
-//		//        else send all nodes and edges to their initial position, but also move camera to g
-//		System.out.println("Ending bring and go");
-//		isBringingAndGoing = false;
-//		if (!broughtElements.isEmpty()){
-//			for (int i=broughtElements.size()-1;i>=0;i--){
-//				sendBack((BroughtElement)broughtElements.elementAt(i));
-//			}
-//		}
-//		for (int i=0;i<allElements.size();i++){
-//			try {
-//				//((Translucent)allElements.elementAt(i)).setTranslucencyValue(allElementsAlpha[i]);
-//				vsm.getAnimationManager().createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_COLOR_LIN, FADE_IN_ANIM, ((Glyph)allElements.elementAt(i)).getID());
-//			}
-//			catch ( ClassCastException e) {}
-//		}
-//		allElements.clear();
+        
 	}
-//	
-	void attemptToBringMore(Glyph g){
-//		System.out.println("Attempting to bring more for "+g);
-	}
-//	
-	void attemptToBringLess(Glyph g){
-//		System.out.println("Attempting to send back for "+g);
-//		
-	}
-//	
-//	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, Hashtable node2bposition){
-//		broughtElements.add(BroughtElement.rememberPreviousState(node));
-//		broughtElements.add(BroughtElement.rememberPreviousState(arc));
-//		ClosedShape nodeShape = node.getShape();
-//		allElements.remove(nodeShape);
-//		LongPoint bposition = (LongPoint)node2bposition.get(node);
-//		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
-//		Glyph[] glyphs = node.getGlyphs();
-//		for (int i=0;i<glyphs.length;i++){
-//			allElements.remove(glyphs[i]);
-//			vsm.getAnimationManager().createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, translation, glyphs[i].getID());			
-//		}
-//		DPathST spline = arc.getSpline();
-//		allElements.remove(spline);
-//		LongPoint asp = spline.getStartPoint();
-//		LongPoint aep = spline.getEndPoint();
-//		LongPoint sp, ep;
-//		if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
-//			sp = new LongPoint(bposition.x, bposition.y);
-//			ep = new LongPoint(sx, sy);
-//		}
-//		else {
-//			sp = new LongPoint(sx, sy);
-//			ep = new LongPoint(bposition.x, bposition.y);
-//		}
-//		//mSpace.atBottom(spline);
-//		mSpace.above(spline, boundingBox);
-//		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
-//		vsm.getAnimationManager().createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
-//		glyphs = arc.getGlyphs();
-//		for (int i=0;i<glyphs.length;i++){
-//			if (glyphs[i] != spline){
-//				allElements.remove(glyphs[i]);
-//				if (glyphs[i] instanceof VText){
-//					// put any label at the center of the edge (simplest think we can do)
-//					vsm.getAnimationManager().createGlyphAnimation(BRING_ANIM_DURATION, AnimManager.GL_TRANS_SIG, new LongPoint(bposition.x-sx, bposition.y-sy), glyphs[i].getID());
-//				}
-//				else {
-//					// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
-//					glyphs[i].setVisible(false);
-//				}
-//			}
-//		}
-//		LEdge[] otherArcs = node.getOtherArcs(arc);
-//		Glyph oe;
-//		for (int i=0;i<otherArcs.length;i++){
-//			broughtElements.add(BroughtElement.rememberPreviousState(otherArcs[i]));
-//			spline = otherArcs[i].getSpline();
-//			allElements.remove(spline);
-//			asp = spline.getStartPoint();
-//			aep = spline.getEndPoint();
-//			if (node2bposition.containsKey(otherArcs[i].getTail())
-//			    && node2bposition.containsKey(otherArcs[i].getHead())){
-//				sp = (LongPoint)node2bposition.get(otherArcs[i].getTail());
-//				ep = (LongPoint)node2bposition.get(otherArcs[i].getHead());
-//			}
-//			else {
-//				oe = otherArcs[i].getOtherEnd(node).getShape();
-//				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
-//					sp = new LongPoint(bposition.x, bposition.y);
-//					ep = oe.getLocation();
-//				}
-//				else {
-//					sp = oe.getLocation();
-//					ep = new LongPoint(bposition.x, bposition.y);
-//				}
-//			}
-//			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
-//			//mSpace.atBottom(spline);
-//			mSpace.above(spline, boundingBox);
-//			vsm.getAnimationManager().createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
-//			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
-//			glyphs = otherArcs[i].getGlyphs();
-//			for (int j=0;j<glyphs.length;j++){
-//				if (glyphs[j] != spline){
-//					allElements.remove(glyphs[j]);
-//					if (glyphs[j] instanceof VText){
-//						continue;
-//					}
-//					else {
-//						// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
-//						glyphs[j].setVisible(false);
-//					}
-//				}
-//			}
-//			
-//		}
-//	}
-//	
-//	void sendBack(BroughtElement be){
-//		be.restorePreviousState(vsm.getAnimationManager(), BRING_ANIM_DURATION);
-//		broughtElements.remove(be);
-//	}
-
+	
 }
 
 class ZGRGlassPane extends JComponent {

@@ -94,7 +94,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+	    if (!toolPaletteIsActive && !v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
 		if (grMngr.isBringingAndGoing){
 			grMngr.endBringAndGo(v.lastGlyphEntered());
 		}
@@ -330,7 +330,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			}
 		}
 		else {
-		    if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
+		    if (v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		}
 		if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
 			grMngr.moveLens(jpx, jpy, e.getWhen());
@@ -413,9 +413,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				grMngr.highlightElement(g, null, null, true); 
 				// g is guaranteed to be != null, don't care about camera and cursor
 			}
-			else if (grMngr.isBringingAndGoing){
-				grMngr.attemptToBringMore(g);
-			}
 			else {
 				// node highlighting is taken care of above (in a slightly different manner)
 				g.highlight(true, null);
@@ -447,9 +444,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		else {
 			if (application.grMngr.tp.isHighlightMode()){
 				grMngr.unhighlightAll();
-			}
-			else if (grMngr.isBringingAndGoing){
-				grMngr.attemptToBringLess(g);
 			}
 			else {
 				// node highlighting is taken care of above (in a slightly different manner)

@@ -43,16 +43,16 @@ public class ToolPalette {
 					"/images/dmnav24b.png",
 					"/images/plnav24b.png",
 					"/images/mlnav24b.png",
-					"/images/hl24b.png"};//,
-					//"/images/fl24b.png"};
+					"/images/hl24b.png",
+					"/images/fl24b.png"};
 
     static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
 						 "/images/flnav24g.png",
 						 "/images/dmnav24g.png",
 						 "/images/plnav24g.png",
 						 "/images/mlnav24g.png",
-						 "/images/hl24g.png"};//,
-						 //"/images/fl24g.png"};
+						 "/images/hl24g.png",
+						 "/images/fl24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
@@ -159,14 +159,14 @@ public class ToolPalette {
                 grMngr.exitBringAndGoMode();
             }
             else if (oldSelectedIconIndex == STD_NAV_MODE){
-                grMngr.mainView.getCursor().activateDynaSpot(false);
+                grMngr.activateDynaSpot(false, false);
             }
             if (selectedIconIndex == BRING_AND_GO_MODE){
                 grMngr.enterBringAndGoMode();
             }
             else if (selectedIconIndex == STD_NAV_MODE){
                 if (ConfigManager.DYNASPOT){
-                    try {grMngr.mainView.getCursor().activateDynaSpot(true);}
+                    try {grMngr.activateDynaSpot(true, false);}
                     catch (NullPointerException ex){}                    
                 }
             }
@@ -198,9 +198,6 @@ public class ToolPalette {
         if (!visible){
             visible = true;
             grMngr.meh.toolPaletteIsActive = true;
-//	    grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
-//							   new LongPoint(-2*buttons[0].getWidth()-5, 0),
-//							   paletteCamera.getID(), null);
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
                 new LongPoint(-2*buttons[0].getWidth()-5, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
@@ -213,9 +210,6 @@ public class ToolPalette {
     void hide(){
         if (visible){
             visible = false;
-//      grMngr.vsm.animator.createCameraAnimation(ANIM_TIME, AnimManager.CA_TRANS_SIG,
-//  						   new LongPoint(2*buttons[0].getWidth()+5, 0),
-//  						   paletteCamera.getID(), null);
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
                 new LongPoint(2*buttons[0].getWidth()+5, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
