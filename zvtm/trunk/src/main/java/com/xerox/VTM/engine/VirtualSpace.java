@@ -166,6 +166,14 @@ public class VirtualSpace {
 	addGlyphToDrawingList(g);
     }
 
+	void addGlyphs(Glyph[] glyphs){
+		for(Glyph glyph: glyphs){
+			glyph.initCams(cm.cameraList.length);
+			visualEnts.add(glyph);
+		}
+		addGlyphsToDrawingList(glyphs);
+	}
+
     /** Get all glyphs in this space, visible or not, sensitive or not.
      * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
      * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
@@ -546,6 +554,31 @@ public class VirtualSpace {
             insertGlyphInDrawingList(g, insertAt);
         }
     }
+
+	protected void addGlyphsToDrawingList(Glyph[] glyphs){
+		synchronized(drawingList){
+			//create a new drawingList array of the right size
+			Glyph[] newDrawingList = new Glyph[drawingList.length + glyphs.length];
+			//merge glyphs and drawingList into the new array
+			System.arraycopy(drawingList,0,newDrawingList,0,drawingList.length);
+			System.arraycopy(glyphs,0,newDrawingList,drawingList.length,
+					glyphs.length);
+			Arrays.sort(newDrawingList,
+					new java.util.Comparator<Glyph>(){
+						public int compare(Glyph g1, Glyph g2){
+							if(g1.getZindex() < g2.getZindex()){
+								return -1;
+							} else if (g1.getZindex() > g2.getZindex()){
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+					});
+			//overwrite drawingList
+			drawingList = newDrawingList;
+		}
+	}
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
         synchronized(drawingList){

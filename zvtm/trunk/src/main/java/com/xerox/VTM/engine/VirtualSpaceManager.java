@@ -323,10 +323,17 @@ public class VirtualSpaceManager implements AWTEventListener {
     }
     
     public void addGlyphs(Glyph[] gs, VirtualSpace vs, boolean repaint){
-        for (int i=0;i<gs.length;i++){
-            addGlyph(gs[i], vs, false);
-        }
-        repaintNow();
+		if(vs != null){
+			vs.addGlyphs(gs);
+
+			for(Glyph glyph: gs){
+				glyph.setID(new Long(nextID++));
+				glyph.setVSM(this);
+				glyph.setMouseInsideHighlightColor(this.mouseInsideColor);
+				allGlyphs.put(glyph.getID(), glyph);
+			}
+			if(repaint){repaintNow();}
+		}
     }
 
     /**add composite glyph c to virtual space whose name is vs*/
