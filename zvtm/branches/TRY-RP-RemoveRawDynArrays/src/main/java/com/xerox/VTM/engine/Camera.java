@@ -22,6 +22,7 @@
 
 package com.xerox.VTM.engine;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -60,7 +61,7 @@ public class Camera {
     /**View using this camera as one of its layer(s)*/
     View view;
     /**glyphs sticked to this one*/
-    Glyph[] stickedGlyphs;
+    ArrayList<Glyph> stickedGlyphs = new ArrayList<Glyph>();
     /**glyphs sticked to this one*/
     Camera[] stickedCameras;
     /**tells whether camera altitude changes should be propagated to sticked cameras or not (in addition to x,y changes)*/
@@ -289,11 +290,9 @@ public class Camera {
     public void propagateMove(double x, double y){
         long lx = Math.round(x);
         long ly = Math.round(y);
-        if (stickedGlyphs != null){
-            for (int i=0;i<stickedGlyphs.length;i++){
-                stickedGlyphs[i].move(lx,ly);
-            }
-        }
+		for(Glyph sticked: stickedGlyphs){
+			sticked.move(lx,ly);
+		}
         if (stickedCameras != null){
             for (int i=0;i<stickedCameras.length;i++){
                 stickedCameras[i].moveTo(posx, posy);
@@ -369,30 +368,14 @@ public class Camera {
      *@see #unstickAllGlyphs()
      */
     public void stick(Glyph g){
-	if (stickedGlyphs == null){
-	    stickedGlyphs = new Glyph[1];
-	    stickedGlyphs[0] = g;
-	    g.stickedTo = this;
-	}
-	else {
-	    boolean alreadySticked = false;
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		if (stickedGlyphs[i] == g){
-		    alreadySticked = true;
-		    break;
+		if(stickedGlyphs.contains(g)){
+			if (parentSpace.vsm.debugModeON()){
+				System.err.println("Warning: trying to stick Glyph "+g+" to Camera "+this+" while they are already sticked.");
+			}
+			return;
 		}
-	    }
-	    if (!alreadySticked){
-		Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
-		System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
-		newStickList[stickedGlyphs.length] = g;
-		stickedGlyphs = newStickList;
+		stickedGlyphs.add(g);
 		g.stickedTo = this;
-	    }
-	    else {
-		if (parentSpace.vsm.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Camera "+this+" while they are already sticked.");}
-	    }
-	}
     }
 
     /**
@@ -402,20 +385,11 @@ public class Camera {
      *@see #unstickAllGlyphs()
      */
     public void unstick(Glyph g){
-	if (stickedGlyphs != null){
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		if (stickedGlyphs[i] == g){
-		    g.stickedTo = null;
-		    Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-		    System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
-		    System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
-		    stickedGlyphs = newStickList;
-		    break;
+		if(stickedGlyphs.contains(g)){
+			stickedGlyphs.remove(g);
+			g.stickedTo = null;
 		}
-	    }
-	    if (stickedGlyphs.length == 0){stickedGlyphs = null;}
 	}
-    }
 
    /**
     *detach all glyphs attached to this camera
@@ -423,18 +397,15 @@ public class Camera {
     *@see #stick(Glyph g)
     */
     public void unstickAllGlyphs(){
-	if (stickedGlyphs != null){
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		stickedGlyphs[i].stickedTo = null;
-		stickedGlyphs[i] = null;
-	    }
-	    stickedGlyphs = null;
+		for(Glyph sticked: stickedGlyphs){
+			sticked.stickedTo = null;
+		}
+		stickedGlyphs.clear();
 	}
-    }
 
     /**return the list of glyphs sticked to this camera (null if none)*/
     public Glyph[] getStickedGlyphArray(){
-	return stickedGlyphs;
+		return stickedGlyphs.toArray(new Glyph[0]);
     }
 
 
