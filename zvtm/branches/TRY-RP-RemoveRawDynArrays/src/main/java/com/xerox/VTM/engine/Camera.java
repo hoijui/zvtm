@@ -61,7 +61,7 @@ public class Camera {
     /**View using this camera as one of its layer(s)*/
     View view;
     /**glyphs sticked to this one*/
-    ArrayList<Glyph> stickedGlyphs = new ArrayList<Glyph>();
+    List<Glyph> stickedGlyphs = new ArrayList<Glyph>();
     /**glyphs sticked to this one*/
     Camera[] stickedCameras;
     /**tells whether camera altitude changes should be propagated to sticked cameras or not (in addition to x,y changes)*/
