@@ -193,6 +193,38 @@ public class ZOrderTest extends TestCase {
 	assertTrue(cg2.getZindex() >= cg1.getZindex());
     }
 
+	//this just tests an implementation detail
+	//(that the drawing list of a VirtualSpace is always
+	//sorted in ascending z-order)
+	public void testArrayInsertInternalZ(){
+		Glyph[] circles = new Glyph[pseudoRandomIndexes.length/2];
+
+		for(int i=0; i<pseudoRandomIndexes.length/2; ++i){
+			Glyph g = new VCircle(10, 10, pseudoRandomIndexes[i], 
+					30, Color.BLACK);
+			circles[i] = g;
+		}
+		vsm.addGlyphs(circles, vs, false);
+
+		Glyph[] circles2 = 
+			new Glyph[pseudoRandomIndexes.length - circles.length];
+
+		for(int i=0; i<pseudoRandomIndexes.length - circles.length; ++i){
+			Glyph g = new VCircle(10, 10, 
+					pseudoRandomIndexes[i+circles.length], 
+					30, Color.BLACK);
+			circles2[i] = g;
+		}
+		vsm.addGlyphs(circles2, vs, false);
+
+		Glyph[] drawingList = vs.getDrawingList();
+		for(int i=0; i<drawingList.length-1; ++i){
+			assertTrue(drawingList[i].getZindex() <=
+						drawingList[i+1].getZindex());
+		}
+
+	}
+
     public static Test suite() {
 	TestSuite suite = new TestSuite();
 	suite.addTestSuite(ZOrderTest.class);
