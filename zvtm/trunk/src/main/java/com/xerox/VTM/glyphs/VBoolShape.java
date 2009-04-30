@@ -69,15 +69,7 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
      *@param c main shape's color
      */
     public VBoolShape(long x,long y, int z,long sx,long sy,int st,BooleanOps[] b,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	szx=sx;
-	szy=sy;
-	shapeType=st;
-	booleanShapes=b;
-	setColor(c);
-	setBorderColor(Color.black);
+	    this(x, y, z, sx, sy, st, b, c, Color.BLACK);
     }
     
     /**
