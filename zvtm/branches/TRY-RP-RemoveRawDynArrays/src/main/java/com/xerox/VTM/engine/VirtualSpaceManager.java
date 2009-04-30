@@ -29,6 +29,7 @@ import java.awt.AWTEvent;
 import java.awt.event.AWTEventListener;
 import java.awt.event.WindowEvent;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -67,8 +68,8 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**set default font used by glyphs*/
     public void setMainFont(Font f){
 	mainFont=f;
-	for (int i=0;i<allViews.length;i++){
-	    allViews[i].updateFont();
+	for(View view: allViews){
+		view.updateFont();
 	}
 	Object g;
 	for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
@@ -112,7 +113,8 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**key is space name (String)*/
     protected Hashtable allVirtualSpaces;
     /**All views managed by this VSM*/
-    protected View[] allViews;
+    //protected View[] allViews;
+	protected ArrayList<View> allViews;
     /**used to quickly retrieve a view by its name (gives its index position in the list of views)*/
     protected Hashtable name2viewIndex;
 
@@ -166,7 +168,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	allPortals=new Hashtable();
 	allLenses=new Hashtable();
 	allVirtualSpaces=new Hashtable();
-	allViews = new View[0];
+	allViews = new ArrayList<View>(); 
 	name2viewIndex = new Hashtable();
 	mouseSync=true;
 	if (!applet){java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);}
@@ -192,9 +194,9 @@ public class VirtualSpaceManager implements AWTEventListener {
     public void setRepaintPolicy(boolean b){
 	if (b!=generalRepaintPolicy){
 	    generalRepaintPolicy=b;
-	    for (int i=0;i<allViews.length;i++){
-		allViews[i].setRepaintPolicy(generalRepaintPolicy);
-	    }
+		for(View view: allViews){
+			view.setRepaintPolicy(generalRepaintPolicy);
+		}
 	}
     }
 
@@ -565,11 +567,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      * Side-effect: attempts to start the animation manager
      */
     protected void addView(View v){
-	View[] tmpA = new View[allViews.length+1];
-	System.arraycopy(allViews, 0, tmpA, 0, allViews.length);
-	tmpA[allViews.length] = v;
-	allViews = tmpA;
-	name2viewIndex.put(v.name, new Integer(allViews.length-1));
+	allViews.add(v);
+	name2viewIndex.put(v.name, new Integer(allViews.size()-1));
 	animationManager.start(); //starts animationManager if not already running
     }
 
@@ -619,7 +618,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public View getView(String n){
 	int index = getViewIndex(n);
 	if (index != -1){
-	    return allViews[index];
+	    return allViews.get(index);
 	}
 	else {
 	    return null;
@@ -628,32 +627,24 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**Destroy a view identified by its index in the list of views.*/
     protected void destroyView(int i){
-	View[] tmpA = new View[allViews.length-1];
-	if (tmpA.length > 0){
-	    System.arraycopy(allViews, 0, tmpA, 0, i);
-	    System.arraycopy(allViews, i+1, tmpA, i, allViews.length-i-1);
-	}
-	allViews = tmpA;
-	updateViewIndex();
+		allViews.remove(i);
+		updateViewIndex();
     }
 
     /**update mapping between view name and view index in the list of views when
      * complex changes are made to the list of views (like removing a view)*/
     protected void updateViewIndex(){
-	name2viewIndex.clear();
-	for (int i=0;i<allViews.length;i++){
-	    name2viewIndex.put(allViews[i].name, new Integer(i));
+		name2viewIndex.clear();
+		for (int i=0;i<allViews.size();i++){
+			name2viewIndex.put(allViews.get(i).name, new Integer(i));
+		}
 	}
-    }
 
     /**Destroy a view.*/
     protected void destroyView(View v){
-	for (int i=0;i<allViews.length;i++){
-	    if (allViews[i] == v){
-		destroyView(i);
-		break;
-	    }
-	}
+		if(allViews.remove(v)){
+			updateViewIndex();
+		}
     }
 
     /**Destroy a view. 
@@ -670,9 +661,9 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@see #repaintNow(View v, RepaintListener rl)
      */
     public void repaintNow(){
-	for (int i=0;i<allViews.length;i++){
-	    allViews[i].repaintNow();
-	}
+		for (View view: allViews){
+			view.repaintNow();
+		}
     }
 
     /**Call this if you want to repaint a given view at once.
@@ -706,7 +697,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param i view index in list of views
      */
     protected void repaintNow(int i){
-	repaintNow(allViews[i]);
+		repaintNow(allViews.get(i));
     }
 
     /**create a new virtual space with name n*/

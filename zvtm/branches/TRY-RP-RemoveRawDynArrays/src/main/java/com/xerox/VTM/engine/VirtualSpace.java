@@ -135,9 +135,9 @@ public class VirtualSpace {
      */
     public void removeCamera(int i){
 	if (cm.cameraList.length>i){
-	    for (int j=0;j<vsm.allViews.length;j++){
-		if (vsm.allViews[j].cameras.contains(cm.getCamera(i))){
-		    vsm.allViews[j].destroyCamera(cm.getCamera(i));
+	    for (View view: vsm.allViews){
+		if (view.cameras.contains(cm.getCamera(i))){
+		    view.destroyCamera(cm.getCamera(i));
 		}
 	    }
 	    for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
