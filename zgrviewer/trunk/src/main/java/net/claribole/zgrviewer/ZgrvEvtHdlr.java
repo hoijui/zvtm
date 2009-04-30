@@ -13,6 +13,7 @@ package net.claribole.zgrviewer;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Point;
 import java.util.Vector;
 
 //import com.xerox.VTM.engine.AnimManager;
@@ -67,6 +68,13 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			else if (grMngr.tp.isBringAndGoMode() && (g = v.lastGlyphEntered()) != null){
 				grMngr.startBringAndGo(g);
 			}
+            else if (grMngr.tp.isLinkSlidingMode()){
+                Point location = e.getComponent().getLocationOnScreen();
+                relative = e.getPoint();
+                LS_SX = v.getVCursor().vx;
+                LS_SY = v.getVCursor().vy;
+                grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x+relative.x, location.y+relative.y);
+            }
 			else {
 				grMngr.rememberLocation(v.cams[0].getLocation());
 				if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
@@ -97,6 +105,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    if (!toolPaletteIsActive && !v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
 		if (grMngr.isBringingAndGoing){
 			grMngr.endBringAndGo(v.lastGlyphEntered());
+		}
+		else if (grMngr.isLinkSliding){
+			grMngr.endLinkSliding();
 		}
 		if (toolPaletteIsActive){return;}
 		else {
@@ -133,7 +144,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		}
 		else {
 			if (grMngr.tp.isBringAndGoMode()){return;}
-			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
+			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
 				lastVX = v.getVCursor().vx;
@@ -191,7 +202,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(false, false);}
 		if (toolPaletteIsActive){return;}
 		else {
-			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
+			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
 			}
@@ -223,7 +234,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		if (toolPaletteIsActive){return;}
 		else {
-			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
+			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
 				lastVX = v.getVCursor().vx;
@@ -282,7 +293,13 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
-		if (mod != ALT_MOD && buttonNumber == 1){
+		if (grMngr.isLinkSliding){
+			if (jpx != relative.x || jpy != relative.y){
+				// ignore events triggered by AWT robot
+				grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy);
+			}				
+		}
+		else if (mod != ALT_MOD && buttonNumber == 1){
 			if (draggingZoomWindow){
 				grMngr.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
 				lastJPX = jpx;

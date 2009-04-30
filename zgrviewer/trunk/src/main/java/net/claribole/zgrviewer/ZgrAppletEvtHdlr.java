@@ -116,7 +116,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	    if (v.lastGlyphEntered() != null){grMngr.tp.selectButton((VImage)v.lastGlyphEntered());}
 	}
 	else {
-	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
+	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 		lastVX = v.getVCursor().vx;
@@ -171,7 +171,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	else {
-	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
+	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 	    }
@@ -183,7 +183,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	if (toolPaletteIsActive){return;}
 	else {
-	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode() || grMngr.tp.isMeltingLensNavMode()){
+	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
 		lastVX = v.getVCursor().vx;

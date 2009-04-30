@@ -34,25 +34,25 @@ public class ToolPalette {
     static final short FL_NAV_MODE = 1;
     static final short DM_NAV_MODE = 2;
     static final short PL_NAV_MODE = 3;
-    static final short ML_NAV_MODE = 4;
-    static final short HIGHLIGHT_MODE = 5;
-    static final short BRING_AND_GO_MODE = 6;
+    static final short HIGHLIGHT_MODE = 4;
+    static final short BRING_AND_GO_MODE = 5;
+    static final short LINK_SLIDING_MODE = 6;
 
     static final String[] ICON_PATHS = {"/images/stdnav24b.png",
 					"/images/flnav24b.png",
 					"/images/dmnav24b.png",
 					"/images/plnav24b.png",
-					"/images/mlnav24b.png",
 					"/images/hl24b.png",
-					"/images/fl24b.png"};
+					"/images/fl24b.png",
+					"/images/ls24b.png"};
 
     static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
 						 "/images/flnav24g.png",
 						 "/images/dmnav24g.png",
 						 "/images/plnav24g.png",
-						 "/images/mlnav24g.png",
 						 "/images/hl24g.png",
-						 "/images/fl24g.png"};
+						 "/images/fl24g.png",
+						 "/images/ls24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
@@ -116,16 +116,16 @@ public class ToolPalette {
 	return selectedIconIndex == PL_NAV_MODE;
     }
 
-    boolean isMeltingLensNavMode(){
-	return selectedIconIndex == ML_NAV_MODE;
-    }
-
     boolean isHighlightMode(){
 	return selectedIconIndex == HIGHLIGHT_MODE;
     }
 
     boolean isBringAndGoMode(){
 		return selectedIconIndex == BRING_AND_GO_MODE;
+    }
+
+    boolean isLinkSlidingMode(){
+		return selectedIconIndex == LINK_SLIDING_MODE;
     }
 
     void selectButton(VImage icon){
@@ -234,21 +234,21 @@ public class ToolPalette {
     }
 
     void showLogicalTools(){
-	for (int i=5;i<=5;i++){
-	    if (!buttons[i].isSensitive()){buttons[i].setSensitivity(true);}
-	    if (!buttons[i].isVisible()){buttons[i].setVisible(true);}
-	    if (!selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(true);}
-	    if (!selectedButtons[i].isVisible()){selectedButtons[i].setVisible(true);}
-	}
+        for (int i=4;i<=6;i++){
+            if (!buttons[i].isSensitive()){buttons[i].setSensitivity(true);}
+            if (!buttons[i].isVisible()){buttons[i].setVisible(true);}
+            if (!selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(true);}
+            if (!selectedButtons[i].isVisible()){selectedButtons[i].setVisible(true);}
+        }
     }
 
 	void hideLogicalTools(){
-		if (isHighlightMode() || isBringAndGoMode()){
+		if (isHighlightMode() || isBringAndGoMode() || isLinkSlidingMode()){
 			// if a tool that makes needs to know about the logical structure is selected,
 			// select something else as they are about to be disabled
 			selectButton(buttons[0]);
 		}
-		for (int i=5;i<=6;i++){
+		for (int i=4;i<=6;i++){
 			if (buttons[i].isSensitive()){buttons[i].setSensitivity(false);}
 			if (buttons[i].isVisible()){buttons[i].setVisible(false);}
 			if (selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(false);}

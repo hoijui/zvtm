@@ -19,11 +19,13 @@ import java.awt.Point;
 import java.awt.GradientPaint;
 import java.awt.Font;
 import java.awt.BasicStroke;
+import java.awt.Robot;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
+import java.awt.geom.Point2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -42,7 +44,6 @@ import net.claribole.zvtm.lens.Lens;
 import net.claribole.zvtm.lens.FixedSizeLens;
 import net.claribole.zvtm.lens.LInfSCBLens;
 import net.claribole.zvtm.lens.SCBLens;
-import net.claribole.zvtm.lens.BGaussianLens;
 import net.claribole.zvtm.lens.FSGaussianLens;
 import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.Java2DPainter;
@@ -57,6 +58,7 @@ import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.RectangleNR;
+import net.claribole.zvtm.glyphs.CircleNR;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.glyphs.VRectangleOr;
@@ -698,20 +700,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     Lens getLensDefinition(int x, int y){
-	Lens res;
-	if (tp.isFadingLensNavMode()){
-	    fLens = new LInfSCBLens(1.0f, 0.0f, 0.95f, 100, x - panelWidth/2, y - panelHeight/2);
-	    res = fLens;
-	}
-	else if (tp.isMeltingLensNavMode()){
-	    res = new BGaussianLens(1.0f, 0.0f, 0.90f, 150, 50, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null;
-	}
-	else {// isProbingLensNavMode()
-	    res = new FSGaussianLens(1.0f, 100, 50, x - panelWidth/2, y - panelHeight/2);
-	    fLens = null; // unset any previous fading lens to make sure it gets garbage collected
-	}
-	return res;
+        Lens res;
+        if (tp.isFadingLensNavMode()){
+            fLens = new LInfSCBLens(1.0f, 0.0f, 0.95f, 100, x - panelWidth/2, y - panelHeight/2);
+            res = fLens;
+        }
+        else {
+            // isProbingLensNavMode()
+            res = new FSGaussianLens(1.0f, 100, 50, x - panelWidth/2, y - panelHeight/2);
+            // unset any previous fading lens to make sure it gets garbage collected
+            fLens = null;
+        }
+        return res;
     }
     
     /*-------------        DragMag        -----------------*/
@@ -1171,6 +1171,108 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	void endBringAndGo(Glyph g){
         
+	}
+	
+	/* ----------------------- Link sliding navigation ----------------------------------- */
+	
+	static final int SLIDER_CURSOR_SIZE = 12;
+	
+	boolean isLinkSliding = false;
+	LinkSliderCalc lsc;
+	DPathST slidingLink;
+	Color slidingLinkActualColor = null;
+	Point2D mPos = new Point2D.Double();
+	
+	CircleNR slideCursor;
+	Point2D cPos;
+
+	int screen_cursor_x,screen_cursor_y;
+	Robot awtRobot;
+	
+	void attemptLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
+		LNode closestNode = lstruct.nodes[0];
+		ClosedShape nodeShape = closestNode.getShape();
+		double shortestDistance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+		double distance;
+		for (int i=1;i<lstruct.nodes.length;i++){
+			nodeShape = lstruct.nodes[i].getShape();
+			distance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+			if (distance < shortestDistance){
+				closestNode = lstruct.nodes[i];
+				shortestDistance = distance;
+			}
+		}
+		if (shortestDistance < 3*closestNode.getShape().getSize()){
+			// if clicked near a node, select edge connected to this node closest to the click point
+			LEdge[] arcs = closestNode.getAllArcs();
+			if (arcs.length == 0){return;}
+			long vieww = mainView.getVisibleRegionWidth(mainCamera);
+			slidingLink = arcs[0].getSpline();
+			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
+			mPos.setLocation(press_vx, press_vy);
+			lsc.updateMousePosition(mPos);
+			cPos = lsc.getPositionAlongPath();
+			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+			for (int i=1;i<arcs.length;i++){
+				lsc = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
+				lsc.updateMousePosition(mPos);
+				cPos = lsc.getPositionAlongPath();
+				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+				if (distance < shortestDistance){
+					shortestDistance = distance;
+					slidingLink = arcs[i].getSpline();
+				}
+			}
+			startLinkSliding(press_vx, press_vy, scr_x, scr_y);
+		}
+		else {
+			// else select the edge hovered by the cursor (if any)
+			Vector pum = mainView.getCursor().getIntersectingPaths(mainCamera, 10);
+			if (pum.size() > 0){
+				slidingLink = (DPathST)pum.firstElement();
+				startLinkSliding(press_vx, press_vy, scr_x, scr_y);
+			}
+		}
+	}
+	
+	void startLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
+		mainView.getCursor().setVisibility(false);
+		isLinkSliding = true;
+		screen_cursor_x = scr_x;
+		screen_cursor_y = scr_y;
+		try {
+			awtRobot = new Robot();
+			slidingLinkActualColor = slidingLink.getColor();
+			slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
+			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), mainView.getVisibleRegionWidth(mainCamera));
+			slideCursor = new CircleNR(0, 0, 0, SLIDER_CURSOR_SIZE, ConfigManager.HIGHLIGHT_COLOR, ConfigManager.HIGHLIGHT_COLOR);
+			slideCursor.setDrawBorder(false);
+			vsm.addGlyph(slideCursor, mSpace);
+			mSpace.atBottom(slideCursor);
+		}
+		catch (java.awt.AWTException e){ 
+			e.printStackTrace();
+		}
+	}
+	
+	void linkSlider(long vx, long vy){
+		mPos.setLocation(vx, vy);
+		awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
+		lsc.updateMousePosition(mPos);
+		cPos = lsc.getPositionAlongPath();
+		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
+		mainCamera.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
+		mainCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
+	}
+	
+	void endLinkSliding(){
+		mainView.getCursor().setVisibility(true);
+		mSpace.removeGlyph(slideCursor);
+		slidingLink.setColor(slidingLinkActualColor);
+		slidingLink = null;
+		isLinkSliding = false;
+		lsc = null;
+		awtRobot = null;
 	}
 	
 }

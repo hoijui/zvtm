@@ -9,6 +9,8 @@
 
 package net.claribole.zgrviewer;
 
+import java.awt.Point;
+
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.glyphs.VSegment;
 
@@ -52,6 +54,9 @@ public abstract class BaseEventHandler implements PortalEventHandler {
     boolean draggingZoomWindow = false;
     boolean draggingZoomWindowContent = false;
     
+    /* Link Sliding */
+	long LS_SX, LS_SY;
+	Point relative;
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
