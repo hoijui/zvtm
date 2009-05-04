@@ -95,8 +95,6 @@ public class VirtualSpace {
 	camera2drawnList=new Vector[0];
   	drawingList = new Glyph[0];
 	spaceName=n;
-//	metaCamera = new MetaCamera(3, 2, 200, 120,
-//			this); //XXX this-escape?
     }
 
     /**get virtual space name*/
