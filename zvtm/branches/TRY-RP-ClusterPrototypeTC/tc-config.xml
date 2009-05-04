@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
 
-  All content copyright (c) 2003-2008 Terracotta, Inc.,
-  except as may otherwise be noted in a separate copyright notice.
-  All rights reserved.
-
--->
 <tc:tc-config xmlns:tc="http://www.terracotta.org/config"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.terracotta.org/schema/terracotta-4.xsd">
@@ -84,10 +78,18 @@
         indicate actionsthat the class need to take when DSO loads that object from the server
         (actions that normally happens on class instantiation)-->
 		<include>
-            <class-expression>testTC.demo.Config</class-expression>
+			<class-expression>com.xerox.VTM.engine.VirtualSpace</class-expression>
+			<!--	<on-load>
+				<execute>
+					<![CDATA[self.vsm = new VirtualSpaceManager();]]>
+				</execute>
+			</on-load> -->
          </include>
       </instrumented-classes>
 
+	  <!-- <transient-fields>
+		  <field-name>com.xerox.VTM.engine.VirtualSpace.vsm</field-name>
+	  </transient-fields> -->
       <!--Declaring a field of a class a root will make it available for all instances
       of our app that runs via DSO-->
       <roots>

@@ -49,6 +49,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 
     /*coordinates of lens center in virtual space for each camera*/
     long lensVx, lensVy;
+
     long lviewWC, lviewNC, lviewEC, lviewSC;
 
     public StdViewPanel(Vector cameras,View v) {

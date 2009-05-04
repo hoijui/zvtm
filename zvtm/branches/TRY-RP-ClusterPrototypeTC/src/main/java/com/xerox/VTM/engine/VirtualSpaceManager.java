@@ -143,6 +143,14 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     Color mouseInsideColor=Color.white;
 
+	private static final VirtualSpaceManager INSTANCE = 
+		new VirtualSpaceManager();
+
+	//returns singleton instance (TODO make other ctors private)
+	public static VirtualSpaceManager getInstance(){
+		return INSTANCE;
+	}
+
     /**
      * Only for use with stand-alone Java applications (use other constructor with applet=true if running inside a JApplet)
      */

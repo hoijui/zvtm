@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import net.claribole.zvtm.cluster.MetaCamera;
+
   /**
    * A virtual space contains glyphs and can be observed through multiple cameras
    * @author Emmanuel Pietriga
@@ -82,6 +84,8 @@ public class VirtualSpace {
     Vector[] camera2drawnList;
     //sharing drawnList was causing a problem ; we now have one for each camera
 
+	MetaCamera metaCamera;
+
     /**
      *@param n virtual space name
      */
@@ -91,10 +95,20 @@ public class VirtualSpace {
 	camera2drawnList=new Vector[0];
   	drawingList = new Glyph[0];
 	spaceName=n;
+//	metaCamera = new MetaCamera(3, 2, 200, 120,
+//			this); //XXX this-escape?
     }
 
     /**get virtual space name*/
     public String getName(){return spaceName;}
+
+	public MetaCamera getMetaCamera(){
+		return metaCamera;
+	}
+
+	public void setMetaCamera(MetaCamera metaCamera){
+		this.metaCamera = metaCamera;
+	}
 
     /**get virtual space's i-th camera*/
     public Camera getCamera(int i){return cm.getCamera(i);}
