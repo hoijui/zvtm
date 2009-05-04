@@ -33,6 +33,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -146,11 +148,26 @@ public class VirtualSpaceManager implements AWTEventListener {
 	private static final VirtualSpaceManager INSTANCE = 
 		new VirtualSpaceManager();
 
+	private CountDownLatch masterLatch;
+
 	//returns singleton instance (TODO make other ctors private)
 	public static VirtualSpaceManager getInstance(){
 		return INSTANCE;
 	}
 
+	//wait until the master application signals that it
+	//created a virtualspace and a metacamera
+	public void awaitMaster(){
+		try{
+			masterLatch.await();
+		} catch(InterruptedException ie){
+			throw new Error("unexpected interruption");
+		}
+	}
+
+	public void signalMasterReady(){
+		masterLatch.countDown();
+	}
     /**
      * Only for use with stand-alone Java applications (use other constructor with applet=true if running inside a JApplet)
      */
@@ -178,6 +195,8 @@ public class VirtualSpaceManager implements AWTEventListener {
 	name2viewIndex = new Hashtable();
 	mouseSync=true;
 	if (!applet){java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);}
+
+	masterLatch = new CountDownLatch(1);
     }
 
     /**set debug mode ON or OFF*/
