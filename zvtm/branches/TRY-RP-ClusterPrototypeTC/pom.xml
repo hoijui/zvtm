@@ -149,13 +149,13 @@ $Id$
 		  <configuration>
 			  <workingDirectory>${project.build.directory}</workingDirectory>
 			  <processes>
-				  <process nodeName="writer" count="1" 
-					  className="testTC.Writer"
-					  arguments="host key314 value42">
+				  <process nodeName="master" count="1" 
+					  className="net.claribole.zvtm.cluster.MasterSkel"
+					  arguments="">
 				  </process>
-				  <process nodeName="reader" count="1"
-					  className="testTC.Reader"
-					  arguments="host key314">
+				  <process nodeName="slave" count="1"
+					  className="net.claribole.zvtm.cluster.SlaveApp"
+					  arguments="">
 				  </process>
 			  </processes>
 			  <startServer>true</startServer>
