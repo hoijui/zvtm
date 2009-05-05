@@ -26,7 +26,7 @@ ZVTM offers animation capabilities inspired by Stasko's path/transition paradigm
 
 Animations are specified with a single instruction and do not require much more code than the basic modification of a variable's value. They require the following parameters: the animation duration, the object involved, the variable(s) impacted by the animation, the desired target value, and the pacing function. Three off-the-shelf pacing functions are available (Figure \ref{fig:pacing}). Slow-in/slow-out transitions are typically used for camera motion and some glyph animations such as translations, as they convey a feeling of solidity that is important in direct manipulation interfaces \cite{Chang93}. Non-uniform pacing functions are generally used to put emphasis on the start (and/or end) of animation paths. However, they are not always appropriate, and the uniform function is often used when modifying, e.g., magnification lens parameters, or when animating color changes.
 
-Animations are managed by a dedicated thread that controls their timing precisely, skipping steps on the computed animation path if necessary. This mechanism ensures that an animation lasts the specified duration, and runs as smoothly as the system and hardware performance allow. Until v0.9.7, ZVTM was using its own animation engine. Since v0.10.0, the animation engine has been completely rewritten and is now based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/}, and now features additional capabilities in terms of animation management. The use of this more generic API should also make it easy for people already familiar with the Timing Framework to write animations in ZVTM. We only describe the new API in the following.
+Animations are managed by a dedicated thread that controls their timing precisely, skipping steps on the computed animation path if necessary. This mechanism ensures that an animation lasts the specified duration, and runs as smoothly as the system and hardware performance allow. Until v0.9.8, ZVTM was using its own animation engine. Since v0.10.0, the animation engine has been completely rewritten and is now based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/}, and now features additional capabilities in terms of animation management. The use of this more generic API should also make it easy for people already familiar with the Timing Framework to write animations in ZVTM. We only describe the new API in the following.
 
 \subsection{Animation Module: Overview}
 The Animation module in ZVTM is heavily based upon the Timing Framework.
@@ -43,7 +43,7 @@ Dimensions are enumerated in the \cd{Animation.Dimension} enum.
 
 \subsubsection{AnimationManager}
 The Animation manager is in charge of managing the queue system (more on that
-below) and of controlling animations ("normal" animations and the current camera 
+below) and of controlling animations (conventional animations and the current camera 
 animation). 
 
 \subsubsection{AnimationFactory}
@@ -108,11 +108,11 @@ the \cd{begin}, \cd{end} and \cd{repeat} methods with empty stubs, leaving only 
 Ready-made Animation factory methods are provided to cover the most common
 cases as part of the \cd{AnimationFactory} class. 
 These factories are named create[TargetType][AnimationType].
-For instance, a Glyph translation can be created by calling 
+For instance, a Glyph translation can be created by calling:
 
 \codebox{vsm.getAnimationManager().getAnimationFactory().createGlyphTranslation(...);}
 
-(where \cd{vsm} is a reference to your application's \cd{VirtualSpaceManager})
+where \cd{vsm} is a reference to your application's \cd{VirtualSpaceManager}.
 
 The target/type combinations provided are:
 \begin{itemize}
@@ -154,7 +154,7 @@ application.vsm.getAnimationManager().startAnimation(anim, true);
 \subsection{Controlling Animations}
 Animations are controlled from the AnimationManager.
 There is a unique animation manager per VirtualSpaceManager.
-Once created, animations need to be started to start taking effect.
+Once created, animations need to be explicitly started.
 Animations will automatically stop after their programmed duration, but may
 be stopped or cancelled early by the programmer.
 
@@ -168,7 +168,7 @@ The queue system can be thought of as a number of queues: one queue for each
 (subject, dimension) pair, although it is not implemented in that way for efficiency reasons. 
 Animations are put into those queues by calling AnimationManager.startAnimation().
 The first animation of the queue is run, and will leave the queue upon completion 
-when it will be replaced by the next animation in line, if it exists.
+when it will be replaced by the next animation in line, if any.
 
 \subsubsection{Starting an Animation}
 Given a reference \cd{anim} to an Animation that was created using the AnimationManager factory,
@@ -195,7 +195,7 @@ both of which take the animation to pause or resume as their only parameter, and
 indicating whether the animation was successfully paused or resumed.
 
 \subsection{Current Camera Animation}  
-Parallel to the animation mechanism described above, the Animation Manager has a 
+Parallel to the animation mechanism described above, the AnimationManager has a 
 built-in mechanism to animate the current Camera in an interactive fashion. This is
 typically used to implement rate-based scrolling and zooming.
 
