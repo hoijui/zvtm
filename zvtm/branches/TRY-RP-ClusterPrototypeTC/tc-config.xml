@@ -79,20 +79,20 @@
         (actions that normally happens on class instantiation)-->
 		<include>
 			<class-expression>com.xerox.VTM.engine.VirtualSpace</class-expression>
-			<!--	<on-load>
+				<on-load>
 				<execute>
-					<![CDATA[self.vsm = new VirtualSpaceManager();]]>
+					<![CDATA[self.vsm = VirtualSpaceManager.getInstance();]]>
 				</execute>
-			</on-load> -->
+			</on-load> 
          </include>
 		 <include>
 			 <class-expression>*..*</class-expression>
 		 </include>
       </instrumented-classes>
 
-	  <!-- <transient-fields>
+	  <transient-fields>
 		  <field-name>com.xerox.VTM.engine.VirtualSpace.vsm</field-name>
-	  </transient-fields> -->
+	  </transient-fields> 
       <!--Declaring a field of a class a root will make it available for all instances
       of our app that runs via DSO-->
       <roots>
