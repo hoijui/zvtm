@@ -100,22 +100,22 @@ public class VirtualSpace {
     /**get virtual space name*/
     public String getName(){return spaceName;}
 
-	public MetaCamera getMetaCamera(){
+	public synchronized MetaCamera getMetaCamera(){
 		return metaCamera;
 	}
 
-	public void setMetaCamera(MetaCamera metaCamera){
+	public synchronized void setMetaCamera(MetaCamera metaCamera){
 		this.metaCamera = metaCamera;
 	}
 
     /**get virtual space's i-th camera*/
-    public Camera getCamera(int i){return cm.getCamera(i);}
+    public synchronized Camera getCamera(int i){return cm.getCamera(i);}
     
     /**
      *@deprecated As of zvtm 0.9.0, replaced by getCameraListAsArray
      *@see #getCameraListAsArray()
      */
-    public Vector getCameraList(){
+    public synchronized Vector getCameraList(){
 	Vector res=new Vector();
 	for (int i=0;i<cm.cameraList.length;i++){
 	    res.add(cm.cameraList[i]);
@@ -124,10 +124,10 @@ public class VirtualSpace {
     }
 
     /**returns the list of all cameras in this virtual space*/
-    public Camera[] getCameraListAsArray(){return cm.cameraList;}
+    public synchronized Camera[] getCameraListAsArray(){return cm.cameraList;}
 
     /**create a new camera*/
-    Camera createCamera(){
+    synchronized Camera createCamera(){
 	Camera c=cm.addCamera();
 	Vector[] newDrawnListList=new Vector[camera2drawnList.length+1];  //create a new drawnList for it
 	System.arraycopy(camera2drawnList,0,newDrawnListList,0,camera2drawnList.length);
@@ -145,7 +145,7 @@ public class VirtualSpace {
      * when a camera is destroyed, its index is not reused for another one - so if camera number #3 is removed and then a new camera is added it will be assigned number #4 even though there is no camera at index #3 any longer
      *@param i index of camera in virtual space
      */
-    public void removeCamera(int i){
+    public synchronized void removeCamera(int i){
 	if (cm.cameraList.length>i){
 	    for (int j=0;j<vsm.allViews.length;j++){
 		if (vsm.allViews[j].cameras.contains(cm.getCamera(i))){
@@ -162,7 +162,7 @@ public class VirtualSpace {
     }
 
 	/**destroy this virtual space - call method in virtual space manager*/
-	protected void destroy(){
+	protected synchronized void destroy(){
 		for (int i=0;i<cm.cameraList.length;i++){
 			this.removeCamera(i);
 		}
@@ -172,7 +172,7 @@ public class VirtualSpace {
 	}
 
     /**add glyph g to this space*/
-    void addGlyph(Glyph g){
+    synchronized void addGlyph(Glyph g){
 	g.initCams(cm.cameraList.length);
 	visualEnts.add(g);
 	addGlyphToDrawingList(g);
@@ -595,3 +595,4 @@ public class VirtualSpace {
     }
 
 }
+

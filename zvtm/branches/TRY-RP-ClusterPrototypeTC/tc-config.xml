@@ -75,23 +75,42 @@
         When DSO finds that an object is already available from the server, additional instances
         of the app will simply receive a reference to that object, and its constructor will not
         be called - transient fields will not be initialized, use the 'on-load' declaration to
-        indicate actionsthat the class need to take when DSO loads that object from the server
-        (actions that normally happens on class instantiation)-->
+		indicate actionsthat the class need to take when DSO loads that object from the server
+		(actions that normally happens on class instantiation)-->
+		<include>
+			<class-expression>*..*</class-expression>
+		</include>
 		<include>
 			<class-expression>com.xerox.VTM.engine.VirtualSpace</class-expression>
-				<on-load>
+			<on-load>
 				<execute>
-					<![CDATA[self.vsm = VirtualSpaceManager.getInstance();]]>
+					<![CDATA[self.vsm = com.xerox.VTM.engine.VirtualSpaceManager.getInstance(); System.out.println("[vs]Frankenstein VSM created");]]>
 				</execute>
 			</on-load> 
-         </include>
-		 <include>
-			 <class-expression>*..*</class-expression>
-		 </include>
+		</include>
+		<include>
+			<class-expression>com.xerox.VTM.glyphs.Glyph</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.vsm = com.xerox.VTM.engine.VirtualSpaceManager.getInstance(); System.out.println("[glyph]Frankenstein VSM created");]]>
+				</execute>
+			</on-load> 
+		</include>
+		<include>
+			<class-expression>com.xerox.VTM.engine.Camera</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.view = null; System.out.println("[camera]null owning view set");]]>
+				</execute>
+			</on-load> 
+		</include>
+
       </instrumented-classes>
 
 	  <transient-fields>
 		  <field-name>com.xerox.VTM.engine.VirtualSpace.vsm</field-name>
+		  <field-name>com.xerox.VTM.glyphs.Glyph.vsm</field-name>
+		  <field-name>com.xerox.VTM.engine.Camera.view</field-name>
 	  </transient-fields> 
       <!--Declaring a field of a class a root will make it available for all instances
       of our app that runs via DSO-->
@@ -113,8 +132,33 @@
 			<method-expression>* net.claribole.zvtm.cluster.ZCountDownLatch.await(..)</method-expression>
 			<lock-level>write</lock-level>
 		</autolock>
+		<autolock auto-synchronized="false">
+			<method-expression>* com.xerox.VTM.engine.VirtualSpace.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+		<autolock auto-synchronized="false">
+			<method-expression>* com.xerox.VTM.engine.VirtualSpaceManager.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+
+		<autolock auto-synchronized="false">
+			<method-expression>* com.xerox.VTM.engine.Camera.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+		<autolock auto-synchronized="false">
+			<method-expression>* com.xerox.VTM.glyphs.Glyph.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+		<autolock auto-synchronized="false">
+			<method-expression>* com.xerox.VTM.engine.StdViewPanel.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+
 	</locks>
 
+	<distributed-methods>
+		<method-expression>* com.xerox.VTM.engine.VirtualSpaceManager.repaintNow(..)</method-expression>
+	</distributed-methods>
     </dso>
   </application>
 </tc:tc-config>

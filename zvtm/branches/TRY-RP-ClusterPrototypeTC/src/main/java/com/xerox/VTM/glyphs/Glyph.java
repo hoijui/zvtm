@@ -61,14 +61,14 @@ public abstract class Glyph implements Cloneable {
     String type;
 
     /** Get this glyph's ID. */
-    public Long getID(){
+    public synchronized Long getID(){
 	return ID;
     }
 
     /** Set this glyph's ID.
      * Set internally by ZVTM. If tampering, make sure there is no conflict.
      */
-    public void setID(Long ident){
+    public synchronized void setID(Long ident){
 	ID = ident;
     }
 
@@ -287,7 +287,7 @@ public abstract class Glyph implements Cloneable {
      *@see com.xerox.VTM.engine.VirtualSpaceManager#setMouseInsideGlyphColor(Color c, boolean propagate)
      *@see com.xerox.VTM.engine.VirtualSpaceManager#setMouseInsideGlyphColor(Color c)
      */
-    public void setMouseInsideHighlightColor(Color c){
+    public synchronized void setMouseInsideHighlightColor(Color c){
 		this.mouseInsideColor = c;
     }
 
@@ -777,10 +777,10 @@ public abstract class Glyph implements Cloneable {
     //     and we can get the VSM from it
 
     /** Reference to owning VSM. */
-    public VirtualSpaceManager vsm;
+    protected VirtualSpaceManager vsm = VirtualSpaceManager.getInstance(); // XXX set to be a singleton
 
     /** Set a reference to the virtual space manager. Called internally. */
-    public void setVSM(VirtualSpaceManager v){this.vsm=v;}
+    public void setVSM(VirtualSpaceManager v){} //XXX disabled
 
     /*-------------Cloning--------------------------------------*/
 

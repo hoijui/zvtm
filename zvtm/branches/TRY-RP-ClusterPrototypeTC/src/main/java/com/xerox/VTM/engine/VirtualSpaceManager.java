@@ -291,7 +291,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param g glyph
      *@param vs virtual space name
      */
-    public Glyph addGlyph(Glyph g, String vs){
+    public synchronized Glyph addGlyph(Glyph g, String vs){
 	return addGlyph(g, vs, true);
     }
 
@@ -299,7 +299,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param g glyph
      *@param vs virtual space
      */
-    public Glyph addGlyph(Glyph g, VirtualSpace vs){
+    public synchronized Glyph addGlyph(Glyph g, VirtualSpace vs){
 	return addGlyph(g, vs, true);
     }
 
@@ -308,7 +308,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param vs virtual space name
      *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
      */
-    public Glyph addGlyph(Glyph g, String vs, boolean repaint){
+    public synchronized Glyph addGlyph(Glyph g, String vs, boolean repaint){
 	if (g!=null){
 	    if (allVirtualSpaces.containsKey(vs)){
 		VirtualSpace tvs = (VirtualSpace)allVirtualSpaces.get(vs);
@@ -324,7 +324,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param vs virtual space
      *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
      */
-    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean repaint){
+    public synchronized Glyph addGlyph(Glyph g, VirtualSpace vs, boolean repaint){
 	return addGlyph(g, vs, true, repaint);
     }
 
@@ -334,11 +334,11 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param initColors false -> do not initalize mouse inside and selected colors
      *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
      */
-    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean initColors, boolean repaint){
+    public synchronized Glyph addGlyph(Glyph g, VirtualSpace vs, boolean initColors, boolean repaint){
 	if (g!=null && vs!=null){
 	    vs.addGlyph(g);
 	    g.setID(new Long(nextID++));
-	    g.setVSM(this);
+	   // g.setVSM(this);
 	    if (initColors){
 		g.setMouseInsideHighlightColor(this.mouseInsideColor);
 	    }

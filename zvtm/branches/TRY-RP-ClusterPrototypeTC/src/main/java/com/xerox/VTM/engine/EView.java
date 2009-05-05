@@ -68,7 +68,7 @@ public class EView extends View implements KeyListener{
 	name=t;
 	parent=vsm;
 	detectMultipleFullFills=vsm.defaultMultiFill;
-	initCameras(v);   //vector -> cast elements as "Camera"
+	//initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
 	Container cpane=frame.getContentPane();
@@ -133,7 +133,7 @@ public class EView extends View implements KeyListener{
 	mouse=new VCursor(this);
 	name=t;
 	parent=vsm;
-	initCameras(v);   //vector -> cast elements as "Camera"
+	//initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
 	Container cpane=frame.getContentPane();

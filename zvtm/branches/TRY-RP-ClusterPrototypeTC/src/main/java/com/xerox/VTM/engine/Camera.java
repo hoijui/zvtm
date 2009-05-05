@@ -23,6 +23,7 @@
 package com.xerox.VTM.engine;
 
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.claribole.zvtm.engine.CameraListener;
@@ -73,7 +74,7 @@ public class Camera {
     boolean shouldRepaint=false;
 
     //"listeners" is traversed a lot more often than it is mutated.
-    private final List<CameraListener> listeners = new CopyOnWriteArrayList<CameraListener>();
+    private final List<CameraListener> listeners = new Vector<CameraListener>();
     
     /** 
      * @param x initial X coordinate
@@ -140,7 +141,7 @@ public class Camera {
     }
 
     /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
-    public void move(double x,double y){
+    public synchronized void move(double x,double y){
         dposx += x;
         dposy += y;
         posx = Math.round(dposx);
@@ -153,7 +154,7 @@ public class Camera {
     }
     
     /**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
-    public void moveTo(long x,long y){
+    public synchronized void moveTo(long x,long y){
 	posx = x;
 	posy = y;
 	updatePrecisePosition();
@@ -169,7 +170,7 @@ public class Camera {
      * Do not automatically refresh associated view.
      *@param a new altitude value
      */
-    public void setAltitude(float a){
+    public synchronized void setAltitude(float a){
 	setAltitude(a, false);
     }
 
@@ -178,7 +179,7 @@ public class Camera {
      * Do not automatically refresh associated view.
      *@param a offset value
      */
-    public void altitudeOffset(float a){
+    public synchronized void altitudeOffset(float a){
 	altitudeOffset(a, false);
     }
 
@@ -188,7 +189,7 @@ public class Camera {
      *@param a new altitude value
      *@param repaint refresh the associated view or not
      */
-    public void setAltitude(float a, boolean repaint){
+    public synchronized void setAltitude(float a, boolean repaint){
 	float oldAlt = altitude;
 	if (a>=parentSpace.vsm.zoomFloor){altitude=a;}  //test prevents incorrect altitudes
 	else {altitude=parentSpace.vsm.zoomFloor;}
@@ -204,7 +205,7 @@ public class Camera {
      *@param a offset value
      *@param repaint refresh the associated view or not
      */
-    public void altitudeOffset(float a, boolean repaint){
+    public synchronized void altitudeOffset(float a, boolean repaint){
 	float oldAlt = altitude;
 	if ((altitude+a)>parentSpace.vsm.zoomFloor){altitude+=a;}   //test prevents incorrect altitudes
 	else {altitude=parentSpace.vsm.zoomFloor;}
@@ -322,14 +323,14 @@ public class Camera {
     /**
      * get camera ID
      */
-    public Integer getID(){
+    public synchronized Integer getID(){
 	return ID;
     }
 
     /**
      * set new ID for this camera (make sure there is no conflict)
      */
-    public void setID(Integer ident){
+    public synchronized void setID(Integer ident){
 	ID=ident;
     }
 
