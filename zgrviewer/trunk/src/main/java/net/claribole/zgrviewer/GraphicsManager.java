@@ -69,6 +69,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.TransitionManager;
 import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 
@@ -1175,7 +1176,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	/* ----------------------- Link sliding navigation ----------------------------------- */
 	
-	static final int SLIDER_CURSOR_SIZE = 12;
+	static final int SLIDER_CURSOR_SIZE = 6;
 	
 	boolean isLinkSliding = false;
 	LinkSliderCalc lsc;
@@ -1235,8 +1236,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}
 	}
 	
-	void startLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
-		mainView.getCursor().setVisibility(false);
+	void startLinkSliding(final long press_vx, final long press_vy, int scr_x, int scr_y){
+	    Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
+	                                                                                          SlowInSlowOutInterpolator.getInstance(), new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy);}});
+	    vsm.getAnimationManager().startAnimation(a, false);
+		//mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
 		screen_cursor_x = scr_x;
 		screen_cursor_y = scr_y;
@@ -1245,10 +1249,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 			slidingLinkActualColor = slidingLink.getColor();
 			slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
 			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), mainView.getVisibleRegionWidth(mainCamera));
-			slideCursor = new CircleNR(0, 0, 0, SLIDER_CURSOR_SIZE, ConfigManager.HIGHLIGHT_COLOR, ConfigManager.HIGHLIGHT_COLOR);
-			slideCursor.setDrawBorder(false);
+			slideCursor = new CircleNR(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, Color.WHITE, ConfigManager.HIGHLIGHT_COLOR);
+			slideCursor.setStrokeWidth(3.0f);
 			vsm.addGlyph(slideCursor, mSpace);
-			mSpace.atBottom(slideCursor);
 		}
 		catch (java.awt.AWTException e){ 
 			e.printStackTrace();
@@ -1257,12 +1260,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	void linkSlider(long vx, long vy){
 		mPos.setLocation(vx, vy);
-		awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
+		//awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
 		lsc.updateMousePosition(mPos);
 		cPos = lsc.getPositionAlongPath();
 		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
 		mainCamera.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
-		mainCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
+		//mainCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
 	}
 	
 	void endLinkSliding(){
