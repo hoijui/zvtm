@@ -71,20 +71,20 @@ public class VirtualSpace {
     public VirtualSpaceManager vsm;
 
     /**camera manager for this virtual space*/
-    CameraManager cm;
+    private CameraManager cm;
 
     /** All glyphs in this virtual space, visible or not. Glyph instances. */
-    Vector visualEnts;
+    private Vector visualEnts;
 
     /** Visible glyphs. Ordering is important: biggest index gets drawn on top.<br>
         Shared by all cameras in the virtual space as it is the same for all of them. */
-    Glyph[] drawingList;
+    private Glyph[] drawingList;
 
     /** List of glyphs draw for a given camera. Vector contains Glyph instances. */
-    Vector[] camera2drawnList;
+    private Vector[] camera2drawnList;
     //sharing drawnList was causing a problem ; we now have one for each camera
 
-	MetaCamera metaCamera;
+	private MetaCamera metaCamera;
 
     /**
      *@param n virtual space name
@@ -179,7 +179,7 @@ public class VirtualSpace {
     }
 
     /** Get all glyphs in this space, visible or not, sensitive or not.
-     * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
+     * IMPORTANT: Read-only. Do not tamper with this data structure unless you know what you are doing.
      * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
      */
     public Vector getAllGlyphs(){
