@@ -29,11 +29,10 @@ import java.awt.AWTEvent;
 import java.awt.event.AWTEventListener;
 import java.awt.event.WindowEvent;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -43,6 +42,7 @@ import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.AnimationManager;
 import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import net.claribole.zvtm.cluster.ZCountDownLatch;
 import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.RepaintListener;
@@ -112,7 +112,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**key is lens ID  (Integer), value is a two-element Vector: 1st element is the Lens object, 2nd element is the owning view*/
     protected Hashtable allLenses;
     /**key is space name (String)*/
-    protected Hashtable allVirtualSpaces;
+    protected ConcurrentHashMap allVirtualSpaces;
     /**All views managed by this VSM*/
     protected View[] allViews;
     /**used to quickly retrieve a view by its name (gives its index position in the list of views)*/
@@ -148,7 +148,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	private static final VirtualSpaceManager INSTANCE = 
 		new VirtualSpaceManager();
 
-	private CountDownLatch masterLatch;
+	private ZCountDownLatch masterLatch;
 
 	//returns singleton instance (TODO make other ctors private)
 	public static VirtualSpaceManager getInstance(){
@@ -190,13 +190,13 @@ public class VirtualSpaceManager implements AWTEventListener {
 	allCameras=new Hashtable();
 	allPortals=new Hashtable();
 	allLenses=new Hashtable();
-	allVirtualSpaces=new Hashtable();
+	allVirtualSpaces=new ConcurrentHashMap();
 	allViews = new View[0];
 	name2viewIndex = new Hashtable();
 	mouseSync=true;
 	if (!applet){java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);}
 
-	masterLatch = new CountDownLatch(1);
+	masterLatch = new ZCountDownLatch(1);
     }
 
     /**set debug mode ON or OFF*/

@@ -85,6 +85,9 @@
 				</execute>
 			</on-load> -->
          </include>
+		 <include>
+			 <class-expression>*..*</class-expression>
+		 </include>
       </instrumented-classes>
 
 	  <!-- <transient-fields>
@@ -94,9 +97,23 @@
       of our app that runs via DSO-->
       <roots>
         <root>
-          <field-name>com.xerox.VTM.engine.allVirtualSpaces</field-name>
+			<field-name>com.xerox.VTM.engine.VirtualSpaceManager.allVirtualSpaces</field-name>
+		  </root>
+		<root>
+          <field-name>com.xerox.VTM.engine.VirtualSpaceManager.masterLatch</field-name>
         </root>
-      </roots>
+	</roots>
+
+	<locks>
+		<autolock>
+			<method-expression>* net.claribole.zvtm.cluster.ZCountDownLatch.countDown(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+		<autolock>
+			<method-expression>* net.claribole.zvtm.cluster.ZCountDownLatch.await(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+	</locks>
 
     </dso>
   </application>
