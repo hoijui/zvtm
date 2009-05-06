@@ -129,9 +129,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**value under which a VText is drawn as a segment instead of a text (considered too small to be read). Default is 0.5 - if you raise this value, text that was still displayed as a string will be displayed as a segment and inversely - of course, displaying a line instead of applying affine transformations to strings is faster*/
     float textAsLineCoef=0.5f;
 
-    /**sync mouse cursor and mouse glyph*/
-    public boolean mouseSync;
-
     /**Animation Manager*/
     private final AnimationManager animationManager;
 
@@ -168,7 +165,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	allVirtualSpaces=new Hashtable();
 	allViews = new View[0];
 	name2viewIndex = new Hashtable();
-	mouseSync=true;
 	if (!applet){java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);}
     }
 
@@ -232,12 +228,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	return zoomFloor;
     }
 
-    /**true -&gt; sync mouse cursor and mouse glyph*/
-    public void setMouseSync(boolean b){
-	mouseSync=b;
-	activeView.mouse.setSync(mouseSync);
-    }
-    
     /** Set border color of glyphs overlapped by mouse.
      * Not propagated to existing glyphs.
      *@see #setMouseInsideGlyphColor(Color c, boolean propagate)

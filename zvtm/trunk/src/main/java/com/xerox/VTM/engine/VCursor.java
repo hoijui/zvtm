@@ -166,9 +166,14 @@ public class VCursor {
     /**get the view to which this cursor belongs*/
     public View getOwningView(){return owningView;}
 
-    /**synchronize real mouse cursor and this glyph*/
+    /** Set whether this ZVTM cursor is synchronized with the system cursor or not. */
     public void setSync(boolean b){
-	sync=b;
+	    sync = b;
+    }
+    
+    /** Tells whether this ZVTM cursor is synchronized with the system cursor or not. */
+    public boolean getSync(){
+        return sync;
     }
 
     /**set the mouse cursor color*/

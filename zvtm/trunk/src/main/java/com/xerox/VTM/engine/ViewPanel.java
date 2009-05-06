@@ -515,75 +515,79 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
     }
 
-
     public void mouseMoved(MouseEvent e){
-	try {
-	    if (parent.parent.mouseSync){
-		synchronized(this){
-		    parent.mouse.moveTo(e.getX(),e.getY());
-		    parent.mouse.unProject(cams[activeLayer],this);  //we project the mouse cursor wrt the appropriate coord sys
-		    updateMouseOnly=true;
-		}
-		parent.mouse.propagateMove();  //translate glyphs sticked to mouse
-		// find out is the cursor is inside one (or more) portals
-		updateCursorInsidePortals(e.getX(), e.getY());
-		// forward mouseMoved event to View event handler
-		if (evHs[activeLayer] != null){
-		    if (parent.notifyMouseMoved){
-			evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
-		    }
-		    if (parent.mouse.isSensitive()){
-			if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this.lens)){
-			    parent.repaintNow();
-			}
-		    }
-		}
-	    }
-	}
-	catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousemoved "+ex);ex.printStackTrace();}}
+        try {
+            if (parent.mouse.sync){
+                synchronized(this){
+                    parent.mouse.moveTo(e.getX(),e.getY());
+                    //we project the mouse cursor wrt the appropriate coord sys
+                    parent.mouse.unProject(cams[activeLayer],this);
+                    updateMouseOnly=true;
+                }
+                //translate glyphs sticked to mouse
+                parent.mouse.propagateMove();
+                // find out is the cursor is inside one (or more) portals
+                updateCursorInsidePortals(e.getX(), e.getY());
+                // forward mouseMoved event to View event handler
+                if (evHs[activeLayer] != null){
+                    if (parent.notifyMouseMoved){
+                        evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
+                    }
+                    if (parent.mouse.isSensitive()){
+                        if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this.lens)){
+                            parent.repaintNow();
+                        }
+                    }
+                }
+            }
+        }
+        catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousemoved "+ex);ex.printStackTrace();}}
     }
-    
+
     /**send event to application event handler*/
     public void mouseDragged(MouseEvent e){
-	int whichButton=e.getModifiers();
-	int buttonNumber=0;
-	try {
-	    if (parent.parent.mouseSync){
- 		parent.mouse.moveTo(e.getX(), e.getY());
- 		parent.mouse.unProject(cams[activeLayer],this);  //we project the mouse cursor wrt the appropriate coord sys
- 		parent.mouse.propagateMove();  //translate glyphs sticked to mouse
-		// find out is the cursor is inside one (or more) portals
-		updateCursorInsidePortals(e.getX(), e.getY());
-		if (evHs[activeLayer] != null){
-		    if ((whichButton & InputEvent.BUTTON1_MASK)==InputEvent.BUTTON1_MASK){buttonNumber=1;}
-		    else {
-			if ((whichButton & InputEvent.BUTTON2_MASK)==InputEvent.BUTTON2_MASK){buttonNumber=2;}
-			else {
-			    if ((whichButton & InputEvent.BUTTON3_MASK)==InputEvent.BUTTON3_MASK){buttonNumber=3;}
-			}
-		    }
-		    if (e.isShiftDown()) {//event sent after unproject because we need to compute coord in virtual space
-			if (e.isControlDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.CTRL_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-			else if (e.isMetaDown()){evHs[activeLayer].mouseDragged(this,ViewEventHandler.META_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-			else if (e.isAltDown()){evHs[activeLayer].mouseDragged(this,ViewEventHandler.ALT_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-			else {evHs[activeLayer].mouseDragged(this,ViewEventHandler.SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-		    }
-		    else if (e.isControlDown()){
-			evHs[activeLayer].mouseDragged(this,ViewEventHandler.CTRL_MOD,buttonNumber,e.getX(),e.getY(), e);
-		    }
-		    else {
-			if (e.isMetaDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.META_MOD,buttonNumber,e.getX(),e.getY(), e);}
-			else if (e.isAltDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.ALT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-			else {evHs[activeLayer].mouseDragged(this,ViewEventHandler.NO_MODIFIER,buttonNumber,e.getX(),e.getY(), e);}
-		    }
-		}
-		//assign anyway, even if the current drag command does not want to display a segment
-		curDragx=e.getX();curDragy=e.getY();  
-		parent.repaintNow();
-		if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
-	    }
-	}	
-	catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousedragged "+ex);}}
+        try {
+            if (parent.mouse.sync){
+                int whichButton=e.getModifiers();
+                int buttonNumber=0;
+                parent.mouse.moveTo(e.getX(), e.getY());
+                //we project the mouse cursor wrt the appropriate coord sys
+                parent.mouse.unProject(cams[activeLayer],this);
+                //translate glyphs sticked to mouse
+                parent.mouse.propagateMove();
+                // find out is the cursor is inside one (or more) portals
+                updateCursorInsidePortals(e.getX(), e.getY());
+                if (evHs[activeLayer] != null){
+                    if ((whichButton & InputEvent.BUTTON1_MASK)==InputEvent.BUTTON1_MASK){buttonNumber=1;}
+                    else {
+                        if ((whichButton & InputEvent.BUTTON2_MASK)==InputEvent.BUTTON2_MASK){buttonNumber=2;}
+                        else {
+                            if ((whichButton & InputEvent.BUTTON3_MASK)==InputEvent.BUTTON3_MASK){buttonNumber=3;}
+                        }
+                    }
+                    if (e.isShiftDown()) {
+                        //event sent after unproject because we need to compute coord in virtual space
+                        if (e.isControlDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.CTRL_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else if (e.isMetaDown()){evHs[activeLayer].mouseDragged(this,ViewEventHandler.META_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else if (e.isAltDown()){evHs[activeLayer].mouseDragged(this,ViewEventHandler.ALT_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else {evHs[activeLayer].mouseDragged(this,ViewEventHandler.SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                    }
+                    else if (e.isControlDown()){
+                        evHs[activeLayer].mouseDragged(this,ViewEventHandler.CTRL_MOD,buttonNumber,e.getX(),e.getY(), e);
+                    }
+                    else {
+                        if (e.isMetaDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.META_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else if (e.isAltDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.ALT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else {evHs[activeLayer].mouseDragged(this,ViewEventHandler.NO_MODIFIER,buttonNumber,e.getX(),e.getY(), e);}
+                    }
+                }
+                //assign anyway, even if the current drag command does not want to display a segment
+                curDragx=e.getX();curDragy=e.getY();  
+                parent.repaintNow();
+                if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
+            }
+        }	
+        catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousedragged "+ex);}}
     }
 
     /**send event to application event handler*/
