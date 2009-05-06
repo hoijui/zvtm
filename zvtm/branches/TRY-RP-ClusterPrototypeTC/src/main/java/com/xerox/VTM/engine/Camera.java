@@ -112,6 +112,12 @@ public class Camera {
 	dposy = posy;
     }
 
+	private void testRepaintNow(){
+		if (view != null){
+			parentSpace.vsm.repaintNow(view);
+		}
+	}
+
     /**
      * set camera position (absolute value) - will trigger a repaint, whereas directly assigning values to posx,posy will not
      *@deprecated As of zvtm 0.9.2, replaced by moveTo
@@ -122,9 +128,7 @@ public class Camera {
 	posx = x;
 	posy = y;
 	updatePrecisePosition();
-	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
-	}
+	testRepaintNow();
 	notifyMoved();
     }
 
@@ -134,9 +138,7 @@ public class Camera {
 	posy += y;
 	updatePrecisePosition();
 	propagateMove(x, y);  //take care of sticked glyphs
-	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
-	}
+	testRepaintNow();
 	notifyMoved();
     }
 
@@ -147,10 +149,8 @@ public class Camera {
         posx = Math.round(dposx);
         posy = Math.round(dposy);
         propagateMove(posx, posy);  //take care of sticked glyphs
-        if (view != null){
-            parentSpace.vsm.repaintNow(view);
-        }
-	notifyMoved();
+		testRepaintNow();
+		notifyMoved();
     }
     
     /**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
@@ -159,9 +159,7 @@ public class Camera {
 	posy = y;
 	updatePrecisePosition();
 	propagateMove(x-posx, y-posy);  //take care of sticked glyphs
-	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
-	}
+	testRepaintNow();
 	notifyMoved();
     }
 
@@ -194,9 +192,7 @@ public class Camera {
 	if (a>=parentSpace.vsm.zoomFloor){altitude=a;}  //test prevents incorrect altitudes
 	else {altitude=parentSpace.vsm.zoomFloor;}
 	propagateAltitudeChange(altitude - oldAlt);
-	if (repaint && view != null){
-	    parentSpace.vsm.repaintNow(view);
-	}
+	testRepaintNow();
 	notifyMoved();
     }
 
@@ -210,9 +206,7 @@ public class Camera {
 	if ((altitude+a)>parentSpace.vsm.zoomFloor){altitude+=a;}   //test prevents incorrect altitudes
 	else {altitude=parentSpace.vsm.zoomFloor;}
 	propagateAltitudeChange(altitude - oldAlt);
-	if (repaint && view != null){
-	    parentSpace.vsm.repaintNow(view);
-	}
+	testRepaintNow();
 	notifyMoved();
     }
 
@@ -234,10 +228,8 @@ public class Camera {
         posy = l.vy;
         altitude = l.alt;
         updatePrecisePosition();
-        if (view != null){
-            parentSpace.vsm.repaintNow(view);
-        }
-	notifyMoved();
+		testRepaintNow();
+		notifyMoved();
     }
 
     /**
@@ -560,7 +552,7 @@ public class Camera {
     public void setEnabled(boolean b){
         if (b != enabled){
             enabled = b;
-            parentSpace.vsm.repaintNow(view);
+			testRepaintNow();
         }
     }
 

@@ -113,9 +113,9 @@ public class PViewPanel extends ViewPanel implements Runnable {
 	    loopStartTime = System.currentTimeMillis();
  	    if (notBlank){
 		if (active){
-		    if (repaintNow){
+		    if (shouldRepaint()){
 			try {
-			    repaintNow=false; //do this first as the thread can be interrupted inside
+				shouldRepaint(false);
 			                      //this branch and we want to catch new requests for repaint
 			    updateMouseOnly=false;
 			    size = this.getSize();

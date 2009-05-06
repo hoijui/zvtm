@@ -89,7 +89,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	oldSize=getSize();
 	while (runView==me) {
 	    if (active){
-		if (repaintNow || updateMouseOnly){
+		if (shouldRepaint() || updateMouseOnly){
 		    repaint();
 		    // time to sleep = wanted refresh rate minus time needed to do the actual repaint operations
 		    timeToSleep = frameTime - loopTotalTime;
@@ -131,7 +131,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	// (simply reusing an already declared var instead of creating a new one for nothing)
 	backBufferGraphics = (Graphics2D)g;
 	try {
-	    repaintNow=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
+		shouldRepaint(false);
 	    updateMouseOnly = false;
 	    size = this.getSize();
 	    viewW = size.width;//compute region's width and height

@@ -52,20 +52,20 @@ public class MetaCamera {
 	private void setSlaveCoordinates(){
 		for(int i=0; i<cameras.length; ++i){
 			int row = i % nbY;
-			int col = i / nbX;
+			int col = i / nbY;
 
-			cameras[i].moveTo(col*blockWidth,
-					row*blockHeight);
+			cameras[i].moveTo(posX + col*blockWidth,
+					posY - row*blockHeight);
 		}
 	}
 
 	//relative movement
-	public void move(long deltaX, long deltaY){
+	public synchronized void move(long deltaX, long deltaY){
 		moveTo(posX + deltaX, posY + deltaY);
 	}
 
 	//absolute movement
-	public void moveTo(long x, long y){
+	public synchronized void moveTo(long x, long y){
 		posX = x;
 		posY = y;
 		setSlaveCoordinates();

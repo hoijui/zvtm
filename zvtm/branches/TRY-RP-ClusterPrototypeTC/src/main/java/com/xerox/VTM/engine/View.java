@@ -452,7 +452,7 @@ public abstract class View {
         *@see #repaintNow(RepaintListener rl)
         */
     public void repaintNow(){
-        panel.repaintNow = true;
+        panel.shouldRepaint(true);
     }
 
     /**Call this if you want to repaint this view at once.

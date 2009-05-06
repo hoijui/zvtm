@@ -91,7 +91,16 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     ViewEventHandler[] evHs;
 
     /**repaint only if necessary (when there are animations, when the mouse moves...)*/
-    volatile boolean repaintNow=true;
+    private boolean shouldRepaint =true;
+
+	public synchronized void shouldRepaint(boolean repaint){
+		shouldRepaint = repaint;
+	}
+
+	public synchronized boolean shouldRepaint(){
+		return shouldRepaint;
+	}
+
     RepaintListener repaintListener;
 
     /**only repaint mouse cursor (using XOR mode)*/
@@ -500,7 +509,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**mouse entered this view*/
     public void mouseEntered(MouseEvent e){
 	active=true; //make the view active any time the mouse enters it
-	repaintNow=true;
+	shouldRepaint(true);
 	inside=true;
 	parent.parent.setActiveView(this.parent);
 	/* requesting parent focus was only used to get keyboard/mouse wheel events in IViews,

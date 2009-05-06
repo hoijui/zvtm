@@ -6,7 +6,7 @@
   <!--Server is colocated with client and DSO is listening on
   default port (9510).-->
   <servers>
-    <server host="%i" name="server1">
+    <server host="129.175.11.199" name="server1">
       <dso-port>9510</dso-port>
       <jmx-port>9520</jmx-port>
       <data>target/terracotta/server/data</data>
@@ -150,7 +150,16 @@
 			<lock-level>write</lock-level>
 		</autolock>
 		<autolock auto-synchronized="false">
+			<method-expression>* com.xerox.VTM.engine.ViewPanel.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+
+		<autolock auto-synchronized="false">
 			<method-expression>* com.xerox.VTM.engine.StdViewPanel.*(..)</method-expression>
+			<lock-level>write</lock-level>
+		</autolock>
+		<autolock auto-synchronized="false">
+			<method-expression>* net.claribole.zvtm.cluster.MetaCamera.*(..)</method-expression>
 			<lock-level>write</lock-level>
 		</autolock>
 
@@ -158,7 +167,14 @@
 
 	<distributed-methods>
 		<method-expression>* com.xerox.VTM.engine.VirtualSpaceManager.repaintNow(..)</method-expression>
+		<method-expression>* com.xerox.VTM.engine.Camera.testRepaintNow(..)</method-expression>
+
 	</distributed-methods>
+
+	<additional-boot-jar-classes>
+		<include>java.awt.geom.AffineTransform</include>
+	</additional-boot-jar-classes>
+
     </dso>
   </application>
 </tc:tc-config>

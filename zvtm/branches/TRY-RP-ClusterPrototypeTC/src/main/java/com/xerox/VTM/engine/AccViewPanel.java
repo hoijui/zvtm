@@ -115,8 +115,8 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	    loopStartTime = System.currentTimeMillis();
 	    if (notBlank) {
 		if (active) {
-		    if (repaintNow) {
-			repaintNow = false;// do this first as the thread
+		    if (shouldRepaint()) {
+				shouldRepaint(false);
                                                 // can be interrupted inside
                                                 // this branch and we want to
                                                 // catch new requests for

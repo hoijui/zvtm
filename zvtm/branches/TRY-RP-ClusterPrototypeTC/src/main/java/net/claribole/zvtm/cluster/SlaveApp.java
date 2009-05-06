@@ -30,14 +30,18 @@ public class SlaveApp {
 
 		Vector<Camera> vcam = new Vector<Camera>();
 		vcam.add(vs.getMetaCamera().retrieveCamera(blockNumber));
-		view = vsm.addExternalView(vcam, "slaveView", View.STD_VIEW,
-				400, 300, false, true, true, null);
+		view = vsm.addExternalView(vcam, "slaveView"  + blockNumber, View.STD_VIEW,
+				400, 240, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 		vcam.get(0).setOwningView(view); //XXX test
 	}
 
 	public static void main(String[] args){
-		new SlaveApp(0);
+		if(args.length == 0){
+			new SlaveApp(0);
+		} else {
+			new SlaveApp(Integer.parseInt(args[0]));
+		}
 	}
 }
 

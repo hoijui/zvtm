@@ -153,10 +153,19 @@ $Id$
 					  className="net.claribole.zvtm.cluster.MasterSkel"
 					  arguments="">
 				  </process>
-				  <process nodeName="slave" count="1"
+				  <process nodeName="slave0" count="1"
 					  className="net.claribole.zvtm.cluster.SlaveApp"
-					  arguments="">
+					  arguments="0">
 				  </process>
+				  <process nodeName="slave1" count="1"
+					  className="net.claribole.zvtm.cluster.SlaveApp"
+					  arguments="1">
+				  </process>
+				  <process nodeName="slave2" count="1"
+					  className="net.claribole.zvtm.cluster.SlaveApp"
+					  arguments="2">
+				  </process>
+
 			  </processes>
 			  <startServer>true</startServer>
 		  </configuration>
