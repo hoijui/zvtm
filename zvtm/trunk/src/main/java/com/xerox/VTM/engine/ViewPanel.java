@@ -514,10 +514,30 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	inside=false;
 	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
     }
+    
+    int ix,iy = -1;
+    
+    /** Set a particular point in view panel coordinates for which mouse move/drag events should be ignored.
+     * This is useful, e.g., to completely ignore mouse repositioning events triggered by an AWT Robot.
+     *@param x x-coordinate in the JPanel's system
+     *@param y y-coordinate in the JPanel's system
+     */
+    public void setNoEventCoordinates(int x, int y){
+        ix = x;
+        iy = y;
+    }
+    
+    /** Get the coordinates of a particular point in view panel coordinates for which mouse move/drag events are ignored, if any.
+     * Such a point is useful, e.g., to completely ignore mouse repositioning events triggered by an AWT Robot.
+     *@return (x,y) coordinates of the point in the JPanel's system
+     */
+    public Point getNoEventCoordinates(){
+        return (ix != -1 && iy != -1) ? new Point(ix, iy) : null;
+    }
 
     public void mouseMoved(MouseEvent e){
         try {
-            if (parent.mouse.sync){
+            if (parent.mouse.sync && (e.getX() != ix || e.getY() != iy)){
                 synchronized(this){
                     parent.mouse.moveTo(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
@@ -547,12 +567,14 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**send event to application event handler*/
     public void mouseDragged(MouseEvent e){
         try {
-            if (parent.mouse.sync){
+            if (parent.mouse.sync && (e.getX() != ix || e.getY() != iy)){
                 int whichButton=e.getModifiers();
                 int buttonNumber=0;
-                parent.mouse.moveTo(e.getX(), e.getY());
-                //we project the mouse cursor wrt the appropriate coord sys
-                parent.mouse.unProject(cams[activeLayer],this);
+                synchronized(this){
+                    parent.mouse.moveTo(e.getX(), e.getY());
+                    //we project the mouse cursor wrt the appropriate coord sys
+                    parent.mouse.unProject(cams[activeLayer], this);                    
+                }
                 //translate glyphs sticked to mouse
                 parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
