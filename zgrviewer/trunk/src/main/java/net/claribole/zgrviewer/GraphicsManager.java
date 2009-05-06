@@ -1177,6 +1177,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	/* ----------------------- Link sliding navigation ----------------------------------- */
 	
 	static final int SLIDER_CURSOR_SIZE = 6;
+	static final Color SLIDER_CURSOR_FILL = Color.WHITE;
 	
 	boolean isLinkSliding = false;
 	LinkSliderCalc lsc;
@@ -1236,31 +1237,33 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}
 	}
 	
-	void startLinkSliding(final long press_vx, final long press_vy, int scr_x, int scr_y){
-	    Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
-	                                                                                          SlowInSlowOutInterpolator.getInstance(), new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy);}});
-	    vsm.getAnimationManager().startAnimation(a, false);
-		//mainView.getCursor().setVisibility(false);
+	void startLinkSliding(final long press_vx, final long press_vy, int px, int py){
+		mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
-		screen_cursor_x = scr_x;
-		screen_cursor_y = scr_y;
+		screen_cursor_x = px + panelWidth/2;
+		screen_cursor_y = py + panelHeight/2;
+		mainView.getPanel().setNoEventCoordinates(panelWidth/2, panelHeight/2);
 		try {
 			awtRobot = new Robot();
-			slidingLinkActualColor = slidingLink.getColor();
-			slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
-			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), mainView.getVisibleRegionWidth(mainCamera));
-			slideCursor = new CircleNR(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, Color.WHITE, ConfigManager.HIGHLIGHT_COLOR);
-			slideCursor.setStrokeWidth(3.0f);
-			vsm.addGlyph(slideCursor, mSpace);
 		}
 		catch (java.awt.AWTException e){ 
 			e.printStackTrace();
 		}
+		slidingLinkActualColor = slidingLink.getColor();
+		slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
+		lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), mainView.getVisibleRegionWidth(mainCamera));
+		slideCursor = new CircleNR(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
+		slideCursor.setStrokeWidth(SLIDER_CURSOR_SIZE/2.0f);
+		vsm.addGlyph(slideCursor, mSpace);
+	    Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
+	                                                                                          SlowInSlowOutInterpolator.getInstance(),
+	                                                                                          new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy);}});
+	    vsm.getAnimationManager().startAnimation(a, false);
 	}
 	
 	void linkSlider(long vx, long vy){
 		mPos.setLocation(vx, vy);
-		//awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
+		awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
 		lsc.updateMousePosition(mPos);
 		cPos = lsc.getPositionAlongPath();
 		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));

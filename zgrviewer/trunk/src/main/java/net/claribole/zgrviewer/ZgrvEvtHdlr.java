@@ -73,7 +73,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
                 relative = e.getPoint();
                 LS_SX = v.getVCursor().vx;
                 LS_SY = v.getVCursor().vy;
-                grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x+relative.x, location.y+relative.y);
+                grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
             }
 			else {
 				grMngr.rememberLocation(v.cams[0].getLocation());
@@ -294,10 +294,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
 		if (grMngr.isLinkSliding){
-			if (jpx != relative.x || jpy != relative.y){
-				// ignore events triggered by AWT robot
-				grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy);
-			}				
+			// ignore events triggered by AWT robot
+			grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy);
 		}
 		else if (mod != ALT_MOD && buttonNumber == 1){
 			if (draggingZoomWindow){
