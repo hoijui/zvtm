@@ -102,7 +102,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    if (!toolPaletteIsActive && !v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
+	    if (ConfigManager.DYNASPOT && !toolPaletteIsActive && !v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
 		if (grMngr.isBringingAndGoing){
 			grMngr.endBringAndGo(v.lastGlyphEntered());
 		}
@@ -293,6 +293,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
+		if (v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		if (grMngr.isLinkSliding){
 			// ignore events triggered by AWT robot
 			grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy);
@@ -343,9 +344,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 					}
 				}
 			}
-		}
-		else {
-		    if (v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		}
 		if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
 			grMngr.moveLens(jpx, jpy, e.getWhen());
