@@ -1192,49 +1192,50 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	Robot awtRobot;
 	
 	void attemptLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
-		LNode closestNode = lstruct.nodes[0];
-		ClosedShape nodeShape = closestNode.getShape();
-		double shortestDistance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
-		double distance;
-		for (int i=1;i<lstruct.nodes.length;i++){
-			nodeShape = lstruct.nodes[i].getShape();
-			distance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
-			if (distance < shortestDistance){
-				closestNode = lstruct.nodes[i];
-				shortestDistance = distance;
-			}
-		}
-		if (shortestDistance < 3*closestNode.getShape().getSize()){
-			// if clicked near a node, select edge connected to this node closest to the click point
-			LEdge[] arcs = closestNode.getAllArcs();
-			if (arcs.length == 0){return;}
-			long vieww = mainView.getVisibleRegionWidth(mainCamera);
-			slidingLink = arcs[0].getSpline();
-			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
-			mPos.setLocation(press_vx, press_vy);
-			lsc.updateMousePosition(mPos);
-			cPos = lsc.getPositionAlongPath();
-			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
-			for (int i=1;i<arcs.length;i++){
-				lsc = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
-				lsc.updateMousePosition(mPos);
-				cPos = lsc.getPositionAlongPath();
-				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
-				if (distance < shortestDistance){
-					shortestDistance = distance;
-					slidingLink = arcs[i].getSpline();
-				}
-			}
-			startLinkSliding(press_vx, press_vy, scr_x, scr_y);
-		}
-		else {
-			// else select the edge hovered by the cursor (if any)
-			Vector pum = mainView.getCursor().getIntersectingPaths(mainCamera, 10);
-			if (pum.size() > 0){
-				slidingLink = (DPathST)pum.firstElement();
-				startLinkSliding(press_vx, press_vy, scr_x, scr_y);
-			}
-		}
+	    if (lstruct != null){
+    		LNode closestNode = lstruct.nodes[0];
+    		ClosedShape nodeShape = closestNode.getShape();
+    		double shortestDistance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+    		double distance;
+    		for (int i=1;i<lstruct.nodes.length;i++){
+    			nodeShape = lstruct.nodes[i].getShape();
+    			distance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+    			if (distance < shortestDistance){
+    				closestNode = lstruct.nodes[i];
+    				shortestDistance = distance;
+    			}
+    		}
+    		if (shortestDistance < closestNode.getShape().getSize()){
+    			// if clicked near a node, select edge connected to this node closest to the click point
+    			LEdge[] arcs = closestNode.getAllArcs();
+    			if (arcs.length == 0){return;}
+    			long vieww = mainView.getVisibleRegionWidth(mainCamera);
+    			slidingLink = arcs[0].getSpline();
+    			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
+    			mPos.setLocation(press_vx, press_vy);
+    			lsc.updateMousePosition(mPos);
+    			cPos = lsc.getPositionAlongPath();
+    			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+    			for (int i=1;i<arcs.length;i++){
+    				lsc = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
+    				lsc.updateMousePosition(mPos);
+    				cPos = lsc.getPositionAlongPath();
+    				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+    				if (distance < shortestDistance){
+    					shortestDistance = distance;
+    					slidingLink = arcs[i].getSpline();
+    				}
+    			}
+    			startLinkSliding(press_vx, press_vy, scr_x, scr_y);
+    			return;
+    		}
+	    }
+        // else select the edge hovered by the cursor (if any) - works even if no knowledge about logical structure
+        Vector pum = mainView.getCursor().getIntersectingPaths(mainCamera, 10);
+        if (pum.size() > 0){
+            slidingLink = (DPathST)pum.firstElement();
+            startLinkSliding(press_vx, press_vy, scr_x, scr_y);
+        }
 	}
 	
 	void startLinkSliding(final long press_vx, final long press_vy, int px, int py){
