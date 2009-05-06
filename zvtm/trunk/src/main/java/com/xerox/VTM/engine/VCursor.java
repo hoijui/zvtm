@@ -592,6 +592,14 @@ public class VCursor {
 	}
 	else return new Glyph[0];
     }
+    
+    /** Tells whether a given glyph is under this cursor. */
+    public boolean isUnderCursor(Glyph g){
+        for (int i=0;i<=maxIndex;i++){
+            if (glyphsUnderMouse[i] == g){return true;}
+        }
+        return false;
+    }
 
     /**remove glyph g in list of glyphs under mouse if it is present (called when destroying a glyph)*/
     void removeGlyphFromList(Glyph g){
