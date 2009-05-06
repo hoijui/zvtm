@@ -322,7 +322,7 @@ public class ZGRViewer implements ZGRApplication {
 	    if (Utils.osIsWindows() || Utils.osIsMacOS()){PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_MAIN_ALPHA);}
 	    PieMenuFactory.setSensitivityRadius(0.5);
 	    PieMenuFactory.setAngle(-Math.PI/2.0);
-	    PieMenuFactory.setRadius(150);
+	    PieMenuFactory.setRadius(100);
 	    mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, grMngr.mainView, grMngr.vsm);
 	    Glyph[] items = mainPieMenu.getItems();
 	    items[0].setType(Messages.PM_ENTRY);
@@ -348,7 +348,7 @@ public class ZGRViewer implements ZGRApplication {
 		PieMenuFactory.setSelectedItemBorderColor(null);
 		PieMenuFactory.setSensitivityRadius(1.0);
 	    if (Utils.osIsWindows() || Utils.osIsMacOS()){PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_SUB_ALPHA);}
-		PieMenuFactory.setRadius(120);
+		PieMenuFactory.setRadius(100);
 		Glyph[] items;
 		if (label == Messages.PM_FILE){
 		    subPieMenu = PieMenuFactory.createPieMenu(Messages.fileMenuLabels, Messages.fileMenuLabelOffsets, 0 , grMngr.mainView, grMngr.vsm);
@@ -358,7 +358,7 @@ public class ZGRViewer implements ZGRApplication {
 		    }
 		}
 		else if (label == Messages.PM_EXPORT){
-		    subPieMenu = PieMenuFactory.createPieMenu(Messages.exportMenuLabels, 0 , grMngr.mainView, grMngr.vsm);
+		    subPieMenu = PieMenuFactory.createPieMenu(Messages.exportMenuLabels, Messages.exportMenuLabelOffsets, 0 , grMngr.mainView, grMngr.vsm);
 		    items = subPieMenu.getItems();
 		    for (int i=0;i<items.length;i++){
 			items[i].setType(Messages.PM_ENTRY);

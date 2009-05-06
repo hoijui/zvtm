@@ -80,27 +80,28 @@ public class Messages {
     static final String PM_GLOBALVIEW = "Global View";
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_FILE, PM_BACK, PM_EXPORT};
-    static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(0, 0), new LongPoint(0, 0),
-						     new LongPoint(0, 0), new LongPoint(0, -10)};
+    static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(5, -4), new LongPoint(0, 4),
+						     new LongPoint(-5, -4), new LongPoint(0, -15)};
 
-    static final String PM_OPENDOTSVG = "Dot (SVG)...";
-    static final String PM_OPENCIRCOSVG = "Circo (SVG)...";
-    static final String PM_OPENNEATOSVG = "Neato (SVG)...";
-    static final String PM_OPENTWOPISVG = "Twopi (SVG)...";
-    static final String PM_OPENSVG = "SVG...";
-    static final String PM_OPENOTHER = "Other (SVG)...";
+    static final String PM_OPENDOTSVG = "Dot (SVG)";
+    static final String PM_OPENCIRCOSVG = "Circo (SVG)";
+    static final String PM_OPENNEATOSVG = "Neato (SVG)";
+    static final String PM_OPENTWOPISVG = "Twopi (SVG)";
+    static final String PM_OPENSVG = "SVG";
+    static final String PM_OPENOTHER = "Other (SVG)";
 
     static final String[] fileMenuLabels = {PM_OPENSVG, PM_OPENCIRCOSVG, PM_OPENDOTSVG,
 					    PM_OPENNEATOSVG, PM_OPENTWOPISVG, PM_OPENOTHER};
-    static final LongPoint[] fileMenuLabelOffsets = {new LongPoint(30, 0), new LongPoint(20, 0),
-						     new LongPoint(0, 10), new LongPoint(-10, 0),
-						     new LongPoint(-10, 0), new LongPoint(0, -30)};
+    static final LongPoint[] fileMenuLabelOffsets = {new LongPoint(16, 6), new LongPoint(16, -10),
+						     new LongPoint(0, 20), new LongPoint(-10, -10),
+						     new LongPoint(-10, 6), new LongPoint(0, -32)};
 
-    static final String PM_EXPSVG = "Export (SVG)...";
-    static final String PM_EXPPNG = "Export (PNG)...";
-    static final String PM_EXPPRINT = "Print...";
+    static final String PM_EXPSVG = "Export (SVG)";
+    static final String PM_EXPPNG = "Export (PNG)";
+    static final String PM_EXPPRINT = "Print";
 
     static final String[] exportMenuLabels = {PM_EXPSVG, PM_EXPPNG, PM_EXPPRINT};
+    static final LongPoint[] exportMenuLabelOffsets = {new LongPoint(4, 0), new LongPoint(-2, 0), new LongPoint(4, -10)};
 
     static final String LOADING_SVG = "Loading Graphviz/SVG...";
 
