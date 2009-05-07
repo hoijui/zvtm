@@ -48,6 +48,7 @@ import net.claribole.zvtm.lens.FSGaussianLens;
 import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.Java2DPainter;
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.engine.View;
@@ -1179,22 +1180,33 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final int SLIDER_CURSOR_SIZE = 6;
 	static final Color SLIDER_CURSOR_FILL = Color.WHITE;
 	
+	static final int SELECTION_RADIUS = 100;
+	static final Color SELECTION_RADIUS_COLOR = Color.RED;
+	
 	boolean isLinkSliding = false;
-	LinkSliderCalc lsc;
+	LinkSliderCalc[] lscs;
+	int lsci = -1;
+	
 	DPathST slidingLink;
 	Color slidingLinkActualColor = null;
 	Point2D mPos = new Point2D.Double();
 	
-	CircleNR slideCursor;
+	CircleNR slideCursor, selectionRadius;
 	Point2D cPos;
+
+    LNode closestNode;
 
 	int screen_cursor_x,screen_cursor_y;
 	Robot awtRobot;
 	
+	Point2D mtPos = new Point2D.Double();
+	
 	void attemptLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
+		long vieww = mainView.getVisibleRegionWidth(mainCamera);
+		lsci = 0;
 	    if (lstruct != null){
-    		LNode closestNode = lstruct.nodes[0];
-    		ClosedShape nodeShape = closestNode.getShape();
+    		closestNode = lstruct.nodes[0];
+            ClosedShape nodeShape = closestNode.getShape();
     		double shortestDistance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
     		double distance;
     		for (int i=1;i<lstruct.nodes.length;i++){
@@ -1205,25 +1217,26 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     				shortestDistance = distance;
     			}
     		}
-    		if (shortestDistance < closestNode.getShape().getSize()){
+    		if (shortestDistance < 2*closestNode.getShape().getSize()){
     			// if clicked near a node, select edge connected to this node closest to the click point
     			LEdge[] arcs = closestNode.getAllArcs();
     			if (arcs.length == 0){return;}
-    			long vieww = mainView.getVisibleRegionWidth(mainCamera);
+    			lscs = new LinkSliderCalc[arcs.length];
     			slidingLink = arcs[0].getSpline();
-    			lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
+    			lscs[0] = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
     			mPos.setLocation(press_vx, press_vy);
-    			lsc.updateMousePosition(mPos);
-    			cPos = lsc.getPositionAlongPath();
+    			lscs[0].updateMousePosition(mPos);
+    			cPos = lscs[0].getPositionAlongPath();
     			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
     			for (int i=1;i<arcs.length;i++){
-    				lsc = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
-    				lsc.updateMousePosition(mPos);
-    				cPos = lsc.getPositionAlongPath();
+    				lscs[i] = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
+    				lscs[i].updateMousePosition(mPos);
+    				cPos = lscs[i].getPositionAlongPath();
     				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
     				if (distance < shortestDistance){
     					shortestDistance = distance;
     					slidingLink = arcs[i].getSpline();
+    					lsci = i;
     				}
     			}
     			startLinkSliding(press_vx, press_vy, scr_x, scr_y);
@@ -1231,15 +1244,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     		}
 	    }
         // else select the edge hovered by the cursor (if any) - works even if no knowledge about logical structure
+        closestNode = null;
         Vector pum = mainView.getCursor().getIntersectingPaths(mainCamera, 10);
         if (pum.size() > 0){
             slidingLink = (DPathST)pum.firstElement();
+            lscs = new LinkSliderCalc[1];
+            lscs[lsci] = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
             startLinkSliding(press_vx, press_vy, scr_x, scr_y);
         }
 	}
 	
 	void startLinkSliding(final long press_vx, final long press_vy, int px, int py){
-		mainView.getCursor().setVisibility(false);
+		//mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
 		screen_cursor_x = px + panelWidth/2;
 		screen_cursor_y = py + panelHeight/2;
@@ -1250,35 +1266,82 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		catch (java.awt.AWTException e){ 
 			e.printStackTrace();
 		}
+		// chosen link
 		slidingLinkActualColor = slidingLink.getColor();
 		slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
-		lsc = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), mainView.getVisibleRegionWidth(mainCamera));
+		// add cursor on link
 		slideCursor = new CircleNR(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
 		slideCursor.setStrokeWidth(SLIDER_CURSOR_SIZE/2.0f);
 		vsm.addGlyph(slideCursor, mSpace);
+		// display selection radius, circular zone that allows for arc switching when starting from a node
+		if (closestNode != null){
+    		selectionRadius = new CircleNR(closestNode.getShape().vx, closestNode.getShape().vy, 0, SELECTION_RADIUS, Color.WHITE, SELECTION_RADIUS_COLOR);
+    		selectionRadius.setFilled(false);
+    		selectionRadius.setStrokeWidth(2.0f);
+    		vsm.addGlyph(selectionRadius, mSpace);	    
+		}
+		// center camera on selection
 	    Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
 	                                                                                          SlowInSlowOutInterpolator.getInstance(),
-	                                                                                          new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy);}});
+	                                                                                          new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy, true);}});
 	    vsm.getAnimationManager().startAnimation(a, false);
 	}
 	
-	void linkSlider(long vx, long vy){
+	void linkSlider(long vx, long vy, boolean centerCursor){
+        boolean withinSelectionRadius = mainView.getCursor().isUnderCursor(selectionRadius);
 		mPos.setLocation(vx, vy);
-		awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
-		lsc.updateMousePosition(mPos);
-		cPos = lsc.getPositionAlongPath();
+		lscs[lsci].updateMousePosition(mPos);
+		if (!withinSelectionRadius || centerCursor){
+		    awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
+		}
+        else {
+            mtPos.setLocation(vx, vy);
+            int newlsci = lsci;
+            Point2D tPos = lscs[lsci].getPositionAlongPath();
+            double shortestDistance = Math.sqrt(Math.pow(tPos.getX()-mtPos.getX(),2) + Math.pow(cPos.getY()-mtPos.getY(),2));
+            double distance;
+            for (int i=0;i<lsci;i++){
+                lscs[i].updateMousePosition(mtPos);
+                tPos = lscs[i].getPositionAlongPath();
+                distance = Math.sqrt(Math.pow(tPos.getX()-mtPos.getX(),2) + Math.pow(cPos.getY()-mtPos.getY(),2));
+                if (distance < shortestDistance){
+                    shortestDistance = distance;
+                    newlsci = i;
+                }
+            }
+            for (int i=lsci+1;i<lscs.length;i++){
+                lscs[i].updateMousePosition(mtPos);
+                tPos = lscs[i].getPositionAlongPath();
+                distance = Math.sqrt(Math.pow(tPos.getX()-mtPos.getX(),2) + Math.pow(cPos.getY()-mtPos.getY(),2));
+                if (distance < shortestDistance){
+                    shortestDistance = distance;
+                    newlsci = i;
+                }
+            }
+            if (newlsci != lsci){
+                lsci = newlsci;
+            }
+        }
+		cPos = lscs[lsci].getPositionAlongPath();
 		slideCursor.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
 		mainCamera.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
 		//mainCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
 	}
 	
 	void endLinkSliding(){
-		mainView.getCursor().setVisibility(true);
+		mainView.getPanel().setNoEventCoordinates(ViewPanel.NO_COORDS, ViewPanel.NO_COORDS);
+        mainView.getCursor().setVisibility(true);
 		mSpace.removeGlyph(slideCursor);
+		if (selectionRadius != null){
+		    mSpace.removeGlyph(selectionRadius);
+		    selectionRadius = null;
+		}
 		slidingLink.setColor(slidingLinkActualColor);
 		slidingLink = null;
+		closestNode = null;
 		isLinkSliding = false;
-		lsc = null;
+		lscs = null;
+		lsci = -1;
 		awtRobot = null;
 	}
 	

@@ -296,7 +296,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 		if (v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		if (grMngr.isLinkSliding){
 			// ignore events triggered by AWT robot
-			grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy);
+			grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy, false);
 		}
 		else if (mod != ALT_MOD && buttonNumber == 1){
 			if (draggingZoomWindow){
