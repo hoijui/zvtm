@@ -63,7 +63,7 @@ public class VText extends Glyph {
     public short text_anchor = TEXT_ANCHOR_START;
 
     /** Affine Transform used when drawing text. For internal use. */
-    public AffineTransform at;
+    protected AffineTransform at;
 
     /** For internal use. */
     public ProjText[] pc;
@@ -365,7 +365,7 @@ public class VText extends Glyph {
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (/*trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive */ true){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].valid){

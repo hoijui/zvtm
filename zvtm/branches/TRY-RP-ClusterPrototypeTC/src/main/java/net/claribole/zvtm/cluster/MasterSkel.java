@@ -33,11 +33,12 @@ public class MasterSkel {
 		//add a few glyphs to the virtual space
 		Glyph rect = new VRectangle(0,0,0,60,40,Color.GREEN);
 		Glyph anotherRect = new VRectangle(30,50,0,60,70,Color.RED);
-		Glyph text = new VText(20,20,0,Color.YELLOW,"No Loitering");
+		VText text = new VText(20,20,0,Color.YELLOW,"No Loitering");
+		text.setScale(4f);
 
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(anotherRect, vs);
-	//	vsm.addGlyph(text, vs);
+		vsm.addGlyph(text, vs);
 
 		Camera cam = vsm.addCamera(vs);
 		cam.setAltitude(0f);
