@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -515,12 +515,15 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
     }
     
-    int ix,iy = -1;
+    /** Value that specifies that there isn't any point for which no mouse move/drag event is sent. */
+    public static final int NO_COORDS = -1;
+    
+    int ix,iy = NO_COORDS;
     
     /** Set a particular point in view panel coordinates for which mouse move/drag events should be ignored.
      * This is useful, e.g., to completely ignore mouse repositioning events triggered by an AWT Robot.
-     *@param x x-coordinate in the JPanel's system
-     *@param y y-coordinate in the JPanel's system
+     *@param x x-coordinate in the JPanel's system ; set to ViewPanel.NO_COORDS to cancel any previsouly set point.
+     *@param y y-coordinate in the JPanel's system ; set to ViewPanel.NO_COORDS to cancel any previsouly set point.
      */
     public void setNoEventCoordinates(int x, int y){
         ix = x;
@@ -529,10 +532,10 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     
     /** Get the coordinates of a particular point in view panel coordinates for which mouse move/drag events are ignored, if any.
      * Such a point is useful, e.g., to completely ignore mouse repositioning events triggered by an AWT Robot.
-     *@return (x,y) coordinates of the point in the JPanel's system
+     *@return (x,y) coordinates of the point in the JPanel's system, null if no such point is set.
      */
     public Point getNoEventCoordinates(){
-        return (ix != -1 && iy != -1) ? new Point(ix, iy) : null;
+        return (ix != NO_COORDS && iy != NO_COORDS) ? new Point(ix, iy) : null;
     }
 
     public void mouseMoved(MouseEvent e){
