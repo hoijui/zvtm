@@ -1187,7 +1187,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	LinkSliderCalc[] lscs;
 	int lsci = -1;
 	
-	DPathST slidingLink;
+	DPath slidingLink;
 	Color slidingLinkActualColor = null;
 	Point2D mPos = new Point2D.Double();
 	
@@ -1223,13 +1223,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     			if (arcs.length == 0){return;}
     			lscs = new LinkSliderCalc[arcs.length];
     			slidingLink = arcs[0].getSpline();
-    			lscs[0] = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
+    			lscs[0] = new LinkSliderCalc(slidingLink, vieww);
     			mPos.setLocation(press_vx, press_vy);
     			lscs[0].updateMousePosition(mPos);
     			cPos = lscs[0].getPositionAlongPath();
     			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
     			for (int i=1;i<arcs.length;i++){
-    				lscs[i] = new LinkSliderCalc(arcs[i].getSpline().getJava2DGeneralPath(), vieww);
+    				lscs[i] = new LinkSliderCalc(arcs[i].getSpline(), vieww);
     				lscs[i].updateMousePosition(mPos);
     				cPos = lscs[i].getPositionAlongPath();
     				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
@@ -1249,7 +1249,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         if (pum.size() > 0){
             slidingLink = (DPathST)pum.firstElement();
             lscs = new LinkSliderCalc[1];
-            lscs[lsci] = new LinkSliderCalc(slidingLink.getJava2DGeneralPath(), vieww);
+            lscs[lsci] = new LinkSliderCalc(slidingLink, vieww);
             startLinkSliding(press_vx, press_vy, scr_x, scr_y);
         }
 	}
@@ -1292,9 +1292,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		mPos.setLocation(vx, vy);
 		lscs[lsci].updateMousePosition(mPos);
 		if (!withinSelectionRadius || centerCursor){
+		    // constrained sliding on link
 		    awtRobot.mouseMove(screen_cursor_x, screen_cursor_y);
 		}
         else {
+            // relatively free movements in link selection area around nodes
             mtPos.setLocation(vx, vy);
             int newlsci = lsci;
             Point2D tPos = lscs[lsci].getPositionAlongPath();
@@ -1319,7 +1321,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 }
             }
             if (newlsci != lsci){
+                slidingLink.setColor(slidingLinkActualColor);                
                 lsci = newlsci;
+                slidingLink = lscs[lsci].getPath();
+                slidingLinkActualColor = slidingLink.getColor();
+        		slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
             }
         }
 		cPos = lscs[lsci].getPositionAlongPath();

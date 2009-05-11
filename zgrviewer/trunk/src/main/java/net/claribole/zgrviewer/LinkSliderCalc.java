@@ -17,7 +17,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-//import java.awt.*;
+import net.claribole.zvtm.glyphs.DPath;
 
 /**
  * Given a GeneralPath and a mouse cursor position, calculate path cursor position and scale
@@ -40,18 +40,26 @@ public class LinkSliderCalc {
 	protected double scale;
 	protected double fractionAlongPath;
 	
-	public LinkSliderCalc(GeneralPath path, double viewWidth){
-		this(path, 0.5, viewWidth);
+	DPath path;
+	
+	public LinkSliderCalc(DPath p, double viewWidth){
+		this(p, 0.5, viewWidth);
 	}
+	
 	/**
-	 * @param path 		path to slide along
+	 * @param p 		path to slide along
 	 * @param flatness	optional - min distance between curve control points and flattend polyline representation
 	 * @param viewWidth width of camera viewport at scale == 1
 	 */
-	public LinkSliderCalc(GeneralPath path, double flatness, double viewWidth){
-		polyLine = new PolyLine( path.getPathIterator(new AffineTransform(), flatness) );
+	public LinkSliderCalc(DPath p, double flatness, double viewWidth){
+	    this.path = p;
+		polyLine = new PolyLine(this.path.getJava2DGeneralPath().getPathIterator(new AffineTransform(), flatness));
 		this.viewWidth = viewWidth;
 	}
+
+    public DPath getPath(){
+        return path;
+    }
 
 	/**
 	 * Call first to set the new mouse position.
