@@ -6,6 +6,7 @@ import org.jdesktop.animation.timing.Animator;
 
 import net.claribole.zvtm.cluster.MetaCamera;
 
+import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VText;
@@ -35,10 +36,15 @@ public class MasterSkel {
 		Glyph anotherRect = new VRectangle(30,50,0,60,70,Color.RED);
 		VText text = new VText(20,20,0,Color.YELLOW,"No Loitering");
 		text.setScale(4f);
+		DPath path = new DPath(40,0,0,Color.ORANGE);
+		path.addQdCurve(60,60,0,60,false);
+		path.addQdCurve(60,60,60,0,false);
+		path.setStrokeWidth(5f);
 
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(anotherRect, vs);
 		vsm.addGlyph(text, vs);
+		vsm.addGlyph(path, vs);
 
 		Camera cam = vsm.addCamera(vs);
 		cam.setAltitude(0f);
