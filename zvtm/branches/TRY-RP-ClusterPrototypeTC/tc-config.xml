@@ -173,6 +173,8 @@
 
 	<additional-boot-jar-classes>
 		<include>java.awt.geom.AffineTransform</include>
+		<include>java.awt.geom.QuadCurve2D</include>
+		<include>java.awt.geom.QuadCurve2D$Double</include>
 	</additional-boot-jar-classes>
 
     </dso>
