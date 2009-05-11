@@ -33,7 +33,7 @@ public class SlaveApp {
 		view = vsm.addExternalView(vcam, "slaveView"  + blockNumber, View.STD_VIEW,
 				400, 240, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-		vcam.get(0).setOwningView(view); //XXX test
+		vcam.get(0).setOwningView(view); 
 	}
 
 	public static void main(String[] args){
