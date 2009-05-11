@@ -83,9 +83,6 @@ public class VText extends Glyph {
      */
     public Font font;
 
-    /** For internal use. */
-    public Rectangle2D bounds;
-
     /** Text that should be painted (read-only), use access methods to change.
      *@see #setText(String t)
      *@see #getText()
@@ -369,6 +366,7 @@ public class VText extends Glyph {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].valid){
+				Rectangle2D bounds;
 				bounds = g.getFontMetrics().getStringBounds(text,g);
 				// cw and ch actually hold width and height of text *in virtual space*
 				pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
@@ -395,6 +393,7 @@ public class VText extends Glyph {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].lvalid){
+				Rectangle2D bounds;
 				bounds = g.getFontMetrics().getStringBounds(text,g);
 				// lcw and lch actually hold width and height of text *in virtual space*
 				pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
@@ -467,7 +466,7 @@ public class VText extends Glyph {
     /** Change the Font used to display this specific text object.
      *@param f set to null to use the default font
      */
-    public void setSpecialFont(Font f){
+    public synchronized void setSpecialFont(Font f){
 	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=VirtualSpaceManager.getMainFont().getSize2D();}
 	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
 	invalidate();
@@ -476,7 +475,7 @@ public class VText extends Glyph {
     /** Get the Font used to display this specific text object.
      *@return the main ZVTM font if no specific Font is used in this object
      */
-    public Font getFont(){
+    public synchronized Font getFont(){
 	if (font!=null){return font;}
 	else return VirtualSpaceManager.getMainFont();
     }
