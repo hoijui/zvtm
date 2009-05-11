@@ -62,9 +62,6 @@ public class VText extends Glyph {
     /** Text alignment (read-only). Use access methods to change. One of TEXT_ANCHOR_*. */
     public short text_anchor = TEXT_ANCHOR_START;
 
-    /** Affine Transform used when drawing text. For internal use. */
-    protected AffineTransform at;
-
     /** For internal use. */
     public ProjText[] pc;
 
@@ -373,6 +370,7 @@ public class VText extends Glyph {
 				pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
 				pc[i].valid=true;
 			}
+			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);}
 			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);}
 			else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
@@ -400,6 +398,7 @@ public class VText extends Glyph {
 				pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
 				pc[i].lvalid=true;
 			}
+			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
 			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
 			else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
