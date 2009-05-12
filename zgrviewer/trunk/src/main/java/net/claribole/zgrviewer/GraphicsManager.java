@@ -188,12 +188,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMainFont(ConfigManager.defaultFont);
-        vsm.setZoomLimit(-90);
         vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
         //vsm.setDebug(true);
         mSpace = vsm.addVirtualSpace(mainSpace);
         // camera #0 for main view
         mainCamera = vsm.addCamera(mainSpace);
+        mainCamera.setZoomFloor(-90);
         // camera #1 for radar view
         vsm.addCamera(mainSpace);
         mnSpace = vsm.addVirtualSpace(menuSpace);
