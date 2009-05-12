@@ -60,7 +60,7 @@ public class VText extends Glyph {
     public static final short TEXT_ANCHOR_END=2;
 
     /** Text alignment (read-only). Use access methods to change. One of TEXT_ANCHOR_*. */
-    public short text_anchor = TEXT_ANCHOR_START;
+    protected short text_anchor = TEXT_ANCHOR_START;
 
     /** For internal use. */
     public ProjText[] pc;
