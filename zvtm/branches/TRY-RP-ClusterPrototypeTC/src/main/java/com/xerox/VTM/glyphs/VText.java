@@ -225,6 +225,7 @@ public class VText extends Glyph {
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+        if (!validBounds(i)){return true;}
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){ //if glyph hotspot is in the region, it is obviously visible
 	    return true;
 	}
