@@ -128,7 +128,7 @@ public class WorldExplorer implements Java2DPainter {
         VirtualSpace[]  sceneSpaces = {mSpace, bSpace};
         Camera[] sceneCameras = {mCamera, bCamera};
 		vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
-        sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setSceneCameraBounds(bCamera, eh.wnes);
         sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), gp);
@@ -146,7 +146,7 @@ public class WorldExplorer implements Java2DPainter {
 
     void initGUI(boolean fullscreen){
         windowLayout();
-        vsm = new VirtualSpaceManager();
+        vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = vsm.addCamera(mSpace);

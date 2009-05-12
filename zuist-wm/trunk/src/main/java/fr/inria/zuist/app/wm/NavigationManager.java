@@ -16,6 +16,7 @@ import javax.swing.JComboBox;
 
 import java.util.Vector;
 
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import net.claribole.zvtm.lens.*;
@@ -98,7 +99,7 @@ class NavigationManager {
 		ovPortal.setBackgroundColor(WorldExplorer.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
 		ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);
-		application.vsm.addPortal(ovPortal, application.mView);
+		VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
 		ovPortal.setBorder(Color.GREEN);
 		updateOverview();
 	}
@@ -121,7 +122,7 @@ class NavigationManager {
         else {
             lens.setAbsolutePosition(x, y);
         }
-        application.vsm.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     void zoomInPhase1(int x, int y){
@@ -130,11 +131,11 @@ class NavigationManager {
             lens = application.mView.setLens(getLensDefinition(x, y));
             lens.setBufferThreshold(1.5f);
         }
-//        application.vsm.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
+//        VirtualSpaceManager.INSTANCE.animator.createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
 //            lens.getID(), null);
-        Animation a = application.vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        application.vsm.getAnimationManager().startAnimation(a, false);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         setLens(ZOOMIN_LENS);
     }
     
@@ -150,19 +151,19 @@ class NavigationManager {
             //	    cadata.add(deltAlt);
             //	    cadata.add(new LongPoint(c2x-application.mCamera.posx, c2y-application.mCamera.posy));
             // animate lens and camera simultaneously (lens will die at the end)
-            //	    application.vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
+            //	    VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
             //					     lens.getID(), new ZP2LensAction(this));
-            Animation al = application.vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+            Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            //	    application.vsm.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
+            //	    VirtualSpaceManager.INSTANCE.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
             //					       cadata, application.mCamera.getID(), null);
-            Animation at = application.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
+            Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
                 new LongPoint(c2x-application.mCamera.posx, c2y-application.mCamera.posy), true, IdentityInterpolator.getInstance(), null);
-            Animation aa = application.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
+            Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
                 deltAlt, true, IdentityInterpolator.getInstance(), null);
-            application.vsm.getAnimationManager().startAnimation(al, false);
-            application.vsm.getAnimationManager().startAnimation(at, false);
-            application.vsm.getAnimationManager().startAnimation(aa, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(al, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(at, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(aa, false);
         }
         else {
             Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
@@ -171,19 +172,19 @@ class NavigationManager {
             //	    cadata.add(new LongPoint(Math.round((c2x-application.mCamera.posx)*ratio),
             //				     Math.round((c2y-application.mCamera.posy)*ratio)));
             // animate lens and camera simultaneously (lens will die at the end)
-            //	    application.vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
+            //	    VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
             //					     lens.getID(), new ZP2LensAction(this));
-            Animation al = application.vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+            Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            //      application.vsm.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
+            //      VirtualSpaceManager.INSTANCE.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
             //  				       cadata, application.mCamera.getID(), null);
-            Animation at = application.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
+            Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
                 new LongPoint(Math.round((c2x-application.mCamera.posx)*ratio), Math.round((c2y-application.mCamera.posy)*ratio)), true, IdentityInterpolator.getInstance(), null);
-            Animation aa = application.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
+            Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
                 actualDeltAlt, true, IdentityInterpolator.getInstance(), null);
-            application.vsm.getAnimationManager().startAnimation(al, false);
-            application.vsm.getAnimationManager().startAnimation(at, false);
-            application.vsm.getAnimationManager().startAnimation(aa, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(al, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(at, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(aa, false);
         }
     }
 
@@ -201,29 +202,29 @@ class NavigationManager {
             lens.setBufferThreshold(1.5f);
         }
         // animate lens and camera simultaneously
-        //        application.vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
+        //        VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(MAG_FACTOR-1),
         //            lens.getID(), null);
-        Animation al = application.vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+        Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        //        application.vsm.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
+        //        VirtualSpaceManager.INSTANCE.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
         //            cadata, application.mCamera.getID(), null);
-        Animation at = application.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
+        Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
             new LongPoint(c2x-application.mCamera.posx, c2y-application.mCamera.posy), true, IdentityInterpolator.getInstance(), null);
-        Animation aa = application.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
+        Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
             new Float(cameraAbsAlt*(MAG_FACTOR-1)), true, IdentityInterpolator.getInstance(), null);
-        application.vsm.getAnimationManager().startAnimation(al, false);
-        application.vsm.getAnimationManager().startAnimation(at, false);
-        application.vsm.getAnimationManager().startAnimation(aa, false);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(al, false);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(at, false);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(aa, false);
         setLens(ZOOMOUT_LENS);
     }
 
     void zoomOutPhase2(){
         // make lens disappear (killing anim)
-        //        application.vsm.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
+        //        VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
         //            lens.getID(), new ZP2LensAction(this));
-        Animation a = application.vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-        application.vsm.getAnimationManager().startAnimation(a, false);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
     }
 
     void setMagFactor(double m){
@@ -270,11 +271,11 @@ class NavigationManager {
                         -Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly));
                 }
                 else {
-//                    application.vsm.animator.createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
+//                    VirtualSpaceManager.INSTANCE.animator.createLensAnimation(WHEEL_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(magOffset),
 //                        lens.getID(), null);
-                    Animation a = application.vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
+                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
                         new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
-                    application.vsm.getAnimationManager().startAnimation(a, false);
+                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
                 }
             }
         }
@@ -433,7 +434,7 @@ class ZP2LensAction implements EndAction {
     }
     
     public void	execute(Object subject, Animation.Dimension dimension){
-        nm.application.vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+        VirtualSpaceManager.INSTANCE.getOwningView(((Lens)subject).getID()).setLens(null);
         ((Lens)subject).dispose();
         nm.setMagFactor(NavigationManager.DEFAULT_MAG_FACTOR);
         nm.lens = null;
