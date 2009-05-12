@@ -50,11 +50,13 @@ Toolkits such as Java2D are powerful but difficult to use, requiring the program
 
 The virtual space manager \cl{com.xerox.VTM.engine.VirtualSpaceManager} is the main entry point in ZVTM. It is the first object instantiated by the client application. There is only one instance of it.
 
-\codebox{VirtualSpaceManager vsm = new VirtualSpaceManager(false);}
-
-The optional boolean feeded to the constructor should be set to \cd{true} when instantiating ZVTM within an applet.
+\codebox{VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;}
 
 Many operations, such as creating virtual spaces, adding glyphs and cameras to them, will take place through the virtual space manager (which we abbreviate VSM from now on).
+
+If ZVTM is instantiated within an applet, the VSM should be notified about this:
+
+\codebox{vsm.setApplet();}
 
 %%%%%%%%%%
 \subsection{Virtual Spaces}
