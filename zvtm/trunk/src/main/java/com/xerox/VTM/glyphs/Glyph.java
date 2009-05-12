@@ -150,7 +150,7 @@ public abstract class Glyph implements Cloneable {
 	vx+=x;
 	vy+=y;
 	propagateMove(x,y);  //take care of sticked glyphs
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Translate the glyph to (x,y) - absolute translation.
@@ -160,7 +160,7 @@ public abstract class Glyph implements Cloneable {
 	propagateMove(x-vx,y-vy);  //take care of sticked glyphs
 	vx=x;
 	vy=y;
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the coordinates of the glyph's geometrical center.
@@ -235,7 +235,7 @@ public abstract class Glyph implements Cloneable {
     public void setVisible(boolean b){
 	if (b!=visible){
 	    visible=b;
-	    try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	    VirtualSpaceManager.INSTANCE.repaintNow();
 	}
     }
 
@@ -296,7 +296,7 @@ public abstract class Glyph implements Cloneable {
 	color = c;
 	fColor = color;
 	HSV = Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),(new float[3]));
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the glyph's border color (use setColor for text, paths, segments, etc.).
@@ -320,7 +320,7 @@ public abstract class Glyph implements Cloneable {
 	if (HSV[2]>1) {HSV[2]=1.0f;} else {if (HSV[2]<0) {HSV[2]=0;}}
 	color = Color.getHSBColor(HSV[0],HSV[1],HSV[2]);
 	fColor = color;
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the glyph's main color (absolute value, HSV color space).
@@ -338,7 +338,7 @@ public abstract class Glyph implements Cloneable {
 	if (HSV[2]>1) {HSV[2]=1.0f;} else {if (HSV[2]<0) {HSV[2]=0;}}
 	this.color=Color.getHSBColor(HSV[0],HSV[1],HSV[2]);
 	fColor = color;
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -450,7 +450,7 @@ public abstract class Glyph implements Cloneable {
 	else {
 	    stroke=new BasicStroke(strokeWidth,cap,join,miterlimit);
 	}
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the width of the stroke used to paint ther glyph's border.
@@ -470,7 +470,7 @@ public abstract class Glyph implements Cloneable {
 	else {
 	    stroke=new BasicStroke(strokeWidth,cap,join,miterlimit);
 	}
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set a custom stroke to paint glyph's border.
@@ -479,7 +479,7 @@ public abstract class Glyph implements Cloneable {
     public void setStroke(BasicStroke b){
 	if (b!=null){stroke=b;strokeWidth=stroke.getLineWidth();}
 	else {stroke=null;strokeWidth=1.0f;}
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the stroke used to paint glyph's border.
@@ -560,7 +560,7 @@ public abstract class Glyph implements Cloneable {
 		g.stickedTo = this;
 	    }
 	    else {
-		if (this.vsm.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Glyph "+this+" while they are already sticked.");}
+		if (VirtualSpaceManager.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Glyph "+this+" while they are already sticked.");}
 	    }
 	}
     }
@@ -769,18 +769,6 @@ public abstract class Glyph implements Cloneable {
 		long[] res = {vx-Math.round(size),vy+Math.round(size),vx+Math.round(size),vy-Math.round(size)};
 		return res;
 	}
-
-    /*-------Internal use only----------------------------------*/
-
-    //XXX: it would probably be better to have a hook to the owning
-    //     virtual space as this information could be more useful
-    //     and we can get the VSM from it
-
-    /** Reference to owning VSM. */
-    public VirtualSpaceManager vsm;
-
-    /** Set a reference to the virtual space manager. Called internally. */
-    public void setVSM(VirtualSpaceManager v){this.vsm=v;}
 
     /*-------------Cloning--------------------------------------*/
 

@@ -29,6 +29,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 
 /**
@@ -69,7 +70,7 @@ public class FPolygonST extends FPolygon implements Translucent {
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //transparency set to alpha
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getTranslucencyValue(){return alpha;}

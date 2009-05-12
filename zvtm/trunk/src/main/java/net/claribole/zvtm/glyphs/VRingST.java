@@ -20,6 +20,7 @@ import java.awt.Shape;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VSlice;
 import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.glyphs.projection.ProjRing;
@@ -89,7 +90,7 @@ public class VRingST extends VRing implements Translucent {
 	public void setTranslucencyValue(float a){
 		alpha = a;
 		acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
-		try{vsm.repaintNow();}catch(NullPointerException e){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	public float getTranslucencyValue(){

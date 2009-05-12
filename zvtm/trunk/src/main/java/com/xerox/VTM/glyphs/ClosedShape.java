@@ -10,6 +10,7 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Super class of all closed shapes (rectangles, circles, diamonds, polygons, etc.)
@@ -53,7 +54,7 @@ public abstract class ClosedShape extends Glyph {
     public void setFilled(boolean b){
 	if (b!=filled){
 	    filled=b;
-	    try{vsm.repaintNow();}catch(NullPointerException e){}
+	    VirtualSpaceManager.INSTANCE.repaintNow();
 	}
     }
 
@@ -68,7 +69,7 @@ public abstract class ClosedShape extends Glyph {
     public void setDrawBorder(boolean b){
 	if (b!=paintBorder){
 	    paintBorder=b;
-	    try{vsm.repaintNow();}catch(NullPointerException e){}
+	    VirtualSpaceManager.INSTANCE.repaintNow();
 	}
     }
 
@@ -93,7 +94,7 @@ public abstract class ClosedShape extends Glyph {
 	borderColor = c;
 	bColor = borderColor;
 	HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -112,7 +113,7 @@ public abstract class ClosedShape extends Glyph {
 	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
 	borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
 	bColor = borderColor;
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
     
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -131,7 +132,7 @@ public abstract class ClosedShape extends Glyph {
 	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
 	this.borderColor = Color.getHSBColor(HSVb[0], HSVb[1], HSVb[2]);
 	bColor = borderColor;
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get border color's HSV components. */
@@ -173,10 +174,7 @@ public abstract class ClosedShape extends Glyph {
 	    }
 	}
 	if (update){
-	    try {
-		vsm.repaintNow();
-	    }
-	    catch(NullPointerException ex){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
     }
 

@@ -29,6 +29,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Rectangle. This version is less efficient than VRectangle, but it can be reoriented. It cannot be made translucent (see VRectangle*ST).
@@ -85,7 +86,7 @@ public class VRectangleOr extends VRectangle {
      */
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

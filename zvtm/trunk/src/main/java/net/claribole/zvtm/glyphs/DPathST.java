@@ -20,6 +20,8 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VPath;
 
+import com.xerox.VTM.engine.VirtualSpaceManager;
+
 /**
  * Dynamic Path, made of an arbitrary number of segments, quadratic curves, cubic curves, and gaps. All of these can be dynamically modified and animated through AnimManager's createPathAnimation method. This version is less efficient than DPath, but it can be made translucent.
  *@author Emmanuel Pietriga
@@ -75,7 +77,7 @@ public class DPathST extends DPath implements Translucent {
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getTranslucencyValue(){

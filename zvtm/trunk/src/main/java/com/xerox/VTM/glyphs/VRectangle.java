@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 
 /**
@@ -174,28 +175,28 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	size=radius;
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(long w){ 
 	vw=w;
 	ar=(float)vw/(float)vh;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(long h){
 	vh=h;
 	ar=(float)vw/(float)vh;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){ //resizing factor
 	size*=factor;
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){//width and height of view - pc[i].c? are JPanel coords

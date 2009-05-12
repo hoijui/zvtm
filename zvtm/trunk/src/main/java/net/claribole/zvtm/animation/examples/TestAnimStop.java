@@ -49,7 +49,7 @@ public class TestAnimStop {
     View testView;
 
     TestAnimStop(){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
     }
 

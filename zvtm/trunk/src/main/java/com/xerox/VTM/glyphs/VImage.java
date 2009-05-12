@@ -34,6 +34,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Bitmap Image. This version is the most efficient, but it can neither be reoriented (see VImageOr*) nor made translucent (see VImage*ST).
@@ -198,7 +199,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	vh=Math.round((float)vw/ar);
 	computeSize();
 	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(long h){
@@ -206,7 +207,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	vw=Math.round(vh*ar);
 	computeSize();
 	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public long getWidth(){return vw;}
@@ -218,7 +219,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
 	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
@@ -226,7 +227,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
 	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
@@ -244,7 +245,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 	vh=Math.round(image.getHeight(null)/2.0);
 	ar=(float)vw/(float)vh;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the bitmap image displayed. */
@@ -258,9 +259,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     public void setZoomSensitive(boolean b){
 	if (zoomSensitive!=b){
 	    zoomSensitive=b;
-	    if (vsm != null){
-		vsm.repaintNow();
-	    }
+	    VirtualSpaceManager.INSTANCE.repaintNow();
 	}
     }
 
@@ -277,9 +276,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     public void setDrawBorderPolicy(short p){
 	if (drawBorder!=p){
 	    drawBorder=p;
-	    if (vsm != null){
-		vsm.repaintNow();
-	    }
+	    VirtualSpaceManager.INSTANCE.repaintNow();
 	}
     }
 

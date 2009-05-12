@@ -33,6 +33,7 @@ import java.awt.Shape;
 import net.claribole.zvtm.glyphs.projection.BProjectedCoords;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Circle. This version is the most efficient, but it cannot be made translucent (see VCircleST). Cannot be reoriented (it makes no sense).
@@ -157,19 +158,19 @@ public class VCircle extends ClosedShape {
     public void sizeTo(float radius){
 	size=radius;
 	vr=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void sizeTo(long radius){
 	size = (float)radius;
 	vr = radius;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vr=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

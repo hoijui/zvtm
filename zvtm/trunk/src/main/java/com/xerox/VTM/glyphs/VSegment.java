@@ -35,6 +35,7 @@ import net.claribole.zvtm.glyphs.projection.RProjectedCoords;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 
 /**
@@ -164,7 +165,7 @@ public class VSegment extends Glyph implements RectangularShape {
     public void orientTo(float angle){
 	orient=angle;
 	computeEdges();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getSize(){return size;}
@@ -184,7 +185,7 @@ public class VSegment extends Glyph implements RectangularShape {
 	vw = (x2 - x1) / 2;
 	vh = (y2 - y1) / 2;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the segment's two endpoints
@@ -221,32 +222,32 @@ public class VSegment extends Glyph implements RectangularShape {
     public void sizeTo(float radius){
 	size=radius;
 	computeEdges();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	computeEdges();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(long w){ 
 	vw=w;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(long h){
 	vh=h;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidthHeight(long w,long h){
 	this.vw=w;
 	this.vh=h;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){
@@ -361,10 +362,7 @@ public class VSegment extends Glyph implements RectangularShape {
             }
         }
         if (update){
-            try {
-                vsm.repaintNow();
-            }
-            catch(NullPointerException ex){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
         }
     }
 

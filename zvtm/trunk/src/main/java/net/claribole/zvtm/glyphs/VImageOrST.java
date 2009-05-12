@@ -61,7 +61,6 @@ public class VImageOrST extends VImageOr implements Translucent {
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
-	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
     public float getTranslucencyValue(){

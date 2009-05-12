@@ -32,6 +32,7 @@ import java.awt.Shape;
 import net.claribole.zvtm.glyphs.projection.ProjectedCoords;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Point. Actually, a rectangle with constant size of 1.
@@ -216,10 +217,7 @@ public class VPoint extends Glyph {
             }
         }
         if (update){
-            try {
-                vsm.repaintNow();
-            }
-            catch(NullPointerException ex){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
         }
     }
 

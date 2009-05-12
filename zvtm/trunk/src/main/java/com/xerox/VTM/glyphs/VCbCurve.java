@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.ProjCbCurve;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 
 /**
@@ -85,14 +86,14 @@ public class VCbCurve extends Glyph {
     public void setCtrlPoint1(long d,float o){
 	vrad1=d;
 	ang1=o;
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set position of control point 2 (polar coords w.r.t end point). */
     public void setCtrlPoint2(long d,float o){
 	vrad2=d;
 	ang2=o;
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get distance from start point to control point 1 (polar coords). */
@@ -153,7 +154,7 @@ public class VCbCurve extends Glyph {
 
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getSize(){return size;}
@@ -167,7 +168,7 @@ public class VCbCurve extends Glyph {
 	vrad2=Math.round(vrad2*radius/size);
 	size=radius;
 	vs=Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
@@ -175,7 +176,7 @@ public class VCbCurve extends Glyph {
 	vs=(long)Math.round(size);
 	vrad1=Math.round(vrad1*factor);
 	vrad2=Math.round(vrad2*factor);
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

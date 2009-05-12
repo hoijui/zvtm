@@ -53,7 +53,7 @@ public class TestCameraPosition {
     View testView;
 
     TestCameraPosition(){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
 	am = vsm.getAnimationManager();
         vsm.setDebug(true);
     }

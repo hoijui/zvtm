@@ -54,7 +54,7 @@ public class TestCameraAnim {
     Animation anim2;
 
     TestCameraAnim(){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
     }
 

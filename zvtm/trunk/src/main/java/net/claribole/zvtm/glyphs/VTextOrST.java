@@ -99,7 +99,7 @@ public class VTextOrST extends VTextOr implements Translucent {
     public void setTranslucencyValue(float a){
 	alpha = a;
 	acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getTranslucencyValue(){
@@ -118,7 +118,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 		if (alpha == 0){return;}
 		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (text_anchor == TEXT_ANCHOR_START){
@@ -164,7 +164,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 		if (alpha == 0){return;}
 		g.setColor(this.color);
 		trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (text_anchor == TEXT_ANCHOR_START){

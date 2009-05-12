@@ -49,7 +49,7 @@ public class TestDefaultHandler {
     View testView;
 
     TestDefaultHandler(short ogl){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
         initTest(ogl);
     }

@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.ProjQdCurve;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Cubic Curve: a curved segment that has two endpoints and one control point.
@@ -78,7 +79,7 @@ public class VQdCurve extends Glyph {
     public void setCtrlPoint(long d,float o){
 	vrad=d;
 	ang=o;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get distance from center of segment linking start and end points to control point (polar coords). */
@@ -133,7 +134,7 @@ public class VQdCurve extends Glyph {
 
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getSize(){return size;}
@@ -146,14 +147,14 @@ public class VQdCurve extends Glyph {
 	vrad=Math.round(vrad*radius/size);
 	size=radius;
 	vs=Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
 	vrad=Math.round(vrad*factor);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

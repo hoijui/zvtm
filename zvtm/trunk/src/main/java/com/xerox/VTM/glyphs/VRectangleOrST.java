@@ -27,6 +27,8 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
+import com.xerox.VTM.engine.VirtualSpaceManager;
+
 /**
  * Reorient-able, translucent Rectangle. This version is less efficient than all others, but it can be reoriented and made translucent.
  * @author Emmanuel Pietriga
@@ -79,7 +81,7 @@ public class VRectangleOrST extends VRectangleOr implements Translucent {
     public void setTranslucencyValue(float a){
 	alpha=a;
 	acST=AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);  //translucency set to alpha
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getTranslucencyValue(){return alpha;}

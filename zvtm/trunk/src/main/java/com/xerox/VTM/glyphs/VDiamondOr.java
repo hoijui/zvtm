@@ -29,6 +29,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Reorient-able Diamond (losange with height equal to width). This version is less efficient than VDiamond, but it can be reoriented. It cannot be made translucent (see VDiamond*ST).
@@ -76,7 +77,7 @@ public class VDiamondOr extends VDiamond {
      */
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

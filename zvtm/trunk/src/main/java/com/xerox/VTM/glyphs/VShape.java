@@ -35,6 +35,7 @@ import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented.<br>
@@ -176,7 +177,7 @@ public class VShape extends ClosedShape {
 
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getSize(){return size;}
@@ -188,13 +189,13 @@ public class VShape extends ClosedShape {
     public void sizeTo(float radius){
 	size=radius;
 	vs=Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

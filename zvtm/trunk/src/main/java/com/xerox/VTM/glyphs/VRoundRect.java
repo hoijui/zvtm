@@ -21,6 +21,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.ProjRoundRect;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Round Rectangle. This version is the most efficient, but it cannot be made translucent (see VRoundRectST).<br>Corners are approximated to right angles for some operations such as cursor entry/exit events.
@@ -180,28 +181,28 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 	size=radius;
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(long w){ 
 	vw=w;
 	ar=(float)vw/(float)vh;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(long h){
 	vh=h;
 	ar=(float)vw/(float)vh;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){ //resizing factor
 	size*=factor;
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.

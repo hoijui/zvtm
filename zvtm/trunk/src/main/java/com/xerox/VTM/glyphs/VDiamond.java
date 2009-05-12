@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.BProjectedCoordsP;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Diamond (losange with height equal to width). This version is the most efficient, but it can neither be reoriented (see VDiamondOr*) nor made translucent (see VDiamond*ST).
@@ -159,13 +160,13 @@ public class VDiamond extends ClosedShape {
     public void sizeTo(float radius){
 	size=radius;
 	vs=Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

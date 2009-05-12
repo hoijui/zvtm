@@ -33,6 +33,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.ProjOctagon;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Octagon (eight "almost" regular edges). This version is the most efficient, but it can neither be reoriented (see VOctagonOr*) nor made translucent (see VOctagon*ST).
@@ -159,13 +160,13 @@ public class VOctagon extends ClosedShape {
     public void sizeTo(float radius){
 	size=radius;
 	vs=Math.round(size/1.118f);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size/1.118f);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

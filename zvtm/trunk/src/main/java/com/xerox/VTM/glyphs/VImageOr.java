@@ -29,6 +29,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Re-orientable Bitmap Image. This version is less efficient than VImage, but it can be reoriented. It cannot be made translucent (see VImage*ST).
@@ -71,7 +72,7 @@ public class VImageOr extends VImage {
      */
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){

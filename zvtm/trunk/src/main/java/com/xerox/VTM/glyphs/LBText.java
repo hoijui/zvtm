@@ -112,7 +112,7 @@ public class LBText extends LText {
 	borderColor = c;
 	bColor = borderColor;
 	HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -131,7 +131,7 @@ public class LBText extends LText {
 	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
 	borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
 	bColor = borderColor;
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
     
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -150,7 +150,7 @@ public class LBText extends LText {
 	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
 	this.borderColor = Color.getHSBColor(HSVb[0], HSVb[1], HSVb[2]);
 	bColor = borderColor;
-	if (vsm != null){vsm.repaintNow();}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get border color's HSV components. */
@@ -167,7 +167,7 @@ public class LBText extends LText {
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].valid){
@@ -197,7 +197,7 @@ public class LBText extends LText {
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > vsm.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].lvalid){

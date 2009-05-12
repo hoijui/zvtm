@@ -33,6 +33,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.ProjTriangle;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Equilateral Triangle. This version is the most efficient, but it can neither be reoriented (see VTriangleOr*) nor made translucent (see VTriangle*ST).
@@ -163,13 +164,13 @@ public class VTriangle extends ClosedShape {
     public void sizeTo(float radius){
 	size=radius;
 	vh=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vh=(long)Math.round(size);
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

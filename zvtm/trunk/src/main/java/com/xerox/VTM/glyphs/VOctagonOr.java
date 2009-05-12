@@ -30,6 +30,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Reorient-able Octagon (eight "almost" regular edges). This version is less efficient than VOctagon, but it can be reoriented. It cannot be made translucent (see VOctagon*ST).
@@ -64,7 +65,7 @@ public class VOctagonOr extends VOctagon {
      */
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

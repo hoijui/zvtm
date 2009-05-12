@@ -34,7 +34,7 @@ public class ZOrderTest extends TestCase {
     }
 
     public void setUp(){
-	vsm = new VirtualSpaceManager();
+	vsm = VirtualSpaceManager.INSTANCE;
 	vs = vsm.addVirtualSpace("testVS");
     }
 

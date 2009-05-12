@@ -51,7 +51,7 @@ public class TestStopCancel {
     View testView;
 
     TestStopCancel(){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
     }
 

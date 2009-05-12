@@ -31,6 +31,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.ProjEllipse;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Ellipse. This version is the most efficient, but it can not be made translucent (see VEllipseST).
@@ -164,19 +165,19 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	size=radius;
 	if (vw>=vh){vw=(long)size;vh=(long)(vw/ar);}
 	else {vh=(long)size;vw=(long)(vh*ar);}
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(long w){ 
 	vw=w;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(long h){
 	vh=h;
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public long getWidth(){return vw;}
@@ -187,7 +188,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	size*=factor;
 	if (vw>=vh){vw=(long)size;vh=(long)(vw/ar);}
 	else {vh=(long)size;vw=(long)(vh*ar);}
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.

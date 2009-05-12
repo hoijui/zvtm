@@ -33,6 +33,7 @@ import java.awt.Shape;
 import net.claribole.zvtm.glyphs.projection.ProjCirImage;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Circle containing a bitmap.
@@ -151,7 +152,7 @@ public class VCirImage extends ClosedShape {
 
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void orientToNS(float angle){orient=angle;}
@@ -170,14 +171,14 @@ public class VCirImage extends ClosedShape {
 	size=radius;
 	vs=(long)Math.round(size);
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
 	size*=factor;
 	vs=(long)Math.round(size);
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the bitmap image to be displayed inside the circle. */
@@ -185,7 +186,7 @@ public class VCirImage extends ClosedShape {
 	image=i;
 	ar=((float)image.getWidth(null))/((float)image.getHeight(null));
 	computeSize();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the bitmap image displayed inside the circle. */
@@ -198,7 +199,7 @@ public class VCirImage extends ClosedShape {
      */
     public void setRelativeImageSize(float f){
 	relCoef=f;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the relative size of the image w.r.t the circle. */

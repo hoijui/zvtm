@@ -17,6 +17,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Translucent Slice. This version is less efficient than VSlice, but it can be made translucent.<br>
@@ -80,8 +81,7 @@ public class VSliceST extends VSlice implements Translucent {
     public void setTranslucencyValue(float a){
         alpha = a;
         acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);  //translucency set to alpha
-        try{vsm.repaintNow();}
-        catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getTranslucencyValue(){return alpha;}

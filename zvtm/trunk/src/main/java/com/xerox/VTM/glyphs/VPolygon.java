@@ -24,6 +24,7 @@ import net.claribole.zvtm.glyphs.projection.ProjPolygon;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Polygon. Can be resized. Cannot be reoriented. This new implementation of VPolygon models vertices as doubles internally to allow resizing without loss of precision (and thus resizing to small sizes does not tamper with the shape's aspect). It might be more memory consuming, and less efficient than the original implementation, so the latter is still provided (class FPolygon), for people who do not care about resizing polygons.
@@ -240,7 +241,7 @@ public class VPolygon extends ClosedShape {
 	    if (f>size){size=(float)f;}
 	}
 	vs=Math.round(size);
-	try {vsm.repaintNow();}catch (NullPointerException ex){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public synchronized void reSize(float factor){
@@ -253,7 +254,7 @@ public class VPolygon extends ClosedShape {
 	    if (f>size){size=(float)f;}
 	}
 	vs=Math.round(size);
-	try {vsm.repaintNow();}catch (NullPointerException ex){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

@@ -11,6 +11,7 @@ package net.claribole.zvtm.glyphs;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VPath;
@@ -335,7 +336,7 @@ public class DPath extends Glyph implements RectangularShape {
 		Arrays.fill(t, new LongPoint(x, y));
 		this.edit(t, false);
 		propagateMove(x,y);  //take care of sticked glyphs
-		try{vsm.repaintNow();}catch(NullPointerException e){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	/** Translate the glyph to (x,y) - absolute translation.
@@ -346,7 +347,7 @@ public class DPath extends Glyph implements RectangularShape {
 		LongPoint[] t = new LongPoint[getNumberOfPoints()];
 		Arrays.fill(t, new LongPoint(x, y));
 		this.edit(t, true);
-		try{vsm.repaintNow();}catch(NullPointerException e){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	/** No effect. */
@@ -541,10 +542,7 @@ public class DPath extends Glyph implements RectangularShape {
             }
         }
         if (update){
-            try {
-                vsm.repaintNow();
-            }
-            catch(NullPointerException ex){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
         }
     }
     
@@ -628,7 +626,7 @@ public class DPath extends Glyph implements RectangularShape {
 		}
 		computeBounds();
 		updateJava2DGeneralPath();
-		try{vsm.repaintNow();}catch(NullPointerException e){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	/**
@@ -716,7 +714,7 @@ public class DPath extends Glyph implements RectangularShape {
 		}
 		computeBounds();
 		updateJava2DGeneralPath();
-		try{vsm.repaintNow();}catch(NullPointerException e){}
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
     /**

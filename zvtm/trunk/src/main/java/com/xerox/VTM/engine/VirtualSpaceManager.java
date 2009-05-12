@@ -140,17 +140,12 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     Color mouseInsideColor=Color.white;
 
-    /**
-     * Only for use with stand-alone Java applications (use other constructor with applet=true if running inside a JApplet)
-     */
-    public VirtualSpaceManager(){
-	this(false);
-    }
-
+  public static final VirtualSpaceManager INSTANCE = new VirtualSpaceManager();
+ 
     /**
      * Set applet to true if you are calling ZVTM from inside an Applet
      */
-    public VirtualSpaceManager(boolean applet){
+    private VirtualSpaceManager(){
 	if (debug){System.out.println("Debug mode ON");}
 	nextID=1;
 	nextcID=1;
@@ -165,7 +160,10 @@ public class VirtualSpaceManager implements AWTEventListener {
 	allVirtualSpaces=new Hashtable();
 	allViews = new View[0];
 	name2viewIndex = new Hashtable();
-	if (!applet){java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(this, AWTEvent.WINDOW_EVENT_MASK);}
+    }
+
+    public static final void setApplet(){
+	    java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(INSTANCE, AWTEvent.WINDOW_EVENT_MASK);
     }
 
     /**set debug mode ON or OFF*/
@@ -301,7 +299,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	if (g!=null && vs!=null){
 	    vs.addGlyph(g);
 	    g.setID(new Long(nextID++));
-	    g.setVSM(this);
 	    if (initColors){
 		g.setMouseInsideHighlightColor(this.mouseInsideColor);
 	    }
@@ -318,7 +315,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 
 			for(Glyph glyph: gs){
 				glyph.setID(new Long(nextID++));
-				glyph.setVSM(this);
 				glyph.setMouseInsideHighlightColor(this.mouseInsideColor);
 				allGlyphs.put(glyph.getID(), glyph);
 			}
@@ -331,7 +327,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	if (c!=null){
 	    if (allVirtualSpaces.containsKey(vs)){
 		c.setID(new Long(nextID++));
-		c.setVSM(this);
 		allGlyphs.put(c.getID(),c);
 		return c;
 	    }

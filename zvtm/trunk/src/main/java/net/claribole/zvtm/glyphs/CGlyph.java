@@ -22,14 +22,13 @@
 
 package net.claribole.zvtm.glyphs;
 
-//import java.lang.Math;
-//import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 
   /**
@@ -90,7 +89,7 @@ public class CGlyph extends Glyph implements Cloneable {
 	    }
 	}
 	propagateMove(x,y);  //take care of sticked glyphs
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void moveTo(long x,long y){
@@ -113,7 +112,7 @@ public class CGlyph extends Glyph implements Cloneable {
 	}
 	this.vx=pGlyph.vx;
 	this.vy=pGlyph.vy;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public float getOrient(){

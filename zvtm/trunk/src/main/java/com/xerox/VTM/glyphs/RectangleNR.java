@@ -21,6 +21,7 @@ import java.awt.geom.AffineTransform;
 import net.claribole.zvtm.glyphs.projection.RProjectedCoords;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Rectangle with constant apparent width and height, no matter the camera's altitude.
@@ -144,21 +145,21 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
 	updateProjectedWH();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(long w){ 
 	vw=w;
 	computeSize();
 	updateProjectedWH();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(long h){
 	vh=h;
 	computeSize();
 	updateProjectedWH();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){//resizing factor
@@ -166,7 +167,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
 	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
 	updateProjectedWH();
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.

@@ -50,7 +50,7 @@ public class TestMultipleGlyphs {
     View testView;
 
     TestMultipleGlyphs(short ogl){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
         initTest(ogl);
     }

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VImage;
 
@@ -116,7 +117,7 @@ public class RImage extends VImageST {
         vh = Math.round(image.getHeight(null)/4.0);
         ar = (float)vw/(float)vh;
         computeSize();
-        try{vsm.repaintNow();}catch(NullPointerException e){}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
     
     public long getHeight(){

@@ -49,7 +49,7 @@ public class Test {
     static double MAG_FACTOR = 8.0;
     
     Test(short ogl){
-        vsm=new VirtualSpaceManager();
+        vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
         //vsm.setDefaultMultiFills(true);
         initTest(ogl);

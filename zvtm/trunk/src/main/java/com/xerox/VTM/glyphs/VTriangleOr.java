@@ -30,6 +30,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
  * Re-orientable Equilateral Triangle. This version is less efficient than VTriangle, but it can be reoriented. It cannot be made translucent (see VTriangle*ST).
@@ -77,7 +78,7 @@ public class VTriangleOr extends VTriangle {
      */
     public void orientTo(float angle){
 	orient=angle;
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(long w,long h,int camIndex){

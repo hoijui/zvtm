@@ -31,6 +31,8 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import com.xerox.VTM.engine.VirtualSpaceManager;
+
 /**
  * Hatched Rectangle. Same as VRectangle, filled with an hatch pattern.
  * @author Emmanuel Pietriga
@@ -157,25 +159,25 @@ public class VRectangleH extends VRectangle {
     public void setHSVColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.setHSVColor(h,s,v);
 	initPattern();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void addHSVColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.addHSVColor(h,s,v);
 	initPattern();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHSVbColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.setHSVbColor(h,s,v);
 	initPattern();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void addHSVbColor(float h,float s,float v){ //color  [0.0,1.0]
 	super.addHSVbColor(h,s,v);
 	initPattern();
-	try{vsm.repaintNow();}catch(NullPointerException e){/*System.err.println("VSM null in Glyph "+e);*/}
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public Object clone(){
