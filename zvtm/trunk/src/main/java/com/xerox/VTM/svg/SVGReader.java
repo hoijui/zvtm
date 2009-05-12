@@ -870,30 +870,27 @@ public class SVGReader {
     /** Create a VText from an SVG text element.
      * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
-     *@param vsm the virtual space manager (to get some font information)
      */
-    public static VTextST createText(Element e,VirtualSpaceManager vsm){
-        return createText(e,null,vsm,false);
+    public static VTextST createText(Element e){
+        return createText(e,null,false);
     }
 
     /** Create a VText from an SVG text element.
      * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
-     *@param vsm the virtual space manager (to get some font information)
      */
-    public static VTextST createText(Element e,Context ctx,VirtualSpaceManager vsm){
-        return createText(e,ctx,vsm,false);
+    public static VTextST createText(Element e,Context ctx){
+        return createText(e,ctx,false);
     }
 
 	/** Create a VText from an SVG text element.
 		* Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
 		*@param e an SVG text as a DOM element (org.w3c.dom.Element)
 		*@param ctx used to propagate contextual style information (put null if none)
-		*@param vsm the virtual space manager (to get some font information)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
-	public static VTextST createText(Element e,Context ctx,VirtualSpaceManager vsm,boolean meta){
+	public static VTextST createText(Element e,Context ctx,boolean meta){
         String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
         long x = getLong(e.getAttribute(_x));
         long y = getLong(e.getAttribute(_y));
@@ -931,7 +928,7 @@ public class SVGReader {
                 res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
             }
             Font f;
-            if (specialFont(f=ss.getDefinedFont(ctx), vsm.getMainFont())){
+            if (specialFont(f=ss.getDefinedFont(ctx), VirtualSpaceManager.INSTANCE.getMainFont())){
                 res.setSpecialFont(f);
             }
         }
@@ -943,7 +940,7 @@ public class SVGReader {
                 res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
             }
             Font f;
-            if (specialFont(f=ctx.getDefinedFont(), vsm.getMainFont())){
+            if (specialFont(f=ctx.getDefinedFont(), VirtualSpaceManager.INSTANCE.getMainFont())){
                 res.setSpecialFont(f);
             }
         }
@@ -1614,48 +1611,44 @@ public class SVGReader {
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
-     *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
-     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
-     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
+     *@deprecated As of zvtm 0.9.5, use load(Document d, String vs, boolean meta, String documentURL)
+     *@see #load(Document d, String vs, boolean meta, String documentURL)
      */
-    public static void load(Document d,VirtualSpaceManager vsm,String vs){
+    public static void load(Document d,String vs){
         load(d, vsm, vs, false, "");
     }
 
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
-     *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
-     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
-     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
+     *@deprecated As of zvtm 0.9.5, use load(Document d, String vs, boolean meta, String documentURL)
+     *@see #load(Document d, String vs, boolean meta, String documentURL)
      */
-    public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta){
-        load(d, vsm, vs, meta, "");
+    public static void load(Document d, String vs, boolean meta){
+        load(d, vs, meta, "");
     }
 
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
-     * This is a convenience method. An invocation of the form load(d, vsm, vs, meta, documentURL) behaves in exactly the same way as the invocation load(d, vsm, vs, meta, documentURL, null).
+     * This is a convenience method. An invocation of the form load(d, vs, meta, documentURL) behaves in exactly the same way as the invocation load(d, vs, meta, documentURL, null).
      *@param d SVG document as a DOM tree
-     *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
      *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
      * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
      * is expressed relative to the document's location.
-     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL, String fallbackParentURL)
+     *@see #load(Document d, String vs, boolean meta, String documentURL, String fallbackParentURL)
      */
-    public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL){
-        SVGReader.load(d, vsm, vs, meta, documentURL, null);
+    public static void load(Document d, String vs, boolean meta, String documentURL){
+        SVGReader.load(d, vs, meta, documentURL, null);
     }
 
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
-     *@param vsm VTM virtual space manager owning the virtual space
      *@param vs name of the virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
      *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
@@ -1664,9 +1657,9 @@ public class SVGReader {
      *@param fallbackParentURL used to indicate a possible fallback directory from which to interpret relative paths in case the parent of
      * documentURL is not the right place where to look for those images (this can happen e.g. if a file was generated somewhere and then
      * moved alone, associated images staying in the original directory) ; set to null if no fallback directory is known.
-     *@see #load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL)
+     *@see #load(Document d, String vs, boolean meta, String documentURL)
      */
-    public static void load(Document d, VirtualSpaceManager vsm, String vs, boolean meta, String documentURL, String fallbackParentURL){
+    public static void load(Document d, String vs, boolean meta, String documentURL, String fallbackParentURL){
         // The following way of retrieving the Document's URL is disabled because it requires Java 1.5/DOM Level 3 support
         String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
         Element svgRoot=d.getDocumentElement();
@@ -1674,46 +1667,46 @@ public class SVGReader {
         Hashtable imageStore = new Hashtable();
         for (int i=0;i<objects.getLength();i++){
             Node obj=objects.item(i);
-            if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vsm,vs,null,false,meta, documentParentURL, fallbackParentURL, imageStore);}
+            if (obj.getNodeType()==Node.ELEMENT_NODE){processNode((Element)obj,vs,null,false,meta, documentParentURL, fallbackParentURL, imageStore);}
         }
     }
 
     /*e is a DOM element, vs is the name of the virtual space where the new glyph(s) is(are) put*/
-    private static void processNode(Element e,VirtualSpaceManager vsm,String vs,
+    private static void processNode(Element e,String vs,
                                     Context ctx,boolean mainFontSet,boolean meta,
                                     String documentParentURL, String fallbackParentURL,
                                     Hashtable imageStore){
         String tagName=e.getTagName();
         if (tagName.equals(_rect)){
-            vsm.addGlyph(createRectangle(e,ctx,meta),vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createRectangle(e,ctx,meta),vs);
         }
         else if (tagName.equals(_ellipse)){
-            vsm.addGlyph(createEllipse(e,ctx,meta),vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createEllipse(e,ctx,meta),vs);
         }
         else if (tagName.equals(_circle)){
-            vsm.addGlyph(createCircle(e,ctx,meta),vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createCircle(e,ctx,meta),vs);
         }
         else if (tagName.equals(_path)){
-            vsm.addGlyph(createPath(e,new DPathST(1.0f),ctx,meta),vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createPath(e,new DPathST(1.0f),ctx,meta),vs);
         }
         else if (tagName.equals(_text)){
-            vsm.addGlyph(createText(e,ctx,vsm,meta),vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createText(e,ctx,meta),vs);
         }
         else if (tagName.equals(_polygon)){
             Glyph g=createRectangleFromPolygon(e,ctx,meta);
             //if e does not describe a rectangle
-            if (g!=null){vsm.addGlyph(g,vs);}
+            if (g!=null){VirtualSpaceManager.INSTANCE.addGlyph(g,vs);}
             //create a VPolygon
-            else {vsm.addGlyph(createPolygon(e,ctx,meta),vs);}
+            else {VirtualSpaceManager.INSTANCE.addGlyph(createPolygon(e,ctx,meta),vs);}
         }
         else if (tagName.equals(_polyline)){
             Glyph[] segments=createPolyline(e,ctx,meta);
             for (int i=0;i<segments.length;i++){
-                vsm.addGlyph(segments[i],vs);
+                VirtualSpaceManager.INSTANCE.addGlyph(segments[i],vs);
             }
         }
         else if (tagName.equals(_line)){
-            vsm.addGlyph(createLine(e, ctx, meta), vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createLine(e, ctx, meta), vs);
         }
         else if (tagName.equals(_image)) {
             if (isSVGImage(e)) {
@@ -1752,7 +1745,7 @@ public class SVGReader {
                 scale = (double)w / iw;
                 xoffset -= (long)Math.floor((double)xor * scale);
                 yoffset -= (long)Math.floor((double)yor * scale);
-                load(imageDoc, vsm, vs, meta, imPath);
+                load(imageDoc, vs, meta, imPath);
                 scale = 1.0;
                 xoffset = xos;
                 yoffset = yos;
@@ -1760,7 +1753,7 @@ public class SVGReader {
             else { 
                 Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
                 if (g != null){
-                    vsm.addGlyph(g, vs);
+                    VirtualSpaceManager.INSTANCE.addGlyph(g, vs);
                 }
             }
         }
@@ -1794,7 +1787,7 @@ public class SVGReader {
                 if (!mainFontSet){
                     Font f;
                     if ((f=ctx.getDefinedFont())!=null){
-                        vsm.setMainFont(f);
+                        VirtualSpaceManager.INSTANCE.setMainFont(f);
                         setAFont=true;
                     }
                 }
@@ -1818,7 +1811,7 @@ public class SVGReader {
             for (int i=0;i<objects.getLength();i++){
                 Node obj=objects.item(i);
                 if (obj.getNodeType()==Node.ELEMENT_NODE){
-                    processNode((Element)obj, vsm, vs,
+                    processNode((Element)obj, vs,
                         ctx.duplicate(),
                         setAFont, meta,
                         documentParentURL, fallbackParentURL, imageStore);
@@ -1836,7 +1829,7 @@ public class SVGReader {
                 if (!mainFontSet){
                     Font f;
                     if ((f=ctx.getDefinedFont())!=null){
-                        vsm.setMainFont(f);
+                        VirtualSpaceManager.INSTANCE.setMainFont(f);
                         setAFont=true;
                     }
                 }
@@ -1849,7 +1842,7 @@ public class SVGReader {
             for (int i=0;i<objects.getLength();i++){
                 Node obj=objects.item(i);
                 if (obj.getNodeType()==Node.ELEMENT_NODE){
-                    processNode((Element)obj, vsm, vs,
+                    processNode((Element)obj, vs,
                         (ctx != null) ? ctx.duplicate() : null,
                         setAFont, meta,
                         documentParentURL, fallbackParentURL, imageStore);
