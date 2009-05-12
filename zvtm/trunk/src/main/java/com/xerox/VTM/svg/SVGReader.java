@@ -1616,7 +1616,7 @@ public class SVGReader {
      *@see #load(Document d, String vs, boolean meta, String documentURL)
      */
     public static void load(Document d,String vs){
-        load(d, vsm, vs, false, "");
+        load(d, vs, false, "");
     }
 
     /**
