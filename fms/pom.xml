@@ -8,10 +8,10 @@ $Id: pom.xml 1334 2008-11-07 08:22:45Z epietrig $
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
-  <artifactId>zvtm-eval</artifactId>
+  <artifactId>fms</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM Evaluations</name>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <url>http://zvtm.sourceforge.net/eval</url>
   
   <!-- Repositories -->
@@ -30,9 +30,9 @@ $Id: pom.xml 1334 2008-11-07 08:22:45Z epietrig $
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
-      <groupId>fr.inria.zvtm</groupId>
+      <groupId>net.claribole.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.10-0-SNAPSHOT</version>
+      <version>0.10.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   
@@ -74,6 +74,23 @@ $Id: pom.xml 1334 2008-11-07 08:22:45Z epietrig $
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
+        </configuration>
+      </plugin>
+	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zvtm.fms.Test</mainClass>
+              <packageName>fr.inria.zvtm.fms</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
         </configuration>
       </plugin>
       <plugin>
