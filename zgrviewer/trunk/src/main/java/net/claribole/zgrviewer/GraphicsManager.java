@@ -183,43 +183,50 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     Vector createZVTMelements(boolean applet){
-	vsm = new VirtualSpaceManager(applet);
-	vsm.setMainFont(ConfigManager.defaultFont);
-	vsm.setZoomLimit(-90);
-	vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
-	//vsm.setDebug(true);
-	mSpace = vsm.addVirtualSpace(mainSpace);
-	mainCamera = vsm.addCamera(mainSpace); // camera #0 for main view
-	vsm.addCamera(mainSpace); // camera #1 for radar view
-	mnSpace = vsm.addVirtualSpace(menuSpace);
-	// camera for pie menu
-	vsm.addCamera(menuSpace).setAltitude(10);
-	rSpace = vsm.addVirtualSpace(rdRegionVirtualSpace);
-	// camera for rectangle representing region seen in main viewport (in overview)
-	vsm.addCamera(rdRegionVirtualSpace);
-	// DragMag portal camera (camera #2)
-	dmCamera = vsm.addCamera(mainSpace);
-	RectangleNR seg1;
-	RectangleNR seg2;
-	observedRegion=new VRectangleST(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR);
-	observedRegion.setBorderColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
-	seg1 = new RectangleNR(0, 0, 0, 0, 500, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);  //500 should be sufficient as the radar window is
-	seg2 = new RectangleNR(0, 0, 0, 500, 0, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);  //not resizable and is 300x200 (see rdW,rdH below)
-	if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
-	    observedRegion.setFilled(false);
-	}
-	vsm.addGlyph(observedRegion,rdRegionVirtualSpace);
-	vsm.addGlyph(seg1,rdRegionVirtualSpace);
-	vsm.addGlyph(seg2,rdRegionVirtualSpace);
-	vsm.stickToGlyph(seg1,observedRegion);
-	vsm.stickToGlyph(seg2,observedRegion);
-	observedRegion.setSensitivity(false);
-	tp = new ToolPalette(this);
-	Vector cameras = new Vector();
-	cameras.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
-	cameras.add(vsm.getVirtualSpace(menuSpace).getCamera(0));
-	cameras.add(tp.getPaletteCamera());
-	return cameras;
+        if (applet){
+            VirtualSpaceManager.setApplet();
+        }
+        vsm = VirtualSpaceManager.INSTANCE;
+        vsm.setMainFont(ConfigManager.defaultFont);
+        vsm.setZoomLimit(-90);
+        vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
+        //vsm.setDebug(true);
+        mSpace = vsm.addVirtualSpace(mainSpace);
+        // camera #0 for main view
+        mainCamera = vsm.addCamera(mainSpace);
+        // camera #1 for radar view
+        vsm.addCamera(mainSpace);
+        mnSpace = vsm.addVirtualSpace(menuSpace);
+        // camera for pie menu
+        vsm.addCamera(menuSpace).setAltitude(10);
+        rSpace = vsm.addVirtualSpace(rdRegionVirtualSpace);
+        // camera for rectangle representing region seen in main viewport (in overview)
+        vsm.addCamera(rdRegionVirtualSpace);
+        // DragMag portal camera (camera #2)
+        dmCamera = vsm.addCamera(mainSpace);
+        RectangleNR seg1;
+        RectangleNR seg2;
+        observedRegion=new VRectangleST(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR);
+        observedRegion.setBorderColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
+        //500 should be sufficient as the radar window is
+        seg1 = new RectangleNR(0, 0, 0, 0, 500, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
+        //not resizable and is 300x200 (see rdW,rdH below)
+        seg2 = new RectangleNR(0, 0, 0, 500, 0, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
+        if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
+            observedRegion.setFilled(false);
+        }
+        vsm.addGlyph(observedRegion,rdRegionVirtualSpace);
+        vsm.addGlyph(seg1,rdRegionVirtualSpace);
+        vsm.addGlyph(seg2,rdRegionVirtualSpace);
+        vsm.stickToGlyph(seg1,observedRegion);
+        vsm.stickToGlyph(seg2,observedRegion);
+        observedRegion.setSensitivity(false);
+        tp = new ToolPalette(this);
+        Vector cameras = new Vector();
+        cameras.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
+        cameras.add(vsm.getVirtualSpace(menuSpace).getCamera(0));
+        cameras.add(tp.getPaletteCamera());
+        return cameras;
     }
 
     void createFrameView(Vector cameras, int acc, JMenuBar jmb){
