@@ -65,9 +65,6 @@ public class VirtualSpace {
     /**name of virtual space*/
     public String spaceName;
     
-    /**hook to virtual space manager*/
-    public VirtualSpaceManager vsm;
-
     /**camera manager for this virtual space*/
     CameraManager cm;
 
@@ -135,9 +132,9 @@ public class VirtualSpace {
      */
     public void removeCamera(int i){
 	if (cm.cameraList.length>i){
-	    for (int j=0;j<vsm.allViews.length;j++){
-		if (vsm.allViews[j].cameras.contains(cm.getCamera(i))){
-		    vsm.allViews[j].destroyCamera(cm.getCamera(i));
+	    for (int j=0;j<VirtualSpaceManager.INSTANCE.allViews.length;j++){
+		if (VirtualSpaceManager.INSTANCE.allViews[j].cameras.contains(cm.getCamera(i))){
+		    VirtualSpaceManager.INSTANCE.allViews[j].destroyCamera(cm.getCamera(i));
 		}
 	    }
 	    for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
@@ -276,7 +273,7 @@ public class VirtualSpace {
      *@param gID glyph's ID
      */
     public void removeGlyph(Long gID){
-	    removeGlyph(vsm.getGlyph(gID), true);
+	    removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
@@ -284,7 +281,7 @@ public class VirtualSpace {
      *@param repaint should the view be updated automatically or not
      */
     public void removeGlyph(Long gID, boolean repaint){
-	    removeGlyph(vsm.getGlyph(gID), repaint);
+	    removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated. */
@@ -320,9 +317,9 @@ public class VirtualSpace {
             }
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
-            vsm.allGlyphs.remove(g.getID());
+            VirtualSpaceManager.INSTANCE.allGlyphs.remove(g.getID());
             if (repaint){
-                vsm.repaintNow();
+                VirtualSpaceManager.INSTANCE.repaintNow();
             }
         }
         catch (NullPointerException ex){
@@ -337,7 +334,7 @@ public class VirtualSpace {
 		*@see #removeGlyph(Long gID)
 		*/
 	public void destroyGlyph(Long gID){
-		removeGlyph(vsm.getGlyph(gID), true);
+		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
 	}
 
 	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
@@ -347,7 +344,7 @@ public class VirtualSpace {
 		*@see #removeGlyph(Long gID, boolean repaint)
 		*/
 	public void destroyGlyph(Long gID, boolean repaint){
-		removeGlyph(vsm.getGlyph(gID), repaint);
+		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
 	}
 
 	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
@@ -373,7 +370,7 @@ public class VirtualSpace {
      *@see #hide(Glyph g)*/
     public void show(Glyph g){
 	if (visualEnts.contains(g) && glyphIndexInDrawingList(g) == -1){addGlyphToDrawingList(g);}
-	vsm.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /**hide Glyph g
@@ -389,7 +386,7 @@ public class VirtualSpace {
 		cm.cameraList[i].view.mouse.removeGlyphFromList(g);
 	    }
 	}
-	vsm.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Put this glyph on top of the drawing list (will be drawn last).
@@ -483,8 +480,6 @@ public class VirtualSpace {
             g1.setZindex(g2.getZindex());
         }
     }
-
-    void setManager(VirtualSpaceManager v){this.vsm=v;}
 
     /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
     public long[] findFarmostGlyphCoords(){

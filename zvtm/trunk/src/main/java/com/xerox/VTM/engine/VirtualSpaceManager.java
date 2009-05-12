@@ -697,7 +697,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**create a new virtual space with name n*/
     public VirtualSpace addVirtualSpace(String n){
 	VirtualSpace tvs=new VirtualSpace(n);
-	tvs.setManager(this);
 	allVirtualSpaces.put(n,tvs);
 	return tvs;
     }

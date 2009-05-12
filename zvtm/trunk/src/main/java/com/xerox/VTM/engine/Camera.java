@@ -122,7 +122,7 @@ public class Camera {
 	posy = y;
 	updatePrecisePosition();
 	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
 	}
 	notifyMoved();
     }
@@ -134,7 +134,7 @@ public class Camera {
 	updatePrecisePosition();
 	propagateMove(x, y);  //take care of sticked glyphs
 	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
 	}
 	notifyMoved();
     }
@@ -147,7 +147,7 @@ public class Camera {
         posy = Math.round(dposy);
         propagateMove(posx, posy);  //take care of sticked glyphs
         if (view != null){
-            parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
         }
 	notifyMoved();
     }
@@ -159,7 +159,7 @@ public class Camera {
 	updatePrecisePosition();
 	propagateMove(x-posx, y-posy);  //take care of sticked glyphs
 	if (view != null){
-	    parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
 	}
 	notifyMoved();
     }
@@ -190,11 +190,11 @@ public class Camera {
      */
     public void setAltitude(float a, boolean repaint){
 	float oldAlt = altitude;
-	if (a>=parentSpace.vsm.zoomFloor){altitude=a;}  //test prevents incorrect altitudes
-	else {altitude=parentSpace.vsm.zoomFloor;}
+	if (a>=VirtualSpaceManager.INSTANCE.zoomFloor){altitude=a;}  //test prevents incorrect altitudes
+	else {altitude=VirtualSpaceManager.INSTANCE.zoomFloor;}
 	propagateAltitudeChange(altitude - oldAlt);
 	if (repaint && view != null){
-	    parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
 	}
 	notifyMoved();
     }
@@ -206,11 +206,11 @@ public class Camera {
      */
     public void altitudeOffset(float a, boolean repaint){
 	float oldAlt = altitude;
-	if ((altitude+a)>parentSpace.vsm.zoomFloor){altitude+=a;}   //test prevents incorrect altitudes
-	else {altitude=parentSpace.vsm.zoomFloor;}
+	if ((altitude+a)>VirtualSpaceManager.INSTANCE.zoomFloor){altitude+=a;}   //test prevents incorrect altitudes
+	else {altitude=VirtualSpaceManager.INSTANCE.zoomFloor;}
 	propagateAltitudeChange(altitude - oldAlt);
 	if (repaint && view != null){
-	    parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
 	}
 	notifyMoved();
     }
@@ -234,7 +234,7 @@ public class Camera {
         altitude = l.alt;
         updatePrecisePosition();
         if (view != null){
-            parentSpace.vsm.repaintNow(view);
+		VirtualSpaceManager.INSTANCE.repaintNow(view);
         }
 	notifyMoved();
     }
@@ -390,7 +390,7 @@ public class Camera {
 		g.stickedTo = this;
 	    }
 	    else {
-		if (parentSpace.vsm.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Camera "+this+" while they are already sticked.");}
+		if (VirtualSpaceManager.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Camera "+this+" while they are already sticked.");}
 	    }
 	}
     }
@@ -481,7 +481,7 @@ public class Camera {
 		stickAltitude = newStickAltList;
 	    }
 	    else {
-		if (parentSpace.vsm.debugModeON()){System.err.println("Warning: trying to stick Camera "+c+" to Camera "+this+" while they are already sticked.");}
+		if (VirtualSpaceManager.debugModeON()){System.err.println("Warning: trying to stick Camera "+c+" to Camera "+this+" while they are already sticked.");}
 	    }
 	}
     }
@@ -559,7 +559,7 @@ public class Camera {
     public void setEnabled(boolean b){
         if (b != enabled){
             enabled = b;
-            parentSpace.vsm.repaintNow(view);
+	    VirtualSpaceManager.INSTANCE.repaintNow(view);
         }
     }
 

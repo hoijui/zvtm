@@ -11,6 +11,7 @@
 package net.claribole.zvtm.glyphs;
 
 import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
@@ -52,7 +53,7 @@ public abstract class PieMenu {
 		if (animLength > 0){
 			for (int i=0;i<items.length;i++){
 				if (items[i] != null){
-				    Animation sizeAnim = vs.vsm.getAnimationManager().getAnimationFactory()
+				    Animation sizeAnim = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
 					.createGlyphSizeAnim(animLength, 
 							     items[i], 
 							     0.1f, 
@@ -64,7 +65,7 @@ public abstract class PieMenu {
 								     vs.removeGlyph((Glyph)subject);
 								 }
 							     });
-				    vs.vsm.getAnimationManager().startAnimation(sizeAnim, false);
+				    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(sizeAnim, false);
 				}   
 			}
 		}
