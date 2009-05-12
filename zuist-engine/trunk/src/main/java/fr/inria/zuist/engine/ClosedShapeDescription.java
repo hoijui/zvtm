@@ -40,23 +40,23 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeIn){
+    public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
             if (fadeIn){
                 ((Translucent)glyph).setTranslucencyValue(0.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
-                vsm.addGlyph(glyph, vs);
+                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
                 //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
                 //        not necessarily 1.0f
-//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
+//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
-                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, (Translucent)glyph,
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, (Translucent)glyph,
                     1.0f, false, IdentityInterpolator.getInstance(), null);
-                vsm.getAnimationManager().startAnimation(a, false);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
                 if (!sensitive){glyph.setSensitivity(false);}
-                vsm.addGlyph(glyph, vs);
+                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
             }
             inSpace = true;
             glyph.setOwner(this);
@@ -65,15 +65,15 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
-    public synchronized void destroyObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeOut){
+    public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
         if (inSpace){
             if (fadeOut){
-//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
+//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
 //                    new ClosedShapeHideAction(vs));
-                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, (Translucent)glyph,
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, (Translucent)glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new ClosedShapeHideAction(vs));
-                vsm.getAnimationManager().startAnimation(a, false);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
                 vs.removeGlyph(glyph);

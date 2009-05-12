@@ -99,8 +99,6 @@ public class SceneManager {
 
     Level[] levels = new Level[0];
 
-    VirtualSpaceManager vsm;
-    
     VirtualSpace[] sceneLayers;
     Camera[] sceneCameras;
     long[][] sceneCameraBounds;
@@ -114,12 +112,10 @@ public class SceneManager {
     RegionListener regionListener;
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
-     *@param vsm ZVTM virtual space manager instantiated by client application
      *@param vss virtual spaces in which the scene will be loaded
      *@param cs cameras associated to those virtual spaces, through which the scene will be observed
      */
-    public SceneManager(VirtualSpaceManager vsm, VirtualSpace[] vss, Camera[] cs){
-        this.vsm = vsm;
+    public SceneManager(VirtualSpace[] vss, Camera[] cs){
         this.sceneLayers = vss;
         this.sceneCameras = cs;
         sceneCameraBounds = new long[cs.length][];
@@ -379,7 +375,7 @@ public class SceneManager {
         }
         if (fill != null || stroke != null || sensitivity){
             // add the rectangle representing the region only if it is visible or sensitive
-            vsm.addGlyph(r, sceneLayers[li]);
+            VirtualSpaceManager.INSTANCE.addGlyph(r, sceneLayers[li]);
         }
         region.setGlyph(r);
         r.setOwner(region);

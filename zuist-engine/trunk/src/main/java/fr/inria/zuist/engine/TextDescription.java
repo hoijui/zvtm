@@ -84,24 +84,24 @@ public class TextDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeIn){
+    public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
         if (glyph == null){
             if (fadeIn){
                 glyph = new VTextST(vx, vy, zindex, fillColor, text, anchor, 0.0f, scale);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-                vsm.addGlyph(glyph, vs);
-//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
+                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
-                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
                     1.0f, false, IdentityInterpolator.getInstance(), null);
-                vsm.getAnimationManager().startAnimation(a, false);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
                 glyph = new VTextST(vx, vy, zindex, fillColor, text, anchor, 1.0f, scale);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-                vsm.addGlyph(glyph, vs);
+                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
             }
             glyph.setOwner(this);
         }
@@ -109,15 +109,15 @@ public class TextDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public synchronized void destroyObject(VirtualSpace vs, VirtualSpaceManager vsm, boolean fadeOut){
+    public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
-//                vsm.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
+//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
 //                    new TextHideAction(vs));
-                Animation a = vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new TextHideAction(vs));
-                vsm.getAnimationManager().startAnimation(a, false);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
                 vs.removeGlyph(glyph);

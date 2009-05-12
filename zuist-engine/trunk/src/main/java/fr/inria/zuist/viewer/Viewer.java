@@ -123,7 +123,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		initGUI(fullscreen, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(vsm, sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setRegionListener(this);
         sm.setLevelListener(this);
@@ -139,7 +139,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     void initGUI(boolean fullscreen, boolean antialiased){
         windowLayout();
-        vsm = new VirtualSpaceManager();
+        vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         vsm.addVirtualSpace(mnSpaceName);
         mCamera = vsm.addCamera(mSpace);

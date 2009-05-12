@@ -193,7 +193,7 @@ class GlyphLoader implements Runnable {
         if (DEBUG){
             System.out.println("Actually loading "+od);
         }
-        od.createObject(sm.sceneLayers[od.getParentRegion().getLayerIndex()], sm.vsm, transition==Request.TRANSITION_FADE);
+        od.createObject(sm.sceneLayers[od.getParentRegion().getLayerIndex()], transition==Request.TRANSITION_FADE);
     }
 
 
@@ -201,7 +201,7 @@ class GlyphLoader implements Runnable {
         if (DEBUG){
             System.out.println("Actually unloading "+od);
         }
-        od.destroyObject(sm.sceneLayers[od.getParentRegion().getLayerIndex()], sm.vsm, transition==Request.TRANSITION_FADE);
+        od.destroyObject(sm.sceneLayers[od.getParentRegion().getLayerIndex()], transition==Request.TRANSITION_FADE);
     }
 
 

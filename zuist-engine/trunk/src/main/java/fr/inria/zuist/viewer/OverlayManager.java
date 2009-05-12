@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
@@ -105,11 +106,11 @@ class OverlayManager implements ViewEventHandler {
             insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            application.vsm.addGlyph(fadeAbout, application.ovSpace);
-            application.vsm.addGlyph(inriaLogo, application.ovSpace);
-            application.vsm.addGlyph(insituLogo, application.ovSpace);
+            VirtualSpaceManager.INSTANCE.addGlyph(fadeAbout, application.ovSpace);
+            VirtualSpaceManager.INSTANCE.addGlyph(inriaLogo, application.ovSpace);
+            VirtualSpaceManager.INSTANCE.addGlyph(insituLogo, application.ovSpace);
 			for (int i=0;i<aboutLines.length;i++){
-	            application.vsm.addGlyph(aboutLines[i], application.ovSpace);				
+	            VirtualSpaceManager.INSTANCE.addGlyph(aboutLines[i], application.ovSpace);				
 			}
             showingAbout = true;
         }
