@@ -194,7 +194,7 @@ public class Camera {
      *@param a new altitude value
      */
     public void setAltitude(float a){
-	setAltitude(a, false);
+	setAltitude(a, true);
     }
 
     /**
@@ -203,7 +203,7 @@ public class Camera {
      *@param a offset value
      */
     public void altitudeOffset(float a){
-	altitudeOffset(a, false);
+	altitudeOffset(a, true);
     }
 
 
@@ -229,14 +229,7 @@ public class Camera {
      *@param repaint refresh the associated view or not
      */
     public void altitudeOffset(float a, boolean repaint){
-	float oldAlt = altitude;
-	if ((altitude+a)>zoomFloor){altitude+=a;}   //test prevents incorrect altitudes
-	else {altitude=zoomFloor;}
-	propagateAltitudeChange(altitude - oldAlt);
-	if (repaint && view != null){
-		VirtualSpaceManager.INSTANCE.repaintNow(view);
-	}
-	notifyMoved();
+	    setAltitude(altitude + a, repaint);
     }
 
     /**
