@@ -54,7 +54,7 @@ public class Test {
         vsm.repaintNow();
     }
     
-    Lens lens;
+    FixedSizeLens lens;
     
     void toggleLens(int x, int y){
         if (lens != null){
@@ -66,8 +66,10 @@ public class Test {
     }
     
     void setLens(int x, int y){
-        lens = mView.setLens(getLensDefinition(x, y));
+        lens = (FixedSizeLens)mView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
+        lens.setOuterRadiusColor(Color.BLACK);
+        lens.setInnerRadiusColor(Color.BLACK);
         Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
