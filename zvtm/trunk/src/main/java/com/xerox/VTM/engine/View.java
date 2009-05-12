@@ -119,12 +119,6 @@ public abstract class View {
     /**View name*/
     protected String name;
 
-    /**root VTM class*/
-    VirtualSpaceManager parent;
-
-//     /**font used in this view  (use setFont() to modify)*/
-//     Font font=Glyph.defaultFont;
-
     /**triggers the mouseMoved method in ViewEventHandler when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
     boolean notifyMouseMoved=false;
 
@@ -420,7 +414,7 @@ public abstract class View {
 
     /**activate the view means that it will be repainted*/
     public void activate(){
-	parent.setActiveView(this);
+	VirtualSpaceManager.INSTANCE.setActiveView(this);
 	panel.active=true;
 	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewActivated(this);}
     }

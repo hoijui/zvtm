@@ -254,7 +254,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 		drawVTMcursor = true;
 	    }
 	    catch(IndexOutOfBoundsException e){
-		if (parent.parent.debug){
+		if (VirtualSpaceManager.debugModeON()){
 		    System.err.println("Error while creating custom cursor " + e);
 		    awtCursor = new Cursor(Cursor.CROSSHAIR_CURSOR);
 		    drawVTMcursor = false;
@@ -269,7 +269,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 		awtCursor = Cursor.getPredefinedCursor(cursorType);
 	    }
 	    catch(IndexOutOfBoundsException e){
-		if (parent.parent.debug){
+		if (VirtualSpaceManager.debugModeON()){
 		    System.err.println("Error while creating AWT cursor " + e);
 		    awtCursor=new Cursor(Cursor.DEFAULT_CURSOR);
 		}
@@ -502,7 +502,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	active=true; //make the view active any time the mouse enters it
 	repaintNow=true;
 	inside=true;
-	parent.parent.setActiveView(this.parent);
+	VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
 	/* requesting parent focus was only used to get keyboard/mouse wheel events in IViews,
 	   better to manage this explcitly when internal frames get selected as doing it
 	   here has unwanted side effects in some UIs that mix internal and external frames */
@@ -564,7 +564,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 }
             }
         }
-        catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousemoved "+ex);ex.printStackTrace();}}
+        catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.mousemoved "+ex);ex.printStackTrace();}}
     }
 
     /**send event to application event handler*/
@@ -612,7 +612,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
             }
         }	
-        catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousedragged "+ex);}}
+        catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);}}
     }
 
     /**send event to application event handler*/
@@ -621,7 +621,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	    try {
 		evHs[activeLayer].mouseWheelMoved(this, (e.getWheelRotation() < 0) ? ViewEventHandler.WHEEL_DOWN : ViewEventHandler.WHEEL_UP, e.getX(), e.getY(), e);
 	    }
-	    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.mousewheelmoved "+ex);}}
+	    catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousewheelmoved "+ex);}}
 	}
     }
 
@@ -686,11 +686,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	if (l != null){
 	    this.lens = l;
 	    if (this.lens.getID() == null){
-		this.lens.setID(new Integer(parent.parent.nextlID++));
+		this.lens.setID(new Integer(VirtualSpaceManager.INSTANCE.nextlID++));
 		Vector v = new Vector();
 		v.addElement(this.lens);
 		v.addElement(parent);
-		parent.parent.allLenses.put(this.lens.getID(), v);
+		VirtualSpaceManager.INSTANCE.allLenses.put(this.lens.getID(), v);
 	    }
 	    this.lens.setLensBuffer(this);
 	    
@@ -699,7 +699,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}
 	else {//removing the lens set for this view
 	    if (this.lens != null){
-		parent.parent.allLenses.remove(this.lens.getID());
+		VirtualSpaceManager.INSTANCE.allLenses.remove(this.lens.getID());
 		this.lens = null;
 		parent.repaintNow();
 	    }

@@ -80,7 +80,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR); // custom cursor means VTM
                                                 // cursor
-	if (parent.parent.debug) {
+	if (VirtualSpaceManager.debugModeON()) {
 	    System.out.println("View refresh time set to " + frameTime + "ms");
 	}
     }
@@ -103,7 +103,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 	    try {
 		runView.sleep(inactiveSleepTime);
 	    } catch (InterruptedException e) {
-		if (parent.parent.debug) {
+		if (VirtualSpaceManager.debugModeON()) {
 		    System.err.println("viewpanel.run.runview.sleep " + e);
 		}
 		return;
@@ -141,7 +141,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			    }
 			    // clipRect=new
                                 // Rectangle(0,0,size.width,size.height);
-			    if (parent.parent.debug) {
+			    if (VirtualSpaceManager.debugModeON()) {
 				System.out.println("Resizing JPanel: ("
 					+ oldSize.width + "x" + oldSize.height
 					+ ") -> (" + size.width + "x"
@@ -401,7 +401,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 						    evHs[activeLayer], cams[activeLayer]);
 					}
 				    } catch (NullPointerException ex) {
-					if (parent.parent.debug) {
+					if (VirtualSpaceManager.debugModeON()) {
 					    System.err
 						    .println("viewpanel.run.drawdrag "
 							    + ex);
@@ -508,7 +508,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 				    .sleep((timeToSleep > minimumSleepTime) ? timeToSleep
 					    : minimumSleepTime);
 			} catch (InterruptedException e) {
-			    if (parent.parent.debug) {
+			    if (VirtualSpaceManager.debugModeON()) {
 				System.err
 					.println("viewpanel.run.runview.sleep2 "
 						+ e);
@@ -534,7 +534,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 					cams[activeLayer]);
 			    }
 			} catch (NullPointerException ex) {
-			    if (parent.parent.debug) {
+			    if (VirtualSpaceManager.debugModeON()) {
 				System.err.println("viewpanel.run.drawdrag "
 					+ ex);
 			    }
@@ -574,7 +574,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 				// just catch it and wait for next loop until we
                                 // find out what's causing this
 				catch (NullPointerException ex47) {
-				    if (parent.parent.debug) {
+				    if (VirtualSpaceManager.debugModeON()) {
 					System.err
 						.println("viewpanel.run.runview.drawVTMcursor "
 							+ ex47);
@@ -593,7 +593,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 				    .sleep((timeToSleep > minimumSleepTime) ? timeToSleep
 					    : minimumSleepTime);
 			} catch (InterruptedException e) {
-			    if (parent.parent.debug) {
+			    if (VirtualSpaceManager.debugModeON()) {
 				System.err
 					.println("viewpanel.run.runview.sleep3 "
 						+ e);
@@ -606,7 +606,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
                                                                                 // ...
                                                                                 // ms
 			} catch (InterruptedException e) {
-			    if (parent.parent.debug) {
+			    if (VirtualSpaceManager.debugModeON()) {
 				System.err
 					.println("viewpanel.run.runview.sleep3 "
 						+ e);
@@ -618,7 +618,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 		    try {
 			runView.sleep(inactiveSleepTime); // sleep ... ms
 		    } catch (InterruptedException e) {
-			if (parent.parent.debug) {
+			if (VirtualSpaceManager.debugModeON()) {
 			    System.err.println("viewpanel.run.runview.sleep4 "
 				    + e);
 			}
@@ -642,7 +642,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			backBufferGraphics = null;
 		    }
 		    // clipRect=new Rectangle(0,0,size.width,size.height);
-		    if (parent.parent.debug) {
+		    if (VirtualSpaceManager.debugModeON()) {
 			System.out.println("Resizing JPanel: (" + oldSize.width
 				+ "x" + oldSize.height + ") -> (" + size.width
 				+ "x" + size.height + ")");
@@ -710,7 +710,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 		try {
 		    runView.sleep(blankSleepTime); // sleep ... ms
 		} catch (InterruptedException e) {
-		    if (parent.parent.debug) {
+		    if (VirtualSpaceManager.debugModeON()) {
 			System.err.println("viewpanel.run.runview.sleep5 " + e);
 		    }
 		    return;

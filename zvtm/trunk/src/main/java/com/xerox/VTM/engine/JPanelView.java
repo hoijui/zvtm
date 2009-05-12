@@ -52,7 +52,6 @@ public class JPanelView extends View  implements KeyListener {
      * @param panelHeight	The height of the view's panel.
      * @param visible	Whether the view should initially be visible.
      * @param decorated	Whether the view should initially be decorated.
-     * @param vsm	The <code>VirtualViewManager</code>.
      * @param viewType	One of <code>View.STD_VIEW</code>, <code>View.OPENGL_VIEW</code>,
      * or <code>View.VOLATILE_VIEW</code>.
      * @param parentPanel	This is the parent panel for this view. A JPanel
@@ -64,7 +63,7 @@ public class JPanelView extends View  implements KeyListener {
      */
     public JPanelView(Vector cameraList, String name, int panelWidth, int panelHeight,
 		      boolean visible, boolean decorated,
-		      VirtualSpaceManager vsm, short viewType, JPanel parentPanel,
+		      short viewType, JPanel parentPanel,
 		      JFrame frame) {
 
 	checkArgs(cameraList, name, viewType, parentPanel, frame);
@@ -77,8 +76,7 @@ public class JPanelView extends View  implements KeyListener {
 
 	this.mouse = new VCursor(this);
 	this.name = name;
-	this.parent = vsm;
-	this.detectMultipleFullFills = vsm.defaultMultiFill;
+	this.detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
 
 	initCameras(cameraList);
 
@@ -125,7 +123,7 @@ public class JPanelView extends View  implements KeyListener {
     //    @Override
     public void destroyView() {
 	panel.stop();
-	parent.destroyView(this.name);
+	VirtualSpaceManager.INSTANCE.destroyView(this.name);
 	parentPanel.remove(viewContainerPanel);
     }
 
@@ -148,7 +146,7 @@ public class JPanelView extends View  implements KeyListener {
 
     //    @Override
     public boolean isSelected() {
-	return (this.frame == parent.activeJFrame);
+	return (this.frame == VirtualSpaceManager.INSTANCE.activeJFrame);
     }
 
     //    @Override

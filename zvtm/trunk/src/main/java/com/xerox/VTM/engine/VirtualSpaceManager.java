@@ -507,21 +507,21 @@ public class VirtualSpaceManager implements AWTEventListener {
 	View v = null;
 	switch(viewType){
 	case View.STD_VIEW:{
-	    v = (mnb != null) ? new EView(c, name, w, h, bar, visible, decorated, this, mnb) : new EView(c, name, w, h, bar, visible, decorated, this);
+	    v = (mnb != null) ? new EView(c, name, w, h, bar, visible, decorated, mnb) : new EView(c, name, w, h, bar, visible, decorated);
 	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
 	    break;
 	}
 	case View.OPENGL_VIEW:{
-	    v = (mnb != null) ? new GLEView(c, name, w, h, bar, visible, this, mnb) : new GLEView(c, name, w, h, bar, visible, this);
+	    v = (mnb != null) ? new GLEView(c, name, w, h, bar, visible, mnb) : new GLEView(c, name, w, h, bar, visible);
 	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
 	    break;
 	}
 	case View.VOLATILE_VIEW:{
-	    v = (mnb != null) ? new AccEView(c, name, w, h, bar, visible, this, mnb) : new AccEView(c, name, w, h, bar, visible, this);
+	    v = (mnb != null) ? new AccEView(c, name, w, h, bar, visible, mnb) : new AccEView(c, name, w, h, bar, visible);
 	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
@@ -538,7 +538,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param h height of window in pixels
      */
     public JPanel addPanelView(Vector c,String name,int w,int h){
-        PView tvi = new PView(c, name, w, h, this);
+        PView tvi = new PView(c, name, w, h);
         tvi.mouse.setID(new Long(nextmID++));
         addView(tvi);
         tvi.setRepaintPolicy(generalRepaintPolicy);
@@ -584,7 +584,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 				boolean visible, boolean decorated, short viewType,
 				JPanel parentPanel, JFrame frame) {
     	View v = new JPanelView(cameraList, name, panelWidth, panelHeight,
-				visible, decorated, this, viewType,
+				visible, decorated, viewType,
 				parentPanel, frame);
 	v.mouse.setID(new Long(nextmID++));
 	addView(v);

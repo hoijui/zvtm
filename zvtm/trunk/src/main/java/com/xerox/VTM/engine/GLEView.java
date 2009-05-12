@@ -48,13 +48,12 @@ public class GLEView extends View implements KeyListener{
      *@param visible should the view be made visible automatically or not
      *@param vsm root VTM class
      */
-    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible,VirtualSpaceManager vsm){
+    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible){
 	frame=new JFrame();
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	mouse=new VCursor(this);
 	name=t;
-	parent=vsm;
-	detectMultipleFullFills=vsm.defaultMultiFill;
+	detectMultipleFullFills=VirtualSpaceManager.INSTANCE.defaultMultiFill;
 	initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
@@ -108,14 +107,13 @@ public class GLEView extends View implements KeyListener{
      *@param vsm root VTM class
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view)
      */
-    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible,VirtualSpaceManager vsm,JMenuBar mnb){
+    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible,JMenuBar mnb){
 	frame=new JFrame();
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	frame.setJMenuBar(mnb);
 	this.jmb=mnb;
 	mouse=new VCursor(this);
 	name=t;
-	parent=vsm;
 	initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
@@ -164,7 +162,7 @@ public class GLEView extends View implements KeyListener{
 
     /**tells whether this frame is selected or not - not used*/
     public boolean isSelected(){
-	if (this.frame==parent.activeJFrame){return true;}else{return false;}
+	return (this.frame==VirtualSpaceManager.INSTANCE.activeJFrame);
     } 
 
     /**set the window location*/
@@ -195,7 +193,7 @@ public class GLEView extends View implements KeyListener{
     /**destroy this view*/
     public void destroyView(){
 	panel.stop();
-	parent.destroyView(this.name);
+	VirtualSpaceManager.INSTANCE.destroyView(this.name);
 	frame.dispose();
     }
 

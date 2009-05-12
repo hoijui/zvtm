@@ -80,7 +80,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 	this.setDoubleBuffered(false);
 	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-	if (parent.parent.debug){System.out.println("View refresh time set to "+frameTime+"ms");}
+	if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
     }
 
     public void start(){
@@ -102,7 +102,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 		runView.sleep(inactiveSleepTime);
 	    } 
 	    catch (InterruptedException e) {
-		if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep "+e);}
+		if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep "+e);}
 		return;
 	    }
         }
@@ -135,7 +135,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 					lensG2D = null;
 				    }
 				}
-				if (parent.parent.debug){
+				if (VirtualSpaceManager.debugModeON()){
 				    System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
 				}
 				oldSize=size;
@@ -341,7 +341,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 					    parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);
 					}
 				    }
-				    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
+				    catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 				    stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
 				    if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
 				    if (drawRect){
@@ -382,7 +382,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			    }
 			}
 			catch (NullPointerException ex0){
-			    if (parent.parent.debug){
+			    if (VirtualSpaceManager.debugModeON()){
 				System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
 				ex0.printStackTrace();
 			    }
@@ -391,7 +391,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			    runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
 			} 
 			catch (InterruptedException e) {
-			    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep2 "+e);}
+			    if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep2 "+e);}
 			    return;
 			}
 		    }
@@ -401,7 +401,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			    parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
 			    if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
 			}
-			catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
+			catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 			if (drawVTMcursor){
 			    synchronized(this){
 				try {
@@ -416,7 +416,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 				}
 				//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
 				//     just catch it and wait for next loop until we find out what's causing this
-				catch (NullPointerException ex47){if (parent.parent.debug){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
+				catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
 			    }
 			}
 			repaint();
@@ -427,7 +427,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			    runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
 			}
 			catch (InterruptedException e) {
-			    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep3 "+e);}
+			    if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep3 "+e);}
 			    return;
 			}
 		    }
@@ -436,7 +436,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			    runView.sleep(frameTime + noRepaintAdditionalTime);   //sleep ... ms  
 			}
 			catch (InterruptedException e) {
-			    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep4 "+e);}
+			    if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep4 "+e);}
 			    return;
 			}
 		    }
@@ -446,7 +446,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			runView.sleep(inactiveSleepTime);   //sleep ... ms  
 		    } 
 		    catch (InterruptedException e) {
-			if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep5 "+e);}
+			if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
 			return;
 		    }
 		}
@@ -469,7 +469,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 			    lensG2D = null;
 			}
 		    }
-		    if (parent.parent.debug){
+		    if (VirtualSpaceManager.debugModeON()){
 			System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
 		    }
 		    oldSize=size;
@@ -541,7 +541,7 @@ public class PViewPanel extends ViewPanel implements Runnable {
 		    runView.sleep(blankSleepTime);   //sleep ... ms  
 		} 
 		catch (InterruptedException e) {
-		    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep5 "+e);}
+		    if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
 		    return;
 		}
 	    }

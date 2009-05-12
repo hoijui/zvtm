@@ -651,13 +651,13 @@ public class VCursor {
                     }
                 }
                 catch (java.util.NoSuchElementException e){
-                    if (owningView.parent.debug){
+                    if (VirtualSpaceManager.debugModeON()){
                         System.err.println("vcursor.computemouseoverlist "+e);
                         e.printStackTrace();
                     }
                 }
                 catch (NullPointerException e2){
-                    if (owningView.parent.debug){
+                    if (VirtualSpaceManager.debugModeON()){
                         System.err.println("vcursor.computemouseoverlist null "+e2+
                             " (This might be caused by an error in enterGlyph/exitGlyph in your event handler)");
                         e2.printStackTrace();

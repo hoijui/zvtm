@@ -56,18 +56,15 @@ public class EView extends View implements KeyListener{
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
-     *@param vsm root VTM class
      */
     protected EView(Vector v, String t, int panelWidth, int panelHeight,
-		    boolean bar, boolean visible, boolean decorated,
-		    VirtualSpaceManager vsm){
+		    boolean bar, boolean visible, boolean decorated){
 	frame=new JFrame();
 	if (!decorated){frame.setUndecorated(true);}
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	mouse=new VCursor(this);
 	name=t;
-	parent=vsm;
-	detectMultipleFullFills=vsm.defaultMultiFill;
+	detectMultipleFullFills=VirtualSpaceManager.INSTANCE.defaultMultiFill;
 	initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
@@ -124,7 +121,7 @@ public class EView extends View implements KeyListener{
      */
     protected EView(Vector v,String t,int panelWidth,int panelHeight,
 		    boolean bar,boolean visible, boolean decorated,
-		    VirtualSpaceManager vsm,JMenuBar mnb){
+		    JMenuBar mnb){
 	frame=new JFrame();
 	if (!decorated){frame.setUndecorated(true);}
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -132,7 +129,6 @@ public class EView extends View implements KeyListener{
 	this.jmb=mnb;
 	mouse=new VCursor(this);
 	name=t;
-	parent=vsm;
 	initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
@@ -209,7 +205,7 @@ public class EView extends View implements KeyListener{
 
     /**tells whether this frame is selected or not - not used*/
     public boolean isSelected(){
-	if (this.frame==parent.activeJFrame){return true;}else{return false;}
+	return (frame==VirtualSpaceManager.INSTANCE.activeJFrame);
     } 
 
     /**set the window location*/
@@ -240,7 +236,7 @@ public class EView extends View implements KeyListener{
     /**destroy this view*/
     public void destroyView(){
 	panel.stop();
-	parent.destroyView(this.name);
+	VirtualSpaceManager.INSTANCE.destroyView(this.name);
 	frame.dispose();
     }
 

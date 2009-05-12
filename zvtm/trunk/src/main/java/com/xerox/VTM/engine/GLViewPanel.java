@@ -60,7 +60,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	this.addComponentListener(this);
 	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-	if (parent.parent.debug){System.out.println("View refresh time set to "+frameTime+"ms");}
+	if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
     }
 
     public void start(){
@@ -82,7 +82,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		runView.sleep(inactiveSleepTime);
 	    } 
 	    catch (InterruptedException e) {
-		if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep "+e);}
+		if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep "+e);}
 		return;
 	    }
         }
@@ -98,7 +98,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
 		    }
 		    catch (InterruptedException e) {
-			if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep3 "+e);}
+			if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep3 "+e);}
 			return;
 		    }
 		}
@@ -107,7 +107,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			runView.sleep(frameTime + noRepaintAdditionalTime);
 		    }
 		    catch (InterruptedException e) {
-			if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep4 "+e);}
+			if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep4 "+e);}
 			return;
 		    }
 		}
@@ -117,7 +117,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    runView.sleep(inactiveSleepTime);
 		} 
 		catch (InterruptedException e) {
-		    if (parent.parent.debug){System.err.println("viewpanel.run.runview.sleep5 "+e);}
+		    if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
 		    return;
 		}
 	    }
@@ -137,7 +137,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	    viewW = size.width;//compute region's width and height
 	    viewH = size.height;
 	    if (size.width != oldSize.width || size.height != oldSize.height) {
-		if (parent.parent.debug){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
+		if (VirtualSpaceManager.debugModeON()){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
 		oldSize=size;
 		updateAntialias=true;
 		updateFont=true;
@@ -210,7 +210,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			    parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer]);
 			}
 		    }
-		    catch (NullPointerException ex) {if (parent.parent.debug){System.err.println("viewpanel.run.drawdrag "+ex);}}
+		    catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 		    backBufferGraphics.setColor(parent.mouse.hcolor);
 		    if (drawDrag){backBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
 		    if (drawRect){backBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
@@ -246,7 +246,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		}
 	    }
 	}
-	catch (NullPointerException ex0){if (parent.parent.debug){System.err.println("GLViewPanel.paint "+ex0);}}
+	catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.paint "+ex0);}}
 	loopTotalTime = System.currentTimeMillis() - loopStartTime;
 	if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
     }
