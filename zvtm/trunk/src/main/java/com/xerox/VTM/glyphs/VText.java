@@ -65,11 +65,7 @@ public class VText extends Glyph {
     /** For internal use. */
     public ProjText[] pc;
 
-    /** (read-only), use access methods to change.
-     *@see #isZoomSensitive()
-     *@see #setZoomSensitive(boolean b)
-     */
-    public boolean zoomSensitive=true;
+    protected boolean zoomSensitive=true;
 
     /** Font size in pixels (read-only). */
     public static float fontSize=VirtualSpaceManager.getMainFont().getSize2D();
