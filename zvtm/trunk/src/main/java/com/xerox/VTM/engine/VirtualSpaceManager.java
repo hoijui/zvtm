@@ -132,9 +132,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**Animation Manager*/
     private final AnimationManager animationManager;
 
-    /**allow negative camera altitudes (zoom beyond the standard size=magnification) ; this is actually a hack to decrease focal value automatically when the altitude is 0*/
-    protected int zoomFloor=0;
-
+   
     /**Constraint Manager*/
 //     public ConstraintManager constMgr;
 
@@ -203,27 +201,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**get state of detection of multiple full fills in one view repaint - default value assigned to new views */
     public boolean getDefaultMultiFills(){
 	return defaultMultiFill;
-    }
-
-    /**
-     * set a zoom-in limit/maximum magnification  (like a floor the camera cannot go through)<br>
-     * value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
-     * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)<br>
-     * Note: there is no limit for zoom out (no so-called ceiling)
-     *@param a the altitude of the floor - the default value is 0 (put a negative value if you want to be able to magnify objects beyond their normal size) 
-     */
-    public void setZoomLimit(int a){
-	zoomFloor=a;
-    }
-
-    /**
-     * get the zoom-in limit/maximum magnification  (like a floor the camera cannot go through)<br>
-     * default value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
-     * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)<br>
-     * Note: there is no limit for zoom out (no so-called ceiling)
-     */
-    public int getZoomLimit(){
-	return zoomFloor;
     }
 
     /** Set border color of glyphs overlapped by mouse.

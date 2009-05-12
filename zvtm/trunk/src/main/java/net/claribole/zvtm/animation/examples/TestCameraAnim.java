@@ -61,10 +61,10 @@ public class TestCameraAnim {
     public void startAnim(short ogl){
         eh=new TestCameraAnim.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
-        vsm.setZoomLimit(-90);
         vsm.addCamera("src");
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
+        vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90f);
         short vt = View.STD_VIEW;
         switch(ogl){
 	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
