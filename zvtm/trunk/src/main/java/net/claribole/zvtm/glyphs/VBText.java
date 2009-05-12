@@ -116,11 +116,12 @@ public class VBText extends VText {
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].valid)
 			{
-				bounds = g.getFontMetrics().getStringBounds(text, g);
+				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 				pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
 				pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
 				pc[i].valid = true;
 			}
+			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].cx, dy + pc[i].cy);
 			}
@@ -159,11 +160,12 @@ public class VBText extends VText {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].lvalid) {
-				bounds = g.getFontMetrics().getStringBounds(text, g);
+				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 				pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
 				pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
 				pc[i].lvalid = true;
 			}
+			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx, dy + pc[i].lcy);
 			}

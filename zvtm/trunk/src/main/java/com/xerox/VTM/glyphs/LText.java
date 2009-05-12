@@ -14,6 +14,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import net.claribole.zvtm.glyphs.LensRendering;
 
@@ -103,12 +104,13 @@ public class LText extends VText implements LensRendering {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
 			if (!pc[i].lvalid){
-				bounds = g.getFontMetrics().getStringBounds(text,g);
+				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 				// lcw and lch actually hold width and height of text *in virtual space*
 				pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
 				pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
 				pc[i].lvalid=true;
 			}
+			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
 			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
 			else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}

@@ -13,6 +13,7 @@ import java.awt.Image;
 import java.awt.Stroke;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Translucent;
@@ -88,7 +89,7 @@ public class VBTextST extends VBText implements Translucent {
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
 		if (!pc[i].valid){
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
-			bounds = g.getFontMetrics().getStringBounds(text, g);
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 			pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
 			pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
 			pc[i].valid = true;
@@ -98,6 +99,7 @@ public class VBTextST extends VBText implements Translucent {
 		if (trueCoef * fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].cx, dy + pc[i].cy);
 			}
@@ -143,7 +145,7 @@ public class VBTextST extends VBText implements Translucent {
 	public void drawForLens(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
 		if (!pc[i].lvalid) {
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
-			bounds = g.getFontMetrics().getStringBounds(text, g);
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 			pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
 			pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
 			pc[i].lvalid = true;
@@ -153,6 +155,7 @@ public class VBTextST extends VBText implements Translucent {
 		if (trueCoef * fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive) {
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx, dy + pc[i].lcy);
 			}
