@@ -67,7 +67,7 @@ public class VText extends Glyph {
     protected boolean zoomSensitive=true;
 
     /** Font size in pixels (read-only). */
-    protected static float fontSize=VirtualSpaceManager.getMainFont().getSize2D();
+    protected float fontSize=VirtualSpaceManager.getMainFont().getSize2D();
 
     protected Font font;
 
