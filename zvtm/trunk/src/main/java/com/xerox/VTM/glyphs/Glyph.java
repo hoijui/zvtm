@@ -135,7 +135,7 @@ public abstract class Glyph implements Cloneable {
      *@see #reSize(float factor)
      *@see #getSize()
      */
-    public float size;
+    protected float size;
 
     /** Glyph's orientation in [0:2Pi[ (read-only).
      *@see #getOrient()
