@@ -398,7 +398,7 @@ public abstract class Glyph implements Cloneable {
     /*------------Selection--------------------------------------*/
 
     /** Indicates whether this glyph is selected or not (default is false)*/
-    boolean selected = false;
+    private boolean selected = false;
 
     /** Select this glyph. This just flags the glyph as selected.
      *@param b true to select glyph, false to unselect it
