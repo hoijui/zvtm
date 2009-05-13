@@ -59,7 +59,6 @@ public class VText extends Glyph {
     /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with end of String). */
     public static final short TEXT_ANCHOR_END=2;
 
-    /** Text alignment (read-only). Use access methods to change. One of TEXT_ANCHOR_*. */
     protected short text_anchor = TEXT_ANCHOR_START;
 
     /** For internal use. */
@@ -76,9 +75,6 @@ public class VText extends Glyph {
 
     protected float scaleFactor = 1.0f;
     
-    /** For internal use. Made public for easier outside package subclassing. */
-    public float trueCoef = 1.0f;
-
     public VText(String t){
 	vx=0;
 	vy=0;
@@ -354,7 +350,7 @@ public class VText extends Glyph {
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		g.setColor(this.color);
-		trueCoef = scaleFactor * coef;
+		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
@@ -381,7 +377,7 @@ public class VText extends Glyph {
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		g.setColor(this.color);
-		trueCoef = scaleFactor * coef;
+		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());

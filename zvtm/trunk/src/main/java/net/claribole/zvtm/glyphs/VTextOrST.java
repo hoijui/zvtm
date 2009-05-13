@@ -118,7 +118,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 		}
 		if (alpha == 0){return;}
 		g.setColor(this.color);
-		trueCoef = scaleFactor * coef;
+		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
@@ -165,7 +165,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 		}
 		if (alpha == 0){return;}
 		g.setColor(this.color);
-		trueCoef = scaleFactor * coef;
+		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());

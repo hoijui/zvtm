@@ -113,7 +113,7 @@ public class VTextST extends VText implements Translucent {
 			pc[i].valid=true;
 		}
 		if (alpha == 0){return;}
-		trueCoef = scaleFactor * coef;
+		float trueCoef = scaleFactor * coef;
 		g.setColor(this.color);
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
@@ -156,7 +156,7 @@ public class VTextST extends VText implements Translucent {
 			pc[i].lvalid=true;
 		}
 		if (alpha == 0){return;}
-		trueCoef = scaleFactor * coef;
+		float trueCoef = scaleFactor * coef;
 		g.setColor(this.color);
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
