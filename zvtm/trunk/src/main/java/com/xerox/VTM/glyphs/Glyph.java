@@ -141,7 +141,7 @@ public abstract class Glyph implements Cloneable {
      *@see #getOrient()
      *@see #orientTo(float angle)
      */
-    public float orient = 0.0f;
+    protected float orient = 0.0f;
 
     /** Translate the glyph by (x,y) - relative translation.
      *@see #moveTo(long x, long y)
