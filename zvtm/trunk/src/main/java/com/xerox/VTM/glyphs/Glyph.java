@@ -58,7 +58,7 @@ public abstract class Glyph implements Cloneable {
     /** Type of object.
      * Arbitrary String, set by client application. Null if not set.
      */
-    String type;
+    private String type;
 
     /** Get this glyph's ID. */
     public Long getID(){
