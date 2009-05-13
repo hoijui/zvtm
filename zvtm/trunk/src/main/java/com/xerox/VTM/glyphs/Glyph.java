@@ -420,7 +420,7 @@ public abstract class Glyph implements Cloneable {
     public static final float DEFAULT_STROKE_WIDTH = 1.0f;
     
     /** For internal use. Dot not tamper with. */
-    public BasicStroke stroke = null;  
+    protected BasicStroke stroke = null;  
     
     boolean dashedContour = false;
     float strokeWidth = DEFAULT_STROKE_WIDTH;
