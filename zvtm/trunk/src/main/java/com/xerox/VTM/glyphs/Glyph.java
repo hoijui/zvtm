@@ -605,8 +605,8 @@ public abstract class Glyph implements Cloneable {
     /** Value sent to cursor when it neither enters nor exit this glyph. For internal use. */
     public static final short NO_CURSOR_EVENT = 0;
 
-    /** Projection coefficient. Computed internally. Do not tamper with. */
-    public float coef=1.0f;
+    // Projection coefficient. Computed internally. Do not tamper with. 
+    protected float coef=1.0f;
 
     /** Project glyph w.r.t a given camera's coordinate system, prior to actual painting. Called internally.
      *@param c camera
