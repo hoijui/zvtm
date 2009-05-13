@@ -250,19 +250,18 @@ public abstract class Glyph implements Cloneable {
 
     /*------------Color------------------------------------------*/
 
-    /** Current main color (read only, use access methods for all modification purposes).
-     * Fill color for closed shapes, stroke color for glyphs which use just one color, such as text, paths, segments.
-     */
-    public Color color;
+     
+     // Fill color for closed shapes, stroke color for glyphs which use just one color, such as text, paths, segments.
+    protected Color color;
     
-    /** Coordinates of main color in HSV color space. */
+    // Coordinates of main color in HSV color space. 
     protected float[] HSV=new float[3];
     
-    /** Main or Fill color of this glyph when it is in its default state. */
-    public Color fColor = Color.white;
+    // Main or Fill color of this glyph when it is in its default state. 
+	protected Color fColor = Color.white;
 
-    /** Highlight color of this glyph when cursor is inside it. Null if same as default border color. */
-    public Color mouseInsideColor;
+    // Highlight color of this glyph when cursor is inside it. Null if same as default border color. 
+    protected Color mouseInsideColor;
 
     /** Indicates whether this glyph's interior is filled or not.
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments (returns true in those cases).
