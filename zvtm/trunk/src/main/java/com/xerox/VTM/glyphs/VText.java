@@ -72,14 +72,9 @@ public class VText extends Glyph {
 
     protected Font font;
 
-    /** Text that should be painted (read-only), use access methods to change.
-     *@see #setText(String t)
-     *@see #getText()
-     */
-    public String text;
+    protected String text;
 
-    /** For internal use. Made public for easier outside package subclassing. */
-    public float scaleFactor = 1.0f;
+    protected float scaleFactor = 1.0f;
     
     /** For internal use. Made public for easier outside package subclassing. */
     public float trueCoef = 1.0f;
