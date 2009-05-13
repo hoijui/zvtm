@@ -495,7 +495,7 @@ public abstract class Glyph implements Cloneable {
     /** Composite glyph associated with this glyph.
      * Means that this glyph is either a primary or secondary glyph inside a CGlyph.
      */
-    CGlyph cGlyph=null;
+    private CGlyph cGlyph=null;
 
     /** Set the composite glyph associated with this glyph.
      * Means that this glyph is either a primary or secondary glyph inside a CGlyph. Do not call this method manually ; called automatically when adding the glyph in a CGlyph. */
