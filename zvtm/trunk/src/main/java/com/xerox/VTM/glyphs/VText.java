@@ -76,11 +76,7 @@ public class VText extends Glyph {
     protected float scaleFactor = 1.0f;
     
     public VText(String t){
-	vx=0;
-	vy=0;
-	vz=0;
-	text=t;
-	setColor(Color.white);
+		this(0,0,0,Color.white,t);
     }
 
     /**
@@ -91,11 +87,7 @@ public class VText extends Glyph {
      *@param t text string
      */
     public VText(long x,long y, int z,Color c,String t){
-	vx=x;
-	vy=y;
-	vz=z;
-	text=t;
-	setColor(c);
+		this(x,y,z,c,t,TEXT_ANCHOR_START);
     }
 
     /**
@@ -107,12 +99,7 @@ public class VText extends Glyph {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
     public VText(long x,long y, int z,Color c,String t,short ta){
-	vx=x;
-	vy=y;
-	vz=z;
-	text=t;
-	setColor(c);
-	text_anchor=ta;
+		this(x,y,z,c,t,ta,1f);
     }
 
     /**
