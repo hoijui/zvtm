@@ -62,7 +62,7 @@ public class VText extends Glyph {
     protected short text_anchor = TEXT_ANCHOR_START;
 
     /** For internal use. */
-    public ProjText[] pc;
+    protected ProjText[] pc;
 
     protected boolean zoomSensitive=true;
 
