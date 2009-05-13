@@ -53,7 +53,7 @@ public abstract class Glyph implements Cloneable {
      * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
      * Set by client application. Null if not set.
      */
-    Object owner;
+    private Object owner;
 
     /** Type of object.
      * Arbitrary String, set by client application. Null if not set.
