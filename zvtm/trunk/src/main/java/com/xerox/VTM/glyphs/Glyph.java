@@ -422,8 +422,8 @@ public abstract class Glyph implements Cloneable {
     /** For internal use. Dot not tamper with. */
     protected BasicStroke stroke = null;  
     
-    boolean dashedContour = false;
-    float strokeWidth = DEFAULT_STROKE_WIDTH;
+    private boolean dashedContour = false;
+    private float strokeWidth = DEFAULT_STROKE_WIDTH;
 
     /** Convenience method for painting the glyph's border with an predefined dashed stroke.
      *@param b true -&gt; draw a discontinuous contour for this glyph
