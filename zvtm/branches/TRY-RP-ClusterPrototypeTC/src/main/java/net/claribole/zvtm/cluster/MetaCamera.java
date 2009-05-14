@@ -9,7 +9,7 @@ public class MetaCamera {
 	//cameras ordered column-wise
 	private Camera[] cameras;
 
-	//*upper left-hand camera coordinates*
+	//*upper left-hand camera (center) coordinates*
 	//(differs from the rest of ZVTM, but it's
 	//a prototype anyway)
 	private long posX = 0;
