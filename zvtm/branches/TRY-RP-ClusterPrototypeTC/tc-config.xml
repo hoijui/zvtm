@@ -104,12 +104,22 @@
 				</execute>
 			</on-load> 
 		</include>
+		<include>
+			<class-expression>com.xerox.VTM.glyphs.VImage</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[try{self.image = javax.imageio.ImageIO.read(new java.io.File(self.path));} catch (java.io.IOException ex){throw new Error("Error while creating Frankenstein image"); self.interpolationMethod = java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;}]]>
+				</execute>
+			</on-load> 
+		</include>
 
       </instrumented-classes>
 
 	  <transient-fields>
-		  <field-name>com.xerox.VTM.engine.VirtualSpace.vsm</field-name>
 		  <field-name>com.xerox.VTM.glyphs.Glyph.vsm</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VImage.image</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VImage.interpolationMethod</field-name>
+		  <field-name>com.xerox.VTM.engine.VirtualSpace.vsm</field-name>
 		  <field-name>com.xerox.VTM.engine.Camera.view</field-name>
 	  </transient-fields> 
       <!--Declaring a field of a class a root will make it available for all instances

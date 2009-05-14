@@ -65,6 +65,8 @@ public class VImage extends ClosedShape implements RectangularShape {
     /** For internal use. Made public for easier outside package subclassing. */
     public Image image;
 
+	private String path;
+
     /** Indicates when a border is drawn around the image (read-only).
      * One of DRAW_BORDER_*
      */
@@ -115,6 +117,27 @@ public class VImage extends ClosedShape implements RectangularShape {
 	orient=0;
 	setBorderColor(Color.black);
     }
+
+	//XXX ctor for the prototype
+	public VImage(long x, long y, int z, String path){
+		vx=x;
+		vy=y;
+		vz=z;
+		this.path = path;
+		try{
+			image=javax.imageio.ImageIO.read(new java.io.File(path));
+		} catch (java.io.IOException ex){
+			//prototype, we are not writing solid code :)
+			throw new Error("Could not load image from given path");
+		}
+		vw=Math.round(image.getWidth(null)/2.0);
+		vh=Math.round(image.getHeight(null)/2.0);
+		if (vw==0 && vh==0){ar=1.0f;}
+		else {ar=(float)vw/(float)vh;}
+		computeSize();
+		orient=0;
+		setBorderColor(Color.black);
+	}
 
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space

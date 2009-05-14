@@ -8,6 +8,7 @@ import net.claribole.zvtm.cluster.MetaCamera;
 
 import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.engine.Camera;
@@ -40,11 +41,13 @@ public class MasterSkel {
 		path.addQdCurve(60,60,0,60,false);
 		path.addQdCurve(60,60,60,0,false);
 		path.setStrokeWidth(5f);
+		Glyph image = new VImage(100, 200, 0, "/Users/romain/Documents/inria/checkouts/zvtm-terra-proto/NoLoitering.gif");
 
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(anotherRect, vs);
 		vsm.addGlyph(text, vs);
 		vsm.addGlyph(path, vs);
+		vsm.addGlyph(image, vs);
 
 		Camera cam = vsm.addCamera(vs);
 		cam.setAltitude(0f);
