@@ -150,7 +150,7 @@ $Id$
 			  <workingDirectory>${project.build.directory}</workingDirectory>
 			  <processes>
 				  <process nodeName="master" count="1" 
-					  className="net.claribole.zvtm.cluster.MasterSkel"
+					  className="net.claribole.zvtm.cluster.MasterSkelWild"
 					  arguments="">
 				  </process>
 				  <process nodeName="slave0" count="1"
