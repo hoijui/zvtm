@@ -165,6 +165,18 @@ $Id$
 					  className="net.claribole.zvtm.cluster.SlaveApp"
 					  arguments="2">
 				  </process>
+				  <process nodeName="slave3" count="1"
+					  className="net.claribole.zvtm.cluster.SlaveApp"
+					  arguments="3">
+				  </process>
+				  <process nodeName="slave4" count="1"
+					  className="net.claribole.zvtm.cluster.SlaveApp"
+					  arguments="4">
+				  </process>
+				  <process nodeName="slave5" count="1"
+					  className="net.claribole.zvtm.cluster.SlaveApp"
+					  arguments="5">
+				  </process>
 
 			  </processes>
 			  <startServer>true</startServer>
