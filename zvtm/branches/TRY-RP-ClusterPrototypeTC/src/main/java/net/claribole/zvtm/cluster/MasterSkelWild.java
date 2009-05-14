@@ -34,9 +34,9 @@ public class MasterSkelWild {
 
 		for(int i=0; i<10; ++i){
 			//add a few glyphs to the virtual space
-			Glyph rect = new VRectangle(0,0,0,60,40,Color.GREEN);
-			Glyph anotherRect = new VRectangle(30,50,0,60,70,Color.RED);
-			Glyph image = new VImage(100, 200, 0, "/Users/romain/Documents/inria/checkouts/zvtm-terra-proto/NoLoitering.gif");
+			Glyph rect = new VRectangle(-2000+400*i,-2000+400*i,0,600,400,Color.GREEN);
+			Glyph anotherRect = new VRectangle(-1700+400*i,-1700+400*i,0,600,700,Color.RED);
+			Glyph image = new VImage(-1750+450*i, -1750+450*i, 0, "/Users/romain/Documents/inria/checkouts/zvtm-terra-proto/NoLoitering.gif");
 
 			vsm.addGlyph(rect, vs);
 			vsm.addGlyph(anotherRect, vs);
