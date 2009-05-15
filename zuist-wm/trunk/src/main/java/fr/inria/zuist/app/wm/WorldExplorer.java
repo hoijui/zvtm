@@ -113,14 +113,14 @@ public class WorldExplorer implements Java2DPainter {
     
     TranslucentTextArea console;
 
-    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, String dir){
+    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, boolean opengl, String dir){
         if (dir != null){
             PATH_TO_HIERARCHY = dir;
             PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
             SCENE_FILE = new File(PATH_TO_SCENE);
         }
         nm = new NavigationManager(this);
-        initGUI(fullscreen);
+        initGUI(fullscreen, opengl);
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
@@ -144,7 +144,7 @@ public class WorldExplorer implements Java2DPainter {
         mCamera.addListener(eh);
     }
 
-    void initGUI(boolean fullscreen){
+    void initGUI(boolean fullscreen, boolean opengl){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -156,7 +156,7 @@ public class WorldExplorer implements Java2DPainter {
         cameras.add(mCamera);
         cameras.add(bCamera);
         mCamera.stick(bCamera, true);
-        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, true, null);
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, true, null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -386,15 +386,17 @@ public class WorldExplorer implements Java2DPainter {
         boolean queryGN = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
         boolean fs = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
         boolean grid = (args.length > 3) ? Boolean.parseBoolean(args[3]) : false;
+        boolean ogl = (args.length > 4) ? Boolean.parseBoolean(args[3]) : false;
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
 		if (dir == null){
-			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [queryGN] [fs] [grid]");
+			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [queryGN] [fs] [grid] [opengl]");
 			System.out.println("\n\tqgn: query geonames.org Web service: true or false");
 			System.out.println("\tfs: fullscreen: true or false");
 			System.out.println("\tgrid: draw a grid on top of the map: true or false");
+			System.out.println("\topengl: use OpenGL: true or false");
 			System.exit(0);
 		}
-        new WorldExplorer(queryGN, fs, grid, dir);
+        new WorldExplorer(queryGN, fs, grid, ogl, dir);
     }
 
 }
