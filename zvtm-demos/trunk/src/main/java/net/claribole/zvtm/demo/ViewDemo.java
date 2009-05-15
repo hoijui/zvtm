@@ -45,6 +45,7 @@ public class ViewDemo {
     FrameRateIndicator fri;
 
     View demoView;
+    Camera mCamera;
 
     short translucentMode = 0;
     short viewType = 0;
@@ -52,7 +53,7 @@ public class ViewDemo {
     String tms, vts;
 
     ViewDemo(short vt, short translucent){
-	vsm = new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
 	translucentMode = translucent;
 	if (translucentMode == 1){
 	    tms = "Translucency: ON";
@@ -75,9 +76,10 @@ public class ViewDemo {
     public void init(){
 	eh=new ViewDemoEventHandler(this);
 	vsm.addVirtualSpace(mainSpaceName);
-	vsm.setZoomLimit(-90);
 	Vector cameras=new Vector();
-	cameras.add(vsm.addCamera(mainSpaceName));
+	mCamera = vsm.addCamera(mainSpaceName);
+	mCamera.setZoomFloor(-90);
+	cameras.add(mCamera);
 	demoView = vsm.addExternalView(cameras, mainViewName, viewType, 800, 600, false, true);
 	demoView.setBackgroundColor(Color.WHITE);
 	demoView.setEventHandler(eh);

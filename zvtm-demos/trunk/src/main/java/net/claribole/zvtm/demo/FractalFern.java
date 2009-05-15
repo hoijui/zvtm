@@ -39,14 +39,14 @@ public class FractalFern extends FractalDemo {
 	if (n > 0){
 	    imax = n;
 	}
-	vsm=new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
 	init();
     }
 
     public void init(){
 	eh=new FractalEventHandler(this);
-	vsm.addVirtualSpace(mainSpaceName);
-	vsm.setZoomLimit(-90);
+	vsm.addVirtualSpace(mainSpaceName);    
+	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
 	buildFern();
 	vsm.addCamera(mainSpaceName);
 	Vector cameras=new Vector();

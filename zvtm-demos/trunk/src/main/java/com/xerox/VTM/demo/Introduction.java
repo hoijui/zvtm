@@ -111,7 +111,7 @@ public class Introduction {
     }
 
     public void init(){
-	vsm=new VirtualSpaceManager(false);
+	    vsm = VirtualSpaceManager.INSTANCE;
 	vsm.setMainFont(new Font("dialog", 0, 40));
 	vsm.addVirtualSpace("vs1");
 	vsm.addCamera("vs1");

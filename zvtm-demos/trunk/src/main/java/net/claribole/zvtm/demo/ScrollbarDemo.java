@@ -53,14 +53,14 @@ public class ScrollbarDemo implements CameraListener {
     static final int ANIM_MOVE_LENGTH = 250;
 
     ScrollbarDemo(){
-	vsm = new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
 	init();
     }
 
     public void init(){
 	demoSpace = vsm.addVirtualSpace(demoSpaceName);
-	vsm.setZoomLimit(-90);
 	mCamera = vsm.addCamera(demoSpaceName);
+	mCamera.setZoomFloor(0);
 	sl = new ScrollLayer(vsm, mCamera);
 	Vector cameras = new Vector();
 	cameras.add(mCamera);

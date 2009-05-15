@@ -90,7 +90,7 @@ public class DragMagDemo implements Java2DPainter {
     Camera portalCamera;
 
     DragMagDemo(){
-	vsm = new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
  	vsm.setDebug(true);
 	init();
     }
@@ -99,8 +99,8 @@ public class DragMagDemo implements Java2DPainter {
 	eh = new DMDEventHandler(this);
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
-	vsm.setZoomLimit(0);
 	demoCamera = vsm.addCamera(mainVSname);
+    demoCamera.setZoomFloor(0);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
 	demoView = vsm.addExternalView(cameras, "Portal World Demo", View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);

@@ -34,14 +34,14 @@ public class FractalJulia extends FractalDemo {
 	if (n > 0){
 	    N = n;
 	}
-	vsm=new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
 	init();
     }
 
     public void init(){
 	eh=new FractalEventHandler(this);
 	vsm.addVirtualSpace(mainSpaceName);
-	vsm.setZoomLimit(-90);
+	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
 	buildJulia();
 	vsm.addCamera(mainSpaceName);
 	Vector cameras=new Vector();

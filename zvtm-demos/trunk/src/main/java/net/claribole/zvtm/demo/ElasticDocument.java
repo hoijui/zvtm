@@ -127,16 +127,16 @@ public class ElasticDocument implements Java2DPainter {
     static final float FLOOR_ALTITUDE = 100.0f;
 
     ElasticDocument(){
-	vsm = new VirtualSpaceManager();
-	init();
+        vsm = VirtualSpaceManager.INSTANCE;
+        init();
     }
 
     public void init(){
 	eh = new ElasticDocumentEventHandler(this);
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
-	vsm.setZoomLimit(0);
 	demoCamera = vsm.addCamera(mainVSname);
+    demoCamera.setZoomFloor(0);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
 	demoView = vsm.addExternalView(cameras, L2_Gaussian_Title, View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);

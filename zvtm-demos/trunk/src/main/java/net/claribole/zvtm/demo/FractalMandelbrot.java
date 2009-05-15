@@ -37,16 +37,16 @@ public class FractalMandelbrot extends FractalDemo {
 // 	if (n > 0){
 // 	    N = n;
 // 	}
-	vsm=new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
 	init();
     }
 
     public void init(){
 	eh=new FractalEventHandler(this);
 	vsm.addVirtualSpace(mainSpaceName);
-	vsm.setZoomLimit(-90);
 	buildMandelbrot();
 	vsm.addCamera(mainSpaceName);
+	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
 	Vector cameras=new Vector();
 	cameras.add(vsm.getVirtualSpace(mainSpaceName).getCamera(0));
 	vsm.addExternalView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);

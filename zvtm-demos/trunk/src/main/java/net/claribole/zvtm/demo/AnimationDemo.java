@@ -113,7 +113,8 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	cpane.setSize(appletWindowWidth, appletWindowHeight);
 	cpane.setBackground(APPLET_BKG_COLOR);
 
-	vsm = new VirtualSpaceManager(true);
+	    vsm = VirtualSpaceManager.INSTANCE;
+	    vsm.setApplet();
 	vsm.setMainFont(new Font("Arial", Font.PLAIN, 24));
 	mSpace = vsm.addVirtualSpace("demoSpace");
 	mCam = vsm.addCamera(mSpace);

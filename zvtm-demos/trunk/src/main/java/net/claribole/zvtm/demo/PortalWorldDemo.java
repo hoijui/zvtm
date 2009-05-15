@@ -91,7 +91,7 @@ public class PortalWorldDemo {
     MapManager mm;
 
     PortalWorldDemo(short am){
-	vsm = new VirtualSpaceManager();
+	    vsm = VirtualSpaceManager.INSTANCE;
  	vsm.setDebug(true);
 	init(am);
     }
@@ -100,8 +100,8 @@ public class PortalWorldDemo {
 	eh = new PWEventHandler(this);
 	windowLayout();
 	mainVS = vsm.addVirtualSpace(mainVSname);
-	vsm.setZoomLimit(0);
 	demoCamera = vsm.addCamera(mainVSname);
+	demoCamera.setZoomFloor(0);
 	demoCamera.addListener(eh);
 	Vector cameras=new Vector();
 	cameras.add(demoCamera);
