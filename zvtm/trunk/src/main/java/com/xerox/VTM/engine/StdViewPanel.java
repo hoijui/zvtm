@@ -459,78 +459,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				}
 			}
 			else {
-				size = this.getSize();
-				viewW = size.width;//compute region's width and height
-				viewH = size.height;
-				if (size.width != oldSize.width || size.height != oldSize.height) {
-					//each time the parent window is resized, adapt the buffer image size
-					backBuffer = null;
-					if (backBufferGraphics != null){
-						backBufferGraphics.dispose();
-						backBufferGraphics = null;
-					}
-					if (lens != null){
-						lens.resetMagnificationBuffer();
-						if (lensG2D != null) {
-							lensG2D.dispose();
-							lensG2D = null;
-						}
-					}
-					if (VirtualSpaceManager.debugModeON()){
-						System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
-					}
-					oldSize=size;
-					updateAntialias=true;
-					updateFont=true;
-				}
-				if (backBuffer == null){
-					gconf = getGraphicsConfiguration();
-					backBuffer = gconf.createCompatibleImage(size.width,size.height);
-					if (backBufferGraphics != null){
-						backBufferGraphics.dispose();
-						backBufferGraphics = null;
-					}
-				}
-				if (backBufferGraphics == null) {
-					backBufferGraphics = backBuffer.createGraphics();
-					updateAntialias=true;
-					updateFont=true;
-				}
-				if (lens != null){
-					lensG2D = lens.getMagnificationGraphics();
-					lensG2D.setFont(VirtualSpaceManager.mainFont);
-					if (antialias){
-						lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-					}
-					else {
-						lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-					}
-				}
-				if (updateFont){
-					backBufferGraphics.setFont(VirtualSpaceManager.mainFont);
-					if (lensG2D != null){
-						lensG2D.setFont(VirtualSpaceManager.mainFont);
-					}
-					updateFont = false;
-				}
-				if (updateAntialias){
-					if (antialias){
-						backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						if (lensG2D != null){
-							lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-						}
-					}
-					else {
-						backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-						if (lensG2D != null){
-							lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-						}
-					}
-					updateAntialias = false;
-				}
-				stableRefToBackBufferGraphics = backBufferGraphics;
-				standardStroke=stableRefToBackBufferGraphics.getStroke();
-				standardTransform=stableRefToBackBufferGraphics.getTransform();
+				updateOffscreenBuffer();	
 				stableRefToBackBufferGraphics.setPaintMode();
 				stableRefToBackBufferGraphics.setColor(blankColor);
 				stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
