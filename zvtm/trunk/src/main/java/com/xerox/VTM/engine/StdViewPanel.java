@@ -329,12 +329,10 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			}
 		}
 		if (drawVTMcursor){
-			synchronized(this){
-				stableRefToBackBufferGraphics.setXORMode(backColor);
-				parent.mouse.draw(stableRefToBackBufferGraphics);
-				oldX=parent.mouse.mx;
-				oldY=parent.mouse.my;
-			}
+			stableRefToBackBufferGraphics.setXORMode(backColor);
+			parent.mouse.draw(stableRefToBackBufferGraphics);
+			oldX=parent.mouse.mx;
+			oldY=parent.mouse.my;
 		}
 
 	}
@@ -464,13 +462,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				stableRefToBackBufferGraphics.setPaintMode();
 				stableRefToBackBufferGraphics.setColor(blankColor);
 				stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
-				// call to after-portals java2d painting hook
-				if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-					try {
-						parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
-					}
-					catch(ClassCastException ex){if (VirtualSpaceManager.debugModeON()){System.err.println("Failed to draw AFTER_PORTALS in blank mode");}}
-				}
+				portalsHook();				
 				repaint();
 				try {
 					runView.sleep(blankSleepTime);   //sleep ... ms  
