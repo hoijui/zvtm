@@ -44,58 +44,58 @@ import net.claribole.zvtm.engine.ViewEventHandler;
  */
 public class StdViewPanel extends ViewPanel implements Runnable {
 
-    /** Double Buffering uses a BufferedImage as the back buffer. */
-    BufferedImage backBuffer;
+	/** Double Buffering uses a BufferedImage as the back buffer. */
+	BufferedImage backBuffer;
 
-    /*coordinates of lens center in virtual space for each camera*/
-    long lensVx, lensVy;
-    long lviewWC, lviewNC, lviewEC, lviewSC;
+	/*coordinates of lens center in virtual space for each camera*/
+	long lensVx, lensVy;
+	long lviewWC, lviewNC, lviewEC, lviewSC;
 
 	Dimension oldSize;
 	Graphics2D lensG2D = null;
 
-    public StdViewPanel(Vector cameras,View v) {
-	addHierarchyListener(
-	    new HierarchyListener() {
-	       public void hierarchyChanged(HierarchyEvent e) {
-		   if (isShowing()) {
-		       start();
-		   } else {
-		       stop();
-		   }
-	       }
-	   }
-	);
-	parent=v;
-	//init of camera array
-	cams=new Camera[cameras.size()];  //array of Camera
-	evHs = new ViewEventHandler[cams.length];
-	for (int nbcam=0;nbcam<cameras.size();nbcam++){
-	    cams[nbcam]=(Camera)(cameras.get(nbcam));
+	public StdViewPanel(Vector cameras,View v) {
+		addHierarchyListener(
+				new HierarchyListener() {
+					public void hierarchyChanged(HierarchyEvent e) {
+						if (isShowing()) {
+							start();
+						} else {
+							stop();
+						}
+					}
+				}
+				);
+		parent=v;
+		//init of camera array
+		cams=new Camera[cameras.size()];  //array of Camera
+		evHs = new ViewEventHandler[cams.length];
+		for (int nbcam=0;nbcam<cameras.size();nbcam++){
+			cams[nbcam]=(Camera)(cameras.get(nbcam));
+		}
+		//init other stuff
+		setBackground(backColor);
+		this.addMouseListener(this);
+		this.addMouseMotionListener(this);
+		this.addMouseWheelListener(this);
+		this.addComponentListener(this);
+		this.setDoubleBuffered(false);
+		start();
+		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
+		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
 	}
-	//init other stuff
-	setBackground(backColor);
-	this.addMouseListener(this);
-	this.addMouseMotionListener(this);
-	this.addMouseWheelListener(this);
-	this.addComponentListener(this);
-	this.setDoubleBuffered(false);
-	start();
-	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-	if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
-    }
 
-    public void start(){
-	size = getSize();
-	runView = new Thread(this);
-	runView.setPriority(Thread.NORM_PRIORITY);
-	runView.start();
-    }
+	public void start(){
+		size = getSize();
+		runView = new Thread(this);
+		runView.setPriority(Thread.NORM_PRIORITY);
+		runView.start();
+	}
 
-    public synchronized void stop() {
-	runView = null;
-	notify();
-    }
+	public synchronized void stop() {
+		runView = null;
+		notify();
+	}
 
 	private void updateOffscreenBuffer(){
 		size = this.getSize();
@@ -413,21 +413,19 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 						updateMouseOnly=false; // do this first as the thread can be interrupted inside this
 						doCursorPicking();
 						if (drawVTMcursor){
-							synchronized(this){
-								try {
-									stableRefToBackBufferGraphics.setXORMode(backColor);
-									stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-									stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
-									stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
-									stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-									stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
-									oldX=parent.mouse.mx;
-									oldY=parent.mouse.my;
-								}
-								//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
-								//     just catch it and wait for next loop until we find out what's causing this
-								catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
+							try {
+								stableRefToBackBufferGraphics.setXORMode(backColor);
+								stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+								stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
+								stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
+								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+								oldX=parent.mouse.mx;
+								oldY=parent.mouse.my;
 							}
+							//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
+							//     just catch it and wait for next loop until we find out what's causing this
+							catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
 						}
 						repaint();
 						loopTotalTime = System.currentTimeMillis() - loopStartTime;
@@ -488,18 +486,16 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 	}
 
-    public void paint(Graphics g) {
-	synchronized (this) {
-	    if (backBuffer != null){
-		g.drawImage(backBuffer, 0, 0, this);
-		if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
-	    }
-        }
-    }
+	public void paint(Graphics g) {
+		if (backBuffer != null){
+			g.drawImage(backBuffer, 0, 0, this);
+			if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
+		}
+	}
 
-    /** Get a snapshot of this view.*/
-    public BufferedImage getImage(){
-	return this.backBuffer;
-    }
+	/** Get a snapshot of this view.*/
+	public BufferedImage getImage(){
+		return this.backBuffer;
+	}
 
 }
