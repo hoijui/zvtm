@@ -66,7 +66,6 @@ public class ViewDemo {
 	vts = "View type: Standard";
 	switch(vt){
 	case View.OPENGL_VIEW:{viewType = View.OPENGL_VIEW;vts = "View type: OpenGL";break;}
-	case View.VOLATILE_VIEW:{viewType = View.VOLATILE_VIEW;vts = "View type: Volatile";break;}
 	}
 	init();
     }
