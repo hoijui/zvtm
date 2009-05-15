@@ -160,16 +160,21 @@
 			<lock-level>write</lock-level>
 		</autolock>
 		<autolock auto-synchronized="false">
-			<method-expression>* com.xerox.VTM.engine.ViewPanel.*(..)</method-expression>
-			<lock-level>write</lock-level>
+		<method-expression>* com.xerox.VTM.engine.ViewPanel.*(..)</method-expression>
+		<lock-level>write</lock-level>
 		</autolock>
 
 		<autolock auto-synchronized="false">
-			<method-expression>* com.xerox.VTM.engine.StdViewPanel.*(..)</method-expression>
-			<lock-level>write</lock-level>
+		<method-expression>* com.xerox.VTM.engine.StdViewPanel.*(..)</method-expression>
+		<lock-level>write</lock-level>
 		</autolock>
 		<autolock auto-synchronized="false">
-			<method-expression>* net.claribole.zvtm.cluster.MetaCamera.*(..)</method-expression>
+		<method-expression>* com.xerox.VTM.engine.GLViewPanel.*(..)</method-expression>
+		<lock-level>write</lock-level>
+		</autolock>
+
+		<autolock auto-synchronized="false">
+		<method-expression>* net.claribole.zvtm.cluster.MetaCamera.*(..)</method-expression>
 			<lock-level>write</lock-level>
 		</autolock>
 
