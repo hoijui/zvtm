@@ -306,6 +306,46 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		foregroundHook();
 	}
 
+	void drawCursor(){
+		try {
+			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
+			if (computeListAtEachRepaint && parent.mouse.isSensitive()){
+				parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);
+			}
+		}
+		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
+		stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
+		if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
+		if (drawRect){
+			stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.mx),
+					Math.min(origDragy,parent.mouse.my),
+					Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),
+					Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
+		if (drawOval){
+			if (circleOnly){
+				stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
+						origDragy-Math.abs(origDragx-parent.mouse.mx),
+						2*Math.abs(origDragx-parent.mouse.mx),
+						2*Math.abs(origDragx-parent.mouse.mx));
+			}
+			else {
+				stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
+						origDragy-Math.abs(origDragy-parent.mouse.my),
+						2*Math.abs(origDragx-parent.mouse.mx),
+						2*Math.abs(origDragy-parent.mouse.my));
+			}
+		}
+		if (drawVTMcursor){
+			synchronized(this){
+				stableRefToBackBufferGraphics.setXORMode(backColor);
+				parent.mouse.draw(stableRefToBackBufferGraphics);
+				oldX=parent.mouse.mx;
+				oldY=parent.mouse.my;
+			}
+		}
+
+	}
+
 	public void run() {
 		Thread me = Thread.currentThread();
 		while (getSize().width <= 0) {  //Wait until the window actually exists
@@ -343,42 +383,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							portalsHook();
 
 							if (inside){//deal with mouse glyph only if mouse cursor is inside this window
-								try {
-									parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-									if (computeListAtEachRepaint && parent.mouse.isSensitive()){
-										parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);
-									}
-								}
-								catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
-								stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
-								if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
-								if (drawRect){
-									stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.mx),
-											Math.min(origDragy,parent.mouse.my),
-											Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),
-											Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
-								if (drawOval){
-									if (circleOnly){
-										stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
-												origDragy-Math.abs(origDragx-parent.mouse.mx),
-												2*Math.abs(origDragx-parent.mouse.mx),
-												2*Math.abs(origDragx-parent.mouse.mx));
-									}
-									else {
-										stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
-												origDragy-Math.abs(origDragy-parent.mouse.my),
-												2*Math.abs(origDragx-parent.mouse.mx),
-												2*Math.abs(origDragy-parent.mouse.my));
-									}
-								}
-								if (drawVTMcursor){
-									synchronized(this){
-										stableRefToBackBufferGraphics.setXORMode(backColor);
-										parent.mouse.draw(stableRefToBackBufferGraphics);
-										oldX=parent.mouse.mx;
-										oldY=parent.mouse.my;
-									}
-								}
+								drawCursor();
 							}
 							//end drawing here
 							if (stableRefToBackBufferGraphics == backBufferGraphics) {
