@@ -172,16 +172,18 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		standardTransform=stableRefToBackBufferGraphics.getTransform();
 	}
 
-	void portalsHook(){
+	void drawPortals(){
 		// paint portals associated with this view
 		for (int i=0;i<parent.portals.length;i++){
 			parent.portals[i].paint(stableRefToBackBufferGraphics, size.width, size.height);
 		}
+	}
+
+	void portalsHook(){
 		// call to after-portals java2d painting hook
 		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
 			parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
 		}
-
 	}
 
 	void foregroundHook(){
@@ -191,7 +193,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 	}
 
-	void afterDistortionHook(){
+	void afterLensHook(){
 		// call to after-distortion java2d painting hook
 		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
 			parent.painters[Java2DPainter.AFTER_LENSES].paint(stableRefToBackBufferGraphics, size.width, size.height);
@@ -265,8 +267,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				// this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
 				if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
 			}
-			afterDistortionHook();
-			portalsHook();
 		}
 	}
 
@@ -304,8 +304,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			}
 		}
 		foregroundHook();
-		afterDistortionHook();
-		portalsHook();
 	}
 
 	public void run() {
@@ -340,6 +338,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							}
 							//begin actual drawing here
 							if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }
+							afterLensHook();
+							drawPortals();
+							portalsHook();
 
 							if (inside){//deal with mouse glyph only if mouse cursor is inside this window
 								try {
