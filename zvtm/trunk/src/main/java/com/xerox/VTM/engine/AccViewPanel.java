@@ -602,9 +602,7 @@ public class AccViewPanel extends ViewPanel implements Runnable {
 			}
 		    } else {
 			try {
-			    runView.sleep(frameTime + noRepaintAdditionalTime); // sleep
-                                                                                // ...
-                                                                                // ms
+			    runView.sleep(frameTime);
 			} catch (InterruptedException e) {
 			    if (VirtualSpaceManager.debugModeON()) {
 				System.err

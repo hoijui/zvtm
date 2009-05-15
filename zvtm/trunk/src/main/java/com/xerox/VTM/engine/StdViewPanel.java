@@ -445,7 +445,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					}
 					else {
 						try {
-							runView.sleep(frameTime + noRepaintAdditionalTime);   //sleep ... ms  
+							runView.sleep(frameTime); 
 						}
 						catch (InterruptedException e) {
 							if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep4 "+e);}
@@ -455,7 +455,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				}
 				else {
 					try {
-						runView.sleep(inactiveSleepTime);   //sleep ... ms  
+						runView.sleep(inactiveSleepTime); 
 					} 
 					catch (InterruptedException e) {
 						if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
