@@ -307,13 +307,6 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	}
 
 	void drawCursor(){
-		try {
-			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-			if (computeListAtEachRepaint && parent.mouse.isSensitive()){
-				parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);
-			}
-		}
-		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 		stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
 		if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
 		if (drawRect){
@@ -344,6 +337,14 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			}
 		}
 
+	}
+
+	void doCursorPicking(){
+		try {                  // branch and we want to catch new requests for repaint
+			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
+			if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
+		}
+		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 	}
 
 	public void run() {
@@ -383,6 +384,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							portalsHook();
 
 							if (inside){//deal with mouse glyph only if mouse cursor is inside this window
+								doCursorPicking();
 								drawCursor();
 							}
 							//end drawing here
@@ -409,11 +411,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					}
 					else if (updateMouseOnly){
 						updateMouseOnly=false; // do this first as the thread can be interrupted inside this
-						try {                  // branch and we want to catch new requests for repaint
-							parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-							if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
-						}
-						catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
+						doCursorPicking();
 						if (drawVTMcursor){
 							synchronized(this){
 								try {
