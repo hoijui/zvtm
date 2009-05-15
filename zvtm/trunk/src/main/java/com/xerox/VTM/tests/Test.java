@@ -65,7 +65,6 @@ public class Test {
         short vt = View.STD_VIEW;
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-            case View.VOLATILE_VIEW:{vt = View.VOLATILE_VIEW;break;}
         }
         testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);

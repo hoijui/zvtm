@@ -24,7 +24,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 /**
  * @author Ruben Kleiman (rk@post.harvard.edu)
  * 
- * A ZVTM view implemented as a JPanel rather than as a JFrame. This view supports OpenGL, Default, or VolatileImage-based rendering.
+ * A ZVTM view implemented as a JPanel rather than as a JFrame. This view supports standard and OpenGL rendering.
  */
 
 public class JPanelView extends View  implements KeyListener {
@@ -99,7 +99,6 @@ public class JPanelView extends View  implements KeyListener {
     private ViewPanel makePanel(short viewType, Vector cameraList) {
 	switch (viewType) {
 	case View.STD_VIEW: return new StdViewPanel(cameras, this);
-	case View.VOLATILE_VIEW: return new AccViewPanel(cameras, this);
 	case View.OPENGL_VIEW: return new GLViewPanel(cameras, this);
 	default: throw new IllegalArgumentException("Invalid view type");
 	}

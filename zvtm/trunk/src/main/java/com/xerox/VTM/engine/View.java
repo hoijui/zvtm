@@ -53,10 +53,8 @@ public abstract class View {
 
     /**Standard ZVTM view, with no particular acceleration method*/
     public static final short STD_VIEW = 0;
-    /**ZVTM view based on Volatile Images introduced with Java 1.4; may provide some acceleration*/
-    public static final short VOLATILE_VIEW = 1;
     /**ZVTM view based on Java 5's OpenGL rendering pipeline; does accelerate rendering but requires a JVM 1.5 or later*/
-    public static final short OPENGL_VIEW = 2;
+    public static final short OPENGL_VIEW = 1;
 
     /**list of Camera objects used in this view*/
     Vector cameras;

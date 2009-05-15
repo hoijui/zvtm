@@ -497,13 +497,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    v.setRepaintPolicy(generalRepaintPolicy);
 	    break;
 	}
-	case View.VOLATILE_VIEW:{
-	    v = (mnb != null) ? new AccEView(c, name, w, h, bar, visible, mnb) : new AccEView(c, name, w, h, bar, visible);
-	    v.mouse.setID(new Long(nextmID++));
-	    addView(v);
-	    v.setRepaintPolicy(generalRepaintPolicy);
-	    break;
-	}   
 	}
 	return v;
     }
