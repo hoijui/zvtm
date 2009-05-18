@@ -73,7 +73,6 @@ public class LensApplet extends JApplet {
 	cp.setLayout(new FlowLayout());
 	((JPanel)cp).setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black,2)," Lens demo "));
 	vsm = VirtualSpaceManager.INSTANCE;
-	vsm.setApplet();
 	vs = vsm.addVirtualSpace(demoVS);
 	vsm.addCamera(demoVS);
 	vsm.getVirtualSpace(demoVS).getCamera(0).setZoomFloor(0);
