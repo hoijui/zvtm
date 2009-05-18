@@ -124,6 +124,27 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	}
     }
 
+	private void backgroundHook(){
+		// call to background java2d painting hook
+		if (parent.painters[Java2DPainter.BACKGROUND] != null){
+			parent.painters[Java2DPainter.BACKGROUND].paint(backBufferGraphics, size.width, size.height);
+		}
+	}
+
+	private void foregroundHook(){
+		// call to foreground java2d painting hook
+		if (parent.painters[Java2DPainter.FOREGROUND] != null){
+		    parent.painters[Java2DPainter.FOREGROUND].paint(backBufferGraphics, size.width, size.height);
+		}
+	}
+	
+	private void afterLensHook(){
+		// call to after-distortion java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
+		    parent.painters[Java2DPainter.AFTER_LENSES].paint(backBufferGraphics, size.width, size.height);
+		}
+	}
+
     public void paint(Graphics g) {
 	loopStartTime = System.currentTimeMillis();
 	super.paint(g);
@@ -150,18 +171,13 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		backBufferGraphics.setPaintMode();
 		backBufferGraphics.setBackground(backColor);
 		backBufferGraphics.clearRect(0,0,getWidth(),getHeight());
-		// call to background java2d painting hook
-		if (parent.painters[Java2DPainter.BACKGROUND] != null){
-		    parent.painters[Java2DPainter.BACKGROUND].paint(backBufferGraphics, size.width, size.height);
-		}
+		backgroundHook();
 		//begin actual drawing here
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
 		    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 			camIndex=cams[nbcam].getIndex();
 			drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-			//synchronized(cams[nbcam].parentSpace.getDrawnGlyphs(camIndex)){
 			synchronized(drawnGlyphs){
-			    //cams[nbcam].parentSpace.getDrawnGlyphs(camIndex).removeAllElements();
 			    drawnGlyphs.removeAllElements();
 			    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 			    //compute region seen from this view through camera
@@ -187,14 +203,8 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			}
 		    }
 		}
-		// call to foreground java2d painting hook
-		if (parent.painters[Java2DPainter.FOREGROUND] != null){
-		    parent.painters[Java2DPainter.FOREGROUND].paint(backBufferGraphics, size.width, size.height);
-		}
-		// call to after-distortion java2d painting hook
-		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
-		    parent.painters[Java2DPainter.AFTER_LENSES].paint(backBufferGraphics, size.width, size.height);
-		}
+		foregroundHook();
+		afterLensHook();
 		// paint portals associated with this view
 		for (int i=0;i<parent.portals.length;i++){
 		    parent.portals[i].paint(backBufferGraphics, size.width, size.height);
@@ -224,7 +234,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    }
 		    if (drawVTMcursor){
 			synchronized(this){
-			    //backBufferGraphics.setXORMode(Color.white);
 			    parent.mouse.draw(backBufferGraphics);
 			    oldX=parent.mouse.mx;
 			    oldY=parent.mouse.my;
