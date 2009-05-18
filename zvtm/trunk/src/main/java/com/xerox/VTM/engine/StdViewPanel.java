@@ -46,6 +46,8 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 
 	/** Double Buffering uses a BufferedImage as the back buffer. */
 	BufferedImage backBuffer;
+    int backBufferW = 0;
+    int backBufferH = 0;
 
 	/*coordinates of lens center in virtual space for each camera*/
 	long lensVx, lensVy;
@@ -101,7 +103,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		size = this.getSize();
 		viewW = size.width;//compute region's width and height
 		viewH = size.height;
-		if (size.width != oldSize.width || size.height != oldSize.height) {
+		if (size.width != oldSize.width || size.height != oldSize.height || backBufferW != size.width || backBufferH != size.height) {
 			//each time the parent window is resized, adapt the buffer image size
 			backBuffer = null;
 			if (backBufferGraphics != null) {
@@ -125,6 +127,8 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		if (backBuffer == null){
 			gconf = getGraphicsConfiguration();
 			backBuffer = gconf.createCompatibleImage(size.width,size.height);
+			backBufferW = backBuffer.getWidth();
+			backBufferH = backBuffer.getHeight();
 			if (backBufferGraphics != null){
 				backBufferGraphics.dispose();
 				backBufferGraphics = null;
@@ -337,9 +341,11 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 		if (drawVTMcursor){
 			stableRefToBackBufferGraphics.setXORMode(backColor);
-			parent.mouse.draw(stableRefToBackBufferGraphics);
-			oldX=parent.mouse.mx;
-			oldY=parent.mouse.my;
+			synchronized(this){
+    			parent.mouse.draw(stableRefToBackBufferGraphics);
+    			oldX = parent.mouse.mx;
+    			oldY = parent.mouse.my;			    
+			}
 		}
 
 	}
@@ -415,15 +421,17 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 						updateMouseOnly=false; // do this first as the thread can be interrupted inside this
 						doCursorPicking();
 						if (drawVTMcursor){
-							try {
-								stableRefToBackBufferGraphics.setXORMode(backColor);
-								stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-								stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
-								stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
-								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
-								oldX=parent.mouse.mx;
-								oldY=parent.mouse.my;
+                            try {
+                                stableRefToBackBufferGraphics.setXORMode(backColor);
+                                stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+                                synchronized(this){
+                                    stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
+                                    stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
+    								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+    								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+    								oldX = parent.mouse.mx;
+    								oldY = parent.mouse.my;							        
+							    }
 							}
 							//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
 							//     just catch it and wait for next loop until we find out what's causing this
