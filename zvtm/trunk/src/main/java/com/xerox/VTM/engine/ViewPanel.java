@@ -64,11 +64,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**should a circle between point where we started dragging the mouse and current point*/
     public final static short CIRCLE=2;
 
-    /**Graphics in which objects are drawn*/
-    Graphics2D backBufferGraphics = null;
     GraphicsConfiguration gconf;
 
-    Graphics2D stableRefToBackBufferGraphics = null;
+    protected Graphics2D stableRefToBackBufferGraphics = null;
 
     Thread runView;
 

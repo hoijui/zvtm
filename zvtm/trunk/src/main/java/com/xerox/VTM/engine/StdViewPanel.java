@@ -53,6 +53,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	long lensVx, lensVy;
 	long lviewWC, lviewNC, lviewEC, lviewSC;
 
+	private Graphics2D backBufferGraphics = null;
 	Dimension oldSize;
 	Graphics2D lensG2D = null;
 
