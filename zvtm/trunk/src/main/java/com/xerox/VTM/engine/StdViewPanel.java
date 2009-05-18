@@ -186,6 +186,13 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 	}
 
+	private void backgroundHook(){
+		// call to background java2d painting hook
+		if (parent.painters[Java2DPainter.BACKGROUND] != null){
+			parent.painters[Java2DPainter.BACKGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
+	}
+
 	private void foregroundHook(){
 		// call to foreground java2d painting hook
 		if (parent.painters[Java2DPainter.FOREGROUND] != null){
@@ -371,10 +378,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							stableRefToBackBufferGraphics.setPaintMode();
 							stableRefToBackBufferGraphics.setBackground(backColor);
 							stableRefToBackBufferGraphics.clearRect(0,0,getWidth(),getHeight());
-							// call to background java2d painting hook
-							if (parent.painters[Java2DPainter.BACKGROUND] != null){
-								parent.painters[Java2DPainter.BACKGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
-							}
+							backgroundHook();
 							//begin actual drawing here
 							if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }
 							afterLensHook();
