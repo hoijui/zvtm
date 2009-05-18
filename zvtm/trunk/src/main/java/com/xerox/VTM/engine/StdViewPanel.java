@@ -172,35 +172,35 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		standardTransform=stableRefToBackBufferGraphics.getTransform();
 	}
 
-	void drawPortals(){
+	private void drawPortals(){
 		// paint portals associated with this view
 		for (int i=0;i<parent.portals.length;i++){
 			parent.portals[i].paint(stableRefToBackBufferGraphics, size.width, size.height);
 		}
 	}
 
-	void portalsHook(){
+	private void portalsHook(){
 		// call to after-portals java2d painting hook
 		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
 			parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
 		}
 	}
 
-	void foregroundHook(){
+	private void foregroundHook(){
 		// call to foreground java2d painting hook
 		if (parent.painters[Java2DPainter.FOREGROUND] != null){
 			parent.painters[Java2DPainter.FOREGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
 		}
 	}
 
-	void afterLensHook(){
+	private void afterLensHook(){
 		// call to after-distortion java2d painting hook
 		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
 			parent.painters[Java2DPainter.AFTER_LENSES].paint(stableRefToBackBufferGraphics, size.width, size.height);
 		}
 	}
 
-	void drawSceneLens(){
+	private void drawSceneLens(){
 		synchronized(lens){// prevents flickering when the lens parameters are being animated (caused by concurrent access)
 			lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
 			lensG2D.setBackground(backColor);
@@ -270,7 +270,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 	}
 
-	void drawSceneNoLens(){
+	private void drawSceneNoLens(){
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
 			if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 				camIndex=cams[nbcam].getIndex();
@@ -306,7 +306,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		foregroundHook();
 	}
 
-	void drawCursor(){
+	private void drawCursor(){
 		stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
 		if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
 		if (drawRect){
@@ -337,7 +337,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 
 	}
 
-	void doCursorPicking(){
+	private void doCursorPicking(){
 		try {                  // branch and we want to catch new requests for repaint
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
 			if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
