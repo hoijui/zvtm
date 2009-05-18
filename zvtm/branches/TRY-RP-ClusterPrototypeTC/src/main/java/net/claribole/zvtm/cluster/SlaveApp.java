@@ -8,40 +8,59 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import java.awt.Color;
 import java.util.Vector;
 
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+
+class SlaveOptions {
+	@Option(name = "-b", aliases = {"--block"}, usage = "metacamera block number")
+	int blockNumber = 0;
+
+	@Option(name = "-w", aliases = {"--width"}, usage = "slave view width")
+	int width = 400;
+
+	@Option(name = "-h", aliases = {"--height"}, usage = "slave view height")
+	int height = 300;
+}
+
 //Generic slave application
 // - retrieves a slave camera from a MetaCamera
 // - creates a std view 
 // - dispays scene
 public class SlaveApp {
+	private SlaveOptions slaveOptions;
 
-	int blockNumber;
 	VirtualSpaceManager vsm;
 	View view;
 
-	public SlaveApp(int blockNumber){
+	SlaveApp(SlaveOptions options){
+		this.slaveOptions = options;
 		vsm = VirtualSpaceManager.getInstance();
 		VirtualSpaceManager.setDebug(true);
-		System.out.println("slave (block " + blockNumber 
+		System.out.println("slave (block " + slaveOptions.blockNumber 
 				+ "): waiting for master to initialize virtual space");
 
+		//the master program creates the main virtual space
+		//and metacamera, among other things 
 		vsm.awaitMaster();
 
 		VirtualSpace vs = vsm.getVirtualSpace("protoSpace");
 
 		Vector<Camera> vcam = new Vector<Camera>();
-		vcam.add(vs.getMetaCamera().retrieveCamera(blockNumber));
-		view = vsm.addExternalView(vcam, "slaveView"  + blockNumber, View.OPENGL_VIEW,
-				2560, 1600, false, true, true, null);
+		vcam.add(vs.getMetaCamera().retrieveCamera(slaveOptions.blockNumber));
+		view = vsm.addExternalView(vcam, "slaveView"  + slaveOptions.blockNumber, 
+				View.OPENGL_VIEW, slaveOptions.width, 
+				slaveOptions.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 		vcam.get(0).setOwningView(view); 
 	}
 
-	public static void main(String[] args){
-		if(args.length == 0){
-			new SlaveApp(0);
-		} else {
-			new SlaveApp(Integer.parseInt(args[0]));
-		}
+	public static void main(String[] args) throws CmdLineException{
+		SlaveOptions options = new SlaveOptions();
+		CmdLineParser parser = new CmdLineParser(options);
+		parser.parseArgument(args);
+		new SlaveApp(options);
 	}
 }
 
