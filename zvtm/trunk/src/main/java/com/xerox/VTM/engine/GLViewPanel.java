@@ -124,41 +124,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	}
     }
 
-	private void drawPortals(){
-		// paint portals associated with this view
-		for (int i=0;i<parent.portals.length;i++){
-		    parent.portals[i].paint(stableRefToBackBufferGraphics, size.width, size.height);
-		}
-	}
-
-	private void portalsHook(){
-		// call to after-portals java2d painting hook
-		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
-		}
-	}
-
-	private void backgroundHook(){
-		// call to background java2d painting hook
-		if (parent.painters[Java2DPainter.BACKGROUND] != null){
-			parent.painters[Java2DPainter.BACKGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
-		}
-	}
-
-	private void foregroundHook(){
-		// call to foreground java2d painting hook
-		if (parent.painters[Java2DPainter.FOREGROUND] != null){
-		    parent.painters[Java2DPainter.FOREGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
-		}
-	}
-	
-	private void afterLensHook(){
-		// call to after-distortion java2d painting hook
-		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
-		    parent.painters[Java2DPainter.AFTER_LENSES].paint(stableRefToBackBufferGraphics, size.width, size.height);
-		}
-	}
-
     public void paint(Graphics g) {
 	loopStartTime = System.currentTimeMillis();
 	super.paint(g);

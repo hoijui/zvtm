@@ -24,6 +24,7 @@
 package com.xerox.VTM.engine;
 
 import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
@@ -750,4 +751,40 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     public void componentHidden(ComponentEvent e){}
     
     //  ---------------- End Resize handling -----------------
+
+	protected final void drawPortals(){
+		// paint portals associated with this view
+		for (int i=0;i<parent.portals.length;i++){
+			parent.portals[i].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
+	}
+
+	protected final void portalsHook(){
+		// call to after-portals java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+			parent.painters[Java2DPainter.AFTER_PORTALS].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
+	}
+
+	protected final void backgroundHook(){
+		// call to background java2d painting hook
+		if (parent.painters[Java2DPainter.BACKGROUND] != null){
+			parent.painters[Java2DPainter.BACKGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
+	}
+
+	protected final void foregroundHook(){
+		// call to foreground java2d painting hook
+		if (parent.painters[Java2DPainter.FOREGROUND] != null){
+			parent.painters[Java2DPainter.FOREGROUND].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
+	}
+
+	protected final void afterLensHook(){
+		// call to after-distortion java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_LENSES] != null){
+			parent.painters[Java2DPainter.AFTER_LENSES].paint(stableRefToBackBufferGraphics, size.width, size.height);
+		}
+	}
+
 }
