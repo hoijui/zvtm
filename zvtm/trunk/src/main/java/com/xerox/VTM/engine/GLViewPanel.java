@@ -124,6 +124,20 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	}
     }
 
+	private void drawPortals(){
+		// paint portals associated with this view
+		for (int i=0;i<parent.portals.length;i++){
+		    parent.portals[i].paint(backBufferGraphics, size.width, size.height);
+		}
+	}
+
+	private void portalsHook(){
+		// call to after-portals java2d painting hook
+		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
+		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(backBufferGraphics, size.width, size.height);
+		}
+	}
+
 	private void backgroundHook(){
 		// call to background java2d painting hook
 		if (parent.painters[Java2DPainter.BACKGROUND] != null){
@@ -205,16 +219,10 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		}
 		foregroundHook();
 		afterLensHook();
-		// paint portals associated with this view
-		for (int i=0;i<parent.portals.length;i++){
-		    parent.portals[i].paint(backBufferGraphics, size.width, size.height);
-		}
-		// call to after-portals java2d painting hook
-		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-		    parent.painters[Java2DPainter.AFTER_PORTALS].paint(backBufferGraphics, size.width, size.height);
-		}
+		drawPortals();
+		portalsHook();
 		if (inside){//deal with mouse glyph only if mouse cursor is inside this window
-		    try {
+			try {
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
 			if (computeListAtEachRepaint && parent.mouse.isSensitive()){
 			    parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer]);
@@ -246,13 +254,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		backBufferGraphics.setPaintMode();
 		backBufferGraphics.setColor(blankColor);
 		backBufferGraphics.fillRect(0, 0, getWidth(), getHeight());
-		// call to after-portals java2d painting hook
-		if (parent.painters[Java2DPainter.AFTER_PORTALS] != null){
-		    try {
-			parent.painters[Java2DPainter.AFTER_PORTALS].paint(backBufferGraphics, size.width, size.height);
-		    }
-		    catch(ClassCastException ex){if (VirtualSpaceManager.debugModeON()){System.err.println("Failed to draw AFTER_PORTALS in blank mode");}}
-		}
+		portalsHook();
 	    }
 	}
 	catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.paint "+ex0);}}
