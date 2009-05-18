@@ -37,7 +37,7 @@ import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 /**
- * Each view runs in its own thread - uses double buffering - for use in JApplet only
+ * Each view runs in its own thread - uses double buffering
  * @author Emmanuel Pietriga
  */
 public class PViewPanel extends ViewPanel implements Runnable {
