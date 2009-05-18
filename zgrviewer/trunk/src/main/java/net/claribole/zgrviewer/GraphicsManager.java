@@ -183,9 +183,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     Vector createZVTMelements(boolean applet){
-        if (applet){
-            VirtualSpaceManager.setApplet();
-        }
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMainFont(ConfigManager.defaultFont);
         vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
@@ -229,22 +226,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         return cameras;
     }
 
-    void createFrameView(Vector cameras, int acc, JMenuBar jmb){
-        if (acc == 1){
-            mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, View.VOLATILE_VIEW,
-                ConfigManager.mainViewW, ConfigManager.mainViewH,
-                true, false, jmb);
-        }
-        else if (acc == 2){
-            mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, View.OPENGL_VIEW,
-                ConfigManager.mainViewW, ConfigManager.mainViewH,
-                true, false, jmb);
-        }
-        else {
-            mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, View.STD_VIEW,
-                ConfigManager.mainViewW, ConfigManager.mainViewH,
-                true, false, jmb);
-        }
+    void createFrameView(Vector cameras, short vt, JMenuBar jmb){
+        mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, vt,
+            ConfigManager.mainViewW, ConfigManager.mainViewH,
+            true, false, jmb);
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
         mainView.getFrame().addComponentListener(this);
         gp = new ZGRGlassPane(this);

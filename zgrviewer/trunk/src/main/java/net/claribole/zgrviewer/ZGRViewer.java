@@ -31,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.engine.View;
 import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.glyphs.PieMenu;
@@ -59,7 +60,7 @@ public class ZGRViewer implements ZGRApplication {
     PieMenu mainPieMenu, subPieMenu;
 
 
-    ZGRViewer(int acc){
+    ZGRViewer(short acc){
 	initConfig();
 	//init GUI after config as we load some GUI prefs from the config file
 	initGUI(acc);
@@ -108,7 +109,7 @@ public class ZGRViewer implements ZGRApplication {
 	cfgMngr.initPlugins(this);
     }
 
-    void initGUI(int acc){
+    void initGUI(short acc){
 	Utils.initLookAndFeel();
 	JMenuBar jmb = initViewMenu(acc);
 	grMngr.createFrameView(grMngr.createZVTMelements(false), acc, jmb);
@@ -473,13 +474,12 @@ public class ZGRViewer implements ZGRApplication {
         if (Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-        int acceleratedView = 0;
+        short acceleratedView = View.STD_VIEW;
         for (int i=0;i<args.length;i++){
             if (args[i].startsWith("-")){
                 if (args[i].equals("--help")){
                     System.out.println("\n\njava net.claribole.zgrviewer.ZGRViewer [options] [file]");
-                    System.out.println("[options] -volatile ZVTM will run in VolatileImage accelerated mode (requires JDK 1.4 or later)");
-                    System.out.println("          -opengl   ZVTM will run in OpenGL accelerated mode (requires JDK 1.5 or later)");
+                    System.out.println("[options] -opengl   ZVTM will run in OpenGL accelerated mode (requires JDK 1.5 or later)");
                     System.out.println("          -Pxxx     where xxx={dot, neato, svg} to specify what program to use to compute the [file]'s layout");
                     System.out.println("[file]    can be a relative or full path ; use the native OS syntax\n\n");
                     System.exit(0);
@@ -487,9 +487,8 @@ public class ZGRViewer implements ZGRApplication {
                 else if (args[i].equals("-opengl")){
                     System.setProperty("sun.java2d.opengl", "true");
                     System.out.println("OpenGL accelerated mode");
-                    acceleratedView = 2;
+                    acceleratedView = View.OPENGL_VIEW;
                 }
-                else if (args[i].equals("-volatile")){System.out.println("Volatile Image accelerated mode");acceleratedView = 1;}
                 else if (args[i].startsWith("-P")){cmdLinePrg=args[i];}
             }
             else {
@@ -499,7 +498,7 @@ public class ZGRViewer implements ZGRApplication {
             }
         }
         System.out.println("--help for command line options");
-        final int av = acceleratedView;
+        final short av = acceleratedView;
         new ZGRViewer(av);
     }
     
