@@ -141,7 +141,7 @@ public class VirtualSpaceManager implements AWTEventListener {
   public static final VirtualSpaceManager INSTANCE = new VirtualSpaceManager();
  
     /**
-     * Set applet to true if you are calling ZVTM from inside an Applet
+     * Automatic instantiation as a singleton. THere is always a single VSM per application.
      */
     private VirtualSpaceManager(){
 	if (debug){System.out.println("Debug mode ON");}
@@ -158,10 +158,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	allVirtualSpaces=new Hashtable();
 	allViews = new View[0];
 	name2viewIndex = new Hashtable();
-    }
-
-    public static final void setApplet(){
-	    java.awt.Toolkit.getDefaultToolkit().addAWTEventListener(INSTANCE, AWTEvent.WINDOW_EVENT_MASK);
     }
 
     /**set debug mode ON or OFF*/
