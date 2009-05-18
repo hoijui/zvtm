@@ -41,7 +41,7 @@ public class MasterSkel {
 		path.addQdCurve(60,60,0,60,false);
 		path.addQdCurve(60,60,60,0,false);
 		path.setStrokeWidth(5f);
-		Glyph image = new VImage(100, 200, 0, "/Users/romain/Documents/inria/checkouts/zvtm-terra-proto/NoLoitering.gif");
+		Glyph image = new VImage(100, 200, 0, "/home/rprimet/Documents/inria/zvtm-cluster/NoLoitering.gif");
 
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(anotherRect, vs);

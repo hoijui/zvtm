@@ -27,6 +27,9 @@ $Id$
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- cluster apps properties -->
+    <slaveWidth>400</slaveWidth>
+    <slaveHeight>240</slaveHeight>
   </properties>
   
   <!-- Repositories -->
@@ -154,23 +157,28 @@ $Id$
 		  <configuration>
 			  <workingDirectory>${project.build.directory}</workingDirectory>
 			  <processes>
-				  <process nodeName="master" count="1" 
+				  <!-- <process nodeName="masterWild" count="1" 
 					  className="net.claribole.zvtm.cluster.MasterSkelWild"
+					  arguments=""> 
+				  </process> -->
+				  <process nodeName="master" count="1" 
+					  className="net.claribole.zvtm.cluster.MasterSkel"
 					  arguments="">
 				  </process>
+
 				  <process nodeName="slave0" count="1"
 					  className="net.claribole.zvtm.cluster.SlaveApp"
-					  arguments="0">
+					  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 0">
 				  </process>
 				  <process nodeName="slave1" count="1"
 					  className="net.claribole.zvtm.cluster.SlaveApp"
-					  arguments="1">
+					  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 1">
 				  </process>
 				  <process nodeName="slave2" count="1"
 					  className="net.claribole.zvtm.cluster.SlaveApp"
-					  arguments="2">
+					  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 2">
 				  </process>
-				  <process nodeName="slave3" count="1"
+				<!--  <process nodeName="slave3" count="1"
 					  className="net.claribole.zvtm.cluster.SlaveApp"
 					  arguments="3">
 				  </process>
@@ -181,7 +189,7 @@ $Id$
 				  <process nodeName="slave5" count="1"
 					  className="net.claribole.zvtm.cluster.SlaveApp"
 					  arguments="5">
-				  </process>
+				  </process> -->
 
 			  </processes>
 			  <startServer>true</startServer>
