@@ -129,6 +129,23 @@ This method returns the JPanel encapsulated by the view instead of returning the
 
 \codebox{View v = vsm.getView("fooview");}
 
+An external view can be set to run in full-screen exclusive mode, as is possible with any JFrame. Usually the View will have been initialized undecorated (no title bar).
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+
+[...]
+
+GraphicsDevice gd =
+    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+gd.setFullScreenWindow((JFrame)v.getFrame());}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+
 %%%%%
 \subsubsection{Layers}
 
