@@ -66,6 +66,7 @@ $Id$
         <directory>src/main/resources</directory> 
           <excludes> 
 		    <exclude>*.dtd</exclude>
+		    <exclude>python/**</exclude>
 		</excludes> 
       </resource>
 	</resources>
