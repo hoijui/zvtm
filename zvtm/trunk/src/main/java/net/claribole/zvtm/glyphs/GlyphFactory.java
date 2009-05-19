@@ -54,7 +54,6 @@ import javax.swing.event.ChangeListener;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VCircleST;
 import com.xerox.VTM.glyphs.VDiamond;
 import com.xerox.VTM.glyphs.VDiamondOr;
 import com.xerox.VTM.glyphs.VDiamondOrST;
@@ -627,10 +626,7 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	    else {g = new VEllipse(0, 0, 0, w, h, fillColor, borderColor);}
 	}
 	else if (si.equals(V_Circle)){
-	    if (transpChk.isSelected()){
-		g=new VCircleST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
-	    }
-	    else {g=new VCircle(0, 0, 0, size, fillColor, borderColor);}
+	    g = new VCircle(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 	}
 	else if (si.equals(V_Triangle)){
 	    if (angleChk.isSelected()){

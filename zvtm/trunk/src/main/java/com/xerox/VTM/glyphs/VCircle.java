@@ -23,6 +23,7 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
+import java.awt.AlphaComposite;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -43,7 +44,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  *@see com.xerox.VTM.glyphs.VEllipseST
  */
 
-public class VCircle extends ClosedShape {
+public class VCircle extends ClosedShape implements Translucent {
 
     /**radius in virtual space (equal to bounding circle radius since this is a circle)*/
     public long vr;
@@ -51,15 +52,10 @@ public class VCircle extends ClosedShape {
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     public BProjectedCoords[] pc;
 
+    AlphaComposite acST;
+    
     public VCircle(){
-	vx=0;
-	vy=0;
-	vz=0;
-	vr=10;
-	computeSize();
-	orient=0;
-	setColor(Color.white);
-	setBorderColor(Color.black);
+        this(0, 0, 0, 10, Color.WHITE, Color.BLACK, 1);
     }
 
     /**
@@ -70,14 +66,7 @@ public class VCircle extends ClosedShape {
      *@param c fill color
      */
     public VCircle(long x,long y, int z,long r,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	vr=r;
-	computeSize();
-	orient=0;
-	setColor(c);
-	setBorderColor(Color.black);
+	    this(x, y, z, r, c, Color.BLACK, 1);
     }
 
     /**
@@ -89,14 +78,42 @@ public class VCircle extends ClosedShape {
      *@param bc border color
      */
     public VCircle(long x, long y, int z, long r, Color c, Color bc){
-	vx=x;
-	vy=y;
-	vz=z;
-	vr=r;
-	computeSize();
-	orient=0;
-	setColor(c);
-	setBorderColor(bc);
+        this(x, y, z, r, c, bc, 1);
+    }
+    
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param r radius in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VCircle(long x, long y, int z, long r, Color c, Color bc, float a){
+        vx = x;
+        vy = y;
+        vz = z;
+        vr = r;
+        computeSize();
+        orient = 0;
+        setColor(c);
+        setBorderColor(bc);
+        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
+    }
+    
+    public void setTranslucencyValue(float alpha){
+        if (alpha == 1.0f){
+            acST = null;
+        }
+        else {
+            acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);            
+        }
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+
+    public float getTranslucencyValue(){
+        return (acST != null) ? acST.getAlpha() : 1.0f;
     }
 
     public void initCams(int nbCam){
@@ -173,14 +190,15 @@ public class VCircle extends ClosedShape {
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
-	if ((Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
-	    && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
-	    && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr) 
-	    && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr)){return true;}
-	else {return false;}
-    }
 
+    public boolean fillsView(long w,long h,int camIndex){
+        if ((acST != null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
+            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
+            && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr) 
+            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr)){return true;}
+        else {return false;}
+    }
+    
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
         if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr){return true;}
         else {return false;}
@@ -235,59 +253,127 @@ public class VCircle extends ClosedShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if (pc[i].cr>1){
-	    if (filled){
-		g.setColor(this.color);
-		g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (acST != null){
+            if (acST.getAlpha() == 0){
+                // totally transparent
+                return;
+            }
+            // translucent
+            if (pc[i].cr>1){
+                g.setComposite(acST);
+                if (filled){
+                    g.setColor(this.color);
+                    g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                g.setColor(this.color);
+                g.setComposite(acST);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+        }
+        else {
+            // opaque
+            if (pc[i].cr>1){
+                if (filled){
+                    g.setColor(this.color);
+                    g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                    }
+                }
+            }
+            else {
+                g.setColor(this.color);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if (pc[i].lcr>1){
-	    if (filled){
-		g.setColor(this.color);
-		g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (acST != null){
+            if (acST.getAlpha() == 0){
+                // totally transparent
+                return;
+            }
+            // translucent
+            if (pc[i].lcr>1){
+                g.setComposite(acST);
+                if (filled){
+                    g.setColor(this.color);
+                    g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                g.setColor(this.color);
+                g.setComposite(acST);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+        }
+        else {
+            // opaque
+            if (pc[i].lcr>1){
+                if (filled){
+                    g.setColor(this.color);
+                    g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                    }
+                }
+            }
+            else {
+                g.setColor(this.color);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     public Object clone(){
-	VCircle res=new VCircle(vx,vy,0,vr,color);
-	res.borderColor=this.borderColor;
-	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	return res;
+        VCircle res=new VCircle(vx,vy,0,vr,color, borderColor, (acST != null) ? acST.getAlpha() : 1);
+        res.mouseInsideColor=this.mouseInsideColor;
+        return res;
     }
 
 }

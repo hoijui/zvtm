@@ -54,8 +54,7 @@ import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
-//import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VCircleST;
+import com.xerox.VTM.glyphs.VCircle;
 //import com.xerox.VTM.glyphs.VEllipse;
 import com.xerox.VTM.glyphs.VEllipseST;
 //import net.claribole.zvtm.glyphs.DPath;
@@ -808,7 +807,7 @@ public class SVGReader {
     /** Create a VCircle from an SVG circle element.
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      */
-    public static VCircleST createCircle(Element e){
+    public static VCircle createCircle(Element e){
         return createCircle(e,null,false);
     }
 
@@ -816,7 +815,7 @@ public class SVGReader {
      *@param e an SVG circle as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VCircleST createCircle(Element e,Context ctx){
+    public static VCircle createCircle(Element e,Context ctx){
         return createCircle(e,ctx,false);
     }
 
@@ -825,7 +824,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VCircleST createCircle(Element e,Context ctx,boolean meta){
+    public static VCircle createCircle(Element e,Context ctx,boolean meta){
         long x = getLong(e.getAttribute(_cx));
         long y = getLong(e.getAttribute(_cy));
         long r = getLong(e.getAttribute(_r));
@@ -836,17 +835,16 @@ public class SVGReader {
         }
         x += xoffset;
         y += yoffset;
-        VCircleST res;
+        VCircle res;
         SVGStyle ss=getStyle(e.getAttribute(_style), e);
         if (ss != null){
             if (ss.hasTransparencyInformation()){
-                if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VCircleST(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
-                ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
+                if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VCircle(x,-y,0,r,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue());}
             }
             else {
-                if (ss.getFillColor()==null){res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VCircleST(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
+                if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VCircle(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
             }
             Color border=ss.getStrokeColor();
             if (border != null){
@@ -859,7 +857,7 @@ public class SVGReader {
             if (ss.requiresSpecialStroke()){
                 assignStroke(res, ss);
             }
-            } else {res=new VCircleST(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);}
+            } else {res=new VCircle(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);}
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
