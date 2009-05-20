@@ -31,6 +31,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.Shape;
+import java.awt.AlphaComposite;
 
 import net.claribole.zvtm.glyphs.CGlyph;
 
@@ -42,7 +43,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  *@author Emmanuel Pietriga
  */
 
-public abstract class Glyph implements Cloneable {
+public abstract class Glyph implements Cloneable, Translucent {
 
     /*------------Misc. Info-------------------------------------*/
 
@@ -394,6 +395,32 @@ public abstract class Glyph implements Cloneable {
     
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public abstract void highlight(boolean b, Color selectedColor);
+    
+    /* ---------------- Translucency ------------------- */
+    
+    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. */
+    AlphaComposite alphaC;
+    
+    /**
+     * Set alpha channel value (translucency).
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */    
+    public void setTranslucencyValue(float alpha){
+        if (alpha == 1.0f){
+            alphaC = null;
+        }
+        else {
+            alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);            
+        }
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){
+        return (alphaC != null) ? alphaC.getAlpha() : 1.0f;
+    }
 
     /*------------Selection--------------------------------------*/
 

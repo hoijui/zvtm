@@ -23,7 +23,6 @@
 package com.xerox.VTM.glyphs;
 
 import java.awt.Color;
-import java.awt.AlphaComposite;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -44,15 +43,13 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  *@see com.xerox.VTM.glyphs.VEllipseST
  */
 
-public class VCircle extends ClosedShape implements Translucent {
+public class VCircle extends ClosedShape {
 
     /**radius in virtual space (equal to bounding circle radius since this is a circle)*/
     public long vr;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     public BProjectedCoords[] pc;
-
-    AlphaComposite acST;
     
     public VCircle(){
         this(0, 0, 0, 10, Color.WHITE, Color.BLACK, 1);
@@ -88,9 +85,9 @@ public class VCircle extends ClosedShape implements Translucent {
      *@param r radius in virtual space
      *@param c fill color
      *@param bc border color
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VCircle(long x, long y, int z, long r, Color c, Color bc, float a){
+    public VCircle(long x, long y, int z, long r, Color c, Color bc, float alpha){
         vx = x;
         vy = y;
         vz = z;
@@ -99,21 +96,7 @@ public class VCircle extends ClosedShape implements Translucent {
         orient = 0;
         setColor(c);
         setBorderColor(bc);
-        acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
-    }
-    
-    public void setTranslucencyValue(float alpha){
-        if (alpha == 1.0f){
-            acST = null;
-        }
-        else {
-            acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);            
-        }
-        VirtualSpaceManager.INSTANCE.repaintNow();
-    }
-
-    public float getTranslucencyValue(){
-        return (acST != null) ? acST.getAlpha() : 1.0f;
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -192,7 +175,7 @@ public class VCircle extends ClosedShape implements Translucent {
 
 
     public boolean fillsView(long w,long h,int camIndex){
-        if ((acST != null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
+        if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
             && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
             && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr) 
             && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr)){return true;}
@@ -253,14 +236,15 @@ public class VCircle extends ClosedShape implements Translucent {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        if (acST != null){
-            if (acST.getAlpha() == 0){
-                // totally transparent
+        if (alphaC != null){
+            // glyph is not opaque
+            if (alphaC.getAlpha() == 0){
+                // glyph is totally transparent
                 return;
             }
-            // translucent
+            // glyph is translucent
             if (pc[i].cr>1){
-                g.setComposite(acST);
+                g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
                     g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
@@ -280,13 +264,13 @@ public class VCircle extends ClosedShape implements Translucent {
             }
             else {
                 g.setColor(this.color);
-                g.setComposite(acST);
+                g.setComposite(alphaC);
                 g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
                 g.setComposite(acO);
             }
         }
         else {
-            // opaque
+            // glyph is opaque
             if (pc[i].cr>1){
                 if (filled){
                     g.setColor(this.color);
@@ -312,14 +296,15 @@ public class VCircle extends ClosedShape implements Translucent {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        if (acST != null){
-            if (acST.getAlpha() == 0){
-                // totally transparent
+        if (alphaC != null){
+            // glyph is not opaque
+            if (alphaC.getAlpha() == 0){
+                // glyph is totally transparent
                 return;
             }
-            // translucent
+            // glyph is translucent
             if (pc[i].lcr>1){
-                g.setComposite(acST);
+                g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
                     g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
@@ -339,13 +324,13 @@ public class VCircle extends ClosedShape implements Translucent {
             }
             else {
                 g.setColor(this.color);
-                g.setComposite(acST);
+                g.setComposite(alphaC);
                 g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
                 g.setComposite(acO);
             }
         }
         else {
-            // opaque
+            // glyph is opaque
             if (pc[i].lcr>1){
                 if (filled){
                     g.setColor(this.color);
@@ -371,7 +356,7 @@ public class VCircle extends ClosedShape implements Translucent {
     }
 
     public Object clone(){
-        VCircle res=new VCircle(vx,vy,0,vr,color, borderColor, (acST != null) ? acST.getAlpha() : 1);
+        VCircle res=new VCircle(vx,vy,0,vr,color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
         res.mouseInsideColor=this.mouseInsideColor;
         return res;
     }

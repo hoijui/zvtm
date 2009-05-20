@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Thu Jan 24 10:32:08 2002 by Emmanuel Pietriga
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,7 @@
 
 package com.xerox.VTM.glyphs;
 
-
 import java.awt.AlphaComposite;
-
 
 /**
  * Translucency interface (previously named Transparency).
@@ -41,7 +39,7 @@ public interface Translucent {
      * Set alpha channel value (translucency).
      *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public void setTranslucencyValue(float a);
+    public void setTranslucencyValue(float alpha);
 
 
     /** Get alpha channel value (translucency).
