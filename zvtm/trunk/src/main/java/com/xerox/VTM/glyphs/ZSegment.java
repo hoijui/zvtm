@@ -23,24 +23,13 @@ import com.xerox.VTM.engine.Camera;
 /**
  * Alternative to VSegment for very large widths and heights in virtual space (that go beyond 32-bit integers). Can only handle horizontal or vertical segments. In most cases VSegment will be the best solution. This version can be useful e.g. when a virtual space contains a very large grid.
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.ZSegmentST
- *@see com.xerox.VTM.glyphs.VSegmentST
  *@see com.xerox.VTM.glyphs.VSegment
  */
 
 public class ZSegment extends VRectangle {
 
     public ZSegment(){
-	vx = 0;
-	vy = 0;
-	vz = 0;
-	vw = 10;
-	vh = 10;
-	computeSize();
-	ar = (float)vw/(float)vh;
-	orient = 0;
-	setColor(Color.white);
-	setBorderColor(Color.black);
+	    this(0, 0, 0, 10, 10, Color.BLACK, 1.0f);
     }
 
     /**
@@ -52,17 +41,31 @@ public class ZSegment extends VRectangle {
      *@param c fill color
      */
     public ZSegment(long x,long y, int z,long w,long h,Color c){
-	vx = x;
-	vy = y;
-	vz = z;
-	vw = w;
-	vh = h;
-	computeSize();
-	if (vw == 0 && vh==0){ar = 1.0f;}
-	else {ar = (float)vw/(float)vh;}
-	orient = 0;
-	setColor(c);
-	setBorderColor(Color.black);
+	    this(x, y, z, w, h, c, 1.0f);
+    }
+    
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param w half width in virtual space
+     *@param h half height in virtual space
+     *@param c fill color
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public ZSegment(long x,long y, int z,long w,long h,Color c, float alpha){
+        vx = x;
+    	vy = y;
+    	vz = z;
+    	vw = w;
+    	vh = h;
+    	computeSize();
+    	if (vw == 0 && vh==0){ar = 1.0f;}
+    	else {ar = (float)vw/(float)vh;}
+    	orient = 0;
+    	setColor(c);
+    	setBorderColor(Color.BLACK);
+    	setTranslucencyValue(alpha);
     }
 
     public boolean fillsView(long w,long h,int camIndex){//width and height of view - pc[i].c? are JPanel coords
@@ -185,35 +188,83 @@ public class ZSegment extends VRectangle {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
-	    g.setColor(this.color);
-	    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, pc[i].ch);
-	}
-	else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {//repaint only if object is visible  (^ means xor)
-	    g.setColor(this.color);
-	    if (pc[i].cw<=1){
-		g.drawRect(dx+pc[i].cx, dy+pc[i].cy, 0, pc[i].ch);
-	    }
-	    else if (pc[i].ch<=1){
-		g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, 0);
-	    }
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        if ((pc[i].cw>1) && (pc[i].ch>1)) {
+            //repaint only if object is visible
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, pc[i].ch);
+                g.setComposite(acO);
+            }
+            else {
+                g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, pc[i].ch);
+            }
+        }
+        else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {
+            //repaint only if object is visible  (^ means xor)
+            g.setColor(this.color);
+            if (pc[i].cw<=1){
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, 0, pc[i].ch);
+                    g.setComposite(acO);
+                }
+                else {
+                    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, 0, pc[i].ch);
+                }
+            }
+            else if (pc[i].ch<=1){
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, 0);
+                    g.setComposite(acO);
+                }
+                else {
+                    g.drawRect(dx+pc[i].cx, dy+pc[i].cy, pc[i].cw, 0);
+                }
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].lch>1)) {//repaint only if object is visible
-	    g.setColor(this.color);
-	    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, pc[i].lch);
-	}
-	else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {//repaint only if object is visible  (^ means xor)
-	    g.setColor(this.color);
-	    if (pc[i].lcw<=1){
-		g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, 0, pc[i].lch);
-	    }
-	    else if (pc[i].lch<=1){
-		g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, 0);
-	    }
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        if ((pc[i].lcw>1) && (pc[i].lch>1)) {
+            //repaint only if object is visible
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, pc[i].lch);
+                g.setComposite(acO);
+            }
+            else {
+                g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, pc[i].lch);
+            }
+        }
+        else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {
+            //repaint only if object is visible  (^ means xor)
+            g.setColor(this.color);
+            if (pc[i].lcw<=1){
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, 0, pc[i].lch);
+                    g.setComposite(acO);
+                }
+                else {
+                    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, 0, pc[i].lch);
+                }
+            }
+            else if (pc[i].lch<=1){
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, 0);
+                    g.setComposite(acO);
+                }
+                else {
+                    g.drawRect(dx+pc[i].lcx, dy+pc[i].lcy, pc[i].lcw, 0);
+                }
+            }
+        }
     }
 
     public Object clone(){
