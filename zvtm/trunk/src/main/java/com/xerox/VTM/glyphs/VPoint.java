@@ -44,10 +44,7 @@ public class VPoint extends Glyph {
     ProjectedCoords[] pc;
 
     public VPoint(){
-	vx=0;
-	vy=0;	
-	size=1;   //radius of the bounding circle
-	setColor(Color.white);
+	    this(0, 0, 0, Color.BLACK, 1.0f);
     }
 
     /**
@@ -56,11 +53,7 @@ public class VPoint extends Glyph {
         *@param c color
         */
     public VPoint(long x,long y, Color c){
-        vx=x;
-        vy=y;
-        vz = 0;
-        size=1;   //radius of the bounding circle
-        setColor(c);
+        this(x, y, 0, c, 1.0f);
     }
 
     /**
@@ -70,11 +63,23 @@ public class VPoint extends Glyph {
         *@param c color
         */
     public VPoint(long x,long y, int z, Color c){
+        this(x, y, z, c, 1.0f);
+    }
+    
+    /**
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param c color
+        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VPoint(long x,long y, int z, Color c, float alpha){
         vx=x;
         vy=y;
         vz = z;
         size=1;   //radius of the bounding circle
         setColor(c);
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -186,19 +191,49 @@ public class VPoint extends Glyph {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);  
-	g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+        if (alphaC != null){
+            // glyph is not opaque
+            if (alphaC.getAlpha() == 0){
+                // glyph is totally transparent
+                return;
+            }
+            // glyph is translucent
+            g.setColor(this.color);
+            g.setComposite(alphaC);
+            g.fillRect(dx+pc[i].cx, dy+pc[i].cy, 1, 1);
+            g.setComposite(acO);
+        }
+        else {
+            // glyph is opaque
+            g.setColor(this.color);
+            g.fillRect(dx+pc[i].cx, dy+pc[i].cy, 1, 1);
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);  
-	g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+        if (alphaC != null){
+            // glyph is not opaque
+            if (alphaC.getAlpha() == 0){
+                // glyph is totally transparent
+                return;
+            }
+            // glyph is translucent
+            g.setColor(this.color);
+            g.setComposite(alphaC);
+            g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
+            g.setComposite(acO);
+        }
+        else {
+            // glyph is opaque
+            g.setColor(this.color);
+            g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
+        }
     }
 
     public Object clone(){
-	VPoint res=new VPoint(vx,vy,color);
-	res.mouseInsideColor=this.mouseInsideColor;
-	return res;
+        VPoint res = new VPoint(vx, vy, 0, color, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
+        res.mouseInsideColor = this.mouseInsideColor;
+        return res;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
