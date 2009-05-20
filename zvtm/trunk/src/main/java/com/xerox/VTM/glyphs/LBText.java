@@ -170,7 +170,7 @@ public class LBText extends LText {
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			if (!pc[i].valid){
 				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 				// cw and ch actually hold width and height of text *in virtual space*
@@ -201,7 +201,7 @@ public class LBText extends LText {
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			if (!pc[i].lvalid){
 				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 				// lcw and lch actually hold width and height of text *in virtual space*

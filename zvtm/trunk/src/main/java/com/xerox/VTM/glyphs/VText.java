@@ -66,14 +66,23 @@ public class VText extends Glyph {
 
     protected boolean zoomSensitive=true;
 
-    /** Font size in pixels (read-only). */
-    protected float fontSize=VirtualSpaceManager.getMainFont().getSize2D();
+	protected static Font mainFont = new Font("Dialog",0,10);
+	/** Font size in pixels (read-only). */
+	protected float fontSize=mainFont.getSize2D();
 
-    protected Font font;
+	/**returns default font used by glyphs*/
+	public static Font getMainFont(){return mainFont;}
+	/**set default font used by glyphs*/
+	public static void setMainFont(Font f){
+		mainFont=f;
+		VirtualSpaceManager.INSTANCE.onMainFontUpdated();
+	}
 
-    protected String text;
+	protected Font font;
 
-    protected float scaleFactor = 1.0f;
+	protected String text;
+
+	protected float scaleFactor = 1.0f;
     
     public VText(String t){
 		this(0,0,0,Color.white,t);
@@ -340,7 +349,7 @@ public class VText extends Glyph {
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			if (!pc[i].valid){
 				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 				// cw and ch actually hold width and height of text *in virtual space*
@@ -367,7 +376,7 @@ public class VText extends Glyph {
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			if (!pc[i].lvalid){
 				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 				// lcw and lch actually hold width and height of text *in virtual space*
@@ -443,7 +452,7 @@ public class VText extends Glyph {
      *@param f set to null to use the default font
      */
     public void setSpecialFont(Font f){
-	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=VirtualSpaceManager.getMainFont().getSize2D();}
+	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
 	VirtualSpaceManager.INSTANCE.repaintNow();
 	invalidate();
     }
@@ -453,7 +462,7 @@ public class VText extends Glyph {
      */
     public Font getFont(){
 	if (font!=null){return font;}
-	else return VirtualSpaceManager.getMainFont();
+	else return getMainFont();
     }
 
     /** Indicates whether this glyph is using a special font or not.

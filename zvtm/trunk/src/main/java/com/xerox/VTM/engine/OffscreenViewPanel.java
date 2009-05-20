@@ -17,6 +17,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
+import com.xerox.VTM.glyphs.VText;
+
 /**
  * Each view runs in its own thread - uses double buffering
  * @author Emmanuel Pietriga
@@ -61,7 +63,7 @@ public class OffscreenViewPanel extends ViewPanel {
 	if (BufferG2D == null) {
 	    BufferG2D = buffImg.createGraphics();
 	}
-	BufferG2D.setFont(VirtualSpaceManager.mainFont);
+	BufferG2D.setFont(VText.getMainFont());
 	if (antialias){BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);}
 	else {BufferG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}
 	g2d = BufferG2D;

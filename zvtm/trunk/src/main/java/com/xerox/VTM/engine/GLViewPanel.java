@@ -20,6 +20,7 @@ import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
+import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
@@ -142,7 +143,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		updateAntialias=true;
 		updateFont=true;
 	    }
-	    if (updateFont){stableRefToBackBufferGraphics.setFont(VirtualSpaceManager.mainFont);updateFont=false;}
+	    if (updateFont){stableRefToBackBufferGraphics.setFont(VText.getMainFont());updateFont=false;}
 	    if (updateAntialias){if (antialias){stableRefToBackBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {stableRefToBackBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
 	    standardStroke=stableRefToBackBufferGraphics.getStroke();
 	    standardTransform=stableRefToBackBufferGraphics.getTransform();

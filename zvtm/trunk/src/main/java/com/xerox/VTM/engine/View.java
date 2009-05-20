@@ -274,9 +274,6 @@ public abstract class View {
     /**update font used in this view (for all cameras) (should be automatically called when changing the VSM's main font)*/
     public void updateFont(){panel.updateFont=true;}
 
-//     /**get font used in this view*/
-//     public Font getFont(){return font;}
-
     /**set antialias rendering hint for this view*/
     public void setAntialiasing(boolean b){
 	if (b!=panel.antialias){

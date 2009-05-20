@@ -34,6 +34,7 @@ import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
+import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.ViewEventHandler;
 
@@ -142,7 +143,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 		if (lens != null){
 			lensG2D = lens.getMagnificationGraphics();
-			lensG2D.setFont(VirtualSpaceManager.mainFont);
+			lensG2D.setFont(VText.getMainFont());
 			if (antialias){
 				lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			}
@@ -151,9 +152,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			}
 		}
 		if (updateFont){
-			backBufferGraphics.setFont(VirtualSpaceManager.mainFont);
+			backBufferGraphics.setFont(VText.getMainFont());
 			if (lensG2D != null){
-				lensG2D.setFont(VirtualSpaceManager.mainFont);
+				lensG2D.setFont(VText.getMainFont());
 			}
 			updateFont = false;
 		}

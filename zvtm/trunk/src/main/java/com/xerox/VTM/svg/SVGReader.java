@@ -67,7 +67,7 @@ import com.xerox.VTM.glyphs.VRectangleOrST;
 import com.xerox.VTM.glyphs.VRoundRectST;
 //import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VSegmentST;
-//import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.glyphs.VTextST;
 //import com.xerox.VTM.glyphs.VImage;
 import net.claribole.zvtm.glyphs.VImageST;
@@ -926,7 +926,7 @@ public class SVGReader {
                 res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
             }
             Font f;
-            if (specialFont(f=ss.getDefinedFont(ctx), VirtualSpaceManager.INSTANCE.getMainFont())){
+            if (specialFont(f=ss.getDefinedFont(ctx), VText.getMainFont())){
                 res.setSpecialFont(f);
             }
         }
@@ -938,7 +938,7 @@ public class SVGReader {
                 res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
             }
             Font f;
-            if (specialFont(f=ctx.getDefinedFont(), VirtualSpaceManager.INSTANCE.getMainFont())){
+            if (specialFont(f=ctx.getDefinedFont(), VText.getMainFont())){
                 res.setSpecialFont(f);
             }
         }
@@ -1785,7 +1785,7 @@ public class SVGReader {
                 if (!mainFontSet){
                     Font f;
                     if ((f=ctx.getDefinedFont())!=null){
-                        VirtualSpaceManager.INSTANCE.setMainFont(f);
+                        VText.setMainFont(f);
                         setAFont=true;
                     }
                 }
@@ -1827,7 +1827,7 @@ public class SVGReader {
                 if (!mainFontSet){
                     Font f;
                     if ((f=ctx.getDefinedFont())!=null){
-                        VirtualSpaceManager.INSTANCE.setMainFont(f);
+                        VText.setMainFont(f);
                         setAFont=true;
                     }
                 }

@@ -166,7 +166,7 @@ public class SVGWriter {
 	    root.setAttribute(SVGReader._height,"600");
 	    root.setAttribute("viewBox","0 0 "+String.valueOf(lurd[2]-lurd[0])+" "+String.valueOf(lurd[1]-lurd[3]));
 	    Element mainGroup=svgDoc.createElementNS(svgURI,SVGReader._g);
-	    mainGroup.setAttribute(SVGReader._style,createFontInformation(VirtualSpaceManager.getMainFont()));
+	    mainGroup.setAttribute(SVGReader._style,createFontInformation(VText.getMainFont()));
 	    root.appendChild(mainGroup);
 	    Glyph[] visibleGlyphs=vs.getDrawingList();
 	    Element el;
@@ -204,7 +204,7 @@ public class SVGWriter {
 	    root.setAttribute(SVGReader._height,"600");
 	    root.setAttribute("viewBox","0 0 "+String.valueOf(lurd[2]-lurd[0])+" "+String.valueOf(lurd[1]-lurd[3]));
 	    Element mainGroup=svgDoc.createElementNS(svgURI,SVGReader._g);
-	    mainGroup.setAttribute(SVGReader._style,createFontInformation(VirtualSpaceManager.getMainFont()));
+	    mainGroup.setAttribute(SVGReader._style,createFontInformation(VText.getMainFont()));
 	    root.appendChild(mainGroup);
 	    Glyph[] visibleGlyphs=vs.getDrawingList();
 	    Element el;

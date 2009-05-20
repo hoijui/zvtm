@@ -16,6 +16,7 @@ import java.awt.Font;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.glyphs.VText;
 
 public abstract class PieMenuFactory {
     
@@ -28,7 +29,7 @@ public abstract class PieMenuFactory {
     static Color LABEL_COLOR = Color.black;
     static float TRANSLUCENCY = 1.0f;
     static double SENSIT_BOUNDING_RADIUS = 1.0f;
-    static Font FONT = VirtualSpaceManager.getMainFont();
+    static Font FONT = VText.getMainFont();
 	static float RING_INNER_RATIO = 0.1f;
 
     /**Standard pie menu creation method.

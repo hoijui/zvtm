@@ -59,30 +59,24 @@ import com.xerox.VTM.glyphs.VText;
 
 public class VirtualSpaceManager implements AWTEventListener {
 
-    static Font mainFont=new Font("Dialog",0,10);
-
-    /**return default font used by glyphs*/
-    public static Font getMainFont(){return mainFont;}
-
-    /**set default font used by glyphs*/
-    public void setMainFont(Font f){
-	mainFont=f;
-	for (int i=0;i<allViews.length;i++){
-	    allViews[i].updateFont();
+	/** called by VText */
+	public void onMainFontUpdated(){
+		for (int i=0;i<allViews.length;i++){
+			allViews[i].updateFont();
+		}
+		Object g;
+		for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
+			g=e.nextElement();
+			if (g instanceof VText){((VText)g).invalidate();}
+		}
+		repaintNow();
 	}
-	Object g;
-	for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
-	    g=e.nextElement();
-	    if (g instanceof VText){((VText)g).invalidate();}
-	}
-	repaintNow();
-    }
 
-    /**select only mouse sensitive and visible glyphs*/
-    public static short VIS_AND_SENS_GLYPHS=0;
-    /**select only visible glyphs*/ 
-    public static short VISIBLE_GLYPHS=1;
-    /**select only mouse sensitive glyphs*/
+	/**select only mouse sensitive and visible glyphs*/
+	public static short VIS_AND_SENS_GLYPHS=0;
+	/**select only visible glyphs*/ 
+	public static short VISIBLE_GLYPHS=1;
+	/**select only mouse sensitive glyphs*/
     public static short SENSITIVE_GLYPHS=2;
     /**select all glyphs in the region*/
     public static short ALL_GLYPHS=3;     

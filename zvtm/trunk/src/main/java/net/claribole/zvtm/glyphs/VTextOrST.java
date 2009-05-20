@@ -109,7 +109,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (!pc[i].valid){
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 			// cw and ch actually hold width and height of text *in virtual space*
 			pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
@@ -121,7 +121,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START){
 				at = AffineTransform.getTranslateInstance(dx+pc[i].cx, pc[i].cy);
@@ -156,7 +156,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (!pc[i].lvalid){
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 			// lcw and lch actually hold width and height of text *in virtual space*
 			pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
@@ -168,7 +168,7 @@ public class VTextOrST extends VTextOr implements Translucent {
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : VirtualSpaceManager.getMainFont());
+			g.setFont((font!=null) ? font : getMainFont());
 			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START){
 				at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, pc[i].lcy);
