@@ -1175,7 +1175,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		// compute layout of brought nodes
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		// distance between two rings
-        double RING_STEP = 4 * thisEndBoundingCircleRadius;
+        double RING_STEP = 3 * thisEndBoundingCircleRadius;
         LEdge[] arcs = n.getAllArcs();
         // sort them according to distance from start node
         // (so as to try to keep the closest ones closer to the start node)
