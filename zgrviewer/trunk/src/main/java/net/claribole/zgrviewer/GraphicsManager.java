@@ -1146,6 +1146,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
 	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.1f;
+	static final float SECOND_STEP_TRANSLUCENCY = 0.4f;
 	
 	boolean isBringingAndGoing = false;
 	
@@ -1208,10 +1209,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         // make other elements translucent (fade them out)
         alphaOfElementsToFade = new float[elementsToFade.size()];
-        Translucent t;
         for (int i=0;i<elementsToFade.size();i++){
             try {
-                t = (Translucent)elementsToFade.elementAt(i);
+                Translucent t = (Translucent)elementsToFade.elementAt(i);
                 alphaOfElementsToFade[i] = t.getTranslucencyValue();
                 //XXX:TBW animate only if total number of objects is not too high
                 Animation a = animator.getAnimationFactory().createTranslucencyAnim(
@@ -1295,50 +1295,37 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 				}
 			}
 		}
-		//XXX:TBW other arcs attached to brought node should follow
-//		LEdge[] otherArcs = node.getOtherArcs(arc);
-//		Glyph oe;
-//		for (int i=0;i<otherArcs.length;i++){
-//			broughtElements.add(BroughtElement.rememberPreviousState(otherArcs[i]));
-//			spline = otherArcs[i].getSpline();
-//			allElements.remove(spline);
-//			asp = spline.getStartPoint();
-//			aep = spline.getEndPoint();
-//			if (node2bposition.containsKey(otherArcs[i].getTail())
-//			    && node2bposition.containsKey(otherArcs[i].getHead())){
-//				sp = (LongPoint)node2bposition.get(otherArcs[i].getTail());
-//				ep = (LongPoint)node2bposition.get(otherArcs[i].getHead());
-//			}
-//			else {
-//				oe = otherArcs[i].getOtherEnd(node).getShape();
-//				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
-//					sp = new LongPoint(bposition.x, bposition.y);
-//					ep = oe.getLocation();
-//				}
-//				else {
-//					sp = oe.getLocation();
-//					ep = new LongPoint(bposition.x, bposition.y);
-//				}
-//			}
-//			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
-//			//mSpace.atBottom(spline);
-//			mSpace.above(spline, boundingBox);
-//			vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
-//			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
-//			glyphs = otherArcs[i].getGlyphs();
-//			for (int j=0;j<glyphs.length;j++){
-//				if (glyphs[j] != spline){
-//					allElements.remove(glyphs[j]);
-//					if (glyphs[j] instanceof VText){
-//						continue;
-//					}
-//					else {
-//						// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
-//						glyphs[j].setVisible(false);
-//					}
-//				}
-//			}
-//		}		
+		LEdge[] otherArcs = node.getOtherArcs(arc);
+		Glyph oe;
+		for (int i=0;i<otherArcs.length;i++){
+			broughtElements.add(BroughtElement.rememberPreviousState(otherArcs[i]));
+			spline = otherArcs[i].getSpline();
+			elementsToFade.remove(spline);
+			asp = spline.getStartPoint();
+			aep = spline.getEndPoint();
+			if (node2broughtPosition.containsKey(otherArcs[i].getTail())
+			    && node2broughtPosition.containsKey(otherArcs[i].getHead())){
+				sp = (LongPoint)node2broughtPosition.get(otherArcs[i].getTail());
+				ep = (LongPoint)node2broughtPosition.get(otherArcs[i].getHead());
+			}
+			else {
+				oe = otherArcs[i].getOtherEnd(node).getShape();
+				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
+					sp = new LongPoint(bposition.x, bposition.y);
+					ep = oe.getLocation();
+				}
+				else {
+					sp = oe.getLocation();
+					ep = new LongPoint(bposition.x, bposition.y);
+				}
+			}
+			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
+			mSpace.above(spline, boundingBox);
+			a = animator.getAnimationFactory().createPathAnim(BRING_ANIM_DURATION, spline, flatCoords,
+    		    false, SlowInSlowOutInterpolator.getInstance(), null);
+    		animator.startAnimation(a, true);
+			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
+		}		
     }
     
     void sendBack(BroughtElement be){
