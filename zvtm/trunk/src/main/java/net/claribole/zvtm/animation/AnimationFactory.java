@@ -930,7 +930,7 @@ public class AnimationFactory {
 
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
-				       if(data.length != path.getElementsCount()){
+				       if(data.length != path.getNumberOfPoints()){
 					   throw new IllegalStateException("'data' element count must be equal to the path element count");
 				       }
 
