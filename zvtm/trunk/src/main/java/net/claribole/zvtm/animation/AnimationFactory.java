@@ -934,15 +934,16 @@ public class AnimationFactory {
 					   throw new IllegalStateException("'data' element count must be equal to the path element count");
 				       }
 
-				       startPoints = new LongPoint[path.getElementsCount()];
+				       startPoints = new LongPoint[path.getNumberOfPoints()];
 				       endPoints = new LongPoint[startPoints.length];
 				       tempPoints = new LongPoint[startPoints.length];
-				       coords = path.getAllPointsCoordinates();
-				       System.arraycopy(coords, 0, startPoints, 0, coords.length);
-				       for(int i=0; i<startPoints.length; ++i){
-					   endPoints[i].x = relative ? startPoints[i].x + data[i].x : data[i].x;
-					   endPoints[i].y = relative ? startPoints[i].y + data[i].y : data[i].y;
-				       }
+                       coords = path.getAllPointsCoordinates();
+                       System.arraycopy(coords, 0, startPoints, 0, coords.length);
+                       for(int i=0; i<startPoints.length; ++i){
+                           endPoints[i] = new LongPoint(relative ? startPoints[i].x + data[i].x : data[i].x,
+                                                        relative ? startPoints[i].y + data[i].y : data[i].y);
+                           tempPoints[i] = new LongPoint();
+                       }
 				   }
 
 				   @Override
