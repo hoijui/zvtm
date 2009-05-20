@@ -38,9 +38,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 /**
  * Circle. This version is the most efficient, but it cannot be made translucent (see VCircleST). Cannot be reoriented (it makes no sense).
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VCircleST
  *@see com.xerox.VTM.glyphs.VEllipse
- *@see com.xerox.VTM.glyphs.VEllipseST
  */
 
 public class VCircle extends ClosedShape {
