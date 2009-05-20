@@ -64,19 +64,7 @@ public class VShape extends ClosedShape {
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      */
     public VShape(float[] v){
-	vx=0;
-	vy=0;
-	vz=0;
-	vs=10;
-	vertices=v;
-	xcoords=new int[vertices.length];
-	ycoords=new int[vertices.length];
-	lxcoords=new int[vertices.length];
-	lycoords=new int[vertices.length];
-	computeSize();
-	orient=0;
-	setColor(Color.white);
-	setBorderColor(Color.black);
+	    this(0, 0, 0, 10, v, Color.WHITE, Color.BLACK, 1.0f, 0);
     }
 
     /**
@@ -89,19 +77,7 @@ public class VShape extends ClosedShape {
      *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(long x,long y, int z,long s,float[] v,Color c,float or){
-	vx=x;
-	vy=y;
-	vz=z;
-	vs=s;
-	vertices=v;
-	xcoords=new int[vertices.length];
-	ycoords=new int[vertices.length];
-	lxcoords=new int[vertices.length];
-	lycoords=new int[vertices.length];
-	computeSize();
-	orient=or;
-	setColor(c);
-	setBorderColor(bColor);
+	    this(x, y, z, s, v, c, Color.BLACK, 1.0f, or);
     }
 
     /**
@@ -112,22 +88,39 @@ public class VShape extends ClosedShape {
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param bc border color
+     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(long x, long y, int z, long s, float[] v, Color c, Color bc, float or){
-	vx=x;
-	vy=y;
-	vz=z;
-	vs=s;
-	vertices=v;
-	xcoords=new int[vertices.length];
-	ycoords=new int[vertices.length];
-	lxcoords=new int[vertices.length];
-	lycoords=new int[vertices.length];
-	computeSize();
-	orient=or;
-	setColor(c);
-	setBorderColor(bc);
+        this(x, y, z, s, v, c, bc, 1.0f, or);
+    }
+    
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param s size (width=height) in virtual space
+     *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
+     *@param c fill color
+     *@param bc border color
+     *@param or shape's orientation in [0, 2Pi[
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VShape(long x, long y, int z, long s, float[] v, Color c, Color bc, float or, float alpha){
+        vx = x;
+        vy = y;
+        vz = z;
+        vs = s;
+        vertices = v;
+        xcoords = new int[vertices.length];
+        ycoords = new int[vertices.length];
+        lxcoords = new int[vertices.length];
+        lycoords = new int[vertices.length];
+        computeSize();
+        orient = or;
+        setColor(c);
+        setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -199,8 +192,9 @@ public class VShape extends ClosedShape {
     }
 
     public boolean fillsView(long w,long h,int camIndex){
-	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
-	else {return false;}
+        return ((alphaC == null) &&
+            pc[camIndex].p.contains(0,0) && pc[camIndex].p.contains(w,0) &&
+            pc[camIndex].p.contains(0,h) && pc[camIndex].p.contains(w,h));
     }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
@@ -313,63 +307,139 @@ public class VShape extends ClosedShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if (pc[i].cr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fillPolygon(pc[i].p);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        if (pc[i].cr >1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].p);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].p);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if (pc[i].lcr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fillPolygon(pc[i].lp);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].lp);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].lp);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        if (pc[i].lcr >1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color); 
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].lp);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                if (filled){
+                    g.setColor(this.color); 
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].lp);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     /** Get the shape's area. */
