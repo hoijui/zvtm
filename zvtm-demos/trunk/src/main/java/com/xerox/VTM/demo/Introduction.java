@@ -112,7 +112,7 @@ public class Introduction {
 
     public void init(){
 	    vsm = VirtualSpaceManager.INSTANCE;
-	vsm.setMainFont(new Font("dialog", 0, 40));
+	VText.setMainFont(new Font("dialog", 0, 40));
 	vsm.addVirtualSpace("vs1");
 	vsm.addCamera("vs1");
 	Vector vc1=new Vector();vc1.add(vsm.getVirtualSpace("vs1").getCamera(0));
