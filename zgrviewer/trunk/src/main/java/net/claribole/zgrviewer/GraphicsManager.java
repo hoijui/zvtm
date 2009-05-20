@@ -1146,7 +1146,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
 	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.1f;
-	static final float SECOND_STEP_TRANSLUCENCY = 0.4f;
+	static final float SECOND_STEP_TRANSLUCENCY = 0.3f;
 	
 	boolean isBringingAndGoing = false;
 	
@@ -1224,9 +1224,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	void endBringAndGo(Glyph g){
         isBringingAndGoing = false;
+        // new camera location (if g != null)
+        LongPoint newCameraLocation = null;
         if (!broughtElements.isEmpty()){
             for (int i=broughtElements.size()-1;i>=0;i--){
-                sendBack((BroughtElement)broughtElements.elementAt(i));
+                LongPoint l = sendBack((BroughtElement)broughtElements.elementAt(i), g);
+                if (l != null){
+                    newCameraLocation = l;
+                }
             }
         }
         for (int i=0;i<elementsToFade.size();i++){
@@ -1240,6 +1245,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             catch (ClassCastException e){e.printStackTrace();}
         }
         elementsToFade.clear();
+        if (newCameraLocation != null){
+            Animation a = animator.getAnimationFactory().createCameraTranslation(
+                BRING_ANIM_DURATION, mainCamera, newCameraLocation, false, SlowInSlowOutInterpolator.getInstance(), null);
+            animator.startAnimation(a, true);
+        }
 	}
 	
 	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, float size, Hashtable node2broughtPosition){
@@ -1328,9 +1338,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}		
     }
     
-    void sendBack(BroughtElement be){
-        be.restorePreviousState(BRING_ANIM_DURATION);
+    LongPoint sendBack(BroughtElement be, Glyph g){
 		broughtElements.remove(be);
+        return be.restorePreviousState(BRING_ANIM_DURATION, g);
     }
 	
 	/* ----------------------- Link sliding navigation ----------------------------------- */
@@ -1413,7 +1423,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	}
 	
 	void startLinkSliding(final long press_vx, final long press_vy, int px, int py){
-		//mainView.getCursor().setVisibility(false);
+		mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
 		screen_cursor_x = px + panelWidth/2;
 		screen_cursor_y = py + panelHeight/2;

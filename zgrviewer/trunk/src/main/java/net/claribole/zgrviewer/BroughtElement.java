@@ -13,6 +13,7 @@ import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import com.xerox.VTM.engine.LongPoint;
+import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.glyphs.DPathST;
@@ -28,7 +29,7 @@ abstract class BroughtElement {
 	Glyph[] glyphs;
 	LongPoint[] previousLocations;
 	
-	abstract void restorePreviousState(int duration);
+	abstract LongPoint restorePreviousState(int duration, Glyph g);
 		
 }
 
@@ -42,12 +43,14 @@ class BroughtNode extends BroughtElement {
 		}
 	}
 
-	void restorePreviousState(int duration){
+	LongPoint restorePreviousState(int duration, Glyph g){
 		for (int i=0;i<glyphs.length;i++){
 		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(
 		        duration, glyphs[i], previousLocations[i], false, SlowInSlowOutInterpolator.getInstance(), null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 		}
+		int i = Utilities.indexOfGlyph(glyphs, g);
+        return (i != -1) ? previousLocations[i] : null;
 	}
 	
 }
@@ -80,7 +83,7 @@ class BroughtEdge extends BroughtElement {
 		}
 	}
 	
-	void restorePreviousState(int duration){
+	LongPoint restorePreviousState(int duration, Glyph g){
 	    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(
 	        duration, spline, splineCoords,
 		    false, SlowInSlowOutInterpolator.getInstance(), null);
@@ -96,6 +99,7 @@ class BroughtEdge extends BroughtElement {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 			}
 		}
+		return null;
 	}
 	
 }
