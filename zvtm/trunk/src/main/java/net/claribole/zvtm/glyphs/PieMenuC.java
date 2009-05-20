@@ -18,7 +18,7 @@ import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VSlice;
-import com.xerox.VTM.glyphs.VSliceST;
+import com.xerox.VTM.glyphs.VSlice;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
 
@@ -65,7 +65,7 @@ public class PieMenuC extends PieMenu {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
             }
             else {
-                items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
+                items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
             }
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
@@ -147,7 +147,7 @@ public class PieMenuC extends PieMenu {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
             }
             else {
-                items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
+                items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
             }
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
@@ -230,7 +230,7 @@ public class PieMenuC extends PieMenu {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor);
             }
             else {
-                items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
+                items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
             }
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
@@ -313,7 +313,7 @@ public class PieMenuC extends PieMenu {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i]);
             }
             else {
-                items[i] = new VSliceST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
+                items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
             }
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
