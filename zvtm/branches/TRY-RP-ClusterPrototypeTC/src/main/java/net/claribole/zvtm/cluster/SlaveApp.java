@@ -50,7 +50,7 @@ public class SlaveApp {
 		Vector<Camera> vcam = new Vector<Camera>();
 		vcam.add(vs.getMetaCamera().retrieveCamera(slaveOptions.blockNumber));
 		view = vsm.addExternalView(vcam, "slaveView"  + slaveOptions.blockNumber, 
-				View.OPENGL_VIEW, slaveOptions.width, 
+				View.STD_VIEW, slaveOptions.width, 
 				slaveOptions.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 		vcam.get(0).setOwningView(view); 

@@ -22,8 +22,10 @@ import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.TimingSource;
 
 //for active Camera animation
+import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.Camera;
+import net.claribole.zvtm.cluster.MetaCamera;
 
 /**
  * A class that manages Animation instances.
@@ -367,29 +369,37 @@ public class AnimationManager {
      */
     class InteractiveCameraAnimation extends DefaultTimingHandler {
 	InteractiveCameraAnimation(VirtualSpaceManager vsm){
-	    this.vsm = vsm;
-	    dx = 0d;
-	    dy = 0d;
-	    dz = 0f;
+		this.vsm = vsm;
+		dx = 0d;
+		dy = 0d;
+		dz = 0f;
 	}
 
 	@Override public void timingEvent(float fraction, 
-					  Object subject, 
-					  Animation.Dimension dim){
-	    Camera cam = vsm.getActiveCamera();
-	    if(null != cam){
-		if((dx != 0) || (dy != 0)){
-		    cam.move(dx, dy);
-		}
+			Object subject, 
+			Animation.Dimension dim){
+		Camera cam = vsm.getActiveCamera();
+		VirtualSpace activeSpace = vsm.getActiveSpace();
+		MetaCamera metacam = (activeSpace != null)?activeSpace.getMetaCamera():null;
+		if(null != cam){
+			if((dx != 0) || (dy != 0)){
+				cam.move(dx, dy);
+			}
 
-		if(dz != 0){
-		    cam.altitudeOffset(dz);
+			if(null != metacam){
+				if((dx != 0) || (dy != 0)){
+					metacam.move((long)dx, (long)dy);
+				}
+			}
+
+			if(dz != 0){
+				cam.altitudeOffset(dz);
+			}
 		}
-	    }
 	}
 
 	public void setXspeed(double dx){
-	    this.dx = dx;
+		this.dx = dx;
 	}
 
 	public void setYspeed(double dy){

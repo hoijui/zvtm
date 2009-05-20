@@ -207,9 +207,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 					for (int nbcam=0;nbcam<cams.length;nbcam++){
 					    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 						camIndex=cams[nbcam].getIndex();
-						drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-						synchronized(drawnGlyphs){
-						    drawnGlyphs.removeAllElements();
+						//drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+						//synchronized(drawnGlyphs){
+						    //drawnGlyphs.removeAllElements();
 						    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 						    //compute region seen from this view through camera
 						    viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
@@ -251,7 +251,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							    }
 							}
 						    }
-						}
+						//}
 					    }
 					}
 					// call to foreground java2d painting hook
@@ -286,9 +286,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 				    for (int nbcam=0;nbcam<cams.length;nbcam++){
 					if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 					    camIndex=cams[nbcam].getIndex();
-					    drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-					    synchronized(drawnGlyphs){
-						drawnGlyphs.removeAllElements();
+					    //drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+					  //  synchronized(drawnGlyphs){
+						//drawnGlyphs.removeAllElements();
 						uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 						//compute region seen from this view through camera
 						viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
@@ -307,12 +307,12 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 								}
 								// notifying outside if branch because glyph sensitivity is not
 								// affected by glyph visibility when managed through Glyph.setVisible()
-								cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
+								//cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
 							    }
 							}
 						    }
 						}
-					    }
+					  //  }
 					}
 				    }
 				    // call to foreground java2d painting hook

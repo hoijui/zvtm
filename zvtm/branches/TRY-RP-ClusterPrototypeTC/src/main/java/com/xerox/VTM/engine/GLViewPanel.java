@@ -159,9 +159,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 			camIndex=cams[nbcam].getIndex();
 			drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-			//synchronized(cams[nbcam].parentSpace.getDrawnGlyphs(camIndex)){
 			synchronized(drawnGlyphs){
-			    //cams[nbcam].parentSpace.getDrawnGlyphs(camIndex).removeAllElements();
 			    drawnGlyphs.removeAllElements();
 			    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 			    //compute region seen from this view through camera

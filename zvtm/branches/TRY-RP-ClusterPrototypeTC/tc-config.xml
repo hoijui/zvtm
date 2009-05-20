@@ -6,7 +6,7 @@
   <!--Server is colocated with client and DSO is listening on
   default port (9510).-->
   <servers>
-    <server host="129.175.11.124" name="server1">
+    <server host="129.175.11.199" name="server1">
       <dso-port>9510</dso-port>
       <jmx-port>9520</jmx-port>
       <data>target/terracotta/server/data</data>
@@ -161,7 +161,7 @@
 		</autolock>
 		<autolock auto-synchronized="false">
 		<method-expression>* com.xerox.VTM.engine.ViewPanel.*(..)</method-expression>
-		<lock-level>write</lock-level>
+		<lock-level>read</lock-level>
 		</autolock>
 
 		<autolock auto-synchronized="false">
@@ -170,7 +170,7 @@
 		</autolock>
 		<autolock auto-synchronized="false">
 		<method-expression>* com.xerox.VTM.engine.GLViewPanel.*(..)</method-expression>
-		<lock-level>write</lock-level>
+		<lock-level>read</lock-level>
 		</autolock>
 
 		<autolock auto-synchronized="false">
