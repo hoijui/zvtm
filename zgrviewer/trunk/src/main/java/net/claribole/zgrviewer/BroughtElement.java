@@ -7,9 +7,11 @@
 
 package net.claribole.zgrviewer;
 
-//import com.xerox.VTM.engine.AnimManager;
+import com.xerox.VTM.engine.VirtualSpaceManager;
 import net.claribole.zvtm.animation.AnimationManager;
 import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
@@ -26,7 +28,7 @@ abstract class BroughtElement {
 	Glyph[] glyphs;
 	LongPoint[] previousLocations;
 	
-	abstract void restorePreviousState(AnimationManager animator, int duration);
+	abstract void restorePreviousState(int duration);
 		
 }
 
@@ -40,11 +42,11 @@ class BroughtNode extends BroughtElement {
 		}
 	}
 
-	void restorePreviousState(AnimationManager animator, int duration){
+	void restorePreviousState(int duration){
 		for (int i=0;i<glyphs.length;i++){
-//			animator.createGlyphAnimation(duration, AnimManager.GL_TRANS_LIN,
-//			                              new LongPoint(previousLocations[i].x-glyphs[i].vx, previousLocations[i].y-glyphs[i].vy),
-//			                              glyphs[i].getID());
+		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(
+		        duration, glyphs[i], previousLocations[i], false, SlowInSlowOutInterpolator.getInstance(), null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 		}
 	}
 	
@@ -78,17 +80,20 @@ class BroughtEdge extends BroughtElement {
 		}
 	}
 	
-	void restorePreviousState(AnimationManager animator, int duration){
-//		animator.createPathAnimation(duration, AnimManager.DP_TRANS_SIG_ABS, splineCoords, spline.getID(), null);
+	void restorePreviousState(int duration){
+	    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(
+	        duration, spline, splineCoords,
+		    false, SlowInSlowOutInterpolator.getInstance(), null);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 		spline.setTranslucencyValue(splineAlpha);
 		for (int i=0;i<glyphs.length;i++){
 			if (!glyphs[i].isVisible()){
 				glyphs[i].setVisible(true);
 			}
 			if (previousLocations[i] != null){
-//  			animator.createGlyphAnimation(duration, AnimManager.GL_TRANS_LIN,
-//  			                              new LongPoint(previousLocations[i].x-glyphs[i].vx, previousLocations[i].y-glyphs[i].vy),
-//  			                              glyphs[i].getID());				
+			    a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(
+    		        duration, glyphs[i], previousLocations[i], false, SlowInSlowOutInterpolator.getInstance(), null);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 			}
 		}
 	}

@@ -70,6 +70,7 @@ import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
 import net.claribole.zvtm.engine.TransitionManager;
 import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.AnimationManager;
 import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
@@ -81,6 +82,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     static final Color FADE_COLOR = Color.WHITE;
 
     public VirtualSpaceManager vsm;
+    AnimationManager animator;
     VirtualSpace mSpace;   // virtual space containing graph
     VirtualSpace mnSpace;  // virtual space containing pie menu
     VirtualSpace rSpace;   // virtual space containing rectangle representing region seen through main camera (used in overview)
@@ -186,6 +188,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMainFont(ConfigManager.defaultFont);
         vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
+        animator = vsm.getAnimationManager();
         //vsm.setDebug(true);
         mSpace = vsm.addVirtualSpace(mainSpace);
         // camera #0 for main view
@@ -401,9 +404,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Float alt=new Float(c.getAltitude()+c.getFocal());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, c,
+        Animation a = animator.getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, c,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
+        animator.startAnimation(a, false);
     }
 
     /*higher view (multiply altitude by altitudeFactor)*/
@@ -411,9 +414,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, c,
+        Animation a = animator.getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, c,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
+        animator.startAnimation(a, false);
     }
 
     /* Direction should be one of GraphicsManager.MOVE_* */
@@ -459,9 +462,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             long qt2=Math.round((rb[0]-rb[2])/2.4);
             trans=new LongPoint(qt,qt2);
         }
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, c,
+        Animation a = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, c,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
+        animator.startAnimation(a, false);
     }
 
     void rememberLocation(Location l){
@@ -479,12 +482,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     void moveBack(){
         if (previousLocations.size()>0){
             Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
-            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+            Animation at = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
                 (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
-            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+            Animation aa = animator.getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
                 (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), null);
-            vsm.getAnimationManager().startAnimation(at, false);
-            vsm.getAnimationManager().startAnimation(aa, false);
+            animator.startAnimation(at, false);
+            animator.startAnimation(aa, false);
             previousLocations.removeElementAt(previousLocations.size()-1);
         }
     }
@@ -570,9 +573,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             lens = mainView.setLens(getLensDefinition(x, y));
             lens.setBufferThreshold(1.5f);
         }
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+        Animation a = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
+        animator.startAnimation(a, false);
         setLens(GraphicsManager.ZOOMIN_LENS);
     }
     
@@ -585,28 +588,28 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         // -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
         Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
         if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
-            Animation al = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+            Animation al = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
+            Animation at = animator.getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
                 new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy), true, IdentityInterpolator.getInstance(), null);
-            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
+            Animation aa = animator.getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
                 deltAlt, true, IdentityInterpolator.getInstance(), null);
-            vsm.getAnimationManager().startAnimation(al, false);
-            vsm.getAnimationManager().startAnimation(at, false);
-            vsm.getAnimationManager().startAnimation(aa, false);
+            animator.startAnimation(al, false);
+            animator.startAnimation(at, false);
+            animator.startAnimation(aa, false);
         }
         else {
             Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
             double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
-            Animation al = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+            Animation al = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
+            Animation at = animator.getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
                 new LongPoint(Math.round((c2x-mainCamera.posx)*ratio), Math.round((c2y-mainCamera.posy)*ratio)), true, IdentityInterpolator.getInstance(), null);
-            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
+            Animation aa = animator.getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
                 actualDeltAlt, true, IdentityInterpolator.getInstance(), null);
-            vsm.getAnimationManager().startAnimation(al, false);
-            vsm.getAnimationManager().startAnimation(at, false);
-            vsm.getAnimationManager().startAnimation(aa, false);
+            animator.startAnimation(al, false);
+            animator.startAnimation(at, false);
+            animator.startAnimation(aa, false);
         }
     }
 
@@ -621,23 +624,23 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             lens.setBufferThreshold(1.5f);
         }
         // animate lens and camera simultaneously
-        Animation al = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+        Animation al = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
+        Animation at = animator.getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
             new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy), true, IdentityInterpolator.getInstance(), null);
-        Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
+        Animation aa = animator.getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
             new Float(cameraAbsAlt*(MAG_FACTOR-1)), true, IdentityInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(al, false);
-        vsm.getAnimationManager().startAnimation(at, false);
-        vsm.getAnimationManager().startAnimation(aa, false);
+        animator.startAnimation(al, false);
+        animator.startAnimation(at, false);
+        animator.startAnimation(aa, false);
         setLens(GraphicsManager.ZOOMOUT_LENS);
     }
 
     void zoomOutPhase2(){
         // make lens disappear (killing anim)
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+        Animation a = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-        vsm.getAnimationManager().startAnimation(a, false);
+        animator.startAnimation(a, false);
     }
 
     void setMagFactor(double m){
@@ -685,9 +688,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                         -Math.round((a1-mainCamera.getAltitude())/mainCamera.getFocal()*lens.ly));
                 }
                 else {
-                    Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
+                    Animation a = animator.getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
                         new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
-                    vsm.getAnimationManager().startAnimation(a, false);
+                    animator.startAnimation(a, false);
                 }
             }
         }
@@ -735,15 +738,15 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         mSpace.onTop(magWindow);
         mSpace.show(magWindow);
         paintLinks = true;
-        //vsm.getAnimationManager().createPortalAnimation(GraphicsManager.DM_PORTAL_ANIM_TIME, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
-        Animation as = vsm.getAnimationManager().getAnimationFactory().createPortalSizeAnim(GraphicsManager.DM_PORTAL_ANIM_TIME, dmPortal,
+        //animator.createPortalAnimation(GraphicsManager.DM_PORTAL_ANIM_TIME, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
+        Animation as = animator.getAnimationFactory().createPortalSizeAnim(GraphicsManager.DM_PORTAL_ANIM_TIME, dmPortal,
             GraphicsManager.DM_PORTAL_WIDTH-w, GraphicsManager.DM_PORTAL_HEIGHT-h, true,
             IdentityInterpolator.getInstance(), null);
-        Animation at = vsm.getAnimationManager().getAnimationFactory().createPortalTranslation(GraphicsManager.DM_PORTAL_ANIM_TIME, dmPortal,
+        Animation at = animator.getAnimationFactory().createPortalTranslation(GraphicsManager.DM_PORTAL_ANIM_TIME, dmPortal,
             new Point(GraphicsManager.DM_PORTAL_INITIAL_X_OFFSET-w/2, GraphicsManager.DM_PORTAL_INITIAL_Y_OFFSET-h/2), true,
             IdentityInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(as, false);
-        vsm.getAnimationManager().startAnimation(at, false);
+        animator.startAnimation(as, false);
+        animator.startAnimation(at, false);
     }
 
     void killDM(){
@@ -1142,9 +1145,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final int BRING_ANIM_DURATION = 300;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
 	
+	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.1f;
+	
 	boolean isBringingAndGoing = false;
 	
-	Vector allElements;
+	Vector broughtElements = new Vector();
+	
+	Vector elementsToFade;
+	float[] alphaOfElementsToFade;
 
 	void enterBringAndGoMode(){}
 	
@@ -1154,18 +1162,189 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		isBringingAndGoing = true;
 		LNode n = LogicalStructure.getNode(g);
 		if (n == null){return;}
-		allElements = (Vector)mSpace.getAllGlyphs().clone();
-		allElements.remove(magWindow);
+		// prepare list of elements to fade out
+		// (it contains too many elements at this point, but these will be
+		// progressively removed from the list as we process connected nodes)
+		elementsToFade = (Vector)mSpace.getAllGlyphs().clone();
+		elementsToFade.remove(magWindow);
 		ClosedShape thisEndShape = n.getShape();
 		Glyph[] glyphs = n.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){
-			allElements.remove(glyphs[i]);
-		}		
+			elementsToFade.remove(glyphs[i]);
+		}
+		// compute layout of brought nodes
+		double thisEndBoundingCircleRadius = thisEndShape.getSize();
+		// distance between two rings
+        double RING_STEP = 4 * thisEndBoundingCircleRadius;
+        LEdge[] arcs = n.getAllArcs();
+        // sort them according to distance from start node
+        // (so as to try to keep the closest ones closer to the start node)
+        Arrays.sort(arcs, new DistanceComparator(n));
+        Hashtable node2broughtPosition = new Hashtable();
+        RingManager rm = new RingManager();
+        for (int i=0;i<arcs.length;i++){
+            // ignore arcs that start and end at this node
+            if (arcs[i].isLoop()){continue;}
+            // process all others
+            LNode otherEnd = arcs[i].getOtherEnd(n);
+            ClosedShape otherEndShape = otherEnd.getShape();
+            double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
+            // use this end's shape size when getting ring because we're rescaling
+            // brought nodes to match the size of the current node
+            Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), thisEndShape.getSize(), RING_STEP);
+            double bd = ring.rank * RING_STEP;
+            double ratio = bd / d;
+            long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
+            long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
+            node2broughtPosition.put(otherEnd, new LongPoint(bx, by));
+        }
+        // actually bring the arcs and nodes (animation)
+        for (int i=0;i<arcs.length;i++){
+            // ignore arcs that start and end at this node
+            if (arcs[i].isLoop()){continue;}
+            LNode otherEnd = arcs[i].getOtherEnd(n);
+            ClosedShape otherEndShape = otherEnd.getShape();
+            bring(arcs[i], otherEnd, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, thisEndShape.getSize(), node2broughtPosition);
+        }
+        // make other elements translucent (fade them out)
+        alphaOfElementsToFade = new float[elementsToFade.size()];
+        Translucent t;
+        for (int i=0;i<elementsToFade.size();i++){
+            try {
+                t = (Translucent)elementsToFade.elementAt(i);
+                alphaOfElementsToFade[i] = t.getTranslucencyValue();
+                //XXX:TBW animate only if total number of objects is not too high
+                Animation a = animator.getAnimationFactory().createTranslucencyAnim(
+                    BRING_ANIM_DURATION, t, FADED_ELEMENTS_TRANSLUCENCY, false, IdentityInterpolator.getInstance(), null);
+                animator.startAnimation(a, true);
+            }
+            catch (ClassCastException e){e.printStackTrace();}
+        }
 	}
 	
 	void endBringAndGo(Glyph g){
-        
+        isBringingAndGoing = false;
+        if (!broughtElements.isEmpty()){
+            for (int i=broughtElements.size()-1;i>=0;i--){
+                sendBack((BroughtElement)broughtElements.elementAt(i));
+            }
+        }
+        for (int i=0;i<elementsToFade.size();i++){
+            try {
+                //XXX:TBW animate only if total number of objects is not too high
+                Animation a = animator.getAnimationFactory().createTranslucencyAnim(
+                    BRING_ANIM_DURATION, (Translucent)elementsToFade.elementAt(i), alphaOfElementsToFade[i],
+                    false, IdentityInterpolator.getInstance(), null);
+                animator.startAnimation(a, true);
+            }
+            catch (ClassCastException e){e.printStackTrace();}
+        }
+        elementsToFade.clear();
 	}
+	
+	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, float size, Hashtable node2broughtPosition){
+	    broughtElements.add(BroughtElement.rememberPreviousState(node));
+	    broughtElements.add(BroughtElement.rememberPreviousState(arc));
+		// deal with node glyphs
+		ClosedShape nodeShape = node.getShape();
+		elementsToFade.remove(nodeShape);
+		LongPoint bposition = (LongPoint)node2broughtPosition.get(node);
+		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
+		Glyph[] glyphs = node.getGlyphs();
+		for (int i=0;i<glyphs.length;i++){
+			elementsToFade.remove(glyphs[i]);
+			Animation a = animator.getAnimationFactory().createGlyphTranslation(
+                BRING_ANIM_DURATION, glyphs[i], translation,
+                true, SlowInSlowOutInterpolator.getInstance(), null);
+            animator.startAnimation(a, true);
+		}
+		// deal with the edge's spline
+		DPathST spline = arc.getSpline();
+		elementsToFade.remove(spline);
+		LongPoint asp = spline.getStartPoint();
+		LongPoint aep = spline.getEndPoint();
+		LongPoint sp, ep;
+		if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
+			sp = new LongPoint(bposition.x, bposition.y);
+			ep = new LongPoint(sx, sy);
+		}
+		else {
+			sp = new LongPoint(sx, sy);
+			ep = new LongPoint(bposition.x, bposition.y);
+		}
+		mSpace.above(spline, boundingBox);
+		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
+		Animation a = animator.getAnimationFactory().createPathAnim(BRING_ANIM_DURATION, spline, flatCoords,
+		    false, SlowInSlowOutInterpolator.getInstance(), null);
+		animator.startAnimation(a, true);
+		// deal with the other glyphs that make the edge
+		glyphs = arc.getGlyphs();
+		for (int i=0;i<glyphs.length;i++){
+			if (glyphs[i] != spline){
+				elementsToFade.remove(glyphs[i]);
+				if (glyphs[i] instanceof VText){
+					// put any label at the center of the edge (simplest thing we can do)
+					a = animator.getAnimationFactory().createGlyphTranslation(
+					    BRING_ANIM_DURATION, glyphs[i], new LongPoint(bposition.x-sx, bposition.y-sy),
+                        true, SlowInSlowOutInterpolator.getInstance(), null);
+                    animator.startAnimation(a, true);
+				}
+				else {
+					// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
+					glyphs[i].setVisible(false);
+				}
+			}
+		}
+		//XXX:TBW other arcs attached to brought node should follow
+//		LEdge[] otherArcs = node.getOtherArcs(arc);
+//		Glyph oe;
+//		for (int i=0;i<otherArcs.length;i++){
+//			broughtElements.add(BroughtElement.rememberPreviousState(otherArcs[i]));
+//			spline = otherArcs[i].getSpline();
+//			allElements.remove(spline);
+//			asp = spline.getStartPoint();
+//			aep = spline.getEndPoint();
+//			if (node2bposition.containsKey(otherArcs[i].getTail())
+//			    && node2bposition.containsKey(otherArcs[i].getHead())){
+//				sp = (LongPoint)node2bposition.get(otherArcs[i].getTail());
+//				ep = (LongPoint)node2bposition.get(otherArcs[i].getHead());
+//			}
+//			else {
+//				oe = otherArcs[i].getOtherEnd(node).getShape();
+//				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
+//					sp = new LongPoint(bposition.x, bposition.y);
+//					ep = oe.getLocation();
+//				}
+//				else {
+//					sp = oe.getLocation();
+//					ep = new LongPoint(bposition.x, bposition.y);
+//				}
+//			}
+//			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
+//			//mSpace.atBottom(spline);
+//			mSpace.above(spline, boundingBox);
+//			vsm.animator.createPathAnimation(BRING_ANIM_DURATION, AnimManager.DP_TRANS_SIG_ABS, flatCoords, spline.getID(), null);
+//			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
+//			glyphs = otherArcs[i].getGlyphs();
+//			for (int j=0;j<glyphs.length;j++){
+//				if (glyphs[j] != spline){
+//					allElements.remove(glyphs[j]);
+//					if (glyphs[j] instanceof VText){
+//						continue;
+//					}
+//					else {
+//						// probably a tail or head decoration ; just hide it for now, we don't know how to transform them correctly
+//						glyphs[j].setVisible(false);
+//					}
+//				}
+//			}
+//		}		
+    }
+    
+    void sendBack(BroughtElement be){
+        be.restorePreviousState(BRING_ANIM_DURATION);
+		broughtElements.remove(be);
+    }
 	
 	/* ----------------------- Link sliding navigation ----------------------------------- */
 	
@@ -1273,10 +1452,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     		vsm.addGlyph(selectionRadius, mSpace);	    
 		}
 		// center camera on selection
-	    Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
+	    Animation a = animator.getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
 	                                                                                          SlowInSlowOutInterpolator.getInstance(),
 	                                                                                          new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy, true);}});
-	    vsm.getAnimationManager().startAnimation(a, false);
+	    animator.startAnimation(a, false);
 	}
 	
 	void linkSlider(long vx, long vy, boolean centerCursor){
