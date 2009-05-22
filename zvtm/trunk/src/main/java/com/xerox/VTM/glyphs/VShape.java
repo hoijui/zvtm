@@ -41,7 +41,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented.<br>
  * This version is the most efficient, but it can not be made translucent (see VShapeST).
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VShapeST
  *@see com.xerox.VTM.glyphs.VCirShape
  **/
 
@@ -88,7 +87,6 @@ public class VShape extends ClosedShape {
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param bc border color
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
      *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(long x, long y, int z, long s, float[] v, Color c, Color bc, float or){

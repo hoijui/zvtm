@@ -27,7 +27,6 @@ import net.claribole.zvtm.glyphs.projection.ProjRing;
  * Like a slice, but with iner and outer arcs (slice of a ring instead of slice of a pie)
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VSlice
- *@see com.xerox.VTM.glyphs.VSliceST
  */
 
 public class VRing extends VSlice {

@@ -37,7 +37,7 @@ public interface Translucent {
 
     /**
      * Set alpha channel value (translucency).
-     *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
     public void setTranslucencyValue(float alpha);
 

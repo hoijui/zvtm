@@ -46,7 +46,6 @@ public class GLEView extends View implements KeyListener{
      *@param panelHeight height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
-     *@param vsm root VTM class
      */
     protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible){
 	frame=new JFrame();
@@ -104,7 +103,6 @@ public class GLEView extends View implements KeyListener{
      *@param panelHeight height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
-     *@param vsm root VTM class
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view)
      */
     protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible,JMenuBar mnb){

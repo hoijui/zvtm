@@ -116,7 +116,6 @@ public class EView extends View implements KeyListener{
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
-     *@param vsm root VTM class
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view)
      */
     protected EView(Vector v,String t,int panelWidth,int panelHeight,

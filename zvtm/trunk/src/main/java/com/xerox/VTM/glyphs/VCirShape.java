@@ -39,7 +39,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * Same as VShape, surrounded by a circle.
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VShape
- *@see com.xerox.VTM.glyphs.VShapeST
  **/
 
 public class VCirShape extends ClosedShape {

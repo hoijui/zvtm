@@ -34,7 +34,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VEllipse
  *@see com.xerox.VTM.glyphs.VCircle
- *@see com.xerox.VTM.glyphs.VCircleST
  */
 
 

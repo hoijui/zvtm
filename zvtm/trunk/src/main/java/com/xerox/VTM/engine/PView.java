@@ -43,7 +43,6 @@ public class PView extends View implements KeyListener {
 		*@param t view name
 		*@param panelWidth width of window in pixels
 		*@param panelHeight height of window in pixels
-		*@param vsm root VTM class
 		*/
 	protected PView(Vector v,String t,int panelWidth,int panelHeight){
 		mouse=new VCursor(this);

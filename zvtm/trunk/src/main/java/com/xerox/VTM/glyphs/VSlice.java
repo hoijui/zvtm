@@ -28,7 +28,6 @@ import com.xerox.VTM.engine.Utilities;
  * Slice. This version is the most efficient, but it cannot be made translucent (see VSliceST).<br>
  * Slices are useful e.g. to draw pie menus.
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VSliceST
  */
 
 public class VSlice extends ClosedShape {
@@ -89,7 +88,7 @@ public class VSlice extends ClosedShape {
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         *@param bc border color
-        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
     public VSlice(LongPoint[] v, int z, Color c, Color bc, float alpha){
 		initCoordArray(3);	
@@ -130,7 +129,7 @@ public class VSlice extends ClosedShape {
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
         *@param c fill color
         *@param bc border color
-        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
     public VSlice(long x, long y, int z, long vs, double ag, double or, Color c, Color bc, float alpha){
 		initCoordArray(3);	
@@ -173,7 +172,7 @@ public class VSlice extends ClosedShape {
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)
         *@param c fill color
         *@param bc border color
-        *@param a in [0;1.0]. 0 is fully transparent, 1 is opaque
+        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
     public VSlice(long x, long y, int z, long vs, int ag, int or, Color c, Color bc, float alpha){
 		initCoordArray(3);	

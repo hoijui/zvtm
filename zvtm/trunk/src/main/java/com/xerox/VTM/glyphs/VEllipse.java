@@ -38,7 +38,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VEllipseST
  *@see com.xerox.VTM.glyphs.VCircle
- *@see com.xerox.VTM.glyphs.VCircleST
  */
 
 public class VEllipse extends ClosedShape implements RectangularShape {
