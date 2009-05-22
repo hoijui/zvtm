@@ -66,7 +66,7 @@ def generateLevels(src_sz, rootEL):
         vtc += 1
     # number of levels
     res = math.ceil(max(math.log(vtc,2)+1, math.log(htc,2)+1))
-    log("Will generate %s level(s)" % res, 2)
+    log("Will generate %s level(s)" % int(res), 2)
     # generate ZUIST levels
     altitudes = [0,]
     for i in range(int(res)):
@@ -116,20 +116,23 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
     if parentRegionID is not None:
         regionEL.set("containedIn", parentRegionID)
     regionEL.set("levels", str(level))
-    regionEL.set("x", str(int(x+TILE_SIZE*scale/2)))
-    regionEL.set("y", str(int(y+TILE_SIZE*scale/2)))
-    regionEL.set("w", str(int(TILE_SIZE*scale)))
-    regionEL.set("h", str(int(TILE_SIZE*scale)))
-    regionEL.set("stroke", "blue")
+    aw = ah = TILE_SIZE*scale
+    if x + TILE_SIZE*scale > src_sz[0]:
+        aw = int(src_sz[0] - x)
+    if y + TILE_SIZE*scale > src_sz[1]:
+        ah = int(src_sz[1] - y)    
+    regionEL.set("x", str(int(x+aw/2)))
+    regionEL.set("y", str(int(-y-ah/2)))
+    regionEL.set("w", str(int(aw)))
+    regionEL.set("h", str(int(ah)))
     objectEL = ET.SubElement(regionEL, "object")
     objectEL.set("id", "I%s" % tileIDstr)
     objectEL.set("type", "image")
-    objectEL.set("x", str(int(x+TILE_SIZE*scale/2)))
-    objectEL.set("y", str(int(y+TILE_SIZE*scale/2)))
-    objectEL.set("w", str(int(TILE_SIZE*scale)))
-    objectEL.set("h", str(int(TILE_SIZE*scale)))
+    objectEL.set("x", str(int(x+aw/2)))
+    objectEL.set("y", str(int(-y-ah/2)))
+    objectEL.set("w", str(int(aw)))
+    objectEL.set("h", str(int(ah)))
     objectEL.set("src", tileFileName)
-    objectEL.set("z-index", str(level))
     objectEL.set("sensitive", "false")
     # call to lower level, top left
     buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, regionEL.get("id"))
@@ -152,7 +155,7 @@ def processSrcImg():
     src_im = Image.open(SRC_PATH)
     src_sz = src_im.size
     levelCount = generateLevels(src_sz, outputroot)
-    buildTiles([0 for i in range(int(levelCount))], 1, 0, levelCount, 0, 0, src_sz, outputroot, None)
+    buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, None)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
