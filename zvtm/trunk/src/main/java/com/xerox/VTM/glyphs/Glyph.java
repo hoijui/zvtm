@@ -398,8 +398,8 @@ public abstract class Glyph implements Cloneable, Translucent {
     
     /* ---------------- Translucency ------------------- */
     
-    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. */
-    AlphaComposite alphaC;
+    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. Temporarily made public until all glyphs get into the same package.*/
+    public AlphaComposite alphaC;
     
     /**
      * Set alpha channel value (translucency).

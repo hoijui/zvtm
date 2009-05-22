@@ -35,7 +35,7 @@ public class VRing extends VSlice {
 
 	/** Radius of inner ring, from center of ring.*/
 	float irr_p;
-    
+
     /** Construct a slice by giving its 3 vertices
         *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
         *@param irr inner ring radius as a percentage of outer ring radius
@@ -44,6 +44,18 @@ public class VRing extends VSlice {
         *@param bc border color
         */
     public VRing(LongPoint[] v, float irr, int z, Color c, Color bc){
+        this(v, irr, z, c, bc, 1.0f);
+    }
+            
+    /** Construct a slice by giving its 3 vertices
+        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
+        *@param irr inner ring radius as a percentage of outer ring radius
+		*@param z z-index (pass 0 if you do not use z-ordering)
+        *@param c fill color
+        *@param bc border color
+        *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+        */
+    public VRing(LongPoint[] v, float irr, int z, Color c, Color bc, float alpha){
 		initCoordArray(4);
         vx = v[0].x;
         vy = v[0].y;
@@ -54,6 +66,7 @@ public class VRing extends VSlice {
         computeAngle();
         setColor(c);
         setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
     /** Construct a slice by giving its size, angle and orientation
@@ -68,6 +81,22 @@ public class VRing extends VSlice {
         *@param bc border color
         */
     public VRing(long x, long y, int z, long vs, double ag, float irr, double or, Color c, Color bc){
+        this(x, y, z, vs, ag, irr, or, c, bc, 1.0f);
+    }
+    
+    /** Construct a slice by giving its size, angle and orientation
+        *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param vs arc radius in virtual space
+        *@param ag arc angle in virtual space (in rad)
+        *@param irr inner ring radius as a percentage of outer ring radius
+        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc) (in rad)
+        *@param c fill color
+        *@param bc border color
+        *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+        */
+    public VRing(long x, long y, int z, long vs, double ag, float irr, double or, Color c, Color bc, float alpha){
 		initCoordArray(4);	
         vx = x;
         vy = y;
@@ -81,6 +110,7 @@ public class VRing extends VSlice {
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
         setColor(c);
         setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
     /** Construct a slice by giving its size, angle and orientation
@@ -95,6 +125,22 @@ public class VRing extends VSlice {
         *@param bc border color
         */
     public VRing(long x, long y, int z, long vs, int ag, float irr, int or, Color c, Color bc){
+        this(x, y, z, vs, ag, irr, or, c, bc, 1.0f);
+    }
+    
+    /** Construct a slice by giving its size, angle and orientation
+        *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint 
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param vs arc radius in virtual space
+        *@param ag arc angle in virtual space (in degrees)
+        *@param irr inner ring radius as a percentage of outer ring radius
+        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)  (in degrees)
+        *@param c fill color
+        *@param bc border color
+        *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+        */
+    public VRing(long x, long y, int z, long vs, int ag, float irr, int or, Color c, Color bc, float alpha){
 		initCoordArray(4);	
         vx = x;
         vy = y;
@@ -108,6 +154,7 @@ public class VRing extends VSlice {
         angleDeg = ag;
         setColor(c);
         setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
 	public void initCams(int nbCam){
@@ -188,6 +235,7 @@ public class VRing extends VSlice {
 	Area subring;
 	
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
+	    if (alphaC != null && alphaC.getAlpha() == 0){return;}
 		if (pc[i].outerCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
@@ -203,28 +251,66 @@ public class VRing extends VSlice {
 				pr[i].ring.subtract(subring);
 				// draw that area
 				g.setColor(this.color);
-				g.fill(pr[i].ring);
+				if (alphaC != null){
+				    // translucent
+					g.setComposite(alphaC);
+					g.fill(pr[i].ring);
+					g.setComposite(acO);
+				}
+				else {
+				    // opaque
+				    g.fill(pr[i].ring);
+				}
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
 				if (stroke != null){
 					g.setStroke(stroke);
-				  	g.draw(pr[i].ring);
+					if (alphaC != null){
+					    // translucwent
+						g.setComposite(alphaC);
+						g.draw(pr[i].ring);
+						g.setComposite(acO);
+					}
+					else {
+					    // opaque
+					    g.draw(pr[i].ring);
+					}
 					g.setStroke(stdS);
 				}
 				else {
-				  g.draw(pr[i].ring);
+					if (alphaC != null){
+					    // translucent
+						g.setComposite(alphaC);
+						g.draw(pr[i].ring);
+						g.setComposite(acO);
+					}
+					else {
+					    // opaque
+					    g.draw(pr[i].ring);
+					}
 				}
 			}
 		}
 		else {
 			//paint a dot if too small
-			g.setColor(this.color);
-			g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+			if (alphaC != null){
+			    // translucent
+				g.setComposite(alphaC);
+				g.setColor(this.color);
+				g.fillRect(dx+pc[i].cx, dy+pc[i].cy, 1, 1);
+				g.setComposite(acO);
+			}
+			else {
+			    // opaque
+				g.setColor(this.color);
+				g.fillRect(dx+pc[i].cx, dy+pc[i].cy, 1, 1);
+			}
 		}
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (alphaC != null && alphaC.getAlpha() == 0){return;}
 		if (pc[i].louterCircleRadius > 2){
 			if (isFilled()){
 				// larger pie slice
@@ -240,26 +326,62 @@ public class VRing extends VSlice {
 				pr[i].lring.subtract(subring);
 				// draw that area
 				g.setColor(this.color);
-				g.fill(pr[i].lring);
+				if (alphaC != null){
+				    // translucent
+					g.setComposite(alphaC);
+					g.fill(pr[i].lring);
+					g.setComposite(acO);
+				}
+				else {
+				    // opaque
+				    g.fill(pr[i].lring);
+				}
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
 				if (stroke != null){
 					g.setStroke(stroke);
-				  	g.draw(pr[i].lring);
+					if (alphaC != null){
+					    // translucent
+						g.setComposite(alphaC);
+						g.draw(pr[i].lring);
+						g.setComposite(acO);
+					}
+					else {
+					    // opaque
+					    g.draw(pr[i].lring);
+					}
 					g.setStroke(stdS);
 				}
 				else {
-				  g.draw(pr[i].lring);
+					if (alphaC != null){
+						// translucent
+						g.setComposite(alphaC);
+						g.draw(pr[i].lring);
+						g.setComposite(acO);
+					}
+					else {
+					    // opaque
+					    g.draw(pr[i].lring);
+					}
 				}
 			}
 		}
 		else {
 			//paint a dot if too small
-			g.setColor(this.color);
-			g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+			if (alphaC != null){
+			    // translucent
+				g.setComposite(alphaC);
+				g.setColor(this.color);
+				g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+				g.setComposite(acO);
+			}
+			else {
+			    // opaque
+				g.setColor(this.color);
+				g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);}
+			}
 		}
-	}
 
     /** Not implement yet. */
     public Object clone(){

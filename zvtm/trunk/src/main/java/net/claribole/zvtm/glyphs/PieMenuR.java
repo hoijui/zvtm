@@ -15,7 +15,6 @@ import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VCircle;
 import net.claribole.zvtm.glyphs.VRing;
-import net.claribole.zvtm.glyphs.VRingST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTextOr;
 
@@ -59,12 +58,7 @@ public class PieMenuR extends PieMenu {
         double textAngle;
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
-            if (alphaT >= 1.0f){
-                items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor);
-            }
-            else {
-                items[i] = new VRingST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
-            }
+            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
             vsm.addGlyph(items[i], vs, false, false);
@@ -142,12 +136,7 @@ public class PieMenuR extends PieMenu {
         double textAngle;
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
-            if (alphaT >= 1.0f){
-                items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i]);
-            }
-            else {
-                items[i] = new VRingST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
-            }
+            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
             vsm.addGlyph(items[i], vs, false, false);
@@ -226,12 +215,7 @@ public class PieMenuR extends PieMenu {
         double textAngle;
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
-            if (alphaT >= 1.0f){
-                items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor);
-            }
-            else {
-                items[i] = new VRingST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
-            }
+            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
             vsm.addGlyph(items[i], vs, false, false);
@@ -310,12 +294,7 @@ public class PieMenuR extends PieMenu {
         double textAngle;
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
-            if (alphaT >= 1.0f){
-                items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i]);
-            }
-            else {
-                items[i] = new VRingST(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
-            }
+            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
             vsm.addGlyph(items[i], vs, false, false);
