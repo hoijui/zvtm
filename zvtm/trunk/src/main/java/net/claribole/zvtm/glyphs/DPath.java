@@ -77,17 +77,7 @@ public class DPath extends Glyph implements RectangularShape {
     GeneralPath gp;
 
 	public DPath(){
-		spx = 0;
-		spy = 0;
-		vz = 0;
-		endPoint = new LongPoint(spx, spy);
-		vx = spx;
-		vy = spy;
-		elements = new PathElement[0];
-		computeBounds();
-		updateJava2DGeneralPath();
-		sensit = true;
-		setColor(Color.BLACK);
+		this(0, 0, 0, Color.BLACK);
 	}
 
 	/**
@@ -97,6 +87,17 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param c color
 		*/
 	public DPath(long x, long y, int z, Color c){
+	    this(x, y, z, c, 1.0f);
+    }
+    
+	/**
+		*@param x start coordinate in virtual space
+		*@param y start coordinate in virtual space
+		*@param z z-index (pass 0 if you do not use z-ordering)
+		*@param c color
+		*@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+		*/
+	public DPath(long x, long y, int z, Color c, float alpha){
 		spx = x;
 		spy = y;
 		vz = z;
@@ -108,6 +109,7 @@ public class DPath extends Glyph implements RectangularShape {
 		updateJava2DGeneralPath();
 		sensit = true;
 		setColor(c);
+		setTranslucencyValue(1.0f);
 	}
 
     /**
@@ -116,6 +118,16 @@ public class DPath extends Glyph implements RectangularShape {
      *@param c color
      */
     public DPath(PathIterator pi, int z, Color c){
+        this(pi, z, c, 1.0f);
+    }
+    
+    /**
+	 *@param pi PathIterator describing this path (virtual space coordinates)
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c color
+     *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     */
+    public DPath(PathIterator pi, int z, Color c, float alpha){
 		vz = z;
 		double[] cds = new double[6];
 		// if first instruction is a jump, make it the start point
@@ -159,6 +171,7 @@ public class DPath extends Glyph implements RectangularShape {
 		updateJava2DGeneralPath();
 		sensit = true;
 		setColor(c);
+		setTranslucencyValue(1.0f);
     }
 
 	/** Add a new cubic curve to the path, from current point to point (x,y), controlled by (x1,y1)
@@ -444,48 +457,99 @@ public class DPath extends Glyph implements RectangularShape {
 	}
     }
 
+
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	if (stroke!=null) {
-	    g.setStroke(stroke);
-	    g.translate(dx,dy);
-	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == DPath.MOV){continue;}
-		g.draw(elements[j].getShape(i));		
-	    }
-	    g.translate(-dx,-dy);
-	    g.setStroke(stdS);
-	}
-	else {
-	    g.translate(dx,dy);
-	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == DPath.MOV){continue;}
-		g.draw(elements[j].getShape(i));
-	    }
-	    g.translate(-dx,-dy);
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        g.setColor(this.color);
+        if (stroke!=null) {
+            g.setStroke(stroke);
+            g.translate(dx,dy);
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getShape(i));		
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getShape(i));		
+                }
+            }
+            g.translate(-dx,-dy);
+            g.setStroke(stdS);
+        }
+        else {
+            g.translate(dx,dy);
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getShape(i));
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getShape(i));
+                }
+            }
+            g.translate(-dx,-dy);
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	if (stroke!=null) {
-	    g.setStroke(stroke);
-	    g.translate(dx,dy);
-	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == DPath.MOV){continue;}
-		g.draw(elements[j].getlShape(i));
-	    }
-	    g.translate(-dx,-dy);
-	    g.setStroke(stdS);
-	}
-	else {
-	    g.translate(dx,dy);
-	    for (int j=0;j<elements.length;j++){
-		if (elements[j].type == DPath.MOV){continue;}
-		g.draw(elements[j].getlShape(i));
-	    }
-	    g.translate(-dx,-dy);
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        g.setColor(this.color);
+        if (stroke!=null) {
+            g.setStroke(stroke);
+            g.translate(dx,dy);
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+            }
+            g.translate(-dx,-dy);
+            g.setStroke(stdS);
+        }
+        else {
+            g.translate(dx,dy);
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+            }
+            g.translate(-dx,-dy);
+        }
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
@@ -872,7 +936,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public static DPath fromVPath(VPath vp){
 		DPath res = null;
 		if (vp != null){
-			res = (vp instanceof VPathST) ? new DPathST(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor());
+			res = (vp instanceof VPathST) ? new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor());
 			BasicStroke s = vp.getStroke();
 			if (s != null){
 				res.setStroke(s);
@@ -918,7 +982,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public static VPath toVPath(DPath dp){
 		VPath res = null;
 		if (dp != null){
-			res = (dp instanceof DPathST) ? new VPathST(dp.spx, dp.spy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue()) : new VPath(dp.spx, dp.spy, dp.vz, dp.getColor());
+			res = new VPathST(dp.spx, dp.spy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue());
 			BasicStroke s = dp.getStroke();
 			if (s != null)
 				res.setStroke(s);

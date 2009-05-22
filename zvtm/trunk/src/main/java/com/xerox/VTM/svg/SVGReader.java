@@ -57,8 +57,7 @@ import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCircle;
 //import com.xerox.VTM.glyphs.VEllipse;
 import com.xerox.VTM.glyphs.VEllipseST;
-//import net.claribole.zvtm.glyphs.DPath;
-import net.claribole.zvtm.glyphs.DPathST;
+import net.claribole.zvtm.glyphs.DPath;
 //import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
 //import com.xerox.VTM.glyphs.VRectangleOr;
@@ -223,7 +222,7 @@ public class SVGReader {
 	    return Math.round(Double.parseDouble(s));
     }
 
-    private static void processNextSVGPathCommand(StringBuffer svg,DPathST ph,StringBuffer lastCommand){
+    private static void processNextSVGPathCommand(StringBuffer svg,DPath ph,StringBuffer lastCommand){
         if (svg.length()>0) {
             switch (svg.charAt(0)){
                 case 'M':{
@@ -1517,7 +1516,7 @@ public class SVGReader {
      *@param e an SVG path as a DOM element (org.w3c.dom.Element)
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      */
-    public static DPathST createPath(Element e,DPathST ph){
+    public static DPath createPath(Element e,DPath ph){
         return createPath(e,ph,null,false);
     }
 
@@ -1526,7 +1525,7 @@ public class SVGReader {
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can simply use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static DPathST createPath(Element e,DPathST ph,Context ctx){
+    public static DPath createPath(Element e,DPath ph,Context ctx){
         return createPath(e,ph,ctx,false);
     }
 
@@ -1536,7 +1535,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static DPathST createPath(Element e,DPathST ph,Context ctx,boolean meta){
+    public static DPath createPath(Element e,DPath ph,Context ctx,boolean meta){
         StringBuffer svg=new StringBuffer(e.getAttribute(_d));
         if (checkSVGPath(svg.toString())){
             StringBuffer lastCommand=new StringBuffer("M");
@@ -1573,7 +1572,7 @@ public class SVGReader {
      *@param d the <i>d</i> attribute value of an SVG path
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      */
-    public static DPathST createPath(String d,DPathST ph){
+    public static DPath createPath(String d,DPath ph){
         return createPath(d,ph,null,false);
     }
 
@@ -1582,7 +1581,7 @@ public class SVGReader {
      *@param ph a DPath that is going to be modified to match the coordinates provided as first argument (you can just use <i>new DPath()</i>)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static DPathST createPath(String d,DPathST ph,Context ctx){
+    public static DPath createPath(String d,DPath ph,Context ctx){
         return createPath(d,ph,ctx,false);
     }
 
@@ -1592,7 +1591,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static DPathST createPath(String d,DPathST ph,Context ctx,boolean meta){
+    public static DPath createPath(String d,DPath ph,Context ctx,boolean meta){
         StringBuffer svg=new StringBuffer(d);
         if (checkSVGPath(svg.toString())){
             StringBuffer lastCommand=new StringBuffer("M");
@@ -1685,7 +1684,7 @@ public class SVGReader {
             VirtualSpaceManager.INSTANCE.addGlyph(createCircle(e,ctx,meta),vs);
         }
         else if (tagName.equals(_path)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createPath(e,new DPathST(1.0f),ctx,meta),vs);
+            VirtualSpaceManager.INSTANCE.addGlyph(createPath(e,new DPath(),ctx,meta),vs);
         }
         else if (tagName.equals(_text)){
             VirtualSpaceManager.INSTANCE.addGlyph(createText(e,ctx,meta),vs);
