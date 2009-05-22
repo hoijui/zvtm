@@ -310,12 +310,9 @@ public class SceneManager {
             Level[] tmpL = new Level[depth+1];
             System.arraycopy(levels, 0, tmpL, 0, levels.length);
             levels = tmpL;
-            levels[depth] = new Level(calt, falt);
-            return levels[depth];
         }
-        else {
-            return null;
-        }
+        levels[depth] = new Level(calt, falt);
+        return levels[depth];
     }
     
     void processLevel(Element levelEL){
@@ -354,7 +351,7 @@ public class SceneManager {
             return null;
         }
         for (int i=highestLevel;i<=lowestLevel;i++){
-            levels[i].addRegion(region);            
+            levels[i].addRegion(region);
         }
         if (sensitivity){region.setSensitive(true);}
         if (title != null && title.length() > 0){
