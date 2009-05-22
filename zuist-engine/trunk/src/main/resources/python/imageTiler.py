@@ -33,6 +33,8 @@ FORCE_GENERATE_TILES = False
 
 TILE_SIZE = 500
 
+OUTPUT_FILE_EXT = "jpg"
+
 # camera focal distance
 F = 100.0
 # camera max altitude
@@ -66,7 +68,7 @@ def generateLevels(src_sz, rootEL):
     res = math.ceil(max(math.log(vtc,2)+1, math.log(htc,2)+1))
     log("Will generate %s level(s)" % res, 2)
     # generate ZUIST levels
-    altitudes = [-F+1,]
+    altitudes = [0,]
     for i in range(int(res)):
         depth = int(res-i-1)
         altitudes.append(int(F*math.pow(2,i+1)-F))
@@ -95,7 +97,8 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
     scale = math.pow(2, levelCount-level-1)
     # generate image tile
     # generate image except for level 0 where we use original image
-    tilePath = "%s/%s%s.jpg" % (TGT_DIR, TILE_FILE_PREFIX, tileIDstr)
+    tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_FILE_EXT)
+    tilePath = "%s/%s" % (TGT_DIR, tileFileName)
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
         log("%s already exists (skipped)" % tilePath, 2)
     else:    
@@ -113,6 +116,21 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
     if parentRegionID is not None:
         regionEL.set("containedIn", parentRegionID)
     regionEL.set("levels", str(level))
+    regionEL.set("x", str(int(x+TILE_SIZE*scale/2)))
+    regionEL.set("y", str(int(y+TILE_SIZE*scale/2)))
+    regionEL.set("w", str(int(TILE_SIZE*scale)))
+    regionEL.set("h", str(int(TILE_SIZE*scale)))
+    regionEL.set("stroke", "blue")
+    objectEL = ET.SubElement(regionEL, "object")
+    objectEL.set("id", "I%s" % tileIDstr)
+    objectEL.set("type", "image")
+    objectEL.set("x", str(int(x+TILE_SIZE*scale/2)))
+    objectEL.set("y", str(int(y+TILE_SIZE*scale/2)))
+    objectEL.set("w", str(int(TILE_SIZE*scale)))
+    objectEL.set("h", str(int(TILE_SIZE*scale)))
+    objectEL.set("src", tileFileName)
+    objectEL.set("z-index", str(level))
+    objectEL.set("sensitive", "false")
     # call to lower level, top left
     buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, regionEL.get("id"))
     # call to lower level, top right
