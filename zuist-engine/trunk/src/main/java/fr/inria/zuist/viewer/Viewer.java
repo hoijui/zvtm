@@ -108,6 +108,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     VirtualSpace mSpace, ovSpace;
     Camera mCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
+    String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
     View mView;
     ViewerEventHandler eh;
@@ -496,6 +497,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
 	public void enteredLevel(int depth){
 	    ovm.sayInConsole("Entered level "+depth+"\n");
+	    levelStr = Messages.LEVEL + String.valueOf(depth);
 	}
 
 	public void exitedLevel(int depth){
@@ -570,14 +572,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         g2d.setColor(Color.DARK_GRAY);
         g2d.fillRect(240,
             3,
-            150,
+            190,
             13);
         g2d.setColor(Color.WHITE);
         g2d.drawRect(240,
             3,
-            150,
+            190,
             13);
-        g2d.drawString(mCameraAltStr, 250, 14);
+        g2d.drawString(levelStr, 250, 14);
+        g2d.drawString(mCameraAltStr, 310, 14);
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
