@@ -9,6 +9,13 @@ from PIL import Image
 # http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
 
+# Tile IDs are generated following this pattern:
+# ---------
+# | 1 | 2 |
+# ---------
+# | 3 | 4 |
+# ---------
+
 CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     " \timageTyler <src_image_path> <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
@@ -18,7 +25,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
 
 TRACE_LEVEL = 1
 
-GENERATE_TILES = False
+FORCE_GENERATE_TILES = False
 
 TILE_SIZE = 500
 
@@ -69,37 +76,38 @@ def generateLevels(src_sz, parent):
 ################################################################################
 # 
 ################################################################################
-def buildTiles(parentTileID, inc, level, levelCount, x, y, parent):
+def buildTiles(parentTileID, inc, level, levelCount, x, y, src_sz, parent):
     if (level >= levelCount):
         return
     tileID = copy(parentTileID)
     tileID[level] = tileID[level] + inc
+    tileIDstr = "-".join([str(s) for s in tileID])
+    if x > src_sz[0] or y > src_sz[1]:
+        log("Ignoring tile %s (out of bounds)" % tileIDstr, 3)
+        return
     scale = math.pow(2, levelCount-level-1)
     if (level != 0):
-        # XXX: HAVE TO CHECK THAT WE ARE WITHIN BOUNDS (otherwise it does not make sense)
-        # generate image except for level 0 where we use original image
-        tileIDstr = "-".join([str(s) for s in tileID])
-        tilePath = "%s/%s%s.jpg" % (TGT_DIR, TILE_FILE_PREFIX, tileIDstr)        
-        if os.path.exists(tilePath) or not GENERATE_TILES:
-            log("%s already exists (skipped)" % tilePath, 2)
-        else:    
-            log("----\nGenerating tile %s" % tileIDstr, 2)
-            ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(TILE_SIZE*scale)), str(int(TILE_SIZE*scale)), str(int(x)), str(int(y)), tilePath)
-            os.system(ccl)
-            log("Cropping: %s" % ccl, 3)
-            if scale > 1.0:
-                ccl = "convert %s -resize %sx%s -quality 95 %s" % (tilePath, str(int(TILE_SIZE)), str(int(TILE_SIZE)), tilePath)
+            # generate image except for level 0 where we use original image
+            tilePath = "%s/%s%s.jpg" % (TGT_DIR, TILE_FILE_PREFIX, tileIDstr)
+            if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
+                log("%s already exists (skipped)" % tilePath, 2)
+            else:    
+                log("----\nGenerating tile %s" % tileIDstr, 2)
+                ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(TILE_SIZE*scale)), str(int(TILE_SIZE*scale)), str(int(x)), str(int(y)), tilePath)
                 os.system(ccl)
-                log("Rescaling %s" % ccl, 3)
+                log("Cropping: %s" % ccl, 3)
+                if scale > 1.0:
+                    ccl = "convert %s -resize %sx%s -quality 95 %s" % (tilePath, str(int(TILE_SIZE)), str(int(TILE_SIZE)), tilePath)
+                    os.system(ccl)
+                    log("Rescaling %s" % ccl, 3)
     # call to lower level, top left
-    buildTiles(tileID, 1, level+1, levelCount, x, y, parent)
+    buildTiles(tileID, 1, level+1, levelCount, x, y, src_sz, parent)
     # call to lower level, top right
-    buildTiles(tileID, 2, level+1, levelCount, x+TILE_SIZE*scale/2, y, parent)
+    buildTiles(tileID, 2, level+1, levelCount, x+TILE_SIZE*scale/2, y, src_sz, parent)
     # call to lower level, bottom left
-    buildTiles(tileID, 3, level+1, levelCount, x, y+TILE_SIZE*scale/2, parent)
+    buildTiles(tileID, 3, level+1, levelCount, x, y+TILE_SIZE*scale/2, src_sz, parent)
     # call to lower level, bottom right
-    buildTiles(tileID, 4, level+1, levelCount, x+TILE_SIZE*scale/2, y+TILE_SIZE*scale/2, parent)
-
+    buildTiles(tileID, 4, level+1, levelCount, x+TILE_SIZE*scale/2, y+TILE_SIZE*scale/2, src_sz, parent)
     
 ################################################################################
 # Create tiles and ZUIST XML scene from source image
@@ -113,7 +121,7 @@ def processSrcImg():
     src_im = Image.open(SRC_PATH)
     src_sz = src_im.size
     levelCount = generateLevels(src_sz, outputroot)
-    buildTiles([0 for i in range(int(levelCount))], 1, 0, levelCount, 0, 0, outputroot)
+    buildTiles([0 for i in range(int(levelCount))], 1, 0, levelCount, 0, 0, src_sz, outputroot)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
@@ -137,7 +145,7 @@ if len(sys.argv) > 2:
             if arg.startswith("-ts"):
                 TILE_SIZE = int(arg[3:])
             elif arg == "-f":
-                GENERATE_TILES = True
+                FORCE_GENERATE_TILES = True
                 log("Force tile generation")
             elif arg.startswith("-tl"):
                 TRACE_LEVEL = int(arg[3:])
