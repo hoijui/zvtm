@@ -16,7 +16,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.glyphs.DPathST;
+import net.claribole.zvtm.glyphs.DPath;
 
 abstract class BroughtElement {
 	
@@ -57,7 +57,7 @@ class BroughtNode extends BroughtElement {
 
 class BroughtEdge extends BroughtElement {
 
-	DPathST spline;
+	DPath spline;
 	float splineAlpha;
 	LongPoint[] splineCoords;
 	

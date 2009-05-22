@@ -13,7 +13,7 @@ package net.claribole.zgrviewer;
 import java.util.Vector;
 
 import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.glyphs.DPathST;
+import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.svg.Metadata;
 
 class LEdge extends LElem {
@@ -94,9 +94,9 @@ class LEdge extends LElem {
 	return (n == tail) ? head : tail;
     }
 
-    DPathST getSpline(){
+    DPath getSpline(){
 	for (int i=0;i<glyphs.length;i++){
-	    if (glyphs[i] instanceof DPathST){return (DPathST)glyphs[i];}
+	    if (glyphs[i] instanceof DPath){return (DPath)glyphs[i];}
 	}
 	return null;
     }

@@ -64,7 +64,6 @@ import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.glyphs.VRectangleOr;
 import net.claribole.zvtm.glyphs.DPath;
-import net.claribole.zvtm.glyphs.DPathST;
 import com.xerox.VTM.svg.Metadata;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.PortalEventHandler;
@@ -186,7 +185,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     Vector createZVTMelements(boolean applet){
         vsm = VirtualSpaceManager.INSTANCE;
-        vsm.setMainFont(ConfigManager.defaultFont);
+        VText.setMainFont(ConfigManager.defaultFont);
         vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
         animator = vsm.getAnimationManager();
         //vsm.setDebug(true);
@@ -878,7 +877,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		    ((VText)g).setSpecialFont(null);
 		}
 	    }
-	    vsm.setMainFont(ConfigManager.defaultFont);
+	    VText.setMainFont(ConfigManager.defaultFont);
 	}
     }
     
@@ -1269,7 +1268,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             animator.startAnimation(a, true);
 		}
 		// deal with the edge's spline
-		DPathST spline = arc.getSpline();
+		DPath spline = arc.getSpline();
 		elementsToFade.remove(spline);
 		LongPoint asp = spline.getStartPoint();
 		LongPoint aep = spline.getEndPoint();
@@ -1415,7 +1414,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         closestNode = null;
         Vector pum = mainView.getCursor().getIntersectingPaths(mainCamera, 10);
         if (pum.size() > 0){
-            slidingLink = (DPathST)pum.firstElement();
+            slidingLink = (DPath)pum.firstElement();
             lscs = new LinkSliderCalc[1];
             lscs[lsci] = new LinkSliderCalc(slidingLink, vieww);
             startLinkSliding(press_vx, press_vy, scr_x, scr_y);

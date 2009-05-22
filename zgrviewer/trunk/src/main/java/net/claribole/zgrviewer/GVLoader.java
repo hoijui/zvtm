@@ -22,6 +22,7 @@ import java.util.zip.GZIPInputStream;
 import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.svg.SVGReader;
+import com.xerox.VTM.glyphs.VText;
 import org.w3c.dom.Document;
 
 /* Multiscale feature manager */
@@ -103,7 +104,7 @@ class GVLoader {
 	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
 	    dotMngr.load(f, prg, parser);
 	    //in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	    ConfigManager.defaultFont = VirtualSpaceManager.getMainFont();
+	    ConfigManager.defaultFont = VText.getMainFont();
 	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
 	    grMngr.reveal();
 	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
@@ -130,7 +131,7 @@ class GVLoader {
                 f.toURI().toURL().toString());
             grMngr.seekBoundingBox();
             grMngr.buildLogicalStructure();
-            ConfigManager.defaultFont=grMngr.vsm.getMainFont();
+            ConfigManager.defaultFont = VText.getMainFont();
             grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
             grMngr.reveal();
             //do not remember camera's initial location (before global view)
@@ -181,7 +182,7 @@ class GVLoader {
 		SVGReader.load(svgDoc, GraphicsManager.mainSpace, true, svgFileURL);
 		grMngr.seekBoundingBox();
 		grMngr.buildLogicalStructure();
-		ConfigManager.defaultFont = VirtualSpaceManager.getMainFont();
+		ConfigManager.defaultFont = VText.getMainFont();
 		grMngr.reveal();
 		//do not remember camera's initial location (before global view)
 		if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
@@ -201,7 +202,7 @@ class GVLoader {
 	grMngr.reset();
 	dotMngr.loadCustom(sourceFile, commandLine);
 	//in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	ConfigManager.defaultFont = grMngr.vsm.getMainFont();
+	ConfigManager.defaultFont = VText.getMainFont();
 	grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
 // 	grMngr.getGlobalView();
 	grMngr.reveal();
