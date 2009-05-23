@@ -4,8 +4,6 @@
 
 import os, sys, math
 from copy import copy
-# http://www.pythonware.com/products/pil/
-from PIL import Image
 # http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
 
@@ -30,6 +28,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
 TRACE_LEVEL = 1
 
 FORCE_GENERATE_TILES = False
+USE_CG = False
 
 TILE_SIZE = 500
 
@@ -152,8 +151,14 @@ def processSrcImg():
     outputroot = ET.Element("scene")
     # source image
     log("Loading source image from %s" % SRC_PATH, 2)
-    src_im = Image.open(SRC_PATH)
-    src_sz = src_im.size
+    if USE_CG:
+        log("Core Graphics pipeline not available yet")
+        return
+    else:
+        # http://www.pythonware.com/products/pil/
+        from PIL import Image
+        im = Image.open(SRC_PATH)
+        src_sz = im.size
     levelCount = generateLevels(src_sz, outputroot)
     buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, None)
     # serialize the XML tree
@@ -183,10 +188,17 @@ if len(sys.argv) > 2:
                 log("Force tile generation")
             elif arg.startswith("-tl"):
                 TRACE_LEVEL = int(arg[3:])
+            elif arg == "-cg":
+                USE_CG = True
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
 
+if USE_CG:
+    log("--------------------\nUsing Core Graphics")
+else:
+    log("--------------------\nUsing PIL + ImageMagick")
 log("Tile Size: %sx%s" % (TILE_SIZE, TILE_SIZE), 1)
 createTargetDir()
 processSrcImg()
+log("--------------------")
