@@ -98,28 +98,39 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
     # generate image except for level 0 where we use original image
     tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_FILE_EXT)
     tilePath = "%s/%s" % (TGT_DIR, tileFileName)
+    aw = ah = TILE_SIZE*scale
+    if x + TILE_SIZE*scale > src_sz[0]:
+        aw = int(src_sz[0] - x)
+    if y + TILE_SIZE*scale > src_sz[1]:
+        ah = int(src_sz[1] - y)    
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
         log("%s already exists (skipped)" % tilePath, 2)
     else:    
         log("----\nGenerating tile %s" % tileIDstr, 2)
-        ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(TILE_SIZE*scale)), str(int(TILE_SIZE*scale)), str(int(x)), str(int(y)), tilePath)
-        os.system(ccl)
-        log("Cropping: %s" % ccl, 3)
-        if scale > 1.0:
-            ccl = "convert %s -resize %sx%s -quality 95 %s" % (tilePath, str(int(TILE_SIZE)), str(int(TILE_SIZE)), tilePath)
+        if USE_CG:
+            from CoreGraphics import *
+            w = h = int(TILE_SIZE)
+            im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
+            cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(x+aw), int(y+ah)))
+            bitmap = CGBitmapContextCreateWithColor(w, h, CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), (0,0,0,1))
+            bitmap.setInterpolationQuality(kCGInterpolationHigh)
+            rect = CGRectMake(0, 0, w, h)
+            bitmap.drawImage(rect, cim)
+            bitmap.writeToFile(tilePath, kCGImageFormatPNG)
+        else:
+            ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(TILE_SIZE*scale)), str(int(TILE_SIZE*scale)), str(int(x)), str(int(y)), tilePath)
             os.system(ccl)
-            log("Rescaling %s" % ccl, 3)
+            log("Cropping: %s" % ccl, 3)
+            if scale > 1.0:
+                ccl = "convert %s -resize %sx%s -quality 95 %s" % (tilePath, str(int(TILE_SIZE)), str(int(TILE_SIZE)), tilePath)
+                os.system(ccl)
+                log("Rescaling %s" % ccl, 3)
     # generate ZUIST region and image object
     regionEL = ET.SubElement(rootEL, "region")
     regionEL.set("id", "R%s" % tileIDstr)
     if parentRegionID is not None:
         regionEL.set("containedIn", parentRegionID)
     regionEL.set("levels", str(level))
-    aw = ah = TILE_SIZE*scale
-    if x + TILE_SIZE*scale > src_sz[0]:
-        aw = int(src_sz[0] - x)
-    if y + TILE_SIZE*scale > src_sz[1]:
-        ah = int(src_sz[1] - y)    
     regionEL.set("x", str(int(x+aw/2)))
     regionEL.set("y", str(int(-y-ah/2)))
     regionEL.set("w", str(int(aw)))
