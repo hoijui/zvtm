@@ -152,8 +152,10 @@ def processSrcImg():
     # source image
     log("Loading source image from %s" % SRC_PATH, 2)
     if USE_CG:
-        log("Core Graphics pipeline not available yet")
-        return
+        # http://developer.apple.com/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_python/dq_python.html
+        from CoreGraphics import CGImageImport, CGDataProviderCreateWithFilename
+        im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
+        src_sz = (im.getWidth(), im.getHeight())
     else:
         # http://www.pythonware.com/products/pil/
         from PIL import Image
