@@ -42,6 +42,8 @@ MAX_ALT = "100000"
 # prefix for image tile files
 TILE_FILE_PREFIX = "tile-"
 
+PROGRESS = 0
+
 ################################################################################
 # Create target directory if it does not exist yet
 ################################################################################
@@ -98,11 +100,13 @@ def generateLevels(src_sz, rootEL):
 def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, parentRegionID):
     if (level >= levelCount):
         return
+    global PROGRESS
+    PROGRESS += 1
     tileID = copy(parentTileID)
     tileID[level] = tileID[level] + pos
     tileIDstr = "-".join([str(s) for s in tileID])
     if x > src_sz[0] or y > src_sz[1]:
-        log("----\nIgnoring tile %s (out of bounds)" % tileIDstr, 3)
+        log("---- %d%%\nIgnoring tile %s (out of bounds)" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 3)
         return
     scale = math.pow(2, levelCount-level-1)
     # generate image tile
@@ -115,9 +119,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     if y + TILE_SIZE*scale > src_sz[1]:
         ah = int(src_sz[1] - y)    
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
-        log("----\n%s already exists (skipped)" % tilePath, 2)
+        log("---- %d%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
     else:    
-        log("----\nGenerating tile %s" % tileIDstr, 2)
+        log("---- %d%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
         if USE_CG:
             from CoreGraphics import *
             w = h = int(TILE_SIZE)
@@ -170,6 +174,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
 # Create tiles and ZUIST XML scene from source image
 ################################################################################
 def processSrcImg():
+    global maxTileCount
     outputSceneFile = "%s/scene.xml" % TGT_DIR
     # prepare the XML scene
     outputroot = ET.Element("scene")
