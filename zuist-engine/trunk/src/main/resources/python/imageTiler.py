@@ -82,9 +82,11 @@ def generateLevels(src_sz, rootEL):
 ################################################################################
 # generate tiles (rec calls)
 # (tile ID of parent, position in parent tile, current level, number of levels
-#  top left coords, size of source image, parent XML element)
+#  top left coords, size of source image, parent XML element,
+#  src image object [a PIL image or a CoreImage depending on pipeline],
+#  ID of parent region [None for 1st level])
 ################################################################################
-def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, parentRegionID):
+def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, parentRegionID):
     if (level >= levelCount):
         return
     tileID = copy(parentTileID)
@@ -111,7 +113,6 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
             print scale
             from CoreGraphics import *
             w = h = int(TILE_SIZE)
-            im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
             log("Cropping at (%s,%s,%s,%s)" % (int(x), int(y), int(aw), int(ah)), 3)
             cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(aw), int(ah)))
             log("Resizing to (%s, %s)" % (int(aw/scale), int(ah/scale)), 3)
@@ -148,13 +149,13 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
     objectEL.set("src", tileFileName)
     objectEL.set("sensitive", "false")
     # call to lower level, top left
-    buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, regionEL.get("id"))
+    buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, top right
-    buildTiles(tileID, TR, level+1, levelCount, x+TILE_SIZE*scale/2, y, src_sz, rootEL, regionEL.get("id"))
+    buildTiles(tileID, TR, level+1, levelCount, x+TILE_SIZE*scale/2, y, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, bottom left
-    buildTiles(tileID, BL, level+1, levelCount, x, y+TILE_SIZE*scale/2, src_sz, rootEL, regionEL.get("id"))
+    buildTiles(tileID, BL, level+1, levelCount, x, y+TILE_SIZE*scale/2, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, bottom right
-    buildTiles(tileID, BR, level+1, levelCount, x+TILE_SIZE*scale/2, y+TILE_SIZE*scale/2, src_sz, rootEL, regionEL.get("id"))
+    buildTiles(tileID, BR, level+1, levelCount, x+TILE_SIZE*scale/2, y+TILE_SIZE*scale/2, src_sz, rootEL, im, regionEL.get("id"))
     
 ################################################################################
 # Create tiles and ZUIST XML scene from source image
@@ -176,7 +177,7 @@ def processSrcImg():
         im = Image.open(SRC_PATH)
         src_sz = im.size
     levelCount = generateLevels(src_sz, outputroot)
-    buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, None)
+    buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, im, None)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
