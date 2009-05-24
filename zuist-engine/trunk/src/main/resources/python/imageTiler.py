@@ -121,7 +121,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             bitmap.drawImage(rect, cim)
             bitmap.writeToFile(tilePath, kCGImageFormatPNG)
         else:
-            ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(TILE_SIZE*scale)), str(int(TILE_SIZE*scale)), str(int(x)), str(int(y)), tilePath)
+            ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(aw)), str(int(ah)), str(int(x)), str(int(y)), tilePath)
             os.system(ccl)
             log("Cropping: %s" % ccl, 3)
             if scale > 1.0:
