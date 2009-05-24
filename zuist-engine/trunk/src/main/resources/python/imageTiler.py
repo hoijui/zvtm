@@ -49,6 +49,15 @@ def createTargetDir():
     if not os.path.exists(TGT_DIR):
         log("Creating target directory %s" % TGT_DIR, 2)
         os.mkdir(TGT_DIR)
+
+################################################################################
+# Compute number of tiles
+################################################################################
+def computeMaxTileCount(i, sum):
+    if i > 0:
+        return computeMaxTileCount(i-1, sum+math.pow(4,i))
+    else:
+        return sum + 1
         
 ################################################################################
 # Count number of levels in ZUIST scene
@@ -177,6 +186,8 @@ def processSrcImg():
         im = Image.open(SRC_PATH)
         src_sz = im.size
     levelCount = generateLevels(src_sz, outputroot)
+    maxTileCount = computeMaxTileCount(levelCount-1, 0)
+    log("Maximum number of tiles to be generated: %s" % maxTileCount, 3)
     buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, im, None)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
