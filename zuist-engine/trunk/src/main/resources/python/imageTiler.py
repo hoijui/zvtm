@@ -108,10 +108,13 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
     else:    
         log("----\nGenerating tile %s" % tileIDstr, 2)
         if USE_CG:
+            print scale
             from CoreGraphics import *
             w = h = int(TILE_SIZE)
             im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
-            cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(x+aw), int(y+ah)))
+            log("Cropping at (%s,%s,%s,%s)" % (int(x), int(y), int(aw), int(ah)), 3)
+            cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(aw), int(ah)))
+            log("Resizing to (%s, %s)" % (int(aw/scale), int(ah/scale)), 3)
             bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), (0,0,0,1))
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
             rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
