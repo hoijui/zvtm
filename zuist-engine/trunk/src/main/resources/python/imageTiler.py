@@ -32,7 +32,7 @@ USE_CG = False
 
 TILE_SIZE = 500
 
-OUTPUT_FILE_EXT = "jpg"
+OUTPUT_FILE_EXT = "png"
 
 # camera focal distance
 F = 100.0
@@ -112,9 +112,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, paren
             w = h = int(TILE_SIZE)
             im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
             cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(x+aw), int(y+ah)))
-            bitmap = CGBitmapContextCreateWithColor(w, h, CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), (0,0,0,1))
+            bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), (0,0,0,1))
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
-            rect = CGRectMake(0, 0, w, h)
+            rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
             bitmap.drawImage(rect, cim)
             bitmap.writeToFile(tilePath, kCGImageFormatPNG)
         else:
