@@ -93,7 +93,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     tileID[level] = tileID[level] + pos
     tileIDstr = "-".join([str(s) for s in tileID])
     if x > src_sz[0] or y > src_sz[1]:
-        log("Ignoring tile %s (out of bounds)" % tileIDstr, 3)
+        log("----\nIgnoring tile %s (out of bounds)" % tileIDstr, 3)
         return
     scale = math.pow(2, levelCount-level-1)
     # generate image tile
@@ -106,11 +106,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     if y + TILE_SIZE*scale > src_sz[1]:
         ah = int(src_sz[1] - y)    
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
-        log("%s already exists (skipped)" % tilePath, 2)
+        log("----\n%s already exists (skipped)" % tilePath, 2)
     else:    
         log("----\nGenerating tile %s" % tileIDstr, 2)
         if USE_CG:
-            print scale
             from CoreGraphics import *
             w = h = int(TILE_SIZE)
             log("Cropping at (%s,%s,%s,%s)" % (int(x), int(y), int(aw), int(ah)), 3)
@@ -148,6 +147,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("h", str(int(ah)))
     objectEL.set("src", tileFileName)
     objectEL.set("sensitive", "false")
+    log("Image in scene: scale=%s, w=%s, h=%s" % (scale, int(aw), int(ah)))
     # call to lower level, top left
     buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, top right
