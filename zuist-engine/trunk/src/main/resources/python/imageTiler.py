@@ -76,7 +76,7 @@ def generateLevels(src_sz, rootEL):
         vtc += 1
     # number of levels
     res = math.ceil(max(math.log(vtc,2)+1, math.log(htc,2)+1))
-    log("Will generate %s level(s)" % int(res), 2)
+    log("Will generate %d level(s)" % res, 2)
     # generate ZUIST levels
     altitudes = [0,]
     for i in range(int(res)):
@@ -125,28 +125,30 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         if USE_CG:
             from CoreGraphics import *
             w = h = int(TILE_SIZE)
-            log("Cropping at (%s,%s,%s,%s)" % (int(x), int(y), int(aw), int(ah)), 3)
+            log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah), 3)
             cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(aw), int(ah)))
-            log("Resizing to (%s, %s)" % (int(aw/scale), int(ah/scale)), 3)
+            log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
             bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), (0,0,0,1))
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
             rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
             bitmap.drawImage(rect, cim)
             bitmap.writeToFile(tilePath, kCGImageFormatPNG)
         else:
-            ccl = "convert %s -crop %sx%s+%s+%s -quality 95 %s" % (SRC_PATH, str(int(aw)), str(int(ah)), str(int(x)), str(int(y)), tilePath)
+            ccl = "convert %s -crop %dx%d+%d+%d -quality 95 %s" % (SRC_PATH, aw, ah, x, y, tilePath)
             os.system(ccl)
             log("Cropping: %s" % ccl, 3)
             if scale > 1.0:
-                ccl = "convert %s -resize %sx%s -quality 95 %s" % (tilePath, str(int(TILE_SIZE)), str(int(TILE_SIZE)), tilePath)
+                ccl = "convert %s -resize %dx%d -quality 95 %s" % (tilePath, TILE_SIZE, TILE_SIZE, tilePath)
                 os.system(ccl)
                 log("Rescaling %s" % ccl, 3)
     # generate ZUIST region and image object
     regionEL = ET.SubElement(rootEL, "region")
     regionEL.set("id", "R%s" % tileIDstr)
-    if parentRegionID is not None:
+    if parentRegionID is None:
+        regionEL.set("levels", "0;%d" % (levelCount-1))
+    else:
         regionEL.set("containedIn", parentRegionID)
-    regionEL.set("levels", str(level))
+        regionEL.set("levels", str(level))
     regionEL.set("x", str(int(x+aw/2)))
     regionEL.set("y", str(int(-y-ah/2)))
     regionEL.set("w", str(int(aw)))
@@ -160,7 +162,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("h", str(int(ah)))
     objectEL.set("src", tileFileName)
     objectEL.set("sensitive", "false")
-    log("Image in scene: scale=%s, w=%s, h=%s" % (scale, int(aw), int(ah)))
+    log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah))
     # call to lower level, top left
     buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, top right
@@ -192,7 +194,7 @@ def processSrcImg():
         src_sz = im.size
     levelCount = generateLevels(src_sz, outputroot)
     maxTileCount = computeMaxTileCount(levelCount-1, 0)
-    log("Maximum number of tiles to be generated: %s" % maxTileCount, 3)
+    log("Maximum number of tiles to be generated: %d" % maxTileCount, 3)
     buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, im, None)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
@@ -231,7 +233,7 @@ if USE_CG:
     log("--------------------\nUsing Core Graphics")
 else:
     log("--------------------\nUsing PIL + ImageMagick")
-log("Tile Size: %sx%s" % (TILE_SIZE, TILE_SIZE), 1)
+log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 createTargetDir()
 processSrcImg()
 log("--------------------")
