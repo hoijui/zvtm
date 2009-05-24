@@ -106,7 +106,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     tileID[level] = tileID[level] + pos
     tileIDstr = "-".join([str(s) for s in tileID])
     if x > src_sz[0] or y > src_sz[1]:
-        log("---- %d%%\nIgnoring tile %s (out of bounds)" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 3)
+        log("---- %.2f%%\nIgnoring tile %s (out of bounds)" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 3)
         return
     scale = math.pow(2, levelCount-level-1)
     # generate image tile
@@ -119,9 +119,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     if y + TILE_SIZE*scale > src_sz[1]:
         ah = int(src_sz[1] - y)    
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
-        log("---- %d%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
+        log("---- %.2f%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
     else:    
-        log("---- %d%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
+        log("---- %.2f%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
         if USE_CG:
             from CoreGraphics import *
             w = h = int(TILE_SIZE)
