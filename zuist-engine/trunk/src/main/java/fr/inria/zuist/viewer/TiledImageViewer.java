@@ -377,10 +377,11 @@ public class TiledImageViewer {
     public static void main(String[] args){
         File xmlSceneFile = null;
 		boolean fs = false;
-		boolean ogl = true;
+		boolean ogl = false;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
+				else if (args[i].substring(1).equals("opengl")){fs = true;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){printCmdLineHelp();System.exit(0);}
 			}
             else {
@@ -397,9 +398,9 @@ public class TiledImageViewer {
     }
     
     private static void printCmdLineHelp(){
-		System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [fs] [opengl]");
-		System.out.println("\n\tfs: fullscreen: true or false");
-		System.out.println("\topengl: use OpenGL: true or false");
+		System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [-fs] [-opengl]");
+		System.out.println("\n\t-fs: fullscreen: true or false");
+		System.out.println("\t-opengl: use OpenGL: true or false");
     }
 
 }
