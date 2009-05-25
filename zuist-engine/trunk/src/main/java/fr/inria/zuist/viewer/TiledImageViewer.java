@@ -390,6 +390,9 @@ public class TiledImageViewer {
                 if (f.exists()){xmlSceneFile = f;}
             }
 		}
+		if (ogl){
+		    System.setProperty("sun.java2d.opengl", "True");
+		}
         if (!fs && Utilities.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -399,8 +402,8 @@ public class TiledImageViewer {
     
     private static void printCmdLineHelp(){
 		System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [-fs] [-opengl]");
-		System.out.println("\n\t-fs: fullscreen: true or false");
-		System.out.println("\t-opengl: use OpenGL: true or false");
+		System.out.println("\n\t-fs: fullscreen mode");
+		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
     }
 
 }
