@@ -98,7 +98,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}
 
 	public synchronized boolean shouldRepaint(){
-		return shouldRepaint;
+		return true; //shouldRepaint;
 	}
 
     RepaintListener repaintListener;

@@ -97,6 +97,30 @@
 			</on-load> 
 		</include>
 		<include>
+			<class-expression>com.xerox.VTM.glyphs.VText</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.ProjText[10];for (int i=0;i<10;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.ProjText();}]]>
+				</execute>
+			</on-load> 
+		</include>
+		<include>
+			<class-expression>com.xerox.VTM.glyphs.VRectangle</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.RProjectedCoordsP[10];for (int i=0;i<10;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.RProjectedCoordsP();}]]>
+				</execute>
+			</on-load> 
+		</include>
+		<include>
+			<class-expression>net.claribole.zvtm.glyphs.DPath</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.ProjectedCoords[10];for (int i=0;i<10;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.ProjectedCoords();}]]>
+				</execute>
+			</on-load> 
+		</include>
+		<include>
 			<class-expression>com.xerox.VTM.engine.Camera</class-expression>
 			<on-load>
 				<execute>
@@ -117,6 +141,18 @@
 
 	  <transient-fields>
 		  <field-name>com.xerox.VTM.glyphs.Glyph.vsm</field-name>
+		  <field-name>com.xerox.VTM.glyphs.Glyph.coef</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VRectangle.pc</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VImage.pc</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VText.at</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VText.pc</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VText.trueCoef</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VText.bounds</field-name>
+		  <field-name>net.claribole.zvtm.glyphs.DPath.pc</field-name>
+		  <field-name>net.claribole.zvtm.glyphs.DPath.hw</field-name>
+		  <field-name>net.claribole.zvtm.glyphs.DPath.hh</field-name>
+		  <field-name>net.claribole.zvtm.glyphs.DPath.lhw</field-name>
+		  <field-name>net.claribole.zvtm.glyphs.DPath.lhh</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VImage.image</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VImage.interpolationMethod</field-name>
 		  <field-name>com.xerox.VTM.engine.VirtualSpace.vsm</field-name>
@@ -166,7 +202,7 @@
 
 		<autolock auto-synchronized="false">
 		<method-expression>* com.xerox.VTM.engine.StdViewPanel.*(..)</method-expression>
-		<lock-level>write</lock-level>
+		<lock-level>read</lock-level>
 		</autolock>
 		<autolock auto-synchronized="false">
 		<method-expression>* com.xerox.VTM.engine.GLViewPanel.*(..)</method-expression>
@@ -180,11 +216,10 @@
 
 	</locks>
 
-	<distributed-methods>
-		<method-expression>* com.xerox.VTM.engine.VirtualSpaceManager.repaintNow(..)</method-expression>
-		<method-expression>* com.xerox.VTM.engine.Camera.testRepaintNow(..)</method-expression>
-
-	</distributed-methods>
+	<!--	<distributed-methods>
+		 <method-expression>* com.xerox.VTM.engine.VirtualSpaceManager.repaintNow(..)</method-expression> 
+		 <method-expression>* com.xerox.VTM.engine.Camera.testRepaintNow(..)</method-expression> 
+	</distributed-methods> -->
 
 	<additional-boot-jar-classes>
 		<include>java.awt.geom.AffineTransform</include>

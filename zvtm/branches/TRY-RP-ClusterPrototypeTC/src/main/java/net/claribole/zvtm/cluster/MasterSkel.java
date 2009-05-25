@@ -54,7 +54,7 @@ public class MasterSkel {
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(anotherRect, vs);
 		vsm.addGlyph(text, vs);
-		vsm.addGlyph(path, vs);
+		//vsm.addGlyph(path, vs);
 		//vsm.addGlyph(image, vs);
 
 		Camera cam = vsm.addCamera(vs);
