@@ -24,6 +24,19 @@ import java.awt.GraphicsDevice;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
@@ -36,10 +49,19 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
+import com.xerox.VTM.engine.SwingWorker;
+import com.xerox.VTM.glyphs.VText;
+import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VImage;
+import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.glyphs.RImage;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import net.claribole.zvtm.engine.RepaintListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -57,9 +79,7 @@ import org.xml.sax.SAXException;
 
 public class TiledImageViewer {
     
-    String PATH_TO_HIERARCHY = "data/tgt";
-    String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/scene.xml";
-    File SCENE_FILE = new File(PATH_TO_SCENE);
+    File SCENE_FILE, SCENE_FILE_DIR;
         
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -84,8 +104,9 @@ public class TiledImageViewer {
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
-    static final String mSpaceName = "BMNG Layer";
-    VirtualSpace mSpace;
+    static final String mSpaceName = "Image Layer";
+    static final String aboutSpaceName = "About layer";
+    VirtualSpace mSpace, aboutSpace;
     Camera mCamera, ovCamera;
     static final String mViewName = "ZUIST Tiled Image Viewer";
     View mView;
@@ -93,44 +114,44 @@ public class TiledImageViewer {
 
     SceneManager sm;
     TIVNavigationManager nm;
+    Overlay ovm;
     
     WEGlassPane gp;
     
-    public TiledImageViewer(boolean fullscreen, boolean opengl, String dir){
-        if (dir != null){
-            PATH_TO_HIERARCHY = dir;
-            PATH_TO_SCENE = PATH_TO_HIERARCHY + "/scene.xml";
-            SCENE_FILE = new File(PATH_TO_SCENE);
-        }
+    public TiledImageViewer(boolean fullscreen, boolean opengl, File xmlSceneFile){
+        
+        ovm = new Overlay(this);
         nm = new TIVNavigationManager(this);
         initGUI(fullscreen, opengl);
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
-        gp.setValue(0);
-        gp.setVisible(true);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
-        sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), gp);
-        gp.setVisible(false);
-        gp.setLabel(WEGlassPane.EMPTY_STRING);
-        mCamera.setAltitude(100.0f);
-        vsm.getGlobalView(mCamera, ANIM_MOVE_DURATION);
         eh.cameraMoved(null, null, 0);
 		nm.createOverview();
+        if (xmlSceneFile != null){
+			loadScene(xmlSceneFile);
+			getGlobalView();
+			nm.updateOverview();
+		}
+        eh.cameraMoved(null, null, 0);
         mCamera.addListener(eh);
     }
-
+    
     void initGUI(boolean fullscreen, boolean opengl){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         mCamera = vsm.addCamera(mSpace);
         ovCamera = vsm.addCamera(mSpace);
+        aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
+		vsm.addCamera(aboutSpaceName);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
+        cameras.add(aboutSpace.getCamera(0));
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -139,6 +160,7 @@ public class TiledImageViewer {
         }
         eh = new TIVExplorerEventHandler(this);
         mView.setEventHandler(eh, 0);
+        mView.setEventHandler(ovm, 1);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.getCursor().setColor(Color.WHITE);
@@ -148,6 +170,39 @@ public class TiledImageViewer {
         updatePanelSize();
         mView.setActiveLayer(0);
     }
+
+	private JMenuBar initMenu(){
+		final JMenuItem openMI = new JMenuItem("Open...");
+		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem reloadMI = new JMenuItem("Reload");
+		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem exitMI = new JMenuItem("Exit");
+		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem aboutMI = new JMenuItem("About...");
+		ActionListener a0 = new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				if (e.getSource()==openMI){openFile();}
+				else if (e.getSource()==reloadMI){reload();}
+				else if (e.getSource()==exitMI){exit();}
+				else if (e.getSource()==aboutMI){ovm.showAbout();}
+			}
+		};
+		JMenuBar jmb = new JMenuBar();
+		JMenu fileM = new JMenu("File");
+		JMenu helpM = new JMenu("Help");
+		fileM.add(openMI);
+		fileM.add(reloadMI);
+		fileM.addSeparator();
+		fileM.add(exitMI);
+		helpM.add(aboutMI);
+		jmb.add(fileM);
+		jmb.add(helpM);
+		openMI.addActionListener(a0);
+		reloadMI.addActionListener(a0);
+		exitMI.addActionListener(a0);
+		aboutMI.addActionListener(a0);
+		return jmb;
+	}
 
     void windowLayout(){
         if (Utilities.osIsWindows()){
@@ -161,10 +216,78 @@ public class TiledImageViewer {
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
     
-    /*-------------     Navigation       -------------*/
+    
+    /*-------------  Scene management    -------------*/
+	
+	void reset(){
+		sm.reset();
+		vsm.removeGlyphsFromSpace(mSpaceName);
+	}
+	
+	void openFile(){
+		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fc.setDialogTitle("Find ZUIST Scene File");
+		int returnVal= fc.showOpenDialog(mView.getFrame());
+		if (returnVal == JFileChooser.APPROVE_OPTION){
+		    final SwingWorker worker = new SwingWorker(){
+			    public Object construct(){
+					reset();
+					loadScene(fc.getSelectedFile());
+					getGlobalView();
+					nm.updateOverview();
+					return null; 
+			    }
+			};
+		    worker.start();
+		}
+	}
 
+	void reload(){
+		if (SCENE_FILE==null){return;}
+		final SwingWorker worker = new SwingWorker(){
+		    public Object construct(){
+				reset();
+				loadScene(SCENE_FILE);
+				getGlobalView();
+				return null; 
+		    }
+		};
+	    worker.start();
+	}
+
+	void loadScene(File xmlSceneFile){
+		try {
+			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());			
+		}
+		catch (IOException ex){}
+		gp.setValue(0);
+		gp.setVisible(true);
+		SCENE_FILE = xmlSceneFile;
+	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, gp);
+	    gp.setVisible(false);
+	    gp.setLabel(WEGlassPane.EMPTY_STRING);
+        mCamera.setAltitude(0.0f);
+        sm.updateLevel(mCamera.altitude);
+        eh.cameraMoved(null, null, 0);
+	}
+    
+    /*-------------     Navigation       -------------*/
+    
     void getGlobalView(){
-        vsm.getGlobalView(mCamera, TiledImageViewer.ANIM_MOVE_DURATION);
+		int l = 0;
+		while (sm.getRegionsAtLevel(l) == null){
+			l++;
+			if (l > sm.getLevelCount()){
+				l = -1;
+				break;
+			}
+		}
+		if (l > -1){
+			long[] wnes = sm.getLevel(l).getBounds();
+	        vsm.centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
+		}
     }
 
     /* Higher view */
@@ -252,16 +375,31 @@ public class TiledImageViewer {
     }
 
     public static void main(String[] args){
-        String dir = (args.length > 0) ? args[0] : null;
-        boolean fs = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
-        boolean ogl = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
-		if (dir == null){
-			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [fs] [opengl]");
-			System.out.println("\n\tfs: fullscreen: true or false");
-			System.out.println("\topengl: use OpenGL: true or false");
-			System.exit(0);
+        File xmlSceneFile = null;
+		boolean fs = false;
+		boolean ogl = true;
+		for (int i=0;i<args.length;i++){
+			if (args[i].startsWith("-")){
+				if (args[i].substring(1).equals("fs")){fs = true;}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){printCmdLineHelp();System.exit(0);}
+			}
+            else {
+                // the only other thing allowed as a cmd line param is a scene file
+                File f = new File(args[i]);
+                if (f.exists()){xmlSceneFile = f;}
+            }
 		}
-        new TiledImageViewer(fs, ogl, dir);
+        if (!fs && Utilities.osIsMacOS()){
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
+        System.out.println("--help for command line options");
+        new TiledImageViewer(fs, ogl, xmlSceneFile);
+    }
+    
+    private static void printCmdLineHelp(){
+		System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [fs] [opengl]");
+		System.out.println("\n\tfs: fullscreen: true or false");
+		System.out.println("\topengl: use OpenGL: true or false");
     }
 
 }
@@ -331,4 +469,124 @@ class WEGlassPane extends JComponent implements ProgressListener {
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
     
+}
+
+class Overlay implements ViewEventHandler {
+    
+    static final Color FADE_REGION_FILL = Color.BLACK;
+    static final Color FADE_REGION_STROKE = Color.WHITE;
+
+    static final String INSITU_LOGO_PATH = "/images/insitu.png";
+    static final String INRIA_LOGO_PATH = "/images/inria.png";
+
+    TiledImageViewer application;
+
+    Overlay(TiledImageViewer app){
+        this.application = app;
+    }
+
+    boolean showingAbout = false;
+    VRectangleST fadeAbout;
+    VImage insituLogo, inriaLogo;
+    VText[] aboutLines;
+    
+    void showAbout(){
+        if (!showingAbout){
+            fadeAbout = new VRectangleST(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+                FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
+            aboutLines = new VText[5];
+			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Tiled Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
+            aboutLines[1] = new VText(0, 110, 0, Color.WHITE, "v"+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "By Emmanuel Pietriga (INRIA) & Michel Beaudouin-Lafon (Universit\u00E9 Paris-Sud)", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            RImage.setReflectionHeight(0.7f);
+            inriaLogo = new RImage(-150, -70, 0, (new ImageIcon(this.getClass().getResource(INRIA_LOGO_PATH))).getImage(), 1.0f);
+            insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
+            aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            VirtualSpaceManager.INSTANCE.addGlyph(fadeAbout, application.aboutSpace);
+            VirtualSpaceManager.INSTANCE.addGlyph(inriaLogo, application.aboutSpace);
+            VirtualSpaceManager.INSTANCE.addGlyph(insituLogo, application.aboutSpace);
+			for (int i=0;i<aboutLines.length;i++){
+	            VirtualSpaceManager.INSTANCE.addGlyph(aboutLines[i], application.aboutSpace);				
+			}
+            showingAbout = true;
+        }
+		application.mView.setActiveLayer(1);
+    }
+
+    void hideAbout(){
+        if (showingAbout){
+            showingAbout = false;
+            if (insituLogo != null){
+                application.aboutSpace.removeGlyph(insituLogo);
+                insituLogo = null;
+            }
+            if (inriaLogo != null){
+                application.aboutSpace.removeGlyph(inriaLogo);
+                inriaLogo = null;
+            }
+            if (fadeAbout != null){
+                application.aboutSpace.removeGlyph(fadeAbout);
+                fadeAbout = null;
+            }
+			for (int i=0;i<aboutLines.length;i++){
+	            if (aboutLines[i] != null){
+	                application.aboutSpace.removeGlyph(aboutLines[i]);
+	                aboutLines[i] = null;
+	            }				
+			}
+		}
+		application.mView.setActiveLayer(0);
+	}
+
+	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	}
+
+	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+		hideAbout();
+	}
+
+	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+
+	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
+
+	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
+
+	public void enterGlyph(Glyph g){}
+
+	public void exitGlyph(Glyph g){}
+
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+		hideAbout();
+	}
+
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+	public void viewActivated(View v){}
+
+	public void viewDeactivated(View v){}
+
+	public void viewIconified(View v){}
+
+	public void viewDeiconified(View v){}
+
+	public void viewClosing(View v){
+		application.exit();
+	}
 }

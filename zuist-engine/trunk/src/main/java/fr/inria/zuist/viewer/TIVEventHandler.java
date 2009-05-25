@@ -208,7 +208,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (panning){
-            if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
             float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
@@ -276,6 +275,8 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateTiles();}
+        else if (code == KeyEvent.VK_O){application.nm.updateOverview();}
+        else if (c == '?'){application.ovm.showAbout();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -324,14 +325,12 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 
 	/* Overview Portal */
 	public void enterPortal(Portal p){
-	    application.mView.getCursor().activateDynaSpot(false);
 		inPortal = true;
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_INSIDE_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	public void exitPortal(Portal p){
-	    application.mView.getCursor().activateDynaSpot(true);
 		inPortal = false;
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
