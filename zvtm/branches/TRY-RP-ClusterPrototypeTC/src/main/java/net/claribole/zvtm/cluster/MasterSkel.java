@@ -123,8 +123,8 @@ public class MasterSkel {
 					//50 is just a speed factor (too fast otherwise)
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/20.0f)) : (long)((jpx-lastJPX)/(a*20)));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/20.0f)) : (long)((lastJPY-jpy)/(a*20)));
 				}
 			}
 		}
