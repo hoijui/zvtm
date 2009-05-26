@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id:  $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;
@@ -112,9 +112,9 @@ public class TiledImageViewer {
     
     WEGlassPane gp;
     
-    public TiledImageViewer(boolean fullscreen, boolean opengl, File xmlSceneFile){
+    public TiledImageViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
         ovm = new Overlay(this);
-        initGUI(fullscreen, opengl);
+        initGUI(fullscreen, opengl, antialiased);
         nm = new TIVNavigationManager(this);
         eh.nm = this.nm;
         gp = new WEGlassPane(this);
@@ -135,7 +135,7 @@ public class TiledImageViewer {
 		nm.updateOverview();
     }
     
-    void initGUI(boolean fullscreen, boolean opengl){
+    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -158,6 +158,7 @@ public class TiledImageViewer {
         mView.setEventHandler(ovm, 1);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
+		mView.setAntialiasing(antialiased);
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
 		mView.getCursor().setDynaSpotColor(Color.WHITE);
@@ -307,11 +308,13 @@ public class TiledImageViewer {
         File xmlSceneFile = null;
 		boolean fs = false;
 		boolean ogl = false;
+		boolean aa = true;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){fs = true;}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){printCmdLineHelp();System.exit(0);}
+				else if (args[i].substring(1).equals("noaa")){aa = false;}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){TiledImageViewer.printCmdLineHelp();System.exit(0);}
 			}
             else {
                 // the only other thing allowed as a cmd line param is a scene file
@@ -339,7 +342,7 @@ public class TiledImageViewer {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new TiledImageViewer(fs, ogl, xmlSceneFile);
+        new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
     }
     
     private static void printCmdLineHelp(){

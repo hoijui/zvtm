@@ -10,16 +10,10 @@ package fr.inria.zuist.viewer;
 import com.xerox.VTM.engine.LongPoint;
 
 class Messages {
-	
-	static final String USAGE = "Usage:\n\tjava -jar target/zuist-engine-X.X.X.jar <zuist_scene_file.xml> [options]\n\n\t-fs displays the viewer full screen";
-	
+		
 	static final String VERSION = "0.2.0-SNAPSHOT";
 
     static final String ABOUT_MSG = "ZUIST Viewer " + VERSION + "\n\nA generic visualization tool for ZUIST multi-scale scenes\nhttp://zvtm.sourceforge.net/zuist\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
-    
-	static void printCmdLineHelp(){
-		System.out.println(USAGE);
-	}
 	
 	static final String PM_ENTRY = "mpmE";
 

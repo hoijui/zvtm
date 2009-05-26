@@ -115,7 +115,7 @@ $Id$
         <configuration>
           <archive>
             <manifest>
-              <mainClass>fr.inria.zuist.viewer.Viewer</mainClass>
+              <mainClass>fr.inria.zuist.viewer.Launcher</mainClass>
               <packageName>fr.inria.zuist.viewer</packageName>
               <addClasspath>true</addClasspath>
             </manifest>

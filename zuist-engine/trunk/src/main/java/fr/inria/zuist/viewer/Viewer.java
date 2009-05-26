@@ -42,6 +42,7 @@ import java.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FilenameFilter;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -119,9 +120,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
     
-    public Viewer(boolean fullscreen, boolean antialiased, File xmlSceneFile){
+    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
-		initGUI(fullscreen, antialiased);
+		initGUI(fullscreen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -138,7 +139,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		ovm.toggleConsole();
     }
 
-    void initGUI(boolean fullscreen, boolean antialiased){
+    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -151,7 +152,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -628,25 +629,47 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     public static void main(String[] args){
         File xmlSceneFile = null;
 		boolean fs = false;
+		boolean ogl = false;
 		boolean aa = true;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
+				else if (args[i].substring(1).equals("opengl")){fs = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Messages.printCmdLineHelp();System.exit(0);}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
 			}
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
-                if (f.exists()){xmlSceneFile = f;}
+                if (f.exists()){
+                    if (f.isDirectory()){
+                        // if arg is a directory, take first xml file we find in that directory
+                        String[] xmlFiles = f.list(new FilenameFilter(){
+                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
+                                            });
+                        if (xmlFiles.length > 0){
+                            xmlSceneFile = new File(f, xmlFiles[0]);
+                        }
+                    }
+                    else {
+                        xmlSceneFile = f;                        
+                    }
+                }
             }
 		}
         if (!fs && Utilities.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new Viewer(fs, aa, xmlSceneFile);
+        new Viewer(fs, ogl, aa, xmlSceneFile);
     }
+    
+    private static void printCmdLineHelp(){
+        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
+        System.out.println("Options:\n\t-fs: fullscreen mode");
+        System.out.println("\t-noaa: no antialiasing");
+    }
+    
 }
 
 class VWGlassPane extends JComponent implements ProgressListener {

@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: TIVExplorerEventHandler.java 1676 2009-04-10 14:56:31Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;

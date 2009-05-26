@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: TIVNavigationManager.java 1780 2009-05-12 12:36:30Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;
