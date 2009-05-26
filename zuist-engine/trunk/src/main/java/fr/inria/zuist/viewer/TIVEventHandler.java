@@ -272,7 +272,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateTiles();}
-        else if (code == KeyEvent.VK_O){application.nm.updateOverview();}
+        else if (code == KeyEvent.VK_O){application.nm.toggleOverview();}
         else if (c == '?'){application.ovm.showAbout();}
     }
 

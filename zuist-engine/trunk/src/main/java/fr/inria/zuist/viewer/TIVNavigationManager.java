@@ -179,6 +179,10 @@ class TIVNavigationManager {
 		}
 	}
 
+    void toggleOverview(){
+        ovPortal.setVisible(!ovPortal.isVisible());
+        vsm.repaintNow(application.mView);
+    }
     
 	/* -------------- Sigma Lenses ------------------- */
 	
