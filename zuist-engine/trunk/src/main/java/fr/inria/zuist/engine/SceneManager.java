@@ -722,4 +722,25 @@ public class SceneManager {
 // 	}
 //     }
 
+    /* -------- Navigation ----------------- */
+    
+    /** Get a global view of the scene.
+     *@param c camera that should show a global view
+     *@param d duration of animation from current location to global view
+     */
+    public void getGlobalView(Camera c, int d){
+		int l = 0;
+		while (getRegionsAtLevel(l) == null){
+			l++;
+			if (l > getLevelCount()){
+				l = -1;
+				break;
+			}
+		}
+		if (l > -1){
+			long[] wnes = getLevel(l).getBounds();
+	        VirtualSpaceManager.INSTANCE.centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3]);		
+		}
+    }
+
 }
