@@ -66,8 +66,8 @@ public class Location {
 	alt=a;
     }
 
-    public LongPoint setPosition(){
-	return new LongPoint(vx,vy);
+    public LongPoint getPosition(){
+        return new LongPoint(vx,vy);
     }
 
     public long getX(){
