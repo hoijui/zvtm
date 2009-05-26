@@ -95,13 +95,6 @@ public class TiledImageViewer {
     
     boolean UPDATE_TILES = true;
     
-    /* Navigation constants */
-    static final int ANIM_MOVE_DURATION = 300;
-    static final short MOVE_UP = 0;
-    static final short MOVE_DOWN = 1;
-    static final short MOVE_LEFT = 2;
-    static final short MOVE_RIGHT = 3;
-    
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Image Layer";
@@ -120,8 +113,9 @@ public class TiledImageViewer {
     
     public TiledImageViewer(boolean fullscreen, boolean opengl, File xmlSceneFile){
         ovm = new Overlay(this);
-        nm = new TIVNavigationManager(this);
         initGUI(fullscreen, opengl);
+        nm = new TIVNavigationManager(this);
+        eh.nm = this.nm;
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         VirtualSpace[]  sceneSpaces = {mSpace};
@@ -131,7 +125,7 @@ public class TiledImageViewer {
         eh.cameraMoved(null, null, 0);
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
-			getGlobalView();
+			nm.getGlobalView();
 		}
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
         eh.cameraMoved(null, null, 0);
@@ -233,7 +227,7 @@ public class TiledImageViewer {
 			    public Object construct(){
 					reset();
 					loadScene(fc.getSelectedFile());
-					getGlobalView();
+					nm.getGlobalView();
 					nm.updateOverview();
 					return null; 
 			    }
@@ -248,7 +242,7 @@ public class TiledImageViewer {
 		    public Object construct(){
 				reset();
 				loadScene(SCENE_FILE);
-				getGlobalView();
+				nm.getGlobalView();
 				return null; 
 		    }
 		};
@@ -271,61 +265,6 @@ public class TiledImageViewer {
         sm.updateLevel(mCamera.altitude);
         eh.cameraMoved(null, null, 0);
 	}
-    
-    /*-------------     Navigation       -------------*/
-    
-    void getGlobalView(){
-		sm.getGlobalView(mCamera, TiledImageViewer.ANIM_MOVE_DURATION);		
-    }
-
-    /* Higher view */
-    void getHigherView(){
-        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        //vsm.animator.createCameraAnimation(TiledImageViewer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(TiledImageViewer.ANIM_MOVE_DURATION, mCamera,
-            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
-    }
-
-    /* Higher view */
-    void getLowerView(){
-        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        //vsm.animator.createCameraAnimation(TiledImageViewer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(TiledImageViewer.ANIM_MOVE_DURATION, mCamera,
-            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
-    }
-
-    /* Direction should be one of TiledImageViewer.MOVE_* */
-    void translateView(short direction){
-        LongPoint trans;
-        long[] rb = mView.getVisibleRegion(mCamera);
-        if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
-        }
-        else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
-        }
-        else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
-        }
-        else {
-            // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
-        }
-        //vsm.animator.createCameraAnimation(TiledImageViewer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(TiledImageViewer.ANIM_MOVE_DURATION, mCamera,
-            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
-    }
-    
-    void altitudeChanged(){
-        sm.updateLevel(mCamera.altitude);
-    }
     
     void updatePanelSize(){
         Dimension d = mView.getPanel().getSize();

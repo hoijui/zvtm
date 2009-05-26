@@ -76,7 +76,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 
     TIVExplorerEventHandler(TiledImageViewer app){
         this.application = app;
-        this.nm = app.nm;
         oldCameraAltitude = this.application.mCamera.getAltitude();
 		initDelayedUpdateTimer();
     }
@@ -90,6 +89,8 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
+        lastVX = v.getVCursor().vx;
+    	lastVY = v.getVCursor().vy;
 		if (inPortal){
 		    if (application.nm.ovPortal.coordInsideObservedRegion(jpx, jpy)){
 				regionStickedToMouse = true;
@@ -103,12 +104,24 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 				regionStickedToMouse = true;
 			}
 		}
-		else {
-		    selectingRegion = true;
-			x1 = v.getVCursor().vx;
-			y1 = v.getVCursor().vy;
-			v.setDrawRect(true);
-		}
+        else if (mod == ALT_MOD){
+            selectingRegion = true;
+            x1 = v.getVCursor().vx;
+            y1 = v.getVCursor().vy;
+            v.setDrawRect(true);
+        }
+        else {
+            if (nm.lensType != TIVNavigationManager.NO_LENS){
+                nm.zoomInPhase2(lastVX, lastVY);
+            }
+            else {
+                if (cursorNearBorder){
+                    // do not activate the lens when cursor is near the border
+                    return;
+                }
+                nm.zoomInPhase1(jpx, jpy);
+            }
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -118,7 +131,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 			x2 = v.getVCursor().vx;
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-				VirtualSpaceManager.INSTANCE.centerOnRegion(application.mCamera, TiledImageViewer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
+				VirtualSpaceManager.INSTANCE.centerOnRegion(application.mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, x1, y1, x2, y2);
 			}
 			selectingRegion = false;
 		}
@@ -129,27 +142,11 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     	lastVY = v.getVCursor().vy;
     }
 
-    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        lastJPX = jpx;
-        lastJPY = jpy;
-    }
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getVCursor().vx;
-    	lastVY = v.getVCursor().vy;
-        if (nm.lensType != TIVNavigationManager.NO_LENS){
-            nm.zoomInPhase2(lastVX, lastVY);
-        }
-        else {
-            if (cursorNearBorder){
-                // do not activate the lens when cursor is near the border
-                return;
-            }
-            nm.zoomInPhase1(jpx, jpy);
-        }
-    }
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
@@ -265,15 +262,15 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     int ci = 1180;
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
-    	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
-    	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
-    	else if (code==KeyEvent.VK_UP){application.translateView(TiledImageViewer.MOVE_UP);}
-    	else if (code==KeyEvent.VK_DOWN){application.translateView(TiledImageViewer.MOVE_DOWN);}
-    	else if (code==KeyEvent.VK_LEFT){application.translateView(TiledImageViewer.MOVE_LEFT);}
-    	else if (code==KeyEvent.VK_RIGHT){application.translateView(TiledImageViewer.MOVE_RIGHT);}
+        if (code==KeyEvent.VK_PAGE_UP){application.nm.getHigherView();}
+    	else if (code==KeyEvent.VK_PAGE_DOWN){application.nm.getLowerView();}
+    	else if (code==KeyEvent.VK_HOME){application.nm.getGlobalView();}
+    	else if (code==KeyEvent.VK_UP){application.nm.translateView(TIVNavigationManager.MOVE_UP);}
+    	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(TIVNavigationManager.MOVE_DOWN);}
+    	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(TIVNavigationManager.MOVE_LEFT);}
+    	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(TIVNavigationManager.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F2){application.gc();}
-        else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
+        else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateTiles();}
         else if (code == KeyEvent.VK_O){application.nm.updateOverview();}
         else if (c == '?'){application.ovm.showAbout();}
@@ -313,7 +310,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
         float alt = application.mCamera.getAltitude();
         if (alt != oldCameraAltitude){
             // camera was an altitude change
-            application.altitudeChanged();
+            application.nm.altitudeChanged();
             oldCameraAltitude = alt;
         }
         else {

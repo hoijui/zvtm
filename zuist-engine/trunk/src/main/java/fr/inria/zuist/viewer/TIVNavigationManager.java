@@ -24,11 +24,19 @@ import net.claribole.zvtm.engine.OverviewPortal;
 import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.Region;
 
 class TIVNavigationManager {
-
+    
+    /* Navigation constants */
+    static final int ANIM_MOVE_DURATION = 300;
+    static final short MOVE_UP = 0;
+    static final short MOVE_DOWN = 1;
+    static final short MOVE_LEFT = 2;
+    static final short MOVE_RIGHT = 3;
+    
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
@@ -57,8 +65,66 @@ class TIVNavigationManager {
 
     TiledImageViewer application;
     
+    Camera mCamera;
+    VirtualSpaceManager vsm;
+    
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
+        this.vsm = VirtualSpaceManager.INSTANCE;
+        mCamera = app.mCamera;
+    }
+
+    void getGlobalView(){
+		application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION);		
+    }
+
+    /* Higher view */
+    void getHigherView(){
+        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
+        //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(TIVNavigationManager.ANIM_MOVE_DURATION, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Higher view */
+    void getLowerView(){
+        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
+        //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(TIVNavigationManager.ANIM_MOVE_DURATION, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Direction should be one of TiledImageViewer.MOVE_* */
+    void translateView(short direction){
+        LongPoint trans;
+        long[] rb = application.mView.getVisibleRegion(mCamera);
+        if (direction==MOVE_UP){
+            long qt = Math.round((rb[1]-rb[3])/4.0);
+            trans = new LongPoint(0,qt);
+        }
+        else if (direction==MOVE_DOWN){
+            long qt = Math.round((rb[3]-rb[1])/4.0);
+            trans = new LongPoint(0,qt);
+        }
+        else if (direction==MOVE_RIGHT){
+            long qt = Math.round((rb[2]-rb[0])/4.0);
+            trans = new LongPoint(qt,0);
+        }
+        else {
+            // direction==MOVE_LEFT
+            long qt = Math.round((rb[0]-rb[2])/4.0);
+            trans = new LongPoint(qt,0);
+        }
+        //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(TIVNavigationManager.ANIM_MOVE_DURATION, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+    
+    void altitudeChanged(){
+        application.sm.updateLevel(mCamera.altitude);
     }
 
 	/* -------------- Overview ------------------- */
@@ -108,13 +174,22 @@ class TIVNavigationManager {
     		}
     		if (l > -1){
     			long[] wnes = application.sm.getLevel(l).getBounds();
-    	        ovPortal.centerOnRegion(TiledImageViewer.ANIM_MOVE_DURATION, wnes[0], wnes[1], wnes[2], wnes[3]);		
+    	        ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, wnes[0], wnes[1], wnes[2], wnes[3]);		
     		}
 		}
 	}
 
     
 	/* -------------- Sigma Lenses ------------------- */
+	
+	void toggleLensType(){
+	    if (lensFamily == L2_Gaussian){
+	        lensFamily = L2_SCB;
+	    }
+	    else {
+	        lensFamily = L2_Gaussian;
+	    }
+	}
 
     void setLens(int t){
         lensType = t;
@@ -278,10 +353,6 @@ class TIVNavigationManager {
         }
         return res;
     }
-    
-    void showLensChooser(){
-        new LensChooser(this);
-    }
 
 }
 
@@ -300,45 +371,6 @@ class ZP2LensAction implements EndAction {
         nm.lens = null;
         nm.setLens(TIVNavigationManager.NO_LENS);
         nm.application.sm.setUpdateLevel(true);
-    }
-    
-}
-
-class LensChooser extends JFrame implements ItemListener {
-
-    // index of lenses should correspond to short value of associated lens type in TIVNavigationManager
-    static final String[] LENS_NAMES = {"Fisheye Lens", "Speed-coupled Blending Lens"};
-
-    TIVNavigationManager nm;
-
-    JComboBox lensList;
-
-    LensChooser(TIVNavigationManager nm){
-        super();
-        this.nm = nm;
-        initGUI();
-        this.pack();
-        this.setVisible(true);
-    }
-    
-    void initGUI(){
-        Container cp = getContentPane();
-        lensList = new JComboBox(LENS_NAMES);
-        lensList.setSelectedIndex(nm.lensFamily);
-        lensList.addItemListener(this);
-        cp.add(lensList);
-    }
-    
-    public void itemStateChanged(ItemEvent e){
-        if (e.getStateChange() == ItemEvent.SELECTED){
-            Object src = e.getItem();
-            for (int i=0;i<LENS_NAMES.length;i++){
-                if (src == LENS_NAMES[i]){
-                    nm.lensFamily = (short)i;
-                    return;
-                }
-            }
-        }
     }
     
 }
