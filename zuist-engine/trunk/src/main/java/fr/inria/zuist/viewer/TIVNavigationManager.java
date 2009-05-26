@@ -185,9 +185,11 @@ class TIVNavigationManager {
 	void toggleLensType(){
 	    if (lensFamily == L2_Gaussian){
 	        lensFamily = L2_SCB;
+	        application.ovm.say("Fisheye Lens");
 	    }
 	    else {
 	        lensFamily = L2_Gaussian;
+	        application.ovm.say("Speed-coupled Blending Lens");
 	    }
 	}
 

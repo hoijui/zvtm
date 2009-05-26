@@ -116,6 +116,7 @@ public class TiledImageViewer {
         ovm = new Overlay(this);
         initGUI(fullscreen, opengl, antialiased);
         nm = new TIVNavigationManager(this);
+        ovm.init();
         eh.nm = this.nm;
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
@@ -163,6 +164,7 @@ public class TiledImageViewer {
 		mView.getCursor().setHintColor(Color.WHITE);
 		mView.getCursor().setDynaSpotColor(Color.WHITE);
         mView.getCursor().setDynaSpotLagTime(200);
+        mView.getPanel().addComponentListener(eh);
         updatePanelSize();
         mView.setActiveLayer(0);
     }
@@ -273,6 +275,9 @@ public class TiledImageViewer {
         Dimension d = mView.getPanel().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
+        if (nm != null && nm.ovPortal != null){
+            nm.ovPortal.moveTo(panelWidth-nm.ovPortal.getDimensions().width-1, panelHeight-nm.ovPortal.getDimensions().height-1);            
+        }
     }
 
     void toggleUpdateTiles(){
@@ -422,6 +427,10 @@ class WEGlassPane extends JComponent implements ProgressListener {
 
 class Overlay implements ViewEventHandler {
     
+    static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
+    static final Font SAY_MSG_FONT = new Font("Arial", Font.PLAIN, 24);
+    static final int SAY_DURATION = 500;
+    
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
@@ -430,14 +439,27 @@ class Overlay implements ViewEventHandler {
 
     TiledImageViewer application;
 
-    Overlay(TiledImageViewer app){
-        this.application = app;
-    }
-
     boolean showingAbout = false;
     VRectangleST fadeAbout;
     VImage insituLogo, inriaLogo;
     VText[] aboutLines;
+
+    VRectangleST fadedRegion;
+    VText sayGlyph;
+
+    Overlay(TiledImageViewer app){
+        this.application = app;
+    }
+    
+    void init(){
+        fadedRegion = new VRectangleST(0, 0, 0, 10, 10, FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
+        application.vsm.addGlyph(fadedRegion, application.aboutSpace);
+        fadedRegion.setVisible(false);
+        sayGlyph = new VText(0, -10, 0, SAY_MSG_COLOR, " ", VText.TEXT_ANCHOR_MIDDLE);
+        sayGlyph.setSpecialFont(SAY_MSG_FONT);
+        application.vsm.addGlyph(sayGlyph, application.aboutSpace);
+        sayGlyph.setVisible(false);
+    }
     
     void showAbout(){
         if (!showingAbout){
@@ -487,6 +509,35 @@ class Overlay implements ViewEventHandler {
 		}
 		application.mView.setActiveLayer(0);
 	}
+
+    void say(final String msg){
+    	final SwingWorker worker = new SwingWorker(){
+    		public Object construct(){
+    		    showMessage(msg);
+    		    sleep(SAY_DURATION);
+    		    hideMessage();
+    		    return null;
+    		}
+    	    };
+    	worker.start();
+    }
+
+    void showMessage(String msg){
+        synchronized(this){
+            fadedRegion.setWidth(application.panelWidth/2-1);
+            fadedRegion.setHeight(50);
+            sayGlyph.setText(msg);
+            fadedRegion.setVisible(true);
+            sayGlyph.setVisible(true);
+        }
+    }
+
+    void hideMessage(){
+        synchronized(this){
+            fadedRegion.setVisible(false);
+            sayGlyph.setVisible(false);
+        }
+    }
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	}
