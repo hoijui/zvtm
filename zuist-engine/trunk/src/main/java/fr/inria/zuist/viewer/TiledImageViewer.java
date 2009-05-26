@@ -119,7 +119,6 @@ public class TiledImageViewer {
     WEGlassPane gp;
     
     public TiledImageViewer(boolean fullscreen, boolean opengl, File xmlSceneFile){
-        
         ovm = new Overlay(this);
         nm = new TIVNavigationManager(this);
         initGUI(fullscreen, opengl);
@@ -130,14 +129,14 @@ public class TiledImageViewer {
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         eh.cameraMoved(null, null, 0);
-		nm.createOverview();
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			getGlobalView();
-			nm.updateOverview();
 		}
+		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
         eh.cameraMoved(null, null, 0);
         mCamera.addListener(eh);
+		nm.updateOverview();
     }
     
     void initGUI(boolean fullscreen, boolean opengl){
@@ -276,7 +275,7 @@ public class TiledImageViewer {
     /*-------------     Navigation       -------------*/
     
     void getGlobalView(){
-		sm.getGlobalView(mCamera, Viewer.ANIM_MOVE_LENGTH);		
+		sm.getGlobalView(mCamera, TiledImageViewer.ANIM_MOVE_DURATION);		
     }
 
     /* Higher view */

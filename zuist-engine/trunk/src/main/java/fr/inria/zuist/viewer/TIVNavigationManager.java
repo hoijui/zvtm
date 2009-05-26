@@ -25,6 +25,8 @@ import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
 
+import fr.inria.zuist.engine.Region;
+
 class TIVNavigationManager {
 
     /* misc. lens settings */
@@ -61,8 +63,8 @@ class TIVNavigationManager {
 
 	/* -------------- Overview ------------------- */
 	
-	static final int OVERVIEW_WIDTH = 200;
-	static final int OVERVIEW_HEIGHT = 100;
+	static final int MAX_OVERVIEW_WIDTH = 200;
+	static final int MAX_OVERVIEW_HEIGHT = 200;
 	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
 	static final float OBSERVED_REGION_ALPHA = 0.5f;
 	static final Color OV_BORDER_COLOR = Color.WHITE;
@@ -70,8 +72,20 @@ class TIVNavigationManager {
 	
 	OverviewPortal ovPortal;
 	
-	void createOverview(){
-		ovPortal = new OverviewPortal(application.panelWidth-OVERVIEW_WIDTH-1, application.panelHeight-OVERVIEW_HEIGHT-1, OVERVIEW_WIDTH, OVERVIEW_HEIGHT, application.ovCamera, application.mCamera);
+	void createOverview(Region rootRegion){
+	    int ow, oh;
+	    float ar = rootRegion.getWidth()/(float)rootRegion.getHeight();
+	    if (ar > 1){
+	        // wider than high
+	        ow = MAX_OVERVIEW_WIDTH;
+	        oh = Math.round(ow/ar);
+	    }
+	    else {
+	        // higher than wide
+	        oh = MAX_OVERVIEW_HEIGHT;
+	        ow = Math.round(oh*ar);
+	    }
+		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
 		ovPortal.setPortalEventHandler(application.eh);
 		ovPortal.setBackgroundColor(TiledImageViewer.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
@@ -82,7 +96,21 @@ class TIVNavigationManager {
 	}
 	
 	void updateOverview(){
-		if (ovPortal != null){application.ovCamera.setLocation(ovPortal.getGlobalView());}
+		if (ovPortal != null){
+		    //application.ovCamera.setLocation(ovPortal.getGlobalView());
+		    int l = 0;
+    		while (application.sm.getRegionsAtLevel(l) == null){
+    			l++;
+    			if (l > application.sm.getLevelCount()){
+    				l = -1;
+    				break;
+    			}
+    		}
+    		if (l > -1){
+    			long[] wnes = application.sm.getLevel(l).getBounds();
+    	        ovPortal.centerOnRegion(TiledImageViewer.ANIM_MOVE_DURATION, wnes[0], wnes[1], wnes[2], wnes[3]);		
+    		}
+		}
 	}
 
     
