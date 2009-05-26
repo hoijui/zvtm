@@ -337,7 +337,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 
 class DelayedUpdateTimer extends TimerTask {
 
-    private boolean enabled = true;
+    private boolean enabled = false;
 	private boolean update = false;
 	
 	TIVExplorerEventHandler eh;

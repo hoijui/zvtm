@@ -128,6 +128,7 @@ public class TiledImageViewer {
 			loadScene(xmlSceneFile);
 			nm.getGlobalView();
 		}
+        eh.dut.setEnabled(true);
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
         eh.cameraMoved(null, null, 0);
         mCamera.addListener(eh);
