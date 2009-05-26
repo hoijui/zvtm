@@ -9,6 +9,7 @@ package fr.inria.zuist.viewer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FilenameFilter;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -144,7 +145,7 @@ public class TiledImageViewer {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(aboutSpace.getCamera(0));
-        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -314,7 +315,20 @@ public class TiledImageViewer {
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
-                if (f.exists()){xmlSceneFile = f;}
+                if (f.exists()){
+                    if (f.isDirectory()){
+                        // if arg is a directory, take first xml file we find in that directory
+                        String[] xmlFiles = f.list(new FilenameFilter(){
+                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
+                                            });
+                        if (xmlFiles.length > 0){
+                            xmlSceneFile = new File(f, xmlFiles[0]);
+                        }
+                    }
+                    else {
+                        xmlSceneFile = f;                        
+                    }
+                }
             }
 		}
 		if (ogl){
