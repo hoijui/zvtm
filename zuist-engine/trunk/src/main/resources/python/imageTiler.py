@@ -117,7 +117,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     if x + TILE_SIZE*scale > src_sz[0]:
         aw = int(src_sz[0] - x)
     if y + TILE_SIZE*scale > src_sz[1]:
-        ah = int(src_sz[1] - y)    
+        ah = int(src_sz[1] - y)
+    if aw == 0 or ah == 0:
+        return
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
         log("---- %.2f%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
     else:    
