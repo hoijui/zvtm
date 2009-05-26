@@ -25,6 +25,7 @@ import com.xerox.VTM.glyphs.Glyph;
 
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 /**A portal showing what is seen through a camera. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
@@ -160,24 +161,21 @@ public class CameraPortal extends Portal {
      *@param d duration of the animation in ms
      *@return the final camera location
      */
-    public Location getGlobalView(int d, VirtualSpaceManager vsm){
-	Location l = getGlobalView();
-
-	Animation trans = 
-	    vsm.getAnimationManager().getAnimationFactory()
-	    .createCameraTranslation(d, camera, new LongPoint(l.vx, l.vy), false,
-				     IdentityInterpolator.getInstance(),
-				     null);
-	Animation altAnim = 
-	    vsm.getAnimationManager().getAnimationFactory()
-	    .createCameraAltAnim(d, camera, l.alt, false,
-				 IdentityInterpolator.getInstance(),
-				 null);
-
-	vsm.getAnimationManager().startAnimation(trans, false);
-	vsm.getAnimationManager().startAnimation(altAnim, false);
-
-	return l;
+    public Location getGlobalView(int d){
+        Location l = getGlobalView();
+        Animation trans = 
+            VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
+            .createCameraTranslation(d, camera, new LongPoint(l.vx, l.vy), false,
+            IdentityInterpolator.getInstance(),
+            null);
+        Animation altAnim = 
+            VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
+            .createCameraAltAnim(d, camera, l.alt, false,
+            IdentityInterpolator.getInstance(),
+            null);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(altAnim, false);
+        return l;
     }
 
     /** Position this portal's camera so that it seamlessly integrates with the surrounding context
@@ -196,6 +194,48 @@ public class CameraPortal extends Portal {
 		       (long) (c.getOwningView().mouse.vy - h/2*uncoef)};
 	// compute the portal camera's new (x,y) coordinates and altitude
 	return new Location((wnes[2]+wnes[0]) / 2, (wnes[1]+wnes[3]) / 2, camera.focal * ((wnes[2]-wnes[0])/((float)w)));
+    }
+
+    public Location centerOnRegion(long x1, long y1, long x2, long y2){
+        long minX = Math.min(x1,x2);
+		long minY = Math.min(y1,y2);
+		long maxX = Math.max(x1,x2);
+		long maxY = Math.max(y1,y2);
+		long[] wnes = {minX,maxY,maxX,minY};  //wnes = west north east south
+		long dx = (wnes[2]+wnes[0])/2;  //new coords where camera should go
+		long dy = (wnes[1]+wnes[3])/2;
+		long[] regBounds = getVisibleRegion();
+		// region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
+		// we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
+		long[] trRegBounds = {regBounds[0]+dx-camera.posx, regBounds[3]+dy-camera.posy};
+		float currentAlt = camera.getAltitude() + camera.getFocal();
+		float ratio = 0;
+		//compute the mult factor for altitude to see all stuff on X
+		if (trRegBounds[0] != 0){ratio = (dx-wnes[0]) / ((float)(dx-trRegBounds[0]));}
+		//same for Y ; take the max of both
+		if (trRegBounds[1] != 0){
+			float tmpRatio = (dy-wnes[3]) / ((float)(dy-trRegBounds[1]));
+			if (tmpRatio > ratio){ratio = tmpRatio;}
+		}
+		float newAlt = currentAlt * Math.abs(ratio);
+		return new Location(dx, dy, newAlt);
+    }
+        
+    public Location centerOnRegion(int d, long x1, long y1, long x2, long y2){
+        Location l = centerOnRegion(x1, y1, x2, y2);
+		Animation trans = 
+		    VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+		    createCameraTranslation(d, camera, l.getPosition(), false,
+					    SlowInSlowOutInterpolator.getInstance(),
+					    null);
+		Animation altAnim = 
+		    VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+		    createCameraAltAnim(d, camera, l.getAltitude(), false,
+					SlowInSlowOutInterpolator.getInstance(),
+					null);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(altAnim, false);
+		return l;
     }
 
     /**Detects whether the given point is inside this portal or not.
