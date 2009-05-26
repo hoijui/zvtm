@@ -63,6 +63,10 @@ public abstract class Portal {
 	this.h = h;
 	updateDimensions();
     }
+    
+    public Dimension getDimensions(){
+        return new Dimension(w, h);
+    }
 
     public void updateDimensions(){
 	size.setSize(w, h);
