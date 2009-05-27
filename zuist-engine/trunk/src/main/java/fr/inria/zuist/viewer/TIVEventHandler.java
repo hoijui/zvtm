@@ -114,21 +114,13 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
             v.setDrawRect(true);
         }
         else {
-            if (nm.lensType != TIVNavigationManager.NO_LENS){
-                nm.zoomInPhase2(lastVX, lastVY);
-            }
-            else {
-                if (cursorNearBorder){
-                    // do not activate the lens when cursor is near the border
-                    return;
-                }
-                nm.zoomInPhase1(jpx, jpy);
-            }
+            panning = true;
         }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		regionStickedToMouse = false;
+		panning = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
 			x2 = v.getVCursor().vx;
@@ -145,7 +137,17 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastVX = v.getVCursor().vx;
-    	lastVY = v.getVCursor().vy;
+        lastVY = v.getVCursor().vy;
+        if (nm.lensType != TIVNavigationManager.NO_LENS){
+            nm.zoomInPhase2(lastVX, lastVY);
+        }
+        else {
+            if (cursorNearBorder){
+                // do not activate the lens when cursor is near the border
+                return;
+            }
+            nm.zoomInPhase1(jpx, jpy);
+        }
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -157,18 +159,11 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        if (!inPortal){
-            panning = true;
-        }
     }
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        panning = false;
-    }
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastJPX = jpx;
-        lastJPY = jpy;
         lastVX = v.getVCursor().vx;
         lastVY = v.getVCursor().vy;
         if (nm.lensType != TIVNavigationManager.NO_LENS){
