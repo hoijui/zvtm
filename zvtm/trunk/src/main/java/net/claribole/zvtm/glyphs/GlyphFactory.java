@@ -59,7 +59,6 @@ import com.xerox.VTM.glyphs.VDiamondOr;
 import com.xerox.VTM.glyphs.VDiamondOrST;
 import com.xerox.VTM.glyphs.VDiamondST;
 import com.xerox.VTM.glyphs.VEllipse;
-import com.xerox.VTM.glyphs.VEllipseST;
 import com.xerox.VTM.glyphs.VOctagon;
 import com.xerox.VTM.glyphs.VOctagonOr;
 import com.xerox.VTM.glyphs.VOctagonOrST;
@@ -620,7 +619,7 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 		w=Math.round(size*aspectRatio);
 	    }
 	    if (transpChk.isSelected()){
-		g = new VEllipseST(0, 0, 0, w, h, fillColor, borderColor, (float)alpha);
+		g = new VEllipse(0, 0, 0, w, h, fillColor, borderColor, (float)alpha);
 	    }
 	    else {g = new VEllipse(0, 0, 0, w, h, fillColor, borderColor);}
 	}

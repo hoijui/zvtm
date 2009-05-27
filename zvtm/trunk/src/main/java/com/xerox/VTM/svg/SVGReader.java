@@ -55,8 +55,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCircle;
-//import com.xerox.VTM.glyphs.VEllipse;
-import com.xerox.VTM.glyphs.VEllipseST;
+import com.xerox.VTM.glyphs.VEllipse;
 import net.claribole.zvtm.glyphs.DPath;
 //import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
@@ -725,7 +724,7 @@ public class SVGReader {
     /** Create a VEllipse from an SVG ellipse element.
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      */
-    public static VEllipseST createEllipse(Element e){
+    public static VEllipse createEllipse(Element e){
         return createEllipse(e,null,false);
     }
 
@@ -733,7 +732,7 @@ public class SVGReader {
      *@param e an SVG ellipse as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VEllipseST createEllipse(Element e,Context ctx){
+    public static VEllipse createEllipse(Element e,Context ctx){
         return createEllipse(e,ctx,false);
     }
 
@@ -742,7 +741,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VEllipseST createEllipse(Element e,Context ctx,boolean meta){
+    public static VEllipse createEllipse(Element e,Context ctx,boolean meta){
         long x = getLong(e.getAttribute(_cx));
         long y = getLong(e.getAttribute(_cy));
         long w = getLong(e.getAttribute(_rx));
@@ -755,17 +754,16 @@ public class SVGReader {
         }
         x += xoffset;
         y += yoffset;
-        VEllipseST res;
+        VEllipse res;
         SVGStyle ss=getStyle(e.getAttribute(_style), e);
         if (ss != null){
             if (ss.hasTransparencyInformation()){
-                if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f);}
-                ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
+                if (ss.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VEllipse(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue());}
             }
             else {
-                if (ss.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VEllipseST(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f);}
+                if (ss.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VEllipse(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f);}
             }
             Color border=ss.getStrokeColor();
             if (border != null){
@@ -781,13 +779,12 @@ public class SVGReader {
         }
         else if (ctx!=null){
             if (ctx.hasTransparencyInformation()){
-                if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f);}
-                ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
+                if (ctx.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VEllipse(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue());}
             }
             else {
-                if (ctx.getFillColor()==null){res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VEllipseST(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f);}
+                if (ctx.getFillColor()==null){res=new VEllipse(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VEllipse(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f);}
             }
             Color border=ctx.getStrokeColor();
             if (border!=null){
@@ -795,7 +792,7 @@ public class SVGReader {
                 res.setHSVbColor(hsv[0],hsv[1],hsv[2]);
             }
         }
-        else {res=new VEllipseST(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);}
+        else {res=new VEllipse(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);}
         if (meta){setMetadata(res,ctx);}
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));

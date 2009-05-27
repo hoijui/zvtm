@@ -54,14 +54,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *creates a new default white ellipse
      */
     public VEllipse(){
-	vx=0;
-	vy=0;
-	vz=0;
-	vw=10;
-	vh=10;
-	setColor(Color.white);
-	setBorderColor(Color.black);
-	computeSize();
+        this(0, 0, 0, 20, 10, Color.WHITE, Color.BLACK, 1.0f);
     }
 
     /**
@@ -73,15 +66,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *@param c fill color
      */
     public VEllipse(long x,long y, int z,long sx,long sy,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=sx;
-	vh=sy;
-	orient=0;
-	setColor(c);
-	setBorderColor(Color.black);
-	computeSize();
+        this(x, y, z, sx, sy, c, Color.BLACK, 1.0f);
     }
 
     /**
@@ -94,15 +79,30 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *@param bc border color
      */
     public VEllipse(long x, long y, int z, long sx, long sy, Color c, Color bc){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=sx;
-	vh=sy;
-	orient=0;
-	setColor(c);
-	setBorderColor(bc);
-	computeSize();
+        this(x, y, z, sx, sy, c, bc, 1.0f);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
+     *@param sx horizontal axis radius in virtual space
+     *@param sy vertical axis radius in virtual space
+     *@param c fill color
+     *@param bc border color
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VEllipse(long x, long y, int z, long sx, long sy, Color c, Color bc, float alpha){
+        vx=x;
+        vy=y;
+        vz=z;
+        vw=sx;
+        vh=sy;
+        orient=0;
+        setColor(c);
+        setBorderColor(bc);
+        computeSize();
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -259,71 +259,140 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].ellipse.getBounds().width>2) && (pc[i].ellipse.getBounds().height>2)){
-	    if (filled){
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fill(pc[i].ellipse);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null){
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.draw(pc[i].ellipse);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.draw(pc[i].ellipse);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].ellipse.getBounds().width>2) && (pc[i].ellipse.getBounds().height>2)){
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fill(pc[i].ellipse);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.draw(pc[i].ellipse);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.draw(pc[i].ellipse);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fill(pc[i].ellipse);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.draw(pc[i].ellipse);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.draw(pc[i].ellipse);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lellipse.getBounds().width>2) && (pc[i].lellipse.getBounds().height>2)){
-	    if (filled){
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fill(pc[i].lellipse);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null){
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.draw(pc[i].lellipse);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.draw(pc[i].lellipse);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].lellipse.getBounds().width>2) && (pc[i].lellipse.getBounds().height>2)){
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fill(pc[i].lellipse);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.draw(pc[i].lellipse);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.draw(pc[i].lellipse);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fill(pc[i].lellipse);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.draw(pc[i].lellipse);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.draw(pc[i].lellipse);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     public Object clone(){
-	VEllipse res=new VEllipse(vx,vy,0,vw,vh,color);
-	res.borderColor=this.borderColor;
-	res.mouseInsideColor=this.mouseInsideColor;
-	res.bColor=this.bColor;
-	return res;
+        VEllipse res=new VEllipse(vx,vy,0,vw,vh,color, this.borderColor, alphaC.getAlpha());
+        res.mouseInsideColor=this.mouseInsideColor;
+        res.bColor=this.bColor;
+        return res;
     }
 
 }
