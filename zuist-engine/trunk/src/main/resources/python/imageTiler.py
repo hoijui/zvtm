@@ -140,7 +140,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             os.system(ccl)
             log("Cropping: %s" % ccl, 3)
             if scale > 1.0:
-                ccl = "convert %s -resize %dx%d -quality 95 %s" % (tilePath, TILE_SIZE, TILE_SIZE, tilePath)
+                ccl = "convert %s -resize %dx%d -quality 95 %s" % (tilePath, aw/scale, ah/scale, tilePath)
                 os.system(ccl)
                 log("Rescaling %s" % ccl, 3)
     # generate ZUIST region and image object
