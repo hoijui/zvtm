@@ -727,8 +727,9 @@ public class SceneManager {
     /** Get a global view of the scene.
      *@param c camera that should show a global view
      *@param d duration of animation from current location to global view
+     @return bounds in virtual space, null if none
      */
-    public void getGlobalView(Camera c, int d){
+    public long[] getGlobalView(Camera c, int d){
 		int l = 0;
 		while (getRegionsAtLevel(l) == null){
 			l++;
@@ -739,7 +740,11 @@ public class SceneManager {
 		}
 		if (l > -1){
 			long[] wnes = getLevel(l).getBounds();
-	        VirtualSpaceManager.INSTANCE.centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3]);		
+	        VirtualSpaceManager.INSTANCE.centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3]);
+	        return wnes;
+		}
+		else {
+		    return null;
 		}
     }
 

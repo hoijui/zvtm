@@ -138,6 +138,8 @@ class TIVNavigationManager {
 	
 	OverviewPortal ovPortal;
 	
+	long[] scene_bounds = {0, 0, 0, 0};
+	
 	void createOverview(Region rootRegion){
 	    int ow, oh;
 	    float ar = rootRegion.getWidth()/(float)rootRegion.getHeight();
@@ -163,7 +165,6 @@ class TIVNavigationManager {
 	
 	void updateOverview(){
 		if (ovPortal != null){
-		    //application.ovCamera.setLocation(ovPortal.getGlobalView());
 		    int l = 0;
     		while (application.sm.getRegionsAtLevel(l) == null){
     			l++;
@@ -173,8 +174,8 @@ class TIVNavigationManager {
     			}
     		}
     		if (l > -1){
-    			long[] wnes = application.sm.getLevel(l).getBounds();
-    	        ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, wnes[0], wnes[1], wnes[2], wnes[3]);		
+    			scene_bounds = application.sm.getLevel(l).getBounds();
+    	        ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);		
     		}
 		}
 	}

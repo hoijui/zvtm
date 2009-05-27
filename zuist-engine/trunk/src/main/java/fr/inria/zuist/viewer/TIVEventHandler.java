@@ -92,15 +92,14 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
         lastVX = v.getVCursor().vx;
     	lastVY = v.getVCursor().vy;
 		if (inPortal){
-		    
-		    
 		    if (application.nm.ovPortal.coordInsideObservedRegion(jpx, jpy)){
 				regionStickedToMouse = true;
 		    }
 			else {
-				double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
-				application.mCamera.moveTo(Math.round(a*(jpx-application.nm.ovPortal.x-application.nm.ovPortal.w/2)),
-				                           Math.round(-a*(jpy-application.nm.ovPortal.y-application.nm.ovPortal.h/2)));
+				double rw = (jpx-application.nm.ovPortal.x) / (double)application.nm.ovPortal.w;
+				double rh = (jpy-application.nm.ovPortal.y) / (double)application.nm.ovPortal.h;
+                application.mCamera.moveTo(Math.round(rw*(application.nm.scene_bounds[2]-application.nm.scene_bounds[0]) + application.nm.scene_bounds[0]),
+                                           Math.round(rh*(application.nm.scene_bounds[3]-application.nm.scene_bounds[1]) + application.nm.scene_bounds[1]));
 				cameraMoved(null, null, 0);
 				// position camera where user has pressed, and then allow seamless dragging
 				regionStickedToMouse = true;
@@ -302,10 +301,12 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     }
     public void componentShown(ComponentEvent e){}
 
+    /** Camera listener interface (delayed call to cameraMoved()) */
     public void cameraMoved(Camera cam, LongPoint coord, float a){
         dut.requestUpdate();
     }
     
+    /** Actual actions to take when camera is moved */
     void cameraMoved(){
         // region seen through camera
         application.mView.getVisibleRegion(application.mCamera, wnes);
