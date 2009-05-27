@@ -111,6 +111,9 @@ public class SceneManager {
     LevelListener levelListener;
     RegionListener regionListener;
 
+    /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
+    LongPoint origin = new LongPoint(0, 0);
+
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vss virtual spaces in which the scene will be loaded
      *@param cs cameras associated to those virtual spaces, through which the scene will be observed
@@ -122,6 +125,16 @@ public class SceneManager {
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
         id2object = new Hashtable();
+    }
+    
+    /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
+    public void setOrigin(LongPoint p){
+        origin = p;
+    }
+    
+    /** Is set to something else than 0,0 when translating a scene to another location than that defined originally. */
+    public LongPoint getOrigin(){
+        return origin;
     }
 
     /** Set the array containing information about the bounds of the region of virtual space seen through the camera observing the scene.
@@ -342,7 +355,7 @@ public class SceneManager {
     public Region createRegion(long x, long y, long w, long h, int highestLevel, int lowestLevel,
                                String id, String title, int li, String[] transitions, String requestOrdering,
                                boolean sensitivity, Color fill, Color stroke){
-        Region region = new Region(x, y, w, h, highestLevel, lowestLevel, id, li, transitions, requestOrdering, this);
+        Region region = new Region(x+origin.x, y+origin.y, w, h, highestLevel, lowestLevel, id, li, transitions, requestOrdering, this);
         if (!id2region.containsKey(id)){
             id2region.put(id, region);
         }
@@ -357,7 +370,7 @@ public class SceneManager {
         if (title != null && title.length() > 0){
             region.setTitle(title);
         }
-        VRectangle r = new VRectangle(x, y, 0, w/2, h/2, Color.WHITE, Color.BLACK);
+        VRectangle r = new VRectangle(x+origin.x, y+origin.y, 0, w/2, h/2, Color.WHITE, Color.BLACK);
         if (fill != null){
             r.setColor(fill);
         }
@@ -479,7 +492,7 @@ public class SceneManager {
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
 		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
 		Object interpolation = (objectEL.hasAttribute(_interpolation)) ? parseInterpolation(objectEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-		ImageDescription od = createImageDescription(x, y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
+		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
         return od;
     }    
 
@@ -533,7 +546,7 @@ public class SceneManager {
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        ClosedShape g = new VRectangleST(x, y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
+        ClosedShape g = new VRectangleST(x+origin.x, y+origin.y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
         return createClosedShapeDescription(g, id, region, sensitivity);
@@ -541,7 +554,7 @@ public class SceneManager {
 
     /** Process XML description of a polygon object. */
     ClosedShapeDescription processPolygon(Element objectEL, String id, int zindex, Region region){
-        LongPoint[] vertices = parseVertexCoordinates(objectEL.getAttribute(_points));
+        LongPoint[] vertices = parseVertexCoordinates(objectEL.getAttribute(_points), origin);
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
@@ -551,13 +564,13 @@ public class SceneManager {
         return createClosedShapeDescription(g, id, region, sensitivity);
     }
     
-    public static LongPoint[] parseVertexCoordinates(String s){
+    public static LongPoint[] parseVertexCoordinates(String s, LongPoint orig){
         String[] points = s.split(";");
         LongPoint[] res = new LongPoint[points.length];
         String[] xy;
         for (int i=0;i<points.length;i++){
             xy = points[i].split(",");
-            res[i] = new LongPoint(SVGReader.getLong(xy[0]), SVGReader.getLong(xy[1]));
+            res[i] = new LongPoint(SVGReader.getLong(xy[0])+orig.x, SVGReader.getLong(xy[1])+orig.y);
         }
         return res;
     }
@@ -571,7 +584,7 @@ public class SceneManager {
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
         short anchor = (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
-        TextDescription od = createTextDescription(x, y, id, zindex, region, scale, text, anchor, fill, sensitivity);
+        TextDescription od = createTextDescription(x+origin.x, y+origin.y, id, zindex, region, scale, text, anchor, fill, sensitivity);
         return od;
     }
     
