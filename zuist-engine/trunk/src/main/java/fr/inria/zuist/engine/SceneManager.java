@@ -247,75 +247,82 @@ public class SceneManager {
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
+     *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
-    public void loadScene(Document scene, File sceneFileDirectory){
-	loadScene(scene, sceneFileDirectory, null);
+    public void loadScene(Document scene, File sceneFileDirectory, boolean reset){
+        loadScene(scene, sceneFileDirectory, reset, null);
     }
 
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
+     *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
-    public void loadScene(Document scene, File sceneFileDirectory, ProgressListener pl){
-		reset();
-	Element root = scene.getDocumentElement();
-	NodeList nl = root.getChildNodes();
-	Node n;
-	Element e;
-	if (pl != null){
-	    pl.setLabel("Creating levels...");
-	    pl.setValue(10);
-	}
-	for (int i=0;i<nl.getLength();i++){
-	    n = nl.item(i);
-	    if (n.getNodeType() == Node.ELEMENT_NODE){
-		e = (Element)n;
-		if (e.getTagName().equals(_level)){
-		    processLevel(e);
-		}
+    public void loadScene(Document scene, File sceneFileDirectory, boolean reset, ProgressListener pl){
+		if (reset){
+		    reset();
 	    }
-	}
-	// temporary hashtable used to build structure
-	if (pl != null){
-	    pl.setLabel("Creating regions, loading object descriptions...");
-	}
-	Hashtable regionName2containerRegionName = new Hashtable();
-	for (int i=0;i<nl.getLength();i++){
-	    n = nl.item(i);
-	    if (n.getNodeType() == Node.ELEMENT_NODE){
-		e = (Element)n;
-		if (e.getTagName().equals(_region)){
-		    if (pl != null){
-			pl.setValue(Math.round(10+i/((float)nl.getLength())*90.0f));
-		    }
-		    processRegion(e, regionName2containerRegionName, sceneFileDirectory);
-		}
-	    }
-	}
-	for (Enumeration en=regionName2containerRegionName.keys();en.hasMoreElements();){
-	    String rn = (String)en.nextElement();
-	    if (rn != null){
-		// region is contained in another region
-		Region r = (Region)id2region.get(rn);
-		Region cr = (Region)id2region.get(regionName2containerRegionName.get(rn));
-		cr.addContainedRegion(r);
-		r.setContainingRegion(cr);
-	    }
-	}
-	if (pl != null){
-	    pl.setLabel("Cleaning up temporary resources...");
-	    pl.setValue(95);
-	}
-	regionName2containerRegionName.clear();
-//    	printLevelInfo();
-//   	printRegionInfo();
-	updateLevel = true;
-	System.gc();
-	glyphLoader.setEnabled(true);
-	if (pl != null){
-	    pl.setLabel("Scene file loaded successfully");
-	    pl.setValue(100);
-	}
+        Element root = scene.getDocumentElement();
+        NodeList nl = root.getChildNodes();
+        Node n;
+        Element e;
+        if (reset || levels.length == 0){
+            // process new levels only if resetting and loading a new scene, or if appending but no level was ever created
+            if (pl != null){
+                pl.setLabel("Creating levels...");
+                pl.setValue(10);
+            }
+            for (int i=0;i<nl.getLength();i++){
+                n = nl.item(i);
+                if (n.getNodeType() == Node.ELEMENT_NODE){
+                    e = (Element)n;
+                    if (e.getTagName().equals(_level)){
+                        processLevel(e);
+                    }
+                }
+            }            
+        }
+        // temporary hashtable used to build structure
+        if (pl != null){
+            pl.setLabel("Creating regions, loading object descriptions...");
+        }
+        Hashtable regionName2containerRegionName = new Hashtable();
+        for (int i=0;i<nl.getLength();i++){
+            n = nl.item(i);
+            if (n.getNodeType() == Node.ELEMENT_NODE){
+                e = (Element)n;
+                if (e.getTagName().equals(_region)){
+                    if (pl != null){
+                        pl.setValue(Math.round(10+i/((float)nl.getLength())*90.0f));
+                    }
+                    processRegion(e, regionName2containerRegionName, sceneFileDirectory);
+                }
+            }
+        }
+        for (Enumeration en=regionName2containerRegionName.keys();en.hasMoreElements();){
+            String rn = (String)en.nextElement();
+            if (rn != null){
+                // region is contained in another region
+                Region r = (Region)id2region.get(rn);
+                Region cr = (Region)id2region.get(regionName2containerRegionName.get(rn));
+                cr.addContainedRegion(r);
+                r.setContainingRegion(cr);
+            }
+        }
+        if (pl != null){
+            pl.setLabel("Cleaning up temporary resources...");
+            pl.setValue(95);
+        }
+        regionName2containerRegionName.clear();
+        //    	printLevelInfo();
+        //   	printRegionInfo();
+        updateLevel = true;
+        System.gc();
+        glyphLoader.setEnabled(true);
+        if (pl != null){
+            pl.setLabel("Scene file loaded successfully");
+            pl.setValue(100);
+        }
     }
     
     public Level createLevel(int depth, float calt, float falt){
