@@ -124,17 +124,15 @@ public class TiledImageViewer {
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
-        eh.cameraMoved(null, null, 0);
+        mCamera.addListener(eh);
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			nm.getGlobalView();
 		}
-        eh.dut.setEnabled(true);
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
-        eh.cameraMoved(null, null, 0);
-        mCamera.addListener(eh);
 		nm.updateOverview();
-		eh.cameraMoved(null, null, 0);
+		eh.cameraMoved();
+        eh.dut.setEnabled(true);
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
