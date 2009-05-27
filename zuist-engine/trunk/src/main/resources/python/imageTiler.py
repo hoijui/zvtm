@@ -4,8 +4,24 @@
 
 import os, sys, math
 from copy import copy
+
 # http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
+
+SUCCEEDED_IMPORTING_PIL = True
+SUCCEEDED_IMPORTING_CG = True
+
+# http://developer.apple.com/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_python/dq_python.html
+try:
+    from CoreGraphics import *
+except ImportError:
+    SUCCEEDED_IMPORTING_CG = False
+
+# http://www.pythonware.com/products/pil/
+try:
+    from PIL import Image
+except ImportError:
+    SUCCEEDED_IMPORTING_PIL = True
 
 # Tile IDs are generated following this pattern:
 # ---------
@@ -23,7 +39,9 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "Options:\n\n"+\
     "\t-tsN\ttile size (N in pixels)\n"+\
     "\t-f\tforce tile generation\n"+\
-    "\t-tlN\ttrace level (N in [0:3])\n"
+    "\t-tlN\ttrace level (N in [0:3])\n"+\
+    "\t-cg\t processing pipeline: CoreGraphics (Mac only)\n"+\
+    "\t-im\t processing pipeline: PIL and ImageMagick (default)\n"
 
 TRACE_LEVEL = 1
 
@@ -43,6 +61,9 @@ MAX_ALT = "100000"
 TILE_FILE_PREFIX = "tile-"
 
 PROGRESS = 0
+
+DX = 0
+DY = 0
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -125,7 +146,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     else:    
         log("---- %.2f%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
         if USE_CG:
-            from CoreGraphics import *
+            # this will work only with a Mac
             w = h = int(TILE_SIZE)
             log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah), 3)
             cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(aw), int(ah)))
@@ -151,15 +172,15 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     else:
         regionEL.set("containedIn", parentRegionID)
         regionEL.set("levels", str(level))
-    regionEL.set("x", str(int(x+aw/2)))
-    regionEL.set("y", str(int(-y-ah/2)))
+    regionEL.set("x", str(int(DX+x+aw/2)))
+    regionEL.set("y", str(int(DY-y-ah/2)))
     regionEL.set("w", str(int(aw)))
     regionEL.set("h", str(int(ah)))
     objectEL = ET.SubElement(regionEL, "object")
     objectEL.set("id", "I%s" % tileIDstr)
     objectEL.set("type", "image")
-    objectEL.set("x", str(int(x+aw/2)))
-    objectEL.set("y", str(int(-y-ah/2)))
+    objectEL.set("x", str(int(DX+x+aw/2)))
+    objectEL.set("y", str(int(DY-y-ah/2)))
     objectEL.set("w", str(int(aw)))
     objectEL.set("h", str(int(ah)))
     objectEL.set("src", tileFileName)
@@ -185,13 +206,9 @@ def processSrcImg():
     # source image
     log("Loading source image from %s" % SRC_PATH, 2)
     if USE_CG:
-        # http://developer.apple.com/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_python/dq_python.html
-        from CoreGraphics import CGImageImport, CGDataProviderCreateWithFilename
         im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
         src_sz = (im.getWidth(), im.getHeight())
     else:
-        # http://www.pythonware.com/products/pil/
-        from PIL import Image
         im = Image.open(SRC_PATH)
         src_sz = im.size
     levelCount = generateLevels(src_sz, outputroot)
@@ -227,6 +244,14 @@ if len(sys.argv) > 2:
                 TRACE_LEVEL = int(arg[3:])
             elif arg == "-cg":
                 USE_CG = True
+                if not SUCCEEDED_IMPORTING_CG:
+                    log("CoreGraphics not available")
+                    sys.exit(0)
+            elif arg == "-im":
+                USE_CG = False
+                if not SUCCEEDED_IMPORTING_PIL:
+                    log("PIL not available")
+                    sys.exit(0)
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
