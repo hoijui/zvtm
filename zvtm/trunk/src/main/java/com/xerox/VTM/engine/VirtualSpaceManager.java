@@ -1017,7 +1017,7 @@ public class VirtualSpaceManager implements AWTEventListener {
         }
     }
 
-	/**translates and (un)zooms a camera in order to focus on a specific rectangular region
+    /**translates and (un)zooms a camera in order to focus on a specific rectangular region
 		*@param c Camera to be moved
 		*@param d duration of the animation in ms
 		*@param x1 x coord of first point
@@ -1027,6 +1027,20 @@ public class VirtualSpaceManager implements AWTEventListener {
 		*@return the final camera location
 		*/
 	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2){
+	    return centerOnRegion(c, d, x1, y1, x2, y2, null);
+    }
+    
+	/**translates and (un)zooms a camera in order to focus on a specific rectangular region
+		*@param c Camera to be moved
+		*@param d duration of the animation in ms
+		*@param x1 x coord of first point
+		*@param y1 y coord of first point
+		*@param x2 x coord of opposite point
+		*@param y2 y coord of opposite point
+		*@param action to be performed at end of animation
+		*@return the final camera location
+		*/
+	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2, EndAction ea){
 		View v=null;
 		try {
 			v=c.getOwningView();
