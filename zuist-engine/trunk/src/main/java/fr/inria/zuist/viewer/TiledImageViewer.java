@@ -134,6 +134,7 @@ public class TiledImageViewer {
         eh.cameraMoved(null, null, 0);
         mCamera.addListener(eh);
 		nm.updateOverview();
+		eh.cameraMoved(null, null, 0);
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){

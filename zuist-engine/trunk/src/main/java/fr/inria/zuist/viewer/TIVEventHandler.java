@@ -92,6 +92,8 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
         lastVX = v.getVCursor().vx;
     	lastVY = v.getVCursor().vy;
 		if (inPortal){
+		    
+		    
 		    if (application.nm.ovPortal.coordInsideObservedRegion(jpx, jpy)){
 				regionStickedToMouse = true;
 		    }
