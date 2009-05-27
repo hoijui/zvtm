@@ -1071,7 +1071,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 				    animationManager.getAnimationFactory().
 				    createCameraTranslation(d, c, new LongPoint(dx, dy), false,
 							    SlowInSlowOutInterpolator.getInstance(),
-							    null);
+							    ea);
 				
 				Animation altAnim = 
 				    animationManager.getAnimationFactory().
