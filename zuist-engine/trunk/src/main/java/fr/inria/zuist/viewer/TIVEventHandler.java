@@ -31,6 +31,8 @@ import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.OverviewPortal;
 import net.claribole.zvtm.engine.PortalEventHandler;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
@@ -132,7 +134,10 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 			x2 = v.getVCursor().vx;
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-				VirtualSpaceManager.INSTANCE.centerOnRegion(application.mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, x1, y1, x2, y2);
+			    application.sm.setUpdateLevel(false);
+				VirtualSpaceManager.INSTANCE.centerOnRegion(application.mCamera, TIVNavigationManager.ANIM_MOVE_DURATION,
+				    x1, y1, x2, y2,
+				    new EndAction(){public void execute(Object subject, Animation.Dimension dimension){application.sm.setUpdateLevel(true);}});
 			}
 			selectingRegion = false;
 		}
