@@ -262,7 +262,7 @@ public class TiledImageViewer {
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, gp);
+	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
 	    gp.setVisible(false);
 	    gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
