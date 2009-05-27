@@ -23,23 +23,23 @@ import net.claribole.zvtm.engine.LowPassFilter;
 
 public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 
-    double frequency = -1;
-    long mLastSampleTime = -1;
-    int xOffset = -10;
-    int yOffset = 10;
-    double maxDist = 2 * Math.abs(xOffset);
-    LowPassFilter filter = new LowPassFilter();
-    Point2D currentPos = new Point2D.Double(0, 0);
-    Point2D parentPos = new Point2D.Double(0, 0);
-    Point2D targetPos = new Point2D.Double(0, 0);
-    Timer timer;
-    DGTrailingTimer mouseStillUpdater;
+    protected double frequency = -1;
+    protected long mLastSampleTime = -1;
+    protected int xOffset = -10;
+    protected int yOffset = 10;
+    protected double maxDist = 2 * Math.abs(xOffset);
+    protected LowPassFilter filter = new LowPassFilter();
+    protected Point2D currentPos = new Point2D.Double(0, 0);
+    protected Point2D parentPos = new Point2D.Double(0, 0);
+    protected Point2D targetPos = new Point2D.Double(0, 0);
+    protected Timer timer;
+    protected DGTrailingTimer mouseStillUpdater;
 
-    double cutoffParamA = 0.1;   // decrease to increase time before starts to go back to rest position 
-    double cutoffParamB = 0.01;  // increase to lower time to go back to rest position
+    protected double cutoffParamA = 0.1;   // decrease to increase time before starts to go back to rest position 
+    protected double cutoffParamB = 0.01;  // increase to lower time to go back to rest position
 
     /** Dynamic magnification factor. */
-    float dMM = MM;
+    protected float dMM = MM;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -128,7 +128,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	updateTimeBasedParams();
     }
 
-    float mindMM = 1.0f;
+    protected float mindMM = 1.0f;
 
     public void updateTimeBasedParams(){
 	synchronized(this){

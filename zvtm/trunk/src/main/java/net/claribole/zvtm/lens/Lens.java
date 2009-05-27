@@ -26,7 +26,7 @@ public abstract class Lens {
 
     public static float MM_FLOOR = 0.001f;
 
-    ViewPanel owningView;
+    protected ViewPanel owningView;
 
     protected Integer ID;
 
