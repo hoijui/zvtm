@@ -52,42 +52,50 @@ public class FPolygon extends ClosedShape {
      *@param c fill color
      */
     public FPolygon(LongPoint[] v,Color c){
-	    this(v, c, Color.BLACK);
+	    this(v, Color.WHITE, Color.BLACK, 1.0f);
+    }
+
+    public FPolygon(LongPoint[] v, Color c, Color bc){
+	    this(v, c, Color.BLACK, 1.0f);
     }
 
     /**
      *@param v list of x,y vertices ABSOLUTE coordinates
      *@param c fill color
      *@param bc border color
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public FPolygon(LongPoint[] v, Color c, Color bc){
-	vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
-	vy=0;  //several lines below
-	vz=0;
-	xcoords=new long[v.length];
-	ycoords=new long[v.length];
-	for (int i=0;i<v.length;i++){
-	    xcoords[i]=v[i].x;
-	    ycoords[i]=v[i].y;
-	}
-	orient=0;
-	LongPoint ct=getCentroid();
-	vx=ct.x;
-	vy=ct.y;
-	for (int i=0;i<xcoords.length;i++){//translate to get relative coords w.r.t centroid
-	    xcoords[i]-=vx;
-	    ycoords[i]-=vy;
-	}
-	computeSize();
-	setColor(c);
-	setBorderColor(bc);
+    public FPolygon(LongPoint[] v, Color c, Color bc, float alpha){
+        //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
+        //several lines belowvx=0;
+        vy=0;
+        vz=0;
+        xcoords=new long[v.length];
+        ycoords=new long[v.length];
+        for (int i=0;i<v.length;i++){
+            xcoords[i]=v[i].x;
+            ycoords[i]=v[i].y;
+        }
+        orient=0;
+        LongPoint ct=getCentroid();
+        vx=ct.x;
+        vy=ct.y;
+        for (int i=0;i<xcoords.length;i++){
+            //translate to get relative coords w.r.t centroid
+            xcoords[i]-=vx;
+            ycoords[i]-=vy;
+        }
+        computeSize();
+        setColor(c);
+        setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
-	pc=new ProjPolygon[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new ProjPolygon(xcoords.length);
-	}
+        pc=new ProjPolygon[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i]=new ProjPolygon(xcoords.length);
+        }
     }
 
     public void addCamera(int verifIndex){
@@ -151,8 +159,9 @@ public class FPolygon extends ClosedShape {
     public synchronized void reSize(float factor){}
 
     public boolean fillsView(long w,long h,int camIndex){
-	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
-	else {return false;}
+        if ((alphaC == null) &&
+            (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
+        else {return false;}
     }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
@@ -274,69 +283,137 @@ public class FPolygon extends ClosedShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
- 	if (pc[i].cr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fillPolygon(pc[i].p);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.translate(dx, dy);
-	    g.fillRect(pc[i].cx,pc[i].cy,1,1);
-	    g.translate(-dx, -dy);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if (pc[i].cr>1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].p);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color); 
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].p);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
- 	if (pc[i].lcr >1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fillPolygon(pc[i].lp);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].lp);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].lp);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.translate(dx, dy);
-	    g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
-	    g.translate(-dx, -dy);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if (pc[i].lcr>1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].lp);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].lp);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
-
+    
     /** Get the polygon's area. */
     public double getArea(){
 	double[] xcoordsForArea=new double[xcoords.length];
