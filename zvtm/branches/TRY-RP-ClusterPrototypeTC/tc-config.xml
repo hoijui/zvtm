@@ -108,7 +108,7 @@
 			<class-expression>com.xerox.VTM.glyphs.VRectangle</class-expression>
 			<on-load>
 				<execute>
-					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.RProjectedCoordsP[10];for (int i=0;i<10;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.RProjectedCoordsP();}]]>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.RProjectedCoordsP[100];for (int i=0;i<100;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.RProjectedCoordsP();}]]>
 				</execute>
 			</on-load> 
 		</include>
