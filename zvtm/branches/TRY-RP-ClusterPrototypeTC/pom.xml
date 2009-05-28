@@ -208,7 +208,7 @@ $Id$
 		  </process>
 		  <process nodeName="slave10" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 1o">
+		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 10">
 		  </process>
 		  <process nodeName="slave11" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
