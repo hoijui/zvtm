@@ -57,11 +57,8 @@ public class ColorRectWild {
 		VirtualSpace vs = vsm.addVirtualSpace("protoSpace");
 		//create metacamera
 		//3 rows, 2 columns
-		MetaCamera metacam = new MetaCamera(3,2,400,240,vs);
+		MetaCamera metacam = new MetaCamera(4,4,2560,1600,vs);
 		vs.setMetaCamera(metacam);
-		//signal that the space and metacamera are ready
-		//to unfreeze the slaves
-		vsm.signalMasterReady();
 		long xOffset = -options.width/2;
 		long yOffset = -options.height/2;
 		long rectWidth = options.width/options.xNum;
@@ -77,6 +74,10 @@ public class ColorRectWild {
 				vsm.addGlyph(rect, vs, false);
 			}
 		}
+
+		//signal that the space and metacamera are ready
+		//to unfreeze the slaves
+		vsm.signalMasterReady();
 
 		Camera cam = vsm.addCamera(vs);
 		cam.setAltitude(0f);
