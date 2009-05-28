@@ -162,7 +162,7 @@ $Id$
 					  arguments=""> 
 				  </process> -->
 				  <process nodeName="master" count="1" 
-					  className="net.claribole.zvtm.cluster.MasterSkel"
+					  className="net.claribole.zvtm.cluster.ColorRectWild"
 					  arguments="">
 				  </process>
 
