@@ -85,7 +85,7 @@ public class VText extends Glyph {
 	protected float scaleFactor = 1.0f;
     
     public VText(String t){
-		this(0,0,0,Color.white,t);
+		this(0, 0, 0, Color.BLACK, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -96,7 +96,7 @@ public class VText extends Glyph {
      *@param t text string
      */
     public VText(long x,long y, int z,Color c,String t){
-		this(x,y,z,c,t,TEXT_ANCHOR_START);
+		this(x, y, z, c, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -108,7 +108,7 @@ public class VText extends Glyph {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
     public VText(long x,long y, int z,Color c,String t,short ta){
-		this(x,y,z,c,t,ta,1f);
+		this(x, y, z, c, t, ta, 1f, 1f);
     }
 
     /**
@@ -121,13 +121,28 @@ public class VText extends Glyph {
      *@param scale scaleFactor w.r.t original image size
      */
     public VText(long x, long y, int z, Color c, String t, short ta, float scale){
-	vx=x;
-	vy=y;
-	vz=z;
-	text=t;
-	setColor(c);
-	text_anchor=ta;
-	scaleFactor = scale;
+        this(x, y, z, c, t, ta, scale, 1.0f);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c fill color
+     *@param t text string
+     *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
+     *@param scale scaleFactor w.r.t original image size
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VText(long x, long y, int z, Color c, String t, short ta, float scale, float alpha){
+        vx = x;
+        vy = y;
+        vz = z;
+        text = t;
+        setColor(c);
+        text_anchor = ta;
+        scaleFactor = scale;
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -345,56 +360,88 @@ public class VText extends Glyph {
     }
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		g.setColor(this.color);
+		if (!pc[i].valid){
+			g.setFont((font!=null) ? font : getMainFont());
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
+			// cw and ch actually hold width and height of text *in virtual space*
+			pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
+			pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
+			pc[i].valid=true;
+		}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
 		float trueCoef = scaleFactor * coef;
+		g.setColor(this.color);
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : getMainFont());
-			if (!pc[i].valid){
-				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-				// cw and ch actually hold width and height of text *in virtual space*
-				pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
-				pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
-				pc[i].valid=true;
-			}
+			g.setFont((font!=null) ? font : getMainFont());			
 			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);}
 			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);}
 			else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
 			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 			g.setTransform(at);
-			g.drawString(text, 0.0f, 0.0f);
+			if (alphaC != null){
+				g.setComposite(alphaC);
+				g.drawString(text, 0.0f, 0.0f);
+				g.setComposite(acO);
+			}
+			else {
+				g.drawString(text, 0.0f, 0.0f);
+			}
 			g.setTransform(stdT);
 		}
 		else {
-			g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+			if (alphaC != null){
+				g.setComposite(alphaC);
+				g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+				g.setComposite(acO);
+			}
+			else {
+				g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+			}
 		}
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		g.setColor(this.color);
-		float trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
-			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+		if (!pc[i].lvalid){
 			g.setFont((font!=null) ? font : getMainFont());
-			if (!pc[i].lvalid){
-				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-				// lcw and lch actually hold width and height of text *in virtual space*
-				pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
-				pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
-				pc[i].lvalid=true;
-			}
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
+			// lcw and lch actually hold width and height of text *in virtual space*
+			pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
+			pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
+			pc[i].lvalid=true;
+		}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+		float trueCoef = scaleFactor * coef;
+		g.setColor(this.color);
+		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
+			g.setFont((font!=null) ? font : getMainFont());
+			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
 			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
 			else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
 			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 			g.setTransform(at);
-			g.drawString(text, 0.0f, 0.0f);
+			if (alphaC != null){
+				g.setComposite(alphaC);
+				g.drawString(text, 0.0f, 0.0f);
+				g.setComposite(acO);
+			}
+			else {
+				g.drawString(text, 0.0f, 0.0f);
+			}
 			g.setTransform(stdT);
 		}
 		else {
-			g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+			if (alphaC != null){
+				g.setComposite(alphaC);
+				g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+				g.setComposite(acO);
+			}
+			else {
+				g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+			}
 		}
 	}
 
@@ -491,7 +538,7 @@ public class VText extends Glyph {
     }
 
     public Object clone(){
-	VText res=new VText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor);
+	VText res=new VText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
 	res.mouseInsideColor=this.mouseInsideColor;
 	return res;
     }

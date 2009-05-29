@@ -63,7 +63,6 @@ import com.xerox.VTM.glyphs.VRoundRect;
 //import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VSegmentST;
 import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.glyphs.VTextST;
 import com.xerox.VTM.glyphs.VImage;
 
 /**
@@ -861,7 +860,7 @@ public class SVGReader {
      * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      */
-    public static VTextST createText(Element e){
+    public static VText createText(Element e){
         return createText(e,null,false);
     }
 
@@ -870,7 +869,7 @@ public class SVGReader {
      *@param e an SVG text as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VTextST createText(Element e,Context ctx){
+    public static VText createText(Element e,Context ctx){
         return createText(e,ctx,false);
     }
 
@@ -880,7 +879,7 @@ public class SVGReader {
 		*@param ctx used to propagate contextual style information (put null if none)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
-	public static VTextST createText(Element e,Context ctx,boolean meta){
+	public static VText createText(Element e,Context ctx,boolean meta){
         String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
         long x = getLong(e.getAttribute(_x));
         long y = getLong(e.getAttribute(_y));
@@ -892,12 +891,12 @@ public class SVGReader {
         x += xoffset;
         y += yoffset;
 
-        VTextST res;
-        short ta=VTextST.TEXT_ANCHOR_START;
+        VText res;
+        short ta = VText.TEXT_ANCHOR_START;
         if (e.hasAttribute(_textanchor)){
             String tas=e.getAttribute(_textanchor);
-            if (tas.equals(_middle)){ta=VTextST.TEXT_ANCHOR_MIDDLE;}
-            else if (tas.equals(_end)){ta=VTextST.TEXT_ANCHOR_END;}
+            if (tas.equals(_middle)){ta = VText.TEXT_ANCHOR_MIDDLE;}
+            else if (tas.equals(_end)){ta = VText.TEXT_ANCHOR_END;}
             else if (tas.equals(_inherit)){System.err.println("SVGReader::'inherit' value for text-anchor attribute not supported yet");}
         }
         Color tc = Color.BLACK;
@@ -912,10 +911,10 @@ public class SVGReader {
                 tc = ss.getStrokeColor();
             }
             if (ss.hasTransparencyInformation()){
-                res = new VTextST(x, -y, 0, tc, tx, ta, ss.getAlphaTransparencyValue());
+                res = new VText(x, -y, 0, tc, tx, ta, 1f, ss.getAlphaTransparencyValue());
             }
             else {
-                res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
+                res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);				
             }
             Font f;
             if (specialFont(f=ss.getDefinedFont(ctx), VText.getMainFont())){
@@ -924,10 +923,10 @@ public class SVGReader {
         }
         else if (ctx != null){
             if (ctx.hasTransparencyInformation()){
-                res = new VTextST(x, -y, 0, tc, tx, ta, ctx.getAlphaTransparencyValue());
+                res = new VText(x, -y, 0, tc, tx, ta, 1f, ctx.getAlphaTransparencyValue());
             }
             else {
-                res = new VTextST(x, -y, 0, tc, tx, ta, 1.0f);				
+                res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);				
             }
             Font f;
             if (specialFont(f=ctx.getDefinedFont(), VText.getMainFont())){
@@ -935,7 +934,7 @@ public class SVGReader {
             }
         }
         else {
-            res = new VTextST(x, -y, 0, tc, tx, ta,1.0f);
+            res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);
         }
 
         if (meta){
