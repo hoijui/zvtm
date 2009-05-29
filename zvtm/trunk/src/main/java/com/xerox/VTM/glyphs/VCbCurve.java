@@ -236,51 +236,106 @@ public class VCbCurve extends Glyph {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	if (pc[i].cr >1){//repaint only if object is visible
-	    if (stroke!=null) {
-		g.setStroke(stroke);
-		g.translate(dx,dy);
-		g.draw(pc[i].curve);
-		g.translate(-dx,-dy);
-		g.setStroke(stdS);
-	    }
-	    else {
-		g.translate(dx,dy);
-		g.draw(pc[i].curve);
-		g.translate(-dx,-dy);
-	    }
-	}
-	else {
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        g.setColor(this.color);
+        if (pc[i].cr >1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (stroke!=null) {
+                    g.setStroke(stroke);
+                    g.translate(dx,dy);
+                    g.draw(pc[i].curve);
+                    g.translate(-dx,-dy);
+                    g.setStroke(stdS);
+                }
+                else {
+                    g.translate(dx,dy);
+                    g.draw(pc[i].curve);
+                    g.translate(-dx,-dy);
+                }                
+                g.setComposite(acO);
+            }
+            else {
+                if (stroke!=null) {
+                    g.setStroke(stroke);
+                    g.translate(dx,dy);
+                    g.draw(pc[i].curve);
+                    g.translate(-dx,-dy);
+                    g.setStroke(stdS);
+                }
+                else {
+                    g.translate(dx,dy);
+                    g.draw(pc[i].curve);
+                    g.translate(-dx,-dy);
+                }
+            }
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	if (pc[i].lcr >1){//repaint only if object is visible
-	    if (stroke!=null) {
-		g.setStroke(stroke);
-		g.translate(dx,dy);
-		g.draw(pc[i].lcurve);
-		g.translate(-dx,-dy);
-		g.setStroke(stdS);
-	    }
-	    else {
-		g.translate(dx,dy);
-		g.draw(pc[i].lcurve);
-		g.translate(-dx,-dy);
-	    }
-	}
-	else {
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        g.setColor(this.color);
+        if (pc[i].lcr >1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (stroke!=null) {
+                    g.setStroke(stroke);
+                    g.translate(dx,dy);
+                    g.draw(pc[i].lcurve);
+                    g.translate(-dx,-dy);
+                    g.setStroke(stdS);
+                }
+                else {
+                    g.translate(dx,dy);
+                    g.draw(pc[i].lcurve);
+                    g.translate(-dx,-dy);
+                }                
+                g.setComposite(acO);
+            }
+            else {
+                if (stroke!=null) {
+                    g.setStroke(stroke);
+                    g.translate(dx,dy);
+                    g.draw(pc[i].lcurve);
+                    g.translate(-dx,-dy);
+                    g.setStroke(stdS);
+                }
+                else {
+                    g.translate(dx,dy);
+                    g.draw(pc[i].lcurve);
+                    g.translate(-dx,-dy);
+                }
+            }
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     public Object clone(){
-	VCbCurve res = new VCbCurve(vx,vy,0,vs,color,orient,vrad1,ang1,vrad2,ang2);
-	res.mouseInsideColor = this.mouseInsideColor;
-	return res;
+        VCbCurve res = new VCbCurve(vx,vy,0,vs,color,orient,vrad1,ang1,vrad2,ang2);
+        res.mouseInsideColor = this.mouseInsideColor;
+        res.setTranslucencyValue(getTranslucencyValue());
+        return res;
     }
 
     public void highlight(boolean b, Color selectedColor){}

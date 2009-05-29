@@ -441,7 +441,9 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-	return new VBoolShape(vx,vy,0,szx,szy,shapeType,booleanShapes,color);
+        VBoolShape res = new VBoolShape(vx,vy,0,szx,szy,shapeType,booleanShapes,color);
+        res.setTranslucencyValue(getTranslucencyValue());
+        return res;
     }
 
 }
