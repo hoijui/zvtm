@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
-import com.xerox.VTM.glyphs.VPolygonST;
+import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.RectangleNR;
 import com.xerox.VTM.engine.LongPoint;
 
@@ -62,7 +62,7 @@ class GeoToolsManager {
                                                     1, transitions, Region.ORDERING_DISTANCE_STR,
                                                     false, null, null);
 
-        //loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
+        loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
 //        loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
@@ -114,7 +114,7 @@ class GeoToolsManager {
                                 for (int j=0;j<zvtmCoords.length;j++){
                                     zvtmCoords[j] = (LongPoint)points.elementAt(j);
                                 }
-                                VPolygonST polygon = new VPolygonST(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
+                                VPolygon polygon = new VPolygon(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
                                 polygon.setFilled(false);
                                 application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
                                                                             region, false);
