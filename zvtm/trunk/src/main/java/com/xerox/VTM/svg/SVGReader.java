@@ -59,8 +59,7 @@ import com.xerox.VTM.glyphs.VEllipse;
 import net.claribole.zvtm.glyphs.DPath;
 //import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
-//import com.xerox.VTM.glyphs.VRectangleOr;
-import com.xerox.VTM.glyphs.VRectangleOrST;
+import com.xerox.VTM.glyphs.VRectangleOr;
 //import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.glyphs.VRoundRectST;
 //import com.xerox.VTM.glyphs.VSegment;
@@ -954,7 +953,7 @@ public class SVGReader {
      * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
-    public static VRectangleOrST createRectangleFromPolygon(Element e){
+    public static VRectangleOr createRectangleFromPolygon(Element e){
         return createRectangleFromPolygon(e,null,false);
     }
 
@@ -963,7 +962,7 @@ public class SVGReader {
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VRectangleOrST createRectangleFromPolygon(Element e,Context ctx){
+    public static VRectangleOr createRectangleFromPolygon(Element e,Context ctx){
         return createRectangleFromPolygon(e,ctx,false);
     }
 
@@ -973,7 +972,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VRectangleOrST createRectangleFromPolygon(Element e,Context ctx,boolean meta){
+    public static VRectangleOr createRectangleFromPolygon(Element e,Context ctx,boolean meta){
         Vector coords=new Vector();
         translateSVGPolygon(e.getAttribute(_points),coords);
         if (isRectangle(coords)){
@@ -995,17 +994,16 @@ public class SVGReader {
             long w=Math.abs(pNW.x-pNE.x);
             long x=pNE.x-w/2;
             long y=pNE.y-h/2;
-            VRectangleOrST res;
+            VRectangleOr res;
             SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
             if (ss != null){
                 if (ss.hasTransparencyInformation()){
-                    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, 0);}
-                    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
+                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
                 }
                 else {
-                    if (ss.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, 0);}
+                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
                 }
                 Color border=ss.getStrokeColor();
                 if (border != null){
@@ -1021,13 +1019,12 @@ public class SVGReader {
             }
             else if (ctx!=null){
                 if (ctx.hasTransparencyInformation()){
-                    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, 0);}
-                    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
+                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
                 }
                 else {
-                    if (ctx.getFillColor()==null){res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                    else {res=new VRectangleOrST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, 0);}
+                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
                 }
                 Color border=ctx.getStrokeColor();
                 if (border != null){
@@ -1038,7 +1035,7 @@ public class SVGReader {
                     res.setDrawBorder(false);
                 }
             }
-            else {res=new VRectangleOrST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, 0);}
+            else {res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);}
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
@@ -1149,7 +1146,7 @@ public class SVGReader {
     /** Create a VRectangle from an SVG rect element.
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      */
-    public static VRectangleOrST createRectangle(Element e){
+    public static VRectangleOr createRectangle(Element e){
         return createRectangle(e,null,false);
     }
 
@@ -1157,7 +1154,7 @@ public class SVGReader {
      *@param e an SVG rect(angle) as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VRectangleOrST createRectangle(Element e,Context ctx){
+    public static VRectangleOr createRectangle(Element e,Context ctx){
         return createRectangle(e,ctx,false);
     }
 
@@ -1166,7 +1163,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VRectangleOrST createRectangle(Element e,Context ctx,boolean meta){
+    public static VRectangleOr createRectangle(Element e,Context ctx,boolean meta){
         long x = getLong(e.getAttribute(_x));
         long y = getLong(e.getAttribute(_y));
         long w = getLong(e.getAttribute(_width))/2;
@@ -1179,17 +1176,16 @@ public class SVGReader {
         }
         x += xoffset;
         y += yoffset;
-        VRectangleOrST res;
+        VRectangleOr res;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
         if (ss != null){
             if (ss.hasTransparencyInformation()){
-                if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f, 0);}
-                ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
+                if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
             }
             else {
-                if (ss.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f, 0);}
+                if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
             }
             Color border=ss.getStrokeColor();
             if (border != null){
@@ -1205,13 +1201,12 @@ public class SVGReader {
         }
         else if (ctx!=null){
             if (ctx.hasTransparencyInformation()){
-                if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f, 0);}
-                ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
+                if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
             }
             else {
-                if (ctx.getFillColor()==null){res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);res.setFilled(false);}
-                else {res=new VRectangleOrST(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f, 0);}
+                if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
             }
             Color border=ctx.getStrokeColor();
             if (border!=null){
@@ -1222,7 +1217,7 @@ public class SVGReader {
                 res.setDrawBorder(false);
             }
         }
-        else {res=new VRectangleOrST(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 1.0f, 0);}
+        else {res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
         if (meta){setMetadata(res,ctx);}
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));

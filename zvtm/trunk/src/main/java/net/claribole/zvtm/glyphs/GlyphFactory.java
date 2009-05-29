@@ -65,7 +65,6 @@ import com.xerox.VTM.glyphs.VOctagonOrST;
 import com.xerox.VTM.glyphs.VOctagonST;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleOr;
-import com.xerox.VTM.glyphs.VRectangleOrST;
 import com.xerox.VTM.glyphs.VShape;
 import com.xerox.VTM.glyphs.VTriangle;
 import com.xerox.VTM.glyphs.VTriangleOr;
@@ -596,7 +595,7 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	    }
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g = new VRectangleOrST(0, 0, 0, w, h, fillColor, borderColor, (float)alpha, (float)angle);
+		    g = new VRectangleOr(0, 0, 0, w, h, fillColor, borderColor, (float)angle, (float)alpha);
 		}
 		else {g = new VRectangleOr(0, 0, 0, w, h, fillColor, borderColor, (float)angle);}
 	    }
