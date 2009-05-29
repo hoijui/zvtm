@@ -104,12 +104,12 @@ public class VPath extends Glyph {
     boolean forcedDrawing=false;
 
     public VPath(){
-	vx=0;
-	vy=0;
-	vz=0;
-	setColor(Color.black);
-	sensit=false;
-	resetPath();
+        vx=0;
+        vy=0;
+        vz=0;
+        setColor(Color.black);
+        sensit=false;
+        resetPath();
     }
 
     /**
@@ -119,6 +119,17 @@ public class VPath extends Glyph {
         *@param c color
         */
     public VPath(long x, long y, int z, Color c){
+        this(x, y, z, c, 1.0f);
+    }
+
+    /**
+        *@param x start coordinate in virtual space
+        *@param y start coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param c color
+         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VPath(long x, long y, int z, Color c, float alpha){
         vx=x;
         vy=y;
         vz=z;
@@ -129,6 +140,7 @@ public class VPath extends Glyph {
         realHotSpot=new LongPoint(vx,vy);
         path.moveTo(vx,-vy);
         computeSize();
+        setTranslucencyValue(alpha);
     }
 
 	/**
@@ -137,6 +149,16 @@ public class VPath extends Glyph {
      *@param c color
      */
     public VPath(PathIterator pi, int z, Color c){
+        this(pi, z, c, 1.0f);
+    }
+
+	/**
+	 *@param pi PathIterator describing this path (virtual space coordinates)
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c color
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VPath(PathIterator pi, int z, Color c, float alpha){
 		vz = z;
 		double[] cds = new double[6];
 		// if first instruction is a jump, make it the start point
@@ -178,29 +200,9 @@ public class VPath extends Glyph {
 	    }
 		sensit = false;
 		setColor(c);
+		setTranslucencyValue(alpha);
 	}
 
-//    /**
-//        *@param z z-index (pass 0 if you do not use z-ordering)
-//        *@param c color
-//        *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
-//        */
-//    public VPath(int z,Color c,String svg){
-//        vx=0;
-//        vy=0;
-//        vz=z;
-//        sensit=false;
-//        setColor(c);
-//        this.setSVGPath(svg);
-//    }
-
-//    /** Reset path and assign it new coordinates according to what is specified in the SVG expression.
-//     *@param svg valid <i>d</i> attribute of an SVG <i>path</i> element. m as first coords are taken into account, so any coord list beginning with one of these instructions will make the path begin elsewhere than at (x,y). Absolute commands (uppercase letters) as first coords have the side effect of assigning first point with these values instead of x,y (overriden)
-//     */
-//    public void setSVGPath(String svg){
-//	resetPath();
-//	SVGReader.createPath(svg,this);
-//    }
 
     /** New path, will begin at (vx,vy)
      */
@@ -389,41 +391,66 @@ public class VPath extends Glyph {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	
-// 	if (true){//replace by something using projected size (so that we do not paint it if too small)
- 	    at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
-	    at.preConcatenate(stdT);
- 	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
-	    g.setTransform(at);
-	    if (stroke!=null){
-		g.setStroke(stroke);
-		g.draw(path);
-		g.setStroke(stdS);
-	    }
-	    else {
-		g.draw(path);
-	    }
-	    g.setTransform(stdT);
-// 	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        g.setColor(this.color);
+        at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy);
+        at.preConcatenate(stdT);
+        at.concatenate(AffineTransform.getScaleInstance(coef, coef));
+        g.setTransform(at);
+        if (stroke != null){
+            g.setStroke(stroke);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.draw(path);
+                g.setComposite(acO);
+            }
+            else {
+                g.draw(path);
+            }
+            g.setStroke(stdS);
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.draw(path);
+                g.setComposite(acO);
+            }
+            else {
+                g.draw(path);
+            }
+        }
+        g.setTransform(stdT);
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-// 	if (true){//replace by something using projected size (so that we do not paint it if too small)
- 	    at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);
- 	    at.concatenate(AffineTransform.getScaleInstance(coef,coef));
-	    g.setTransform(at);
-	    if (stroke!=null){
-		g.setStroke(stroke);
-		g.draw(path);
-		g.setStroke(stdS);
-	    }
-	    else {
-		g.draw(path);
-	    }
-	    g.setTransform(stdT);
-// 	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        g.setColor(this.color);
+        at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, dy+pc[i].lcy);
+        at.concatenate(AffineTransform.getScaleInstance(coef, coef));
+        g.setTransform(at);
+        if (stroke != null){
+            g.setStroke(stroke);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.draw(path);
+                g.setComposite(acO);
+            }
+            else {
+                g.draw(path);
+            }
+            g.setStroke(stdS);
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.draw(path);
+                g.setComposite(acO);
+            }
+            else {
+                g.draw(path);
+            }
+        }
+        g.setTransform(stdT);
     }
 
     public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){

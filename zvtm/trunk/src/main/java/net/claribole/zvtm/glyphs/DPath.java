@@ -936,7 +936,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public static DPath fromVPath(VPath vp){
 		DPath res = null;
 		if (vp != null){
-			res = (vp instanceof VPathST) ? new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue()) : new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor());
+			res = new DPath(vp.vx, vp.vy, vp.getZindex(), vp.getColor(), ((Translucent)vp).getTranslucencyValue());
 			BasicStroke s = vp.getStroke();
 			if (s != null){
 				res.setStroke(s);
@@ -982,7 +982,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public static VPath toVPath(DPath dp){
 		VPath res = null;
 		if (dp != null){
-			res = new VPathST(dp.spx, dp.spy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue());
+			res = new VPath(dp.spx, dp.spy, dp.vz, dp.getColor(), ((Translucent)dp).getTranslucencyValue());
 			BasicStroke s = dp.getStroke();
 			if (s != null)
 				res.setStroke(s);
