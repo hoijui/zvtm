@@ -1,5 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+
+# AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+# Copyright (c) INRIA, 2009. All Rights Reserved
+# Licensed under the GNU LGPL. For full terms see the file COPYING.
+
 # $Id$
 
 import os, sys, math
