@@ -74,12 +74,12 @@ public class ScrollLayer implements ComponentListener {
 	slVSname = "scrollspace" + controlledCamera.getID();
 	slVS = vsm.addVirtualSpace(slVSname);
 	slC = vsm.addCamera(slVS);
-	vgutter = new VRectangleST(0, 0, 0, 8, 8, Color.WHITE, PASTEL_BLUE, 1.0f);
-	vslider = new VRectangleST(0, 0, 0, 8, 8, PASTEL_BLUE, PASTEL_BLUE, 1.0f);
+	vgutter = new VRectangle(0, 0, 0, 8, 8, Color.WHITE, PASTEL_BLUE, 1.0f);
+	vslider = new VRectangle(0, 0, 0, 8, 8, PASTEL_BLUE, PASTEL_BLUE, 1.0f);
 	upBt = new VImage((new ImageIcon(this.getClass().getResource("/images/button_up_16x16.png"))).getImage());
 	downBt = new VImage((new ImageIcon(this.getClass().getResource("/images/button_down_16x16.png"))).getImage());
-	hgutter = new VRectangleST(0, 0, 0, 8, 8, Color.WHITE, PASTEL_BLUE, 1.0f);
-	hslider = new VRectangleST(0, 0, 0, 8, 8, PASTEL_BLUE, PASTEL_BLUE, 1.0f);
+	hgutter = new VRectangle(0, 0, 0, 8, 8, Color.WHITE, PASTEL_BLUE, 1.0f);
+	hslider = new VRectangle(0, 0, 0, 8, 8, PASTEL_BLUE, PASTEL_BLUE, 1.0f);
 	leftBt = new VImage((new ImageIcon(this.getClass().getResource("/images/button_left_16x16.png"))).getImage());
 	rightBt = new VImage((new ImageIcon(this.getClass().getResource("/images/button_right_16x16.png"))).getImage());
 	vgutterRS = (RectangularShape)vgutter;

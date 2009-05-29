@@ -15,7 +15,7 @@ import java.awt.Color;
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VRectangle;
 
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.EndAction;
@@ -57,9 +57,9 @@ public class TransitionManager {
 	final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
 	long[] wnes = v.getVisibleRegion(c);
 	// position the fade rectangle so that it covers this region
-	final VRectangleST fadeRect = new VRectangleST((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
+	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
 						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
-						       fadeColor, fadeColor, 0);
+						       fadeColor, fadeColor, 0.0f);
 	fadeRect.setDrawBorder(false);
 	vsm.addGlyph(fadeRect, c.getOwningSpace());
 
@@ -109,9 +109,9 @@ public class TransitionManager {
 	final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
 	long[] wnes = v.getVisibleRegion(c);
 	// position the fade rectangle so that it covers this region
-	final VRectangleST fadeRect = new VRectangleST((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
+	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
 						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
-						       fadeColor, fadeColor, 1);
+						       fadeColor, fadeColor, 1.0f);
 	fadeRect.setDrawBorder(false);
 	vsm.addGlyph(fadeRect, c.getOwningSpace());
 	v.setBlank(null);
