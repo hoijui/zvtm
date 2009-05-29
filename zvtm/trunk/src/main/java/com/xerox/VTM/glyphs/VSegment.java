@@ -406,9 +406,9 @@ public class VSegment extends Glyph implements RectangularShape {
     }
 
     public Object clone(){
-	VSegment res=new VSegment(vx,vy,0,vw,vh,color);
-	res.mouseInsideColor=this.mouseInsideColor;
-	return res;
+        VSegment res = new VSegment(vx,vy,0,vw,vh,color, (alphaC != null) ? alphaC.getAlpha() : 1f);
+        res.mouseInsideColor = this.mouseInsideColor;
+        return res;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
