@@ -48,11 +48,10 @@ public class VBText extends VText {
 	 *@param y coordinate in virtual space
 	 *@param z z-index (pass 0 if you do not use z-ordering)
 	 *@param c color of the text
-	 *@param t text string
+	 *@param text text string
 	 */
-	public VBText(long x, long y, int z, Color c, String t) {
-		super(x, y, z, c, t);
-		this.sensit = true;
+	public VBText(long x, long y, int z, Color c, String text) {
+		this(x, y, z, c, Color.BLACK, Color.WHITE, text, TEXT_ANCHOR_START, 1f);
 	}
 
 	/**
@@ -65,9 +64,7 @@ public class VBText extends VText {
 	 * @param text text string
 	 */
 	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text) {
-		super(x, y, z, textColor, text);
-		this.fillColor = fillColor;
-		this.borderColor = borderColor;
+		this(x, y, z, textColor, borderColor, fillColor, text, TEXT_ANCHOR_START, 1f);
 	}
 
 	/**
@@ -79,11 +76,28 @@ public class VBText extends VText {
 	 * @param fillColor color of the background
 	 * @param text text string
 	 * @param ta text anchor
+      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 	 */
 	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text, short ta) {
+	    this(x, y, z, textColor, borderColor, fillColor, text, ta, 1f);
+    }
+    
+	/**
+	 * @param x coordinate in virtual space
+	 * @param y coordinate in virtual space
+	 * @param z altitude
+	 * @param textColor color of the text
+	 * @param borderColor color of the border
+	 * @param fillColor color of the background
+	 * @param text text string
+	 * @param ta text anchor
+      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+	 */
+	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text, short ta, float alpha) {
 		super(x, y, z, textColor, text, ta);
 		this.fillColor = fillColor;
 		this.borderColor = borderColor;
+		setTranslucencyValue(alpha);
 	}
 
 	public boolean coordInside(int x, int y, int camIndex) {
@@ -110,17 +124,18 @@ public class VBText extends VText {
 	}
 	
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
+		if (!pc[i].valid){
+			g.setFont((font!=null) ? font : getMainFont());
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
+			pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
+			pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
+			pc[i].valid = true;
+		}
+		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef * fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive) {
-			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+			// if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
-			if (!pc[i].valid)
-			{
-				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
-				pc[i].cw = (int)Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
-				pc[i].ch = (int)Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
-				pc[i].valid = true;
-			}
 			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].cx, dy + pc[i].cy);
@@ -135,36 +150,47 @@ public class VBText extends VText {
 				at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));
 			}
 			g.setTransform(at);
-
-			g.setColor(fillColor);
 			int rectW = Math.round(pc[i].cw / scaleFactor);
 			int rectH = Math.round(pc[i].ch / scaleFactor);
-			g.fillRect(dx, dy - rectH, rectW, rectH);
-
-			g.setColor(borderColor);
-			g.drawRect(dx, dy - rectH, rectW, rectH);
-
-			g.setColor(this.color);
-			g.drawString(text, paddingX, -paddingY);
+			g.setColor(fillColor);
+			if (alphaC != null){
+				// translucent
+				g.setComposite(alphaC);
+				g.fillRect(dx, dy-rectH+1, rectW, rectH-1);
+				g.setColor(borderColor);
+				g.drawRect(dx, dy-rectH+1, rectW, rectH-1);
+				g.setColor(this.color);
+				g.drawString(text, paddingX, -paddingY);
+				g.setComposite(acO);
+			}
+			else {
+				// opaque
+				g.fillRect(dx, dy-rectH, rectW, rectH);
+				g.setColor(borderColor);
+				g.drawRect(dx, dy-rectH, rectW, rectH);
+				g.setColor(this.color);
+				g.drawString(text, paddingX, -paddingY);
+			}
 			g.setTransform(stdT);
 		}
 		else {
 			g.fillRect(dx + pc[i].cx, dy + pc[i].cy, 1, 1);
 		}
 	}
-
-
+	
 	public void drawForLens(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy) {
+		if (!pc[i].lvalid) {
+			g.setFont((font!=null) ? font : getMainFont());
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
+			pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
+			pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
+			pc[i].lvalid = true;
+		}
+		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef * fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive) {
-			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+			// if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
-			if (!pc[i].lvalid) {
-				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
-				pc[i].lcw = (int) Math.round((bounds.getWidth() + 2 * paddingX) * scaleFactor);
-				pc[i].lch = (int) Math.round((bounds.getHeight() + 2 * paddingY) * scaleFactor);
-				pc[i].lvalid = true;
-			}
 			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START) {
 				at = AffineTransform.getTranslateInstance(dx + pc[i].lcx, dy + pc[i].lcy);
@@ -179,24 +205,34 @@ public class VBText extends VText {
 				at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));
 			}
 			g.setTransform(at);
-
-			g.setColor(fillColor);
 			int rectW = Math.round(pc[i].lcw / scaleFactor);
 			int rectH = Math.round(pc[i].lch / scaleFactor);
-			g.fillRect(dx, dy - rectH, rectW, rectH);
-
-			g.setColor(borderColor);
-			g.drawRect(dx, dy - rectH, rectW, rectH);
-
-			g.setColor(this.color);
-			g.drawString(text, paddingX, -paddingY);
+			if (alphaC != null){
+				// translucent
+				g.setComposite(alphaC);
+				g.setColor(fillColor);
+				g.fillRect(dx, dy-rectH+1, rectW, rectH-1);
+				g.setColor(borderColor);
+				g.drawRect(dx, dy-rectH+1, rectW, rectH-1);
+				g.setColor(this.color);
+				g.drawString(text, paddingX, -paddingY);
+				g.setComposite(acO);
+			}
+			else {
+				g.setColor(fillColor);
+				g.fillRect(dx, dy - rectH, rectW+1, rectH-1);
+				g.setColor(borderColor);
+				g.drawRect(dx, dy - rectH, rectW, rectH);
+				g.setColor(this.color);
+				g.drawString(text, paddingX, -paddingY);
+			}
 			g.setTransform(stdT);
 		}
 		else {
 			g.fillRect(dx + pc[i].lcx, dy + pc[i].lcy, 1, 1);
 		}
 	}
-
+	
 	public short mouseInOut(int x, int y, int camIndex) {
 		short res;
 		if (coordInside(x, y, camIndex)) {//if the mouse is inside the glyph
