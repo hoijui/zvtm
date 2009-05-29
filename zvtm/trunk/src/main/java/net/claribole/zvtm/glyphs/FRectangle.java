@@ -22,14 +22,12 @@ import com.xerox.VTM.glyphs.VRectangle;
  *@author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VRectangle
  *@see com.xerox.VTM.glyphs.VRectangleOr
- *@see com.xerox.VTM.glyphs.VRectangleOrST
  */
 
 public class FRectangle extends VRectangle {
 
 	public FRectangle(){
-		super();
-		createMask();
+        this(0, 0, 0, 10, 10, Color.WHITE, Color.BLACK, 0, 1f);
 	}
 
 	/**
@@ -43,10 +41,7 @@ public class FRectangle extends VRectangle {
 		*@param ba gradient bottom alpha value
 		*/
 	public FRectangle(long x,long y, int z,long w,long h,Color c, float ta, float ba){
-		super(x,y,z,w,h,c);
-		MASK_ALPHA_TOP = ta;
-		MASK_ALPHA_BOTTOM = ba;
-		createMask();
+		this(x, y, z, w, h, c, Color.BLACK, ta, ba);
 	}
 
 	/**
