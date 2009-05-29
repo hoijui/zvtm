@@ -299,65 +299,137 @@ public class VBoolShape extends ClosedShape implements RectangularShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].mainArea.getBounds().width>2) && (pc[i].mainArea.getBounds().height>2)){
-	    if (filled){
-		g.setColor(this.color);
-		g.translate(dx,dy);
-		g.fill(pc[i].mainArea);
-		g.translate(-dx,-dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null){
-		    g.setStroke(stroke);
-		    g.translate(dx,dy);
-		    g.draw(pc[i].mainArea);
-		    g.translate(-dx,-dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx,dy);
-		    g.draw(pc[i].mainArea);
-		    g.translate(-dx,-dy);
-		}		   
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].mainArea.getBounds().width>2) && (pc[i].mainArea.getBounds().height>2)){
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx,dy);
+                    g.fill(pc[i].mainArea);
+                    g.translate(-dx,-dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx,dy);
+                        g.draw(pc[i].mainArea);
+                        g.translate(-dx,-dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx,dy);
+                        g.draw(pc[i].mainArea);
+                        g.translate(-dx,-dy);
+                    }		   
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx,dy);
+                    g.fill(pc[i].mainArea);
+                    g.translate(-dx,-dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx,dy);
+                        g.draw(pc[i].mainArea);
+                        g.translate(-dx,-dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx,dy);
+                        g.draw(pc[i].mainArea);
+                        g.translate(-dx,-dy);
+                    }		   
+                }
+            }
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.setColor(this.color);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.setColor(this.color);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lmainArea.getBounds().width>2) && (pc[i].lmainArea.getBounds().height>2)){
-	    if (filled){
-		g.setColor(this.color);
-		g.translate(dx,dy);
-		g.fill(pc[i].lmainArea);
-		g.translate(-dx,-dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null){
-		    g.setStroke(stroke);
-		    g.translate(dx,dy);
-		    g.draw(pc[i].lmainArea);
-		    g.translate(-dx,-dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx,dy);
-		    g.draw(pc[i].lmainArea);
-		    g.translate(-dx,-dy);
-		}		   
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].lmainArea.getBounds().width>2) && (pc[i].lmainArea.getBounds().height>2)){
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx,dy);
+                    g.fill(pc[i].lmainArea);
+                    g.translate(-dx,-dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx,dy);
+                        g.draw(pc[i].lmainArea);
+                        g.translate(-dx,-dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx,dy);
+                        g.draw(pc[i].lmainArea);
+                        g.translate(-dx,-dy);
+                    }		   
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx,dy);
+                    g.fill(pc[i].lmainArea);
+                    g.translate(-dx,-dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx,dy);
+                        g.draw(pc[i].lmainArea);
+                        g.translate(-dx,-dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx,dy);
+                        g.draw(pc[i].lmainArea);
+                        g.translate(-dx,-dy);
+                    }		   
+                }
+            }
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.setColor(this.color);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.setColor(this.color);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
-
+    
     /** For internal use. */
     public int getMainShapeType(){
 	return shapeType;
