@@ -29,9 +29,7 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 /**
  * Polygon. Can be resized. Cannot be reoriented. This new implementation of VPolygon models vertices as doubles internally to allow resizing without loss of precision (and thus resizing to small sizes does not tamper with the shape's aspect). It might be more memory consuming, and less efficient than the original implementation, so the latter is still provided (class FPolygon), for people who do not care about resizing polygons.
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VPolygonST
  *@see com.xerox.VTM.glyphs.FPolygon
- *@see com.xerox.VTM.glyphs.FPolygonST
  **/
 
 public class VPolygon extends ClosedShape {
@@ -49,93 +47,12 @@ public class VPolygon extends ClosedShape {
     double[] lycoords;
 
     /**
-     *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
-     *@param c fill color
-     */
-    public VPolygon(LongPoint[] v,Color c){
-	vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
-	vy=0;  //several lines below
-	vz=0;
-	xcoords=new double[v.length];
-	ycoords=new double[v.length];
-	lxcoords=new double[v.length];
-	lycoords=new double[v.length];
-	for (int i=0;i<v.length;i++){
-	    xcoords[i]=v[i].x;
-	    ycoords[i]=v[i].y;
-	}
-	orient=0;
-	LongPoint ct=getCentroid();
-	vx=ct.x;
-	vy=ct.y;
-	for (int i=0;i<xcoords.length;i++){//translate to get relative coords w.r.t centroid
-	    xcoords[i]-=vx;
-	    ycoords[i]-=vy;
-	}
-	computeSize();
-	setColor(c);
-	setBorderColor(Color.black);
-    }
-
-    /**
-     *@param v list of x,y vertices ABSOLUTE coordinates i virtual space
-     *@param c fill color
-     *@param bc border color
-     */
-    public VPolygon(LongPoint[] v, Color c, Color bc){
-	vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
-	vy=0;  //several lines below
-	vz=0;
-	xcoords=new double[v.length];
-	ycoords=new double[v.length];
-	lxcoords=new double[v.length];
-	lycoords=new double[v.length];
-	for (int i=0;i<v.length;i++){
-	    xcoords[i]=v[i].x;
-	    ycoords[i]=v[i].y;
-	}
-	orient=0;
-	LongPoint ct=getCentroid();
-	vx=ct.x;
-	vy=ct.y;
-	for (int i=0;i<xcoords.length;i++){//translate to get relative coords w.r.t centroid
-	    xcoords[i]-=vx;
-	    ycoords[i]-=vy;
-	}
-	computeSize();
-	setColor(c);
-	setBorderColor(bc);
-    }
-
-    /**
         *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         */
     public VPolygon(LongPoint[] v, int z, Color c){
-        vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
-        vy=0;  //several lines below
-        vz = z;
-        xcoords=new double[v.length];
-        ycoords=new double[v.length];
-        lxcoords=new double[v.length];
-        lycoords=new double[v.length];
-        for (int i=0;i<v.length;i++){
-            xcoords[i]=v[i].x;
-            ycoords[i]=v[i].y;
-        }
-        orient=0;
-        LongPoint ct=getCentroid();
-        vx=ct.x;
-        vy=ct.y;
-        for (int i=0;i<xcoords.length;i++){
-            //translate to get relative coords w.r.t centroid
-            xcoords[i]-=vx;
-            ycoords[i]-=vy;
-        }
-        computeSize();
-        setColor(c);
-        setBorderColor(Color.black);
+        this(v, z, c, Color.BLACK, 1.0f);
     }
 
     /**
@@ -145,29 +62,43 @@ public class VPolygon extends ClosedShape {
         *@param bc border color
         */
     public VPolygon(LongPoint[] v, int z, Color c, Color bc){
-        vx=0;  //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
-        vy=0;  //several lines below
+        this(v, z, c, bc, 1.0f);
+    }
+    
+    /**
+        *@param v list of x,y vertices ABSOLUTE coordinates i virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param c fill color
+        *@param bc border color
+         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VPolygon(LongPoint[] v, int z, Color c, Color bc, float alpha){
+        //should be zero here first as this is assumed when calling getCentroid
+        // later to compute the centroid's coordinates several lines below
+        vx = 0;
+        vy = 0;
         vz = z;
-        xcoords=new double[v.length];
-        ycoords=new double[v.length];
-        lxcoords=new double[v.length];
-        lycoords=new double[v.length];
+        xcoords = new double[v.length];
+        ycoords = new double[v.length];
+        lxcoords = new double[v.length];
+        lycoords = new double[v.length];
         for (int i=0;i<v.length;i++){
-            xcoords[i]=v[i].x;
-            ycoords[i]=v[i].y;
+            xcoords[i] = v[i].x;
+            ycoords[i] = v[i].y;
         }
-        orient=0;
-        LongPoint ct=getCentroid();
-        vx=ct.x;
-        vy=ct.y;
+        orient = 0;
+        LongPoint ct = getCentroid();
+        vx = ct.x;
+        vy = ct.y;
         for (int i=0;i<xcoords.length;i++){
             //translate to get relative coords w.r.t centroid
-            xcoords[i]-=vx;
-            ycoords[i]-=vy;
+            xcoords[i] -= vx;
+            ycoords[i] -= vy;
         }
         computeSize();
         setColor(c);
         setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -258,8 +189,9 @@ public class VPolygon extends ClosedShape {
     }
 
     public boolean fillsView(long w,long h,int camIndex){
-	if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
-	else {return false;}
+        return ((alphaC == null) &&
+            (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) &&
+            (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h)));
     }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
@@ -381,63 +313,135 @@ public class VPolygon extends ClosedShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if (pc[i].cr>1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fillPolygon(pc[i].p);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].p);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if (pc[i].cr>1){
+            //repaint only if object is visible
+            if (alphaC != null){ 
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color); 
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].p);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color); 
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].p);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if (pc[i].lcr > 1){//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.translate(dx, dy);
-		g.fillPolygon(pc[i].lp);
-		g.translate(-dx, -dy);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].lp);
-		    g.translate(-dx, -dy);
-		    g.setStroke(stdS);
-		}
-		else {
-		    g.translate(dx, dy);
-		    g.drawPolygon(pc[i].lp);
-		    g.translate(-dx, -dy);
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if (pc[i].lcr>1){
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].lp);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fillPolygon(pc[i].lp);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.drawPolygon(pc[i].lp);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     /** Get the polygon's area. */
@@ -511,7 +515,7 @@ public class VPolygon extends ClosedShape {
 	for (int i=0;i<lps.length;i++){
 	    lps[i]=new LongPoint(Math.round(xcoords[i]+vx),Math.round(ycoords[i]+vy));
 	}
-	VPolygon res=new VPolygon(lps,color);
+	VPolygon res = new VPolygon(lps, getZindex(), color, borderColor, (alphaC != null ) ? alphaC.getAlpha() : 1.0f);
 	res.borderColor=this.borderColor;
 	res.mouseInsideColor=this.mouseInsideColor;
 	res.bColor=this.bColor;

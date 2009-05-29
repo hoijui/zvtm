@@ -31,9 +31,7 @@ import com.xerox.VTM.engine.LongPoint;
  * The new version of VPolygon can be resized, but at some cost from an efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances.<br>
  * This implementation uses longs instead of doubles for its internal representation of the vertices, see VPolygon for more details. 
  *@author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.FPolygonST
  *@see com.xerox.VTM.glyphs.VPolygon
- *@see com.xerox.VTM.glyphs.VPolygonST
  **/
 
 public class FPolygon extends ClosedShape {

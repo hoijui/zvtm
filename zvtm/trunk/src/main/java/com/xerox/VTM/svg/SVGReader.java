@@ -57,8 +57,7 @@ import com.xerox.VTM.glyphs.Translucent;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VEllipse;
 import net.claribole.zvtm.glyphs.DPath;
-//import com.xerox.VTM.glyphs.VPolygon;
-import com.xerox.VTM.glyphs.VPolygonST;
+import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VRectangleOr;
 import com.xerox.VTM.glyphs.VRoundRect;
 //import com.xerox.VTM.glyphs.VSegment;
@@ -1324,7 +1323,7 @@ public class SVGReader {
     /** Create a VPolygon from an SVG polygon element.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
-    public static VPolygonST createPolygon(Element e){
+    public static VPolygon createPolygon(Element e){
         return createPolygon(e,null,false);
     }
 
@@ -1332,7 +1331,7 @@ public class SVGReader {
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VPolygonST createPolygon(Element e,Context ctx){
+    public static VPolygon createPolygon(Element e,Context ctx){
         return createPolygon(e,ctx,false);
     }
 
@@ -1341,7 +1340,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VPolygonST createPolygon(Element e,Context ctx,boolean meta){
+    public static VPolygon createPolygon(Element e,Context ctx,boolean meta){
         Vector coords=new Vector();
         translateSVGPolygon(e.getAttribute(_points),coords);
         LongPoint[] coords2=new LongPoint[coords.size()];
@@ -1350,17 +1349,16 @@ public class SVGReader {
             lp=(LongPoint)coords.elementAt(i);
             coords2[i]=new LongPoint(lp.x,-lp.y);
         }
-        VPolygonST res;
+        VPolygon res;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
         if (ss != null){
             if (ss.hasTransparencyInformation()){
-                if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VPolygonST(coords2,ss.getFillColor(), Color.BLACK, 1.0f);}
-                ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
+                if (ss.getFillColor()==null){res=new VPolygon(coords2, 0, Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VPolygon(coords2, 0, ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue());}
             }
             else {
-                if (ss.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VPolygonST(coords2,ss.getFillColor(), Color.BLACK, 1.0f);}
+                if (ss.getFillColor()==null){res=new VPolygon(coords2, 0, Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VPolygon(coords2, 0, ss.getFillColor(), Color.BLACK, 1.0f);}
             }
             Color border=ss.getStrokeColor();
             if (border != null){
@@ -1376,13 +1374,12 @@ public class SVGReader {
         }
         else if (ctx!=null){
             if (ctx.hasTransparencyInformation()){
-                if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VPolygonST(coords2,ctx.getFillColor(), Color.BLACK, 1.0f);}
-                ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
+                if (ctx.getFillColor()==null){res=new VPolygon(coords2, 0, Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VPolygon(coords2, 0, ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue());}
             }
             else {
-                if (ctx.getFillColor()==null){res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VPolygonST(coords2,ctx.getFillColor(), Color.BLACK, 1.0f);}
+                if (ctx.getFillColor()==null){res=new VPolygon(coords2, 0, Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VPolygon(coords2, 0, ctx.getFillColor(), Color.BLACK, 1.0f);}
             }
             Color border=ctx.getStrokeColor();
             if (border!=null){
@@ -1393,7 +1390,7 @@ public class SVGReader {
                 res.setDrawBorder(false);
             }
         }
-        else {res=new VPolygonST(coords2,Color.WHITE, Color.BLACK, 1.0f);}
+        else {res=new VPolygon(coords2, 0, Color.WHITE, Color.BLACK, 1.0f);}
         if (meta){setMetadata(res,ctx);}
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));
