@@ -32,7 +32,6 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.glyphs.VTextST;
 import net.claribole.zvtm.glyphs.RImage;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.widgets.TranslucentTextArea;

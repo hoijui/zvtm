@@ -25,7 +25,6 @@ import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.glyphs.VTextST;
 import com.xerox.VTM.glyphs.ClosedShape;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
@@ -33,7 +32,6 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.svg.SVGReader;
 import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.glyphs.VTextST;
 
 /** <strong>Multi-scale scene manager: main ZUIST class instantiated by client application.</strong>
  * Used to parse XML descriptions of multi-scale scene configurations and manage them once instantiated.

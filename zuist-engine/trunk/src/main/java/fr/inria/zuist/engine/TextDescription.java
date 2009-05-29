@@ -17,7 +17,6 @@ import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
-import net.claribole.zvtm.glyphs.VTextST;
 
 /** Description of text objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -39,7 +38,7 @@ public class TextDescription extends ObjectDescription {
     
     Color fillColor;
     
-    VTextST glyph;
+    VText glyph;
 
     /** Constructs the description of an image (VTextST).
         *@param id ID of object in scene
@@ -87,7 +86,7 @@ public class TextDescription extends ObjectDescription {
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
         if (glyph == null){
             if (fadeIn){
-                glyph = new VTextST(vx, vy, zindex, fillColor, text, anchor, 0.0f, scale);
+                glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
                 VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
@@ -98,7 +97,7 @@ public class TextDescription extends ObjectDescription {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
-                glyph = new VTextST(vx, vy, zindex, fillColor, text, anchor, 1.0f, scale);
+                glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 1.0f);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
                 VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
@@ -148,9 +147,9 @@ public class TextDescription extends ObjectDescription {
     }
     
     public static short getAnchor(String anchor){
-	if (anchor.equals(_start)){return VText.TEXT_ANCHOR_START;}
-	else if (anchor.equals(_end)){return VText.TEXT_ANCHOR_END;}
-	else {return VText.TEXT_ANCHOR_MIDDLE;}
+        if (anchor.equals(_start)){return VText.TEXT_ANCHOR_START;}
+        else if (anchor.equals(_end)){return VText.TEXT_ANCHOR_END;}
+        else {return VText.TEXT_ANCHOR_MIDDLE;}
     }
     
     public long getX(){
