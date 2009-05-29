@@ -61,7 +61,6 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.RectangleNR;
 import net.claribole.zvtm.glyphs.CircleNR;
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.glyphs.VRectangleOr;
 import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.svg.Metadata;
@@ -205,8 +204,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         dmCamera = vsm.addCamera(mainSpace);
         RectangleNR seg1;
         RectangleNR seg2;
-        observedRegion=new VRectangleST(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR);
-        observedRegion.setBorderColor(ConfigManager.OBSERVED_REGION_BORDER_COLOR);
+        observedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR, 0.5f);
         //500 should be sufficient as the radar window is
         seg1 = new RectangleNR(0, 0, 0, 0, 500, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
         //not resizable and is 300x200 (see rdW,rdH below)
