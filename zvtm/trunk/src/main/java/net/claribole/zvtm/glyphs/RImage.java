@@ -28,11 +28,9 @@ import com.xerox.VTM.glyphs.VImage;
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VImage
  *@see com.xerox.VTM.glyphs.VImageOr
- *@see net.claribole.zvtm.glyphs.VImageST
- *@see net.claribole.zvtm.glyphs.VImageOrST
  */
 
-public class RImage extends VImageST {
+public class RImage extends VImage {
     
     static float REFLECTION_HEIGHT_RATIO = 0.5f;
     static float REFLECTION_MASK_ALPHA_BASE = 0.2f;
@@ -56,10 +54,11 @@ public class RImage extends VImageST {
     
     /**
         *@param img image to be displayed
-        *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+        *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
-    public RImage(Image img, float a){
-        super(img, a);
+    public RImage(Image img, float alpha){
+        super(img);
+        setTranslucencyValue(alpha);
         this.image = createReflection(img);
     }
 
@@ -68,10 +67,10 @@ public class RImage extends VImageST {
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
-     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public RImage(long x,long y, int z,Image img, float a){
-        super(x, y, z, img, a);
+    public RImage(long x,long y, int z,Image img, float alpha){
+        super(x, y, z, img, 1.0, alpha);
         this.image = createReflection(img);
     }
 
@@ -81,10 +80,10 @@ public class RImage extends VImageST {
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
-     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public RImage(long x, long y, int z, Image img, double scale, float a){
-        super(x, y, z, img, scale, a);
+    public RImage(long x, long y, int z, Image img, double scale, float alpha){
+        super(x, y, z, img, scale, alpha);
         this.image = createReflection(img);
     }
     
@@ -94,11 +93,11 @@ public class RImage extends VImageST {
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
-     *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+     *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      *@param hir true if height measurement should include mirrored version of the image (doubles the image's height) - defaults to false
      */
-    public RImage(long x, long y, int z, Image img, double scale, float a, boolean hir){
-        super(x, y, z, img, scale, a);
+    public RImage(long x, long y, int z, Image img, double scale, float alpha, boolean hir){
+        super(x, y, z, img, scale, alpha);
         this.image = createReflection(img);
         this.irihc = hir;
         if (this.irihc){
@@ -125,7 +124,7 @@ public class RImage extends VImageST {
     }
     
     public Object clone(){
-    	RImage res = new RImage(vx, vy, 0, image, alpha);
+    	RImage res = new RImage(vx, vy, 0, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
     	res.setWidth(vw);
     	res.setHeight(vh);
     	res.borderColor = this.borderColor;

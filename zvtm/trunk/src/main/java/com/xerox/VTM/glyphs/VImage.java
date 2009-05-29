@@ -40,8 +40,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * Bitmap Image. This version is the most efficient, but it can neither be reoriented (see VImageOr*) nor made translucent (see VImage*ST).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VImageOr
- *@see net.claribole.zvtm.glyphs.VImageOrST
- *@see net.claribole.zvtm.glyphs.VImageST
  */
 
 public class VImage extends ClosedShape implements RectangularShape {
@@ -84,17 +82,7 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@param img image to be displayed
      */
     public VImage(Image img){
-	vx=0;
-	vy=0;
-	vz=0;
-	image=img;
-	vw=image.getWidth(null)/2;
-	vh=image.getHeight(null)/2;
-	if (vw==0 && vh==0){ar=1.0f;}
-	else {ar=(float)vw/(float)vh;}
-	computeSize();
-	orient=0;
-	setBorderColor(Color.black);
+	    this(0, 0, 0, img, 1.0, 1.0f);
     }
 
     /** Construct an image at (x, y) with original scale.
@@ -104,17 +92,7 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@param img image to be displayed
      */
     public VImage(long x,long y, int z,Image img){
-	vx=x;
-	vy=y;
-	vz=z;
-	image=img;
-	vw=Math.round(image.getWidth(null)/2.0);
-	vh=Math.round(image.getHeight(null)/2.0);
-	if (vw==0 && vh==0){ar=1.0f;}
-	else {ar=(float)vw/(float)vh;}
-	computeSize();
-	orient=0;
-	setBorderColor(Color.black);
+        this(x, y, z, img, 1.0, 1.0f);
     }
 
     /** Construct an image at (x, y) with a custom scale.
@@ -125,18 +103,31 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@param scale scaleFactor w.r.t original image size
      */
     public VImage(long x, long y, int z, Image img, double scale){
-	vx = x;
-	vy = y;
-	vz = z;
-	image = img;
-	vw = Math.round(image.getWidth(null) * scale / 2.0);
-	vh = Math.round(image.getHeight(null) * scale / 2.0);
-	if (vw==0 && vh==0){ar = 1.0f;}
-	else {ar = (float)vw/(float)vh;}
-	computeSize();
-	orient = 0;
-	setBorderColor(Color.black);
-	scaleFactor = (float)scale;
+        this(x, y, z, img, scale, 1.0f);
+    }
+    
+    /** Construct an image at (x, y) with a custom scale.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param img image to be displayed
+     *@param scale scaleFactor w.r.t original image size
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VImage(long x, long y, int z, Image img, double scale, float alpha){
+        vx = x;
+        vy = y;
+        vz = z;
+        image = img;
+        vw = Math.round(image.getWidth(null) * scale / 2.0);
+        vh = Math.round(image.getHeight(null) * scale / 2.0);
+        if (vw==0 && vh==0){ar = 1.0f;}
+        else {ar = (float)vw/(float)vh;}
+        computeSize();
+        orient = 0;
+        setBorderColor(Color.black);
+        scaleFactor = (float)scale;
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -353,6 +344,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].cw>1) && (pc[i].ch>1)){
             if (zoomSensitive){
                 trueCoef = scaleFactor*coef;
@@ -367,37 +359,83 @@ public class VImage extends ClosedShape implements RectangularShape {
                 at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
                 g.setTransform(at);
                 // rescale and draw
-                if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
-                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);		    
-                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                }
-                else {
-                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);		    
-                }
-                g.setTransform(stdT);
-                if (drawBorder==1){
-                    if (pc[i].prevMouseIn){
+                if (alphaC != null){
+                    // translucent
+                    g.setComposite(alphaC);
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    }
+                    else {
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                    }
+                    g.setTransform(stdT);
+                    if (drawBorder==1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
+                    }
+                    else if (drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                     }
+                    g.setComposite(acO);
                 }
-                else if (drawBorder==2){
-                    g.setColor(borderColor);
-                    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                else {
+                    // opaque
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    }
+                    else {
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                    }
+                    g.setTransform(stdT);
+                    if (drawBorder==1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
+                    }
+                    else if (drawBorder==2){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                    }
                 }
             }
             else {
-                g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                if (drawBorder == 1){
-                    if (pc[i].prevMouseIn){
+                if (alphaC != null){
+                    // translucent
+                    g.setComposite(alphaC);
+                    g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                    if (drawBorder == 1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
+                    }
+                    else if (drawBorder == 2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                     }
+                    g.setComposite(acO);
                 }
-                else if (drawBorder == 2){
-                    g.setColor(borderColor);
-                    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                else {
+                    // opaque
+                    g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                    if (drawBorder == 1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
+                    }
+                    else if (drawBorder == 2){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                    }
                 }
             }
         }
@@ -408,44 +446,91 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
             if (zoomSensitive){trueCoef=scaleFactor*coef;}
             else {trueCoef=scaleFactor;}
-            // a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+            //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
             if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
             if (trueCoef!=1.0f){
                 g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
-                if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
-                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);
-                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                }
-                else {
-                    g.drawImage(image, AffineTransform.getScaleInstance(trueCoef, trueCoef), null);
-                }
-                g.setTransform(stdT);
-                if (drawBorder==1){
-                    if (pc[i].prevMouseIn){
+                if (alphaC != null){
+                    // translucent
+                    g.setComposite(alphaC);
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    }
+                    else {
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                    }
+                    g.setTransform(stdT);
+                    if (drawBorder==1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
+                    else if (drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                     }
+                    g.setComposite(acO);
                 }
-                else if (drawBorder==2){
-                    g.setColor(borderColor);
-                    g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                else {
+                    // opaque
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    }
+                    else {
+                        g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                    }
+                    g.setTransform(stdT);
+                    if (drawBorder==1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
+                    else if (drawBorder==2){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                    }
                 }
             }
             else {
-                g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-                if (drawBorder == 1){
-                    if (pc[i].prevMouseIn){
+                if (alphaC != null){
+                    // translucent
+                    g.setComposite(alphaC);
+                    g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                    if (drawBorder == 1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
+                    else if (drawBorder == 2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                     }
+                    g.setComposite(acO);
                 }
-                else if (drawBorder == 2){
-                    g.setColor(borderColor);
-                    g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                else {
+                    // opaque
+                    g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                    if (drawBorder == 1){
+                        if (pc[i].prevMouseIn){
+                            g.setColor(borderColor);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
+                    else if (drawBorder == 2){
+                        g.setColor(borderColor);
+                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                    }
                 }
             }
         }
@@ -454,7 +539,7 @@ public class VImage extends ClosedShape implements RectangularShape {
             g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
         }
     }
-    
+        
     /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
     

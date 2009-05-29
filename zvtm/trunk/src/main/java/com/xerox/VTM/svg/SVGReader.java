@@ -67,8 +67,7 @@ import com.xerox.VTM.glyphs.VRoundRectST;
 import com.xerox.VTM.glyphs.VSegmentST;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.glyphs.VTextST;
-//import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.glyphs.VImageST;
+import com.xerox.VTM.glyphs.VImage;
 
 /**
  *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
@@ -1261,7 +1260,7 @@ public class SVGReader {
      * associated images staying in the original directory) ; set to null if no fallback directory is known.
      *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL)
      */
-    public static VImageST createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
+    public static VImage createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
         long x = getLong(e.getAttribute(_x)) + xoffset;
         long y = getLong(e.getAttribute(_y)) + yoffset;
         String width = e.getAttribute(_width);
@@ -1277,7 +1276,7 @@ public class SVGReader {
         long h = getLong(height);
         long hw = w / 2;
         long hh = h / 2;
-        VImageST res = null;
+        VImage res = null;
         if (e.hasAttributeNS(xlinkURI, _href)){
             String imagePath = e.getAttributeNS(xlinkURI, _href);
             if (imagePath.length() > 0){
@@ -1290,9 +1289,9 @@ public class SVGReader {
                     double wr = w/((double)aw);
                     double hr = h/((double)ah);
                     if (wr != 1.0 || hr != 1.0){
-                        res = new VImageST(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr), 1.0f);
+                        res = new VImage(x+hw, -y-hh, 0, ii.getImage(), Math.min(wr, hr), 1.0f);
                     } else {
-                        res = new VImageST(x+hw, -y-hh, 0, ii.getImage(), 1.0f);
+                        res = new VImage(x+hw, -y-hh, 0, ii.getImage(), 1.0, 1.0f);
                     }
                 }
             }
