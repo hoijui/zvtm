@@ -271,6 +271,10 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}
 	this.setCursor(awtCursor);
     }
+    
+    public void setDrawCursor(boolean b){
+        drawVTMcursor = b;
+    }
 
     /**Set the cursor.
      * Replaces the ZVTM cursor by a bitmap cursor similar to the default AWT cursors.
