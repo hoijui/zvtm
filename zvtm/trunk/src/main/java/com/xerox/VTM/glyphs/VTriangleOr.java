@@ -77,12 +77,6 @@ public class VTriangleOr extends VTriangle {
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
-        return ((alphaC == null) &&
-            (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) &&
-            (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h)));
-    }
-
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
 	coef=(float)(c.focal/(c.focal+c.altitude));

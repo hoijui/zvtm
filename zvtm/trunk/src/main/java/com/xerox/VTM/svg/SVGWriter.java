@@ -53,7 +53,6 @@ import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VDiamond;
 import com.xerox.VTM.glyphs.VEllipse;
 import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.VOctagon;
 import com.xerox.VTM.glyphs.VPath;
 import com.xerox.VTM.glyphs.VPoint;
 import com.xerox.VTM.glyphs.VPolygon;
@@ -233,7 +232,6 @@ public class SVGWriter {
 	    else if (o instanceof VCircle){return createCircle((VCircle)o);}
 	    else if (o instanceof VPolygon){return createPolygon((VPolygon)o);}
 	    else if (o instanceof VDiamond){return createPolygon((VDiamond)o);}
-	    else if (o instanceof VOctagon){return createPolygon((VOctagon)o);}
 	    else if (o instanceof VPoint){return createPoint((VPoint)o);}
 	    else if (o instanceof VSegment){return createLine((VSegment)o);}
 	    else if (o instanceof VShape){return createPolygon((VShape)o);}
@@ -522,38 +520,6 @@ public class SVGWriter {
 			createStrokeInformation(d,shape);
 		}
 		createClassInforation(d, shape);
-		return shape;
-	}
-
-	private Element createPolygon(VOctagon o){
-		//svg output seems to be slightly bigger than it should be
-		//don't know why yet
-		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-		long[] xcoords=new long[8];
-		long[] ycoords=new long[8];
-		float halfs=o.getSize()/2.0f;
-		xcoords[0]=Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[1]=Math.round((halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[2]=Math.round((-halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[3]=Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[4]=Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[5]=Math.round((-halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[6]=Math.round((halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		xcoords[7]=Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vx)+farWest;
-		ycoords[0]=-Math.round((-halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[1]=-Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[2]=-Math.round((-o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[3]=-Math.round((-halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[4]=-Math.round((halfs*Math.cos(Math.PI-o.getOrient())+o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[5]=-Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())+halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[6]=-Math.round((o.getSize()*Math.cos(Math.PI-o.getOrient())-halfs*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		ycoords[7]=-Math.round((halfs*Math.cos(Math.PI-o.getOrient())-o.getSize()*Math.sin(Math.PI-o.getOrient()))+o.vy)+farNorth;
-		shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3])+" "+String.valueOf(xcoords[4])+","+String.valueOf(ycoords[4])+" "+String.valueOf(xcoords[5])+","+String.valueOf(ycoords[5])+" "+String.valueOf(xcoords[6])+","+String.valueOf(ycoords[6])+" "+String.valueOf(xcoords[7])+","+String.valueOf(ycoords[7]));
-		shape.setAttribute(SVGReader._style,shapeColors(o));
-		if (o.getStroke()!=null){
-			createStrokeInformation(o,shape);
-		}
-		createClassInforation(o, shape);
 		return shape;
 	}
 

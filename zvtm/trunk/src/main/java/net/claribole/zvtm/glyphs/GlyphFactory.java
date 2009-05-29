@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Thu Feb 20 10:44:34 2003 by Emmanuel Pietriga
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  * $Id$
  */
@@ -56,13 +56,7 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VDiamond;
 import com.xerox.VTM.glyphs.VDiamondOr;
-import com.xerox.VTM.glyphs.VDiamondOrST;
-import com.xerox.VTM.glyphs.VDiamondST;
 import com.xerox.VTM.glyphs.VEllipse;
-import com.xerox.VTM.glyphs.VOctagon;
-import com.xerox.VTM.glyphs.VOctagonOr;
-import com.xerox.VTM.glyphs.VOctagonOrST;
-import com.xerox.VTM.glyphs.VOctagonST;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleOr;
 import com.xerox.VTM.glyphs.VShape;
@@ -80,11 +74,10 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
     public static String V_Circle="VCircle";
     public static String V_Triangle="VTriangle";
     public static String V_Diamond="VDiamond";
-    public static String V_Octagon="VOctagon";
     private static Vector initShapeTypes(){
 	Vector res=new Vector();
 	res.add(V_Shape);res.add(V_Rectangle);res.add(V_Ellipse);res.add(V_Circle);
-	res.add(V_Triangle);res.add(V_Diamond);res.add(V_Octagon);
+	res.add(V_Triangle);res.add(V_Diamond);
 	return res;
     }
     private static Vector allowedShapeTypes=initShapeTypes();
@@ -512,7 +505,6 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	else if (glClass.equals(V_Ellipse)){return new VEllPanel(this);}
 	else if (glClass.equals(V_Triangle)){return new VTrgPanel(this);}
 	else if (glClass.equals(V_Diamond)){return new VDiamPanel(this);}
-	else if (glClass.equals(V_Octagon)){return new VOctPanel(this);}
 	else {return new VShapePanel(this);}
     }
 
@@ -639,29 +631,15 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	else if (si.equals(V_Diamond)){
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g=new VDiamondOrST(0, 0, 0, size, fillColor, borderColor, (float)alpha, (float)angle);
+		    g=new VDiamondOr(0, 0, 0, size, fillColor, borderColor, (float)angle, (float)alpha);
 		}
 		else {g=new VDiamondOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
 	    }
 	    else {
 		if (transpChk.isSelected()){
-		    g=new VDiamondST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
+		    g=new VDiamond(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 		}
 		else {g=new VDiamond(0, 0, 0, size, fillColor, borderColor);}
-	    }
-	}
-	else if (si.equals(V_Octagon)){
-	    if (angleChk.isSelected()){
-		if (transpChk.isSelected()){
-		    g=new VOctagonOrST(0, 0, 0, size, fillColor, borderColor, (float)alpha, (float)angle);
-		}
-		else {g=new VOctagonOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
-	    }
-	    else {
-		if (transpChk.isSelected()){
-		    g=new VOctagonST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
-		}
-		else {g=new VOctagon(0, 0, 0, size, fillColor, borderColor);}
 	    }
 	}
 // 	//border color

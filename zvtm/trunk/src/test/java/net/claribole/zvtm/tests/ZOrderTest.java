@@ -15,7 +15,7 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VOctagon;
+import com.xerox.VTM.glyphs.VTriangle;
 
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
@@ -81,7 +81,7 @@ public class ZOrderTest extends TestCase {
     }
 
     public void testAboveSameGlyph(){
-	Glyph g = new VOctagon(10, 10, 3, 30, Color.BLACK);
+	Glyph g = new VTriangle(10, 10, 3, 30, Color.BLACK);
 	vsm.addGlyph(g, vs, false);
 	vs.above(g, g);
 
@@ -89,7 +89,7 @@ public class ZOrderTest extends TestCase {
     }
 
     public void testBelowSameGlyph(){
-	Glyph g = new VOctagon(10, 10, 3, 30, Color.BLACK);
+	Glyph g = new VTriangle(10, 10, 3, 30, Color.BLACK);
 	vsm.addGlyph(g, vs, false);
 	vs.below(g, g);
 
@@ -101,7 +101,7 @@ public class ZOrderTest extends TestCase {
 	final int nbGlyphs = 100;
 
 	for(int i=0; i<nbGlyphs; ++i){
-	    Glyph g = new VOctagon(10, 10, i, 30, Color.BLACK);
+	    Glyph g = new VTriangle(10, 10, i, 30, Color.BLACK);
 	    glyphs.add(g);
 	    vsm.addGlyph(g, vs, false);
 	}

@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Thu Jul 10 16:10:14 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */
  
@@ -20,7 +21,6 @@ import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VDiamond;
 import com.xerox.VTM.glyphs.VEllipse;
 import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.VOctagon;
 import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRoundRect;
@@ -108,13 +108,6 @@ public class GlyphUtils {
 	    int[] xcoords={(int)g.vx+size,(int)g.vx,(int)g.vx-size,(int)g.vx};
 	    int[] ycoords={(int)g.vy,(int)g.vy-size,(int)g.vy,(int)g.vy+size};
 	    return new Polygon(xcoords,ycoords,4);
-	}
-	else if (g instanceof VOctagon){
-	    int size=Math.round(g.getSize());
-	    int halfSize=Math.round(0.5f*g.getSize());
-	    int[] xcoords={(int)g.vx+size,(int)g.vx+halfSize,(int)g.vx-halfSize,(int)g.vx-size,(int)g.vx-size,(int)g.vx-halfSize,(int)g.vx+halfSize,(int)g.vx+size};
-	    int[] ycoords={(int)g.vy+halfSize,(int)g.vy+size,(int)g.vy+size,(int)g.vy+halfSize,(int)g.vy-halfSize,(int)g.vy-size,(int)g.vy-size,(int)g.vy-halfSize};
-	    return new Polygon(xcoords,ycoords,8);
 	}
 	else if (g instanceof VImage){
 	    VImage im1=(VImage)g;

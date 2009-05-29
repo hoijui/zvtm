@@ -18,7 +18,6 @@ import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VDiamond;
 import com.xerox.VTM.glyphs.VEllipse;
-import com.xerox.VTM.glyphs.VOctagon;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRoundRect;
 import com.xerox.VTM.glyphs.VShape;
@@ -59,9 +58,6 @@ public abstract class GlyphIcon {
 	}
 	else if (g instanceof VDiamond){
 	    return new IcDiamond((VDiamond)g,w,h);
-	}
-	else if (g instanceof VOctagon){
-	    return new IcOctagon((VOctagon)g,w,h);
 	}
 	else if (g instanceof VRoundRect){
 	    return new IcRoundRect((VRoundRect)g,w,h);
@@ -508,83 +504,6 @@ class IcDiamond extends GlyphIcon implements Icon {
 	ycoords[2]=(int)Math.round(cHeight+trS*Math.sin(orient));
 	ycoords[3]=(int)Math.round(cHeight+trS*Math.cos(orient));
 	p=new Polygon(xcoords,ycoords,4);
-    }
-    
-}
-
-class IcOctagon extends GlyphIcon implements Icon {
-
-    VOctagon glyph;
-    int trS;
-    Polygon p;
-    int halfS;
-    int[] xcoords=new int[8];
-    int[] ycoords=new int[8];
-    float orient;
-    
-    IcOctagon(VOctagon g,int w,int h){
-	this.glyph=g;
-	this.width=w;
-	this.height=h;
-    }
-
-    /**set the glyph that the icon should be representing
-     *@param g glyph to be represented  (should be a VOctagon (or subclass))
-     */
-    public void setGlyph(Glyph g){
-	glyph=(VOctagon)g;
-    }
-
-    /**get the glyph that the icon is representing
-     */
-    public Glyph getGlyph(){return glyph;}
-
-    /**
-     *get the icon's width (Icon interface)
-     */
-    public int getIconHeight(){return height;}
-
-    /**
-     *get the icon's height (Icon interface)
-     */
-    public int getIconWidth(){return width;}
-
-    /**
-     *Icon interface
-     */
-    public void paintIcon(Component c,Graphics g,int x,int y){
-	cWidth=c.getWidth()/2;
-	cHeight=c.getHeight()/2;
-	computePolygon();
-	if (glyph.isFilled()){
-	    g.setColor(glyph.getColor());
-	    g.fillPolygon(p);
-	}
-	g.setColor(glyph.getBorderColor());
-	g.drawPolygon(p);
-    }
-
-    protected void computePolygon(){
-	trS=Math.min(width,height)/2-2;
-	orient=glyph.getOrient();
-	halfS=trS/2;
-	xcoords[0]=(int)Math.round((trS*Math.cos(orient)-halfS*Math.sin(orient))+cWidth);
-	xcoords[1]=(int)Math.round((halfS*Math.cos(orient)-trS*Math.sin(orient))+cWidth);
-	xcoords[2]=(int)Math.round((-halfS*Math.cos(orient)-trS*Math.sin(orient))+cWidth);
-	xcoords[3]=(int)Math.round((-trS*Math.cos(orient)-halfS*Math.sin(orient))+cWidth);
-	xcoords[4]=(int)Math.round((-trS*Math.cos(orient)+halfS*Math.sin(orient))+cWidth);
-	xcoords[5]=(int)Math.round((-halfS*Math.cos(orient)+trS*Math.sin(orient))+cWidth);
-	xcoords[6]=(int)Math.round((halfS*Math.cos(orient)+trS*Math.sin(orient))+cWidth);
-	xcoords[7]=(int)Math.round((trS*Math.cos(orient)+halfS*Math.sin(orient))+cWidth);
-	ycoords[0]=(int)Math.round((-halfS*Math.cos(orient)-trS*Math.sin(orient))+cHeight);
-	ycoords[1]=(int)Math.round((-trS*Math.cos(orient)-halfS*Math.sin(orient))+cHeight);
-	ycoords[2]=(int)Math.round((-trS*Math.cos(orient)+halfS*Math.sin(orient))+cHeight);
-	ycoords[3]=(int)Math.round((-halfS*Math.cos(orient)+trS*Math.sin(orient))+cHeight);
-	ycoords[4]=(int)Math.round((halfS*Math.cos(orient)+trS*Math.sin(orient))+cHeight);
-	ycoords[5]=(int)Math.round((trS*Math.cos(orient)+halfS*Math.sin(orient))+cHeight);
-	ycoords[6]=(int)Math.round((trS*Math.cos(orient)-halfS*Math.sin(orient))+cHeight);
-	ycoords[7]=(int)Math.round((halfS*Math.cos(orient)-trS*Math.sin(orient))+cHeight);
-	p=new Polygon(xcoords,ycoords,8);
     }
     
 }
