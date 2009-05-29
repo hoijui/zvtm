@@ -21,10 +21,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.glyphs.VImageST;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
 import net.claribole.zvtm.glyphs.VTextST;
@@ -35,7 +33,6 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.svg.SVGReader;
 import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.glyphs.VImageST;
 import net.claribole.zvtm.glyphs.VTextST;
 
 /** <strong>Multi-scale scene manager: main ZUIST class instantiated by client application.</strong>
@@ -553,7 +550,7 @@ public class SceneManager {
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        ClosedShape g = new VRectangleST(x+origin.x, y+origin.y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
+        ClosedShape g = new VRectangle(x+origin.x, y+origin.y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
         return createClosedShapeDescription(g, id, region, sensitivity);

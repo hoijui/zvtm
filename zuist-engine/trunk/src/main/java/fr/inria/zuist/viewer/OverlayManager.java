@@ -32,7 +32,6 @@ import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.VRectangleST;
 import net.claribole.zvtm.glyphs.VTextST;
 import net.claribole.zvtm.glyphs.RImage;
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -89,13 +88,13 @@ class OverlayManager implements ViewEventHandler {
 	}
     
     boolean showingAbout = false;
-    VRectangleST fadeAbout;
+    VRectangle fadeAbout;
     VImage insituLogo, inriaLogo;
     VText[] aboutLines;
     
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangleST(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);

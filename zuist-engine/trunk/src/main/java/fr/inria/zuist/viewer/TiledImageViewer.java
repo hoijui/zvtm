@@ -55,7 +55,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.Utilities;
 import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.VRectangleST;
+import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.ViewEventHandler;
@@ -439,11 +439,11 @@ class Overlay implements ViewEventHandler {
     TiledImageViewer application;
 
     boolean showingAbout = false;
-    VRectangleST fadeAbout;
+    VRectangle fadeAbout;
     VImage insituLogo, inriaLogo;
     VText[] aboutLines;
 
-    VRectangleST fadedRegion;
+    VRectangle fadedRegion;
     VText sayGlyph;
 
     Overlay(TiledImageViewer app){
@@ -451,7 +451,7 @@ class Overlay implements ViewEventHandler {
     }
     
     void init(){
-        fadedRegion = new VRectangleST(0, 0, 0, 10, 10, FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
+        fadedRegion = new VRectangle(0, 0, 0, 10, 10, FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
         application.vsm.addGlyph(fadedRegion, application.aboutSpace);
         fadedRegion.setVisible(false);
         sayGlyph = new VText(0, -10, 0, SAY_MSG_COLOR, " ", VText.TEXT_ANCHOR_MIDDLE);
@@ -462,7 +462,7 @@ class Overlay implements ViewEventHandler {
     
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangleST(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Tiled Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);

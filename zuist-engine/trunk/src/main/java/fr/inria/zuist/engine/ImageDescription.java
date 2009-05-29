@@ -15,10 +15,10 @@ import javax.swing.ImageIcon;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.glyphs.Glyph;
+import com.xerox.VTM.glyphs.VImage;
 import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
-import net.claribole.zvtm.glyphs.VImageST;
 
 /** Description of image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -34,7 +34,7 @@ public class ImageDescription extends ObjectDescription {
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    VImageST glyph;
+    VImage glyph;
 
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
@@ -92,10 +92,10 @@ public class ImageDescription extends ObjectDescription {
             int ih = i.getHeight(null);
             double sf = vh / ((double)ih);
             if (fadeIn){
-                glyph = new VImageST(vx, vy, zindex, i, sf, 0.0f);
+                glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
                 if (strokeColor != null){
                     glyph.setBorderColor(strokeColor);
-                    glyph.setDrawBorderPolicy(VImageST.DRAW_BORDER_ALWAYS);
+                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
@@ -107,10 +107,10 @@ public class ImageDescription extends ObjectDescription {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
-                glyph = new VImageST(vx, vy, zindex, i, sf, 1.0f);
+                glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
                 if (strokeColor != null){
                     glyph.setBorderColor(strokeColor);
-                    glyph.setDrawBorderPolicy(VImageST.DRAW_BORDER_ALWAYS);
+                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
@@ -166,7 +166,7 @@ class ImageHideAction implements EndAction {
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            ((VImageST)subject).getImage().flush();
+            ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
             System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).getID() + " failed. Trying one more time.");
@@ -177,7 +177,7 @@ class ImageHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            ((VImageST)subject).getImage().flush();
+            ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
             System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).getID() + " failed. Giving up.");
