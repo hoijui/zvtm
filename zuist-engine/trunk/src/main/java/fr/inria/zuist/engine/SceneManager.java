@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VPolygonST;
+import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VText;
@@ -562,7 +562,7 @@ public class SceneManager {
         Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        ClosedShape g = new VPolygonST(vertices, zindex, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
+        ClosedShape g = new VPolygon(vertices, zindex, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
         return createClosedShapeDescription(g, id, region, sensitivity);
