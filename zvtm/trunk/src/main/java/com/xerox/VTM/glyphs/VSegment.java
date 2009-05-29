@@ -51,16 +51,6 @@ public class VSegment extends Glyph implements RectangularShape {
 
     RProjectedCoords[] pc;
 
-    public VSegment(){
-	vx=0;
-	vy=0;
-	vz=0;
-	orient=0;
-	size=10;
-	computeEdges();
-	setColor(Color.white);
-    }
-
     /**
      *give the centre of segment and half its projected length on X & Y axis
      *@param x coordinate in virtual space
@@ -70,14 +60,29 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param h half height in virtual space (can be negative)
      *@param c fill color
      */
-    public VSegment(long x,long y, int z,long w,long h,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=w;
-	vh=h;
-	computeSize();
-	setColor(c);
+    public VSegment(long x, long y, int z, long w, long h, Color c){
+        this(x, y, z, w, h, c, 1f);
+    }
+    
+    /**
+     *give the centre of segment and half its projected length on X & Y axis
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param w half width in virtual space (can be negative)
+     *@param h half height in virtual space (can be negative)
+     *@param c fill color
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VSegment(long x, long y, int z, long w, long h, Color c, float alpha){
+        vx = x;
+        vy = y;
+        vz = z;
+        vw = w;
+        vh = h;
+        computeSize();
+        setColor(c);
+        setTranslucencyValue(alpha);
     }
 
     /**
@@ -90,13 +95,28 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param c fill color
      */
     public VSegment(long x1, long y1, int z, Color c, long x2, long y2){
-	vx = (x1 + x2) / 2;
-	vy = (y1 + y2) / 2;
-	vz = z;
-	vw = (x2 - x1) / 2;
-	vh = (y2 - y1) / 2;
-	computeSize();
-	setColor(c);
+        this(x1, y1, z, c, x2, y2, 1f);
+    }
+    
+    /**
+     *give the end points of segment
+     *@param x1 coordinate of endpoint 1 in virtual space
+     *@param y1 coordinate of endpoint 1 in virtual space
+     *@param x2 coordinate of endpoint 2 in virtual space
+     *@param y2 coordinate of endpoint 2 in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c fill color
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VSegment(long x1, long y1, int z, Color c, long x2, long y2, float alpha){
+        vx = (x1 + x2) / 2;
+        vy = (y1 + y2) / 2;
+        vz = z;
+        vw = (x2 - x1) / 2;
+        vh = (y2 - y1) / 2;
+        computeSize();
+        setColor(c);
+        setTranslucencyValue(alpha);
     }
 
     /**
@@ -108,14 +128,29 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param angle orientation
      *@param c fill color
      */
-    public VSegment(long x,long y, int z,float lgth,float angle,Color c){
-	vx=x;
-	vy=y;
-	vz=z;
-	orient=angle;
-	size=lgth;
-	computeEdges();
-	setColor(c);
+    public VSegment(long x, long y, int z, float lgth, float angle, Color c){
+        this(x, y, z, lgth, angle, c, 1f);
+    }
+    
+    /**
+     *give the centre of segment and half its length & orient
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param lgth half length in virtual space
+     *@param angle orientation
+     *@param c fill color
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VSegment(long x, long y, int z, float lgth, float angle, Color c, float alpha){
+        vx = x;
+        vy = y;
+        vz = z;
+        orient = angle;
+        size = lgth;
+        computeEdges();
+        setColor(c);
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
@@ -317,27 +352,57 @@ public class VSegment extends Glyph implements RectangularShape {
     }
     
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	if (stroke!=null) {
-	    g.setStroke(stroke);
-	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
-	    g.setStroke(stdS);
-	}
-	else {
-	    g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        g.setColor(this.color);
+        if (stroke!=null) {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.setStroke(stroke);
+                g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
+                g.setStroke(stdS);
+                g.setComposite(acO);
+            }
+            else {
+                g.setStroke(stroke);
+                g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
+                g.setStroke(stdS);
+            }
+        }
+        else if (alphaC != null){
+            g.setComposite(alphaC);
+            g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
+            g.setComposite(acO);
+        }
+        else {
+            g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);	    
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	g.setColor(this.color);
-	if (stroke!=null) {
-	    g.setStroke(stroke);
-	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
-	    g.setStroke(stdS);
-	}
-	else {
-	    g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        g.setColor(this.color);
+        if (stroke!=null) {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.setStroke(stroke);
+                g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
+                g.setStroke(stdS);
+                g.setComposite(acO);
+            }
+            else {
+                g.setStroke(stroke);
+                g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
+                g.setStroke(stdS);
+            }
+        }
+        else if (alphaC != null){
+            g.setComposite(alphaC);
+            g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
+            g.setComposite(acO);
+        }
+        else {
+            g.drawLine(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy+pc[i].lch,dx+pc[i].lcx+pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
+        }
     }
 
     public Object clone(){

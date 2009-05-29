@@ -60,8 +60,7 @@ import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VRectangleOr;
 import com.xerox.VTM.glyphs.VRoundRect;
-//import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.VSegmentST;
+import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VImage;
 
@@ -1400,7 +1399,7 @@ public class SVGReader {
     /** Create a set of VSegments from an SVG polyline element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      */
-    public static VSegmentST[] createPolyline(Element e){
+    public static VSegment[] createPolyline(Element e){
         return createPolyline(e,null,false);
     }
 
@@ -1408,7 +1407,7 @@ public class SVGReader {
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VSegmentST[] createPolyline(Element e,Context ctx){
+    public static VSegment[] createPolyline(Element e,Context ctx){
         return createPolyline(e,ctx,false);
     }
 
@@ -1417,10 +1416,10 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VSegmentST[] createPolyline(Element e,Context ctx,boolean meta){
+    public static VSegment[] createPolyline(Element e,Context ctx,boolean meta){
         Vector coords=new Vector();
         translateSVGPolygon(e.getAttribute(_points),coords);
-        VSegmentST[] res=new VSegmentST[coords.size()-1];        
+        VSegment[] res=new VSegment[coords.size()-1];        
         Color border=Color.black;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
         if (ss != null){
@@ -1435,7 +1434,7 @@ public class SVGReader {
         for (int i=0;i<coords.size()-1;i++){
             lp1=(LongPoint)coords.elementAt(i);
             lp2=(LongPoint)coords.elementAt(i+1);
-            res[i] = new VSegmentST(lp1.x, -lp1.y, 0, border, lp2.x, -lp2.y, 1.0f);
+            res[i] = new VSegment(lp1.x, -lp1.y, 0, border, lp2.x, -lp2.y, 1f);
             if (ss != null && ss.requiresSpecialStroke()){
                 assignStroke(res[i], ss);
             }
@@ -1450,7 +1449,7 @@ public class SVGReader {
     /** Create a VSegment from an SVG line element.
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      */
-    public static VSegmentST createLine(Element e){
+    public static VSegment createLine(Element e){
         return createLine(e, null, false);
     }
 
@@ -1458,7 +1457,7 @@ public class SVGReader {
      *@param e an SVG polyline as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VSegmentST createLine(Element e, Context ctx){
+    public static VSegment createLine(Element e, Context ctx){
         return createLine(e, ctx, false);
     }
 
@@ -1467,8 +1466,8 @@ public class SVGReader {
 		*@param ctx used to propagate contextual style information (put null if none)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
-	public static VSegmentST createLine(Element e, Context ctx, boolean meta){
-		VSegmentST res;		
+	public static VSegment createLine(Element e, Context ctx, boolean meta){
+		VSegment res;		
 		long x1 = getLong(e.getAttribute(_x1));
 		long y1 = getLong(e.getAttribute(_y1));
 		long x2 = getLong(e.getAttribute(_x2));
@@ -1489,24 +1488,24 @@ public class SVGReader {
 			border = ss.getStrokeColor();
 			if (border == null){border = (ss.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ss.hasTransparencyInformation()){
-			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ss.getAlphaTransparencyValue());
+			    res = new VSegment(x1, -y1, 0, border, x2, -y2, ss.getAlphaTransparencyValue());
 			}
 			else {
-			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, 1.0f);
+			    res = new VSegment(x1, -y1, 0, border, x2, -y2, 1f);
 			}
 		}
 		else if (ctx != null){
 			if (ctx.getStrokeColor() != null){border = ctx.getStrokeColor();}
 			else {border = (ctx.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ctx.hasTransparencyInformation()){
-			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, ctx.getAlphaTransparencyValue());
+			    res = new VSegment(x1, -y1, 0, border, x2, -y2, ctx.getAlphaTransparencyValue());
 			}
 			else {
-			    res = new VSegmentST(x1, -y1, 0, border, x2, -y2, 1.0f);
+			    res = new VSegment(x1, -y1, 0, border, x2, -y2, 1f);
 			}
 		}
 		else {
-			res = new VSegmentST(x1, -y1, 0, border, x2, -y2, 1.0f);			
+			res = new VSegment(x1, -y1, 0, border, x2, -y2, 1f);			
 		}
 		if (ss != null && ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
