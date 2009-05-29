@@ -49,8 +49,7 @@ public class VTextOr extends VText {
     float vw,vh;
 
     public VTextOr(String t,float or){
-	super(t);
-	orient=or;
+	    this(0, 0, 0, Color.BLACK, t, or, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -62,8 +61,7 @@ public class VTextOr extends VText {
      *@param or orientation
      */
     public VTextOr(long x,long y, int z,Color c,String t,float or){
-	super(x,y,z,c,t);
-	orient=or;
+	    this(x, y, z, c, t, or, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -76,8 +74,7 @@ public class VTextOr extends VText {
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
      */
     public VTextOr(long x,long y, int z,Color c,String t,float or,short ta){
-	super(x, y, z, c, t, ta);
-	orient = or;
+	    this(x, y, z, c, t, or, ta, 1f, 1f);
     }
 
     /**
@@ -91,9 +88,25 @@ public class VTextOr extends VText {
      *@param scale scaleFactor w.r.t original image size
      */
     public VTextOr(long x, long y, int z, Color c, String t, float or, short ta, float scale){
-	super(x, y, z, c, t, ta);
-	orient = or;
-	scaleFactor = scale;
+        this(x, y, z, c, t, or, ta, scale, 1f);
+    }
+    
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c fill color
+     *@param t text string
+     *@param or orientation
+     *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
+     *@param scale scaleFactor w.r.t original image size
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VTextOr(long x, long y, int z, Color c, String t, float or, short ta, float scale, float alpha){
+        super(x, y, z, c, t, ta);
+        orient = or;
+        scaleFactor = scale;
+        setTranslucencyValue(alpha);
     }
 
     public void orientTo(float angle){
@@ -107,18 +120,20 @@ public class VTextOr extends VText {
     }
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (!pc[i].valid){
+			g.setFont((font!=null) ? font : getMainFont());
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
+			// cw and ch actually hold width and height of text *in virtual space*
+			pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
+			pc[i].ch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
+			pc[i].valid=true;
+		}
+		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		g.setColor(this.color);
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
-			if (!pc[i].valid){
-				Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
-				// cw and ch actually hold width and height of text *in virtual space*
-				pc[i].cw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
-				pc[i].ch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
-				pc[i].valid=true;
-			}
 			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START){
 				at = AffineTransform.getTranslateInstance(dx+pc[i].cx, pc[i].cy);
@@ -138,26 +153,34 @@ public class VTextOr extends VText {
 				at.concatenate(AffineTransform.getTranslateInstance(-pc[i].cw/scaleFactor, 0));
 			}
 			g.setTransform(at);
-			g.drawString(text, 0.0f, 0.0f);
+			if (alphaC != null){
+				g.setComposite(alphaC);
+				g.drawString(text, 0.0f, 0.0f);
+				g.setComposite(acO);
+			}
+			else {
+				g.drawString(text, 0.0f, 0.0f);
+			}
 			g.setTransform(stdT);
 		}
 		else {g.fillRect(dx+pc[i].cx,pc[i].cy,1,1);}
 	}
 
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (!pc[i].lvalid){
+			g.setFont((font!=null) ? font : getMainFont());
+			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
+			// lcw and lch actually hold width and height of text *in virtual space*
+			pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
+			pc[i].lch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
+			pc[i].lvalid=true;
+		}
+		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		g.setColor(this.color);
 		float trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
-			if (!pc[i].lvalid){
-				Rectangle2D bounds;
-				bounds = g.getFontMetrics().getStringBounds(text, g);
-				// lcw and lch actually hold width and height of text *in virtual space*
-				pc[i].lcw = (int)Math.abs(Math.round(bounds.getWidth() * scaleFactor));
-				pc[i].lch = (int)Math.abs(Math.round(bounds.getHeight() * scaleFactor));
-				pc[i].lvalid=true;
-			}
 			AffineTransform at;
 			if (text_anchor == TEXT_ANCHOR_START){
 				at = AffineTransform.getTranslateInstance(dx+pc[i].lcx, pc[i].lcy);
@@ -177,11 +200,19 @@ public class VTextOr extends VText {
 				at.concatenate(AffineTransform.getTranslateInstance(-pc[i].lcw/scaleFactor, 0));
 			}
 			g.setTransform(at);
-			g.drawString(text, 0.0f, 0.0f);
+			if (alphaC != null){
+				g.setComposite(alphaC);
+				g.drawString(text, 0.0f, 0.0f);
+				g.setComposite(acO);
+			}
+			else {
+				g.drawString(text, 0.0f, 0.0f);
+			}
 			g.setTransform(stdT);
 		}
 		else {g.fillRect(dx+pc[i].lcx, pc[i].lcy, 1, 1);}
 	}
+
 
     public Object clone(){
 	VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
