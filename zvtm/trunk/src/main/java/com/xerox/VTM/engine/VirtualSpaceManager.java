@@ -1037,7 +1037,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 		*@param y1 y coord of first point
 		*@param x2 x coord of opposite point
 		*@param y2 y coord of opposite point
-		*@param action to be performed at end of animation
+		*@param ea action to be performed at end of animation
 		*@return the final camera location
 		*/
 	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2, EndAction ea){

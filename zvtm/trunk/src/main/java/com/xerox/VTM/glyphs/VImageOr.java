@@ -35,8 +35,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * Re-orientable Bitmap Image. This version is less efficient than VImage, but it can be reoriented. It cannot be made translucent (see VImage*ST).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VImage
- *@see net.claribole.zvtm.glyphs.VImageOrST
- *@see net.claribole.zvtm.glyphs.VImageST
  */
 
 public class VImageOr extends VImage {

@@ -39,8 +39,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * Equilateral Triangle. This version is the most efficient, but it can neither be reoriented (see VTriangleOr*) nor made translucent (see VTriangle*ST).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VTriangleOr
- *@see com.xerox.VTM.glyphs.VTriangleOrST
- *@see com.xerox.VTM.glyphs.VTriangleST
  */
 
 public class VTriangle extends ClosedShape {

@@ -76,7 +76,6 @@ public class VBText extends VText {
 	 * @param fillColor color of the background
 	 * @param text text string
 	 * @param ta text anchor
-      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 	 */
 	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text, short ta) {
 	    this(x, y, z, textColor, borderColor, fillColor, text, ta, 1f);
@@ -91,7 +90,7 @@ public class VBText extends VText {
 	 * @param fillColor color of the background
 	 * @param text text string
 	 * @param ta text anchor
-      *@param a alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+      *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 	 */
 	public VBText(long x, long y, int z, Color textColor, Color borderColor, Color fillColor, String text, short ta, float alpha) {
 		super(x, y, z, textColor, text, ta);

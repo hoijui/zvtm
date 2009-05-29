@@ -41,7 +41,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 /**
  * Segment (straight line). This version is the most efficient, but it cannot be made translucent (see VSegmentST).
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VSegmentST
  */
 
 public class VSegment extends Glyph implements RectangularShape {

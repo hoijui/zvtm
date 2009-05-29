@@ -44,10 +44,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
  * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VTextOr
- *@see com.xerox.VTM.glyphs.LText
- *@see com.xerox.VTM.glyphs.LBText
- *@see net.claribole.zvtm.glyphs.VTextST
- *@see net.claribole.zvtm.glyphs.VTextOrST
  */
 
 public class VText extends Glyph {

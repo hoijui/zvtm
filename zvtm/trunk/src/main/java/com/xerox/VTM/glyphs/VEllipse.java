@@ -36,7 +36,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 /**
  * Ellipse. This version is the most efficient, but it can not be made translucent (see VEllipseST).
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VEllipseST
  *@see com.xerox.VTM.glyphs.VCircle
  */
 
