@@ -68,8 +68,6 @@ import com.xerox.VTM.glyphs.VRectangleOr;
 import com.xerox.VTM.glyphs.VShape;
 import com.xerox.VTM.glyphs.VTriangle;
 import com.xerox.VTM.glyphs.VTriangleOr;
-import com.xerox.VTM.glyphs.VTriangleOrST;
-import com.xerox.VTM.glyphs.VTriangleST;
 
 
 public class GlyphFactory extends JDialog implements ActionListener,MouseListener,ChangeListener {
@@ -627,13 +625,13 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	else if (si.equals(V_Triangle)){
 	    if (angleChk.isSelected()){
 		if (transpChk.isSelected()){
-		    g=new VTriangleOrST(0, 0, 0, size, fillColor, borderColor, (float)alpha, (float)angle);
+		    g=new VTriangleOr(0, 0, 0, size, fillColor, borderColor, (float)angle, (float)alpha);
 		}
-		else {g=new VTriangleOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
+		else {g=new VTriangleOr(0, 0, 0, size, fillColor, borderColor, (float)angle, 1f);}
 	    }
 	    else {
 		if (transpChk.isSelected()){
-		    g=new VTriangleST(0, 0, 0, size, fillColor, borderColor, (float)alpha);
+		    g=new VTriangle(0, 0, 0, size, fillColor, borderColor, (float)alpha);
 		}
 		else {g=new VTriangle(0, 0, 0, size, fillColor, borderColor);}
 	    }
