@@ -26,7 +26,6 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 /**
  * Round Rectangle. This version is the most efficient, but it cannot be made translucent (see VRoundRectST).<br>Corners are approximated to right angles for some operations such as cursor entry/exit events.
  * @author Emmanuel Pietriga
- *@see com.xerox.VTM.glyphs.VRoundRectST
  *@see com.xerox.VTM.glyphs.VRectangle
  */
 
@@ -50,73 +49,63 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     public int arcHeight;
 
     public VRoundRect(){
-	vx=0;
-	vy=0;
-	vz=0;
-	vw=10;
-	vh=10;
-	computeSize();
-	ar=(float)vw/(float)vh;
-	orient=0;
-	setColor(Color.white);
-	setBorderColor(Color.black);
-	arcWidth=10;
-	arcHeight=10;
+        this(0, 0, 0, 10, 10, Color.WHITE, Color.BLACK, 1.0f, 10, 10);
     }
 
     /**
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space
-     *@param h half height in virtual space
-     *@param c fill color
-     *@param aw arc width in virtual space
-     *@param ah arc height in virtual space
-     */
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param w half width in virtual space
+        *@param h half height in virtual space
+        *@param c fill color
+        *@param aw arc width in virtual space
+        *@param ah arc height in virtual space
+        */
     public VRoundRect(long x,long y, int z,long w,long h,Color c,int aw,int ah){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=w;
-	vh=h;
-	computeSize();
-	if (vw==0 && vh==0){ar=1.0f;}
-	else {ar=(float)vw/(float)vh;}
-	//if (vh!=0){ar=vw/vh;}else{ar=0;}
-	orient=0;
-	setColor(c);
-	setBorderColor(Color.black);
-	arcWidth=aw;
-	arcHeight=ah;
+        this(x, y, z, w, h, c, Color.BLACK, 1.0f, aw, ah);
     }
 
     /**
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space
-     *@param h half height in virtual space
-     *@param c fill color
-     *@param bc border color
-     *@param aw arc width in virtual space
-     *@param ah arc height in virtual space
-     */
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param w half width in virtual space
+        *@param h half height in virtual space
+        *@param c fill color
+        *@param bc border color
+        *@param aw arc width in virtual space
+        *@param ah arc height in virtual space
+        */
     public VRoundRect(long x, long y, int z, long w, long h, Color c, Color bc, int aw, int ah){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=w;
-	vh=h;
-	computeSize();
-	if (vw==0 && vh==0){ar=1.0f;}
-	else {ar=(float)vw/(float)vh;}
-	//if (vh!=0){ar=vw/vh;}else{ar=0;}
-	orient=0;
-	setColor(c);
-	setBorderColor(bc);
-	arcWidth=aw;
-	arcHeight=ah;
+        this(x, y, z, w, h, c, bc, 1.0f, aw, ah);
+    }
+
+    /**
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param w half width in virtual space
+        *@param h half height in virtual space
+        *@param c fill color
+        *@param bc border color
+        *@param aw arc width in virtual space
+        *@param ah arc height in virtual space
+        */
+    public VRoundRect(long x, long y, int z, long w, long h, Color c, Color bc, float alpha, int aw, int ah){
+        vx = x;
+        vy = y;
+        vz = z;
+        vw = w;
+        vh = h;
+        computeSize();
+        if (vw==0 && vh==0){ar = 1.0f;}
+        else {ar = (float)vw / (float)vh;}
+        orient = 0;
+        setColor(c);
+        setBorderColor(bc);
+        arcWidth = aw;
+        arcHeight = ah;
     }
 
     public void initCams(int nbCam){
@@ -241,9 +230,11 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 	return arcHeight;
     }
 
-    public boolean fillsView(long w,long h,int camIndex){//width and height of view - pc[i].c? are JPanel coords
-	if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
-	else {return false;}
+    public boolean fillsView(long w,long h,int camIndex){
+        if ((alphaC == null) &&
+            (w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) &&
+            (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
+        else {return false;}
     }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
@@ -307,80 +298,161 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].ch>1)) {//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		if (pc[i].aw > 4 || pc[i].ah > 4){
-		    g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
-		}
-		else {
-		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
-		}
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);  //change stroke there
-		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
-		    g.setStroke(stdS);  //original stroke restored here
-		}
-		else {
-		    g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
-		}
-	    }
-	}
-	else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {//repaint only if object is visible  (^ means xor)
-	    g.setColor(this.color);
-	    if (pc[i].cw<=1){
-		g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
-	    }
-	    else if (pc[i].ch<=1){
-		g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].cw>1) && (pc[i].ch>1)) {
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled) {
+                    g.setColor(this.color);
+                    g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled) {
+                    g.setColor(this.color);
+                    g.fillRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch,pc[i].aw,pc[i].ah);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
+                    }
+                }
+            }
+        }
+        else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {
+            //repaint only if object is visible  (^ means xor)
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (pc[i].cw<=1){
+                    g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
+                }
+                else if (pc[i].ch<=1){
+                    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (pc[i].cw<=1){
+                    g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
+                }
+                else if (pc[i].ch<=1){
+                    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lcw>1) && (pc[i].lch>1)) {//repaint only if object is visible
-	    if (filled) {
-		g.setColor(this.color);
-		g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);
-	    }
-	    if (paintBorder){
-		g.setColor(borderColor);
-		if (stroke!=null) {
-		    g.setStroke(stroke);  //change stroke there
-		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
-		    g.setStroke(stdS);  //original stroke restored here
-		}
-		else {
-		    g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
-		}
-	    }
-	}
-	else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {//repaint only if object is visible  (^ means xor)
-	    g.setColor(this.color);
-	    if (pc[i].lcw<=1){
-		g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
-	    }
-	    else if (pc[i].lch<=1){
-		g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].lcw>1) && (pc[i].lch>1)) {
+            //repaint only if object is visible
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled) {
+                    g.setColor(this.color);
+                    g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled) {
+                    g.setColor(this.color);
+                    g.fillRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch,pc[i].law,pc[i].lah);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null) {
+                        g.setStroke(stroke);
+                        g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
+                    }
+                }
+            }
+        }
+        else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {
+            //repaint only if object is visible  (^ means xor)
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (pc[i].lcw<=1){
+                    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
+                }
+                else if (pc[i].lch<=1){
+                    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (pc[i].lcw<=1){
+                    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
+                }
+                else if (pc[i].lch<=1){
+                    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     public Object clone(){
-	VRoundRect res = new VRoundRect(vx, vy, 0, vw, vh, color, borderColor, arcWidth, arcHeight);
-	res.mouseInsideColor=this.mouseInsideColor;
-	return res;
+        VRoundRect res = new VRoundRect(vx, vy, 0, vw, vh, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1.0f, arcWidth, arcHeight);
+        res.mouseInsideColor=this.mouseInsideColor;
+        return res;
     }
 
 }

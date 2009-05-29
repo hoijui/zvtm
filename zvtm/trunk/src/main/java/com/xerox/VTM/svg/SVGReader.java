@@ -60,8 +60,7 @@ import net.claribole.zvtm.glyphs.DPath;
 //import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VPolygonST;
 import com.xerox.VTM.glyphs.VRectangleOr;
-//import com.xerox.VTM.glyphs.VRoundRect;
-import com.xerox.VTM.glyphs.VRoundRectST;
+import com.xerox.VTM.glyphs.VRoundRect;
 //import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VSegmentST;
 import com.xerox.VTM.glyphs.VText;
@@ -1049,7 +1048,7 @@ public class SVGReader {
      * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      */
-    public static VRoundRectST createRoundRectFromPolygon(Element e){
+    public static VRoundRect createRoundRectFromPolygon(Element e){
         return createRoundRectFromPolygon(e,null,false);
     }
 
@@ -1058,7 +1057,7 @@ public class SVGReader {
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
      *@param ctx used to propagate contextual style information (put null if none)
      */
-    public static VRoundRectST createRoundRectFromPolygon(Element e,Context ctx){
+    public static VRoundRect createRoundRectFromPolygon(Element e,Context ctx){
         return createRoundRectFromPolygon(e,ctx,false);
     }
 
@@ -1068,7 +1067,7 @@ public class SVGReader {
      *@param ctx used to propagate contextual style information (put null if none)
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
-    public static VRoundRectST createRoundRectFromPolygon(Element e,Context ctx,boolean meta){
+    public static VRoundRect createRoundRectFromPolygon(Element e,Context ctx,boolean meta){
         Vector coords=new Vector();
         translateSVGPolygon(e.getAttribute(_points),coords);
         if (isRectangle(coords)){
@@ -1090,17 +1089,26 @@ public class SVGReader {
             long w=Math.abs(pNW.x-pNE.x);
             long x=pNE.x-w/2;
             long y=pNE.y-h/2;
-            VRoundRectST res;
+            VRoundRect res;
             SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
             if (ss != null){
                 if (ss.hasTransparencyInformation()){
-                    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-                    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f,Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
-                    ((Translucent)res).setTranslucencyValue(ss.getAlphaTransparencyValue());
+                    if (ss.getFillColor()==null){
+                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res.setFilled(false);
+                    }
+                    else {
+                        res = new VRoundRect(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                    }
                 }
                 else {
-                    if (ss.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-                    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+                    if (ss.getFillColor()==null){
+                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res.setFilled(false);
+                    }
+                    else {
+                        res = new VRoundRect(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                    }
                 }
                 Color border=ss.getStrokeColor();
                 if (border != null){
@@ -1116,13 +1124,22 @@ public class SVGReader {
             }
             else if (ctx!=null){
                 if (ctx.hasTransparencyInformation()){
-                    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-                    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
-                    ((Translucent)res).setTranslucencyValue(ctx.getAlphaTransparencyValue());
+                    if (ctx.getFillColor()==null){
+                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res.setFilled(false);
+                    }
+                    else {
+                        res = new VRoundRect(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                    }
                 }
                 else {
-                    if (ctx.getFillColor()==null){res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));res.setFilled(false);}
-                    else {res=new VRoundRectST(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+                    if (ctx.getFillColor()==null){
+                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res.setFilled(false);
+                    }
+                    else {
+                        res = new VRoundRect(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                    }
                 }
                 Color border=ctx.getStrokeColor();
                 if (border!=null){
@@ -1133,7 +1150,9 @@ public class SVGReader {
                     res.setDrawBorder(false);
                 }
             }
-            else {res=new VRoundRectST(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));}
+            else {
+                res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+            }
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
