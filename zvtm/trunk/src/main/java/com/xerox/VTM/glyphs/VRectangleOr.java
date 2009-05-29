@@ -32,11 +32,9 @@ import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 
 /**
- * Rectangle. This version is less efficient than VRectangle, but it can be reoriented. It cannot be made translucent (see VRectangle*ST).
+ * Rectangle. This version is less efficient than VRectangle, but it can be reoriented.
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VRectangle
- *@see com.xerox.VTM.glyphs.VRectangleOrST
- *@see com.xerox.VTM.glyphs.VRectangleST
  */
 
 public class VRectangleOr extends VRectangle {
@@ -47,36 +45,51 @@ public class VRectangleOr extends VRectangle {
     int[] ycoords = new int[4];
 
     public VRectangleOr(){
-	super();
+        this(0, 0, 0, 10, 10, Color.WHITE, Color.BLACK, 0, 1.0f);
     }
 
     /**
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space
-     *@param h half height in virtual space
-     *@param c fill color
-     *@param or orientation
-     */
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param w half width in virtual space
+        *@param h half height in virtual space
+        *@param c fill color
+        *@param or orientation
+        */
     public VRectangleOr(long x,long y, int z,long w,long h,Color c,float or){
-	super(x,y,z,w,h,c);
-	orient=or;
+        this(x, y, z, w, h, c, Color.BLACK, or, 1.0f);
     }
-
+    
     /**
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space
-     *@param h half height in virtual space
-     *@param c fill color
-     *@param bc border color
-     *@param or orientation
-     */
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param w half width in virtual space
+        *@param h half height in virtual space
+        *@param c fill color
+        *@param bc border color
+        *@param or orientation
+        */
     public VRectangleOr(long x, long y, int z, long w, long h, Color c, Color bc, float or){
-	super(x, y, z, w, h, c);
-	orient=or;
+        this(x, y, z, w, h, c, bc, or, 1.0f);
+    }
+    
+    /**
+        *@param x coordinate in virtual space
+        *@param y coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param w half width in virtual space
+        *@param h half height in virtual space
+        *@param c fill color
+        *@param bc border color
+        *@param or orientation
+         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+        */
+    public VRectangleOr(long x, long y, int z, long w, long h, Color c, Color bc, float or, float alpha){
+        super(x, y, z, w, h, c);
+        orient = or;
+        setTranslucencyValue(alpha);
     }
 
     public float getOrient(){return orient;}
@@ -195,102 +208,213 @@ public class VRectangleOr extends VRectangle {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].cw>1) && (pc[i].ch>1)){//repaint only if object is visible
-	    if (orient==0) {
-		if (filled){
-		    g.setColor(this.color);
-		    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
-		}
-		if (paintBorder){
-		    g.setColor(borderColor);
-		    if (stroke!=null) {	
- 			if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
-			    ((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
-			    // [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
-			    // the rectangle, in which case the border would not be visible;
-			    // the fact that the rectangle intersects the viewport has already been tested by the main
-			    // clipping algorithm
-			    g.setStroke(stroke);
-			    g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);   //outline rectangle
-			    g.setStroke(stdS);
- 			}
-		    }
-		    else {
-			g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);   //outline rectangle
-		    }
-		}
-	    }
-	    else {
-		g.translate(dx, dy);
-		if (filled){
-		    g.setColor(this.color);
-		    g.fillPolygon(pc[i].p);
-		}
-		if (paintBorder){
-		    g.setColor(borderColor);
-		    if (stroke!=null) {
-			g.setStroke(stroke);
-			g.drawPolygon(pc[i].p);
-			g.setStroke(stdS);
-		    }
-		    else {
-			g.drawPolygon(pc[i].p);
-		    }
-		}
-		g.translate(-dx, -dy);
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].cw>1) && (pc[i].ch>1)){
+            //repaint only if object is visible
+            if (orient==0) {
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
+                            ((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
+                                // [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
+                                // the rectangle, in which case the border would not be visible;
+                                // the fact that the rectangle intersects the viewport has already been tested by the main
+                                // clipping algorithm
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+                                g.setStroke(stdS);
+                            }
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+                        }
+                    }
+                    g.setComposite(acO);
+                }
+                else {
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            if (((dx+pc[i].cx-pc[i].cw)>0) || ((dy+pc[i].cy-pc[i].ch)>0) ||
+                            ((dx+pc[i].cx-pc[i].cw+2*pc[i].cw-1)<vW) || ((dy+pc[i].cy-pc[i].ch+2*pc[i].ch-1)<vH)){
+                                // [C1] draw complex border only if it is actually visible (just test that viewport is not fully within
+                                // the rectangle, in which case the border would not be visible;
+                                // the fact that the rectangle intersects the viewport has already been tested by the main
+                                // clipping algorithm
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+                                g.setStroke(stdS);
+                            }
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+                        }
+                    }
+                }
+            }
+            else {
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillPolygon(pc[i].p);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].p);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].p);
+                        }
+                    }
+                    g.setComposite(acO);
+                }
+                else {
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillPolygon(pc[i].p);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].p);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].p);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	if ((pc[i].lcw>1) && (pc[i].lch>1)){//repaint only if object is visible
-	    if (orient==0) {
-		if (filled){
-		    g.setColor(this.color);
-		    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
-		}
-		if (paintBorder){
-		    g.setColor(borderColor);
-		    if (stroke!=null) {
-			if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
-			    ((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
-			    // see [C1] above for explanations about this test
-			    g.setStroke(stroke);
-			    g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);   //outline rectangle
-			    g.setStroke(stdS);
-			}
-		    }
-		    else {
-			g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1);   //outline rectangle
-		    }
-		}
-	    }
-	    else {
-		if (filled){
-		    g.setColor(this.color);
-		    g.fillPolygon(pc[i].lp);
-		}
-		if (paintBorder){
-		    g.setColor(borderColor);
-		    if (stroke!=null) {
-			g.setStroke(stroke);
-			g.drawPolygon(pc[i].lp);
-			g.setStroke(stdS);
-		    }
-		    else {
-			g.drawPolygon(pc[i].lp);
-		    }
-		}
-	    }
-	}
-	else {
-	    g.setColor(this.color);
-	    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-	}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].lcw>1) && (pc[i].lch>1)){
+            //repaint only if object is visible
+            if (orient==0) {
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
+                            ((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
+                                // see [C1] above for explanations about this test
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+                                g.setStroke(stdS);
+                            }
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+                        }
+                    }
+                    g.setComposite(acO);
+                }
+                else {
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            if (((dx+pc[i].lcx-pc[i].lcw)>0) || ((dy+pc[i].lcy-pc[i].lch)>0) ||
+                            ((dx+pc[i].lcx-pc[i].lcw+2*pc[i].lcw-1)<vW) || ((dy+pc[i].lcy-pc[i].lch+2*pc[i].lch-1)<vH)){
+                                // see [C1] above for explanations about this test
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+                                g.setStroke(stdS);
+                            }
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
+                        }
+                    }
+                }
+            }
+            else {
+                if (alphaC != null){
+                    g.setComposite(alphaC);
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillPolygon(pc[i].lp);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].lp);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].lp);
+                        }
+                    }
+                    g.setComposite(acO);
+                }
+                else {
+                    if (filled){
+                        g.setColor(this.color);
+                        g.fillPolygon(pc[i].lp);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].lp);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].lp);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
     }
 
     public Object clone(){

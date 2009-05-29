@@ -36,11 +36,9 @@ import com.xerox.VTM.engine.VirtualSpaceManager;
 
 
 /**
- * Rectangle. This version is the most efficient, but it can neither be reoriented (see VRectangleOr*) nor made translucent (see VRectangle*ST).
+ * Rectangle. This version is the most efficient, but it cannot be reoriented.
  * @author Emmanuel Pietriga
  *@see com.xerox.VTM.glyphs.VRectangleOr
- *@see com.xerox.VTM.glyphs.VRectangleOrST
- *@see com.xerox.VTM.glyphs.VRectangleST
  */
 
 public class VRectangle extends ClosedShape implements RectangularShape {
