@@ -62,7 +62,7 @@ public class VShape extends ClosedShape {
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      */
     public VShape(float[] v){
-	    this(0, 0, 0, 10, v, Color.WHITE, Color.BLACK, 1.0f, 0);
+	    this(0, 0, 0, 10, v, Color.WHITE, Color.BLACK, 0, 1.0f);
     }
 
     /**
@@ -75,7 +75,7 @@ public class VShape extends ClosedShape {
      *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(long x,long y, int z,long s,float[] v,Color c,float or){
-	    this(x, y, z, s, v, c, Color.BLACK, 1.0f, or);
+	    this(x, y, z, s, v, c, Color.BLACK, or, 1.0f);
     }
 
     /**
@@ -89,7 +89,7 @@ public class VShape extends ClosedShape {
      *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(long x, long y, int z, long s, float[] v, Color c, Color bc, float or){
-        this(x, y, z, s, v, c, bc, 1.0f, or);
+        this(x, y, z, s, v, c, bc, or, 1.0f);
     }
     
     /**
