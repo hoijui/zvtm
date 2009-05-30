@@ -25,7 +25,6 @@ import com.xerox.VTM.engine.SwingWorker;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRectangleST;
 
 public class ViewDemo {
 
@@ -103,7 +102,7 @@ public class ViewDemo {
 	for (int i=0;i<100;i++){
 	    for (int j=0;j<100;j++){
 		if (translucentMode == 1){
-		    r = new VRectangleST(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/10000.0), 1.0f,1.0f));
+		    r = new VRectangle(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/10000.0), 1.0f,1.0f), Color.BLACK, 0.5f);
 		}
 		else {
 		    r = new VRectangle(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/10000.0), 1.0f,1.0f));

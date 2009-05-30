@@ -200,7 +200,7 @@ public class PortalWorldDemo {
 
     void getGlobalView(boolean inPortal){
 	if (inPortal){
-	    portal.getGlobalView(ANIM_MOVE_LENGTH, vsm);
+	    portal.getGlobalView(ANIM_MOVE_LENGTH);
 	}
 	else {
 	    vsm.getGlobalView(demoCamera, ANIM_MOVE_LENGTH);

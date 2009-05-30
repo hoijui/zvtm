@@ -47,26 +47,16 @@ import com.xerox.VTM.glyphs.VCbCurve;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VDiamond;
 import com.xerox.VTM.glyphs.VDiamondOr;
-import com.xerox.VTM.glyphs.VDiamondST;
 import com.xerox.VTM.glyphs.VImage;
 import com.xerox.VTM.glyphs.VImageOr;
-import com.xerox.VTM.glyphs.VOctagon;
-import com.xerox.VTM.glyphs.VOctagonOr;
-import com.xerox.VTM.glyphs.VOctagonOrST;
-import com.xerox.VTM.glyphs.VOctagonST;
 import com.xerox.VTM.glyphs.VQdCurve;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VRectangleOr;
-import com.xerox.VTM.glyphs.VRectangleOrST;
-import com.xerox.VTM.glyphs.VRectangleST;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VShape;
-import com.xerox.VTM.glyphs.VShapeST;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.glyphs.VTriangle;
 import com.xerox.VTM.glyphs.VTriangleOr;
-import com.xerox.VTM.glyphs.VTriangleOrST;
-import com.xerox.VTM.glyphs.VTriangleST;
 
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.EndAction;
@@ -180,9 +170,6 @@ public class Introduction {
 	    else if (shapeType<0.4){
 		g=new VDiamondOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
 	    }
-	    else if (shapeType<0.6){
-		g=new VOctagonOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f), Color.BLACK,randomO);
-	    }
 	    else if (shapeType<0.8){
 		g=new VRectangleOr(randomX,randomY,0,randomS,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
 	    }
@@ -214,24 +201,22 @@ public class Introduction {
 	VRectangle r1=new VRectangle(-600,400,0,100,50,Color.black);
 	VRectangle r2=new VRectangle(-200,400,0,50,50,Color.black);
 	VRectangleOr r3=new VRectangleOr(200,400,0,30,100,Color.black,0.707f);
-	VRectangleST r4=new VRectangleST(600,400,0,100,75,Color.black);
+	VRectangle r4=new VRectangle(600,400,0,100,75,Color.WHITE, Color.BLACK, 0.5f);
 	r2.setDashed(true);r3.setFilled(false);
 	vsm.addGlyph(r1,"vs1");vsm.addGlyph(r2,"vs1");vsm.addGlyph(r3,"vs1");vsm.addGlyph(r4,"vs1");
 	r1.setHSVColor(0.5f,0.9f,0.6f);r2.setHSVColor(0.5f,0.9f,0.6f);r3.setHSVColor(0.5f,0.9f,0.6f);r4.setHSVColor(0.5f,0.9f,0.6f);
-	VTriangleST t1=new VTriangleST(-600,200,0,50,Color.black);
+	VTriangle t1=new VTriangle(-600,200,0,50,Color.BLACK, Color.BLACK, 0.5f);
 	VTriangle t2=new VTriangle(-200,200,0,50,Color.black);
 	VTriangle t3=new VTriangle(200,200,0,50,Color.black);
-	VTriangleOrST t4=new VTriangleOrST(600,200,0,75,Color.black, Color.BLACK, 0.5f, 0.707f);
+	VTriangleOr t4=new VTriangleOr(600,200,0,75,Color.black, Color.BLACK, 0.707f, 0.5f);
 	t1.setDashed(true);t3.setFilled(false);t3.setDashed(true);
 	vsm.addGlyph(t1,"vs1");vsm.addGlyph(t2,"vs1");vsm.addGlyph(t3,"vs1");vsm.addGlyph(t4,"vs1");
 	t1.setHSVColor(0.66f,0.5f,0.5f);t2.setHSVColor(0.66f,0.5f,0.5f);t3.setHSVColor(0.66f,0.5f,0.5f);t4.setHSVColor(0.66f,0.5f,0.5f);
-	VDiamondST d1=new VDiamondST(-600,0,0,50,Color.black, Color.BLACK, 0.5f);
+	VDiamond d1=new VDiamond(-600,0,0,50,Color.black, Color.BLACK, 0.5f);
 	VDiamond d2=new VDiamond(-200,0,0,45,Color.black);
-	VOctagon o3=new VOctagon(200,0,0,50,Color.black);
-	VOctagonOrST o4=new VOctagonOrST(600,0,0,75,Color.black,Color.BLACK, 0.5f,0.5f);
-	d1.setDashed(true);d2.setFilled(false);o3.setDashed(true);
-	vsm.addGlyph(d1,"vs1");vsm.addGlyph(d2,"vs1");vsm.addGlyph(o3,"vs1");vsm.addGlyph(o4,"vs1");
-	d1.setHSVColor(0.0f,0.8f,0.8f);d2.setHSVColor(0.0f,0.8f,0.8f);o3.setHSVColor(0.0f,0.8f,0.8f);o4.setHSVColor(0.0f,0.8f,0.8f);
+	d1.setDashed(true);d2.setFilled(false);
+	vsm.addGlyph(d1,"vs1");vsm.addGlyph(d2,"vs1");
+	d1.setHSVColor(0.0f,0.8f,0.8f);d2.setHSVColor(0.0f,0.8f,0.8f);
 	VCircle x1=new VCircle(-600,-200,0,50,Color.black);
 	VSegment x2=new VSegment(-200,-200,0,50,100,Color.black);
 	BooleanOps[] barray={new BooleanOps(0,-20,20,40,1,2),new BooleanOps(0,25,20,40,2,1)};
@@ -243,7 +228,7 @@ public class Introduction {
 	VImage i1=new VImage(0,-400,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	vsm.addGlyph(i1,"vs1");
 	float[] vs={0.1f,0.5f,0.3f,0.5f,1.0f,0.5f,1.0f,0.5f};
-	VShapeST s1=new VShapeST(-600,-400,0,100,vs,Color.gray,0);vsm.addGlyph(s1,"vs1");
+	VShape s1=new VShape(-600,-400,0,100,vs,Color.gray,Color.BLACK, 0, 0.5f);vsm.addGlyph(s1,"vs1");
 	float[] vs2={1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f};
 	VShape s2=new VShape(600,-400,0,100,vs2,Color.gray,0);vsm.addGlyph(s2,"vs1");
 	VQdCurve qd1=new VQdCurve(-600,-600,0,100,Color.black,0,50,(float)Math.PI/2);
@@ -324,11 +309,10 @@ public class Introduction {
 
 	VCircle c1=new VCircle(-400,900,0,100,Color.black);c1.setType("an");	
 	VTriangleOr t1=new VTriangleOr(-400,600,0,100,Color.black,0);t1.setType("an");
-	VOctagonOr o1=new VOctagonOr(-400,300,0,100,Color.black,Color.BLACK,0);o1.setType("an");
 	VRectangleOr r1=new VRectangleOr(-400,0,0,100,50,Color.black,0);r1.setType("an");
 	VDiamondOr d1=new VDiamondOr(-400,-300,0,100,Color.black,0);d1.setType("an");
-	vsm.addGlyph(c1,"vs1");vsm.addGlyph(t1,"vs1");vsm.addGlyph(o1,"vs1");vsm.addGlyph(r1,"vs1");vsm.addGlyph(d1,"vs1");
-	c1.setColor(Introduction.ANIM_OBJECT_COLOR);t1.setColor(Introduction.ANIM_OBJECT_COLOR);o1.setColor(Introduction.ANIM_OBJECT_COLOR);r1.setColor(Introduction.ANIM_OBJECT_COLOR);d1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	vsm.addGlyph(c1,"vs1");vsm.addGlyph(t1,"vs1");vsm.addGlyph(r1,"vs1");vsm.addGlyph(d1,"vs1");
+	c1.setColor(Introduction.ANIM_OBJECT_COLOR);t1.setColor(Introduction.ANIM_OBJECT_COLOR);r1.setColor(Introduction.ANIM_OBJECT_COLOR);d1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	VImageOr i1=new VImageOr(-400,-600,0,(new ImageIcon(this.getClass().getResource("/images/xrce.gif"))).getImage(),0.0f);i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	vsm.addGlyph(i1,"vs1");i1.setType("an");
 	i1.sizeTo(200);
@@ -339,8 +323,8 @@ public class Introduction {
 	VRectangleOr cg1=new VRectangleOr(-400,-1200,0,200,100,Color.black,0);
 	//and 4 secondary glyphs (init coordinates of secondary glyphs do not matter as they will be changed to match the position offset defined in the associated SGlyph)
 	VTriangleOr cg2=new VTriangleOr(0,0,0,50,Color.black,0);
-	VRectangleOrST cg3=new VRectangleOrST(0,0,0,50,50,Color.black,Color.BLACK, 0.5f,0.404f);
-	VTriangleOrST cg4=new VTriangleOrST(0,0,0,50,Color.black,Color.BLACK, 0.5f,0.404f);
+	VRectangleOr cg3=new VRectangleOr(0,0,0,50,50,Color.black,Color.BLACK,0.404f, 0.5f);
+	VTriangleOr cg4=new VTriangleOr(0,0,0,50,Color.black,Color.BLACK,0.404f, 0.5f);
 	VRectangleOr cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
 	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
 	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
@@ -363,8 +347,8 @@ public class Introduction {
 	cg1=new VRectangleOr(-400,-1600,0,200,100,Color.black,0);
 	//and 4 secondary glyphs (init coordinates of secondary glyphs do not matter as they will be changed to match the position offset defined in the associated SGlyph)
 	cg2=new VTriangleOr(0,0,0,50,Color.black,0);
-	cg3=new VRectangleOrST(0,0,0,50,50,Color.black,Color.BLACK, 0.5f,0.404f);
-	cg4=new VTriangleOrST(0,0,0,50,Color.black,Color.BLACK, 0.5f,0.404f);
+	cg3=new VRectangleOr(0,0,0,50,50,Color.black,Color.BLACK,0.404f, 0.5f);
+	cg4=new VTriangleOr(0,0,0,50,Color.black,Color.BLACK, 0.404f, 0.5f);
 	cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
 	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
 	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
@@ -442,23 +426,22 @@ public class Introduction {
 	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
 	eh=new MultiLayerEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
-	VRectangleST g1=new VRectangleST(-2000,0,0,500,500,Color.blue);
-	VTriangleST g2=new VTriangleST(2000,0,0,500,Color.blue);
-	VDiamondST g3=new VDiamondST(0,-2000,0,500,Color.blue, Color.BLACK, 0.5f);
-	VOctagonST g4=new VOctagonST(0,2000,0,500,Color.blue, Color.BLACK, 0.5f);
+	VRectangle g1=new VRectangle(-2000,0,0,500,500,Color.blue, Color.BLACK, 0.5f);
+	VTriangle g2=new VTriangle(2000,0,0,500,Color.blue, Color.BLACK, 0.5f);
+	VDiamond g3=new VDiamond(0,-2000,0,500,Color.blue, Color.BLACK, 0.5f);
 	float[] vertices={1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f};
-	VShapeST g5=new VShapeST(0,0,0,200,vertices,Color.blue,0);
+	VShape g5=new VShape(0,0,0,200,vertices,Color.blue,Color.BLACK, 0, 0.5f);
 	VCbCurve cb1=new VCbCurve(0,1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	VCbCurve cb2=new VCbCurve(1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	VCbCurve cb3=new VCbCurve(0,-1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	VCbCurve cb4=new VCbCurve(-1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
-	vsm.addGlyph(g1,"vs2");vsm.addGlyph(g2,"vs2");vsm.addGlyph(g3,"vs2");vsm.addGlyph(g4,"vs2");vsm.addGlyph(g5,"vs2");
+	vsm.addGlyph(g1,"vs2");vsm.addGlyph(g2,"vs2");vsm.addGlyph(g3,"vs2");vsm.addGlyph(g5,"vs2");
 	vsm.addGlyph(cb1,"vs2");vsm.addGlyph(cb2,"vs2");vsm.addGlyph(cb3,"vs2");vsm.addGlyph(cb4,"vs2");
 	VCircle c1=new VCircle(-2000,0,0,500,Color.yellow);
 	VCircle c2=new VCircle(2000,0,0,500,Color.yellow);
 	VCircle c3=new VCircle(0,-2000,0,500,Color.yellow);
 	VCircle c4=new VCircle(0,2000,0,500,Color.yellow);
-	VShapeST c5=new VShapeST(0,0,0,200,vertices,Color.yellow,0);
+	VShape c5=new VShape(0,0,0,200,vertices,Color.yellow,Color.BLACK, 0, 0.5f);
 	cb1=new VCbCurve(0,1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	cb2=new VCbCurve(1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	cb3=new VCbCurve(0,-1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);

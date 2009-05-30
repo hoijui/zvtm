@@ -41,8 +41,6 @@ import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import net.claribole.zvtm.engine.TransitionManager;
 import net.claribole.zvtm.glyphs.CGlyph;
 import net.claribole.zvtm.glyphs.SGlyph;
-import net.claribole.zvtm.glyphs.VImageOrST;
-import net.claribole.zvtm.glyphs.VTextOrST;
 
 import com.xerox.VTM.engine.Camera;
 import com.xerox.VTM.engine.LongPoint;
@@ -51,11 +49,13 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.Translucent;
-import com.xerox.VTM.glyphs.VRectangleOrST;
-import com.xerox.VTM.glyphs.VSegmentST;
-import com.xerox.VTM.glyphs.VShapeST;
+import com.xerox.VTM.glyphs.VRectangleOr;
+import com.xerox.VTM.glyphs.VSegment;
+import com.xerox.VTM.glyphs.VShape;
 import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.VTriangleOrST;
+import com.xerox.VTM.glyphs.VTextOr;
+import com.xerox.VTM.glyphs.VImageOr;
+import com.xerox.VTM.glyphs.VTriangleOr;
 
 public class AnimationDemo extends JApplet implements MouseListener, KeyListener {
 
@@ -149,13 +149,13 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	mCam.setAltitude(150);
     }
 
-    VRectangleOrST rectangle;
-    VShapeST irregularShape, star;
-    VTextOrST text;
-    VImageOrST image;
+    VRectangleOr rectangle;
+    VShape irregularShape, star;
+    VTextOr text;
+    VImageOr image;
     CGlyph composite1, composite2;
-    VSegmentST segment;
-    VTriangleOrST triangle;
+    VSegment segment;
+    VTriangleOr triangle;
 
     static final long COL1_X = -500;
     static final long COL2_X = 0;
@@ -174,36 +174,36 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     
     void initGlyphs(){
 	// 1st row
-	rectangle = new VRectangleOrST(COL1_X, ROW1_Y, 0, 100, 50, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	rectangle = new VRectangleOr(COL1_X, ROW1_Y, 0, 100, 50, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	float[] starVertices = {1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f};
-	star = new VShapeST(COL2_X, ROW1_Y, 0, (long)SIZE, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
-	triangle = new VTriangleOrST(COL3_X, ROW1_Y, 0, (long)SIZE, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	star = new VShape(COL2_X, ROW1_Y, 0, (long)SIZE, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
+	triangle = new VTriangleOr(COL3_X, ROW1_Y, 0, (long)SIZE, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	// 2nd row
-	text = new VTextOrST(COL1_X, ROW2_Y, 0, ROW2_COLOR, "Text", 0.0f, VText.TEXT_ANCHOR_MIDDLE, 1.0f);
+	text = new VTextOr(COL1_X, ROW2_Y, 0, ROW2_COLOR, "Text", 0.0f, VText.TEXT_ANCHOR_MIDDLE, 1.0f);
 	text.setSpecialFont(new Font("Arial", Font.PLAIN, 48));
-	image = new VImageOrST(COL2_X, ROW2_Y, 0, (new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage(), 0, 1.0f);
+	image = new VImageOr(COL2_X, ROW2_Y, 0, (new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage(), 0, 1.0f);
 	image.setBorderColor(GLYPH_BORDER_COLOR);
-	image.setDrawBorderPolicy(VImageOrST.DRAW_BORDER_MOUSE_INSIDE);
+	image.setDrawBorderPolicy(VImageOr.DRAW_BORDER_MOUSE_INSIDE);
 	float[] irregVertices = {1.0f, 0.2f, 0.7f, 0.3f, 0.5f, 0.1f, 0.8f, 1.0f, 0.4f, 0.4f, 0.3f, 0.6f};
-	irregularShape = new VShapeST(COL3_X, ROW2_Y, 0, (long)SIZE, irregVertices, ROW2_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	irregularShape = new VShape(COL3_X, ROW2_Y, 0, (long)SIZE, irregVertices, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	// 3rd row
-	VRectangleOrST c1m = new VRectangleOrST(COL1_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	VRectangleOr c1m = new VRectangleOr(COL1_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	SGlyph[] sgs1 = {
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), 80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), 80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), -80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), -80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE)
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE)
 	};
 	composite1 = new CGlyph(c1m, sgs1);
-	VRectangleOrST c2m = new VRectangleOrST(COL2_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 1.0f, 0);
+	VRectangleOr c2m = new VRectangleOr(COL2_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	SGlyph[] sgs2 = {
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), 80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), 80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), -80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOrST(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0.8f, 0), -80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
 	};
 	composite2 = new CGlyph(c2m, sgs2);
-	segment = new VSegmentST(COL3_X, ROW3_Y, 0, SIZE, 0.707f, ROW3_COLOR, 1.0f);
+	segment = new VSegment(COL3_X, ROW3_Y, 0, SIZE, 0.707f, ROW3_COLOR, 1.0f);
 	vsm.addGlyph(rectangle, mSpace);
 	vsm.addGlyph(star, mSpace);
 	vsm.addGlyph(triangle, mSpace);
