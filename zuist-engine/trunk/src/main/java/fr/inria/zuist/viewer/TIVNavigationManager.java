@@ -61,7 +61,7 @@ class TIVNavigationManager {
     static final short L2_SCB = 1;
     short lensFamily = L2_Gaussian;
     
-    static final float FLOOR_ALTITUDE = 0.0f;
+    static final float FLOOR_ALTITUDE = 100.0f;
 
     TiledImageViewer application;
     
