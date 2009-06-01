@@ -226,8 +226,6 @@ public class SceneManager {
         return regionListener;
     }
     
-    /* ----------- level / region / object creation (API and XML) ----------- */
-
     public int getPendingRequestQueueSize(){
         return glyphLoader.requestQueue.size();
     }
@@ -408,7 +406,7 @@ public class SceneManager {
             regionEL.getAttribute(_ttll)};
         int li = getLayerIndex(regionEL.getAttribute(_layer));
         if (li == -1){
-            // put region in first (assumed to be the only if yields -1) virtual space corresponding to a layer
+            // put region in first virtual space (assumed to be the only one if yields -1) corresponding to a layer
             li = 0;
         }
         boolean sensitivity = (regionEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(regionEL.getAttribute(_sensitive)) : false;
@@ -518,7 +516,7 @@ public class SceneManager {
         return imd;
     }
     
-    Object parseInterpolation(String im){
+    private Object parseInterpolation(String im){
         if (im.equals(_bilinear)){
             return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
         }
