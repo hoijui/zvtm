@@ -94,6 +94,7 @@ public class VDiamond extends ClosedShape {
         orient=0;
         setColor(c);
         setBorderColor(bc);
+        setTranslucencyValue(alpha);
     }
 
     public void initCams(int nbCam){
