@@ -30,26 +30,17 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-class CROptions {
-	@Option(name = "-x", aliases = {"--xnum"}, usage = "number of subdivisions along x axis")
-	int xNum = 50;
-
-	@Option(name = "-y", aliases = {"--ynum"}, usage = "number of subdivisions along y axis")
-	int yNum = 20;
-
-	@Option(name = "-w", aliases = {"--width"}, usage = "color rect width")
-	int width = 800;
-
-	@Option(name = "-h", aliases = {"--height"}, usage = "color rect height")
-	int height = 600;
+class IDOptions {
+	@Option(name = "-p", aliases = {"--path"}, usage = "image path")
+	String imagePath = "";
 }
 
 //master application skeleton
-public class ColorRectWild {
+public class ImageDemo {
 	VirtualSpaceManager vsm;
-	CROptions options;
+	IDOptions options;
 
-	public ColorRectWild(CROptions options){
+	public ImageDemo(IDOptions options){
 		this.options = options;
 
 		//create virtualspace "protoSpace"
@@ -58,21 +49,9 @@ public class ColorRectWild {
 		//create metacamera
 		MetaCamera metacam = new MetaCamera(3,2,600,400,vs);
 		vs.setMetaCamera(metacam);
-		long xOffset = -options.width/2;
-		long yOffset = -options.height/2;
-		long rectWidth = options.width/options.xNum;
-		long rectHeight = options.height/options.yNum;
-		for(int i=0; i<options.xNum; ++i){
-			for(int j=0; j<options.yNum; ++j){
-				VRectangle rect = new VRectangle(xOffset+i*rectWidth,
-						yOffset+j*rectHeight,
-						0,
-						rectWidth/2, rectHeight/2,
-						Color.getHSBColor((float)(i*j/(float)(options.xNum*options.yNum)), 1f, 1f));
-				rect.setDrawBorder(false);
-				vsm.addGlyph(rect, vs, false);
-			}
-		}
+
+		VImage img1 = new VImage(0, 0, 0, "/home/rprimet/Bureau/images_astro/hs-2004-17-b-full_jpg.jpg");
+		vsm.addGlyph(img1, vs);
 
 		//signal that the space and metacamera are ready
 		//to unfreeze the slaves
@@ -91,18 +70,18 @@ public class ColorRectWild {
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 		//add a panning evt handler
-		view.setEventHandler(new CREventHandler());
+		view.setEventHandler(new IDEventHandler());
 	}
 
 	public static void main(String[] args) throws CmdLineException{
-		CROptions options = new CROptions();
+		IDOptions options = new IDOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 
-		new ColorRectWild(options);
+		new ImageDemo(options);
 	}
 
-	class CREventHandler implements ViewEventHandler{
+	class IDEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
 
@@ -148,8 +127,8 @@ public class ColorRectWild {
 					//50 is just a speed factor (too fast otherwise)
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
 				}
 			}
 		}

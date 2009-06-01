@@ -14,8 +14,8 @@ ssh wild@d1.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking
 ssh wild@d1.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave12 -DstartServer=false  tc:run" &
 ssh wild@d2.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave9 -DstartServer=false  tc:run" &
 ssh wild@d2.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave13 -DstartServer=false  tc:run" &
-ssh wild@d3.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave10 -DstartServer=false  tc:run" &
-ssh wild@d3.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave14 -DstartServer=false  tc:run" &
+#ssh wild@d3.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave10 -DstartServer=false  tc:run" &
+#ssh wild@d3.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave14 -DstartServer=false  tc:run" &
 ssh wild@d4.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave11 -DstartServer=false  tc:run" &
 ssh wild@d4.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wild/romain/zvtm_tc && mvn -DactiveNodes=slave15 -DstartServer=false  tc:run" &
 

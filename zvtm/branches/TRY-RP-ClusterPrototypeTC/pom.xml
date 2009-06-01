@@ -28,8 +28,8 @@ $Id$
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- cluster apps properties -->
-    <slaveWidth>2560</slaveWidth>
-    <slaveHeight>1600</slaveHeight>
+    <slaveWidth>600</slaveWidth>
+    <slaveHeight>400</slaveHeight>
   </properties>
   
   <!-- Repositories -->
@@ -163,8 +163,12 @@ $Id$
 		  </process> -->
 		  <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.ColorRectWild"
-		  arguments="-w 10240 -h 6400">
-		  </process>
+		  arguments="-w 4000 -h 3000">
+		  </process> 
+		<!--  <process nodeName="master" count="1" 
+		  className="net.claribole.zvtm.cluster.ImageDemo"
+		  arguments="">
+		  </process> -->
 
 		  <process nodeName="slave0" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
@@ -178,7 +182,7 @@ $Id$
 		  className="net.claribole.zvtm.cluster.SlaveApp"
 		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 2">
 		  </process>
-		  <process nodeName="slave3" count="1"
+		<!--  <process nodeName="slave3" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
 		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 3">
 		  </process>
@@ -229,7 +233,7 @@ $Id$
 		  <process nodeName="slave15" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
 		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 15">
-		  </process>
+		  </process> -->
 
 		  </processes>
 		  <startServer>true</startServer>
