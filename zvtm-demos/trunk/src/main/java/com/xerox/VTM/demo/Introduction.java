@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -95,6 +95,15 @@ public class Introduction {
     int camNb=0;
 
     boolean autoZoomEnabled = false;
+    
+    static final String VS_1 = "vs1";
+    static final String VS_2 = "vs2";
+    
+    static final float[] OCTAGON_VERTICES = {1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f};
+    static final float[] STAR1_VERTICES={1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f};
+    static final float[] STAR2_VERTICES = {1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f};
+	
+    
 
     Introduction(){
 	init();
@@ -103,9 +112,9 @@ public class Introduction {
     public void init(){
 	    vsm = VirtualSpaceManager.INSTANCE;
 	VText.setMainFont(new Font("dialog", 0, 40));
-	vsm.addVirtualSpace("vs1");
-	vsm.addCamera("vs1");
-	Vector vc1=new Vector();vc1.add(vsm.getVirtualSpace("vs1").getCamera(0));
+	vsm.addVirtualSpace(VS_1);
+	vsm.addCamera(VS_1);
+	Vector vc1=new Vector();vc1.add(vsm.getVirtualSpace(VS_1).getCamera(0));
 	Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
 	if (screenDimension.width < IntroPanel.PANEL_WIDTH + PREFERRED_VIEW_WIDTH){
 	    viewWidth = screenDimension.width - IntroPanel.PANEL_WIDTH;
@@ -126,7 +135,7 @@ public class Introduction {
 	    c.posx = l.vx;
 	    c.posy = l.vy;
 	    c.updatePrecisePosition();
-	    c.setAltitude(l.alt-c.getFocal());
+	    c.setAltitude(l.alt);
 	}
 	TransitionManager.fadeIn(vsm.getView("Demo"), 500, vsm);
     }
@@ -146,37 +155,39 @@ public class Introduction {
     void cameraDemoActions(){
 	vsm.getView("Demo").setBlank(BLANK_COLOR);
 	vsm.getView("Demo").setBackgroundColor(Color.WHITE);
-	vsm.destroyGlyphsInSpace("vs1");
+	vsm.destroyGlyphsInSpace(VS_1);
 	eh=new CameraDemoEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
 	long randomX=0;
 	long randomY=0;
 	long randomS=0;
-	float randomO=0;
+	float randomOr = 0;
 	float randomSat=0;
 	double shapeType=0;
 	Glyph g;
-	float[] vertices={1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f};
 	for (int i=0;i<400;i++){
 	    randomX=Math.round(Math.random()*6000);
 	    randomY=Math.round(Math.random()*6000);
 	    randomS=Math.round(Math.random()*199)+20;
-	    randomO=(float)(Math.random()*2*Math.PI);
+	    randomOr=(float)(Math.random()*2*Math.PI);
 	    randomSat=(float)Math.random();
 	    shapeType=Math.random();
 	    if (shapeType<0.2){
-		g=new VTriangleOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
+		g=new VTriangleOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomOr);
 	    }
 	    else if (shapeType<0.4){
-		g=new VDiamondOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
+		g=new VDiamondOr(randomX,randomY,0,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomOr);
+	    }
+	    else if (shapeType<0.6){
+		    g = new VShape(randomX, randomY, 0, randomS, OCTAGON_VERTICES, Color.getHSBColor(0.66f,randomSat,0.8f), Color.BLACK, randomOr);
 	    }
 	    else if (shapeType<0.8){
-		g=new VRectangleOr(randomX,randomY,0,randomS,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
+		g=new VRectangleOr(randomX,randomY,0,randomS,randomS,Color.getHSBColor(0.66f,randomSat,0.8f),randomOr);
 	    }
 	    else {
-		g=new VShape(randomX,randomY,0,randomS,vertices,Color.getHSBColor(0.66f,randomSat,0.8f),randomO);
+		g = new VShape(randomX, randomY, 0, randomS, STAR1_VERTICES, Color.getHSBColor(0.66f,randomSat,0.8f), randomOr);
 	    }
-	    vsm.addGlyph(g,"vs1");
+	    vsm.addGlyph(g,VS_1);
 	}
 	reveal(true);
     }
@@ -195,7 +206,7 @@ public class Introduction {
     void objectFamiliesActions(){
 	vsm.getView("Demo").setBlank(BLANK_COLOR);
 	vsm.getView("Demo").setBackgroundColor(Color.LIGHT_GRAY);
-	vsm.destroyGlyphsInSpace("vs1");
+	vsm.destroyGlyphsInSpace(VS_1);
 	eh=new CameraDemoEvtHdlr(this);
 	vsm.getView("Demo").setEventHandler(eh);
 	VRectangle r1=new VRectangle(-600,400,0,100,50,Color.black);
@@ -203,19 +214,19 @@ public class Introduction {
 	VRectangleOr r3=new VRectangleOr(200,400,0,30,100,Color.black,0.707f);
 	VRectangle r4=new VRectangle(600,400,0,100,75,Color.WHITE, Color.BLACK, 0.5f);
 	r2.setDashed(true);r3.setFilled(false);
-	vsm.addGlyph(r1,"vs1");vsm.addGlyph(r2,"vs1");vsm.addGlyph(r3,"vs1");vsm.addGlyph(r4,"vs1");
+	vsm.addGlyph(r1,VS_1);vsm.addGlyph(r2,VS_1);vsm.addGlyph(r3,VS_1);vsm.addGlyph(r4,VS_1);
 	r1.setHSVColor(0.5f,0.9f,0.6f);r2.setHSVColor(0.5f,0.9f,0.6f);r3.setHSVColor(0.5f,0.9f,0.6f);r4.setHSVColor(0.5f,0.9f,0.6f);
 	VTriangle t1=new VTriangle(-600,200,0,50,Color.BLACK, Color.BLACK, 0.5f);
 	VTriangle t2=new VTriangle(-200,200,0,50,Color.black);
 	VTriangle t3=new VTriangle(200,200,0,50,Color.black);
 	VTriangleOr t4=new VTriangleOr(600,200,0,75,Color.black, Color.BLACK, 0.707f, 0.5f);
 	t1.setDashed(true);t3.setFilled(false);t3.setDashed(true);
-	vsm.addGlyph(t1,"vs1");vsm.addGlyph(t2,"vs1");vsm.addGlyph(t3,"vs1");vsm.addGlyph(t4,"vs1");
+	vsm.addGlyph(t1,VS_1);vsm.addGlyph(t2,VS_1);vsm.addGlyph(t3,VS_1);vsm.addGlyph(t4,VS_1);
 	t1.setHSVColor(0.66f,0.5f,0.5f);t2.setHSVColor(0.66f,0.5f,0.5f);t3.setHSVColor(0.66f,0.5f,0.5f);t4.setHSVColor(0.66f,0.5f,0.5f);
 	VDiamond d1=new VDiamond(-600,0,0,50,Color.black, Color.BLACK, 0.5f);
 	VDiamond d2=new VDiamond(-200,0,0,45,Color.black);
 	d1.setDashed(true);d2.setFilled(false);
-	vsm.addGlyph(d1,"vs1");vsm.addGlyph(d2,"vs1");
+	vsm.addGlyph(d1,VS_1);vsm.addGlyph(d2,VS_1);
 	d1.setHSVColor(0.0f,0.8f,0.8f);d2.setHSVColor(0.0f,0.8f,0.8f);
 	VCircle x1=new VCircle(-600,-200,0,50,Color.black);
 	VSegment x2=new VSegment(-200,-200,0,50,100,Color.black);
@@ -223,20 +234,20 @@ public class Introduction {
 	VBoolShape x3=new VBoolShape(200,-200,0,100,50,2,barray,Color.black);
 	VText x4=new VText(600,-200,0,Color.black,"text object", VText.TEXT_ANCHOR_MIDDLE);
 	x2.setDashed(true);
-	vsm.addGlyph(x1,"vs1");vsm.addGlyph(x2,"vs1");vsm.addGlyph(x3,"vs1");vsm.addGlyph(x4,"vs1");
+	vsm.addGlyph(x1,VS_1);vsm.addGlyph(x2,VS_1);vsm.addGlyph(x3,VS_1);vsm.addGlyph(x4,VS_1);
 	x1.setHSVColor(0.2f,0.55f,0.95f);x2.setHSVColor(0.2f,0.55f,0.95f);x3.setHSVColor(0.2f,0.55f,0.95f);x4.setHSVColor(0.2f,0.55f,0.95f);
 	VImage i1=new VImage(0,-400,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
-	vsm.addGlyph(i1,"vs1");
-	float[] vs={0.1f,0.5f,0.3f,0.5f,1.0f,0.5f,1.0f,0.5f};
-	VShape s1=new VShape(-600,-400,0,100,vs,Color.gray,Color.BLACK, 0, 0.5f);vsm.addGlyph(s1,"vs1");
-	float[] vs2={1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f,1.0f,0.8f};
-	VShape s2=new VShape(600,-400,0,100,vs2,Color.gray,0);vsm.addGlyph(s2,"vs1");
+	vsm.addGlyph(i1,VS_1);
+	float[] vs={0.1f,0.5f,0.3f,0.5f,1f,0.5f,1f,0.5f};
+	VShape s1=new VShape(-600,-400,0,100,vs,Color.gray,Color.BLACK, 0, 0.5f);vsm.addGlyph(s1,VS_1);
+	float[] vs2={1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f};
+	VShape s2=new VShape(600,-400,0,100,vs2,Color.gray,0);vsm.addGlyph(s2,VS_1);
 	VQdCurve qd1=new VQdCurve(-600,-600,0,100,Color.black,0,50,(float)Math.PI/2);
-	vsm.addGlyph(qd1,"vs1");
+	vsm.addGlyph(qd1,VS_1);
 	VQdCurve qd2=new VQdCurve(0,-600,0,100,Color.black,0.707f,100,(float)Math.PI/3);
-	vsm.addGlyph(qd2,"vs1");
+	vsm.addGlyph(qd2,VS_1);
 	VCbCurve cb1=new VCbCurve(600,-600,0,100,Color.black,0,50,(float)Math.PI/2,100,(float)-Math.PI/2);
-	vsm.addGlyph(cb1,"vs1");
+	vsm.addGlyph(cb1,VS_1);
 	qd2.setHSVColor(0.0f,0.8f,0.8f);
 	cb1.setHSVColor(0.66f,0.5f,0.5f);
 	//will be the primary glyph of a CGlyph
@@ -246,7 +257,7 @@ public class Introduction {
 	VTriangleOr cg3=new VTriangleOr(0,-800,0,50,Color.red,(float)(Math.PI/4.0f));
 	VTriangleOr cg4=new VTriangleOr(0,-800,0,50,Color.red,(float)(-5*Math.PI/4.0f));
 	VTriangleOr cg5=new VTriangleOr(0,-800,0,50,Color.red,(float)(-3*Math.PI/4.0f));
-	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
+	vsm.addGlyph(cg1,VS_1);vsm.addGlyph(cg2,VS_1);vsm.addGlyph(cg3,VS_1);vsm.addGlyph(cg4,VS_1);vsm.addGlyph(cg5,VS_1);
 	cg1.setHSVColor(0.66f,0.5f,0.5f);
 	SGlyph[] sgs={
 	    new SGlyph(cg2,400,100,SGlyph.FULL_ROTATION,SGlyph.RESIZE),
@@ -255,7 +266,7 @@ public class Introduction {
 	    new SGlyph(cg5,400,-100,SGlyph.FULL_ROTATION,SGlyph.RESIZE)
 	};
 	CGlyph cg=new CGlyph(cg1,sgs);
-	vsm.addCGlyph(cg,"vs1");  //use addCGlyph, not addGlyph
+	vsm.addCGlyph(cg,VS_1);  //use addCGlyph, not addGlyph
 	reveal(true);
     }
 
@@ -273,8 +284,8 @@ public class Introduction {
     void objectAnimActions(){
 	vsm.getView("Demo").setBlank(BLANK_COLOR);
 	vsm.getView("Demo").setBackgroundColor(ANIM_BKG_COLOR);
-	vsm.destroyGlyphsInSpace("vs1");
-	vsm.destroyVirtualSpace("vs2");
+	vsm.destroyGlyphsInSpace(VS_1);
+	vsm.destroyVirtualSpace(VS_2);
 	VRectangle orG=new VRectangle(400,300,0,25,25,Color.black);
 	orG.setType("orient");
 	VText orT = new VText(400, 200, 0, Color.black, "Orientation", VText.TEXT_ANCHOR_MIDDLE);
@@ -287,11 +298,11 @@ public class Introduction {
 	VRectangle trG=new VRectangle(400,-300,0,25,25,Color.black);
 	trG.setType("pos");
 	VText trT = new VText(400, -400, 0, Color.black, "Translation", VText.TEXT_ANCHOR_MIDDLE);
-	vsm.addGlyph(orG,"vs1");vsm.addGlyph(szG,"vs1");vsm.addGlyph(clG,"vs1");vsm.addGlyph(trG,"vs1");
-	vsm.addGlyph(orT,"vs1");vsm.addGlyph(szT,"vs1");vsm.addGlyph(clT,"vs1");vsm.addGlyph(trT,"vs1");
+	vsm.addGlyph(orG,VS_1);vsm.addGlyph(szG,VS_1);vsm.addGlyph(clG,VS_1);vsm.addGlyph(trG,VS_1);
+	vsm.addGlyph(orT,VS_1);vsm.addGlyph(szT,VS_1);vsm.addGlyph(clT,VS_1);vsm.addGlyph(trT,VS_1);
 	orG.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);szG.setColor(Introduction.ANIM_BUTTON_COLOR);clG.setColor(Introduction.ANIM_BUTTON_COLOR);trG.setColor(Introduction.ANIM_BUTTON_COLOR);
 	VSegment sep=new VSegment(700,0,0,1,300,Color.black);
-	vsm.addGlyph(sep,"vs1");
+	vsm.addGlyph(sep,VS_1);
 	VRectangle linG=new VRectangle(1000,200,0,25,25,Color.black);
 	linG.setType("lin");
 	VText linT = new VText(1000, 100, 0, Color.black, "Linear", VText.TEXT_ANCHOR_MIDDLE);
@@ -301,23 +312,28 @@ public class Introduction {
 	VRectangle sigG=new VRectangle(1000,-200,0,25,25,Color.black);
 	sigG.setType("sig");
 	VText sigT = new VText(1000, -300, 0, Color.black, "Slow-in/Slow-out", VText.TEXT_ANCHOR_MIDDLE);
-	vsm.addGlyph(linG,"vs1");vsm.addGlyph(expG,"vs1");vsm.addGlyph(sigG,"vs1");
-	vsm.addGlyph(linT,"vs1");vsm.addGlyph(expT,"vs1");vsm.addGlyph(sigT,"vs1");
+	vsm.addGlyph(linG,VS_1);vsm.addGlyph(expG,VS_1);vsm.addGlyph(sigG,VS_1);
+	vsm.addGlyph(linT,VS_1);vsm.addGlyph(expT,VS_1);vsm.addGlyph(sigT,VS_1);
 	linG.setColor(Introduction.ANIM_BUTTON_COLOR);expG.setColor(Introduction.ANIM_BUTTON_COLOR);sigG.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 	eh=new AnimationEvtHdlr(this,orG,szG,clG,trG,linG,expG,sigG);
 	vsm.getView("Demo").setEventHandler(eh);
 
 	VCircle c1=new VCircle(-400,900,0,100,Color.black);c1.setType("an");	
 	VTriangleOr t1=new VTriangleOr(-400,600,0,100,Color.black,0);t1.setType("an");
+	VShape o1 = new VShape(-400, 300, 0, 100, OCTAGON_VERTICES, Color.BLACK, 0);o1.setType("an");
 	VRectangleOr r1=new VRectangleOr(-400,0,0,100,50,Color.black,0);r1.setType("an");
 	VDiamondOr d1=new VDiamondOr(-400,-300,0,100,Color.black,0);d1.setType("an");
-	vsm.addGlyph(c1,"vs1");vsm.addGlyph(t1,"vs1");vsm.addGlyph(r1,"vs1");vsm.addGlyph(d1,"vs1");
-	c1.setColor(Introduction.ANIM_OBJECT_COLOR);t1.setColor(Introduction.ANIM_OBJECT_COLOR);r1.setColor(Introduction.ANIM_OBJECT_COLOR);d1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	vsm.addGlyph(c1,VS_1);vsm.addGlyph(t1,VS_1);vsm.addGlyph(r1,VS_1);vsm.addGlyph(d1,VS_1);vsm.addGlyph(o1,VS_1);
+	c1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	o1.setColor(Introduction.ANIM_OBJECT_COLOR);
+    t1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	r1.setColor(Introduction.ANIM_OBJECT_COLOR);
+	d1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	VImageOr i1=new VImageOr(-400,-600,0,(new ImageIcon(this.getClass().getResource("/images/xrce.gif"))).getImage(),0.0f);i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
-	vsm.addGlyph(i1,"vs1");i1.setType("an");
+	vsm.addGlyph(i1,VS_1);i1.setType("an");
 	i1.sizeTo(200);
-	float[] vs={1.0f,0.4f,1.0f,0.4f,0.8f,0.5f,0.3f,1.0f};
-	VShape s1=new VShape(-400,-900,0,100,vs,ANIM_OBJECT_COLOR,0);vsm.addGlyph(s1,"vs1");s1.setType("an");
+	float[] vs={1f,0.4f,1f,0.4f,0.8f,0.5f,0.3f,1f};
+	VShape s1=new VShape(-400,-900,0,100,vs,ANIM_OBJECT_COLOR,0);vsm.addGlyph(s1,VS_1);s1.setType("an");
 
 	//will be the primary glyph of a CGlyph
 	VRectangleOr cg1=new VRectangleOr(-400,-1200,0,200,100,Color.black,0);
@@ -326,7 +342,7 @@ public class Introduction {
 	VRectangleOr cg3=new VRectangleOr(0,0,0,50,50,Color.black,Color.BLACK,0.404f, 0.5f);
 	VTriangleOr cg4=new VTriangleOr(0,0,0,50,Color.black,Color.BLACK,0.404f, 0.5f);
 	VRectangleOr cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
-	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
+	vsm.addGlyph(cg1,VS_1);vsm.addGlyph(cg2,VS_1);vsm.addGlyph(cg3,VS_1);vsm.addGlyph(cg4,VS_1);vsm.addGlyph(cg5,VS_1);
 	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
 	cg1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	cg2.setColor(Introduction.ANIM_OBJECT_COLOR);
@@ -340,7 +356,7 @@ public class Introduction {
 	    new SGlyph(cg5,0,-100,SGlyph.FULL_ROTATION,SGlyph.RESIZE)
 	};
 	CGlyph cg=new CGlyph(cg1,sgs);
-	vsm.addCGlyph(cg,"vs1");  //use addCGlyph, not addGlyph
+	vsm.addCGlyph(cg,VS_1);  //use addCGlyph, not addGlyph
 
 
 	//will be the primary glyph of a CGlyph
@@ -350,7 +366,7 @@ public class Introduction {
 	cg3=new VRectangleOr(0,0,0,50,50,Color.black,Color.BLACK,0.404f, 0.5f);
 	cg4=new VTriangleOr(0,0,0,50,Color.black,Color.BLACK, 0.404f, 0.5f);
 	cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
-	vsm.addGlyph(cg1,"vs1");vsm.addGlyph(cg2,"vs1");vsm.addGlyph(cg3,"vs1");vsm.addGlyph(cg4,"vs1");vsm.addGlyph(cg5,"vs1");
+	vsm.addGlyph(cg1,VS_1);vsm.addGlyph(cg2,VS_1);vsm.addGlyph(cg3,VS_1);vsm.addGlyph(cg4,VS_1);vsm.addGlyph(cg5,VS_1);
 	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
 	cg1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	cg2.setColor(Introduction.ANIM_OBJECT_COLOR);
@@ -364,7 +380,7 @@ public class Introduction {
 	    new SGlyph(cg5,0,-100,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
 	};
 	cg=new CGlyph(cg1,sgs2);
-	vsm.addCGlyph(cg,"vs1");  //use addCGlyph, not addGlyph
+	vsm.addCGlyph(cg,VS_1);  //use addCGlyph, not addGlyph
 	reveal(true);
     }
 
@@ -412,48 +428,49 @@ public class Introduction {
 				  }
 				  );
     }
-
+    
     void multiLayerActions(){
 	vsm.getView("Demo").setBlank(BLANK_COLOR);
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
-	vsm.destroyGlyphsInSpace("vs1");
-	vsm.getVirtualSpace("vs1").removeCamera(1);
+	vsm.destroyGlyphsInSpace(VS_1);
+	vsm.getVirtualSpace(VS_1).removeCamera(1);
 	vsm.getView("Demo").destroyView();
-	vsm.addVirtualSpace("vs2");
-	vsm.addCamera("vs2");
-	Vector vc1=new Vector();vc1.add(vsm.getVirtualSpace("vs1").getCamera(0));vc1.add(vsm.getVirtualSpace("vs2").getCamera(0));
+	vsm.addVirtualSpace(VS_2);
+	vsm.addCamera(VS_2);
+	Vector vc1=new Vector();vc1.add(vsm.getVirtualSpace(VS_1).getCamera(0));vc1.add(vsm.getVirtualSpace(VS_2).getCamera(0));
 	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
 	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
 	eh=new MultiLayerEvtHdlr(this);
-	vsm.getView("Demo").setEventHandler(eh);
+	vsm.getView("Demo").setEventHandler(eh, 0);
+	vsm.getView("Demo").setEventHandler(eh, 1);
 	VRectangle g1=new VRectangle(-2000,0,0,500,500,Color.blue, Color.BLACK, 0.5f);
 	VTriangle g2=new VTriangle(2000,0,0,500,Color.blue, Color.BLACK, 0.5f);
 	VDiamond g3=new VDiamond(0,-2000,0,500,Color.blue, Color.BLACK, 0.5f);
-	float[] vertices={1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f,1.0f,0.76f};
-	VShape g5=new VShape(0,0,0,200,vertices,Color.blue,Color.BLACK, 0, 0.5f);
+	VShape g4 = new VShape(0, 2000, 0, 500, OCTAGON_VERTICES, Color.BLUE, Color.BLACK, (float)(2*Math.PI/16.0f), 0.5f);
+	VShape g5 = new VShape(0, 0, 0, 200, STAR2_VERTICES, Color.blue, Color.BLACK, 0, 0.5f);
 	VCbCurve cb1=new VCbCurve(0,1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	VCbCurve cb2=new VCbCurve(1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	VCbCurve cb3=new VCbCurve(0,-1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	VCbCurve cb4=new VCbCurve(-1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
-	vsm.addGlyph(g1,"vs2");vsm.addGlyph(g2,"vs2");vsm.addGlyph(g3,"vs2");vsm.addGlyph(g5,"vs2");
-	vsm.addGlyph(cb1,"vs2");vsm.addGlyph(cb2,"vs2");vsm.addGlyph(cb3,"vs2");vsm.addGlyph(cb4,"vs2");
+	vsm.addGlyph(g1,VS_2);vsm.addGlyph(g2,VS_2);vsm.addGlyph(g3,VS_2);vsm.addGlyph(g4, VS_2);vsm.addGlyph(g5,VS_2);
+	vsm.addGlyph(cb1,VS_2);vsm.addGlyph(cb2,VS_2);vsm.addGlyph(cb3,VS_2);vsm.addGlyph(cb4,VS_2);
 	VCircle c1=new VCircle(-2000,0,0,500,Color.yellow);
 	VCircle c2=new VCircle(2000,0,0,500,Color.yellow);
 	VCircle c3=new VCircle(0,-2000,0,500,Color.yellow);
 	VCircle c4=new VCircle(0,2000,0,500,Color.yellow);
-	VShape c5=new VShape(0,0,0,200,vertices,Color.yellow,Color.BLACK, 0, 0.5f);
+	VShape c5 = new VShape(0, 0, 0, 200, STAR1_VERTICES, Color.yellow, Color.BLACK, 0, 0.5f);
 	cb1=new VCbCurve(0,1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	cb2=new VCbCurve(1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	cb3=new VCbCurve(0,-1000,0,300,Color.black,(float)Math.PI/2,200,(float)Math.PI/2,200,(float)-Math.PI/2);
 	cb4=new VCbCurve(-1000,0,0,300,Color.black,0,200,(float)Math.PI/2,200,(float)-Math.PI/2);
-	vsm.addGlyph(c1,"vs1");vsm.addGlyph(c2,"vs1");vsm.addGlyph(c3,"vs1");vsm.addGlyph(c4,"vs1");vsm.addGlyph(c5,"vs1");
-	vsm.addGlyph(cb1,"vs1");vsm.addGlyph(cb2,"vs1");vsm.addGlyph(cb3,"vs1");vsm.addGlyph(cb4,"vs1");
-	vsm.getVirtualSpace("vs1").getCamera(0).posx=0;
-	vsm.getVirtualSpace("vs1").getCamera(0).posy=0;
-	vsm.getVirtualSpace("vs1").getCamera(0).setAltitude(800.0f);
-	vsm.getVirtualSpace("vs2").getCamera(0).posx=0;
-	vsm.getVirtualSpace("vs2").getCamera(0).posy=0;
-	vsm.getVirtualSpace("vs2").getCamera(0).setAltitude(800.0f);
+	vsm.addGlyph(c1,VS_1);vsm.addGlyph(c2,VS_1);vsm.addGlyph(c3,VS_1);vsm.addGlyph(c4,VS_1);vsm.addGlyph(c5,VS_1);
+	vsm.addGlyph(cb1,VS_1);vsm.addGlyph(cb2,VS_1);vsm.addGlyph(cb3,VS_1);vsm.addGlyph(cb4,VS_1);
+	vsm.getVirtualSpace(VS_1).getCamera(0).posx=0;
+	vsm.getVirtualSpace(VS_1).getCamera(0).posy=0;
+	vsm.getVirtualSpace(VS_1).getCamera(0).setAltitude(800.0f);
+	vsm.getVirtualSpace(VS_2).getCamera(0).posx=0;
+	vsm.getVirtualSpace(VS_2).getCamera(0).posy=0;
+	vsm.getVirtualSpace(VS_2).getCamera(0).setAltitude(800.0f);
 	reveal(false);
     }
 
@@ -471,14 +488,14 @@ public class Introduction {
     void multiViewActions(){
 	vsm.getView("Demo").setBlank(BLANK_COLOR);
 	vsm.getView("Demo").setBackgroundColor(Color.WHITE);
-	vsm.destroyGlyphsInSpace("vs1");
-	vsm.destroyVirtualSpace("vs2");
+	vsm.destroyGlyphsInSpace(VS_1);
+	vsm.destroyVirtualSpace(VS_2);
 	eh=new CameraDemoEvtHdlr(this);
 	ViewEventHandler eh2=new CameraDemoEvtHdlr(this);
-	vsm.addCamera("vs1");
+	vsm.addCamera(VS_1);
 	camNb++;  //keep track of how many cameras have been created in the virtual space
 	Vector vc1=new Vector();
-	vc1.add(vsm.getVirtualSpace("vs1").getCamera(camNb));
+	vc1.add(vsm.getVirtualSpace(VS_1).getCamera(camNb));
 	vsm.addExternalView(vc1, "Demo2", View.STD_VIEW, 300, 200, false, true);
 	vsm.getView("Demo").setEventHandler(eh);
 	vsm.getView("Demo2").setEventHandler(eh2);
@@ -488,8 +505,8 @@ public class Introduction {
 	VRectangle g2=new VRectangle(200,200,0,100,50,Color.green);
 	VRectangle g3=new VRectangle(-200,-200,0,100,50,Color.red);
 	VRectangle g4=new VRectangle(-200,200,0,100,50,Color.blue);
-	vsm.addGlyph(g1,"vs1");vsm.addGlyph(g2,"vs1");vsm.addGlyph(g3,"vs1");vsm.addGlyph(g4,"vs1");
-	vsm.getGlobalView(vsm.getVirtualSpace("vs1").getCamera(camNb),200);
+	vsm.addGlyph(g1,VS_1);vsm.addGlyph(g2,VS_1);vsm.addGlyph(g3,VS_1);vsm.addGlyph(g4,VS_1);
+	vsm.getGlobalView(vsm.getVirtualSpace(VS_1).getCamera(camNb),200);
 	reveal(true);
     }
 
