@@ -21,8 +21,6 @@ import net.claribole.zvtm.animation.EndAction;
 
 class GlyphLoader implements Runnable {
 
-    static final float[] FADE_OUT_ANIM_DATA = {0, 0, 0, 0, 0, 0, -1.0f};
-    static final float[] FADE_IN_ANIM_DATA = {0, 0, 0, 0, 0, 0, 1.0f};
     static int FADE_IN_DURATION = 300;
     static int FADE_OUT_DURATION = 300;
 
