@@ -1254,17 +1254,34 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	    broughtElements.add(BroughtElement.rememberPreviousState(arc));
 		// deal with node glyphs
 		ClosedShape nodeShape = node.getShape();
+
+
+        if (size < nodeShape.getSize()){
+            Animation szAnim = animator.getAnimationFactory().createGlyphSizeAnim(
+                BRING_ANIM_DURATION, nodeShape, size,
+                false, SlowInSlowOutInterpolator.getInstance(), null);
+            animator.startAnimation(szAnim, true);
+            VText label = node.getLabel();
+            if (label != null){
+                label.setScale(size/nodeShape.getSize());
+            }
+        }
+
+
 		elementsToFade.remove(nodeShape);
 		LongPoint bposition = (LongPoint)node2broughtPosition.get(node);
 		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
 		Glyph[] glyphs = node.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){
 			elementsToFade.remove(glyphs[i]);
-			Animation a = animator.getAnimationFactory().createGlyphTranslation(
+			Animation posAnim = animator.getAnimationFactory().createGlyphTranslation(
                 BRING_ANIM_DURATION, glyphs[i], translation,
                 true, SlowInSlowOutInterpolator.getInstance(), null);
-            animator.startAnimation(a, true);
+            animator.startAnimation(posAnim, true);
 		}
+
+
+
 		// deal with the edge's spline
 		DPath spline = arc.getSpline();
 		elementsToFade.remove(spline);

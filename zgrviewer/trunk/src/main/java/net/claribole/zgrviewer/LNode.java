@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Thu Mar 15 19:18:17 2007
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.ClosedShape;
+import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.svg.Metadata;
 
 class LNode extends LElem {
@@ -126,10 +127,17 @@ class LNode extends LElem {
     }
 
     ClosedShape getShape(){
-	for (int i=0;i<glyphs.length;i++){
-	    if (glyphs[i] instanceof ClosedShape){return (ClosedShape)glyphs[i];}
-	}
-	return null;
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphs[i] instanceof ClosedShape){return (ClosedShape)glyphs[i];}
+        }
+        return null;
+    }
+
+    VText getLabel(){
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphs[i] instanceof VText){return (VText)glyphs[i];}
+        }
+        return null;
     }
 
     public String toString(){
