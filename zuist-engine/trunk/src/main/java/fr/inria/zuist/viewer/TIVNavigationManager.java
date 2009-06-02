@@ -13,6 +13,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import java.util.Vector;
 
@@ -72,6 +74,9 @@ class TIVNavigationManager {
         this.application = app;
         this.vsm = VirtualSpaceManager.INSTANCE;
         mCamera = app.mCamera;
+        ss = new ScreenSaver(this);
+        ssTimer = new Timer();
+    	ssTimer.scheduleAtFixedRate(ss, SCREEN_SAVER_INTERVAL, SCREEN_SAVER_INTERVAL);
     }
 
     void getGlobalView(){
@@ -360,7 +365,69 @@ class TIVNavigationManager {
         }
         return res;
     }
+    
+    /* ---------------- Screen saver ---------------------- */
+    
+    boolean screensaverEnabled = false;
+    
+    int SCREEN_SAVER_INTERVAL = 2000;
+    
+    ScreenSaver ss;
+	Timer ssTimer;    
+    
+    void toggleScreenSaver(){
+        screensaverEnabled = !screensaverEnabled;
+        ss.setEnabled(screensaverEnabled);
+        application.ovm.say((screensaverEnabled) ? "Screen Saver Mode" : "Viewer Mode");
+    }
 
+}
+
+class ScreenSaver extends TimerTask {
+	
+	TIVNavigationManager nm;
+    boolean enabled = false;
+	
+	ScreenSaver(TIVNavigationManager nm){
+		super();
+        this.nm = nm;
+	}
+
+    void setEnabled(boolean b){
+        enabled = b;
+    }
+	
+	public void run(){
+		if (enabled){
+		    move();
+		}
+	}
+	
+	void move(){
+	    int r = (int)Math.round(Math.random()*20);
+	    if (r < 6){
+	        nm.getGlobalView();
+	    }
+	    else if (r < 8){
+	        nm.getHigherView();
+	    }
+	    else if (r < 16){
+	        nm.getLowerView();
+	    }
+	    else if (r < 17){
+	        nm.translateView(TIVNavigationManager.MOVE_UP);
+	    }
+	    else if (r < 18){
+	        nm.translateView(TIVNavigationManager.MOVE_DOWN);
+	    }
+	    else if (r < 19){
+	        nm.translateView(TIVNavigationManager.MOVE_LEFT);
+	    }
+	    else if (r <= 20){
+	        nm.translateView(TIVNavigationManager.MOVE_RIGHT);
+	    }
+	}
+	
 }
 
 class ZP2LensAction implements EndAction {
