@@ -70,6 +70,8 @@ PROGRESS = 0
 DX = 0
 DY = 0
 
+ID_PREFIX = ""
+
 ################################################################################
 # Create target directory if it does not exist yet
 ################################################################################
@@ -171,7 +173,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 log("Rescaling %s" % ccl, 3)
     # generate ZUIST region and image object
     regionEL = ET.SubElement(rootEL, "region")
-    regionEL.set("id", "R%s" % tileIDstr)
+    regionEL.set("id", "R%s-%s" % (ID_PREFIX, tileIDstr))
     if parentRegionID is None:
         regionEL.set("levels", "0;%d" % (levelCount-1))
     else:
@@ -182,7 +184,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("w", str(int(aw)))
     regionEL.set("h", str(int(ah)))
     objectEL = ET.SubElement(regionEL, "object")
-    objectEL.set("id", "I%s" % tileIDstr)
+    objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
     objectEL.set("type", "image")
     objectEL.set("x", str(int(DX+x+aw/2)))
     objectEL.set("y", str(int(DY-y-ah/2)))
@@ -219,6 +221,8 @@ def processSrcImg():
     levelCount = generateLevels(src_sz, outputroot)
     maxTileCount = computeMaxTileCount(levelCount-1, 0)
     log("Maximum number of tiles to be generated: %d" % maxTileCount, 3)
+    log("Scene offset (%s,%s)" % (DX, DY), 2)
+    log("ID Prefix: %s" % ID_PREFIX, 2)
     buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, im, None)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
@@ -257,6 +261,12 @@ if len(sys.argv) > 2:
                 if not SUCCEEDED_IMPORTING_PIL:
                     log("PIL not available")
                     sys.exit(0)
+            elif arg.startswith("-idprefix"):
+                ID_PREFIX = arg[len("-idprefix="):]
+            elif arg.startswith("-dx"):
+                DX = int(arg[len("-dx="):])
+            elif arg.startswith("-dy"):
+                DY = int(arg[len("-dy="):])
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
