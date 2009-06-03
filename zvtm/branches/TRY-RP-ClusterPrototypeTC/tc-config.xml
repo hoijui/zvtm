@@ -177,13 +177,27 @@
 			<lock-level>write</lock-level>
 		</autolock>
 		<autolock>
-			<method-expression>* net.claribole.zvtm.cluster.ZCountDownLatch.await(..)</method-expression>
-			<lock-level>write</lock-level>
+		<method-expression>* net.claribole.zvtm.cluster.ZCountDownLatch.await(..)</method-expression>
+		<lock-level>write</lock-level>
 		</autolock>
 		<autolock auto-synchronized="false">
-			<method-expression>* com.xerox.VTM.engine.VirtualSpace.*(..)</method-expression>
-			<lock-level>write</lock-level>
+		<method-expression>* com.xerox.VTM.engine.VirtualSpace.*(..)</method-expression>
+		<lock-level>write</lock-level>
 		</autolock>
+		<autolock auto-synchronized="false">
+		<method-expression>* com.xerox.VTM.engine.VirtualSpace.setMetaCamera(..)</method-expression>
+		<lock-level>write</lock-level>
+		</autolock>
+		<autolock auto-synchronized="false">
+		<method-expression>* com.xerox.VTM.engine.VirtualSpace.setMetaCamera(..)</method-expression>
+		<lock-level>write</lock-level>
+		</autolock>
+
+		<autolock auto-synchronized="false">
+		<method-expression>* com.xerox.VTM.engine.VirtualSpace.getMetaCamera(..)</method-expression>
+		<lock-level>read</lock-level>
+		</autolock>
+
 		<autolock auto-synchronized="false">
 			<method-expression>* com.xerox.VTM.engine.VirtualSpaceManager.*(..)</method-expression>
 			<lock-level>write</lock-level>
