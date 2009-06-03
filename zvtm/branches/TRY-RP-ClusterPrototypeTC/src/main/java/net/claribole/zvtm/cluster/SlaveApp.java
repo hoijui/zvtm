@@ -22,11 +22,14 @@ class SlaveOptions {
 
 	@Option(name = "-h", aliases = {"--height"}, usage = "slave view height")
 	int height = 300;
+
+	@Option(name = "-g", aliases = {"--opengl"}, usage = "create OpenGL view (default std view)")
+	boolean opengl = false;
 }
 
 //Generic slave application
 // - retrieves a slave camera from a MetaCamera
-// - creates a std view 
+// - creates a std or opengl view 
 // - dispays scene
 public class SlaveApp {
 	private SlaveOptions slaveOptions;
@@ -49,8 +52,9 @@ public class SlaveApp {
 
 		Vector<Camera> vcam = new Vector<Camera>();
 		vcam.add(vs.getMetaCamera().retrieveCamera(slaveOptions.blockNumber));
+		if(slaveOptions.opengl){ System.out.println("creating openGL view");}
 		view = vsm.addExternalView(vcam, "slaveView"  + slaveOptions.blockNumber, 
-				View.STD_VIEW, slaveOptions.width, 
+				slaveOptions.opengl? View.OPENGL_VIEW : View.STD_VIEW, slaveOptions.width, 
 				slaveOptions.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 		vcam.get(0).setOwningView(view); 

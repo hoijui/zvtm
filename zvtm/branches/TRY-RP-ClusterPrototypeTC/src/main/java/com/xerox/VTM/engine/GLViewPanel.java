@@ -158,9 +158,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
 		    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 			camIndex=cams[nbcam].getIndex();
-			drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-			synchronized(drawnGlyphs){
-			    drawnGlyphs.removeAllElements();
 			    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 			    //compute region seen from this view through camera
 			    viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
@@ -176,13 +173,9 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 					if (gll[i].isVisible()){
 					    gll[i].draw(backBufferGraphics,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
 					}
-					// notifying outside if branch because glyph sensitivity is not
-					// affected by glyph visibility when managed through Glyph.setVisible()
-					cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
 				    }
 				}
 			    }
-			}
 		    }
 		}
 		// call to foreground java2d painting hook

@@ -172,15 +172,18 @@ $Id$
 
 		  <process nodeName="slave0" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 0">
+		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b 0" 
+		  vmargs="-Dsun.java2d.opengl=True">
 		  </process>
 		  <process nodeName="slave1" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 1">
+		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b 1"
+		  vmargs="-Dsun.java2d.opengl=True">
 		  </process>
 		  <process nodeName="slave2" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 2">
+		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b 2"
+		  vmargs="-Dsun.java2d.opengl=True">
 		  </process>
 		<!--  <process nodeName="slave3" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
