@@ -12,6 +12,8 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 import java.io.File;
+import java.io.IOException;
+import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
 
@@ -19,6 +21,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
 
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VPolygon;
@@ -52,6 +59,7 @@ public class SceneManager {
     static final String _text = "text";
     static final String _rect = "rect";
     static final String _polygon = "polygon";
+    static final String _scene = "scene";
     static final String _x = "x";
     static final String _y = "y";
     static final String _w = "w";
@@ -242,8 +250,8 @@ public class SceneManager {
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
-    public void loadScene(Document scene, File sceneFileDirectory, boolean reset){
-        loadScene(scene, sceneFileDirectory, reset, null);
+    public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset){
+        return loadScene(scene, sceneFileDirectory, reset, null);
     }
 
     /** Load a multi-scale scene configuration described in an XML document.
@@ -251,7 +259,7 @@ public class SceneManager {
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
-    public void loadScene(Document scene, File sceneFileDirectory, boolean reset, ProgressListener pl){
+    public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset, ProgressListener pl){
 		if (reset){
 		    reset();
 	    }
@@ -280,6 +288,7 @@ public class SceneManager {
             pl.setLabel("Creating regions, loading object descriptions...");
         }
         Hashtable regionName2containerRegionName = new Hashtable();
+        Vector regions = new Vector();
         for (int i=0;i<nl.getLength();i++){
             n = nl.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE){
@@ -288,7 +297,7 @@ public class SceneManager {
                     if (pl != null){
                         pl.setValue(Math.round(10+i/((float)nl.getLength())*90.0f));
                     }
-                    processRegion(e, regionName2containerRegionName, sceneFileDirectory);
+                    regions.add(processRegion(e, regionName2containerRegionName, sceneFileDirectory));
                 }
             }
         }
@@ -316,6 +325,7 @@ public class SceneManager {
             pl.setLabel("Scene file loaded successfully");
             pl.setValue(100);
         }
+        return (Region[])regions.toArray(new Region[regions.size()]);
     }
     
     public Level createLevel(int depth, float calt, float falt){
@@ -328,8 +338,8 @@ public class SceneManager {
         return levels[depth];
     }
     
-    void processLevel(Element levelEL){
-        createLevel(Integer.parseInt(levelEL.getAttribute(_depth)), Float.parseFloat(levelEL.getAttribute(_ceiling)), Float.parseFloat(levelEL.getAttribute(_floor)));
+    Level processLevel(Element levelEL){
+        return createLevel(Integer.parseInt(levelEL.getAttribute(_depth)), Float.parseFloat(levelEL.getAttribute(_ceiling)), Float.parseFloat(levelEL.getAttribute(_floor)));
     }
     
     /** Create a new region.
@@ -392,7 +402,7 @@ public class SceneManager {
         return region;
     }
 
-    void processRegion(Element regionEL, Hashtable rn2crn, File sceneFileDirectory){
+    Region processRegion(Element regionEL, Hashtable rn2crn, File sceneFileDirectory){
         long x = Long.parseLong(regionEL.getAttribute(_x));
         long y = Long.parseLong(regionEL.getAttribute(_y));
         long w = Long.parseLong(regionEL.getAttribute(_w));
@@ -439,9 +449,17 @@ public class SceneManager {
                 }
             }
         }
+        return region;
+    }
+    
+    public void destroyRegion(Region r){
+        id2region.remove(r.getID());
+        for (int i=r.getLowestLevel();i<=r.getHighestLevel();i++){
+            levels[i].removeRegion(r);
+        }
     }
 
-    void processObject(Element objectEL, Region region, File sceneFileDirectory){
+    ObjectDescription processObject(Element objectEL, Region region, File sceneFileDirectory){
         String type = objectEL.getAttribute(_type);
         String id = objectEL.getAttribute(_id);
         int zindex = (objectEL.hasAttribute(_zindex)) ? Integer.parseInt(objectEL.getAttribute(_zindex)) : 0;
@@ -461,9 +479,12 @@ public class SceneManager {
         else if (type.equals(_polygon)){
             res = processPolygon(objectEL, id, zindex, region);
         }
+        else if (type.equals(_scene)){
+            res = processNestedScene(objectEL, id, region, sceneFileDirectory);
+        }
         else {
             System.err.println("Error: failed to process object declaration: "+id);
-            return;
+            return null;
         }
         String tto = objectEL.getAttribute(_takesToO);
         String ttr = objectEL.getAttribute(_takesToR);
@@ -479,6 +500,7 @@ public class SceneManager {
         else {
             System.err.println("Warning: ID: "+id+" used to identify more than one object.");
         }
+        return res;
     }
 
     /** Process XML description of an image object. */
@@ -494,7 +516,7 @@ public class SceneManager {
 		Object interpolation = (objectEL.hasAttribute(_interpolation)) ? parseInterpolation(objectEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
         return od;
-    }    
+    }
 
     /** Creates an image and adds it to a region.
         *@param id ID of object in scene
@@ -526,6 +548,30 @@ public class SceneManager {
         else {
             return RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         }
+    }
+    
+    /** Process XML description of an image object. */
+    NestedSceneDescription processNestedScene(Element objectEL, String id, Region region, File sceneFileDirectory){
+        long x = Long.parseLong(objectEL.getAttribute(_x));
+        long y = Long.parseLong(objectEL.getAttribute(_y));
+        String src = objectEL.getAttribute(_src);
+		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
+		NestedSceneDescription od = createNestedSceneDescription(x+origin.x, y+origin.y, id, region, absoluteSrc);
+        return od;
+    }
+    
+    /** Creates an image and adds it to a region.
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param scenePath path to bitmap resource
+        *@param region parent Region in scene
+     */
+    public NestedSceneDescription createNestedSceneDescription(long x, long y, String id,
+                                                               Region region, String scenePath){
+        NestedSceneDescription sd = new NestedSceneDescription(id, x, y, scenePath, region, this);
+        region.addObject(sd);
+        return sd;
     }
     
     /**
@@ -761,4 +807,20 @@ public class SceneManager {
 		}
     }
 
+    public static Document parseXML(File f){
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setValidating(false);
+            factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", new Boolean(false));
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document res = builder.parse(f);
+            return res;
+        }
+        catch (FactoryConfigurationError e){e.printStackTrace();return null;}
+        catch (ParserConfigurationException e){e.printStackTrace();return null;}
+        catch (SAXException e){e.printStackTrace();return null;}
+        catch (IOException e){e.printStackTrace();return null;}
+    }
+    
 }

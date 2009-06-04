@@ -65,10 +65,22 @@ public class Level {
 	}
     
     void addRegion(Region r){
-	Region[] tmpR = new Region[regions.length+1];
-	System.arraycopy(regions, 0, tmpR, 0, regions.length);
-	regions = tmpR;
-	regions[regions.length-1] = r;
+        Region[] tmpR = new Region[regions.length+1];
+        System.arraycopy(regions, 0, tmpR, 0, regions.length);
+        regions = tmpR;
+        regions[regions.length-1] = r;
+    }
+    
+    void removeRegion(Region r){
+        for (int i=0;i<regions.length;i++){
+            if (regions[i] == r){
+                Region[] tmpR = new Region[regions.length-1];
+                System.arraycopy(regions, 0, tmpR, 0, i);
+                System.arraycopy(regions, i+1, tmpR, i, regions.length-i-1);
+                regions = tmpR;                
+                return;
+            }
+        }
     }
 
     boolean inRange(float alt){

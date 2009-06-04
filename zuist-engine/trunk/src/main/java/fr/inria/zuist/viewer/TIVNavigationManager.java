@@ -406,7 +406,7 @@ class ScreenSaver extends TimerTask {
 	void move(){
 	    int r = (int)Math.round(Math.random()*20);
 	    if (r < 6){
-	        nm.getGlobalView();
+	        overview();
 	    }
 	    else if (r < 8){
 	        nm.getHigherView();
@@ -427,6 +427,33 @@ class ScreenSaver extends TimerTask {
 	        nm.translateView(TIVNavigationManager.MOVE_RIGHT);
 	    }
 	}
+	
+	void overview(){
+	    nm.getGlobalView();
+        
+	    
+//        final SwingWorker worker = new SwingWorker(){
+//    		public Object construct(){
+//    		    sleep(5000);
+//    		    displayAnnotations();
+//    		    sleep(4000);
+//    		    eraseAnnotations();
+//    		    return null;
+//    		}
+//    	    };
+//    	worker.start();
+	}
+	
+//	VCircle c1;
+//	
+//	displayAnnotations(){
+//	    c1 = new VCircle();
+//	    vsm.addGlyph();
+//	}
+//	
+//	eraseAnnotations(){
+//	    
+//	}
 	
 }
 

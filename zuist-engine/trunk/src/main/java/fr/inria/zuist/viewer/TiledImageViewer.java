@@ -67,12 +67,7 @@ import net.claribole.zvtm.engine.RepaintListener;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**
  * @author Emmanuel Pietriga
@@ -262,7 +257,7 @@ public class TiledImageViewer {
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
 	    gp.setVisible(false);
 	    gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
@@ -286,22 +281,6 @@ public class TiledImageViewer {
     
     void gc(){
         System.gc();
-    }
-    
-    static Document parseXML(File f){ 
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", new Boolean(false));
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document res = builder.parse(f);
-            return res;
-        }
-        catch (FactoryConfigurationError e){e.printStackTrace();return null;}
-        catch (ParserConfigurationException e){e.printStackTrace();return null;}
-        catch (SAXException e){e.printStackTrace();return null;}
-        catch (IOException e){e.printStackTrace();return null;}
     }
     
     void exit(){

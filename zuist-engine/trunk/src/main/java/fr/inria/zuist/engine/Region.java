@@ -175,6 +175,13 @@ public class Region {
             return cr;
         }
     }
+    
+    /** Get objects in this region.
+     *@return returns the actual list, not a clone. Do not temper with.
+     */
+    public ObjectDescription[] getObjectsInRegion(){
+        return objects;
+    }
 
     void setGlyph(VRectangle r){
         bounds = r;

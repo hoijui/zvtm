@@ -45,7 +45,6 @@ public class ImageDescription extends ObjectDescription {
         *@param h height in scene
         *@param p path to bitmap resource
         *@param sc border color
-        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
     ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){

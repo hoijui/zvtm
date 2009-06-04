@@ -28,7 +28,7 @@
 
 <!ELEMENT object ANY>
 <!ATTLIST object id ID #REQUIRED
-                 type (image|text|rect|polygon) #REQUIRED
+                 type (image|text|rect|polygon|scene) #REQUIRED
                  x CDATA #REQUIRED
                  y CDATA #REQUIRED
                  z-index CDATA #IMPLIED
