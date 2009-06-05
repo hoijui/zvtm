@@ -453,6 +453,7 @@ public class SceneManager {
     }
     
     public void destroyRegion(Region r){
+        r.forceHide(Region.DISAPPEAR, r.x, r.y);
         id2region.remove(r.getID());
         for (int i=r.getLowestLevel();i<=r.getHighestLevel();i++){
             levels[i].removeRegion(r);
