@@ -295,7 +295,7 @@ public class SceneManager {
                 e = (Element)n;
                 if (e.getTagName().equals(_region)){
                     if (pl != null){
-                        pl.setValue(Math.round(10+i/((float)nl.getLength())*90.0f));
+                        pl.setValue(Math.round(10+i/((float)nl.getLength())*50.0f));
                     }
                     regions.add(processRegion(e, regionName2containerRegionName, sceneFileDirectory));
                 }
@@ -309,6 +309,22 @@ public class SceneManager {
                 Region cr = (Region)id2region.get(regionName2containerRegionName.get(rn));
                 cr.addContainedRegion(r);
                 r.setContainingRegion(cr);
+            }
+        }
+        if (pl != null){
+            pl.setLabel("Processing inclusions...");
+        }
+        nl = root.getChildNodes();
+        for (int i=0;i<nl.getLength();i++){
+            n = nl.item(i);
+            if (n.getNodeType() == Node.ELEMENT_NODE){
+                e = (Element)n;
+                if (e.getTagName().equals(_include)){
+                    if (pl != null){
+                        pl.setValue(Math.round(60+i/((float)nl.getLength())*30.0f));
+                    }
+                    processInclude(e, sceneFileDirectory);
+                }
             }
         }
         if (pl != null){
@@ -484,9 +500,6 @@ public class SceneManager {
         else if (type.equals(_polygon)){
             res = processPolygon(objectEL, id, zindex, region);
         }
-        else if (type.equals(_include)){
-            //XXX:TBW
-        }
         else {
             System.err.println("Error: failed to process object declaration: "+id);
             return null;
@@ -625,6 +638,20 @@ public class SceneManager {
         region.addObject(td);
         return td;
     }
+    
+    /* ---------- inclusions (of other scene files) ----------- */
+    
+    void processInclude(Element includeEL, File sceneFileDirectory){
+        long x = Long.parseLong(includeEL.getAttribute(_x));
+        long y = Long.parseLong(includeEL.getAttribute(_y));
+        String src = includeEL.getAttribute(_src);
+        String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
+        File f = new File(absoluteSrc);
+        setOrigin(new LongPoint(x, y));
+        loadScene(parseXML(f), f.getParentFile(), false, null);
+        setOrigin(new LongPoint(0, 0));
+    }
+    
 
     /* ----------- level / region visibility update ----------- */
 
