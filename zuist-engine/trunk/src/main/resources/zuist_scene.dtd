@@ -1,6 +1,6 @@
 <!-- $Id$ -->
 
-<!ELEMENT scene (level+,region+)>
+<!ELEMENT scene (level+,region+,include*)>
 
 <!ELEMENT level EMPTY>
 <!ATTLIST level depth CDATA #REQUIRED
@@ -28,7 +28,7 @@
 
 <!ELEMENT object ANY>
 <!ATTLIST object id ID #REQUIRED
-                 type (image|text|rect|polygon|scene) #REQUIRED
+                 type (image|text|rect|polygon) #REQUIRED
                  x CDATA #REQUIRED
                  y CDATA #REQUIRED
                  z-index CDATA #IMPLIED
@@ -44,3 +44,7 @@
                  takesToRegion IDREF #IMPLIED
                  sensitive (true|false) "true"
                  anchor (start|middle|end) "middle">
+
+<!ELEMENT include EMPTY>
+<!ATTLIST include x CDATA #REQUIRED
+                  y CDATA #REQUIRED>

@@ -59,7 +59,7 @@ public class SceneManager {
     static final String _text = "text";
     static final String _rect = "rect";
     static final String _polygon = "polygon";
-    static final String _scene = "scene";
+    static final String _include = "include";
     static final String _x = "x";
     static final String _y = "y";
     static final String _w = "w";
@@ -251,16 +251,15 @@ public class SceneManager {
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
     public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset){
-        return loadScene(scene, sceneFileDirectory, reset, null, null);
+        return loadScene(scene, sceneFileDirectory, reset, null);
     }
 
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
-     *@param parent parent region, null if none. Used, e.g., when nesting a scene within another scene.
      */
-    public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset, Region parent, ProgressListener pl){
+    public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset, ProgressListener pl){
 		if (reset){
 		    reset();
 	    }
@@ -326,16 +325,7 @@ public class SceneManager {
             pl.setLabel("Scene file loaded successfully");
             pl.setValue(100);
         }
-        Region[] res = (Region[])regions.toArray(new Region[regions.size()]);
-        if (parent != null){
-            for (int i=0;i<res.length;i++){
-                if (res[i].getContainingRegion() == null){
-                    res[i].setContainingRegion(parent);
-                    parent.addContainedRegion(res[i]);
-                }
-            }            
-        }
-        return res;
+        return (Region[])regions.toArray(new Region[regions.size()]);
     }
     
     public Level createLevel(int depth, float calt, float falt){
@@ -494,8 +484,8 @@ public class SceneManager {
         else if (type.equals(_polygon)){
             res = processPolygon(objectEL, id, zindex, region);
         }
-        else if (type.equals(_scene)){
-            res = processNestedScene(objectEL, id, region, sceneFileDirectory);
+        else if (type.equals(_include)){
+            //XXX:TBW
         }
         else {
             System.err.println("Error: failed to process object declaration: "+id);
@@ -564,31 +554,7 @@ public class SceneManager {
             return RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         }
     }
-    
-    /** Process XML description of an image object. */
-    NestedSceneDescription processNestedScene(Element objectEL, String id, Region region, File sceneFileDirectory){
-        long x = Long.parseLong(objectEL.getAttribute(_x));
-        long y = Long.parseLong(objectEL.getAttribute(_y));
-        String src = objectEL.getAttribute(_src);
-		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
-		NestedSceneDescription od = createNestedSceneDescription(x+origin.x, y+origin.y, id, region, absoluteSrc);
-        return od;
-    }
-    
-    /** Creates an image and adds it to a region.
-        *@param id ID of object in scene
-        *@param x x-coordinate in scene
-        *@param y y-coordinate in scene
-        *@param scenePath path to bitmap resource
-        *@param region parent Region in scene
-     */
-    public NestedSceneDescription createNestedSceneDescription(long x, long y, String id,
-                                                               Region region, String scenePath){
-        NestedSceneDescription sd = new NestedSceneDescription(id, x, y, scenePath, region, this);
-        region.addObject(sd);
-        return sd;
-    }
-    
+        
     /**
      *@param g any ClosedShape. It must implement com.xerox.VTM.glyphs.Translucent if fade in/out transitions are used in the parent region.
      */
