@@ -326,7 +326,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, null, gp);
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);

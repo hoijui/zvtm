@@ -251,15 +251,16 @@ public class SceneManager {
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
     public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset){
-        return loadScene(scene, sceneFileDirectory, reset, null);
+        return loadScene(scene, sceneFileDirectory, reset, null, null);
     }
 
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
      *@param sceneFileDirectory absolute or relative (w.r.t exec dir) path to the directory containing that XML file (required only if the scene contains image objects whose location is indicated as relative paths to the bitmap files)
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
+     *@param parent parent region, null if none. Used, e.g., when nesting a scene within another scene.
      */
-    public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset, ProgressListener pl){
+    public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset, Region parent, ProgressListener pl){
 		if (reset){
 		    reset();
 	    }
@@ -325,7 +326,16 @@ public class SceneManager {
             pl.setLabel("Scene file loaded successfully");
             pl.setValue(100);
         }
-        return (Region[])regions.toArray(new Region[regions.size()]);
+        Region[] res = (Region[])regions.toArray(new Region[regions.size()]);
+        if (parent != null){
+            for (int i=0;i<res.length;i++){
+                if (res[i].getContainingRegion() == null){
+                    res[i].setContainingRegion(parent);
+                    parent.addContainedRegion(res[i]);
+                }
+            }            
+        }
+        return res;
     }
     
     public Level createLevel(int depth, float calt, float falt){
