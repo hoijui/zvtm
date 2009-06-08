@@ -642,19 +642,9 @@ public abstract class View {
     /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
         * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
     public Lens setLens(Lens l){
-        if (isFocusControlled){
-            if (focusControlHandler == null){
-                focusControlHandler = new FocusControlHandler(this, getPanel().getEventHandlers()[getActiveLayer()]);
-                this.setNotifyMouseMoved(true);
-            }
-            if (l != null){
-                focusControlHandler.start();
-            }
-            else {
-                focusControlHandler.stop();
-            }
-        }
-        return panel.setLens(l);
+        Lens res = panel.setLens(l);
+        activateFocusControlled(isFocusControlled);
+        return res;
     }
 
     /**return Lens currently used by this view (null if none)*/
@@ -664,9 +654,24 @@ public abstract class View {
     
     public void setFocusControlled(boolean isFocusControlled) {
 		this.isFocusControlled = isFocusControlled;
-		if (getLens() != null){
-		    setLens(getLens());
-	    }
+        activateFocusControlled(isFocusControlled);
+	}
+	
+	void activateFocusControlled(boolean b){
+	    if (panel.getLens() == null){return;}
+        if (b){
+            if (focusControlHandler == null){
+                focusControlHandler = new FocusControlHandler(this, getPanel().getEventHandlers()[getActiveLayer()]);
+                this.setNotifyMouseMoved(true);
+            }
+            focusControlHandler.start(panel.getLens());                
+        }
+        else {
+            if (focusControlHandler != null){
+                focusControlHandler.stop();
+                focusControlHandler = null;                
+            }
+        }
 	}
 
 }

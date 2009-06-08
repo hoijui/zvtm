@@ -42,6 +42,9 @@ public class FocusControlHandler implements ViewEventHandler {
 	
 	ViewEventHandler actualViewEventHandler;
 	
+	Lens lens;
+	TemporalLens tLens;
+	
 	public FocusControlHandler(View v, ViewEventHandler aveh){
 		view = v;
 		this.actualViewEventHandler = aveh;
@@ -65,17 +68,24 @@ public class FocusControlHandler implements ViewEventHandler {
 		v.setJava2DPainter(paintCursor, Java2DPainter.AFTER_PORTALS);
 	}
 	
-	public void start() { 
-		started = true; 
+	public void start(Lens l) { 
+		started = true;
 		if(view.getPanel() != null) view.setEventHandler(this);
 		if(view.getLens() == null) return;
-		lastXLensCenter = view.getLens().lx;
-		lastYLensCenter = view.getLens().ly;
+	    lens = l;
+		if (l instanceof TemporalLens){
+		    tLens = (TemporalLens)l;
+		}
+		else {
+            tLens = null;
+		}
+		lastXLensCenter = lens.lx;
+		lastYLensCenter = lens.ly;
 	}
 	
-	public void stop() { 
-		view.getLens().setXfocusOffset(0);
-		view.getLens().setYfocusOffset(0);
+	public void stop() {
+		lens.setXfocusOffset(0);
+		lens.setYfocusOffset(0);
 		started = false; 
 		if(view.getPanel() != null) view.setEventHandler(actualViewEventHandler);
 		lastXLensCenter = -1;
@@ -138,11 +148,11 @@ public class FocusControlHandler implements ViewEventHandler {
 			lastYLensCenter = e.getY();
 		}
 			
-		dx = view.getLens().getXfocusOffset() + (e.getX() - lastXLensCenter);
-		dy = view.getLens().getYfocusOffset() + (e.getY() - lastYLensCenter);
+		dx = lens.getXfocusOffset() + (e.getX() - lastXLensCenter);
+		dy = lens.getYfocusOffset() + (e.getY() - lastYLensCenter);
 		
 		speed = sf.getSpeedCoeff(e.getWhen(), e.getX(), e.getY());
-		magFactor = 1 + (1-speed) * (view.getLens().getMaximumMagnification() - 1);
+		magFactor = 1 + (1-speed) * (lens.getMaximumMagnification() - 1);
 		
 		lastXLensCenter = lastXLensCenter + dx / (int)magFactor;
 		lastYLensCenter = lastYLensCenter + dy / (int)magFactor;
@@ -153,11 +163,15 @@ public class FocusControlHandler implements ViewEventHandler {
 			robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
 		}
 		
-		view.getLens().setXfocusOffset(dx % (int)magFactor);
-		view.getLens().setYfocusOffset(dy % (int)magFactor);
+		lens.setXfocusOffset(dx % (int)magFactor);
+		lens.setYfocusOffset(dy % (int)magFactor);
 		
-		view.getLens().setAbsolutePosition(lastXLensCenter, lastYLensCenter);	
-		
+		if (tLens != null){
+		    tLens.setAbsolutePosition(lastXLensCenter, lastYLensCenter, e.getWhen());
+		}
+		else {
+		    lens.setAbsolutePosition(lastXLensCenter, lastYLensCenter);
+		}
 		view.repaintNow();
 	}
 	
