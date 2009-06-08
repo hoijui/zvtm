@@ -70,7 +70,6 @@ public class LInfSCFGaussianLens extends SCFGaussianLens {
     public void drawBoundary(Graphics2D g2d){
         // get the alpha composite from a precomputed list of values
         // (we don't want to instantiate a new AlphaComposite at each repaint request)
-        System.out.println(Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY));
         g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
         if (r1Color != null){
             g2d.setColor(r1Color);
