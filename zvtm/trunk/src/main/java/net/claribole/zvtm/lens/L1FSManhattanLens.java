@@ -63,14 +63,15 @@ public class L1FSManhattanLens extends FSManhattanLens {
 	    g[0] = g[1] = 1;
     }
 
+    /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
-	if (bColor != null){
-	    g2d.setColor(bColor);
-	    g2d.drawLine(lx+w/2-lensWidth/2, ly+h/2, lx+w/2, ly+h/2-lensHeight/2);
-	    g2d.drawLine(lx+w/2, ly+h/2-lensHeight/2, lx+w/2+lensWidth/2, ly+h/2);
-	    g2d.drawLine(lx+w/2+lensWidth/2, ly+h/2, lx+w/2, ly+h/2+lensHeight/2);
-	    g2d.drawLine(lx+w/2, ly+h/2+lensHeight/2, lx+w/2-lensWidth/2, ly+h/2);
-	}
+        if (r2Color != null){
+            g2d.setColor(r2Color);
+            g2d.drawLine(lx+w/2, ly+h/2-LR2, lx+w/2+LR2, ly+h/2);
+            g2d.drawLine(lx+w/2+LR2, ly+h/2, lx+w/2, ly+h/2+LR2);
+            g2d.drawLine(lx+w/2, ly+h/2+LR2, lx+w/2-LR2, ly+h/2);
+            g2d.drawLine(lx+w/2-LR2, ly+h/2, lx+w/2, ly+h/2-LR2);
+        }
     }
 
 }

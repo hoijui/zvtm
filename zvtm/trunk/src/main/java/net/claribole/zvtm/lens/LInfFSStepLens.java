@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -49,6 +49,18 @@ public class LInfFSStepLens extends FSStepLens {
         }
         else
             g[0] = g[1] = 1;
+    }
+    
+    /**for internal use*/
+    public void drawBoundary(Graphics2D g2d){
+        if (r1Color != null){
+            g2d.setColor(r1Color);
+            g2d.drawRect(lx+w/2-LR1, ly+h/2-LR1, 2*LR1, 2*LR1);
+        }
+        if (r2Color != null){
+            g2d.setColor(r2Color);
+            g2d.drawRect(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
+        }
     }
 
 }

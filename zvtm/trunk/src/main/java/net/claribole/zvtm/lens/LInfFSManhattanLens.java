@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Wed Nov 03 11:51:04 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -64,10 +64,10 @@ public class LInfFSManhattanLens extends FSManhattanLens {
     }
 
     public void drawBoundary(Graphics2D g2d){
-	if (bColor != null){
-	    g2d.setColor(bColor);
-	    g2d.drawRect(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
-	}
+        if (r2Color != null){
+            g2d.setColor(r2Color);
+            g2d.drawRect(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+        }
     }
 
 }
