@@ -42,6 +42,7 @@ import net.claribole.zvtm.engine.Portal;
 import net.claribole.zvtm.engine.RepaintListener;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.lens.Lens;
+import net.claribole.zvtm.lens.FocusControlHandler;
 
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>
@@ -635,9 +636,24 @@ public abstract class View {
     
     /* --------------------- LENSES -------------------------- */
 
+    boolean isFocusControlled = false;
+    FocusControlHandler focusControlHandler = null;
+
     /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
         * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
     public Lens setLens(Lens l){
+        if (isFocusControlled){
+            if (focusControlHandler == null){
+                focusControlHandler = new FocusControlHandler(this, getPanel().getEventHandlers()[getActiveLayer()]);
+                this.setNotifyMouseMoved(true);
+            }
+            if (l != null){
+                focusControlHandler.start();
+            }
+            else {
+                focusControlHandler.stop();
+            }
+        }
         return panel.setLens(l);
     }
 
@@ -645,5 +661,12 @@ public abstract class View {
     public Lens getLens(){
         return panel.getLens();
     }
+    
+    public void setFocusControlled(boolean isFocusControlled) {
+		this.isFocusControlled = isFocusControlled;
+		if (getLens() != null){
+		    setLens(getLens());
+	    }
+	}
 
 }
