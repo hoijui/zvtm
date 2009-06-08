@@ -27,8 +27,8 @@ import com.xerox.VTM.glyphs.Glyph;
 
 public class FocusControlHandler implements ViewEventHandler {
 
-	int  lastXLensCenter = -1;
-	int  lastYLensCenter = -1;
+	int lastXLensCenter = -1;
+	int lastYLensCenter = -1;
 	
 	int dx, dy;
 	double speed;
@@ -89,8 +89,6 @@ public class FocusControlHandler implements ViewEventHandler {
 		lens.setYfocusOffset(0);
 		started = false; 
 		if(view.getPanel() != null) view.setEventHandler(actualViewEventHandler);
-		lastXLensCenter = -1;
-		lastYLensCenter = -1;
 	}
 	
 	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e) {
@@ -144,10 +142,6 @@ public class FocusControlHandler implements ViewEventHandler {
 		
 		if(e.getX() == lastXLensCenter && e.getY() == lastYLensCenter)
 			return;
-		if(lastXLensCenter == -1 && lastYLensCenter == -1) {
-			lastXLensCenter = e.getX();
-			lastYLensCenter = e.getY();
-		}
 			
 		dx = lens.getXfocusOffset() + (e.getX() - lastXLensCenter);
 		dy = lens.getYfocusOffset() + (e.getY() - lastYLensCenter);
