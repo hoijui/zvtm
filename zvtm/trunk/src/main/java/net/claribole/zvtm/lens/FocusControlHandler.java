@@ -13,6 +13,7 @@ import java.awt.Robot;
 import java.awt.AWTException;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.KeyEvent;
@@ -71,7 +72,6 @@ public class FocusControlHandler implements ViewEventHandler {
 	public void start(Lens l) { 
 		started = true;
 		if(view.getPanel() != null) view.setEventHandler(this);
-		if(view.getLens() == null) return;
 	    lens = l;
 		if (l instanceof TemporalLens){
 		    tLens = (TemporalLens)l;
@@ -79,8 +79,9 @@ public class FocusControlHandler implements ViewEventHandler {
 		else {
             tLens = null;
 		}
-		lastXLensCenter = lens.lx;
-		lastYLensCenter = lens.ly;
+		Dimension d = view.getPanelSize();
+		lastXLensCenter = lens.lx + d.width/2;
+		lastYLensCenter = lens.ly + d.height/2;
 	}
 	
 	public void stop() {
