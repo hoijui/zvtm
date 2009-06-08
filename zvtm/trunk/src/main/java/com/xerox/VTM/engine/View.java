@@ -465,17 +465,6 @@ public abstract class View {
 	return panel.stableRefToBackBufferGraphics;
     }
 
-    /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
-     * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
-    public Lens setLens(Lens l){
-	return panel.setLens(l);
-    }
-
-    /**return Lens currently used by this view (null if none)*/
-    public Lens getLens(){
-	return panel.getLens();
-    }
-
     /**ask for a bitmap rendering of this view and encode it in a PNG file
      *@param w width of rendered image
      *@param h height of rendered image
@@ -642,6 +631,19 @@ public abstract class View {
 	gbc.gridheight=gh;
 	gbc.weightx=wx;
 	gbc.weighty=wy;
+    }
+    
+    /* --------------------- LENSES -------------------------- */
+
+    /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
+        * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
+    public Lens setLens(Lens l){
+        return panel.setLens(l);
+    }
+
+    /**return Lens currently used by this view (null if none)*/
+    public Lens getLens(){
+        return panel.getLens();
     }
 
 }
