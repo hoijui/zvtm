@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
-$Id: pom.xml 1334 2008-11-07 08:22:45Z epietrig $
+$Id$
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
@@ -82,7 +82,7 @@ $Id: pom.xml 1334 2008-11-07 08:22:45Z epietrig $
         <configuration>
           <archive>
             <manifest>
-              <mainClass>fr.inria.zvtm.fms.Test</mainClass>
+              <mainClass>fr.inria.zvtm.fms.Launcher</mainClass>
               <packageName>fr.inria.zvtm.fms</packageName>
               <addClasspath>true</addClasspath>
             </manifest>
