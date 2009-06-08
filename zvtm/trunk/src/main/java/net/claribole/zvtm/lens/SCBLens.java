@@ -269,21 +269,21 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
-	if (bColor != null){
-	    g2d.setColor(bColor);
-	    g2d.drawOval(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
-	}
-	if (rColor != null){
-	    //XXX: the following two values could actually be computed less frequently, just when MM of lens{Width,Height} change
-	    lensProjectedWidth = Math.round(lensWidth/MM);
-	    lensProjectedHeight = Math.round(lensHeight/MM);
-	    g2d.setColor(rColor);
-	    // get the alpha composite from a precomputed list of values
-	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
-	    g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)-1]);  
-	    g2d.drawOval(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
-	    g2d.setComposite(Translucent.acO);
-	}
+        if (bColor != null){
+            g2d.setColor(bColor);
+            g2d.drawOval(lx+w/2-lensWidth/2, ly+h/2-lensHeight/2, lensWidth, lensHeight);
+        }
+        if (rColor != null){
+            //XXX: the following two values could actually be computed less frequently, just when MM of lens{Width,Height} change
+            lensProjectedWidth = Math.round(lensWidth/MM);
+            lensProjectedHeight = Math.round(lensHeight/MM);
+            g2d.setColor(rColor);
+            // get the alpha composite from a precomputed list of values
+            // (we don't want to instantiate a new AlphaComposite at each repaint request)
+            g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)]);
+            g2d.drawOval(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
+            g2d.setComposite(Translucent.acO);
+        }
     }
 
 }

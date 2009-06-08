@@ -82,7 +82,7 @@ public class LInfSCBLens extends SCBLens {
 	    g2d.setColor(rColor);
 	    // get the alpha composite from a precomputed list of values
 	    // (we don't want to instantiate a new AlphaComposite at each repaint request)
-	    g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)-1]);  
+	    g2d.setComposite(Translucency.acs[Math.round((1.0f-MMTf)*Translucency.ACS_ACCURACY)]);
 	    g2d.drawRect(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
 	    g2d.setComposite(Translucent.acO);
 	}
