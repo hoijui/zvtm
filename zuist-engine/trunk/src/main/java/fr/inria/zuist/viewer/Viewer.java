@@ -634,7 +634,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){fs = true;}
+				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
 			}
