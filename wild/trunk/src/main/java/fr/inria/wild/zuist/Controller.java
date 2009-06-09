@@ -25,13 +25,14 @@ import com.illposed.osc.OSCMessage;
 public class Controller extends JFrame implements ActionListener {
     
     static final String MOVE_CAMERA = "/moveCam";
+    
     static final short TRANSLATE_WEST = 0;
     static final short TRANSLATE_NORTH = 1;
     static final short TRANSLATE_EAST = 2;
     static final short TRANSLATE_SOUTH = 3;
     
     // sequence should match above values
-    static final String[] TRANSLATE_STR = {"West", "North", "East", "South"};
+    static final String[] MOVE_STR = {"West", "North", "East", "South", "Higher", "Lower", "Global"};
     
     Integer TRANSLATE_VALUE = new Integer(1000);
 
@@ -43,9 +44,9 @@ public class Controller extends JFrame implements ActionListener {
         super();
         Container c = this.getContentPane();
         c.setLayout(new FlowLayout());
-        translateBts = new JButton[TRANSLATE_STR.length];
-        for (int i=0;i<TRANSLATE_STR.length;i++){
-            translateBts[i] = new JButton(TRANSLATE_STR[i]);
+        translateBts = new JButton[MOVE_STR.length];
+        for (int i=0;i<MOVE_STR.length;i++){
+            translateBts[i] = new JButton(MOVE_STR[i]);
             c.add(translateBts[i]);
             translateBts[i].addActionListener(this);
         }
@@ -75,7 +76,7 @@ public class Controller extends JFrame implements ActionListener {
     }
     
     void translate(int direction){
-        sendMsg(MOVE_CAMERA, TRANSLATE_STR[direction], TRANSLATE_VALUE);
+        sendMsg(MOVE_CAMERA, MOVE_STR[direction], TRANSLATE_VALUE);
     }
 
     void sendMsg(String listener, String cmd, Integer value){

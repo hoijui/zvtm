@@ -95,10 +95,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     
     /* Navigation constants */
     static final int ANIM_MOVE_LENGTH = 300;
-    static final short MOVE_UP = 0;
-    static final short MOVE_DOWN = 1;
-    static final short MOVE_LEFT = 2;
-    static final short MOVE_RIGHT = 3;
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
@@ -186,7 +182,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         try {
             receiver = new OSCPortIn(OSCPort.defaultSCOSCPort());
             OSCListener listener = new OSCListener() {
-                public void acceptMessage(java.util.Date time, OSCMessage message) {
+                public void acceptMessage(java.util.Date time, OSCMessage message){
                     processMessage(message);
                 }
             };
@@ -228,8 +224,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void processMessage(OSCMessage msg){
         Object[] params = msg.getArguments();
         String cmd = (String)params[0];
-        int value = ((Integer)params[1]).intValue();
-        System.out.println(cmd);
+        for (short i=0;i<Controller.MOVE_STR.length;i++){
+            if (cmd.equals(Controller.MOVE_STR[i])){
+                if (i<4){translateView(i);}
+                else if (i==4){getHigherView();}
+                else if (i==5){getLowerView();}
+                else if (i==6){getGlobalView();}
+                break;
+            }
+        }
     }
 
     void getGlobalView(){
@@ -252,7 +255,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void getHigherView(){
 		rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -262,7 +264,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void getLowerView(){
 		rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -272,24 +273,23 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void translateView(short direction){
         LongPoint trans;
         long[] rb = mView.getVisibleRegion(mCamera);
-        if (direction==MOVE_UP){
+        if (direction == Controller.TRANSLATE_NORTH){
             long qt = Math.round((rb[1]-rb[3])/4.0);
             trans = new LongPoint(0,qt);
         }
-        else if (direction==MOVE_DOWN){
+        else if (direction == Controller.TRANSLATE_SOUTH){
             long qt = Math.round((rb[3]-rb[1])/4.0);
             trans = new LongPoint(0,qt);
         }
-        else if (direction==MOVE_RIGHT){
+        else if (direction == Controller.TRANSLATE_EAST){
             long qt = Math.round((rb[2]-rb[0])/4.0);
             trans = new LongPoint(qt,0);
         }
         else {
-            // direction==MOVE_LEFT
+            // direction == Controller.TRANSLATE_WEST
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
-//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);

@@ -163,13 +163,12 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
     	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
-    	else if (code==KeyEvent.VK_UP){application.translateView(Viewer.MOVE_UP);}
-    	else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
-    	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
-    	else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
-//		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
-//        else if (code == KeyEvent.VK_F7){application.gc();}
-//        else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
+    	else if (code==KeyEvent.VK_UP){application.translateView(Controller.TRANSLATE_NORTH);}
+    	else if (code==KeyEvent.VK_DOWN){application.translateView(Controller.TRANSLATE_SOUTH);}
+    	else if (code==KeyEvent.VK_LEFT){application.translateView(Controller.TRANSLATE_WEST);}
+    	else if (code==KeyEvent.VK_RIGHT){application.translateView(Controller.TRANSLATE_EAST);}
+		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
+        else if (code == KeyEvent.VK_F7){application.gc();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
