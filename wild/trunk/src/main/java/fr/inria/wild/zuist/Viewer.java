@@ -70,6 +70,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.illposed.osc.OSCPort;
+import com.illposed.osc.OSCPortIn;
+import com.illposed.osc.OSCListener;
+import com.illposed.osc.OSCMessage;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -112,11 +117,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	
 	long cameraXOffset = 0;
 	long cameraYOffset = 0;
+	
+	OSCPortIn receiver;
     
     public Viewer(short screen, long cx, long cy, boolean opengl, boolean antialiased, File xmlSceneFile){
 		this.cameraXOffset = cx;
 		this.cameraYOffset = cy;
 		initGUI(screen, opengl, antialiased);
+		initOSCListener();
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -138,7 +146,12 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
-        GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].setFullScreenWindow((JFrame)mView.getFrame());
+        if (screen != -1){
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].setFullScreenWindow((JFrame)mView.getFrame());            
+        }
+        else {
+            mView.setVisible(true);
+        }
         updatePanelSize();
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
@@ -168,6 +181,22 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
+    
+    void initOSCListener(){
+        try {
+            receiver = new OSCPortIn(OSCPort.defaultSCOSCPort());
+            OSCListener listener = new OSCListener() {
+                public void acceptMessage(java.util.Date time, OSCMessage message) {
+                    processMessage(message);
+                }
+            };
+            receiver.addListener(Controller.MOVE_CAMERA, listener);
+            receiver.startListening();
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
 
 	/*-------------  Scene management    -------------*/
 	
@@ -195,6 +224,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	}
     
     /*-------------     Navigation       -------------*/
+    
+    void processMessage(OSCMessage msg){
+        Object[] params = msg.getArguments();
+        String cmd = (String)params[0];
+        int value = ((Integer)params[1]).intValue();
+        System.out.println(cmd);
+    }
 
     void getGlobalView(){
 		int l = 0;

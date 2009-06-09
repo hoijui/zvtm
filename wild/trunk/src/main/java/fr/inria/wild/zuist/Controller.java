@@ -22,28 +22,30 @@ import com.illposed.osc.OSCMessage;
 
 public class Controller extends JFrame implements ActionListener {
     
-    JButton upBt, downBt, leftBt, rightBt;
+    JButton[] translateBts;
     
     OSCPortOut sender;
+
+    static final String MOVE_CAMERA = "/moveCam";
     
-    Long TRANSLATION = new Long(1000);
+    static final short TRANSLATE_WEST = 0;
+    static final short TRANSLATE_NORTH = 1;
+    static final short TRANSLATE_EAST = 2;
+    static final short TRANSLATE_SOUTH = 3;
+    
+    static final String[] TRANSLATE_STR = {"West", "North", "East", "South"};
+    
+    Float TRANSLATE_VALUE = new Float(1000);
     
     public Controller(){
         super();
         Container c = this.getContentPane();
         c.setLayout(new FlowLayout());
-        upBt = new JButton("Up");
-        downBt = new JButton("Down");
-        leftBt = new JButton("Left");
-        rightBt = new JButton("Right");
-        c.add(upBt);
-        c.add(downBt);
-        c.add(leftBt);
-        c.add(rightBt);
-        upBt.addActionListener(this);
-        downBt.addActionListener(this);
-        leftBt.addActionListener(this);
-        rightBt.addActionListener(this);
+        for (int i=0;i<TRANSLATE_STR.length;i++){
+            translateBts[i] = new JButton(TRANSLATE_STR[i]);
+            c.add(translateBts[i]);
+            translateBts[i].addActionListener(this);
+        }
         this.pack();
         this.setVisible(true);
         this.addWindowListener(new WindowAdapter(){public void windowClosing(WindowEvent e){System.exit(0);}});
@@ -61,25 +63,23 @@ public class Controller extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent e){
         Object src = e.getSource();
-        if (src == upBt){
-            sendMsg("UP");
-        }
-        else if (src == downBt){
-            sendMsg("DOWN");
-        }
-        else if (src == leftBt){
-            sendMsg("LEFT");
-        }
-        else if (src == rightBt){
-            sendMsg("RIGHT");
+        for (int i=0;i<translateBts.length;i++){
+            if (src == translateBts[i]){
+                translate(i);
+                break;
+            }
         }
     }
+    
+    void translate(int direction){
+        sendMsg(MOVE_CAMERA, TRANSLATE_STR[direction], TRANSLATE_VALUE);
+    }
 
-    void sendMsg(String cmd){
+    void sendMsg(String listener, String cmd, Float value){
         Object args[] = new Object[2];
     	args[0] = cmd;
-    	args[1] = TRANSLATION;
-    	OSCMessage msg = new OSCMessage("/translate", args);
+    	args[1] = value;
+    	OSCMessage msg = new OSCMessage(listener, args);
     	System.out.println("Sending "+msg);
     	 try {
     		sender.send(msg);
