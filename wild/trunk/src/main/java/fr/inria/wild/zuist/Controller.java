@@ -16,11 +16,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import java.util.Vector;
+
+import java.io.File;
 import java.net.InetAddress;
 
 import com.illposed.osc.OSCPort;
 import com.illposed.osc.OSCPortOut;
 import com.illposed.osc.OSCMessage;
+
+import fr.inria.zuist.engine.SceneManager;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 public class Controller extends JFrame implements ActionListener {
     
@@ -30,7 +39,7 @@ public class Controller extends JFrame implements ActionListener {
     static final short TRANSLATE_NORTH = 1;
     static final short TRANSLATE_EAST = 2;
     static final short TRANSLATE_SOUTH = 3;
-    
+        
     // sequence should match above values
     static final String[] MOVE_STR = {"West", "North", "East", "South", "Higher", "Lower", "Global"};
     
@@ -38,9 +47,13 @@ public class Controller extends JFrame implements ActionListener {
 
     JButton[] translateBts;
 
-    OSCPortOut sender;
+    // following arrays have same length, viewport at index i is associated with sender at index i
+    ViewPort[] viewports;
+    OSCPortOut[] senders;
+    
+    WallConfiguration wc;
         
-    public Controller(){
+    public Controller(File configFile){
         super();
         Container c = this.getContentPane();
         c.setLayout(new FlowLayout());
@@ -53,12 +66,28 @@ public class Controller extends JFrame implements ActionListener {
         this.pack();
         this.setVisible(true);
         this.addWindowListener(new WindowAdapter(){public void windowClosing(WindowEvent e){System.exit(0);}});
+        wc = new WallConfiguration(configFile);
         initOSC();
     }
     
     void initOSC(){
         try {
-            sender = new OSCPortOut(InetAddress.getByName("mac11-148.lri.fr"));            
+            Vector vp = new Vector();
+            Vector sd = new Vector();
+            ClusterNode[] nodes = wc.getNodes();
+            for (int i=0;i<nodes.length;i++){
+                for (int j=0;j<nodes[i].getViewPorts().length;j++){
+                    ViewPort p = nodes[i].getViewPorts()[j];
+                    System.out.println("Creating for "+p.getPort()+" for "+p.getNode().getHostName());
+                    vp.add(p);
+                    sd.add(new OSCPortOut(InetAddress.getByName(p.getNode().getHostName()), p.getPort()));
+                }
+            }
+            if (vp.size() != sd.size()){
+                System.out.println("Error while initializing OSC senders: viewport count does not match osc sender count");
+            }
+            viewports = (ViewPort[])vp.toArray(new ViewPort[vp.size()]);
+            senders = (OSCPortOut[])sd.toArray(new OSCPortOut[sd.size()]);
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -69,31 +98,32 @@ public class Controller extends JFrame implements ActionListener {
         Object src = e.getSource();
         for (int i=0;i<translateBts.length;i++){
             if (src == translateBts[i]){
-                translate(i);
+                move(i);
                 break;
             }
         }
     }
     
-    void translate(int direction){
-        sendMsg(MOVE_CAMERA, MOVE_STR[direction], TRANSLATE_VALUE);
+    void move(int direction){
+        for (int i=0;i<senders.length;i++){
+            sendMsg(senders[i], MOVE_CAMERA, MOVE_STR[direction], TRANSLATE_VALUE);            
+        }
     }
 
-    void sendMsg(String listener, String cmd, Integer value){
+    void sendMsg(OSCPortOut sender, String listener, String cmd, Integer value){
         Object args[] = new Object[2];
-    	args[0] = cmd;
-    	args[1] = value;
-    	OSCMessage msg = new OSCMessage(listener, args);
-    	System.out.println("Sending "+msg);
-    	 try {
-    		sender.send(msg);
-    	 } catch (Exception e) {
-    		 System.out.println("Couldn't send");
-    	 }
+        args[0] = cmd;
+        args[1] = value;
+        OSCMessage msg = new OSCMessage(listener, args);
+        try {
+            sender.send(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     public static void main(String[] args){
-        new Controller();
+        new Controller(new File(args[0]));
     }
     
 }

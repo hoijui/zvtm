@@ -69,7 +69,7 @@ def generateConfig():
         nodeEL.set("name", host)
         i = 0
         for screen in NODES[host]:
-            cameraEL = ET.SubElement(nodeEL, "camera")
+            cameraEL = ET.SubElement(nodeEL, "viewport")
             cameraEL.set("device", "%d" % i)
             cameraEL.set("port", "%d" % PORTS[i])
             cameraEL.set("dx", "%d" % getX(screen[0]))
