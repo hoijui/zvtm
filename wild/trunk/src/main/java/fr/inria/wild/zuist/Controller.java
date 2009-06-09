@@ -16,31 +16,34 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import java.net.InetAddress;
+
 import com.illposed.osc.OSCPort;
 import com.illposed.osc.OSCPortOut;
 import com.illposed.osc.OSCMessage;
 
 public class Controller extends JFrame implements ActionListener {
     
-    JButton[] translateBts;
-    
-    OSCPortOut sender;
-
     static final String MOVE_CAMERA = "/moveCam";
-    
     static final short TRANSLATE_WEST = 0;
     static final short TRANSLATE_NORTH = 1;
     static final short TRANSLATE_EAST = 2;
     static final short TRANSLATE_SOUTH = 3;
     
+    // sequence should match above values
     static final String[] TRANSLATE_STR = {"West", "North", "East", "South"};
     
-    Float TRANSLATE_VALUE = new Float(1000);
-    
+    Integer TRANSLATE_VALUE = new Integer(1000);
+
+    JButton[] translateBts;
+
+    OSCPortOut sender;
+        
     public Controller(){
         super();
         Container c = this.getContentPane();
         c.setLayout(new FlowLayout());
+        translateBts = new JButton[TRANSLATE_STR.length];
         for (int i=0;i<TRANSLATE_STR.length;i++){
             translateBts[i] = new JButton(TRANSLATE_STR[i]);
             c.add(translateBts[i]);
@@ -54,7 +57,7 @@ public class Controller extends JFrame implements ActionListener {
     
     void initOSC(){
         try {
-            sender = new OSCPortOut();            
+            sender = new OSCPortOut(InetAddress.getByName("mac11-148.lri.fr"));            
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -75,7 +78,7 @@ public class Controller extends JFrame implements ActionListener {
         sendMsg(MOVE_CAMERA, TRANSLATE_STR[direction], TRANSLATE_VALUE);
     }
 
-    void sendMsg(String listener, String cmd, Float value){
+    void sendMsg(String listener, String cmd, Integer value){
         Object args[] = new Object[2];
     	args[0] = cmd;
     	args[1] = value;
