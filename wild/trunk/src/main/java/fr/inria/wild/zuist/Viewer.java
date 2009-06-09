@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -17,6 +17,7 @@ import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -27,16 +28,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
 import java.awt.Container;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
 
 import java.util.Vector;
 
@@ -115,9 +109,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     SceneManager sm;
 
 	VWGlassPane gp;
+	
+	long cameraXOffset = 0;
+	long cameraYOffset = 0;
     
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
-		initGUI(fullscreen, opengl, antialiased);
+    public Viewer(short screen, long cx, long cy, boolean opengl, boolean antialiased, File xmlSceneFile){
+		this.cameraXOffset = cx;
+		this.cameraYOffset = cy;
+		initGUI(screen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -127,25 +126,19 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		previousLocations = new Vector();
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
-			getGlobalView();
 		}
         mCamera.addListener(eh);
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    void initGUI(short screen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         mCamera = vsm.addCamera(mSpace);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
-        if (fullscreen){
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
-        }
-        else {
-            mView.setVisible(true);
-        }
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].setFullScreenWindow((JFrame)mView.getFrame());
         updatePanelSize();
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
@@ -462,13 +455,21 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
+        short screen = 0;
 		boolean ogl = false;
 		boolean aa = true;
+		long camX = 0;
+		long camY = 0;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){fs = true;}
+			    // -screen=N with N in [0..X] where X is the number of displays (graphics device)
+				if (args[i].substring(1).startsWith("screen")){screen = Short.parseShort(args[i].substring(8));}
+				else if (args[i].substring(1).startsWith("camera")){
+				    String[] coords = args[i].substring(8).split(",");
+				    camX = Long.parseLong(coords[0]);
+				    camY = Long.parseLong(coords[1]);
+				}
+				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
 			}
@@ -491,16 +492,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-        }
         System.out.println("--help for command line options");
-        new Viewer(fs, ogl, aa, xmlSceneFile);
+        new Viewer(screen, camX, camY, ogl, aa, xmlSceneFile);
     }
     
     private static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
-        System.out.println("Options:\n\t-fs: fullscreen mode");
+        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist4wild-0.1.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
+        System.out.println("Options:\n\t-scene=N: N in [0..X] where X is the number of displays (graphics device)");
+        System.out.println("\t-camera=x,y: relative coords w.r.t meta camera center in virtual space");
         System.out.println("\t-noaa: no antialiasing");
     }
     
