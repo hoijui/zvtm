@@ -227,7 +227,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void processMessage(OSCMessage msg){
         Object[] params = msg.getArguments();
         String cmd = (String)params[0];
-        if (cmd.equals(Controller.CMD_MOVE_WEST)){
+        if (cmd.equals(Controller.CMD_CENTER_REGION)){
+            centerOnRegion(Long.parseLong((String)params[1]), Long.parseLong((String)params[2]), Long.parseLong((String)params[3]), Long.parseLong((String)params[4]));
+        }
+        else if (cmd.equals(Controller.CMD_MOVE_WEST)){
             translateView(Controller.MOVE_WEST);
         }
         else if (cmd.equals(Controller.CMD_MOVE_NORTH)){
@@ -248,6 +251,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         else if (cmd.equals(Controller.CMD_STOP)){
             stop();
         }
+    }
+    
+    void centerOnRegion(long w, long n, long e, long s){
+        vsm.centerOnRegion(mCamera, 0, w, n, e, s);
     }
     
     void firstOrderTranslate(int dragX, int dragY){

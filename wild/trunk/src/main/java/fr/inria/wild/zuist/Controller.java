@@ -79,6 +79,7 @@ public class Controller {
     static final String CMD_TRANSLATION_SPEED = "xyspeed";
     static final String CMD_ZOOM_SPEED = "zspeed";
     static final String CMD_STOP = "stop";
+    static final String CMD_CENTER_REGION = "creg";
     
     static final Integer VALUE_NONE = new Integer(0);
     
@@ -269,9 +270,13 @@ public class Controller {
     void updateMetaCam(long[] wnes){
         long rw = wnes[2] - wnes[0];
         long rh = wnes[1] - wnes[3];
-        
         for (int i=0;i<viewports.length;i++){
-            //System.out.println(viewports[i].getColumn()+" "+viewports[i].getRow());
+            long[] vwnes = new long[4];
+            vwnes[0] = Math.round(wnes[0] + rw * viewports[i].wnes[0]);
+            vwnes[2] = Math.round(wnes[0] + rw * viewports[i].wnes[2]);
+            vwnes[1] = Math.round(wnes[3] + rh * viewports[i].wnes[1]);
+            vwnes[3] = Math.round(wnes[3] + rh * viewports[i].wnes[3]);
+            sendMsg(senders[i], MOVE_CAMERA, CMD_CENTER_REGION, vwnes);
         }
         
     }
@@ -311,6 +316,21 @@ public class Controller {
         }
     }
 
+    void sendMsg(OSCPortOut sender, String listener, String cmd, long[] wnes){
+        Object args[] = new Object[5];
+        args[0] = cmd;
+        args[1] = String.valueOf(wnes[0]);
+        args[2] = String.valueOf(wnes[1]);
+        args[3] = String.valueOf(wnes[2]);
+        args[4] = String.valueOf(wnes[3]);
+        OSCMessage msg = new OSCMessage(listener, args);
+        try {
+            sender.send(msg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     void sendMsg(OSCPortOut sender, String listener, String cmd, Integer value1, Integer value2){
         Object args[] = new Object[3];
         args[0] = cmd;
