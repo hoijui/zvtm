@@ -181,21 +181,66 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	    g[0] = g[1] = 1;
     }
 
+    /**
+     * set the minimum magnification factor (1.0 by default)
+     *
+     *@param minMagFac minimum magnification factor, in [1.0,MaxMag]
+     */
+    public void setMinMagFactor(float minMagFac){
+	minMagFac = (minMagFac < 1.0f) ? 1.0f:minMagFac;
+	mindMM = minMagFac;
+    }
+
+    boolean doDrawMaxFlatTop = false;
+    /**
+     * allows to ask to draw the max flat top (not rawn by default)
+     *
+     *@param b if true ask to draw the max flat top
+     */
+    public void setDrawMaxFlatTop(boolean b){
+	doDrawMaxFlatTop = b;
+    }
+
+    boolean doSpeedBlendOuterRadius = true;
+    boolean doSpeedBlendFlatTop = true;
+    /**
+     * allows to ask to draw the max flat top
+     *
+     *@param bft if true speed blend the flat top
+     *@param bor if true speed blend the outer radius
+     */
+    public void setSpeedBlendRadii(boolean bft, boolean bor){
+	doSpeedBlendFlatTop = bft;
+	doSpeedBlendOuterRadius = bor;
+    }
+
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
         // get the alpha composite from a precomputed list of values
         // (we don't want to instantiate a new AlphaComposite at each repaint request)
-        g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
+	if (doSpeedBlendOuterRadius){
+	    g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
+	}
         if (r1Color != null){
             g2d.setColor(r1Color);
             g2d.drawOval(lx+w/2-LR1, ly+h/2-LR1, 2*LR1, 2*LR1);
         }
+	if (doSpeedBlendFlatTop && !doSpeedBlendOuterRadius){
+	    g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
+	}
+	else if (!doSpeedBlendFlatTop && doSpeedBlendOuterRadius){
+	    g2d.setComposite(Translucent.acO);
+	}
         if (r2Color != null){
             int r2 = Math.round(dMM/((float)MM) * LR2);
             g2d.setColor(r2Color);
             g2d.drawOval(lx+w/2-r2, ly+h/2-r2, 2*r2, 2*r2);
         }
         g2d.setComposite(Translucent.acO);
+	if (doDrawMaxFlatTop && r2Color != null){
+	    g2d.setColor(r2Color);
+            g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
+	}
     }
 
     public float getActualMaximumMagnification(){
