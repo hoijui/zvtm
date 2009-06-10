@@ -163,10 +163,10 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
     	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
-    	else if (code==KeyEvent.VK_UP){application.translateView(Controller.TRANSLATE_NORTH);}
-    	else if (code==KeyEvent.VK_DOWN){application.translateView(Controller.TRANSLATE_SOUTH);}
-    	else if (code==KeyEvent.VK_LEFT){application.translateView(Controller.TRANSLATE_WEST);}
-    	else if (code==KeyEvent.VK_RIGHT){application.translateView(Controller.TRANSLATE_EAST);}
+    	else if (code==KeyEvent.VK_UP){application.translateView(Controller.MOVE_NORTH);}
+    	else if (code==KeyEvent.VK_DOWN){application.translateView(Controller.MOVE_SOUTH);}
+    	else if (code==KeyEvent.VK_LEFT){application.translateView(Controller.MOVE_WEST);}
+    	else if (code==KeyEvent.VK_RIGHT){application.translateView(Controller.MOVE_EAST);}
 		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
         else if (code == KeyEvent.VK_F7){application.gc();}
     }
