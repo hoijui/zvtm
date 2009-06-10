@@ -224,15 +224,35 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void processMessage(OSCMessage msg){
         Object[] params = msg.getArguments();
         String cmd = (String)params[0];
-        for (short i=0;i<Controller.MOVE_STR.length;i++){
-            if (cmd.equals(Controller.MOVE_STR[i])){
-                if (i<4){translateView(i);}
-                else if (i==4){getHigherView();}
-                else if (i==5){getLowerView();}
-                else if (i==6){getGlobalView();}
-                break;
-            }
+        if (cmd.equals(Controller.CMD_MOVE_WEST)){
+            translateView(Controller.MOVE_WEST);
         }
+        else if (cmd.equals(Controller.CMD_MOVE_NORTH)){
+            translateView(Controller.MOVE_NORTH);
+        }
+        else if (cmd.equals(Controller.CMD_MOVE_EAST)){
+            translateView(Controller.MOVE_EAST);
+        }
+        else if (cmd.equals(Controller.CMD_MOVE_SOUTH)){
+            translateView(Controller.MOVE_SOUTH);
+        }
+    }
+    
+    void firstOrderTranslate(int dragX, int dragY){
+        float a = (mCamera.focal + Math.abs(mCamera.altitude)) / mCamera.focal;
+        vsm.getAnimationManager().setXspeed((mCamera.altitude>0) ? (long)((dragX)*(a/50.0f)) : (long)((dragX)/(a*50)));
+        vsm.getAnimationManager().setYspeed((mCamera.altitude>0) ? (long)((dragY)*(a/50.0f)) : (long)((dragY)/(a*50)));
+    }
+    
+    void firstOrderZoom(int dragZ){
+        float a = (mCamera.focal + Math.abs(mCamera.altitude)) / mCamera.focal;
+        vsm.getAnimationManager().setZspeed((mCamera.altitude>0) ? (long)((dragZ)*(a/50.0f)) : (long)((dragZ)/(a*50)));
+    }
+    
+    void stopFirstOrder(){
+        vsm.getAnimationManager().setXspeed(0);
+        vsm.getAnimationManager().setYspeed(0);
+        vsm.getAnimationManager().setZspeed(0);
     }
 
     void getGlobalView(){
@@ -273,20 +293,20 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void translateView(short direction){
         LongPoint trans;
         long[] rb = mView.getVisibleRegion(mCamera);
-        if (direction == Controller.TRANSLATE_NORTH){
+        if (direction == Controller.MOVE_NORTH){
             long qt = Math.round((rb[1]-rb[3])/4.0);
             trans = new LongPoint(0,qt);
         }
-        else if (direction == Controller.TRANSLATE_SOUTH){
+        else if (direction == Controller.MOVE_SOUTH){
             long qt = Math.round((rb[3]-rb[1])/4.0);
             trans = new LongPoint(0,qt);
         }
-        else if (direction == Controller.TRANSLATE_EAST){
+        else if (direction == Controller.MOVE_EAST){
             long qt = Math.round((rb[2]-rb[0])/4.0);
             trans = new LongPoint(qt,0);
         }
         else {
-            // direction == Controller.TRANSLATE_WEST
+            // direction == Controller.MOVE_WEST
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }

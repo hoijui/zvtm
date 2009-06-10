@@ -7,14 +7,10 @@
 
 package fr.inria.wild.zuist;
 
-import javax.swing.JFrame;
-import javax.swing.JButton;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.Color;
 
 import java.util.Vector;
 
@@ -25,28 +21,42 @@ import com.illposed.osc.OSCPort;
 import com.illposed.osc.OSCPortOut;
 import com.illposed.osc.OSCMessage;
 
+import com.xerox.VTM.engine.VirtualSpaceManager;
+import com.xerox.VTM.engine.VirtualSpace;
+import com.xerox.VTM.engine.View;
+import com.xerox.VTM.engine.ViewPanel;
+import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.glyphs.Glyph;
+import net.claribole.zvtm.engine.ViewEventHandler;
 import fr.inria.zuist.engine.SceneManager;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
-public class Controller extends JFrame implements ActionListener {
+public class Controller {
     
     static final String MOVE_CAMERA = "/moveCam";
     
-    static final short TRANSLATE_WEST = 0;
-    static final short TRANSLATE_NORTH = 1;
-    static final short TRANSLATE_EAST = 2;
-    static final short TRANSLATE_SOUTH = 3;
-        
-    // sequence should match above values
-    static final String[] MOVE_STR = {"West", "North", "East", "South", "Higher", "Lower", "Global"};
+    static final short MOVE_WEST = 0;
+    static final short MOVE_NORTH = 1;
+    static final short MOVE_EAST = 2;
+    static final short MOVE_SOUTH = 3;
+    static final String CMD_MOVE_WEST = "west";
+    static final String CMD_MOVE_NORTH = "north";
+    static final String CMD_MOVE_EAST = "east";
+    static final String CMD_MOVE_SOUTH = "south";
     
-    Integer TRANSLATE_VALUE = new Integer(1000);
-
-    JButton[] translateBts;
-
+    static final Integer VALUE_NONE = new Integer(0);
+    
+    
+    VirtualSpaceManager vsm;
+    VirtualSpace mSpace;
+    static final String mSpaceName = "Control Space";
+    Camera mCamera;
+    View mView;
+    ControllerEventHandler eh;
+    
     // following arrays have same length, viewport at index i is associated with sender at index i
     ViewPort[] viewports;
     OSCPortOut[] senders;
@@ -54,20 +64,24 @@ public class Controller extends JFrame implements ActionListener {
     WallConfiguration wc;
         
     public Controller(File configFile){
-        super();
-        Container c = this.getContentPane();
-        c.setLayout(new FlowLayout());
-        translateBts = new JButton[MOVE_STR.length];
-        for (int i=0;i<MOVE_STR.length;i++){
-            translateBts[i] = new JButton(MOVE_STR[i]);
-            c.add(translateBts[i]);
-            translateBts[i].addActionListener(this);
-        }
-        this.pack();
-        this.setVisible(true);
-        this.addWindowListener(new WindowAdapter(){public void windowClosing(WindowEvent e){System.exit(0);}});
         wc = new WallConfiguration(configFile);
+        initGUI();
         initOSC();
+    }
+
+    void initGUI(){
+        vsm = VirtualSpaceManager.INSTANCE;
+        eh = new ControllerEventHandler(this);
+        mSpace = vsm.addVirtualSpace(mSpaceName);
+        mCamera = vsm.addCamera(mSpace);
+        Vector cameras = new Vector();
+        cameras.add(mCamera);
+        short vt = View.STD_VIEW;
+        mView = vsm.addExternalView(cameras, "ZUIST4WILD Controller", vt, 800, 600, false, true);
+        mView.setBackgroundColor(Color.LIGHT_GRAY);
+        mView.setEventHandler(eh);
+        mView.setNotifyMouseMoved(true);
+        vsm.repaintNow();
     }
     
     void initOSC(){
@@ -78,7 +92,7 @@ public class Controller extends JFrame implements ActionListener {
             for (int i=0;i<nodes.length;i++){
                 for (int j=0;j<nodes[i].getViewPorts().length;j++){
                     ViewPort p = nodes[i].getViewPorts()[j];
-                    System.out.println("Creating for "+p.getPort()+" for "+p.getNode().getHostName());
+                    System.out.println("Creating out port "+p.getPort()+" for "+p.getNode().getHostName());
                     vp.add(p);
                     sd.add(new OSCPortOut(InetAddress.getByName(p.getNode().getHostName()), p.getPort()));
                 }
@@ -93,27 +107,27 @@ public class Controller extends JFrame implements ActionListener {
             ex.printStackTrace();
         }
     }
-
-    public void actionPerformed(ActionEvent e){
-        Object src = e.getSource();
-        for (int i=0;i<translateBts.length;i++){
-            if (src == translateBts[i]){
-                move(i);
-                break;
-            }
+    
+    void translate(short direction){
+        switch(direction){
+            case MOVE_WEST:{sendToAll(CMD_MOVE_WEST, VALUE_NONE, VALUE_NONE);break;}
+            case MOVE_NORTH:{sendToAll(CMD_MOVE_NORTH, VALUE_NONE, VALUE_NONE);break;}
+            case MOVE_EAST:{sendToAll(CMD_MOVE_EAST, VALUE_NONE, VALUE_NONE);break;}
+            case MOVE_SOUTH:{sendToAll(CMD_MOVE_SOUTH, VALUE_NONE, VALUE_NONE);break;}
         }
     }
     
-    void move(int direction){
+    void sendToAll(String cmd, Integer value1, Integer value2){
         for (int i=0;i<senders.length;i++){
-            sendMsg(senders[i], MOVE_CAMERA, MOVE_STR[direction], TRANSLATE_VALUE);            
+            sendMsg(senders[i], MOVE_CAMERA, cmd, value1, value2);
         }
     }
 
-    void sendMsg(OSCPortOut sender, String listener, String cmd, Integer value){
-        Object args[] = new Object[2];
+    void sendMsg(OSCPortOut sender, String listener, String cmd, Integer value1, Integer value2){
+        Object args[] = new Object[3];
         args[0] = cmd;
-        args[1] = value;
+        args[1] = value1;
+        args[1] = value2;
         OSCMessage msg = new OSCMessage(listener, args);
         try {
             sender.send(msg);
@@ -126,4 +140,96 @@ public class Controller extends JFrame implements ActionListener {
         new Controller(new File(args[0]));
     }
     
+}
+
+class ControllerEventHandler implements ViewEventHandler {
+
+    Controller application;
+
+    //remember last mouse coords to compute translation  (dragging)
+    long lastJPX,lastJPY;
+
+    ControllerEventHandler(Controller appli){
+        application = appli;
+    }
+
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+        v.setDrawDrag(true);
+    }
+
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        v.setDrawDrag(false);
+    }
+
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+//        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+//            Camera c=application.vsm.getActiveCamera();
+//            float a=(c.focal+Math.abs(c.altitude))/c.focal;
+//            if (mod == META_SHIFT_MOD) {
+//                application.vsm.getAnimationManager().setXspeed(0);
+//                application.vsm.getAnimationManager().setYspeed(0);
+//                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+//                //50 is just a speed factor (too fast otherwise)
+//            }
+//            else {
+//                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+//                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+//                application.vsm.getAnimationManager().setZspeed(0);
+//            }
+//        }
+    }
+
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
+
+    public void enterGlyph(Glyph g){
+        g.highlight(true, null);
+    }
+
+    public void exitGlyph(Glyph g){
+        g.highlight(false, null);
+    }
+
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+//        if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
+//		else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
+//		else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
+		if (code==KeyEvent.VK_UP){application.translate(Controller.MOVE_NORTH);}
+		else if (code==KeyEvent.VK_DOWN){application.translate(Controller.MOVE_SOUTH);}
+		else if (code==KeyEvent.VK_LEFT){application.translate(Controller.MOVE_WEST);}
+		else if (code==KeyEvent.VK_RIGHT){application.translate(Controller.MOVE_EAST);}
+    }
+
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void viewActivated(View v){}
+
+    public void viewDeactivated(View v){}
+
+    public void viewIconified(View v){}
+
+    public void viewDeiconified(View v){}
+
+    public void viewClosing(View v){System.exit(0);}
+
+
 }
