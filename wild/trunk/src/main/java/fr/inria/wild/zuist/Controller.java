@@ -46,6 +46,9 @@ public class Controller {
     static final String CMD_MOVE_NORTH = "north";
     static final String CMD_MOVE_EAST = "east";
     static final String CMD_MOVE_SOUTH = "south";
+    static final String CMD_TRANSLATION_SPEED = "xyspeed";
+    static final String CMD_ZOOM_SPEED = "zspeed";
+    static final String CMD_STOP = "stop";
     
     static final Integer VALUE_NONE = new Integer(0);
     
@@ -117,6 +120,18 @@ public class Controller {
         }
     }
     
+    void firstOrderTranslate(int x, int y){
+        sendToAll(CMD_TRANSLATION_SPEED, new Integer(x), new Integer(y));
+    }
+    
+    void firstOrderZoom(int z){
+        sendToAll(CMD_ZOOM_SPEED, new Integer(z), VALUE_NONE);
+    }
+    
+    void stop(){
+        sendToAll(CMD_STOP, VALUE_NONE, VALUE_NONE);
+    }
+    
     void sendToAll(String cmd, Integer value1, Integer value2){
         for (int i=0;i<senders.length;i++){
             sendMsg(senders[i], MOVE_CAMERA, cmd, value1, value2);
@@ -127,7 +142,7 @@ public class Controller {
         Object args[] = new Object[3];
         args[0] = cmd;
         args[1] = value1;
-        args[1] = value2;
+        args[2] = value2;
         OSCMessage msg = new OSCMessage(listener, args);
         try {
             sender.send(msg);
@@ -147,15 +162,22 @@ class ControllerEventHandler implements ViewEventHandler {
     Controller application;
 
     //remember last mouse coords to compute translation  (dragging)
-    long lastJPX,lastJPY;
+    int lastJPX,lastJPY;
 
     ControllerEventHandler(Controller appli){
         application = appli;
     }
 
-    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+        v.setDrawDrag(true);
+    }
 
-    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        v.setDrawDrag(false);
+        application.stop();
+    }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -165,36 +187,25 @@ class ControllerEventHandler implements ViewEventHandler {
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        lastJPX = jpx;
-        lastJPY = jpy;
-        v.setDrawDrag(true);
-    }
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        v.setDrawDrag(false);
-    }
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-//        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-//            Camera c=application.vsm.getActiveCamera();
-//            float a=(c.focal+Math.abs(c.altitude))/c.focal;
-//            if (mod == META_SHIFT_MOD) {
-//                application.vsm.getAnimationManager().setXspeed(0);
-//                application.vsm.getAnimationManager().setYspeed(0);
-//                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-//                //50 is just a speed factor (too fast otherwise)
-//            }
-//            else {
-//                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-//                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-//                application.vsm.getAnimationManager().setZspeed(0);
-//            }
-//        }
+        if (buttonNumber == 1){
+            Camera c=application.vsm.getActiveCamera();
+            float a=(c.focal+Math.abs(c.altitude))/c.focal;
+            if (mod == SHIFT_MOD) {
+                application.firstOrderZoom(lastJPY-jpy);
+            }
+            else {
+                application.firstOrderTranslate(jpx-lastJPX, lastJPY-jpy);
+            }
+        }
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}

@@ -115,6 +115,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	long cameraYOffset = 0;
 	
 	OSCPortIn receiver;
+	int oscPort = 0;
     
     public Viewer(short screen, long cx, long cy, boolean opengl, boolean antialiased, File xmlSceneFile, int port){
 		this.cameraXOffset = cx;
@@ -141,7 +142,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mCamera = vsm.addCamera(mSpace);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, (screen == -1), null);
+        mView = vsm.addExternalView(cameras, mViewName + " [" + oscPort + "]",
+            (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, (screen == -1), null);
         if (screen != -1){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].setFullScreenWindow((JFrame)mView.getFrame());            
         }
@@ -179,6 +181,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
     
     void initOSCListener(int port){
+        oscPort = port;
         try {
             receiver = new OSCPortIn(port);
             OSCListener listener = new OSCListener() {
@@ -203,7 +206,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	
 	void loadScene(File xmlSceneFile){
 		try {
-			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());			
+			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath() + " [" + oscPort + "]");			
 		}
 		catch (IOException ex){}
 		gp.setValue(0);
@@ -236,6 +239,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         else if (cmd.equals(Controller.CMD_MOVE_SOUTH)){
             translateView(Controller.MOVE_SOUTH);
         }
+        else if (cmd.equals(Controller.CMD_TRANSLATION_SPEED)){
+            firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
+        }
+        else if (cmd.equals(Controller.CMD_ZOOM_SPEED)){
+            firstOrderZoom(((Integer)params[1]).intValue());
+        }
+        else if (cmd.equals(Controller.CMD_STOP)){
+            stop();
+        }
     }
     
     void firstOrderTranslate(int dragX, int dragY){
@@ -249,7 +261,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         vsm.getAnimationManager().setZspeed((mCamera.altitude>0) ? (long)((dragZ)*(a/50.0f)) : (long)((dragZ)/(a*50)));
     }
     
-    void stopFirstOrder(){
+    void stop(){
         vsm.getAnimationManager().setXspeed(0);
         vsm.getAnimationManager().setYspeed(0);
         vsm.getAnimationManager().setZspeed(0);
