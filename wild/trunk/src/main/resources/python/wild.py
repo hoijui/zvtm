@@ -15,25 +15,30 @@ import elementtree.ElementTree as ET
 
 TRACE_LEVEL = 1
 
-NODES = {"a1.wild.lri.fr": [(-4,2), (-3,2)],
-"a2.wild.lri.fr": [(-4,1), (-3,1)],
-"a3.wild.lri.fr": [(-4,-1), (-3,-1)],
-"a4.wild.lri.fr": [(-4,-2), (-3,-2)],
+NB_COLS = 8
+NB_ROWS = 4
 
-"b1.wild.lri.fr": [(-2,2), (-1,2)],
-"b2.wild.lri.fr": [(-2,1), (-1,1)],
-"b3.wild.lri.fr": [(-2,-1), (-1,-1)],
-"b4.wild.lri.fr": [(-2,-2), (-1,-2)],
+# (horiz screen count from center, vert screen count from center, device number, column from left, row from top)
 
-"c1.wild.lri.fr": [(1,2), (2,2)],
-"c2.wild.lri.fr": [(1,1), (2,1)],
-"c3.wild.lri.fr": [(1,-1), (2,-1)],
-"c4.wild.lri.fr": [(1,-2), (2,-2)],
+NODES = {"a1.wild.lri.fr": [(-4,2,0,0,0), (-3,2,1,1,0)],
+"a2.wild.lri.fr": [(-4,1,0,0,1), (-3,1,1,1,1)],
+"a3.wild.lri.fr": [(-4,-1,0,0,2), (-3,-1,1,1,2)],
+"a4.wild.lri.fr": [(-4,-2,0,0,3), (-3,-2,1,1,3)],
 
-"d1.wild.lri.fr": [(3,2), (4,2)],
-"d2.wild.lri.fr": [(3,1), (4,1)],
-"d3.wild.lri.fr": [(3,-1), (4,-1)],
-"d4.wild.lri.fr": [(3,-2), (4,-2)],
+"b1.wild.lri.fr": [(-2,2,0,2,0), (-1,2,1,3,0)],
+"b2.wild.lri.fr": [(-2,1,0,2,1), (-1,1,1,3,1)],
+"b3.wild.lri.fr": [(-2,-1,0,2,2), (-1,-1,1,3,2)],
+"b4.wild.lri.fr": [(-2,-2,0,2,3), (-1,-2,1,3,3)],
+
+"c1.wild.lri.fr": [(1,2,0,4,0), (2,2,1,5,0)],
+"c2.wild.lri.fr": [(1,1,0,4,1), (2,1,1,5,1)],
+"c3.wild.lri.fr": [(1,-1,0,4,2), (2,-1,1,5,2)],
+"c4.wild.lri.fr": [(1,-2,0,4,3), (2,-2,1,5,3)],
+
+"d1.wild.lri.fr": [(3,2,0,6,0), (4,2,1,7,0)],
+"d2.wild.lri.fr": [(3,1,0,6,1), (4,1,1,7,1)],
+"d3.wild.lri.fr": [(3,-1,0,6,2), (4,-1,1,7,2)],
+"d4.wild.lri.fr": [(3,-2,0,6,3), (4,-2,1,7,3)],
 }
 
 PORTS = [57110, 57111]
@@ -64,13 +69,15 @@ def generateConfig():
     outputSceneFile = TGT_PATH
     # prepare the XML scene
     outputroot = ET.Element("wall")
+    outputroot.set("cols", "%d" % NB_COLS)
+    outputroot.set("rows", "%d" % NB_ROWS)
     for host in NODES.keys():
         nodeEL = ET.SubElement(outputroot, "node")
         nodeEL.set("name", host)
         i = 0
         for screen in NODES[host]:
             viewportEL = ET.SubElement(nodeEL, "viewport")
-            viewportEL.set("device", "%d" % i)
+            viewportEL.set("device", "%d" % screen[2])
             viewportEL.set("port", "%d" % PORTS[i])
             viewportEL.set("dx", "%d" % getX(screen[0]))
             viewportEL.set("dy", "%d" % getY(screen[1]))
@@ -78,6 +85,8 @@ def generateConfig():
             viewportEL.set("h", "%d" % SCREEN_H)
             viewportEL.set("bw", "%d" % BEZEL_W)
             viewportEL.set("bh", "%d" % BEZEL_H)
+            viewportEL.set("col", "%d" % screen[3])
+            viewportEL.set("row", "%d" % screen[4])
             i += 1
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
