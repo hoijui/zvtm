@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.awt.Font;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
@@ -29,6 +30,7 @@ import java.awt.Dimension;
 import java.util.Vector;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -124,7 +126,9 @@ public class Controller {
 				updatePanelSize();
 			}
 		};
-		mView.getFrame().addComponentListener(ca0);		
+		mView.getFrame().addComponentListener(ca0);
+		gp = new CTGlassPane(this);
+		((JFrame)mView.getFrame()).setGlassPane(gp);
         vsm.repaintNow();
     }
     
@@ -230,7 +234,27 @@ public class Controller {
     }
     
     public static void main(String[] args){
-        new Controller(new File(args[0]), (args.length > 1) ? new File(args[1]) : null);
+        File configF = new File(args[0]);
+        File zuistF = null;
+        if (args.length > 1){
+            // the only other thing allowed as a cmd line param is a scene file
+            File f = new File(args[1]);
+            if (f.exists()){
+                if (f.isDirectory()){
+                    // if arg is a directory, take first xml file we find in that directory
+                    String[] xmlFiles = f.list(new FilenameFilter(){
+                                            public boolean accept(File dir, String name){return name.endsWith(".xml");}
+                                        });
+                    if (xmlFiles.length > 0){
+                        zuistF = new File(f, xmlFiles[0]);
+                    }
+                }
+                else {
+                    zuistF = f;                        
+                }
+            }
+        }
+        new Controller(configF, zuistF);
     }
     
 }
