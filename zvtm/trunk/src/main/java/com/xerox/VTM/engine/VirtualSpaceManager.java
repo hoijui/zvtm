@@ -1019,7 +1019,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**translates and (un)zooms a camera in order to focus on a specific rectangular region
 		*@param c Camera to be moved
-		*@param d duration of the animation in ms
+		*@param d duration of the animation in ms (pass 0 to go there instantanesouly)
 		*@param x1 x coord of first point
 		*@param y1 y coord of first point
 		*@param x2 x coord of opposite point
@@ -1032,7 +1032,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     
 	/**translates and (un)zooms a camera in order to focus on a specific rectangular region
 		*@param c Camera to be moved
-		*@param d duration of the animation in ms
+		*@param d duration of the animation in ms (pass 0 to go there instantanesouly)
 		*@param x1 x coord of first point
 		*@param y1 y coord of first point
 		*@param x2 x coord of opposite point
@@ -1066,22 +1066,22 @@ public class VirtualSpaceManager implements AWTEventListener {
 					if (tmpRatio>ratio){ratio=tmpRatio;}
 				}
 				float newAlt=currentAlt*Math.abs(ratio);
-			
-				Animation trans = 
-				    animationManager.getAnimationFactory().
-				    createCameraTranslation(d, c, new LongPoint(dx, dy), false,
-							    SlowInSlowOutInterpolator.getInstance(),
-							    ea);
-				
-				Animation altAnim = 
-				    animationManager.getAnimationFactory().
-				    createCameraAltAnim(d, c, newAlt, false,
-							SlowInSlowOutInterpolator.getInstance(),
-							null);
+			    if (d > 0){
+    				Animation trans = 
+    				    animationManager.getAnimationFactory().
+    				    createCameraTranslation(d, c, new LongPoint(dx, dy), false,
+    							    SlowInSlowOutInterpolator.getInstance(),
+    							    ea);
 
-				animationManager.startAnimation(trans, false);
-				animationManager.startAnimation(altAnim, false);
-				
+    				Animation altAnim = 
+    				    animationManager.getAnimationFactory().
+    				    createCameraAltAnim(d, c, newAlt, false,
+    							SlowInSlowOutInterpolator.getInstance(),
+    							null);
+
+    				animationManager.startAnimation(trans, false);
+    				animationManager.startAnimation(altAnim, false);			        
+			    }
 				return new Location(dx,dy,newAlt);
 			}
 			else return null;
