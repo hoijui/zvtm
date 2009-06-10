@@ -1082,6 +1082,10 @@ public class VirtualSpaceManager implements AWTEventListener {
     				animationManager.startAnimation(trans, false);
     				animationManager.startAnimation(altAnim, false);			        
 			    }
+			    else {
+			        c.setAltitude(newAlt);
+			        c.moveTo(dx, dy);
+			    }
 				return new Location(dx,dy,newAlt);
 			}
 			else return null;
