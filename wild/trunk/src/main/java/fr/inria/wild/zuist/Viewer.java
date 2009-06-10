@@ -116,11 +116,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	
 	OSCPortIn receiver;
     
-    public Viewer(short screen, long cx, long cy, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public Viewer(short screen, long cx, long cy, boolean opengl, boolean antialiased, File xmlSceneFile, int port){
 		this.cameraXOffset = cx;
 		this.cameraYOffset = cy;
 		initGUI(screen, opengl, antialiased);
-		initOSCListener();
+		initOSCListener(port);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -141,7 +141,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mCamera = vsm.addCamera(mSpace);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, (screen == -1), null);
         if (screen != -1){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].setFullScreenWindow((JFrame)mView.getFrame());            
         }
@@ -178,9 +178,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
     
-    void initOSCListener(){
+    void initOSCListener(int port){
         try {
-            receiver = new OSCPortIn(OSCPort.defaultSCOSCPort());
+            receiver = new OSCPortIn(port);
             OSCListener listener = new OSCListener() {
                 public void acceptMessage(java.util.Date time, OSCMessage message){
                     processMessage(message);
@@ -496,10 +496,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		boolean aa = true;
 		long camX = 0;
 		long camY = 0;
+		// default port is supposed to be 57110
+		int oscPort = OSCPortIn.defaultSCOSCPort();
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 			    // -screen=N with N in [0..X] where X is the number of displays (graphics device)
 				if (args[i].substring(1).startsWith("screen")){screen = Short.parseShort(args[i].substring(8));}
+				else if (args[i].substring(1).startsWith("port")){oscPort = Integer.parseInt(args[i].substring(6));}
 				else if (args[i].substring(1).startsWith("camera")){
 				    String[] coords = args[i].substring(8).split(",");
 				    camX = Long.parseLong(coords[0]);
@@ -529,12 +532,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             }
 		}
         System.out.println("--help for command line options");
-        new Viewer(screen, camX, camY, ogl, aa, xmlSceneFile);
+        System.out.println("Display set to screen "+screen);
+        System.out.println("Listening for OSC instructions on port "+oscPort);
+        new Viewer(screen, camX, camY, ogl, aa, xmlSceneFile, oscPort);
     }
     
     private static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist4wild-0.1.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
-        System.out.println("Options:\n\t-scene=N: N in [0..X] where X is the number of displays (graphics device)");
+        System.out.println("Options:\n\t-screen=N: N in [0..X] where X is the number of displays (graphics device)");
+        System.out.println("\t-port=N: OSC commands listening port");
         System.out.println("\t-camera=x,y: relative coords w.r.t meta camera center in virtual space");
         System.out.println("\t-noaa: no antialiasing");
     }
