@@ -38,8 +38,17 @@ public class WallConfiguration {
     static final String _bw = "bw";
     static final String _bh = "bh";
     static final String _port = "port";
+    static final String _cols = "cols";
+    static final String _rows = "rows";
+    static final String _col = "col";
+    static final String _row = "row";
+    
+    int nbCols = 0;
+    int nbRows = 0;
     
     ClusterNode[] nodes;
+    
+    Dimension size;
     
     public WallConfiguration(File configFile){
         parseConfig(configFile);
@@ -51,6 +60,8 @@ public class WallConfiguration {
     
     void parseConfig(File f){
         Element root = parseXML(f).getDocumentElement();
+        nbCols = Integer.parseInt(root.getAttribute(_cols));
+        nbRows = Integer.parseInt(root.getAttribute(_rows));
         NodeList nl = root.getChildNodes();
         Element e;
         Node n;
@@ -65,6 +76,40 @@ public class WallConfiguration {
             }
         }
         nodes = (ClusterNode[])cnv.toArray(new ClusterNode[cnv.size()]);
+        computeDimensions();
+    }
+    
+    void computeDimensions(){
+        int[] wnes = {0, 0, 0, 0};
+        ViewPort v;
+        int k;
+        for (int i=0;i<nodes.length;i++){
+            for (int j=0;j<nodes[i].viewports.length;j++){
+                v = nodes[i].viewports[j];
+                // west
+                k = v.getX()-v.getW()/2-v.getBW();
+                if (k < wnes[0]){wnes[0] = k;}
+                // north
+                k = v.getY()+v.getH()/2+v.getBH();
+                if (k > wnes[1]){wnes[1] = k;}
+                // east
+                k = v.getX()+v.getW()/2+v.getBW();
+                if (k > wnes[2]){wnes[2] = k;}
+                // south
+                k = v.getY()-v.getH()/2-v.getBH();
+                if (k > wnes[3]){wnes[3] = k;}
+            }
+        }            
+        size = new Dimension(wnes[2]-wnes[0], wnes[1]-wnes[3]);
+        for (int i=0;i<nodes.length;i++){
+            for (int j=0;j<nodes[i].viewports.length;j++){
+                nodes[i].viewports[j].computeRelativeBounds(1/(double)nbCols, 1/(double)nbRows);
+            }
+        }
+    }
+    
+    public Dimension getSize(){
+        return (Dimension)size.clone();
     }
     
     ClusterNode parseClusterNode(Element e){
@@ -91,32 +136,10 @@ public class WallConfiguration {
             Integer.parseInt(e.getAttribute(_h)),
             Integer.parseInt(e.getAttribute(_bw)),
             Integer.parseInt(e.getAttribute(_bh)),
+            Integer.parseInt(e.getAttribute(_col)),
+            Integer.parseInt(e.getAttribute(_row)),
             Short.parseShort(e.getAttribute(_device)),
             Integer.parseInt(e.getAttribute(_port)));
-    }
-    
-    public Dimension getSize(){
-        int[] wnes = {0, 0, 0, 0};
-        ViewPort v;
-        int k;
-        for (int i=0;i<nodes.length;i++){
-            for (int j=0;j<nodes[i].viewports.length;j++){
-                v = nodes[i].viewports[j];
-                // west
-                k = v.getX()-v.getW()/2-v.getBW();
-                if (k < wnes[0]){wnes[0] = k;}
-                // north
-                k = v.getY()+v.getH()/2+v.getBH();
-                if (k > wnes[1]){wnes[1] = k;}
-                // east
-                k = v.getX()+v.getW()/2+v.getBW();
-                if (k > wnes[2]){wnes[2] = k;}
-                // south
-                k = v.getY()-v.getH()/2-v.getBH();
-                if (k > wnes[3]){wnes[3] = k;}
-            }
-        }
-        return new Dimension(wnes[2]-wnes[0], wnes[1]-wnes[3]);
     }
     
     public static Document parseXML(File f){

@@ -16,13 +16,13 @@ public class ClusterNode {
         this.hostName = name;
     }
     
-    public void addViewPort(int dx, int dy, int w, int h, int bw, int bh, short device, int port){
+    public void addViewPort(int dx, int dy, int w, int h, int bw, int bh, int col, int row, short device, int port){
         if (viewports.length <= device){
             ViewPort[] tmpA = new ViewPort[device+1];
             System.arraycopy(viewports, 0, tmpA, 0, viewports.length);
             viewports = tmpA;            
         }
-        viewports[viewports.length-1] = new ViewPort(dx, dy, w, h, bw, bh, device, port, this);
+        viewports[viewports.length-1] = new ViewPort(dx, dy, w, h, bw, bh, col, row, device, port, this);
     }
     
     public ViewPort[] getViewPorts(){

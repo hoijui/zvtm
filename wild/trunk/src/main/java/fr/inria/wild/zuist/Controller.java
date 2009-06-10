@@ -84,9 +84,6 @@ public class Controller {
     
     File SCENE_FILE, SCENE_FILE_DIR;
     
-    /* size of wall in pixels */
-    Dimension wallSize;
-    
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
     
@@ -109,8 +106,7 @@ public class Controller {
         
     public Controller(File configFile, File zuistFile, int OSCin, boolean opengl, boolean antialiased){
         wc = new WallConfiguration(configFile);
-        wallSize = wc.getSize();
-        System.out.println("Wall size: "+wallSize.width+" x "+wallSize.height);
+        System.out.println("Wall size: "+wc.getSize().width+" x "+wc.getSize().height);
         initGUI(opengl, antialiased);
         initOSC(OSCin);
         VirtualSpace[]  sceneSpaces = {mSpace};
@@ -134,7 +130,7 @@ public class Controller {
         cameras.add(mCamera);
         short vt = (opengl) ? View.OPENGL_VIEW : View.STD_VIEW;
         mView = vsm.addExternalView(cameras, "ZUIST4WILD Controller", vt,
-            DEFAULT_VIEW_WIDTH, Math.round(DEFAULT_VIEW_WIDTH * wallSize.height/((float)wallSize.width)),
+            DEFAULT_VIEW_WIDTH, Math.round(DEFAULT_VIEW_WIDTH * wc.getSize().height/((float)wc.getSize().width)),
             false, true);
         mView.setBackgroundColor(Color.LIGHT_GRAY);
         mView.setEventHandler(eh);
@@ -271,7 +267,13 @@ public class Controller {
     /* ------------------ Remote Navigation ----------------- */
     
     void updateMetaCam(long[] wnes){
-        System.out.println(((wnes[0]+wnes[2])/2)+" "+((wnes[1]+wnes[3])/2));
+        long rw = wnes[2] - wnes[0];
+        long rh = wnes[1] - wnes[3];
+        
+        for (int i=0;i<viewports.length;i++){
+            //System.out.println(viewports[i].getColumn()+" "+viewports[i].getRow());
+        }
+        
     }
 
     void translate(short direction){
@@ -294,11 +296,11 @@ public class Controller {
     void stop(){
         sendToAll(CMD_STOP, VALUE_NONE, VALUE_NONE);
     }
-        
+    
     /* ------------------ OSC in  ----------------- */
 
     public void processIncomingMessage(OSCMessage message){
-        
+        //XXX:TBW
     }
 
     /* ------------------ OSC out ----------------- */
