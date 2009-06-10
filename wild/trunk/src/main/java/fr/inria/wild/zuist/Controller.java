@@ -49,6 +49,8 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import net.claribole.zvtm.engine.ViewEventHandler;
 import net.claribole.zvtm.engine.CameraListener;
+import net.claribole.zvtm.animation.Animation;
+import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -58,6 +60,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
 public class Controller {
+    
+    static final int DEFAULT_VIEW_WIDTH = 1280;
     
     static final int DEFAULT_OSC_LISTENING_PORT = 57109;
     
@@ -79,6 +83,9 @@ public class Controller {
     static final Integer VALUE_NONE = new Integer(0);
     
     File SCENE_FILE, SCENE_FILE_DIR;
+    
+    /* size of wall in pixels */
+    Dimension wallSize;
     
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
@@ -102,6 +109,8 @@ public class Controller {
         
     public Controller(File configFile, File zuistFile, int OSCin, boolean opengl, boolean antialiased){
         wc = new WallConfiguration(configFile);
+        wallSize = wc.getSize();
+        System.out.println("Wall size: "+wallSize.width+" x "+wallSize.height);
         initGUI(opengl, antialiased);
         initOSC(OSCin);
         VirtualSpace[]  sceneSpaces = {mSpace};
@@ -110,6 +119,7 @@ public class Controller {
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         if (zuistFile != null){
 			loadScene(zuistFile);
+			//vsm.addGlyph(new net.claribole.zvtm.glyphs.CircleNR(0, 0, 0, 10, Color.WHITE), mSpace);
 			getGlobalView();
 		}
         mCamera.addListener(eh);
@@ -123,7 +133,9 @@ public class Controller {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         short vt = (opengl) ? View.OPENGL_VIEW : View.STD_VIEW;
-        mView = vsm.addExternalView(cameras, "ZUIST4WILD Controller", vt, 800, 600, false, true);
+        mView = vsm.addExternalView(cameras, "ZUIST4WILD Controller", vt,
+            DEFAULT_VIEW_WIDTH, Math.round(DEFAULT_VIEW_WIDTH * wallSize.height/((float)wallSize.width)),
+            false, true);
         mView.setBackgroundColor(Color.LIGHT_GRAY);
         mView.setEventHandler(eh);
         mView.setNotifyMouseMoved(true);
@@ -213,8 +225,54 @@ public class Controller {
         panelWidth = d.width;
 		panelHeight = d.height;
 	}
+	
+    /* Higher view */
+    void getHigherView(){
+        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Higher view */
+    void getLowerView(){
+        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Direction should be one of Viewer.MOVE_* */
+    void translateView(short direction){
+        LongPoint trans;
+        long[] rb = mView.getVisibleRegion(mCamera);
+        if (direction == Controller.MOVE_NORTH){
+            long qt = Math.round((rb[1]-rb[3])/4.0);
+            trans = new LongPoint(0,qt);
+        }
+        else if (direction == Controller.MOVE_SOUTH){
+            long qt = Math.round((rb[3]-rb[1])/4.0);
+            trans = new LongPoint(0,qt);
+        }
+        else if (direction == Controller.MOVE_EAST){
+            long qt = Math.round((rb[2]-rb[0])/4.0);
+            trans = new LongPoint(qt,0);
+        }
+        else {
+            // direction == Controller.MOVE_WEST
+            long qt = Math.round((rb[0]-rb[2])/4.0);
+            trans = new LongPoint(qt,0);
+        }
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
     
     /* ------------------ Remote Navigation ----------------- */
+    
+    void updateMetaCam(long[] wnes){
+        System.out.println(((wnes[0]+wnes[2])/2)+" "+((wnes[1]+wnes[3])/2));
+    }
 
     void translate(short direction){
         switch(direction){
@@ -390,13 +448,21 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-//        if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
-//		else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
-//		else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
-		if (code==KeyEvent.VK_UP){application.translate(Controller.MOVE_NORTH);}
-		else if (code==KeyEvent.VK_DOWN){application.translate(Controller.MOVE_SOUTH);}
-		else if (code==KeyEvent.VK_LEFT){application.translate(Controller.MOVE_WEST);}
-		else if (code==KeyEvent.VK_RIGHT){application.translate(Controller.MOVE_EAST);}
+        if (mod == SHIFT_MOD){
+    		if (code==KeyEvent.VK_UP){application.translate(Controller.MOVE_NORTH);}
+    		else if (code==KeyEvent.VK_DOWN){application.translate(Controller.MOVE_SOUTH);}
+    		else if (code==KeyEvent.VK_LEFT){application.translate(Controller.MOVE_WEST);}
+    		else if (code==KeyEvent.VK_RIGHT){application.translate(Controller.MOVE_EAST);}            
+        }
+        else {
+            if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
+        	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
+        	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
+        	else if (code==KeyEvent.VK_UP){application.translateView(Controller.MOVE_NORTH);}
+        	else if (code==KeyEvent.VK_DOWN){application.translateView(Controller.MOVE_SOUTH);}
+        	else if (code==KeyEvent.VK_LEFT){application.translateView(Controller.MOVE_WEST);}
+        	else if (code==KeyEvent.VK_RIGHT){application.translateView(Controller.MOVE_EAST);}
+        }
     }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -414,6 +480,7 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     public void cameraMoved(Camera cam, LongPoint coord, float a){
         // region seen through camera
         application.mView.getVisibleRegion(application.mCamera, wnes);
+        application.updateMetaCam(wnes);
         float alt = application.mCamera.getAltitude();
         if (alt != oldCameraAltitude){
             // camera was an altitude change
