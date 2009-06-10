@@ -69,11 +69,15 @@ def generateConfig():
         nodeEL.set("name", host)
         i = 0
         for screen in NODES[host]:
-            cameraEL = ET.SubElement(nodeEL, "viewport")
-            cameraEL.set("device", "%d" % i)
-            cameraEL.set("port", "%d" % PORTS[i])
-            cameraEL.set("dx", "%d" % getX(screen[0]))
-            cameraEL.set("dy", "%d" % getY(screen[1]))
+            viewportEL = ET.SubElement(nodeEL, "viewport")
+            viewportEL.set("device", "%d" % i)
+            viewportEL.set("port", "%d" % PORTS[i])
+            viewportEL.set("dx", "%d" % getX(screen[0]))
+            viewportEL.set("dy", "%d" % getY(screen[1]))
+            viewportEL.set("w", "%d" % SCREEN_W)
+            viewportEL.set("h", "%d" % SCREEN_H)
+            viewportEL.set("bw", "%d" % BEZEL_W)
+            viewportEL.set("bh", "%d" % BEZEL_H)
             i += 1
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
