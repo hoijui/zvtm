@@ -36,7 +36,9 @@ import java.net.InetAddress;
 
 import com.illposed.osc.OSCPort;
 import com.illposed.osc.OSCPortOut;
+import com.illposed.osc.OSCPortIn;
 import com.illposed.osc.OSCMessage;
+import com.illposed.osc.OSCListener;
 
 import com.xerox.VTM.engine.VirtualSpaceManager;
 import com.xerox.VTM.engine.VirtualSpace;
@@ -57,7 +59,10 @@ import org.w3c.dom.Node;
 
 public class Controller {
     
+    static final int DEFAULT_OSC_LISTENING_PORT = 57109;
+    
     static final String MOVE_CAMERA = "/moveCam";
+    static final String MOVE_META_CAMERA = "/moveMCam";
     
     static final short MOVE_WEST = 0;
     static final short MOVE_NORTH = 1;
@@ -88,16 +93,17 @@ public class Controller {
     // following arrays have same length, viewport at index i is associated with sender at index i
     ViewPort[] viewports;
     OSCPortOut[] senders;
+    OSCPortIn receiver;
     
     SceneManager sm;
     WallConfiguration wc;
     
     CTGlassPane gp;
         
-    public Controller(File configFile, File zuistFile){
+    public Controller(File configFile, File zuistFile, int OSCin, boolean opengl, boolean antialiased){
         wc = new WallConfiguration(configFile);
-        initGUI();
-        initOSC();
+        initGUI(opengl, antialiased);
+        initOSC(OSCin);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -109,18 +115,19 @@ public class Controller {
         mCamera.addListener(eh);
     }
 
-    void initGUI(){
+    void initGUI(boolean opengl, boolean antialiased){
         vsm = VirtualSpaceManager.INSTANCE;
         eh = new ControllerEventHandler(this);
         mSpace = vsm.addVirtualSpace(mSpaceName);
         mCamera = vsm.addCamera(mSpace);
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        short vt = View.STD_VIEW;
+        short vt = (opengl) ? View.OPENGL_VIEW : View.STD_VIEW;
         mView = vsm.addExternalView(cameras, "ZUIST4WILD Controller", vt, 800, 600, false, true);
         mView.setBackgroundColor(Color.LIGHT_GRAY);
         mView.setEventHandler(eh);
         mView.setNotifyMouseMoved(true);
+        mView.setAntialiasing(antialiased);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
@@ -132,7 +139,8 @@ public class Controller {
         vsm.repaintNow();
     }
     
-    void initOSC(){
+    void initOSC(int in){
+        // OSC senders (control of cameras)
         try {
             Vector vp = new Vector();
             Vector sd = new Vector();
@@ -150,6 +158,21 @@ public class Controller {
             }
             viewports = (ViewPort[])vp.toArray(new ViewPort[vp.size()]);
             senders = (OSCPortOut[])sd.toArray(new OSCPortOut[sd.size()]);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        // OSC receiver (control of meta camera)
+        try {
+            System.out.println("Initializing OSC receiver");
+            receiver = new OSCPortIn(in);
+            OSCListener listener = new OSCListener() {
+                public void acceptMessage(java.util.Date time, OSCMessage message){
+                    processIncomingMessage(message);
+                }
+            };
+            receiver.addListener(Controller.MOVE_META_CAMERA, listener);
+            receiver.startListening();
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -213,6 +236,14 @@ public class Controller {
     void stop(){
         sendToAll(CMD_STOP, VALUE_NONE, VALUE_NONE);
     }
+        
+    /* ------------------ OSC in  ----------------- */
+
+    public void processIncomingMessage(OSCMessage message){
+        
+    }
+
+    /* ------------------ OSC out ----------------- */
     
     void sendToAll(String cmd, Integer value1, Integer value2){
         for (int i=0;i<senders.length;i++){
@@ -233,28 +264,60 @@ public class Controller {
         }
     }
     
+    /* ------------------ MAIN ----------------- */
+    
     public static void main(String[] args){
-        File configF = new File(args[0]);
+        File configF = null;
         File zuistF = null;
-        if (args.length > 1){
-            // the only other thing allowed as a cmd line param is a scene file
-            File f = new File(args[1]);
-            if (f.exists()){
-                if (f.isDirectory()){
-                    // if arg is a directory, take first xml file we find in that directory
-                    String[] xmlFiles = f.list(new FilenameFilter(){
-                                            public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                        });
-                    if (xmlFiles.length > 0){
-                        zuistF = new File(f, xmlFiles[0]);
+        int OSCportIn = DEFAULT_OSC_LISTENING_PORT;
+        boolean ogl = false;
+        boolean aa = true;
+		for (int i=0;i<args.length;i++){
+			if (args[i].startsWith("-")){
+				if (args[i].substring(1).startsWith("port")){OSCportIn = Integer.parseInt(args[i].substring(6));}
+				else if (args[i].substring(1).equals("opengl")){ogl = true;}
+				else if (args[i].substring(1).equals("noaa")){aa = false;}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Controller.printCmdLineHelp();System.exit(0);}
+				else if (args[i].equals("-c")){
+				    configF = new File(args[++i]);
+				}
+			}
+            else {
+                // the only other thing allowed as a cmd line param is a scene file
+                File f = new File(args[i]);
+                if (f.exists()){
+                    if (f.isDirectory()){
+                        // if arg is a directory, take first xml file we find in that directory
+                        String[] xmlFiles = f.list(new FilenameFilter(){
+                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
+                                            });
+                        if (xmlFiles.length > 0){
+                            zuistF = new File(f, xmlFiles[0]);
+                        }
+                    }
+                    else {
+                        zuistF = f;                        
                     }
                 }
-                else {
-                    zuistF = f;                        
-                }
             }
-        }
-        new Controller(configF, zuistF);
+		}
+		if (ogl){
+		    System.setProperty("sun.java2d.opengl", "True");
+		}
+		System.out.println("Loading config from "+configF);
+		System.out.println("Loading scene from "+zuistF);
+		System.out.println("Listening for OSC commands from port "+OSCportIn);
+		System.out.println("OpenGL pipeline is "+((ogl) ? "ON" : "OFF"));
+		System.out.println("Antialiasing is "+((aa) ? "ON" : "OFF"));
+        new Controller(configF, zuistF, OSCportIn, ogl, aa);
+    }
+    
+    private static void printCmdLineHelp(){
+        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/zuist4wild-0.1.0-SNAPSHOT.jar fr.inria.wild.zuist.Controller <path_to_scene_dir> [options]");
+        System.out.println("Options:\n\t-port=N: OSC commands listening port");
+        System.out.println("\t-port=N: OSC commands listening port");
+        System.out.println("\t-noaa: no antialiasing");
+        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
     }
     
 }

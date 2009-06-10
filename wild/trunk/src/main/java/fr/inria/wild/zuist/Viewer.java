@@ -551,9 +551,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                 }
             }
 		}
+		if (ogl){
+		    System.setProperty("sun.java2d.opengl", "True");
+		}
         System.out.println("--help for command line options");
         System.out.println("Display set to screen "+screen);
         System.out.println("Listening for OSC instructions on port "+oscPort);
+		System.out.println("OpenGL pipeline is "+((ogl) ? "ON" : "OFF"));
+		System.out.println("Antialiasing is "+((aa) ? "ON" : "OFF"));
         new Viewer(screen, camX, camY, ogl, aa, xmlSceneFile, oscPort);
     }
     
@@ -563,6 +568,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         System.out.println("\t-port=N: OSC commands listening port");
         System.out.println("\t-camera=x,y: relative coords w.r.t meta camera center in virtual space");
         System.out.println("\t-noaa: no antialiasing");
+        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
     }
     
 }
