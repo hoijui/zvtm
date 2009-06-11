@@ -28,6 +28,7 @@ public class Test3 {
     Camera mCamera;
     View mView;
     ViewEventHandler eh;
+    SpeedCoupling speedCoupling;
 
     static int LENS_R1 = 125;
     static int LENS_R2 = 75;
@@ -38,13 +39,13 @@ public class Test3 {
     boolean FLATENING_VARIABLE = false;
     boolean INFINITE_FRICTION = true;
     boolean ELASTIC_BORDER = false;
+    boolean SMOOTH = false;
+    boolean USE_LINEAR_SC = true;
 
     float MIN_MAG_FACTOR = (DO_FLATENING)? 1.0f : (float)MAG_FACTOR;
     Robot robot;
 
-    // for non flatting
-    //static float MIN_MAG_FACTOR = (float)MAG_FACTOR;
-
+ 
     Test3(){
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
@@ -62,7 +63,7 @@ public class Test3 {
         mView.setEventHandler(eh);
         mView.setNotifyMouseMoved(true);
 	int trans = 400;
-        for (int i=-5;i<=5;i++){
+        for (int i=-10;i<=10;i++){
             for (int j=-5;j<=5;j++){
 		if (i == 0 && j == 0)
 		{
@@ -89,6 +90,7 @@ public class Test3 {
     
     //FixedSizeLens lens;
     SCFGaussianLens lens;
+    //Lens lens;
 
     double _lensX, _lensY;
     double _lensLastContactX, _lensLastContactY;
@@ -305,9 +307,18 @@ public class Test3 {
         lens.setInnerRadiusColor(Color.BLACK);
 	lens.setDrawMaxFlatTop(true);
 	lens.setSpeedBlendRadii(false, false);
+	if (USE_LINEAR_SC)
+	{
+	    speedCoupling = new SpeedCoupling();
+	    lens.setSpeedCoupling(speedCoupling);
+	}
         Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
+	// caro diff
+	lens.setAbsolutePosition((int)x, (int)y, System.currentTimeMillis());
+	lens.setXfocusOffset(0);
+	lens.setYfocusOffset(0);
     }
     
     void unsetLens(){
@@ -323,8 +334,12 @@ public class Test3 {
         lens = null;
     }
 
-    Lens getLensDefinition(int x, int y){
-	return new SCFGaussianLens(1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
+    SCFGaussianLens getLensDefinition(int x, int y)
+    {
+	SCFGaussianLens l = new SCFGaussianLens(
+				    1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
+	
+	return l;
 	// return new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
     }
     
@@ -405,6 +420,10 @@ public class Test3 {
 	}
 	setUpRadiiDrawing();
     }
+    void toggleLensSmoothing()
+    {
+	SMOOTH = !SMOOTH;
+    }
 
     //long _prevCurrentTime = System.currentTimeMillis();
     void moveLens(double x, double y, long currentTime){
@@ -466,6 +485,8 @@ public class Test3 {
 	    _lensAttached = 0;
 	    _motor_space = 0;
 	    _prev_radius = Rad2;
+	    lens.setXfocusOffset(0);
+	    lens.setYfocusOffset(0);
 	    //System.out.println("Inside Return");
 	    //lens.setInnerRadiusColor(Color.BLACK);
 	    return;
@@ -493,7 +514,9 @@ public class Test3 {
 
 	// stupid method
 	// moveLens(_lensX + (x-_lastX), _lensY + (y-_lastY));
+
 	double fac = (Rad1 - Rad2)/2;
+
 	if (new_code && _motor_space < fac*(Rad1 - Rad2)) // new code
 	{
 	    double coef =  Math.pow(((Rad2 +(_motor_space/fac) + 1.0)-Rad2)/(Rad1 - Rad2),1.0);
@@ -540,15 +563,12 @@ public class Test3 {
 	Gx = x2 - r*((x2-xg)/norm);
 	Gy = y2 - r*((y2-yg)/norm);
 
-	// convert back to screen coordinate:
-	Gx = Gx + (double)_pX[NUM_PSTOCK-1]; //_lastX;
-	Gy = - Gy + (double)_pY[NUM_PSTOCK-1];//_lastY;
 	
 	//System.out.println("G: " + (int)Gx + "," + (int)Gy + "    " +
 	//		   _lensX  + "," + _lensY);
 
 	
-	if (_prev_radius != Rad2)
+	if (_prev_radius != Rad2 && robot != null && e != null)
 	{
 	    // intersection de la droite 2,g et du cercle g,Rad2
 	    double normg = Math.sqrt((x2 - xg)*(x2 - xg) + (y2 -yg)*(y2 -yg));
@@ -562,7 +582,6 @@ public class Test3 {
 		Point ptRobot = new Point((int)Gx, (int)Gy);
 		SwingUtilities.convertPointToScreen(
 						    ptRobot, e.getComponent()); 
-		
 		robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
 		_wait_robot = true;
 		_lastX = (int)Gx; _lastY = (int)Gy;
@@ -575,6 +594,50 @@ public class Test3 {
 		return;
 	    }
 	}
+
+	if (SMOOTH && !(DO_FLATENING && FLATENING_VARIABLE))
+	{
+	    
+	    double ra = 2*(Rad1 - Rad2);
+
+	    if (_motor_space <= ra) 
+	    {
+		double coef =  Math.pow(
+					(_motor_space/ra),4.0);
+
+		_motor_space = _motor_space +
+		    Math.sqrt((x2)*(x2) + (y2)*(y2));
+		double magFactor = 1 + (1-coef) * (lens.getMaximumMagnification() - 1);
+		
+
+		int dx = lens.getXfocusOffset() + (int)(Gx - xg);
+		int dy = lens.getYfocusOffset() + (int)(Gy - yg);
+
+		Gx = xg + (double)(dx / (int)magFactor);
+		Gy = yg + (double)(dy / (int)magFactor);
+
+		int ox = dx % (int)magFactor;
+		int oy = dy %  (int)magFactor;
+		lens.setXfocusOffset(ox);
+		lens.setYfocusOffset(oy);
+		if (false) {
+		    System.out.println("Offsets: " + ox + " " + oy + " " +
+				       (int)(Gx + (double)_pX[NUM_PSTOCK-1]) +
+				       " " +
+				       (int)(- Gy + (double)_pY[NUM_PSTOCK-1])
+				       + " " + coef);
+		}
+	    }
+	    else
+	    {
+		lens.setXfocusOffset(0);
+		lens.setYfocusOffset(0);
+	    }
+	}
+
+	// convert back to screen coordinate:
+	Gx = Gx + (double)_pX[NUM_PSTOCK-1]; //_lastX;
+	Gy = - Gy + (double)_pY[NUM_PSTOCK-1];//_lastY;
 	_lensLastContactX = _lensLastContactX + (Gx - _lensX);
 	_lensLastContactY = _lensLastContactY + (Gy - _lensY);
 	moveLens(Gx, Gy, System.currentTimeMillis());
@@ -614,6 +677,7 @@ public class Test3 {
 class EventHandlerTest3 implements ViewEventHandler{
 
     Test3 application;
+    boolean precisionEnabled = false;
 
     long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
 
@@ -670,10 +734,14 @@ class EventHandlerTest3 implements ViewEventHandler{
 	    application.moveLens(jpx, jpy,System.currentTimeMillis());
 	}
         else if (application.lensCursorSync){
+	    application.lens.setXfocusOffset(0);
+	    application.lens.setYfocusOffset(0);
             application.moveLens(jpx, jpy, System.currentTimeMillis());
         }
 	else
 	{
+	    //application.lens.setXfocusOffset(0);
+	    //application.lens.setYfocusOffset(0);
 	    application.lens_cursorMoved(jpx, jpy, false, e);
 	}
     }
@@ -731,6 +799,12 @@ class EventHandlerTest3 implements ViewEventHandler{
 	    {application.toggleLensSlide();}
 	else if (c == 'v') 
 	    {application.toggleLensVarFlatening();}
+	else if(c == 'p') {
+	    precisionEnabled = !precisionEnabled;
+	    application.mView.setFocusControlled(precisionEnabled); }
+	else if(c == 'o') {
+	    application.toggleLensSmoothing();
+	}
     }
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
