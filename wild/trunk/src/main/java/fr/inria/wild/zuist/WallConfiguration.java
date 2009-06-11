@@ -97,7 +97,7 @@ public class WallConfiguration {
                 if (k > wnes[2]){wnes[2] = k;}
                 // south
                 k = v.getY()-v.getH()/2-v.getBH();
-                if (k > wnes[3]){wnes[3] = k;}
+                if (k < wnes[3]){wnes[3] = k;}
             }
         }            
         size = new Dimension(wnes[2]-wnes[0], wnes[1]-wnes[3]);
