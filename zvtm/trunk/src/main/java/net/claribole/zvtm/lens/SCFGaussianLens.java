@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import com.xerox.VTM.glyphs.Translucent;
 import net.claribole.zvtm.glyphs.Translucency;
 import net.claribole.zvtm.engine.LowPassFilter;
+import net.claribole.zvtm.engine.SpeedCoupling;
 
 /**Profile: gaussian - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
@@ -37,6 +38,8 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 
     protected double cutoffParamA = 0.1;   // decrease to increase time before starts to go back to rest position 
     protected double cutoffParamB = 0.01;  // increase to lower time to go back to rest position
+
+    protected SpeedCoupling speedCoupling = null;
 
     /** Dynamic magnification factor. */
     protected float dMM = MM;
@@ -104,6 +107,10 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	    super.setAbsolutePosition(ax, ay);
 	    updateFrequency(absTime);
 	    updateTimeBasedParams(ax, ay);
+	    if (speedCoupling != null)
+	    {
+		speedCoupling.addPoint(ax, ay, absTime);
+	    }
 	}
     }
 
@@ -132,15 +139,24 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 
     public void updateTimeBasedParams(){
 	synchronized(this){
-	    targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-	    double distAway = targetPos.distance(currentPos);
-	    double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-	    filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
-	    currentPos = filter.apply(targetPos, frequency);
-	    int tx = (int)Math.round(currentPos.getX());
-	    int ty = (int)Math.round(currentPos.getY());
-	    tx = Math.max(tx, w/2);
-	    ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+	    double opacity;
+	    if (speedCoupling != null)
+	    {
+		opacity = 1.0 - (double)speedCoupling.getCoef();
+	    }
+	    else
+	    {
+		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+		double distAway = targetPos.distance(currentPos);
+		opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
+		currentPos = filter.apply(targetPos, frequency);
+		int tx = (int)Math.round(currentPos.getX());
+		int ty = (int)Math.round(currentPos.getY());
+		tx = Math.max(tx, w/2);
+		ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+		float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
+	    }
 	    float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
 	    if (Math.abs(dMM - nMM) > 0.1f){// avoid unnecesarry repaint requests
 		// make the lens almost flat when making big moves
@@ -160,6 +176,10 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     public void setCutoffFrequencyParameters(double a, double b){
 	cutoffParamA = a;
 	cutoffParamB = b;
+    }
+
+    public void setSpeedCoupling(SpeedCoupling sc){
+	speedCoupling = sc;
     }
 
     public void setNoUpdateWhenMouseStill(boolean b){
@@ -275,3 +295,5 @@ class DGTrailingTimer extends TimerTask {
     }
 
 }
+
+
