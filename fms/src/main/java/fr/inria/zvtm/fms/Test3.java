@@ -40,6 +40,7 @@ public class Test3 {
     boolean INFINITE_FRICTION = true;
     boolean ELASTIC_BORDER = false;
     boolean SMOOTH = false;
+    boolean SMOOTH_WARPING = true;
     boolean USE_LINEAR_SC = true;
 
     float MIN_MAG_FACTOR = (DO_FLATENING)? 1.0f : (float)MAG_FACTOR;
@@ -413,10 +414,14 @@ public class Test3 {
 		toggleLensCursorSync();
 	    if (!DO_FLATENING)
 		toggleLensFlattening();
+	    speedCoupling.setSpeedParameters(300);
+	    speedCoupling.setCoefParameters(0.05f,0.0f);
 	}
 	else
 	{
 	    // ok
+	    speedCoupling.setSpeedParameters(200);
+	    speedCoupling.setCoefParameters(0.05f,0.0f);
 	}
 	setUpRadiiDrawing();
     }
@@ -568,7 +573,7 @@ public class Test3 {
 	//		   _lensX  + "," + _lensY);
 
 	
-	if (_prev_radius != Rad2 && robot != null && e != null)
+	if (false && _prev_radius != Rad2 && robot != null && e != null)
 	{
 	    // intersection de la droite 2,g et du cercle g,Rad2
 	    double normg = Math.sqrt((x2 - xg)*(x2 - xg) + (y2 -yg)*(y2 -yg));
@@ -595,7 +600,7 @@ public class Test3 {
 	    }
 	}
 
-	if (SMOOTH && !(DO_FLATENING && FLATENING_VARIABLE))
+	if (SMOOTH) // && !(DO_FLATENING && FLATENING_VARIABLE))
 	{
 	    
 	    double ra = 2*(Rad1 - Rad2);
@@ -627,6 +632,35 @@ public class Test3 {
 				       (int)(- Gy + (double)_pY[NUM_PSTOCK-1])
 				       + " " + coef);
 		}
+		if (SMOOTH_WARPING && false)
+		{
+		    // FIXME: does not work !!!
+		    // intersection de la droite 2,g et du cercle g,Rad2
+		    double normg = Math.sqrt((x2 - Gx)*(x2 - Gx) + (y2 -Gy)*(y2 - Gy));
+		    r = Rad2;
+		    double nx,ny;
+		    nx = Gx - Rad2*((Gx-x2)/normg);
+		    ny = Gy - Rad2*((Gy-y2)/normg);
+		    nx = nx + (double)_pX[NUM_PSTOCK-1]; //_lastX;
+		    ny = - ny + (double)_pY[NUM_PSTOCK-1];//_lastY;
+		    if (robot != null && e != null)
+		    {
+			Point ptRobot = new Point((int)nx, (int)ny);
+			SwingUtilities.convertPointToScreen(
+						  ptRobot, e.getComponent()); 
+			robot.mouseMove((int)ptRobot.getX(),
+					(int)ptRobot.getY());
+			_wait_robot = true;
+			_lastX = (int)nx;
+			_lastY = (int)ny;
+			pstock(nx,ny);
+			_lensLastContactX = nx;
+			_lensLastContactY = ny;
+			//System.out.println(
+			//		    "RR: " + xx + "(" + (int)ptRobot.getX() +
+			//		    "), " + yy + "(" + (int)ptRobot.getY() + ")");
+		    }
+		}
 	    }
 	    else
 	    {
@@ -651,7 +685,7 @@ public class Test3 {
 		//pstock(_lastX,_lastY);
 		//System.out.println("F3: " + _lastX + ", " + _lastY);
 	    }
-	else
+	else if (!SMOOTH_WARPING)
 	    {
 		_lastX = x; _lastY = y;
 		pstock(x,y);
