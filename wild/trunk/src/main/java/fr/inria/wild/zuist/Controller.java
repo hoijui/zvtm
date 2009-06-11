@@ -108,6 +108,7 @@ public class Controller {
     Camera oCamera, rCamera;
     View oView;
     VRectangle viewFinder;
+    VRectangle[] viewportFinders;
 
     ControllerEventHandler ceh;
     OverviewEventHandler oeh;
@@ -127,6 +128,7 @@ public class Controller {
         System.out.println("Wall size: "+wc.getSize().width+" x "+wc.getSize().height);
         initGUI(opengl, antialiased);
         initOSC(OSCin);
+        initViewFinders();
         VirtualSpace[]  sceneSpaces = {zSpace};
         Camera[] sceneCameras = {cCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -180,8 +182,6 @@ public class Controller {
         oView.setEventHandler(oeh, 1);
         oView.setAntialiasing(antialiased);
         oCamera.stick(rCamera);
-        viewFinder = new VRectangle(0, 0, 0, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
-        vsm.addGlyph(viewFinder, rSpace);
         vsm.repaintNow();
     }
     
@@ -194,9 +194,12 @@ public class Controller {
             for (int i=0;i<nodes.length;i++){
                 for (int j=0;j<nodes[i].getViewPorts().length;j++){
                     ViewPort p = nodes[i].getViewPorts()[j];
-                    System.out.println("Creating out port "+p.getPort()+" for "+p.getNode().getHostName());
                     vp.add(p);
-                    sd.add(new OSCPortOut(InetAddress.getByName(p.getNode().getHostName()), p.getPort()));
+                    try {
+                        sd.add(new OSCPortOut(InetAddress.getByName(p.getNode().getHostName()), p.getPort()));
+                        System.out.println("Creating out port "+p.getPort()+" for "+p.getNode().getHostName());
+                    }
+                    catch (java.net.UnknownHostException ex){System.err.println("Error: could not connect to host "+p.getNode().getHostName());}
                 }
             }
             if (vp.size() != sd.size()){
@@ -222,6 +225,17 @@ public class Controller {
         }
         catch (Exception ex){
             ex.printStackTrace();
+        }
+    }
+    
+    void initViewFinders(){
+        // viewfinders
+        viewFinder = new VRectangle(0, 0, 0, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
+        vsm.addGlyph(viewFinder, rSpace);
+        viewportFinders = new VRectangle[viewports.length];
+        for (int i=0;i<viewportFinders.length;i++){
+            viewportFinders[i] = new VRectangle(0, 0, 0, 10, 10, Color.RED, Color.RED, VIEWPORT_OPACITY);
+            vsm.addGlyph(viewportFinders[i], rSpace);
         }
     }
     
@@ -282,20 +296,20 @@ public class Controller {
         LongPoint trans;
         long[] rb = cView.getVisibleRegion(cCamera);
         if (direction == Controller.MOVE_NORTH){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
+            long qt = Math.round((rb[1]-rb[3])/2.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_SOUTH){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
+            long qt = Math.round((rb[3]-rb[1])/2.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_EAST){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
+            long qt = Math.round((rb[2]-rb[0])/2.0);
             trans = new LongPoint(qt,0);
         }
         else {
             // direction == Controller.MOVE_WEST
-            long qt = Math.round((rb[0]-rb[2])/4.0);
+            long qt = Math.round((rb[0]-rb[2])/2.0);
             trans = new LongPoint(qt,0);
         }
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, cCamera,
@@ -319,7 +333,10 @@ public class Controller {
             vwnes[2] = Math.round(wnes[0] + rw * viewports[i].wnes[2]);
             vwnes[1] = Math.round(wnes[3] + rh * viewports[i].wnes[1]);
             vwnes[3] = Math.round(wnes[3] + rh * viewports[i].wnes[3]);
-            sendMsg(senders[i], MOVE_CAMERA, CMD_CENTER_REGION, vwnes);
+            if (i<senders.length){sendMsg(senders[i], MOVE_CAMERA, CMD_CENTER_REGION, vwnes);}
+            viewportFinders[i].moveTo((vwnes[0]+vwnes[2])/2, (vwnes[1]+vwnes[3])/2);
+            viewportFinders[i].setWidth((vwnes[2]-vwnes[0])/2);
+            viewportFinders[i].setHeight((vwnes[1]-vwnes[3])/2);
         }
         
     }
