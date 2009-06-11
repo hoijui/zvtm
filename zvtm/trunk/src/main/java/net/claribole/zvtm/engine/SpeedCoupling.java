@@ -39,12 +39,12 @@ public class SpeedCoupling
 	reducTime = reduc_time;
     }
 
-    public void setSpeedParamters(float min_speed)
+    public void setSpeedParameters(float min_speed)
     {
 	minSpeed = min_speed;
     }
 
-    public void setCoefParamters(float coef_inc, float coef_dec)
+    public void setCoefParameters(float coef_inc, float coef_dec)
     {
 	coefIncStep = coef_inc;
 	coefDecStep = coef_dec;
