@@ -1026,7 +1026,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 		*@param y2 y coord of opposite point
 		*@return the final camera location
 		*/
-	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2){
+	public Location centerOnRegion(Camera c, int d, long x1, long y1, long x2, long y2){
 	    return centerOnRegion(c, d, x1, y1, x2, y2, null);
     }
     
@@ -1040,7 +1040,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 		*@param ea action to be performed at end of animation
 		*@return the final camera location
 		*/
-	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2, EndAction ea){
+	public Location centerOnRegion(Camera c, int d, long x1, long y1, long x2, long y2, EndAction ea){
 		View v = null;
 		try {
 			v = c.getOwningView();
@@ -1050,7 +1050,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 				long maxX = Math.max(x1,x2);
 				long maxY = Math.max(y1,y2);
 				//wnes=west north east south
-				long[] wnes={minX,maxY,maxX,minY};
+				long[] wnes = {minX, maxY, maxX, minY};
 				//new coords where camera should go
 				long dx = (wnes[2]+wnes[0]) / 2; 
 				long dy = (wnes[1]+wnes[3]) / 2;
@@ -1061,7 +1061,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 				float currentAlt = c.getAltitude() + c.getFocal();
 				float ratio = 0;
 				//compute the mult factor for altitude to see all stuff on X
-				if (trRegBounds[0]!=0){
+				if (trRegBounds[0] != 0){
 				    ratio = (dx-wnes[0]) / ((float)(dx-trRegBounds[0]));
 				}
 				//same for Y ; take the max of both
