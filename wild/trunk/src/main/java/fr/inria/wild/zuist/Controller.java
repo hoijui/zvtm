@@ -89,6 +89,7 @@ public class Controller implements Java2DPainter {
     
     static final String IN_CMD_PAN = "pan";
     static final String IN_CMD_ZOOM = "zoom";
+    static final String IN_CMD_STOP = CMD_STOP;
     
     static final Integer VALUE_NONE = new Integer(0);
     
@@ -181,7 +182,7 @@ public class Controller implements Java2DPainter {
         cameras.add(oCamera);
         cameras.add(rCamera);
         oView = vsm.addExternalView(cameras, OVERVIEW_TITLE, vt,
-            800, 600,
+            1440, 850,
             false, true);
         oView.setBackgroundColor(Color.WHITE);
         oeh = new OverviewEventHandler(this);
@@ -329,6 +330,9 @@ public class Controller implements Java2DPainter {
     /* ------------------ Remote Navigation ----------------- */
     
     void updateMetaCam(long[] wnes){
+        if ((wnes[2]-wnes[0]) < wc.size.width || (wnes[1]-wnes[3]) < wc.size.height){
+            return;
+        }
         // update VRect representing overall observed region
         viewFinder.moveTo((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2);
         viewFinder.setWidth((wnes[2]-wnes[0])/2);
@@ -384,6 +388,10 @@ public class Controller implements Java2DPainter {
         else if (cmd.equals(IN_CMD_ZOOM)){
             System.out.println("zoom "+((Integer)params[1]).intValue());
             firstOrderZoom(((Integer)params[1]).intValue());
+        }
+        else if (cmd.equals(IN_CMD_STOP)){
+            System.out.println("stop ");
+            stop();
         }
     }
 
