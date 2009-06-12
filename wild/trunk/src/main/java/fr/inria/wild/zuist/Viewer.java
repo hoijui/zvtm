@@ -297,6 +297,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         else if (cmd.equals(Controller.CMD_CONSOLE)){
             toggleConsole();
         }
+        else if (cmd.equals(Controller.CMD_QUIT)){
+            System.exit(0);
+        }
     }
     
     void centerOnRegion(long w, long n, long e, long s){

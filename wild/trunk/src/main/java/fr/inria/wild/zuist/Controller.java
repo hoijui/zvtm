@@ -85,6 +85,10 @@ public class Controller implements Java2DPainter {
     static final String CMD_GC = "gc";
     static final String CMD_INFO = "info";
     static final String CMD_CONSOLE = "cs";
+    static final String CMD_QUIT = "quit";
+    
+    static final String IN_CMD_PAN = "pan";
+    static final String IN_CMD_ZOOM = "zoom";
     
     static final Integer VALUE_NONE = new Integer(0);
     
@@ -301,20 +305,20 @@ public class Controller implements Java2DPainter {
         LongPoint trans;
         long[] rb = cView.getVisibleRegion(cCamera);
         if (direction == Controller.MOVE_NORTH){
-            long qt = Math.round((rb[1]-rb[3])/2.0);
+            long qt = Math.round((rb[1]-rb[3])/8.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_SOUTH){
-            long qt = Math.round((rb[3]-rb[1])/2.0);
+            long qt = Math.round((rb[3]-rb[1])/8.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_EAST){
-            long qt = Math.round((rb[2]-rb[0])/2.0);
+            long qt = Math.round((rb[2]-rb[0])/8.0);
             trans = new LongPoint(qt,0);
         }
         else {
             // direction == Controller.MOVE_WEST
-            long qt = Math.round((rb[0]-rb[2])/2.0);
+            long qt = Math.round((rb[0]-rb[2])/8.0);
             trans = new LongPoint(qt,0);
         }
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, cCamera,
@@ -338,11 +342,6 @@ public class Controller implements Java2DPainter {
             vwnes[2] = Math.round(wnes[0] + rw * viewports[i].wnes[2]);
             vwnes[1] = Math.round(wnes[3] + rh * viewports[i].wnes[1]);
             vwnes[3] = Math.round(wnes[3] + rh * viewports[i].wnes[3]);
-            
-            if (viewports[i].getNode().getHostName().equals("mac11-148.lri.fr")){
-                System.out.println("Sending for "+viewports[i].getPort()+": "+vwnes[0]+" "+vwnes[1]+" "+vwnes[2]+" "+vwnes[3]);
-            }
-            
             if (i<senders.length){sendMsg(senders[i], MOVE_CAMERA, CMD_CENTER_REGION, vwnes);}
             viewportFinders[i].moveTo((vwnes[0]+vwnes[2])/2, (vwnes[1]+vwnes[3])/2);
             viewportFinders[i].setWidth((vwnes[2]-vwnes[0])/2);
@@ -374,8 +373,18 @@ public class Controller implements Java2DPainter {
     
     /* ------------------ OSC in  ----------------- */
 
-    public void processIncomingMessage(OSCMessage message){
-        //XXX:TBW
+    public void processIncomingMessage(OSCMessage msg){
+        System.out.println(msg);
+        Object[] params = msg.getArguments();
+        String cmd = (String)params[0];
+        if (cmd.equals(IN_CMD_PAN)){
+            firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
+            System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
+        }
+        else if (cmd.equals(IN_CMD_ZOOM)){
+            System.out.println("zoom "+((Integer)params[1]).intValue());
+            firstOrderZoom(((Integer)params[1]).intValue());
+        }
     }
 
     /* ------------------ OSC out ----------------- */
@@ -391,6 +400,10 @@ public class Controller implements Java2DPainter {
     void consoleNodes(){
         sendToAll(CMD_CONSOLE, VALUE_NONE, VALUE_NONE);
     }
+
+    void quitNodes(){
+        sendToAll(CMD_QUIT, VALUE_NONE, VALUE_NONE);
+    }
     
     void sendToAll(String cmd, Integer value1, Integer value2){
         for (int i=0;i<senders.length;i++){
@@ -401,10 +414,10 @@ public class Controller implements Java2DPainter {
     void sendMsg(OSCPortOut sender, String listener, String cmd, long[] wnes){
         Object args[] = new Object[5];
         args[0] = cmd;
-        args[1] = new Long(wnes[0]);
-        args[2] = new Long(wnes[1]);
-        args[3] = new Long(wnes[2]);
-        args[4] = new Long(wnes[3]);
+        args[1] = String.valueOf(wnes[0]);
+        args[2] = String.valueOf(wnes[1]);
+        args[3] = String.valueOf(wnes[2]);
+        args[4] = String.valueOf(wnes[3]);
         OSCMessage msg = new OSCMessage(listener, args);
         try {
             sender.send(msg);
@@ -429,7 +442,7 @@ public class Controller implements Java2DPainter {
     /* ------------------ Overlaid info ----------------- */    
     
     static final Font OVERLAY_FONT = new Font("Dialog", Font.PLAIN, 10);
-    String mCoordsStr = " ";
+    String mCoordsStr = "";
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         g2d.setColor(Color.BLACK);
@@ -570,6 +583,9 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     		else if (code==KeyEvent.VK_LEFT){application.translate(Controller.MOVE_WEST);}
     		else if (code==KeyEvent.VK_RIGHT){application.translate(Controller.MOVE_EAST);}            
         }
+        else if (mod == CTRL_MOD){
+            if (code==KeyEvent.VK_Q){application.quitNodes();}
+        }
         else {
             if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
         	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
@@ -685,6 +701,9 @@ class OverviewEventHandler implements ViewEventHandler {
     		else if (code==KeyEvent.VK_DOWN){application.translate(Controller.MOVE_SOUTH);}
     		else if (code==KeyEvent.VK_LEFT){application.translate(Controller.MOVE_WEST);}
     		else if (code==KeyEvent.VK_RIGHT){application.translate(Controller.MOVE_EAST);}            
+        }
+        else if (mod == CTRL_MOD){
+            if (code==KeyEvent.VK_Q){application.quitNodes();}
         }
         else {
             if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
