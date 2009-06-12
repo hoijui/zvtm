@@ -49,6 +49,7 @@ import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VRectangle;
 import net.claribole.zvtm.engine.ViewEventHandler;
+import net.claribole.zvtm.engine.Java2DPainter;
 import net.claribole.zvtm.engine.CameraListener;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
@@ -60,7 +61,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
-public class Controller {
+public class Controller implements Java2DPainter {
     
     static final int DEFAULT_VIEW_WIDTH = 1280;
     
@@ -81,6 +82,9 @@ public class Controller {
     static final String CMD_ZOOM_SPEED = "zspeed";
     static final String CMD_STOP = "stop";
     static final String CMD_CENTER_REGION = "creg";
+    static final String CMD_GC = "gc";
+    static final String CMD_INFO = "info";
+    static final String CMD_CONSOLE = "cs";
     
     static final Integer VALUE_NONE = new Integer(0);
     
@@ -135,7 +139,6 @@ public class Controller {
         sm.setSceneCameraBounds(cCamera, ceh.wnes);
         if (zuistFile != null){
 			loadScene(zuistFile);
-			//vsm.addGlyph(new net.claribole.zvtm.glyphs.CircleNR(0, 0, 0, 10, Color.WHITE), zSpace);
 			getGlobalView(cCamera);
 			getGlobalView(oCamera);
 		}
@@ -180,7 +183,9 @@ public class Controller {
         oeh = new OverviewEventHandler(this);
         oView.setEventHandler(oeh, 0);
         oView.setEventHandler(oeh, 1);
+        oView.setNotifyMouseMoved(true);
         oView.setAntialiasing(antialiased);
+        oView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
         oCamera.stick(rCamera);
         vsm.repaintNow();
     }
@@ -333,6 +338,11 @@ public class Controller {
             vwnes[2] = Math.round(wnes[0] + rw * viewports[i].wnes[2]);
             vwnes[1] = Math.round(wnes[3] + rh * viewports[i].wnes[1]);
             vwnes[3] = Math.round(wnes[3] + rh * viewports[i].wnes[3]);
+            
+            if (viewports[i].getNode().getHostName().equals("mac11-148.lri.fr")){
+                System.out.println("Sending for "+viewports[i].getPort()+": "+vwnes[0]+" "+vwnes[1]+" "+vwnes[2]+" "+vwnes[3]);
+            }
+            
             if (i<senders.length){sendMsg(senders[i], MOVE_CAMERA, CMD_CENTER_REGION, vwnes);}
             viewportFinders[i].moveTo((vwnes[0]+vwnes[2])/2, (vwnes[1]+vwnes[3])/2);
             viewportFinders[i].setWidth((vwnes[2]-vwnes[0])/2);
@@ -370,6 +380,18 @@ public class Controller {
 
     /* ------------------ OSC out ----------------- */
     
+    void gcNodes(){
+        sendToAll(CMD_GC, VALUE_NONE, VALUE_NONE);
+    }
+    
+    void infoNodes(){
+        sendToAll(CMD_INFO, VALUE_NONE, VALUE_NONE);
+    }
+
+    void consoleNodes(){
+        sendToAll(CMD_CONSOLE, VALUE_NONE, VALUE_NONE);
+    }
+    
     void sendToAll(String cmd, Integer value1, Integer value2){
         for (int i=0;i<senders.length;i++){
             sendMsg(senders[i], MOVE_CAMERA, cmd, value1, value2);
@@ -379,10 +401,10 @@ public class Controller {
     void sendMsg(OSCPortOut sender, String listener, String cmd, long[] wnes){
         Object args[] = new Object[5];
         args[0] = cmd;
-        args[1] = String.valueOf(wnes[0]);
-        args[2] = String.valueOf(wnes[1]);
-        args[3] = String.valueOf(wnes[2]);
-        args[4] = String.valueOf(wnes[3]);
+        args[1] = new Long(wnes[0]);
+        args[2] = new Long(wnes[1]);
+        args[3] = new Long(wnes[2]);
+        args[4] = new Long(wnes[3]);
         OSCMessage msg = new OSCMessage(listener, args);
         try {
             sender.send(msg);
@@ -402,6 +424,18 @@ public class Controller {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    /* ------------------ Overlaid info ----------------- */    
+    
+    static final Font OVERLAY_FONT = new Font("Dialog", Font.PLAIN, 10);
+    String mCoordsStr = " ";
+    
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        g2d.setColor(Color.BLACK);
+        g2d.setFont(OVERLAY_FONT);
+        g2d.drawString(mCoordsStr, 10, 20);
+        oView.repaintNow();
     }
     
     /* ------------------ MAIN ----------------- */
@@ -544,6 +578,9 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
         	else if (code==KeyEvent.VK_DOWN){application.translateView(Controller.MOVE_SOUTH);}
         	else if (code==KeyEvent.VK_LEFT){application.translateView(Controller.MOVE_WEST);}
         	else if (code==KeyEvent.VK_RIGHT){application.translateView(Controller.MOVE_EAST);}
+        	else if (code==KeyEvent.VK_G){application.gcNodes();}
+        	else if (code==KeyEvent.VK_I){application.infoNodes();}
+        	else if (code==KeyEvent.VK_C){application.consoleNodes();}
         }
     }
 
@@ -613,7 +650,9 @@ class OverviewEventHandler implements ViewEventHandler {
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        application.mCoordsStr = v.getVCursor().vx + ", " + v.getVCursor().vy;
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
@@ -655,6 +694,9 @@ class OverviewEventHandler implements ViewEventHandler {
         	else if (code==KeyEvent.VK_DOWN){application.translateView(Controller.MOVE_SOUTH);}
         	else if (code==KeyEvent.VK_LEFT){application.translateView(Controller.MOVE_WEST);}
         	else if (code==KeyEvent.VK_RIGHT){application.translateView(Controller.MOVE_EAST);}
+        	else if (code==KeyEvent.VK_G){application.gcNodes();}
+        	else if (code==KeyEvent.VK_I){application.infoNodes();}
+        	else if (code==KeyEvent.VK_C){application.consoleNodes();}
         }
     }
 

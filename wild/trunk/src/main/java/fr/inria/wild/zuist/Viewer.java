@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Insets;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
 import java.awt.event.ActionListener;
@@ -30,6 +31,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
+import javax.swing.JLayeredPane;
 import java.awt.Container;
 
 import java.util.Vector;
@@ -54,6 +56,7 @@ import net.claribole.zvtm.engine.Location;
 import net.claribole.zvtm.animation.EndAction;
 import net.claribole.zvtm.animation.Animation;
 import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import net.claribole.zvtm.widgets.TranslucentTextArea;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -165,7 +168,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 				updatePanelSize();
 			}
 		};
-		mView.getFrame().addComponentListener(ca0);		
+		mView.getFrame().addComponentListener(ca0);
+		initConsole();
     }
 
     void windowLayout(){
@@ -196,6 +200,39 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             ex.printStackTrace();
         }
     }
+
+    /* -------------- Console ------------------------*/
+    
+    TranslucentTextArea console;
+
+	// west, east and south margins of console (north bound depends on frame's height)
+	static final int[] consoleMarginsWES = {10, 10, 10};
+	static final int[] consolePaddingWNES = {5, 5, 5, 5};
+
+	void initConsole(){
+		JFrame f = (JFrame)mView.getFrame();
+		JLayeredPane lp = f.getRootPane().getLayeredPane();
+		console = new TranslucentTextArea("");
+		console.setEditable(false);
+		console.setMargin(new Insets(consolePaddingWNES[1], consolePaddingWNES[0], consolePaddingWNES[3], consolePaddingWNES[2]));
+		lp.add(console, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
+		updateConsoleBounds();
+	}
+	
+	void updateConsoleBounds(){
+	    if (console == null){return;}
+		console.setBounds(consoleMarginsWES[0], Math.round(panelHeight*.8f),
+		                  panelWidth-consoleMarginsWES[1]-consoleMarginsWES[0], Math.round(panelHeight*.05f-consoleMarginsWES[2]));
+	}
+	
+	void toggleConsole(){
+		console.setVisible(!console.isVisible());
+	}
+	
+	void sayInConsole(String text){
+		console.setText(text);
+	}
+	
 
 	/*-------------  Scene management    -------------*/
 	
@@ -250,6 +287,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         }
         else if (cmd.equals(Controller.CMD_STOP)){
             stop();
+        }
+        else if (cmd.equals(Controller.CMD_GC)){
+            gc();
+        }
+        else if (cmd.equals(Controller.CMD_INFO)){
+            toggleMiscInfoDisplay();
+        }
+        else if (cmd.equals(Controller.CMD_CONSOLE)){
+            toggleConsole();
         }
     }
     
@@ -393,6 +439,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         Dimension d = mView.getPanel().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
+		updateConsoleBounds();
 	}
 
 	/* ---- Debug information ----*/
