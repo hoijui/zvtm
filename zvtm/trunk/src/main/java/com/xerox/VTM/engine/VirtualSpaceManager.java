@@ -1041,52 +1041,54 @@ public class VirtualSpaceManager implements AWTEventListener {
 		*@return the final camera location
 		*/
 	public Location centerOnRegion(Camera c,int d,long x1,long y1,long x2,long y2, EndAction ea){
-		View v=null;
+		View v = null;
 		try {
-			v=c.getOwningView();
-			if (v!=null){
-				long minX=Math.min(x1,x2);
-				long minY=Math.min(y1,y2);
-				long maxX=Math.max(x1,x2);
-				long maxY=Math.max(y1,y2);
-				long[] wnes={minX,maxY,maxX,minY};  //wnes=west north east south
-				long dx=(wnes[2]+wnes[0])/2;  //new coords where camera should go
-				long dy=(wnes[1]+wnes[3])/2;
-				long[] regBounds=v.getVisibleRegion(c);
+			v = c.getOwningView();
+			if (v != null){
+				long minX = Math.min(x1,x2);
+				long minY = Math.min(y1,y2);
+				long maxX = Math.max(x1,x2);
+				long maxY = Math.max(y1,y2);
+				//wnes=west north east south
+				long[] wnes={minX,maxY,maxX,minY};
+				//new coords where camera should go
+				long dx = (wnes[2]+wnes[0]) / 2; 
+				long dy = (wnes[1]+wnes[3]) / 2;
+				long[] regBounds = v.getVisibleRegion(c);
 				// region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
 				// we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
-				long[] trRegBounds={regBounds[0]+dx-c.posx,regBounds[3]+dy-c.posy};
-				float currentAlt=c.getAltitude()+c.getFocal();
-				float ratio=0;
+				long[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
+				float currentAlt = c.getAltitude() + c.getFocal();
+				float ratio = 0;
 				//compute the mult factor for altitude to see all stuff on X
-				if (trRegBounds[0]!=0){ratio=(dx-wnes[0])/((float)(dx-trRegBounds[0]));}
-				//same for Y ; take the max of both
-				if (trRegBounds[1]!=0){
-					float tmpRatio=(dy-wnes[3])/((float)(dy-trRegBounds[1]));
-					if (tmpRatio>ratio){ratio=tmpRatio;}
+				if (trRegBounds[0]!=0){
+				    ratio = (dx-wnes[0]) / ((float)(dx-trRegBounds[0]));
 				}
-				float newAlt=currentAlt*Math.abs(ratio);
+				//same for Y ; take the max of both
+				if (trRegBounds[1] != 0){
+					float tmpRatio = (dy-wnes[3]) / ((float)(dy-trRegBounds[1]));
+					if (tmpRatio > ratio){ratio = tmpRatio;}
+				}
+				float newAlt = currentAlt * Math.abs(ratio);
 			    if (d > 0){
-    				Animation trans = 
+    				Animation trans =
     				    animationManager.getAnimationFactory().
     				    createCameraTranslation(d, c, new LongPoint(dx, dy), false,
     							    SlowInSlowOutInterpolator.getInstance(),
     							    ea);
-
     				Animation altAnim = 
     				    animationManager.getAnimationFactory().
     				    createCameraAltAnim(d, c, newAlt, false,
     							SlowInSlowOutInterpolator.getInstance(),
     							null);
-
     				animationManager.startAnimation(trans, false);
     				animationManager.startAnimation(altAnim, false);			        
 			    }
 			    else {
-			        c.setAltitude(newAlt);
+			        c.setAltitude(newAlt-100);
 			        c.moveTo(dx, dy);
 			    }
-				return new Location(dx,dy,newAlt);
+				return new Location(dx, dy, newAlt);
 			}
 			else return null;
 		}
