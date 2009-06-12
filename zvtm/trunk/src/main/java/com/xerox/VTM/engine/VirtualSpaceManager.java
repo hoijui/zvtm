@@ -1054,22 +1054,12 @@ public class VirtualSpaceManager implements AWTEventListener {
 				//new coords where camera should go
 				long dx = (wnes[2]+wnes[0]) / 2; 
 				long dy = (wnes[1]+wnes[3]) / 2;
-				long[] regBounds = v.getVisibleRegion(c);
-				// region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
-				// we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
-				long[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
-				float currentAlt = c.getAltitude() + c.getFocal();
-				float ratio = 0;
-				//compute the mult factor for altitude to see all stuff on X
-				if (trRegBounds[0] != 0){
-				    ratio = (dx-wnes[0]) / ((float)(dx-trRegBounds[0]));
-				}
-				//same for Y ; take the max of both
-				if (trRegBounds[1] != 0){
-					float tmpRatio = (dy-wnes[3]) / ((float)(dy-trRegBounds[1]));
-					if (tmpRatio > ratio){ratio = tmpRatio;}
-				}
-				float newAlt = currentAlt * Math.abs(ratio);
+				// new alt to fit horizontally
+                float nah = (wnes[2]-dx) * 2 * c.getFocal() / v.getPanel().viewW - c.getFocal();
+				// new alt to fit vertically
+                float nav = (wnes[1]-dy) * 2 * c.getFocal() / v.getPanel().viewH - c.getFocal();
+                // take max of both
+                float na = Math.max(nah, nav);
 			    if (d > 0){
     				Animation trans =
     				    animationManager.getAnimationFactory().
@@ -1078,17 +1068,17 @@ public class VirtualSpaceManager implements AWTEventListener {
     							    ea);
     				Animation altAnim = 
     				    animationManager.getAnimationFactory().
-    				    createCameraAltAnim(d, c, newAlt, false,
+    				    createCameraAltAnim(d, c, na, false,
     							SlowInSlowOutInterpolator.getInstance(),
     							null);
     				animationManager.startAnimation(trans, false);
     				animationManager.startAnimation(altAnim, false);			        
 			    }
 			    else {
-			        c.setAltitude(newAlt-100);
+			        c.setAltitude(na);
 			        c.moveTo(dx, dy);
 			    }
-				return new Location(dx, dy, newAlt);
+				return new Location(dx, dy, na);
 			}
 			else return null;
 		}
