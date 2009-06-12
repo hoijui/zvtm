@@ -94,7 +94,7 @@ public class Controller implements Java2DPainter {
     static final Integer VALUE_NONE = new Integer(0);
     
     static final float VIEWFINDER_OPACITY = .3f;
-    static final float VIEWPORT_OPACITY = .5f;
+    static final float VIEWPORT_OPACITY = .2f;
     
     File SCENE_FILE, SCENE_FILE_DIR;
     
@@ -241,7 +241,7 @@ public class Controller implements Java2DPainter {
     void initViewFinders(){
         // viewfinders
         viewFinder = new VRectangle(0, 0, 0, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
-        vsm.addGlyph(viewFinder, rSpace);
+        //vsm.addGlyph(viewFinder, rSpace);
         viewportFinders = new VRectangle[viewports.length];
         for (int i=0;i<viewportFinders.length;i++){
             viewportFinders[i] = new VRectangle(0, 0, 0, 10, 10, Color.RED, Color.RED, VIEWPORT_OPACITY);
