@@ -42,11 +42,14 @@ BR = 4
 CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     " \timageTyler <src_image_path> <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
-    "\t-tsN\ttile size (N in pixels)\n"+\
-    "\t-f\tforce tile generation\n"+\
-    "\t-tlN\ttrace level (N in [0:3])\n"+\
-    "\t-cg\t processing pipeline: CoreGraphics (Mac only)\n"+\
-    "\t-im\t processing pipeline: PIL and ImageMagick (default)\n"
+    "\t-ts=N\t\ttile size (N in pixels)\n"+\
+    "\t-f\t\tforce tile generation\n"+\
+    "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
+    "\t-idprefix=p\tcustom prefix for all region and objects IDs\n"+\
+    "\t-dx=y\t\tx offset for all regions and objects\n"+\
+    "\t-dy=x\t\ty offset for all regions and objects\n"+\
+    "\t-cg\t\tprocessing pipeline: CoreGraphics (Mac only)\n"+\
+    "\t-im\t\tprocessing pipeline: PIL and ImageMagick (default)\n"
 
 TRACE_LEVEL = 1
 
@@ -244,13 +247,13 @@ if len(sys.argv) > 2:
     TGT_DIR = os.path.realpath(sys.argv[2])
     if len(sys.argv) > 3:
         for arg in sys.argv[3:]:
-            if arg.startswith("-ts"):
-                TILE_SIZE = int(arg[3:])
+            if arg.startswith("-ts="):
+                TILE_SIZE = int(arg[4:])
             elif arg == "-f":
                 FORCE_GENERATE_TILES = True
                 log("Force tile generation")
-            elif arg.startswith("-tl"):
-                TRACE_LEVEL = int(arg[3:])
+            elif arg.startswith("-tl="):
+                TRACE_LEVEL = int(arg[4:])
             elif arg == "-cg":
                 USE_CG = True
                 if not SUCCEEDED_IMPORTING_CG:
