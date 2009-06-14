@@ -94,7 +94,7 @@ public class Controller implements Java2DPainter {
     static final Integer VALUE_NONE = new Integer(0);
     
     static final float VIEWFINDER_OPACITY = .3f;
-    static final float VIEWPORT_OPACITY = .2f;
+    static final float VIEWPORT_OPACITY = .3f;
     
     File SCENE_FILE, SCENE_FILE_DIR;
     
@@ -160,7 +160,7 @@ public class Controller implements Java2DPainter {
         short vt = (opengl) ? View.OPENGL_VIEW : View.STD_VIEW;
         cView = vsm.addExternalView(cameras, CONTROL_VIEW_TITLE, vt,
             DEFAULT_VIEW_WIDTH, Math.round(DEFAULT_VIEW_WIDTH * wc.getSize().height/((float)wc.getSize().width)),
-            false, true);
+            false, true, true, null);
         cView.setBackgroundColor(Color.WHITE);
         ceh = new ControllerEventHandler(this);
         cView.setEventHandler(ceh);
@@ -330,9 +330,6 @@ public class Controller implements Java2DPainter {
     /* ------------------ Remote Navigation ----------------- */
     
     void updateMetaCam(long[] wnes){
-        if ((wnes[2]-wnes[0]) < wc.size.width || (wnes[1]-wnes[3]) < wc.size.height){
-            return;
-        }
         // update VRect representing overall observed region
         viewFinder.moveTo((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2);
         viewFinder.setWidth((wnes[2]-wnes[0])/2);
@@ -539,8 +536,10 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        application.vsm.getAnimationManager().setXspeed(0);
+        application.vsm.getAnimationManager().setYspeed(0);
+        application.vsm.getAnimationManager().setZspeed(0);
         v.setDrawDrag(false);
-        application.stop();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -551,18 +550,37 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+        v.setDrawDrag(true);
+    }
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        v.setDrawDrag(false);
+        application.stop();
+    }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+        Camera c = application.rCamera;
+        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (buttonNumber == 1){
-            Camera c=application.vsm.getActiveCamera();
-            float a=(c.focal+Math.abs(c.altitude))/c.focal;
+            if (mod == SHIFT_MOD){
+                application.vsm.getAnimationManager().setXspeed(0);
+                application.vsm.getAnimationManager().setYspeed(0);
+                application.vsm.getAnimationManager().setZspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+            }
+            else {
+                application.vsm.getAnimationManager().setXspeed((application.rCamera.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                application.vsm.getAnimationManager().setYspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setZspeed(0);
+            }
+        }
+        else if (buttonNumber == 3){
             if (mod == SHIFT_MOD) {
                 application.firstOrderZoom(lastJPY-jpy);
             }
@@ -605,6 +623,9 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
         	else if (code==KeyEvent.VK_G){application.gcNodes();}
         	else if (code==KeyEvent.VK_I){application.infoNodes();}
         	else if (code==KeyEvent.VK_C){application.consoleNodes();}
+        	else if (code==KeyEvent.VK_P){System.out.println(application.panelWidth+" "+application.panelHeight);}
+        	
+    		
         }
     }
 
@@ -623,7 +644,6 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     public void cameraMoved(Camera cam, LongPoint coord, float a){
         // region seen through camera
         application.cView.getVisibleRegion(application.cCamera, wnes);
-        application.updateMetaCam(wnes);
         float alt = application.cCamera.getAltitude();
         if (alt != oldCameraAltitude){
             // camera was an altitude change
@@ -634,6 +654,9 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
             // camera movement was a simple translation
             application.sm.updateVisibleRegions();
         }
+        if ((wnes[2]-wnes[0]) >= application.wc.size.width && (wnes[1]-wnes[3]) >= application.wc.size.height){
+            application.updateMetaCam(wnes);
+        }            
     }
 
 }
@@ -656,8 +679,10 @@ class OverviewEventHandler implements ViewEventHandler {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        application.vsm.getAnimationManager().setXspeed(0);
+        application.vsm.getAnimationManager().setYspeed(0);
+        application.vsm.getAnimationManager().setZspeed(0);
         v.setDrawDrag(false);
-        application.stop();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -668,9 +693,16 @@ class OverviewEventHandler implements ViewEventHandler {
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX = jpx;
+        lastJPY = jpy;
+        v.setDrawDrag(true);
+    }
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        v.setDrawDrag(false);
+        application.stop();
+    }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -679,9 +711,21 @@ class OverviewEventHandler implements ViewEventHandler {
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+        Camera c = application.rCamera;
+        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (buttonNumber == 1){
-            Camera c=application.vsm.getActiveCamera();
-            float a=(c.focal+Math.abs(c.altitude))/c.focal;
+            if (mod == SHIFT_MOD){
+                application.vsm.getAnimationManager().setYspeed(0);
+                application.vsm.getAnimationManager().setYspeed(0);
+                application.vsm.getAnimationManager().setZspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+            }
+            else {
+                application.vsm.getAnimationManager().setXspeed((application.rCamera.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                application.vsm.getAnimationManager().setYspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setZspeed(0);
+            }
+        }
+        else if (buttonNumber == 3){
             if (mod == SHIFT_MOD) {
                 application.firstOrderZoom(lastJPY-jpy);
             }
