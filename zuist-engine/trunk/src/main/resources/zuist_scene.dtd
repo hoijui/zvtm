@@ -1,6 +1,7 @@
 <!-- $Id$ -->
 
 <!ELEMENT scene (level+,region+,include*)>
+<!ATTLIST scene background CDATA #IMPLIED>
 
 <!ELEMENT level EMPTY>
 <!ATTLIST level depth CDATA #REQUIRED
@@ -43,7 +44,10 @@
                  takesToObject IDREF #IMPLIED
                  takesToRegion IDREF #IMPLIED
                  sensitive (true|false) "true"
-                 anchor (start|middle|end) "middle">
+                 anchor (start|middle|end) "middle"
+				 font-family CDATA #IMPLIED
+				 font-style (plain|bold|italic|boldItalic) "plain"
+				 font-size CDATA #IMPLIED>
 
 <!ELEMENT include EMPTY>
 <!ATTLIST include x CDATA #REQUIRED

@@ -9,12 +9,14 @@ package fr.inria.zuist.engine;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Font;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Enumeration;
 
 import org.w3c.dom.Element;
@@ -47,53 +49,61 @@ import net.claribole.zvtm.engine.Location;
 
 public class SceneManager {
     
-    static final String _none = "none";
-    static final String _level = "level";
-    static final String _region = "region";
-    static final String _object = "object";
-    static final String _id = "id";
-    static final String _title = "title";
-    static final String _containedIn = "containedIn";
-    static final String _image = "image";
-    static final String _type = "type";
-    static final String _text = "text";
-    static final String _rect = "rect";
-    static final String _polygon = "polygon";
-    static final String _include = "include";
-    static final String _x = "x";
-    static final String _y = "y";
-    static final String _w = "w";
-    static final String _h = "h";
-    static final String _points = "points";
-    static final String _fill = "fill";
-    static final String _stroke = "stroke";
-    static final String _scale = "scale";
-    static final String _src = "src";
-    static final String _onClick = "onClick";
-    static final String _focusOnObject = "focusOnObject";
-    static final String _tful = "tful"; // transition from upper level
-    static final String _tfll = "tfll"; // transition from lower level
-    static final String _ttul = "ttul"; // transition to upper level
-    static final String _ttll = "ttll"; // transition to lower level
-    static final String _appear = "appear";
-    static final String _diappear = "disappear";
-    static final String _fadein = "fadein";
-    static final String _fadeout = "fadeout";
-    static final String _levels = "levels";
-    static final String _depth = "depth";
-    static final String _ceiling = "ceiling";
-    static final String _floor = "floor";
-    static final String _ro = "ro";
-    static final String _takesToR = "takesToRegion";
-    static final String _takesToO = "takesToObject";
-    static final String _sensitive = "sensitive";
-    static final String _anchor = "anchor";
-    static final String _layer = "layer";
-    static final String _zindex = "z-index";
-    static final String _interpolation = "interpolation";
-    static final String _nearestNeighbor = "nearestNeighbor";
-    static final String _bilinear = "bilinear";
-    static final String _bicubic = "bicubic";
+    public static final String _none = "none";
+    public static final String _level = "level";
+    public static final String _region = "region";
+    public static final String _object = "object";
+    public static final String _id = "id";
+    public static final String _title = "title";
+    public static final String _containedIn = "containedIn";
+    public static final String _image = "image";
+    public static final String _type = "type";
+    public static final String _text = "text";
+    public static final String _rect = "rect";
+    public static final String _polygon = "polygon";
+    public static final String _include = "include";
+    public static final String _x = "x";
+    public static final String _y = "y";
+    public static final String _w = "w";
+    public static final String _h = "h";
+    public static final String _points = "points";
+    public static final String _fill = "fill";
+    public static final String _stroke = "stroke";
+    public static final String _background = "background";
+    public static final String _scale = "scale";
+    public static final String _src = "src";
+    public static final String _onClick = "onClick";
+    public static final String _focusOnObject = "focusOnObject";
+    public static final String _tful = "tful"; // transition from upper level
+    public static final String _tfll = "tfll"; // transition from lower level
+    public static final String _ttul = "ttul"; // transition to upper level
+    public static final String _ttll = "ttll"; // transition to lower level
+    public static final String _appear = "appear";
+    public static final String _diappear = "disappear";
+    public static final String _fadein = "fadein";
+    public static final String _fadeout = "fadeout";
+    public static final String _levels = "levels";
+    public static final String _depth = "depth";
+    public static final String _ceiling = "ceiling";
+    public static final String _floor = "floor";
+    public static final String _ro = "ro";
+    public static final String _takesToR = "takesToRegion";
+    public static final String _takesToO = "takesToObject";
+    public static final String _sensitive = "sensitive";
+    public static final String _anchor = "anchor";
+    public static final String _layer = "layer";
+    public static final String _zindex = "z-index";
+    public static final String _interpolation = "interpolation";
+    public static final String _nearestNeighbor = "nearestNeighbor";
+    public static final String _bilinear = "bilinear";
+    public static final String _bicubic = "bicubic";
+    public static final String _fontFamily = "font-family";
+    public static final String _fontStyle = "font-style";
+    public static final String _fontSize = "font-size";
+    public static final String _plain = "plain";
+    public static final String _italic = "italic";
+    public static final String _bold = "bold";
+    public static final String _boldItalic = "boldItalic";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -116,6 +126,8 @@ public class SceneManager {
 
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
     LongPoint origin = new LongPoint(0, 0);
+    
+    HashMap sceneAttrs;
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vss virtual spaces in which the scene will be loaded
@@ -128,6 +140,7 @@ public class SceneManager {
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
         id2object = new Hashtable();
+        sceneAttrs = new HashMap();
     }
     
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
@@ -138,6 +151,13 @@ public class SceneManager {
     /** Is set to something else than 0,0 when translating a scene to another location than that defined originally. */
     public LongPoint getOrigin(){
         return origin;
+    }
+    
+    /**
+        *@return the actual hashmap used internally to store scene attributes.
+        */
+    public HashMap getSceneAttributes(){
+        return sceneAttrs;
     }
 
     /** Set the array containing information about the bounds of the region of virtual space seen through the camera observing the scene.
@@ -243,6 +263,7 @@ public class SceneManager {
 	public void reset(){
 		id2region.clear();
 		id2object.clear();
+		sceneAttrs.clear();
 	}
 
     /** Load a multi-scale scene configuration described in an XML document.
@@ -264,6 +285,8 @@ public class SceneManager {
 		    reset();
 	    }
         Element root = scene.getDocumentElement();
+        // scene attributes
+        processSceneAttributes(root);
         NodeList nl = root.getChildNodes();
         Node n;
         Element e;
@@ -342,6 +365,15 @@ public class SceneManager {
             pl.setValue(100);
         }
         return (Region[])regions.toArray(new Region[regions.size()]);
+    }
+    
+    void processSceneAttributes(Element sceneEL){
+        if (sceneEL.hasAttribute(_background)){
+            Color bkg = SVGReader.getColor(sceneEL.getAttribute(_background));
+            if (bkg != null){
+                sceneAttrs.put(_background, bkg);
+            }
+        }
     }
     
     public Level createLevel(int depth, float calt, float falt){
@@ -614,7 +646,7 @@ public class SceneManager {
         }
         return res;
     }
-
+    
     /** Process XML description of a text object. */
     TextDescription processText(Element objectEL, String id, int zindex, Region region){
         long x = Long.parseLong(objectEL.getAttribute(_x));
@@ -622,18 +654,46 @@ public class SceneManager {
         float scale = Float.parseFloat(objectEL.getAttribute(_scale));
         String text = objectEL.getFirstChild().getNodeValue();
         Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
+        String ff = (objectEL.hasAttribute(_fontFamily)) ? objectEL.getAttribute(_fontFamily) : null;
+        int fst = (objectEL.hasAttribute(_fontStyle)) ? getFontStyle(objectEL.getAttribute(_fontStyle)) : Font.PLAIN;
+        int fsz = (objectEL.hasAttribute(_fontSize)) ? Integer.parseInt(objectEL.getAttribute(_fontSize)) : 12;        
         boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
         short anchor = (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
-        TextDescription od = createTextDescription(x+origin.x, y+origin.y, id, zindex, region, scale, text, anchor, fill, sensitivity);
+        TextDescription od = createTextDescription(x+origin.x, y+origin.y, id, zindex, region, scale, text,
+                                                   anchor, fill,
+                                                   ff, fst, fsz,
+                                                   sensitivity);
         return od;
+    }
+    
+    public static int getFontStyle(String style){
+        if (style.equals(_italic)){
+            return Font.ITALIC;
+        }
+        else if (style.equals(_bold)){
+            return Font.BOLD;
+        }
+        else if (style.equals(_boldItalic)){
+            return Font.BOLD + Font.ITALIC;
+        }
+        else {
+            return Font.PLAIN;
+        }
     }
     
     /** Creates a text object and adds it to a region.
      *
      */
     public TextDescription createTextDescription(long x, long y, String id, int zindex, Region region, float scale, String text,
-                                                 short anchor, Color fill, boolean sensitivity){
-        TextDescription td = new TextDescription(id, x, y, zindex, scale, text, (fill != null) ? fill : Color.BLACK, anchor, region);
+                                                 short anchor, Color fill, 
+                                                 String family, int style, int size,
+                                                 boolean sensitivity){
+        TextDescription td = new TextDescription(id, x, y, zindex, scale, text,
+                                                 (fill != null) ? fill : Color.BLACK,
+                                                 anchor, region);
+        if (family != null){
+            td.setFont(SVGReader.getFont(family, style, size));
+        }
         td.setSensitive(sensitivity);
         region.addObject(td);
         return td;

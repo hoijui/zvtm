@@ -39,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
 import java.util.Vector;
+import java.util.HashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -327,6 +328,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    HashMap sceneAttributes = sm.getSceneAttributes();
+	    if (sceneAttributes.containsKey(SceneManager._background)){
+	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+	    }
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
