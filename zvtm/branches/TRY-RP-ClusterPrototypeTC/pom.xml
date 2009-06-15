@@ -30,6 +30,7 @@ $Id$
     <!-- cluster apps properties -->
     <slaveWidth>600</slaveWidth>
     <slaveHeight>400</slaveHeight>
+	<slaveNum>0</slaveNum>
   </properties>
   
   <!-- Repositories -->
@@ -170,74 +171,12 @@ $Id$
 		  arguments="">
 		  </process> -->
 
-		  <process nodeName="slave0" count="1"
+		  <process nodeName="slave" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b 0" 
+		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b ${slaveNum}" 
 		  vmargs="-Dsun.java2d.opengl=True">
 		  </process>
-		  <process nodeName="slave1" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b 1"
-		  vmargs="-Dsun.java2d.opengl=True">
-		  </process>
-		  <process nodeName="slave2" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b 2"
-		  vmargs="-Dsun.java2d.opengl=True">
-		  </process>
-		<!--  <process nodeName="slave3" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 3">
-		  </process>
-		  <process nodeName="slave4" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 4">
-		  </process>
-		  <process nodeName="slave5" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 5">
-		  </process>
-		  <process nodeName="slave6" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 6">
-		  </process>
-		  <process nodeName="slave7" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 7">
-		  </process>
-		  <process nodeName="slave8" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 8">
-		  </process>
-		  <process nodeName="slave9" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 9">
-		  </process>
-		  <process nodeName="slave10" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 10">
-		  </process>
-		  <process nodeName="slave11" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 11">
-		  </process>
-		  <process nodeName="slave12" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 12">
-		  </process>
-		  <process nodeName="slave13" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 13">
-		  </process>
-		  <process nodeName="slave14" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 14">
-		  </process>
-		  <process nodeName="slave15" count="1"
-		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b 15">
-		  </process> -->
-
+		
 		  </processes>
 		  <startServer>true</startServer>
 		  </configuration>
