@@ -50,15 +50,15 @@ public class WallConfiguration {
     
     Dimension size;
     
-    public WallConfiguration(File configFile){
-        parseConfig(configFile);
+    public WallConfiguration(File configFile, boolean bezels){
+        parseConfig(configFile, bezels);
     }
     
     public ClusterNode[] getNodes(){
         return nodes;
     }
     
-    void parseConfig(File f){
+    void parseConfig(File f, boolean bezels){
         Element root = parseXML(f).getDocumentElement();
         nbCols = Integer.parseInt(root.getAttribute(_cols));
         nbRows = Integer.parseInt(root.getAttribute(_rows));
@@ -76,10 +76,10 @@ public class WallConfiguration {
             }
         }
         nodes = (ClusterNode[])cnv.toArray(new ClusterNode[cnv.size()]);
-        computeDimensions();
+        computeDimensions(bezels);
     }
     
-    void computeDimensions(){
+    void computeDimensions(boolean bezels){
         int[] wnes = {0, 0, 0, 0};
         ViewPort v;
         int k;
@@ -99,16 +99,37 @@ public class WallConfiguration {
                 k = v.getY()-v.getH()/2-v.getBH();
                 if (k < wnes[3]){wnes[3] = k;}
             }
-        }            
+        }
         size = new Dimension(wnes[2]-wnes[0], wnes[1]-wnes[3]);
-        for (int i=0;i<nodes.length;i++){
-            for (int j=0;j<nodes[i].viewports.length;j++){
-                double[] dwnes = {1/(double)nbCols * nodes[i].viewports[j].getColumn(),
-                    1/(double)nbRows * (nodes[i].viewports[j].getRow()+1),
-                    1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1),
-                    1/(double)nbRows * nodes[i].viewports[j].getRow()
-                };
-                nodes[i].viewports[j].setRelativeBounds(dwnes);
+        if (bezels){
+            // bezel horizontal thickness
+            double bht = nodes[0].viewports[0].getBW() / ((double)size.width);
+            // bezel vertical thickness
+            double bvt = nodes[0].viewports[0].getBH() / ((double)size.height);
+            for (int i=0;i<nodes.length;i++){
+                for (int j=0;j<nodes[i].viewports.length;j++){
+                    double[] dwnes = {(nodes[i].viewports[j].getColumn() == 0) ? 1/(double)nbCols * nodes[i].viewports[j].getColumn() : 1/(double)nbCols * nodes[i].viewports[j].getColumn() + bht,
+                        (nodes[i].viewports[j].getRow() == 0) ? 1/(double)nbRows * (nodes[i].viewports[j].getRow()) : 1/(double)nbRows * (nodes[i].viewports[j].getRow()) + bvt,
+                        (nodes[i].viewports[j].getColumn() == nbCols-1) ? 1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1) : 1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1) - bht,
+                        (nodes[i].viewports[j].getRow() == nbRows-1) ? 1/(double)nbRows * (nodes[i].viewports[j].getRow()+1) : 1/(double)nbRows * (nodes[i].viewports[j].getRow()+1) - bvt
+                    };
+                    
+                    System.out.println(nodes[i].viewports[j].getColumn()+" "+nodes[i].viewports[j].getRow());
+                    System.out.println(dwnes[0]+" "+dwnes[1]+" "+dwnes[2]+" "+dwnes[3]);
+                    nodes[i].viewports[j].setRelativeBounds(dwnes);
+                }
+            }
+        }
+        else {
+            for (int i=0;i<nodes.length;i++){
+                for (int j=0;j<nodes[i].viewports.length;j++){
+                    double[] dwnes = {1/(double)nbCols * nodes[i].viewports[j].getColumn(),
+                        1/(double)nbRows * (nodes[i].viewports[j].getRow()+1),
+                        1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1),
+                        1/(double)nbRows * nodes[i].viewports[j].getRow()
+                    };
+                    nodes[i].viewports[j].setRelativeBounds(dwnes);
+                }
             }
         }
     }
