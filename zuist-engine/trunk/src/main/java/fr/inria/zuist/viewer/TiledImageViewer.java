@@ -43,6 +43,7 @@ import javax.swing.JFrame;
 import javax.swing.ImageIcon;
 
 import java.util.Vector;
+import java.util.HashMap;
 
 import java.io.File;
 
@@ -258,6 +259,10 @@ public class TiledImageViewer {
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    HashMap sceneAttributes = sm.getSceneAttributes();
+	    if (sceneAttributes.containsKey(SceneManager._background)){
+	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+	    }
 	    gp.setVisible(false);
 	    gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
