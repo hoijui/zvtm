@@ -77,8 +77,8 @@ public class MetaCamera {
 			long newX = posX + col*blockWidth;
 			long newY = posY - row*blockHeight;
 			if(bezelEnabled){
-				newX += (col*bezelWidth);	
-				newY -= (row*bezelHeight);
+				newX += (2*col*bezelWidth);	
+				newY -= (2*row*bezelHeight);
 			}
 
 			cameras[i].moveTo(newX,
