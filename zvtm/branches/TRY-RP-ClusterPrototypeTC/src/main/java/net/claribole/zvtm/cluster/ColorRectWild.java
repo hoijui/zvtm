@@ -56,7 +56,7 @@ public class ColorRectWild {
 		vsm = VirtualSpaceManager.getInstance();
 		VirtualSpace vs = vsm.addVirtualSpace("protoSpace");
 		//create metacamera
-		MetaCamera metacam = new MetaCamera(3,2,600,400,vs);
+		MetaCamera metacam = new MetaCamera(4,4,2560,1600,vs);
 		vs.setMetaCamera(metacam);
 		long xOffset = -options.width/2;
 		long yOffset = -options.height/2;
