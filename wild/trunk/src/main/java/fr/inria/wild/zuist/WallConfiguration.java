@@ -113,9 +113,6 @@ public class WallConfiguration {
                         (nodes[i].viewports[j].getColumn() == nbCols-1) ? 1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1) : 1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1) - bht,
                         (nodes[i].viewports[j].getRow() == nbRows-1) ? 1/(double)nbRows * (nodes[i].viewports[j].getRow()+1) : 1/(double)nbRows * (nodes[i].viewports[j].getRow()+1) - bvt
                     };
-                    
-                    System.out.println(nodes[i].viewports[j].getColumn()+" "+nodes[i].viewports[j].getRow());
-                    System.out.println(dwnes[0]+" "+dwnes[1]+" "+dwnes[2]+" "+dwnes[3]);
                     nodes[i].viewports[j].setRelativeBounds(dwnes);
                 }
             }
@@ -124,9 +121,9 @@ public class WallConfiguration {
             for (int i=0;i<nodes.length;i++){
                 for (int j=0;j<nodes[i].viewports.length;j++){
                     double[] dwnes = {1/(double)nbCols * nodes[i].viewports[j].getColumn(),
-                        1/(double)nbRows * (nodes[i].viewports[j].getRow()+1),
+                        1/(double)nbRows * (nodes[i].viewports[j].getRow()),
                         1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1),
-                        1/(double)nbRows * nodes[i].viewports[j].getRow()
+                        1/(double)nbRows * (nodes[i].viewports[j].getRow()+1)
                     };
                     nodes[i].viewports[j].setRelativeBounds(dwnes);
                 }

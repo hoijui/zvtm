@@ -134,7 +134,7 @@ public class Controller implements Java2DPainter {
     CTGlassPane gp;
         
     public Controller(File configFile, File zuistFile, int OSCin, boolean opengl, boolean antialiased){
-        wc = new WallConfiguration(configFile, true);
+        wc = new WallConfiguration(configFile, bezels);
         System.out.println("Wall size: "+wc.getSize().width+" x "+wc.getSize().height);
         initGUI(opengl, antialiased);
         initOSC(OSCin);
@@ -242,7 +242,7 @@ public class Controller implements Java2DPainter {
     void initViewFinders(){
         // viewfinders
         viewFinder = new VRectangle(0, 0, 0, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
-        vsm.addGlyph(viewFinder, rSpace);
+        //vsm.addGlyph(viewFinder, rSpace);
         viewportFinders = new VRectangle[viewports.length];
         for (int i=0;i<viewportFinders.length;i++){
             viewportFinders[i] = new VRectangle(0, 0, 0, 10, 10, Color.RED, Color.RED, VIEWPORT_OPACITY);
@@ -274,6 +274,14 @@ public class Controller implements Java2DPainter {
         sm.updateLevel(cCamera.altitude);
         ceh.cameraMoved(null, null, 0);
 	}
+    
+    boolean bezels = false;
+    
+    void toggleBezels(){
+        bezels = ! bezels;
+        wc.computeDimensions(bezels);
+        ceh.cameraMoved(null, null, 0);
+    }
     
     /* ------------------ Local Navigation ----------------- */
 
@@ -627,8 +635,7 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
         	else if (code==KeyEvent.VK_I){application.infoNodes();}
         	else if (code==KeyEvent.VK_C){application.consoleNodes();}
         	else if (code==KeyEvent.VK_P){System.out.println(application.panelWidth+" "+application.panelHeight);}
-        	
-    		
+        	else if (code==KeyEvent.VK_B){application.toggleBezels();}
         }
     }
 
@@ -759,6 +766,7 @@ class OverviewEventHandler implements ViewEventHandler {
         	else if (code==KeyEvent.VK_G){application.gcNodes();}
         	else if (code==KeyEvent.VK_I){application.infoNodes();}
         	else if (code==KeyEvent.VK_C){application.consoleNodes();}
+        	else if (code==KeyEvent.VK_B){application.toggleBezels();}
         }
     }
 
