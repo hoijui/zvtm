@@ -4,7 +4,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.terracotta.org/schema/terracotta-4.xsd">
   <servers>
-	  <server host="127.0.0.1" name="server1">
+	  <server host="192.168.0.69" name="server1">
       <dso-port>9510</dso-port>
       <jmx-port>9520</jmx-port>
       <data>target/terracotta/server/data</data>
