@@ -219,6 +219,7 @@ def processSrcImg():
     outputroot = ET.Element("scene")
     # source image
     log("Loading source image from %s" % SRC_PATH, 2)
+    deleteTmpFile = False
     if USE_CG:
         if SRC_PATH.lower().endswith(".pdf"):
             IMG_SRC_PATH = "%s.png" % SRC_PATH
@@ -233,6 +234,7 @@ def processSrcImg():
             # draw the PDF page on it
             bitmap.drawPDFDocument(page_rect, pdf_document, 1)
             bitmap.writeToFile(IMG_SRC_PATH, kCGImageFormatPNG)
+            deleteTmpFile = True
         else:
             IMG_SRC_PATH = SRC_PATH
         im = CGImageImport(CGDataProviderCreateWithFilename(IMG_SRC_PATH))
@@ -250,6 +252,9 @@ def processSrcImg():
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
     tree.write(outputSceneFile, encoding='utf-8')
+    if deleteTmpFile:
+        log("Deleting temp file %s" % IMG_SRC_PATH)
+        os.remove(IMG_SRC_PATH)
 
 ################################################################################
 # Trace exec on std output
@@ -289,6 +294,8 @@ if len(sys.argv) > 2:
                 DX = int(arg[len("-dx="):])
             elif arg.startswith("-dy"):
                 DY = int(arg[len("-dy="):])
+            elif arg.startswith("-scale"):
+                PDF_SCALE_FACTOR = int(arg[len("-scale="):])
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
