@@ -361,11 +361,17 @@ public class Controller implements Java2DPainter {
     }
     
     void firstOrderTranslate(int x, int y){
-        sendToAll(CMD_TRANSLATION_SPEED, new Integer(x), new Integer(y));
+        float a = (rCamera.focal+Math.abs(rCamera.altitude)) / rCamera.focal;
+        vsm.getAnimationManager().setXspeed((rCamera.altitude>0) ? (long)(x*(a/50.0f)) : (long)(x/(a*50)));
+        vsm.getAnimationManager().setYspeed((rCamera.altitude>0) ? (long)(y*(a/50.0f)) : (long)(y/(a*50)));
+        vsm.getAnimationManager().setZspeed(0);
     }
     
     void firstOrderZoom(int z){
-        sendToAll(CMD_ZOOM_SPEED, new Integer(z), VALUE_NONE);
+        float a = (rCamera.focal+Math.abs(rCamera.altitude)) / rCamera.focal;
+        vsm.getAnimationManager().setXspeed(0);
+        vsm.getAnimationManager().setYspeed(0);
+        vsm.getAnimationManager().setZspeed((rCamera.altitude>0) ? (long)(z*(a/50.0f)) : (long)(z/(a*50)));
     }
     
     void stop(){
@@ -380,15 +386,15 @@ public class Controller implements Java2DPainter {
         String cmd = (String)params[0];
         if (cmd.equals(IN_CMD_PAN)){
             firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
-            System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
+            //System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
         }
         else if (cmd.equals(IN_CMD_ZOOM)){
-            System.out.println("zoom "+((Integer)params[1]).intValue());
             firstOrderZoom(((Integer)params[1]).intValue());
+            //System.out.println("zoom "+((Integer)params[1]).intValue());
         }
         else if (cmd.equals(IN_CMD_STOP)){
-            System.out.println("stop ");
             stop();
+            //System.out.println("stop ");
         }
     }
 
@@ -566,22 +572,8 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        Camera c = application.rCamera;
-        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (buttonNumber == 1){
             if (mod == SHIFT_MOD){
-                application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-            }
-            else {
-                application.vsm.getAnimationManager().setXspeed((application.rCamera.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.vsm.getAnimationManager().setYspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-                application.vsm.getAnimationManager().setZspeed(0);
-            }
-        }
-        else if (buttonNumber == 3){
-            if (mod == SHIFT_MOD) {
                 application.firstOrderZoom(lastJPY-jpy);
             }
             else {
@@ -654,9 +646,10 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
             // camera movement was a simple translation
             application.sm.updateVisibleRegions();
         }
-        if ((wnes[2]-wnes[0]) >= application.wc.size.width && (wnes[1]-wnes[3]) >= application.wc.size.height){
+        //if ((wnes[2]-wnes[0]) >= application.wc.size.width && (wnes[1]-wnes[3]) >= application.wc.size.height){
+            // disabled test would prevent commands from being sent when zooming beyond max res limit
             application.updateMetaCam(wnes);
-        }            
+        //}            
     }
 
 }
@@ -711,22 +704,8 @@ class OverviewEventHandler implements ViewEventHandler {
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        Camera c = application.rCamera;
-        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (buttonNumber == 1){
             if (mod == SHIFT_MOD){
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-            }
-            else {
-                application.vsm.getAnimationManager().setXspeed((application.rCamera.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.vsm.getAnimationManager().setYspeed((application.rCamera.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-                application.vsm.getAnimationManager().setZspeed(0);
-            }
-        }
-        else if (buttonNumber == 3){
-            if (mod == SHIFT_MOD) {
                 application.firstOrderZoom(lastJPY-jpy);
             }
             else {
