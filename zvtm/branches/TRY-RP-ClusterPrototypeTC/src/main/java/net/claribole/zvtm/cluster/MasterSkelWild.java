@@ -49,7 +49,8 @@ public class MasterSkelWild {
 		segment.setStrokeWidth(150);
 		Glyph circle = new VCircle(1000, 3000, 0, 900, Color.RED);
 		circle.setStrokeWidth(80);
-		//Glyph text = ;
+		VText text = new VText(500,300,0,Color.RED, "No loitering");
+		text.setScale(40f);
 		//Glyph otherText = ;	
 		Glyph polygon = new VPolygon(new LongPoint[]{new LongPoint(-1000, 0),
 new LongPoint(0, 1000), new LongPoint(1000, 0)},0,Color.BLACK);
@@ -58,7 +59,7 @@ new LongPoint(0, 1000), new LongPoint(1000, 0)},0,Color.BLACK);
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(segment, vs);
 		vsm.addGlyph(circle, vs);
-		//vsm.addGlyph(text, vs);
+		vsm.addGlyph(text, vs);
 		//vsm.addGlyph(otherText, vs);
 		vsm.addGlyph(polygon, vs);
 
