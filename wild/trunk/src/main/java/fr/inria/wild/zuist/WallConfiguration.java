@@ -109,9 +109,9 @@ public class WallConfiguration {
             for (int i=0;i<nodes.length;i++){
                 for (int j=0;j<nodes[i].viewports.length;j++){
                     double[] dwnes = {(nodes[i].viewports[j].getColumn() == 0) ? 1/(double)nbCols * nodes[i].viewports[j].getColumn() : 1/(double)nbCols * nodes[i].viewports[j].getColumn() + bht,
-                        (nodes[i].viewports[j].getRow() == 0) ? 1/(double)nbRows * (nodes[i].viewports[j].getRow()) : 1/(double)nbRows * (nodes[i].viewports[j].getRow()) + bvt,
+                        (nodes[i].viewports[j].getRow() == nbRows-1) ? 1/(double)nbRows * (nbRows-nodes[i].viewports[j].getRow()-1) : 1/(double)nbRows * (nbRows-nodes[i].viewports[j].getRow()-1) + bvt,
                         (nodes[i].viewports[j].getColumn() == nbCols-1) ? 1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1) : 1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1) - bht,
-                        (nodes[i].viewports[j].getRow() == nbRows-1) ? 1/(double)nbRows * (nodes[i].viewports[j].getRow()+1) : 1/(double)nbRows * (nodes[i].viewports[j].getRow()+1) - bvt
+                        (nodes[i].viewports[j].getRow() == 0) ? 1/(double)nbRows * (nbRows-nodes[i].viewports[j].getRow()) : 1/(double)nbRows * (nbRows-nodes[i].viewports[j].getRow()) - bvt
                     };
                     nodes[i].viewports[j].setRelativeBounds(dwnes);
                 }
@@ -121,9 +121,9 @@ public class WallConfiguration {
             for (int i=0;i<nodes.length;i++){
                 for (int j=0;j<nodes[i].viewports.length;j++){
                     double[] dwnes = {1/(double)nbCols * nodes[i].viewports[j].getColumn(),
-                        1/(double)nbRows * (nodes[i].viewports[j].getRow()),
+                        1/(double)nbRows * (nbRows-nodes[i].viewports[j].getRow()-1),
                         1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1),
-                        1/(double)nbRows * (nodes[i].viewports[j].getRow()+1)
+                        1/(double)nbRows * (nbRows-nodes[i].viewports[j].getRow())
                     };
                     nodes[i].viewports[j].setRelativeBounds(dwnes);
                 }
