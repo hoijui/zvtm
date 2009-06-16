@@ -30,7 +30,7 @@ public class ViewPort {
     
     ClusterNode node;
     
-    double[] wnes = new double[4];
+    double[] wnes = {0, 0, 0, 0};
     
     public ViewPort(int dx, int dy, int w, int h, int bw, int bh, int col, int row, short device, int port, ClusterNode cn){
         this.dx = dx;
@@ -46,11 +46,8 @@ public class ViewPort {
         this.node = cn;
     }
     
-    void computeRelativeBounds(double nbCols, double nbRows){
-        wnes[0] = nbCols * col;
-        wnes[2] = nbCols * (col+1);
-        wnes[1] = nbRows * (row+1);
-        wnes[3] = nbRows * row;
+    void setRelativeBounds(double[] wnes){
+        this.wnes = wnes;
     }
     
     public ClusterNode getNode(){

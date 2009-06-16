@@ -35,6 +35,7 @@ import javax.swing.JLayeredPane;
 import java.awt.Container;
 
 import java.util.Vector;
+import java.util.HashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -217,6 +218,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		console.setMargin(new Insets(consolePaddingWNES[1], consolePaddingWNES[0], consolePaddingWNES[3], consolePaddingWNES[2]));
 		lp.add(console, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
 		updateConsoleBounds();
+		console.setVisible(false);
 	}
 	
 	void updateConsoleBounds(){
@@ -251,6 +253,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    HashMap sceneAttributes = sm.getSceneAttributes();
+	    if (sceneAttributes.containsKey(SceneManager._background)){
+	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+	    }
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
@@ -504,6 +510,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     static final int REQ_QUEUE_BAR_WIDTH = 100;
     static final int REQ_QUEUE_BAR_HEIGHT = 6;
     
+    static final Font INFO_FONT = new Font("Dialog", Font.PLAIN, 10);
+    
     void showReqQueueStatus(Graphics2D g2d, int viewWidth, int viewHeight){
         float ratio = sm.getPendingRequestQueueSize()/(MAX_NB_REQUESTS);
         if (ratio > 1.0f){
@@ -532,6 +540,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!SHOW_MISC_INFO){return;}
+        g2d.setFont(INFO_FONT);
 		g2d.setComposite(acST);
 		showMemoryUsage(g2d, viewWidth, viewHeight);
 		showReqQueueStatus(g2d, viewWidth, viewHeight);

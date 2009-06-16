@@ -103,7 +103,12 @@ public class WallConfiguration {
         size = new Dimension(wnes[2]-wnes[0], wnes[1]-wnes[3]);
         for (int i=0;i<nodes.length;i++){
             for (int j=0;j<nodes[i].viewports.length;j++){
-                nodes[i].viewports[j].computeRelativeBounds(1/(double)nbCols, 1/(double)nbRows);
+                double[] dwnes = {1/(double)nbCols * nodes[i].viewports[j].getColumn(),
+                    1/(double)nbRows * (nodes[i].viewports[j].getRow()+1),
+                    1/(double)nbCols * (nodes[i].viewports[j].getColumn()+1),
+                    1/(double)nbRows * nodes[i].viewports[j].getRow()
+                };
+                nodes[i].viewports[j].setRelativeBounds(dwnes);
             }
         }
     }

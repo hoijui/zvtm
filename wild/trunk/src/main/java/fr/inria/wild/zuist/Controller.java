@@ -28,6 +28,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.Dimension;
 
 import java.util.Vector;
+import java.util.HashMap;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -262,6 +263,11 @@ public class Controller implements Java2DPainter {
 		SCENE_FILE = zuistFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    sm.loadScene(Viewer.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    HashMap sceneAttributes = sm.getSceneAttributes();
+	    if (sceneAttributes.containsKey(SceneManager._background)){
+	        cView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+	        oView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+	    }
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         cCamera.setAltitude(0.0f);
@@ -269,8 +275,8 @@ public class Controller implements Java2DPainter {
         ceh.cameraMoved(null, null, 0);
 	}
     
-    /* ------------------ Local Navigation ----------------- */    
-    
+    /* ------------------ Local Navigation ----------------- */
+
     void getGlobalView(Camera c){
         sm.getGlobalView(c, Viewer.ANIM_MOVE_LENGTH);
     }
@@ -306,20 +312,20 @@ public class Controller implements Java2DPainter {
         LongPoint trans;
         long[] rb = cView.getVisibleRegion(cCamera);
         if (direction == Controller.MOVE_NORTH){
-            long qt = Math.round((rb[1]-rb[3])/8.0);
+            long qt = Math.round((rb[1]-rb[3])/4.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_SOUTH){
-            long qt = Math.round((rb[3]-rb[1])/8.0);
+            long qt = Math.round((rb[3]-rb[1])/4.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_EAST){
-            long qt = Math.round((rb[2]-rb[0])/8.0);
+            long qt = Math.round((rb[2]-rb[0])/4.0);
             trans = new LongPoint(qt,0);
         }
         else {
             // direction == Controller.MOVE_WEST
-            long qt = Math.round((rb[0]-rb[2])/8.0);
+            long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, cCamera,
@@ -329,7 +335,13 @@ public class Controller implements Java2DPainter {
     
     /* ------------------ Remote Navigation ----------------- */
     
-    void updateMetaCam(long[] wnes){
+    boolean isBeyondLimit = false;
+    
+    void setBeyondLimit(boolean b){
+        isBeyondLimit = b;
+    }
+    
+    void updateCameraGroup(long[] wnes){
         // update VRect representing overall observed region
         viewFinder.moveTo((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2);
         viewFinder.setWidth((wnes[2]-wnes[0])/2);
@@ -361,14 +373,14 @@ public class Controller implements Java2DPainter {
     }
     
     void firstOrderTranslate(int x, int y){
-        float a = (rCamera.focal+Math.abs(rCamera.altitude)) / rCamera.focal;
+        float a = (cCamera.focal+Math.abs(cCamera.altitude)) / cCamera.focal;
         vsm.getAnimationManager().setXspeed((rCamera.altitude>0) ? (long)(x*(a/50.0f)) : (long)(x/(a*50)));
         vsm.getAnimationManager().setYspeed((rCamera.altitude>0) ? (long)(y*(a/50.0f)) : (long)(y/(a*50)));
         vsm.getAnimationManager().setZspeed(0);
     }
     
     void firstOrderZoom(int z){
-        float a = (rCamera.focal+Math.abs(rCamera.altitude)) / rCamera.focal;
+        float a = (cCamera.focal+Math.abs(cCamera.altitude)) / cCamera.focal;
         vsm.getAnimationManager().setXspeed(0);
         vsm.getAnimationManager().setYspeed(0);
         vsm.getAnimationManager().setZspeed((rCamera.altitude>0) ? (long)(z*(a/50.0f)) : (long)(z/(a*50)));
@@ -459,7 +471,6 @@ public class Controller implements Java2DPainter {
         g2d.setColor(Color.BLACK);
         g2d.setFont(OVERLAY_FONT);
         g2d.drawString(mCoordsStr, 10, 20);
-        oView.repaintNow();
     }
     
     /* ------------------ MAIN ----------------- */
@@ -646,10 +657,10 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
             // camera movement was a simple translation
             application.sm.updateVisibleRegions();
         }
-        //if ((wnes[2]-wnes[0]) >= application.wc.size.width && (wnes[1]-wnes[3]) >= application.wc.size.height){
-            // disabled test would prevent commands from being sent when zooming beyond max res limit
-            application.updateMetaCam(wnes);
-        //}            
+        // tests when zooming beyond max res limit (beyond this limit camera positions on cluster nodes are just crazy, have to fix it eventually)
+        application.setBeyondLimit((wnes[2]-wnes[0]) >= application.wc.size.width && (wnes[1]-wnes[3]) >= application.wc.size.height);
+        // update camera group
+        application.updateCameraGroup(wnes);
     }
 
 }
@@ -701,6 +712,7 @@ class OverviewEventHandler implements ViewEventHandler {
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
         application.mCoordsStr = v.getVCursor().vx + ", " + v.getVCursor().vy;
+        application.oView.repaintNow();
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
