@@ -75,6 +75,10 @@ DY = 0
 
 ID_PREFIX = ""
 
+PDF_SCALE_FACTOR = 5
+
+COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB)
+
 ################################################################################
 # Create target directory if it does not exist yet
 ################################################################################
@@ -161,7 +165,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah), 3)
             cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(aw), int(ah)))
             log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
-            bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB), (0,0,0,1))
+            bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), COLOR_SPACE, (0,0,0,1))
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
             rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
             bitmap.drawImage(rect, cim)
@@ -216,7 +220,22 @@ def processSrcImg():
     # source image
     log("Loading source image from %s" % SRC_PATH, 2)
     if USE_CG:
-        im = CGImageImport(CGDataProviderCreateWithFilename(SRC_PATH))
+        if SRC_PATH.lower().endswith(".pdf"):
+            IMG_SRC_PATH = "%s.png" % SRC_PATH
+            log("Generating bitmap from PDF, stored temporarily in %s" % IMG_SRC_PATH)
+            pdf_document = CGPDFDocumentCreateWithProvider(CGDataProviderCreateWithFilename(SRC_PATH))
+            page_rect = pdf_document.getMediaBox(1)
+            page_width = int(page_rect.getWidth() * PDF_SCALE_FACTOR)
+            page_height = int(page_rect.getHeight() * PDF_SCALE_FACTOR)
+            bitmap = CGBitmapContextCreateWithColor(page_width, page_height,\
+                                                    COLOR_SPACE, (1,1,1,1))
+            bitmap.scaleCTM(PDF_SCALE_FACTOR, PDF_SCALE_FACTOR)
+            # draw the PDF page on it
+            bitmap.drawPDFDocument(page_rect, pdf_document, 1)
+            bitmap.writeToFile(IMG_SRC_PATH, kCGImageFormatPNG)
+        else:
+            IMG_SRC_PATH = SRC_PATH
+        im = CGImageImport(CGDataProviderCreateWithFilename(IMG_SRC_PATH))
         src_sz = (im.getWidth(), im.getHeight())
     else:
         im = Image.open(SRC_PATH)
