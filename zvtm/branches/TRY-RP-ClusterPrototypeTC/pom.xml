@@ -173,7 +173,7 @@ $Id$
 
 		  <process nodeName="slave" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-w ${slaveWidth} -h ${slaveHeight} -b ${slaveNum}" 
+		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b ${slaveNum}" 
 		  vmargs="-Dsun.java2d.opengl=True">
 		  </process>
 		
