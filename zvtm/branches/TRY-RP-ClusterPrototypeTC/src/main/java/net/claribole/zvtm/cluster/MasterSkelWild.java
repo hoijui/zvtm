@@ -11,10 +11,12 @@ import net.claribole.zvtm.glyphs.DPath;
 import com.xerox.VTM.glyphs.Glyph;
 import com.xerox.VTM.glyphs.VCircle;
 import com.xerox.VTM.glyphs.VImage;
+import com.xerox.VTM.glyphs.VPolygon;
 import com.xerox.VTM.glyphs.VRectangle;
 import com.xerox.VTM.glyphs.VSegment;
 import com.xerox.VTM.glyphs.VText;
 import com.xerox.VTM.engine.Camera;
+import com.xerox.VTM.engine.LongPoint;
 import com.xerox.VTM.engine.View;
 import com.xerox.VTM.engine.ViewPanel;
 import com.xerox.VTM.engine.VirtualSpace;
@@ -49,14 +51,16 @@ public class MasterSkelWild {
 		circle.setStrokeWidth(80);
 		//Glyph text = ;
 		//Glyph otherText = ;	
-		//Glyph polygon = ;
+		Glyph polygon = new VPolygon(new LongPoint[]{new LongPoint(-1000, 0),
+new LongPoint(0, 1000), new LongPoint(1000, 0)},0,Color.BLACK);
+		polygon.setStrokeWidth(80);
 
 		vsm.addGlyph(rect, vs);
 		vsm.addGlyph(segment, vs);
 		vsm.addGlyph(circle, vs);
 		//vsm.addGlyph(text, vs);
 		//vsm.addGlyph(otherText, vs);
-		//vsm.addGlyph(polygon, vs);
+		vsm.addGlyph(polygon, vs);
 
 		Camera cam = vsm.addCamera(vs);
 		cam.setAltitude(0f);

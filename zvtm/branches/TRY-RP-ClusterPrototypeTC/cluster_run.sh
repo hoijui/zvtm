@@ -18,7 +18,7 @@ do
 		  SLAVENUM1=`expr $? \* 8 + $row - 1`
 		  SLAVENUM2=`expr $SLAVENUM1 + 4`
 		  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wild/romain/zvtm_tc && mvn -DslaveWidth=2560 -DslaveHeight=1600 -DactiveNodes=slave -DslaveNum=$SLAVENUM1 -DstartServer=false tc:run" &
-		  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wild/romain/zvtm_tc && mvn -DslaveWidth=2560 -DslaveHeight=1600 -DactiveNodes=slave -DslaveNum=$SLAVENUM2 -DstartServer=false tc:run" &
+		  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wild/romain/zvtm_tc && mvn -DslaveWidth=2560 -DslaveHeight=1600 -DactiveNodes=slave -DslaveNum=$SLAVENUM2 -DstartServer=false tc:run" &
 
       done
 done

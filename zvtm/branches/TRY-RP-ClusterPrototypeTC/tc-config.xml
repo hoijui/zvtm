@@ -110,6 +110,14 @@
 				</execute>
 			</on-load> 
 		</include>
+	<include>
+			<class-expression>com.xerox.VTM.glyphs.VPolygon</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.ProjPolygon[100];for (int i=0;i<100;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.ProjPolygon();}]]>
+				</execute>
+			</on-load> 
+		</include>
 <include>
 			<class-expression>com.xerox.VTM.glyphs.VRectangle</class-expression>
 			<on-load>
@@ -157,6 +165,7 @@
 		  <field-name>com.xerox.VTM.glyphs.Glyph.vsm</field-name>
 		  <field-name>com.xerox.VTM.glyphs.Glyph.coef</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VCircle.pc</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VPolygon.pc</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VRectangle.pc</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VSegment.pc</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VImage.pc</field-name>
