@@ -37,7 +37,7 @@ public class MasterSkelWild {
 		//create virtualspace "protoSpace"
 		VirtualSpace vs = vsm.addVirtualSpace("protoSpace");
 		//create metacamera
-		MetaCamera metacam = new MetaCamera(4,4,2560,1600,vs);
+		MetaCamera metacam = new MetaCamera(4,4,2560,1600,vs, 96, 120);
 		vs.setMetaCamera(metacam);
 		//signal that the space and metacamera are ready
 		//to unfreeze the slaves

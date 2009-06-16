@@ -21,6 +21,12 @@ public class MetaCamera {
 	private int blockWidth;
 	private int blockHeight;
 
+	private int bezelWidth = 0; //bezel width, in pixels
+	private int bezelHeight = 0; //bezel height, in pixels
+	private boolean bezelEnabled = false; //true if bezels are taken
+	//into account, i.e. image under the bezels is not shown (a circle looks like a 
+	//circle, not like an oval)
+
 	//XXX todo altitude
 
 	//nbX: number of screens (horiz)
@@ -28,15 +34,29 @@ public class MetaCamera {
 	public MetaCamera(int nbX, int nbY, 
 			int blockWidth, int blockHeight,
 			VirtualSpace virtualSpace){
+		this(nbX, nbY, blockWidth, 
+				blockHeight, virtualSpace,
+				0, 0);
+		bezelEnabled = false;
+	}
+
+	public MetaCamera(int nbX, int nbY, 
+			int blockWidth, int blockHeight,
+			VirtualSpace virtualSpace,
+			int bezelWidth, int bezelHeight){
 		assert(nbX > 0);
 		assert(nbY > 0);
 		assert(blockWidth > 0);
 		assert(blockHeight > 0);
+		assert(bezelWidth >= 0);
+		assert(bezelHeight >= 0);
 
 		this.nbX = nbX;
 		this.nbY = nbY;
 		this.blockWidth = blockWidth;
 		this.blockHeight = blockHeight;
+		this.bezelWidth = bezelWidth;
+		bezelEnabled = true;
 
 		cameras = new Camera[nbX*nbY];
 		for(int i=0; i<cameras.length; ++i){
@@ -54,8 +74,15 @@ public class MetaCamera {
 			int row = i % nbY;
 			int col = i / nbY;
 
-			cameras[i].moveTo(posX + col*blockWidth,
-					posY - row*blockHeight);
+			long newX = posX + col*blockWidth;
+			long newY = posY - row*blockHeight;
+			if(bezelEnabled){
+				newX += (col*bezelWidth);	
+				newY -= (row*bezelHeight);
+			}
+
+			cameras[i].moveTo(newX,
+					newY);
 		}
 	}
 
@@ -69,6 +96,10 @@ public class MetaCamera {
 		posX = x;
 		posY = y;
 		setSlaveCoordinates();
+	}
+
+	public void enableBezel(boolean enable){
+		bezelEnabled = enable;
 	}
 
 	public Camera retrieveCamera(int index){
