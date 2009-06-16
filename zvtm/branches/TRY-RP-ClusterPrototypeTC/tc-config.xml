@@ -103,6 +103,14 @@
 			</on-load> 
 		</include>
 		<include>
+			<class-expression>com.xerox.VTM.glyphs.VCircle</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.BProjectedCoordsP[100];for (int i=0;i<100;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.BProjectedCoordsP();}]]>
+				</execute>
+			</on-load> 
+		</include>
+<include>
 			<class-expression>com.xerox.VTM.glyphs.VRectangle</class-expression>
 			<on-load>
 				<execute>
@@ -111,6 +119,14 @@
 			</on-load> 
 		</include>
 		<include>
+			<class-expression>com.xerox.VTM.glyphs.VSegment</class-expression>
+			<on-load>
+				<execute>
+					<![CDATA[self.pc=new net.claribole.zvtm.glyphs.projection.RProjectedCoords[100];for (int i=0;i<100;i++){self.pc[i]=new net.claribole.zvtm.glyphs.projection.RProjectedCoords();}]]>
+				</execute>
+			</on-load> 
+		</include>
+<include>
 			<class-expression>net.claribole.zvtm.glyphs.DPath</class-expression>
 			<on-load>
 				<execute>
@@ -140,7 +156,9 @@
 	  <transient-fields>
 		  <field-name>com.xerox.VTM.glyphs.Glyph.vsm</field-name>
 		  <field-name>com.xerox.VTM.glyphs.Glyph.coef</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VCircle.pc</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VRectangle.pc</field-name>
+		  <field-name>com.xerox.VTM.glyphs.VSegment.pc</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VImage.pc</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VText.at</field-name>
 		  <field-name>com.xerox.VTM.glyphs.VText.pc</field-name>
