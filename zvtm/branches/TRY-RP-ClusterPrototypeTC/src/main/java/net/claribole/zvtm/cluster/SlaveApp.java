@@ -68,8 +68,10 @@ public class SlaveApp {
 		if(slaveOptions.fullscreen){
 			//GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)view.getFrame());
 			JFrame vFrame = (JFrame)view.getFrame();
+			vFrame.dispose();
 			vFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			vFrame.setUndecorated(true); 
+			vFrame.setVisible(true);
 		}
 	}
 
