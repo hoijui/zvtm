@@ -158,14 +158,14 @@ $Id$
 		  <configuration>
 		  <workingDirectory>${project.build.directory}</workingDirectory>
 		  <processes>
-		  <!-- <process nodeName="masterWild" count="1" 
+		  <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.MasterSkelWild"
 		  arguments=""> 
-		  </process> -->
-		  <process nodeName="master" count="1" 
+		  </process> 
+		  <!-- <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.ColorRectWild"
 		  arguments="-w 4000 -h 3000">
-		  </process> 
+	  </process> -->
 		<!--  <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.ImageDemo"
 		  arguments="">
