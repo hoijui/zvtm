@@ -98,7 +98,7 @@ public class MetaCamera {
 		setSlaveCoordinates();
 	}
 
-	public void enableBezel(boolean enable){
+	public synchronized void enableBezel(boolean enable){
 		bezelEnabled = enable;
 	}
 

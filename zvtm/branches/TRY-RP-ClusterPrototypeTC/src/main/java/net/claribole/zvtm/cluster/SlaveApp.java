@@ -6,6 +6,8 @@ import com.xerox.VTM.engine.VirtualSpace;
 import com.xerox.VTM.engine.VirtualSpaceManager;
 
 import java.awt.Color;
+import javax.swing.JFrame;
+import java.awt.GraphicsEnvironment;
 import java.util.Vector;
 
 import org.kohsuke.args4j.Argument;
@@ -25,6 +27,9 @@ class SlaveOptions {
 
 	@Option(name = "-g", aliases = {"--opengl"}, usage = "create OpenGL view (default std view)")
 	boolean opengl = false;
+
+	@Option(name = "-f", aliases = {"--fullscreen"}, usage = "set view in fullscreen")
+	boolean fullscreen = false;
 }
 
 //Generic slave application
@@ -58,6 +63,11 @@ public class SlaveApp {
 				slaveOptions.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 		vcam.get(0).setOwningView(view); 
+
+		//set fullscreen if needed
+		if(slaveOptions.fullscreen){
+			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)view.getFrame());
+		}
 	}
 
 	public static void main(String[] args) throws CmdLineException{
