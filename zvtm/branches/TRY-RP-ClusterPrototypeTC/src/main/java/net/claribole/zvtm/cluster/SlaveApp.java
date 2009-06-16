@@ -66,8 +66,10 @@ public class SlaveApp {
 
 		//set fullscreen if needed
 		if(slaveOptions.fullscreen){
-			System.out.println("slave in fullscreen");
-			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)view.getFrame());
+			//GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)view.getFrame());
+			JFrame vFrame = (JFrame)view.getFrame();
+			vFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			vFrame.setUndecorated(true); 
 		}
 	}
 
