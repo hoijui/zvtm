@@ -42,14 +42,15 @@ BR = 4
 CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     " \timageTyler <src_image_path> <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
+    "\t-cg\t\tprocessing pipeline: CoreGraphics (Mac only)\n"+\
+    "\t-im\t\tprocessing pipeline: PIL and ImageMagick (default)\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
     "\t-f\t\tforce tile generation\n"+\
     "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
     "\t-idprefix=p\tcustom prefix for all region and objects IDs\n"+\
     "\t-dx=y\t\tx offset for all regions and objects\n"+\
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
-    "\t-cg\t\tprocessing pipeline: CoreGraphics (Mac only)\n"+\
-    "\t-im\t\tprocessing pipeline: PIL and ImageMagick (default)\n"
+    "\t-scale=s\t\ts scale factor w.r.t default size for PDF input\n"
 
 TRACE_LEVEL = 1
 
@@ -225,7 +226,7 @@ def processSrcImg():
             IMG_SRC_PATH = "%s.png" % SRC_PATH
             log("Generating bitmap from PDF, stored temporarily in %s" % IMG_SRC_PATH)
             pdf_document = CGPDFDocumentCreateWithProvider(CGDataProviderCreateWithFilename(SRC_PATH))
-            page_rect = pdf_document.getMediaBox(1)
+            page_rect = pdf_document.getPage(1).getBoxRect(1)
             page_width = int(page_rect.getWidth() * PDF_SCALE_FACTOR)
             page_height = int(page_rect.getHeight() * PDF_SCALE_FACTOR)
             bitmap = CGBitmapContextCreateWithColor(page_width, page_height,\
