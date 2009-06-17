@@ -50,15 +50,15 @@ public class WallConfiguration {
     
     Dimension size;
     
-    public WallConfiguration(File configFile, boolean bezels){
-        parseConfig(configFile, bezels);
+    public WallConfiguration(File configFile, boolean pixelsBehindBezels){
+        parseConfig(configFile, pixelsBehindBezels);
     }
     
     public ClusterNode[] getNodes(){
         return nodes;
     }
     
-    void parseConfig(File f, boolean bezels){
+    void parseConfig(File f, boolean pixelsBehindBezels){
         Element root = parseXML(f).getDocumentElement();
         nbCols = Integer.parseInt(root.getAttribute(_cols));
         nbRows = Integer.parseInt(root.getAttribute(_rows));
@@ -76,10 +76,10 @@ public class WallConfiguration {
             }
         }
         nodes = (ClusterNode[])cnv.toArray(new ClusterNode[cnv.size()]);
-        computeDimensions(bezels);
+        computeDimensions(pixelsBehindBezels);
     }
     
-    void computeDimensions(boolean bezels){
+    void computeDimensions(boolean pixelsBehindBezels){
         int[] wnes = {0, 0, 0, 0};
         ViewPort v;
         int k;
@@ -101,7 +101,7 @@ public class WallConfiguration {
             }
         }
         size = new Dimension(wnes[2]-wnes[0], wnes[1]-wnes[3]);
-        if (bezels){
+        if (pixelsBehindBezels){
             // bezel horizontal thickness
             double bht = nodes[0].viewports[0].getBW() / ((double)size.width);
             // bezel vertical thickness

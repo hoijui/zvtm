@@ -70,7 +70,9 @@ public class Controller implements Java2DPainter {
     
     static final String MOVE_CAMERA = "/moveCam";
     static final String MOVE_META_CAMERA = "/moveMCam";
-    
+
+    static final float SPEED_FACTOR = 50f;
+        
     static final short MOVE_WEST = 0;
     static final short MOVE_NORTH = 1;
     static final short MOVE_EAST = 2;
@@ -129,12 +131,15 @@ public class Controller implements Java2DPainter {
     OSCPortIn receiver;
     
     SceneManager sm;
+    
     WallConfiguration wc;
+    boolean pixelsBehindBezels = false;
     
     CTGlassPane gp;
         
-    public Controller(File configFile, File zuistFile, int OSCin, boolean opengl, boolean antialiased){
-        wc = new WallConfiguration(configFile, bezels);
+    public Controller(File configFile, File zuistFile, int OSCin, boolean opengl, boolean antialiased, boolean pbb){
+        this.pixelsBehindBezels = pbb;
+        wc = new WallConfiguration(configFile, pixelsBehindBezels);
         System.out.println("Wall size: "+wc.getSize().width+" x "+wc.getSize().height);
         initGUI(opengl, antialiased);
         initOSC(OSCin);
@@ -275,11 +280,9 @@ public class Controller implements Java2DPainter {
         ceh.cameraMoved(null, null, 0);
 	}
     
-    boolean bezels = false;
-    
-    void toggleBezels(){
-        bezels = ! bezels;
-        wc.computeDimensions(bezels);
+    void togglePixelsBehindBezels(){
+        pixelsBehindBezels = !pixelsBehindBezels;
+        wc.computeDimensions(pixelsBehindBezels);
         ceh.cameraMoved(null, null, 0);
     }
     
@@ -382,8 +385,8 @@ public class Controller implements Java2DPainter {
     
     void firstOrderTranslate(int x, int y){
         float a = (cCamera.focal+Math.abs(cCamera.altitude)) / cCamera.focal;
-        vsm.getAnimationManager().setXspeed((rCamera.altitude>0) ? (long)(x*(a/50.0f)) : (long)(x/(a*50)));
-        vsm.getAnimationManager().setYspeed((rCamera.altitude>0) ? (long)(y*(a/50.0f)) : (long)(y/(a*50)));
+        vsm.getAnimationManager().setXspeed((rCamera.altitude>0) ? (long)(x*(a/SPEED_FACTOR)) : (long)(x/(a*SPEED_FACTOR)));
+        vsm.getAnimationManager().setYspeed((rCamera.altitude>0) ? (long)(y*(a/SPEED_FACTOR)) : (long)(y/(a*SPEED_FACTOR)));
         vsm.getAnimationManager().setZspeed(0);
     }
     
@@ -391,10 +394,13 @@ public class Controller implements Java2DPainter {
         float a = (cCamera.focal+Math.abs(cCamera.altitude)) / cCamera.focal;
         vsm.getAnimationManager().setXspeed(0);
         vsm.getAnimationManager().setYspeed(0);
-        vsm.getAnimationManager().setZspeed((rCamera.altitude>0) ? (long)(z*(a/50.0f)) : (long)(z/(a*50)));
+        vsm.getAnimationManager().setZspeed((rCamera.altitude>0) ? (long)(z*(a/SPEED_FACTOR)) : (long)(z/(a*SPEED_FACTOR)));
     }
     
     void stop(){
+        vsm.getAnimationManager().setXspeed(0);
+        vsm.getAnimationManager().setYspeed(0);
+        vsm.getAnimationManager().setZspeed(0);
         sendToAll(CMD_STOP, VALUE_NONE, VALUE_NONE);
     }
     
@@ -476,9 +482,13 @@ public class Controller implements Java2DPainter {
     String mCoordsStr = "";
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (isBeyondLimit){
+            g2d.setColor(Color.RED);
+            g2d.fillRect(5, 5, 10, 10);
+        }
         g2d.setColor(Color.BLACK);
         g2d.setFont(OVERLAY_FONT);
-        g2d.drawString(mCoordsStr, 10, 20);
+        g2d.drawString(mCoordsStr, 20, 15);
     }
     
     /* ------------------ MAIN ----------------- */
@@ -489,11 +499,13 @@ public class Controller implements Java2DPainter {
         int OSCportIn = DEFAULT_OSC_LISTENING_PORT;
         boolean ogl = false;
         boolean aa = true;
+        boolean pbb = true;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).startsWith("port")){OSCportIn = Integer.parseInt(args[i].substring(6));}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
+				else if (args[i].substring(1).equals("nopbb")){pbb = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Controller.printCmdLineHelp();System.exit(0);}
 				else if (args[i].equals("-c")){
 				    configF = new File(args[++i]);
@@ -526,7 +538,7 @@ public class Controller implements Java2DPainter {
 		System.out.println("Listening for OSC commands from port "+OSCportIn);
 		System.out.println("OpenGL pipeline is "+((ogl) ? "ON" : "OFF"));
 		System.out.println("Antialiasing is "+((aa) ? "ON" : "OFF"));
-        new Controller(configF, zuistF, OSCportIn, ogl, aa);
+        new Controller(configF, zuistF, OSCportIn, ogl, aa, pbb);
     }
     
     private static void printCmdLineHelp(){
@@ -535,6 +547,7 @@ public class Controller implements Java2DPainter {
         System.out.println("\t-port=N: OSC commands listening port");
         System.out.println("\t-noaa: no antialiasing");
         System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
+        System.out.println("\t-nopbb: confugre viewports so that there are no pixels behind bezels (distorts image, but shows all pixels)");
     }
     
 }
@@ -635,7 +648,7 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
         	else if (code==KeyEvent.VK_I){application.infoNodes();}
         	else if (code==KeyEvent.VK_C){application.consoleNodes();}
         	else if (code==KeyEvent.VK_P){System.out.println(application.panelWidth+" "+application.panelHeight);}
-        	else if (code==KeyEvent.VK_B){application.toggleBezels();}
+        	else if (code==KeyEvent.VK_B){application.togglePixelsBehindBezels();}
         }
     }
 
@@ -665,7 +678,7 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
             application.sm.updateVisibleRegions();
         }
         // tests when zooming beyond max res limit (beyond this limit camera positions on cluster nodes are just crazy, have to fix it eventually)
-        application.setBeyondLimit((wnes[2]-wnes[0]) >= application.wc.size.width && (wnes[1]-wnes[3]) >= application.wc.size.height);
+        application.setBeyondLimit((wnes[2]-wnes[0]) < application.wc.size.width || (wnes[1]-wnes[3]) < application.wc.size.height);
         // update camera group
         application.updateCameraGroup(wnes);
     }
@@ -766,7 +779,7 @@ class OverviewEventHandler implements ViewEventHandler {
         	else if (code==KeyEvent.VK_G){application.gcNodes();}
         	else if (code==KeyEvent.VK_I){application.infoNodes();}
         	else if (code==KeyEvent.VK_C){application.consoleNodes();}
-        	else if (code==KeyEvent.VK_B){application.toggleBezels();}
+        	else if (code==KeyEvent.VK_B){application.togglePixelsBehindBezels();}
         }
     }
 
