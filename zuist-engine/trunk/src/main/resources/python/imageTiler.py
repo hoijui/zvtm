@@ -224,16 +224,20 @@ def processSrcImg():
     if USE_CG:
         if SRC_PATH.lower().endswith(".pdf"):
             IMG_SRC_PATH = "%s.png" % SRC_PATH
-            log("Generating bitmap from PDF, stored temporarily in %s" % IMG_SRC_PATH)
+            log("Generating bitmap from PDF, stored temporarily in %s" % IMG_SRC_PATH, 2)
             pdf_document = CGPDFDocumentCreateWithProvider(CGDataProviderCreateWithFilename(SRC_PATH))
             page_rect = pdf_document.getPage(1).getBoxRect(1)
+            log("Default PDF page size: %d x %d" % (page_rect.getWidth(), page_rect.getHeight()), 1)
             page_width = int(page_rect.getWidth() * PDF_SCALE_FACTOR)
             page_height = int(page_rect.getHeight() * PDF_SCALE_FACTOR)
+            log("Target bitmap size: %d x %d" % (page_width, page_height), 1)
             bitmap = CGBitmapContextCreateWithColor(page_width, page_height,\
                                                     COLOR_SPACE, (1,1,1,1))
+            log("\tRescaling bitmap", 3)
             bitmap.scaleCTM(PDF_SCALE_FACTOR, PDF_SCALE_FACTOR)
-            # draw the PDF page on it
+            log("\tDrawing PDF to bitmap", 3)
             bitmap.drawPDFDocument(page_rect, pdf_document, 1)
+            log("\tWriting bitmap to temp file", 3)
             bitmap.writeToFile(IMG_SRC_PATH, kCGImageFormatPNG)
             deleteTmpFile = True
         else:
@@ -296,7 +300,7 @@ if len(sys.argv) > 2:
             elif arg.startswith("-dy"):
                 DY = int(arg[len("-dy="):])
             elif arg.startswith("-scale"):
-                PDF_SCALE_FACTOR = int(arg[len("-scale="):])
+                PDF_SCALE_FACTOR = float(arg[len("-scale="):])
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
