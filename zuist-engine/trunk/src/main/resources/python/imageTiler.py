@@ -257,9 +257,9 @@ def processSrcImg():
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
     tree.write(outputSceneFile, encoding='utf-8')
-    if deleteTmpFile:
-        log("Deleting temp file %s" % IMG_SRC_PATH)
-        os.remove(IMG_SRC_PATH)
+    #if deleteTmpFile:
+    #    log("Deleting temp file %s" % IMG_SRC_PATH)
+    #    os.remove(IMG_SRC_PATH)
 
 ################################################################################
 # Trace exec on std output
