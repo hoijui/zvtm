@@ -32,6 +32,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.Shape;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import net.claribole.zvtm.glyphs.CGlyph;
 
 import com.xerox.VTM.engine.Camera;
@@ -112,6 +114,7 @@ public abstract class Glyph implements Cloneable {
 
 
     /*------------Geometry---------------------------------------*/
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /** Horizontal coordinate of the glyph's geomatrical center, in virtual space.
      *@see #moveTo(long x, long y)
@@ -147,8 +150,10 @@ public abstract class Glyph implements Cloneable {
      *@see #moveTo(long x, long y)
      */
     public void move(long x, long y){
+	lock.writeLock().lock();
 	vx+=x;
 	vy+=y;
+	lock.writeLock().unlock();
 	propagateMove(x,y);  //take care of sticked glyphs
 	try{vsm.repaintNow();}catch(NullPointerException e){}
     }
@@ -157,16 +162,24 @@ public abstract class Glyph implements Cloneable {
      *@see #move(long x, long y)
      */
     public void moveTo(long x, long y){
-	propagateMove(x-vx,y-vy);  //take care of sticked glyphs
-	vx=x;
-	vy=y;
-	try{vsm.repaintNow();}catch(NullPointerException e){}
+	    lock.writeLock().lock();
+	    vx=x;
+	    vy=y;
+	    lock.writeLock().unlock();
+	    propagateMove(x-vx,y-vy);  //take care of sticked glyphs
+	    try{vsm.repaintNow();}catch(NullPointerException e){}
     }
 
     /** Get the coordinates of the glyph's geometrical center.
      *@return a copy of the glyph's location. Changing the x,y coordinates of the returned LongPoint will not have any effect on the glyph's position.
      */
-    public LongPoint getLocation(){return new LongPoint(vx,vy);}
+    public LongPoint getLocation(){
+	lock.readLock().lock();
+	long tmpX = vx;
+	long tmpY = vy;
+	lock.readLock().unlock();
+	return new LongPoint(tmpX,tmpY);
+	}
 
     /** Get glyph's size (radius of bounding circle). */
     public abstract float getSize();    

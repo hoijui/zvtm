@@ -158,14 +158,19 @@ $Id$
 		  <configuration>
 		  <workingDirectory>${project.build.directory}</workingDirectory>
 		  <processes>
-		  <process nodeName="master" count="1" 
+		 <!-- <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.MasterSkelWild"
 		  arguments=""> 
-		  </process> 
+		  </process> -->
 		  <!-- <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.ColorRectWild"
 		  arguments="-w 4000 -h 3000">
-	  </process> -->
+		  </process> -->
+		  <process nodeName="master" count="1" 
+		  className="net.claribole.zvtm.cluster.ColorRectAnim"
+		  arguments="-w 1000 -h 500 -x 5 -y 2">
+		  </process> 
+
 		<!--  <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.ImageDemo"
 		  arguments="">
@@ -173,7 +178,7 @@ $Id$
 
 		  <process nodeName="slave" count="1"
 		  className="net.claribole.zvtm.cluster.SlaveApp"
-		  arguments="-f -g -w ${slaveWidth} -h ${slaveHeight} -b ${slaveNum}" 
+		  arguments="-g -w ${slaveWidth} -h ${slaveHeight} -b ${slaveNum}" 
 		  vmargs="-Dsun.java2d.opengl=True">
 		  </process>
 		

@@ -62,6 +62,8 @@ public class SlaveApp {
 				slaveOptions.opengl? View.OPENGL_VIEW : View.STD_VIEW, slaveOptions.width, 
 				slaveOptions.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
+		//set refresh rate to 20fps (50ms)
+		view.setRefreshRate(50);
 		vcam.get(0).setOwningView(view); 
 
 		//set fullscreen if needed
