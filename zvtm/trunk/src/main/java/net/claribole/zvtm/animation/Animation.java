@@ -32,6 +32,11 @@ public class Animation {
     public static enum Dimension {POSITION, ALTITUDE, SIZE, ORIENTATION,                
 	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH, LENS_MAG,
 	    LENS_RADIUS, LENS_MAG_RADIUS};
+
+	/**
+	 * Used to specify unending duration or RepeatCount
+	 */
+	public static final int INFINITE = Animator.INFINITE;
     
     //package-level ctor, to be used from AnimationManager
     //(not publicly visible)
@@ -137,7 +142,7 @@ public class Animation {
     final Dimension dimension;
 
     //This class is not really conceptually separate from "Animation",
-    //it is mailny a trick to avoid exposing its TimingTarget inheritance
+    //it is mainly a trick to avoid exposing its TimingTarget inheritance
     //to clients (and providing public callback methods, et caetera).
     private class TimingInterceptor implements TimingTarget {
 	TimingInterceptor(){}

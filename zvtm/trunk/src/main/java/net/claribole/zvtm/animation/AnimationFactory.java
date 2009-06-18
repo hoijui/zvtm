@@ -41,7 +41,10 @@ public class AnimationFactory {
     /**
      * Creates a new Animation object that will be handled 
      * by the associated AnimationManager.
-     * @param duration duration of the animation, in milliseconds
+     * @param duration duration of the animation, in milliseconds.
+	 * duration may be set to Animation.INFINITE, in which case the 
+	 * animation will run indefinitely. In that case, the fraction passed
+	 * to the timingEvent method of the handler is meaningless.
      * @param subject object that will be animated
      * @param dimension dimension of the animation
      * @param handler timing handler that will receive callbacks 
@@ -63,7 +66,8 @@ public class AnimationFactory {
      * @param duration duration of the animation, in milliseconds
      * @param repeatCount the number of times this Animation will
      * be repeated. This is not necessarily an integer, i.e. an animation may
-     * be repeated 2.5 times
+     * be repeated 2.5 times. repeatCount may be set to Animation.INFINITE,
+	 * in which case the animation will be repeated indefinitely.
      * @param repeatBehavior controls whether an animation loops or reverse
      * when repeating
      * @param subject object that will be animated

@@ -84,7 +84,7 @@ public class TestCameraAnim {
 	vsm.addGlyph(circle2, "src");
 	
 	Animation anim = am.getAnimationFactory().createAnimation(3000, 
-					    Animator.INFINITE,
+					    Animation.INFINITE,
 					    Animator.RepeatBehavior.REVERSE,
 					    circle,
 					    Animation.Dimension.POSITION,
@@ -102,7 +102,7 @@ public class TestCameraAnim {
 					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 	
 	anim2 = am.getAnimationFactory().createAnimation(3000, 
-					     Animator.INFINITE,
+					     Animation.INFINITE,
 					     Animator.RepeatBehavior.REVERSE,
 					     circle2,
 					     Animation.Dimension.POSITION,

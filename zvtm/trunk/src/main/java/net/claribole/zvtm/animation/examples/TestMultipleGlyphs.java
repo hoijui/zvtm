@@ -87,7 +87,7 @@ public class TestMultipleGlyphs {
 	    vsm.addGlyph(circle, "src");
 
 	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
-								      Animator.INFINITE,
+								      Animation.INFINITE,
 								      Animator.RepeatBehavior.REVERSE,
 								      circle,
 								      Animation.Dimension.POSITION,
