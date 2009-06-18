@@ -50,7 +50,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-idprefix=p\tcustom prefix for all region and objects IDs\n"+\
     "\t-dx=y\t\tx offset for all regions and objects\n"+\
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
-    "\t-scale=s\t\ts scale factor w.r.t default size for PDF input\n"
+    "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"
 
 TRACE_LEVEL = 1
 
@@ -226,7 +226,7 @@ def processSrcImg():
             IMG_SRC_PATH = "%s.png" % SRC_PATH
             log("Generating bitmap from PDF, stored temporarily in %s" % IMG_SRC_PATH, 2)
             pdf_document = CGPDFDocumentCreateWithProvider(CGDataProviderCreateWithFilename(SRC_PATH))
-            page_rect = pdf_document.getPage(1).getBoxRect(1)
+            page_rect = pdf_document.getPage(1).getBoxRect(kCGPDFCropBox)
             log("Default PDF page size: %d x %d" % (page_rect.getWidth(), page_rect.getHeight()), 1)
             page_width = int(page_rect.getWidth() * PDF_SCALE_FACTOR)
             page_height = int(page_rect.getHeight() * PDF_SCALE_FACTOR)
@@ -240,6 +240,7 @@ def processSrcImg():
             log("\tWriting bitmap to temp file", 3)
             bitmap.writeToFile(IMG_SRC_PATH, kCGImageFormatPNG)
             deleteTmpFile = True
+            return
         else:
             IMG_SRC_PATH = SRC_PATH
         im = CGImageImport(CGDataProviderCreateWithFilename(IMG_SRC_PATH))
