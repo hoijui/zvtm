@@ -168,7 +168,7 @@ $Id$
 		  </process> -->
 		  <process nodeName="master" count="1" 
 		  className="net.claribole.zvtm.cluster.ColorRectAnim"
-		  arguments="-w 1000 -h 500 -x 5 -y 2">
+		  arguments="-w 15000 -h 5000 -x 5 -y 2">
 		  </process> 
 
 		<!--  <process nodeName="master" count="1" 
