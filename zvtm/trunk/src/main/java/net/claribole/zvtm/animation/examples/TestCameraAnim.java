@@ -85,7 +85,7 @@ public class TestCameraAnim {
 	
 	Animation anim = am.getAnimationFactory().createAnimation(3000, 
 					    Animation.INFINITE,
-					    Animator.RepeatBehavior.REVERSE,
+					    Animation.RepeatBehavior.REVERSE,
 					    circle,
 					    Animation.Dimension.POSITION,
 					    new DefaultTimingHandler(){
@@ -103,7 +103,7 @@ public class TestCameraAnim {
 	
 	anim2 = am.getAnimationFactory().createAnimation(3000, 
 					     Animation.INFINITE,
-					     Animator.RepeatBehavior.REVERSE,
+					     Animation.RepeatBehavior.REVERSE,
 					     circle2,
 					     Animation.Dimension.POSITION,
 					     new DefaultTimingHandler(){
@@ -121,7 +121,7 @@ public class TestCameraAnim {
 
 	Animation cameraPos = am.getAnimationFactory().createAnimation(4000, 
 						 2f,
-						 Animator.RepeatBehavior.LOOP,
+						 Animation.RepeatBehavior.LOOP,
 						 vsm.getVirtualSpace("src").getCamera(0),
 						 Animation.Dimension.POSITION,
 						 new DefaultTimingHandler(){
@@ -142,7 +142,7 @@ public class TestCameraAnim {
 	
 	Animation cameraAlt = am.getAnimationFactory().createAnimation(4000, 
 						 2f,
-						 Animator.RepeatBehavior.REVERSE,
+						 Animation.RepeatBehavior.REVERSE,
 						 vsm.getVirtualSpace("src").getCamera(0),
 						 Animation.Dimension.ALTITUDE,
 						 new DefaultTimingHandler(){

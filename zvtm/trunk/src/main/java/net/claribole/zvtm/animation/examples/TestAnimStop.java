@@ -36,7 +36,6 @@ import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.widgets.*;
 
 import net.claribole.zvtm.animation.*;
-import org.jdesktop.animation.timing.*;
 import org.jdesktop.animation.timing.interpolation.*;
 
 // Checking that animation stopping is handled correctly
@@ -80,7 +79,7 @@ public class TestAnimStop {
 	
 	Animation anim = am.getAnimationFactory().createAnimation(3000, 
 					    Animation.INFINITE,
-					    Animator.RepeatBehavior.REVERSE,
+					    Animation.RepeatBehavior.REVERSE,
 					    circle,
 					    Animation.Dimension.POSITION,
 					    new DefaultTimingHandler(){
@@ -99,7 +98,7 @@ public class TestAnimStop {
 	
 	Animation anim2 = am.getAnimationFactory().createAnimation(3000, 
 					     Animation.INFINITE,
-					     Animator.RepeatBehavior.REVERSE,
+					     Animation.RepeatBehavior.REVERSE,
 					     circle2,
 					     Animation.Dimension.POSITION,
 					     new DefaultTimingHandler(){

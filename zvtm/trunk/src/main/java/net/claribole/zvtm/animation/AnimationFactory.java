@@ -56,7 +56,7 @@ public class AnimationFactory {
 				     Object subject,
 				     Animation.Dimension dimension,
 				     TimingHandler handler){
-	return createAnimation(duration, 1.0, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1.0, Animation.RepeatBehavior.LOOP,
 			       subject, dimension, handler);
     }
 
@@ -79,7 +79,7 @@ public class AnimationFactory {
      */
     public Animation createAnimation(int duration, 
 				     double repeatCount, 
-				     Animator.RepeatBehavior repeatBehavior,
+				     Animation.RepeatBehavior repeatBehavior,
 				     Object subject,
 				     Animation.Dimension dimension,
 				     TimingHandler handler){
@@ -113,7 +113,7 @@ public class AnimationFactory {
      */
     public Animation createAnimation(int duration, 
 				     double repeatCount, 
-				     Animator.RepeatBehavior repeatBehavior,
+				     Animation.RepeatBehavior repeatBehavior,
 				     Object subject,
 				     Animation.Dimension dimension,
 				     TimingHandler handler,
@@ -143,7 +143,7 @@ public class AnimationFactory {
 					     final LongPoint data, final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       camera,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
@@ -197,7 +197,7 @@ public class AnimationFactory {
 					 final Interpolator interpolator,
 					 final EndAction endAction){
 	
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       camera,
 			       Animation.Dimension.ALTITUDE,
 			       new DefaultTimingHandler(){
@@ -245,7 +245,7 @@ public class AnimationFactory {
 					    final LongPoint data, final boolean relative,
 					    final Interpolator interpolator,
 					    final EndAction endAction){
-	 return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	 return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 				glyph,
 				Animation.Dimension.POSITION,
 				new DefaultTimingHandler(){
@@ -299,7 +299,7 @@ public class AnimationFactory {
 					 final float data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
@@ -354,7 +354,7 @@ public class AnimationFactory {
 						final float data, final boolean relative,
 						final Interpolator interpolator,
 						final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.ORIENTATION,
 			       new DefaultTimingHandler(){
@@ -407,7 +407,7 @@ public class AnimationFactory {
 					      final float[] data, final boolean relative,
 					      final Interpolator interpolator,
 					      final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.FILLCOLOR,
 			       new DefaultTimingHandler(){
@@ -470,7 +470,7 @@ public class AnimationFactory {
 						final float[] data, final boolean relative,
 						final Interpolator interpolator,
 						final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.BORDERCOLOR,
 			       new DefaultTimingHandler(){
@@ -531,7 +531,7 @@ public class AnimationFactory {
 					    final float data, final boolean relative,
 					    final Interpolator interpolator,
 					    final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       translucent,
 			       Animation.Dimension.TRANSLUCENCY,
 			       new DefaultTimingHandler(){
@@ -579,7 +579,7 @@ public class AnimationFactory {
 					     final Point data, final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       portal,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
@@ -638,7 +638,7 @@ public class AnimationFactory {
 					  final boolean relative,
 					  final Interpolator interpolator,
 					  final EndAction endAction){
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       portal,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
@@ -696,7 +696,7 @@ public class AnimationFactory {
 	//XXX throw an exception if the animation causes the
 	//magnification factor to become < 0
 
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG,
 			       new DefaultTimingHandler(){
@@ -770,7 +770,7 @@ public class AnimationFactory {
 	//get bigger than the outer radius or if it causes the magnification
 	//factor to become < 0
 
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG_RADIUS,
 			       new DefaultTimingHandler(){
@@ -852,7 +852,7 @@ public class AnimationFactory {
 	//XXX throw an exception if the animation causes the inner radius to 
 	//get bigger than the outer radius
 
- 	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+ 	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_RADIUS,
 			       new DefaultTimingHandler(){
@@ -923,7 +923,7 @@ public class AnimationFactory {
 				    final Interpolator interpolator,
 				    final EndAction endAction){
 
-	return createAnimation(duration, 1f, Animator.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       path,
 			       Animation.Dimension.PATH,
 			       new DefaultTimingHandler(){

@@ -38,7 +38,6 @@ import net.claribole.zvtm.widgets.*;
 
 import net.claribole.zvtm.animation.*;
 import net.claribole.zvtm.animation.interpolation.*;
-import org.jdesktop.animation.timing.*;
 import org.jdesktop.animation.timing.interpolation.*;
 
 // Click handler that animates the Camera to a new position.
@@ -88,7 +87,7 @@ public class TestCameraPosition {
 
 	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
 						Animation.INFINITE,
-						Animator.RepeatBehavior.REVERSE,
+						Animation.RepeatBehavior.REVERSE,
 						circle,
 						Animation.Dimension.POSITION,
 						new DefaultTimingHandler(){
@@ -157,7 +156,7 @@ public class TestCameraPosition {
 	    final long ex = v.getVCursor().vx;
 	    final long ey = v.getVCursor().vy;
 
-	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animator.RepeatBehavior.LOOP,
+	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animation.RepeatBehavior.LOOP,
 						 vsm.getVirtualSpace("src").getCamera(0),
 						 Animation.Dimension.POSITION,
 						  new DefaultTimingHandler(){

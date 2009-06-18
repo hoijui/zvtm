@@ -37,13 +37,40 @@ public class Animation {
 	 * Used to specify unending duration or RepeatCount
 	 */
 	public static final int INFINITE = Animator.INFINITE;
+
+	/**
+	 * RepeatBehavior determines how each successive cycle will flow.
+	 */
+	public static enum RepeatBehavior {
+		/**
+		 * Each repeated cycle proceeds in the same direction 
+		 * as the previous one.
+		 */
+		LOOP { 
+			Animator.RepeatBehavior getAnimatorValue(){
+				return Animator.RepeatBehavior.LOOP;
+			}
+		},
+		/**
+		 * Each repeated cycle proceeds in the opposite direction
+		 * as the previous one.
+		 */
+		REVERSE {
+			Animator.RepeatBehavior getAnimatorValue(){
+				return Animator.RepeatBehavior.REVERSE;
+			}
+		};
+
+		//translate into Animator.RepeatBehavior enum values
+		abstract Animator.RepeatBehavior getAnimatorValue();
+	}
     
     //package-level ctor, to be used from AnimationManager
     //(not publicly visible)
     Animation(AnimationManager parent,
 	      int duration, 
 	      double repeatCount, 
-	      Animator.RepeatBehavior repeatBehavior, 
+	      RepeatBehavior repeatBehavior, 
 	      Object subject,
 	      Dimension dimension,
 	      TimingHandler handler){
@@ -53,7 +80,7 @@ public class Animation {
 	this.handler = handler;
 
 	timingInterceptor = new TimingInterceptor();
-	animator = new Animator(duration, repeatCount, repeatBehavior, timingInterceptor);
+	animator = new Animator(duration, repeatCount, repeatBehavior.getAnimatorValue(), timingInterceptor);
     }
 
     /**

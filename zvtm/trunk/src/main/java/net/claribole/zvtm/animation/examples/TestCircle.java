@@ -80,7 +80,7 @@ public class TestCircle {
 	    Animation anim = 
 		am.getAnimationFactory().createAnimation(3000, //milliseconds
 							 1.0,
-							 Animator.RepeatBehavior.LOOP,
+							 Animation.RepeatBehavior.LOOP,
 							 circle,
 							 Animation.Dimension.POSITION,
 							 new TimingHandler(){
@@ -100,7 +100,7 @@ public class TestCircle {
 	Animation anim = 
 	    am.getAnimationFactory().createAnimation(8000, 
 						     1.0,
-						     Animator.RepeatBehavior.LOOP,
+						     Animation.RepeatBehavior.LOOP,
 						     circle,
 						     Animation.Dimension.FILLCOLOR,
 						     new TimingHandler(){
@@ -120,7 +120,7 @@ public class TestCircle {
 	Animation animSize = 
 	    am.getAnimationFactory().createAnimation(4000, 
 						     1.0,
-						     Animator.RepeatBehavior.LOOP,
+						     Animation.RepeatBehavior.LOOP,
 						     circle,
 						     Animation.Dimension.SIZE,
 						     new TimingHandler(){

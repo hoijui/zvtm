@@ -37,7 +37,6 @@ import net.claribole.zvtm.glyphs.*;
 import net.claribole.zvtm.widgets.*;
 
 import net.claribole.zvtm.animation.*;
-import org.jdesktop.animation.timing.*;
 import org.jdesktop.animation.timing.interpolation.*;
 
 public class TestDefaultHandler {
@@ -79,7 +78,7 @@ public class TestDefaultHandler {
 	for(int i=0; i<4; ++i){
 	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
 								      1.0,
-								      Animator.RepeatBehavior.LOOP,
+								      Animation.RepeatBehavior.LOOP,
 								      circle,
 								      Animation.Dimension.POSITION,
 								      new DefaultTimingHandler(){
@@ -95,7 +94,7 @@ public class TestDefaultHandler {
 
 	Animation anim = am.getAnimationFactory().createAnimation(8000, 
 								  1.0,
-								  Animator.RepeatBehavior.LOOP,
+								  Animation.RepeatBehavior.LOOP,
 								  circle,
 								  Animation.Dimension.FILLCOLOR,
 								  new DefaultTimingHandler(){
@@ -111,7 +110,7 @@ public class TestDefaultHandler {
 	 
 	Animation animSize = am.getAnimationFactory().createAnimation(4000, 
 								      1.0,
-								      Animator.RepeatBehavior.LOOP,
+								      Animation.RepeatBehavior.LOOP,
 								      circle,
 								      Animation.Dimension.SIZE,
 								      new DefaultTimingHandler(){

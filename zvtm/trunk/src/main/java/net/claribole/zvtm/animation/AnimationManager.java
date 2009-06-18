@@ -47,7 +47,7 @@ public class AnimationManager {
 	//vsm is only useful for currentCamAnim
 	currentCamAnim = new InteractiveCameraAnimation(vsm);
 	Animation anim = createAnimation(Animator.INFINITE, 1d,
-					 Animator.RepeatBehavior.LOOP,
+					 Animation.RepeatBehavior.LOOP,
 					 currentCamAnim, //DUMMY subject: avoids conflicts
 					 Animation.Dimension.POSITION,
 					 currentCamAnim);
@@ -56,7 +56,7 @@ public class AnimationManager {
 
     Animation createAnimation(int duration, 
 			      double repeatCount, 
-			      Animator.RepeatBehavior repeatBehavior,
+			      Animation.RepeatBehavior repeatBehavior,
 			      Object subject,
 			      Animation.Dimension dimension,
 			      TimingHandler handler,
@@ -71,7 +71,7 @@ public class AnimationManager {
 
     Animation createAnimation(int duration, 
 			      double repeatCount, 
-			      Animator.RepeatBehavior repeatBehavior,
+			      Animation.RepeatBehavior repeatBehavior,
 			      Object subject,
 			      Animation.Dimension dimension,
 			      TimingHandler handler){
