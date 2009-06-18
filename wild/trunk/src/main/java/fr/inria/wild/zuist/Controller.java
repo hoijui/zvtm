@@ -92,6 +92,7 @@ public class Controller implements Java2DPainter {
     
     static final String IN_CMD_PAN = "pan";
     static final String IN_CMD_ZOOM = "zoom";
+    static final String IN_CMD_GGV = "ggv";
     static final String IN_CMD_STOP = CMD_STOP;
     
     static final Integer VALUE_NONE = new Integer(0);
@@ -407,7 +408,6 @@ public class Controller implements Java2DPainter {
     /* ------------------ OSC in  ----------------- */
 
     public void processIncomingMessage(OSCMessage msg){
-        System.out.println(msg);
         Object[] params = msg.getArguments();
         String cmd = (String)params[0];
         if (cmd.equals(IN_CMD_PAN)){
@@ -417,6 +417,10 @@ public class Controller implements Java2DPainter {
         else if (cmd.equals(IN_CMD_ZOOM)){
             firstOrderZoom(((Integer)params[1]).intValue());
             //System.out.println("zoom "+((Integer)params[1]).intValue());
+        }
+        else if (cmd.equals(IN_CMD_GGV)){
+            getGlobalView(cCamera);
+            //System.out.println("ggv ");
         }
         else if (cmd.equals(IN_CMD_STOP)){
             stop();
