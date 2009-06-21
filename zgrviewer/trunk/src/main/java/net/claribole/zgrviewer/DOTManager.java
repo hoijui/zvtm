@@ -14,6 +14,7 @@ package net.claribole.zgrviewer;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.StringTokenizer;
@@ -144,11 +145,11 @@ class DOTManager {
             try {
                 File execDir = (new File(dotFilePath)).getParentFile();
                 Process p = rt.exec(cmdArray, null, execDir);
-                p.waitFor();
+                executeProcess(p);
             }
             catch (IOException ex){
                 Process p = rt.exec(cmdArray);
-                p.waitFor();
+                executeProcess(p);
             }
         }
         catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
@@ -186,8 +187,8 @@ class DOTManager {
         try {
             try {
                 File execDir = (new File(dotFilePath)).getParentFile();
-                Process p = rt.exec(cmdArray, null, execDir);
-                p.waitFor();
+                final Process p = rt.exec(cmdArray, null, execDir);
+                executeProcess(p);
             }
             catch (IOException ex){
                 Process p = rt.exec(cmdArray);
@@ -196,6 +197,14 @@ class DOTManager {
         }
         catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
+    }
+    
+    protected void executeProcess(Process p) throws InterruptedException, IOException {
+        Thread consumer = new ProcessOutputConsumer(p);
+        consumer.start();
+        p.waitFor();
+        p.destroy();
+        consumer.interrupt();
     }
 
     /*load a file using a program other than dot/neato for computing the layout (e.g. twopi)*/
