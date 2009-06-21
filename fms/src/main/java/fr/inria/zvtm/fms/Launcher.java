@@ -21,14 +21,14 @@ public class Launcher {
 			    testType = args[i];
 			}
 		}
-        if (testType.equals(TEST_2)){
+		if (testType.equals(TEST_2)){
             new Test2();            
         }
-	else if (testType.equals(TEST_3)){
+		else if (testType.equals(TEST_3)){
             new Test3();            
         }
         else {
-            new Test3();
+            new Test();
         }
     }
     

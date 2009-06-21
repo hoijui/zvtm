@@ -2,9 +2,7 @@ package fr.inria.zvtm.fms;
 
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.event.*;
 import java.util.Vector;
 
 import com.xerox.VTM.engine.*;
@@ -41,8 +39,17 @@ public class Test {
         mCamera = vsm.addCamera(mSpace);
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace(mSpaceStr).getCamera(0));
-        mView = vsm.addExternalView(cameras, "FMS", View.STD_VIEW, 800, 600, false, true);
-        mView.setBackgroundColor(Color.LIGHT_GRAY);
+        //mView = vsm.addExternalView(cameras, "FMS", View.STD_VIEW, 800, 600, false, true);
+		
+		JPanel panel = vsm.addPanelView(cameras, "mainview", 800, 600);
+		mView = vsm.getView("mainview");
+		panel.setPreferredSize(new Dimension(800, 600));
+		JFrame frame = new JFrame("Lenses and motor precision");
+		frame.getContentPane().add(panel);
+		frame.pack();
+		frame.setVisible(true);
+		
+		mView.setBackgroundColor(Color.LIGHT_GRAY);
         eh = new EventHandlerTest(this);
         mView.setEventHandler(eh);
         mView.setNotifyMouseMoved(true);
