@@ -84,14 +84,10 @@ public class Test {
     void setLens(int x, int y){
         lens = testView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
-            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
     }
 
     Lens getLensDefinition(int x, int y){
-        //return new FSOLinearLens(1.0f, LENS_R1, LENS_R2, x - 400, y - 300);
-        return new SCBLens(1.0f, 0.5f, 0.9f, LENS_R1, x - 400, y - 300);
+        return new FSLinearLens(4.0f, LENS_R1, LENS_R2, x - 400, y - 300);
     }
     
     void moveLens(int x, int y){

@@ -715,20 +715,13 @@ public class VCursor {
     void unProject(Camera c,ViewPanel v){
         if (sync){
             //translate from JPanel coords
+            cx = mx - (v.getSize().width/2);
+            cy = (v.getSize().height/2) - my;
             if (v.lens != null){
                 //take lens into account (if set)
-                v.lens.gf(mx,my,gain);
-                cx = mx-(v.getSize().width/2);
-                cy = (v.getSize().height/2)-my;
                 v.lens.gf(cx, cy, gain);
                 cx *= gain[0];
                 cy *= gain[1];
-                //cx = Math.round((((float)mx-v.lens.sw)/gain[0])+v.lens.sw)-(v.getSize().width/2);
-                //cy = (v.getSize().height/2)-Math.round((((float)my-v.lens.sh)/gain[1])+v.lens.sh);
-            }
-            else {
-                cx = mx-(v.getSize().width/2);
-                cy = (v.getSize().height/2)-my;
             }
             double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
             //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
@@ -740,26 +733,18 @@ public class VCursor {
     }
 
     public LongPoint getVSCoordinates(Camera c, ViewPanel v){
-	//translate from JPanel coords
-	int cx, cy;
-	if (v.lens != null){//take lens into account (if set)
-	    v.lens.gf(mx,my,gain);
-	    cx = mx-(v.getSize().width/2);
-	    cy = (v.getSize().height/2)-my;
-	    v.lens.gf(cx, cy, gain);
-	    cx *= gain[0];
-	    cy *= gain[1];
-// 	    cx = Math.round((((float)mx-v.lens.sw)/gain[0])+v.lens.sw) - (v.getSize().width/2);
-// 	    cy = (v.getSize().height/2) - Math.round((((float)my-v.lens.sh)/gain[1])+v.lens.sh);
-	}
-	else {
-	    cx = mx - (v.getSize().width/2);
-	    cy = (v.getSize().height/2) - my;
-	}
-	double coef=(((double)c.focal+(double)c.altitude)/(double)c.focal);
-	//find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
-	return new LongPoint(Math.round((cx*coef)+c.posx),
-			     Math.round((cy*coef)+c.posy));
+        //translate from JPanel coords
+        int tcx = mx - (v.getSize().width/2);
+        int tcy = (v.getSize().height/2) - my;
+        if (v.lens != null){
+            //take lens into account (if set)
+            v.lens.gf(tcx, tcy, gain);
+            tcx *= gain[0];
+            tcy *= gain[1];
+        }
+        double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
+        //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
+        return new LongPoint(Math.round((tcx*coef) + c.posx), Math.round((tcy*coef) + c.posy));
     }
 
     /**returns the cursor's X JPanel coordinate*/
