@@ -713,29 +713,30 @@ public class VCursor {
 
     /**project mouse cursor IN VIRTUAL SPACE wrt camera info and change origin -> JPanel coords*/
     void unProject(Camera c,ViewPanel v){
-	if (sync){
-	    //translate from JPanel coords
-	    if (v.lens != null){//take lens into account (if set)
-		v.lens.gf(mx,my,gain);
-		cx = mx-(v.getSize().width/2);
-		cy = (v.getSize().height/2)-my;
-		v.lens.gf(cx, cy, gain);
-		cx *= gain[0];
-		cy *= gain[1];
-//  		cx = Math.round((((float)mx-v.lens.sw)/gain[0])+v.lens.sw)-(v.getSize().width/2);
-//  		cy = (v.getSize().height/2)-Math.round((((float)my-v.lens.sh)/gain[1])+v.lens.sh);
-	    }
-	    else {
-		cx = mx-(v.getSize().width/2);
-		cy = (v.getSize().height/2)-my;
-	    }
-	    double coef=(((double)c.focal+(double)c.altitude)/(double)c.focal);
-	    //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
-	    pvx=vx;
-	    pvy=vy;
-	    vx=Math.round((cx*coef)+c.posx);
-	    vy=Math.round((cy*coef)+c.posy);
-	}
+        if (sync){
+            //translate from JPanel coords
+            if (v.lens != null){
+                //take lens into account (if set)
+                v.lens.gf(mx,my,gain);
+                cx = mx-(v.getSize().width/2);
+                cy = (v.getSize().height/2)-my;
+                v.lens.gf(cx, cy, gain);
+                cx *= gain[0];
+                cy *= gain[1];
+                //cx = Math.round((((float)mx-v.lens.sw)/gain[0])+v.lens.sw)-(v.getSize().width/2);
+                //cy = (v.getSize().height/2)-Math.round((((float)my-v.lens.sh)/gain[1])+v.lens.sh);
+            }
+            else {
+                cx = mx-(v.getSize().width/2);
+                cy = (v.getSize().height/2)-my;
+            }
+            double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
+            //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
+            pvx = vx;
+            pvy = vy;
+            vx = Math.round((cx*coef) + c.posx);
+            vy = Math.round((cy*coef) + c.posy);
+        }
     }
 
     public LongPoint getVSCoordinates(Camera c, ViewPanel v){
