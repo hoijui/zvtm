@@ -526,6 +526,8 @@ public class SVGReader {
             // parse all CSS instructions in style attribute
             while (st.hasMoreTokens()){
                 String instr = st.nextToken();
+                // FIXME (see Bug #2809312 Patch #2809313): getColor can return null, but calling
+                // SVGStyle#setColor( null) causes problems
                 if (instr.startsWith(_fillCSS)){
                     ss.setFillColor(getColor(instr.substring(5,instr.length())));
                     attributesSet[fill_INDEX] = true;

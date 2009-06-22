@@ -110,6 +110,8 @@ public class SVGStyle {
 
 	/** Set the stroke (border) color. */
 	public void setStrokeColor(Color c){
+	    // (see Bug #2809312 Patch #2809313)
+	    assert c != null : "SVGStyle#setStrokeColor -- color should not be null";
 		strokeColor = c;
 		strokeColorDefined = true;
 	}
