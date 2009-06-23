@@ -25,7 +25,7 @@ import javax.swing.BorderFactory;
 
 import java.util.Vector;
 
-import com.xerox.VTM.engine.View;
+import fr.inria.zvtm.engine.View;
 
 /* Navigation Panel (directional arrows, plus zoom) */
 

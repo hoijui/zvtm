@@ -10,9 +10,9 @@
 
 package net.claribole.zgrviewer;
 
-import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.lens.Lens;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.lens.Lens;
 
 public class ZP2LensAction implements EndAction {
 

@@ -34,8 +34,8 @@ import javax.swing.JTextField;
 
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VText;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
 
 class SearchBox extends JFrame implements ActionListener, KeyListener {
 

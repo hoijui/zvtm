@@ -25,7 +25,7 @@ import java.net.URLClassLoader;
 import java.util.jar.JarFile;
 import java.util.jar.JarEntry;
 
-import com.xerox.VTM.engine.Utilities;
+import fr.inria.zvtm.engine.Utilities;
 
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.DOMImplementation;

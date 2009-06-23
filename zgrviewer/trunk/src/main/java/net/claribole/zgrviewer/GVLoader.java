@@ -19,10 +19,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
-import com.xerox.VTM.engine.SwingWorker;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.svg.SVGReader;
-import com.xerox.VTM.glyphs.VText;
+import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.svg.SVGReader;
+import fr.inria.zvtm.glyphs.VText;
 import org.w3c.dom.Document;
 
 /* Multiscale feature manager */

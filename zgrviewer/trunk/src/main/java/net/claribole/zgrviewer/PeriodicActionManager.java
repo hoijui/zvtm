@@ -20,13 +20,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 
-import com.xerox.VTM.glyphs.RectangleNR;
-//import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.svg.Metadata;
-import com.xerox.VTM.engine.LongPoint;
-import net.claribole.zvtm.engine.Java2DPainter;
+import fr.inria.zvtm.glyphs.RectangleNR;
+//import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.svg.Metadata;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.Java2DPainter;
 
 class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPainter {
 

@@ -36,42 +36,42 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Arrays;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.VCursor;
-import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.engine.DraggableCameraPortal;
-import net.claribole.zvtm.lens.Lens;
-import net.claribole.zvtm.lens.FixedSizeLens;
-import net.claribole.zvtm.lens.LInfSCBLens;
-import net.claribole.zvtm.lens.SCBLens;
-import net.claribole.zvtm.lens.FSGaussianLens;
-import net.claribole.zvtm.engine.CameraListener;
-import net.claribole.zvtm.engine.Java2DPainter;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.SwingWorker;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.glyphs.Translucent;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.RectangleNR;
-import net.claribole.zvtm.glyphs.CircleNR;
-import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRectangleOr;
-import net.claribole.zvtm.glyphs.DPath;
-import com.xerox.VTM.svg.Metadata;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.PortalEventHandler;
-import net.claribole.zvtm.engine.TransitionManager;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.AnimationManager;
-import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.VCursor;
+import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.DraggableCameraPortal;
+import fr.inria.zvtm.lens.Lens;
+import fr.inria.zvtm.lens.FixedSizeLens;
+import fr.inria.zvtm.lens.LInfSCBLens;
+import fr.inria.zvtm.lens.SCBLens;
+import fr.inria.zvtm.lens.FSGaussianLens;
+import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.engine.Java2DPainter;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.RectangleNR;
+import fr.inria.zvtm.glyphs.CircleNR;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VRectangleOr;
+import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.svg.Metadata;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.TransitionManager;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 /* Multiscale feature manager */
 
@@ -864,7 +864,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /* -------------- Font management ----------------*/
 
     void assignFontToGraph(){
-	Font f = net.claribole.zvtm.fonts.FontDialog.getFontDialog((JFrame)mainView.getFrame(), ConfigManager.defaultFont);
+	Font f = fr.inria.zvtm.fonts.FontDialog.getFontDialog((JFrame)mainView.getFrame(), ConfigManager.defaultFont);
 	if (f!=null){
 	    ConfigManager.defaultFont=f;
 	    Vector glyphs = mSpace.getAllGlyphs();

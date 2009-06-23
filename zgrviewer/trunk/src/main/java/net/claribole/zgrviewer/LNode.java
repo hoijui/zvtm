@@ -12,10 +12,10 @@ package net.claribole.zgrviewer;
 
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.svg.Metadata;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.svg.Metadata;
 
 class LNode extends LElem {
 

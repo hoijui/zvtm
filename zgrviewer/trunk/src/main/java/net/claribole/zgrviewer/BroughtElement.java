@@ -7,17 +7,17 @@
 
 package net.claribole.zgrviewer;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import net.claribole.zvtm.animation.AnimationManager;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.Utilities;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.glyphs.DPath;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.DPath;
 
 abstract class BroughtElement {
 	

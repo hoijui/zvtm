@@ -17,7 +17,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import net.claribole.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.DPath;
 
 /**
  * Given a GeneralPath and a mouse cursor position, calculate path cursor position and scale

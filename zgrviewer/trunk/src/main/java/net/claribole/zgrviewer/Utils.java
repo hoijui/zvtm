@@ -68,14 +68,14 @@ public class Utils {
      * tells whether the underlying OS is Windows (Win32) or not
      */
     public static boolean osIsWindows(){
-	return com.xerox.VTM.engine.Utilities.osIsWindows();
+	return fr.inria.zvtm.engine.Utilities.osIsWindows();
     }
 
     /**
      * tells whether the underlying OS is Mac OS X or not
      */
     public static boolean osIsMacOS(){
-	return com.xerox.VTM.engine.Utilities.osIsMacOS();
+	return fr.inria.zvtm.engine.Utilities.osIsMacOS();
     }
 
     /**

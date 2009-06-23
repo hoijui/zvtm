@@ -13,13 +13,13 @@ package net.claribole.zgrviewer;
 import java.awt.Cursor;
 import javax.swing.ImageIcon;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 public class ToolPalette {
     

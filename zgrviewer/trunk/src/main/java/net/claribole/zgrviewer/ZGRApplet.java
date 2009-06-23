@@ -28,13 +28,13 @@ import java.util.Vector;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import net.claribole.zvtm.engine.Location;
-import net.claribole.zvtm.engine.RepaintListener;
+import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.RepaintListener;
 
 import org.w3c.dom.Document;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.svg.SVGReader;
+import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.svg.SVGReader;
 
 
 public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZGRApplication, RepaintListener {

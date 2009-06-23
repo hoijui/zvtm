@@ -3,7 +3,7 @@
  * 
  * @author David J. Hamilton <hamilton37@llnl.gov>
  *
- *$Id:$
+ *$Id$
  */
 
 package net.claribole.zgrviewer;

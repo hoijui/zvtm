@@ -12,15 +12,15 @@ package net.claribole.zgrviewer;
 
 import java.awt.event.KeyEvent;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.ViewPanel;
-//import com.xerox.VTM.engine.AnimManager;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import net.claribole.zvtm.animation.Animation;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
+//import fr.inria.zvtm.engine.AnimManager;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.animation.Animation;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;

@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
 
 import antlr.CommonAST;
 
-import com.xerox.VTM.svg.SVGReader;
+import fr.inria.zvtm.svg.SVGReader;
 
 class DOTManager {
 

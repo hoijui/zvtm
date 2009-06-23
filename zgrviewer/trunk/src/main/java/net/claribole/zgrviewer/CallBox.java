@@ -38,7 +38,7 @@ import java.util.Vector;
 
 import java.io.File;
 
-import com.xerox.VTM.engine.SwingWorker;
+import fr.inria.zvtm.engine.SwingWorker;
 
 class CallBox extends JDialog implements ActionListener {
 

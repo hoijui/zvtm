@@ -11,11 +11,11 @@ package net.claribole.zgrviewer;
 
 import java.awt.Point;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.glyphs.VSegment;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.glyphs.VSegment;
 
-import net.claribole.zvtm.engine.Portal;
-import net.claribole.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.Portal;
+import fr.inria.zvtm.engine.PortalEventHandler;
 
 public abstract class BaseEventHandler implements PortalEventHandler {
 

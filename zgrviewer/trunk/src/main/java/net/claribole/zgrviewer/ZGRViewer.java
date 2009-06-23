@@ -30,12 +30,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import com.xerox.VTM.engine.SwingWorker;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.glyphs.PieMenu;
-import net.claribole.zvtm.glyphs.PieMenuFactory;
+import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.glyphs.PieMenu;
+import fr.inria.zvtm.glyphs.PieMenuFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -288,7 +288,7 @@ public class ZGRViewer implements ZGRApplication {
 	    ConfigManager.m_LastExportDir=f.getParentFile();
 	    setStatusBarText("Exporting to SVG "+f.toString()+" ...");
 	    if (f.exists()){f.delete();}
-	    com.xerox.VTM.svg.SVGWriter svgw=new com.xerox.VTM.svg.SVGWriter();
+	    fr.inria.zvtm.svg.SVGWriter svgw=new fr.inria.zvtm.svg.SVGWriter();
 	    Document d = svgw.exportVirtualSpace(grMngr.vsm.getVirtualSpace(grMngr.mainSpace), new DOMImplementationImpl(), f);
 	    Utils.serialize(d,f);
 	    setStatusBarText("Exporting to SVG "+f.toString()+" ...done");

@@ -10,7 +10,7 @@
 
 package net.claribole.zgrviewer;
 
-import com.xerox.VTM.engine.LongPoint;
+import fr.inria.zvtm.engine.LongPoint;
 
 public class Messages {
     

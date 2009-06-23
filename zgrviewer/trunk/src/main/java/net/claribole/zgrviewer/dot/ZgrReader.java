@@ -13,18 +13,18 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Vector;
 
-import net.claribole.zvtm.glyphs.CGlyph;
-import net.claribole.zvtm.glyphs.SGlyph;
+import fr.inria.zvtm.glyphs.CGlyph;
+import fr.inria.zvtm.glyphs.SGlyph;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VEllipse;
-import net.claribole.zvtm.glyphs.DPath;
-import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VRoundRect;
-import com.xerox.VTM.glyphs.VShape;
-import com.xerox.VTM.glyphs.VText;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VEllipse;
+import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VRoundRect;
+import fr.inria.zvtm.glyphs.VShape;
+import fr.inria.zvtm.glyphs.VText;
 
 /**
  * Create the ZVTM Glyphs corresponding to a given Graph.

@@ -10,8 +10,8 @@
 
 package net.claribole.zgrviewer;
 
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.svg.Metadata;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.svg.Metadata;
 
 class LElem {
 

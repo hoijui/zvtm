@@ -12,9 +12,9 @@ package net.claribole.zgrviewer;
 
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.glyphs.DPath;
-import com.xerox.VTM.svg.Metadata;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.svg.Metadata;
 
 class LEdge extends LElem {
 
