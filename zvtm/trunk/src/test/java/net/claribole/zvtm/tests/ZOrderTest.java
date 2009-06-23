@@ -5,20 +5,20 @@
  *
  */ 
 
-package net.claribole.zvtm.tests;
+package fr.inria.zvtm.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VTriangle;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VTriangle;
 
-import net.claribole.zvtm.glyphs.CGlyph;
-import net.claribole.zvtm.glyphs.SGlyph;
+import fr.inria.zvtm.glyphs.CGlyph;
+import fr.inria.zvtm.glyphs.SGlyph;
 
 import java.awt.Color;
 
