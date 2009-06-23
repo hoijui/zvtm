@@ -1,23 +1,24 @@
 /*   FILE: ZPDFPage.java
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
  */
 
-package net.claribole.zvtm.glyphs;
+package fr.inria.zvtm.glyphs;
 
 import java.awt.Image;
 import java.awt.Rectangle;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.RectangularShape;
-import net.claribole.zvtm.glyphs.projection.RProjectedCoordsP;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.RectangularShape;
+import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -216,9 +217,7 @@ public class ZPDFPage extends ClosedShape implements RectangularShape {
 	public void setZoomSensitive(boolean b){
 		if (zoomSensitive!=b){
 			zoomSensitive=b;
-			if (vsm != null){
-				vsm.repaintNow();
-			}
+			VirtualSpaceManager.INSTANCE.repaintNow();
 		}
 	}
 
@@ -235,9 +234,7 @@ public class ZPDFPage extends ClosedShape implements RectangularShape {
 	public void setDrawBorderPolicy(short p){
 		if (drawBorder!=p){
 			drawBorder=p;
-			if (vsm != null){
-				vsm.repaintNow();
-			}
+			VirtualSpaceManager.INSTANCE.repaintNow();
 		}
 	}
 	

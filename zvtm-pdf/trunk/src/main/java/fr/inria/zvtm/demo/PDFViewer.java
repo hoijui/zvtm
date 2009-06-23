@@ -1,11 +1,11 @@
 /*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
  */
 
-package net.claribole.zvtm.demo;
+package fr.inria.zvtm.demo;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -19,14 +19,14 @@ import java.nio.channels.FileChannel;
 
 import java.util.Vector;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.glyphs.Glyph;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.glyphs.ZPDFPage;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.glyphs.ZPDFPage;
 
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
@@ -35,7 +35,6 @@ public class PDFViewer {
 	
 	static final int NAV_ANIM_DURATION = 300;
 
-	VirtualSpaceManager vsm;
 	VirtualSpace vs;
 	static final String spaceName = "pdfSpace";
 	ViewEventHandler eh;
@@ -44,25 +43,23 @@ public class PDFViewer {
 	View pdfView;
 
 	PDFViewer(String pdfFilePath){
-		vsm = new VirtualSpaceManager();
-		vsm.setDebug(true);
+		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
 		load(new File(pdfFilePath));
 	}
 
 	public void initGUI(){
-		vs = vsm.addVirtualSpace(spaceName);
-		vsm.setZoomLimit(-90);
-		mCamera = vsm.addCamera(spaceName);
+		vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
+		mCamera = VirtualSpaceManager.INSTANCE.addCamera(spaceName);
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = vsm.addExternalView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 800, 600, false, true, true, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 800, 600, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		eh = new PDFViewerEventHandler(this);
 		pdfView.setEventHandler(eh);
 		pdfView.setAntialiasing(true);
 		mCamera.setAltitude(0);
-		vsm.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	void load(File f){
@@ -73,7 +70,7 @@ public class PDFViewer {
 			PDFFile pdfFile = new PDFFile(buf);
 			for (int i=0;i<pdfFile.getNumPages();i++){
 				try {
-					vsm.addGlyph(new ZPDFPage(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1), vs);				
+					VirtualSpaceManager.INSTANCE.addGlyph(new ZPDFPage(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1), vs);				
 				}
 				catch ( Exception e) {
 					e.printStackTrace();
@@ -121,24 +118,24 @@ class PDFViewerEventHandler implements ViewEventHandler {
 		lastJPX=jpx;
 		lastJPY=jpy;
 		v.setDrawDrag(true);
-		application.vsm.activeView.mouse.setSensitivity(false);
+		VirtualSpaceManager.INSTANCE.activeView.mouse.setSensitivity(false);
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
 		v.setDrawDrag(false);
-		application.vsm.activeView.mouse.setSensitivity(true);
+		VirtualSpaceManager.INSTANCE.activeView.mouse.setSensitivity(true);
 	}
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		Glyph g = v.lastGlyphEntered();
 		if (g != null){
-			application.vsm.centerOnGlyph(g, application.mCamera, PDFViewer.NAV_ANIM_DURATION);
+			VirtualSpaceManager.INSTANCE.centerOnGlyph(g, application.mCamera, PDFViewer.NAV_ANIM_DURATION);
 		}
 		else {
-			application.vsm.getGlobalView(application.mCamera, PDFViewer.NAV_ANIM_DURATION);
+			VirtualSpaceManager.INSTANCE.getGlobalView(application.mCamera, PDFViewer.NAV_ANIM_DURATION);
 		}
 	}
 
@@ -164,33 +161,33 @@ class PDFViewerEventHandler implements ViewEventHandler {
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (buttonNumber == 1){
-			Camera c = application.vsm.getActiveCamera();
+			Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 			float a = (c.focal+Math.abs(c.altitude))/c.focal;
 			if (mod == SHIFT_MOD) {
-			    application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
 				//50 is just a speed factor (too fast otherwise)
 			}
 			else {
-			    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-                application.vsm.getAnimationManager().setZspeed(0);
+			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
 			}
 		}
 	}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		Camera c = application.vsm.getActiveCamera();
+		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 		float a = (c.focal+Math.abs(c.altitude))/c.focal;
 		if (wheelDirection == WHEEL_UP){
 			c.altitudeOffset(-a*5);
-			application.vsm.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaintNow();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN
 			c.altitudeOffset(a*5);
-			application.vsm.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaintNow();
 		}
 	}
 
