@@ -31,9 +31,9 @@ import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
-import com.xerox.VTM.glyphs.VPolygon;
-import com.xerox.VTM.glyphs.RectangleNR;
-import com.xerox.VTM.engine.LongPoint;
+import fr.inria.zvtm.glyphs.VPolygon;
+import fr.inria.zvtm.glyphs.RectangleNR;
+import fr.inria.zvtm.engine.LongPoint;
 
 import fr.inria.zuist.engine.Region;
 

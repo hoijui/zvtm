@@ -24,8 +24,8 @@ import org.geonames.Toponym;
 import org.geonames.WebService;
 import org.geonames.Style;
 
-import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.glyphs.RectangleNR;
+import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.RectangleNR;
 
 public class GeoNamesParser {
     

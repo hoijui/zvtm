@@ -20,6 +20,7 @@ import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
@@ -32,20 +33,20 @@ import java.util.Vector;
 
 import java.io.File;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.Utilities;
-import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.engine.Java2DPainter;
-import net.claribole.zvtm.widgets.TranslucentTextArea;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.engine.Java2DPainter;
+import fr.inria.zvtm.widgets.TranslucentTextArea;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -127,7 +128,7 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(true);
         VirtualSpace[]  sceneSpaces = {mSpace, bSpace};
         Camera[] sceneCameras = {mCamera, bCamera};
-		vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
+		//vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setSceneCameraBounds(bCamera, eh.wnes);
@@ -156,8 +157,8 @@ public class WorldExplorer implements Java2DPainter {
         cameras.add(mCamera);
         cameras.add(bCamera);
         mCamera.stick(bCamera, true);
-        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, true, null);
-        if (fullscreen){
+        mView = vsm.addExternalView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
+        if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {

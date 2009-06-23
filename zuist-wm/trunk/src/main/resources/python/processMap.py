@@ -58,6 +58,7 @@ def processSrcDir():
     # prepare the XML scene
     outputroot = ET.Element("scene")
     createXMLLevels(outputroot)
+    createBackground(outputroot)
     # process images and populate scene
     for f in srcFiles:
         if f.endswith(".jpg"):
@@ -66,6 +67,9 @@ def processSrcDir():
     tree = ET.ElementTree(outputroot)
     log("-----------------------------------\nWriting %s\n-----------------------------------" % outputSceneFile)
     tree.write(outputSceneFile, encoding='utf-8')
+
+def createBackground(outputParent):
+    
 
 def createXMLLevels(outputParent):
     i = 0
@@ -155,6 +159,15 @@ def generateLevel(level, x, y, im, tileName, srcTilePath, parentTileID, parentRe
             if level < NB_LEVELS-1:
                 generateLevel(level+1, tx, ty, im, tileName, srcTilePath, tileID, regionEL, rootEL)
 
+################################################################################
+# stroke region (debug)
+################################################################################
+def getStroke(color):
+    if DEBUG_SCENE:
+        return color
+    else:
+        return "white"
+                        
 ################################################################################
 # Trace exec on std output
 ################################################################################
