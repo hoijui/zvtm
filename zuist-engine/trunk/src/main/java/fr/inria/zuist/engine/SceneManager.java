@@ -29,18 +29,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VPolygon;
-import com.xerox.VTM.glyphs.VImage;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.ClosedShape;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.svg.SVGReader;
-import net.claribole.zvtm.engine.Location;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VPolygon;
+import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.svg.SVGReader;
+import fr.inria.zvtm.engine.Location;
 
 /** <strong>Multi-scale scene manager: main ZUIST class instantiated by client application.</strong>
  * Used to parse XML descriptions of multi-scale scene configurations and manage them once instantiated.
@@ -162,8 +162,8 @@ public class SceneManager {
 
     /** Set the array containing information about the bounds of the region of virtual space seen through the camera observing the scene.
      *@param bounds array containing information about the bounds of the region of virtual space seen through the camera observing the scene. It is up to the client application to update the values in this array whenever the camera is moved (through any mean).
-     *@see com.xerox.VTM.engine.View#getVisibleRegion(Camera c, long[] res)
-     *@see com.xerox.VTM.engine.View#getVisibleRegion(Camera c)
+     *@see fr.inria.zvtm.engine.View#getVisibleRegion(Camera c, long[] res)
+     *@see fr.inria.zvtm.engine.View#getVisibleRegion(Camera c)
      */
     public void setSceneCameraBounds(Camera c, long[] bounds){
 	    for (int i=0;i<sceneCameras.length;i++){
@@ -601,7 +601,7 @@ public class SceneManager {
     }
         
     /**
-     *@param g any ClosedShape. It must implement com.xerox.VTM.glyphs.Translucent if fade in/out transitions are used in the parent region.
+     *@param g any ClosedShape. It must implement fr.inria.zvtm.glyphs.Translucent if fade in/out transitions are used in the parent region.
      */
     public ClosedShapeDescription createClosedShapeDescription(ClosedShape g, String id, Region region, boolean sensitivity){
         ClosedShapeDescription gd = new ClosedShapeDescription(id, g, region, sensitivity);

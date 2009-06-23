@@ -10,7 +10,7 @@ package fr.inria.zuist.viewer;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import com.xerox.VTM.engine.Utilities;
+import fr.inria.zvtm.engine.Utilities;
 
 public class Launcher {
     

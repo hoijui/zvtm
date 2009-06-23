@@ -7,7 +7,7 @@
 
 package fr.inria.zuist.viewer;
 
-import com.xerox.VTM.engine.LongPoint;
+import fr.inria.zvtm.engine.LongPoint;
 
 class Messages {
 		

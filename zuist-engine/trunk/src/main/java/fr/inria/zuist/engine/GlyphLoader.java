@@ -10,10 +10,10 @@ package fr.inria.zuist.engine;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.animation.EndAction;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.animation.EndAction;
 
 /** Thread dedicated to the processing of load/unload requests.
  *@author Emmanuel Pietriga

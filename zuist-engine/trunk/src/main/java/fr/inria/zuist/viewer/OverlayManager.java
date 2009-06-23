@@ -25,16 +25,16 @@ import java.awt.BorderLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.glyphs.VText;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangle;
-import com.xerox.VTM.glyphs.VImage;
-import net.claribole.zvtm.glyphs.RImage;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.widgets.TranslucentTextArea;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.RImage;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.widgets.TranslucentTextArea;
 
 class OverlayManager implements ViewEventHandler {
     

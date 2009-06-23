@@ -7,7 +7,7 @@
 
 package fr.inria.zuist.engine;
 
-import com.xerox.VTM.engine.LongPoint;
+import fr.inria.zvtm.engine.LongPoint;
 
 /** Information about a level in the scene. Levels contain regions which themselves contain objects.
  *@author Emmanuel Pietriga

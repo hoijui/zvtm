@@ -10,13 +10,13 @@ package fr.inria.zuist.engine;
 import java.awt.Color;
 import java.awt.Font;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 /** Description of text objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga

@@ -18,15 +18,15 @@ import java.util.TimerTask;
 
 import java.util.Vector;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.engine.OverviewPortal;
-import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.interpolation.IdentityInterpolator;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.lens.*;
+import fr.inria.zvtm.engine.OverviewPortal;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.Region;
 

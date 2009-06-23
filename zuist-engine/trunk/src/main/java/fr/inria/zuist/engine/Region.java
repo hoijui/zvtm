@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Vector;
 
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 /** Information about a region in the scene. Regions contain objects. They span one or more contiguous level(s).
  *@author Emmanuel Pietriga
