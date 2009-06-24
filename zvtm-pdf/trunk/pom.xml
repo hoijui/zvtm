@@ -7,7 +7,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.claribole.zvtm</groupId>
+  <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-pdf</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-PDF</name>
@@ -52,7 +52,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
-      <groupId>net.claribole.zvtm</groupId>
+      <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
       <version>0.10.0-SNAPSHOT</version>
     </dependency>
