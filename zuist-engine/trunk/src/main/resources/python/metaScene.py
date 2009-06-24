@@ -12,17 +12,15 @@ from copy import copy
 # http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
 
-CMD_LINE_HELP = "ZUIST PDF Page Tiler Script\n\nUsage:\n\n" + \
-    " \tpdfPageTiler <src_image_path> <target_dir> [options]\n\n" + \
+CMD_LINE_HELP = "ZUIST Meta Scene Script\n\nUsage:\n\n" + \
+    " \tmetaScene <target_path> [options]\n\n" + \
     "Options:\n\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
-    "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
-    "\t-f\t\tforce tile generation\n"+\
-    "\t-scale=s\ts scale factor w.r.t default size\n"
+    "\t-tl=N\t\ttrace level (N in [0:3])\n"
 
 TRACE_LEVEL = 1
 
-TILE_SIZE = 500
+TILE_SIZE = 10000
 
 IMG_W = 214414
 IMG_H = 80571
@@ -32,18 +30,23 @@ IMG_H = 80571
 ################################################################################
 def processSrc():
     # source image
-    log("Loading source image from %s" % SRC_PATH, 2)
-    outputSceneFile = "%s/scene.xml" % TGT_DIR
+    outputSceneFile = TGT_PATH
     outputroot = ET.Element("scene")
     x = 0
     y = 0
-    while y < IMG_W:
+#    while y < IMG_W:
+#        x = 0
+#        while x < IMG_H:
+#            include = ET.SubElement(outputroot, "include")
+#            include.set("src", "tile-%d-%d/scene.xml" % (x/TILE_SIZE, y/TILE_SIZE))
+#            include.set("x", "%d" % x)
+#            include.set("y", "%d" % y)
+
+    for i in range(9):
         x = 0
-        while x < IMG_H:
-            #generateTile(pdf_document, page, x, y, "%s/tile-%d-%d.%s" % (TGT_DIR, x/TILE_SIZE, y/TILE_SIZE, OUTPUT_FILE_EXT))
-            
+        for j in range(22):
             include = ET.SubElement(outputroot, "include")
-            include.set("src", "tile-%d-%d/scene.xml" % (x/TILE_SIZE, y/TILE_SIZE))
+            include.set("src", "r%04dc%04d/scene.xml" % (i,j))
             include.set("x", "%d" % x)
             include.set("y", "%d" % y)
             
@@ -63,8 +66,8 @@ def log(msg, level=0):
 ################################################################################
 # main
 ################################################################################
-if len(sys.argv) > 2:
-    TGT_DIR = os.path.realpath(sys.argv[2])
+if len(sys.argv) > 1:
+    TGT_PATH = os.path.realpath(sys.argv[1])
     if len(sys.argv) > 3:
         for arg in sys.argv[3:]:
             if arg.startswith("-ts="):
