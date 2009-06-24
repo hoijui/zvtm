@@ -17,17 +17,17 @@ import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.xerox.VTM.engine.VCursor;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.Utilities;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.CameraListener;
+import fr.inria.zvtm.engine.VCursor;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.CameraListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;

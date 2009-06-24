@@ -41,19 +41,19 @@ import com.illposed.osc.OSCPortIn;
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCListener;
 
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VRectangle;
-import net.claribole.zvtm.engine.ViewEventHandler;
-import net.claribole.zvtm.engine.Java2DPainter;
-import net.claribole.zvtm.engine.CameraListener;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.Java2DPainter;
+import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -412,19 +412,19 @@ public class Controller implements Java2DPainter {
         String cmd = (String)params[0];
         if (cmd.equals(IN_CMD_PAN)){
             firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
-            //System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
+            System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
         }
         else if (cmd.equals(IN_CMD_ZOOM)){
             firstOrderZoom(((Integer)params[1]).intValue());
-            //System.out.println("zoom "+((Integer)params[1]).intValue());
+            System.out.println("zoom "+((Integer)params[1]).intValue());
         }
         else if (cmd.equals(IN_CMD_GGV)){
             getGlobalView(cCamera);
-            //System.out.println("ggv ");
+            System.out.println("ggv ");
         }
         else if (cmd.equals(IN_CMD_STOP)){
             stop();
-            //System.out.println("stop ");
+            System.out.println("stop ");
         }
     }
 
