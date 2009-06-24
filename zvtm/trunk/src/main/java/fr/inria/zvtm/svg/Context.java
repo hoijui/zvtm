@@ -68,13 +68,13 @@ public class Context {
 		    strokeColorDefined = true;
 		}
 		else if (ar[i].startsWith(SVGReader._fillopacity)){fill_opacity=new Float(ar[i].substring(SVGReader._fillopacity.length()));}
-		else if (ar[i].startsWith(SVGReader._fontfamily)){font_family=ar[i].substring(SVGReader._fontfamily.length());}
+		else if (ar[i].startsWith(SVGReader._fontfamilyCSS)){font_family=ar[i].substring(SVGReader._fontfamily.length());}
 		else if (ar[i].startsWith(SVGReader._fontsize)){
-		    font_size=ar[i].substring(SVGReader._fontsize.length());
+		    font_size=ar[i].substring(SVGReader._fontsizeCSS.length());
 		    if (font_size.endsWith(SVGReader._pt)){font_size = font_size.substring(0, font_size.length()-2);}
 		}
-		else if (ar[i].startsWith(SVGReader._fontweight)){font_weight=ar[i].substring(SVGReader._fontweight.length());}
-		else if (ar[i].startsWith(SVGReader._fontstyle)){font_style=ar[i].substring(SVGReader._fontstyle.length());}
+		else if (ar[i].startsWith(SVGReader._fontweight)){font_weight=ar[i].substring(SVGReader._fontweightCSS.length());}
+		else if (ar[i].startsWith(SVGReader._fontstyle)){font_style=ar[i].substring(SVGReader._fontstyleCSS.length());}
 	    }
 	}
     }

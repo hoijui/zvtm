@@ -131,6 +131,7 @@ public class SVGReader {
     public static final String _pt = "pt";
     public static final String _id = "id";
     public static final String _transform = "transform";
+    public static final String _translate = "translate";
     public static final String _viewBox = "viewBox";
 
     public static final String xlinkURI="http://www.w3.org/1999/xlink";
@@ -1767,22 +1768,24 @@ public class SVGReader {
             long yos = yoffset;
             if (e.hasAttribute(SVGReader._transform)){
                 String transform = e.getAttribute(_transform);
-                int transl = transform.indexOf("translate");
-                int rp = transform.indexOf(")", transl);
-                String tlate = transform.substring(transl + 10, rp);
-                String[] split = tlate.split(COMMA_SEP);
-                String tx,ty;
-                if (split.length >= 2){
-                    tx = split[0].trim();
-                    ty = split[1].trim();
+                if (transform.startsWith(_translate)){
+                    int transl = transform.indexOf("translate");
+                    int rp = transform.indexOf(")", transl);
+                    String tlate = transform.substring(transl + 10, rp);
+                    String[] split = tlate.split(COMMA_SEP);
+                    String tx,ty;
+                    if (split.length >= 2){
+                        tx = split[0].trim();
+                        ty = split[1].trim();
+                    }
+                    else {
+                        split = tlate.split(SPACE_SEP);
+                        tx = split[0].trim();
+                        ty = split[1].trim();
+                    }
+                    xoffset += (long)Math.floor((double)getLong(tx) * scale);
+                    yoffset += (long)Math.floor((double)getLong(ty) * scale);                    
                 }
-                else {
-                    split = tlate.split(SPACE_SEP);
-                    tx = split[0].trim();
-                    ty = split[1].trim();
-                }
-                xoffset += (long)Math.floor((double)getLong(tx) * scale);
-                yoffset += (long)Math.floor((double)getLong(ty) * scale);
             }
             NodeList objects=e.getChildNodes();
             boolean setAFont=false;
