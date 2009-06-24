@@ -7,7 +7,7 @@ $Id$
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.claribole.zvtm</groupId>
+  <groupId>fr.inria.zvtm</groupId>
   <artifactId>zgrviewer</artifactId>
   <packaging>jar</packaging>
   <name>ZGRViewer</name>
@@ -58,7 +58,7 @@ $Id$
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
-      <groupId>net.claribole.zvtm</groupId>
+      <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
       <version>0.10.0-SNAPSHOT</version>
     </dependency>
@@ -185,7 +185,7 @@ $Id$
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
-          <excludePackageNames>net.claribole.zvtm.glyphs.projection</excludePackageNames>
+          <excludePackageNames>fr.inria.zvtm.glyphs.projection</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
