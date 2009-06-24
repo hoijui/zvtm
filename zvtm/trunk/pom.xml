@@ -7,7 +7,7 @@ $Id$
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.claribole.zvtm</groupId>
+  <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM</name>
@@ -147,7 +147,7 @@ $Id$
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
-          <excludePackageNames>com.xerox.VTM.tests,net.claribole.zvtm.glyphs.projection,net.claribole.zvtm.animation.examples</excludePackageNames>
+          <excludePackageNames>fr.inria.zvtm.tests,fr.inria.zvtm.glyphs.projection,fr.inria.zvtm.animation.examples</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
