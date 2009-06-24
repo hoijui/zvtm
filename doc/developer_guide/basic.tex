@@ -48,7 +48,7 @@ Toolkits such as Java2D are powerful but difficult to use, requiring the program
 %%%%%%%%%%
 \subsection{Virtual Space Manager}
 
-The virtual space manager \cl{com.xerox.VTM.engine.VirtualSpaceManager} is the main entry point in ZVTM. It is the first object instantiated by the client application. There is only one instance of it.
+The virtual space manager \cl{fr.inria.zvtm.engine.VirtualSpaceManager} is the main entry point in ZVTM. It is the first object instantiated by the client application. There is only one instance of it.
 
 \codebox{VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;}
 
@@ -61,7 +61,7 @@ If ZVTM is instantiated within an applet, the VSM should be notified about this:
 %%%%%%%%%%
 \subsection{Virtual Spaces}
 
-Graphical objects are put on infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{com.xerox.VTM.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
+Graphical objects are put on infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{fr.inria.zvtm.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
 
 There can be an arbitrary number of virtual spaces. This provides an easy logical separation between graphical scenes/repre\-sen\-tations that are independent from one another.
 
@@ -83,7 +83,7 @@ vsm.addGlyph(c, vs);
 %%%%%
 \subsubsection{Cameras}
 
-Even though we present them as 2D {\em surfaces} on which we put graphical objects, virtual spaces are logical constructs. They are not directly presented on screen. Instead, cameras \cl{com.xerox.VTM.engine.Camera} are associated with virtual spaces. A camera observes a virtual space, with the ``line of sight'' always perpendicular to the virtual space's surface. A camera has a position \cd{x,y} in the virtual space coordinate system, as well as an altitude \cd{alt}. See Figure \ref{fig:vtmVS}. Of course, each camera's position and altitude can be changed at any time, whether abruptly or through an animation (see Section \ref{sec:animations}).
+Even though we present them as 2D {\em surfaces} on which we put graphical objects, virtual spaces are logical constructs. They are not directly presented on screen. Instead, cameras \cl{fr.inria.zvtm.engine.Camera} are associated with virtual spaces. A camera observes a virtual space, with the ``line of sight'' always perpendicular to the virtual space's surface. A camera has a position \cd{x,y} in the virtual space coordinate system, as well as an altitude \cd{alt}. See Figure \ref{fig:vtmVS}. Of course, each camera's position and altitude can be changed at any time, whether abruptly or through an animation (see Section \ref{sec:animations}).
 
 As for glyphs, cameras are added to virtual spaces:
 
@@ -100,7 +100,7 @@ An arbitrary number of cameras can be added to each virtual space. One camera, h
 
 Associating a camera with a virtual space is however not sufficient for creating a visual representation on screen. Cameras do not display anything by themselves. Rather, they define what region of the virtual space is observed through them when associated with a {\em view}. A view is an actual window displayed on screen to the user through the windowing system. It has a width and height. Together with the camera's position and altitude, these parameters define the rectangular region of the virtual space observed through the camera. See Figure \ref{fig:vtmVS}.
 
-There are two main types of views \cl{com.xerox.VTM.engine.View}: external views \cl{EView, GLEView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{PView}\footnote{Formerly miscalled AppletView because it was used mostly within a Swing JApplet.}, which can be inserted in any Swing hierarchy.
+There are two main types of views \cl{fr.inria.zvtm.engine.View}: external views \cl{EView, GLEView}, which are managed by the windowing system, e.g., Mac OS X, Windows, X11/Xorg; panel views \cl{PView}\footnote{Formerly miscalled AppletView because it was used mostly within a Swing JApplet.}, which can be inserted in any Swing hierarchy.
 
 Views with the \cd{GL} prefix are OpenGL views (they use Java2D's OpenGL rendering pipeline). They require that pipeline to be enabled at runtime using the following flag:
 
@@ -190,7 +190,7 @@ Position in the drawing stack can also be changed through the glyph's z-index. T
   \label{fig:j2dp}
 \end{figure}
 
-ZVTM also provides developers with convenient callback methods for calling raw Java2D instructions at various stages of the rendering process, through the \cl{net.claribole.zvtm.engine.Java2DPainter} interface. This can be useful, e.g., for drawing a static label in a corner of the view, a logo or a memory  gauge (see Figure \ref{fig:j2dp}).
+ZVTM also provides developers with convenient callback methods for calling raw Java2D instructions at various stages of the rendering process, through the \cl{fr.inria.zvtm.engine.Java2DPainter} interface. This can be useful, e.g., for drawing a static label in a corner of the view, a logo or a memory  gauge (see Figure \ref{fig:j2dp}).
 
 Java2DPainter callbacks can be set at the following steps of the rendering process:
 \begin{itemize}
@@ -221,7 +221,7 @@ class D2P implements Java2DPainter {
 %%%%%%%%%%
 \subsection{Portals}
 
-A portal is a subregion of a view that displays something different. Typically, a portal will display what is seen through another camera than the camera associated with the main view\cl{net.claribole.zvtm.engine.CameraPortal}. Camera portals can be considered as smaller views inset within views. Figure \ref{fig:portal} shows an example of a camera portal displaying an overview of a virtual space containing a map. One camera (associated with the main view) observes Central America. This camera is moved freely by the user (position and altitude). A second fixed camera is positioned so as to observe the entire world (associated with the portal in the lower-left corner). See Section \ref{sec:bifocal} for more information about bi-focal displays.
+A portal is a subregion of a view that displays something different. Typically, a portal will display what is seen through another camera than the camera associated with the main view\cl{fr.inria.zvtm.engine.CameraPortal}. Camera portals can be considered as smaller views inset within views. Figure \ref{fig:portal} shows an example of a camera portal displaying an overview of a virtual space containing a map. One camera (associated with the main view) observes Central America. This camera is moved freely by the user (position and altitude). A second fixed camera is positioned so as to observe the entire world (associated with the portal in the lower-left corner). See Section \ref{sec:bifocal} for more information about bi-focal displays.
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
@@ -246,11 +246,11 @@ vsm.addPortal(p, v);
 %%%%%%%%%%
 \subsection{Input events}
 
-It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{net.claribole.zvtm.engine.ViewEventHandler}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
+It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.engine.ViewEventHandler}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
 
 \cd{ViewEventHandler} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
 
-Portals have their own event interface \cl{net.claribole.zvtm.engine.PortalEventHandler}, that is used to listen for cursor entry/exit.
+Portals have their own event interface \cl{fr.inria.zvtm.engine.PortalEventHandler}, that is used to listen for cursor entry/exit.
 
 %%%%%%%%%%
 \subsection{Graphical Object Model}
