@@ -105,8 +105,8 @@ $Id$
         <configuration>
           <archive>
             <manifest>
-              <mainClass>com.xerox.VTM.demo.Introduction</mainClass>
-              <packageName>com.xerox.VTM.demo</packageName>
+              <mainClass>fr.inria.zvtm.demo.Introduction</mainClass>
+              <packageName>fr.inria.zvtm.demo</packageName>
               <addClasspath>true</addClasspath>
             </manifest>
             <manifestEntries>
