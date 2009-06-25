@@ -7,14 +7,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
-import net.claribole.zvtm.animation.*;
-import net.claribole.zvtm.animation.interpolation.*;
-import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.widgets.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.animation.*;
+import fr.inria.zvtm.animation.interpolation.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.lens.*;
+import fr.inria.zvtm.widgets.*;
 
 import javax.swing.Timer;
 import java.awt.event.ActionListener;

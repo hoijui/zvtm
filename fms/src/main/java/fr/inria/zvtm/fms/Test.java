@@ -5,14 +5,13 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
-import net.claribole.zvtm.animation.*;
-import net.claribole.zvtm.animation.interpolation.*;
-import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.lens.*;
-import net.claribole.zvtm.widgets.*;
+import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.animation.*;
+import fr.inria.zvtm.animation.interpolation.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.lens.*;
+import fr.inria.zvtm.widgets.*;
 
 public class Test {
 
@@ -48,6 +47,7 @@ public class Test {
 		frame.getContentPane().add(panel);
 		frame.pack();
 		frame.setVisible(true);
+		panel.requestFocus();
 		
 		mView.setBackgroundColor(Color.LIGHT_GRAY);
         eh = new EventHandlerTest(this);
@@ -175,6 +175,7 @@ class EventHandlerTest implements ViewEventHandler{
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        System.out.println("mouse moved");
         if (application.lensCursorSync){
             application.moveLens(jpx, jpy);
         }
@@ -222,7 +223,15 @@ class EventHandlerTest implements ViewEventHandler{
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (code==KeyEvent.VK_SPACE){application.toggleLensCursorSync();}
+        if (code==KeyEvent.VK_SPACE){
+			application.toggleLensCursorSync();
+		} else {
+			Glyph[] pickedGlyphs = application.mView.getCursor().getGlyphsUnderMouseList();
+			System.out.print("picked glyphs: ");
+			for(int i = 0; i < pickedGlyphs.length; i++)
+				System.out.print(pickedGlyphs[i]);
+			System.out.println();
+		}
     }
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
