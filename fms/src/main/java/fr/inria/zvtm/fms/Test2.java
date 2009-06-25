@@ -69,11 +69,11 @@ public class Test2 {
     void toggleLens(int x, int y){
         if (lens != null){
             unsetLens();
-			mView.getPanel().setDrawCursor(true);
+			//mView.getPanel().setDrawCursor(true);
         }
         else {
             setLens(x, y);
-			mView.getPanel().setDrawCursor(false);
+			//mView.getPanel().setDrawCursor(false);
         }
     }
     
