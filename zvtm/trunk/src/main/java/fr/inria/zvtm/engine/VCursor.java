@@ -91,8 +91,8 @@ public class VCursor {
     /**sync VTM cursor and system cursor if true*/
     boolean sync;
 
-    /**coord in camera space*/
-    int cx,cy;
+    /**coord in camera space (same as jpanel coords, but conventional coord sys at center of view panel, upward)*/
+    float cx,cy;
     /**coord in virtual space*/
     public long vx,vy;
     /**previous coords in virtual space*/
@@ -630,7 +630,7 @@ public class VCursor {
     boolean computeMouseOverList(ViewEventHandler eh,Camera c, ViewPanel v){
         if (v.lens != null){
             // following use of cx,cy implies that VCursor.unProject() has been called before this method
-            return this.computeMouseOverList(eh, c, cx + v.getSize().width/2, v.getSize().height/2 - cy);
+            return this.computeMouseOverList(eh, c, Math.round(cx + v.size.width/2), Math.round(v.size.height/2 - cy));
         }
         else {
             return this.computeMouseOverList(eh, c, mx, my);
@@ -720,41 +720,42 @@ public class VCursor {
                 //take lens into account (if set)
                 v.lens.gf(mx, my, gain);
                                              // cx(*) - v.lens.lx   (*) when no lens
-                cx = v.lens.lx + Math.round((mx - v.getSize().width/2 - v.lens.lx) / gain[0]);
+                cx = v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
                                 // v.lens.ly - cy(*)   (*) when no lens
-                cy = Math.round((v.lens.ly + v.getSize().height/2 - my) / gain[1]) - v.lens.ly;
+                cy = (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
             }
             else {
-                cx = mx - v.getSize().width/2;
-                cy = v.getSize().height/2 - my;
+                cx = mx - v.size.width/2;
+                cy = v.size.height/2 - my;
             }
-            double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
+            float ucoef = ((c.focal+c.altitude) / c.focal);
             //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
             pvx = vx;
             pvy = vy;
-            vx = Math.round((cx*coef) + c.posx);
-            vy = Math.round((cy*coef) + c.posy);
+            vx = Math.round((cx*ucoef) + c.posx);
+            vy = Math.round((cy*ucoef) + c.posy);
+            //System.out.print(vx+" "+vy+"       ");
         }
     }
 
     public LongPoint getVSCoordinates(Camera c, ViewPanel v){
         //translate from JPanel coords
-        int tcx,tcy;
+        float tcx,tcy;
         if (v.lens != null){
             //take lens into account (if set)
             v.lens.gf(mx, my, gain);
                                          // cx(*) - v.lens.lx   (*) when no lens
-            tcx = v.lens.lx + Math.round((mx - v.getSize().width/2 - v.lens.lx) / gain[0]);
+            tcx = v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
                             // v.lens.ly - cy(*)   (*) when no lens
-            tcy = Math.round((v.lens.ly + v.getSize().height/2 - my) / gain[1]) - v.lens.ly;
+            tcy = (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
         }
         else {
-            tcx = mx - v.getSize().width/2;
-            tcy = v.getSize().height/2 - my;
+            tcx = mx - v.size.width/2;
+            tcy = v.size.height/2 - my;
         }
-        double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
-        //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
-        return new LongPoint(Math.round((tcx*coef) + c.posx), Math.round((tcy*coef) + c.posy));
+        float ucoef = ((c.focal+c.altitude) / c.focal);
+        // find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
+        return new LongPoint(Math.round((tcx*ucoef) + c.posx), Math.round((tcy*ucoef) + c.posy));
     }
 
     /**returns the cursor's X JPanel coordinate*/

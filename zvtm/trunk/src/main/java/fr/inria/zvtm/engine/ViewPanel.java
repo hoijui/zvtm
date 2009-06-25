@@ -542,7 +542,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 synchronized(this){
                     parent.mouse.moveTo(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
-                    parent.mouse.unProject(cams[activeLayer],this);
+                    //parent.mouse.unProject(cams[activeLayer],this);
                     updateMouseOnly=true;
                 }
                 //translate glyphs sticked to mouse

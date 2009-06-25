@@ -350,7 +350,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							updateOffscreenBuffer();
 							stableRefToBackBufferGraphics.setPaintMode();
 							stableRefToBackBufferGraphics.setBackground(backColor);
-							stableRefToBackBufferGraphics.clearRect(0,0,getWidth(),getHeight());
+							stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
 							backgroundHook();
 							//begin actual drawing here
 							if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }
