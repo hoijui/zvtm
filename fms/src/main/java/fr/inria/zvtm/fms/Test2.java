@@ -230,10 +230,18 @@ class EventHandlerTest2 implements ViewEventHandler{
 		
 		if(c == 'p') {
 			precisionEnabled = !precisionEnabled;
-			application.mView.setFocusControlled(precisionEnabled);
+			application.mView.setFocusControlled(precisionEnabled, FocusControlHandler.SPEED_DEPENDENT_LINEAR);
 			System.out.println("\n******************\n"
 							   + "MOTOR PRECISION " + (precisionEnabled ? "ON" : "OFF")
 							   + "\n******************\n");
+		} else {
+			if(c == 'c') {
+				precisionEnabled = !precisionEnabled;
+				application.mView.setFocusControlled(precisionEnabled, FocusControlHandler.CONSTANT);
+				System.out.println("\n******************\n"
+								   + "MOTOR PRECISION " + (precisionEnabled ? "ON" : "OFF")
+								   + "\n******************\n");
+			}
 		}
     }
     

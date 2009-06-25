@@ -834,7 +834,7 @@ class EventHandlerTest3 implements ViewEventHandler{
 	    {application.toggleLensVarFlatening();}
 	else if(c == 'p') {
 	    precisionEnabled = !precisionEnabled;
-	    application.mView.setFocusControlled(precisionEnabled); }
+	    application.mView.setFocusControlled(precisionEnabled, FocusControlHandler.SPEED_DEPENDENT_LINEAR); }
 	else if(c == 'o') {
 	    application.toggleLensSmoothing();
 	}
