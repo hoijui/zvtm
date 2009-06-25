@@ -713,16 +713,17 @@ public class VCursor {
     }
 
     /**project mouse cursor IN VIRTUAL SPACE wrt camera info and change origin -> JPanel coords*/
-    void unProject(Camera c,ViewPanel v){
+    void unProject(Camera c, ViewPanel v){
         if (sync){
             //translate from JPanel coords
             if (v.lens != null){
                 //take lens into account (if set)
                 v.lens.gf(mx, my, gain);
-                                             // cx(*) - v.lens.lx   (*) when no lens
-                cx = v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
-                                // v.lens.ly - cy(*)   (*) when no lens
-                cy = (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
+                // take lens focus offset into account only when above threshold as the offset is not taken into account during rendering when below threshold
+                // mx - v.size.width/2 = cx when no lens
+                cx = (gain[0] >= v.lens.getBufferThreshold()) ? v.lens.lx + (mx+v.lens.getXfocusOffset() - v.size.width/2 - v.lens.lx) / gain[0] : v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
+                // v.size.height/2 - my = cy when no lens
+                cy = (gain[1] >= v.lens.getBufferThreshold()) ? (v.lens.ly + v.size.height/2 - my-v.lens.getYfocusOffset()) / gain[1] - v.lens.ly : (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
             }
             else {
                 cx = mx - v.size.width/2;
@@ -734,7 +735,6 @@ public class VCursor {
             pvy = vy;
             vx = Math.round((cx*ucoef) + c.posx);
             vy = Math.round((cy*ucoef) + c.posy);
-            //System.out.print(vx+" "+vy+"       ");
         }
     }
 
@@ -744,10 +744,11 @@ public class VCursor {
         if (v.lens != null){
             //take lens into account (if set)
             v.lens.gf(mx, my, gain);
-                                         // cx(*) - v.lens.lx   (*) when no lens
-            tcx = v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
-                            // v.lens.ly - cy(*)   (*) when no lens
-            tcy = (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
+            // take lens focus offset into account only when above threshold as the offset is not taken into account during rendering when below threshold
+            // mx - v.size.width/2 = cx when no lens
+            tcx = (gain[0] >= v.lens.getBufferThreshold()) ? v.lens.lx + (mx+v.lens.getXfocusOffset() - v.size.width/2 - v.lens.lx) / gain[0] : v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
+            // v.size.height/2 - my = cy when no lens
+            tcy = (gain[1] >= v.lens.getBufferThreshold()) ? (v.lens.ly + v.size.height/2 - my-v.lens.getYfocusOffset()) / gain[1] - v.lens.ly : (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
         }
         else {
             tcx = mx - v.size.width/2;
