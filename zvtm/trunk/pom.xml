@@ -48,8 +48,8 @@ $Id$
   <!-- Distribution - Deploy to FTP -->
   <distributionManagement>
 	<repository>
-      <id>zvtm repository</id>
-      <url>scp://web.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
   
