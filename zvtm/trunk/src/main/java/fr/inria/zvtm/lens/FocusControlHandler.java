@@ -36,7 +36,7 @@ public class FocusControlHandler implements ViewEventHandler {
 	Point ptRobot = new Point();
 	
 	Robot robot;
-	SpeedFunction sf = new SpeedFunction();
+	SpeedFunction sf;
 	View view;
 	
 	boolean started = false;
@@ -45,9 +45,30 @@ public class FocusControlHandler implements ViewEventHandler {
 	
 	Lens lens;
 	TemporalLens tLens;
+
+	public static short CONSTANT = 0;
+	public static short SPEED_DEPENDENT_LINEAR = 1;
 	
-	public FocusControlHandler(View v, ViewEventHandler aveh){
+	
+	public FocusControlHandler(View v, ViewEventHandler aveh, short speedBehavior){
 		view = v;
+		if(speedBehavior == SPEED_DEPENDENT_LINEAR) {
+			sf = new LSpeedFunction();
+		} else {
+			if(speedBehavior == CONSTANT) {
+				sf = new SpeedFunction() {
+					public double getSpeedCoeff(long currentTime, int x, int y) {
+						return 0;
+					}
+				};
+			} else {
+				sf = new SpeedFunction() {
+					public double getSpeedCoeff(long currentTime, int x, int y) {
+						return 0;
+					}
+				};
+			}
+		}
 		this.actualViewEventHandler = aveh;
 		robot = null;
 		try {
@@ -232,8 +253,11 @@ public class FocusControlHandler implements ViewEventHandler {
 	
 }
 
+interface SpeedFunction {
+	double getSpeedCoeff(long currentTime, int x, int y);
+}
 
-class SpeedFunction {
+class LSpeedFunction implements SpeedFunction {
 
 	static final int NB_SPEED_POINTS = 4;
 	static final int MIN_SPEED = 100;
@@ -245,7 +269,7 @@ class SpeedFunction {
 	float[] speeds = new float[NB_SPEED_POINTS-1];
 	float mean_speed = 0;
 
-	public SpeedFunction() { }
+	public LSpeedFunction() { }
 
 	public void getSpeed(long currentTime, int x, int y) {
 		// compute mean speed over last 3 points

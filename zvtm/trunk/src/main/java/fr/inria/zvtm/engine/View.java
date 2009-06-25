@@ -637,13 +637,14 @@ public abstract class View {
     /* --------------------- LENSES -------------------------- */
 
     boolean isFocusControlled = false;
+	short speedBehavior = FocusControlHandler.SPEED_DEPENDENT_LINEAR;
     FocusControlHandler focusControlHandler = null;
 
     /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
         * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
     public Lens setLens(Lens l){
         Lens res = panel.setLens(l);
-        activateFocusControlled(isFocusControlled);
+        activateFocusControlled(isFocusControlled, speedBehavior);
         return res;
     }
 
@@ -652,16 +653,21 @@ public abstract class View {
         return panel.getLens();
     }
     
-    public void setFocusControlled(boolean isFocusControlled) {
+    public void setFocusControlled(boolean isFocusControlled, short speedBehavior) {
 		this.isFocusControlled = isFocusControlled;
-        activateFocusControlled(isFocusControlled);
+		this.speedBehavior = speedBehavior;
+        activateFocusControlled(isFocusControlled, speedBehavior);
 	}
 	
-	void activateFocusControlled(boolean b){
+	public void setFocusControlled(boolean isFocusControlled) {
+		setFocusControlled(isFocusControlled, speedBehavior);
+	}
+	
+	void activateFocusControlled(boolean b, short speedBehavior){
 	    if (panel.getLens() == null){return;}
         if (b){
             if (focusControlHandler == null){
-                focusControlHandler = new FocusControlHandler(this, getPanel().getEventHandlers()[getActiveLayer()]);
+                focusControlHandler = new FocusControlHandler(this, getPanel().getEventHandlers()[getActiveLayer()], speedBehavior);
                 this.setNotifyMouseMoved(true);
             }
             focusControlHandler.start(panel.getLens());                
