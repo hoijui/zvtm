@@ -627,13 +627,14 @@ public class VCursor {
     }
 
     /**compute list of glyphs currently overlapped by the mouse (take into account lens l when unprojecting)*/
-    boolean computeMouseOverList(ViewEventHandler eh,Camera c, Lens l){
-	if (l != null){
-	    return this.computeMouseOverList(eh, c, Math.round((((float)mx-l.sw)/gain[0])+l.sw), Math.round((((float)my-l.sh)/gain[1])+l.sh));
-	}
-	else {
-	    return this.computeMouseOverList(eh, c, mx, my);
-	}
+    boolean computeMouseOverList(ViewEventHandler eh,Camera c, ViewPanel v){
+        if (v.lens != null){
+            // following use of cx,cy implies that VCursor.unProject() has been called before this method
+            return this.computeMouseOverList(eh, c, cx + v.getSize().width/2, v.getSize().height/2 - cy);
+        }
+        else {
+            return this.computeMouseOverList(eh, c, mx, my);
+        }
     }
     
     /** Compute list of glyphs currently overlapped by the mouse. */
@@ -715,13 +716,17 @@ public class VCursor {
     void unProject(Camera c,ViewPanel v){
         if (sync){
             //translate from JPanel coords
-            cx = mx - (v.getSize().width/2);
-            cy = (v.getSize().height/2) - my;
             if (v.lens != null){
                 //take lens into account (if set)
-                v.lens.gf(cx, cy, gain);
-                cx *= gain[0];
-                cy *= gain[1];
+                v.lens.gf(mx, my, gain);
+                                             // cx(*) - v.lens.lx   (*) when no lens
+                cx = v.lens.lx + Math.round((mx - v.getSize().width/2 - v.lens.lx) / gain[0]);
+                                // v.lens.ly - cy(*)   (*) when no lens
+                cy = Math.round((v.lens.ly + v.getSize().height/2 - my) / gain[1]) - v.lens.ly;
+            }
+            else {
+                cx = mx - v.getSize().width/2;
+                cy = v.getSize().height/2 - my;
             }
             double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
             //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
@@ -734,13 +739,18 @@ public class VCursor {
 
     public LongPoint getVSCoordinates(Camera c, ViewPanel v){
         //translate from JPanel coords
-        int tcx = mx - (v.getSize().width/2);
-        int tcy = (v.getSize().height/2) - my;
+        int tcx,tcy;
         if (v.lens != null){
             //take lens into account (if set)
-            v.lens.gf(tcx, tcy, gain);
-            tcx *= gain[0];
-            tcy *= gain[1];
+            v.lens.gf(mx, my, gain);
+                                         // cx(*) - v.lens.lx   (*) when no lens
+            tcx = v.lens.lx + Math.round((mx - v.getSize().width/2 - v.lens.lx) / gain[0]);
+                            // v.lens.ly - cy(*)   (*) when no lens
+            tcy = Math.round((v.lens.ly + v.getSize().height/2 - my) / gain[1]) - v.lens.ly;
+        }
+        else {
+            tcx = mx - v.getSize().width/2;
+            tcy = v.getSize().height/2 - my;
         }
         double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
         //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE

@@ -555,7 +555,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
                     if (parent.mouse.isSensitive()){
-                        if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this.lens)){
+                        if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this)){
                             parent.repaintNow();
                         }
                     }
@@ -607,7 +607,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();  
                 parent.repaintNow();
-                if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
+                if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this);}
             }
         }	
         catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);}}
