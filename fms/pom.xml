@@ -30,7 +30,7 @@ $Id$
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
-      <groupId>net.claribole.zvtm</groupId>
+      <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
       <version>0.10.0-SNAPSHOT</version>
     </dependency>
