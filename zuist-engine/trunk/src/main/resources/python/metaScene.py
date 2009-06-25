@@ -51,7 +51,7 @@ def processSrc():
             include.set("y", "%d" % y)
             
             x += TILE_SIZE
-        y += TILE_SIZE
+        y -= TILE_SIZE
     log("Writing scene file %s" % outputSceneFile, 1)
     tree = ET.ElementTree(outputroot)
     tree.write(outputSceneFile, encoding='utf-8')
