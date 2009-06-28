@@ -497,14 +497,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     /**mouse entered this view*/
     public void mouseEntered(MouseEvent e){
-	active=true; //make the view active any time the mouse enters it
-	repaintNow=true;
-	inside=true;
-	VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
-	/* requesting parent focus was only used to get keyboard/mouse wheel events in IViews,
-	   better to manage this explcitly when internal frames get selected as doing it
-	   here has unwanted side effects in some UIs that mix internal and external frames */
-	//parent.requestFocus();
+        //make the view active any time the mouse enters it
+        active = true;
+        repaintNow = true;
+        inside = true;
+        VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
     }
 
     /**mouse exited this view*/
