@@ -127,7 +127,4 @@ public class PView extends View implements KeyListener {
 	}
     }
 
-    /**used only in Internal Views to get focus in view for key events (called automatically when the mouse enters the (Acc)IView)*/
-    public void requestFocus(){}
-
 }
