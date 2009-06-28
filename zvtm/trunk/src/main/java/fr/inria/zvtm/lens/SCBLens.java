@@ -19,6 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.LowPassFilter;
+import fr.inria.zvtm.engine.SpeedCoupling;
 
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.Translucency;
@@ -41,6 +42,8 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 
     double cutoffParamA = 0.2;   // 0.8
     double cutoffParamB = 0.2;  // 0.1 to make it more difficult to acquire
+
+    protected SpeedCoupling speedCoupling = null;
 
     /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
@@ -206,15 +209,23 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     }
 
     public void updateTimeBasedParams(){
-	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-	double distAway = targetPos.distance(currentPos);
-	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-	filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
-	currentPos = filter.apply(targetPos, frequency);
-	int tx = (int)Math.round(currentPos.getX());
-	int ty = (int)Math.round(currentPos.getY());
-	tx = Math.max(tx, w/2);
- 	ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+	double opacity;
+	if (speedCoupling != null)
+	{
+	    opacity = 1.0 - (double)speedCoupling.getCoef();
+	}
+	else
+	{
+	    targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+	    double distAway = targetPos.distance(currentPos);
+	    opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+	    filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
+	    currentPos = filter.apply(targetPos, frequency);
+	    int tx = (int)Math.round(currentPos.getX());
+	    int ty = (int)Math.round(currentPos.getY());
+	    tx = Math.max(tx, w/2);
+	    ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+	}
 	float nMMTf = ((float)opacity) * a + b;
 	if (Math.abs(MMTf - nMMTf) > 0.01f){// avoid unnecesarry repaint requests
 	    // make the lens almost disappear when making big moves
@@ -227,6 +238,10 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     public void setCutoffFrequencyParameters(double a, double b){
 	cutoffParamA = a;
 	cutoffParamB = b;
+    }
+
+    public void setSpeedCoupling(SpeedCoupling sc){
+	speedCoupling = sc;
     }
 
     public void setNoUpdateWhenMouseStill(boolean b){
@@ -247,6 +262,10 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 	super.setAbsolutePosition(ax, ay);
 	updateFrequency(absTime);
 	updateTimeBasedParams(ax, ay);
+	if (speedCoupling != null)
+	{
+	    speedCoupling.addPoint(ax, ay, absTime);
+	}
     }
 
     public int getRadius(){

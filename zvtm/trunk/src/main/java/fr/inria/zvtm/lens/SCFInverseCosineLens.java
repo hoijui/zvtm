@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.Translucency;
 import fr.inria.zvtm.engine.LowPassFilter;
+import fr.inria.zvtm.engine.SpeedCoupling;
 
 /**Profile: inverse cosine - Distance metric: L(2) (circular shape) - Flattens itself when moving fast<br>Size expressed as an absolute value in pixels*/
 
@@ -37,6 +38,8 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 
     double cutoffParamA = 0.2;   // 0.8
     double cutoffParamB = 0.001;  // 0.1 to make it more difficult to acquire
+
+    SpeedCoupling speedCoupling = null;
 
     /** Dynamic magnification factor. */
     float dMM = MM;
@@ -104,6 +107,10 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 	    super.setAbsolutePosition(ax, ay);
 	    updateFrequency(absTime);
 	    updateTimeBasedParams(ax, ay);
+	    if (speedCoupling != null)
+	    {
+		speedCoupling.addPoint(ax, ay, absTime);
+	    }
 	}
     }
 
@@ -132,15 +139,23 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 
     public void updateTimeBasedParams(){
 	synchronized(this){
-	    targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-	    double distAway = targetPos.distance(currentPos);
-	    double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-	    filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
-	    currentPos = filter.apply(targetPos, frequency);
-	    int tx = (int)Math.round(currentPos.getX());
-	    int ty = (int)Math.round(currentPos.getY());
-	    tx = Math.max(tx, w/2);
-	    ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+	    double opacity;
+	    if (speedCoupling != null)
+	    {
+		opacity = 1.0 - (double)speedCoupling.getCoef();
+	    }
+	    else
+	    {
+		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+		double distAway = targetPos.distance(currentPos);
+		opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
+		currentPos = filter.apply(targetPos, frequency);
+		int tx = (int)Math.round(currentPos.getX());
+		int ty = (int)Math.round(currentPos.getY());
+		tx = Math.max(tx, w/2);
+		ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+	    }
 	    float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
 	    if (Math.abs(dMM - nMM) > 0.1f){// avoid unnecesarry repaint requests
 		// make the lens almost flat when making big moves
@@ -159,6 +174,10 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
     public void setCutoffFrequencyParameters(double a, double b){
 	cutoffParamA = a;
 	cutoffParamB = b;
+    }
+
+    public void setSpeedCoupling(SpeedCoupling sc){
+	speedCoupling = sc;
     }
 
     public void setNoUpdateWhenMouseStill(boolean b){
@@ -180,21 +199,66 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 	    g[0] = g[1] = 1;
     }
 
+    /**
+     * set the minimum magnification factor (1.0 by default)
+     *
+     *@param minMagFac minimum magnification factor, in [1.0,MaxMag]
+     */
+    public void setMinMagFactor(float minMagFac){
+	minMagFac = (minMagFac < 1.0f) ? 1.0f:minMagFac;
+	mindMM = minMagFac;
+    }
+
+    boolean doDrawMaxFlatTop = false;
+    /**
+     * allows to ask to draw the max flat top (not drawn by default)
+     *
+     *@param b if true ask to draw the max flat top
+     */
+    public void setDrawMaxFlatTop(boolean b){
+	doDrawMaxFlatTop = b;
+    }
+
+    boolean doSpeedBlendOuterRadius = true;
+    boolean doSpeedBlendFlatTop = true;
+    /**
+     * allows to ask to draw the max flat top
+     *
+     *@param bft if true speed blend the flat top
+     *@param bor if true speed blend the outer radius
+     */
+    public void setSpeedBlendRadii(boolean bft, boolean bor){
+	doSpeedBlendFlatTop = bft;
+	doSpeedBlendOuterRadius = bor;
+    }
+
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
         // get the alpha composite from a precomputed list of values
         // (we don't want to instantiate a new AlphaComposite at each repaint request)
-        g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
+	if (doSpeedBlendOuterRadius){
+	    g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
+	}
         if (r1Color != null){
             g2d.setColor(r1Color);
             g2d.drawOval(lx+w/2-LR1, ly+h/2-LR1, 2*LR1, 2*LR1);
         }
+	if (doSpeedBlendFlatTop && !doSpeedBlendOuterRadius){
+	    g2d.setComposite(Translucency.acs[Math.round((dMM/((float)(1-MM)) + MM/((float)(MM-1)))*Translucency.ACS_ACCURACY)]);
+	}
+	else if (!doSpeedBlendFlatTop && doSpeedBlendOuterRadius){
+	    g2d.setComposite(Translucent.acO);
+	}
         if (r2Color != null){
             int r2 = Math.round(dMM/((float)MM) * LR2);
             g2d.setColor(r2Color);
             g2d.drawOval(lx+w/2-r2, ly+h/2-r2, 2*r2, 2*r2);
         }
         g2d.setComposite(Translucent.acO);
+	if (doDrawMaxFlatTop && r2Color != null){
+	    g2d.setColor(r2Color);
+            g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
+	}
     }
 
     public float getActualMaximumMagnification(){

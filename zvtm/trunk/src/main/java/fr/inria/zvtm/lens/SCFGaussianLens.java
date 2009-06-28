@@ -155,7 +155,6 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		int ty = (int)Math.round(currentPos.getY());
 		tx = Math.max(tx, w/2);
 		ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
-		float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
 	    }
 	    float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
 	    if (Math.abs(dMM - nMM) > 0.1f){// avoid unnecesarry repaint requests
