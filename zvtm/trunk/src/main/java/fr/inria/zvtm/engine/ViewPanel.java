@@ -186,6 +186,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     protected boolean drawVTMcursor=true;
     /**the AWT cursor*/
     protected Cursor awtCursor;
+    
+    /** Should the viewpanel automatically request focus when cursor enters it or not. */
+    boolean autoRequestFocusOnMouseEnter = false;
 
     /**Lens (fisheye, etc.)*/
     protected Lens lens;
@@ -502,6 +505,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
         repaintNow = true;
         inside = true;
         VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
+        if (autoRequestFocusOnMouseEnter){
+            requestFocus();
+        }
     }
 
     /**mouse exited this view*/
@@ -509,6 +515,22 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	inside=false;
 	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
     }
+    
+    /** Should the viewpanel automatically request focus when cursor enters it or not.
+     *  Default is false for external views (EView).
+     *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
+     */
+    public void setAutoRequestFocusOnMouseEnter(boolean b){
+        autoRequestFocusOnMouseEnter = b;
+    }
+
+    /** Tells whether the viewpanel is automatically requesting focus when cursor enters it or not.
+     *  Default is false for external views (EView).
+     *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
+     */
+    public boolean getAutoRequestFocusOnMouseEnter(){
+        return autoRequestFocusOnMouseEnter;
+    }    
     
     /** Value that specifies that there isn't any point for which no mouse move/drag event is sent. */
     public static final int NO_COORDS = -1;

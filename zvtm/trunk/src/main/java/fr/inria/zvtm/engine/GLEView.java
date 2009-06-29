@@ -62,7 +62,7 @@ public class GLEView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new GLViewPanel(v,this);
+	    panel=new GLViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -76,7 +76,7 @@ public class GLEView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new GLViewPanel(v,this);
+	    panel=new GLViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -121,7 +121,7 @@ public class GLEView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new GLViewPanel(v,this);
+	    panel=new GLViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -135,7 +135,7 @@ public class GLEView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new GLViewPanel(v,this);
+	    panel=new GLViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);

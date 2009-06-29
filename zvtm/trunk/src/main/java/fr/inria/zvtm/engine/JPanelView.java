@@ -98,8 +98,8 @@ public class JPanelView extends View  implements KeyListener {
 
     private ViewPanel makePanel(short viewType, Vector cameraList) {
 	switch (viewType) {
-	case View.STD_VIEW: return new StdViewPanel(cameras, this);
-	case View.OPENGL_VIEW: return new GLViewPanel(cameras, this);
+	case View.STD_VIEW: return new StdViewPanel(cameras, this, true);
+	case View.OPENGL_VIEW: return new GLViewPanel(cameras, this, true);
 	default: throw new IllegalArgumentException("Invalid view type");
 	}
     }

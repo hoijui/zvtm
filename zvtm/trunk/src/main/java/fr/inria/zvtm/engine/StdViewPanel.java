@@ -58,7 +58,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	Dimension oldSize;
 	Graphics2D lensG2D = null;
 
-	public StdViewPanel(Vector cameras,View v) {
+	StdViewPanel(Vector cameras,View v, boolean arfome) {
 		addHierarchyListener(
 				new HierarchyListener() {
 					public void hierarchyChanged(HierarchyEvent e) {
@@ -84,6 +84,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		this.addMouseWheelListener(this);
 		this.addComponentListener(this);
 		this.setDoubleBuffered(false);
+    	setAutoRequestFocusOnMouseEnter(arfome);
 		start();
 		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}

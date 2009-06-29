@@ -74,7 +74,7 @@ public class EView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new StdViewPanel(v,this);
+	    panel=new StdViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -88,7 +88,7 @@ public class EView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new StdViewPanel(v,this);
+	    panel=new StdViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -137,7 +137,7 @@ public class EView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new StdViewPanel(v,this);
+	    panel=new StdViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -151,7 +151,7 @@ public class EView extends View implements KeyListener{
 	    buildConstraints(constraints,0,0,1,1,100,90);
 	    constraints.fill=GridBagConstraints.BOTH;
 	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new StdViewPanel(v,this);
+	    panel=new StdViewPanel(v,this, false);
 	    panel.setSize(panelWidth,panelHeight);
 	    gridBag.setConstraints(panel,constraints);
 	    cpane.add(panel);
@@ -170,34 +170,6 @@ public class EView extends View implements KeyListener{
 	frame.setSize(panelWidth,panelHeight);
 	if (visible){frame.setVisible(true);}
     }
-
-//     public void fullScreen(DisplayMode dm){
-// 	if (dm!=null){
-// 	    frame.setVisible(false);
-// 	    frame.dispose();
-// 	    frame=new JFrame();
-// 	    GridBagLayout gridBag=new GridBagLayout();
-// 	    GridBagConstraints constraints=new GridBagConstraints();
-// 	    Container cpane=frame.getContentPane();
-// 	    cpane.setLayout(gridBag);
-// 	    buildConstraints(constraints,0,0,1,1,100,90);
-// 	    constraints.fill=GridBagConstraints.BOTH;
-// 	    constraints.anchor=GridBagConstraints.CENTER;
-// 	    panel.setSize(dm.getWidth(),dm.getHeight());
-// 	    gridBag.setConstraints(panel,constraints);
-// 	    cpane.add(panel);
-// 	    frame.setUndecorated(true);
-// 	    frame.setSize(dm.getWidth(),dm.getHeight());
-// 	    frame.setResizable(false);
-// 	    java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(frame);
-// 	    java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setDisplayMode(dm);
-// 	    frame.validate();
-// 	}
-// 	else {
-// 	    java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
-	    
-// 	}
-//     }
 
     /**get the java.awt.Container for this view*/
     public Container getFrame(){return frame;}
@@ -274,9 +246,5 @@ public class EView extends View implements KeyListener{
 	    else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
 	}
     }
-
-
-    /**used only in Internal Views to get focus in view for key events (called automatically when the mouse enters the (Acc)IView)*/
-    public void requestFocus(){}
 
 }
