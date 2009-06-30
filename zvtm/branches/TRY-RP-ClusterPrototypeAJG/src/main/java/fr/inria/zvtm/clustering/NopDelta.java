@@ -1,5 +1,7 @@
 package fr.inria.zvtm.clustering;
 
+import fr.inria.zvtm.engine.VirtualSpace;
+
 /**
  * No-op Delta, to be used as a 
  * default implementation while "patching holes"

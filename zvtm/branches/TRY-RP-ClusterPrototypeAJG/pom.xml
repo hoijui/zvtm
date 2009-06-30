@@ -83,7 +83,7 @@ $Id$
 	<dependency>
 	  <groupId>aspectj</groupId>
 	  <artifactId>aspectjrt</artifactId>
-	  <version>1.6.2</version>
+	  <version>1.5.4</version>
 	</dependency>
   </dependencies>
   
@@ -138,6 +138,11 @@ $Id$
 	<plugin>
 		<groupId>org.codehaus.mojo</groupId>
 		<artifactId>aspectj-maven-plugin</artifactId>
+		<version>1.1</version>
+		<configuration>
+			<source>1.5</source>
+			<target>1.5</target>
+		</configuration>
 		<executions>
 			<execution>
 				<goals>
