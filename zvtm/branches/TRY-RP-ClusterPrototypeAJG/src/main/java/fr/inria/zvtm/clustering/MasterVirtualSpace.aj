@@ -15,6 +15,8 @@ public aspect MasterVirtualSpace {
 	//data structure for easy retrieval of a Glyph 
 	//given its key: either a BStree or a hash table
 	private final Map<ObjId, Glyph> VirtualSpace.idMap = new HashMap<ObjId, Glyph>();
+
+	//multicast group, named after the virtual space 
 	
 	//define pointcuts to catch Glyphs additions 
 	//and removals to/from a VirtualSpace
@@ -31,7 +33,7 @@ public aspect MasterVirtualSpace {
 		&& args(glyph, ..)
 		&&!within(VirtualSpace); 
 
-	//
+	//!within(Glyph+) to avoid calling multiple times when chained overloads(is it the right approach?)
 	pointcut glyphPosChange(Glyph glyph):
 		(call(public * Glyph+.moveTo(..)) || call(public * Glyph+.move(..)))
 		&& target(glyph)
