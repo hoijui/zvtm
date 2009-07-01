@@ -3,6 +3,8 @@ package fr.inria.zvtm.clustering;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.inria.zvtm.clustering.ObjId;
+import fr.inria.zvtm.clustering.ObjIdFactory;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -25,19 +27,21 @@ public aspect MasterVirtualSpace {
 	pointcut glyphAdd(Glyph glyph): 
 		call(public Glyph VirtualSpaceManager.addGlyph(..)) 
 		&& args(glyph, ..)
-		&&!within(VirtualSpaceManager);
+		&&!within(VirtualSpaceManager)
+		&&!within(Delta+); //Delta manages updates to slaves
 
-	//here we need to capture the Glyph argument
 	pointcut glyphRemove(Glyph glyph): 
 		call(public * VirtualSpace.removeGlyph(..)) 
 		&& args(glyph, ..)
-		&&!within(VirtualSpace); 
+		&&!within(VirtualSpace)
+		&&!within(Delta+); //Delta manages updates to slaves
 
 	//!within(Glyph+) to avoid calling multiple times when chained overloads(is it the right approach?)
 	pointcut glyphPosChange(Glyph glyph):
 		(call(public * Glyph+.moveTo(..)) || call(public * Glyph+.move(..)))
 		&& target(glyph)
-		&&!within(Glyph+);
+		&&!within(Glyph+)
+		&&!within(Delta+); //Delta manages updates to slaves
 
 	//
 	after(Glyph glyph) returning: glyphAdd(glyph) {
@@ -62,5 +66,6 @@ public aspect MasterVirtualSpace {
 	public Glyph VirtualSpace.getGlyphById(ObjId id){
 		return idMap.get(id);
 	}
+
 }
 

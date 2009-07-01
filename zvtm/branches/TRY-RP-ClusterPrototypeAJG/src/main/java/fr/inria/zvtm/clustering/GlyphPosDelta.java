@@ -24,5 +24,10 @@ class GlyphPosDelta implements Delta {
 
 		toAlter.moveTo(xPos, yPos);
 	}
+
+	@Override public String toString(){
+		return "GlyphPosDelta, target " + id +
+			", x=" + xPos + ", y=" + yPos;
+	}
 }
 

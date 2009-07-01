@@ -38,15 +38,19 @@ $Id$
       <id>zvtm repository</id>
       <url>http://zvtm.sourceforge.net/maven</url>
     </repository>
-    <repository>
-      <id>central</id>
-      <name>Maven Repository</name>
-      <url>http://repo1.maven.org/maven2</url>
-    </repository>
-  </repositories>
-  
-  <!-- Distribution - Deploy to FTP -->
-  <distributionManagement>
+	<repository>
+		<id>central</id>
+		<name>Maven Repository</name>
+		<url>http://repo1.maven.org/maven2</url>
+	</repository>
+	<repository>
+		<id>jboss</id>
+		<url>http://repository.jboss.com/maven2</url>
+	</repository>
+</repositories>
+
+<!-- Distribution - Deploy to FTP -->
+<distributionManagement>
 	<repository>
       <id>zvtm repository</id>
       <url>scp://web.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
@@ -85,6 +89,12 @@ $Id$
 	  <artifactId>aspectjrt</artifactId>
 	  <version>1.5.4</version>
 	</dependency>
+	<dependency>
+	  <groupId>jgroups</groupId>
+	  <artifactId>jgroups</artifactId>
+	  <version>2.7.0.GA</version>
+	</dependency>
+
   </dependencies>
   
   <!-- Build -->

@@ -56,4 +56,7 @@ public class ObjId implements Serializable {
 		return !this.equals(INVALID_ID);
 	}
 
+	@Override public String toString(){
+		return "ObjId@" + id;
+	}
 }

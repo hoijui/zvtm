@@ -13,5 +13,9 @@ class NopDelta implements Delta {
 	public void apply(VirtualSpace vs){
 		System.err.println("Default delta executed. This probably means that a Glyph or Camera derived class needs updates to its serialization code");
 	}
+
+	@Override public String toString(){
+		return "NopDelta";
+	}
 }
 
