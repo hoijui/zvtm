@@ -6,9 +6,9 @@
  *
  * $Id$
  */
-package net.claribole.zvtm.layout;
+package fr.inria.zvtm.layout;
 
-import com.xerox.VTM.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpace;
 
 import java.awt.Color;
 

@@ -5,18 +5,18 @@
  * $Id:  $
  */
 
-package net.claribole.zvtm.layout.tests;
+package fr.inria.zvtm.layout.tests;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import net.claribole.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.ViewEventHandler;
 
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.glyphs.Glyph;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.glyphs.Glyph;
 
 public class EventHandlerTest implements ViewEventHandler{
 

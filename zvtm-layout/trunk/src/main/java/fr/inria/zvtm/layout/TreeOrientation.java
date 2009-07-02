@@ -6,7 +6,7 @@
  *
  * $Id$
  */
-package net.claribole.zvtm.layout;
+package fr.inria.zvtm.layout;
 
 /**
  * Tree orientation constants

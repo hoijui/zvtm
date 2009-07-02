@@ -5,19 +5,19 @@
  * $Id:  $
  */
 
-package net.claribole.zvtm.layout.tests;
+package fr.inria.zvtm.layout.tests;
 
 import java.awt.*;
 import javax.swing.*;
 
 import java.util.Vector;
 
-import com.xerox.VTM.engine.*;
-import com.xerox.VTM.glyphs.*;
-import net.claribole.zvtm.engine.*;
-import net.claribole.zvtm.glyphs.*;
-import net.claribole.zvtm.widgets.*;
-import net.claribole.zvtm.layout.*;
+import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.widgets.*;
+import fr.inria.zvtm.layout.*;
 
 public class Test {
 
@@ -30,7 +30,7 @@ public class Test {
 	Camera mCamera;
 
     Test(){
-        vsm = new VirtualSpaceManager();
+        vsm = VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
         initTest();
     }
@@ -38,7 +38,6 @@ public class Test {
     public void initTest(){
         eh = new EventHandlerTest(this);
         vs = vsm.addVirtualSpace(mSpaceName);
-        vsm.setZoomLimit(-90);
         mCamera = vsm.addCamera(mSpaceName);
         Vector cameras = new Vector();
         cameras.add(mCamera);

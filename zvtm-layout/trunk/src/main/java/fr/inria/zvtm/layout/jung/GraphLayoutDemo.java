@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package net.claribole.zvtm.layout.jung;
+package fr.inria.zvtm.layout.jung;
 
 import java.awt.Color;
 import java.awt.Shape;
@@ -36,17 +36,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
 
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.VPath;
-import net.claribole.zvtm.glyphs.DPath;
-import net.claribole.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VPath;
+import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.engine.ViewEventHandler;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -95,6 +95,7 @@ public class GraphLayoutDemo extends JApplet {
 	static final String mSpaceName = "graph space";
 	static final String mViewName = "Jung in ZVTM Demo";
 	View mView;
+	VirtualSpace mSpace;
 	Camera mCamera;
 	GraphLayoutDemoEventHandler eh;
 	JPanel viewPanel;
@@ -140,9 +141,9 @@ public class GraphLayoutDemo extends JApplet {
 		this.setSize(appletWindowWidth-10, appletWindowHeight-10);
 		cpane.setSize(appletWindowWidth, appletWindowHeight);
 		cpane.setBackground(Color.WHITE);
-		vsm = new VirtualSpaceManager(true);
+		vsm = VirtualSpaceManager.INSTANCE;
 		eh = new GraphLayoutDemoEventHandler(this);
-		vsm.addVirtualSpace(mSpaceName);
+		mSpace = vsm.addVirtualSpace(mSpaceName);
 		mCamera = vsm.addCamera(mSpaceName);
 		Vector cameras = new Vector();
 		cameras.add(mCamera);		
@@ -203,8 +204,8 @@ public class GraphLayoutDemo extends JApplet {
 		Iterator i = layout.getVisibleEdges().iterator();
 		while (i.hasNext()){
 			Edge e = (Edge)i.next();
-			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK, false);
-			vsm.addGlyph(g, mSpaceName);
+			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK);
+			mSpace.addGlyph(g);
 			edge2glyph.put(e, g);
 			g.setOwner(e);
 		}
@@ -213,7 +214,7 @@ public class GraphLayoutDemo extends JApplet {
 			Vertex v = (Vertex)i.next();
 			Coordinates c = layout.getCoordinates(v);
 			VCircle cl = new VCircle((int)c.getX(), (int)c.getY(), 0, 10, Color.RED);
-			vsm.addGlyph(cl, mSpaceName);
+			mSpace.addGlyph(cl);
 			vertex2glyph.put(v, cl);
 			cl.setOwner(v);
 		}

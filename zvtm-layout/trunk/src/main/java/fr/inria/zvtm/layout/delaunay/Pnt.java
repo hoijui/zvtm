@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-package net.claribole.zvtm.layout.delaunay;
+package fr.inria.zvtm.layout.delaunay;
 
 /**
  * Points in Euclidean space, implemented as double[].

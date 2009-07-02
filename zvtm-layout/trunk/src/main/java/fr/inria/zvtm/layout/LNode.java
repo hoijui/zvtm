@@ -4,17 +4,18 @@
  *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */
-package net.claribole.zvtm.layout;
+package fr.inria.zvtm.layout;
 
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.VText;
-import net.claribole.zvtm.animation.EndAction;
-import net.claribole.zvtm.animation.Animation;
-import net.claribole.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import net.claribole.zvtm.glyphs.DPath;
-import net.claribole.zvtm.glyphs.VBText;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.VBText;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -244,8 +245,8 @@ public class LNode {
 		child.text = text;
 		child.initLNode();
 		children.add(child);
-		child.inEdge.visible = visible;
-		child.vText.visible = visible;
+		child.inEdge.setVisible(visible);
+		child.vText.setVisible(visible);
 		return child;
 	}
 
@@ -323,8 +324,8 @@ public class LNode {
 					if (!children.contains(node)){
 						children.add(node);
 						node.parent = this;
-						node.inEdge.visible = true;
-						node.vText.visible = true;
+						node.inEdge.setVisible(true);
+						node.vText.setVisible(true);
 					}
 				}
 			}
@@ -361,8 +362,8 @@ public class LNode {
 			vText.vx = parent.vText.vx;
 			vText.vy = parent.vText.vy;
 		}
-		tree.vs.vsm.addGlyph(inEdge, tree.vs);
-		tree.vs.vsm.addGlyph(vText, tree.vs);
+		tree.vs.addGlyph(inEdge);
+		tree.vs.addGlyph(vText);
 		tree.vs.atBottom(inEdge);
 		tree.vs.atBottom(vText);
 		if (isExpanded()){
@@ -437,8 +438,8 @@ public class LNode {
 			switchToCollapsedView();
 			class EdgeHider implements EndAction {
 			    public void execute(Object subject, Animation.Dimension dimension){
-					vText.visible = false;
-					inEdge.visible = false;
+					vText.setVisible(false);
+					inEdge.setVisible(false);
 				}
 			}
 			ea = new EdgeHider();
@@ -486,8 +487,8 @@ public class LNode {
 			inEdge.editElement(0, dpath[0].x, dpath[0].y, dpath[3].x, dpath[3].y, cp, true);
 			vText.vx = textX;
 			vText.vy = textY;
-			vText.visible = true;
-			inEdge.visible = true;
+			vText.setVisible(true);
+			inEdge.setVisible(true);
 
 			// Copmute positions to be animated
 			switch (treeOrientation) {
@@ -577,11 +578,11 @@ public class LNode {
 			}
 		}
 		LongPoint data = new LongPoint(textX - vText.vx, textY - vText.vy);
-		Animation an = tree.vs.vsm.getAnimationManager().getAnimationFactory().createGlyphTranslation(500, vText, data, true, SlowInSlowOutInterpolator.getInstance(), null);
-		tree.vs.vsm.getAnimationManager().startAnimation(an, false);
+		Animation an = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(500, vText, data, true, SlowInSlowOutInterpolator.getInstance(), null);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(an, false);
 		if (parent != null){
-			an = tree.vs.vsm.getAnimationManager().getAnimationFactory().createPathAnim(500, inEdge, dpath, false, SlowInSlowOutInterpolator.getInstance(), ea);
-			tree.vs.vsm.getAnimationManager().startAnimation(an, false);
+			an = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(500, inEdge, dpath, false, SlowInSlowOutInterpolator.getInstance(), ea);
+			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(an, false);
 		}
 		for (LNode child : children) {
 			child.updateNode(treeOrientation, camIndex);

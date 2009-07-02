@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package net.claribole.zvtm.layout.jung;
+package fr.inria.zvtm.layout.jung;
 
 import java.awt.Color;
 import java.awt.Shape;
@@ -34,19 +34,19 @@ import java.io.BufferedInputStream;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
 
-import com.xerox.VTM.engine.VirtualSpace;
-import com.xerox.VTM.engine.VirtualSpaceManager;
-import com.xerox.VTM.engine.Camera;
-import com.xerox.VTM.engine.View;
-import com.xerox.VTM.engine.ViewPanel;
-import com.xerox.VTM.engine.LongPoint;
-import com.xerox.VTM.glyphs.Glyph;
-import com.xerox.VTM.glyphs.VCircle;
-import com.xerox.VTM.glyphs.VSegment;
-import com.xerox.VTM.glyphs.VPath;
-import com.xerox.VTM.svg.SVGWriter;
-import net.claribole.zvtm.glyphs.DPath;
-import net.claribole.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VPath;
+import fr.inria.zvtm.svg.SVGWriter;
+import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.engine.ViewEventHandler;
 
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.Vertex;
@@ -121,7 +121,7 @@ public class Viewer extends JFrame {
     }
 
 	void initGUI(){
-		vsm = new VirtualSpaceManager(false);
+		vsm = VirtualSpaceManager.INSTANCE;
 		eh = new ViewerEventHandler(this);
 		mSpace = vsm.addVirtualSpace(mSpaceName);
 		mCamera = vsm.addCamera(mSpaceName);
@@ -208,8 +208,8 @@ public class Viewer extends JFrame {
 		while (i.hasNext()){
 			Edge e = (Edge)i.next();
 			
-			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK, false);
-			vsm.addGlyph(g, mSpaceName);
+			Glyph g = EdgeTransformer.getDPath(e, l, EDGE_SHAPE, Color.BLACK);
+			mSpace.addGlyph(g);
 			edge2glyph.put(e, g);
 			g.setOwner(e);
 		}
@@ -218,7 +218,7 @@ public class Viewer extends JFrame {
 			Vertex v = (Vertex)i.next();
 			Coordinates c = layout.getCoordinates(v);
 			VCircle cl = new VCircle((int)c.getX(), (int)c.getY(), 0, NODE_SIZE, Color.WHITE);
-			vsm.addGlyph(cl, mSpaceName);
+			mSpace.addGlyph(cl);
 			cl.setMouseInsideHighlightColor(Color.RED);
 			vertex2glyph.put(v, cl);
 			cl.setOwner(v);

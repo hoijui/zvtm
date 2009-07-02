@@ -6,7 +6,7 @@
  *
  * $Id$
  */
-package net.claribole.zvtm.layout;
+package fr.inria.zvtm.layout;
 
 import java.awt.geom.Point2D;
 import java.util.Arrays;

@@ -109,7 +109,7 @@
 * 
 ---------------------------------------------*/
 
-package net.claribole.zvtm.layout.delaunay;
+package fr.inria.zvtm.layout.delaunay;
 
 import java.util.Collection;
 import java.util.HashSet;
