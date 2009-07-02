@@ -1,7 +1,5 @@
 package fr.inria.zvtm.clustering;
 
-import fr.inria.zvtm.engine.VirtualSpace;
-
 /**
  * No-op Delta, to be used as a 
  * default implementation while "patching holes"
@@ -10,7 +8,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
  * for their Glyph or Camera derived types.
  */
 class NopDelta implements Delta {
-	public void apply(VirtualSpace vs){
+	public void apply(SlaveUpdater slaveUpdater){
 		System.err.println("Default delta executed. This probably means that a Glyph or Camera derived class needs updates to its serialization code");
 	}
 

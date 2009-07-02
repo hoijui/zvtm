@@ -1,7 +1,6 @@
 package fr.inria.zvtm.clustering;
 
 import java.io.Serializable;
-import fr.inria.zvtm.engine.VirtualSpace;
 
 /**
  * A delta that can be applied to a VirtualSpace
@@ -19,6 +18,6 @@ import fr.inria.zvtm.engine.VirtualSpace;
  * make any difference for users. It is simply a design choice.
  */
 interface Delta extends Serializable {
-	public void apply(VirtualSpace vs);
+	public void apply(SlaveUpdater updater);
 }
 

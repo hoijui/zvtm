@@ -1,8 +1,5 @@
 package fr.inria.zvtm.clustering;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.inria.zvtm.clustering.ObjId;
 import fr.inria.zvtm.clustering.ObjIdFactory;
 import fr.inria.zvtm.engine.LongPoint;
@@ -14,9 +11,10 @@ import fr.inria.zvtm.glyphs.Glyph;
  * A VirtualSpace that can be replicated over a cluster
  */
 public aspect MasterVirtualSpace {
-	//data structure for easy retrieval of a Glyph 
-	//given its key: either a BStree or a hash table
-	private final Map<ObjId, Glyph> VirtualSpace.idMap = new HashMap<ObjId, Glyph>();
+	
+	//augment Glyph with an ObjId identifier
+	private ObjId Glyph.id = ObjIdFactory.next();
+	private ObjId Glyph.getObjId(){ return id; }
 
 	//multicast group, named after the virtual space 
 	
@@ -30,9 +28,10 @@ public aspect MasterVirtualSpace {
 		&&!within(VirtualSpaceManager)
 		&&!within(Delta+); //Delta manages updates to slaves
 
-	pointcut glyphRemove(Glyph glyph): 
+	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		call(public * VirtualSpace.removeGlyph(..)) 
 		&& args(glyph, ..)
+		&& target(virtualSpace)
 		&&!within(VirtualSpace)
 		&&!within(Delta+); //Delta manages updates to slaves
 
@@ -43,13 +42,18 @@ public aspect MasterVirtualSpace {
 		&&!within(Glyph+)
 		&&!within(Delta+); //Delta manages updates to slaves
 
-	//
+	
 	after(Glyph glyph) returning: glyphAdd(glyph) {
+		//information needed: the glyph's ID (that we get through
+		//a method injection) and parent virtualspace (that we can
+		//obtain by instrumenting the right method in VS rather than VSM)
 		System.out.println("glyph add: send add message");
-		//idMap.put();
 	}
 
-	after(Glyph glyph) returning: glyphRemove(glyph){
+	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
+		glyphRemove(glyph, virtualSpace){
+		//information needed: the glyph's ID (that we get through
+		//a method injection) and parent virtualspace (target)
 		System.out.println("glyph remove: send remove message");
 	}
 
@@ -59,13 +63,6 @@ public aspect MasterVirtualSpace {
 		loc.x + "," + loc.y + ")");	
 	}
 
-	//retrieve a glyph according to its (cluster) id
-	//overloading Glyph.equals is probably more elegant (and would
-	//allow us to use a set instead of a map) but I am not comfortable
-	//with doing that from AspectJ yet.
-	public Glyph VirtualSpace.getGlyphById(ObjId id){
-		return idMap.get(id);
-	}
 
 }
 

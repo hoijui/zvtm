@@ -22,10 +22,11 @@ class RectangleCreateDelta implements Delta {
 		this.halfHeight = halfHeight;
 	}
 
-	public void apply(VirtualSpace vs){
+	public void apply(SlaveUpdater slaveUpdater){
 		VRectangle rect = new VRectangle(center.x, center.y,
 				zIndex, halfWidth, halfHeight, Color.BLUE);
-		//rect.setObjId();
+		slaveUpdater.addGlyph(id, rect);
+
 	}
 
 	@Override public String toString(){

@@ -14,8 +14,8 @@ class GlyphPosDelta implements Delta {
 		this.yPos = yPos;
 	}
 
-	public void apply(VirtualSpace vs){
-		Glyph toAlter = vs.getGlyphById(id);
+	public void apply(SlaveUpdater slaveUpdater){
+		Glyph toAlter = slaveUpdater.getGlyphById(id);
 
 		if(null == toAlter){
 			System.err.println("Could not retrieve glyph id "  + id);
