@@ -73,7 +73,15 @@ public class SlaveUpdater {
 				}
 
 				Delta delta = (Delta)msg.getObject();
+				
+				//Do whatever needs to be done to update the
+				//state of the slave VirtualSpace (e.g. move a 
+				//Camera, create a rectangle, ...)
+				//In other words, "apply the message"
 				delta.apply(SlaveUpdater.this); 
+
+				//...
+				VirtualSpaceManager.INSTANCE.repaintNow();
 			}
 		});
 	}
