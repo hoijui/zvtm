@@ -90,7 +90,7 @@ public class GeoNamesParser {
             for (Toponym toponym : searchResult.getToponyms()){
                 ClosedShape g = new RectangleNR(Math.round(GeoToolsManager.CC*toponym.getLongitude()), Math.round(GeoToolsManager.CC*toponym.getLatitude()),
                                                 1, 3, 3, FEATURE_COLOR);
-                application.vsm.addGlyph(g, application.bSpace);
+                application.bSpace.addGlyph(g);
                 g.setMouseInsideFillColor(Color.RED);
                 g.setOwner(toponym);
             }

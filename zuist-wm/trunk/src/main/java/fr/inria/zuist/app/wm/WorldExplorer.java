@@ -206,13 +206,13 @@ public class WorldExplorer implements Java2DPainter {
         for (int i=-43200;i<=43200;){
             VSegment s = new VSegment(i, 0, 0, 0, 21600, Color.RED);
             s.setSensitivity(false);
-            vsm.addGlyph(s, bSpace);
+            bSpace.addGlyph(s);
             i += GRID_STEP;
         }
         for (int i=-21600;i<=21600;){
             VSegment s = new VSegment(0, i, 0, 43200, 0, Color.RED);
             s.setSensitivity(false);
-            vsm.addGlyph(s, bSpace);
+            bSpace.addGlyph(s);
             i += GRID_STEP;
         }
     }
