@@ -180,6 +180,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	}
 
 	private void drawSceneLens(){
+	    if (lensG2D == null){
+	        updateOffscreenBuffer();
+	    }
 		synchronized(lens){// prevents flickering when the lens parameters are being animated (caused by concurrent access)
 			lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
 			lensG2D.setBackground(backColor);
