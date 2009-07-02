@@ -52,11 +52,11 @@ The virtual space manager \cl{fr.inria.zvtm.engine.VirtualSpaceManager} is the m
 
 \codebox{VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;}
 
-Many operations, such as creating virtual spaces, adding glyphs and cameras to them, will take place through the virtual space manager (which we abbreviate VSM from now on).
+Many operations, such as creating virtual spaces and views will take place through the virtual space manager (which we abbreviate VSM from now on).
 
-If ZVTM is instantiated within an applet, the VSM should be notified about this:
+If ZVTM is instantiated within an applet, you will probably need to call the following method when instantiating the JApplet:
 
-\codebox{vsm.setApplet();}
+\codebox{getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);}
 
 %%%%%%%%%%
 \subsection{Virtual Spaces}
