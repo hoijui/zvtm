@@ -84,10 +84,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     VirtualSpace mSpace;   // virtual space containing graph
     VirtualSpace mnSpace;  // virtual space containing pie menu
     VirtualSpace rSpace;   // virtual space containing rectangle representing region seen through main camera (used in overview)
-    static final String mainSpace = "graphSpace";
+    static final String mainSpaceName = "graphSpace";
     static final String menuSpace = "menuSpace";
     /*name of the VTM virtual space holding the rectangle delimiting the region seen by main view in radar view*/
-    static final String rdRegionVirtualSpace = "radarSpace";
+    static final String rdRegionVirtualSpaceName = "radarSpace";
     /*represents the region seen by main view in the radar view*/
     VRectangle observedRegion;
 
@@ -185,23 +185,23 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Vector createZVTMelements(boolean applet){
         vsm = VirtualSpaceManager.INSTANCE;
         VText.setMainFont(ConfigManager.defaultFont);
-        vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR);
+        Glyph.setDefaultMouseInsideColor(ConfigManager.HIGHLIGHT_COLOR);
         animator = vsm.getAnimationManager();
         //vsm.setDebug(true);
-        mSpace = vsm.addVirtualSpace(mainSpace);
+        mSpace = vsm.addVirtualSpace(mainSpaceName);
         // camera #0 for main view
-        mainCamera = vsm.addCamera(mainSpace);
+        mainCamera = vsm.addCamera(mainSpaceName);
         mainCamera.setZoomFloor(-90);
         // camera #1 for radar view
-        vsm.addCamera(mainSpace);
+        vsm.addCamera(mainSpaceName);
         mnSpace = vsm.addVirtualSpace(menuSpace);
         // camera for pie menu
         vsm.addCamera(menuSpace).setAltitude(10);
-        rSpace = vsm.addVirtualSpace(rdRegionVirtualSpace);
+        rSpace = vsm.addVirtualSpace(rdRegionVirtualSpaceName);
         // camera for rectangle representing region seen in main viewport (in overview)
-        vsm.addCamera(rdRegionVirtualSpace);
+        vsm.addCamera(rdRegionVirtualSpaceName);
         // DragMag portal camera (camera #2)
-        dmCamera = vsm.addCamera(mainSpace);
+        dmCamera = vsm.addCamera(mSpace);
         RectangleNR seg1;
         RectangleNR seg2;
         observedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR, 0.5f);
@@ -212,16 +212,16 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
             observedRegion.setFilled(false);
         }
-        vsm.addGlyph(observedRegion,rdRegionVirtualSpace);
-        vsm.addGlyph(seg1,rdRegionVirtualSpace);
-        vsm.addGlyph(seg2,rdRegionVirtualSpace);
+        rSpace.addGlyph(observedRegion);
+        rSpace.addGlyph(seg1);
+        rSpace.addGlyph(seg2);
         vsm.stickToGlyph(seg1,observedRegion);
         vsm.stickToGlyph(seg2,observedRegion);
         observedRegion.setSensitivity(false);
         tp = new ToolPalette(this);
         Vector cameras = new Vector();
-        cameras.add(vsm.getVirtualSpace(mainSpace).getCamera(0));
-        cameras.add(vsm.getVirtualSpace(menuSpace).getCamera(0));
+        cameras.add(mSpace.getCamera(0));
+        cameras.add(mnSpace.getCamera(0));
         cameras.add(tp.getPaletteCamera());
         return cameras;
     }
@@ -282,8 +282,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
 	void reset(){
-		vsm.removeGlyphsFromSpace(mainSpace);
-		vsm.addGlyph(magWindow, mSpace);
+		mSpace.removeAllGlyphs();
+		mSpace.addGlyph(magWindow);
 		mSpace.hide(magWindow);
 		previousLocations.removeAllElements();
 		highlightedEdges.removeAllElements();
@@ -297,7 +297,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	magWindow = new VRectangle(0, 0, 0, 1, 1, GraphicsManager.DM_COLOR);
 	magWindow.setFilled(false);
 	magWindow.setBorderColor(GraphicsManager.DM_COLOR);
-	vsm.addGlyph(magWindow, mSpace);
+	mSpace.addGlyph(magWindow);
 	mSpace.hide(magWindow);	
     }
 
@@ -1454,13 +1454,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		// add cursor on link
 		slideCursor = new CircleNR(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
 		slideCursor.setStrokeWidth(SLIDER_CURSOR_SIZE/2.0f);
-		vsm.addGlyph(slideCursor, mSpace);
+		mSpace.addGlyph(slideCursor);
 		// display selection radius, circular zone that allows for arc switching when starting from a node
 		if (closestNode != null){
     		selectionRadius = new CircleNR(closestNode.getShape().vx, closestNode.getShape().vy, 0, SELECTION_RADIUS, Color.WHITE, SELECTION_RADIUS_COLOR);
     		selectionRadius.setFilled(false);
     		selectionRadius.setStrokeWidth(2.0f);
-    		vsm.addGlyph(selectionRadius, mSpace);	    
+    		mSpace.addGlyph(selectionRadius);	    
 		}
 		// center camera on selection
 	    Animation a = animator.getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,

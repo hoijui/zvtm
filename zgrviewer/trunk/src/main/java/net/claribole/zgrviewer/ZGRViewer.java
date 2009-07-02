@@ -289,7 +289,7 @@ public class ZGRViewer implements ZGRApplication {
 	    setStatusBarText("Exporting to SVG "+f.toString()+" ...");
 	    if (f.exists()){f.delete();}
 	    fr.inria.zvtm.svg.SVGWriter svgw=new fr.inria.zvtm.svg.SVGWriter();
-	    Document d = svgw.exportVirtualSpace(grMngr.vsm.getVirtualSpace(grMngr.mainSpace), new DOMImplementationImpl(), f);
+	    Document d = svgw.exportVirtualSpace(grMngr.mSpace, new DOMImplementationImpl(), f);
 	    Utils.serialize(d,f);
 	    setStatusBarText("Exporting to SVG "+f.toString()+" ...done");
 	    grMngr.mainView.setCursorIcon(java.awt.Cursor.CUSTOM_CURSOR);

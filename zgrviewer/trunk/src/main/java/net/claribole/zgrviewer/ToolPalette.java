@@ -85,8 +85,8 @@ public class ToolPalette {
 					    (new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
 	    buttons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	    selectedButtons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
-	    grMngr.vsm.addGlyph(buttons[i], paletteSpace);
-	    grMngr.vsm.addGlyph(selectedButtons[i], paletteSpace);
+	    paletteSpace.addGlyph(buttons[i]);
+	    paletteSpace.addGlyph(selectedButtons[i]);
 	}
 	selectButton(buttons[0]);
     }

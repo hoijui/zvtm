@@ -49,6 +49,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import fr.inria.zvtm.glyphs.Glyph;
+
 class PrefWindow extends JFrame implements ActionListener, MouseListener {
 
     ZGRViewer application;
@@ -758,7 +760,7 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
 	    if (newCol != null){
 		ConfigManager.HIGHLIGHT_COLOR = newCol;
 		highlightColor.setColor(ConfigManager.HIGHLIGHT_COLOR);
-		application.grMngr.vsm.setMouseInsideGlyphColor(ConfigManager.HIGHLIGHT_COLOR, true);
+		Glyph.setDefaultMouseInsideColor(ConfigManager.HIGHLIGHT_COLOR);
 	    }
 	}
     }

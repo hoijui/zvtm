@@ -12,6 +12,7 @@ package net.claribole.zgrviewer;
 
 import java.awt.event.KeyEvent;
 
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -52,7 +53,7 @@ public class RadarEvtHdlr implements ViewEventHandler {
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		LongPoint lp = v.getVCursor().getLocation();
-		Camera c = grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(0);
+		Camera c = grMngr.mSpace.getCamera(0);
 //		grMngr.vsm.animator.createCameraAnimation(, AnimManager.CA_TRANS_SIG, new LongPoint(lp.x-c.posx, lp.y-c.posy), c.getID());
 		Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, c,
             new LongPoint(lp.x-c.posx, lp.y-c.posy), true, SlowInSlowOutInterpolator.getInstance(), null);
@@ -60,7 +61,7 @@ public class RadarEvtHdlr implements ViewEventHandler {
 	}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	grMngr.vsm.getGlobalView(grMngr.vsm.getVirtualSpace(grMngr.mainSpace).getCamera(1),500);
+	VirtualSpaceManager.INSTANCE.getGlobalView(grMngr.mSpace.getCamera(1),500);
 	grMngr.cameraMoved(null, null, 0);
     }
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}

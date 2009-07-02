@@ -277,7 +277,7 @@ class DOTManager {
         grMngr.gp.setProgress(80);
         try {
             // going through URI and then URL as advised in JDK 1.6
-            SVGReader.load(svgDoc, grMngr.mainSpace, true, svgF.toURI().toURL().toString(), sourceDotFileParentDir.toURI().toURL().toString());
+            SVGReader.load(svgDoc, grMngr.mSpace, true, svgF.toURI().toURL().toString(), sourceDotFileParentDir.toURI().toURL().toString());
             grMngr.seekBoundingBox();
             grMngr.buildLogicalStructure();
         }
@@ -302,7 +302,7 @@ class DOTManager {
             graph = graphWalker.graph(ast);
             grMngr.gp.setMessage("Displaying...");
             grMngr.gp.setProgress(80);
-            ZgrReader.load(graph, grMngr.vsm, grMngr.mainSpace, true);
+            ZgrReader.load(graph, grMngr.vsm, grMngr.mSpace, true);
         }
         catch (NullPointerException ex){
             JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.ERROR_LOADING_DOT_FILE, "Error", JOptionPane.ERROR_MESSAGE);

@@ -17,6 +17,7 @@ import fr.inria.zvtm.glyphs.CGlyph;
 import fr.inria.zvtm.glyphs.SGlyph;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
@@ -38,7 +39,7 @@ public class ZgrReader {
 
     private static int spacingPeripheries = 4;
 
-    public static void load(Graph graph, VirtualSpaceManager vsm, String vs,
+    public static void load(Graph graph, VirtualSpaceManager vsm, VirtualSpace vs,
             boolean meta) {
         //System.out.println(graph);
 
@@ -50,7 +51,7 @@ public class ZgrReader {
         if (graph.bgcolor != null) {
             Glyph background = new VRectangle(x2 + x1, y2 + y1, 1, x2 - x1, y2
                     - y1, graph.bgcolor);
-            vsm.addGlyph(background, vs);
+            vs.addGlyph(background);
         }
 
         if (graph.lp != null) {
@@ -66,7 +67,7 @@ public class ZgrReader {
     // TODO: add added glyphs to cloned objects
 
     private static void createNodesGlyphs(Node[] nodes,
-            VirtualSpaceManager vsm, String vs) {
+            VirtualSpaceManager vsm, VirtualSpace vs) {
         if (nodes != null)
             for (int i = 0; i < nodes.length; i++) {
                 Node node = nodes[i];
@@ -109,7 +110,7 @@ public class ZgrReader {
     }
 
     private static void createSubGraph(SubGraph subgraph,
-            VirtualSpaceManager vsm, String vs, Color fill, Color border) {
+            VirtualSpaceManager vsm, VirtualSpace vs, Color fill, Color border) {
         if (subgraph.bb != null) {
             long x1 = subgraph.bb.x1 >> 1;
             long x2 = subgraph.bb.x2 >> 1;
@@ -119,7 +120,7 @@ public class ZgrReader {
             Glyph background = new VRectangle(x2 + x1, y2 + y1, 1, x2 - x1, y2
                     - y1, fill);
             background.setBorderColor(border);
-            vsm.addGlyph(background, vs);
+            vs.addGlyph(background);
         }
 
         if (subgraph.lp != null) {
@@ -133,7 +134,7 @@ public class ZgrReader {
     }
 
     private static void createRecord(Record record, VirtualSpaceManager vsm,
-            String vs, Color fill, Color border) {
+            VirtualSpace vs, Color fill, Color border) {
         if (record.pos != null) {
             // XXX: dot generates rects only for non-rounded records
 
@@ -154,14 +155,14 @@ public class ZgrReader {
                     /*VRectangle*/rect = new VRectangle(x2 + x1, y2 + y1, 1,
                             x2 - x1, y2 - y1, fill);
                 rect.setBorderColor(border);
-                vsm.addGlyph(rect, vs);
+                vs.addGlyph(rect);
 
                 for (int j = 0; j < lines.length - 1; j++) {
                     DPath line;
                     line = new DPath(lines[j].x1, lines[j].y1, 1, Color.black);
                     line.addSegment(lines[j].x2, lines[j].y2, true);
 
-                    vsm.addGlyph(line, vs);
+                    vs.addGlyph(line);
                 }
 
                 if (record.subRecords != null)
@@ -189,7 +190,7 @@ public class ZgrReader {
                             (long) (inches * record.width),
                             (long) (inches * record.height), fill);
 
-                vsm.addGlyph(rect, vs);
+                vs.addGlyph(rect);
                 rect.setBorderColor(border);
 
                 createLabel(record.label, record.pos.coords[0],
@@ -200,7 +201,7 @@ public class ZgrReader {
     }
 
     private static void createBasicNode(BasicNode node,
-            VirtualSpaceManager vsm, String vs, Color fill, Color border) {
+            VirtualSpaceManager vsm, VirtualSpace vs, Color fill, Color border) {
         if (node.pos != null) {
             Glyph nodeGlyph = null;
             // TODO: take care of style
@@ -234,7 +235,7 @@ public class ZgrReader {
                                     (long) (inches * node.width),
                                     (long) (inches * node.height), fill);
                         primary.setBorderColor(border);
-                        vsm.addGlyph(primary, vs);
+                        vs.addGlyph(primary);
 
                         SGlyph[] secondaries = new SGlyph[node.peripheries - 1];
                         for (int j = 0; j < secondaries.length; j++) {
@@ -256,7 +257,7 @@ public class ZgrReader {
                                         fill);
                             }
                             ellipse.setBorderColor(border);
-                            vsm.addGlyph(ellipse, vs);
+                            vs.addGlyph(ellipse);
                             secondaries[j] = new SGlyph(ellipse, 0, 0);
                         }
                         nodeGlyph = new CGlyph(primary, secondaries);
@@ -337,7 +338,7 @@ public class ZgrReader {
 
             }
             if (nodeGlyph != null) {
-                vsm.addGlyph(nodeGlyph, vs);
+                vs.addGlyph(nodeGlyph);
                 nodeGlyph.setOwner(node);
             }
             createLabel(node.label, node.pos.coords[0], node.pos.coords[1],
@@ -346,7 +347,7 @@ public class ZgrReader {
     }
 
     private static void createSubRecordLabel(SubRecord sub,
-            VirtualSpaceManager vsm, String vs) {
+            VirtualSpaceManager vsm, VirtualSpace vs) {
         if (sub.rect != null) {
             long x1 = sub.rect.x1 >> 1;
             long x2 = sub.rect.x2 >> 1;
@@ -457,7 +458,7 @@ public class ZgrReader {
     }
 
     private static void createLabel(String label, long x, long y, double size,
-            Color color, String fontname, VirtualSpaceManager vsm, String vs,
+            Color color, String fontname, VirtualSpaceManager vsm, VirtualSpace vs,
             Object owner) {
         if (!label.trim().equals("")) {
             // TODO: use \l, \c and \r separators to indicate vertical position
@@ -474,7 +475,7 @@ public class ZgrReader {
                             - (k + 1) * (interline - 1), 1, color, text
                             .replaceAll("\\\\", ""), VText.TEXT_ANCHOR_MIDDLE);
                     g.setSpecialFont(Font.decode(fontname + "-PLAIN-" + s));
-                    vsm.addGlyph(g, vs);
+                    vs.addGlyph(g);
                     g.setOwner(owner);
                 }
             }
@@ -482,7 +483,7 @@ public class ZgrReader {
     }
 
     private static void createEdgesGlyphs(Edge[] edges,
-            VirtualSpaceManager vsm, String vs) {
+            VirtualSpaceManager vsm, VirtualSpace vs) {
         if (edges != null)
             for (int i = 0; i < edges.length; i++) {
                 Edge edge = edges[i];
@@ -504,18 +505,18 @@ public class ZgrReader {
                                 points[j].coords[1], points[j + 1].coords[0],
                                 points[j + 1].coords[1], true);
                     }
-                    vsm.addGlyph(pathGlyph, vs);
+                    vs.addGlyph(pathGlyph);
                     if (edge.pos.startingPoint != null) {
                         Glyph arrow = createArrow(points[0],
                                 edge.pos.startingPoint, edge.tail, edge);
                         if (arrow != null)
-                            vsm.addGlyph(arrow, vs);
+                            vs.addGlyph(arrow);
                     }
                     if (edge.pos.endingPoint != null) {
                         Glyph arrow = createArrow(points[points.length - 1],
                                 edge.pos.endingPoint, edge.head, edge);
                         if (arrow != null)
-                            vsm.addGlyph(arrow, vs);
+                            vs.addGlyph(arrow);
                     }
                 }
                 if (edge.lp != null) {

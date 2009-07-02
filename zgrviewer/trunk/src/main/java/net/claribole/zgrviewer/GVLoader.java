@@ -127,7 +127,7 @@ class GVLoader {
             grMngr.gp.setMessage("Building graph...");
             grMngr.gp.setProgress(80);
             if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-            SVGReader.load(svgDoc, GraphicsManager.mainSpace, true,
+            SVGReader.load(svgDoc, grMngr.mSpace, true,
                 f.toURI().toURL().toString());
             grMngr.seekBoundingBox();
             grMngr.buildLogicalStructure();
@@ -179,7 +179,7 @@ class GVLoader {
 	    Document svgDoc = AppletUtils.parse(is, false);
 	    if (svgDoc != null){
 		if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-		SVGReader.load(svgDoc, GraphicsManager.mainSpace, true, svgFileURL);
+		SVGReader.load(svgDoc, grMngr.mSpace, true, svgFileURL);
 		grMngr.seekBoundingBox();
 		grMngr.buildLogicalStructure();
 		ConfigManager.defaultFont = VText.getMainFont();
