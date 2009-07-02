@@ -61,7 +61,7 @@ public class TransitionManager {
 						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
 						       fadeColor, fadeColor, 0.0f);
 	fadeRect.setDrawBorder(false);
-	vsm.addGlyph(fadeRect, c.getOwningSpace());
+	c.getOwningSpace().addGlyph(fadeRect);
 
 	Animation trans = vsm.getAnimationManager().getAnimationFactory()
 	    .createTranslucencyAnim(duration, fadeRect,
@@ -113,7 +113,7 @@ public class TransitionManager {
 						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
 						       fadeColor, fadeColor, 1.0f);
 	fadeRect.setDrawBorder(false);
-	vsm.addGlyph(fadeRect, c.getOwningSpace());
+	c.getOwningSpace().addGlyph(fadeRect);
 	v.setBlank(null);
 	vsm.repaintNow();
 

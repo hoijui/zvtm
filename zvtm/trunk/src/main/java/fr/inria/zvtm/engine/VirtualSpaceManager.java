@@ -65,9 +65,11 @@ public class VirtualSpaceManager implements AWTEventListener {
 			allViews[i].updateFont();
 		}
 		Object g;
-		for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
-			g=e.nextElement();
-			if (g instanceof VText){((VText)g).invalidate();}
+		for (Enumeration e=allVirtualSpaces.elements();e.hasMoreElements();){
+    		for (Enumeration e2=((VirtualSpace)e.nextElement()).getAllGlyphs().elements();e2.hasMoreElements();){
+    			g = e2.nextElement();
+    			if (g instanceof VText){((VText)g).invalidate();}
+    		}		    
 		}
 		repaintNow();
 	}
@@ -95,8 +97,8 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**next cursor will have ID...*/
     private int nextmID;
 
-    /**key is glyph ID (Long)*/
-    protected Hashtable allGlyphs;
+//    /**key is glyph ID (Long)*/
+//    protected Hashtable allGlyphs;
     /**key is camera ID  (Integer)*/
     protected Hashtable allCameras;
     /**key is portal ID  (Integer)*/
@@ -125,14 +127,8 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**Animation Manager*/
     private final AnimationManager animationManager;
-
-   
-    /**Constraint Manager*/
-//     public ConstraintManager constMgr;
-
-    Color mouseInsideColor=Color.white;
-
-  public static final VirtualSpaceManager INSTANCE = new VirtualSpaceManager();
+    
+    public static final VirtualSpaceManager INSTANCE = new VirtualSpaceManager();
  
     /**
      * Automatic instantiation as a singleton. THere is always a single VSM per application.
@@ -145,7 +141,6 @@ public class VirtualSpaceManager implements AWTEventListener {
 	nextlID=1;
 	nextmID=1;
 	animationManager = new AnimationManager(this);
-	allGlyphs=new Hashtable();
 	allCameras=new Hashtable();
 	allPortals=new Hashtable();
 	allLenses=new Hashtable();
@@ -193,148 +188,135 @@ public class VirtualSpaceManager implements AWTEventListener {
 	return defaultMultiFill;
     }
 
-    /** Set border color of glyphs overlapped by mouse.
-     * Not propagated to existing glyphs.
-     *@see #setMouseInsideGlyphColor(Color c, boolean propagate)
-     */
-    public void setMouseInsideGlyphColor(Color c){
-	setMouseInsideGlyphColor(c, false);
-    }
+//    /** Set border color of glyphs overlapped by mouse.
+//     * Not propagated to existing glyphs.
+//     *@see #setMouseInsideGlyphColor(Color c, boolean propagate)
+//     */
+//    public void setMouseInsideGlyphColor(Color c){
+//	setMouseInsideGlyphColor(c, false);
+//    }
+//
+//
+//    /** Set border color of glyphs overlapped by mouse.
+//     *@param propagate propagate changes to existing glyphs
+//     *@see #setMouseInsideGlyphColor(Color c)
+//     */
+//    public void setMouseInsideGlyphColor(Color c, boolean propagate){
+//	mouseInsideColor = c;
+//	if (propagate){
+//	    for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
+//		((Glyph)e.nextElement()).setMouseInsideHighlightColor(mouseInsideColor);
+//	    }
+//	}
+//    }
 
+//    /**add glyph g to virtual space whose name is vs
+//     *@param g glyph
+//     *@param vs virtual space name
+//     */
+//    public Glyph addGlyph(Glyph g, String vs){
+//	return addGlyph(g, vs, true);
+//    }
 
-    /** Set border color of glyphs overlapped by mouse.
-     *@param propagate propagate changes to existing glyphs
-     *@see #setMouseInsideGlyphColor(Color c)
-     */
-    public void setMouseInsideGlyphColor(Color c, boolean propagate){
-	mouseInsideColor = c;
-	if (propagate){
-	    for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
-		((Glyph)e.nextElement()).setMouseInsideHighlightColor(mouseInsideColor);
-	    }
-	}
-    }
+//    /**add glyph g to virtual space vs
+//     *@param g glyph
+//     *@param vs virtual space
+//     */
+//    public Glyph addGlyph(Glyph g, VirtualSpace vs){
+//	return addGlyph(g, vs, true);
+//    }
 
-    /**add glyph g to virtual space whose name is vs
-     *@param g glyph
-     *@param vs virtual space name
-     */
-    public Glyph addGlyph(Glyph g, String vs){
-	return addGlyph(g, vs, true);
-    }
+//    /**add glyph g to virtual space whose name is vs
+//     *@param g glyph
+//     *@param vs virtual space name
+//     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
+//     */
+//    public Glyph addGlyph(Glyph g, String vs, boolean repaint){
+//	if (g!=null){
+//	    if (allVirtualSpaces.containsKey(vs)){
+//		VirtualSpace tvs = (VirtualSpace)allVirtualSpaces.get(vs);
+//		return addGlyph(g, tvs, true, repaint);
+//	    }
+//	    else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:unknown virtual space: "+vs);return null;}
+//	}
+//	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
+//    }
 
-    /**add glyph g to virtual space vs
-     *@param g glyph
-     *@param vs virtual space
-     */
-    public Glyph addGlyph(Glyph g, VirtualSpace vs){
-	return addGlyph(g, vs, true);
-    }
+//    /**add glyph g to virtual space vs
+//     *@param g glyph
+//     *@param vs virtual space
+//     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
+//     */
+//    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean repaint){
+//	return addGlyph(g, vs, true, repaint);
+//    }
 
-    /**add glyph g to virtual space whose name is vs
-     *@param g glyph
-     *@param vs virtual space name
-     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
-     */
-    public Glyph addGlyph(Glyph g, String vs, boolean repaint){
-	if (g!=null){
-	    if (allVirtualSpaces.containsKey(vs)){
-		VirtualSpace tvs = (VirtualSpace)allVirtualSpaces.get(vs);
-		return addGlyph(g, tvs, true, repaint);
-	    }
-	    else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:unknown virtual space: "+vs);return null;}
-	}
-	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
-    }
-
-    /**add glyph g to virtual space vs
-     *@param g glyph
-     *@param vs virtual space
-     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
-     */
-    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean repaint){
-	return addGlyph(g, vs, true, repaint);
-    }
-
-    /**add glyph g to virtual space vs
-     *@param g glyph
-     *@param vs virtual space
-     *@param initColors false -> do not initalize mouse inside and selected colors
-     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
-     */
-    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean initColors, boolean repaint){
-	if (g!=null && vs!=null){
-	    vs.addGlyph(g);
-	    g.setID(new Long(nextID++));
-	    if (initColors){
-		g.setMouseInsideHighlightColor(this.mouseInsideColor);
-	    }
-	    allGlyphs.put(g.getID(),g);
-	    if (repaint){repaintNow();}
-	    return g;
-	}
-	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
-    }
+//    /**add glyph g to virtual space vs
+//     *@param g glyph
+//     *@param vs virtual space
+//     *@param initColors false -> do not initalize mouse inside and selected colors
+//     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
+//     */
+//    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean initColors, boolean repaint){
+//	if (g!=null && vs!=null){
+//	    vs.addGlyph(g);
+//	    g.setID(new Long(nextID++));
+//	    if (initColors){
+//		g.setMouseInsideHighlightColor(this.mouseInsideColor);
+//	    }
+//	    allGlyphs.put(g.getID(),g);
+//	    if (repaint){repaintNow();}
+//	    return g;
+//	}
+//	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
+//    }
     
-    public void addGlyphs(Glyph[] gs, VirtualSpace vs, boolean repaint){
-		if(vs != null){
-			vs.addGlyphs(gs);
+//    public void addGlyphs(Glyph[] gs, VirtualSpace vs, boolean repaint){
+//		if(vs != null){
+//			vs.addGlyphs(gs);
+//
+//			for(Glyph glyph: gs){
+//				glyph.setID(new Long(nextID++));
+//				glyph.setMouseInsideHighlightColor(this.mouseInsideColor);
+//				allGlyphs.put(glyph.getID(), glyph);
+//			}
+//			if(repaint){repaintNow();}
+//		}
+//    }
 
-			for(Glyph glyph: gs){
-				glyph.setID(new Long(nextID++));
-				glyph.setMouseInsideHighlightColor(this.mouseInsideColor);
-				allGlyphs.put(glyph.getID(), glyph);
-			}
-			if(repaint){repaintNow();}
-		}
-    }
+//    /** Get glyph with ID id. */
+//    public Glyph getGlyph(Long id){
+//        return (Glyph)(allGlyphs.get(id));
+//    }
+//    
+//    /** Get all glyphs currently present in the various virtual spaces managed by this VSM. */
+//    public Enumeration getAllGlyphs(){
+//        return allGlyphs.elements();
+//    }
+//
+//	/** Remove all glyphs from a virtual space.
+//		*@param spaceName name of that virtual space
+//		*@deprecated as of zvtm 0.9.8
+//		*@see #removeGlyphsFromSpace(String spaceName)
+//		*/
+//	public void destroyGlyphsInSpace(String spaceName){
+//		removeGlyphsFromSpace(spaceName);
+//	}
 
-    /**add composite glyph c to virtual space whose name is vs*/
-    public CGlyph addCGlyph(CGlyph c,String vs){
-	if (c!=null){
-	    if (allVirtualSpaces.containsKey(vs)){
-		c.setID(new Long(nextID++));
-		allGlyphs.put(c.getID(),c);
-		return c;
-	    }
-	    else {System.err.println("Error:VirtualSpaceManager:addCGlyph:unknown virtual space: "+vs);return null;}
-	}
-	else {System.err.println("Error:VirtualSpaceManager:addCGlyph:attempting to add a null composite glyph in space: "+vs);return null;}
-    }
-
-    /** Get glyph with ID id. */
-    public Glyph getGlyph(Long id){
-        return (Glyph)(allGlyphs.get(id));
-    }
-    
-    /** Get all glyphs currently present in the various virtual spaces managed by this VSM. */
-    public Enumeration getAllGlyphs(){
-        return allGlyphs.elements();
-    }
-
-	/** Remove all glyphs from a virtual space.
-		*@param spaceName name of that virtual space
-		*@deprecated as of zvtm 0.9.8
-		*@see #removeGlyphsFromSpace(String spaceName)
-		*/
-	public void destroyGlyphsInSpace(String spaceName){
-		removeGlyphsFromSpace(spaceName);
-	}
-
-	/** Remove all glyphs from a virtual space.
-		*@param spaceName name of that virtual space
-		*/
-	public void removeGlyphsFromSpace(String spaceName){
-		VirtualSpace vs=getVirtualSpace(spaceName);
-		Glyph g;
-		Vector entClone=(Vector)vs.getAllGlyphs().clone();
-		for (int i=0;i<entClone.size();i++){
-			g = (Glyph)entClone.elementAt(i);
-			vs.removeGlyph(g, false);
-			allGlyphs.remove(g);
-		}
-		repaintNow();
-	}
+//	/** Remove all glyphs from a virtual space.
+//		*@param spaceName name of that virtual space
+//		*/
+//	public void removeGlyphsFromSpace(String spaceName){
+//		VirtualSpace vs=getVirtualSpace(spaceName);
+//		Glyph g;
+//		Vector entClone=(Vector)vs.getAllGlyphs().clone();
+//		for (int i=0;i<entClone.size();i++){
+//			g = (Glyph)entClone.elementAt(i);
+//			vs.removeGlyph(g, false);
+//			allGlyphs.remove(g);
+//		}
+//		repaintNow();
+//	}
 
     /**add camera to space whose name is vs
      *@param vs owning virtual space's name
@@ -701,10 +683,10 @@ public class VirtualSpaceManager implements AWTEventListener {
 	return activeView;
     }
 
-    /**stick glyph whose ID is id to mouse (to drag it) - glyph is automatically made unsensitive to mouse events*/
-    public void stickToMouse(Long id){
-	stickToMouse(getGlyph(id));
-    }
+//    /**stick glyph whose ID is id to mouse (to drag it) - glyph is automatically made unsensitive to mouse events*/
+//    public void stickToMouse(Long id){
+//	stickToMouse(getGlyph(id));
+//    }
 
     /**stick glyph g to mouse (to drag it) - glyph is automatically made unsensitive to mouse events*/
     public void stickToMouse(Glyph g){
@@ -716,30 +698,30 @@ public class VirtualSpaceManager implements AWTEventListener {
 	activeView.mouse.unstick();
     }
     
-    /**stick glyph whose ID is id1 to glyph whose ID is id2 (behaves like a one-way constraint)*/
-    public void stickToGlyph(Long id1,Long id2){
-	stickToGlyph(getGlyph(id1),getGlyph(id2));
-    }
+//    /**stick glyph whose ID is id1 to glyph whose ID is id2 (behaves like a one-way constraint)*/
+//    public void stickToGlyph(Long id1,Long id2){
+//	stickToGlyph(getGlyph(id1),getGlyph(id2));
+//    }
 
     /**stick glyph g1 to glyph g2 (behaves like a one-way constraint)*/
     public void stickToGlyph(Glyph g1,Glyph g2){
 	g2.stick(g1);
     }
 
-    /**unstick glyph whose ID is id1 from glyph whose ID is id2*/
-    public void unstickFromGlyph(Long id1,Long id2){
-	getGlyph(id2).unstick(getGlyph(id1));
-    }
+//    /**unstick glyph whose ID is id1 from glyph whose ID is id2*/
+//    public void unstickFromGlyph(Long id1,Long id2){
+//	getGlyph(id2).unstick(getGlyph(id1));
+//    }
 
     /**unstick glyph g1 from glyph g2*/
     public void unstickFromGlyph(Glyph g1,Glyph g2){
 	g2.unstick(g1);
     }
 
-    /**stick glyph whose ID is id1 to camera whose ID is id2 (behaves like a one-way constraint)*/
-    public void stickToCamera(Long id1, Integer id2){
-	stickToCamera(getGlyph(id1), getCamera(id2));
-    }
+//    /**stick glyph whose ID is id1 to camera whose ID is id2 (behaves like a one-way constraint)*/
+//    public void stickToCamera(Long id1, Integer id2){
+//	stickToCamera(getGlyph(id1), getCamera(id2));
+//    }
 
     /**stick glyph g to camera c (behaves like a one-way constraint)*/
     public void stickToCamera(Glyph g, Camera c){

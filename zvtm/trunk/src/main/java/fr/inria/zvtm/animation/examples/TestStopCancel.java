@@ -75,16 +75,16 @@ public class TestStopCancel {
 	AnimationManager am = vsm.getAnimationManager();
 
 	final Glyph circle = new VCircle(0,200,0,30,Color.BLUE);
-	vsm.addGlyph(circle, "src");
+	vs.addGlyph(circle);
 
 	final Glyph circle2 = new VCircle(60,200,0,30,Color.BLUE);
-	vsm.addGlyph(circle2, "src");
+	vs.addGlyph(circle2);
 
 	final Glyph circle3 = new VCircle(90,200,0,30,Color.BLUE);
-	vsm.addGlyph(circle3, "src");
+	vs.addGlyph(circle3);
 
 	final Glyph circle4 = new VCircle(120,200,0,30,Color.BLUE);
-	vsm.addGlyph(circle4, "src");
+	vs.addGlyph(circle4);
 
 	class ColorEndAction implements EndAction {
 		public void execute(Object subject, 

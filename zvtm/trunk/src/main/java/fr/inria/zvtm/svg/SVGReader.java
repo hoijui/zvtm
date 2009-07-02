@@ -52,6 +52,7 @@ import org.xml.sax.SAXException;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.VCircle;
@@ -1616,23 +1617,23 @@ public class SVGReader {
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
-     *@param vs name of the virtual space
-     *@deprecated As of zvtm 0.9.5, use load(Document d, String vs, boolean meta, String documentURL)
-     *@see #load(Document d, String vs, boolean meta, String documentURL)
+     *@param vs virtual space
+     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpace vs, boolean meta, String documentURL)
+     *@see #load(Document d, VirtualSpace vs, boolean meta, String documentURL)
      */
-    public static void load(Document d,String vs){
+    public static void load(Document d, VirtualSpace vs){
         load(d, vs, false, "");
     }
 
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
-     *@param vs name of the virtual space
+     *@param vs virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
-     *@deprecated As of zvtm 0.9.5, use load(Document d, String vs, boolean meta, String documentURL)
-     *@see #load(Document d, String vs, boolean meta, String documentURL)
+     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpace vs, boolean meta, String documentURL)
+     *@see #load(Document d, VirtualSpace vs, boolean meta, String documentURL)
      */
-    public static void load(Document d, String vs, boolean meta){
+    public static void load(Document d, VirtualSpace vs, boolean meta){
         load(d, vs, meta, "");
     }
 
@@ -1640,21 +1641,21 @@ public class SVGReader {
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      * This is a convenience method. An invocation of the form load(d, vs, meta, documentURL) behaves in exactly the same way as the invocation load(d, vs, meta, documentURL, null).
      *@param d SVG document as a DOM tree
-     *@param vs name of the virtual space
+     *@param vs virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
      *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
      * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
      * is expressed relative to the document's location.
-     *@see #load(Document d, String vs, boolean meta, String documentURL, String fallbackParentURL)
+     *@see #load(Document d, VirtualSpace vs, boolean meta, String documentURL, String fallbackParentURL)
      */
-    public static void load(Document d, String vs, boolean meta, String documentURL){
+    public static void load(Document d, VirtualSpace vs, boolean meta, String documentURL){
         SVGReader.load(d, vs, meta, documentURL, null);
     }
 
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
      *@param d SVG document as a DOM tree
-     *@param vs name of the virtual space
+     *@param vs virtual space
      *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
      *@param documentURL the URL where the SVG/XML document was found. Provide an empty String if it is not know.
      * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
@@ -1662,9 +1663,9 @@ public class SVGReader {
      *@param fallbackParentURL used to indicate a possible fallback directory from which to interpret relative paths in case the parent of
      * documentURL is not the right place where to look for those images (this can happen e.g. if a file was generated somewhere and then
      * moved alone, associated images staying in the original directory) ; set to null if no fallback directory is known.
-     *@see #load(Document d, String vs, boolean meta, String documentURL)
+     *@see #load(Document d, VirtualSpace vs, boolean meta, String documentURL)
      */
-    public static void load(Document d, String vs, boolean meta, String documentURL, String fallbackParentURL){
+    public static void load(Document d, VirtualSpace vs, boolean meta, String documentURL, String fallbackParentURL){
         // The following way of retrieving the Document's URL is disabled because it requires Java 1.5/DOM Level 3 support
         String documentParentURL = documentURL.substring(0, documentURL.lastIndexOf("/")+1);
         Element svgRoot=d.getDocumentElement();
@@ -1677,41 +1678,41 @@ public class SVGReader {
     }
 
     /*e is a DOM element, vs is the name of the virtual space where the new glyph(s) is(are) put*/
-    private static void processNode(Element e,String vs,
+    private static void processNode(Element e, VirtualSpace vs,
                                     Context ctx,boolean mainFontSet,boolean meta,
                                     String documentParentURL, String fallbackParentURL,
                                     Hashtable imageStore){
         String tagName=e.getTagName();
         if (tagName.equals(_rect)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createRectangle(e,ctx,meta),vs);
+            vs.addGlyph(createRectangle(e,ctx,meta));
         }
         else if (tagName.equals(_ellipse)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createEllipse(e,ctx,meta),vs);
+            vs.addGlyph(createEllipse(e,ctx,meta));
         }
         else if (tagName.equals(_circle)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createCircle(e,ctx,meta),vs);
+            vs.addGlyph(createCircle(e,ctx,meta));
         }
         else if (tagName.equals(_path)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createPath(e,new DPath(),ctx,meta),vs);
+            vs.addGlyph(createPath(e,new DPath(),ctx,meta));
         }
         else if (tagName.equals(_text)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createText(e,ctx,meta),vs);
+            vs.addGlyph(createText(e,ctx,meta));
         }
         else if (tagName.equals(_polygon)){
             Glyph g=createRectangleFromPolygon(e,ctx,meta);
             //if e does not describe a rectangle
-            if (g!=null){VirtualSpaceManager.INSTANCE.addGlyph(g,vs);}
+            if (g!=null){vs.addGlyph(g);}
             //create a VPolygon
-            else {VirtualSpaceManager.INSTANCE.addGlyph(createPolygon(e,ctx,meta),vs);}
+            else {vs.addGlyph(createPolygon(e,ctx,meta));}
         }
         else if (tagName.equals(_polyline)){
             Glyph[] segments=createPolyline(e,ctx,meta);
             for (int i=0;i<segments.length;i++){
-                VirtualSpaceManager.INSTANCE.addGlyph(segments[i],vs);
+                vs.addGlyph(segments[i]);
             }
         }
         else if (tagName.equals(_line)){
-            VirtualSpaceManager.INSTANCE.addGlyph(createLine(e, ctx, meta), vs);
+            vs.addGlyph(createLine(e, ctx, meta));
         }
         else if (tagName.equals(_image)) {
             if (isSVGImage(e)) {
@@ -1758,7 +1759,7 @@ public class SVGReader {
             else { 
                 Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
                 if (g != null){
-                    VirtualSpaceManager.INSTANCE.addGlyph(g, vs);
+                    vs.addGlyph(g);
                 }
             }
         }

@@ -66,24 +66,26 @@ public class Test {
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
-        testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
+        testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true, false, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
-        vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
+        vsm.getVirtualSpace("src").getCamera(0).setAltitude(1000);
         for (int i=0;i<10;i++){
             for (int j=0;j<10;j++){
-        		vsm.addGlyph(new VRectangle(i*30,j*30,0,10,10,Color.WHITE), "src");            
+        		vs.addGlyph(new VRectangle(i*300,j*300,0,100,100,Color.WHITE));            
             }
         }
         vsm.repaintNow();
     }
     
-    Lens lens;
+    FixedSizeLens lens;
     
     void setLens(int x, int y){
-        lens = testView.setLens(getLensDefinition(x, y));
+        lens = (FixedSizeLens)testView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
+        lens.setInnerRadiusColor(Color.RED);
+        lens.setOuterRadiusColor(Color.RED);
     }
 
     Lens getLensDefinition(int x, int y){
@@ -97,11 +99,13 @@ public class Test {
     }
     
     void incX(){
-        lens.setXfocusOffset(lens.getXfocusOffset()+1);
+        lens.setXfocusOffset(lens.getXfocusOffset()-1);
+        vsm.repaintNow();
     }
 
     void incY(){
-        lens.setYfocusOffset(lens.getYfocusOffset()+1);
+        lens.setYfocusOffset(lens.getYfocusOffset()-1);
+        vsm.repaintNow();
     }
 
     public static void main(String[] args){

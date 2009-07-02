@@ -42,8 +42,8 @@ public class ZOrderTest extends TestCase {
 	Glyph g1 = new VCircle(2, 5, 42, 314, Color.WHITE);
 	Glyph g2 = null;
 	
-	vsm.addGlyph(g1, vs, false);
-	vsm.addGlyph(g2, vs, false);
+	vs.addGlyph(g1, false);
+	vs.addGlyph(g2, false);
 
 	vs.above(g1, g2);
 	
@@ -56,8 +56,8 @@ public class ZOrderTest extends TestCase {
 	Glyph g1 = new VCircle();
 	Glyph g2 = new VCircle();
 
-	vsm.addGlyph(g1, vs, false); 
-	vsm.addGlyph(g2, vs, false);
+	vs.addGlyph(g1, false); 
+	vs.addGlyph(g2, false);
 
 	vs.atBottom(g1, Integer.MIN_VALUE);
 	vs.below(g2, g1);
@@ -70,8 +70,8 @@ public class ZOrderTest extends TestCase {
 	Glyph g1 = new VCircle();
 	Glyph g2 = new VCircle();
 
-	vsm.addGlyph(g1, vs, false); 
-	vsm.addGlyph(g2, vs, false);
+	vs.addGlyph(g1, false); 
+	vs.addGlyph(g2, false);
 
 	vs.onTop(g1, Integer.MAX_VALUE);
 	vs.above(g2, g1);
@@ -82,7 +82,7 @@ public class ZOrderTest extends TestCase {
 
     public void testAboveSameGlyph(){
 	Glyph g = new VTriangle(10, 10, 3, 30, Color.BLACK);
-	vsm.addGlyph(g, vs, false);
+	vs.addGlyph(g, false);
 	vs.above(g, g);
 
 	assertEquals(3, g.getZindex());
@@ -90,7 +90,7 @@ public class ZOrderTest extends TestCase {
 
     public void testBelowSameGlyph(){
 	Glyph g = new VTriangle(10, 10, 3, 30, Color.BLACK);
-	vsm.addGlyph(g, vs, false);
+	vs.addGlyph(g, false);
 	vs.below(g, g);
 
 	assertEquals(3, g.getZindex());
@@ -103,7 +103,7 @@ public class ZOrderTest extends TestCase {
 	for(int i=0; i<nbGlyphs; ++i){
 	    Glyph g = new VTriangle(10, 10, i, 30, Color.BLACK);
 	    glyphs.add(g);
-	    vsm.addGlyph(g, vs, false);
+	    vs.addGlyph(g, false);
 	}
 
 	for(int i=0; i<nbGlyphs; ++i){
@@ -123,7 +123,7 @@ public class ZOrderTest extends TestCase {
 	    Glyph g = new VCircle(10, 10, pseudoRandomIndexes[i], 
 				  30, Color.BLACK);
 	    glyphs.add(g);
-	    vsm.addGlyph(g, vs, false);
+	    vs.addGlyph(g, false);
 	}
 
 	for(int i=0; i<pseudoRandomIndexes.length; ++i){
@@ -143,7 +143,7 @@ public class ZOrderTest extends TestCase {
 	    Glyph g = new VCircle(10, 10, pseudoRandomIndexes[i], 
 				  30, Color.BLACK);
 	    glyphs.add(g);
-	    vsm.addGlyph(g, vs, false);
+	    vs.addGlyph(g, false);
 	}
 
 	for(int i=0; i<pseudoRandomIndexes.length; ++i){
@@ -164,7 +164,7 @@ public class ZOrderTest extends TestCase {
 	Glyph g1 = new VCircle(10, 10, 42, 30, Color.BLACK);
 	Glyph g2 = new VCircle(10, 10, 43, 30, Color.BLACK);
 	
-	vsm.addGlyph(g1, vs, false);
+	vs.addGlyph(g1, false);
 	vs.below(g2, g1);
 
 	assertEquals(g1.getZindex(), 42);
@@ -181,12 +181,12 @@ public class ZOrderTest extends TestCase {
 	CGlyph cg1 = new CGlyph(g1, new SGlyph[]{new SGlyph(g2, 10, 23)});
 	CGlyph cg2 = new CGlyph(g3, new SGlyph[]{new SGlyph(g4, -42, 314)});
 	
-	vsm.addGlyph(g1, vs, false);
-	vsm.addGlyph(g2, vs, false);
-	vsm.addGlyph(g3, vs, false);
-	vsm.addGlyph(g4, vs, false);
-	vsm.addGlyph(cg1, vs, false);
-	vsm.addGlyph(cg2, vs, false);
+	vs.addGlyph(g1, false);
+	vs.addGlyph(g2, false);
+	vs.addGlyph(g3, false);
+	vs.addGlyph(g4, false);
+	vs.addGlyph(cg1, false);
+	vs.addGlyph(cg2, false);
 
 	vs.above(cg2, cg1);
 
@@ -204,7 +204,7 @@ public class ZOrderTest extends TestCase {
 					30, Color.BLACK);
 			circles[i] = g;
 		}
-		vsm.addGlyphs(circles, vs, false);
+		vs.addGlyphs(circles, false);
 
 		Glyph[] circles2 = 
 			new Glyph[pseudoRandomIndexes.length - circles.length];
@@ -215,7 +215,7 @@ public class ZOrderTest extends TestCase {
 					30, Color.BLACK);
 			circles2[i] = g;
 		}
-		vsm.addGlyphs(circles2, vs, false);
+		vs.addGlyphs(circles2, false);
 
 		Glyph[] drawingList = vs.getDrawingList();
 		for(int i=0; i<drawingList.length-1; ++i){

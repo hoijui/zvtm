@@ -69,7 +69,7 @@ public class PieMenuC extends PieMenu {
             }
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -91,7 +91,7 @@ public class PieMenuC extends PieMenu {
                 }
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -107,7 +107,7 @@ public class PieMenuC extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -151,7 +151,7 @@ public class PieMenuC extends PieMenu {
             }
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -173,7 +173,7 @@ public class PieMenuC extends PieMenu {
                 labels[i].setBorderColor(borderColors[i]);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -189,7 +189,7 @@ public class PieMenuC extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -234,7 +234,7 @@ public class PieMenuC extends PieMenu {
             }
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -256,7 +256,7 @@ public class PieMenuC extends PieMenu {
                 }
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -272,7 +272,7 @@ public class PieMenuC extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -317,7 +317,7 @@ public class PieMenuC extends PieMenu {
             }
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -339,7 +339,7 @@ public class PieMenuC extends PieMenu {
                 labels[i].setBorderColor(borderColors[i]);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -355,7 +355,7 @@ public class PieMenuC extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 

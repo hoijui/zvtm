@@ -72,10 +72,10 @@ public class TestAnimStop {
 	AnimationManager am = vsm.getAnimationManager();
 
 	final Glyph circle = new VCircle(0,200,0,30,Color.BLUE);
-	vsm.addGlyph(circle, "src");
+	vs.addGlyph(circle);
 
 	final Glyph circle2 = new VCircle(60,200,0,30,Color.GREEN);
-	vsm.addGlyph(circle2, "src");
+	vs.addGlyph(circle2);
 	
 	Animation anim = am.getAnimationFactory().createAnimation(3000, 
 					    Animation.INFINITE,

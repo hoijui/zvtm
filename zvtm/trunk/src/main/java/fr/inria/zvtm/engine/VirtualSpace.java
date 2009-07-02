@@ -157,20 +157,38 @@ public class VirtualSpace {
 	}
 
     /**add glyph g to this space*/
-    void addGlyph(Glyph g){
-	g.initCams(cm.cameraList.length);
-	visualEnts.add(g);
-	addGlyphToDrawingList(g);
+    public void addGlyph(Glyph g, boolean initColors, boolean repaint){
+        if (g == null){return;}
+        if (initColors){g.setMouseInsideHighlightColor(Glyph.getDefaultMouseInsideColor());}
+        g.initCams(cm.cameraList.length);
+        visualEnts.add(g);
+        addGlyphToDrawingList(g);
+        if (repaint){VirtualSpaceManager.INSTANCE.repaintNow();}
     }
 
-	void addGlyphs(Glyph[] glyphs){
+    /**add glyph g to this space*/
+    public void addGlyph(Glyph g){
+        addGlyph(g, true, true);
+    }
+    
+    /**add glyph g to this space*/
+    public void addGlyph(Glyph g, boolean repaint){
+        addGlyph(g, true, repaint);
+    }
+
+	public void addGlyphs(Glyph[] glyphs, boolean repaint){
 		for(Glyph glyph: glyphs){
 			glyph.initCams(cm.cameraList.length);
 			visualEnts.add(glyph);
 		}
 		addGlyphsToDrawingList(glyphs);
+		if (repaint){VirtualSpaceManager.INSTANCE.repaintNow();}
 	}
 
+	public void addGlyphs(Glyph[] glyphs){
+		addGlyphs(glyphs, true);
+	}
+	
     /** Get all glyphs in this space, visible or not, sensitive or not.
      * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
      * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
@@ -269,19 +287,30 @@ public class VirtualSpace {
 	return v;
     }
 
-    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
-     *@param gID glyph's ID
-     */
-    public void removeGlyph(Long gID){
-	    removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
-    }
+//    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
+//     *@param gID glyph's ID
+//     */
+//    public void removeGlyph(Long gID){
+//	    removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
+//    }
+//
+//    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
+//     *@param gID glyph's ID
+//     *@param repaint should the view be updated automatically or not
+//     */
+//    public void removeGlyph(Long gID, boolean repaint){
+//	    removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
+//    }
 
-    /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
-     *@param gID glyph's ID
-     *@param repaint should the view be updated automatically or not
+    /** Remove all glyphs in this virtual space.
+     *
      */
-    public void removeGlyph(Long gID, boolean repaint){
-	    removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
+    public void removeAllGlyphs(){
+        Vector entClone = (Vector)getAllGlyphs().clone();
+        for (int i=0;i<entClone.size();i++){
+            removeGlyph((Glyph)entClone.elementAt(i), false);
+        }
+        VirtualSpaceManager.INSTANCE.repaintNow();        
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated. */
@@ -317,7 +346,6 @@ public class VirtualSpace {
             }
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
-            VirtualSpaceManager.INSTANCE.allGlyphs.remove(g.getID());
             if (repaint){
                 VirtualSpaceManager.INSTANCE.repaintNow();
             }
@@ -328,24 +356,24 @@ public class VirtualSpace {
         }
     }
 
-	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
-		*@param gID glyph's ID
-		*@deprecated as of zvtm 0.9.8
-		*@see #removeGlyph(Long gID)
-		*/
-	public void destroyGlyph(Long gID){
-		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
-	}
-
-	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
-		*@param gID glyph's ID
-		*@param repaint should the view be updated automatically or not
-		*@deprecated as of zvtm 0.9.8
-		*@see #removeGlyph(Long gID, boolean repaint)
-		*/
-	public void destroyGlyph(Long gID, boolean repaint){
-		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
-	}
+//	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
+//		*@param gID glyph's ID
+//		*@deprecated as of zvtm 0.9.8
+//		*@see #removeGlyph(Long gID)
+//		*/
+//	public void destroyGlyph(Long gID){
+//		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
+//	}
+//
+//	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
+//		*@param gID glyph's ID
+//		*@param repaint should the view be updated automatically or not
+//		*@deprecated as of zvtm 0.9.8
+//		*@see #removeGlyph(Long gID, boolean repaint)
+//		*/
+//	public void destroyGlyph(Long gID, boolean repaint){
+//		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
+//	}
 
 	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
 		*@deprecated as of zvtm 0.9.8

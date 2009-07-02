@@ -63,7 +63,7 @@ public class PieMenuP extends PieMenu {
             items[i] = new VPolygon(coords, 0, fillColor, borderColor, alphaT);
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
@@ -92,12 +92,12 @@ public class PieMenuP extends PieMenu {
                 labels[i].setBorderColor(borderColor);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -141,7 +141,7 @@ public class PieMenuP extends PieMenu {
             items[i] = new VPolygon(coords, 0, fillColors[i], borderColors[i], alphaT);
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
@@ -163,12 +163,12 @@ public class PieMenuP extends PieMenu {
                 labels[i].setBorderColor(borderColors[i]);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -213,7 +213,7 @@ public class PieMenuP extends PieMenu {
             items[i] = new VPolygon(coords, 0, fillColor, borderColor, alphaT);
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
@@ -242,12 +242,12 @@ public class PieMenuP extends PieMenu {
                 labels[i].setBorderColor(borderColor);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -292,7 +292,7 @@ public class PieMenuP extends PieMenu {
             items[i] = new VPolygon(coords, 0, fillColors[i], borderColors[i], alphaT);
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
@@ -314,12 +314,12 @@ public class PieMenuP extends PieMenu {
                 labels[i].setBorderColor(borderColors[i]);
                 labels[i].setSpecialFont(font);                
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
