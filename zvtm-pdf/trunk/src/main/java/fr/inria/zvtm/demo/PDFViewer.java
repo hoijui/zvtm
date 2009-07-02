@@ -70,7 +70,7 @@ public class PDFViewer {
 			PDFFile pdfFile = new PDFFile(buf);
 			for (int i=0;i<pdfFile.getNumPages();i++){
 				try {
-					VirtualSpaceManager.INSTANCE.addGlyph(new ZPDFPage(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1), vs);				
+					vs.addGlyph(new ZPDFPage(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1));			
 				}
 				catch ( Exception e) {
 					e.printStackTrace();
