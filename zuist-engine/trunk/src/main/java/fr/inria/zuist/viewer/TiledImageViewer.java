@@ -214,7 +214,7 @@ public class TiledImageViewer {
 	
 	void reset(){
 		sm.reset();
-		vsm.removeGlyphsFromSpace(mSpaceName);
+		mSpace.removeAllGlyphs();
 	}
 	
 	void openFile(){
@@ -436,11 +436,11 @@ class Overlay implements ViewEventHandler {
     
     void init(){
         fadedRegion = new VRectangle(0, 0, 0, 10, 10, FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
-        application.vsm.addGlyph(fadedRegion, application.aboutSpace);
+        application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
         sayGlyph = new VText(0, -10, 0, SAY_MSG_COLOR, " ", VText.TEXT_ANCHOR_MIDDLE);
         sayGlyph.setSpecialFont(SAY_MSG_FONT);
-        application.vsm.addGlyph(sayGlyph, application.aboutSpace);
+        application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
     
@@ -457,11 +457,11 @@ class Overlay implements ViewEventHandler {
             insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            VirtualSpaceManager.INSTANCE.addGlyph(fadeAbout, application.aboutSpace);
-            VirtualSpaceManager.INSTANCE.addGlyph(inriaLogo, application.aboutSpace);
-            VirtualSpaceManager.INSTANCE.addGlyph(insituLogo, application.aboutSpace);
+            application.aboutSpace.addGlyph(fadeAbout);
+            application.aboutSpace.addGlyph(inriaLogo);
+            application.aboutSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
-	            VirtualSpaceManager.INSTANCE.addGlyph(aboutLines[i], application.aboutSpace);				
+	            application.aboutSpace.addGlyph(aboutLines[i]);				
 			}
             showingAbout = true;
         }

@@ -98,7 +98,7 @@ public class ImageDescription extends ObjectDescription {
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
-                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+                vs.addGlyph(glyph);
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
@@ -113,7 +113,7 @@ public class ImageDescription extends ObjectDescription {
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
-                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+                vs.addGlyph(glyph);
             }
             glyph.setOwner(this);
         }

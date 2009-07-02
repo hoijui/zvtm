@@ -104,11 +104,11 @@ class OverlayManager implements ViewEventHandler {
             insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            VirtualSpaceManager.INSTANCE.addGlyph(fadeAbout, application.ovSpace);
-            VirtualSpaceManager.INSTANCE.addGlyph(inriaLogo, application.ovSpace);
-            VirtualSpaceManager.INSTANCE.addGlyph(insituLogo, application.ovSpace);
+            application.ovSpace.addGlyph(fadeAbout);
+            application.ovSpace.addGlyph(inriaLogo);
+            application.ovSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
-	            VirtualSpaceManager.INSTANCE.addGlyph(aboutLines[i], application.ovSpace);				
+	            application.ovSpace.addGlyph(aboutLines[i]);				
 			}
             showingAbout = true;
         }

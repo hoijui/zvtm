@@ -89,7 +89,7 @@ public class TextDescription extends ObjectDescription {
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+                vs.addGlyph(glyph);
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
@@ -100,7 +100,7 @@ public class TextDescription extends ObjectDescription {
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 1.0f);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+                vs.addGlyph(glyph);
             }
             glyph.setOwner(this);
         }

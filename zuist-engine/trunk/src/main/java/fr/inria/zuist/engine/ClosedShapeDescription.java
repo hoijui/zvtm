@@ -45,7 +45,7 @@ public class ClosedShapeDescription extends ObjectDescription {
             if (fadeIn){
                 ((Translucent)glyph).setTranslucencyValue(0.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
-                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+                vs.addGlyph(glyph);
                 //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
                 //        not necessarily 1.0f
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
@@ -56,7 +56,7 @@ public class ClosedShapeDescription extends ObjectDescription {
             }
             else {
                 if (!sensitive){glyph.setSensitivity(false);}
-                VirtualSpaceManager.INSTANCE.addGlyph(glyph, vs);
+                vs.addGlyph(glyph);
             }
             inSpace = true;
             glyph.setOwner(this);

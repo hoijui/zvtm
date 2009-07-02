@@ -443,7 +443,7 @@ public class SceneManager {
         }
         if (fill != null || stroke != null || sensitivity){
             // add the rectangle representing the region only if it is visible or sensitive
-            VirtualSpaceManager.INSTANCE.addGlyph(r, sceneLayers[li]);
+            sceneLayers[li].addGlyph(r);
         }
         region.setGlyph(r);
         r.setOwner(region);
