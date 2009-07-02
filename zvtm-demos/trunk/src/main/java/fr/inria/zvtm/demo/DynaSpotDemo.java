@@ -59,8 +59,8 @@ public class DynaSpotDemo {
         demoView.setEventHandler(eh);
         demoView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-		vsm.addGlyph(new VCircle(-300,0,0,4,Color.BLACK), "src");
-		vsm.addGlyph(new VCircle(300,0,0,4,Color.BLACK), "src");
+		vs.addGlyph(new VCircle(-300,0,0,4,Color.BLACK));
+		vs.addGlyph(new VCircle(300,0,0,4,Color.BLACK));
         vsm.repaintNow();
 		demoView.getCursor().activateDynaSpot(true);
     }

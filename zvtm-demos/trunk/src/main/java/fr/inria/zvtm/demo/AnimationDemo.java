@@ -204,25 +204,25 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	};
 	composite2 = new CGlyph(c2m, sgs2);
 	segment = new VSegment(COL3_X, ROW3_Y, 0, SIZE, 0.707f, ROW3_COLOR, 1.0f);
-	vsm.addGlyph(rectangle, mSpace);
-	vsm.addGlyph(star, mSpace);
-	vsm.addGlyph(triangle, mSpace);
-	vsm.addGlyph(text, mSpace);
-	vsm.addGlyph(image, mSpace);
-	vsm.addGlyph(irregularShape, mSpace);
-	vsm.addGlyph(c1m, mSpace);
-	vsm.addGlyph(new VText(COL1_X, ROW3_Y-100, 0, Color.BLACK, "Composite: full rotation", VText.TEXT_ANCHOR_MIDDLE), mSpace);
+	mSpace.addGlyph(rectangle);
+	mSpace.addGlyph(star);
+	mSpace.addGlyph(triangle);
+	mSpace.addGlyph(text);
+	mSpace.addGlyph(image);
+	mSpace.addGlyph(irregularShape);
+	mSpace.addGlyph(c1m);
+	mSpace.addGlyph(new VText(COL1_X, ROW3_Y-100, 0, Color.BLACK, "Composite: full rotation", VText.TEXT_ANCHOR_MIDDLE));
 	for (int i=0;i<sgs1.length;i++){
-	    vsm.addGlyph(sgs1[i].getGlyph(), mSpace);
+	    mSpace.addGlyph(sgs1[i].getGlyph());
 	}
-	vsm.addGlyph(composite1, mSpace);
-	vsm.addGlyph(c2m, mSpace);
+	mSpace.addGlyph(composite1);
+	mSpace.addGlyph(c2m);
 	for (int i=0;i<sgs2.length;i++){
-	    vsm.addGlyph(sgs2[i].getGlyph(), mSpace);
+	    mSpace.addGlyph(sgs2[i].getGlyph());
 	}
-	vsm.addGlyph(composite2, mSpace);
-	vsm.addGlyph(new VText(COL2_X, ROW3_Y-100, 0, Color.BLACK, "Composite: position rotation", VText.TEXT_ANCHOR_MIDDLE), mSpace);
-	vsm.addGlyph(segment, mSpace);
+	mSpace.addGlyph(composite2);
+	mSpace.addGlyph(new VText(COL2_X, ROW3_Y-100, 0, Color.BLACK, "Composite: position rotation", VText.TEXT_ANCHOR_MIDDLE));
+	mSpace.addGlyph(segment);
 	RECTANGLE_SIZE = rectangle.getSize();
 	IMAGE_SIZE = image.getSize();
 	COMPOSITE_SIZE = composite1.getSize();

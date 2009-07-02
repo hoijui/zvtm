@@ -188,31 +188,31 @@ public class ElasticDocument implements Java2DPainter {
 			   (new ImageIcon(PAGE1_PATH)).getImage(),
 			   PAGE_SCALE);
 	page1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(page1, mainVSname);
+	mainVS.addGlyph(page1);
 
 	page2 = new VImage(PAGE2_X, PAGE2_Y, 0,
 			   (new ImageIcon(PAGE2_PATH)).getImage(),
 			   PAGE_SCALE);
 	page2.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(page2, mainVSname);
+	mainVS.addGlyph(page2);
 
 	page3 = new VImage(PAGE3_X, PAGE3_Y, 0,
 			   (new ImageIcon(PAGE3_PATH)).getImage(),
 			   PAGE_SCALE);
 	page3.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(page3, mainVSname);
+	mainVS.addGlyph(page3);
 
 	page4 = new VImage(PAGE4_X, PAGE4_Y, 0,
 			   (new ImageIcon(PAGE4_PATH)).getImage(),
 			   PAGE_SCALE);
 	page4.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(page4, mainVSname);
+	mainVS.addGlyph(page4);
 
 	page5 = new VImage(PAGE5_X, PAGE5_Y, 0,
 			   (new ImageIcon(PAGE5_PATH)).getImage(),
 			   PAGE_SCALE);
 	page5.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(page5, mainVSname);
+	mainVS.addGlyph(page5);
     }
 
     void setLens(int t){

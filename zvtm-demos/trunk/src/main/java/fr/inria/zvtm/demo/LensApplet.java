@@ -119,11 +119,12 @@ public class LensApplet extends JApplet {
 	for (int i=-200;i<=200;i+=40){
 	    VSegment s = new VSegment(i,0,0,0,200,Color.black);
 	    VSegment s2 = new VSegment(0,i,0,200,0,Color.black);
-	    vsm.addGlyph(s,demoVS);vsm.addGlyph(s2,demoVS);
+	    vs.addGlyph(s);
+	    vs.addGlyph(s2);
 	}
 	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
 	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
-	vsm.addGlyph(i1,demoVS);
+	vs.addGlyph(i1);
 	vsm.repaintNow();
 	vsm.getGlobalView(vs.getCamera(0),500);
 	vsm.repaintNow();

@@ -13,6 +13,7 @@ package fr.inria.zvtm.demo;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
@@ -21,7 +22,9 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 public abstract class FractalDemo {
 
     VirtualSpaceManager vsm;
-
+    
+    VirtualSpace vs;
+    
     String mainSpaceName = "fractalSpace";
     String mainViewName = "Fractal";
 

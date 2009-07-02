@@ -95,7 +95,7 @@ public class ScrollbarDemo implements CameraListener {
 	    for (int j=0;j<30;j++){
 		r = new VRectangle(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/900.0), 1.0f,1.0f));
 		r.setDrawBorder(false);
-		vsm.addGlyph(r, demoSpace, false);
+		demoSpace.addGlyph(r, false);
 	    }
 	}
 	sl.virtualSpaceUpdated();

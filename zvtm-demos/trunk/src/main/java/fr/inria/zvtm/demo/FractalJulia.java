@@ -40,7 +40,7 @@ public class FractalJulia extends FractalDemo {
 
     public void init(){
 	eh=new FractalEventHandler(this);
-	vsm.addVirtualSpace(mainSpaceName);
+	vs = vsm.addVirtualSpace(mainSpaceName);
 	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
 	buildJulia();
 	vsm.addCamera(mainSpaceName);
@@ -55,7 +55,7 @@ public class FractalJulia extends FractalDemo {
     }
 
     void reset(){
-	vsm.destroyGlyphsInSpace(mainSpaceName);
+	vs.removeAllGlyphs();
     }
 
     /* adapted from http://www.hewgill.com/chaos-and-fractals/c13_julia.html
@@ -64,8 +64,8 @@ public class FractalJulia extends FractalDemo {
     void buildJulia(){
 	reset();
 	pf = new ProgFrame("Computing "+N+" points...", "Julia Fractal Demo");
-	vsm.addGlyph(new VSegment(left, -left-w/2, 0, Color.gray, left+w, -left-w/2), mainSpaceName);
-	vsm.addGlyph(new VSegment(left+w/2, -left, 0, Color.gray, left+w/2, -left-w), mainSpaceName);
+	vs.addGlyph(new VSegment(left, -left-w/2, 0, Color.gray, left+w, -left-w/2));
+	vs.addGlyph(new VSegment(left+w/2, -left, 0, Color.gray, left+w/2, -left-w));
 	double xn = 0.25;
 	double yn = 0;
 	for (int i = 0; i < N; i++) {
@@ -92,7 +92,7 @@ public class FractalJulia extends FractalDemo {
 		xn = -xn;
 		yn = -yn;
 	    }
-	    vsm.addGlyph(new VPoint((int)(xn*s + orig), (int)(yn*s - orig), Color.white), mainSpaceName);
+	    vs.addGlyph(new VPoint((int)(xn*s + orig), (int)(yn*s - orig), Color.white));
 	    if (i % 10 == 0){//don't refresh too often: it is time consuming
 		pf.setPBValue(i * 100 / N);
 	    }

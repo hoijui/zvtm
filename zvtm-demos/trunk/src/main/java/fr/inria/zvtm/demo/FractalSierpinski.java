@@ -34,22 +34,22 @@ public class FractalSierpinski extends FractalDemo {
 
     public void init(){
 	eh=new FractalEventHandler(this);
-	vsm.addVirtualSpace(mainSpaceName);
+	vs = vsm.addVirtualSpace(mainSpaceName);
 	buildSierpinski();
 	vsm.addCamera(mainSpaceName);
-	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
+	vs.getCamera(0).setZoomFloor(-90);
 	Vector cameras=new Vector();
-	cameras.add(vsm.getVirtualSpace(mainSpaceName).getCamera(0));
+	cameras.add(vs.getCamera(0));
 	vsm.addExternalView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
 	View v = vsm.getView(mainViewName);
 	v.setEventHandler(eh);
 	v.setBackgroundColor(Color.black);
 	v.mouse.setColor(Color.white);
-	vsm.getGlobalView(vsm.getVirtualSpace(mainSpaceName).getCamera(0), 500);
+	vsm.getGlobalView(vs.getCamera(0), 500);
     }
 
     void reset(){
-	vsm.destroyGlyphsInSpace(mainSpaceName);
+	vs.removeAllGlyphs();
 	totalNumberOfGlyphs = 0;
 	progressIndex = 0;
     }
@@ -66,7 +66,7 @@ public class FractalSierpinski extends FractalDemo {
 	    pf.setPBValue((int)(y * 100 / n));
 	    for (int x = 0; x < n; x++) {
 		if ((x & (y-x)) == 0) {
-		    vsm.addGlyph(new VPoint(x+15800-y/2,3000-y,Color.white), mainSpaceName);
+		    vs.addGlyph(new VPoint(x+15800-y/2,3000-y,Color.white));
 		    progressIndex += 1;
 		}
 	    }

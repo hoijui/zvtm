@@ -45,22 +45,22 @@ public class FractalFern extends FractalDemo {
 
     public void init(){
 	eh=new FractalEventHandler(this);
-	vsm.addVirtualSpace(mainSpaceName);    
-	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
+	vs = vsm.addVirtualSpace(mainSpaceName);    
+	vs.getCamera(0).setZoomFloor(-90);
 	buildFern();
 	vsm.addCamera(mainSpaceName);
 	Vector cameras=new Vector();
-	cameras.add(vsm.getVirtualSpace(mainSpaceName).getCamera(0));
+	cameras.add(vs.getCamera(0));
 	vsm.addExternalView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
 	View v = vsm.getView(mainViewName);
 	v.setEventHandler(eh);
 	v.setBackgroundColor(Color.black);
 	v.mouse.setColor(Color.white);
-	vsm.getGlobalView(vsm.getVirtualSpace(mainSpaceName).getCamera(0), 500);
+	vsm.getGlobalView(vs.getCamera(0), 500);
     }
 
     void reset(){
-	vsm.destroyGlyphsInSpace(mainSpaceName);
+	vs.removeAllGlyphs();
     }
 
     /* adapted from http://www.hewgill.com/chaos-and-fractals/c06_fern.java
@@ -87,7 +87,7 @@ public class FractalFern extends FractalDemo {
 		xn = 0.781 * x + 0.034 * y + e4;
 		yn = -0.032 * x + 0.739 * y + f4;
 	    }
-	    vsm.addGlyph(new VPoint(left+(int)xn, (int)yn-wl, Color.white), mainSpaceName);
+	    vs.addGlyph(new VPoint(left+(int)xn, (int)yn-wl, Color.white));
 	    x = xn;
 	    y = yn;
 	    pf.setPBValue(i*100/imax);

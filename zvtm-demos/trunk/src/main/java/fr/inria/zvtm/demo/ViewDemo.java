@@ -24,11 +24,14 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 public class ViewDemo {
 
     VirtualSpaceManager vsm;
+
+    VirtualSpace vs;
 
     String mainSpaceName = "demoSpace";
     String mainViewName = "View";
@@ -73,7 +76,7 @@ public class ViewDemo {
 
     public void init(){
 	eh=new ViewDemoEventHandler(this);
-	vsm.addVirtualSpace(mainSpaceName);
+	vs = vsm.addVirtualSpace(mainSpaceName);
 	Vector cameras=new Vector();
 	mCamera = vsm.addCamera(mainSpaceName);
 	mCamera.setZoomFloor(-90);
@@ -108,7 +111,7 @@ public class ViewDemo {
 		    r = new VRectangle(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/10000.0), 1.0f,1.0f));
 		}
 		r.setDrawBorder(false);
-		vsm.addGlyph(r, mainSpaceName, false);
+		vs.addGlyph(r, false);
 		pf.setPBValue(i+j/100);
 	    }
 	}

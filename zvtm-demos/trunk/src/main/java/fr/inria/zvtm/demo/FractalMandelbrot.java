@@ -43,22 +43,22 @@ public class FractalMandelbrot extends FractalDemo {
 
     public void init(){
 	eh=new FractalEventHandler(this);
-	vsm.addVirtualSpace(mainSpaceName);
+	vs = vsm.addVirtualSpace(mainSpaceName);
 	buildMandelbrot();
 	vsm.addCamera(mainSpaceName);
-	vsm.getVirtualSpace(mainSpaceName).getCamera(0).setZoomFloor(-90);
+	vs.getCamera(0).setZoomFloor(-90);
 	Vector cameras=new Vector();
-	cameras.add(vsm.getVirtualSpace(mainSpaceName).getCamera(0));
+	cameras.add(vs.getCamera(0));
 	vsm.addExternalView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
 	View v = vsm.getView(mainViewName);
 	v.setEventHandler(eh);
 	v.setBackgroundColor(Color.black);
 	v.mouse.setColor(Color.white);
-	vsm.getGlobalView(vsm.getVirtualSpace(mainSpaceName).getCamera(0), 500);
+	vsm.getGlobalView(vs.getCamera(0), 500);
     }
 
     void reset(){
-	vsm.destroyGlyphsInSpace(mainSpaceName);
+	vs.removeAllGlyphs();
     }
 
     /* adapted from http://www.hewgill.com/chaos-and-fractals/c14_mandelbrot.html
@@ -67,8 +67,8 @@ public class FractalMandelbrot extends FractalDemo {
     void buildMandelbrot(){
 	reset();
 	pf = new ProgFrame("Computing points...", "Mandelbrot Fractal Demo");
-	vsm.addGlyph(new VSegment((int)(-1/s+left+w/2), left+w/2, 0, Color.gray, (int)(1/s+left+w/2), left+w/2), mainSpaceName);
-	vsm.addGlyph(new VSegment(left+w/2, (int)(-1/s+left+w/2), 0, Color.gray, left+w/2, (int)(1/s+left+w/2)), mainSpaceName);
+	vs.addGlyph(new VSegment((int)(-1/s+left+w/2), left+w/2, 0, Color.gray, (int)(1/s+left+w/2), left+w/2));
+	vs.addGlyph(new VSegment(left+w/2, (int)(-1/s+left+w/2), 0, Color.gray, left+w/2, (int)(1/s+left+w/2)));
 	int x[] = new int[3];
 	int y[] = new int[3];
 	for (int k = kstart; k >= kend; k += kstep) {
@@ -102,7 +102,7 @@ public class FractalMandelbrot extends FractalDemo {
 		if (!outside(k, s*x[vnew]+recen, s*y[vnew]+imcen)) {
 		    //vsm.addGlyph(new VSegment(x[vin]+left+w/2, -y[vin]+left+w/2, 0, Color.white, x[vnew]+left+w/2, -y[vnew]+left+w/2), mainSpaceName);
 
-		    vsm.addGlyph(new VPoint(x[vin]+left+w/2, -y[vin]+left+w/2, Color.white), mainSpaceName);
+		    vs.addGlyph(new VPoint(x[vin]+left+w/2, -y[vin]+left+w/2, Color.white));
 		    vref = vin;
 		    vin = vnew;
 		    vnew = vref;
