@@ -250,7 +250,16 @@ public abstract class Glyph implements Cloneable, Translucent {
 
 
     /*------------Color------------------------------------------*/
+    
+    static Color DEFAULT_MOUSE_INSIDE_COLOR = Color.WHITE;
 
+    public static void setDefaultMouseInsideColor(Color c){
+        DEFAULT_MOUSE_INSIDE_COLOR = c;
+    }
+    
+    public static Color getDefaultMouseInsideColor(){
+        return DEFAULT_MOUSE_INSIDE_COLOR;
+    }
      
      // Fill color for closed shapes, stroke color for glyphs which use just one color, such as text, paths, segments.
     protected Color color;
@@ -277,8 +286,6 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Set the glyph's border color when cursor is inside it. IMPORTANT: add ing the glyph to a virtual space <strong>after</strong> calling this method might override this color.
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      *@param c set to null to keep the original color.
-     *@see fr.inria.zvtm.engine.VirtualSpaceManager#setMouseInsideGlyphColor(Color c, boolean propagate)
-     *@see fr.inria.zvtm.engine.VirtualSpaceManager#setMouseInsideGlyphColor(Color c)
      */
     public void setMouseInsideHighlightColor(Color c){
 		this.mouseInsideColor = c;

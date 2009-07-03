@@ -137,9 +137,6 @@ public abstract class View {
     /**get the java.awt.Container for this view*/
     public abstract Container getFrame();
 
-    /**used only in Internal Views to get focus in view for key events (called automatically when the mouse enters the (Acc)IView)*/
-    public abstract void requestFocus();
-
     /**Set the cursor for this view.
      * Either the ZVTM cursor or one of the default AWT cursors.
      *@param cursorType any of the cursor type values declared in java.awt.Cursor, such as DEFAULT_CURSOR, CROSSHAIR_CURSOR HAND_CURSOR, etc. To get the ZVTM cursor, use Cursor.CUSTOM_CURSOR.

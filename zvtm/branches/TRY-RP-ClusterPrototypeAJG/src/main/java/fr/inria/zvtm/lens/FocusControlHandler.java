@@ -42,7 +42,8 @@ public class FocusControlHandler implements ViewEventHandler {
 	boolean started = false;
 	
 	ViewEventHandler actualViewEventHandler;
-	
+	Java2DPainter    actualAfterPortalsPainter;
+	Java2DPainter paintCursor;
 	Lens lens;
 	TemporalLens tLens;
 
@@ -77,7 +78,8 @@ public class FocusControlHandler implements ViewEventHandler {
 			e.printStackTrace();
 		}
 		
-		Java2DPainter paintCursor = new Java2DPainter() {
+		actualAfterPortalsPainter = v.getJava2DPainter(Java2DPainter.AFTER_PORTALS);
+		paintCursor = new Java2DPainter() {
 			public void paint(Graphics2D g2d, int viewWidth, int viewHeight) {
 				if(view.getLens() != null) {
 					g2d.setColor(Color.BLACK);
@@ -87,7 +89,6 @@ public class FocusControlHandler implements ViewEventHandler {
 			}
 		};
 		
-		v.setJava2DPainter(paintCursor, Java2DPainter.AFTER_PORTALS);
 	}
 	
 	public void start(Lens l) { 
@@ -103,13 +104,19 @@ public class FocusControlHandler implements ViewEventHandler {
 		Dimension d = view.getPanelSize();
 		lastXLensCenter = lens.lx + d.width/2;
 		lastYLensCenter = lens.ly + d.height/2;
+		view.getPanel().setDrawCursor(false);
+		view.setJava2DPainter(paintCursor, Java2DPainter.AFTER_PORTALS);
 	}
 	
 	public void stop() {
 		lens.setXfocusOffset(0);
 		lens.setYfocusOffset(0);
 		started = false; 
-		if(view.getPanel() != null) view.setEventHandler(actualViewEventHandler);
+		view.getPanel().setDrawCursor(true);
+		if(view.getPanel() != null) {
+			view.setEventHandler(actualViewEventHandler);
+			view.setJava2DPainter(actualAfterPortalsPainter, Java2DPainter.AFTER_PORTALS);
+		}
 	}
 	
 	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e) {

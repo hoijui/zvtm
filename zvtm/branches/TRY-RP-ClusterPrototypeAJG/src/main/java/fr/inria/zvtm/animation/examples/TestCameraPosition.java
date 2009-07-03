@@ -83,7 +83,7 @@ public class TestCameraPosition {
 										  rnd.nextFloat(),
 										  rnd.nextFloat()));
 	    circles.add(circle);
-	    vsm.addGlyph(circle, "src");
+	    vs.addGlyph(circle);
 
 	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
 						Animation.INFINITE,

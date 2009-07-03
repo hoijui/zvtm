@@ -92,6 +92,7 @@ public aspect VirtualSpaceReplication {
 
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) {
+			if(null == glyph){ return; }//XXX add dbg trace?
 
 			System.out.println("glyph add: send add message");
 			Delta delta = glyph.getCreateDelta();

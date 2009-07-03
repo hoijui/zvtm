@@ -20,7 +20,7 @@ public class SpeedCoupling
     private long reducTime = 500;
     private float coefIncStep = 0.05f;
     private float coefDecStep = 0.0f;
-
+    
     long[] _cursor_time = new long[NB_SPEED_POINTS];
     int[] _cursor_x = new int[NB_SPEED_POINTS];
     int[] _cursor_y = new int[NB_SPEED_POINTS];
@@ -28,6 +28,9 @@ public class SpeedCoupling
  
     float[] _speeds = new float[NB_SPEED_POINTS-1];
     float _speed_coef = 0;
+    float _mspeed = 0;
+    float _mspeedX = 0;
+    float _mspeedY = 0;
 
     public SpeedCoupling()
     {
@@ -85,7 +88,26 @@ public class SpeedCoupling
 	{
 	    ms += _speeds[i];
 	}
-	ms = ms / (float)_speeds.length * 1000;
+	_mspeed = ms = ms / (float)_speeds.length * 1000.0f;
+	_mspeedX = _cursor_x[NB_SPEED_POINTS-1]-_cursor_x[0];
+	_mspeedY = _cursor_y[NB_SPEED_POINTS-1]-_cursor_y[0];
+	if (ms == 0.0f)
+	{
+	    _mspeedX = _mspeedY = 0;
+	}
+	else
+	{
+	    float norm = (float)Math.sqrt(_mspeedX*_mspeedX + _mspeedY*_mspeedY);
+	    if (norm == 0.0f)
+	    {
+		_mspeedX = _mspeedY = 0;
+	    }
+	    else
+	    {
+		_mspeedX = (ms/norm)*_mspeedX;
+		_mspeedY = (ms/norm)*_mspeedY;
+	    }	
+	}
 	if (ms > minSpeed)
 	{
 	    _speed_coef = _speed_coef + coefIncStep;
@@ -98,6 +120,20 @@ public class SpeedCoupling
 	if (_speed_coef < 0.0f) _speed_coef = 0.0f;
     }
 
+    public float getMeanSpeed()
+    {
+	return _mspeed;
+    }
+
+    public float getMeanSpeedVecX()
+    {
+	return _mspeedX;
+    }
+
+    public float getMeanSpeedVecY()
+    {
+	return _mspeedY;
+    }
 
     public float getCoef()
     {

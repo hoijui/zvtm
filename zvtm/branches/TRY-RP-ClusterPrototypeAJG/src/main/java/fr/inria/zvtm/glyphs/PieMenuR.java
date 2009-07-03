@@ -61,7 +61,7 @@ public class PieMenuR extends PieMenu {
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -83,7 +83,7 @@ public class PieMenuR extends PieMenu {
                 }
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -99,7 +99,7 @@ public class PieMenuR extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -139,7 +139,7 @@ public class PieMenuR extends PieMenu {
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -161,7 +161,7 @@ public class PieMenuR extends PieMenu {
                 labels[i].setBorderColor(borderColors[i]);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -177,7 +177,7 @@ public class PieMenuR extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -218,7 +218,7 @@ public class PieMenuR extends PieMenu {
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
             items[i].setMouseInsideFillColor(fillSColor);
             items[i].setMouseInsideHighlightColor(borderSColor);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -240,7 +240,7 @@ public class PieMenuR extends PieMenu {
                 }
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -256,7 +256,7 @@ public class PieMenuR extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 
@@ -297,7 +297,7 @@ public class PieMenuR extends PieMenu {
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
             items[i].setMouseInsideFillColor(fillSColors[i]);
             items[i].setMouseInsideHighlightColor(borderSColors[i]);
-            vsm.addGlyph(items[i], vs, false, false);
+            vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
@@ -319,7 +319,7 @@ public class PieMenuR extends PieMenu {
                 labels[i].setBorderColor(borderColors[i]);
                 labels[i].setSpecialFont(font);
                 labels[i].setSensitivity(false);
-                vsm.addGlyph(labels[i], vs);
+                vs.addGlyph(labels[i]);
             }
         }
         if (animDuration > 0){
@@ -335,7 +335,7 @@ public class PieMenuR extends PieMenu {
         }
         boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
         boundary.setVisible(false);
-        vsm.addGlyph(boundary, vs);
+        vs.addGlyph(boundary);
         vs.atBottom(boundary);
     }
 

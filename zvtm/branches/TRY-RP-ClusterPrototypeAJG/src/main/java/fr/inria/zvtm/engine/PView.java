@@ -49,7 +49,7 @@ public class PView extends View implements KeyListener {
 		name=t;
 		detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
 		initCameras(v);   //vector -> cast elements as "Camera"
-		panel = new StdViewPanel(v, this);
+		panel = new StdViewPanel(v, this, true);
 		panel.setSize(panelWidth,panelHeight);
 		panel.addKeyListener(this);
 	}
@@ -126,8 +126,5 @@ public class PView extends View implements KeyListener {
 	    else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
 	}
     }
-
-    /**used only in Internal Views to get focus in view for key events (called automatically when the mouse enters the (Acc)IView)*/
-    public void requestFocus(){}
 
 }

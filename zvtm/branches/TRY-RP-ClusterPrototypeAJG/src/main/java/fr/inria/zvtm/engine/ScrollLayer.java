@@ -90,14 +90,14 @@ public class ScrollLayer implements ComponentListener {
 	hsliderRS = (RectangularShape)hslider;
 	leftBtRS = (RectangularShape)leftBt;
 	rightBtRS = (RectangularShape)rightBt;
-	vsm.addGlyph(vgutter, slVS);
-	vsm.addGlyph(vslider, slVS);
-	vsm.addGlyph(upBt, slVS);
-	vsm.addGlyph(downBt, slVS);
-	vsm.addGlyph(hgutter, slVS);
-	vsm.addGlyph(hslider, slVS);
-	vsm.addGlyph(leftBt, slVS);
-	vsm.addGlyph(rightBt, slVS);
+	slVS.addGlyph(vgutter);
+	slVS.addGlyph(vslider);
+	slVS.addGlyph(upBt);
+	slVS.addGlyph(downBt);
+	slVS.addGlyph(hgutter);
+	slVS.addGlyph(hslider);
+	slVS.addGlyph(leftBt);
+	slVS.addGlyph(rightBt);
     }
 
     /** Create all elements that compose the scroll bars to control a camera.
@@ -128,14 +128,14 @@ public class ScrollLayer implements ComponentListener {
 	rightBtRS = (RectangularShape)rightBt;
 	vgutter.setSensitivity(false);
 	hgutter.setSensitivity(false);
-	vsm.addGlyph(vgutter, slVS);
-	vsm.addGlyph(vslider, slVS);
-	vsm.addGlyph(upBt, slVS);
-	vsm.addGlyph(downBt, slVS);
-	vsm.addGlyph(hgutter, slVS);
-	vsm.addGlyph(hslider, slVS);
-	vsm.addGlyph(leftBt, slVS);
-	vsm.addGlyph(rightBt, slVS);
+	slVS.addGlyph(vgutter);
+	slVS.addGlyph(vslider);
+	slVS.addGlyph(upBt);
+	slVS.addGlyph(downBt);
+	slVS.addGlyph(hgutter);
+	slVS.addGlyph(hslider);
+	slVS.addGlyph(leftBt);
+	slVS.addGlyph(rightBt);
     }
     
     

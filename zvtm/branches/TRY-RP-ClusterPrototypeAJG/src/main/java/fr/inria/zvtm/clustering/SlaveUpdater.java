@@ -39,7 +39,7 @@ public class SlaveUpdater {
 	void addGlyph(ObjId id, Glyph glyph){
 		//XXX ObjId consistency (glyph.getObjId().equals(id) ???)
 		//XXX solve by yet another weaving?
-		VirtualSpaceManager.INSTANCE.addGlyph(glyph, virtualSpace);
+		virtualSpace.addGlyph(glyph);
 		idMap.put(id, glyph);
 	}
 

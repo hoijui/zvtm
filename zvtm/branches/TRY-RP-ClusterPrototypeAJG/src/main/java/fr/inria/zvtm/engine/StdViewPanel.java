@@ -58,7 +58,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	Dimension oldSize;
 	Graphics2D lensG2D = null;
 
-	public StdViewPanel(Vector cameras,View v) {
+	StdViewPanel(Vector cameras,View v, boolean arfome) {
 		addHierarchyListener(
 				new HierarchyListener() {
 					public void hierarchyChanged(HierarchyEvent e) {
@@ -84,6 +84,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		this.addMouseWheelListener(this);
 		this.addComponentListener(this);
 		this.setDoubleBuffered(false);
+    	setAutoRequestFocusOnMouseEnter(arfome);
 		start();
 		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
@@ -179,6 +180,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	}
 
 	private void drawSceneLens(){
+	    if (lensG2D == null){
+	        updateOffscreenBuffer();
+	    }
 		synchronized(lens){// prevents flickering when the lens parameters are being animated (caused by concurrent access)
 			lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
 			lensG2D.setBackground(backColor);
@@ -320,7 +324,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	private void doCursorPicking(){
 		try {                  // branch and we want to catch new requests for repaint
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-			if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
+			if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer], this);}
 		}
 		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 	}
@@ -350,7 +354,7 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 							updateOffscreenBuffer();
 							stableRefToBackBufferGraphics.setPaintMode();
 							stableRefToBackBufferGraphics.setBackground(backColor);
-							stableRefToBackBufferGraphics.clearRect(0,0,getWidth(),getHeight());
+							stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
 							backgroundHook();
 							//begin actual drawing here
 							if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }

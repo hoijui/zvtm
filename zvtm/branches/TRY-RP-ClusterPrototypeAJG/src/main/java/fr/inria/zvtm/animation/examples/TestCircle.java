@@ -71,7 +71,7 @@ public class TestCircle {
         testView.setNotifyMouseMoved(true);
 	final Glyph circle = new VCircle(100,0,0,40,Color.WHITE);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-	vsm.addGlyph(circle, "src");
+	vs.addGlyph(circle);
         vsm.repaintNow();
 
 	AnimationManager am = vsm.getAnimationManager();

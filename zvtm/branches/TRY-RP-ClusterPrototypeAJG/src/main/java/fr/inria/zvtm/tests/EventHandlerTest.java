@@ -87,7 +87,7 @@ public class EventHandlerTest implements ViewEventHandler{
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        application.moveLens(jpx, jpy);
+        //application.moveLens(jpx, jpy);
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){

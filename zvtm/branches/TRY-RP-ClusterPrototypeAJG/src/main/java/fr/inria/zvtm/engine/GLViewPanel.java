@@ -34,7 +34,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
     
     Dimension oldSize;
 
-    public GLViewPanel(Vector cameras,View v) {
+    GLViewPanel(Vector cameras,View v, boolean arfome) {
 	addHierarchyListener(
 	    new HierarchyListener() {
 	       public void hierarchyChanged(HierarchyEvent e) {
@@ -59,6 +59,7 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	this.addMouseMotionListener(this);
 	this.addMouseWheelListener(this);
 	this.addComponentListener(this);
+	setAutoRequestFocusOnMouseEnter(arfome);
 	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 	if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}

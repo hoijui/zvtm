@@ -91,8 +91,8 @@ public class VCursor {
     /**sync VTM cursor and system cursor if true*/
     boolean sync;
 
-    /**coord in camera space*/
-    int cx,cy;
+    /**coord in camera space (same as jpanel coords, but conventional coord sys at center of view panel, upward)*/
+    float cx,cy;
     /**coord in virtual space*/
     public long vx,vy;
     /**previous coords in virtual space*/
@@ -627,13 +627,14 @@ public class VCursor {
     }
 
     /**compute list of glyphs currently overlapped by the mouse (take into account lens l when unprojecting)*/
-    boolean computeMouseOverList(ViewEventHandler eh,Camera c, Lens l){
-	if (l != null){
-	    return this.computeMouseOverList(eh, c, Math.round((((float)mx-l.sw)/gain[0])+l.sw), Math.round((((float)my-l.sh)/gain[1])+l.sh));
-	}
-	else {
-	    return this.computeMouseOverList(eh, c, mx, my);
-	}
+    boolean computeMouseOverList(ViewEventHandler eh,Camera c, ViewPanel v){
+        if (v.lens != null){
+            // following use of cx,cy implies that VCursor.unProject() has been called before this method
+            return this.computeMouseOverList(eh, c, Math.round(cx + v.size.width/2), Math.round(v.size.height/2 - cy));
+        }
+        else {
+            return this.computeMouseOverList(eh, c, mx, my);
+        }
     }
     
     /** Compute list of glyphs currently overlapped by the mouse. */
@@ -712,39 +713,50 @@ public class VCursor {
     }
 
     /**project mouse cursor IN VIRTUAL SPACE wrt camera info and change origin -> JPanel coords*/
-    void unProject(Camera c,ViewPanel v){
+    public void unProject(Camera c, ViewPanel v){
         if (sync){
             //translate from JPanel coords
-            cx = mx - (v.getSize().width/2);
-            cy = (v.getSize().height/2) - my;
             if (v.lens != null){
                 //take lens into account (if set)
-                v.lens.gf(cx, cy, gain);
-                cx *= gain[0];
-                cy *= gain[1];
+                v.lens.gf(mx, my, gain);
+                // take lens focus offset into account only when above threshold as the offset is not taken into account during rendering when below threshold
+                // mx - v.size.width/2 = cx when no lens
+                cx = (gain[0] >= v.lens.getBufferThreshold()) ? v.lens.lx + (mx+v.lens.getXfocusOffset() - v.size.width/2 - v.lens.lx) / gain[0] : v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
+                // v.size.height/2 - my = cy when no lens
+                cy = (gain[1] >= v.lens.getBufferThreshold()) ? (v.lens.ly + v.size.height/2 - my-v.lens.getYfocusOffset()) / gain[1] - v.lens.ly : (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
             }
-            double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
+            else {
+                cx = mx - v.size.width/2;
+                cy = v.size.height/2 - my;
+            }
+            float ucoef = ((c.focal+c.altitude) / c.focal);
             //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
             pvx = vx;
             pvy = vy;
-            vx = Math.round((cx*coef) + c.posx);
-            vy = Math.round((cy*coef) + c.posy);
+            vx = Math.round((cx*ucoef) + c.posx);
+            vy = Math.round((cy*ucoef) + c.posy);
         }
     }
 
     public LongPoint getVSCoordinates(Camera c, ViewPanel v){
         //translate from JPanel coords
-        int tcx = mx - (v.getSize().width/2);
-        int tcy = (v.getSize().height/2) - my;
+        float tcx,tcy;
         if (v.lens != null){
             //take lens into account (if set)
-            v.lens.gf(tcx, tcy, gain);
-            tcx *= gain[0];
-            tcy *= gain[1];
+            v.lens.gf(mx, my, gain);
+            // take lens focus offset into account only when above threshold as the offset is not taken into account during rendering when below threshold
+            // mx - v.size.width/2 = cx when no lens
+            tcx = (gain[0] >= v.lens.getBufferThreshold()) ? v.lens.lx + (mx+v.lens.getXfocusOffset() - v.size.width/2 - v.lens.lx) / gain[0] : v.lens.lx + (mx - v.size.width/2 - v.lens.lx) / gain[0];
+            // v.size.height/2 - my = cy when no lens
+            tcy = (gain[1] >= v.lens.getBufferThreshold()) ? (v.lens.ly + v.size.height/2 - my-v.lens.getYfocusOffset()) / gain[1] - v.lens.ly : (v.lens.ly + v.size.height/2 - my) / gain[1] - v.lens.ly;
         }
-        double coef = (((double)c.focal+(double)c.altitude) / (double)c.focal);
-        //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
-        return new LongPoint(Math.round((tcx*coef) + c.posx), Math.round((tcy*coef) + c.posy));
+        else {
+            tcx = mx - v.size.width/2;
+            tcy = v.size.height/2 - my;
+        }
+        float ucoef = ((c.focal+c.altitude) / c.focal);
+        // find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
+        return new LongPoint(Math.round((tcx*ucoef) + c.posx), Math.round((tcy*ucoef) + c.posy));
     }
 
     /**returns the cursor's X JPanel coordinate*/

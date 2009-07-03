@@ -186,6 +186,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     protected boolean drawVTMcursor=true;
     /**the AWT cursor*/
     protected Cursor awtCursor;
+    
+    /** Should the viewpanel automatically request focus when cursor enters it or not. */
+    boolean autoRequestFocusOnMouseEnter = false;
 
     /**Lens (fisheye, etc.)*/
     protected Lens lens;
@@ -497,14 +500,14 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     /**mouse entered this view*/
     public void mouseEntered(MouseEvent e){
-	active=true; //make the view active any time the mouse enters it
-	repaintNow=true;
-	inside=true;
-	VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
-	/* requesting parent focus was only used to get keyboard/mouse wheel events in IViews,
-	   better to manage this explcitly when internal frames get selected as doing it
-	   here has unwanted side effects in some UIs that mix internal and external frames */
-	//parent.requestFocus();
+        //make the view active any time the mouse enters it
+        active = true;
+        repaintNow = true;
+        inside = true;
+        VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
+        if (autoRequestFocusOnMouseEnter){
+            requestFocus();
+        }
     }
 
     /**mouse exited this view*/
@@ -512,6 +515,22 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	inside=false;
 	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
     }
+    
+    /** Should the viewpanel automatically request focus when cursor enters it or not.
+     *  Default is false for external views (EView).
+     *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
+     */
+    public void setAutoRequestFocusOnMouseEnter(boolean b){
+        autoRequestFocusOnMouseEnter = b;
+    }
+
+    /** Tells whether the viewpanel is automatically requesting focus when cursor enters it or not.
+     *  Default is false for external views (EView).
+     *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
+     */
+    public boolean getAutoRequestFocusOnMouseEnter(){
+        return autoRequestFocusOnMouseEnter;
+    }    
     
     /** Value that specifies that there isn't any point for which no mouse move/drag event is sent. */
     public static final int NO_COORDS = -1;
@@ -542,7 +561,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 synchronized(this){
                     parent.mouse.moveTo(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
-                    parent.mouse.unProject(cams[activeLayer],this);
+                    //parent.mouse.unProject(cams[activeLayer],this);
                     updateMouseOnly=true;
                 }
                 //translate glyphs sticked to mouse
@@ -555,7 +574,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
                     if (parent.mouse.isSensitive()){
-                        if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this.lens)){
+                        if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this)){
                             parent.repaintNow();
                         }
                     }
@@ -607,7 +626,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();  
                 parent.repaintNow();
-                if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this.lens);}
+                if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this);}
             }
         }	
         catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);}}
