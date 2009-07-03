@@ -13,9 +13,10 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 /**
- * A VirtualSpace that can be replicated over a cluster
+ * Intercepts VirtualSpace state changes and propagates
+ * them to slaves. 
  */
-public aspect MasterVirtualSpace {
+public aspect VirtualSpaceReplication {
 	//misc.
 	declare parents : LongPoint implements java.io.Serializable;
 
@@ -98,7 +99,7 @@ public aspect MasterVirtualSpace {
 			try{
 				retrieveChannel(virtualSpace.getName()).send(msg);
 			} catch(Exception e){
-				System.out.println("Could not retrieve comm channel");
+				throw new Error("Could not retrieve comm channel");
 			}
 		}
 
@@ -111,7 +112,7 @@ public aspect MasterVirtualSpace {
 		try{
 			retrieveChannel(virtualSpace.getName()).send(msg);
 		} catch(Exception e){
-			System.out.println("Could not retrieve comm channel");
+			throw new Error("Could not retrieve comm channel");
 		}
 	}
 

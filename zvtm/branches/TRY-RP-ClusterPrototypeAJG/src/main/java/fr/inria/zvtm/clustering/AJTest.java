@@ -26,7 +26,7 @@ public class AJTest {
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 
-		VRectangle rect = new VRectangle(10, 10, 0, 300, 400, Color.RED);
+		VRectangle rect = new VRectangle(10, 10, 0, 100, 150, Color.RED);
 		vsm.addGlyph(rect, vs);
 		rect.moveTo(40,50);
 		rect.move(10,20);	
