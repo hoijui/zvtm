@@ -8,6 +8,7 @@ import java.util.Map;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -21,15 +22,23 @@ import fr.inria.zvtm.glyphs.VRectangle;
 public aspect VirtualSpaceReplication {
 	//misc.
 	declare parents : LongPoint implements java.io.Serializable;
-
-	//augment Glyph with an ObjId identifier (serializable)
-	private ObjId Glyph.id = ObjIdFactory.next();
-	private ObjId Glyph.getObjId(){ return id; }
-
+	
 	//master communication channel, indexed by
 	//virtual space name (XXX find better solution?)
 	private Map<String, JChannel> channels = 
 		new HashMap<String, JChannel>(); 
+
+	//XXX move Glyph and Camera to implement a new interface "VSObject"
+	//(would allow to query ObjID, retrieve parent space
+	//if existing...)
+	
+	//augment Glyph with an ObjId identifier (serializable)
+	private ObjId Glyph.id = ObjIdFactory.next();
+	private ObjId Glyph.getObjId(){ return id; }
+
+	//augment Camera with an ObjId identifier (serializable)
+	private ObjId Camera.id = ObjIdFactory.next();
+	private ObjId Camera.getObjId(){ return id; }
 
 	/**
 	 * Gets a channel to the VirtualSpace cluster,
@@ -44,6 +53,8 @@ public aspect VirtualSpaceReplication {
 		}
 		return retval;
 	}
+
+	/* Section: Glyph-related delta creation methods */
 
 	//augment Glyph with a getCreateDelta method
 	//that should be overriden by all glyph classes
@@ -62,8 +73,8 @@ public aspect VirtualSpaceReplication {
 				getColor());
 	}
 
-	//multicast group, named after the virtual space 
-	
+	/* Section: Glyph-related pointcuts */
+
 	//define pointcuts to catch Glyphs additions 
 	//and removals to/from a VirtualSpace
 	//make sure this join point fires only once even if addGlyph
@@ -72,28 +83,50 @@ public aspect VirtualSpaceReplication {
 		call(public * VirtualSpace.addGlyph(..)) 
 		&& args(glyph, ..)
 		&& target(virtualSpace)
-		&&!within(VirtualSpace)
-		&&!within(SlaveUpdater);
+		&& !within(VirtualSpace)
+		&& !within(SlaveUpdater);
 
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		call(public * VirtualSpace.removeGlyph(..)) 
 		&& args(glyph, ..)
 		&& target(virtualSpace)
-		&&!within(VirtualSpace)
-		&&!within(SlaveUpdater);
+		&& !within(VirtualSpace)
+		&& !within(SlaveUpdater);
 
 	//!within(Glyph+) to avoid calling multiple times when chained overloads(is it the right approach?)
 	pointcut glyphPosChange(Glyph glyph):
 		(call(public * Glyph+.moveTo(..)) || call(public * Glyph+.move(..)))
 		&& target(glyph)
-		&&!within(Glyph+)
-		&&!within(Delta+); //Delta manages updates to slaves
+		&& !within(Glyph+)
+		&& !within(Delta+); //Delta manages updates to slaves
 
 	pointcut glyphColorChange(Glyph glyph):
 		(call(public * Glyph+.setColor(..)) || call(public * Glyph+.setHSVColor(..)))
 		 && target(glyph)
 		 && !within(Glyph+)
-		 &&!within(Delta+);
+		 && !within(Delta+);
+	 
+	/* Section: Camera-related pointcuts */
+	pointcut cameraAdd(Camera camera):
+		call(public * VirtualSpaceManager.addCamera(..))
+		&& args(camera, ..)
+		&& !within(VirtualSpaceManager);
+
+	pointcut cameraRemove(Camera camera):
+		call(public * VirtualSpace.removeCamera(..))
+		&& args(camera, ..)
+		&& !within(VirtualSpace);
+
+	pointcut cameraPosChange(Camera camera):
+		(call(public * Camera.moveTo(..)) 
+		  || call(public * Camera.move(..))
+		  || call (public * Camera.setAltitude(..))
+		  || call (public * Camera.setLocation(..)))
+		&& target(camera)
+		&& !within(Camera)
+		&& !within(Delta+);
+
+	/* Section: Glyph-related advice */
 
 	//We want a link from a Glyph to its parent VirtualSpace,
 	//so we will just hijack the 'owner' attribute of Glyph
