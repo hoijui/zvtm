@@ -3,7 +3,10 @@ package fr.inria.zvtm.clustering;
 import java.awt.Color;
 import java.util.Vector;
 
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -30,6 +33,16 @@ public class AJTest {
 		vs.addGlyph(rect);
 		rect.moveTo(40,50);
 		rect.move(10,20);	
+
+		Animation anim = VirtualSpaceManager.INSTANCE.getAnimationManager()
+			.getAnimationFactory().createGlyphTranslation(4000,
+					rect,
+					new LongPoint(100, 200), true,
+					IdentityInterpolator.getInstance(),
+					null);
+
+		VirtualSpaceManager.INSTANCE.getAnimationManager().
+			startAnimation(anim, false);
 		//vs.removeGlyph(rect);
 	}
 }

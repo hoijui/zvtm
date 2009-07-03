@@ -100,7 +100,6 @@ public aspect VirtualSpaceReplication {
 		glyphAdd(glyph, virtualSpace) {
 			if(null == glyph){ return; }//XXX add dbg trace?
 
-			System.out.println("glyph add: send add message");
 			Delta delta = glyph.getCreateDelta();
 			Message msg = new Message(null, null, delta);
 			try{
@@ -113,7 +112,6 @@ public aspect VirtualSpaceReplication {
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphRemove(glyph, virtualSpace){
 
-		System.out.println("glyph remove: send remove message");
 		Delta delta = new GlyphRemoveDelta(glyph.getObjId());
 		Message msg = new Message(null, null, delta);
 		try{
@@ -125,8 +123,6 @@ public aspect VirtualSpaceReplication {
 
 	after(Glyph glyph) returning: glyphPosChange(glyph) {
 		LongPoint loc = glyph.getLocation();
-		System.out.println("Glyph moved, destination (" +
-		loc.x + "," + loc.y + ")");	
 
 		Delta delta = new GlyphPosDelta(glyph.getObjId(),
 				loc.x, loc.y);

@@ -65,8 +65,6 @@ public class SlaveUpdater {
 			}
 
 			@Override public void receive(Message msg){
-				System.out.println("received message: " + msg.getObject());
-
 				if(!(msg.getObject() instanceof Delta)){
 					System.out.println("wrong message type (Delta expected)");
 					return;
