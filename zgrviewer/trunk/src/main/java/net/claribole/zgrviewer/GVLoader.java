@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
+import java.io.FileInputStream;
 
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -123,7 +124,10 @@ class GVLoader {
             grMngr.gp.setProgress(30);
             cfgMngr.lastFileOpened = f;
             dotMngr.lastProgramUsed = DOTManager.SVG_FILE;
-            Document svgDoc=Utils.parse(f,false);
+            Document svgDoc=f.getName().toLowerCase().endsWith(".svgz")?
+                Utils.parse(new BufferedInputStream(new GZIPInputStream(
+                new FileInputStream(f))),false):
+            Utils.parse(f,false);
             grMngr.gp.setMessage("Building graph...");
             grMngr.gp.setProgress(80);
             if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
@@ -168,7 +172,7 @@ class GVLoader {
 		//
 		InputStream is = c.getInputStream();
 		String encoding = c.getContentEncoding();
-		if("gzip".equals(encoding)||"x-gzip".equals(encoding))
+		if ("gzip".equals(encoding) || "x-gzip".equals(encoding) || svgFileURL.toLowerCase().endsWith(".svgz"))
 		{
 			// handle gzip stream
 			is = new GZIPInputStream(is);			

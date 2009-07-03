@@ -90,8 +90,9 @@ public class ZGRViewer implements ZGRApplication {
 	    }
 	}
 	else {
-	    if (cmdLineDOTFile.toString().endsWith(".svg")){
-		gvLdr.loadSVG(cmdLineDOTFile);
+        if (cmdLineDOTFile.toString().toLowerCase().endsWith(".svg")
+            || cmdLineDOTFile.toString().toLowerCase().endsWith(".svgz")){
+		    gvLdr.loadSVG(cmdLineDOTFile);
 	    }
 	    else {
 		gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
