@@ -248,11 +248,11 @@ public class Controller implements Java2DPainter {
     void initViewFinders(){
         // viewfinders
         viewFinder = new VRectangle(0, 0, 0, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
-        vsm.addGlyph(viewFinder, rSpace);
+        rSpace.addGlyph(viewFinder);
         viewportFinders = new VRectangle[viewports.length];
         for (int i=0;i<viewportFinders.length;i++){
             viewportFinders[i] = new VRectangle(0, 0, 0, 10, 10, Color.RED, Color.RED, VIEWPORT_OPACITY);
-            vsm.addGlyph(viewportFinders[i], rSpace);
+            rSpace.addGlyph(viewportFinders[i]);
         }
     }
     

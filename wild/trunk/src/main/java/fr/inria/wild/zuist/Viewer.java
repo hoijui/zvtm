@@ -240,7 +240,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	
 	void reset(){
 		sm.reset();
-		vsm.removeGlyphsFromSpace(mSpaceName);
+		mSpace.removeAllGlyphs();
 	}
 	
 	void loadScene(File xmlSceneFile){
