@@ -29,7 +29,7 @@ public class AJTest {
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
 
-		VRectangle rect = new VRectangle(10, 10, 0, 100, 150, Color.RED);
+		VRectangle rect = new VRectangle(10, 10, 0, 100, 150, Color.BLUE);
 		vs.addGlyph(rect);
 		rect.moveTo(40,50);
 		rect.move(10,20);	
@@ -43,6 +43,8 @@ public class AJTest {
 
 		VirtualSpaceManager.INSTANCE.getAnimationManager().
 			startAnimation(anim, false);
+		try{Thread.sleep(4000);}catch(InterruptedException ie){}
+		rect.setColor(Color.GREEN);
 		//vs.removeGlyph(rect);
 	}
 }

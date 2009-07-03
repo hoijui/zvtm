@@ -1,5 +1,7 @@
 package fr.inria.zvtm.clustering;
 
+import java.awt.Color;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +89,12 @@ public aspect VirtualSpaceReplication {
 		&&!within(Glyph+)
 		&&!within(Delta+); //Delta manages updates to slaves
 
+	pointcut glyphColorChange(Glyph glyph):
+		(call(public * Glyph+.setColor(..)) || call(public * Glyph+.setHSVColor(..)))
+		 && target(glyph)
+		 && !within(Glyph+)
+		 &&!within(Delta+);
+
 	//We want a link from a Glyph to its parent VirtualSpace,
 	//so we will just hijack the 'owner' attribute of Glyph
 	//XXX ugly hack
@@ -126,6 +134,24 @@ public aspect VirtualSpaceReplication {
 
 		Delta delta = new GlyphPosDelta(glyph.getObjId(),
 				loc.x, loc.y);
+
+		Message msg = new Message(null, null, delta);
+		try{
+			//XXX using the 'owner' attribute is an ugly hack
+			if(null == glyph.getOwner()){ return;}
+			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
+
+			retrieveChannel(vs.getName()).send(msg);
+		} catch(Exception e){
+			throw new Error("Could not retrieve comm channel");
+		}
+	}
+
+	after(Glyph glyph) returning: glyphColorChange(glyph){
+		Color color = glyph.getColor();
+
+		Delta delta = new GlyphColorDelta(glyph.getObjId(),
+				color);
 
 		Message msg = new Message(null, null, delta);
 		try{
