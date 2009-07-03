@@ -45,11 +45,12 @@ public aspect MasterVirtualSpace {
 	//augment Glyph with a getCreateDelta method
 	//that should be overriden by all glyph classes
 	//(default produces a nopDelta)
-	//!!!! check signification of private for aspects (we WANT overrides)!!!!
 	private Delta Glyph.getCreateDelta(){
 		return new NopDelta();
 	}	
 
+	//note the private @Override; no contradiction here because
+	//private means "private within the aspect"
 	@Override private Delta VRectangle.getCreateDelta(){
 		return new RectangleCreateDelta(getObjId(), 
 				getLocation(), 
@@ -69,6 +70,7 @@ public aspect MasterVirtualSpace {
 		&& args(glyph, ..)
 		&& target(virtualSpace)
 		&&!within(VirtualSpace)
+		&&!within(SlaveUpdater)
 		&&!within(Delta+); //Delta manages updates to slaves
 
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
@@ -76,6 +78,7 @@ public aspect MasterVirtualSpace {
 		&& args(glyph, ..)
 		&& target(virtualSpace)
 		&&!within(VirtualSpace)
+		&&!within(SlaveUpdater)
 		&&!within(Delta+); //Delta manages updates to slaves
 
 	//!within(Glyph+) to avoid calling multiple times when chained overloads(is it the right approach?)
