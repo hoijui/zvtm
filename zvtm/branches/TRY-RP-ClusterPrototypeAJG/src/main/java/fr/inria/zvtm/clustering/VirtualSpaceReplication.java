@@ -67,20 +67,18 @@ public aspect VirtualSpaceReplication {
 	//make sure this join point fires only once even if addGlyph
 	//overloads are chained together (!within VirtualSpaceManager... -- is that the right way of doing it?)
 	pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
-		call(* VirtualSpace.addGlyph(..)) 
+		call(public * VirtualSpace.addGlyph(..)) 
 		&& args(glyph, ..)
 		&& target(virtualSpace)
 		&&!within(VirtualSpace)
-		&&!within(SlaveUpdater)
-		&&!within(Delta+); //Delta manages updates to slaves
+		&&!within(SlaveUpdater);
 
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		call(public * VirtualSpace.removeGlyph(..)) 
 		&& args(glyph, ..)
 		&& target(virtualSpace)
 		&&!within(VirtualSpace)
-		&&!within(SlaveUpdater)
-		&&!within(Delta+); //Delta manages updates to slaves
+		&&!within(SlaveUpdater);
 
 	//!within(Glyph+) to avoid calling multiple times when chained overloads(is it the right approach?)
 	pointcut glyphPosChange(Glyph glyph):
@@ -89,6 +87,14 @@ public aspect VirtualSpaceReplication {
 		&&!within(Glyph+)
 		&&!within(Delta+); //Delta manages updates to slaves
 
+	//We want a link from a Glyph to its parent VirtualSpace,
+	//so we will just hijack the 'owner' attribute of Glyph
+	//XXX ugly hack
+	before(Glyph glyph, VirtualSpace virtualSpace): 
+		glyphAdd(glyph, virtualSpace) {
+			if(null == glyph){ return; }
+			glyph.setOwner(virtualSpace);
+		}
 
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) {
@@ -124,8 +130,18 @@ public aspect VirtualSpaceReplication {
 
 		Delta delta = new GlyphPosDelta(glyph.getObjId(),
 				loc.x, loc.y);
-	}
 
+		Message msg = new Message(null, null, delta);
+		try{
+			//XXX using the 'owner' attribute is an ugly hack
+			if(null == glyph.getOwner()){ return;}
+			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
+
+			retrieveChannel(vs.getName()).send(msg);
+		} catch(Exception e){
+			throw new Error("Could not retrieve comm channel");
+		}
+	}
 
 }
 
