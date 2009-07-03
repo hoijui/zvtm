@@ -267,8 +267,8 @@ interface SpeedFunction {
 class LSpeedFunction implements SpeedFunction {
 
 	static final int NB_SPEED_POINTS = 4;
-	static final int MIN_SPEED = 100;
-	static final int MAX_SPEED = 300;
+	static final int MIN_SPEED = 200;
+	static final int MAX_SPEED = 500;
 	long[] cursor_time = new long[NB_SPEED_POINTS];
 	int[] cursor_x = new int[NB_SPEED_POINTS];
 	int[] cursor_y = new int[NB_SPEED_POINTS];
