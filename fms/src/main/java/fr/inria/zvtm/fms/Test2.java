@@ -39,6 +39,11 @@ public class Test2 {
     static final int LENS_ANIM_TIME = 300;
     static double MAG_FACTOR = 8.0;
     
+	static final short SPEED_DEPENDENT = 1;
+	static final short CONSTANT = 2;
+	static final short NONE = 3;
+	
+	short precisionEnabled = NONE;
 	
     Test2(){
         vsm = VirtualSpaceManager.INSTANCE;
@@ -58,7 +63,7 @@ public class Test2 {
         mView.setNotifyMouseMoved(true);
         for (int i=-5;i<=5;i++){
             for (int j=-5;j<=5;j++){
-        		vsm.addGlyph(new VRectangle(i*30,j*30,0,10,10,Color.WHITE), mSpace);
+        		mSpace.addGlyph(new VRectangle(i*30,j*30,0,10,10,Color.WHITE));
             }
         }
         vsm.repaintNow();
@@ -69,11 +74,9 @@ public class Test2 {
     void toggleLens(int x, int y){
         if (lens != null){
             unsetLens();
-			//mView.getPanel().setDrawCursor(true);
         }
         else {
             setLens(x, y);
-			//mView.getPanel().setDrawCursor(false);
         }
     }
     
@@ -86,9 +89,20 @@ public class Test2 {
 		lens.setAbsolutePosition(x, y);
 		lens.setXfocusOffset(0);
 		lens.setYfocusOffset(0);
+		
+		if(precisionEnabled == SPEED_DEPENDENT) {
+			lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
+		} else if(precisionEnabled == CONSTANT) {
+			lens.setFocusControlled(true, FixedSizeLens.CONSTANT);
+		} else {
+			precisionEnabled = NONE;
+			lens.setFocusControlled(false);
+		}
     }
     
     void unsetLens(){
+		if(lens != null)
+			lens.setFocusControlled(false);
         Animation a = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(),
             new EndAction(){public void execute(Object subject, Animation.Dimension dimension){doUnsetLens();}});
@@ -129,9 +143,9 @@ public class Test2 {
 class EventHandlerTest2 implements ViewEventHandler{
 	
     Test2 application;
-	boolean precisionEnabled = false;
 	
-    long lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    int lastJPX = Integer.MAX_VALUE;
+	int lastJPY = Integer.MAX_VALUE;    //remember last mouse coords to compute translation  (dragging)
 		
     EventHandlerTest2(Test2 appli){
         application=appli;
@@ -174,18 +188,17 @@ class EventHandlerTest2 implements ViewEventHandler{
     }
 	
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-	
+
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e) {
-		if(precisionEnabled) return;
 		if(application.lens != null) {
-			application.lens.setXfocusOffset(0);
-			application.lens.setYfocusOffset(0);
-			application.moveLens(jpx, jpy, e.getWhen());
+			int lensX = application.lens.lx + (int)application.mView.getPanel().getSize().getWidth() / 2;
+			int lensY = application.lens.ly + (int)application.mView.getPanel().getSize().getHeight() / 2;
+			application.lens.moveLensBy(jpx - lensX, jpy - lensY, e.getWhen());
 		}
 	}
-	
-    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+
+	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+		if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
             Camera c=VirtualSpaceManager.INSTANCE.getActiveCamera();
             float a=(c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
@@ -229,19 +242,23 @@ class EventHandlerTest2 implements ViewEventHandler{
         if (code==KeyEvent.VK_SPACE){application.toggleLensCursorSync();}
 		
 		if(c == 'p') {
-			precisionEnabled = !precisionEnabled;
-			application.mView.setFocusControlled(precisionEnabled, FocusControlHandler.SPEED_DEPENDENT_LINEAR);
+			application.precisionEnabled = Test2.SPEED_DEPENDENT;
+			if(application.lens != null) application.lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
 			System.out.println("\n******************\n"
-							   + "MOTOR PRECISION " + (precisionEnabled ? "ON" : "OFF")
+							   + "MOTOR PRECISION SPEED_DEPENDENT"
+							   + "\n******************\n");
+		} else if(c == 'c') {
+			application.precisionEnabled = Test2.CONSTANT;
+			if(application.lens != null) application.lens.setFocusControlled(true, FixedSizeLens.CONSTANT);
+			System.out.println("\n******************\n"
+							   + "MOTOR PRECISION CONSTANT"
 							   + "\n******************\n");
 		} else {
-			if(c == 'c') {
-				precisionEnabled = !precisionEnabled;
-				application.mView.setFocusControlled(precisionEnabled, FocusControlHandler.CONSTANT);
-				System.out.println("\n******************\n"
-								   + "MOTOR PRECISION " + (precisionEnabled ? "ON" : "OFF")
-								   + "\n******************\n");
-			}
+			application.precisionEnabled = Test2.NONE;
+			if(application.lens != null) application.lens.setFocusControlled(false);
+			System.out.println("\n******************\n"
+							   + "MOTOR PRECISION OFF"
+							   + "\n******************\n");
 		}
     }
     

@@ -67,13 +67,13 @@ public class Test3 {
             for (int j=-5;j<=5;j++){
 		if (i == 0 && j == 0)
 		{
-		    vsm.addGlyph(new VRectangle(i*3 - trans,j*3,0,1,1,Color.RED), mSpace);
-		    vsm.addGlyph(new VRectangle(i*3 + trans,j*3,0,1,1,Color.RED), mSpace);
+		    mSpace.addGlyph(new VRectangle(i*3 - trans,j*3,0,1,1,Color.RED));
+		    mSpace.addGlyph(new VRectangle(i*3 + trans,j*3,0,1,1,Color.RED));
 		}
 		else
 		{
-		    vsm.addGlyph(new VRectangle(i*3  - trans,j*3,0,1,1,Color.WHITE), mSpace);
-		    vsm.addGlyph(new VRectangle(i*3   + trans,j*3,0,1,1,Color.WHITE), mSpace);
+		    mSpace.addGlyph(new VRectangle(i*3  - trans,j*3,0,1,1,Color.WHITE));
+		    mSpace.addGlyph(new VRectangle(i*3   + trans,j*3,0,1,1,Color.WHITE));
 		    
 		}
             }
@@ -712,7 +712,10 @@ class EventHandlerTest3 implements ViewEventHandler{
     Test3 application;
     boolean precisionEnabled = false;
 
-    long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    long lastX,lastY;    //remember last mouse coords to compute translation  (dragging)
+
+    int lastJPX = Integer.MAX_VALUE;
+	int lastJPY = Integer.MAX_VALUE;    //remember last mouse coords to compute translation  (dragging)
 
     EventHandlerTest3(Test3 appli){
         application=appli;
@@ -760,6 +763,15 @@ class EventHandlerTest3 implements ViewEventHandler{
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+		if(precisionEnabled) {
+			if(lastJPX != Integer.MAX_VALUE && lastJPY != Integer.MAX_VALUE) {
+				application.lens.moveLensBy(jpx - lastJPX, jpy - lastJPY, e.getWhen());
+			}
+			lastJPX = jpx;
+			lastJPY = jpx;
+			return;
+		}
+	
 	if (application.lens == null && application.showLense)
 	{
 	    // FIXME: create the lense in the center of the window
@@ -834,7 +846,7 @@ class EventHandlerTest3 implements ViewEventHandler{
 	    {application.toggleLensVarFlatening();}
 	else if(c == 'p') {
 	    precisionEnabled = !precisionEnabled;
-	    application.mView.setFocusControlled(precisionEnabled, FocusControlHandler.SPEED_DEPENDENT_LINEAR); }
+	    application.lens.setFocusControlled(precisionEnabled, FixedSizeLens.SPEED_DEPENDENT_LINEAR); }
 	else if(c == 'o') {
 	    application.toggleLensSmoothing();
 	}

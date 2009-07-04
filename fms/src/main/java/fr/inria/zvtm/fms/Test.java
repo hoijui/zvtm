@@ -55,7 +55,7 @@ public class Test {
         mView.setNotifyMouseMoved(true);
         for (int i=-5;i<=5;i++){
             for (int j=-5;j<=5;j++){
-        		vsm.addGlyph(new VRectangle(i*30,j*30,0,10,10,Color.WHITE), mSpace);
+        		mSpace.addGlyph(new VRectangle(i*30,j*30,0,10,10,Color.WHITE));
             }
         }
         vsm.repaintNow();
