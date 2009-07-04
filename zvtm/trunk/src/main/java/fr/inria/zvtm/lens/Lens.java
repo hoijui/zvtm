@@ -407,4 +407,12 @@ public abstract class Lens {
         return dy;
     }
 
+	/*------------------- focus control ------------------*/
+
+	public abstract void setFocusControlled(boolean isFocusControlled, short speedBehavior);
+	
+	public abstract void setFocusControlled(boolean isFocusControlled);
+	
+	public abstract void moveLensBy(int dx, int dy, long currentTime);
+
 }

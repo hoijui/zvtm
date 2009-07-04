@@ -15,9 +15,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.awt.Robot;
+import java.awt.AWTException;
+import java.awt.Point;
+
+import javax.swing.SwingUtilities;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.Java2DPainter;
 
 /**Parent class of all lenses which have a fixed size (i.e. whose radius does not depend on the view's size)*/
 
@@ -272,6 +278,157 @@ public abstract class FixedSizeLens extends Lens {
 	lensHeight = lurd[3] - lurd[1];
     }
 
+	/*****************************/
+
+	Robot robot;
+	Point ptRobot = new Point();
+	SpeedFunction sf;
+	int lensX, lensY;
+	boolean first = true;
+	
+	short speedBehavior = SPEED_DEPENDENT_LINEAR;
+	public static short CONSTANT = 0;
+	public static short SPEED_DEPENDENT_LINEAR = 1;
+
+
+	Java2DPainter    actualAfterPortalsPainter;
+	Java2DPainter paintCursor = new Java2DPainter() {
+		public void paint(Graphics2D g2d, int viewWidth, int viewHeight) {
+			g2d.setColor(Color.BLACK);
+			g2d.drawLine(lensX - 10, lensY, lensX + 10, lensY);
+			g2d.drawLine(lensX, lensY - 10, lensX, lensY + 10);
+		}
+	};
+	
+    public void setFocusControlled(boolean isFocusControlled, short speedBehavior) {
+		this.speedBehavior = speedBehavior;
+        activateFocusControlled(isFocusControlled, speedBehavior);
+	}
+
+	public void setFocusControlled(boolean isFocusControlled) {
+		setFocusControlled(isFocusControlled, speedBehavior);
+	}
+	
+	void activateFocusControlled(boolean isFocusControlled, short speedBehavior){
+		if(isFocusControlled) {
+			if(robot == null) {
+				actualAfterPortalsPainter = owningView.parent.getJava2DPainter(Java2DPainter.AFTER_PORTALS);
+				owningView.parent.setJava2DPainter(paintCursor, Java2DPainter.AFTER_PORTALS);
+				try {
+					robot = new Robot();
+				} catch(AWTException e) { 
+					e.printStackTrace();
+				}
+			}
+			if(speedBehavior == SPEED_DEPENDENT_LINEAR) {
+				sf = new LSpeedFunction();
+			} else {
+				if(speedBehavior == CONSTANT) {
+					sf = new SpeedFunction() {
+						public double getSpeedCoeff(long currentTime, int x, int y) {
+							return 0;
+						}
+					};
+				}
+			}
+			
+		} else {
+			setXfocusOffset(0);
+			setYfocusOffset(0);
+			if(!first) owningView.parent.setJava2DPainter(actualAfterPortalsPainter, Java2DPainter.AFTER_PORTALS);
+			robot = null;
+		}
+		first = false;
+		owningView.setDrawCursor(!isFocusControlled);
+		lensX = lx + (int)owningView.getSize().getWidth() / 2;
+		lensY = ly + (int)owningView.getSize().getHeight() / 2;
+		owningView.parent.repaintNow();
+	}
+
+	public void moveLensBy(int dx, int dy, long currentTime) {	
+		lensX = lx + (int)owningView.getSize().getWidth() / 2;
+		lensY = ly + (int)owningView.getSize().getHeight() / 2;
+		if(robot != null) { // lens is focus controlled
+			int deltaX = getXfocusOffset() + dx;
+			int deltaY = getYfocusOffset() + dy;
+			double speed = sf.getSpeedCoeff(currentTime, lensX+deltaX, lensY+deltaY);
+			double magFactor = 1 + (1-speed) * (getMaximumMagnification() - 1);
+			lensX = lensX + deltaX / (int)magFactor;
+			lensY = lensY + deltaY / (int)magFactor;
+			if(robot != null) {
+				ptRobot.setLocation(lensX, lensY);
+				SwingUtilities.convertPointToScreen(ptRobot, owningView);
+				robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
+			}
+			setXfocusOffset(deltaX % (int)magFactor);
+			setYfocusOffset(deltaY % (int)magFactor);
+		} else {
+			lensX = lensX + dx;
+			lensY = lensY + dy;
+		}
+		if (this instanceof TemporalLens) {
+		    ((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
+		}
+		else {
+		    setAbsolutePosition(lensX, lensY);
+		}
+		owningView.parent.repaintNow();
+	}
+
+
+	interface SpeedFunction {
+		double getSpeedCoeff(long currentTime, int x, int y);
+	}
+
+	class LSpeedFunction implements SpeedFunction {
+
+		static final int NB_SPEED_POINTS = 4;
+		static final int MIN_SPEED = 25;
+		static final int MAX_SPEED = 400;
+		long[] cursor_time = new long[NB_SPEED_POINTS];
+		int[] cursor_x = new int[NB_SPEED_POINTS];
+		int[] cursor_y = new int[NB_SPEED_POINTS];
+
+		float[] speeds = new float[NB_SPEED_POINTS-1];
+		float mean_speed = 0;
+
+		public LSpeedFunction() { }
+
+		public void getSpeed(long currentTime, int x, int y) {
+			// compute mean speed over last 3 points
+			for (int i=1;i<NB_SPEED_POINTS;i++){
+				cursor_time[i-1] = cursor_time[i];
+				cursor_x[i-1] = cursor_x[i];
+				cursor_y[i-1] = cursor_y[i];
+			}
+			cursor_time[NB_SPEED_POINTS-1] = currentTime;
+			cursor_x[NB_SPEED_POINTS-1] = x;
+			cursor_y[NB_SPEED_POINTS-1] = y;
+			for (int i=0;i<speeds.length;i++){
+				if(cursor_time[i+1] != cursor_time[i])
+					speeds[i] = (float)Math.sqrt(Math.pow(cursor_x[i+1]-cursor_x[i],2)+Math.pow(cursor_y[i+1]-cursor_y[i],2)) / (float)(cursor_time[i+1]-cursor_time[i]);
+				else
+					speeds[i] = 0;
+			}
+			mean_speed = 0;
+			for (int i=0;i<speeds.length;i++){
+				mean_speed += speeds[i];
+			}
+			mean_speed = mean_speed / (float)speeds.length * 1000;
+		}
+
+		public double getSpeedCoeff(long currentTime, int x, int y) {
+			getSpeed(currentTime, x, y);
+			if(mean_speed <= MIN_SPEED) return 0;
+			if(mean_speed >= MAX_SPEED) return 1;
+			return (mean_speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED);
+		}
+
+	}
+	
+	/*****************************/
+	
+	
     /** Set the color used to draw the lens' inner radius (default is black).
      *@param c color of the boundary (set to null if you do not want to draw that border)
      */
