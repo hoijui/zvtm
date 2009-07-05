@@ -42,7 +42,6 @@ import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.engine.RepaintListener;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.lens.Lens;
-import fr.inria.zvtm.lens.FocusControlHandler;
 
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>
