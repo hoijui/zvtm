@@ -10,6 +10,7 @@ import org.jgroups.View;
 
 import fr.inria.zvtm.clustering.ObjId;
 import fr.inria.zvtm.clustering.ObjIdFactory;
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -25,14 +26,19 @@ public class SlaveUpdater {
 	
 	//data structure for easy retrieval of a Glyph 
 	//given its ObjId: either a BStree or a hash table
-	private final Map<ObjId, Glyph> idMap = new HashMap<ObjId, Glyph>();
-	
+	private final Map<ObjId, Glyph> glyphMap = new HashMap<ObjId, Glyph>();
+
+	//if we have to do that for more than glyphs and cameras,
+	//consider refactoring
+	private final Map<ObjId, Camera> cameraMap = 
+		new HashMap<ObjId, Camera>();
+
 	//retrieve a glyph according to its (cluster) id
 	//overloading Glyph.equals is probably more elegant (and would
 	//allow us to use a set instead of a map) but I am not comfortable
 	//with doing that from AspectJ yet.
 	Glyph getGlyphById(ObjId id){
-		return idMap.get(id);
+		return glyphMap.get(id);
 	}
 
 	//XXX if multithreaded context, should be atomic (?)
@@ -40,18 +46,33 @@ public class SlaveUpdater {
 		//XXX ObjId consistency (glyph.getObjId().equals(id) ???)
 		//XXX solve by yet another weaving?
 		virtualSpace.addGlyph(glyph);
-		idMap.put(id, glyph);
+		glyphMap.put(id, glyph);
 	}
 
 	//XXX if multithreaded context, should be atomic (?)
 	void removeGlyph(ObjId id){
-		Glyph glyph = getGlyphById(id);
+		Glyph glyph = glyphMap.get(id);
 		if(null == glyph){
-			System.out.println("Oops. tried to remove a non-existent Glyph. Something fishy is happening");
+			System.out.println("Attempting to remove a non-existent Glyph.");
 			return;
 		}
 		virtualSpace.removeGlyph(glyph);
-		idMap.remove(id);
+		glyphMap.remove(id);
+	}
+
+	void addCamera(ObjId id){
+		Camera cam = VirtualSpaceManager.INSTANCE.addCamera(virtualSpace);
+		cameraMap.put(id, cam);
+	}
+	
+	void removeCamera(ObjId id){
+		Camera cam = cameraMap.get(id);
+		if(null == cam){
+			System.out.println("Attempting to remove a non-exitent Camera");
+			return;
+		}
+		virtualSpace.removeCamera(cam.getIndex());
+		cameraMap.remove(id);
 	}
 
 	public SlaveUpdater(VirtualSpace vs) throws Exception {
