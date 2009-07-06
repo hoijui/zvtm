@@ -345,14 +345,25 @@ public abstract class FixedSizeLens extends Lens {
 		owningView.parent.repaintNow();
 	}
 
-	public void moveLensBy(int dx, int dy, long currentTime) {	
+	int lastX = Integer.MAX_VALUE;
+	int lastY = Integer.MAX_VALUE;
+	
+	public void moveLensBy(int dx, int dy, long currentTime) {
 		lensX = lx + (int)owningView.getSize().getWidth() / 2;
 		lensY = ly + (int)owningView.getSize().getHeight() / 2;
+		//System.out.println("- lensX="+lensX+"+"+getXfocusOffset()+", lensY="+lensY+"+"+getYfocusOffset());
+		if(lastX == Integer.MAX_VALUE && lastY == Integer.MAX_VALUE)	{
+			lastX = lensX; lastY = lensY;
+		}
+		lastX += dx;
+		lastY += dy;
 		if(robot != null) { // lens is focus controlled
 			int deltaX = getXfocusOffset() + dx;
 			int deltaY = getYfocusOffset() + dy;
-			double speed = sf.getSpeedCoeff(currentTime, lensX+deltaX, lensY+deltaY);
+			// double speed = sf.getSpeedCoeff(currentTime, lensX+deltaX, lensY+deltaY);
+			double speed = sf.getSpeedCoeff(currentTime, lastX, lastY);
 			double magFactor = 1 + (1-speed) * (getMaximumMagnification() - 1);
+			//System.out.println("magFactor="+magFactor);
 			lensX = lensX + deltaX / (int)magFactor;
 			lensY = lensY + deltaY / (int)magFactor;
 			if(robot != null) {
@@ -360,19 +371,29 @@ public abstract class FixedSizeLens extends Lens {
 				SwingUtilities.convertPointToScreen(ptRobot, owningView);
 				robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
 			}
+			if(
+			deltaX % (int)magFactor == getXfocusOffset()
+			&& deltaY % (int)magFactor == getYfocusOffset()
+			&& deltaX / (int)magFactor == 0
+			&& deltaY / (int)magFactor == 0)
+				return;
 			setXfocusOffset(deltaX % (int)magFactor);
 			setYfocusOffset(deltaY % (int)magFactor);
+			if (this instanceof TemporalLens)
+				((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
+			else
+				setAbsolutePosition(lensX, lensY);
+			owningView.parent.repaintNow();
+			//System.out.println("+ lensX="+lensX+"+"+getXfocusOffset()+", lensY="+lensY+"+"+getYfocusOffset());
 		} else {
 			lensX = lensX + dx;
 			lensY = lensY + dy;
+			if (this instanceof TemporalLens)
+			    ((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
+			else
+			    setAbsolutePosition(lensX, lensY);
+			owningView.parent.repaintNow();
 		}
-		if (this instanceof TemporalLens) {
-		    ((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
-		}
-		else {
-		    setAbsolutePosition(lensX, lensY);
-		}
-		owningView.parent.repaintNow();
 	}
 
 
