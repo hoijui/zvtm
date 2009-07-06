@@ -335,7 +335,7 @@ public abstract class FixedSizeLens extends Lens {
 		} else {
 			setXfocusOffset(0);
 			setYfocusOffset(0);
-			if(!first) owningView.parent.setJava2DPainter(actualAfterPortalsPainter, Java2DPainter.AFTER_PORTALS);
+			owningView.parent.setJava2DPainter(actualAfterPortalsPainter, Java2DPainter.AFTER_PORTALS);
 			robot = null;
 		}
 		first = false;
