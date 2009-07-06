@@ -9,6 +9,7 @@ import org.jgroups.JChannel;
 import org.jgroups.Message;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -22,6 +23,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
 public aspect VirtualSpaceReplication {
 	//misc.
 	declare parents : LongPoint implements java.io.Serializable;
+	declare parents : Location implements java.io.Serializable;
 	
 	//master communication channel, indexed by
 	//virtual space name (XXX find better solution?)
@@ -40,6 +42,10 @@ public aspect VirtualSpaceReplication {
 	private ObjId Camera.id = ObjIdFactory.next();
 	private ObjId Camera.getObjId(){ return id; }
 
+	//augment VirtualSpace with a CameraGroup
+	private final CameraGroup VirtualSpace.cameraGroup = 
+		new CameraGroup(this);
+
 	/**
 	 * Gets a channel to the VirtualSpace cluster,
 	 * creating it if it does not exist yet
@@ -52,6 +58,10 @@ public aspect VirtualSpaceReplication {
 			channels.put(vsName, retval);
 		}
 		return retval;
+	}
+
+	public CameraGroup VirtualSpace.getCameraGroup(){
+		return cameraGroup;
 	}
 
 	/* Section: Glyph-related delta creation methods */
@@ -107,23 +117,31 @@ public aspect VirtualSpaceReplication {
 		 && !within(Delta+);
 	 
 	/* Section: Camera-related pointcuts */
-	pointcut cameraAdd(Camera camera):
-		call(public * VirtualSpaceManager.addCamera(..))
-		&& args(camera, ..)
-		&& !within(VirtualSpaceManager);
+//	pointcut cameraAdd(Camera camera):
+//		call(public * VirtualSpaceManager.addCamera(..))
+//		&& args(camera, ..)
+//		&& !within(VirtualSpaceManager);
+//
+//	pointcut cameraRemove(Camera camera):
+//		call(public * VirtualSpace.removeCamera(..))
+//		&& args(camera, ..)
+//		&& !within(VirtualSpace);
+//
+//	/* not yet in use */
+//	pointcut cameraPosChange(Camera camera):
+//		(call(public * Camera.moveTo(..)) 
+//		  || call(public * Camera.move(..))
+//		  || call (public * Camera.setAltitude(..))
+//		  || call (public * Camera.setLocation(..)))
+//		&& target(camera)
+//		&& !within(Camera)
+//		&& !within(Delta+);
 
-	pointcut cameraRemove(Camera camera):
-		call(public * VirtualSpace.removeCamera(..))
-		&& args(camera, ..)
-		&& !within(VirtualSpace);
-
-	pointcut cameraPosChange(Camera camera):
-		(call(public * Camera.moveTo(..)) 
-		  || call(public * Camera.move(..))
-		  || call (public * Camera.setAltitude(..))
-		  || call (public * Camera.setLocation(..)))
-		&& target(camera)
-		&& !within(Camera)
+	/* Section: CameraGroup-related pointcuts */
+	pointcut groupPosChange(CameraGroup cameraGroup):
+		call(public * CameraGroup.setLocation(..))
+		&& target(cameraGroup)
+		&& !within(CameraGroup)
 		&& !within(Delta+);
 
 	/* Section: Glyph-related advice */
@@ -171,7 +189,7 @@ public aspect VirtualSpaceReplication {
 		Message msg = new Message(null, null, delta);
 		try{
 			//XXX using the 'owner' attribute is an ugly hack
-			if(null == glyph.getOwner()){ return;}
+			if(null == glyph.getOwner()){ return; }
 			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
 
 			retrieveChannel(vs.getName()).send(msg);
@@ -189,9 +207,22 @@ public aspect VirtualSpaceReplication {
 		Message msg = new Message(null, null, delta);
 		try{
 			//XXX using the 'owner' attribute is an ugly hack
-			if(null == glyph.getOwner()){ return;}
+			if(null == glyph.getOwner()){ return; }
 			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
 
+			retrieveChannel(vs.getName()).send(msg);
+		} catch(Exception e){
+			throw new Error("Could not retrieve comm channel");
+		}
+	}
+
+	/* Section: CameraGroup-related advice */
+	after(CameraGroup cameraGroup) returning: groupPosChange(cameraGroup){
+		VirtualSpace vs = cameraGroup.getOwner();
+		Delta delta = new GroupLocDelta(cameraGroup.getLocation()); 
+
+		Message msg = new Message(null, null, delta);
+		try{
 			retrieveChannel(vs.getName()).send(msg);
 		} catch(Exception e){
 			throw new Error("Could not retrieve comm channel");

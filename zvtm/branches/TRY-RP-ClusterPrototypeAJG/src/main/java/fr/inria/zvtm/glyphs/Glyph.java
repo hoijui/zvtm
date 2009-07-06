@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.Shape;
 import java.awt.AlphaComposite;
+import java.util.concurrent.locks.ReentrantLock;
 
 import fr.inria.zvtm.glyphs.CGlyph;
 
@@ -47,6 +48,8 @@ public abstract class Glyph implements Cloneable, Translucent {
 
     /*------------Misc. Info-------------------------------------*/
 
+	private final ReentrantLock lock = new ReentrantLock();
+	
     /** Glyph ID. */
     private Long ID;
 
@@ -147,27 +150,45 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Translate the glyph by (x,y) - relative translation.
      *@see #moveTo(long x, long y)
      */
-    public void move(long x, long y){
-	vx+=x;
-	vy+=y;
-	propagateMove(x,y);  //take care of sticked glyphs
-	VirtualSpaceManager.INSTANCE.repaintNow();
-    }
+	public void move(long x, long y){
+		lock.lock();
+		try{
+			vx+=x;
+			vy+=y;
+			propagateMove(x,y);  //take care of sticked glyphs
+		} finally {
+			lock.unlock();
+		}
+		VirtualSpaceManager.INSTANCE.repaintNow();
+	}
 
     /** Translate the glyph to (x,y) - absolute translation.
      *@see #move(long x, long y)
      */
-    public void moveTo(long x, long y){
-	propagateMove(x-vx,y-vy);  //take care of sticked glyphs
-	vx=x;
-	vy=y;
-	VirtualSpaceManager.INSTANCE.repaintNow();
-    }
+	public void moveTo(long x, long y){
+		lock.lock();
+		try{
+			propagateMove(x-vx,y-vy);  //take care of sticked glyphs
+			vx=x;
+			vy=y;
+		} finally {
+			lock.unlock();
+		}
+		VirtualSpaceManager.INSTANCE.repaintNow();
+	}
 
     /** Get the coordinates of the glyph's geometrical center.
      *@return a copy of the glyph's location. Changing the x,y coordinates of the returned LongPoint will not have any effect on the glyph's position.
      */
-    public LongPoint getLocation(){return new LongPoint(vx,vy);}
+    public LongPoint getLocation(){
+		lock.lock();
+		try{
+			LongPoint retval = new LongPoint(vx, vy);
+			return retval;
+		} finally {
+			lock.unlock();
+		}
+	}
 
     /** Get glyph's size (radius of bounding circle). */
     public abstract float getSize();    

@@ -60,6 +60,10 @@ public class SlaveUpdater {
 		glyphMap.remove(id);
 	}
 
+	Camera getCameraById(ObjId id){
+		return cameraMap.get(id);
+	}
+
 	void addCamera(ObjId id){
 		Camera cam = VirtualSpaceManager.INSTANCE.addCamera(virtualSpace);
 		cameraMap.put(id, cam);
@@ -73,6 +77,10 @@ public class SlaveUpdater {
 		}
 		virtualSpace.removeCamera(cam.getIndex());
 		cameraMap.remove(id);
+	}
+
+	CameraGroup getCameraGroup(){
+		return virtualSpace.getCameraGroup();
 	}
 
 	public SlaveUpdater(VirtualSpace vs) throws Exception {

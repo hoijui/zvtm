@@ -32,6 +32,7 @@ import java.awt.geom.AffineTransform;
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 
@@ -240,11 +241,12 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 
     public void project(Camera c, Dimension d){
 	int i=c.getIndex();
+	LongPoint loc = getLocation();
 	coef=(float)(c.focal/(c.focal+c.altitude));
 	//find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
 	//translate in JPanel coords
-	pc[i].cx = (d.width/2) + Math.round((vx-c.posx)*coef);
-	pc[i].cy = (d.height/2) - Math.round((vy-c.posy)*coef);
+	pc[i].cx = (d.width/2) + Math.round((loc.x-c.posx)*coef);
+	pc[i].cy = (d.height/2) - Math.round((loc.y-c.posy)*coef);
 	//project width and height
 	pc[i].cw=Math.round(vw*coef);
 	pc[i].ch=Math.round(vh*coef);
