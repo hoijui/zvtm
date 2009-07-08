@@ -22,8 +22,11 @@ import org.jdesktop.animation.timing.interpolation.Interpolator;
 import org.jdesktop.animation.timing.TimingSource;
 
 //for active Camera animation
+import fr.inria.zvtm.clustering.CameraGroup;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 
 /**
  * A class that manages Animation instances.
@@ -386,6 +389,17 @@ public class AnimationManager {
 		    cam.altitudeOffset(dz);
 		}
 	    }
+		VirtualSpace activeSpace = vsm.getActiveSpace();
+		if(!(null == activeSpace)){
+			CameraGroup camGroup = activeSpace.getCameraGroup();
+			Location current = camGroup.getLocation();
+			if((dx != 0) || (dy != 0) || (dz != 0)){
+				camGroup.setLocation(new Location(
+							(long)(current.getX() + dx),
+							(long)(current.getY() +	dy),
+							(long)(current.getAltitude() + dz)));
+			}
+		}
 	}
 
 	public void setXspeed(double dx){

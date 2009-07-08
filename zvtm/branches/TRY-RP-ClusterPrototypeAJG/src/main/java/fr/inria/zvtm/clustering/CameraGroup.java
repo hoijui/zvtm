@@ -30,7 +30,7 @@ public class CameraGroup {
 
 	/* called by the master application */
 	public void setLocation(Location loc){
-		this.location = location;
+		this.location = loc;
 		if(slaveCam != null){
 			int row = slaveIndex % numCols;
 			int col = slaveIndex / numCols;

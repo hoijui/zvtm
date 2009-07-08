@@ -98,7 +98,6 @@ public class SlaveUpdater {
 					System.out.println("wrong message type (Delta expected)");
 					return;
 				}
-
 				Delta delta = (Delta)msg.getObject();
 				
 				//Do whatever needs to be done to update the
