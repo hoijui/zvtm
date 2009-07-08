@@ -49,10 +49,11 @@ public class AJTestSlave {
 			options.width, options.height);
 		Vector<Camera> vcam = new Vector<Camera>();
 		vcam.add(c);
-		View view = vsm.addExternalView(vcam, "slaveView", View.STD_VIEW,
+		View view = vsm.addExternalView(vcam, 
+				"slaveView " + options.blockNumber, 
+				View.STD_VIEW,
 				options.width, options.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-
 	}
 
 	public static void main(String[] args) throws Exception {

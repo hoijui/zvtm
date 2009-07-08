@@ -160,7 +160,5 @@ public class TestColorRect {
 		public void viewClosing(View v){System.exit(0);}
 
 	}
-
-
 }
 
