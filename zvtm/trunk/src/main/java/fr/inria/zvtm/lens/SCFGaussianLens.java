@@ -44,6 +44,9 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     /** Dynamic magnification factor. */
     protected float dMM = MM;
 
+    /** bracelet pseudo dMM **/
+    protected float braceletRadius = LR2;
+    protected boolean doBracelet = false;
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
@@ -163,6 +166,14 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		this.setDynamicMagnification();
 		owningView.parent.repaintNow();
 	    }
+	    if (doBracelet)
+	    {
+		float bR = Math.min(LR2, ((float)opacity) * (LR2) + 1.0f);
+		if (Math.abs(bR - braceletRadius) > 1.0f){
+		    braceletRadius = bR;
+		    owningView.parent.repaintNow();
+		}
+	    }
 	}
     }
 
@@ -208,6 +219,13 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     public void setMinMagFactor(float minMagFac){
 	minMagFac = (minMagFac < 1.0f) ? 1.0f:minMagFac;
 	mindMM = minMagFac;
+    }
+
+    public void doBracelet(boolean b){
+	doBracelet = b;
+    }
+    public boolean hasBracelet(){
+	return doBracelet;
     }
 
     boolean doDrawMaxFlatTop = false;
@@ -260,12 +278,21 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	    g2d.setColor(r2Color);
             g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
 	}
+	if (doBracelet && r2Color != null){
+	    g2d.setColor(r2Color);
+	    float dbr = Math.max(5.0f,braceletRadius-2.0f);
+            g2d.drawOval(lx+w/2 - (int)dbr, ly+h/2 - (int)dbr,
+			 2*(int)dbr, 2*(int)dbr);
+	}
     }
 
     public float getActualMaximumMagnification(){
 	return dMM;
     }
 
+    public float getActualBraceletRadius(){
+	return braceletRadius;
+    }
 }
 
 
