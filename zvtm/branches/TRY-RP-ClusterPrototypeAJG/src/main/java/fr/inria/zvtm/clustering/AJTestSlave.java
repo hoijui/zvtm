@@ -67,7 +67,6 @@ public class AJTestSlave {
 				"slaveView " + options.blockNumber, 
 				View.STD_VIEW,
 				options.width, options.height, false, true, true, null);
-		view.setBackgroundColor(Color.LIGHT_GRAY);
 
 		//fullscreen takes precedence over xOffset
 		if(options.xOffset >= 0 && !options.fullscreen){
@@ -104,6 +103,8 @@ public class AJTestSlave {
 				device.setFullScreenWindow((JFrame)view.getFrame());
 			}
 		}
+
+		view.setBackgroundColor(Color.LIGHT_GRAY);
 	}
 
 	public static void main(String[] args) throws Exception {
