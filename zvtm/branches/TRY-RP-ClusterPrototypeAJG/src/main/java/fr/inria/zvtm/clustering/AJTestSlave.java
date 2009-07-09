@@ -92,7 +92,7 @@ public class AJTestSlave {
 			}
 			System.out.println("");
 			GraphicsDevice device = null;
-			if(!options.device.isEmpty()){
+			if(!options.device.equals("")){
 				device = devMap.get(options.device);
 			}
 			if(null == device){
