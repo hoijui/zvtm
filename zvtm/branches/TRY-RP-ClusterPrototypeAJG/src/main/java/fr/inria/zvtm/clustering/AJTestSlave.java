@@ -28,6 +28,9 @@ class SlaveOptions{
 
 	@Option(name = "-c", aliases = {"--num-cols"}, usage = "number of columns")
 	int numCols = 1;
+
+	@Option(name = "-xo", usage = "window X offset")
+	int xOffset = -1;
 }
 
 /**
@@ -54,6 +57,9 @@ public class AJTestSlave {
 				View.STD_VIEW,
 				options.width, options.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
+		if(options.xOffset >= 0){
+			view.setLocation(options.xOffset, 0);
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
