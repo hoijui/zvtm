@@ -66,7 +66,7 @@ public class AJTestSlave {
 		View view = vsm.addExternalView(vcam, 
 				"slaveView " + options.blockNumber, 
 				View.STD_VIEW,
-				options.width, options.height, false, true, true, null);
+				options.width, options.height, false, false, true, null);
 
 		//fullscreen takes precedence over xOffset
 		if(options.xOffset >= 0 && !options.fullscreen){
@@ -99,8 +99,10 @@ public class AJTestSlave {
 			}
 
 			if (device.isFullScreenSupported()) {
+				((JFrame)view.getFrame()).removeNotify();
 				((JFrame)view.getFrame()).setUndecorated(true);
 				device.setFullScreenWindow((JFrame)view.getFrame());
+				((JFrame)view.getFrame()).addNotify();
 			}
 		}
 
