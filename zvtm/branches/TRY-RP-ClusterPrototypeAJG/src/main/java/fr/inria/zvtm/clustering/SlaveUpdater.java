@@ -22,7 +22,7 @@ import fr.inria.zvtm.glyphs.Glyph;
  */
 public class SlaveUpdater {
 	private final VirtualSpace virtualSpace;
-	private final JChannel channel = new JChannel();
+	private final JChannel channel = new JChannel(new java.io.File("chan_conf.xml"));
 	
 	//data structure for easy retrieval of a Glyph 
 	//given its ObjId: either a BStree or a hash table

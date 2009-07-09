@@ -53,7 +53,7 @@ public aspect VirtualSpaceReplication {
 	private JChannel retrieveChannel(String vsName) throws Exception{
 		JChannel retval = channels.get(vsName);
 		if(null == retval){
-			retval = new JChannel();
+			retval = new JChannel(new java.io.File("chan_conf.xml"));
 			retval.connect(vsName);
 			channels.put(vsName, retval);
 		}
@@ -164,6 +164,7 @@ public aspect VirtualSpaceReplication {
 			try{
 				retrieveChannel(virtualSpace.getName()).send(msg);
 			} catch(Exception e){
+				e.printStackTrace();
 				throw new Error("Could not retrieve comm channel");
 			}
 		}
@@ -176,6 +177,7 @@ public aspect VirtualSpaceReplication {
 		try{
 			retrieveChannel(virtualSpace.getName()).send(msg);
 		} catch(Exception e){
+			e.printStackTrace();
 			throw new Error("Could not retrieve comm channel");
 		}
 	}
@@ -194,6 +196,7 @@ public aspect VirtualSpaceReplication {
 
 			retrieveChannel(vs.getName()).send(msg);
 		} catch(Exception e){
+			e.printStackTrace();
 			throw new Error("Could not retrieve comm channel");
 		}
 	}
@@ -212,6 +215,7 @@ public aspect VirtualSpaceReplication {
 
 			retrieveChannel(vs.getName()).send(msg);
 		} catch(Exception e){
+			e.printStackTrace();
 			throw new Error("Could not retrieve comm channel");
 		}
 	}
@@ -225,6 +229,7 @@ public aspect VirtualSpaceReplication {
 		try{
 			retrieveChannel(vs.getName()).send(msg);
 		} catch(Exception e){
+			e.printStackTrace();
 			throw new Error("Could not retrieve comm channel");
 		}
 	}
