@@ -32,8 +32,8 @@ public class CameraGroup {
 	public void setLocation(Location loc){
 		this.location = loc;
 		if(slaveCam != null){
-			int row = slaveIndex % numCols;
-			int col = slaveIndex / numCols;
+			int row = slaveIndex % numRows;
+			int col = slaveIndex / numRows;
 
 			long newX = location.vx + col*blockWidth;
 			long newY = location.vy - row*blockHeight;
