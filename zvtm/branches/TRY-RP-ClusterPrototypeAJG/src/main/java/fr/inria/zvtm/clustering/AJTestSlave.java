@@ -93,6 +93,9 @@ public class AJTestSlave {
 			GraphicsDevice device = null;
 			if(!options.device.equals("")){
 				device = devMap.get(options.device);
+				if(null == device){
+					System.out.println("Warning: could not find device named " + options.device);
+				}
 			}
 			if(null == device){
 				device = ge.getDefaultScreenDevice();
