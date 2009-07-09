@@ -6,7 +6,12 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import java.awt.Color;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import javax.swing.JFrame;
 import java.util.Vector;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -31,6 +36,12 @@ class SlaveOptions{
 
 	@Option(name = "-xo", usage = "window X offset")
 	int xOffset = -1;
+
+	@Option(name = "-f", aliases = {"--fullscreen"}, usage = "open in full screen mode")
+	boolean fullscreen = false;
+
+	@Option(name = "-d", aliases = {"--device-name"}, usage = "use chosen device (fullscreen only)")
+	String device = "";
 }
 
 /**
@@ -57,8 +68,41 @@ public class AJTestSlave {
 				View.STD_VIEW,
 				options.width, options.height, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-		if(options.xOffset >= 0){
+
+		//fullscreen takes precedence over xOffset
+		if(options.xOffset >= 0 && !options.fullscreen){
 			view.setLocation(options.xOffset, 0);
+		}
+
+		if(options.fullscreen){
+			GraphicsEnvironment ge = 
+				GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+			GraphicsDevice[] devices = ge.getScreenDevices();
+			if(devices.length == 0){
+				throw new Error("no screen devices found");
+			}
+			Map<String, GraphicsDevice> devMap = 
+				new HashMap<String, GraphicsDevice>();
+
+			System.out.print("available devices: ");
+			for(GraphicsDevice d: devices) {
+				devMap.put(d.getIDstring(), d);	
+				System.out.print(d.getIDstring());
+			}
+			System.out.println("");
+			GraphicsDevice device = null;
+			if(!options.device.isEmpty()){
+				device = devMap.get(options.device);
+			}
+			if(null == device){
+				device = ge.getDefaultScreenDevice();
+			}
+
+			if (device.isFullScreenSupported()) {
+				((JFrame)view.getFrame()).setUndecorated(true);
+				device.setFullScreenWindow((JFrame)view.getFrame());
+			}
 		}
 	}
 
