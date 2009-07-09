@@ -2,7 +2,7 @@
 <UDP
 mcast_addr="${jgroups.udp.mcast_addr:228.10.10.10}"
 mcast_port="${jgroups.udp.mcast_port:45588}"
-bind_addr="${cluster.bind_addr:null}"
+bind_addr="${cluster.bind_addr}"
 discard_incompatible_packets="true"
 max_bundle_size="60000"
 max_bundle_timeout="30"
