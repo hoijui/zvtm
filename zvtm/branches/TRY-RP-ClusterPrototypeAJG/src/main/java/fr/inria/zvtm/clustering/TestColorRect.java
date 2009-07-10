@@ -66,7 +66,7 @@ public class TestColorRect {
 				VRectangle rect = new VRectangle(xOffset+i*rectWidth,
 						yOffset+j*rectHeight,
 						0,
-						(long)(0.5*(rectWidth/2)), (long)(0.5*(rectHeight/2)),
+						(long)(1.0*(rectWidth/2)), (long)(1.0*(rectHeight/2)),
 						Color.getHSBColor((float)(i*j/(float)(options.xNum*options.yNum)), 1f, 1f));
 				rect.setDrawBorder(false);
 				vs.addGlyph(rect, false);
