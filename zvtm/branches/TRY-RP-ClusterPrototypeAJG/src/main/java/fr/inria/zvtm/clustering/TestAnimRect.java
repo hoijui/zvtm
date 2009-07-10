@@ -8,6 +8,7 @@ import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -90,6 +91,7 @@ public class TestAnimRect {
 
 			}
 		}
+		vs.getCameraGroup().setLocation(new Location(0l,0l,0f));
 	}
 
 	public static void main(String[] args) throws CmdLineException{
