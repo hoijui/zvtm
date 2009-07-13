@@ -360,10 +360,9 @@ public abstract class FixedSizeLens extends Lens {
 		if(robot != null) { // lens is focus controlled
 			int deltaX = getXfocusOffset() + dx;
 			int deltaY = getYfocusOffset() + dy;
-			// double speed = sf.getSpeedCoeff(currentTime, lensX+deltaX, lensY+deltaY);
 			double speed = sf.getSpeedCoeff(currentTime, lastX, lastY);
 			double magFactor = 1 + (1-speed) * (getMaximumMagnification() - 1);
-			//System.out.println("magFactor="+magFactor);
+			//System.out.println("speed="+speed+", magFactor="+magFactor);
 			lensX = lensX + deltaX / (int)magFactor;
 			lensY = lensY + deltaY / (int)magFactor;
 			if(robot != null) {
