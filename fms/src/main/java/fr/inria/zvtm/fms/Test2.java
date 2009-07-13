@@ -2,10 +2,8 @@ package fr.inria.zvtm.fms;
 
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.util.Vector;
+import java.awt.event.*;
+import java.util.*;
 
 import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.engine.*;
@@ -16,10 +14,8 @@ import fr.inria.zvtm.lens.*;
 import fr.inria.zvtm.widgets.*;
 import java.awt.geom.Point2D;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import javax.swing.event.*;
+import javax.swing.Timer;
 
 public class Test2 {
 
@@ -37,7 +33,7 @@ public class Test2 {
     static int LENS_R1 = 100;
     static int LENS_R2 = 50;
     static final int LENS_ANIM_TIME = 300;
-    static double MAG_FACTOR = 8.0;
+    static double MAG_FACTOR = 12.0;
     
 	static final short SPEED_DEPENDENT = 1;
 	static final short CONSTANT = 2;
@@ -238,6 +234,15 @@ class EventHandlerTest2 implements ViewEventHandler{
 	
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
+	ActionListener listener = new ActionListener() {
+		public void actionPerformed(ActionEvent evt) {
+			if(application.lens != null) {
+				application.lens.moveLensBy(1, 1, evt.getWhen());
+			}
+		}
+	};
+	javax.swing.Timer t = new javax.swing.Timer(1000, listener);
+	
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_SPACE){application.toggleLensCursorSync();}
 		
@@ -253,6 +258,15 @@ class EventHandlerTest2 implements ViewEventHandler{
 			System.out.println("\n******************\n"
 							   + "MOTOR PRECISION CONSTANT"
 							   + "\n******************\n");
+		} else if(c == 'a') {
+			application.precisionEnabled = Test2.CONSTANT;
+			if(application.lens != null) application.lens.setFocusControlled(true, FixedSizeLens.CONSTANT);
+			System.out.println("\n******************\n"
+						       + "ANIMATION"
+							   + "\n******************\n");
+			t.setRepeats(true);
+			if(!t.isRunning()) t.start();
+			else t.stop();
 		} else {
 			application.precisionEnabled = Test2.NONE;
 			if(application.lens != null) application.lens.setFocusControlled(false);
