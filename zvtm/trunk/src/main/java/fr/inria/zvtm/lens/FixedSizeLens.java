@@ -403,7 +403,7 @@ public abstract class FixedSizeLens extends Lens {
 	class LSpeedFunction implements SpeedFunction {
 
 		static final int NB_SPEED_POINTS = 4;
-		static final int MIN_SPEED = 25;
+		static final int MIN_SPEED = 40;
 		static final int MAX_SPEED = 400;
 		long[] cursor_time = new long[NB_SPEED_POINTS];
 		int[] cursor_x = new int[NB_SPEED_POINTS];
