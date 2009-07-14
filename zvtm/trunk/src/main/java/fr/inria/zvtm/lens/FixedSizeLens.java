@@ -348,7 +348,7 @@ public abstract class FixedSizeLens extends Lens {
 	int lastX = Integer.MAX_VALUE;
 	int lastY = Integer.MAX_VALUE;
 	
-	public void moveLensBy(int dx, int dy, long currentTime) {
+	public synchronized void moveLensBy(int dx, int dy, long currentTime) {
 		lensX = lx + (int)owningView.getSize().getWidth() / 2;
 		lensY = ly + (int)owningView.getSize().getHeight() / 2;
 		//System.out.println("- lensX="+lensX+"+"+getXfocusOffset()+", lensY="+lensY+"+"+getYfocusOffset());
