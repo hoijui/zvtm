@@ -14,6 +14,7 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 /**
@@ -80,6 +81,13 @@ public aspect VirtualSpaceReplication {
 				getLocation(), 
 				getZindex(),
 				getWidth(), getHeight(), 
+				getColor());
+	}
+	@Override private Delta VCircle.getCreateDelta(){
+		return new CircleCreateDelta(getObjId(), 
+				getLocation(), 
+				getZindex(),
+				(long)getSize(),
 				getColor());
 	}
 
