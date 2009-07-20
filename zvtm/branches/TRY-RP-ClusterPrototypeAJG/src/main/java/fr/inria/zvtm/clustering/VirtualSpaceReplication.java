@@ -16,6 +16,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VSegment;
 
 /**
  * Intercepts VirtualSpace state changes and propagates
@@ -88,6 +89,13 @@ public aspect VirtualSpaceReplication {
 				getLocation(), 
 				getZindex(),
 				(long)getSize(),
+				getColor());
+	}
+	@Override private Delta VSegment.getCreateDelta(){
+		return new SegmentCreateDelta(getObjId(), 
+				getEndPoints()[0], 
+				getEndPoints()[1], 
+				getZindex(),
 				getColor());
 	}
 
