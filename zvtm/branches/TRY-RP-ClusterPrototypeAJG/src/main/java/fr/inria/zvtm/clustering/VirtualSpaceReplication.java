@@ -131,7 +131,13 @@ public aspect VirtualSpaceReplication {
 		 && target(glyph)
 		 && !within(Glyph+)
 		 && !within(Delta+);
-	 
+
+	pointcut glyphStrokeWidthChange(Glyph glyph):
+		call(public * Glyph+.setStrokeWidth(..))
+		&& target(glyph)
+		&& !within(Glyph+)
+		&& !within(Delta+);
+ 
 	/* Section: Camera-related pointcuts */
 //	pointcut cameraAdd(Camera camera):
 //		call(public * VirtualSpaceManager.addCamera(..))
@@ -235,6 +241,26 @@ public aspect VirtualSpaceReplication {
 			throw new Error("Could not retrieve comm channel");
 		}
 	}
+
+	after(Glyph glyph) returning: glyphStrokeWidthChange(glyph){
+		float strokeWidth = glyph.getStrokeWidth();
+
+		Delta delta = new GlyphStrokeWidthDelta(glyph.getObjId(),
+				strokeWidth);
+
+		Message msg = new Message(null, null, delta);
+		try{
+			//XXX using the 'owner' attribute is an ugly hack
+			if(null == glyph.getOwner()){ return; }
+			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
+
+			retrieveChannel(vs.getName()).send(msg);
+		} catch(Exception e){
+			e.printStackTrace();
+			throw new Error("Could not retrieve comm channel");
+		}
+	}
+
 
 	/* Section: CameraGroup-related advice */
 	after(CameraGroup cameraGroup) returning: groupPosChange(cameraGroup){
