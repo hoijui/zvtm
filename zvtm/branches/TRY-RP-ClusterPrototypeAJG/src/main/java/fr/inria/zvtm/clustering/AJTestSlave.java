@@ -69,7 +69,7 @@ public class AJTestSlave {
 				options.width, options.height, false, false, true, null);
 
 		//fullscreen takes precedence over xOffset
-		if(options.xOffset >= 0 && !options.fullscreen){
+		if((options.xOffset >= 0) && (!options.fullscreen)){
 			view.setLocation(options.xOffset, 0);
 		}
 
@@ -110,6 +110,7 @@ public class AJTestSlave {
 		}
 
 		view.setBackgroundColor(Color.LIGHT_GRAY);
+		view.setVisible(true);
 	}
 
 	public static void main(String[] args) throws Exception {
