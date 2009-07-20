@@ -89,7 +89,8 @@ public aspect VirtualSpaceReplication {
 				getLocation(), 
 				getZindex(),
 				(long)getSize(),
-				getColor());
+				getColor(),
+				getBorderColor());
 	}
 	@Override private Delta VSegment.getCreateDelta(){
 		return new SegmentCreateDelta(getObjId(), 

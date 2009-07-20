@@ -12,19 +12,22 @@ class CircleCreateDelta implements Delta {
 	private final int zIndex; //should be moved to Glyph attr??
 	private final long radius; 
 	private final Color mainColor; //should be moved to Glyph attr??
+	private final Color borderColor; //should be moved to Glyph attr??
 
 	CircleCreateDelta(ObjId id, LongPoint center, int zIndex,
-			long radius, Color mainColor){
+			long radius, Color mainColor, Color borderColor){
 		this.id = id;
 		this.center = center;
 		this.zIndex = zIndex;
 		this.radius = radius;
 		this.mainColor = mainColor;
+		this.borderColor = borderColor;
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
 		VCircle circle = new VCircle(center.x, center.y,
 				zIndex, radius, mainColor);
+		circle.setBorderColor(borderColor);
 		slaveUpdater.addGlyph(id, circle);
 	}
 
