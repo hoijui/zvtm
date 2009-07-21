@@ -45,8 +45,10 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     protected float dMM = MM;
 
     /** bracelet pseudo dMM **/
-    protected float braceletRadius = LR2;
-    protected boolean doBracelet = false;
+    protected float scRingRadius = LR2;
+    protected boolean doRing = false;
+    protected boolean doDrawRing = false;
+
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
@@ -166,11 +168,11 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		this.setDynamicMagnification();
 		owningView.parent.repaintNow();
 	    }
-	    if (doBracelet)
+	    if (doRing)
 	    {
 		float bR = Math.min(LR2, ((float)opacity) * (LR2) + 1.0f);
-		if (Math.abs(bR - braceletRadius) > 1.0f){
-		    braceletRadius = bR;
+		if (Math.abs(bR - scRingRadius) > 1.0f){
+		    scRingRadius = bR;
 		    owningView.parent.repaintNow();
 		}
 	    }
@@ -221,11 +223,14 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	mindMM = minMagFac;
     }
 
-    public void doBracelet(boolean b){
-	doBracelet = b;
+    public void setDoRing(boolean b){
+	doRing = b;
     }
-    public boolean hasBracelet(){
-	return doBracelet;
+    public boolean getDoRing(){
+	return doRing;
+    }
+    public void setDoDrawRing(boolean b){
+	doDrawRing = b;
     }
 
     boolean doDrawMaxFlatTop = false;
@@ -278,9 +283,9 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	    g2d.setColor(r2Color);
             g2d.drawOval(lx+w/2-LR2, ly+h/2-LR2, 2*LR2, 2*LR2);
 	}
-	if (doBracelet && r2Color != null){
+	if (doRing && r2Color != null && doDrawRing){
 	    g2d.setColor(r2Color);
-	    float dbr = Math.max(5.0f,braceletRadius-2.0f);
+	    float dbr = Math.max(5.0f,scRingRadius-2.0f);
             g2d.drawOval(lx+w/2 - (int)dbr, ly+h/2 - (int)dbr,
 			 2*(int)dbr, 2*(int)dbr);
 	}
@@ -290,8 +295,8 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	return dMM;
     }
 
-    public float getActualBraceletRadius(){
-	return braceletRadius;
+    public float getActualRingRadius(){
+	return scRingRadius;
     }
 }
 

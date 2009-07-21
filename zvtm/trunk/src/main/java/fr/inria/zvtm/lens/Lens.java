@@ -133,6 +133,9 @@ public abstract class Lens {
 	return this.MM;
     }
 
+    public float getActualMaximumMagnification(){
+	return this.MM;
+    }
     /**
      * set the lens' buffer threshold, beyond which magnification should pixels be taken from the magnified buffer rather than from the source buffer
      */

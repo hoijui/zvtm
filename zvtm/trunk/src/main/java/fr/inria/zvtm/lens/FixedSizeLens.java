@@ -348,7 +348,32 @@ public abstract class FixedSizeLens extends Lens {
 	int lastX = Integer.MAX_VALUE;
 	int lastY = Integer.MAX_VALUE;
 	
-	public synchronized void moveLensBy(int dx, int dy, long currentTime) {
+    private void doFocusControledOffsets(int deltaX, int deltaY, double magFactor, long currentTime) {
+	if(robot != null) {
+	    ptRobot.setLocation(lensX, lensY);
+	    SwingUtilities.convertPointToScreen(ptRobot, owningView);
+	    robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
+	}
+	if( 
+	    deltaX % (int)magFactor == getXfocusOffset()
+	    && deltaY % (int)magFactor == getYfocusOffset()
+	    && deltaX / (int)magFactor == 0
+	    && deltaY / (int)magFactor == 0)
+	    return;
+		
+	setXfocusOffset(deltaX % (int)magFactor);
+	setYfocusOffset(deltaY % (int)magFactor);
+	if (this instanceof TemporalLens)
+	    ((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
+	else
+	    setAbsolutePosition(lensX, lensY);
+
+	owningView.parent.repaintNow();
+    }
+
+    // FIXME: synchronized !
+    //public synchronized void moveLensBy(int dx, int dy, long currentTime) {
+    	public void moveLensBy(int dx, int dy, long currentTime) {
 		lensX = lx + (int)owningView.getSize().getWidth() / 2;
 		lensY = ly + (int)owningView.getSize().getHeight() / 2;
 		//System.out.println("- lensX="+lensX+"+"+getXfocusOffset()+", lensY="+lensY+"+"+getYfocusOffset());
@@ -361,28 +386,20 @@ public abstract class FixedSizeLens extends Lens {
 			int deltaX = getXfocusOffset() + dx;
 			int deltaY = getYfocusOffset() + dy;
 			double speed = sf.getSpeedCoeff(currentTime, lastX, lastY);
-			double magFactor = 1 + (1-speed) * (getMaximumMagnification() - 1);
-			//System.out.println("speed="+speed+", magFactor="+magFactor);
+			double magFactor = 1 + (1-speed) * (getActualMaximumMagnification() - 1);
+			//System.out.println("speed="+speed+", magFactor="+magFactor+", ActualMM="+getActualMaximumMagnification());
 			lensX = lensX + deltaX / (int)magFactor;
 			lensY = lensY + deltaY / (int)magFactor;
-			if(robot != null) {
-				ptRobot.setLocation(lensX, lensY);
-				SwingUtilities.convertPointToScreen(ptRobot, owningView);
-				robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
+		
+			if (magFactor  > 1.0) {
+			    synchronized(this)
+			    {
+				doFocusControledOffsets(deltaX, deltaY, magFactor, currentTime);
+			    }
 			}
-			if(
-			deltaX % (int)magFactor == getXfocusOffset()
-			&& deltaY % (int)magFactor == getYfocusOffset()
-			&& deltaX / (int)magFactor == 0
-			&& deltaY / (int)magFactor == 0)
-				return;
-			setXfocusOffset(deltaX % (int)magFactor);
-			setYfocusOffset(deltaY % (int)magFactor);
-			if (this instanceof TemporalLens)
-				((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
-			else
-				setAbsolutePosition(lensX, lensY);
-			owningView.parent.repaintNow();
+			else {
+			    doFocusControledOffsets(deltaX, deltaY, magFactor, currentTime);
+			}
 			//System.out.println("+ lensX="+lensX+"+"+getXfocusOffset()+", lensY="+lensY+"+"+getYfocusOffset());
 		} else {
 			lensX = lensX + dx;

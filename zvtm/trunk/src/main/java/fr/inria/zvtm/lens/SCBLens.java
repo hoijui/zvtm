@@ -45,6 +45,13 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 
     protected SpeedCoupling speedCoupling = null;
 
+    protected float scRingRadius = LR2;
+    protected boolean doRing = false;
+
+    /** pseudo Dynamic magnification factor. */
+    protected float dMM = MM;
+    protected float mindMM = 1.0f;
+    
     /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
 
@@ -98,7 +105,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
      *@param y vertical coordinate of the lens' center (as an offset w.r.t the view's center coordinates)
      */
     public SCBLens(float mm, float minT, float maxT, int innerRadius, int x, int y){
-	this.MM = mm;
+	this.MM = this.dMM = mm;
 	this.LR2 = innerRadius;
 	this.MMTf = maxT;
 	updateMagBufferWorkingDimensions();
@@ -232,6 +239,16 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 	    MMTf = nMMTf;
 	    owningView.parent.repaintNow();
 	}
+
+	dMM = ((float)opacity) * (MM-mindMM) + mindMM;
+
+	if (doRing) {
+	    float bR = Math.min(LR2, ((float)opacity) * (LR2) + 1.0f);
+	    if (Math.abs(bR - scRingRadius) > 1.0f){
+		scRingRadius = bR;
+		owningView.parent.repaintNow();
+	    }
+	}
     }
 
 
@@ -242,6 +259,13 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 
     public void setSpeedCoupling(SpeedCoupling sc){
 	speedCoupling = sc;
+    }
+
+    public void setDoRing(boolean b){
+	doRing = b;
+    }
+    public boolean getDoRing(){
+	return doRing;
     }
 
     public void setNoUpdateWhenMouseStill(boolean b){
@@ -303,8 +327,21 @@ public class SCBLens extends BlendingLens implements TemporalLens {
             g2d.drawOval(lx+w/2-lensProjectedWidth/2, ly+h/2-lensProjectedHeight/2, lensProjectedWidth, lensProjectedHeight);
             g2d.setComposite(Translucent.acO);
         }
+	if (doRing && rColor != null) {
+	    g2d.setColor(rColor);
+	    float dbr = Math.max(lensProjectedWidth/2.0f,scRingRadius-2.0f);
+            g2d.drawOval(lx+w/2 - (int)dbr, ly+h/2 - (int)dbr,
+			 2*(int)dbr, 2*(int)dbr);
+	}
     }
 
+    public float getActualRingRadius(){
+	return scRingRadius;
+    }
+
+    public float getActualMaximumMagnification(){
+	return dMM;
+    }
 }
 
 class TTrailingTimer extends TimerTask {
