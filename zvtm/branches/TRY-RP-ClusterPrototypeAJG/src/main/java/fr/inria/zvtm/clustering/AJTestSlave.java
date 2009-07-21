@@ -109,7 +109,7 @@ public class AJTestSlave {
 			}
 		}
 
-		view.setBackgroundColor(Color.LIGHT_GRAY);
+		view.setBackgroundColor(Color.BLACK);
 		view.setVisible(true);
 	}
 
