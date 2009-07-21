@@ -17,6 +17,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VText;
 
 /**
  * Intercepts VirtualSpace state changes and propagates
@@ -98,6 +99,16 @@ public aspect VirtualSpaceReplication {
 				getEndPoints()[1], 
 				getZindex(),
 				getColor());
+	}
+	@Override private Delta VText.getCreateDelta(){
+		return new TextCreateDelta(getObjId(),
+				getLocation(),
+				getZindex(),
+				getColor(),
+				getText(),
+				getTextAnchor(),
+				getScale()
+				);
 	}
 
 	/* Section: Glyph-related pointcuts */
