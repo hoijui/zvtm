@@ -83,6 +83,10 @@ public class SlaveUpdater {
 		return virtualSpace.getCameraGroup();
 	}
 
+	void removeAllGlyphs(){
+		virtualSpace.removeAllGlyphs();
+	}
+
 	public SlaveUpdater(VirtualSpace vs) throws Exception {
 		this.virtualSpace = vs;
 		

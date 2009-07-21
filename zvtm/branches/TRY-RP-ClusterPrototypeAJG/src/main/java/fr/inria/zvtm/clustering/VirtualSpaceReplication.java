@@ -156,6 +156,13 @@ public aspect VirtualSpaceReplication {
 		&& !within(Glyph+)
 		&& !within(Delta+);
 
+	/* Section: misc. VS-related pointcuts */
+	pointcut removeAllGlyphs(VirtualSpace virtualSpace): 
+		call(public * VirtualSpace.removeAllGlyphs(..)) 
+		&& target(virtualSpace)
+		&& !within(VirtualSpace)
+		&& !within(SlaveUpdater);
+
 	/* Section: Camera-related pointcuts */
 //	pointcut cameraAdd(Camera camera):
 //		call(public * VirtualSpaceManager.addCamera(..))
@@ -298,6 +305,19 @@ public aspect VirtualSpaceReplication {
 		}
 	}
 
+	/* Section: misc. VS-related advice */
+	after(VirtualSpace virtualSpace): 
+		removeAllGlyphs(virtualSpace) {
+			Delta delta = new RemoveAllGlyphsDelta();
+			Message msg = new Message(null, null, delta);
+			try{
+				retrieveChannel(virtualSpace.getName()).send(msg);
+			} catch(Exception e){
+				e.printStackTrace();
+				throw new Error("Could not retrieve comm channel");
+			}
+
+		}
 
 	/* Section: CameraGroup-related advice */
 	after(CameraGroup cameraGroup) returning: groupPosChange(cameraGroup){
