@@ -17,7 +17,6 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.clustering.ObjIdFactory;
@@ -111,7 +110,9 @@ public class GraffitiWall {
 		private boolean painting = false;
 		private Robot robot;
 		private final Location CENTER = new Location(200,200,0);
-		private static final long XYFACT = 10;
+		private static final long XYFACT = 5;
+		private long precX = 0;
+		private long precY = 0;
 		private long wallX = 0;
 		private long wallY = 0;
 
@@ -155,8 +156,12 @@ public class GraffitiWall {
 		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 		public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+			System.out.println("mm " + jpx + " " + jpy + ", " + e.getX() 
++ " " + e.getY());
 			if((jpx != 195) && (jpy != 175)){
 				//compute wall coords
+				precX = wallX;
+				precY = wallY;
 				wallX += ((jpx - 195) * XYFACT);
 				wallY -= ((jpy - 175) * XYFACT);
 				//move cursor
@@ -169,14 +174,17 @@ public class GraffitiWall {
 			if(buttonNumber == 1){
 				if((jpx != 195) && (jpy != 175)){
 					//compute wall coords
+					precX = wallX;
+					precY = wallY;
 					wallX += ((jpx - 195) * XYFACT);
 					wallY -= ((jpy - 175) * XYFACT);
 					//move cursor
 					cursor.moveTo(new LongPoint(wallX, wallY));
 					robot.mouseMove((int)CENTER.vx, (int)CENTER.vy);
 				}
-				VCircle circ = new VCircle(wallX, wallY, 0, 30, Color.GREEN);
-				vs.addGlyph(circ, false);
+				VSegment glyph = new VSegment(precX, precY, 0, Color.GREEN, wallX, wallY);
+				vs.addGlyph(glyph, false);
+				glyph.setStrokeWidth(20f);
 			}
 
 			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
