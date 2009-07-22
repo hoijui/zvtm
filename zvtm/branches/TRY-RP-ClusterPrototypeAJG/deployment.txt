@@ -1,0 +1,26 @@
+-- notes about deployment issues when 
+-- not using maven or compiling client programs separately
+
+Pour l'experience de Mathieu, on a procede comme ceci:
+
+-> Faire un build de zvtm-cluster (mvn package) et obtenu
+une archive jar.
+
+-> Rendre l'archive disponible pour l'application cliente
+
+-> Obtenir une archive d'AspectJ (1.6.5)
+
+-> Rendre chan_conf.xml accessible par le client (TODO meilleure
+implementation)
+
+-> Creer un fichier META-INF/aop.xml accessible dans le classpath
+du client, contenant la configuration correcte pour le load-time weaving
+(aspect: VirtualSpaceReplication, classes a tisser...)
+
+-> Exporter la variable ASPECTPATH contenant le chemin vers le
+binaire de zvtm-cluster (zvtm-0.10.0-SNAPSHOT.jar)
+
+-> Pour lancer le programme, passer a java l'argument
+-javagent:path.to/aspectjweaver.jar (load-time weaving)
+
+
