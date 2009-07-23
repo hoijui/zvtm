@@ -31,18 +31,20 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 class GWOptions {
-	@Option(name = "-w", aliases = {"--width"}, usage = "color rect width")
+	@Option(name = "-w", aliases = {"--width"}, usage = "screen width (hint)")
 	int width = 800;
 
-	@Option(name = "-h", aliases = {"--height"}, usage = "color rect height")
+	@Option(name = "-h", aliases = {"--height"}, usage = "screen height (hint)")
 	int height = 600;
 }
 
 //java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.GraffitiWall
 /**
  * Graffiti wall.
- * Desirable features are:
- * - strokes [through small circles or rectangles]
+ * Implemented features:
+ * - strokes
+ *
+ * Desirable features:
  * - images (scaled) [VImage support needs to be added to zvtm-cluster]
  * - text (scaled) [supported]
  * - easy way to add/update those and select parameters (e.g. color) [email, cli]
@@ -84,8 +86,6 @@ public class GraffitiWall {
 		view.setEventHandler(new GraffitiWallEventHandler());
 		view.setNotifyMouseMoved(true);
 
-		long xOffset = -options.width/2;
-		long yOffset = options.height/2;
 		VText text = new VText(0L, 0L, 0, //XXX set sensible coords 
 				Color.YELLOW,
 				"scribble here",
