@@ -3,7 +3,7 @@
 
 Pour l'experience de Mathieu, on a procede comme ceci:
 
--> Faire un build de zvtm-cluster (mvn package) et obtenu
+-> Faire un build de zvtm-cluster (mvn package) et obtenir
 une archive jar.
 
 -> Rendre l'archive disponible pour l'application cliente
