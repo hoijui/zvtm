@@ -59,10 +59,11 @@ class GWOptions {
  * - strokes
  *
  * Desirable features:
- * - images (scaled) [VImage support needs to be added to zvtm-cluster]
+ * - images (scaled) [zvtm-cluster now supports images through 
+ *   the ClusteredImage class]
  * - text (scaled) [supported]
  * - easy way to add/update those and select parameters (e.g. color) [email, cli]
- * - persistence (save/load)
+ * - persistence (save/load) [in progress]
  */
 public class GraffitiWall {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
