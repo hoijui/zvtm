@@ -28,11 +28,13 @@ import fr.inria.zvtm.glyphs.VImage;
  */
 public class ClusteredImage extends Glyph {
 	private final VImage image;
+	private final URL location;
 	//private static final Image DEFAULT_IMAGE;
 
 	static { /* init default (not found or error) image */ }
 
 	public ClusteredImage(long x, long y, int z, URL location, double scale){
+		this.location = location;
 		Image img = null;
 
 		try{
@@ -48,7 +50,10 @@ public class ClusteredImage extends Glyph {
 		image = new VImage(x,y,z,img,scale);
 	}
 
-	/* delegate everything to VImage instance */
+	public final URL getImageLocation(){ return location; }
+	public final double getScale(){ return image.scaleFactor; }
+
+	/* delegate everything else to VImage instance */
 
 	//TODO: is it possible to express this delegation 
 	//concisely using AOP?

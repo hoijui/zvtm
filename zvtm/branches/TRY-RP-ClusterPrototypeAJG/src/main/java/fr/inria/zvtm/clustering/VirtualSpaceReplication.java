@@ -110,6 +110,13 @@ public aspect VirtualSpaceReplication {
 				getScale()
 				);
 	}
+	@Override private Delta ClusteredImage.getCreateDelta(){
+		return new ImageCreateDelta(getObjId(),
+				getLocation(),
+				getZindex(),
+				getImageLocation(),
+				getScale());
+	}
 
 	/* Section: Glyph-related pointcuts */
 
