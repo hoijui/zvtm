@@ -25,6 +25,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+
+import java.util.ArrayList;
+
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -36,6 +47,9 @@ class GWOptions {
 
 	@Option(name = "-h", aliases = {"--height"}, usage = "screen height (hint)")
 	int height = 600;
+
+	@Option(name = "-f", aliases = {"--file"}, usage = "filename (state save/restore)")
+	String filename = "";
 }
 
 //java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.GraffitiWall
@@ -48,11 +62,13 @@ class GWOptions {
  * - images (scaled) [VImage support needs to be added to zvtm-cluster]
  * - text (scaled) [supported]
  * - easy way to add/update those and select parameters (e.g. color) [email, cli]
+ * - persistence (save/load)
  */
 public class GraffitiWall {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 	private VirtualSpace vs;
 	private Cursor cursor;
+	private final GWOptions options;
 
 	private class Cursor {
 		private final VSegment segH;
@@ -73,7 +89,14 @@ public class GraffitiWall {
 		}
 	}
 
-	GraffitiWall(CROptions options){
+	//silly hack to make sure this particular SU
+	//*is* instrumented (transmits messages)
+	private class MySlaveUpdater extends SlaveUpdater{
+		MySlaveUpdater(VirtualSpace vs) throws Exception {super(vs);}
+	}
+
+	GraffitiWall(GWOptions options){
+		this.options = options;
 		vs = vsm.addVirtualSpace("testSpace");
 		cursor = new Cursor(vs);
 
@@ -94,10 +117,54 @@ public class GraffitiWall {
 				1f); 	
 		vs.addGlyph(text, false);
 		vs.getCameraGroup().setLocation(new Location(0,0,0));
+		load();
+	}
+
+	//rudimentary binary save
+	void save(){
+		if(options.filename.equals("")){
+			return;
+		}
+		try{
+			ArrayList<Delta> createDeltas = new ArrayList<Delta>();
+			Vector glyphs = vs.getAllGlyphs();
+			for(Object obj: glyphs){
+				Glyph g = (Glyph)obj;
+				createDeltas.add(g.getCreateDelta());
+			}
+
+			OutputStream os = new FileOutputStream(options.filename);
+			ObjectOutput oo = new ObjectOutputStream(os);
+			oo.writeObject(createDeltas);
+			oo.close();
+		} catch (Exception e){
+			//just fail semi-silently (throwaway code)
+			e.printStackTrace();
+		}
+	}
+
+	void load(){
+		if(options.filename.equals("")){
+			return;
+		}
+		try{
+			InputStream is = new FileInputStream(options.filename);
+			ObjectInput oi = new ObjectInputStream(is);
+			ArrayList<Delta> createDeltas = (ArrayList<Delta>)oi.readObject();
+			oi.close();
+			MySlaveUpdater su = new MySlaveUpdater(vs);
+			for(Delta delta: createDeltas){
+				delta.apply(su);
+			}
+		} catch (Exception e){
+			//just fail semi-silently (throwaway code)
+			e.printStackTrace();
+		}
+
 	}
 
 	public static void main(String[] args) throws CmdLineException{
-		CROptions options = new CROptions();
+		GWOptions options = new GWOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 
@@ -210,7 +277,12 @@ public class GraffitiWall {
 		public void exitGlyph(Glyph g){
 		}
 
-		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+			if(c == 's'){
+				System.out.println("saving state");
+				save();
+			}
+		}
 
 		public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		}
