@@ -223,8 +223,6 @@ public class GraffitiWall {
 		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 		public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-			System.out.println("mm " + jpx + " " + jpy + ", " + e.getX() 
-+ " " + e.getY());
 			if((jpx != 195) && (jpy != 175)){
 				//compute wall coords
 				precX = wallX;
