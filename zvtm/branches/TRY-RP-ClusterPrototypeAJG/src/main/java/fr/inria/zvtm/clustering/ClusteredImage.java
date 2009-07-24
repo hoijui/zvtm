@@ -57,7 +57,14 @@ public class ClusteredImage extends Glyph {
 
 	//TODO: is it possible to express this delegation 
 	//concisely using AOP?
-	
+
+	//for some reason, visibleInRegion is non-abstract
+	@Override public boolean visibleInRegion(long wb, long nb,
+			long eb, long sb,
+			int i){
+		return image.visibleInRegion(wb,nb,eb,sb,i);
+	}
+
 	@Override public void addCamera(int verifIndex){
 		image.addCamera(verifIndex);
 	}
