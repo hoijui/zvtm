@@ -175,7 +175,6 @@ public class GraffitiWall {
 	class GraffitiWallEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
-		private boolean painting = false;
 		private Robot robot;
 		private final Location CENTER = new Location(200,200,0);
 		private static final long XYFACT = 5;
@@ -193,9 +192,9 @@ public class GraffitiWall {
 			robot.mouseMove((int)CENTER.vx, (int)CENTER.vy);
 		} 
 
-		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){ painting = true; }
+		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){ painting = false; }
+		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 		public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
