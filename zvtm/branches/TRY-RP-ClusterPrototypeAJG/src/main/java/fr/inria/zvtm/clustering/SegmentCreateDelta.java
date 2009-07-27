@@ -12,21 +12,25 @@ class SegmentCreateDelta implements Delta {
 	private final LongPoint p2; //second endpoint
 	private final int zIndex; //should be moved to Glyph attr??
 	private final Color mainColor; //should be moved to Glyph attr??
+	private final float strokeWidth; //should be moved to Glyph attr??
 
 	SegmentCreateDelta(ObjId id, LongPoint p1, 
 			LongPoint p2,
 			int zIndex,
-		    Color mainColor){
+		    Color mainColor,
+			float strokeWidth){
 		this.id = id;
 		this.p1 = p1;
 		this.p2 = p2;
 		this.zIndex = zIndex;
 		this.mainColor = mainColor;
+		this.strokeWidth = strokeWidth;
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
 		VSegment segment = new VSegment(p1.x, p1.y,
 				zIndex, mainColor, p2.x, p2.y);
+		segment.setStrokeWidth(strokeWidth);
 		slaveUpdater.addGlyph(id, segment);
 	}
 

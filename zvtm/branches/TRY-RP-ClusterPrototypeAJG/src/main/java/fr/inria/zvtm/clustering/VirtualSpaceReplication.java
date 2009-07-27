@@ -100,7 +100,8 @@ public aspect VirtualSpaceReplication {
 				getEndPoints()[0], 
 				getEndPoints()[1], 
 				getZindex(),
-				getColor());
+				getColor(),
+				getStrokeWidth());
 	}
 	@Override Delta VText.getCreateDelta(){
 		return new TextCreateDelta(getObjId(),
