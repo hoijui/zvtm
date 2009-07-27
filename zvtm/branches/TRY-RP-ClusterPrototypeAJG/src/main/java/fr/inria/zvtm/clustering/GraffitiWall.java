@@ -3,6 +3,7 @@ package fr.inria.zvtm.clustering;
 
 import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Robot;
 import java.util.Vector;
 
@@ -35,6 +36,8 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 
 import java.util.ArrayList;
+
+import javax.swing.SwingUtilities;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -216,12 +219,14 @@ public class GraffitiWall {
 		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 		public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-			if((jpx != 195) && (jpy != 175)){
+			Point p = new Point(jpx, jpy);
+			SwingUtilities.convertPointToScreen(p, v);
+			if((p.x != (int)CENTER.vx) && (p.y != (int)CENTER.vy)){
 				//compute wall coords
 				precX = wallX;
 				precY = wallY;
-				wallX += ((jpx - 195) * XYFACT);
-				wallY -= ((jpy - 175) * XYFACT);
+				wallX += ((p.x - CENTER.vx) * XYFACT);
+				wallY -= ((p.y - CENTER.vy) * XYFACT);
 				//move cursor
 				cursor.moveTo(new LongPoint(wallX, wallY));
 				robot.mouseMove((int)CENTER.vx, (int)CENTER.vy);
@@ -230,12 +235,14 @@ public class GraffitiWall {
 
 		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 			if(buttonNumber == 1){
-				if((jpx != 195) && (jpy != 175)){
+				Point p = new Point(jpx, jpy);
+				SwingUtilities.convertPointToScreen(p, v);
+				if((p.x != (int)CENTER.vx) && (p.y != (int)CENTER.vy)){
 					//compute wall coords
 					precX = wallX;
 					precY = wallY;
-					wallX += ((jpx - 195) * XYFACT);
-					wallY -= ((jpy - 175) * XYFACT);
+					wallX += ((p.x - CENTER.vx) * XYFACT);
+					wallY -= ((p.y - CENTER.vy) * XYFACT);
 					//move cursor
 					cursor.moveTo(new LongPoint(wallX, wallY));
 					robot.mouseMove((int)CENTER.vx, (int)CENTER.vy);
