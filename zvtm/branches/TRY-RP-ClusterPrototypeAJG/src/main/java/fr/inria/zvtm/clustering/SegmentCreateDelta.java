@@ -4,9 +4,10 @@ import java.awt.Color;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VSegment;
 
-class SegmentCreateDelta implements Delta {
+class SegmentCreateDelta implements CreateDelta {
 	private final ObjId id; //should be moved to Glyph attr??
 	private final LongPoint p1; //first endpoint 
 	private final LongPoint p2; //second endpoint
@@ -28,10 +29,15 @@ class SegmentCreateDelta implements Delta {
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
+		slaveUpdater.addGlyph(id, create());
+	}
+
+	public Glyph create(){
 		VSegment segment = new VSegment(p1.x, p1.y,
 				zIndex, mainColor, p2.x, p2.y);
 		segment.setStrokeWidth(strokeWidth);
-		slaveUpdater.addGlyph(id, segment);
+
+		return segment;
 	}
 
 	@Override public String toString(){

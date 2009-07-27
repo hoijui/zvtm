@@ -90,12 +90,6 @@ public class GraffitiWall {
 		}
 	}
 
-	//silly hack to make sure this particular SU
-	//*is* instrumented (transmits messages)
-	private class MySlaveUpdater extends SlaveUpdater{
-		MySlaveUpdater(VirtualSpace vs) throws Exception {super(vs);}
-	}
-
 	GraffitiWall(GWOptions options){
 		this.options = options;
 		vs = vsm.addVirtualSpace("testSpace");
@@ -151,11 +145,10 @@ public class GraffitiWall {
 		try{
 			InputStream is = new FileInputStream(options.filename);
 			ObjectInput oi = new ObjectInputStream(is);
-			ArrayList<Delta> createDeltas = (ArrayList<Delta>)oi.readObject();
+			ArrayList<CreateDelta> createDeltas = (ArrayList<CreateDelta>)oi.readObject();
 			oi.close();
-			MySlaveUpdater su = new MySlaveUpdater(vs);
-			for(Delta delta: createDeltas){
-				delta.apply(su);
+			for(CreateDelta delta: createDeltas){
+				vs.addGlyph(delta.create());
 			}
 		} catch (Exception e){
 			//just fail semi-silently (throwaway code)

@@ -74,20 +74,20 @@ public aspect VirtualSpaceReplication {
 	//(default produces a nopDelta)
 	//[commented out private mod for saving purposes, but should be left
 	//private in a 'production' design (?)
-	/* private */ Delta Glyph.getCreateDelta(){
+	/* private */ CreateDelta Glyph.getCreateDelta(){
 		return new NopDelta();
 	}	
 
 	//note the private @Override; no contradiction here because
 	//private means "private within the aspect"
-	@Override Delta VRectangle.getCreateDelta(){
+	@Override CreateDelta VRectangle.getCreateDelta(){
 		return new RectangleCreateDelta(getObjId(), 
 				getLocation(), 
 				getZindex(),
 				getWidth(), getHeight(), 
 				getColor());
 	}
-	@Override Delta VCircle.getCreateDelta(){
+	@Override CreateDelta VCircle.getCreateDelta(){
 		return new CircleCreateDelta(getObjId(), 
 				getLocation(), 
 				getZindex(),
@@ -95,7 +95,7 @@ public aspect VirtualSpaceReplication {
 				getColor(),
 				getBorderColor());
 	}
-	@Override Delta VSegment.getCreateDelta(){
+	@Override CreateDelta VSegment.getCreateDelta(){
 		return new SegmentCreateDelta(getObjId(), 
 				getEndPoints()[0], 
 				getEndPoints()[1], 
@@ -103,7 +103,7 @@ public aspect VirtualSpaceReplication {
 				getColor(),
 				getStrokeWidth());
 	}
-	@Override Delta VText.getCreateDelta(){
+	@Override CreateDelta VText.getCreateDelta(){
 		return new TextCreateDelta(getObjId(),
 				getLocation(),
 				getZindex(),
@@ -113,7 +113,7 @@ public aspect VirtualSpaceReplication {
 				getScale()
 				);
 	}
-	@Override Delta ClusteredImage.getCreateDelta(){
+	@Override CreateDelta ClusteredImage.getCreateDelta(){
 		return new ImageCreateDelta(getObjId(),
 				getLocation(),
 				getZindex(),

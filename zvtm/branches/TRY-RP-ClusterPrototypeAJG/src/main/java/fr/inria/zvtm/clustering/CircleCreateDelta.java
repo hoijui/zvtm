@@ -4,9 +4,10 @@ import java.awt.Color;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 
-class CircleCreateDelta implements Delta {
+class CircleCreateDelta implements CreateDelta {
 	private final ObjId id; //should be moved to Glyph attr??
 	private final LongPoint center; //should be moved to Glyph attr??
 	private final int zIndex; //should be moved to Glyph attr??
@@ -25,10 +26,14 @@ class CircleCreateDelta implements Delta {
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
+		slaveUpdater.addGlyph(id, create());
+	}
+
+	public Glyph create(){
 		VCircle circle = new VCircle(center.x, center.y,
 				zIndex, radius, mainColor);
 		circle.setBorderColor(borderColor);
-		slaveUpdater.addGlyph(id, circle);
+		return circle;
 	}
 
 	@Override public String toString(){

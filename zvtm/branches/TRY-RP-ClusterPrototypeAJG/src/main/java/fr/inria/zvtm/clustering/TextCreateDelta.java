@@ -4,9 +4,10 @@ import java.awt.Color;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 
-class TextCreateDelta implements Delta {
+class TextCreateDelta implements CreateDelta {
 	private final ObjId id; //should be moved to Glyph attr??
 	private final LongPoint pos; //should be moved to Glyph attr??
 	private final int zIndex; //should be moved to Glyph attr??
@@ -31,10 +32,14 @@ class TextCreateDelta implements Delta {
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
+		slaveUpdater.addGlyph(id, create());
+	}
+
+	public Glyph create(){
 		VText glyph = new VText(pos.x, pos.y,
 				zIndex, mainColor,
 				text, anchor, scale);
-		slaveUpdater.addGlyph(id, glyph);
+		return glyph;
 	}
 
 	@Override public String toString(){

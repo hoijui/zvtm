@@ -5,9 +5,10 @@ import java.net.URL;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
 
 /* Delta for ClusteredImage creation */
-class ImageCreateDelta implements Delta {
+class ImageCreateDelta implements CreateDelta {
 	private final ObjId id; //should be moved to Glyph attr??
 	private final LongPoint center; //should be moved to Glyph attr??
 	private final int zIndex; //should be moved to Glyph attr??
@@ -24,9 +25,13 @@ class ImageCreateDelta implements Delta {
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
+		slaveUpdater.addGlyph(id, create());
+	}
+
+	public Glyph create(){
 		ClusteredImage glyph = new ClusteredImage(center.x, center.y,
 				zIndex, location, scale);
-		slaveUpdater.addGlyph(id, glyph);
+		return glyph;
 	}
 
 	@Override public String toString(){

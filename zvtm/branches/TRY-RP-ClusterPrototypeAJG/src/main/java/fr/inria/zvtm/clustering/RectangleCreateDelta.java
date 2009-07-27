@@ -4,9 +4,10 @@ import java.awt.Color;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
-class RectangleCreateDelta implements Delta {
+class RectangleCreateDelta implements CreateDelta {
 	private final ObjId id; //should be moved to Glyph attr??
 	private final LongPoint center; //should be moved to Glyph attr??
 	private final int zIndex; //should be moved to Glyph attr??
@@ -25,9 +26,13 @@ class RectangleCreateDelta implements Delta {
 	}
 
 	public void apply(SlaveUpdater slaveUpdater){
+		slaveUpdater.addGlyph(id, create());
+	}
+
+	public Glyph create(){
 		VRectangle rect = new VRectangle(center.x, center.y,
 				zIndex, halfWidth, halfHeight, mainColor);
-		slaveUpdater.addGlyph(id, rect);
+		return rect;
 	}
 
 	@Override public String toString(){
