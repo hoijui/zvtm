@@ -4,7 +4,7 @@
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */ 
-package fr.inria.zvtm.clustering;
+package fr.inria.zvtm.clustering.examples;
 
 import java.awt.AWTException;
 import java.awt.Color;
@@ -26,6 +26,8 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.clustering.ObjIdFactory;
+import fr.inria.zvtm.clustering.CreateDelta;
+import fr.inria.zvtm.clustering.Delta;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;

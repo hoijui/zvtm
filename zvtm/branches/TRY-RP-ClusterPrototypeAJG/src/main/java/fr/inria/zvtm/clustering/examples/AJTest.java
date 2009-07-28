@@ -3,8 +3,8 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
-package fr.inria.zvtm.clustering;
+ */
+package fr.inria.zvtm.clustering.examples;
 
 import java.awt.Color;
 import java.util.Vector;
@@ -26,27 +26,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.Option;
-
-class ImOptions {
-	@Option(name = "-s", aliases = {"--source"}, usage = "image source")
-	String source = "";
-	}
-
-//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.TestImage
+//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.AJTest
 /**
- * Clustered image test class
+ * Basic test class
  */
-public class TestImage {
+public class AJTest {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
-	TestImage(ImOptions options){
+	AJTest(){
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 
 		Camera c = vsm.addCamera(vs);
@@ -55,31 +42,32 @@ public class TestImage {
 		View view = vsm.addExternalView(vcam, "masterView", View.STD_VIEW,
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-		view.setEventHandler(new TestImageEventHandler());
+		view.setEventHandler(new AJTestEventHandler());
 
-		URL imgURL = null;
-		try {
-			if(options.source.equals("")){
-				imgURL = new URL("http://www.urban.youvox.fr/IMG/png/WildSe1.png");
-			} else {
-				imgURL = new URL(options.source);
-			}
-		} catch (MalformedURLException e){
-			throw new Error("Malformed URL");
-		}
-		ClusteredImage cImg = new ClusteredImage(0,0,0,imgURL,2f);
-		vs.addGlyph(cImg, false);
+		VRectangle rect = new VRectangle(10, 10, 0, 100, 150, Color.BLUE);
+		vs.addGlyph(rect);
+		rect.moveTo(40,50);
+		rect.move(10,20);	
+
+		Animation anim = VirtualSpaceManager.INSTANCE.getAnimationManager()
+			.getAnimationFactory().createGlyphTranslation(4000,
+					rect,
+					new LongPoint(100, 200), true,
+					IdentityInterpolator.getInstance(),
+					null);
+
+	//	VirtualSpaceManager.INSTANCE.getAnimationManager().
+	//		startAnimation(anim, false);
+		try{Thread.sleep(4000);}catch(InterruptedException ie){}
+		rect.setColor(Color.GREEN);
+		//vs.removeGlyph(rect);
+}
+
+	public static void main(String[] args){
+		new AJTest();
 	}
 
-	public static void main(String[] args) throws CmdLineException{
-		ImOptions options = new ImOptions();
-		CmdLineParser parser = new CmdLineParser(options);
-		parser.parseArgument(args);
-
-		new TestImage(options);
-	}
-
-	class TestImageEventHandler implements ViewEventHandler{
+	class AJTestEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
 
@@ -157,5 +145,7 @@ public class TestImage {
 		public void viewClosing(View v){System.exit(0);}
 
 	}
+
+
 }
 

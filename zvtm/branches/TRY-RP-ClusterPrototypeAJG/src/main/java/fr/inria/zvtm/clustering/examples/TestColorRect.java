@@ -4,7 +4,7 @@
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */ 
-package fr.inria.zvtm.clustering;
+package fr.inria.zvtm.clustering.examples;
 
 import java.awt.Color;
 import java.util.Vector;
@@ -19,7 +19,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.clustering.ObjIdFactory;
 
 import java.awt.event.KeyEvent;
@@ -31,7 +31,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-class CSOptions {
+class CROptions {
 	@Option(name = "-x", aliases = {"--xnum"}, usage = "number of subdivisions along x axis")
 	int xNum = 50;
 
@@ -45,14 +45,14 @@ class CSOptions {
 	int height = 600;
 }
 
-//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.TestColorSegments
+//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.TestColorRect
 /**
- * Color segments test class
+ * Color rectangle test class
  */
-public class TestColorSegments {
+public class TestColorRect {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
-	TestColorSegments(CSOptions options){
+	TestColorRect(CROptions options){
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 
 		Camera c = vsm.addCamera(vs);
@@ -61,7 +61,7 @@ public class TestColorSegments {
 		View view = vsm.addExternalView(vcam, "masterView", View.STD_VIEW,
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-		view.setEventHandler(new TestColorSegmentsEventHandler());
+		view.setEventHandler(new TestColorRectEventHandler());
 
 		long xOffset = -options.width/2;
 		long yOffset = -options.height/2;
@@ -69,27 +69,26 @@ public class TestColorSegments {
 		long rectHeight = options.height/options.yNum;
 		for(int i=0; i<options.xNum; ++i){
 			for(int j=0; j<options.yNum; ++j){
-				VSegment segment = new VSegment(xOffset+i*rectWidth,
+				VRectangle rect = new VRectangle(xOffset+i*rectWidth,
 						yOffset+j*rectHeight,
 						0,
-						(long)(1.0*(rectWidth/2)), 
-						45f,
+						(long)(1.0*(rectWidth/2)), (long)(1.0*(rectHeight/2)),
 						Color.getHSBColor((float)(i*j/(float)(options.xNum*options.yNum)), 1f, 1f));
-				vs.addGlyph(segment, false);
-				segment.setStrokeWidth(4f);
+				rect.setDrawBorder(false);
+				vs.addGlyph(rect, false);
 			}
 		}
 }
 
 	public static void main(String[] args) throws CmdLineException{
-		CSOptions options = new CSOptions();
+		CROptions options = new CROptions();
 		CmdLineParser parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 
-		new TestColorSegments(options);
+		new TestColorRect(options);
 	}
 
-	class TestColorSegmentsEventHandler implements ViewEventHandler{
+	class TestColorRectEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
 

@@ -3,8 +3,8 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */
-package fr.inria.zvtm.clustering;
+ */ 
+package fr.inria.zvtm.clustering.examples;
 
 import java.awt.Color;
 import java.util.Vector;
@@ -21,19 +21,33 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.clustering.ObjIdFactory;
+import fr.inria.zvtm.clustering.ClusteredImage;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.AJTest
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+
+class ImOptions {
+	@Option(name = "-s", aliases = {"--source"}, usage = "image source")
+	String source = "";
+	}
+
+//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.TestImage
 /**
- * Basic test class
+ * Clustered image test class
  */
-public class AJTest {
+public class TestImage {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
-	AJTest(){
+	TestImage(ImOptions options){
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 
 		Camera c = vsm.addCamera(vs);
@@ -42,32 +56,31 @@ public class AJTest {
 		View view = vsm.addExternalView(vcam, "masterView", View.STD_VIEW,
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-		view.setEventHandler(new AJTestEventHandler());
+		view.setEventHandler(new TestImageEventHandler());
 
-		VRectangle rect = new VRectangle(10, 10, 0, 100, 150, Color.BLUE);
-		vs.addGlyph(rect);
-		rect.moveTo(40,50);
-		rect.move(10,20);	
-
-		Animation anim = VirtualSpaceManager.INSTANCE.getAnimationManager()
-			.getAnimationFactory().createGlyphTranslation(4000,
-					rect,
-					new LongPoint(100, 200), true,
-					IdentityInterpolator.getInstance(),
-					null);
-
-	//	VirtualSpaceManager.INSTANCE.getAnimationManager().
-	//		startAnimation(anim, false);
-		try{Thread.sleep(4000);}catch(InterruptedException ie){}
-		rect.setColor(Color.GREEN);
-		//vs.removeGlyph(rect);
-}
-
-	public static void main(String[] args){
-		new AJTest();
+		URL imgURL = null;
+		try {
+			if(options.source.equals("")){
+				imgURL = new URL("http://www.urban.youvox.fr/IMG/png/WildSe1.png");
+			} else {
+				imgURL = new URL(options.source);
+			}
+		} catch (MalformedURLException e){
+			throw new Error("Malformed URL");
+		}
+		ClusteredImage cImg = new ClusteredImage(0,0,0,imgURL,2f);
+		vs.addGlyph(cImg, false);
 	}
 
-	class AJTestEventHandler implements ViewEventHandler{
+	public static void main(String[] args) throws CmdLineException{
+		ImOptions options = new ImOptions();
+		CmdLineParser parser = new CmdLineParser(options);
+		parser.parseArgument(args);
+
+		new TestImage(options);
+	}
+
+	class TestImageEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
 
@@ -145,7 +158,5 @@ public class AJTest {
 		public void viewClosing(View v){System.exit(0);}
 
 	}
-
-
 }
 

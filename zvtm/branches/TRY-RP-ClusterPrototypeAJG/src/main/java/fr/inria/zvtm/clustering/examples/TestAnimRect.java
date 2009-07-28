@@ -4,15 +4,17 @@
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */ 
-package fr.inria.zvtm.clustering;
+package fr.inria.zvtm.clustering.examples;
 
 import java.awt.Color;
 import java.util.Vector;
 
 import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -31,28 +33,28 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-class CROptions {
+class AROptions {
 	@Option(name = "-x", aliases = {"--xnum"}, usage = "number of subdivisions along x axis")
-	int xNum = 50;
+		int xNum = 10;
 
 	@Option(name = "-y", aliases = {"--ynum"}, usage = "number of subdivisions along y axis")
-	int yNum = 20;
+		int yNum = 5;
 
 	@Option(name = "-w", aliases = {"--width"}, usage = "color rect width")
-	int width = 800;
+		int width = 800;
 
 	@Option(name = "-h", aliases = {"--height"}, usage = "color rect height")
-	int height = 600;
+		int height = 600;
 }
 
-//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.TestColorRect
+//java -cp target/zvtm-0.10.0-SNAPSHOT.jar:targetimingframework-1.0.jar:target/aspectjrt-1.5.4.jar:target/jgroups-2.7.0.GA.jar:target/commons-logging-1.1.jar fr.inria.zvtm.clustering.TestAnimRect
 /**
  * Color rectangle test class
  */
-public class TestColorRect {
+public class TestAnimRect {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
-	TestColorRect(CROptions options){
+	TestAnimRect(AROptions options){
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 
 		Camera c = vsm.addCamera(vs);
@@ -61,34 +63,52 @@ public class TestColorRect {
 		View view = vsm.addExternalView(vcam, "masterView", View.STD_VIEW,
 				800, 600, false, true, true, null);
 		view.setBackgroundColor(Color.LIGHT_GRAY);
-		view.setEventHandler(new TestColorRectEventHandler());
+		view.setEventHandler(new TestAnimRectEventHandler());
 
 		long xOffset = -options.width/2;
 		long yOffset = -options.height/2;
 		long rectWidth = options.width/options.xNum;
 		long rectHeight = options.height/options.yNum;
-		for(int i=0; i<options.xNum; ++i){
+	final java.util.Random rnd = new java.util.Random(); //animation direction
+	for(int i=0; i<options.xNum; ++i){
 			for(int j=0; j<options.yNum; ++j){
-				VRectangle rect = new VRectangle(xOffset+i*rectWidth,
+				final VRectangle rect = new VRectangle(xOffset+i*rectWidth,
 						yOffset+j*rectHeight,
 						0,
-						(long)(1.0*(rectWidth/2)), (long)(1.0*(rectHeight/2)),
+						(long)(0.5*(rectWidth/2)), (long)(0.5*(rectHeight/2)),
 						Color.getHSBColor((float)(i*j/(float)(options.xNum*options.yNum)), 1f, 1f));
 				rect.setDrawBorder(false);
 				vs.addGlyph(rect, false);
+				//animate rectangle: infinite circular motion
+				Animation rectAnim = vsm.getAnimationManager()
+					.getAnimationFactory().createAnimation(3000, Animation.INFINITE, Animation.RepeatBehavior.LOOP, rect,
+							Animation.Dimension.POSITION,
+							new DefaultTimingHandler(){
+							private final LongPoint center = rect.getLocation();
+							private final float radius = rect.getSize();
+							private final int direction = rnd.nextBoolean()? 1 : -1; 
+							@Override
+							public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
+							((Glyph)subject).moveTo((long)(center.x + (radius*Math.cos(2*Math.PI*fraction))),
+								(long)(center.y + (direction*radius*Math.sin(2*Math.PI*fraction))));
+							}
+							});
+				vsm.getAnimationManager().startAnimation(rectAnim, true);
+
 			}
 		}
-}
+		vs.getCameraGroup().setLocation(new Location(0l,0l,0f));
+	}
 
 	public static void main(String[] args) throws CmdLineException{
-		CROptions options = new CROptions();
+		AROptions options = new AROptions();
 		CmdLineParser parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 
-		new TestColorRect(options);
+		new TestAnimRect(options);
 	}
 
-	class TestColorRectEventHandler implements ViewEventHandler{
+	class TestAnimRectEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
 
