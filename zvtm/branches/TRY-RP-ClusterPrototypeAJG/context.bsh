@@ -1,0 +1,45 @@
+// Context setup file for the ZVTM cluster shell
+// See http://beanshell.org for syntax (java-like)
+
+import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.glyphs.*;
+import java.awt.Color;
+
+DEFAULT_SERVER_PORT = 1234;
+
+System.out.println("Setting up ZVTM context...");
+
+//give unrestricted access to the programmer
+setAccessibility(true);
+
+//options provided by the main program
+if(options.spawnServer){
+	int port = (options.port != -1)? options.port : DEFAULT_SERVER_PORT;
+    server(port);
+}
+
+//set up "standard" ZVTM objects needed to work with WILD
+vsm = VirtualSpaceManager.INSTANCE;
+vs = vsm.addVirtualSpace("testSpace");
+
+//"util" is a hack due to AspectJ usage.
+//TODO find a way to make AspectJ weave bean shells (??!)
+
+//define "glyphAdd" convenience command
+ga(glyph){
+	util.glyphAdd(vs, glyph);
+}
+
+//define "glyphMoveTo"
+gmt(glyph, x, y){
+	util.glyphMoveTo(glyph, x, y);
+}
+
+//define "glyphMove"
+gm(glyph, dx, dy){
+	util.glyphMove(glyph, dx, dy);
+}
+
+
+//start console
+
