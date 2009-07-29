@@ -44,8 +44,9 @@ public aspect VirtualSpaceReplication {
 	//if existing...)
 	
 	//augment Glyph with an ObjId identifier (serializable)
-	private ObjId Glyph.id = ObjIdFactory.next();
-	private ObjId Glyph.getObjId(){ return id; }
+	//'private' attr made public for Jython (zvtm shell) purposes
+	public ObjId Glyph.id = ObjIdFactory.next();
+	public ObjId Glyph.getObjId(){ return id; }
 
 	//augment Camera with an ObjId identifier (serializable)
 	private ObjId Camera.id = ObjIdFactory.next();
