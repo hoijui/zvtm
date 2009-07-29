@@ -64,6 +64,19 @@ def patchGlyphColorChange():
 
 	Glyph.setColor = newGlyphSetColor
 
+def patchGlyphStrokeWidthChange():
+	""" Sends a network message whenever a glyph's stroke width is changed
+	"""
+	oldMethod = Glyph.setStrokeWidth
+
+	def newGlyphStrokeWidthChange(self, strokeWidth):
+		oldMethod(self, strokeWidth)
+		delta = GlyphStrokeWidthDelta(self.getObjId(),
+				self.getStrokeWidth())
+		channel.send(Message(None,None,delta))
+
+	Glyph.setStrokeWidth = newGlyphStrokeWidthChange
+
 def doMonkeyPatch():
 	""" Patches Glyph-derived class as well as VirtualSpace so that
 	network messages are sent whenever a glyph is added or removed
@@ -75,6 +88,7 @@ def doMonkeyPatch():
 	patchGlyphMove()
 	patchGlyphMoveTo()
 	patchGlyphColorChange()
+	patchGlyphStrokeWidthChange()
 
 def init():
 	doMonkeyPatch()
