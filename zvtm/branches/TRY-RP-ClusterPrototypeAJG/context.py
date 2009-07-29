@@ -52,6 +52,17 @@ def patchGlyphMoveTo():
 
 	Glyph.moveTo = newGlyphMoveTo
 
+def patchGlyphColorChange():
+	""" Sends a network message whenever a glyph's color is changed. """
+	oldMethod = Glyph.setColor
+
+	def newGlyphSetColor(self, color):
+			oldMethod(self, color)
+			delta = GlyphColorDelta(self.getObjId(),
+					self.getColor())
+			channel.send(Message(None,None,delta))
+
+	Glyph.setColor = newGlyphSetColor
 
 def doMonkeyPatch():
 	""" Patches Glyph-derived class as well as VirtualSpace so that
@@ -59,8 +70,11 @@ def doMonkeyPatch():
 	into a virtual space, or a glyph property is changed.
 	"""
 	patchVSGlyphAdd()
+	#todo patchVSGlyphRemove
+	#todo patchVSGlyphRemoveAll
 	patchGlyphMove()
 	patchGlyphMoveTo()
+	patchGlyphColorChange()
 
 def init():
 	doMonkeyPatch()
