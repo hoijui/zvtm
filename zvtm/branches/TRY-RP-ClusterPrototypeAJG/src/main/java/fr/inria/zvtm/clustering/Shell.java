@@ -42,7 +42,6 @@ public class Shell {
 		try{
 			//provide options to the context setup script
 			interpreter.set("options", options);
-			interpreter.set("util", new Util());
 			interpreter.source("context.bsh");
 		} catch (Exception e){
 			//prototype code - not much in the way of error handling
