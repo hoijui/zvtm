@@ -22,24 +22,4 @@ if(options.spawnServer){
 vsm = VirtualSpaceManager.INSTANCE;
 vs = vsm.addVirtualSpace("testSpace");
 
-//"util" is a hack due to AspectJ usage.
-//TODO find a way to make AspectJ weave bean shells (??!)
-
-//define "glyphAdd" convenience command
-ga(glyph){
-	util.glyphAdd(vs, glyph);
-}
-
-//define "glyphMoveTo"
-gmt(glyph, x, y){
-	util.glyphMoveTo(glyph, x, y);
-}
-
-//define "glyphMove"
-gm(glyph, dx, dy){
-	util.glyphMove(glyph, dx, dy);
-}
-
-
-//start console
 

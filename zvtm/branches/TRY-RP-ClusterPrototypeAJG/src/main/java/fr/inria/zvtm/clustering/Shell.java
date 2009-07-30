@@ -35,20 +35,6 @@ public class Shell {
 	private final ShellOptions options;
 	private final Interpreter interpreter = new Interpreter();
 
-	class Util{
-		public void glyphAdd(VirtualSpace vs, Glyph glyph){
-			vs.addGlyph(glyph, false);
-		}
-
-		public void glyphMoveTo(Glyph glyph, long x, long y){
-			glyph.moveTo(x,y);
-		}
-
-		public void glyphMove(Glyph glyph, long dx, long dy){
-			glyph.move(dx, dy);
-		}
-	}
-
 	private Shell(ShellOptions options){
 		this.options = options;
 
