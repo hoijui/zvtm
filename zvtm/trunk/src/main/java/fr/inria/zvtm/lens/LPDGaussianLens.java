@@ -153,6 +153,7 @@ public class LPDGaussianLens extends LPFSGaussianLens implements TemporalLens {
             // make the lens almost disappear when making big moves
             this.setDistanceMetrics(nLp);
             owningView.parent.repaintNow();
+            if (tpl != null){tpl.parameterUpdated();}
         }
     }
     

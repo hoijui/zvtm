@@ -140,32 +140,34 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
     float mindMM = 1.0f;
 
     public void updateTimeBasedParams(){
-	synchronized(this){
-	    double opacity;
-	    if (speedCoupling != null)
-	    {
-		opacity = 1.0 - (double)speedCoupling.getCoef();
-	    }
-	    else
-	    {
-		targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-		double distAway = targetPos.distance(currentPos);
-		opacity = 1.0 - Math.min(1.0, distAway / maxDist);
-		filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
-		currentPos = filter.apply(targetPos, frequency);
-		int tx = (int)Math.round(currentPos.getX());
-		int ty = (int)Math.round(currentPos.getY());
-		tx = Math.max(tx, w/2);
-		ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
-	    }
-	    float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
-	    if (Math.abs(dMM - nMM) > 0.1f){// avoid unnecesarry repaint requests
-		// make the lens almost flat when making big moves
-		dMM = nMM;
-		this.setDynamicMagnification();
-		owningView.parent.repaintNow();
-	    }
-	}
+        synchronized(this){
+            double opacity;
+            if (speedCoupling != null)
+            {
+                opacity = 1.0 - (double)speedCoupling.getCoef();
+            }
+            else
+            {
+                targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+                double distAway = targetPos.distance(currentPos);
+                opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+                filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) +  cutoffParamB);
+                currentPos = filter.apply(targetPos, frequency);
+                int tx = (int)Math.round(currentPos.getX());
+                int ty = (int)Math.round(currentPos.getY());
+                tx = Math.max(tx, w/2);
+                ty = Math.min(ty, owningView.parent.getPanelSize().height - h/2);
+            }
+            float nMM = ((float)opacity) * (MM-mindMM) + mindMM;
+            if (Math.abs(dMM - nMM) > 0.1f){
+                // avoid unnecesarry repaint requests
+                // make the lens almost flat when making big moves
+                dMM = nMM;
+                this.setDynamicMagnification();
+                owningView.parent.repaintNow();
+                if (tpl != null){tpl.parameterUpdated();}
+            }
+        }
     }
 
     void setDynamicMagnification(){

@@ -169,6 +169,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		dMM = nMM;
 		this.setDynamicMagnification();
 		owningView.parent.repaintNow();
+	    if (tpl != null){tpl.parameterUpdated();}
 	    }
 	    if (doRing)
 	    {
@@ -178,7 +179,6 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		    owningView.parent.repaintNow();
 		}
 	    }
-	    if (tpl != null){tpl.parameterUpdated();}
 	}
     }
 
