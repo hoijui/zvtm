@@ -95,6 +95,10 @@ public class SlaveUpdater {
 
 	public SlaveUpdater(VirtualSpace vs) throws Exception {
 		this.virtualSpace = vs;
+
+		//slaves should not send network messages, otherwise
+		//chaos and infinite loops will ensue
+		virtualSpace.setSlave(true);
 		
 		//use slave virtual space name to search for master group
 		channel.connect(vs.getName());

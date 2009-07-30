@@ -52,6 +52,12 @@ public aspect VirtualSpaceReplication {
 	private ObjId Camera.id = ObjIdFactory.next();
 	private ObjId Camera.getObjId(){ return id; }
 
+	//test: augment VirtualSpace with an 'isSlave' attribute
+	private boolean VirtualSpace.isSlave = false;
+	boolean VirtualSpace.isSlave(){ return isSlave; }
+	void VirtualSpace.setSlave(boolean b){ isSlave = b; }
+	boolean Glyph.isOwnerSlave(){ return ((VirtualSpace)getOwner()).isSlave(); }
+
 	//augment VirtualSpace with a CameraGroup
 	private final CameraGroup VirtualSpace.cameraGroup = 
 		new CameraGroup(this);
@@ -133,80 +139,43 @@ public aspect VirtualSpaceReplication {
 	//define pointcuts to catch Glyphs additions 
 	//and removals to/from a VirtualSpace
 	//make sure this join point fires only once even if addGlyph
-	//overloads are chained together (!within VirtualSpaceManager... -- is that the right way of doing it?)
+	//overloads are chained together 	
 	pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
-		call(public * VirtualSpace.addGlyph(..)) 
+		execution(public * VirtualSpace.addGlyph(Glyph, boolean, boolean)) 
 		&& args(glyph, ..)
-		&& target(virtualSpace)
-		&& !within(VirtualSpace)
-		&& !within(SlaveUpdater);
+		&& this(virtualSpace); 
 
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
-		call(public * VirtualSpace.removeGlyph(..)) 
+		execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) 
 		&& args(glyph, ..)
-		&& target(virtualSpace)
-		&& !within(VirtualSpace)
-		&& !within(SlaveUpdater);
+		&& this(virtualSpace);
 
 	//!within(Glyph+) to avoid calling multiple times when chained overloads(is it the right approach?)
 	pointcut glyphPosChange(Glyph glyph):
-		(call(public * Glyph+.moveTo(..)) || call(public * Glyph+.move(..)))
-		&& target(glyph)
-		&& !within(Glyph+)
-		&& !within(Delta+); //Delta manages updates to slaves
+		(execution(public * Glyph+.moveTo(long, long)) || execution(public * Glyph+.move(long, long)))
+		&& this(glyph);
 
 	pointcut glyphColorChange(Glyph glyph):
-		(call(public * Glyph+.setColor(..)) || call(public * Glyph+.setHSVColor(..)))
-		 && target(glyph)
-		 && !within(Glyph+)
-		 && !within(Delta+);
+		(execution(public * Glyph+.setColor(..)) || execution(public * Glyph+.setHSVColor(..)))
+		 && this(glyph); //todo avoid method chaining (?)
 
 	pointcut glyphStrokeWidthChange(Glyph glyph):
-		call(public * Glyph+.setStrokeWidth(..))
-		&& target(glyph)
-		&& !within(Glyph+)
-		&& !within(Delta+);
+		execution(public * Glyph+.setStrokeWidth(..))
+		&& this(glyph);
 
  	pointcut glyphVisibilityChange(Glyph glyph):
-		call(public * Glyph+.setVisible(..))
-		&& target(glyph)
-		&& !within(Glyph+)
-		&& !within(Delta+);
+		execution(public * Glyph+.setVisible(boolean))
+		&& this(glyph);
 
 	/* Section: misc. VS-related pointcuts */
 	pointcut removeAllGlyphs(VirtualSpace virtualSpace): 
-		call(public * VirtualSpace.removeAllGlyphs(..)) 
-		&& target(virtualSpace)
-		&& !within(VirtualSpace)
-		&& !within(SlaveUpdater);
-
-	/* Section: Camera-related pointcuts */
-//	pointcut cameraAdd(Camera camera):
-//		call(public * VirtualSpaceManager.addCamera(..))
-//		&& args(camera, ..)
-//		&& !within(VirtualSpaceManager);
-//
-//	pointcut cameraRemove(Camera camera):
-//		call(public * VirtualSpace.removeCamera(..))
-//		&& args(camera, ..)
-//		&& !within(VirtualSpace);
-//
-//	/* not yet in use */
-//	pointcut cameraPosChange(Camera camera):
-//		(call(public * Camera.moveTo(..)) 
-//		  || call(public * Camera.move(..))
-//		  || call (public * Camera.setAltitude(..))
-//		  || call (public * Camera.setLocation(..)))
-//		&& target(camera)
-//		&& !within(Camera)
-//		&& !within(Delta+);
+		execution(public * VirtualSpace.removeAllGlyphs()) 
+		&& this(virtualSpace);
 
 	/* Section: CameraGroup-related pointcuts */
 	pointcut groupPosChange(CameraGroup cameraGroup):
-		call(public * CameraGroup.setLocation(..))
-		&& target(cameraGroup)
-		&& !within(CameraGroup)
-		&& !within(Delta+);
+		execution(public * CameraGroup.setLocation(..))
+		&& this(cameraGroup);
 
 	/* Section: Glyph-related advice */
 
@@ -221,6 +190,8 @@ public aspect VirtualSpaceReplication {
 
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) {
+			if(virtualSpace.isSlave()){ return;}
+
 			if(null == glyph){ return; }//XXX add dbg trace?
 
 			Delta delta = glyph.getCreateDelta();
@@ -235,18 +206,21 @@ public aspect VirtualSpaceReplication {
 
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphRemove(glyph, virtualSpace){
-
-		Delta delta = new GlyphRemoveDelta(glyph.getObjId());
-		Message msg = new Message(null, null, delta);
-		try{
-			retrieveChannel(virtualSpace.getName()).send(msg);
-		} catch(Exception e){
-			e.printStackTrace();
-			throw new Error("Could not retrieve comm channel");
+			if(virtualSpace.isSlave()){ return;}
+			Delta delta = new GlyphRemoveDelta(glyph.getObjId());
+			Message msg = new Message(null, null, delta);
+			try{
+				retrieveChannel(virtualSpace.getName()).send(msg);
+			} catch(Exception e){
+				e.printStackTrace();
+				throw new Error("Could not retrieve comm channel");
+			}
 		}
-	}
 
 	after(Glyph glyph) returning: glyphPosChange(glyph) {
+		if(null == glyph.getOwner()){ return; }
+		if(glyph.isOwnerSlave()){ return;}
+
 		LongPoint loc = glyph.getLocation();
 
 		Delta delta = new GlyphPosDelta(glyph.getObjId(),
@@ -254,8 +228,6 @@ public aspect VirtualSpaceReplication {
 
 		Message msg = new Message(null, null, delta);
 		try{
-			//XXX using the 'owner' attribute is an ugly hack
-			if(null == glyph.getOwner()){ return; }
 			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
 
 			retrieveChannel(vs.getName()).send(msg);
@@ -266,6 +238,9 @@ public aspect VirtualSpaceReplication {
 	}
 
 	after(Glyph glyph) returning: glyphColorChange(glyph){
+		if(null == glyph.getOwner()){ return; }
+		if(glyph.isOwnerSlave()){ return;}
+
 		Color color = glyph.getColor();
 
 		Delta delta = new GlyphColorDelta(glyph.getObjId(),
@@ -273,8 +248,6 @@ public aspect VirtualSpaceReplication {
 
 		Message msg = new Message(null, null, delta);
 		try{
-			//XXX using the 'owner' attribute is an ugly hack
-			if(null == glyph.getOwner()){ return; }
 			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
 
 			retrieveChannel(vs.getName()).send(msg);
@@ -285,6 +258,9 @@ public aspect VirtualSpaceReplication {
 	}
 
 	after(Glyph glyph) returning: glyphStrokeWidthChange(glyph){
+		if(null == glyph.getOwner()){ return; }
+		if(glyph.isOwnerSlave()){ return;}
+
 		float strokeWidth = glyph.getStrokeWidth();
 
 		Delta delta = new GlyphStrokeWidthDelta(glyph.getObjId(),
@@ -292,8 +268,6 @@ public aspect VirtualSpaceReplication {
 
 		Message msg = new Message(null, null, delta);
 		try{
-			//XXX using the 'owner' attribute is an ugly hack
-			if(null == glyph.getOwner()){ return; }
 			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
 
 			retrieveChannel(vs.getName()).send(msg);
@@ -304,6 +278,9 @@ public aspect VirtualSpaceReplication {
 	}
 
 	after(Glyph glyph) returning: glyphVisibilityChange(glyph){
+		if(null == glyph.getOwner()){ return; }
+		if(glyph.isOwnerSlave()){ return;}
+
 		boolean visible = glyph.isVisible();
 
 		Delta delta = new GlyphVisibilityDelta(glyph.getObjId(),
@@ -311,8 +288,6 @@ public aspect VirtualSpaceReplication {
 
 		Message msg = new Message(null, null, delta);
 		try{
-			//XXX using the 'owner' attribute is an ugly hack
-			if(null == glyph.getOwner()){ return; }
 			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
 
 			retrieveChannel(vs.getName()).send(msg);
@@ -325,6 +300,8 @@ public aspect VirtualSpaceReplication {
 	/* Section: misc. VS-related advice */
 	after(VirtualSpace virtualSpace): 
 		removeAllGlyphs(virtualSpace) {
+			if(virtualSpace.isSlave()){ return;}
+
 			Delta delta = new RemoveAllGlyphsDelta();
 			Message msg = new Message(null, null, delta);
 			try{
@@ -339,6 +316,8 @@ public aspect VirtualSpaceReplication {
 	/* Section: CameraGroup-related advice */
 	after(CameraGroup cameraGroup) returning: groupPosChange(cameraGroup){
 		VirtualSpace vs = cameraGroup.getOwner();
+		if(vs.isSlave()){ return; }
+
 		Delta delta = new GroupLocDelta(cameraGroup.getLocation()); 
 
 		Message msg = new Message(null, null, delta);
