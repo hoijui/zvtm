@@ -43,6 +43,8 @@ public class LPDGaussianLens extends LPFSGaussianLens implements TemporalLens {
     float a = 1;
     float b = 0;
     
+    TemporalParamListener tpl;
+    
     /**
      * create a lens with a maximum magnification factor of 2.0
      */
@@ -186,7 +188,16 @@ public class LPDGaussianLens extends LPFSGaussianLens implements TemporalLens {
             g2d.setStroke(os);
         }
         g2d.setComposite(Translucent.acO);
-    }   
+    }
+    
+    /** To be notified about updates to MM due to speed-coupling. */
+    public void setTemporalParamListener(TemporalParamListener tpl){
+        this.tpl = tpl;
+    }
+
+    public TemporalParamListener getTemporalParamListener(){
+        return this.tpl;
+    }
 
 }
 

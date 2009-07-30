@@ -48,6 +48,8 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     protected float scRingRadius = LR2;
     protected boolean doRing = false;
     protected boolean doDrawRing = false;
+    
+    TemporalParamListener tpl;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -176,6 +178,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		    owningView.parent.repaintNow();
 		}
 	    }
+	    if (tpl != null){tpl.parameterUpdated();}
 	}
     }
 
@@ -298,6 +301,16 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     public float getActualRingRadius(){
 	return scRingRadius;
     }
+
+    /** To be notified about updates to MM due to speed-coupling. */
+    public void setTemporalParamListener(TemporalParamListener tpl){
+        this.tpl = tpl;
+    }
+
+    public TemporalParamListener getTemporalParamListener(){
+        return this.tpl;
+    }
+
 }
 
 

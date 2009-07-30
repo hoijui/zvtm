@@ -65,6 +65,8 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     // a and b are used to convert the filter's opacity to values in the [minT, maxT] range
     float a = 1;
     float b = 0;
+    
+    TemporalParamListener tpl;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -342,6 +344,16 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     public float getActualMaximumMagnification(){
 	return dMM;
     }
+    
+    /** To be notified about updates to MM due to speed-coupling. */
+    public void setTemporalParamListener(TemporalParamListener tpl){
+        this.tpl = tpl;
+    }
+    
+    public TemporalParamListener getTemporalParamListener(){
+        return this.tpl;
+    }
+    
 }
 
 class TTrailingTimer extends TimerTask {

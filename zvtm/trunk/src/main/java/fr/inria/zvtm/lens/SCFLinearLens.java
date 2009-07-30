@@ -43,6 +43,8 @@ public class SCFLinearLens extends FSLinearLens implements TemporalLens {
 
     /** Dynamic magnification factor. */
     float dMM = MM;
+    
+    TemporalParamListener tpl;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -264,6 +266,15 @@ public class SCFLinearLens extends FSLinearLens implements TemporalLens {
 
     public float getActualMaximumMagnification(){
 	return dMM;
+    }
+
+    /** To be notified about updates to MM due to speed-coupling. */
+    public void setTemporalParamListener(TemporalParamListener tpl){
+        this.tpl = tpl;
+    }
+
+    public TemporalParamListener getTemporalParamListener(){
+        return this.tpl;
     }
 
 }

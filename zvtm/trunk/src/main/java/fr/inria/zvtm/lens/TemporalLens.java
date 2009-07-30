@@ -26,4 +26,9 @@ public interface TemporalLens {
 
     public void setNoUpdateWhenMouseStill(boolean b);
 
+    public void setTemporalParamListener(TemporalParamListener tpl);
+    
+    public TemporalParamListener getTemporalParamListener();
+    
+
 }

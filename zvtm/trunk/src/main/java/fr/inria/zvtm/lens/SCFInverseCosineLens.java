@@ -43,6 +43,8 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 
     /** Dynamic magnification factor. */
     float dMM = MM;
+    
+    TemporalParamListener tpl;
 
     /**
      * create a lens with a maximum magnification factor of 2.0
@@ -263,6 +265,15 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 
     public float getActualMaximumMagnification(){
 	return dMM;
+    }
+    
+    /** To be notified about updates to MM due to speed-coupling. */
+    public void setTemporalParamListener(TemporalParamListener tpl){
+        this.tpl = tpl;
+    }
+
+    public TemporalParamListener getTemporalParamListener(){
+        return this.tpl;
     }
 
 }
