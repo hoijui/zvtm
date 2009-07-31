@@ -232,8 +232,8 @@ public class VImage extends ClosedShape implements RectangularShape {
     /** Set bitmap image to be displayed. */
     public void setImage(Image i){
 	image=i;
-	vw=Math.round(image.getWidth(null)/2.0);
-	vh=Math.round(image.getHeight(null)/2.0);
+	vw = Math.round(image.getWidth(null) * scaleFactor / 2.0);
+	vh = Math.round(image.getHeight(null) * scaleFactor / 2.0);
 	ar=(float)vw/(float)vh;
 	computeSize();
 	VirtualSpaceManager.INSTANCE.repaintNow();
