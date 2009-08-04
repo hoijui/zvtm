@@ -48,6 +48,9 @@ class SlaveOptions{
 
 	@Option(name = "-d", aliases = {"--device-name"}, usage = "use chosen device (fullscreen only)")
 	String device = "";
+
+	@Option(name = "-jmx", usage = "enable JMX monitoring")
+	boolean jmx = false;
 }
 
 /**
@@ -62,7 +65,7 @@ public class AJTestSlave {
 
 		vsm.setDebug(true);
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
-		SlaveUpdater updater = new SlaveUpdater(vs);
+		SlaveUpdater updater = new SlaveUpdater(vs, options.jmx);
 		Camera c = vsm.addCamera(vs);
 		vs.getCameraGroup().offerCamera(c, options.blockNumber,
 			options.numRows, options.numCols, 

@@ -6,13 +6,19 @@
  */ 
 package fr.inria.zvtm.clustering;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import java.lang.management.ManagementFactory;
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 import org.jgroups.ReceiverAdapter;
 import org.jgroups.View;
+import org.jgroups.jmx.JmxConfigurator;
 
 import fr.inria.zvtm.clustering.ObjId;
 import fr.inria.zvtm.clustering.ObjIdFactory;
@@ -91,9 +97,10 @@ public class SlaveUpdater {
 
 	void removeAllGlyphs(){
 		virtualSpace.removeAllGlyphs();
+		glyphMap.clear();
 	}
 
-	public SlaveUpdater(VirtualSpace vs) throws Exception {
+	public SlaveUpdater(VirtualSpace vs, boolean jmx) throws Exception {
 		this.virtualSpace = vs;
 
 		//slaves should not send network messages, otherwise
@@ -102,6 +109,12 @@ public class SlaveUpdater {
 		
 		//use slave virtual space name to search for master group
 		channel.connect(vs.getName());
+
+		if(jmx){
+			MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+			JmxConfigurator.registerChannel(channel, server, "JGroupsChannel=" + channel.getChannelName(), "wild" , true);
+		}
+
 		channel.setReceiver(new ReceiverAdapter(){
 			@Override public void viewAccepted(View newView){
 				System.out.println("** view: " + newView);
@@ -125,5 +138,10 @@ public class SlaveUpdater {
 			}
 		});
 	}
+
+	public SlaveUpdater(VirtualSpace vs) throws Exception {
+		this(vs, false);
+	}
+
 }
 
