@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 
@@ -70,6 +71,7 @@ public aspect VirtualSpaceReplication {
 		JChannel retval = channels.get(vsName);
 		if(null == retval){
 			retval = new JChannel(new java.io.File("chan_conf.xml"));
+			retval.setOpt(Channel.LOCAL, Boolean.FALSE);
 			retval.connect(vsName);
 			channels.put(vsName, retval);
 		}
