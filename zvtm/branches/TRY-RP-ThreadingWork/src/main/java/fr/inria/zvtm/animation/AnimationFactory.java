@@ -721,24 +721,20 @@ public class AnimationFactory {
 				       }
 
 				       //shrink buffer size
-				       if(endMag < startMag){
-					   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getOuterRadius()));
-				       }
+					   if(endMag < startMag){
+						   lens.setMagRasterDimensions(Math.round(2*endMag*lens.getOuterRadius()));
+					   }
 				   }
 
-				   @Override
-				   public void timingEvent(float fraction, 
-							   Object subject, Animation.Dimension dim){
-				       //synchronization is a less-than-ideal workaround
-				       //(should be done by the Lens itself if necessary)
-				       synchronized(lens){
-					   lens.setMaximumMagnification(startMag + 
-									fraction * (endMag - startMag), false);
-				       }
-				   }
-			       },
-			       interpolator);
-    }
+	@Override
+		public void timingEvent(float fraction, 
+				Object subject, Animation.Dimension dim){
+			lens.setMaximumMagnification(startMag + 
+					fraction * (endMag - startMag), false);
+		}
+		},
+				   interpolator);
+	}
 
     /**
      * Creates and returns a lens magnification and radii animation

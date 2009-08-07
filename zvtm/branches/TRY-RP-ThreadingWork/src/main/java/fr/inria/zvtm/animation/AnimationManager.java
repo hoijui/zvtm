@@ -15,6 +15,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Timer;
+
 import net.jcip.annotations.*;
 
 import org.jdesktop.animation.timing.Animator;
@@ -457,22 +462,29 @@ class TickSource extends TimingSource {
     }
 }
 
-@ThreadSafe
-class TickThread extends Thread{
-    private volatile boolean stopped = false;
-    private AtomicInteger resolution; //milliseconds
+class TickThread {
+	private Timer edtTimer;
 
     //receivers is traversed a *lot* more often than it is mutated
     private final List<TickSource> receivers = new CopyOnWriteArrayList<TickSource>();
 
     public TickThread(String name){
-	super(name);
-
-	resolution = new AtomicInteger(25);
+		ActionListener taskPerformer = new ActionListener(){
+			public void actionPerformed(ActionEvent evt){
+				for(TickSource ts: receivers){
+					ts.tick();
+				}
+			}
+		};
+		edtTimer = new Timer(19, taskPerformer);
     }
 
+	public void start(){
+		edtTimer.start();
+	}
+
     public void setResolution(int res){
-	resolution.set(res);
+		edtTimer.setDelay(res);
     }
 
     public void addSubscriber(TickSource ts){
@@ -484,32 +496,7 @@ class TickThread extends Thread{
     }
 	
     public void requestStop(){
-	stopped = true;
-    }
-
-    public void run(){
-	long startEventProcessing;
-	long endEventProcessing;
-	long NS_IN_MS = 1000000; //nanoseconds in a millisecond
-	while(!stopped){
-	    try{
-		startEventProcessing = System.nanoTime();
-
-		for(TickSource ts: receivers){
-		    ts.tick();
-		}
-
-		endEventProcessing = System.nanoTime();
-
-		sleep(Math.max(0,
-			       resolution.get() - (endEventProcessing - startEventProcessing)/NS_IN_MS));
-	    } catch(InterruptedException ex){
-		//Swallowing this exception should be okay
-		//because TickThread is only ever used by
-		//AnimationManager, which will not require its
-		//interruption (method stop provides this).
-	    }
-	}
+		edtTimer.stop();
     }
 }
 
