@@ -123,8 +123,8 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         <configuration>
           <archive>
             <manifest>
-              <mainClass>net.claribole.zvtm.demo.PDFViewer</mainClass>
-              <packageName>net.claribole.zvtm.demo</packageName>
+              <mainClass>fr.inria.zvtm.demo.PDFViewer</mainClass>
+              <packageName>fr.inria.zvtm.demo</packageName>
               <addClasspath>true</addClasspath>
             </manifest>
             <manifestEntries>
