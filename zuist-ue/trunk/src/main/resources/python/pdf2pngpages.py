@@ -5,7 +5,7 @@
 import os, sys
 from CoreGraphics import CGColorSpaceCreateWithName, kCGColorSpaceGenericRGB,\
     CGDataProviderCreateWithFilename, CGPDFDocumentCreateWithProvider,\
-    CGBitmapContextCreateWithColor, kCGImageFormatPNG
+    CGBitmapContextCreateWithColor, kCGImageFormatPNG, kCGPDFMediaBox
 
 USAGE_MSG = """
 Usage: pdf2pngpages.py <src_dir> <dst_dir> [trace_level]
@@ -70,7 +70,8 @@ def processDocument(parent_dir_src, parent_dir_dst, document_name):
 
 def writePage(pdf_document, page_number, scaleFactor, document_dir_basename, parent_dir_dst, res_dir_name):
     # for each page, create a bitmap
-    page_rect = pdf_document.getMediaBox(page_number)
+    page_rect = pdf_document.getPage(page_number).getBoxRect(kCGPDFMediaBox)
+    # above replaced the following deprecated instruction: pdf_document.getMediaBox(page_number)
     page_width = int(page_rect.getWidth() * scaleFactor)
     page_height = int(page_rect.getHeight() * scaleFactor)
     bitmap = CGBitmapContextCreateWithColor(page_width, page_height,\
