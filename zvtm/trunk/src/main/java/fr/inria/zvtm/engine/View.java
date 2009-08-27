@@ -118,7 +118,7 @@ public abstract class View {
     protected String name;
 
     /**triggers the mouseMoved method in ViewEventHandler when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
-    boolean notifyMouseMoved=false;
+    boolean notifyMouseMoved = true;
 
     /**hooks for Java2D painting in ZVTM views (BACKGROUND, FOREGROUND, AFTER_DISTORTION, AFTER_PORTALS)*/
     Java2DPainter[] painters = new Java2DPainter[4];
@@ -168,12 +168,16 @@ public abstract class View {
 	panel.setEventHandler(eh, layer);
     }
 
-    /**sets whether the mouseMoved method in ViewEventHandler is triggered when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
+    /** Sets whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
+     * Set to true by default. Applications that do not care about this callback can disable notification
+     * about these events to avoid unnecessary callbacks (an event each sent each time the cursor moves).
+     */
     public void setNotifyMouseMoved(boolean b){
-	notifyMouseMoved=b;
+	    notifyMouseMoved=b;
     }
 
-    /**get state of notifyMouseMoved for this view*/
+    /** Tells whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
+     * Set to true by default.*/
     public boolean getNotifyMouseMoved(){return notifyMouseMoved;}
 
     /**set status bar text*/
