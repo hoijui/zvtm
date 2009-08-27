@@ -26,7 +26,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.glyphs.ZPDFPage;
+import fr.inria.zvtm.glyphs.ZPDFPageImg;
 
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
@@ -70,7 +70,7 @@ public class PDFViewer {
 			PDFFile pdfFile = new PDFFile(buf);
 			for (int i=0;i<pdfFile.getNumPages();i++){
 				try {
-					vs.addGlyph(new ZPDFPage(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1));			
+					vs.addGlyph(new ZPDFPageImg(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1));			
 				}
 				catch ( Exception e) {
 					e.printStackTrace();
