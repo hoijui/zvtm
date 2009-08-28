@@ -3,4 +3,15 @@
 \section{Displaying PDF documents}
 \label{sec:pdf}
 
-Documentation for module zvtm-pdf.
+PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. This module has depends on Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}; pdf-renderer is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
+
+There are two rendering techniques for a PDF page. Either it is rendered once in an offscreen \cd{BufferedImage} that then gets painted to the screen; or it is rendered each time ZVTM paints the glyph, directly in the corresponding Graphics2D.
+
+\subsection{Offscreen Rendering}
+
+This is the preferred method. Rendering of the PDF page only happens once in the offscreen \cd{BufferedImage}. It is this image that gets painted in the rendering loop. Instantiate the PDF page as a \cd{ZPDFPageImg} glyph.
+
+\subsection{Direct rendering to ZVTM's Graphics2D}
+
+This method is experimental. Rendering of the PDF page happens each time the glyph is rendered on screen. Instantiate the PDF page as a \cd{ZPDFPageG2D} glyph.
+
