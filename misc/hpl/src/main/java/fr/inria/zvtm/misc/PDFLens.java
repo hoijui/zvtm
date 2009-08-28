@@ -2,9 +2,13 @@
 
 package fr.inria.zvtm.misc;
 
+import java.awt.Toolkit;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
 
 import java.io.File;
@@ -16,21 +20,33 @@ import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.ZPDFPageImg;
 import fr.inria.zvtm.glyphs.ZPDFPageG2D;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.lens.*;
 
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
-public class PDFLens {
+public class PDFLens implements ComponentListener {
 	
-	int VIEW_W = 1024;
-	int VIEW_H = 768;
+    /* screen dimensions, actual dimensions of windows */
+    static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
+    static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
+    static int VIEW_MAX_W = 1024;  // 1400
+    static int VIEW_MAX_H = 768;   // 1050
+    int VIEW_W, VIEW_H;
+    int VIEW_X, VIEW_Y;
+    /* dimensions of zoomable panel */
+    int panelWidth, panelHeight;
 	
 	static final int NAV_ANIM_DURATION = 300;
 	
@@ -49,15 +65,45 @@ public class PDFLens {
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
 		load(new File(pdfFilePath), df);
+		
+		
+		vs.addGlyph(new VRectangle(0, 0, 0, 1, 1, Color.RED));
+		
 	}
+	
+	void windowLayout(){
+        if (Utilities.osIsWindows()){
+            VIEW_X = VIEW_Y = 0;
+        }
+        else if (Utilities.osIsMacOS()){
+            VIEW_X = 80;
+            SCREEN_WIDTH -= 80;
+        }
+        VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+        VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+    
+    /*ComponentListener*/
+    public void componentHidden(ComponentEvent e){}
+    public void componentMoved(ComponentEvent e){}
+    public void componentResized(ComponentEvent e){updatePanelSize();}
+    public void componentShown(ComponentEvent e){}
+    
+    void updatePanelSize(){
+        Dimension d = pdfView.getPanel().getSize();
+        panelWidth = d.width;
+        panelHeight = d.height;
+    }
 
 	public void initGUI(){
+	    this.windowLayout();
 		vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
 		mCamera = VirtualSpaceManager.INSTANCE.addCamera(spaceName);
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 		pdfView.setBackgroundColor(Color.WHITE);
+		pdfView.getPanel().addComponentListener(this);
 		eh = new PDFLensEventHandler(this);
 		pdfView.setEventHandler(eh);
 		pdfView.setAntialiasing(true);
@@ -91,6 +137,122 @@ public class PDFLens {
 			e.printStackTrace();
 		}
 	}
+	
+	/* -------------- Lenses ------------------- */
+		
+    /* misc. lens settings */
+    FixedSizeLens lens;
+    TemporalLens tLens;
+    static int LENS_R1 = 100;
+    static int LENS_R2 = 50;
+    static final int WHEEL_ANIM_TIME = 50;
+    static final int LENS_ANIM_TIME = 300;
+    static double DEFAULT_MAG_FACTOR = 8.0;
+    static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
+    static double INV_MAG_FACTOR = 1/MAG_FACTOR;
+    /* LENS MAGNIFICATION */
+    static float WHEEL_MM_STEP = 1.0f;
+    static final float MAX_MAG_FACTOR = 20.0f;
+        
+    /* lens distance and drop-off functions */
+    static final short L2_Gaussian = 0;
+    static final short L2_SCB = 1;
+    short visual_behavior = L2_Gaussian;
+    
+    static final short MP_NONE = 0;
+    static final short MP_CONTINUOUS = 1;
+    static final short MP_RING = 2;
+    static final short MP_SHIFT = 3;
+    short motor_precision = MP_CONTINUOUS;
+	
+	void toggleLensType(){}
+	
+	void goFocusControl(boolean b){
+	    lens.setFocusControlled(b, FixedSizeLens.CONSTANT);
+	}
+
+    void moveLens(int x, int y, long absTime){
+        if (tLens != null){
+            tLens.setAbsolutePosition(x, y, absTime);
+        }
+        else {
+            lens.setAbsolutePosition(x, y);
+        }
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+    
+    void relativeMoveLens(int x, int y, long absTime){
+		int lX = lens.lx + panelWidth / 2;
+		int lY = lens.ly + panelHeight / 2;
+
+		if (lX == x && lY == y)
+			return;
+
+		// hack (disabled if accel = 1)
+		int accel = 1;
+		int dx = x - lX;
+		int dy = y - lY;
+		if (dx >= 4)
+		    dx = dx*accel;
+		if (dy >= 4)
+		    dy = dy*accel;
+
+		lens.moveLensBy(dx, dy, absTime);
+
+		VirtualSpaceManager.INSTANCE.repaintNow();
+	}
+	
+
+    void activateLens(int x, int y){
+        if (lens != null){return;}
+        lens = (FixedSizeLens)pdfView.setLens(getLensDefinition(x, y));
+        lens.setBufferThreshold(1.5f);
+        
+        /* motor precison: continuous */
+        lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
+        motor_precision = MP_CONTINUOUS;
+        
+        /* motor precison: key */
+        //motor_precision = MP_SHIFT;
+        
+        
+    }
+
+    void setMagFactor(double m){
+        MAG_FACTOR = m;
+        INV_MAG_FACTOR = 1 / MAG_FACTOR;
+    }
+
+    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
+        synchronized (lens){
+            double nmf = MAG_FACTOR + magOffset;
+            if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
+                setMagFactor(nmf);
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
+                    new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+            }
+        }
+    }
+
+    FixedSizeLens getLensDefinition(int x, int y){
+        FixedSizeLens res = null;
+        switch (visual_behavior){
+            case L2_Gaussian:{
+                res = new FSGaussianLens((float)MAG_FACTOR, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+                tLens = null;
+                break;
+            }
+            case L2_SCB:{
+                tLens = new SCBLens((float)MAG_FACTOR, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+                ((SCBLens)tLens).setBoundaryColor(Color.RED);
+                ((SCBLens)tLens).setObservedRegionColor(Color.RED);
+                res = (FixedSizeLens)tLens;
+                break;
+            }
+        }
+        return res;
+    }
 
 	public static void main(String[] args){
 		System.out.println("-----------------");
@@ -117,6 +279,11 @@ class PDFLensEventHandler implements ViewEventHandler {
 	PDFLens application;
 
 	long lastJPX,lastJPY;
+	int cjpx,cjpy;
+
+    boolean SHIFT_PRESSED = false;
+
+    boolean cursorNearBorder = false;
 
 	PDFLensEventHandler(PDFLens appli){
 		application = appli;
@@ -160,6 +327,7 @@ class PDFLensEventHandler implements ViewEventHandler {
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    application.activateLens(jpx, jpy);
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -167,7 +335,38 @@ class PDFLensEventHandler implements ViewEventHandler {
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+	    if ((jpx-application.LENS_R1/2) < 0){
+    	    cjpx = application.LENS_R1/2;
+    	}
+    	else if ((jpx+application.LENS_R1/2) > application.panelWidth){
+    	    cjpx = application.panelWidth - application.LENS_R1/2;
+    	}
+    	else {
+    	    cjpx = jpx;
+    	}
+    	if ((jpy-application.LENS_R1/2) < 0){
+    	    cjpy = application.LENS_R1/2;
+    	}
+    	else if ((jpy+application.LENS_R1/2) > application.panelHeight){
+    	    cjpy = application.panelHeight - application.LENS_R1/2;
+    	}
+    	else {
+    	    cjpy = jpy;
+    	}
+    	if (application.lens != null){
+    	    if (application.motor_precision == PDFLens.MP_CONTINUOUS ||
+    	        application.motor_precision == PDFLens.MP_SHIFT && this.SHIFT_PRESSED){
+    	        application.relativeMoveLens(jpx, jpy, e.getWhen());
+    	    }
+    	    else if (application.motor_precision == PDFLens.MP_RING){
+    	    }
+    	    else {
+        	    application.moveLens(jpx, jpy, e.getWhen());
+    	    }
+    	}
+	    
+	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (buttonNumber == 1){
@@ -209,9 +408,22 @@ class PDFLensEventHandler implements ViewEventHandler {
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+	    if (code == KeyEvent.VK_L){
+	        application.toggleLensType();
+	    }
+	    else if (code == KeyEvent.VK_SHIFT){
+	        SHIFT_PRESSED = true;
+	        if (application.motor_precision == application.MP_SHIFT){application.goFocusControl(true);}
+	    }
+	}
 
-	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
+	    if (code == KeyEvent.VK_SHIFT){
+	        SHIFT_PRESSED = false;
+	        if (application.motor_precision == application.MP_SHIFT){application.goFocusControl(false);}
+	    }
+	}
 
 	public void viewActivated(View v){}
 
