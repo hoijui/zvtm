@@ -371,13 +371,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if (drawBorder==1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                        }
-                    }
-                    else if (drawBorder==2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                     }
@@ -394,13 +388,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if (drawBorder==1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                        }
-                    }
-                    else if (drawBorder==2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                     }
@@ -411,13 +399,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                     // translucent
                     g.setComposite(alphaC);
                     g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                    if (drawBorder == 1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                        }
-                    }
-                    else if (drawBorder == 2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                     }
@@ -426,13 +408,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                 else {
                     // opaque
                     g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                    if (drawBorder == 1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                        }
-                    }
-                    else if (drawBorder == 2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                     }
@@ -466,13 +442,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if (drawBorder==1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }
-                    }
-                    else if (drawBorder==2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                     }
@@ -489,13 +459,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if (drawBorder==1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }
-                    }
-                    else if (drawBorder==2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                     }
@@ -506,13 +470,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                     // translucent
                     g.setComposite(alphaC);
                     g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-                    if (drawBorder == 1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }
-                    }
-                    else if (drawBorder == 2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                     }
@@ -521,13 +479,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                 else {
                     // opaque
                     g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-                    if (drawBorder == 1){
-                        if (pc[i].prevMouseIn){
-                            g.setColor(borderColor);
-                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }
-                    }
-                    else if (drawBorder == 2){
+                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                         g.setColor(borderColor);
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                     }
