@@ -3,7 +3,7 @@
  *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ZPDFPage.java 2112 2009-06-23 15:04:47Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zvtm.glyphs;
