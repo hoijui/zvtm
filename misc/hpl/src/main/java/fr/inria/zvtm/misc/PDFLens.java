@@ -5,11 +5,13 @@ package fr.inria.zvtm.misc;
 import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.MouseWheelEvent;
+import javax.swing.ImageIcon;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -27,6 +29,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.ZPDFPageImg;
 import fr.inria.zvtm.glyphs.ZPDFPageG2D;
@@ -107,31 +110,43 @@ public class PDFLens implements ComponentListener {
 		eh = new PDFLensEventHandler(this);
 		pdfView.setEventHandler(eh);
 		pdfView.setAntialiasing(true);
-		mCamera.setAltitude(0);
+		mCamera.setAltitude(1100);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	void load(File f, float detailFactor){
 		try {
-			RandomAccessFile raf = new RandomAccessFile(f, "r");
-			FileChannel channel = raf.getChannel();
-			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-			PDFFile pdfFile = new PDFFile(buf);
-			int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
-			for (int i=0;i<pdfFile.getNumPages();i++){
-				try {
-				    if (rendering_technique == DIRECT_G2D_RENDERING){
-				        vs.addGlyph(new ZPDFPageG2D(i*Math.round(page_width*1.1f), i*Math.round(page_width*1.1f), 0, pdfFile.getPage(i+1), detailFactor));
-				    }
-				    else {
-				        // OFFSCREEN_IMAGE_RENDERING
-				        vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1));
-				    }
-				}
-				catch ( Exception e) {
-					e.printStackTrace();
-				}
-			}
+		    System.out.println("Loading file...");
+		    if (f.getName().toLowerCase().endsWith(".pdf")){
+    			RandomAccessFile raf = new RandomAccessFile(f, "r");
+    			FileChannel channel = raf.getChannel();
+    			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+    			PDFFile pdfFile = new PDFFile(buf);
+    			int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
+    			System.out.println("page width "+page_width);
+    			for (int i=0;i<pdfFile.getNumPages();i++){
+    				try {
+    				    if (rendering_technique == DIRECT_G2D_RENDERING){
+    				        vs.addGlyph(new ZPDFPageG2D(i*Math.round(page_width*1.1f), i*Math.round(page_width*1.1f), 0, pdfFile.getPage(i+1), detailFactor));
+    				    }
+    				    else {
+    				        // OFFSCREEN_IMAGE_RENDERING
+                			ZPDFPageImg p = new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1);
+    				        p.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    				        vs.addGlyph(p);
+    				    }
+    				}
+    				catch ( Exception e) {
+    					e.printStackTrace();
+    				}
+    			}		        
+		    }
+		    else {
+		        VImage im = new VImage(0, 0, 0, (new ImageIcon(f.getAbsolutePath())).getImage());
+		        im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		        vs.addGlyph(im);
+		    }
+			System.out.println("done");
 		}
 		catch ( Exception e) { 
 			e.printStackTrace();
@@ -147,7 +162,7 @@ public class PDFLens implements ComponentListener {
     static int LENS_R2 = 50;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
-    static double DEFAULT_MAG_FACTOR = 8.0;
+    static double DEFAULT_MAG_FACTOR = 12.0;
     static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
     /* LENS MAGNIFICATION */
@@ -209,11 +224,11 @@ public class PDFLens implements ComponentListener {
         lens.setBufferThreshold(1.5f);
         
         /* motor precison: continuous */
-        lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
-        motor_precision = MP_CONTINUOUS;
+        //lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
+        //motor_precision = MP_CONTINUOUS;
         
         /* motor precison: key */
-        //motor_precision = MP_SHIFT;
+        motor_precision = MP_SHIFT;
         
         
     }
@@ -292,13 +307,19 @@ class PDFLensEventHandler implements ViewEventHandler {
 	boolean dragging = false;
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		lastJPX=jpx;
-		lastJPY=jpy;
-		v.setDrawDrag(true);
-		VirtualSpaceManager.INSTANCE.activeView.mouse.setSensitivity(false);
-	}
+	    if (mod == CTRL_MOD){
+	        VirtualSpaceManager.INSTANCE.stickToMouse(v.lastGlyphEntered());
+	    }
+        else {
+            lastJPX=jpx;
+            lastJPY=jpy;
+            v.setDrawDrag(true);
+            VirtualSpaceManager.INSTANCE.activeView.mouse.setSensitivity(false);	        
+        }
+    }
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    VirtualSpaceManager.INSTANCE.unstickFromMouse();
 		VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
         VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
         VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
