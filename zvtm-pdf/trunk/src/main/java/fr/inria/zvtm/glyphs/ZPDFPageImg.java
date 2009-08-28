@@ -10,6 +10,7 @@ package fr.inria.zvtm.glyphs;
 
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
@@ -118,6 +119,23 @@ public class ZPDFPageImg extends ZPDFPage {
 		orient = 0;		
 		scaleFactor = (float)scale;		
 	}
+	
+	/** For internal use. Made public for easier outside package subclassing. */
+    public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+    
+    /** Specify how image should be interpolated when drawn at a scale different from its original scale.
+        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        */
+    public void setInterpolationMethod(Object im){
+        interpolationMethod = im;
+    }
+    
+    /** Get information about how image should be interpolated when drawn at a scale different from its original scale.
+        *@return one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        */
+    public Object getInterpolationMethod(){
+        return interpolationMethod;
+    }
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].cw>1) && (pc[i].ch>1)){
@@ -133,8 +151,15 @@ public class ZPDFPageImg extends ZPDFPage {
 				// translate
 				at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch);
 				g.setTransform(at);
-				// rescale and draw
-				g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+				// rescale and draw				
+				if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                }
 				g.setTransform(stdT);
                 if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
                     g.setColor(borderColor);
@@ -142,7 +167,14 @@ public class ZPDFPageImg extends ZPDFPage {
                 }
             }
 			else {
-				g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
+			    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
+                }
 				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
 					g.setColor(borderColor);
 					g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
@@ -165,7 +197,14 @@ public class ZPDFPageImg extends ZPDFPage {
 			}
 			if (trueCoef!=1.0f){
 				g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
-				g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
+				if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                    g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+                    g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
+                }
 				g.setTransform(stdT);
 				if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
 					g.setColor(borderColor);
@@ -173,7 +212,14 @@ public class ZPDFPageImg extends ZPDFPage {
 				}
 			}
 			else {
-				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+			    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+    				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                    g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+                else {
+    				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                }
 				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
 					g.setColor(borderColor);
 					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
