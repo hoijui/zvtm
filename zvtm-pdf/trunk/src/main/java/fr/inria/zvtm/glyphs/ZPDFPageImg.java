@@ -56,8 +56,8 @@ public class ZPDFPageImg extends ZPDFPage {
 			null,   // null for the ImageObserver
 			true,   // fill background with white
 			true);  // block until drawing is done
-		vw = Math.round(pageImage.getWidth(null)/2.0);
-		vh = Math.round(pageImage.getHeight(null)/2.0);
+		vw = Math.round(rect.width/2.0);
+		vh = Math.round(rect.height/2.0);
 		if (vw==0 && vh==0){ar = 1.0f;}
 		else {ar = (float)vw/(float)vh;}
 		computeSize();
@@ -74,15 +74,15 @@ public class ZPDFPageImg extends ZPDFPage {
 		vy = y;
 		vz = z;
 		// get the width and height for the doc at the default zoom 
-		Rectangle rect = new Rectangle(0, 0, (int)(detailFactor*page.getBBox().getWidth()), (int)(detailFactor*page.getBBox().getHeight()));
+		Rectangle rect = new Rectangle(0, 0, (int)(page.getBBox().getWidth()), (int)(page.getBBox().getHeight()));
 		// generate the image
 		pageImage = page.getImage((int)(detailFactor*rect.width), (int)(detailFactor*rect.height),
 		 	rect,   // clip rect
 			null,   // null for the ImageObserver
 			true,   // fill background with white
 			true);  // block until drawing is done
-		vw = Math.round(pageImage.getWidth(null)/2.0);
-		vh = Math.round(pageImage.getHeight(null)/2.0);
+		vw = Math.round(detailFactor*rect.width/2.0);
+		vh = Math.round(detailFactor*rect.height/2.0);
 		if (vw==0 && vh==0){ar = 1.0f;}
 		else {ar = (float)vw/(float)vh;}
 		computeSize();
@@ -110,8 +110,8 @@ public class ZPDFPageImg extends ZPDFPage {
 			null,   // null for the ImageObserver
 			true,   // fill background with white
 			true);  // block until drawing is done
-		vw = Math.round(pageImage.getWidth(null)/2.0);
-		vh = Math.round(pageImage.getHeight(null)/2.0);
+		vw = Math.round(rect.width/2.0);
+		vh = Math.round(rect.height/2.0);
 		if (vw==0 && vh==0){ar = 1.0f;}
 		else {ar = (float)vw/(float)vh;}
 		computeSize();
@@ -131,31 +131,19 @@ public class ZPDFPageImg extends ZPDFPage {
 			if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
 			if (trueCoef!=1.0f){
 				// translate
-				at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
+				at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch);
 				g.setTransform(at);
 				// rescale and draw
 				g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
 				g.setTransform(stdT);
-				if (drawBorder==1){
-					if (pc[i].prevMouseIn){
-						g.setColor(borderColor);
-						g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-					}
-				}
-				else if (drawBorder==2){
-					g.setColor(borderColor);
-					g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-				}
-			}
+                if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    g.setColor(borderColor);
+                    g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                }
+            }
 			else {
-				g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-				if (drawBorder == 1){
-					if (pc[i].prevMouseIn){
-						g.setColor(borderColor);
-						g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-					}
-				}
-				else if (drawBorder == 2){
+				g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
+				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
 					g.setColor(borderColor);
 					g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
 				}
@@ -179,26 +167,14 @@ public class ZPDFPageImg extends ZPDFPage {
 				g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
 				g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
 				g.setTransform(stdT);
-				if (drawBorder==1){
-					if (pc[i].prevMouseIn){
-						g.setColor(borderColor);
-						g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-					}
-				}
-				else if (drawBorder==2){
+				if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
 					g.setColor(borderColor);
 					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
 				}
 			}
 			else {
 				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-				if (drawBorder == 1){
-					if (pc[i].prevMouseIn){
-						g.setColor(borderColor);
-						g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-					}
-				}
-				else if (drawBorder == 2){
+				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
 					g.setColor(borderColor);
 					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
 				}

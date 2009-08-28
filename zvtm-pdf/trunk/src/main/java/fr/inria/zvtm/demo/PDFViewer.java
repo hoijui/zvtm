@@ -42,10 +42,10 @@ public class PDFViewer {
 
 	View pdfView;
 
-	PDFViewer(String pdfFilePath){
+	PDFViewer(String pdfFilePath, float df){
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
-		load(new File(pdfFilePath));
+		load(new File(pdfFilePath), df);
 	}
 
 	public void initGUI(){
@@ -62,15 +62,16 @@ public class PDFViewer {
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
-	void load(File f){
+	void load(File f, float detailFactor){
 		try {
 			RandomAccessFile raf = new RandomAccessFile(f, "r");
 			FileChannel channel = raf.getChannel();
 			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
 			PDFFile pdfFile = new PDFFile(buf);
+			int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
 			for (int i=0;i<pdfFile.getNumPages();i++){
 				try {
-					vs.addGlyph(new ZPDFPageImg(i*700, 0, 0, pdfFile.getPage(i+1), 1, 1));			
+					vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1));
 				}
 				catch ( Exception e) {
 					e.printStackTrace();
@@ -97,7 +98,7 @@ public class PDFViewer {
 		System.out.println("User name: "+System.getProperty("user.name"));
 		System.out.println("User home directory: "+System.getProperty("user.home"));
 		System.out.println("-----------------");
-		new PDFViewer((args.length > 0) ? args[0] : null);
+		new PDFViewer((args.length > 0) ? args[0] : null, (args.length > 1) ? Float.parseFloat(args[1]) : 1);
 	}
 
 }
