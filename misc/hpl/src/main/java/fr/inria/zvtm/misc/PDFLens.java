@@ -5,6 +5,8 @@ package fr.inria.zvtm.misc;
 import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -28,6 +30,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -38,7 +41,7 @@ import fr.inria.zvtm.lens.*;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
-public class PDFLens implements ComponentListener {
+public class PDFLens implements ComponentListener, Java2DPainter {
 	
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -63,14 +66,12 @@ public class PDFLens implements ComponentListener {
 
 	View pdfView;
 
-	PDFLens(String pdfFilePath, float df){
+	PDFLens(String pdfFilePath, float df, float mm){
+	    setMagFactor(mm);
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
 		load(new File(pdfFilePath), df);
-		
-		
 		vs.addGlyph(new VRectangle(0, 0, 0, 1, 1, Color.RED));
-		
 	}
 	
 	void windowLayout(){
@@ -106,6 +107,7 @@ public class PDFLens implements ComponentListener {
 		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		pdfView.getPanel().addComponentListener(this);
+		pdfView.setJava2DPainter(this, AFTER_LENSES);
 		eh = new PDFLensEventHandler(this);
 		pdfView.setEventHandler(eh);
 		pdfView.setAntialiasing(true);
@@ -134,73 +136,124 @@ public class PDFLens implements ComponentListener {
                     }
     			}		        
 		    }
+		    else if (f.getName().toLowerCase().endsWith(".png12")){
+		        /// 4 5 6
+                VImage im = new VImage(0, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map5/H/map5_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                im = new VImage(-2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map4/H/map4_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                im = new VImage(2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map6/H/map6_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                // 1 2 3
+                im = new VImage(0, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map2/H/map2_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                im = new VImage(-2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map1/H/map1_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                im = new VImage(2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map3/H/map3_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                // 7 8 9
+                im = new VImage(0, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map8/H/map8_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                im = new VImage(-2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map7/H/map7_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                im = new VImage(2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map9/H/map9_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                // A B C
+                im = new VImage(-4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapA/H/mapA_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                im = new VImage(-4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapB/H/mapB_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                im = new VImage(-4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapC/H/mapC_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+                // I J K
+                im = new VImage(4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapK/H/mapK_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                im = new VImage(4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapJ/H/mapJ_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+                
+                im = new VImage(4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapI/H/mapI_p1.png")).getImage(), 12.4);
+                vs.addGlyph(im);
+
+		    }
 		    else {
 		        /// 4 5 6
-                VImage im = new VImage(0, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map5/H/map5_p1.png")).getImage());
+                VImage im = new VImage(0, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map5/H/map5_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map4/H/map4_p1.png")).getImage());
+                im = new VImage(-2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map4/H/map4_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map6/H/map6_p1.png")).getImage());
+                im = new VImage(2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map6/H/map6_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
                 // 1 2 3
-                im = new VImage(0, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map2/H/map2_p1.png")).getImage());
+                im = new VImage(0, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map2/H/map2_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map1/H/map1_p1.png")).getImage());
+                im = new VImage(-2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map1/H/map1_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map3/H/map3_p1.png")).getImage());
+                im = new VImage(2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map3/H/map3_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
                 // 7 8 9
-                im = new VImage(0, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map8/H/map8_p1.png")).getImage());
+                im = new VImage(0, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map8/H/map8_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map7/H/map7_p1.png")).getImage());
+                im = new VImage(-2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map7/H/map7_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map9/H/map9_p1.png")).getImage());
+                im = new VImage(2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map9/H/map9_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
                 // A B C
-                im = new VImage(-4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapA/H/mapA_p1.png")).getImage());
+                im = new VImage(-4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapA/H/mapA_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(-4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapB/H/mapB_p1.png")).getImage());
+                im = new VImage(-4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapB/H/mapB_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(-4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapC/H/mapC_p1.png")).getImage());
+                im = new VImage(-4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapC/H/mapC_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
                 // I J K
-                im = new VImage(4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapK/H/mapK_p1.png")).getImage());
+                im = new VImage(4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapK/H/mapK_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapJ/H/mapJ_p1.png")).getImage());
+                im = new VImage(4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapJ/H/mapJ_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapI/H/mapI_p1.png")).getImage());
+                im = new VImage(4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapI/H/mapI_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
-
-
+		        
 		    }
 			System.out.println("done");
 		}
@@ -223,7 +276,7 @@ public class PDFLens implements ComponentListener {
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
-    static final float MAX_MAG_FACTOR = 20.0f;
+    static final float MAX_MAG_FACTOR = 12.0f;
         
     /* lens distance and drop-off functions */
     static final short L2_Gaussian = 0;
@@ -329,6 +382,19 @@ public class PDFLens implements ComponentListener {
         }
         return res;
     }
+    
+    static final AlphaComposite acO = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f);
+    static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .7f);
+    
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (lens == null){return;}
+        g2d.setColor(Color.BLACK);
+        g2d.setComposite(acST);
+        g2d.fillRect(0, 0, 50, 20);
+        g2d.setComposite(acO);
+        g2d.setColor(Color.WHITE);
+        g2d.drawString(String.valueOf(Math.round(MAG_FACTOR))+"x", 15, 15);
+    }
 
 	public static void main(String[] args){
 		System.out.println("-----------------");
@@ -345,7 +411,9 @@ public class PDFLens implements ComponentListener {
 		System.out.println("User name: "+System.getProperty("user.name"));
 		System.out.println("User home directory: "+System.getProperty("user.home"));
 		System.out.println("-----------------");
-		new PDFLens((args.length > 0) ? args[0] : null, (args.length > 1) ? Float.parseFloat(args[1]) : 1);
+		new PDFLens((args.length > 0) ? args[0] : null,
+		            (args.length > 1) ? Float.parseFloat(args[1]) : 1,
+		            (args.length > 2) ? Float.parseFloat(args[2]) : 12);
 	}
 
 }
