@@ -44,7 +44,7 @@ public class PDFLens implements ComponentListener {
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
     static int VIEW_MAX_W = 800;
-    static int VIEW_MAX_H = 500;
+    static int VIEW_MAX_H = 450;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -103,7 +103,7 @@ public class PDFLens implements ComponentListener {
 		mCamera = VirtualSpaceManager.INSTANCE.addCamera(spaceName);
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		pdfView.getPanel().addComponentListener(this);
 		eh = new PDFLensEventHandler(this);
@@ -279,6 +279,10 @@ public class PDFLens implements ComponentListener {
         lens = (FixedSizeLens)pdfView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
         
+        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+        
         /* motor precison: continuous */
         //lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
         //motor_precision = MP_CONTINUOUS;
@@ -292,9 +296,10 @@ public class PDFLens implements ComponentListener {
     void setMagFactor(double m){
         MAG_FACTOR = m;
         INV_MAG_FACTOR = 1 / MAG_FACTOR;
+        System.out.println(MAG_FACTOR);
     }
 
-    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
+    synchronized void magnifyFocus(double magOffset){
         synchronized (lens){
             double nmf = MAG_FACTOR + magOffset;
             if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
@@ -310,12 +315,12 @@ public class PDFLens implements ComponentListener {
         FixedSizeLens res = null;
         switch (visual_behavior){
             case L2_Gaussian:{
-                res = new FSGaussianLens((float)MAG_FACTOR, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+                res = new FSGaussianLens(1f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
                 tLens = null;
                 break;
             }
             case L2_SCB:{
-                tLens = new SCBLens((float)MAG_FACTOR, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+                tLens = new SCBLens(1f, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
                 ((SCBLens)tLens).setBoundaryColor(Color.RED);
                 ((SCBLens)tLens).setObservedRegionColor(Color.RED);
                 res = (FixedSizeLens)tLens;
@@ -464,17 +469,27 @@ class PDFLensEventHandler implements ViewEventHandler {
 	}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-		float a = (c.focal+Math.abs(c.altitude))/c.focal;
-		if (wheelDirection == WHEEL_UP){
-			c.altitudeOffset(-a*5);
-			VirtualSpaceManager.INSTANCE.repaintNow();
-		}
-		else {
-			//wheelDirection == WHEEL_DOWN
-			c.altitudeOffset(a*5);
-			VirtualSpaceManager.INSTANCE.repaintNow();
-		}
+	    if (application.lens != null){
+	        if (wheelDirection  == ViewEventHandler.WHEEL_UP){
+                application.magnifyFocus(PDFLens.WHEEL_MM_STEP);
+            }
+            else {
+                application.magnifyFocus(-PDFLens.WHEEL_MM_STEP);
+            }
+	    }
+	    else {
+    		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+    		float a = (c.focal+Math.abs(c.altitude))/c.focal;
+    		if (wheelDirection == WHEEL_UP){
+    			c.altitudeOffset(-a*5);
+    			VirtualSpaceManager.INSTANCE.repaintNow();
+    		}
+    		else {
+    			//wheelDirection == WHEEL_DOWN
+    			c.altitudeOffset(a*5);
+    			VirtualSpaceManager.INSTANCE.repaintNow();
+    		}	        
+	    }
 	}
 
 	public void enterGlyph(Glyph g){
