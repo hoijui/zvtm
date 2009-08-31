@@ -32,7 +32,6 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.ZPDFPageImg;
-import fr.inria.zvtm.glyphs.ZPDFPageG2D;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.lens.*;
 
@@ -44,8 +43,8 @@ public class PDFLens implements ComponentListener {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1024;  // 1400
-    static int VIEW_MAX_H = 768;   // 1050
+    static int VIEW_MAX_W = 800;
+    static int VIEW_MAX_H = 500;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -104,7 +103,7 @@ public class PDFLens implements ComponentListener {
 		mCamera = VirtualSpaceManager.INSTANCE.addCamera(spaceName);
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		pdfView.getPanel().addComponentListener(this);
 		eh = new PDFLensEventHandler(this);
@@ -125,26 +124,83 @@ public class PDFLens implements ComponentListener {
     			int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
     			System.out.println("page width "+page_width);
     			for (int i=0;i<pdfFile.getNumPages();i++){
-    				try {
-    				    if (rendering_technique == DIRECT_G2D_RENDERING){
-    				        vs.addGlyph(new ZPDFPageG2D(i*Math.round(page_width*1.1f), i*Math.round(page_width*1.1f), 0, pdfFile.getPage(i+1), detailFactor));
-    				    }
-    				    else {
-    				        // OFFSCREEN_IMAGE_RENDERING
-                			ZPDFPageImg p = new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1);
-    				        p.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    				        vs.addGlyph(p);
-    				    }
-    				}
-    				catch ( Exception e) {
-    					e.printStackTrace();
-    				}
+                    try {
+                        ZPDFPageImg p = new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1);
+                        p.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                        vs.addGlyph(p);
+                    }
+                    catch ( Exception e) {
+                        e.printStackTrace();
+                    }
     			}		        
 		    }
 		    else {
-		        VImage im = new VImage(0, 0, 0, (new ImageIcon(f.getAbsolutePath())).getImage());
-		        im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		        vs.addGlyph(im);
+		        /// 4 5 6
+                VImage im = new VImage(0, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map5/H/map5_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                im = new VImage(-2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map4/H/map4_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                im = new VImage(2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map6/H/map6_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                // 1 2 3
+                im = new VImage(0, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map2/H/map2_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                im = new VImage(-2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map1/H/map1_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                im = new VImage(2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map3/H/map3_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                // 7 8 9
+                im = new VImage(0, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map8/H/map8_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                im = new VImage(-2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map7/H/map7_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                im = new VImage(2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map9/H/map9_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                // A B C
+                im = new VImage(-4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapA/H/mapA_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                im = new VImage(-4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapB/H/mapB_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                im = new VImage(-4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapC/H/mapC_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+                // I J K
+                im = new VImage(4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapK/H/mapK_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                im = new VImage(4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapJ/H/mapJ_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+                
+                im = new VImage(4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapI/H/mapI_p1.png")).getImage());
+                im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                vs.addGlyph(im);
+
+
 		    }
 			System.out.println("done");
 		}
@@ -158,8 +214,8 @@ public class PDFLens implements ComponentListener {
     /* misc. lens settings */
     FixedSizeLens lens;
     TemporalLens tLens;
-    static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
+    static int LENS_R1 = 150;
+    static int LENS_R2 = 75;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 12.0;
