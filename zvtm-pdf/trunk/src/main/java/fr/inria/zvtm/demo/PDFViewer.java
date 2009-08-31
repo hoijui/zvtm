@@ -27,6 +27,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.ZPDFPageImg;
+import fr.inria.zvtm.glyphs.ZPDFPageG2D;
 
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
@@ -34,6 +35,10 @@ import com.sun.pdfview.PDFPage;
 public class PDFViewer {
 	
 	static final int NAV_ANIM_DURATION = 300;
+	
+	static final short DIRECT_G2D_RENDERING = 0;
+	static final short OFFSCREEN_IMAGE_RENDERING = 1;
+	short rendering_technique = OFFSCREEN_IMAGE_RENDERING;
 
 	VirtualSpace vs;
 	static final String spaceName = "pdfSpace";
@@ -71,7 +76,13 @@ public class PDFViewer {
 			int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
 			for (int i=0;i<pdfFile.getNumPages();i++){
 				try {
-					vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1));
+				    if (rendering_technique == DIRECT_G2D_RENDERING){
+				        vs.addGlyph(new ZPDFPageG2D(i*Math.round(page_width*1.1f), i*Math.round(page_width*1.1f), 0, pdfFile.getPage(i+1), detailFactor));
+				    }
+				    else {
+				        // OFFSCREEN_IMAGE_RENDERING
+				        vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1));
+				    }
 				}
 				catch ( Exception e) {
 					e.printStackTrace();

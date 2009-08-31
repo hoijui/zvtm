@@ -1,5 +1,4 @@
-/*   FILE: ZPDFPage.java
- *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+/*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
@@ -38,6 +37,9 @@ import com.sun.pdfview.PDFPage;
 public class ZPDFPageImg extends ZPDFPage {
 
 	Image pageImage;
+
+    /** For internal use. Made public for easier outside package subclassing. */
+    public float trueCoef = 1.0f;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;

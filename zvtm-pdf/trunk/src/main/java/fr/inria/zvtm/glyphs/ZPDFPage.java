@@ -1,5 +1,4 @@
-/*   FILE: ZPDFPage.java
- *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+/*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
@@ -52,9 +51,6 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
     /** For internal use. Made public for easier outside package subclassing. */
     public float scaleFactor = 1.0f;
     
-    /** For internal use. Made public for easier outside package subclassing. */
-    public float trueCoef = 1.0f;
-
     /** Indicates when a border is drawn around the image (read-only).
      * One of DRAW_BORDER_*
      */
