@@ -136,6 +136,10 @@ public abstract class FixedSizeLens extends Lens {
 	return LR2;
     }
 
+    public float getActualRingRadius(){
+	return LR2;
+    }
+
     /**Should not be called directly ; used to update buffer image caracteristics when lens outer radius changes*/
     public synchronized void setLensBuffer(ViewPanel p){
 	owningView = p;
