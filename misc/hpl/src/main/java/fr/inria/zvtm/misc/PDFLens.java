@@ -31,6 +31,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.Java2DPainter;
+import fr.inria.zvtm.engine.SpeedCoupling;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -66,12 +67,14 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 
 	View pdfView;
 
-	PDFLens(String pdfFilePath, float df, float mm){
+    PDFLens(String pdfFilePath, float df, float mm, short prec_tech, short vb){
 	    setMagFactor(mm);
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
 		load(new File(pdfFilePath), df);
 		vs.addGlyph(new VRectangle(0, 0, 0, 1, 1, Color.RED));
+		motor_precision = prec_tech;
+		visual_behavior = vb;
 	}
 	
 	void windowLayout(){
@@ -267,6 +270,8 @@ public class PDFLens implements ComponentListener, Java2DPainter {
     /* misc. lens settings */
     FixedSizeLens lens;
     TemporalLens tLens;
+    SpeedCoupling speedCoupling;
+
     static int LENS_R1 = 150;
     static int LENS_R2 = 75;
     static final int WHEEL_ANIM_TIME = 50;
@@ -343,7 +348,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 
     double getRadius()
     {
-	double Rad = (double)lens.getInnerRadius();
+	double Rad = (double)lens.getActualRingRadius();
 	// getActualRingRadius();  
 	return Rad;
     }
@@ -411,20 +416,30 @@ public class PDFLens implements ComponentListener, Java2DPainter {
         lens = (FixedSizeLens)pdfView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
         
-        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
-            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+	if (visual_behavior != L2_SCB)
+	{
+	    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
+														     new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
+	    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+	}
+	else
+	{
+	    
+	}
         
         /* motor precison: continuous */
-        //lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
-        //motor_precision = MP_CONTINUOUS;
-        
+	//motor_precision = MP_CONTINUOUS;
+	if (motor_precision == MP_CONTINUOUS)
+	{
+	    lens.setFocusControlled(true, FixedSizeLens.SPEED_DEPENDENT_LINEAR);
+        }
+
         /* motor precison: key */
-        motor_precision = MP_SHIFT;
+        //motor_precision = MP_SHIFT;
         
 
 	 /* motor precison: ring */
-        motor_precision = MP_RING;
+        //motor_precision = MP_RING;
         
     }
 
@@ -439,10 +454,17 @@ public class PDFLens implements ComponentListener, Java2DPainter {
             double nmf = MAG_FACTOR + magOffset;
             if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
                 setMagFactor(nmf);
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
-                    new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-            }
+		if (visual_behavior != L2_SCB)
+		{
+		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
+															     new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
+		    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+		}
+		else
+		{
+		    
+		}
+	    }
         }
     }
 
@@ -457,17 +479,55 @@ public class PDFLens implements ComponentListener, Java2DPainter {
                 break;
             }
             case L2_SCB:{
-                tLens = new SCBLens(1f, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                ((SCBLens)tLens).setBoundaryColor(Color.RED);
-                ((SCBLens)tLens).setObservedRegionColor(Color.RED);
+                SCBLens scbLens = new SCBLens((float)MAG_FACTOR, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
+                scbLens.setBoundaryColor(Color.RED);
+                scbLens.setObservedRegionColor(Color.RED);
+
+		speedCoupling = new SpeedCoupling();
+		// lag time (100ms bd) and reduc time (500ms bd)
+		speedCoupling.setTimeParameters(300, 400);
+		// min speed (200 p/s bd)
+		speedCoupling.setSpeedParameters(200);
+		// coef_inc = 0.05 bd , coef_dec = 0.0 bd
+		speedCoupling.setCoefParameters(0.05f, 0.01f);
+		if (motor_precision ==  MP_RING)
+		{
+		    speedCoupling.setCoefParameters(0.05f, 0.005f);
+		    // should put this func in TemporalLens ?
+		    scbLens.setDoRing(true);
+		    //scbLens.setDoDrawRing(true);
+		}
+		// should put this func in TemporalLens ?
+		scbLens.setSpeedCoupling(speedCoupling);
+
+		tLens = (TemporalLens)scbLens;
                 res = (FixedSizeLens)tLens;
                 break;
             }
 	    case L2_FLAT:{
-		tLens = new SCFGaussianLens(1f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-		((SCBLens)tLens).setBoundaryColor(Color.RED);
-                ((SCBLens)tLens).setObservedRegionColor(Color.RED);
+		SCFGaussianLens SCFLens = new SCFGaussianLens(1f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+
+		speedCoupling = new SpeedCoupling();
+		// lag time (100ms bd) and reduc time (500ms bd)
+		speedCoupling.setTimeParameters(200, 400);
+		// min speed (200 p/s bd)
+		speedCoupling.setSpeedParameters(200);
+		// coef_inc = 0.05 bd , coef_dec = 0.0 bd
+		speedCoupling.setCoefParameters(0.05f, 0.00f);
+		if (motor_precision ==  MP_RING)
+		{
+		    SCFLens.setSpeedBlendRadii(false, false);
+		    // should put this func in TemporalLens ?
+		    SCFLens.setDoRing(true);
+		    //SCFLens.setDoDrawRing(true);
+		}
+		// should put this func in TemporalLens ?
+		SCFLens.setSpeedCoupling(speedCoupling);
+
+		tLens = (TemporalLens)SCFLens;
 		res = (FixedSizeLens)tLens;
+		res.setOuterRadiusColor(Color.RED);
+		res.setInnerRadiusColor(Color.RED);
                 break;
 	    }
         }
@@ -502,9 +562,12 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		System.out.println("User name: "+System.getProperty("user.name"));
 		System.out.println("User home directory: "+System.getProperty("user.home"));
 		System.out.println("-----------------");
+		System.setProperty("sun.java2d.opengl","true");
 		new PDFLens((args.length > 0) ? args[0] : null,
 		            (args.length > 1) ? Float.parseFloat(args[1]) : 1,
-		            (args.length > 2) ? Float.parseFloat(args[2]) : 12);
+		            (args.length > 2) ? Float.parseFloat(args[2]) : 12,
+			    (args.length > 3) ? Short.parseShort(args[3]) : 0,
+			    (args.length > 4) ? Short.parseShort(args[4]) : 0);
 	}
 
 }
