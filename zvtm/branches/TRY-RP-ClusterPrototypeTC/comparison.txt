@@ -15,13 +15,25 @@ Prototypes characteristics
 
 Prototype 1 - Terracotta-based
 ------------------------------
+Terracotta is a technology that provides network-attached memory.
+It provides a virtual shared Java heap that any machine on the 
+network may use transparently. It has no API (instead, it instruments
+java bytecode to propagate changes to shared objects across the
+cluster). Object identity is maintained automatically.
+
+The idea of our first prototype implementation is to declare
+a VirtualSpace as a shared root and let "slave" applications
+(one slave for each screen or machine) scan repeatedly the scene 
+graph (ie the VirtualSpace) to draw a part of the scene. 
+
+Salient traits of the first prototype:
 
 * No/minimal modifications on the trunk (add rather than modify)
 * Minimal modifications to distribute an application
 * Minimal API changes (No API changes for glyphs except images
   which need passing metadata rather than data around - ie URLs
   or filenames).
-* Pull model (slaves refresh scene state from master), optimised
+* *Pull model* (slaves refresh scene state from master), optimised
   through Terracotta use (only changed parts of the scene are transmitted).
 * Adding a new Glyph subtype is easy (configuration + optional
   beanshell script in tc-config.xml)
@@ -33,11 +45,21 @@ Prototype 1 - Terracotta-based
 * Needs to work together with the zvtm threading model
   (rendering threads contending for glyph access)
 
-Prototype 2 - AspectJ and JGroups based
+Prototype 2 - JGroups and AspectJ based
 ---------------------------------------
+The second prototype is based around the idea of "manually"
+replicating the state of a VirtualSpace across every node
+of the cluster (i.e. mirror the master VirtualSpace in each slave 
+application). We use our own serialization device and network 
+transport, and we (library implementers) are responsible for
+maintaining object identity (replacing pointers with integers).
 
-* No/minimal modifications on the trunk (add rather than modify)
-* Push model (master sends changes to slaves)
+Salient traits of the second prototype:
+
+* No/minimal modifications on the trunk (add rather than modify -- this
+  could allow providing a separate clustering library, thus avoiding 
+  single-host users of ZVTM any extra dependency or penalty)
+* *Push model* (master sends changes to slaves)
 * Minimal API changes (No API changes for glyphs except images
   which need passing metadata rather than data around - ie URLs
   or filenames).
@@ -59,6 +81,8 @@ Prototype 2 - AspectJ and JGroups based
   (see AspectJ protocol stack).
 * Uses message passing: less affected by zvtm threading model
   (no distributed shared memory)
+* Requires distributed garbage collection (provided by Terracotta,
+  but assumes a well-behaved application)
 
 Decision Criteria
 =================
@@ -124,7 +148,7 @@ Static scene (camera movement only)
 
 * Prototype 1
 
-  - Method of measurement: stopwatch
+  - Method of measurement: stopwatch. 
     Measurements are approximate. 
   - 1000 glyphs  : 35 or 47 sec (master only, slave+master)
   - 10000 glyphs : OOME (first try - which process? DSO server? is that 
@@ -133,12 +157,12 @@ Static scene (camera movement only)
 
 * Prototype 2
 
-  - Method of measurement: stopwatch
+  - Method of measurement: stopwatch. 
     Measurements are approximate. Launch slave, wait until ready
     and launch master. Only master launch time is reported.
   - 1000 glyphs  : <2s
   - 10000 glyphs : <2.5s
-  - 100000 glyphs: appr. 45s (non-clustered version: 16 s)
+  - 100000 glyphs: approx. 45s (non-clustered version: 16s)
 
 Dynamic scene, multiple hosts
 -----------------------------
@@ -151,7 +175,6 @@ Dynamic scene, multiple hosts
   - 500 concurrent anims :
   - 2000 concurrent anims:
 
-
 A first attempt at a conclusion
 ===============================
 
@@ -163,12 +186,15 @@ A first attempt at a conclusion
   and should yield better performance
 
 * Depending on Terracotta is somewhat "heavier" than depending on 
-  AspectJ + JGroups
+  JGroups + AspectJ 
 
 * Distributed garbage collection may require careful tuning
   (although in the OOME problem I suspect that ZVTM n+1 dynarrays are the
   cause). Using a "share-nothing"  approach (ie prototype 2) lets 
   us avoid this issue.
 
-* The second prototype has met our initial performance targets
+* The second prototype has met our initial performance targets.
+  There are also no major development/deployment/use hurdles, so
+  modeling the final library after the second prototype looks like
+  our best option so far. 
 
