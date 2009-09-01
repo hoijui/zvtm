@@ -36,14 +36,16 @@ Salient traits of the first prototype:
 * *Pull model* (slaves refresh scene state from master), optimised
   through Terracotta use (only changed parts of the scene are transmitted).
 * Adding a new Glyph subtype is easy (configuration + optional
-  beanshell script in tc-config.xml)
+  Beanshell script in tc-config.xml)
 * *Code-by-exception* approach: Glyph objects (and others) will
   usually be properly distributed, changes are needed sometimes
-  and are performed by transient declarations and beanshell snippets
+  and are performed by transient declarations and Beanshell snippets
 * Networking is unicast (implementation detail, but cannot be
   changed)
 * Needs to work together with the zvtm threading model
   (rendering threads contending for glyph access)
+* Requires distributed garbage collection (provided by Terracotta,
+  but assumes a well-behaved application)
 
 Prototype 2 - JGroups and AspectJ based
 ---------------------------------------
@@ -77,12 +79,12 @@ Salient traits of the second prototype:
 * Networking is (usually) multicast, can be wrapped into unicast
   channels when necessary (e.g. machines distributed on different 
   networks...) by configuring a text file. There is typically
-  only one such file. Extensive network tuning capabilities
-  (see AspectJ protocol stack).
+  only one such file. 
+* Extensive network tuning capabilities
+  (see JGroups protocol stack). Framework for building state transfer
+  protocols. Built-in tunneling capabilities etc.
 * Uses message passing: less affected by zvtm threading model
   (no distributed shared memory)
-* Requires distributed garbage collection (provided by Terracotta,
-  but assumes a well-behaved application)
 
 Decision Criteria
 =================
@@ -124,13 +126,17 @@ Performance
 Dynamic scene, one host
 -----------------------
 Average number of position updates per glyph per second for
-different numbers of animated glyphs in the scene.
+different numbers of animated glyphs in the scene. Higher is better.
+Our target, given WILD dimensions, is to run 300 concurrent animations
+smoothly.
 
 * Prototype 1
 
-  - Method of measurement: ? 
-  - 200 concurrent anims: ?
-  - 500 concurrent anims: ?
+  - Method of measurement: update counter in AnimationManager (warning: 
+    differs from 2nd prototype measurement technique, but consistent
+    with observed behavior)
+  - 200 concurrent anims: 4.37 updates/glyph/sec (not smooth) 
+  - 500 concurrent anims: 1.6 updates/glyph/sec (not smooth) 
   - 2000 concurrent anims: ?
 
 * Prototype 2
@@ -144,7 +150,9 @@ different numbers of animated glyphs in the scene.
 
 Static scene (camera movement only)
 -----------------------------------
-*Startup* time for different number of glyphs, one host
+*Startup* time for different number of glyphs, one host.
+We do not have target numbers for this, we just want to be reasonably
+quick.
 
 * Prototype 1
 
@@ -190,11 +198,11 @@ A first attempt at a conclusion
 
 * Distributed garbage collection may require careful tuning
   (although in the OOME problem I suspect that ZVTM n+1 dynarrays are the
-  cause). Using a "share-nothing"  approach (ie prototype 2) lets 
+  cause). Using a "share-nothing" approach (ie prototype 2) lets 
   us avoid this issue.
 
 * The second prototype has met our initial performance targets.
   There are also no major development/deployment/use hurdles, so
-  modeling the final library after the second prototype looks like
-  our best option so far. 
+  *modeling the final library after the second prototype looks like
+  our best option so far*. 
 
