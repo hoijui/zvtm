@@ -281,13 +281,14 @@ public class PDFLens implements ComponentListener, Java2DPainter {
     /* lens distance and drop-off functions */
     static final short L2_Gaussian = 0;
     static final short L2_SCB = 1;
-    short visual_behavior = L2_Gaussian;
+    static final short L2_FLAT = 2;
+    short visual_behavior = L2_Gaussian; //L2_FLAT,L2_SCB L2_Gaussian;
     
     static final short MP_NONE = 0;
     static final short MP_CONTINUOUS = 1;
     static final short MP_RING = 2;
     static final short MP_SHIFT = 3;
-    short motor_precision = MP_CONTINUOUS;
+    short motor_precision = MP_RING; //MP_CONTINUOUS;
 	
 	void toggleLensType(){}
 	
@@ -296,6 +297,13 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 	}
 
     void moveLens(int x, int y, long absTime){
+	if (lens == null)
+	    return;
+	int lX = lens.lx + panelWidth / 2;
+	int lY = lens.ly + panelHeight / 2;
+
+	//System.out.println("x: " + x + ", y:" + y + ", lX: " + lX + ", lY: " + lY +
+	//		   ", panel: " + panelWidth + ", " + panelHeight);
         if (tLens != null){
             tLens.setAbsolutePosition(x, y, absTime);
         }
@@ -309,6 +317,8 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		int lX = lens.lx + panelWidth / 2;
 		int lY = lens.ly + panelHeight / 2;
 
+		//System.out.println("x: " + x + ", y:" + y + ", lX: " + lX + ", lY: " + lY +
+		//		   ", panel: " + panelWidth + ", " + panelHeight);
 		if (lX == x && lY == y)
 			return;
 
@@ -325,9 +335,78 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
-	
+
+    int _lastX,_lastY;
+    static int NUM_PSTOCK = 1;
+    double[] _pX = new double[NUM_PSTOCK];
+    double[] _pY = new double[NUM_PSTOCK];
+
+    double getRadius()
+    {
+	double Rad = (double)lens.getInnerRadius();
+	// getActualRingRadius();  
+	return Rad;
+    }
+
+    void pstock(double x, double y)
+    {
+	for (int i = NUM_PSTOCK-1; i > 0; i--)
+	{
+	    _pX[i] = _pX[i-1];
+	    _pY[i] = _pY[i-1];
+	}
+	_pX[0] = x;
+	_pY[0] = y;
+    }
+
+    void ringMoveLens(int x, int y, long absTime)
+    {
+	int lX = lens.lx + panelWidth / 2;
+	int lY = lens.ly + panelHeight / 2;
+
+	if (x == _lastX && y == _lastY)
+	{
+	    return;
+	}
+
+	int lensX = lX;
+	int lensY = lY;
+	double d = Math.sqrt((lensX-x)*(lensX-x) + (lensY-y)*(lensY-y));
+	double Rad2 = getRadius();
+	if (d < Rad2)
+	{
+	    _lastX = x; _lastY = y;
+ 	    pstock((double)x, (double)y);
+
+	    return;
+	}
+
+	double x2 =   (double)x - _pX[NUM_PSTOCK-1]; //_lastX;
+	double y2 = - (double)y + _pY[NUM_PSTOCK-1]; //_lastY;
+	double xg =   (double)lensX - _pX[NUM_PSTOCK-1]; //_lastX;
+	double yg = - (double)lensY + _pY[NUM_PSTOCK-1]; //_lastY;
+	double Gx,Gy;
+	double norm = Math.sqrt((x2 - xg)*(x2 - xg) + (y2 -yg)*(y2 -yg));
+	double r =  Math.sqrt((xg*xg) + (yg*yg));
+	r = Rad2;
+	Gx = x2 - r*((x2-xg)/norm);
+	Gy = y2 - r*((y2-yg)/norm);
+	Gx = Gx + (double)_pX[NUM_PSTOCK-1]; //_lastX;
+	Gy = - Gy + (double)_pY[NUM_PSTOCK-1];//_lastY;
+
+	moveLens((int)Gx, (int)Gy, absTime);
+
+	_lastX = x; _lastY = y;
+	pstock(x,y);
+    }
+
 
     void activateLens(int x, int y){
+	updatePanelSize();
+	System.out.println(
+	    "ACTIVATE LENS x: " + x + ", y:" + y + ", panel: " + 
+	    panelWidth + ", " + panelHeight);
+	
         if (lens != null){return;}
         lens = (FixedSizeLens)pdfView.setLens(getLensDefinition(x, y));
         lens.setBufferThreshold(1.5f);
@@ -343,6 +422,9 @@ public class PDFLens implements ComponentListener, Java2DPainter {
         /* motor precison: key */
         motor_precision = MP_SHIFT;
         
+
+	 /* motor precison: ring */
+        motor_precision = MP_RING;
         
     }
 
@@ -369,6 +451,8 @@ public class PDFLens implements ComponentListener, Java2DPainter {
         switch (visual_behavior){
             case L2_Gaussian:{
                 res = new FSGaussianLens(1f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+		res.setOuterRadiusColor(Color.RED);
+		res.setInnerRadiusColor(Color.RED);
                 tLens = null;
                 break;
             }
@@ -379,6 +463,13 @@ public class PDFLens implements ComponentListener, Java2DPainter {
                 res = (FixedSizeLens)tLens;
                 break;
             }
+	    case L2_FLAT:{
+		tLens = new SCFGaussianLens(1f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
+		((SCBLens)tLens).setBoundaryColor(Color.RED);
+                ((SCBLens)tLens).setObservedRegionColor(Color.RED);
+		res = (FixedSizeLens)tLens;
+                break;
+	    }
         }
         return res;
     }
@@ -510,6 +601,7 @@ class PDFLensEventHandler implements ViewEventHandler {
     	        application.relativeMoveLens(jpx, jpy, e.getWhen());
     	    }
     	    else if (application.motor_precision == PDFLens.MP_RING){
+		application.ringMoveLens(jpx, jpy, e.getWhen());
     	    }
     	    else {
         	    application.moveLens(jpx, jpy, e.getWhen());
