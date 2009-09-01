@@ -1,0 +1,174 @@
+====================================
+Prototypes assessment and comparison 
+====================================
+
+This document has two objectives:
+
+* Assess which of the two prototypes are suitable as a model for
+  the production library, if any.
+* Compare both prototypes in terms of performance, programming
+  model, ease of maintenance, user friendliness (programming using
+  the library, deploying applications)...
+
+Prototypes characteristics
+==========================
+
+Prototype 1 - Terracotta-based
+------------------------------
+
+* No/minimal modifications on the trunk (add rather than modify)
+* Minimal modifications to distribute an application
+* Minimal API changes (No API changes for glyphs except images
+  which need passing metadata rather than data around - ie URLs
+  or filenames).
+* Pull model (slaves refresh scene state from master), optimised
+  through Terracotta use (only changed parts of the scene are transmitted).
+* Adding a new Glyph subtype is easy (configuration + optional
+  beanshell script in tc-config.xml)
+* *Code-by-exception* approach: Glyph objects (and others) will
+  usually be properly distributed, changes are needed sometimes
+  and are performed by transient declarations and beanshell snippets
+* Networking is unicast (implementation detail, but cannot be
+  changed)
+* Needs to work together with the zvtm threading model
+  (rendering threads contending for glyph access)
+
+Prototype 2 - AspectJ and JGroups based
+---------------------------------------
+
+* No/minimal modifications on the trunk (add rather than modify)
+* Push model (master sends changes to slaves)
+* Minimal API changes (No API changes for glyphs except images
+  which need passing metadata rather than data around - ie URLs
+  or filenames).
+* JGroups is the networking technology, AspectJ enables us
+  to make API changes mostly transparent and (hopefully) keep
+  clustering dependencies independant of the rest (ie we want to
+  build a clustered or non-clustered version of ZVTM without having
+  to pull clustered dependencies and with no/minimal performance impact
+  in the non-clustered case).
+* Adding a new Glyph subtype is more tedious than with prototype 1
+* *Code-all* approach: All interesting state needs to be passed explicitely
+  to the slaves by creating the appropriate network messages (from the
+  library dev point-of-view -- by design it is transparent from the library
+  user or application developer point of view) 
+* Networking is (usually) multicast, can be wrapped into unicast
+  channels when necessary (e.g. machines distributed on different 
+  networks...) by configuring a text file. There is typically
+  only one such file. Extensive network tuning capabilities
+  (see AspectJ protocol stack).
+* Uses message passing: less affected by zvtm threading model
+  (no distributed shared memory)
+
+Decision Criteria
+=================
+
+* Performance
+
+  - Static scene startup
+  - Dynamic scene startup
+  - Dynamic scene refresh rate
+  - Vary the number of hosts, total glyphs, animated glyphs.
+
+* Ease of use / extensibility / implementation
+
+  - Ease of deployment
+  - Number and "weight" of dependencies: Terracotta has numerous 
+    dependencies, including a special server process
+    and database. The second prototype has lighter dependencies (no
+    unneeded persistence/failover capabilities, no dedicated shared heap
+    process that requires a database). This also means 
+    less memory consumption.
+  - Maven integration: Terracotta has good Maven integration.
+    AspectJ has a few problems(outdated Maven plugin?).
+    JGroups has good Maven integration
+  - Ease of implementation
+    The Terracotta prototype was easier / less tedious to implement
+    but avoiding thread contention requires efforts (possibly important)
+  - Ease of extensibility for customers (application writers)
+    Terracotta wins here, as new Glyph-derived classes need some scaffolding
+    to be clustered using the second prototype. 
+
+* Other
+
+  - Licencing issues: advertising clause in Terracotta which 
+    may need attention.
+
+Performance
+===========
+
+Dynamic scene, one host
+-----------------------
+Average number of position updates per glyph per second for
+different numbers of animated glyphs in the scene.
+
+* Prototype 1
+
+  - Method of measurement: ? 
+  - 200 concurrent anims: ?
+  - 500 concurrent anims: ?
+  - 2000 concurrent anims: ?
+
+* Prototype 2
+
+  - Method of measurement: received message counter
+    in SlaveUpdater
+  - 200 concurrent anims : 38.5 updates/glyph/sec (7700 msg/sec)
+  - 500 concurrent anims : 24 updates/glyph/sec (12000 msg/sec - limit
+    for smooth animation?)
+  - 2000 concurrent anims: 7 updates/glyph/sec (14000 msg/sec)
+
+Static scene (camera movement only)
+-----------------------------------
+*Startup* time for different number of glyphs, one host
+
+* Prototype 1
+
+  - Method of measurement: stopwatch
+    Measurements are approximate. 
+  - 1000 glyphs  : 35 or 47 sec (master only, slave+master)
+  - 10000 glyphs : OOME (first try - which process? DSO server? is that 
+    due to the n+1 dynamic arrays in ZVTM? -- how do they play with DGC?) 
+  - 100000 glyphs: ?
+
+* Prototype 2
+
+  - Method of measurement: stopwatch
+    Measurements are approximate. Launch slave, wait until ready
+    and launch master. Only master launch time is reported.
+  - 1000 glyphs  : <2s
+  - 10000 glyphs : <2.5s
+  - 100000 glyphs: appr. 45s (non-clustered version: 16 s)
+
+Dynamic scene, multiple hosts
+-----------------------------
+
+* Prototype 2 (no comparison w/ prototype 1, just assessing
+  suitability)
+
+  - Method of measurement: received message counter in SlaveUpdater
+  - 200 concurrent anims :
+  - 500 concurrent anims :
+  - 2000 concurrent anims:
+
+
+A first attempt at a conclusion
+===============================
+
+* Terracotta looked promising but is probably not adapted to
+  this use case (a large number of slaves scanning a large
+  scene graph continuously)
+
+* Message passing is easier than extending the threading model
+  and should yield better performance
+
+* Depending on Terracotta is somewhat "heavier" than depending on 
+  AspectJ + JGroups
+
+* Distributed garbage collection may require careful tuning
+  (although in the OOME problem I suspect that ZVTM n+1 dynarrays are the
+  cause). Using a "share-nothing"  approach (ie prototype 2) lets 
+  us avoid this issue.
+
+* The second prototype has met our initial performance targets
+
