@@ -85,6 +85,12 @@ Salient traits of the second prototype:
   protocols. Built-in tunneling capabilities etc.
 * Uses message passing: less affected by zvtm threading model
   (no distributed shared memory)
+* Plays nice with scripting engines, as long as the clustering library
+  is "self-contained" with regards to AspectJ, i.e. client programs do not
+  need weaving (the prototype was modified to gain this property). 
+  Moreover, client compilation and deployment is made simpler if 
+  the client application programmer does not need to care about 
+  AspectJ weaving. Tested engines include Jython and Beanshell. 
 
 Decision Criteria
 =================
@@ -143,10 +149,10 @@ smoothly.
 
   - Method of measurement: received message counter
     in SlaveUpdater
-  - 200 concurrent anims : 38.5 updates/glyph/sec (7700 msg/sec)
+  - 200 concurrent anims : 38.5 updates/glyph/sec (7700 msg/sec - smooth)
   - 500 concurrent anims : 24 updates/glyph/sec (12000 msg/sec - limit
     for smooth animation?)
-  - 2000 concurrent anims: 7 updates/glyph/sec (14000 msg/sec)
+  - 2000 concurrent anims: 7 updates/glyph/sec (14000 msg/sec - not smooth)
 
 Static scene (camera movement only)
 -----------------------------------
