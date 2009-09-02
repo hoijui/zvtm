@@ -523,6 +523,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		}
 		// should put this func in TemporalLens ?
 		SCFLens.setSpeedCoupling(speedCoupling);
+		SCFLens.setSpeedBlendRadii(false, false);
 
 		tLens = (TemporalLens)SCFLens;
 		res = (FixedSizeLens)tLens;
