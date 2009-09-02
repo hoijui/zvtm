@@ -232,7 +232,6 @@ public abstract class View {
     /**returns a BufferedImage representation of this view (this is actually a COPY of the original) that can be used for instance with ImageIO.ImageWriter*/
     public BufferedImage getImage(){
 	BufferedImage res=null;
-	synchronized(this.getClass()){
 	    BufferedImage i=panel.getImage();
 	    if (i!=null){
 		//this is the old method for doing this, which eventually stopped working on POSIX systems  (hangs at i.copyData())
@@ -243,7 +242,6 @@ public abstract class View {
 		Graphics2D resg2d=res.createGraphics();
 		resg2d.drawImage(i,null,0,0);
 	    }
-	}
 	return res;
     }
 

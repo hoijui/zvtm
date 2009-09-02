@@ -213,22 +213,18 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     int cursorInsidePortals = 0;
     
     void resetCursorInsidePortals(){
-	synchronized(this){
 	    cursorInsidePortals = 0;
 	    for (int i=0;i<parent.portals.length;i++){
 		if (parent.portals[i].coordInside(oldX, oldY)){
 		    cursorInsidePortals += 1;
 		}
 	    }
-	}
     }
 
     void updateCursorInsidePortals(int x, int y){
-	synchronized(this){
 	    for (int i=0;i<parent.portals.length;i++){
 		cursorInsidePortals += parent.portals[i].cursorInOut(x, y);
 	    }
-	}
     }
 
     /* -------------------- CURSOR ------------------- */
@@ -558,12 +554,10 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     public void mouseMoved(MouseEvent e){
         try {
             if (parent.mouse.sync && (e.getX() != ix || e.getY() != iy)){
-                synchronized(this){
                     parent.mouse.moveTo(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
                     updateMouseOnly=true;
-                }
                 //translate glyphs sticked to mouse
                 parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
@@ -590,11 +584,9 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
             if (parent.mouse.sync && (e.getX() != ix || e.getY() != iy)){
                 int whichButton=e.getModifiers();
                 int buttonNumber=0;
-                synchronized(this){
                     parent.mouse.moveTo(e.getX(), e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     parent.mouse.unProject(cams[activeLayer], this);                    
-                }
                 //translate glyphs sticked to mouse
                 parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
