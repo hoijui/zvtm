@@ -169,6 +169,11 @@ public aspect VirtualSpaceReplication {
 		execution(public * Glyph+.setVisible(boolean))
 		&& this(glyph);
 
+	pointcut glyphSizeChange(Glyph glyph):
+		(execution(public * Glyph+.sizeTo(float)) || execution(public * Glyph+.reSize(float)))
+		&& this(glyph);
+
+
 	/* Section: misc. VS-related pointcuts */
 	pointcut removeAllGlyphs(VirtualSpace virtualSpace): 
 		execution(public * VirtualSpace.removeAllGlyphs()) 
@@ -287,6 +292,26 @@ public aspect VirtualSpaceReplication {
 
 		Delta delta = new GlyphVisibilityDelta(glyph.getObjId(),
 				visible);
+
+		Message msg = new Message(null, null, delta);
+		try{
+			VirtualSpace vs = (VirtualSpace)glyph.getOwner();
+
+			retrieveChannel(vs.getName()).send(msg);
+		} catch(Exception e){
+			e.printStackTrace();
+			throw new Error("Could not retrieve comm channel");
+		}
+	}
+
+	after(Glyph glyph) returning: glyphSizeChange(glyph){
+		if(null == glyph.getOwner()){ return; }
+		if(glyph.isOwnerSlave()){ return;}
+
+		float size = glyph.getSize();
+
+		Delta delta = new GlyphSizeDelta(glyph.getObjId(),
+				size);
 
 		Message msg = new Message(null, null, delta);
 		try{
