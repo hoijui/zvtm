@@ -272,8 +272,8 @@ public class PDFLens implements ComponentListener, Java2DPainter {
     TemporalLens tLens;
     SpeedCoupling speedCoupling;
 
-    static int LENS_R1 = 150;
-    static int LENS_R2 = 75;
+    static int LENS_R1 = 100;
+    static int LENS_R2 = 60;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 12.0;
