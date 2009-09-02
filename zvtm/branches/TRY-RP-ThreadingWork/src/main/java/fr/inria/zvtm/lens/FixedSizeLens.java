@@ -137,7 +137,7 @@ public abstract class FixedSizeLens extends Lens {
     }
 
     /**Should not be called directly ; used to update buffer image caracteristics when lens outer radius changes*/
-    public synchronized void setLensBuffer(ViewPanel p){
+    public void setLensBuffer(ViewPanel p){
 	owningView = p;
 	Dimension s = p.getSize();
 	w = s.width;
@@ -160,7 +160,7 @@ public abstract class FixedSizeLens extends Lens {
 	initBuffers((lensWidth)*(lensHeight), (mbw)*(mbh));
     }
 
-	synchronized void transformI(WritableRaster iwr, WritableRaster ewr){
+	void transformI(WritableRaster iwr, WritableRaster ewr){
 		// get source pixels in an array
 		iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsI);
 		// get magnified source pixels in a second array
@@ -193,7 +193,7 @@ public abstract class FixedSizeLens extends Lens {
 		iwr.setDataElements(lurd[0], lurd[1], lensWidth, lensHeight, tPixelsI);
 	}
 
-    synchronized void transformS(WritableRaster iwr, WritableRaster ewr){
+    void transformS(WritableRaster iwr, WritableRaster ewr){
         // get source pixels in an array
         iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsS);
         // get magnified source pixels in a second array
@@ -226,7 +226,7 @@ public abstract class FixedSizeLens extends Lens {
         iwr.setDataElements(lurd[0], lurd[1], lensWidth, lensHeight, tPixelsS);
     }
 
-    synchronized void transformB(WritableRaster iwr, WritableRaster ewr){
+    void transformB(WritableRaster iwr, WritableRaster ewr){
         // get source pixels in an array
         iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsB);
         // get magnified source pixels in a second array
@@ -263,7 +263,7 @@ public abstract class FixedSizeLens extends Lens {
      *@param ax lens's center horizontal coordinate expressed as an absolute position within the view (JPanel coordinate system)
      *@param ay lens's center vertical coordinate expressed as an absolute position within the view (JPanel coordinate system)
      */
-    public synchronized void setAbsolutePosition(int ax, int ay){
+    public void setAbsolutePosition(int ax, int ay){
 	lx = ax - sw;
 	ly = ay - sh;
 	lurd[0] = lx + sw - getRadius();
@@ -392,10 +392,7 @@ public abstract class FixedSizeLens extends Lens {
 			lensY = lensY + deltaY / (int)magFactor;
 		
 			if (magFactor  > 1.0) {
-			    synchronized(this)
-			    {
 				doFocusControledOffsets(deltaX, deltaY, magFactor, currentTime);
-			    }
 			}
 			else {
 			    doFocusControledOffsets(deltaX, deltaY, magFactor, currentTime);
