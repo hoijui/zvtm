@@ -473,26 +473,26 @@ public class PDFLens implements ComponentListener, Java2DPainter {
         switch (visual_behavior){
             case L2_Gaussian:{
                 res = new FSGaussianLens(1f, LENS_R1, LENS_R2, x - panelWidth/2, y - panelHeight/2);
-		res.setOuterRadiusColor(Color.RED);
-		res.setInnerRadiusColor(Color.RED);
+		res.setOuterRadiusColor(Color.BLACK);
+		res.setInnerRadiusColor(Color.BLACK);
                 tLens = null;
                 break;
             }
             case L2_SCB:{
                 SCBLens scbLens = new SCBLens((float)MAG_FACTOR, 0.0f, 1.0f, LENS_R1, x - panelWidth/2, y - panelHeight/2);
-                scbLens.setBoundaryColor(Color.RED);
-                scbLens.setObservedRegionColor(Color.RED);
+                scbLens.setBoundaryColor(Color.BLACK);
+                scbLens.setObservedRegionColor(Color.BLACK);
 
 		speedCoupling = new SpeedCoupling();
 		// lag time (100ms bd) and reduc time (500ms bd)
 		speedCoupling.setTimeParameters(300, 400);
 		// min speed (200 p/s bd)
-		speedCoupling.setSpeedParameters(200);
+		speedCoupling.setSpeedParameters(100);
 		// coef_inc = 0.05 bd , coef_dec = 0.0 bd
-		speedCoupling.setCoefParameters(0.05f, 0.01f);
+		speedCoupling.setCoefParameters(0.1f, 0.01f);
 		if (motor_precision ==  MP_RING)
 		{
-		    speedCoupling.setCoefParameters(0.05f, 0.005f);
+		    speedCoupling.setCoefParameters(0.1f, 0.005f);
 		    // should put this func in TemporalLens ?
 		    scbLens.setDoRing(true);
 		    //scbLens.setDoDrawRing(true);
@@ -511,9 +511,9 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		// lag time (100ms bd) and reduc time (500ms bd)
 		speedCoupling.setTimeParameters(200, 400);
 		// min speed (200 p/s bd)
-		speedCoupling.setSpeedParameters(200);
+		speedCoupling.setSpeedParameters(100);
 		// coef_inc = 0.05 bd , coef_dec = 0.0 bd
-		speedCoupling.setCoefParameters(0.05f, 0.00f);
+		speedCoupling.setCoefParameters(0.1f, 0.00f);
 		if (motor_precision ==  MP_RING)
 		{
 		    SCFLens.setSpeedBlendRadii(false, false);
@@ -526,8 +526,8 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 
 		tLens = (TemporalLens)SCFLens;
 		res = (FixedSizeLens)tLens;
-		res.setOuterRadiusColor(Color.RED);
-		res.setInnerRadiusColor(Color.RED);
+		res.setOuterRadiusColor(Color.BLACK);
+		res.setInnerRadiusColor(Color.BLACK);
                 break;
 	    }
         }
