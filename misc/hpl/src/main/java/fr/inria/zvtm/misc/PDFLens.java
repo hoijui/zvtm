@@ -141,119 +141,119 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		    }
 		    else if (f.getName().toLowerCase().endsWith(".png12")){
 		        /// 4 5 6
-                VImage im = new VImage(0, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map5/H/map5_p1.png")).getImage(), 12.4);
+                VImage im = new VImage(0, 0, 0, (new ImageIcon("images/1-12/map5/H/map5_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map4/H/map4_p1.png")).getImage(), 12.4);
+                im = new VImage(-2000, 0, 0, (new ImageIcon("images/1-12/map4/H/map4_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map6/H/map6_p1.png")).getImage(), 12.4);
+                im = new VImage(2000, 0, 0, (new ImageIcon("images/1-12/map6/H/map6_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
                 // 1 2 3
-                im = new VImage(0, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map2/H/map2_p1.png")).getImage(), 12.4);
+                im = new VImage(0, 2000, 0, (new ImageIcon("images/1-12/map2/H/map2_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map1/H/map1_p1.png")).getImage(), 12.4);
+                im = new VImage(-2000, 2000, 0, (new ImageIcon("images/1-12/map1/H/map1_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map3/H/map3_p1.png")).getImage(), 12.4);
+                im = new VImage(2000, 2000, 0, (new ImageIcon("images/1-12/map3/H/map3_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
                 // 7 8 9
-                im = new VImage(0, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map8/H/map8_p1.png")).getImage(), 12.4);
+                im = new VImage(0, -2000, 0, (new ImageIcon("images/1-12/map8/H/map8_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map7/H/map7_p1.png")).getImage(), 12.4);
+                im = new VImage(-2000, -2000, 0, (new ImageIcon("images/1-12/map7/H/map7_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/map9/H/map9_p1.png")).getImage(), 12.4);
+                im = new VImage(2000, -2000, 0, (new ImageIcon("images/1-12/map9/H/map9_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
                 // A B C
-                im = new VImage(-4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapA/H/mapA_p1.png")).getImage(), 12.4);
+                im = new VImage(-4000, 2000, 0, (new ImageIcon("images/1-12/mapA/H/mapA_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
-                im = new VImage(-4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapB/H/mapB_p1.png")).getImage(), 12.4);
+                im = new VImage(-4000, 0, 0, (new ImageIcon("images/1-12/mapB/H/mapB_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
-                im = new VImage(-4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapC/H/mapC_p1.png")).getImage(), 12.4);
+                im = new VImage(-4000, -2000, 0, (new ImageIcon("images/1-12/mapC/H/mapC_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
                 // I J K
-                im = new VImage(4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapK/H/mapK_p1.png")).getImage(), 12.4);
+                im = new VImage(4000, 2000, 0, (new ImageIcon("images/1-12/mapK/H/mapK_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
-                im = new VImage(4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapJ/H/mapJ_p1.png")).getImage(), 12.4);
+                im = new VImage(4000, 0, 0, (new ImageIcon("images/1-12/mapJ/H/mapJ_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
                 
-                im = new VImage(4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1-12/mapI/H/mapI_p1.png")).getImage(), 12.4);
+                im = new VImage(4000, -2000, 0, (new ImageIcon("images/1-12/mapI/H/mapI_p1.png")).getImage(), 12.4);
                 vs.addGlyph(im);
 
 		    }
 		    else {
 		        /// 4 5 6
-                VImage im = new VImage(0, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map5/H/map5_p1.png")).getImage());
+                VImage im = new VImage(0, 0, 0, (new ImageIcon("images/1/map5/H/map5_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map4/H/map4_p1.png")).getImage());
+                im = new VImage(-2000, 0, 0, (new ImageIcon("images/1/map4/H/map4_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map6/H/map6_p1.png")).getImage());
+                im = new VImage(2000, 0, 0, (new ImageIcon("images/1/map6/H/map6_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
                 // 1 2 3
-                im = new VImage(0, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map2/H/map2_p1.png")).getImage());
+                im = new VImage(0, 2000, 0, (new ImageIcon("images/1/map2/H/map2_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map1/H/map1_p1.png")).getImage());
+                im = new VImage(-2000, 2000, 0, (new ImageIcon("images/1/map1/H/map1_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map3/H/map3_p1.png")).getImage());
+                im = new VImage(2000, 2000, 0, (new ImageIcon("images/1/map3/H/map3_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
                 // 7 8 9
-                im = new VImage(0, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map8/H/map8_p1.png")).getImage());
+                im = new VImage(0, -2000, 0, (new ImageIcon("images/1/map8/H/map8_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(-2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map7/H/map7_p1.png")).getImage());
+                im = new VImage(-2000, -2000, 0, (new ImageIcon("images/1/map7/H/map7_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
-                im = new VImage(2000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/map9/H/map9_p1.png")).getImage());
+                im = new VImage(2000, -2000, 0, (new ImageIcon("images/1/map9/H/map9_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
                 // A B C
-                im = new VImage(-4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapA/H/mapA_p1.png")).getImage());
+                im = new VImage(-4000, 2000, 0, (new ImageIcon("images/1/mapA/H/mapA_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(-4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapB/H/mapB_p1.png")).getImage());
+                im = new VImage(-4000, 0, 0, (new ImageIcon("images/1/mapB/H/mapB_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(-4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapC/H/mapC_p1.png")).getImage());
+                im = new VImage(-4000, -2000, 0, (new ImageIcon("images/1/mapC/H/mapC_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 
                 // I J K
-                im = new VImage(4000, 2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapK/H/mapK_p1.png")).getImage());
+                im = new VImage(4000, 2000, 0, (new ImageIcon("images/1/mapK/H/mapK_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(4000, 0, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapJ/H/mapJ_p1.png")).getImage());
+                im = new VImage(4000, 0, 0, (new ImageIcon("images/1/mapJ/H/mapJ_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
                 
-                im = new VImage(4000, -2000, 0, (new ImageIcon("/Users/epietrig/projects/zvtm_misc/hpl/images/1/mapI/H/mapI_p1.png")).getImage());
+                im = new VImage(4000, -2000, 0, (new ImageIcon("images/1/mapI/H/mapI_p1.png")).getImage());
                 im.setInterpolationMethod(RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                 vs.addGlyph(im);
 		        
