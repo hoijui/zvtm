@@ -476,7 +476,7 @@ class TickThread {
 				}
 			}
 		};
-		edtTimer = new Timer(19, taskPerformer);
+		edtTimer = new Timer(16, taskPerformer);
     }
 
 	public void start(){
