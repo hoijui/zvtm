@@ -103,11 +103,15 @@ public class StdViewPanel extends ViewPanel {
 	}
 
 	private void start(){
+		backBufferGraphics = null;
 		edtTimer.start();
 	}
 
 	public void stop(){
 		edtTimer.stop();
+		if (stableRefToBackBufferGraphics != null) {
+			stableRefToBackBufferGraphics.dispose();
+		}
 	}
 
 	private void updateOffscreenBuffer(){
@@ -328,7 +332,6 @@ public class StdViewPanel extends ViewPanel {
 	//draw ONCE (no more infinite thread loop; will be driven
 	//from an EDT timer)
 	public void drawOffscreen() {
-		backBufferGraphics = null;
 		oldSize=getSize();
 		if (notBlank){
 			if (active){
@@ -379,7 +382,7 @@ public class StdViewPanel extends ViewPanel {
 							oldY = parent.mouse.my;							        
 						}
 						//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
-						//     just catch it and wait for next loop until we find out what's causing this
+						//just catch it and wait for next loop until we find out what's causing this
 						catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
 					}
 					repaint();
@@ -397,9 +400,6 @@ public class StdViewPanel extends ViewPanel {
 			stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
 			portalsHook();				
 			repaint();
-		}
-		if (stableRefToBackBufferGraphics != null) {
-			stableRefToBackBufferGraphics.dispose();
 		}
 	}
 
