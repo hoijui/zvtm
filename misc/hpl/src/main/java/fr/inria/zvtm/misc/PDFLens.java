@@ -545,13 +545,13 @@ public class PDFLens implements ComponentListener, Java2DPainter {
         g2d.setComposite(acST);
         g2d.fillRect(0, 0, 50, 20);
 		if (eh.SHIFT_PRESSED){
-			g2d.fillRect(panelWidth/2-40, 0, 80, 20);
+			g2d.fillRect(panelWidth/2-50, 0, 100, 20);
 		}
         g2d.setComposite(acO);
         g2d.setColor(Color.WHITE);
         g2d.drawString(String.valueOf(Math.round(MAG_FACTOR))+"x", 15, 15);
 		if (eh.SHIFT_PRESSED){
-			g2d.drawString(SP, panelWidth/2-20, 15);
+			g2d.drawString(SP, panelWidth/2-30, 15);
 		}
     }
 
