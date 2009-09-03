@@ -62,7 +62,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 
 	VirtualSpace vs;
 	static final String spaceName = "pdfSpace";
-	ViewEventHandler eh;
+	PDFLensEventHandler eh;
 	Camera mCamera;
 
 	View pdfView;
@@ -537,15 +537,22 @@ public class PDFLens implements ComponentListener, Java2DPainter {
     
     static final AlphaComposite acO = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f);
     static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .7f);
+	static final String SP = "SHIFT pressed";
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (lens == null){return;}
         g2d.setColor(Color.BLACK);
         g2d.setComposite(acST);
         g2d.fillRect(0, 0, 50, 20);
+		if (eh.SHIFT_PRESSED){
+			g2d.fillRect(panelWidth/2-40, 0, 80, 20);
+		}
         g2d.setComposite(acO);
         g2d.setColor(Color.WHITE);
         g2d.drawString(String.valueOf(Math.round(MAG_FACTOR))+"x", 15, 15);
+		if (eh.SHIFT_PRESSED){
+			g2d.drawString(SP, panelWidth/2-20, 15);
+		}
     }
 
 	public static void main(String[] args){
