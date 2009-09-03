@@ -35,7 +35,7 @@ class CROptions {
 	int xNum = 50;
 
 	@Option(name = "-y", aliases = {"--ynum"}, usage = "number of subdivisions along y axis")
-	int yNum = 20;
+	int yNum = 30;
 
 	@Option(name = "-w", aliases = {"--width"}, usage = "color rect width")
 	int width = 800;
@@ -133,8 +133,8 @@ public class TestColorRect {
 					//50 is just a speed factor (too fast otherwise)
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/12.0f)) : (long)((jpx-lastJPX)/(a*12)));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/12.0f)) : (long)((lastJPY-jpy)/(a*12)));
 				}
 			}
 		}
