@@ -64,7 +64,7 @@ public class StdViewPanel extends ViewPanel {
 	private Timer edtTimer;
 
 	StdViewPanel(Vector cameras,View v, boolean arfome) {
-		int delay = 40; //milliseconds
+		int delay = 50;//milliseconds
 		ActionListener taskPerformer = new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				drawOffscreen();
@@ -357,7 +357,8 @@ public class StdViewPanel extends ViewPanel {
 						}
 						//end drawing here
 						if (stableRefToBackBufferGraphics == backBufferGraphics) {
-							repaint();
+							//repaint();
+							paintImmediately(0,0,size.width,size.height);
 						}
 					}
 					catch (NullPointerException ex0){
@@ -385,7 +386,8 @@ public class StdViewPanel extends ViewPanel {
 						//just catch it and wait for next loop until we find out what's causing this
 						catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
 					}
-					repaint();
+					//repaint();
+					paintImmediately(0,0,size.width,size.height);
 				}
 				else {
 				}
@@ -399,7 +401,8 @@ public class StdViewPanel extends ViewPanel {
 			stableRefToBackBufferGraphics.setColor(blankColor);
 			stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
 			portalsHook();				
-			repaint();
+			//repaint();
+			paintImmediately(0,0,size.width,size.height);
 		}
 	}
 
