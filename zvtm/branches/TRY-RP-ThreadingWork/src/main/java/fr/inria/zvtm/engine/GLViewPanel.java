@@ -15,9 +15,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
+import javax.swing.Timer;
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
@@ -30,11 +33,22 @@ import fr.inria.zvtm.engine.ViewEventHandler;
  * @author Emmanuel Pietriga
  */
 
-public class GLViewPanel extends ViewPanel implements Runnable {
+public class GLViewPanel extends ViewPanel {
     
     Dimension oldSize;
+	Timer edtTimer;
 
-    GLViewPanel(Vector cameras,View v, boolean arfome) {
+    GLViewPanel(Vector cameras,View v, boolean arfome) {	
+		int delay = 40;//milliseconds
+		ActionListener taskPerformer = new ActionListener(){
+			public void actionPerformed(ActionEvent evt){
+				repaint();
+			}
+		};
+		edtTimer = new Timer(delay, taskPerformer);
+		edtTimer.setCoalesce(false);
+
+
 	addHierarchyListener(
 	    new HierarchyListener() {
 	       public void hierarchyChanged(HierarchyEvent e) {
@@ -60,80 +74,28 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	this.addMouseWheelListener(this);
 	this.addComponentListener(this);
 	setAutoRequestFocusOnMouseEnter(arfome);
-	start();
 	setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 	if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
+	start();
     }
 
     public void start(){
 	size = getSize();
-	runView = new Thread(this);
-	runView.setPriority(Thread.NORM_PRIORITY);
-	runView.start();
+	oldSize = size;
+	edtTimer.start();
     }
 
     public synchronized void stop() {
-	runView = null;
 	notify();
-    }
-
-    public void run() {
-	Thread me = Thread.currentThread();
-	while (getSize().width <= 0) {  //Wait until the window actually exists
-	    try {
-		runView.sleep(inactiveSleepTime);
-	    } 
-	    catch (InterruptedException e) {
-		if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep "+e);}
-		return;
-	    }
-        }
-	oldSize=getSize();
-	while (runView==me) {
-	    if (active){
-		if (repaintNow || updateMouseOnly){
-		    repaint();
-		    // time to sleep = wanted refresh rate minus time needed to do the actual repaint operations
-		    timeToSleep = frameTime - loopTotalTime;
-		    try {// sleep at least minimumSleepTime ms so that other
-			//  threads get a chance to run (thread policy varies with each OS)
-			runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
-		    }
-		    catch (InterruptedException e) {
-			if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep3 "+e);}
-			return;
-		    }
-		}
-		else {
-		    try {
-			runView.sleep(frameTime);
-		    }
-		    catch (InterruptedException e) {
-			if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep4 "+e);}
-			return;
-		    }
-		}
-	    }
-	    else {
-		try {
-		    runView.sleep(inactiveSleepTime);
-		} 
-		catch (InterruptedException e) {
-		    if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
-		    return;
-		}
-	    }
-	}
+	edtTimer.stop();
     }
 
     public void paint(Graphics g) {
-	loopStartTime = System.currentTimeMillis();
 	super.paint(g);
 	// stableRefToBackBufferGraphics is used here not as a Graphics from a back buffer image, but directly as the OpenGL graphics context
 	// (simply reusing an already declared var instead of creating a new one for nothing)
 	stableRefToBackBufferGraphics = (Graphics2D)g;
 	try {
-	    repaintNow=false;//do this first as the thread can be interrupted inside this branch and we want to catch new requests for repaint
 	    updateMouseOnly = false;
 	    size = this.getSize();
 	    viewW = size.width;//compute region's width and height
@@ -158,7 +120,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 		    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 			camIndex=cams[nbcam].getIndex();
 			drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-			synchronized(drawnGlyphs){
 			    drawnGlyphs.removeAllElements();
 			    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 			    //compute region seen from this view through camera
@@ -170,7 +131,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			    for (int i=0;i<gll.length;i++){
 				if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
 				    //if glyph is at least partially visible in the reg. seen from this view, display
-				    synchronized(gll[i]){
 					gll[i].project(cams[nbcam], size);
 					if (gll[i].isVisible()){
 					    gll[i].draw(stableRefToBackBufferGraphics,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
@@ -178,10 +138,8 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 					// notifying outside if branch because glyph sensitivity is not
 					// affected by glyph visibility when managed through Glyph.setVisible()
 					cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
-				    }
 				}
 			    }
-			}
 		    }
 		}
 		foregroundHook();
@@ -208,11 +166,9 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 			}
 		    }
 		    if (drawVTMcursor){
-			synchronized(this){
 			    parent.mouse.draw(stableRefToBackBufferGraphics);
 			    oldX=parent.mouse.mx;
 			    oldY=parent.mouse.my;
-			}
 		    }
 		}
 		//end drawing here
@@ -225,7 +181,6 @@ public class GLViewPanel extends ViewPanel implements Runnable {
 	    }
 	}
 	catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.paint "+ex0);}}
-	loopTotalTime = System.currentTimeMillis() - loopStartTime;
 	if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
     }
 
