@@ -107,7 +107,7 @@ public class TestCameraPosition {
 	    am.startAnimation(anim, false);
 	}
 
-	vsm.getVirtualSpace("src").getCamera(0).setLocation(vsm.getGlobalView(vsm.getVirtualSpace("src").getCamera(0)));
+	vsm.getVirtualSpace("src").getCamera(0).setLocation(testView.getGlobalView(vsm.getVirtualSpace("src").getCamera(0)));
     }
     
     public static void main(String[] args){
