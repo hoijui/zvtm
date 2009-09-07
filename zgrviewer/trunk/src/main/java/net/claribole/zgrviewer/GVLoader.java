@@ -110,7 +110,7 @@ class GVLoader {
 	    grMngr.reveal();
 	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	    if (grMngr.rView != null){
-		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+		grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
 		grMngr.cameraMoved(null, null, 0);
 	    }
 	}
@@ -141,7 +141,7 @@ class GVLoader {
             //do not remember camera's initial location (before global view)
             if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
             if (grMngr.rView != null){
-                grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+                grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
                 grMngr.cameraMoved(null, null, 0);
             }
             grMngr.gp.setVisible(false);
@@ -191,7 +191,7 @@ class GVLoader {
 		//do not remember camera's initial location (before global view)
 		if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
 		if (grMngr.rView != null){
-		    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1), 100);
+		    grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1), 100);
 		}
 		grMngr.cameraMoved(null, null, 0);
 	    }
@@ -212,7 +212,7 @@ class GVLoader {
 	grMngr.reveal();
 	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
 	if (grMngr.rView != null){
-	    grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+	    grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
 	    grMngr.cameraMoved(null, null, 0);
 	}
     }

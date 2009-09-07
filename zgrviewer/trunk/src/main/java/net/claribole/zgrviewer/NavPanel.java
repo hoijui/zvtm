@@ -97,7 +97,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 		grMngr.rView.setEventHandler(grMngr.reh, 1);
 		grMngr.rView.setActiveLayer(1);
 		grMngr.rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
-		grMngr.vsm.getGlobalView(grMngr.mSpace.getCamera(1),100);
+		grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
 		grMngr.cameraMoved(null, null, 0);
 		borderPanel.add(ovPanel, BorderLayout.CENTER);
 		buildConstraints(constraints, 0, gncl_i++, 1, 1, 100, 64);

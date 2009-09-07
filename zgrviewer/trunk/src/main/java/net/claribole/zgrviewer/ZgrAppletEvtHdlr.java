@@ -95,7 +95,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
                 x2=v.getVCursor().vx;
                 y2=v.getVCursor().vy;
                 if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-                    grMngr.vsm.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
+                    grMngr.mainView.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
                 }
                 zoomingInRegion=false;
             }
@@ -143,7 +143,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 		    }
 		    else {
 			if (g != null && g != grMngr.boundingBox){
-			    grMngr.vsm.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+			    grMngr.mainView.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
 			}
 		    }
 		}

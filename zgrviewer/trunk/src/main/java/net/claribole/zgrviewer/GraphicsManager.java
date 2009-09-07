@@ -379,7 +379,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
 	void reveal(){
 		Camera c = mSpace.getCamera(0);
-		Location l = vsm.getGlobalView(c);
+		Location l = mainView.getGlobalView(c);
 		c.posx = l.vx;
 		c.posy = l.vy;
 		c.updatePrecisePosition();
@@ -392,7 +392,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /*-------------     Navigation              -------------*/
 
     void getGlobalView(){
-	Location l=vsm.getGlobalView(mSpace.getCamera(0),ConfigManager.ANIM_MOVE_LENGTH);
+	Location l = mainView.getGlobalView(mSpace.getCamera(0),ConfigManager.ANIM_MOVE_LENGTH);
 	rememberLocation(mSpace.getCamera(0).getLocation());
     }
 
@@ -507,7 +507,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 rView.setResizable(false);
                 rView.setActiveLayer(1);
                 rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
-                vsm.getGlobalView(mSpace.getCamera(1),100);
+                rView.getGlobalView(mSpace.getCamera(1),100);
                 // give null arguments because the method does not really care
                 cameraMoved(null, null, 0);
             }
@@ -543,7 +543,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     void centerRADAR_VIEW_NAME(){
 	if (rView != null){
-	    vsm.getGlobalView(mSpace.getCamera(1),ConfigManager.ANIM_MOVE_LENGTH);
+	    rView.getGlobalView(mSpace.getCamera(1),ConfigManager.ANIM_MOVE_LENGTH);
 	    cameraMoved(null, null, 0);
 	}
     }
@@ -824,7 +824,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}
 		//center on the entity
 		Glyph g = (Glyph)matchingList.elementAt(searchIndex);
-		vsm.centerOnGlyph(g/*lastMatchingEntity*/, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
+		// g is the lastMatchingEntity
+		mainView.centerOnGlyph(g, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
 		highlight(g);
 		vsm.repaintNow();
 	    }

@@ -61,7 +61,7 @@ public class RadarEvtHdlr implements ViewEventHandler {
 	}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	VirtualSpaceManager.INSTANCE.getGlobalView(grMngr.mSpace.getCamera(1),500);
+	grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),500);
 	grMngr.cameraMoved(null, null, 0);
     }
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
