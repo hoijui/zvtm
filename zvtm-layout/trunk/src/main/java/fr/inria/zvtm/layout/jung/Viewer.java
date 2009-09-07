@@ -124,7 +124,7 @@ public class Viewer extends JFrame {
 		vsm = VirtualSpaceManager.INSTANCE;
 		eh = new ViewerEventHandler(this);
 		mSpace = vsm.addVirtualSpace(mSpaceName);
-		mCamera = vsm.addCamera(mSpaceName);
+		mCamera = mSpace.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
 		mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, viewWidth, viewHeight, false, true);

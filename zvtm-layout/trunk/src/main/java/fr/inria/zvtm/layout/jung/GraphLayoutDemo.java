@@ -144,7 +144,7 @@ public class GraphLayoutDemo extends JApplet {
 		vsm = VirtualSpaceManager.INSTANCE;
 		eh = new GraphLayoutDemoEventHandler(this);
 		mSpace = vsm.addVirtualSpace(mSpaceName);
-		mCamera = vsm.addCamera(mSpaceName);
+		mCamera = mSpace.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);		
 		viewPanel = vsm.addPanelView(cameras, mViewName, appletWindowWidth, appletWindowHeight);
