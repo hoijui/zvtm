@@ -63,7 +63,7 @@ public abstract class FractalDemo {
     }
 
     void getGlobalView(){
-	vsm.getGlobalView(vsm.getActiveCamera(), ANIM_MOVE_LENGTH);
+	vsm.getView(mainViewName).getGlobalView(vsm.getActiveCamera(), ANIM_MOVE_LENGTH);
     }
 
     void getHigherView(){

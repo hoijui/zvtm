@@ -107,7 +107,7 @@ public class Introduction {
     static final float[] STAR1_VERTICES={1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f,1f,0.8f};
     static final float[] STAR2_VERTICES = {1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f,1f,0.76f};
 	
-    
+    View demoView;
 
     Introduction(){
 	init();
@@ -126,27 +126,28 @@ public class Introduction {
 	if (screenDimension.height < PREFERRED_VIEW_HEIGHT){
 	    viewHeight = screenDimension.height;
 	}
-	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(Color.BLACK);
-	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
+	demoView = vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true);
+	demoView.setBackgroundColor(Color.BLACK);
+	demoView.setLocation(IntroPanel.PANEL_WIDTH, 0);
 	iPanel=new IntroPanel(this);
 	//setAutoZoomEnabled(true);
     }
 
     void reveal(boolean center){
 	if (center){
-	    Camera c = vsm.getView("Demo").getCameraNumber(0);
-	    Location l = vsm.getGlobalView(c);
+	    Camera c = demoView.getCameraNumber(0);
+	    Location l = demoView.getGlobalView(c);
 	    c.posx = l.vx;
 	    c.posy = l.vy;
 	    c.updatePrecisePosition();
 	    c.setAltitude(l.alt);
 	}
-	TransitionManager.fadeIn(vsm.getView("Demo"), 500, vsm);
+	TransitionManager.fadeIn(demoView, 500, vsm);
     }
 
     void cameraDemo(){
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
-	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
 				  new EndAction(){
 				      public void execute(Object subject,
 						   Animation.Dimension dimension){
@@ -157,11 +158,11 @@ public class Introduction {
     }
 
     void cameraDemoActions(){
-	vsm.getView("Demo").setBlank(BLANK_COLOR);
-	vsm.getView("Demo").setBackgroundColor(Color.WHITE);
+	demoView.setBlank(BLANK_COLOR);
+	demoView.setBackgroundColor(Color.WHITE);
 	vs1.removeAllGlyphs();
 	eh=new CameraDemoEvtHdlr(this);
-	vsm.getView("Demo").setEventHandler(eh);
+	demoView.setEventHandler(eh);
 	long randomX=0;
 	long randomY=0;
 	long randomS=0;
@@ -197,7 +198,7 @@ public class Introduction {
     }
 
     void objectFamilies(){
-	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -208,11 +209,11 @@ public class Introduction {
     }
 
     void objectFamiliesActions(){
-	vsm.getView("Demo").setBlank(BLANK_COLOR);
-	vsm.getView("Demo").setBackgroundColor(Color.LIGHT_GRAY);
+	demoView.setBlank(BLANK_COLOR);
+	demoView.setBackgroundColor(Color.LIGHT_GRAY);
 	vs1.removeAllGlyphs();
 	eh=new CameraDemoEvtHdlr(this);
-	vsm.getView("Demo").setEventHandler(eh);
+	demoView.setEventHandler(eh);
 	VRectangle r1=new VRectangle(-600,400,0,100,50,Color.black);
 	VRectangle r2=new VRectangle(-200,400,0,50,50,Color.black);
 	VRectangleOr r3=new VRectangleOr(200,400,0,30,100,Color.black,0.707f);
@@ -274,7 +275,7 @@ public class Introduction {
     }
 
     void objectAnim(){
-	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -285,8 +286,8 @@ public class Introduction {
     }
 
     void objectAnimActions(){
-	vsm.getView("Demo").setBlank(BLANK_COLOR);
-	vsm.getView("Demo").setBackgroundColor(ANIM_BKG_COLOR);
+	demoView.setBlank(BLANK_COLOR);
+	demoView.setBackgroundColor(ANIM_BKG_COLOR);
 	vs1.removeAllGlyphs();
 	vsm.destroyVirtualSpace(VS_2);
 	VRectangle orG=new VRectangle(400,300,0,25,25,Color.black);
@@ -319,7 +320,7 @@ public class Introduction {
 	vs1.addGlyph(linT);vs1.addGlyph(expT);vs1.addGlyph(sigT);
 	linG.setColor(Introduction.ANIM_BUTTON_COLOR);expG.setColor(Introduction.ANIM_BUTTON_COLOR);sigG.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 	eh=new AnimationEvtHdlr(this,orG,szG,clG,trG,linG,expG,sigG);
-	vsm.getView("Demo").setEventHandler(eh);
+	demoView.setEventHandler(eh);
 
 	VCircle c1=new VCircle(-400,900,0,100,Color.black);c1.setType("an");	
 	VTriangleOr t1=new VTriangleOr(-400,600,0,100,Color.black,0);t1.setType("an");
@@ -420,7 +421,7 @@ public class Introduction {
     }
 
     void multiLayer(){
-	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -431,19 +432,19 @@ public class Introduction {
     }
     
     void multiLayerActions(){
-	vsm.getView("Demo").setBlank(BLANK_COLOR);
+	demoView.setBlank(BLANK_COLOR);
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
 	vs1.removeAllGlyphs();
 	vs1.removeCamera(1);
-	vsm.getView("Demo").destroyView();
+	demoView.destroyView();
 	vs2 = vsm.addVirtualSpace(VS_2);
 	vs2.addCamera();
 	Vector vc1=new Vector();vc1.add(vs1.getCamera(0));vc1.add(vsm.getVirtualSpace(VS_2).getCamera(0));
 	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
-	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
+	demoView.setLocation(IntroPanel.PANEL_WIDTH, 0);
 	eh=new MultiLayerEvtHdlr(this);
-	vsm.getView("Demo").setEventHandler(eh, 0);
-	vsm.getView("Demo").setEventHandler(eh, 1);
+	demoView.setEventHandler(eh, 0);
+	demoView.setEventHandler(eh, 1);
 	VRectangle g1=new VRectangle(-2000,0,0,500,500,Color.blue, Color.BLACK, 0.5f);
 	VTriangle g2=new VTriangle(2000,0,0,500,Color.blue, Color.BLACK, 0.5f);
 	VDiamond g3=new VDiamond(0,-2000,0,500,Color.blue, Color.BLACK, 0.5f);
@@ -476,7 +477,7 @@ public class Introduction {
     }
 
     void multiView(){
-	TransitionManager.fadeOut(vsm.getView("Demo"), 500, BLANK_COLOR, vsm,
+	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -487,8 +488,8 @@ public class Introduction {
     }
 
     void multiViewActions(){
-	vsm.getView("Demo").setBlank(BLANK_COLOR);
-	vsm.getView("Demo").setBackgroundColor(Color.WHITE);
+	demoView.setBlank(BLANK_COLOR);
+	demoView.setBackgroundColor(Color.WHITE);
 	vs1.removeAllGlyphs();
 	vsm.destroyVirtualSpace(VS_2);
 	eh=new CameraDemoEvtHdlr(this);
@@ -498,7 +499,7 @@ public class Introduction {
 	Vector vc1=new Vector();
 	vc1.add(vs1.getCamera(camNb));
 	vsm.addExternalView(vc1, "Demo2", View.STD_VIEW, 300, 200, false, true);
-	vsm.getView("Demo").setEventHandler(eh);
+	demoView.setEventHandler(eh);
 	vsm.getView("Demo2").setEventHandler(eh2);
 	vsm.getView("Demo2").setLocation(0,350);
 	vsm.getView("Demo2").setBackgroundColor(Color.WHITE);
@@ -507,7 +508,7 @@ public class Introduction {
 	VRectangle g3=new VRectangle(-200,-200,0,100,50,Color.red);
 	VRectangle g4=new VRectangle(-200,200,0,100,50,Color.blue);
 	vs1.addGlyph(g1);vs1.addGlyph(g2);vs1.addGlyph(g3);vs1.addGlyph(g4);
-	vsm.getGlobalView(vs1.getCamera(camNb),200);
+	vsm.getView("Demo2").getGlobalView(vs1.getCamera(camNb),200);
 	reveal(true);
     }
 
@@ -746,7 +747,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	switch(c){
 	case 'c':{
-	    application.vsm.getGlobalView(application.vsm.getActiveCamera(),200);
+	    application.demoView.getGlobalView(application.vsm.getActiveCamera(),200);
 	    break;
 	}
 	}
@@ -897,7 +898,7 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	switch(c){
 	case 'c':{
-	    application.vsm.getGlobalView(application.vsm.getActiveCamera(),200);
+	    application.demoView.getGlobalView(application.vsm.getActiveCamera(),200);
 	    break;
 	}
 	case 'f':{

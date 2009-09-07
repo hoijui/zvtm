@@ -70,7 +70,7 @@ public class FractalEventHandler implements ViewEventHandler {
 	    x2=v.getMouse().vx;
 	    y2=v.getMouse().vy;
 	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-		application.vsm.centerOnRegion(application.vsm.getActiveCamera(),FractalDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
+		v.parent.centerOnRegion(application.vsm.getActiveCamera(),FractalDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 	    }
 	    zoomingInRegion=false;
 	}

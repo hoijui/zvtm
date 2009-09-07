@@ -133,7 +133,7 @@ public class LensApplet extends JApplet {
 	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vs.addGlyph(i1);
 	vsm.repaintNow();
-	vsm.getGlobalView(vs.getCamera(0),500);
+	view.getGlobalView(vs.getCamera(0),500);
 	vsm.repaintNow();
     }
 

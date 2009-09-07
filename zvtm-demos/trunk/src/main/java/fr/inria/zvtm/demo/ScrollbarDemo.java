@@ -100,7 +100,7 @@ public class ScrollbarDemo implements CameraListener {
 	}
 	sl.virtualSpaceUpdated();
 	vsm.repaintNow();
-	vsm.getGlobalView(demoSpace.getCamera(0), 400);
+	demoView.getGlobalView(demoSpace.getCamera(0), 400);
     }
 
     void translateView(short direction){
@@ -131,7 +131,7 @@ public class ScrollbarDemo implements CameraListener {
     }
 
     void getGlobalView(){
-	vsm.getGlobalView(vsm.getActiveCamera(), ScrollbarDemo.ANIM_MOVE_LENGTH);
+	demoView.getGlobalView(vsm.getActiveCamera(), ScrollbarDemo.ANIM_MOVE_LENGTH);
     }
 
     void getHigherView(){

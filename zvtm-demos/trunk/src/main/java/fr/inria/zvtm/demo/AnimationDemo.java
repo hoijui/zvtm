@@ -497,7 +497,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     /* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */
     
     public void keyPressed(KeyEvent e){
-	vsm.getGlobalView(mCam, 400);
+	mView.getGlobalView(mCam, 400);
     }
 
     public void keyReleased(KeyEvent e){}

@@ -123,7 +123,7 @@ public class ViewDemo {
 	}
 	vsm.repaintNow();
 	pf.destroy();
-	vsm.getGlobalView(vsm.getVirtualSpace(mainSpaceName).getCamera(0), 400);
+	demoView.getGlobalView(vsm.getVirtualSpace(mainSpaceName).getCamera(0), 400);
     }
 
     void translateView(short direction){
@@ -154,7 +154,7 @@ public class ViewDemo {
     }
 
     void getGlobalView(){
-	vsm.getGlobalView(vsm.getActiveCamera(), ViewDemo.ANIM_MOVE_LENGTH);
+	demoView.getGlobalView(vsm.getActiveCamera(), ViewDemo.ANIM_MOVE_LENGTH);
     }
 
     void getHigherView(){
@@ -262,7 +262,7 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	    x2=v.getMouse().vx;
 	    y2=v.getMouse().vy;
 	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-		application.vsm.centerOnRegion(application.vsm.getActiveCamera(),ViewDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
+		application.demoView.centerOnRegion(application.vsm.getActiveCamera(),ViewDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 	    }
 	    zoomingInRegion=false;
 	}
