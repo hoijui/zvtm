@@ -1,6 +1,6 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -29,8 +29,8 @@ import javax.swing.event.ChangeListener;
 
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.engine.*;
-import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 public class DynaSpotDemo {
 
