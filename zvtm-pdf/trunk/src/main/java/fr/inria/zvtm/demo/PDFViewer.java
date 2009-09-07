@@ -55,7 +55,7 @@ public class PDFViewer {
 
 	public void initGUI(){
 		vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
-		mCamera = VirtualSpaceManager.INSTANCE.addCamera(spaceName);
+		mCamera = vs.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
 		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 800, 600, false, true, true, null);
