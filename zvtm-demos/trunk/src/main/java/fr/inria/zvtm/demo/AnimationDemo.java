@@ -115,7 +115,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	    vsm = VirtualSpaceManager.INSTANCE;
 	VText.setMainFont(new Font("Arial", Font.PLAIN, 24));
 	mSpace = vsm.addVirtualSpace("demoSpace");
-	mCam = vsm.addCamera(mSpace);
+	mCam = mSpace.addCamera();
 	Vector cameras = new Vector();
 	cameras.add(mCam);
 	viewPanel = vsm.addPanelView(cameras, APPLET_TITLE, appletWindowWidth, appletWindowHeight-40);

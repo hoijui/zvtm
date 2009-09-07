@@ -48,7 +48,7 @@ public class FractalFern extends FractalDemo {
 	vs = vsm.addVirtualSpace(mainSpaceName);    
 	vs.getCamera(0).setZoomFloor(-90);
 	buildFern();
-	vsm.addCamera(mainSpaceName);
+	vs.addCamera();
 	Vector cameras=new Vector();
 	cameras.add(vs.getCamera(0));
 	vsm.addExternalView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);

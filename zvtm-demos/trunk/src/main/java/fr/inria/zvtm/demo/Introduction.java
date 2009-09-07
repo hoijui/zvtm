@@ -114,7 +114,7 @@ public class Introduction {
 	    vsm = VirtualSpaceManager.INSTANCE;
 	VText.setMainFont(new Font("dialog", 0, 40));
 	vs1 = vsm.addVirtualSpace(VS_1);
-	vsm.addCamera(vs1);
+	vs1.addCamera();
 	Vector vc1=new Vector();vc1.add(vs1.getCamera(0));
 	Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
 	if (screenDimension.width < IntroPanel.PANEL_WIDTH + PREFERRED_VIEW_WIDTH){
@@ -434,7 +434,7 @@ public class Introduction {
 	vs1.removeCamera(1);
 	vsm.getView("Demo").destroyView();
 	vs2 = vsm.addVirtualSpace(VS_2);
-	vsm.addCamera(VS_2);
+	vs2.addCamera();
 	Vector vc1=new Vector();vc1.add(vs1.getCamera(0));vc1.add(vsm.getVirtualSpace(VS_2).getCamera(0));
 	vsm.addExternalView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
 	vsm.getView("Demo").setLocation(IntroPanel.PANEL_WIDTH, 0);
@@ -490,7 +490,7 @@ public class Introduction {
 	vsm.destroyVirtualSpace(VS_2);
 	eh=new CameraDemoEvtHdlr(this);
 	ViewEventHandler eh2=new CameraDemoEvtHdlr(this);
-	vsm.addCamera(VS_1);
+	vs1.addCamera();
 	camNb++;  //keep track of how many cameras have been created in the virtual space
 	Vector vc1=new Vector();
 	vc1.add(vs1.getCamera(camNb));

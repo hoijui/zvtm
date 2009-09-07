@@ -78,7 +78,7 @@ public class ViewDemo {
 	eh=new ViewDemoEventHandler(this);
 	vs = vsm.addVirtualSpace(mainSpaceName);
 	Vector cameras=new Vector();
-	mCamera = vsm.addCamera(mainSpaceName);
+	mCamera = vs.addCamera();
 	mCamera.setZoomFloor(-90);
 	cameras.add(mCamera);
 	demoView = vsm.addExternalView(cameras, mainViewName, viewType, 800, 600, false, true);

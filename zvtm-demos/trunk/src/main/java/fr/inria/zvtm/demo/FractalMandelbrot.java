@@ -45,7 +45,7 @@ public class FractalMandelbrot extends FractalDemo {
 	eh=new FractalEventHandler(this);
 	vs = vsm.addVirtualSpace(mainSpaceName);
 	buildMandelbrot();
-	vsm.addCamera(mainSpaceName);
+	vs.addCamera();
 	vs.getCamera(0).setZoomFloor(-90);
 	Vector cameras=new Vector();
 	cameras.add(vs.getCamera(0));
