@@ -190,18 +190,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         //vsm.setDebug(true);
         mSpace = vsm.addVirtualSpace(mainSpaceName);
         // camera #0 for main view
-        mainCamera = vsm.addCamera(mainSpaceName);
+        mainCamera = mSpace.addCamera();
         mainCamera.setZoomFloor(-90);
         // camera #1 for radar view
-        vsm.addCamera(mainSpaceName);
+        mSpace.addCamera();
         mnSpace = vsm.addVirtualSpace(menuSpace);
         // camera for pie menu
-        vsm.addCamera(menuSpace).setAltitude(10);
+        mnSpace.addCamera().setAltitude(10);
         rSpace = vsm.addVirtualSpace(rdRegionVirtualSpaceName);
         // camera for rectangle representing region seen in main viewport (in overview)
-        vsm.addCamera(rdRegionVirtualSpaceName);
+        rSpace.addCamera();
         // DragMag portal camera (camera #2)
-        dmCamera = vsm.addCamera(mSpace);
+        dmCamera = mSpace.addCamera();
         RectangleNR seg1;
         RectangleNR seg2;
         observedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR, 0.5f);

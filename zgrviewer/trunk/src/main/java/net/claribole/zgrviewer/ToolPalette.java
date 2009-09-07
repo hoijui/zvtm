@@ -74,7 +74,7 @@ public class ToolPalette {
     
     void initZVTMelements(){
 	paletteSpace = grMngr.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
-	paletteCamera = grMngr.vsm.addCamera(PALETTE_SPACE_NAME);
+	paletteCamera = paletteSpace.addCamera();
 	paletteCamera.setAltitude(0);
 	buttons = new VImage[ICON_PATHS.length];
 	selectedButtons = new VImage[ICON_PATHS.length];
