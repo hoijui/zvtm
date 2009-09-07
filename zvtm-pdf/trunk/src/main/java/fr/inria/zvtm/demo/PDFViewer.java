@@ -144,10 +144,10 @@ class PDFViewerEventHandler implements ViewEventHandler {
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		Glyph g = v.lastGlyphEntered();
 		if (g != null){
-			VirtualSpaceManager.INSTANCE.centerOnGlyph(g, application.mCamera, PDFViewer.NAV_ANIM_DURATION);
+			application.pdfView.centerOnGlyph(g, application.mCamera, PDFViewer.NAV_ANIM_DURATION);
 		}
 		else {
-			VirtualSpaceManager.INSTANCE.getGlobalView(application.mCamera, PDFViewer.NAV_ANIM_DURATION);
+			application.pdfView.getGlobalView(application.mCamera, PDFViewer.NAV_ANIM_DURATION);
 		}
 	}
 
