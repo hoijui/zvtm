@@ -144,11 +144,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
-        vsm.addVirtualSpace(mnSpaceName);
-        mCamera = vsm.addCamera(mSpace);
-		vsm.addCamera(mnSpaceName).setAltitude(10);
+        VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        mCamera = mSpace.addCamera();
+		mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
-		vsm.addCamera(ovSpaceName);
+		ovSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));

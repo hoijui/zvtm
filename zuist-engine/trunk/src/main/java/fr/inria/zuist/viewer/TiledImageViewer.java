@@ -135,10 +135,10 @@ public class TiledImageViewer {
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
-        mCamera = vsm.addCamera(mSpace);
-        ovCamera = vsm.addCamera(mSpace);
+        mCamera = mSpace.addCamera();
+        ovCamera = mSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
-		vsm.addCamera(aboutSpaceName);
+		aboutSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(aboutSpace.getCamera(0));
