@@ -87,11 +87,7 @@ Even though we present them as 2D {\em surfaces} on which we put graphical objec
 
 As for glyphs, cameras are added to virtual spaces:
 
-\codebox{Camera foocam = vsm.addCamera(vs);}
-
-or 
-
-\codebox{Camera foocam = vsm.addCamera("foo");}
+\codebox{Camera cam = vs.addCamera();}
 
 An arbitrary number of cameras can be added to each virtual space. One camera, however, can only belong to one virtual space.
 
@@ -113,7 +109,7 @@ A view is instantiated through the VSM:
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
 Vector cameras = new Vector();
-cameras.add(foocam);
+cameras.add(cam);
 View v = vsm.addExternalView(cameras, "fooview", View.STD_VIEW, 800, 600, true, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
