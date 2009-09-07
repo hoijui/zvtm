@@ -104,7 +104,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 	public void initGUI(){
 	    this.windowLayout();
 		vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
-		mCamera = VirtualSpaceManager.INSTANCE.addCamera(spaceName);
+		mCamera = vs.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
 		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
