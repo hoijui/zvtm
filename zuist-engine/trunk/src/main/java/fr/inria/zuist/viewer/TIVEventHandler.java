@@ -127,7 +127,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 			    application.sm.setUpdateLevel(false);
-				VirtualSpaceManager.INSTANCE.centerOnRegion(application.mCamera, TIVNavigationManager.ANIM_MOVE_DURATION,
+				application.mCamera.getOwningView().centerOnRegion(application.mCamera, TIVNavigationManager.ANIM_MOVE_DURATION,
 				    x1, y1, x2, y2,
 				    new EndAction(){public void execute(Object subject, Animation.Dimension dimension){application.sm.setUpdateLevel(true);}});
 			}

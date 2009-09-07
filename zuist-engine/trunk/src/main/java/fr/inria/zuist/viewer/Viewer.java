@@ -354,7 +354,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (l > -1){
 			rememberLocation(mCamera.getLocation());
 			long[] wnes = sm.getLevel(l).getBounds();
-	        vsm.centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
+	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
 		}
     }
 
@@ -412,7 +412,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			Glyph g = od.getGlyph();
 			if (g != null){
 				rememberLocation(mCamera.getLocation());
-				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+				mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}
 	}
@@ -424,7 +424,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			Glyph g = r.getBounds();
 			if (g != null){
 				rememberLocation(mCamera.getLocation());
-				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+				mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}		
 	}

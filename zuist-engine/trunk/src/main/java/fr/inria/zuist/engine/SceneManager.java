@@ -867,7 +867,7 @@ public class SceneManager {
 		}
 		if (l > -1){
 			long[] wnes = getLevel(l).getBounds();
-	        VirtualSpaceManager.INSTANCE.centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3]);
+	        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3]);
 	        return wnes;
 		}
 		else {

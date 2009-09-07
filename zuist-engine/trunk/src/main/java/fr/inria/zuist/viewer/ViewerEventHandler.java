@@ -108,7 +108,7 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
 		else {
 			// last click was not on this object, center on it
 			application.rememberLocation(application.mCamera.getLocation());
-			application.vsm.centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			objectJustSelected = g;
 		}
     }
