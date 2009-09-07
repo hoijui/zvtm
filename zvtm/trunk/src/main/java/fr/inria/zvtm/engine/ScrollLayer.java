@@ -64,6 +64,8 @@ public class ScrollLayer implements ComponentListener {
 
     int panelWidth;
     int panelHeight;
+    
+    static final String SCROLLSPACE_NAME_PREFIX = "scrollspace";
 
     /** Create all elements that compose the scroll bars to control a camera.
      *@param vsm current virtual space manager
@@ -71,9 +73,9 @@ public class ScrollLayer implements ComponentListener {
      */
     public ScrollLayer(VirtualSpaceManager vsm, Camera cc){
 	controlledCamera = cc;
-	slVSname = "scrollspace" + controlledCamera.getID();
+	slVSname = SCROLLSPACE_NAME_PREFIX + controlledCamera.hashCode();
 	slVS = vsm.addVirtualSpace(slVSname);
-	slC = vsm.addCamera(slVS);
+	slC = slVS.addCamera();
 	vgutter = new VRectangle(0, 0, 0, 8, 8, Color.WHITE, PASTEL_BLUE, 1.0f);
 	vslider = new VRectangle(0, 0, 0, 8, 8, PASTEL_BLUE, PASTEL_BLUE, 1.0f);
 	upBt = new VImage((new ImageIcon(this.getClass().getResource("/images/button_up_16x16.png"))).getImage());
@@ -107,9 +109,9 @@ public class ScrollLayer implements ComponentListener {
      */
     public ScrollLayer(VirtualSpaceManager vsm, Camera cc, Glyph[] widgets){
 	controlledCamera = cc;
-	slVSname = "scrollspace" + controlledCamera.getID();
+	slVSname = SCROLLSPACE_NAME_PREFIX + controlledCamera.hashCode();
 	slVS = vsm.addVirtualSpace(slVSname);
-	slC = vsm.addCamera(slVS);
+	slC = slVS.addCamera();
 	vgutter = widgets[0];
 	vslider = widgets[1];
 	upBt = widgets[2];

@@ -57,7 +57,7 @@ public class TestCircle {
     public void initTest(short ogl){
         eh=new TestCircle.EventHandlerTest(this);
         vs = vsm.addVirtualSpace("src");
-        vsm.addCamera("src");
+        vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90);

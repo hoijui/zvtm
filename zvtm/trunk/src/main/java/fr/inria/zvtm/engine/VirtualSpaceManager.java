@@ -86,10 +86,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**print exceptions and warning*/
     static boolean debug = false;
 
-    /**next glyph will have ID...*/
-    private long nextID;
-    /**next camera will have ID...*/
-    private int nextcID;
     /**next lens will have ID...*/
     protected int nextlID;
     /**next portal will have ID...*/
@@ -97,10 +93,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**next cursor will have ID...*/
     private int nextmID;
 
-//    /**key is glyph ID (Long)*/
-//    protected Hashtable allGlyphs;
-    /**key is camera ID  (Integer)*/
-    protected Hashtable allCameras;
     /**key is portal ID  (Integer)*/
     protected Hashtable allPortals;
     /**key is lens ID  (Integer), value is a two-element Vector: 1st element is the Lens object, 2nd element is the owning view*/
@@ -135,13 +127,10 @@ public class VirtualSpaceManager implements AWTEventListener {
      */
     private VirtualSpaceManager(){
 	if (debug){System.out.println("Debug mode ON");}
-	nextID=1;
-	nextcID=1;
 	nextpID=1;
 	nextlID=1;
 	nextmID=1;
 	animationManager = new AnimationManager(this);
-	allCameras=new Hashtable();
 	allPortals=new Hashtable();
 	allLenses=new Hashtable();
 	allVirtualSpaces=new Hashtable();
@@ -188,178 +177,43 @@ public class VirtualSpaceManager implements AWTEventListener {
 	return defaultMultiFill;
     }
 
-//    /** Set border color of glyphs overlapped by mouse.
-//     * Not propagated to existing glyphs.
-//     *@see #setMouseInsideGlyphColor(Color c, boolean propagate)
+//    /**add camera to space whose name is vs
+//     *@param vs owning virtual space's name
 //     */
-//    public void setMouseInsideGlyphColor(Color c){
-//	setMouseInsideGlyphColor(c, false);
+//    public Camera addCamera(String vs){
+//	return addCamera((VirtualSpace)allVirtualSpaces.get(vs));
 //    }
 //
-//
-//    /** Set border color of glyphs overlapped by mouse.
-//     *@param propagate propagate changes to existing glyphs
-//     *@see #setMouseInsideGlyphColor(Color c)
+//    /**add camera to space whose name is vs
+//     *@param vs owning virtual space 
 //     */
-//    public void setMouseInsideGlyphColor(Color c, boolean propagate){
-//	mouseInsideColor = c;
-//	if (propagate){
-//	    for (Enumeration e=allGlyphs.elements();e.hasMoreElements();){
-//		((Glyph)e.nextElement()).setMouseInsideHighlightColor(mouseInsideColor);
-//	    }
-//	}
-//    }
-
-//    /**add glyph g to virtual space whose name is vs
-//     *@param g glyph
-//     *@param vs virtual space name
-//     */
-//    public Glyph addGlyph(Glyph g, String vs){
-//	return addGlyph(g, vs, true);
-//    }
-
-//    /**add glyph g to virtual space vs
-//     *@param g glyph
-//     *@param vs virtual space
-//     */
-//    public Glyph addGlyph(Glyph g, VirtualSpace vs){
-//	return addGlyph(g, vs, true);
-//    }
-
-//    /**add glyph g to virtual space whose name is vs
-//     *@param g glyph
-//     *@param vs virtual space name
-//     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
-//     */
-//    public Glyph addGlyph(Glyph g, String vs, boolean repaint){
-//	if (g!=null){
-//	    if (allVirtualSpaces.containsKey(vs)){
-//		VirtualSpace tvs = (VirtualSpace)allVirtualSpaces.get(vs);
-//		return addGlyph(g, tvs, true, repaint);
-//	    }
-//	    else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:unknown virtual space: "+vs);return null;}
-//	}
-//	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
-//    }
-
-//    /**add glyph g to virtual space vs
-//     *@param g glyph
-//     *@param vs virtual space
-//     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
-//     */
-//    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean repaint){
-//	return addGlyph(g, vs, true, repaint);
-//    }
-
-//    /**add glyph g to virtual space vs
-//     *@param g glyph
-//     *@param vs virtual space
-//     *@param initColors false -> do not initalize mouse inside and selected colors
-//     *@param repaint false -> do not issue a repaint request for cameras associated with vs (default is true)
-//     */
-//    public Glyph addGlyph(Glyph g, VirtualSpace vs, boolean initColors, boolean repaint){
-//	if (g!=null && vs!=null){
-//	    vs.addGlyph(g);
-//	    g.setID(new Long(nextID++));
-//	    if (initColors){
-//		g.setMouseInsideHighlightColor(this.mouseInsideColor);
-//	    }
-//	    allGlyphs.put(g.getID(),g);
-//	    if (repaint){repaintNow();}
-//	    return g;
-//	}
-//	else {System.err.println("ZVTM Error:VirtualSpaceManager:addGlyph:attempting to add a null Glyph in space: "+vs);return null;}
-//    }
-    
-//    public void addGlyphs(Glyph[] gs, VirtualSpace vs, boolean repaint){
-//		if(vs != null){
-//			vs.addGlyphs(gs);
-//
-//			for(Glyph glyph: gs){
-//				glyph.setID(new Long(nextID++));
-//				glyph.setMouseInsideHighlightColor(this.mouseInsideColor);
-//				allGlyphs.put(glyph.getID(), glyph);
-//			}
-//			if(repaint){repaintNow();}
-//		}
-//    }
-
-//    /** Get glyph with ID id. */
-//    public Glyph getGlyph(Long id){
-//        return (Glyph)(allGlyphs.get(id));
-//    }
-//    
-//    /** Get all glyphs currently present in the various virtual spaces managed by this VSM. */
-//    public Enumeration getAllGlyphs(){
-//        return allGlyphs.elements();
+//    public Camera addCamera(VirtualSpace vs){
+//	Camera c = vs.createCamera();
+//	c.setID(new Integer(nextcID++));
+//	allCameras.put(c.getID(), c);
+//	return c;
 //    }
 //
-//	/** Remove all glyphs from a virtual space.
-//		*@param spaceName name of that virtual space
-//		*@deprecated as of zvtm 0.9.8
-//		*@see #removeGlyphsFromSpace(String spaceName)
-//		*/
-//	public void destroyGlyphsInSpace(String spaceName){
-//		removeGlyphsFromSpace(spaceName);
-//	}
-
-//	/** Remove all glyphs from a virtual space.
-//		*@param spaceName name of that virtual space
-//		*/
-//	public void removeGlyphsFromSpace(String spaceName){
-//		VirtualSpace vs=getVirtualSpace(spaceName);
-//		Glyph g;
-//		Vector entClone=(Vector)vs.getAllGlyphs().clone();
-//		for (int i=0;i<entClone.size();i++){
-//			g = (Glyph)entClone.elementAt(i);
-//			vs.removeGlyph(g, false);
-//			allGlyphs.remove(g);
-//		}
-//		repaintNow();
-//	}
-
-    /**add camera to space whose name is vs
-     *@param vs owning virtual space's name
-     */
-    public Camera addCamera(String vs){
-	return addCamera((VirtualSpace)allVirtualSpaces.get(vs));
-    }
-
-    /**add camera to space whose name is vs
-     *@param vs owning virtual space 
-     */
-    public Camera addCamera(VirtualSpace vs){
-	Camera c = vs.createCamera();
-	c.setID(new Integer(nextcID++));
-	allCameras.put(c.getID(), c);
-	return c;
-    }
-
-    /**add camera to space whose name is vs
-     *@param vs owning virtual space's name
-     *@param lazy true if this is to be a lazy camera (false otherwise)
-     */
-    public Camera addCamera(String vs, boolean lazy){
-	return addCamera((VirtualSpace)allVirtualSpaces.get(vs), lazy);
-    }
-
-    /**
-     *add camera to space whose name is vs
-     *@param vs owning virtual space
-     *@param lazy true if this is to be a lazy camera (false otherwise)
-     */
-    public Camera addCamera(VirtualSpace vs, boolean lazy){
-	Camera c = vs.createCamera();
-	c.setLaziness(lazy);
-	c.setID(new Integer(nextcID++));
-	allCameras.put(c.getID(),c);
-	return c;
-    }
-
-    /**get camera whose ID is id*/
-    public Camera getCamera(Integer id){
-	return (Camera)(allCameras.get(id));
-    }
+//    /**add camera to space whose name is vs
+//     *@param vs owning virtual space's name
+//     *@param lazy true if this is to be a lazy camera (false otherwise)
+//     */
+//    public Camera addCamera(String vs, boolean lazy){
+//	return addCamera((VirtualSpace)allVirtualSpaces.get(vs), lazy);
+//    }
+//
+//    /**
+//     *add camera to space whose name is vs
+//     *@param vs owning virtual space
+//     *@param lazy true if this is to be a lazy camera (false otherwise)
+//     */
+//    public Camera addCamera(VirtualSpace vs, boolean lazy){
+//	Camera c = vs.createCamera();
+//	c.setLaziness(lazy);
+//	c.setID(new Integer(nextcID++));
+//	allCameras.put(c.getID(),c);
+//	return c;
+//    }
 
     /**get active camera (in focused view) - null if no view is active*/
     public Camera getActiveCamera(){

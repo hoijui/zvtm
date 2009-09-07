@@ -111,19 +111,20 @@ public class VirtualSpace {
     /**returns the list of all cameras in this virtual space*/
     public Camera[] getCameraListAsArray(){return cm.cameraList;}
 
-    /**create a new camera*/
-    Camera createCamera(){
-	Camera c=cm.addCamera();
-	Vector[] newDrawnListList=new Vector[camera2drawnList.length+1];  //create a new drawnList for it
-	System.arraycopy(camera2drawnList,0,newDrawnListList,0,camera2drawnList.length);
-	newDrawnListList[camera2drawnList.length]=new Vector();
-	camera2drawnList=newDrawnListList;
-	c.setOwningSpace(this);
-	for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
-	    Glyph g=(Glyph)e.nextElement();
-	    g.addCamera(c.getIndex());
-	}
-	return c;
+    /** Create a new camera*/
+    public Camera addCamera(){
+        Camera c=cm.addCamera();
+        //create a new drawnList for it
+        Vector[] newDrawnListList=new Vector[camera2drawnList.length+1];
+        System.arraycopy(camera2drawnList,0,newDrawnListList,0,camera2drawnList.length);
+        newDrawnListList[camera2drawnList.length]=new Vector();
+        camera2drawnList=newDrawnListList;
+        c.setOwningSpace(this);
+        for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
+            Glyph g=(Glyph)e.nextElement();
+            g.addCamera(c.getIndex());
+        }
+        return c;
     }
     
     /**remove camera at index i

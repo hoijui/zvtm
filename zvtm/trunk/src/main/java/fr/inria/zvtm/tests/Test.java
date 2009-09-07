@@ -58,7 +58,7 @@ public class Test {
     public void initTest(short ogl){
         eh=new EventHandlerTest(this);
         vs = vsm.addVirtualSpace("src");
-        vsm.addCamera("src");
+        vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90f);

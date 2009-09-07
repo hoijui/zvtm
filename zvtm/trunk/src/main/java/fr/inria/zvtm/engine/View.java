@@ -534,7 +534,7 @@ public abstract class View {
 	Vector cams = (layers != null) ? layers : cameras;
 	for (int i=0;i<cams.size();i++){
 	    c = (Camera)cams.elementAt(i);
-	    nc = vsm.addCamera(c.parentSpace.spaceName);
+	    nc = c.parentSpace.addCamera();
 	    nc.posx = c.posx;
 	    nc.posy = c.posy;
 	    /*change this altitude to compensate for the w/h change what we
