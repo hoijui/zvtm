@@ -150,9 +150,9 @@ public class WorldExplorer implements Java2DPainter {
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
-        mCamera = vsm.addCamera(mSpace);
-        ovCamera = vsm.addCamera(mSpace);
-		bCamera = vsm.addCamera(bSpace);
+        mCamera = mSpace.addCamera();
+        ovCamera = mSpace.addCamera();
+		bCamera = bSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
