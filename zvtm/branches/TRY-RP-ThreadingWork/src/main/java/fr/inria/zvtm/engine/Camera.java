@@ -39,8 +39,6 @@ public class Camera {
 
     public static final float DEFAULT_FOCAL = 100;
 
-    /** camera ID */
-    Integer ID;
     /** camera index (wrt the owning virtual space)*/
     int index; 
     /** Coordinates in virtual space.
@@ -337,20 +335,6 @@ public class Camera {
     }
 
     /**
-     * get camera ID
-     */
-    public Integer getID(){
-	return ID;
-    }
-
-    /**
-     * set new ID for this camera (make sure there is no conflict)
-     */
-    public void setID(Integer ident){
-	ID=ident;
-    }
-
-    /**
      * set virtual space owning this camera
      */
     protected void setOwningSpace(VirtualSpace vs){
@@ -619,7 +603,7 @@ public class Camera {
      * returns a String with ID, position, altitude and focal distance
      */
     public String toString() {
-	return new String("Camera "+ID+" position ("+posx+","+posy+") alt "+altitude+" focal "+focal);
+	return new String("Camera: index"+index+" position ("+posx+","+posy+") alt "+altitude+" focal "+focal);
     }
 
 }

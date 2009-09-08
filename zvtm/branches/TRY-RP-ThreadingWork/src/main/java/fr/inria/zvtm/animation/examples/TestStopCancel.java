@@ -58,7 +58,7 @@ public class TestStopCancel {
     public void startAnim(short ogl){
         eh=new TestStopCancel.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
-        vsm.addCamera("src");
+        vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90);
@@ -66,7 +66,7 @@ public class TestStopCancel {
         switch(ogl){
 	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
-        testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true);
+        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);

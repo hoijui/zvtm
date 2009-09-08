@@ -37,11 +37,19 @@ import java.util.Vector;
 
 import javax.swing.JLabel;
 
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.engine.RepaintListener;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.lens.Lens;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VPath;
+import fr.inria.zvtm.glyphs.RectangularShape;
 
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>
@@ -118,7 +126,7 @@ public abstract class View {
     protected String name;
 
     /**triggers the mouseMoved method in ViewEventHandler when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
-    boolean notifyMouseMoved=false;
+    boolean notifyMouseMoved = true;
 
     /**hooks for Java2D painting in ZVTM views (BACKGROUND, FOREGROUND, AFTER_DISTORTION, AFTER_PORTALS)*/
     Java2DPainter[] painters = new Java2DPainter[4];
@@ -168,12 +176,16 @@ public abstract class View {
 	panel.setEventHandler(eh, layer);
     }
 
-    /**sets whether the mouseMoved method in ViewEventHandler is triggered when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
+    /** Sets whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
+     * Set to true by default. Applications that do not care about this callback can disable notification
+     * about these events to avoid unnecessary callbacks (an event each sent each time the cursor moves).
+     */
     public void setNotifyMouseMoved(boolean b){
-	notifyMouseMoved=b;
+	    notifyMouseMoved=b;
     }
 
-    /**get state of notifyMouseMoved for this view*/
+    /** Tells whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
+     * Set to true by default.*/
     public boolean getNotifyMouseMoved(){return notifyMouseMoved;}
 
     /**set status bar text*/
@@ -528,7 +540,7 @@ public abstract class View {
 	Vector cams = (layers != null) ? layers : cameras;
 	for (int i=0;i<cams.size();i++){
 	    c = (Camera)cams.elementAt(i);
-	    nc = vsm.addCamera(c.parentSpace.spaceName);
+	    nc = c.parentSpace.addCamera();
 	    nc.posx = c.posx;
 	    nc.posy = c.posy;
 	    /*change this altitude to compensate for the w/h change what we
@@ -643,9 +655,333 @@ public abstract class View {
         return panel.getLens();
     }
     
-
+    /* ----------------- Navigation ------------------ */
+    
+    /** Get the location from which a camera will see all glyphs visible in the associated virtual space.
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+     *@param c camera considered (will not be moved)
+     *@param mFactor magnification factor - 1.0 (default) means that the glyphs will occupy the whole screen. mFactor &gt; 1 will zoom out from this default location. mFactor &lt; 1 will do the opposite
+     *@return the location to which the camera should go, null if the camera is not associated with this view.
+     *@see #getGlobalView(Camera c, int d)
+     *@see #getGlobalView(Camera c)
+     *@see #getGlobalView(Camera c, int d, float mFactor)
+     */
+    public Location getGlobalView(Camera c, float mFactor){
+        if (c.getOwningView() != this){return null;}
+        //wnes=west north east south
+        long[] wnes = c.parentSpace.findFarmostGlyphCoords();
+        //new coords where camera should go
+        long dx = (wnes[2]+wnes[0])/2;
+        long dy = (wnes[1]+wnes[3])/2;
+        long[] regBounds = this.getVisibleRegion(c);
+        /*region that will be visible after translation, but before zoom/unzoom (need to
+        compute zoom) ; we only take left and down because we only need horizontal and
+        vertical ratios, which are equals for left and right, up and down*/
+        long[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
+        float currentAlt = c.getAltitude()+c.getFocal();
+        float ratio = 0;
+        //compute the mult factor for altitude to see all stuff on X
+        if (trRegBounds[0]!=0){ratio = (dx-wnes[0])/((float)(dx-trRegBounds[0]));}
+        //same for Y ; take the max of both
+        if (trRegBounds[1]!=0){
+            float tmpRatio = (dy-wnes[3])/((float)(dy-trRegBounds[1]));
+            if (tmpRatio>ratio){ratio = tmpRatio;}
+        }
+        ratio *= mFactor;
+        return new Location(dx, dy, currentAlt*Math.abs(ratio)-c.getFocal());
+    }
+    
+    /** Translates and (un)zooms a camera in order to see everything visible in the associated virtual space.
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+     *@param c Camera to be moved (will actually be moved)
+     *@param d duration of the animation in ms
+     *@return the final camera location, null if the camera is not associated with this view.
+     *@see #getGlobalView(Camera c)
+     *@see #getGlobalView(Camera c, int d, float mFactor)
+     *@see #getGlobalView(Camera c, float mFactor)
+     */
+    public Location getGlobalView(Camera c, int d){
+        return getGlobalView(c, d, 1.0f);
+    }
+    
+    /** Translates and (un)zooms a camera in order to see everything visible in the associated virtual space.
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+     *@param c Camera to be moved (will actually be moved)
+     *@param d duration of the animation in ms
+     *@param mFactor magnification factor - 1.0 (default) means that the glyphs will occupy the whole screen. mFactor &gt; 1 will zoom out from this default location. mFactor &lt; 1 will do the opposite
+     *@return the final camera location, null if the camera is not associated with this view.
+     *@see #getGlobalView(Camera c)
+     *@see #getGlobalView(Camera c, int d)
+     *@see #getGlobalView(Camera c, float mFactor)
+     */
+	public Location getGlobalView(Camera c, int d, float mFactor){
+		Location l = this.getGlobalView(c, mFactor);
+		if (l != null){
+		    Animation trans = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(d,c,
+										       new LongPoint(l.vx,l.vy),
+										       false,
+										       SlowInSlowOutInterpolator.getInstance(),
+										       null);
+		    
+		    Animation alt = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(d,c,
+										   l.alt,
+										   false,
+										   SlowInSlowOutInterpolator.getInstance(),
+										   null);
+		    
+		    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+		    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(alt, false);
+		}
+		return l;
+	}
 	
+	/** Get the location from which a camera will see everything visible in the associated virtual space.
+	 * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+	 *@param c camera considered (will not be moved)
+	 *@return the location to which the camera should go, null if the camera is not associated with this view.
+	 *@see #getGlobalView(Camera c, int d)
+	 *@see #getGlobalView(Camera c, int d, float mFactor)
+	 *@see #getGlobalView(Camera c, float mFactor)
+	 */
+	public Location getGlobalView(Camera c){
+		return getGlobalView(c, 1.0f);
+	}
 
+    /** Translates and (un)zooms a camera in order to focus on glyph g
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+        *@param g Glyph of interest
+        *@param c Camera to be moved
+        *@param d duration of the animation in ms
+        *@param z if false, do not (un)zoom, just translate (default is true)
+        *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
+        *@param endAction end action to execute after camera reaches its final position
+        *@return the final camera location, null if the camera is not associated with this view.
+        */
+    public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, EndAction endAction){
+        if (c.getOwningView() != this){return null;}
+        long dx;
+        long dy;
+        if (g instanceof VText){
+            VText t=(VText)g;
+            LongPoint p=t.getBounds(c.getIndex());
+            if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){
+                dx=g.vx+p.x/2-c.posx;
+                dy=g.vy+p.y/2-c.posy;
+            }
+            else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){
+                dx=g.vx-c.posx;
+                dy=g.vy-c.posy;
+            }
+            else {
+                dx=g.vx-p.x/2-c.posx;
+                dy=g.vy-p.y/2-c.posy;
+            }
+        }
+        else if (g instanceof VPath){
+            VPath p=(VPath)g;
+            dx=p.realHotSpot.x-c.posx;
+            dy=p.realHotSpot.y-c.posy;
+        }
+        else {
+            dx=g.vx-c.posx;
+            dy=g.vy-c.posy;
+        }
 
+        //relative translation
+        Animation trans = 
+            VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+            createCameraTranslation(d, c,
+            new LongPoint(dx,dy),
+            true,
+            SlowInSlowOutInterpolator.getInstance(),
+            endAction);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+
+        float currentAlt=c.getAltitude()+c.getFocal();
+        if (z){
+            long[] regBounds = this.getVisibleRegion(c);
+            // region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
+            // we only take left and down because ratios are equals for left and right, up and down
+            long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};
+            float ratio=0;
+            //compute the mult factor for altitude to see glyph g entirely
+            if (trRegBounds[0]!=0){
+                if (g instanceof VText){
+                    ratio = ((float)(((VText)g).getBounds(c.getIndex()).x)) / ((float)(g.vx-trRegBounds[0]));
+                }
+                else if (g instanceof RectangularShape){
+                    ratio = ((float)(((RectangularShape)g).getWidth())) / ((float)(g.vx-trRegBounds[0]));
+                }
+                else {
+                    ratio = g.getSize() / ((float)(g.vx-trRegBounds[0]));
+                }
+            }
+            //same for Y ; take the max of both
+            if (trRegBounds[1]!=0){
+                float tmpRatio;
+                if (g instanceof VText){
+                    tmpRatio = ((float)(((VText)g).getBounds(c.getIndex()).y)) / ((float)(g.vy-trRegBounds[1]));
+                }
+                else if (g instanceof RectangularShape){
+                    tmpRatio = ((float)(((RectangularShape)g).getHeight())) / ((float)(g.vy-trRegBounds[1]));
+                }
+                else {
+                    tmpRatio = (g.getSize())/((float)(g.vy-trRegBounds[1]));
+                }
+                if (tmpRatio>ratio){ratio=tmpRatio;}
+            }
+            ratio *= mFactor;
+            float newAlt=currentAlt*Math.abs(ratio);
+
+            Animation altAnim = 
+                VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+                createCameraAltAnim(d, c, 
+                newAlt, false,
+                SlowInSlowOutInterpolator.getInstance(),
+                null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(altAnim, false);
+
+            return new Location(g.vx,g.vy,newAlt);
+        }
+        else {
+            return new Location(g.vx,g.vy,currentAlt);
+        }
+    }
+ 
+    /** Translates and (un)zooms a camera in order to focus on glyph g
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+     *@param g Glyph of interest
+     *@param c Camera to be moved
+     *@param d duration of the animation in ms
+     *@return the final camera location, null if the camera is not associated with this view.
+     */
+    public Location centerOnGlyph(Glyph g,Camera c,int d){
+	return this.centerOnGlyph(g,c,d,true);
+    }
+
+    /** Translates and (un)zooms a camera in order to focus on glyph g
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+     *@param g Glyph of interest
+     *@param c Camera to be moved
+     *@param d duration of the animation in ms
+     *@param z if false, do not (un)zoom, just translate (default is true)
+     *@return the final camera location, null if the camera is not associated with this view.
+     */
+    public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z){
+	return this.centerOnGlyph(g, c, d, z, 1.0f);
+    }
+
+    /** Translates and (un)zooms a camera in order to focus on glyph g
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+     *@param g Glyph of interest
+     *@param c Camera to be moved
+     *@param d duration of the animation in ms
+     *@param z if false, do not (un)zoom, just translate (default is true)
+     *@param mFactor magnification factor - 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
+     *@return the final camera location, null if the camera is not associated with this view.
+     */
+    public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor){
+	return this.centerOnGlyph(g, c, d, z, mFactor, null);
+    }
+    
+    
+
+    /** Translates and (un)zooms a camera in order to focus on a specific rectangular region
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+		*@param c Camera to be moved
+		*@param d duration of the animation in ms (pass 0 to go there instantanesouly)
+		*@param x1 x coord of first point
+		*@param y1 y coord of first point
+		*@param x2 x coord of opposite point
+		*@param y2 y coord of opposite point
+		*@return the final camera location, null if the camera is not associated with this view.
+		*/
+	public Location centerOnRegion(Camera c, int d, long x1, long y1, long x2, long y2){
+	    return centerOnRegion(c, d, x1, y1, x2, y2, null);
+    }
+    
+	/** Translates and (un)zooms a camera in order to focus on a specific rectangular region
+     * The camera must be used in this view. Otherwise, the method returns null and does nothing.
+		*@param c Camera to be moved
+		*@param d duration of the animation in ms (pass 0 to go there instantanesouly)
+		*@param x1 x coord of first point
+		*@param y1 y coord of first point
+		*@param x2 x coord of opposite point
+		*@param y2 y coord of opposite point
+		*@param ea action to be performed at end of animation
+		*@return the final camera location, null if the camera is not associated with this view.
+		*/
+	public Location centerOnRegion(Camera c, int d, long x1, long y1, long x2, long y2, EndAction ea){
+        if (c.getOwningView() != this){return null;}
+        long minX = Math.min(x1,x2);
+        long minY = Math.min(y1,y2);
+        long maxX = Math.max(x1,x2);
+        long maxY = Math.max(y1,y2);
+        //wnes=west north east south
+        long[] wnes = {minX, maxY, maxX, minY};
+        //new coords where camera should go
+        long dx = (wnes[2]+wnes[0]) / 2; 
+        long dy = (wnes[1]+wnes[3]) / 2;
+        // new alt to fit horizontally
+        float nah = (wnes[2]-dx) * 2 * c.getFocal() / this.getPanel().viewW - c.getFocal();
+        // new alt to fit vertically
+        float nav = (wnes[1]-dy) * 2 * c.getFocal() / this.getPanel().viewH - c.getFocal();
+        // take max of both
+        float na = Math.max(nah, nav);
+        if (d > 0){
+            Animation trans =
+                VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+                createCameraTranslation(d, c, new LongPoint(dx, dy), false,
+                SlowInSlowOutInterpolator.getInstance(),
+                ea);
+            Animation altAnim = 
+                VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+                createCameraAltAnim(d, c, na, false,
+                SlowInSlowOutInterpolator.getInstance(),
+                null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(altAnim, false);			        
+        }
+        else {
+            c.setAltitude(na);
+            c.moveTo(dx, dy);
+        }
+        return new Location(dx, dy, na);
+    }
+
+    /** returns a vector of glyphs whose hotspot is in region delimited by rectangle (x1,y1,x2,y2) in virtual space vs (returns null if empty). Coordinates of the mouse cursor in virtual space are available in instance variables vx and vy of class VCursor. The selection rectangle can be drawn on screen by using ViewPanel.setDrawRect(true) (e.g. call when mouse button is pressed)/ViewPanel.setDrawRect(false) (e.g. call when mouse button is released)
+     *@param x1 x coord of first point
+     *@param y1 y coord of first point
+     *@param x2 x coord of opposite point
+     *@param y2 y coord of opposite point
+     *@param vsn name of virtual space
+     *@param wg which glyphs in the region should be returned (among VIS_AND_SENS_GLYPHS (default), VISIBLE_GLYPHS, SENSIBLE_GLYPHS, ALL_GLYPHS)
+     */
+    public Vector getGlyphsInRegion(long x1,long y1,long x2,long y2,String vsn,int wg){
+        Vector res=new Vector();
+        VirtualSpace vs = VirtualSpaceManager.INSTANCE.getVirtualSpace(vsn);
+        long minX=Math.min(x1,x2);
+        long minY=Math.min(y1,y2);
+        long maxX=Math.max(x1,x2);
+        long maxY=Math.max(y1,y2);
+        if (vs!=null){
+            Vector allG=vs.getAllGlyphs();
+            Glyph g;
+            for (int i=0;i<allG.size();i++){
+                g=(Glyph)allG.elementAt(i);
+                if ((g.vx>=minX) && (g.vy>=minY) && (g.vx<=maxX) && (g.vy<=maxY)){
+                    if ((wg==VirtualSpaceManager.VIS_AND_SENS_GLYPHS) && g.isSensitive() && g.isVisible()){res.add(g);}
+                    else if ((wg==VirtualSpaceManager.VISIBLE_GLYPHS) && g.isVisible()){res.add(g);}
+                    else if ((wg==VirtualSpaceManager.SENSITIVE_GLYPHS) && g.isSensitive()){res.add(g);}
+                    else if (wg==VirtualSpaceManager.ALL_GLYPHS){res.add(g);}
+                }
+            }
+        }
+        if (res.isEmpty()){res=null;}
+        return res;
+    }
+   
 }
 
