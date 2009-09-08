@@ -46,8 +46,6 @@ public class GLViewPanel extends ViewPanel {
 			}
 		};
 		edtTimer = new Timer(delay, taskPerformer);
-		edtTimer.setCoalesce(false);
-
 
 	addHierarchyListener(
 	    new HierarchyListener() {
