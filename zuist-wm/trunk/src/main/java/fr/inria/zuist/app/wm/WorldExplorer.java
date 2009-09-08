@@ -138,7 +138,7 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(9000.0f);
-        vsm.getGlobalView(mCamera, ANIM_MOVE_DURATION);
+        mView.getGlobalView(mCamera, ANIM_MOVE_DURATION);
         eh.cameraMoved(null, null, 0);
 		nm.createOverview();
         console.setVisible(true);
@@ -251,7 +251,7 @@ public class WorldExplorer implements Java2DPainter {
     /*-------------     Navigation       -------------*/
 
     void getGlobalView(){
-        vsm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION);
+        mView.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION);
     }
 
     /* Higher view */

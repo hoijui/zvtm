@@ -121,7 +121,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 			x2 = v.getVCursor().vx;
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-				application.vsm.centerOnRegion(application.mCamera, WorldExplorer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
+				application.mCamera.getOwningView().centerOnRegion(application.mCamera, WorldExplorer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
 			}
 			selectingRegion = false;
 		}
