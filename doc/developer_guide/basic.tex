@@ -110,7 +110,7 @@ A view is instantiated through the VSM:
 \begin{SaveVerbatim}{CodeVerb}
 Vector cameras = new Vector();
 cameras.add(cam);
-View v = vsm.addExternalView(cameras, "fooview", View.STD_VIEW, 800, 600, true, true);
+View v = vsm.addFrameView(cameras, "fooview", View.STD_VIEW, 800, 600, true, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
@@ -119,7 +119,7 @@ There are a number of variations depending on whether you want to attach a menu 
 
 Special case of panel views:
 
-\fbox{JPanel p = vsm.addExternalView(cameras, "fooView", 800, 600);}
+\codebox{JPanel p = vsm.addPanelView(cameras, "fooView", 800, 600);}
 
 This method returns the JPanel encapsulated by the view instead of returning the view itself, for straightforward (possible inlined) integration within a Swing component hierarchy. The \cd{View} instance itself can easily be retrieved by a call to:
 
@@ -152,7 +152,7 @@ Vector cameras = new Vector();
 cameras.add(foocam);
 cameras.add(barcam);
 cameras.add(lastcam);
-View v = vsm.addExternalView(cameras, "3_layer_view", View.STD_VIEW, 800, 600, true, true);
+View v = vsm.addFrameView(cameras, "3_layer_view", View.STD_VIEW, 800, 600, true, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
@@ -224,7 +224,7 @@ Camera detailCam = ...;
 Camera overviewCam = ...;
 Vector cams = new Vector();
 cams.add(detailCam);
-View v = vsm.addExternalView(cams, ...);
+View v = vsm.addFrameView(cams, ...);
 Portal p = new CameraPortal(0, 0, 100, 50, overviewCam);
 vsm.addPortal(p, v);
 \end{SaveVerbatim}
