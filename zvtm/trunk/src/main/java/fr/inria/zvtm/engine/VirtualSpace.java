@@ -357,25 +357,6 @@ public class VirtualSpace {
         }
     }
 
-//	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
-//		*@param gID glyph's ID
-//		*@deprecated as of zvtm 0.9.8
-//		*@see #removeGlyph(Long gID)
-//		*/
-//	public void destroyGlyph(Long gID){
-//		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), true);
-//	}
-//
-//	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
-//		*@param gID glyph's ID
-//		*@param repaint should the view be updated automatically or not
-//		*@deprecated as of zvtm 0.9.8
-//		*@see #removeGlyph(Long gID, boolean repaint)
-//		*/
-//	public void destroyGlyph(Long gID, boolean repaint){
-//		removeGlyph(VirtualSpaceManager.INSTANCE.getGlyph(gID), repaint);
-//	}
-
 	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
 		*@deprecated as of zvtm 0.9.8
 		*@see #removeGlyph(Glyph g)
@@ -447,7 +428,6 @@ public class VirtualSpace {
             removeGlyphFromDrawingList(g);
 	        // insert at bottom of list if no other glyph has a lower z-index
 	        int insertAt = 0;
-	        synchronized(drawingList){
 	            // insert glyph in the drawing list so that 
 	            // it is the last glyph to be drawn for a given z-index
 	            for (int i=drawingList.length-1;i>=0;i--){
@@ -457,7 +437,6 @@ public class VirtualSpace {
 	                }
 	            }
 	            insertGlyphInDrawingList(g, insertAt);
-	        }
             g.setZindex(z);
         }
 	}
@@ -467,7 +446,6 @@ public class VirtualSpace {
             removeGlyphFromDrawingList(g);
 	        // insert at bottom of list if no other glyph has a lower z-index
 	        int insertAt = 0;
-	        synchronized(drawingList){
 	            // insert glyph in the drawing list so that 
 	            // it is the last glyph to be drawn for a given z-index
 	            for (int i=0;i<drawingList.length;i++){
@@ -477,7 +455,6 @@ public class VirtualSpace {
 	                }
 	            }
 	            insertGlyphInDrawingList(g, insertAt);
-	        }
             g.setZindex(z);
         }
 	}
@@ -566,7 +543,6 @@ public class VirtualSpace {
         int zindex = g.getZindex();
         // insert at bottom of list if no other glyph has a lower z-index
         int insertAt = 0;
-        synchronized(drawingList){
             // insert glyph in the drawing list so that 
             // it is the last glyph to be drawn for a given z-index
             for (int i=drawingList.length-1;i>=0;i--){
@@ -576,11 +552,9 @@ public class VirtualSpace {
                 }
             }
             insertGlyphInDrawingList(g, insertAt);
-        }
     }
 
 	protected void addGlyphsToDrawingList(Glyph[] glyphs){
-		synchronized(drawingList){
 			//create a new drawingList array of the right size
 			Glyph[] newDrawingList = new Glyph[drawingList.length + glyphs.length];
 			//merge glyphs and drawingList into the new array
@@ -601,21 +575,17 @@ public class VirtualSpace {
 					});
 			//overwrite drawingList
 			drawingList = newDrawingList;
-		}
 	}
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
-        synchronized(drawingList){
             Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
             System.arraycopy(drawingList, 0, newDrawingList, 0, index);
             newDrawingList[index] = g;
             System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
             drawingList = newDrawingList;
-        }
     }
 
     protected void removeGlyphFromDrawingList(Glyph g){
-        synchronized(drawingList){
             for (int i=0;i<drawingList.length;i++){
                 if (drawingList[i] == g){
                     Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
@@ -625,17 +595,14 @@ public class VirtualSpace {
                     break;
                 }
             }
-        }
     }
 
     protected int glyphIndexInDrawingList(Glyph g){
-        synchronized(drawingList){
             for (int i=0;i<drawingList.length;i++){
                 if (drawingList[i] == g){
                     return i;
                 }
             }
-        }
         return -1;
     }
 

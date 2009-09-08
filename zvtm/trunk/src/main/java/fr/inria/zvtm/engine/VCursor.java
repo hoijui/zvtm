@@ -286,7 +286,6 @@ public class VCursor {
 		*@see #getIntersectingPaths(Camera c)
 		*/
 	public Vector getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY){
-		synchronized(this){
 			Vector res=new Vector();
 			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 			Object glyph;
@@ -295,7 +294,6 @@ public class VCursor {
 				if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
 			}
 			return res;
-		}
 	}
     
     /**returns a list of all VPaths under the mouse cursor (default tolerance, 5) - returns null if none
@@ -392,7 +390,6 @@ public class VCursor {
      *@see #getIntersectingTexts(Camera c)
      */
     public Vector getIntersectingTexts(Camera c, long cursorX, long cursorY){
-	synchronized(this){
 	    Vector res=new Vector();
 	    int index=c.getIndex();
 	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
@@ -403,7 +400,6 @@ public class VCursor {
 	    }
 	    if (res.isEmpty()){res=null;}
 	    return res;
-	}
     }
 
     /**tells if the mouse is above VText t<br>
@@ -462,7 +458,6 @@ public class VCursor {
      *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
      */
     public Vector getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance){
-	synchronized(this){
 	    Vector res = new Vector();
 	    int index = c.getIndex();
 	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
@@ -473,7 +468,6 @@ public class VCursor {
 	    }
 	    if (res.isEmpty()){res = null;}
 	    return res;
-	}
     }
 
     /** Indicates if the mouse cursor is above VSegment s.
@@ -507,7 +501,6 @@ public class VCursor {
 		*@see #getGlyphsUnderMouseList()
 		*/
 	public Vector getIntersectingGlyphs(Camera c){
-		synchronized(this){
 			Vector res=new Vector();
 			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 			Glyph glyph;
@@ -528,7 +521,6 @@ public class VCursor {
 			}
 			if (res.isEmpty()){res = null;}
 			return res;
-		}
 	}
 
     /**double capacity of array containing glyphs under mouse*/
@@ -540,14 +532,12 @@ public class VCursor {
 
     /**empty the list of glyphs under mouse*/
     void resetGlyphsUnderMouseList(VirtualSpace vs,int camIndex){
-        synchronized(this){
             for (int i=0;i<glyphsUnderMouse.length;i++){
                 glyphsUnderMouse[i] = null;
                 maxIndex =- 1;
             }
             lastGlyphEntered = null;
             Glyph[] gl = vs.getDrawingList();
-            synchronized(gl){
                 for (int i=0;i<gl.length;i++){
                     try {
                         gl[i].resetMouseIn(camIndex);
@@ -559,8 +549,6 @@ public class VCursor {
                         }
                     }
                 }
-            }
-        }
     }
 
     /**get the list of glyphs currently under mouse (last entry is last glyph entered)
@@ -603,7 +591,6 @@ public class VCursor {
 
     /**remove glyph g in list of glyphs under mouse if it is present (called when destroying a glyph)*/
     void removeGlyphFromList(Glyph g){
-	synchronized(this){
 	    int i=0;
 	    boolean present=false;
 	    while (i<=maxIndex){
@@ -618,7 +605,6 @@ public class VCursor {
 		if (maxIndex<0){lastGlyphEntered=null;maxIndex=-1;}
 		else {lastGlyphEntered=glyphsUnderMouse[maxIndex];}
 	    }
-	}
     }
 
     /**compute list of glyphs currently overlapped by the mouse*/
@@ -641,8 +627,6 @@ public class VCursor {
     boolean computeMouseOverList(ViewEventHandler eh,Camera c, int x, int y){
         boolean res=false;
         Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-        synchronized(drawnGlyphs){
-            synchronized(this.glyphsUnderMouse){
                 try {
                     for (int i=0;i<drawnGlyphs.size();i++){
                         tmpGlyph = (Glyph)drawnGlyphs.elementAt(i);
@@ -664,8 +648,6 @@ public class VCursor {
                         e2.printStackTrace();
                     }
                 }
-            }
-        }
         return res;
     }
 
@@ -923,7 +905,7 @@ public class VCursor {
 	boolean reducing = false;
 	long reducStartTime = 0;
 
-	public synchronized void updateDynaSpot(long currentTime){
+	public void updateDynaSpot(long currentTime){
 		// compute mean speed over last 3 points
 		for (int i=1;i<NB_SPEED_POINTS;i++){
 			cursor_time[i-1] = cursor_time[i];

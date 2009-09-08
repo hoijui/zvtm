@@ -279,14 +279,12 @@ public abstract class Lens {
         * Depends on the outer radius and maximum magnification.
         */
     void updateMagBufferWorkingDimensions(){
-        synchronized(this){
             // synchronized to manage concurrent access to the raster while
             // animating the lens and transforming in the View thread (drawing)
             hmbw = getRadius() * MM;
             hmbh = getRadius() * MM;
             mbw = Math.round(2 * hmbw);
             mbh = Math.round(2 * hmbh);
-        }
     }
     
     /**Force the magnification buffer to a new width and height.
@@ -308,7 +306,6 @@ public abstract class Lens {
      *@param h height of the magnification buffer (in pixels)
      */
     public void setMagRasterDimensions(int w, int h){
-	synchronized(this){
 	    switch(transferType){
 	    case DataBuffer.TYPE_INT:{/*Mac OS X (256/1K/1M), Windows (32bits), Linux/Xorg (24bits and maybe 32bits)*/
 		// in theory this should be s.width*s.height*Raster.getNumDataElements
@@ -339,7 +336,6 @@ public abstract class Lens {
 	    }
 	    mbi = new BufferedImage(w, h, imageType);
 	    magnifiedGraphics = mbi.createGraphics();
-	}
     }
 
     public void resetMagnificationBuffer(){
@@ -354,7 +350,6 @@ public abstract class Lens {
     }
 
     public Graphics2D getMagnificationGraphics(){
-	synchronized(this){
 	    if (mbi == null){
 		mbi = new BufferedImage(mbw, mbh, imageType);
 	    }
@@ -362,7 +357,6 @@ public abstract class Lens {
 		magnifiedGraphics = mbi.createGraphics();
 	    }
 	    return magnifiedGraphics;
-	}
     }
 
     public void dispose(){

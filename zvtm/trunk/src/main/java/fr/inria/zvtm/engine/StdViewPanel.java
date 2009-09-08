@@ -20,7 +20,7 @@
  *
  * $Id$
  */
- 
+
 package fr.inria.zvtm.engine;
 
 import java.awt.Color;
@@ -29,10 +29,14 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
+
+import javax.swing.Timer;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.Java2DPainter;
@@ -40,15 +44,14 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 
 
 /**
- * Each view runs in its own thread - uses double buffering
  * @author Emmanuel Pietriga
  */
-public class StdViewPanel extends ViewPanel implements Runnable {
+public class StdViewPanel extends ViewPanel {
 
 	/** Double Buffering uses a BufferedImage as the back buffer. */
 	BufferedImage backBuffer;
-    int backBufferW = 0;
-    int backBufferH = 0;
+	int backBufferW = 0;
+	int backBufferH = 0;
 
 	/*coordinates of lens center in virtual space for each camera*/
 	long lensVx, lensVy;
@@ -58,7 +61,16 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	Dimension oldSize;
 	Graphics2D lensG2D = null;
 
+	private Timer edtTimer;
+
 	StdViewPanel(Vector cameras,View v, boolean arfome) {
+		ActionListener taskPerformer = new ActionListener(){
+			public void actionPerformed(ActionEvent evt){
+				drawOffscreen();
+			}
+		};
+		edtTimer = new Timer(frameTime, taskPerformer);
+
 		addHierarchyListener(
 				new HierarchyListener() {
 					public void hierarchyChanged(HierarchyEvent e) {
@@ -84,22 +96,21 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		this.addMouseWheelListener(this);
 		this.addComponentListener(this);
 		this.setDoubleBuffered(false);
-    	setAutoRequestFocusOnMouseEnter(arfome);
-		start();
+		setAutoRequestFocusOnMouseEnter(arfome);
 		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
 	}
 
-	public void start(){
-		size = getSize();
-		runView = new Thread(this);
-		runView.setPriority(Thread.NORM_PRIORITY);
-		runView.start();
+	private void start(){
+		backBufferGraphics = null;
+		edtTimer.start();
 	}
 
-	public synchronized void stop() {
-		runView = null;
-		notify();
+	public void stop(){
+		edtTimer.stop();
+		if (stableRefToBackBufferGraphics != null) {
+			stableRefToBackBufferGraphics.dispose();
+		}
 	}
 
 	private void updateOffscreenBuffer(){
@@ -180,75 +191,69 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 	}
 
 	private void drawSceneLens(){
-	    if (lensG2D == null){
-	        updateOffscreenBuffer();
-	    }
-		synchronized(lens){// prevents flickering when the lens parameters are being animated (caused by concurrent access)
-			lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
-			lensG2D.setBackground(backColor);
-			lensG2D.clearRect(0, 0, lens.mbw, lens.mbh);
-			for (int nbcam=0;nbcam<cams.length;nbcam++){
-				if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
-					camIndex=cams[nbcam].getIndex();
-					drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-					synchronized(drawnGlyphs){
-						drawnGlyphs.removeAllElements();
-						uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
-						//compute region seen from this view through camera
-						viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
-						viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
-						viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
-						viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-						lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
-						lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
-						lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
-						lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
-						lensVx = (lviewWC+lviewEC)/2;
-						lensVy = (lviewSC+lviewNC)/2;
-						gll = cams[nbcam].parentSpace.getDrawingList();
-						for (int i=0;i<gll.length;i++){
-							if (gll[i] != null){
-								synchronized(gll[i]){
-									if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-										/* if glyph is at least partially visible in the reg. seen from this view,
-										   compute in which buffer it should be rendered: */
-										/* always draw in the main buffer */
-										gll[i].project(cams[nbcam], size);
-										if (gll[i].isVisible()){
-											gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
-													standardStroke, standardTransform, 0, 0);
-										}
-										if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
-											/* partially within the region seen through the lens
-											   draw it in both buffers */
-											gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
-											if (gll[i].isVisibleThroughLens()){
-												gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
-														standardStroke, standardTransform, 0, 0);
-											}
-										}
-										/* notifying outside of above test because glyph sensitivity is not
-										   affected by glyph visibility when managed through Glyph.setVisible() */
-										cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
-									}
+		if (lensG2D == null){
+			updateOffscreenBuffer();
+		}
+		lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
+		lensG2D.setBackground(backColor);
+		lensG2D.clearRect(0, 0, lens.mbw, lens.mbh);
+		for (int nbcam=0;nbcam<cams.length;nbcam++){
+			if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
+				camIndex=cams[nbcam].getIndex();
+				drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+				drawnGlyphs.removeAllElements();
+				uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+				//compute region seen from this view through camera
+				viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
+				viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
+				viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
+				viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
+				lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
+				lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
+				lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
+				lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
+				lensVx = (lviewWC+lviewEC)/2;
+				lensVy = (lviewSC+lviewNC)/2;
+				gll = cams[nbcam].parentSpace.getDrawingList();
+				for (int i=0;i<gll.length;i++){
+					if (gll[i] != null){
+						if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+							/* if glyph is at least partially visible in the reg. seen from this view,
+							   compute in which buffer it should be rendered: */
+							/* always draw in the main buffer */
+							gll[i].project(cams[nbcam], size);
+							if (gll[i].isVisible()){
+								gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
+										standardStroke, standardTransform, 0, 0);
+							}
+							if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
+								/* partially within the region seen through the lens
+								   draw it in both buffers */
+								gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
+								if (gll[i].isVisibleThroughLens()){
+									gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
+											standardStroke, standardTransform, 0, 0);
 								}
 							}
+							/* notifying outside of above test because glyph sensitivity is not
+							   affected by glyph visibility when managed through Glyph.setVisible() */
+							cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
 						}
 					}
 				}
 			}
-			foregroundHook();
-			try {
-				lens.transform(backBuffer);
-				lens.drawBoundary(stableRefToBackBufferGraphics);
-			}
-			catch (ArrayIndexOutOfBoundsException ex){
-				if (VirtualSpaceManager.debugModeON()){ex.printStackTrace();}
-			}
-			catch (NullPointerException ex2){
-				// this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
-				if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
-			}
+		}
+		foregroundHook();
+		try {
+			lens.transform(backBuffer);
+			lens.drawBoundary(stableRefToBackBufferGraphics);
+		}
+		catch (ArrayIndexOutOfBoundsException ex){
+			if (VirtualSpaceManager.debugModeON()){ex.printStackTrace();}
+		}
+		catch (NullPointerException ex2){
+			// this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
+			if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
 		}
 	}
 
@@ -257,29 +262,25 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 			if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 				camIndex=cams[nbcam].getIndex();
 				drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-				synchronized(drawnGlyphs){
-					drawnGlyphs.removeAllElements();
-					uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
-					//compute region seen from this view through camera
-					viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
-					viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
-					viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
-					viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-					gll = cams[nbcam].parentSpace.getDrawingList();
-					for (int i=0;i<gll.length;i++){
-						if (gll[i] != null){
-							synchronized(gll[i]){
-								if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-									//if glyph is at least partially visible in the reg. seen from this view, display
-									gll[i].project(cams[nbcam], size); // an invisible glyph should still be projected
-									if (gll[i].isVisible()){          // as it can be sensitive
-										gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, camIndex, standardStroke, standardTransform, 0, 0);
-									}
-									// notifying outside if branch because glyph sensitivity is not
-									// affected by glyph visibility when managed through Glyph.setVisible()
-									cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
-								}
+				drawnGlyphs.removeAllElements();
+				uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+				//compute region seen from this view through camera
+				viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
+				viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
+				viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
+				viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
+				gll = cams[nbcam].parentSpace.getDrawingList();
+				for (int i=0;i<gll.length;i++){
+					if (gll[i] != null){
+						if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+							//if glyph is at least partially visible in the reg. seen from this view, display
+							gll[i].project(cams[nbcam], size); // an invisible glyph should still be projected
+							if (gll[i].isVisible()){          // as it can be sensitive
+								gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, camIndex, standardStroke, standardTransform, 0, 0);
 							}
+							// notifying outside if branch because glyph sensitivity is not
+							// affected by glyph visibility when managed through Glyph.setVisible()
+							cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
 						}
 					}
 				}
@@ -312,11 +313,9 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		}
 		if (drawVTMcursor){
 			stableRefToBackBufferGraphics.setXORMode(backColor);
-			synchronized(this){
-    			parent.mouse.draw(stableRefToBackBufferGraphics);
-    			oldX = parent.mouse.mx;
-    			oldY = parent.mouse.my;			    
-			}
+			parent.mouse.draw(stableRefToBackBufferGraphics);
+			oldX = parent.mouse.mx;
+			oldY = parent.mouse.my;			    
 		}
 
 	}
@@ -329,135 +328,80 @@ public class StdViewPanel extends ViewPanel implements Runnable {
 		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 	}
 
-	public void run() {
-		Thread me = Thread.currentThread();
-		while (getSize().width <= 0) {  //Wait until the window actually exists
-			try {
-				runView.sleep(inactiveSleepTime);
-			} 
-			catch (InterruptedException e) {
-				if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep "+e);}
-				return;
-			}
-		}
-		backBufferGraphics = null;
+	//draw ONCE (no more infinite thread loop; will be driven
+	//from an EDT timer)
+	public void drawOffscreen() {
 		oldSize=getSize();
-		while (runView==me) {
-			loopStartTime = System.currentTimeMillis();
-			if (notBlank){
-				if (active){
-					if (repaintNow){
-						try {
-							repaintNow=false; //do this first as the thread can be interrupted inside
-							//this branch and we want to catch new requests for repaint
-							updateMouseOnly=false;
-							updateOffscreenBuffer();
-							stableRefToBackBufferGraphics.setPaintMode();
-							stableRefToBackBufferGraphics.setBackground(backColor);
-							stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
-							backgroundHook();
-							//begin actual drawing here
-							if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }
-							afterLensHook();
-							drawPortals();
-							portalsHook();
+		if (notBlank){
+			if (active){
+				if (repaintNow){
+					try {
+						repaintNow=false; //do this first as the thread can be interrupted inside
+						//this branch and we want to catch new requests for repaint
+						updateMouseOnly=false;
+						updateOffscreenBuffer();
+						stableRefToBackBufferGraphics.setPaintMode();
+						stableRefToBackBufferGraphics.setBackground(backColor);
+						stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
+						backgroundHook();
+						//begin actual drawing here
+						if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }
+						afterLensHook();
+						drawPortals();
+						portalsHook();
 
-							if (inside){//deal with mouse glyph only if mouse cursor is inside this window
-								doCursorPicking();
-								drawCursor();
-							}
-							//end drawing here
-							if (stableRefToBackBufferGraphics == backBufferGraphics) {
-								repaint();
-							}
-							loopTotalTime = System.currentTimeMillis() - loopStartTime;
-							// time to sleep = wanted refresh rate minus time needed to do the actual repaint operations
-							timeToSleep = frameTime - loopTotalTime;
+						if (inside){//deal with mouse glyph only if mouse cursor is inside this window
+							doCursorPicking();
+							drawCursor();
 						}
-						catch (NullPointerException ex0){
-							if (VirtualSpaceManager.debugModeON()){
-								System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
-								ex0.printStackTrace();
-							}
-						}
-						try {
-							runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
-						} 
-						catch (InterruptedException e) {
-							if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep2 "+e);}
-							return;
+						//end drawing here
+						if (stableRefToBackBufferGraphics == backBufferGraphics) {
+							//repaint();
+							paintImmediately(0,0,size.width,size.height);
 						}
 					}
-					else if (updateMouseOnly){
-						updateMouseOnly=false; // do this first as the thread can be interrupted inside this
-						doCursorPicking();
-						if (drawVTMcursor){
-                            try {
-                                stableRefToBackBufferGraphics.setXORMode(backColor);
-                                stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-                                synchronized(this){
-                                    stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
-                                    stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
-    								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-    								stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
-    								oldX = parent.mouse.mx;
-    								oldY = parent.mouse.my;							        
-							    }
-							}
-							//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
-							//     just catch it and wait for next loop until we find out what's causing this
-							catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
-						}
-						repaint();
-						loopTotalTime = System.currentTimeMillis() - loopStartTime;
-						// time to sleep = wanted refresh rate minus time needed to do the actual repaint operations
-						timeToSleep = frameTime - loopTotalTime;
-						try {
-							runView.sleep((timeToSleep > minimumSleepTime) ? timeToSleep : minimumSleepTime);
-						}
-						catch (InterruptedException e) {
-							if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep3 "+e);}
-							return;
-						}
-					}
-					else {
-						try {
-							runView.sleep(frameTime); 
-						}
-						catch (InterruptedException e) {
-							if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep4 "+e);}
-							return;
+					catch (NullPointerException ex0){
+						if (VirtualSpaceManager.debugModeON()){
+							System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
+							ex0.printStackTrace();
 						}
 					}
 				}
-				else {
-					try {
-						runView.sleep(inactiveSleepTime); 
-					} 
-					catch (InterruptedException e) {
-						if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
-						return;
+				else if (updateMouseOnly){
+					updateMouseOnly=false; // do this first as the thread can be interrupted inside this
+					doCursorPicking();
+					if (drawVTMcursor){
+						try {
+							stableRefToBackBufferGraphics.setXORMode(backColor);
+							stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+							stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
+							stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
+							stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+							stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+							oldX = parent.mouse.mx;
+							oldY = parent.mouse.my;							        
+						}
+						//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
+						//just catch it and wait for next loop until we find out what's causing this
+						catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
 					}
+					//repaint();
+					paintImmediately(0,0,size.width,size.height);
+				}
+				else {
 				}
 			}
 			else {
-				updateOffscreenBuffer();	
-				stableRefToBackBufferGraphics.setPaintMode();
-				stableRefToBackBufferGraphics.setColor(blankColor);
-				stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
-				portalsHook();				
-				repaint();
-				try {
-					runView.sleep(blankSleepTime);   //sleep ... ms  
-				} 
-				catch (InterruptedException e) {
-					if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.sleep5 "+e);}
-					return;
-				}
 			}
 		}
-		if (stableRefToBackBufferGraphics != null) {
-			stableRefToBackBufferGraphics.dispose();
+		else {
+			updateOffscreenBuffer();	
+			stableRefToBackBufferGraphics.setPaintMode();
+			stableRefToBackBufferGraphics.setColor(blankColor);
+			stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
+			portalsHook();				
+			//repaint();
+			paintImmediately(0,0,size.width,size.height);
 		}
 	}
 
