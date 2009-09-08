@@ -66,7 +66,7 @@ public class Test {
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
-        testView = vsm.addExternalView(cameras, "Test", vt, 800, 600, false, true, false, null);
+        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true, false, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);

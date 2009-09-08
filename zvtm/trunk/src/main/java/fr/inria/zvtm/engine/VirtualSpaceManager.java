@@ -235,8 +235,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      */
-    public View addExternalView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible){
-	return addExternalView(c, name, viewType, w, h, bar, visible, null);
+    public View addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible){
+	return addFrameView(c, name, viewType, w, h, bar, visible, null);
     }
 
     /**Create a new external view.<br>
@@ -249,11 +249,11 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
-     *@see #addExternalView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
+     *@see #addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
      */
-    public View addExternalView(Vector c, String name, short viewType, int w, int h,
+    public View addFrameView(Vector c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, JMenuBar mnb){
-	return addExternalView(c, name, viewType, w, h, bar, visible, true, mnb);
+	return addFrameView(c, name, viewType, w, h, bar, visible, true, mnb);
     }
     
     /**Create a new external view.<br>
@@ -267,9 +267,9 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
-     *@see #addExternalView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, JMenuBar mnb)
+     *@see #addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, JMenuBar mnb)
      */
-    public View addExternalView(Vector c, String name, short viewType, int w, int h,
+    public View addFrameView(Vector c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
 	View v = null;
 	switch(viewType){
@@ -340,7 +340,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	 * (This is to be compatible with the <code>View</code> API.)
 	 * @return	View	The created view.
 	 */
-    public View addExternalView(Vector cameraList, String name, int panelWidth, int panelHeight,
+    public View addFrameView(Vector cameraList, String name, int panelWidth, int panelHeight,
 				boolean visible, boolean decorated, short viewType,
 				JPanel parentPanel, JFrame frame) {
     	View v = new JPanelView(cameraList, name, panelWidth, panelHeight,
