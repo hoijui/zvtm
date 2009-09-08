@@ -58,7 +58,7 @@ public class PDFViewer {
 		mCamera = vs.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 800, 600, false, true, true, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 800, 600, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		eh = new PDFViewerEventHandler(this);
 		pdfView.setEventHandler(eh);
