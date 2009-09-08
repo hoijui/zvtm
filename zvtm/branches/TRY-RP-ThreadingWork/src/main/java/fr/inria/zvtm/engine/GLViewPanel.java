@@ -39,13 +39,12 @@ public class GLViewPanel extends ViewPanel {
 	Timer edtTimer;
 
     GLViewPanel(Vector cameras,View v, boolean arfome) {	
-		int delay = 40;//milliseconds
 		ActionListener taskPerformer = new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				repaint();
 			}
 		};
-		edtTimer = new Timer(delay, taskPerformer);
+		edtTimer = new Timer(frameTime, taskPerformer);
 
 	addHierarchyListener(
 	    new HierarchyListener() {
