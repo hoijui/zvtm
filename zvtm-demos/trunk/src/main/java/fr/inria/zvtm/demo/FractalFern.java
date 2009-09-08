@@ -51,7 +51,7 @@ public class FractalFern extends FractalDemo {
 	vs.addCamera();
 	Vector cameras=new Vector();
 	cameras.add(vs.getCamera(0));
-	vsm.addExternalView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
+	vsm.addFrameView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
 	View v = vsm.getView(mainViewName);
 	v.setEventHandler(eh);
 	v.setBackgroundColor(Color.black);

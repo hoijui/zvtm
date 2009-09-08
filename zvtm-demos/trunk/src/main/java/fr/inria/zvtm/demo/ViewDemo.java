@@ -87,7 +87,7 @@ public class ViewDemo {
 	mCamera = vs.addCamera();
 	mCamera.setZoomFloor(-90);
 	cameras.add(mCamera);
-	demoView = vsm.addExternalView(cameras, mainViewName, viewType, 800, 600, false, true);
+	demoView = vsm.addFrameView(cameras, mainViewName, viewType, 800, 600, false, true);
 	demoView.setBackgroundColor(Color.WHITE);
 	demoView.setEventHandler(eh);
 	fri = new FrameRateIndicator(this);
