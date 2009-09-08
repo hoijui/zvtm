@@ -127,7 +127,7 @@ public class Viewer extends JFrame {
 		mCamera = mSpace.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		mView = vsm.addExternalView(cameras, mViewName, View.STD_VIEW, viewWidth, viewHeight, false, true);
+		mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, viewWidth, viewHeight, false, true);
         mView.setBackgroundColor(Color.WHITE);
         mView.setEventHandler(eh);
 		mView.setAntialiasing(true);
