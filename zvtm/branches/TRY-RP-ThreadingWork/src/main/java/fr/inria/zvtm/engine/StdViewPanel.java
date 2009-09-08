@@ -64,13 +64,12 @@ public class StdViewPanel extends ViewPanel {
 	private Timer edtTimer;
 
 	StdViewPanel(Vector cameras,View v, boolean arfome) {
-		int delay = 25;//milliseconds
 		ActionListener taskPerformer = new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				drawOffscreen();
 			}
 		};
-		edtTimer = new Timer(delay, taskPerformer);
+		edtTimer = new Timer(frameTime, taskPerformer);
 
 		addHierarchyListener(
 				new HierarchyListener() {
