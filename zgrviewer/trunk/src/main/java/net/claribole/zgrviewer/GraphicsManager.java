@@ -227,7 +227,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     void createFrameView(Vector cameras, short vt, JMenuBar jmb){
-        mainView = vsm.addExternalView(cameras, ConfigManager.MAIN_TITLE, vt,
+        mainView = vsm.addFrameView(cameras, ConfigManager.MAIN_TITLE, vt,
             ConfigManager.mainViewW, ConfigManager.mainViewH,
             true, false, jmb);
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
@@ -496,7 +496,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 Vector cameras = new Vector();
                 cameras.add(mSpace.getCamera(1));
                 cameras.add(rSpace.getCamera(0));
-                vsm.addExternalView(cameras, RADAR_VIEW_NAME, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
+                vsm.addFrameView(cameras, RADAR_VIEW_NAME, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
                 reh = new RadarEvtHdlr(this);
                 rView = vsm.getView(RADAR_VIEW_NAME);
                 rView.setBackgroundColor(cfgMngr.backgroundColor);
