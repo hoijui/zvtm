@@ -107,7 +107,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		mCamera = vs.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addExternalView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		pdfView.getPanel().addComponentListener(this);
 		pdfView.setJava2DPainter(this, AFTER_LENSES);
@@ -621,10 +621,10 @@ class PDFLensEventHandler implements ViewEventHandler {
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		Glyph g = v.lastGlyphEntered();
 		if (g != null){
-			VirtualSpaceManager.INSTANCE.centerOnGlyph(g, application.mCamera, PDFLens.NAV_ANIM_DURATION);
+			application.pdfView.centerOnGlyph(g, application.mCamera, PDFLens.NAV_ANIM_DURATION);
 		}
 		else {
-			VirtualSpaceManager.INSTANCE.getGlobalView(application.mCamera, PDFLens.NAV_ANIM_DURATION);
+			application.pdfView.getGlobalView(application.mCamera, PDFLens.NAV_ANIM_DURATION);
 		}
 	}
 
