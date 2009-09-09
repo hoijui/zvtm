@@ -601,36 +601,6 @@ public abstract class View {
 	return panel.getVisibilityPadding();
     }
     
-    /**Set how much time should the view go to sleep between to consecutive repaints when the view is not active.
-     *@param t time to sleep, in milliseconds (default is 500)
-     */
-    public void setInactiveSleepTime(int t){
-	panel.inactiveSleepTime = t;
-    }
-
-    /**Set how much time should the view go to sleep between to consecutive repaints when the view is blank.
-     * Do not set too short if using fade in/fade out transitions
-     * (a too long time can cause lags at the beginning of a fade in transition).
-     *@param t time to sleep, in milliseconds (default is 100)
-     */
-    public void setBlankSleepTime(int t){
-	panel.blankSleepTime = t;
-    }
-
-    /**Get how much time the view goes to sleep between to consecutive repaints when the view is not active.
-     *@return time sleeping, in milliseconds (default is 500)
-     */
-    public int getInactiveSleepTime(){
-	return panel.inactiveSleepTime;
-    }
-
-    /**Get how much time the view goes to sleep between to consecutive repaints when the view is blank.
-     *@return time sleeping, in milliseconds (default is 100)
-     */
-    public int getBlankSleepTime(){
-	return panel.blankSleepTime;
-    }
-
     void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
 	gbc.gridx=gx;
 	gbc.gridy=gy;
@@ -642,7 +612,6 @@ public abstract class View {
     
     /* --------------------- LENSES -------------------------- */
 
-	
     /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
         * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
     public Lens setLens(Lens l){

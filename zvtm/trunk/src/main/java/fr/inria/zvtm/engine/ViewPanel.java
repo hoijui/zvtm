@@ -109,19 +109,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**minimum time in ms between two consecutive repaints (refresh rate)*/
     int frameTime = 25;
 
-    /**When view is iconified/deactivated, go sleep much longer.*/
-    int inactiveSleepTime = 500;
-    
-    /**When view is blank, paint less often, but not too much because of fade in transitions.*/
-    int blankSleepTime = 100;
-
     /**absolute time at which the last painting loop has begun<br>used for an adaptative sleeping time in order to spend max. frameTime ms in each iteration*/
     public long loopStartTime;
     /**duration of the last painting loop<br>used for an adaptative sleeping time in order to spend max. frameTime ms in each iteration*/
     public long loopTotalTime;
-    /**how long this thread should sleep in order to spend max. frameTime ms in each iteration*/
-    long timeToSleep;
-
+  
     /**view's backgorund color (default is black)*/
     Color backColor = Color.BLACK;
 
