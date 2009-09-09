@@ -895,7 +895,7 @@ public abstract class View {
         long dx = (wnes[2]+wnes[0]) / 2; 
         long dy = (wnes[1]+wnes[3]) / 2;
         // new alt to fit horizontally
-		Dimension panelSize = this.getPanel().size();
+		Dimension panelSize = this.getPanel().getSize();
         float nah = (wnes[2]-dx) * 2 * c.getFocal() / panelSize.width - c.getFocal();
         // new alt to fit vertically
         float nav = (wnes[1]-dy) * 2 * c.getFocal() / panelSize.height - c.getFocal();
