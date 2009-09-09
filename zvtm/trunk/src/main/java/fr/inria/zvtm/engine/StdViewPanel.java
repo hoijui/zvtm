@@ -198,7 +198,7 @@ public class StdViewPanel extends ViewPanel {
 				camIndex=cams[nbcam].getIndex();
 				drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
 				drawnGlyphs.removeAllElements();
-				uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+				float uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 				//compute region seen from this view through camera
 				long viewW = size.width;
 				long viewH = size.height;

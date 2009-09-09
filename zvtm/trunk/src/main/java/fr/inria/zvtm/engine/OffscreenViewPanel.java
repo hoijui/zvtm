@@ -79,7 +79,7 @@ public class OffscreenViewPanel extends ViewPanel {
 		drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
 		synchronized(drawnGlyphs){
 		    drawnGlyphs.removeAllElements();
-		    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+		    float uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 		    long viewW=this.getSize().width;//compute region's width and height
 		    long viewH=this.getSize().height;
 		    long viewEC = (long)(cams[nbcam].posx+viewW/2*uncoef);

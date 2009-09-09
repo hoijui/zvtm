@@ -118,8 +118,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**graphics2d's original affine transform -passed to each glyph in case it needs to modifiy the affine transform when painting itself*/
     AffineTransform standardTransform;
 
-    float uncoef;
-
     int[] visibilityPadding = {0,0,0,0};
 
     Dimension size;
