@@ -224,10 +224,11 @@ public abstract class View {
     public long[] getVisibleRegion(Camera c, long[] res){
 	if (cameras.contains(c)){
 	    float uncoef=(float)((c.focal+c.altitude)/c.focal);  //compute region seen from this view through camera
-	    res[0] = (long)(c.posx-(panel.viewW/2-panel.visibilityPadding[0])*uncoef);
-	    res[1] = (long)(c.posy+(panel.viewH/2-panel.visibilityPadding[1])*uncoef);
-	    res[2] = (long)(c.posx+(panel.viewW/2-panel.visibilityPadding[2])*uncoef);
-	    res[3] = (long)(c.posy-(panel.viewH/2-panel.visibilityPadding[3])*uncoef);
+		Dimension panelSize = panel.getSize();
+	    res[0] = (long)(c.posx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef);
+	    res[1] = (long)(c.posy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef);
+	    res[2] = (long)(c.posx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef);
+	    res[3] = (long)(c.posy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef);
 	    return res;
 	}
 	return null;
@@ -894,9 +895,10 @@ public abstract class View {
         long dx = (wnes[2]+wnes[0]) / 2; 
         long dy = (wnes[1]+wnes[3]) / 2;
         // new alt to fit horizontally
-        float nah = (wnes[2]-dx) * 2 * c.getFocal() / this.getPanel().viewW - c.getFocal();
+		Dimension panelSize = this.getPanel().size();
+        float nah = (wnes[2]-dx) * 2 * c.getFocal() / panelSize.width - c.getFocal();
         // new alt to fit vertically
-        float nav = (wnes[1]-dy) * 2 * c.getFocal() / this.getPanel().viewH - c.getFocal();
+        float nav = (wnes[1]-dy) * 2 * c.getFocal() / panelSize.height - c.getFocal();
         // take max of both
         float na = Math.max(nah, nav);
         if (d > 0){

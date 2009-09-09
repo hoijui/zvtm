@@ -111,8 +111,6 @@ public class StdViewPanel extends ViewPanel {
 
 	private void updateOffscreenBuffer(){
 		size = this.getSize();
-		viewW = size.width;//compute region's width and height
-		viewH = size.height;
 		if (size.width != oldSize.width || size.height != oldSize.height || backBufferW != size.width || backBufferH != size.height) {
 			//each time the parent window is resized, adapt the buffer image size
 			backBuffer = null;
@@ -202,6 +200,8 @@ public class StdViewPanel extends ViewPanel {
 				drawnGlyphs.removeAllElements();
 				uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 				//compute region seen from this view through camera
+				long viewW = size.width;
+				long viewH = size.height;
 				long viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
 				long viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
 				long viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);

@@ -95,8 +95,6 @@ public class GLViewPanel extends ViewPanel {
 	try {
 	    updateMouseOnly = false;
 	    size = this.getSize();
-	    viewW = size.width;//compute region's width and height
-	    viewH = size.height;
 	    if (size.width != oldSize.width || size.height != oldSize.height) {
 		if (VirtualSpaceManager.debugModeON()){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
 		oldSize=size;
@@ -120,6 +118,8 @@ public class GLViewPanel extends ViewPanel {
 			    drawnGlyphs.removeAllElements();
 			    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 			    //compute region seen from this view through camera
+				long viewW = size.width;
+				long viewH = size.height;
 			    long viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
 			    long viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
 			    long viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
