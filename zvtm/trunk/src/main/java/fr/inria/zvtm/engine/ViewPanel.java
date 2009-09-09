@@ -121,7 +121,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     float uncoef;
     long viewW;
     long viewH;
-    long viewWC, viewNC, viewEC, viewSC;
 
     int[] visibilityPadding = {0,0,0,0};
 

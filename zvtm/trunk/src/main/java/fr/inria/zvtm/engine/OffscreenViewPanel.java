@@ -82,10 +82,10 @@ public class OffscreenViewPanel extends ViewPanel {
 		    uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
 		    viewW=this.getSize().width;//compute region's width and height
 		    viewH=this.getSize().height;
-		    viewEC = (long)(cams[nbcam].posx+viewW/2*uncoef);
-		    viewNC = (long)(cams[nbcam].posy+viewH/2*uncoef);
-		    viewWC = (long)(cams[nbcam].posx-viewW/2*uncoef);
-		    viewSC = (long)(cams[nbcam].posy-viewH/2*uncoef);
+		    long viewEC = (long)(cams[nbcam].posx+viewW/2*uncoef);
+		    long viewNC = (long)(cams[nbcam].posy+viewH/2*uncoef);
+		    long viewWC = (long)(cams[nbcam].posx-viewW/2*uncoef);
+		    long viewSC = (long)(cams[nbcam].posy-viewH/2*uncoef);
 		    gll = cams[nbcam].parentSpace.getDrawingList();
 		    for (int i=0;i<gll.length;i++){
 			if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
