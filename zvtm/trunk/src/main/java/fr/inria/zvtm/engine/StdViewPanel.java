@@ -190,13 +190,15 @@ public class StdViewPanel extends ViewPanel {
 		standardTransform=stableRefToBackBufferGraphics.getTransform();
 	}
 
-	private void drawSceneLens(){
-		if (lensG2D == null){
-			updateOffscreenBuffer();
+	private void drawScene(boolean drawLens){
+		if(drawLens){
+			if (lensG2D == null){
+				updateOffscreenBuffer();
+			}
+			lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
+			lensG2D.setBackground(backColor);
+			lensG2D.clearRect(0, 0, lens.mbw, lens.mbh);
 		}
-		lensG2D.setPaintMode(); // to the lens from LAnimation.animate() methods and this thread
-		lensG2D.setBackground(backColor);
-		lensG2D.clearRect(0, 0, lens.mbw, lens.mbh);
 		for (int nbcam=0;nbcam<cams.length;nbcam++){
 			if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
 				camIndex=cams[nbcam].getIndex();
@@ -208,12 +210,14 @@ public class StdViewPanel extends ViewPanel {
 				viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
 				viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
 				viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-				lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
-				lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
-				lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
-				lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
-				lensVx = (lviewWC+lviewEC)/2;
-				lensVy = (lviewSC+lviewNC)/2;
+				if(drawLens){
+					lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
+					lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
+					lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
+					lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
+					lensVx = (lviewWC+lviewEC)/2;
+					lensVy = (lviewSC+lviewNC)/2;
+				}
 				gll = cams[nbcam].parentSpace.getDrawingList();
 				for (int i=0;i<gll.length;i++){
 					if (gll[i] != null){
@@ -226,13 +230,15 @@ public class StdViewPanel extends ViewPanel {
 								gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
 										standardStroke, standardTransform, 0, 0);
 							}
-							if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
-								/* partially within the region seen through the lens
-								   draw it in both buffers */
-								gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
-								if (gll[i].isVisibleThroughLens()){
-									gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
-											standardStroke, standardTransform, 0, 0);
+							if(drawLens){
+								if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
+									/* partially within the region seen through the lens
+									   draw it in both buffers */
+									gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
+									if (gll[i].isVisibleThroughLens()){
+										gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
+												standardStroke, standardTransform, 0, 0);
+									}
 								}
 							}
 							/* notifying outside of above test because glyph sensitivity is not
@@ -244,49 +250,19 @@ public class StdViewPanel extends ViewPanel {
 			}
 		}
 		foregroundHook();
-		try {
-			lens.transform(backBuffer);
-			lens.drawBoundary(stableRefToBackBufferGraphics);
-		}
-		catch (ArrayIndexOutOfBoundsException ex){
-			if (VirtualSpaceManager.debugModeON()){ex.printStackTrace();}
-		}
-		catch (NullPointerException ex2){
-			// this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
-			if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
-		}
-	}
-
-	private void drawSceneNoLens(){
-		for (int nbcam=0;nbcam<cams.length;nbcam++){
-			if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
-				camIndex=cams[nbcam].getIndex();
-				drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-				drawnGlyphs.removeAllElements();
-				uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
-				//compute region seen from this view through camera
-				viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
-				viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
-				viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
-				viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-				gll = cams[nbcam].parentSpace.getDrawingList();
-				for (int i=0;i<gll.length;i++){
-					if (gll[i] != null){
-						if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
-							//if glyph is at least partially visible in the reg. seen from this view, display
-							gll[i].project(cams[nbcam], size); // an invisible glyph should still be projected
-							if (gll[i].isVisible()){          // as it can be sensitive
-								gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, camIndex, standardStroke, standardTransform, 0, 0);
-							}
-							// notifying outside if branch because glyph sensitivity is not
-							// affected by glyph visibility when managed through Glyph.setVisible()
-							cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
-						}
-					}
-				}
+		if(drawLens){
+			try {
+				lens.transform(backBuffer);
+				lens.drawBoundary(stableRefToBackBufferGraphics);
+			}
+			catch (ArrayIndexOutOfBoundsException ex){
+				if (VirtualSpaceManager.debugModeON()){ex.printStackTrace();}
+			}
+			catch (NullPointerException ex2){
+				// this sometimes happens when the lens is unset after entering this branch but before doing the actual transform
+				if (VirtualSpaceManager.debugModeON()){ex2.printStackTrace();}
 			}
 		}
-		foregroundHook();
 	}
 
 	private void drawCursor(){
@@ -345,7 +321,11 @@ public class StdViewPanel extends ViewPanel {
 						stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
 						backgroundHook();
 						//begin actual drawing here
-						if(lens != null) { drawSceneLens(); } else {drawSceneNoLens(); }
+						if(lens != null) { 
+							drawScene(true); 
+						} else {
+							drawScene(false); 
+						}
 						afterLensHook();
 						drawPortals();
 						portalsHook();
