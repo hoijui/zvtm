@@ -206,6 +206,21 @@ public class StdViewPanel extends ViewPanel {
 				long viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
 				long viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
 				long viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
+				long lviewWC = 0;
+				long lviewNC = 0;
+				long lviewEC = 0;
+				long lviewSC = 0;
+				long lensVx = 0;
+				long lensVy = 0;
+				if(drawLens){
+					lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
+					lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
+					lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
+					lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
+					lensVx = (lviewWC+lviewEC)/2;
+					lensVy = (lviewSC+lviewNC)/2;
+
+				}
 				gll = cams[nbcam].parentSpace.getDrawingList();
 				for (int i=0;i<gll.length;i++){
 					if (gll[i] != null){
@@ -219,13 +234,6 @@ public class StdViewPanel extends ViewPanel {
 										standardStroke, standardTransform, 0, 0);
 							}
 							if(drawLens){	
-								long lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
-								long lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
-								long lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
-								long lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
-								long lensVx = (lviewWC+lviewEC)/2;
-								long lensVy = (lviewSC+lviewNC)/2;
-
 								if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
 									/* partially within the region seen through the lens
 									   draw it in both buffers */
