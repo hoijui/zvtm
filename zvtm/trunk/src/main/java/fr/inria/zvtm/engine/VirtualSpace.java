@@ -76,7 +76,7 @@ public class VirtualSpace {
     Glyph[] drawingList;
 
     /** List of glyphs draw for a given camera. Vector contains Glyph instances. */
-    Vector[] camera2drawnList;
+    private Vector[] camera2drawnList;
     //sharing drawnList was causing a problem ; we now have one for each camera
 
     /**
