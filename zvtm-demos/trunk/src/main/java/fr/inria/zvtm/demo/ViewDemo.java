@@ -50,8 +50,6 @@ public class ViewDemo {
     static short MOVE_RIGHT=3;
     static int ANIM_MOVE_LENGTH = 500;
 
-    FrameRateIndicator fri;
-
     View demoView;
     Camera mCamera;
 
@@ -90,8 +88,6 @@ public class ViewDemo {
 	demoView = vsm.addFrameView(cameras, mainViewName, viewType, 800, 600, false, true);
 	demoView.setBackgroundColor(Color.WHITE);
 	demoView.setEventHandler(eh);
-	fri = new FrameRateIndicator(this);
-	demoView.setJava2DPainter(fri, Java2DPainter.FOREGROUND);
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
 		    buildGlyphs();
@@ -195,27 +191,6 @@ public class ViewDemo {
     
 }
 
-class FrameRateIndicator implements Java2DPainter {
-
-    ViewDemo application;
-
-    FrameRateIndicator(ViewDemo app){
-	application = app;
-    }
-
-    long d1,d2;
-    
-    public void paint(java.awt.Graphics2D g2d, int viewWidth, int viewHeight){
-	g2d.setColor(Color.black);
-	d1 = application.demoView.getPanel().loopTotalTime;
-	if (d1 > 0){ d2 = 1000/d1;}
-	g2d.drawString(Long.toString(d2) + " fps", viewWidth-50, 30);
-	g2d.drawString(viewWidth + " x " + viewHeight, 20, viewHeight - 70);
-	g2d.drawString(application.vts, 20, viewHeight - 50);
-	g2d.drawString(application.tms, 20, viewHeight - 30);
-    }
-    
-}
 
 class ViewDemoEventHandler implements ViewEventHandler {
 
