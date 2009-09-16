@@ -25,6 +25,7 @@ import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.ZPDFPageImg;
 
 /**
  * Intercepts VirtualSpace state changes and propagates
@@ -135,6 +136,13 @@ public aspect VirtualSpaceReplication {
 				getImageLocation(),
 				getScale());
 	}
+
+	@Override public CreateDelta ZPDFPageImg.getCreateDelta(){
+		return new PdfPageCreateDelta(getObjId(),
+				getLocation(),
+				getFilePath(),
+				getPageNumber()); //zindex and scale not implemented
+	}	
 
 	/* Section: Glyph-related pointcuts */
 

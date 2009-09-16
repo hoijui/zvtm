@@ -128,6 +128,18 @@ $Id$
 			<artifactId>args4j</artifactId>
 			<version>2.0.12</version>
 		</dependency>
+		<!--
+
+		SwingLab's PRDFRenderer is not available in any Maven repository.
+		Build it and install the JAR file in your local repository using the following command line:
+		mvn install:install-file -Dfile=PDFRenderer.jar -DgroupId=com.sun.pdfrenderer -DartifactId=pdfRenderer -Dversion=1.0 -Dpackaging=jar	
+
+		-->
+		<dependency>
+			<groupId>com.sun.pdfrenderer</groupId>
+			<artifactId>pdfRenderer</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<!-- Build -->
