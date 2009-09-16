@@ -38,13 +38,20 @@ public class CameraGroup {
 	public void setLocation(Location loc){
 		this.location = loc;
 		if(slaveCam != null){
+			float focal = slaveCam.getFocal();
+			float altCoef = (focal + loc.alt) / focal;
+			//screen width in virtualspace coords
+			long virtBlockWidth = (long)(blockWidth * altCoef);
+			//screen height in virtualspace coords
+			long virtBlockHeight = (long)(blockHeight * altCoef);
+
 			int row = slaveIndex % numRows;
 			int col = slaveIndex / numRows;
 
-			long newX = location.vx + col*blockWidth;
-			long newY = location.vy - row*blockHeight;
+			long newX = location.vx + col*virtBlockWidth;
+			long newY = location.vy - row*virtBlockHeight;
 
-			slaveCam.moveTo(newX, newY);
+			slaveCam.setLocation(new Location(newX, newY, loc.alt));
 		}
 	}
 
@@ -53,6 +60,7 @@ public class CameraGroup {
 			int numRows, int numCols, 
 			int blockWidth, int blockHeight){
 		this.slaveCam = cam;
+		this.slaveCam.setZoomFloor(0f);
 		this.slaveIndex = slaveIndex;
 		this.numRows = numRows;
 		this.numCols = numCols;

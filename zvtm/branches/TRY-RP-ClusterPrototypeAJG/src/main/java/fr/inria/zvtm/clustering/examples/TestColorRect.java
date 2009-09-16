@@ -131,7 +131,8 @@ public class TestColorRect {
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
-					//50 is just a speed factor (too fast otherwise)
+					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+
 				}
 				else {
 					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
