@@ -165,11 +165,11 @@ class PDFViewerEventHandler implements ViewEventHandler {
 			if (mod == SHIFT_MOD) {
 			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/5.0f)) : (long)((lastJPY-jpy)/(a*5)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/45.0f)) : (long)((lastJPY-jpy)/(a*45)));
 			}
 			else {
-			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/10.0f)) : (long)((jpx-lastJPX)/(a*10)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/10.0f)) : (long)((lastJPY-jpy)/(a*10)));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
 			}
 		}
