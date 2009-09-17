@@ -84,7 +84,7 @@ public class SlaveUpdater {
 	void removeCamera(ObjId id){
 		Camera cam = cameraMap.get(id);
 		if(null == cam){
-			System.out.println("Attempting to remove a non-exitent Camera");
+			System.out.println("Attempting to remove a non-existent Camera");
 			return;
 		}
 		virtualSpace.removeCamera(cam.getIndex());
