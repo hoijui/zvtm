@@ -165,8 +165,7 @@ class PDFViewerEventHandler implements ViewEventHandler {
 			if (mod == SHIFT_MOD) {
 			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-				//50 is just a speed factor (too fast otherwise)
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/5.0f)) : (long)((lastJPY-jpy)/(a*5)));
 			}
 			else {
 			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
