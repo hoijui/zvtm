@@ -696,7 +696,7 @@ public class VCursor {
 
     /**project mouse cursor IN VIRTUAL SPACE wrt camera info and change origin -> JPanel coords*/
     public void unProject(Camera c, ViewPanel v){
-        if (sync){
+        if (sync && v.size != null){
             //translate from JPanel coords
             if (v.lens != null){
                 //take lens into account (if set)

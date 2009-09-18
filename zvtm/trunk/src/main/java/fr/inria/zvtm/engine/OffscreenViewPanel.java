@@ -40,6 +40,7 @@ public class OffscreenViewPanel extends ViewPanel {
 	}
 	//init other stuff
 	setBackground(Color.white);
+	this.size = this.getSize();
     }
 
     public synchronized void stop(){}

@@ -94,6 +94,7 @@ public class StdViewPanel extends ViewPanel {
 		this.setDoubleBuffered(false);
 		setAutoRequestFocusOnMouseEnter(arfome);
 		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
+		this.size = this.getSize();
 		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
 	}
 
