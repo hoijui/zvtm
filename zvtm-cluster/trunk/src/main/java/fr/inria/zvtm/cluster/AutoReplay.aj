@@ -9,8 +9,7 @@ import java.awt.Color;
  * on remote virtual spaces.
  * Autoreplay is a quick way of propagating changes to
  * remote objects without writing Delta classes.
- * Use only for "atomic" operations (change one attribute at a time),
- * performance caveats *may* apply.
+ * Use only for "atomic" operations (change one attribute at a time).
  * Likely candidates are Glyph.setStrokeWidth(float),
  * Glyph.setMouseInsideHighlightColor(Color).
  * Bad candidates includes Glyph.setLocation(Location)
@@ -20,4 +19,7 @@ public aspect AutoReplay {
 		execution(public Glyph.setStrokeWidth(float)) ||
 		execution(public Glyph.setMouseInsideHighlightColor(Color))
 		;
+
+	void after() : glyphAutoReplayMethods() {
+	}
 }
