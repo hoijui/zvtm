@@ -244,7 +244,7 @@ public class IntroPanel  extends JFrame {
 				   new EndAction(){
 				       public void execute(Object subject,
 							   Animation.Dimension dimension){
-					   application.vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+					   ((Lens)subject).getOwningView().setLens(null);
 					   ((Lens)subject).dispose();
 				       }
 				   }); //XXX kill lens?
