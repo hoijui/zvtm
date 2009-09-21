@@ -30,6 +30,7 @@ import java.awt.geom.GeneralPath;
 
 import java.util.Vector;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -104,7 +105,6 @@ public class VCursor {
 
     Glyph tmpGlyph;  //used in computeMouseOverGlyph
     short tmpRes;      //used in computeMouseOverGlyph
-    Long tmpID;      //used in computeMouseOverGlyph
 
     int maxIndex=-1;  //used in computeMouseOverGlyph
     
@@ -655,7 +655,6 @@ public class VCursor {
         tmpRes = tmpGlyph.mouseInOut(jpx, jpy, c.getIndex(), vx, vy);
         if (tmpRes == Glyph.ENTERED_GLYPH){
             //we've entered this glyph
-            tmpID = tmpGlyph.getID();
             maxIndex = maxIndex + 1;
             if (maxIndex >= glyphsUnderMouse.length){doubleCapacity();}
             glyphsUnderMouse[maxIndex] = tmpGlyph;
@@ -665,7 +664,6 @@ public class VCursor {
         }
         else if (tmpRes == Glyph.EXITED_GLYPH){
             //we've exited it
-            tmpID = tmpGlyph.getID();
             int j = 0;
             while (j <= maxIndex){
                 if (glyphsUnderMouse[j++] == tmpGlyph){break;}
@@ -689,7 +687,7 @@ public class VCursor {
     public void printList(){
 	System.err.print("[");
 	for (int i=0;i<=maxIndex;i++){
-	    System.err.print(glyphsUnderMouse[i].getID().toString()+",");
+	    System.err.print(glyphsUnderMouse[i].hashCode()+",");
 	}
 	System.err.println("]");
     }
@@ -773,7 +771,7 @@ public class VCursor {
 	/* ---- DynaSpot implementation ---- */
 	
 	/* Glyphs in DynaSpot area */
-	Hashtable gida = new Hashtable(20);
+	HashMap gida = new HashMap(20);
 	
 	Color DYNASPOT_COLOR = Color.LIGHT_GRAY;
 	float DYNASPOT_MAX_TRANSLUCENCY = 0.3f;
@@ -1094,14 +1092,14 @@ public class VCursor {
 					selectedGlyph = g;
 					distanceToSelectedGlyph = 0;
 				}
-				gida.put(g.getID(), g);
+				gida.put(g, null);
 			}
 			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
 			// if they do intersect, peform a finer-grain chec with Areas
 			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
 			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), mx, my, dynaSpotRadius)){
                 // glyph intersects dynaspot area    
-                gida.put(g.getID(), g);
+                gida.put(g, null);
                 double d = Math.sqrt(Math.pow(g.vx-vx,2)+Math.pow(g.vy-vy,2));
                 if (distanceToSelectedGlyph == -1 || d < distanceToSelectedGlyph){
                     selectedGlyph = g;
@@ -1110,8 +1108,8 @@ public class VCursor {
 			}
 			else {
 			    // glyph does not intersect dynaspot area
-			    if (gida.containsKey(g.getID())){
-    		        gida.remove(g.getID());
+			    if (gida.containsKey(g)){
+    		        gida.remove(g);
     		        if (sl != null){
     		            sl.glyphSelected(lastDynaPicked, false);
     		        }
