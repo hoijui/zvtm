@@ -317,12 +317,12 @@ class ViewerEventHandler implements ViewEventHandler {
 		Glyph g = v.lastGlyphEntered();
 		if (g != null){
 			draggedNode = g;
-			application.vsm.stickToMouse(draggedNode);
+			v.getVCursor().stickGlyph(draggedNode);
 		}
 	}
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		application.vsm.unstickFromMouse();
+		v.getVCursor().unstickLastGlyph();
 		draggedNode = null;
 	}
 
