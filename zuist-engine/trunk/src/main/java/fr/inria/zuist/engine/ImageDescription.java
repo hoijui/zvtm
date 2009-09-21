@@ -168,7 +168,7 @@ class ImageHideAction implements EndAction {
             ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).getID() + " failed. Trying one more time.");
+            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
@@ -179,7 +179,7 @@ class ImageHideAction implements EndAction {
             ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).getID() + " failed. Giving up.");
+            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");
         }	
     }
 

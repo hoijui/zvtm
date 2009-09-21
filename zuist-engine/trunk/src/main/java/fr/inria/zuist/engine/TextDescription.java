@@ -175,7 +175,7 @@ class TextHideAction implements EndAction {
             vs.removeGlyph((Glyph)subject);
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).getID() + " failed. Trying one more time.");
+            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
@@ -185,7 +185,7 @@ class TextHideAction implements EndAction {
             vs.removeGlyph((Glyph)subject);
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).getID() + " failed. Giving up.");
+            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
