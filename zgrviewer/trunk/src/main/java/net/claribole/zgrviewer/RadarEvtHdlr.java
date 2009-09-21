@@ -38,7 +38,7 @@ public class RadarEvtHdlr implements ViewEventHandler {
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    grMngr.vsm.stickToMouse(grMngr.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
+	    v.getVCursor().stickGlyph(grMngr.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
 	    grMngr.vsm.activeView.mouse.setSensitivity(false);
 	    draggingRegionRect=true;
     }
@@ -46,7 +46,7 @@ public class RadarEvtHdlr implements ViewEventHandler {
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (draggingRegionRect){
 	    grMngr.vsm.activeView.mouse.setSensitivity(true);
-	    grMngr.vsm.unstickFromMouse();
+	    v.getVCursor().unstickLastGlyph();
 	    draggingRegionRect=false;
 	}
     }
@@ -68,15 +68,15 @@ public class RadarEvtHdlr implements ViewEventHandler {
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	grMngr.vsm.stickToMouse(grMngr.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
-	grMngr.vsm.activeView.mouse.setSensitivity(false);
-	draggingRegionRect=true;
+		v.getVCursor().stickGlyph(grMngr.observedRegion);  //necessarily observedRegion glyph (there is no other glyph)
+		grMngr.vsm.activeView.mouse.setSensitivity(false);
+		draggingRegionRect=true;
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (draggingRegionRect){
 	    grMngr.vsm.activeView.mouse.setSensitivity(true);
-	    grMngr.vsm.unstickFromMouse();
+	    v.getVCursor().unstickLastGlyph();
 	    draggingRegionRect=false;
 	}
     }

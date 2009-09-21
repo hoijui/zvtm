@@ -57,8 +57,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 		}
 	    }
 	    else if (inMagWindow){
-		grMngr.vsm.stickToMouse(grMngr.magWindow);
-		draggingMagWindow = true;
+			v.getVCursor().stickGlyph(grMngr.magWindow);
+			draggingMagWindow = true;
 	    }
 	    else {
 		grMngr.rememberLocation(v.cams[0].getLocation());
@@ -88,7 +88,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
             draggingZoomWindowContent = false;
             if (draggingMagWindow){
                 draggingMagWindow = false;
-                grMngr.vsm.unstickFromMouse();
+                v.getVCursor().unstickLastGlyph();
             }
             if (zoomingInRegion){
                 v.setDrawRect(false);

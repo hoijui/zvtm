@@ -215,8 +215,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         rSpace.addGlyph(observedRegion);
         rSpace.addGlyph(seg1);
         rSpace.addGlyph(seg2);
-        vsm.stickToGlyph(seg1,observedRegion);
-        vsm.stickToGlyph(seg2,observedRegion);
+        Glyph.stickToGlyph(seg1, observedRegion);
+        Glyph.stickToGlyph(seg2, observedRegion);
         observedRegion.setSensitivity(false);
         tp = new ToolPalette(this);
         Vector cameras = new Vector();
