@@ -15,13 +15,17 @@ import java.awt.Color;
  * Bad candidates includes Glyph.setLocation(Location)
  */
 public aspect AutoReplay {
-	pointcut glyphAutoReplayMethods() : 
+	pointcut glyphAutoReplayMethods(Glyph glyph) : 
+		this(glyph) && (
 		execution(public * Glyph.setStrokeWidth(float))	||
 		execution(public * Glyph.setMouseInsideHighlightColor(Color)) ||
 		execution(public * Glyph.setVisible(boolean))
+		)
 		;
 
-	after() : glyphAutoReplayMethods() {
+	after(Glyph glyph) : glyphAutoReplayMethods(glyph) {
+		//create a delta message, supplying the Glyph's object
+		//id and method argument.
 	}
 }
 
