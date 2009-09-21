@@ -434,7 +434,7 @@ class ZP2LensAction implements EndAction {
     }
     
     public void	execute(Object subject, Animation.Dimension dimension){
-        VirtualSpaceManager.INSTANCE.getOwningView(((Lens)subject).getID()).setLens(null);
+        ((Lens)subject).getOwningView().setLens(null);
         ((Lens)subject).dispose();
         nm.setMagFactor(NavigationManager.DEFAULT_MAG_FACTOR);
         nm.lens = null;
