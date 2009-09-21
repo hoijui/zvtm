@@ -15,11 +15,12 @@ import java.awt.Color;
  * Bad candidates includes Glyph.setLocation(Location)
  */
 public aspect AutoReplay {
-	pointcut glyphAutoReplayMethods : 
-		execution(public Glyph.setStrokeWidth(float)) ||
-		execution(public Glyph.setMouseInsideHighlightColor(Color))
+	pointcut glyphAutoReplayMethods() : 
+		execution(public * Glyph.setStrokeWidth(float))	||
+		execution(public * Glyph.setMouseInsideHighlightColor(Color))
 		;
 
-	void after() : glyphAutoReplayMethods() {
+	after() : glyphAutoReplayMethods() {
 	}
 }
+

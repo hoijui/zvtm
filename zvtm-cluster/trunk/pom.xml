@@ -46,9 +46,42 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>fr.inria.zvtm</groupId>
+			<artifactId>zvtm</artifactId>
+			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.6.2</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+				<version>1.2</version>
+				<configuration>
+					<weaveDependencies>
+						<weaveDependency>
+							<groupId>fr.inria.zvtm</groupId>
+							<artifactId>zvtm</artifactId>
+						</weaveDependency>
+					</weaveDependencies>	
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>				
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>       
+							<goal>test-compile</goal>  
+						</goals>
+					</execution>
+				</executions>
+			</plugin>			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>dependency-maven-plugin</artifactId>
