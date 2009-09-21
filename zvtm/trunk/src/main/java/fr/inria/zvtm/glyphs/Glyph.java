@@ -780,6 +780,23 @@ public abstract class Glyph implements Cloneable, Translucent {
 		long[] res = {vx-Math.round(size),vy+Math.round(size),vx+Math.round(size),vy-Math.round(size)};
 		return res;
 	}
+	
+	/*------------------------Sticking--------------------------*/
+	
+	/** Stick glyph g1 to glyph g2. Behaves like a one-way constraint.*/
+    public static void stickToGlyph(Glyph g1,Glyph g2){
+		g2.stick(g1);
+	}
+
+    /** Unstick glyph g1 from glyph g2. */
+    public static void unstickFromGlyph(Glyph g1,Glyph g2){
+		g2.unstick(g1);
+	}
+    
+    /** Unstick all glyphs sticked to Glyph g. */
+    public static void unstickAllGlyphs(Glyph g){
+		g.unstickAllGlyphs();
+	}
 
     /*-------------Cloning--------------------------------------*/
 

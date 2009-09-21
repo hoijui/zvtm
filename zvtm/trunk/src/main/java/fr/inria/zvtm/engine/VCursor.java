@@ -204,32 +204,36 @@ public class VCursor {
 	}
     }
 
-    /**attach glyph to mouse*/
-    void stick(Glyph g){
-	if (g!=null){
-	    //make it unsensitive (was automatically disabled when glyph was sticked to mouse)
-	    //because false enter/exit events can be generated when moving the mouse too fast
-	    //in small glyphs   (I did not find a way to correct this bug yet)
-	    g.setSensitivity(false);
-	    Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
-	    System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
-	    newStickList[stickedGlyphs.length] = g;
-	    stickedGlyphs = newStickList;
-	    g.stickedTo = this;
+    /** Attach glyph g to mouse cursor. */
+	public void stickGlyph(Glyph g){
+		if (g==null){return;}
+		//make it unsensitive (was automatically disabled when glyph was sticked to mouse)
+		//because false enter/exit events can be generated when moving the mouse too fast
+		//in small glyphs   (I did not find a way to correct this bug yet)
+		g.setSensitivity(false);
+		Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
+		System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
+		newStickList[stickedGlyphs.length] = g;
+		stickedGlyphs = newStickList;
+		g.stickedTo = this;
 	}
-    }
 
-    /**detach last glyph from mouse*/
-    void unstick(){
-	if (stickedGlyphs.length>0){
-	    Glyph g = stickedGlyphs[stickedGlyphs.length - 1];
-	    g.setSensitivity(true);  //make it sensitive again (was automatically disabled when glyph was sticked to mouse)
-	    g.stickedTo = null;
-	    Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-	    System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length - 1);
-	    stickedGlyphs = newStickList;
+    /** Unstick glyph that was last sticked to mouse.
+     * The glyph is automatically made sensitive to mouse events.
+     * The number of glyphs sticked to the mouse can be obtained by calling VCursor.getStickedGlyphsNumber().
+     */
+	public Glyph unstickLastGlyph(){
+		if (stickedGlyphs.length>0){
+			Glyph g = stickedGlyphs[stickedGlyphs.length - 1];
+			g.setSensitivity(true);  //make it sensitive again (was automatically disabled when glyph was sticked to mouse)
+			g.stickedTo = null;
+			Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
+			System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length - 1);
+			stickedGlyphs = newStickList;
+			return g;
+		}
+		return null;
 	}
-    }
 
     /**get the number of glyphs sticked to the mouse*/
     public int getStickedGlyphsNumber(){return stickedGlyphs.length;}

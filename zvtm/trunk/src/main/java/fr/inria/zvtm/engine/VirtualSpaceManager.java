@@ -458,42 +458,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     }
 
     /* ----------- GLYPHS, CAMERAS, CURSOR --------------- */
-
-    /**stick glyph g to mouse (to drag it) - glyph is automatically made unsensitive to mouse events*/
-    public void stickToMouse(Glyph g){
-	activeView.mouse.stick(g);
-    }
-
-    /**unstick ONLY LAST glyph sticked to mouse - glyph is automatically made sensitive to mouse events - the number of glyphs sticked to the mouse can be obtained by calling VCursor.getStickedGlyphsNumber()*/
-    public void unstickFromMouse(){
-	activeView.mouse.unstick();
-    }
     
-    /**stick glyph g1 to glyph g2 (behaves like a one-way constraint)*/
-    public void stickToGlyph(Glyph g1,Glyph g2){
-	g2.stick(g1);
-    }
-
-    /**unstick glyph g1 from glyph g2*/
-    public void unstickFromGlyph(Glyph g1,Glyph g2){
-	g2.unstick(g1);
-    }
-
-    /**stick glyph g to camera c (behaves like a one-way constraint)*/
-    public void stickToCamera(Glyph g, Camera c){
-	c.stick(g);
-    }
-
-    /**unstick all glyphs sticked to Glyph g*/
-    public void unstickAllGlyphs(Glyph g){
-	g.unstickAllGlyphs();
-    }
-
-    /**unstick all glyphs sticked to Camera c*/
-    public void unstickAllGlyphs(Camera c){
-	c.unstickAllGlyphs();
-    }
-
     /**set the value under which a VText is drawn as a point instead of a text (considered too small to be read). Default is 0.5 (it is compared to the product of the font size by the projection value) - if you raise this value, more text that was still displayed as a string will be displayed as a segment and inversely - of course, displaying a line instead of applying affine transformations to strings is faster*/
     public void setTextDisplayedAsSegCoef(float f){
 	textAsLineCoef=f;

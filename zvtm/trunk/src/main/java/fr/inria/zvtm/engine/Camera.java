@@ -606,4 +606,17 @@ public class Camera {
 	return new String("Camera: index"+index+" position ("+posx+","+posy+") alt "+altitude+" focal "+focal);
     }
 
+	/*--------------------Sticking--------------------*/
+	
+    /** Stick glyph g to camera c. Behaves like a one-way constraint. */
+    public static void stickToCamera(Glyph g, Camera c){
+		c.stick(g);
+    }
+
+    /** Unstick all glyphs sticked to Camera c. */
+    public static void unstickAllGlyphs(Camera c){
+		c.unstickAllGlyphs();
+    }
+
+
 }
