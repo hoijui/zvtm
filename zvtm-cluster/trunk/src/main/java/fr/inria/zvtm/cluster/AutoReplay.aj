@@ -17,7 +17,8 @@ import java.awt.Color;
 public aspect AutoReplay {
 	pointcut glyphAutoReplayMethods() : 
 		execution(public * Glyph.setStrokeWidth(float))	||
-		execution(public * Glyph.setMouseInsideHighlightColor(Color))
+		execution(public * Glyph.setMouseInsideHighlightColor(Color)) ||
+		execution(public * Glyph.setVisible(boolean))
 		;
 
 	after() : glyphAutoReplayMethods() {
