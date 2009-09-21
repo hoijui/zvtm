@@ -23,7 +23,7 @@ public class ZP2LensAction implements EndAction {
     }
     
     public void	execute(Object subject, Animation.Dimension dimension){
-        grMngr.vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+        ((Lens)subject).getOwningView().setLens(null);
         ((Lens)subject).dispose();
         grMngr.setMagFactor(GraphicsManager.DEFAULT_MAG_FACTOR);
         grMngr.lens.dispose();
