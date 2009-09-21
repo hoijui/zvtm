@@ -566,10 +566,10 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	    Glyph g=v.lastGlyphEntered();
 	    if (g!=null && g.getType().equals("an")){
 		if (g.getCGlyph()!=null){
-		    application.vsm.stickToMouse(g.getCGlyph());
+		    v.getVCursor().stickGlyph(g.getCGlyph());
 		}
 		else {
-		    application.vsm.stickToMouse(g);
+		    v.getVCursor().stickGlyph(g);
 		}
 	    }
 	}
@@ -579,7 +579,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	application.vsm.activeView.mouse.setSensitivity(true);
-	application.vsm.unstickFromMouse();
+	v.getVCursor().unstickLastGlyph();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -792,10 +792,10 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 	    Glyph g=v.lastGlyphEntered();
 	    if (g!=null){
 		if (g.getCGlyph()!=null){
-		    application.vsm.stickToMouse(g.getCGlyph());
+		    v.getVCursor().stickGlyph(g.getCGlyph());
 		}
 		else {
-		    application.vsm.stickToMouse(g);
+		    v.getVCursor().stickGlyph(g);
 		    application.vsm.getVirtualSpace("vs1").onTop(g);
 		}
 	    }
@@ -806,7 +806,7 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	application.vsm.activeView.mouse.setSensitivity(true);
-	application.vsm.unstickFromMouse();
+	v.getVCursor().unstickLastGlyph();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -945,14 +945,14 @@ class MultiLayerEvtHdlr implements ViewEventHandler {
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	try {application.vsm.stickToMouse(v.lastGlyphEntered());application.vsm.getVirtualSpace("vs1").onTop(v.lastGlyphEntered());}
+	try {v.getVCursor().stickGlyph(v.lastGlyphEntered());application.vsm.getVirtualSpace("vs1").onTop(v.lastGlyphEntered());}
 	catch (NullPointerException ex){}
 	application.vsm.activeView.mouse.setSensitivity(false);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	application.vsm.activeView.mouse.setSensitivity(true);
-	application.vsm.unstickFromMouse();
+	v.getVCursor().unstickLastGlyph();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}

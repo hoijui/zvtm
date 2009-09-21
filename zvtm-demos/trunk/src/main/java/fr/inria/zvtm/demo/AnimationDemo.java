@@ -647,16 +647,16 @@ class AnimationDemoEventHandler implements ViewEventHandler {
 	this.application = app;
     }
 
-    public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	underCursor = getGlyph(v.getMouse());
-	if (underCursor != null){
-	    application.mSpace.onTop((underCursor.getCGlyph() != null) ? underCursor.getCGlyph() : underCursor);
-	    application.vsm.stickToMouse((underCursor.getCGlyph() != null) ? underCursor.getCGlyph() : underCursor);
+	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+		underCursor = getGlyph(v.getMouse());
+		if (underCursor != null){
+			application.mSpace.onTop((underCursor.getCGlyph() != null) ? underCursor.getCGlyph() : underCursor);
+			v.getVCursor().stickGlyph((underCursor.getCGlyph() != null) ? underCursor.getCGlyph() : underCursor);
+		}
 	}
-    }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-	application.vsm.unstickFromMouse();
+		v.getVCursor().unstickLastGlyph();
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
