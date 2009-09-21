@@ -17,9 +17,6 @@ import fr.inria.zvtm.engine.View;
 
 public abstract class Portal {
     
-    /** portal ID */
-    Integer ID;
-
     /** top-left horizontal coordinate of portal, in parent's JPanel coordinates */
     public int x;
     /** top-left vertical coordinate of portal, in parent's JPanel coordinates */
@@ -90,20 +87,6 @@ public abstract class Portal {
     /**Get the event handler for mouse and keyboard events occuring inside the portal (null if none)*/
     public PortalEventHandler getPortalEventHandler(){
 	return this.pevH;
-    }
-
-    /**
-     * get portal ID
-     */
-    public Integer getID(){
-	return ID;
-    }
-
-    /**
-     * set new ID for this portal
-     */
-    public void setID(Integer ident){
-	ID = ident;
     }
 
     /**detects whether the given point is inside this portal or not 

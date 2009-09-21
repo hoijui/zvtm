@@ -28,8 +28,6 @@ public abstract class Lens {
 
     protected ViewPanel owningView;
 
-    protected Integer ID;
-
     /**view width*/
     public int w;
     /**view height*/
@@ -149,20 +147,6 @@ public abstract class Lens {
      */
     public float getBufferThreshold(){
 	return this.mSwitchThreshold;
-    }
-
-    /**
-     * set the lens' ID
-     */
-    public void setID(Integer id){
-	ID = id;
-    }
-
-    /**
-     * get the lens' ID
-     */
-    public Integer getID(){
-	return ID;
     }
 
     void initBuffers(int mainBufferSize, int magBufferSize){

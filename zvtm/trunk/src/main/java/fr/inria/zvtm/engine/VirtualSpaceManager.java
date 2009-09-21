@@ -86,17 +86,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**print exceptions and warning*/
     static boolean debug = false;
 
-    /**next lens will have ID...*/
-    protected int nextlID;
-    /**next portal will have ID...*/
-    protected int nextpID;
-    /**next cursor will have ID...*/
-    private int nextmID;
-
-    /**key is portal ID  (Integer)*/
-    protected Hashtable allPortals;
-    /**key is lens ID  (Integer), value is a two-element Vector: 1st element is the Lens object, 2nd element is the owning view*/
-    protected Hashtable allLenses;
     /**key is space name (String)*/
     protected Hashtable allVirtualSpaces;
     /**All views managed by this VSM*/
@@ -126,17 +115,12 @@ public class VirtualSpaceManager implements AWTEventListener {
      * Automatic instantiation as a singleton. THere is always a single VSM per application.
      */
     private VirtualSpaceManager(){
-	if (debug){System.out.println("Debug mode ON");}
-	nextpID=1;
-	nextlID=1;
-	nextmID=1;
-	animationManager = new AnimationManager(this);
-	allPortals=new Hashtable();
-	allLenses=new Hashtable();
-	allVirtualSpaces=new Hashtable();
-	allViews = new View[0];
-	name2viewIndex = new Hashtable();
-    }
+		if (debug){System.out.println("Debug mode ON");}
+		animationManager = new AnimationManager(this);
+		allVirtualSpaces=new Hashtable();
+		allViews = new View[0];
+		name2viewIndex = new Hashtable();
+	}
 
     /**set debug mode ON or OFF*/
     public static void setDebug(boolean b){
@@ -189,40 +173,14 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param v owning view
      */
     public Portal addPortal(Portal p, View v){
-	p.setID(new Integer(nextpID++));
-	allPortals.put(p.getID(), p);
-	return v.addPortal(p);
-    }
+		return v.addPortal(p);
+	}
 
     /**destroy a portal*/
     public void destroyPortal(Portal p){
-	View v = p.getOwningView();
-	v.removePortal(p);
-	allPortals.remove(p.getID());
-    }
-
-    /**get portal whose ID is id*/
-    public Portal getPortal(Integer id){
-	return (Portal)(allPortals.get(id));
-    }
-
-    /* ----------------- LENSES ---------------- */
-
-    /**get lens whose ID is id*/
-    public Lens getLens(Integer id){
-	try {
-	    return (Lens)(((Vector)allLenses.get(id)).elementAt(0));
+		View v = p.getOwningView();
+		v.removePortal(p);
 	}
-	catch (NullPointerException ex){return null;}
-    }
-
-    /**get view to which lens whose ID is id belongs to*/
-    public View getOwningView(Integer id){
-	try {
-	    return (View)(((Vector)allLenses.get(id)).elementAt(1));
-	}
-	catch (NullPointerException ex){return null;}
-    }
 
     /* ----------------- VIEWS ---------------- */
 
@@ -275,14 +233,12 @@ public class VirtualSpaceManager implements AWTEventListener {
 	switch(viewType){
 	case View.STD_VIEW:{
 	    v = (mnb != null) ? new EView(c, name, w, h, bar, visible, decorated, mnb) : new EView(c, name, w, h, bar, visible, decorated);
-	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
 	    break;
 	}
 	case View.OPENGL_VIEW:{
 	    v = (mnb != null) ? new GLEView(c, name, w, h, bar, visible, mnb) : new GLEView(c, name, w, h, bar, visible);
-	    v.mouse.setID(new Long(nextmID++));
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
 	    break;
@@ -299,7 +255,6 @@ public class VirtualSpaceManager implements AWTEventListener {
      */
     public JPanel addPanelView(Vector c,String name,int w,int h){
         PView tvi = new PView(c, name, w, h);
-        tvi.mouse.setID(new Long(nextmID++));
         addView(tvi);
         tvi.setRepaintPolicy(generalRepaintPolicy);
         return tvi.panel;
@@ -346,7 +301,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     	View v = new JPanelView(cameraList, name, panelWidth, panelHeight,
 				visible, decorated, viewType,
 				parentPanel, frame);
-	v.mouse.setID(new Long(nextmID++));
 	addView(v);
 	v.setRepaintPolicy(generalRepaintPolicy);
 	return v;

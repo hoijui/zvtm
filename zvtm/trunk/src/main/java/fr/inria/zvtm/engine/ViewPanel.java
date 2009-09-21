@@ -665,31 +665,23 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	return frameTime;
     }
 
-    /**set a lens for this view ; set to null to remove an existing lens*/
-    protected Lens setLens(Lens l){
-	if (l != null){
-	    this.lens = l;
-	    if (this.lens.getID() == null){
-		this.lens.setID(new Integer(VirtualSpaceManager.INSTANCE.nextlID++));
-		Vector v = new Vector();
-		v.addElement(this.lens);
-		v.addElement(parent);
-		VirtualSpaceManager.INSTANCE.allLenses.put(this.lens.getID(), v);
-	    }
-	    this.lens.setLensBuffer(this);
-	    
-	    parent.repaintNow();
-	    return this.lens;
+	/**set a lens for this view ; set to null to remove an existing lens*/
+	protected Lens setLens(Lens l){
+		if (l != null){
+			this.lens = l;
+			this.lens.setLensBuffer(this);	    
+			parent.repaintNow();
+			return this.lens;
+		}
+		else {
+			//removing the lens set for this view
+			if (this.lens != null){
+				this.lens = null;
+				parent.repaintNow();
+			}
+			return null;
+		}
 	}
-	else {//removing the lens set for this view
-	    if (this.lens != null){
-		VirtualSpaceManager.INSTANCE.allLenses.remove(this.lens.getID());
-		this.lens = null;
-		parent.repaintNow();
-	    }
-	    return null;
-	}
-    }
 
     /**return Lens cyrrently used by this view (null if none)*/
     protected Lens getLens(){
