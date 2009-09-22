@@ -20,12 +20,18 @@ import org.aspectj.lang.Signature;
  * Bad candidates includes Glyph.setLocation(Location)
  */
 public aspect AutoReplay {
+	//Rules to observe in order to modify this pointcut:
+	// - only add execution join points
+	// - every parameter of every method join point must be
+	// serializable (this include primitive types)
+	// - exercise caution when adding non-public methods to the 
+	// join points, because these methods will be invoked reflectively.
 	pointcut glyphAutoReplayMethods(Glyph glyph) : 
 		this(glyph) && 
 		(
-		execution(public * Glyph+.setStrokeWidth(float))	||
-		execution(public * Glyph+.setMouseInsideHighlightColor(Color)) ||
-		execution(public * Glyph+.setVisible(boolean))
+		execution(public * Glyph.setStrokeWidth(float))	||
+		execution(public * Glyph.setMouseInsideHighlightColor(Color)) ||
+		execution(public * Glyph.setVisible(boolean))
 		)
 		;
 
