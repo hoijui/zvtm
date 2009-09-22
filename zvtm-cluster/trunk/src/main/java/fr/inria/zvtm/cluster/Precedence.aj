@@ -1,5 +1,6 @@
 package fr.inria.zvtm.cluster;
 
+// aspect MiscIntroduction has no dependencies
 // aspect ObjIdIntroduction has no dependencies
 // aspect AutoReplay requires ObjIdIntroduction, and requires
 // that networking be available
@@ -8,6 +9,10 @@ package fr.inria.zvtm.cluster;
  * Makes precedence explicit.
  */
 public aspect Precedence {
-	declare precedence: ObjIdIntroduction, AutoReplay, *;
+	declare precedence: 
+		MiscIntroduction,
+		ObjIdIntroduction, 
+		AutoReplay, 
+		*;
 }
 
