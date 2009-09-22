@@ -32,7 +32,6 @@ public aspect AutoReplay {
 
 	after(Glyph glyph, Serializable arg) : 
 		glyphAutoReplayMethods(glyph, arg) {
-		System.out.println("inside glyphAutoReplayMethods");
 		//create a delta message
 		Signature sig = thisJoinPoint.getStaticPart().getSignature();
 		assert(sig instanceof MethodSignature);
