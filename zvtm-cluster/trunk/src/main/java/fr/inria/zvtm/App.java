@@ -17,9 +17,5 @@ public class App
 		rect.setMouseInsideHighlightColor(Color.GREEN);
 		rect.setStrokeWidth(4f);
 		rect.moveTo(4,4);
-
-		System.out.println(rect.getObjId());
-
-		try{Thread.sleep(3000);} catch(InterruptedException ie){}
     }
 }

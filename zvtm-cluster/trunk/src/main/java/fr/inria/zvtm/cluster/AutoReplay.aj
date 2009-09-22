@@ -20,9 +20,8 @@ import org.aspectj.lang.Signature;
  * Bad candidates includes Glyph.setLocation(Location)
  */
 public aspect AutoReplay {
-	pointcut glyphAutoReplayMethods(Glyph glyph, Serializable arg) : 
+	pointcut glyphAutoReplayMethods(Glyph glyph) : 
 		this(glyph) && 
-		args(arg) && //capture first argument *only*
 		(
 		execution(public * Glyph+.setStrokeWidth(float))	||
 		execution(public * Glyph+.setMouseInsideHighlightColor(Color)) ||
@@ -30,39 +29,53 @@ public aspect AutoReplay {
 		)
 		;
 
-	after(Glyph glyph, Serializable arg) : 
-		glyphAutoReplayMethods(glyph, arg) {
-		//create a delta message
+	after(Glyph glyph) : 
+		glyphAutoReplayMethods(glyph) {
+
 		Signature sig = thisJoinPoint.getStaticPart().getSignature();
+		//We want to create a generic, serializable proxy that
+		//calls a remote method. Hence, we catch method invocations.
+		//If this assert fires, chances are that the definition of
+		//the above pointcut "glyphAutoReplayMethods" is incorrect.
 		assert(sig instanceof MethodSignature);
 		Method method = ((MethodSignature)sig).getMethod();
+		Object[] args = thisJoinPoint.getArgs();
 
 		GenericGlyphDelta glyphDelta = new GenericGlyphDelta(glyph,
 				method.getName(),
 				method.getParameterTypes(),
-				arg);
+				args);
 
 		glyphDelta.execute();
 	}
 
 	//DRAFT generic proxy, for debug purposes
-	private class GenericGlyphDelta implements Serializable {
+	private static class GenericGlyphDelta implements Serializable {
 		private final ObjId objId;
 		private final String methodName;
 		private final Class[] parameterTypes;
-		private final Serializable argument;
+		private final Object[] arguments;
 
 		GenericGlyphDelta(Glyph target, String methodName,
 				Class[] parameterTypes,
-				Serializable argument){
+				Object[] arguments){
+
 			this.objId = target.getObjId();
 			this.methodName = methodName;
 			this.parameterTypes = parameterTypes;
-			this.argument = argument;
+			this.arguments = arguments;
+		}
+
+		private static String printArgs(Object[] args){
+			String result = "";
+			for(Object obj: args){
+				result += obj;
+			}
+			return result;
 		}
 
 		void execute(){
-			System.out.println("Were I a real Delta, I would now be invoking method " + methodName + "(" + parameterTypes + ") with the argument " + argument);
+			System.out.println("Were I a real Delta, I would now be invoking method " + methodName + "(" + parameterTypes + ") with arguments " + printArgs(arguments));
 		}
 	}
 }
