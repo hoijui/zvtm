@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Thu Mar 15 18:33:17 2007
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -137,9 +137,19 @@ class LogicalStructure {
 
 	LNode getNode(String title){
 		LNode res = null;
+		// starting with GV 2.24, edge titles now include port in situations where they did not previously
+		// if we manage to find a matching node with port information, then use it
 		for (int i=0;i<nodes.length;i++){
 			if (nodes[i].title.equals(title)){return nodes[i];}
 		}
+		// if not, try to find a node matching the title without port information
+		if (title.indexOf(LElem.PORT_SEPARATOR) != -1){
+			title = title.substring(0, title.indexOf(LElem.PORT_SEPARATOR));
+			for (int i=0;i<nodes.length;i++){
+				if (nodes[i].title.equals(title)){return nodes[i];}
+			}			
+		}
+		// if this also fails, don't return anything
 		return null;
 	}
 

@@ -14,6 +14,8 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.svg.Metadata;
 
 class LElem {
+	
+	static final String PORT_SEPARATOR = ":";
 
     String title;
     // URLs associated with each glyph (there might be different URLs associated with
