@@ -1,0 +1,8 @@
+=================
+A few quick notes
+=================
+
+When executing a program based on zvtm-cluster, do put the
+zvtm-cluster jar file in your classpath, *not* the vanilla zvtm 
+jar.
+
