@@ -6,6 +6,11 @@ import junit.framework.TestSuite;
 
 import java.awt.Color;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 
@@ -22,5 +27,29 @@ public class ObjIdTest extends TestCase {
 		Glyph glyph = new VCircle(2,5,42,314,Color.WHITE);
 		ObjId id = glyph.getObjId();
 		assertTrue(id.isValid());
+	}
+
+	public void testObjIdSerialization(){
+		try{
+			Glyph glyph = new VCircle(2,5,42,314,Color.WHITE);
+			ObjId id = glyph.getObjId();
+
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = 
+				new ObjectOutputStream(bos);
+			oos.writeObject(id);
+			oos.flush();
+
+			ObjectInputStream ois = 
+				new ObjectInputStream(
+						new ByteArrayInputStream(bos.toByteArray())
+						);
+			ObjId deserializedId = (ObjId)ois.readObject();
+
+			assertTrue(id != deserializedId);
+			assertTrue(id.equals(deserializedId));
+		} catch(Exception ex){
+			assertTrue(false);
+		}
 	}
 }
