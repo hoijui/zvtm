@@ -57,11 +57,11 @@ public aspect AutoReplay {
 				method.getParameterTypes(),
 				args);
 
-		glyphDelta.execute();
+		glyphDelta.apply(null);
 	}
 
 	//dummy generic proxy, for debug purposes
-	private static class GenericGlyphDelta implements Serializable {
+	private static class GenericGlyphDelta implements Delta {
 		private final ObjId objId;
 		private final String methodName;
 		private final Class[] parameterTypes;
@@ -85,7 +85,7 @@ public aspect AutoReplay {
 			return result;
 		}
 
-		void execute(){
+		public void apply(SlaveUpdater updater){
 			System.out.println("Were I a real Delta, I would now be invoking method " + methodName + "(" + parameterTypes + ") with arguments " + printArgs(arguments));
 			//get Glyph associated with ID
 			//retrieve method
