@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
 import java.io.Serializable;
@@ -23,17 +24,19 @@ public aspect AutoReplay {
 	//Rules to observe in order to modify this pointcut:
 	// - only add execution join points
 	// - every parameter of every method join point must be
-	// serializable (this include primitive types)
+	// serializable (primitive types are okay)
 	// - exercise caution when adding non-public methods to the 
 	// join points, because these methods will be invoked reflectively.
 	pointcut glyphAutoReplayMethods(Glyph glyph) : 
 		this(glyph) && 
 		(
-		execution(public * Glyph.setStrokeWidth(float))	||
-		execution(public * Glyph.setMouseInsideHighlightColor(Color)) ||
-		execution(public * Glyph.setVisible(boolean)) ||
-		execution(public * Glyph.orientTo(float)) ||
-		execution(public * Glyph.setSensitivity(boolean))
+		execution(public void Glyph.setStrokeWidth(float))	||
+		execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
+		execution(public void Glyph.setVisible(boolean)) ||
+		execution(public void Glyph.orientTo(float)) ||
+		execution(public void Glyph.setSensitivity(boolean)) ||
+		execution(public void VText.setText(String)) || 
+		execution(public void VText.setScale(float))  
 		)
 		;
 
