@@ -52,4 +52,13 @@ public class ObjIdTest extends TestCase {
 			assertTrue(false);
 		}
 	}
+
+	public void testObjIdSequence(){
+		Glyph glyph = new VCircle(2,5,42,314,Color.WHITE);
+		ObjId id = glyph.getObjId();
+		Glyph anotherGlyph = new VCircle(2,5,42,314,Color.WHITE);
+		ObjId anotherId = anotherGlyph.getObjId();
+
+		assertTrue(!id.equals(anotherId));
+	}
 }
