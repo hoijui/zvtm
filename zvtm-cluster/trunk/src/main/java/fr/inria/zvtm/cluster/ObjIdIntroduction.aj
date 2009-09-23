@@ -8,6 +8,8 @@ import fr.inria.zvtm.glyphs.Glyph;
  * a shared VirtualSpace state across different address spaces
  */
 public aspect ObjIdIntroduction {
+    declare parents: Glyph implements Identifiable;
+
 	private final ObjId Glyph.id = ObjIdFactory.next();
 	public final ObjId Glyph.getObjId(){ return id; }
 }

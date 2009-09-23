@@ -52,7 +52,7 @@ public aspect AutoReplay {
 		Method method = ((MethodSignature)sig).getMethod();
 		Object[] args = thisJoinPoint.getArgs();
 
-		GenericGlyphDelta glyphDelta = new GenericGlyphDelta(glyph,
+		GenericDelta glyphDelta = new GenericDelta(glyph,
 				method.getName(),
 				method.getParameterTypes(),
 				args);
@@ -61,13 +61,13 @@ public aspect AutoReplay {
 	}
 
 	//dummy generic proxy, for debug purposes
-	private static class GenericGlyphDelta implements Delta {
+	private static class GenericDelta implements Delta {
 		private final ObjId objId;
 		private final String methodName;
 		private final Class[] parameterTypes;
 		private final Object[] arguments;
 
-		GenericGlyphDelta(Glyph target, String methodName,
+		GenericDelta(Identifiable target, String methodName,
 				Class[] parameterTypes,
 				Object[] arguments){
 
