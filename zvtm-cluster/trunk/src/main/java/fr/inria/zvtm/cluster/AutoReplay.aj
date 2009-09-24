@@ -9,15 +9,11 @@ package fr.inria.zvtm.cluster;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 
-import java.awt.Color;
-import java.io.Serializable;
 import java.lang.reflect.Method;
-
 import org.aspectj.lang.reflect.MethodSignature;
 import org.aspectj.lang.Signature;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.awt.Color;
 
 /**
  * Define methods that will be replayed automatically
@@ -69,35 +65,5 @@ public aspect AutoReplay {
 		glyphDelta.apply(null);
 	}
 
-	private static class GenericDelta implements Delta {
-		private final ObjId objId;
-		private final String methodName;
-		private final Class[] parameterTypes;
-		private final Object[] arguments;
-
-		static final Logger logger = 
-			LoggerFactory.getLogger(GenericDelta.class);
-
-		GenericDelta(Identifiable target, String methodName,
-				Class[] parameterTypes,
-				Object[] arguments){
-
-			this.objId = target.getObjId();
-			this.methodName = methodName;
-			this.parameterTypes = parameterTypes;
-			this.arguments = arguments;
-		}
-
-		public void apply(SlaveUpdater updater){
-			try{
-				Object target = updater.getSlaveObject(objId);
-				Method method = 
-					target.getClass().getMethod(methodName, parameterTypes);
-				method.invoke(target, arguments);
-			} catch (Exception e){
-				logger.error("Could not invoke remove method", e);
-			}
-		}
-	}
 }
 
