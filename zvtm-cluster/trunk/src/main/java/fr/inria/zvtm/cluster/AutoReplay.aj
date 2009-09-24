@@ -16,6 +16,9 @@ import java.lang.reflect.Method;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.aspectj.lang.Signature;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Define methods that will be replayed automatically
  * on remote virtual spaces.
@@ -66,12 +69,14 @@ public aspect AutoReplay {
 		glyphDelta.apply(null);
 	}
 
-	//dummy generic proxy, for debug purposes
 	private static class GenericDelta implements Delta {
 		private final ObjId objId;
 		private final String methodName;
 		private final Class[] parameterTypes;
 		private final Object[] arguments;
+
+		static final Logger logger = 
+			LoggerFactory.getLogger(GenericDelta.class);
 
 		GenericDelta(Identifiable target, String methodName,
 				Class[] parameterTypes,
@@ -83,19 +88,15 @@ public aspect AutoReplay {
 			this.arguments = arguments;
 		}
 
-		private static String printArgs(Object[] args){
-			String result = "";
-			for(Object obj: args){
-				result += obj;
-			}
-			return result;
-		}
-
 		public void apply(SlaveUpdater updater){
-			System.out.println("Were I a real Delta, I would now be invoking method " + methodName + "(" + parameterTypes + ") with arguments " + printArgs(arguments));
-			//get Glyph associated with ID
-			//retrieve method
-			//execute method
+			try{
+				Object target = updater.getSlaveObject(objId);
+				Method method = 
+					target.getClass().getMethod(methodName, parameterTypes);
+				method.invoke(target, arguments);
+			} catch (Exception e){
+				logger.error("Could not invoke remove method", e);
+			}
 		}
 	}
 }
