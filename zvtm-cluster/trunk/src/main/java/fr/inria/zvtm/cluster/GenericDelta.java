@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,18 @@ public class GenericDelta implements Delta {
 	public void apply(SlaveUpdater updater){
 		try{
 			Object target = updater.getSlaveObject(objId);
-			Method method = 
-				target.getClass().getMethod(methodName, parameterTypes);
+			Method method = target.getClass().getMethod(methodName, 
+					parameterTypes);
 			method.invoke(target, arguments);
 		} catch (Exception e){
 			logger.error("Could not invoke remove method", e);
 		}
+	}
+
+	@Override public String toString(){
+		return "GenericDelta, target=" + objId + 
+			", method=" + methodName + ", args=" + 
+			Arrays.toString(arguments);
 	}
 }
 
