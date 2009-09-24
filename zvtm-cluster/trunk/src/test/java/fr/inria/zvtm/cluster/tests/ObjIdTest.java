@@ -46,10 +46,10 @@ public class ObjIdTest extends TestCase {
 						);
 			ObjId deserializedId = (ObjId)ois.readObject();
 
-			assertTrue(id != deserializedId);
-			assertTrue(id.equals(deserializedId));
+			assertNotSame(id, deserializedId);
+			assertEquals(id, deserializedId);
 		} catch(Exception ex){
-			assertTrue(false);
+			fail();
 		}
 	}
 
