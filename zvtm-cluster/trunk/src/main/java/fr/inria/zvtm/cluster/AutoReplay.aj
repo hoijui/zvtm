@@ -59,7 +59,7 @@ public aspect AutoReplay {
 				method.getParameterTypes(),
 				args);
 
-		glyphDelta.apply(null);
+		//retrieve communication channel, enqueue message
 	}
 }
 

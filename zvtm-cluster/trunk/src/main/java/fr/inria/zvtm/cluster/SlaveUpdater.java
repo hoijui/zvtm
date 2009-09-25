@@ -23,13 +23,24 @@ import org.slf4j.LoggerFactory;
 public class SlaveUpdater {
 	protected final Logger logger = 
 		LoggerFactory.getLogger(SlaveUpdater.class);
-	private final VirtualSpace virtualSpace;
+	private final int slaveNumber;
+	private final String appId;
 	//examples of slave objects are glyphs and cameras
 	private final Map<ObjId, Object> slaveObjects =
 		new HashMap<ObjId, Object>();
 
-	public SlaveUpdater(VirtualSpace virtualSpace){
-		this.virtualSpace = virtualSpace;
+	/**
+	 * Creates a new Slave updater.
+	 * TODO SlaveUpdater should maintain a whole application's
+	 * state, not just a VirtualSpace
+	 */
+	public SlaveUpdater(int slaveNumber, String appId){
+		this.slaveNumber = slaveNumber;
+		this.appId = appId;
+	}
+
+	public SlaveUpdater(){
+		this(0, "clusterApp");
 	}
 
 	/**
