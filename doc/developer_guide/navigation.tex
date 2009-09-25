@@ -1,0 +1,232 @@
+\newpage
+%%%%%%%%%%%%%%%%%%%%
+\section{Navigating in Virtual Spaces}
+\label{sec:nav}
+
+Cameras can be repositioned manually by setting their position explicitly by providing new (x,y) and altitude coordinates. ZVTM also features several methods that make it easier to position a camera in a more declarative manner.
+
+%%%%%%%%%%
+\subsection{Manual positioning}
+
+Camera coordinates are expressed in virtual space units.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+Camera cam = ...;
+
+// moving the camera to (x,y) coordinates 100, -200 in virtual space
+cam.moveTo(100, -200);
+
+// moving the camera by -10,10
+cam.move(-10, 10);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+ Changing the camera's altitude changes the zoom factor. The zoom factor is computed as: \[f = \frac{f}{a+f}\] where $f$ is the camera's focal distance (set to 100 by default) and $a$ is the camera's altitude. Thus, an altitude of $a=0$ corresponds to a zoom factor of 1. This is the default altitude. Setting a positive altitude zooms out compared to this default altitude. Setting a negative altitude zooms in. Obviously, $a \in ]-f,\infty[$.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+// set the camera's altitude
+cam.setAltitude(150.0f)
+
+// relative altitude change
+cam.altitudeOffset(-10.0f);
+
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+Position and altitude can be set with a single method call.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+cam.setLocation(new Location(100,-200,150f));
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+A \cd{fr.inria.zvtm.engine.CameraListener} can be associated with a \cd{Camera} to be notified about camera movements (both (x,y) and altitude changes).
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+CameraListener cl = ...; // implements addListener(CameraListener listener) 
+
+cam.addListener(cl);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+%%%%%%%%%%
+\subsection{Repositioning based on input device events}
+
+In many applications the camera's position and altitude is controlled by pan \& zoom actions initiated by the user through an input device such as a mouse, trackpad, trackball. This is easily implemented in ZVTM with a few lines of code in the application's \cd{ViewEventHandler} (see Section \ref{sec:input} for more detail about this interface).
+
+%%%%%
+\subsubsection{Conventional panning}
+
+The following code shows an example of how to implement conventional panning with the left mouse button, as typically encountered in applications that feature a 2D canvas and provide the "hand" tool to pan the viewport (Adobe Photoshop, Adobe Illustrator, GIMP, etc.). All methods are callbacks declared in \cd{ViewEventHandler}.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+... implements ViewEventHandler {
+
+int lastJPX, lastJPY;
+
+public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+    lastJPX = jpx;
+    lastJPY = jpy;
+}
+
+public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy,
+                         MouseEvent e){
+    if (buttonNumber == 1){
+        Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+        float a = (c.focal + Math.abs(c.altitude)) / c.focal;
+        synchronized(c){
+            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            lastJPX = jpx;
+            lastJPY = jpy;
+        }
+    }
+}
+
+}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+%%%%%
+\subsubsection{Rate-based Scrolling}
+
+This is a first-order control method for panning. The amount of drag controls the camera's translation speed instead of its position. The faster the drag segment in one direction, the faster the scrolling speed. This can be very convenient when scrolling large distances, as there is no need to clutch the input device at all. The following example implements rate-based scrolling with the left mouse button.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+... implements ViewEventHandler {
+
+int lastJPX, lastJPY;
+
+// rate-based scrolling speed factor
+static final float RBSSF = 50;
+
+public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+    lastJPX = jpx;
+    lastJPY = jpy;
+    v.setDrawDrag(true);
+}
+
+public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
+    VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+    VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+    v.setDrawDrag(false);
+}
+
+public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy,
+                         MouseEvent e){
+    if (buttonNumber == 3){
+        Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+        VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(
+            (c.altitude>0) ? (long)((jpx-lastJPX)*(a/RBSSF))
+                           : (long)((jpx-lastJPX)/(a*RBSSF)));
+        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(
+            (c.altitude>0) ? (long)((lastJPY-jpy)*(a/RBSSF))
+                           : (long)((lastJPY-jpy)/(a*RBSSF)));
+        VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+    }
+}
+
+}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+Note that rate-based scrolling and zooming can easily be combined to implement speed-dependent automatic zooming \cite{igarashi00}.
+
+%%%%%
+\subsubsection{Using the mouse wheel to zoom in and out}
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+... implements ViewEventHandler {
+
+// wheel speed factor
+static final float WSF = 5f;
+
+public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy,
+                            MouseWheelEvent e){
+    Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+    float a = (c.focal + Math.abs(c.altitude)) / c.focal;
+    if (wheelDirection == WHEEL_UP){
+        c.altitudeOffset(-a*WSF);
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+    else {
+        c.altitudeOffset(a*WSF);
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+}
+
+}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+%%%%%%%%%%
+\subsection{Getting an overview of a virtual space}
+
+A camera can be repositioned so as to fit all glyphs visible in a virtual space in the associated view.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+View v = ...;
+Camera c = ...;
+
+// doing the move manually
+Location loc = v.getGlobalView(c);
+c.setLocation(loc);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+Repositioning can also be animated automatically.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+// animation of 300ms
+v.getGlobalView(c, 300);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+There are a few other options, see the javadoc for more detail.
+
+%%%%%%%%%%
+\subsection{Centering on a specific region of a virtual space}
+
+A camera can be repositioned so as to fit a given rectangular region of the virtual space. That region is specified by two of its corners, that have to be opposite from one another. If the view's and region's aspect ratios do not match, the camera's altitude is computed so that the region fits in the viewport in its entirety.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+// centering on region defined by points (-400,400) and (150,120).
+// repositioning smoothly animated over 300ms
+v.centerOnRegion(c, 300, -400, 400, 150, 120);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+%%%%%%%%%%
+\subsection{Centering on a specific glyph in a virtual space}
+
+A camera can be repositioned so that a given glyph will occupy most of the viewport. There are several options, see the javadoc for more detail.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+// repositioning over glyph g, smoothly animated over 300ms
+// zooming so as to fit the glyph in the viewport with some space around it
+Glyph g = ...;
+v.centerOnGlyph(g, c, 300, true, 0.9f);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
