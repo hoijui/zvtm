@@ -6,6 +6,7 @@
  */ 
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 
 /** 
@@ -15,8 +16,11 @@ import fr.inria.zvtm.glyphs.Glyph;
  */
 public aspect ObjIdIntroduction {
     declare parents: Glyph implements Identifiable;
-
 	private final ObjId Glyph.id = ObjIdFactory.next();
 	public final ObjId Glyph.getObjId(){ return id; }
+
+	declare parents: VirtualSpace implements Identifiable;
+	private final ObjId VirtualSpace.id = ObjIdFactory.next();
+	public final ObjId VirtualSpace.getObjId(){ return id; }
 }
 
