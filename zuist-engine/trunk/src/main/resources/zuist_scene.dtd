@@ -13,80 +13,97 @@ ZUIST DTD, for v0.3.0 and above.
                 floor CDATA #REQUIRED
                 ceiling CDATA #REQUIRED>
 
+<!ENTITY % ID "id ID #REQUIRED">
+
+<!ENTITY % x "x CDATA #REQUIRED">
+<!ENTITY % y "y CDATA #REQUIRED">
+<!ENTITY % zindex "z-index CDATA #IMPLIED">
+
+<!ENTITY % width "w CDATA">
+<!ENTITY % height "h CDATA">
+<!ENTITY % scale "scale CDATA #IMPLIED">
+
+<!ENTITY % stroke "stroke CDATA #IMPLIED">
+<!ENTITY % fill "fill CDATA #IMPLIED">
+
+<!ENTITY % sensitive "sensitive  (true|false)">
+<!ENTITY % takesToObject "tto IDREF #IMPLIED">
+<!ENTITY % takesToRegion "ttr IDREF #IMPLIED">
+
 <!ELEMENT region (text|rect|polygon|resource)*>
 <!ATTLIST region levels CDATA #REQUIRED
-                 id ID #REQUIRED
+                 %ID;
                  title CDATA #IMPLIED
                  containedIn IDREF #IMPLIED
-                 x CDATA #REQUIRED
-                 y CDATA #REQUIRED
-                 w CDATA #REQUIRED
-                 h CDATA #REQUIRED
-                 stroke CDATA #IMPLIED
+                 %x;
+                 %y;
+                 %width; #REQUIRED
+                 %height; #REQUIRED
+                 %stroke;
                  fill CDATA #IMPLIED
                  tful (appear|disappear|fadein|fadeout) "appear"
                  tfll (appear|disappear|fadein|fadeout) "appear"
                  ttul (appear|disappear|fadein|fadeout) "disappear"
                  ttll (appear|disappear|fadein|fadeout) "disappear"
-                 sensitive (true|false) "false"
+                 %sensitive; "false"
                  requestOrdering (decl|dist) "dist"
                  layer CDATA #IMPLIED>
 
 <!ELEMENT text ANY>
-<!ATTLIST text id ID #REQUIRED
-                 x CDATA #REQUIRED
-                 y CDATA #REQUIRED
-                 z-index CDATA #IMPLIED
-                 scale CDATA #IMPLIED
-                 fill CDATA #IMPLIED
-                 takesToObject IDREF #IMPLIED
-                 takesToRegion IDREF #IMPLIED
-                 sensitive (true|false) "true"
-                 anchor (start|middle|end) "middle"
-				 font-family CDATA #IMPLIED
-				 font-style (plain|bold|italic|boldItalic) "plain"
-				 font-size CDATA #IMPLIED>
+<!ATTLIST text %ID;
+               %x;
+               %y;
+               %zindex;
+               %scale;
+               %fill;
+               %takesToObject;
+               %takesToRegion;
+               %sensitive; "true"
+               anchor (start|middle|end) "middle"
+			   font-family CDATA #IMPLIED
+			   font-style (plain|bold|italic|boldItalic) "plain"
+			   font-size CDATA #IMPLIED>
 
 <!ELEMENT rect ANY>
-<!ATTLIST rect id ID #REQUIRED
-                 x CDATA #REQUIRED
-                 y CDATA #REQUIRED
-                 z-index CDATA #IMPLIED
-                 w CDATA #IMPLIED
-                 h CDATA #IMPLIED
-                 stroke CDATA #IMPLIED
-                 fill CDATA #IMPLIED
-                 takesToObject IDREF #IMPLIED
-                 takesToRegion IDREF #IMPLIED
-                 sensitive (true|false) "true">
+<!ATTLIST rect %ID;
+               %x;
+               %y;
+               %zindex;
+               %width; #REQUIRED
+               %height; #REQUIRED
+               %stroke;
+			   %fill;
+               %takesToObject;
+               %takesToRegion;
+               %sensitive; "true">
 
 <!ELEMENT polygon ANY>
-<!ATTLIST polygon id ID #REQUIRED
-                 points CDATA #IMPLIED
-                 z-index CDATA #IMPLIED
-                 stroke CDATA #IMPLIED
-                 fill CDATA #IMPLIED
-                 takesToObject IDREF #IMPLIED
-                 takesToRegion IDREF #IMPLIED
-                 sensitive (true|false) "true">
+<!ATTLIST polygon %ID;
+                  points CDATA #IMPLIED
+                  %zindex;
+                  %stroke;
+				  %fill;
+                  %takesToObject;
+                  %takesToRegion;
+                  %sensitive; "true">
 
 <!ELEMENT resource ANY>
-<!ATTLIST resource id ID #REQUIRED
-                 type (image|pdf) #REQUIRED
-                 x CDATA #REQUIRED
-                 y CDATA #REQUIRED
-                 z-index CDATA #IMPLIED
-                 w CDATA #IMPLIED
-                 h CDATA #IMPLIED
-                 src CDATA #IMPLIED
-                 scale CDATA #IMPLIED
-                 stroke CDATA #IMPLIED
-                 fill CDATA #IMPLIED
-                 interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
-                 takesToObject IDREF #IMPLIED
-                 takesToRegion IDREF #IMPLIED
-                 sensitive (true|false) "true">
+<!ATTLIST resource %ID;
+                   type (image|pdf) #REQUIRED
+                   %x;
+                   %y;
+                   %zindex;
+                   %width; #IMPLIED
+                   %height; #IMPLIED
+                   %scale;
+                   src CDATA #IMPLIED
+				   %stroke;
+				   %fill;
+				   interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
+	               %takesToObject;
+	               %takesToRegion;
+                   %sensitive; "true">
 
 <!ELEMENT include EMPTY>
-<!ATTLIST include x CDATA #REQUIRED
-                  y CDATA #REQUIRED>
+<!ATTLIST include %x;
+                  %y;>

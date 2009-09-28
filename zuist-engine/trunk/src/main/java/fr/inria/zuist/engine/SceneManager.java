@@ -88,8 +88,8 @@ public class SceneManager {
     public static final String _ceiling = "ceiling";
     public static final String _floor = "floor";
     public static final String _ro = "ro";
-    public static final String _takesToR = "takesToRegion";
-    public static final String _takesToO = "takesToObject";
+    public static final String _takesToR = "ttr";
+    public static final String _takesToO = "tto";
     public static final String _sensitive = "sensitive";
     public static final String _anchor = "anchor";
     public static final String _layer = "layer";
