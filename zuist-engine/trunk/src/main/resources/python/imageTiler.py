@@ -7,6 +7,15 @@
 
 # $Id$
 
+###############################################################################
+# Only 32-bit Python will work with CG bindings on Mac OS X 10.6 Snow Leopard
+# make sure you
+
+#    export VERSIONER_PYTHON_PREFER_32_BIT=yes
+
+# before calling this script
+###############################################################################
+
 import os, sys, math
 from copy import copy
 
@@ -191,7 +200,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("y", str(int(DY-y-ah/2)))
     regionEL.set("w", str(int(aw)))
     regionEL.set("h", str(int(ah)))
-    objectEL = ET.SubElement(regionEL, "object")
+    objectEL = ET.SubElement(regionEL, "resource")
     objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
     objectEL.set("type", "image")
     objectEL.set("x", str(int(DX+x+aw/2)))

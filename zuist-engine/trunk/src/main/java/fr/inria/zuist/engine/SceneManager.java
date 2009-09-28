@@ -56,6 +56,7 @@ public class SceneManager {
     public static final String _id = "id";
     public static final String _title = "title";
     public static final String _containedIn = "containedIn";
+    public static final String _resource = "resource";
     public static final String _image = "image";
     public static final String _type = "type";
     public static final String _text = "text";
@@ -491,10 +492,7 @@ public class SceneManager {
         for (int i=0;i<nl.getLength();i++){
             n = nl.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE){
-                e = (Element)n;
-                if (e.getTagName().equals(_object)){
-                    processObject(e, region, sceneFileDirectory);
-                }
+                processObject((Element)n, region, sceneFileDirectory);
             }
         }
         return region;
@@ -512,60 +510,66 @@ public class SceneManager {
         }
     }
 
-    ObjectDescription processObject(Element objectEL, Region region, File sceneFileDirectory){
-        String type = objectEL.getAttribute(_type);
-        String id = objectEL.getAttribute(_id);
-        int zindex = (objectEL.hasAttribute(_zindex)) ? Integer.parseInt(objectEL.getAttribute(_zindex)) : 0;
+    ObjectDescription processObject(Element e, Region region, File sceneFileDirectory){
+        ObjectDescription od = null;
+        // extract info shared by all types of elements
+        String id = e.getAttribute(_id);
+        int zindex = (e.hasAttribute(_zindex)) ? Integer.parseInt(e.getAttribute(_zindex)) : 0;
         if (id == null || id.length() == 0){
-            System.err.println("Warning: object "+objectEL+" has no ID");
+            System.err.println("Warning: object "+e+" has no ID");
         }
-        ObjectDescription res = null;
-        if (type.equals(_image)){
-            res = processImage(objectEL, id, zindex, region, sceneFileDirectory);
+        // process element-specific attributes
+        if (e.getTagName().equals(_resource)){
+            od = processResource(e, id, zindex, region, sceneFileDirectory);
         }
-        else if (type.equals(_rect)){
-            res = processRectangle(objectEL, id, zindex, region);
+        else if (e.getTagName().equals(_text)){
+            od = processText(e, id, zindex, region);
         }
-        else if (type.equals(_text)){
-            res = processText(objectEL, id, zindex, region);
+        else if (e.getTagName().equals(_rect)){
+            od = processRectangle(e, id, zindex, region);
         }
-        else if (type.equals(_polygon)){
-            res = processPolygon(objectEL, id, zindex, region);
+        else if (e.getTagName().equals(_polygon)){
+            od = processPolygon(e, id, zindex, region);
         }
         else {
             System.err.println("Error: failed to process object declaration: "+id);
             return null;
         }
-        String tto = objectEL.getAttribute(_takesToO);
-        String ttr = objectEL.getAttribute(_takesToR);
+        String tto = e.getAttribute(_takesToO);
+        String ttr = e.getAttribute(_takesToR);
         if (tto != null && tto.length() > 0){
-            res.setTakesTo(tto, TAKES_TO_OBJECT);
+            od.setTakesTo(tto, TAKES_TO_OBJECT);
         }
         else if (ttr != null && ttr.length() > 0){
-            res.setTakesTo(ttr, TAKES_TO_REGION);
+            od.setTakesTo(ttr, TAKES_TO_REGION);
         }
         if (!id2object.containsKey(id)){
-            id2object.put(id, res);
+            id2object.put(id, od);
         }
         else {
             System.err.println("Warning: ID: "+id+" used to identify more than one object.");
         }
-        return res;
+        return od;
     }
 
-    /** Process XML description of an image object. */
-    ImageDescription processImage(Element objectEL, String id, int zindex, Region region, File sceneFileDirectory){
-        long x = Long.parseLong(objectEL.getAttribute(_x));
-        long y = Long.parseLong(objectEL.getAttribute(_y));
-        long w = Long.parseLong(objectEL.getAttribute(_w));
-        long h = Long.parseLong(objectEL.getAttribute(_h));
-        String src = objectEL.getAttribute(_src);
-        Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
-        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
-		Object interpolation = (objectEL.hasAttribute(_interpolation)) ? parseInterpolation(objectEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
-        return od;
+    /** Process XML description of a resource (image, pdf) object. */
+    ImageDescription processResource(Element resourceEL, String id, int zindex, Region region, File sceneFileDirectory){
+        String type = resourceEL.getAttribute(_type);
+        // should do something with type
+        if (type.equals(_image)){
+            long x = Long.parseLong(resourceEL.getAttribute(_x));
+            long y = Long.parseLong(resourceEL.getAttribute(_y));
+            long w = Long.parseLong(resourceEL.getAttribute(_w));
+            long h = Long.parseLong(resourceEL.getAttribute(_h));
+            String src = resourceEL.getAttribute(_src);
+            Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
+            boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
+    		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
+    		Object interpolation = (resourceEL.hasAttribute(_interpolation)) ? parseInterpolation(resourceEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+    		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
+            return od;            
+        }
+        return null;
     }
 
     /** Creates an image and adds it to a region.
@@ -610,14 +614,14 @@ public class SceneManager {
     }
 
     /** Process XML description of a rectangle object. */
-    ClosedShapeDescription processRectangle(Element objectEL, String id, int zindex, Region region){
-        long x = Long.parseLong(objectEL.getAttribute(_x));
-        long y = Long.parseLong(objectEL.getAttribute(_y));
-        long w = Long.parseLong(objectEL.getAttribute(_w));
-        long h = Long.parseLong(objectEL.getAttribute(_h));
-        Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
-        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
-        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+    ClosedShapeDescription processRectangle(Element rectEL, String id, int zindex, Region region){
+        long x = Long.parseLong(rectEL.getAttribute(_x));
+        long y = Long.parseLong(rectEL.getAttribute(_y));
+        long w = Long.parseLong(rectEL.getAttribute(_w));
+        long h = Long.parseLong(rectEL.getAttribute(_h));
+        Color stroke = SVGReader.getColor(rectEL.getAttribute(_stroke));
+        Color fill = SVGReader.getColor(rectEL.getAttribute(_fill));
+        boolean sensitivity = (rectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(rectEL.getAttribute(_sensitive)) : true;
         ClosedShape g = new VRectangle(x+origin.x, y+origin.y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
@@ -625,11 +629,11 @@ public class SceneManager {
     }
 
     /** Process XML description of a polygon object. */
-    ClosedShapeDescription processPolygon(Element objectEL, String id, int zindex, Region region){
-        LongPoint[] vertices = parseVertexCoordinates(objectEL.getAttribute(_points), origin);
-        Color stroke = SVGReader.getColor(objectEL.getAttribute(_stroke));
-        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
-        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
+    ClosedShapeDescription processPolygon(Element polygonEL, String id, int zindex, Region region){
+        LongPoint[] vertices = parseVertexCoordinates(polygonEL.getAttribute(_points), origin);
+        Color stroke = SVGReader.getColor(polygonEL.getAttribute(_stroke));
+        Color fill = SVGReader.getColor(polygonEL.getAttribute(_fill));
+        boolean sensitivity = (polygonEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(polygonEL.getAttribute(_sensitive)) : true;
         ClosedShape g = new VPolygon(vertices, zindex, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
@@ -648,17 +652,17 @@ public class SceneManager {
     }
     
     /** Process XML description of a text object. */
-    TextDescription processText(Element objectEL, String id, int zindex, Region region){
-        long x = Long.parseLong(objectEL.getAttribute(_x));
-        long y = Long.parseLong(objectEL.getAttribute(_y));
-        float scale = Float.parseFloat(objectEL.getAttribute(_scale));
-        String text = objectEL.getFirstChild().getNodeValue();
-        Color fill = SVGReader.getColor(objectEL.getAttribute(_fill));
-        String ff = (objectEL.hasAttribute(_fontFamily)) ? objectEL.getAttribute(_fontFamily) : null;
-        int fst = (objectEL.hasAttribute(_fontStyle)) ? getFontStyle(objectEL.getAttribute(_fontStyle)) : Font.PLAIN;
-        int fsz = (objectEL.hasAttribute(_fontSize)) ? Integer.parseInt(objectEL.getAttribute(_fontSize)) : 12;        
-        boolean sensitivity = (objectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(objectEL.getAttribute(_sensitive)) : true;
-        short anchor = (objectEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(objectEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
+    TextDescription processText(Element textEL, String id, int zindex, Region region){
+        long x = Long.parseLong(textEL.getAttribute(_x));
+        long y = Long.parseLong(textEL.getAttribute(_y));
+        float scale = Float.parseFloat(textEL.getAttribute(_scale));
+        String text = textEL.getFirstChild().getNodeValue();
+        Color fill = SVGReader.getColor(textEL.getAttribute(_fill));
+        String ff = (textEL.hasAttribute(_fontFamily)) ? textEL.getAttribute(_fontFamily) : null;
+        int fst = (textEL.hasAttribute(_fontStyle)) ? getFontStyle(textEL.getAttribute(_fontStyle)) : Font.PLAIN;
+        int fsz = (textEL.hasAttribute(_fontSize)) ? Integer.parseInt(textEL.getAttribute(_fontSize)) : 12;        
+        boolean sensitivity = (textEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(textEL.getAttribute(_sensitive)) : true;
+        short anchor = (textEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(textEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
         TextDescription od = createTextDescription(x+origin.x, y+origin.y, id, zindex, region, scale, text,
                                                    anchor, fill,
                                                    ff, fst, fsz,

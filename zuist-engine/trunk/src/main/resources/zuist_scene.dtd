@@ -1,3 +1,8 @@
+<!--
+Author: Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ZUIST DTD, for v0.3.0 and above.
+-->
+
 <!-- $Id$ -->
 
 <!ELEMENT scene (level+,region+,include*)>
@@ -8,7 +13,7 @@
                 floor CDATA #REQUIRED
                 ceiling CDATA #REQUIRED>
 
-<!ELEMENT region (object)*>
+<!ELEMENT region (text|rect|polygon|resource)*>
 <!ATTLIST region levels CDATA #REQUIRED
                  id ID #REQUIRED
                  title CDATA #IMPLIED
@@ -27,20 +32,13 @@
                  requestOrdering (decl|dist) "dist"
                  layer CDATA #IMPLIED>
 
-<!ELEMENT object ANY>
-<!ATTLIST object id ID #REQUIRED
-                 type (image|text|rect|polygon) #REQUIRED
+<!ELEMENT text ANY>
+<!ATTLIST text id ID #REQUIRED
                  x CDATA #REQUIRED
                  y CDATA #REQUIRED
                  z-index CDATA #IMPLIED
-                 w CDATA #IMPLIED
-                 h CDATA #IMPLIED
-                 points CDATA #IMPLIED
-                 src CDATA #IMPLIED
                  scale CDATA #IMPLIED
-                 stroke CDATA #IMPLIED
                  fill CDATA #IMPLIED
-                 interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
                  takesToObject IDREF #IMPLIED
                  takesToRegion IDREF #IMPLIED
                  sensitive (true|false) "true"
@@ -48,6 +46,46 @@
 				 font-family CDATA #IMPLIED
 				 font-style (plain|bold|italic|boldItalic) "plain"
 				 font-size CDATA #IMPLIED>
+
+<!ELEMENT rect ANY>
+<!ATTLIST rect id ID #REQUIRED
+                 x CDATA #REQUIRED
+                 y CDATA #REQUIRED
+                 z-index CDATA #IMPLIED
+                 w CDATA #IMPLIED
+                 h CDATA #IMPLIED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 takesToObject IDREF #IMPLIED
+                 takesToRegion IDREF #IMPLIED
+                 sensitive (true|false) "true">
+
+<!ELEMENT polygon ANY>
+<!ATTLIST polygon id ID #REQUIRED
+                 points CDATA #IMPLIED
+                 z-index CDATA #IMPLIED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 takesToObject IDREF #IMPLIED
+                 takesToRegion IDREF #IMPLIED
+                 sensitive (true|false) "true">
+
+<!ELEMENT resource ANY>
+<!ATTLIST resource id ID #REQUIRED
+                 type (image|pdf) #REQUIRED
+                 x CDATA #REQUIRED
+                 y CDATA #REQUIRED
+                 z-index CDATA #IMPLIED
+                 w CDATA #IMPLIED
+                 h CDATA #IMPLIED
+                 src CDATA #IMPLIED
+                 scale CDATA #IMPLIED
+                 stroke CDATA #IMPLIED
+                 fill CDATA #IMPLIED
+                 interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
+                 takesToObject IDREF #IMPLIED
+                 takesToRegion IDREF #IMPLIED
+                 sensitive (true|false) "true">
 
 <!ELEMENT include EMPTY>
 <!ATTLIST include x CDATA #REQUIRED
