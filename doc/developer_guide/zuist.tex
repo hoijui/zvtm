@@ -3,14 +3,16 @@
 \section{ZUIST: a Multi-Scale Scene Manager for ZVTM}
 \label{sec:zuist}
 
-ZUIST is a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to create multi-scale interfaces à la Google Earth (though in 2.5D) in which objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera(s). Multi-scale scenes can be built through the ZUIST API (javadoc) or can be loaded from files that describe them declaratively using a dedicated, simple XML vocabulary\footnote{\url{http://zvtm.svn.sourceforge.net/viewvc/zvtm/zuist-engine/trunk/src/main/resources/zuist_scene.dtd?view=markup}}.
+ZUIST is a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to create multi-scale interfaces. Objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera(s). This is similar to Google Earth, though here we are not limited to geo-spatial data but can navigate any kind of dataset, not necessarily organized as a quad-tree (see, e.g., Figure \ref{fig:ue}).
+
+Multi-scale scenes can be built through the ZUIST API (javadoc) or can be loaded from files that describe them declaratively using a dedicated, simple XML vocabulary\footnote{\url{http://zvtm.svn.sourceforge.net/viewvc/zvtm/zuist-engine/trunk/src/main/resources/zuist_scene.dtd?view=markup}}.
 
 For now, only the Javadoc API documentation is available, along with code examples from various applications: the basic viewer/debugger\footnote{\url{http://zvtm.svn.sourceforge.net/viewvc/zvtm/zuist-engine/trunk/src/main/java/fr/inria/zuist/viewer/}}, UIST Archive Explorer\footnote{\url{http://zvtm.svn.sourceforge.net/viewvc/zvtm/zuist-ue/trunk/}}, and Blue Marble Next Generation Explorer\footnote{\url{http://zvtm.svn.sourceforge.net/viewvc/zvtm/zuist-wm/trunk/}}.
 
 %%%%%%%%%%
-\subsection{Applications}
+\subsection{Example Applications}
 
-Additional information and resources about applications is available on the ZUIST web page\footnote{\url{http://zvtm.sourceforge.net/zuist/}}.
+Additional information and resources about the following example applications is available on the ZUIST web page\footnote{\url{http://zvtm.sourceforge.net/zuist/}}.
 
 %%%%%
 \subsubsection{UIST Archive Explorer}
@@ -23,6 +25,7 @@ Additional information and resources about applications is available on the ZUIS
     \fbox{\includegraphics[height=6cm]{images/zuist2.png}}
   \end{tabular}
  \caption{ACM UIST Archive Explorer (20th Anniversary)}
+ \label{fig:ue}
 \end{figure}
 
 UIST Explorer is a ZUIST-based application that lets users navigate in 20 years of papers published at the ACM UIST conference\footnote{\url{http://www.acm.org/uist/}} from 1988 to 2007. It was one of the 20th Anniversary Interactive Visualization tools demonstrated during the 2007 conference. Users have access to 578 research papers, typically 4-to-10 page long. Papers can be browsed by year, by author, or by keywords. Overall, the multi-scale scene is composed of more than 80,000 graphical objects, most of them being 1224x1584 pixels compressed bitmap images (representing about 2GB of compressed data), loaded dynamically into memory. Running UIST Explorer typically requires less than 512MB of RAM. During the conference, the application ran on an Apple MacBook Pro laptop hooked to a SmartBoard 3000i, with a Java heap size set to 1GB, of which it never used more than 50\%.
@@ -65,3 +68,7 @@ A similar application was developed to navigate in all research documents publis
 \end{figure}
 
 Navigating in a multi-scale version of NASA's Blue Marble Next Generation world map\footnote{\url{http://earthobservatory.nasa.gov/Newsroom/BlueMarble/}}: 86400 x 43200 pixels decomposed into 2730 tiles (1350x1350 each) arranged in a pyramid. The map is enriched with geographical data taken from the Geonames database\footnote{\url{http://www.geonames.org/}} and boundaries for countries and administrative regions publicly available as ESRI shapefiles\footnote{\url{http://en.wikipedia.org/wiki/Shapefile}}.
+
+%%%%%%%%%%
+\subsection{Multi-scale Scenes in ZUIST}
+
