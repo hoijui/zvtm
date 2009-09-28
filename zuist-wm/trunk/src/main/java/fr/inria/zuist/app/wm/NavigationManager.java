@@ -24,6 +24,7 @@ import fr.inria.zvtm.engine.OverviewPortal;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zuist.engine.Region;
 
 class NavigationManager {
 
@@ -84,8 +85,8 @@ class NavigationManager {
 
 	/* -------------- Overview ------------------- */
 	
-	static final int OVERVIEW_WIDTH = 200;
-	static final int OVERVIEW_HEIGHT = 100;
+	static final int MAX_OVERVIEW_WIDTH = 200;
+	static final int MAX_OVERVIEW_HEIGHT = 200;
 	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
 	static final float OBSERVED_REGION_ALPHA = 0.5f;
 	static final Color OV_BORDER_COLOR = Color.WHITE;
@@ -93,8 +94,22 @@ class NavigationManager {
 	
 	OverviewPortal ovPortal;
 	
-	void createOverview(){
-		ovPortal = new OverviewPortal(application.panelWidth-OVERVIEW_WIDTH-1, application.panelHeight-OVERVIEW_HEIGHT-1, OVERVIEW_WIDTH, OVERVIEW_HEIGHT, application.ovCamera, application.mCamera);
+	long[] scene_bounds = {0, 0, 0, 0};
+	
+	void createOverview(Region rootRegion){
+	    int ow, oh;
+	    float ar = rootRegion.getWidth()/(float)rootRegion.getHeight();
+	    if (ar > 1){
+	        // wider than high
+	        ow = MAX_OVERVIEW_WIDTH;
+	        oh = Math.round(ow/ar);
+	    }
+	    else {
+	        // higher than wide
+	        oh = MAX_OVERVIEW_HEIGHT;
+	        ow = Math.round(oh*ar);
+	    }
+		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
 		ovPortal.setPortalEventHandler(application.eh);
 		ovPortal.setBackgroundColor(WorldExplorer.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
@@ -105,10 +120,22 @@ class NavigationManager {
 	}
 	
 	void updateOverview(){
-		if (ovPortal != null){application.ovCamera.setLocation(ovPortal.getGlobalView());}
+		if (ovPortal != null){
+		    int l = 0;
+    		while (application.sm.getRegionsAtLevel(l) == null){
+    			l++;
+    			if (l > application.sm.getLevelCount()){
+    				l = -1;
+    				break;
+    			}
+    		}
+    		if (l > -1){
+    			scene_bounds = application.sm.getLevel(l).getBounds();
+    	        ovPortal.centerOnRegion(WorldExplorer.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);		
+    		}
+		}
 	}
-
-    
+	
 	/* -------------- Sigma Lenses ------------------- */
 
     void setLens(int t){
