@@ -9,6 +9,7 @@ package fr.inria.zuist.app.wm;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.FilenameFilter;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -114,12 +115,7 @@ public class WorldExplorer implements Java2DPainter {
     
     TranslucentTextArea console;
 
-    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, boolean opengl, String dir){
-        if (dir != null){
-            PATH_TO_HIERARCHY = dir;
-            PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
-            SCENE_FILE = new File(PATH_TO_SCENE);
-        }
+    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, boolean opengl, File xmlSceneFile){
         nm = new NavigationManager(this);
         initGUI(fullscreen, opengl);
         gp = new WEGlassPane(this);
@@ -132,7 +128,7 @@ public class WorldExplorer implements Java2DPainter {
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setSceneCameraBounds(bCamera, eh.wnes);
-        sm.loadScene(parseXML(SCENE_FILE), new File(PATH_TO_HIERARCHY), true, gp);
+        sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
         if (grid){buildGrid();}
         gm = new GeoToolsManager(this, queryGN);
         gp.setVisible(false);
@@ -383,22 +379,42 @@ public class WorldExplorer implements Java2DPainter {
         System.exit(0);
     }
 
+    static void printCmdLineHelp(){
+        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [queryGN] [fs] [grid] [opengl]");
+		System.out.println("\n\tqgn: query geonames.org Web service: true or false");
+		System.out.println("\tfs: fullscreen: true or false");
+		System.out.println("\tgrid: draw a grid on top of the map: true or false");
+		System.out.println("\topengl: use OpenGL: true or false");
+		System.exit(0);
+    }
+
     public static void main(String[] args){
-        String dir = (args.length > 0) ? args[0] : null;
+        File xmlSceneFile = null;
+        File f = new File(args[0]);
+        if (f.exists()){
+            if (f.isDirectory()){
+                // if arg is a directory, take first xml file we find in that directory
+                String[] xmlFiles = f.list(new FilenameFilter(){
+                                        public boolean accept(File dir, String name){return name.endsWith(".xml");}
+                                    });
+                if (xmlFiles.length > 0){
+                    xmlSceneFile = new File(f, xmlFiles[0]);
+                }
+            }
+            else {
+                xmlSceneFile = f;                        
+            }
+        }
+        if (xmlSceneFile == null){
+            printCmdLineHelp();
+            return;
+        }
         boolean queryGN = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
         boolean fs = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
         boolean grid = (args.length > 3) ? Boolean.parseBoolean(args[3]) : false;
         boolean ogl = (args.length > 4) ? Boolean.parseBoolean(args[3]) : false;
         System.out.println("Using GeoTools v" + GeoTools.getVersion() );
-		if (dir == null){
-			System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [queryGN] [fs] [grid] [opengl]");
-			System.out.println("\n\tqgn: query geonames.org Web service: true or false");
-			System.out.println("\tfs: fullscreen: true or false");
-			System.out.println("\tgrid: draw a grid on top of the map: true or false");
-			System.out.println("\topengl: use OpenGL: true or false");
-			System.exit(0);
-		}
-        new WorldExplorer(queryGN, fs, grid, ogl, dir);
+        new WorldExplorer(queryGN, fs, grid, ogl, xmlSceneFile);
     }
 
 }
