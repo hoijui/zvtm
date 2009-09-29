@@ -31,16 +31,16 @@ public class SlaveUpdater {
 
 	/**
 	 * Creates a new Slave updater.
-	 * TODO SlaveUpdater should maintain a whole application's
-	 * state, not just a VirtualSpace
+	 * SlaveUpdater maintains the state of a whole application,
+	 * not just a VirtualSpace
 	 */
-	public SlaveUpdater(int slaveNumber, String appId){
-		this.slaveNumber = slaveNumber;
+	public SlaveUpdater(String appId, int slaveNumber){
 		this.appId = appId;
+		this.slaveNumber = slaveNumber;
 	}
 
 	public SlaveUpdater(){
-		this(0, "clusterApp");
+		this("clusterApp", 0);
 	}
 
 	/**
