@@ -44,8 +44,8 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <!-- Distribution - Deploy to FTP -->
   <distributionManagement>
 	<repository>
-      <id>zvtm repository</id>
-      <url>scp://zvtm.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
   
