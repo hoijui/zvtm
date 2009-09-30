@@ -59,54 +59,9 @@ public class EView extends View implements KeyListener{
      */
     protected EView(Vector v, String t, int panelWidth, int panelHeight,
 		    boolean bar, boolean visible, boolean decorated){
-	frame=new JFrame();
-	if (!decorated){frame.setUndecorated(true);}
-	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	mouse=new VCursor(this);
-	name=t;
-	detectMultipleFullFills=VirtualSpaceManager.INSTANCE.defaultMultiFill;
-	initCameras(v);   //vector -> cast elements as "Camera"
-	GridBagLayout gridBag=new GridBagLayout();
-	GridBagConstraints constraints=new GridBagConstraints();
-	Container cpane=frame.getContentPane();
-	cpane.setLayout(gridBag);
-	if (bar){
-	    buildConstraints(constraints,0,0,1,1,100,90);
-	    constraints.fill=GridBagConstraints.BOTH;
-	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new StdViewPanel(v,this, false);
-	    panel.setSize(panelWidth,panelHeight);
-	    gridBag.setConstraints(panel,constraints);
-	    cpane.add(panel);
-	    buildConstraints(constraints,0,1,1,1,0,0);
-	    constraints.anchor=GridBagConstraints.WEST;
-	    statusBar=new JLabel(" ");
-	    gridBag.setConstraints(statusBar,constraints);
-	    cpane.add(statusBar);
-	}
-	else {
-	    buildConstraints(constraints,0,0,1,1,100,90);
-	    constraints.fill=GridBagConstraints.BOTH;
-	    constraints.anchor=GridBagConstraints.CENTER;
-	    panel=new StdViewPanel(v,this, false);
-	    panel.setSize(panelWidth,panelHeight);
-	    gridBag.setConstraints(panel,constraints);
-	    cpane.add(panel);
-	}
-	frame.setTitle(t);
-	WindowListener l=new WindowAdapter(){
-		public void windowClosing(WindowEvent e){close();}
-		public void windowActivated(WindowEvent e){activate();}
-		public void windowDeactivated(WindowEvent e){deactivate();}
-		public void windowIconified(WindowEvent e){iconify();}
-		public void windowDeiconified(WindowEvent e){deiconify();}
-	    };
-	frame.addWindowListener(l);
-	frame.addKeyListener(this);
-	frame.pack();
-	frame.setSize(panelWidth,panelHeight);
-	if (visible){frame.setVisible(true);}
-    }
+		this(v, t, panelWidth, panelHeight, bar,
+				visible, decorated, null);
+	    }
 
     /**
      *@param v list of cameras
@@ -116,7 +71,7 @@ public class EView extends View implements KeyListener{
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
-     *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view)
+     *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view). No effect if null.
      */
     protected EView(Vector v,String t,int panelWidth,int panelHeight,
 		    boolean bar,boolean visible, boolean decorated,
@@ -124,10 +79,13 @@ public class EView extends View implements KeyListener{
 	frame=new JFrame();
 	if (!decorated){frame.setUndecorated(true);}
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	frame.setJMenuBar(mnb);
-	this.jmb=mnb;
+	if(mnb != null){
+		frame.setJMenuBar(mnb);
+		this.jmb=mnb;
+	}
 	mouse=new VCursor(this);
 	name=t;
+	detectMultipleFullFills=VirtualSpaceManager.INSTANCE.defaultMultiFill;
 	initCameras(v);   //vector -> cast elements as "Camera"
 	GridBagLayout gridBag=new GridBagLayout();
 	GridBagConstraints constraints=new GridBagConstraints();
