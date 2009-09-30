@@ -28,6 +28,7 @@ public class SlaveUpdater {
 	//examples of slave objects are glyphs and cameras
 	private final Map<ObjId, Object> slaveObjects =
 		new HashMap<ObjId, Object>();
+	private final NetworkDelegate networkDelegate;
 
 	/**
 	 * Creates a new Slave updater.
@@ -37,6 +38,7 @@ public class SlaveUpdater {
 	public SlaveUpdater(String appId, int slaveNumber){
 		this.appId = appId;
 		this.slaveNumber = slaveNumber;
+		networkDelegate = new NetworkDelegate(appId);
 	}
 
 	public SlaveUpdater(){
@@ -71,18 +73,26 @@ public class SlaveUpdater {
 		return slaveObjects.remove(id);
 	}
 
+	void startOperation(){
+		try{
+			networkDelegate.startOperation();
+		} catch( ChannelException ce ){
+			logger.error("Could not join network channel: " + ce);
+		}
+	}
+
 	class NetworkDelegate {
-		private final JChannel channel;
+		private JChannel channel;
 		private final String spaceName;
-		NetworkDelegate(String spaceName) throws ChannelException {
+		NetworkDelegate(String spaceName){
 			this.spaceName = spaceName;
-			channel = new JChannel();
 		}
 
 		//start listening on the appropriate channel,
 		//handle incoming messages (optionnally post reply
 		//or error messages)
 		void startOperation() throws ChannelException {
+			channel = new JChannel();
 			channel.connect(spaceName);
 			channel.setReceiver(new ReceiverAdapter(){
 				@Override public void viewAccepted(View newView){
