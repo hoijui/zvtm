@@ -81,6 +81,10 @@ public class SlaveUpdater {
 		}
 	}
 
+	void stop(){
+		networkDelegate.stop();
+	}
+
 	class NetworkDelegate {
 		private JChannel channel;
 		private final String spaceName;
@@ -113,6 +117,10 @@ public class SlaveUpdater {
 					delta.apply(SlaveUpdater.this); 
 				}
 			});
+		}
+
+		void stop(){
+			channel.close();
 		}
 	}
 }

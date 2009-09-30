@@ -20,7 +20,12 @@ public class SlaveApp {
 		vsm.setDebug(options.debug);
 		SlaveUpdater updater = new SlaveUpdater(options.appName,
 				options.blockNumber);
-		//instanciate a single View
+		updater.startOperation();
+	}
+
+	//called back to initialize views once the master
+	//has sent camera specifications.
+	void initView(){
 	}
 
 	public static void main(String[] args){
