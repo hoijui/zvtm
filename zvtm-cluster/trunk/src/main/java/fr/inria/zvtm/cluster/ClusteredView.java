@@ -52,3 +52,4 @@ public class ClusteredView {
 		throw new UnsupportedOperationException();
 	}
 }
+

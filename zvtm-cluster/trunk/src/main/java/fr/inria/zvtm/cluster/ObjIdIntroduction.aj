@@ -14,7 +14,7 @@ import fr.inria.zvtm.glyphs.Glyph;
  * This object ID will be used for instance to maintain 
  * a shared VirtualSpace state across different address spaces
  */
-public aspect ObjIdIntroduction {
+aspect ObjIdIntroduction {
     declare parents: Glyph implements Identifiable;
 	private final ObjId Glyph.id = ObjIdFactory.next();
 	public final ObjId Glyph.getObjId(){ return id; }

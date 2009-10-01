@@ -6,7 +6,7 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericDelta implements Delta {
+class GenericDelta implements Delta {
 	private final ObjId objId;
 	private final String methodName;
 	private final Class[] parameterTypes;

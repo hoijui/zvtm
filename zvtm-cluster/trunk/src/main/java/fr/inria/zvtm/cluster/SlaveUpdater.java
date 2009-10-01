@@ -87,9 +87,9 @@ public class SlaveUpdater {
 
 	class NetworkDelegate {
 		private JChannel channel;
-		private final String spaceName;
-		NetworkDelegate(String spaceName){
-			this.spaceName = spaceName;
+		private final String appName;
+		NetworkDelegate(String appName){
+			this.appName = appName;
 		}
 
 		//start listening on the appropriate channel,
@@ -97,7 +97,7 @@ public class SlaveUpdater {
 		//or error messages)
 		void startOperation() throws ChannelException {
 			channel = new JChannel();
-			channel.connect(spaceName);
+			channel.connect(appName);
 			channel.setReceiver(new ReceiverAdapter(){
 				@Override public void viewAccepted(View newView){
 					logger.info("new view: {}", newView);
