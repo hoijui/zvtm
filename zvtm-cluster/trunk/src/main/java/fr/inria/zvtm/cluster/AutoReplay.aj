@@ -61,17 +61,7 @@ public aspect AutoReplay {
 					args);
 
 			//retrieve communication channel, enqueue message
-		}
-
-	pointcut virtualSpaceManagerAutoReplayMethods() :
-		(
-		 execution(public VirtualSpace VirtualSpaceManager.addVirtualSpace(String)) ||
-		 execution(public void VirtualSpaceManager.destroyVirtualSpace(String))
-		)
-		 ;
-
-	after() :
-		virtualSpaceManagerAutoReplayMethods(){
+			VirtualSpaceManager.INSTANCE.sendDelta(glyphDelta);
 		}
 }
 
