@@ -6,6 +6,7 @@
  */ 
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 
@@ -15,12 +16,16 @@ import fr.inria.zvtm.glyphs.Glyph;
  * a shared VirtualSpace state across different address spaces
  */
 aspect ObjIdIntroduction {
+	declare parents: VirtualSpace implements Identifiable;
+	private final ObjId VirtualSpace.id = ObjIdFactory.next();
+	public final ObjId VirtualSpace.getObjId(){ return id; }
+
     declare parents: Glyph implements Identifiable;
 	private final ObjId Glyph.id = ObjIdFactory.next();
 	public final ObjId Glyph.getObjId(){ return id; }
 
-	declare parents: VirtualSpace implements Identifiable;
-	private final ObjId VirtualSpace.id = ObjIdFactory.next();
-	public final ObjId VirtualSpace.getObjId(){ return id; }
-}
+	declare parents: Camera implements Identifiable;
+	private final ObjId Camera.id = ObjIdFactory.next();
+	public final ObjId Camera.getObjId(){ return id; }
+	}
 
