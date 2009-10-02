@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 aspect MasterNetworkIntroduction {
 	private MasterNetworkDelegate VirtualSpaceManager.networkDelegate = 
 		new MasterNetworkDelegate();
+	private boolean VirtualSpaceManager.isMaster = false;
 	private String VirtualSpaceManager.appName;
 	private final Logger VirtualSpaceManager.logger = 
 		LoggerFactory.getLogger(VirtualSpaceManager.class);
@@ -29,12 +30,15 @@ aspect MasterNetworkIntroduction {
 	public void VirtualSpaceManager.setMaster(String app){
 		appName = app;
 		startOperation();
+		isMaster = true;
 	}
 
+	public boolean VirtualSpaceManager.isMaster(){ return isMaster; }
+
 	public void VirtualSpaceManager.sendDelta(Delta delta){
-		//assert(vsm.isMaster());
+		assert(isMaster());
 		try{
-		networkDelegate.sendDelta(delta);
+			networkDelegate.sendDelta(delta);
 		} catch (ChannelException ce){
 			logger.error("Could not send Delta message: " + ce);
 		}
