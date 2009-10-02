@@ -23,7 +23,7 @@ import java.io.Serializable;
  * internally use moveTo and not move. That said, it should not
  * make any difference for users. It is simply a design choice.
  */
-public interface Delta extends Serializable {
+interface Delta extends Serializable {
 	public void apply(SlaveUpdater updater);
 }
 

@@ -6,6 +6,7 @@
  */ 
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
@@ -31,7 +32,7 @@ public aspect AutoReplay {
 	// - exercise caution when adding non-public methods to the 
 	// join points, because these methods will be invoked reflectively.
 	pointcut glyphAutoReplayMethods(Glyph glyph) : 
-		this(glyph) && 
+		this(glyph) &&
 		(
 		 execution(public void Glyph.setStrokeWidth(float))	||
 		 execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
@@ -62,6 +63,31 @@ public aspect AutoReplay {
 
 			//retrieve communication channel, enqueue message
 			VirtualSpaceManager.INSTANCE.sendDelta(glyphDelta);
+		}
+
+	pointcut cameraAutoReplayMethods(Camera camera) :
+		this(camera) &&
+		(
+		 execution(public void Camera.altitudeOffset(float)) ||
+		 execution(public void Camera.moveTo(long, long)) ||
+		 execution(public void Camera.setLocation(Location)) ||
+		 execution(public void Camera.setZoomFloor(float))
+		 )
+		;
+
+	after(Camera camera) :
+		cameraAutoReplayMethods(camera){
+			Signature sig = thisJoinPoint.getStaticPart().getSignature();
+			assert(sig instanceof MethodSignature);
+			Method method = ((MethodSignature)sig).getMethod();
+			Object[] args = thisJoinPoint.getArgs();
+
+			GenericDelta cameraDelta = new GenericDelta(camera,
+					method.getName(),
+					method.getParameterTypes(),
+					args);
+
+			VirtualSpaceManager.INSTANCE.sendDelta(cameraDelta);
 		}
 }
 

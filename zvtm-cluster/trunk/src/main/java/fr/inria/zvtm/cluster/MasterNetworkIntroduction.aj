@@ -26,7 +26,6 @@ aspect MasterNetworkIntroduction {
 	private final Logger VirtualSpaceManager.logger = 
 		LoggerFactory.getLogger(VirtualSpaceManager.class);
 
-
 	public void VirtualSpaceManager.setMaster(String app){
 		appName = app;
 		startOperation();
@@ -36,7 +35,10 @@ aspect MasterNetworkIntroduction {
 	public boolean VirtualSpaceManager.isMaster(){ return isMaster; }
 
 	public void VirtualSpaceManager.sendDelta(Delta delta){
-		assert(isMaster());
+		if(!isMaster()){
+			throw new IllegalStateException("VirtualSpaceManager must be a master to send deltas, see setMaster()");
+		}
+
 		try{
 			networkDelegate.sendDelta(delta);
 		} catch (ChannelException ce){

@@ -23,6 +23,7 @@ public class ColorRectCluster {
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
 
 	ColorRectCluster(CROptions options){
+		vsm.setMaster("ColorRectCluster");
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
