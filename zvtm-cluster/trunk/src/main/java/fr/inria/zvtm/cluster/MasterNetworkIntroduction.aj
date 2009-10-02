@@ -8,8 +8,10 @@ package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
+import org.jgroups.Channel;
 import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
+import org.jgroups.Message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +32,12 @@ aspect MasterNetworkIntroduction {
 	}
 
 	public void VirtualSpaceManager.sendDelta(Delta delta){
-		//TODO implement
-		throw new UnsupportedOperationException();
+		//assert(vsm.isMaster());
+		try{
+		networkDelegate.sendDelta(delta);
+		} catch (ChannelException ce){
+			logger.error("Could not send Delta message: " + ce);
+		}
 	}
 
 	void VirtualSpaceManager.stop(){
@@ -51,13 +57,20 @@ aspect MasterNetworkIntroduction {
 
 		void startOperation(String appName) throws ChannelException {
 			channel = new JChannel();
+			//disable local echo
+			channel.setOpt(Channel.LOCAL, Boolean.FALSE); 
 			channel.connect(appName);
 		}
 
 		void stop(){
 			channel.close();
 		}
-		
+
+		void sendDelta(Delta delta) throws ChannelException {
+			Message msg = new Message(null, null, delta);
+				channel.send(msg);
+		}
+
 	}
 }
 
