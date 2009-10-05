@@ -13,6 +13,7 @@ import fr.inria.zvtm.glyphs.VText;
 
 import java.lang.reflect.Method;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 
 import java.awt.Color;
@@ -46,23 +47,7 @@ public aspect AutoReplay {
 
 	after(Glyph glyph) : 
 		glyphAutoReplayMethods(glyph) {
-
-			Signature sig = thisJoinPoint.getStaticPart().getSignature();
-			//We want to create a generic, serializable proxy that
-			//calls a remote method. Hence, we catch method invocations.
-			//If this assert fires, chances are that the definition of
-			//the above pointcut "glyphAutoReplayMethods" is incorrect.
-			assert(sig instanceof MethodSignature);
-			Method method = ((MethodSignature)sig).getMethod();
-			Object[] args = thisJoinPoint.getArgs();
-
-			GenericDelta glyphDelta = new GenericDelta(glyph,
-					method.getName(),
-					method.getParameterTypes(),
-					args);
-
-			//retrieve communication channel, enqueue message
-			VirtualSpaceManager.INSTANCE.sendDelta(glyphDelta);
+			sendGenericDelta(glyph, thisJoinPoint);
 		}
 
 	pointcut cameraAutoReplayMethods(Camera camera) :
@@ -72,22 +57,31 @@ public aspect AutoReplay {
 		 execution(public void Camera.moveTo(long, long)) ||
 		 execution(public void Camera.setLocation(Location)) ||
 		 execution(public void Camera.setZoomFloor(float))
-		 )
+		)
 		;
 
 	after(Camera camera) :
 		cameraAutoReplayMethods(camera){
-			Signature sig = thisJoinPoint.getStaticPart().getSignature();
-			assert(sig instanceof MethodSignature);
-			Method method = ((MethodSignature)sig).getMethod();
-			Object[] args = thisJoinPoint.getArgs();
-
-			GenericDelta cameraDelta = new GenericDelta(camera,
-					method.getName(),
-					method.getParameterTypes(),
-					args);
-
-			VirtualSpaceManager.INSTANCE.sendDelta(cameraDelta);
+			sendGenericDelta(camera, thisJoinPoint);
 		}
+
+	private static void sendGenericDelta(Identifiable target, 
+			JoinPoint joinPoint){
+		Signature sig = joinPoint.getStaticPart().getSignature();
+		//We want to create a generic, serializable proxy that
+		//calls a remote method. Hence, we catch method invocations.
+		//If this assert fires, chances are that the definition of
+		//the above pointcut "glyphAutoReplayMethods" is incorrect.
+		assert(sig instanceof MethodSignature);
+		Method method = ((MethodSignature)sig).getMethod();
+		Object[] args = joinPoint.getArgs();
+
+		GenericDelta glyphDelta = new GenericDelta(target,
+				method.getName(),
+				method.getParameterTypes(),
+				args);
+
+		VirtualSpaceManager.INSTANCE.sendDelta(glyphDelta);
+	}
 }
 
