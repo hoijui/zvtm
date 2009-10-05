@@ -80,7 +80,7 @@ public abstract class ResourceDescription extends ObjectDescription {
 		else {
 			// probably a relative file URL
 			try {
-				this.src  = (new File(path)).toURL();	
+				this.src  = (new File(path)).toURI().toURL();	
 			}
 			catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}			
 		}
