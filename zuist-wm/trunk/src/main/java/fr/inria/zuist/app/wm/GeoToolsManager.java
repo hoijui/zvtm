@@ -117,6 +117,7 @@ class GeoToolsManager {
                                 VPolygon polygon = new VPolygon(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
                                 polygon.setFilled(false);
                                 application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
+																			polygon.getZindex(),
                                                                             region, false);
                             }
                             else {
