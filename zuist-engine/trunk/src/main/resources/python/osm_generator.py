@@ -37,8 +37,7 @@ def createTargetDir():
         os.mkdir(TGT_DIR)
         
 ################################################################################
-# Count number of levels in ZUIST scene
-# (source image size from PIL, parent XML element)
+# Generate all zoom levels
 ################################################################################
 def generateLevels(rootEL):
 	# making the assumption that src dir only contains tile level directories
@@ -56,10 +55,17 @@ def generateLevels(rootEL):
 		level.set("ceiling", str(altitudes[-1]))
 	# fix max scene altitude (for highest region)
 	level.set("ceiling", MAX_ALT)
-	return res
+	for d in os.listdir(SRC_PATH):
+	    processLevel(d, rootEL)
 
 ################################################################################
-# Create tiles and ZUIST XML scene from source image
+# 
+################################################################################
+def processLevel(level_dir, rootEL):
+    log("Processing level %s" % level_dir, 2)
+
+################################################################################
+# Create levels for ZUIST scene from source OSM tile hierarchy
 ################################################################################
 def processOSMTiles():
     global maxTileCount
@@ -68,9 +74,7 @@ def processOSMTiles():
     outputroot = ET.Element("scene")
     # source data
     log("Loading OSM tiles from %s" % SRC_PATH, 2)
-    generateLevels(outputroot)
-    #XXX:TODO
-    
+    generateLevels(outputroot)    
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
