@@ -12,6 +12,8 @@ import java.awt.Color;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 
+import java.net.URL;
+
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -28,7 +30,6 @@ public class ImageDescription extends ResourceDescription {
 
     /* necessary info about an image for instantiation */
     long vw, vh;
-    String path;
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
@@ -41,7 +42,7 @@ public class ImageDescription extends ResourceDescription {
         *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
-        *@param p path to bitmap resource
+        *@param p path to bitmap resource (any valid URI)
         *@param sc border color
         *@param pr parent Region in scene
         */
@@ -53,7 +54,6 @@ public class ImageDescription extends ResourceDescription {
         this.zindex = z;
         this.vw = w;
         this.vh = h;
-        this.path = p;
         this.strokeColor = sc;
         this.parentRegion = pr;
     }
@@ -65,7 +65,7 @@ public class ImageDescription extends ResourceDescription {
         *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
-        *@param p path to bitmap resource
+        *@param p path to bitmap resource (any valid URI)
         *@param sc border color
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
@@ -78,7 +78,7 @@ public class ImageDescription extends ResourceDescription {
         this.zindex = z;
         this.vw = w;
         this.vh = h;
-        this.path = p;
+		this.setURL(p);
         this.strokeColor = sc;
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
@@ -87,35 +87,35 @@ public class ImageDescription extends ResourceDescription {
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
         if (glyph == null){
-            Image i = (new ImageIcon(path)).getImage();
-            int ih = i.getHeight(null);
-            double sf = vh / ((double)ih);
-            if (fadeIn){
-                glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
-                if (strokeColor != null){
-                    glyph.setBorderColor(strokeColor);
-                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-                }
-                if (!sensitive){glyph.setSensitivity(false);}
-                glyph.setInterpolationMethod(interpolationMethod);
-                vs.addGlyph(glyph);
-//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
-//                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
-                    1.0f, false, IdentityInterpolator.getInstance(), null);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-            }
-            else {
-                glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
-                if (strokeColor != null){
-                    glyph.setBorderColor(strokeColor);
-                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-                }
-                if (!sensitive){glyph.setSensitivity(false);}
-                glyph.setInterpolationMethod(interpolationMethod);
-                vs.addGlyph(glyph);
-            }
-            glyph.setOwner(this);
+               Image i = (new ImageIcon(src)).getImage();
+               int ih = i.getHeight(null);
+               double sf = vh / ((double)ih);
+               if (fadeIn){
+                   glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
+                   if (strokeColor != null){
+                       glyph.setBorderColor(strokeColor);
+                       glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+                   }
+                   if (!sensitive){glyph.setSensitivity(false);}
+                   glyph.setInterpolationMethod(interpolationMethod);
+                   vs.addGlyph(glyph);
+//                 VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
+//                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
+                   Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
+                       1.0f, false, IdentityInterpolator.getInstance(), null);
+                   VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+               }
+               else {
+                   glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
+                   if (strokeColor != null){
+                       glyph.setBorderColor(strokeColor);
+                       glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+                   }
+                   if (!sensitive){glyph.setSensitivity(false);}
+                   glyph.setInterpolationMethod(interpolationMethod);
+                   vs.addGlyph(glyph);
+               }
+               glyph.setOwner(this);
         }
         loadRequest = null;
     }
