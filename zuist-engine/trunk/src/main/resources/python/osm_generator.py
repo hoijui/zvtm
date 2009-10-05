@@ -41,11 +41,9 @@ def createTargetDir():
 # (source image size from PIL, parent XML element)
 ################################################################################
 def generateLevels(rootEL):
-	
-	
-	
-	#XXX: count number of levels
-	res = 1
+	# making the assumption that src dir only contains tile level directories
+	# (which is the case when coming out of the mapnik tile generation script)
+	res = len(os.listdir(SRC_PATH))
 	log("Will generate %d level(s)" % res, 2)
 	# generate ZUIST levels
 	altitudes = [0,]
