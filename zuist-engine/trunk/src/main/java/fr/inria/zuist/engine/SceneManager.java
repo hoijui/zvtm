@@ -57,7 +57,7 @@ public class SceneManager {
     public static final String _title = "title";
     public static final String _containedIn = "containedIn";
     public static final String _resource = "resource";
-    public static final String _image = "image";
+    public static final String _image = "img";
     public static final String _type = "type";
     public static final String _text = "text";
     public static final String _rect = "rect";
@@ -607,8 +607,8 @@ public class SceneManager {
     /**
      *@param g any ClosedShape. It must implement fr.inria.zvtm.glyphs.Translucent if fade in/out transitions are used in the parent region.
      */
-    public ClosedShapeDescription createClosedShapeDescription(ClosedShape g, String id, Region region, boolean sensitivity){
-        ClosedShapeDescription gd = new ClosedShapeDescription(id, g, region, sensitivity);
+    public ClosedShapeDescription createClosedShapeDescription(ClosedShape g, String id, int zindex, Region region, boolean sensitivity){
+        ClosedShapeDescription gd = new ClosedShapeDescription(id, g, zindex, region, sensitivity);
         region.addObject(gd);
         return gd;
     }
@@ -625,7 +625,7 @@ public class SceneManager {
         ClosedShape g = new VRectangle(x+origin.x, y+origin.y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
-        return createClosedShapeDescription(g, id, region, sensitivity);
+        return createClosedShapeDescription(g, id, zindex, region, sensitivity);
     }
 
     /** Process XML description of a polygon object. */
@@ -637,7 +637,7 @@ public class SceneManager {
         ClosedShape g = new VPolygon(vertices, zindex, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
-        return createClosedShapeDescription(g, id, region, sensitivity);
+        return createClosedShapeDescription(g, id, zindex, region, sensitivity);
     }
     
     public static LongPoint[] parseVertexCoordinates(String s, LongPoint orig){

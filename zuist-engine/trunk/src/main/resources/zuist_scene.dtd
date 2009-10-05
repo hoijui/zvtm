@@ -89,7 +89,7 @@ ZUIST DTD, for v0.3.0 and above.
 
 <!ELEMENT resource ANY>
 <!ATTLIST resource %ID;
-                   type (image|pdf) #REQUIRED
+                   type (img|pdf) #REQUIRED
                    %x;
                    %y;
                    %zindex;

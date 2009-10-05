@@ -24,11 +24,9 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
  *@author Emmanuel Pietriga
  */
 
-public class ImageDescription extends ObjectDescription {
+public class ImageDescription extends ResourceDescription {
 
     /* necessary info about an image for instantiation */
-    long vx, vy;
-    int zindex;
     long vw, vh;
     String path;
     Color strokeColor;
@@ -40,7 +38,7 @@ public class ImageDescription extends ObjectDescription {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
-        *@param z z-index (layer)
+        *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
         *@param p path to bitmap resource
@@ -48,6 +46,7 @@ public class ImageDescription extends ObjectDescription {
         *@param pr parent Region in scene
         */
     ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){
+		this.type = RESOURCE_TYPE_IMG;
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -63,7 +62,7 @@ public class ImageDescription extends ObjectDescription {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
-        *@param z z-index (layer)
+        *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
         *@param p path to bitmap resource
@@ -72,6 +71,7 @@ public class ImageDescription extends ObjectDescription {
         *@param pr parent Region in scene
         */
     ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Object im, Region pr){
+		this.type = RESOURCE_TYPE_IMG;
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -142,14 +142,6 @@ public class ImageDescription extends ObjectDescription {
 
     public Glyph getGlyph(){
 	    return glyph;
-    }
-
-    public long getX(){
-        return vx;
-    }
-    
-    public long getY(){
-        return vy;
     }
         
 }

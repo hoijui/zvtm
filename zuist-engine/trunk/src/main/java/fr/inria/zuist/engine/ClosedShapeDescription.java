@@ -30,11 +30,14 @@ public class ClosedShapeDescription extends ObjectDescription {
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
         *@param g any ClosedShape. It must implement fr.inria.zvtm.glyphs.Translucent if fade in/out transitions are used in the parent region.
+        *@param z z-index (layer). Feed 0 if you don't know.
         *@param pr parent Region in scene
         */
-    ClosedShapeDescription(String id, ClosedShape g, Region pr, boolean sensitive){
+    ClosedShapeDescription(String id, ClosedShape g, int z, Region pr, boolean sensitive){
         this.id = id;
         this.glyph = g;
+        this.zindex = z;
+		this.glyph.setZindex(this.zindex);
         this.parentRegion = pr;
         this.sensitive = sensitive;
     }

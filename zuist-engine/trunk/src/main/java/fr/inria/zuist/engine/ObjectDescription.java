@@ -19,6 +19,8 @@ public abstract class ObjectDescription {
 
     String id;
 
+	int zindex = 0;
+
     boolean sensitive = true;
 
     Integer loadRequest, unloadRequest;
@@ -44,6 +46,10 @@ public abstract class ObjectDescription {
 
     public abstract Glyph getGlyph();
     
+	public int getZindex(){
+		return zindex;
+	}
+
     public Region getParentRegion(){
 	return parentRegion;
     }

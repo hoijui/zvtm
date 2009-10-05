@@ -30,7 +30,6 @@ public class TextDescription extends ObjectDescription {
 
     /* necessary info about a text for instantiation */
     long vx, vy;
-    int zindex;
     float scale;
     String text;
     short anchor = VText.TEXT_ANCHOR_MIDDLE;
@@ -44,15 +43,17 @@ public class TextDescription extends ObjectDescription {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
+        *@param z z-index (layer). Feed 0 if you don't know.
         *@param s scale factor
         *@param tx text label
         *@param c text color
         *@param pr parent Region in scene
         */
-    TextDescription(String id, long x, long y, float s, String tx, Color c, Region pr){
+    TextDescription(String id, long x, long y, int z, float s, String tx, Color c, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
+    	this.zindex = z;
         this.scale = s;
         this.text = tx;
         this.fillColor = c;
@@ -63,7 +64,7 @@ public class TextDescription extends ObjectDescription {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
-        *@param z z-index (layer)
+        *@param z z-index (layer). Feed 0 if you don't know.
         *@param s scale factor
         *@param tx text label
         *@param c text color
