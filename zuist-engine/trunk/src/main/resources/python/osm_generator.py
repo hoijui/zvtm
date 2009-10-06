@@ -58,12 +58,12 @@ def generateLevels(rootEL):
 	level_dirs = os.listdir(SRC_PATH)
 	level_dirs.sort(strNumSorter)
 	for d in level_dirs:
-	    processLevel(d, rootEL)
+	    processLevel(d, res, rootEL)
 
 ################################################################################
 # Generate regions and tiles for a given level
 ################################################################################
-def processLevel(level_dir, rootEL):
+def processLevel(level_dir, level_count, rootEL):
     level = int(level_dir)
     log("Processing level %s" % level, 2)
     col_dirs = os.listdir("%s/%s" % (SRC_PATH, level_dir))
@@ -72,17 +72,42 @@ def processLevel(level_dir, rootEL):
         row_files = os.listdir("%s/%s/%s" % (SRC_PATH, level_dir, col_dir))
         row_files.sort(pngRowSorter)
         for row_file in row_files:
-            processTile(int(level_dir), int(col_dir), int(row_file[:-4]), rootEL)    
+            processTile(int(level_dir), int(col_dir), int(row_file[:-4]),\
+                        level_count, rootEL)    
 
 ################################################################################
 # Generate one specific region/resource for a given level/column/row
 ################################################################################
-def processTile(level, col, row, rootEL):
+def processTile(level, col, row, level_count, rootEL):
     log("Processing %s %s %s" % (level, col, row))
+    ilc = level_count - level
+    ts = TILE_SIZE * math.pow(2, ilc-2)
+    x = (col*ts + ts/2.0)
+    y = -(row*ts + ts/2.0)
+    w = h = ts
+    regionEL = ET.SubElement(rootEL, "region")
+    regionEL.set("id", "ID-%s-%s-%s" % (level, col, row))
+    regionEL.set("x", "%d" % x)
+    regionEL.set("y", "%d" % y)
+    regionEL.set("w", "%d" % w)
+    regionEL.set("h", "%d" % h)
+    regionEL.set("levels", "%d" % level)
+    #XXX set containedIn
     
+    resourceEL = ET.SubElement(regionEL, "resource")
+    resourceEL.set("id", "T-%s-%s-%s" % (level, col, row))
+    resourceEL.set("x", "%d" % x)
+    resourceEL.set("y", "%d" % y)
+    resourceEL.set("w", "%d" % w)
+    resourceEL.set("h", "%d" % h)
+    resourceEL.set("type", "img")
+    resourceEL.set("src", "tiles/%s/%s/%s.png" % (level,col,row))
+
+
+
     
 ################################################################################
-# level/col/row sorter
+# level/col/row sorters
 ################################################################################
 def strNumSorter(l1, l2):
     n1 = int(l1)
