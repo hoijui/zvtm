@@ -85,17 +85,20 @@ def processTile(level, col, row, level_count, rootEL):
     x = (col*ts + ts/2.0)
     y = -(row*ts + ts/2.0)
     w = h = ts
+    # region
     regionEL = ET.SubElement(rootEL, "region")
-    regionEL.set("id", "ID-%s-%s-%s" % (level, col, row))
+    regionEL.set("id", "ID-%d-%d-%d" % (level, col, row))
     regionEL.set("x", "%d" % x)
     regionEL.set("y", "%d" % y)
     regionEL.set("w", "%d" % w)
     regionEL.set("h", "%d" % h)
     regionEL.set("levels", "%d" % level)
-    #XXX set containedIn
-    
+    if level > 0:
+        pass
+        #regionEL.set("containedIn", "ID-%d-%d-%d" % (level-1, , ))
+    # image
     resourceEL = ET.SubElement(regionEL, "resource")
-    resourceEL.set("id", "T-%s-%s-%s" % (level, col, row))
+    resourceEL.set("id", "T-%d-%d-%d" % (level, col, row))
     resourceEL.set("x", "%d" % x)
     resourceEL.set("y", "%d" % y)
     resourceEL.set("w", "%d" % w)
@@ -103,9 +106,6 @@ def processTile(level, col, row, level_count, rootEL):
     resourceEL.set("type", "img")
     resourceEL.set("src", "tiles/%s/%s/%s.png" % (level,col,row))
 
-
-
-    
 ################################################################################
 # level/col/row sorters
 ################################################################################
