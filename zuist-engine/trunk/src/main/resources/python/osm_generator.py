@@ -55,14 +55,55 @@ def generateLevels(rootEL):
 		level.set("ceiling", str(altitudes[-1]))
 	# fix max scene altitude (for highest region)
 	level.set("ceiling", MAX_ALT)
-	for d in os.listdir(SRC_PATH):
+	level_dirs = os.listdir(SRC_PATH)
+	level_dirs.sort(strNumSorter)
+	for d in level_dirs:
 	    processLevel(d, rootEL)
 
 ################################################################################
-# 
+# Generate regions and tiles for a given level
 ################################################################################
 def processLevel(level_dir, rootEL):
-    log("Processing level %s" % level_dir, 2)
+    level = int(level_dir)
+    log("Processing level %s" % level, 2)
+    col_dirs = os.listdir("%s/%s" % (SRC_PATH, level_dir))
+    col_dirs.sort(strNumSorter)
+    for col_dir in col_dirs:
+        row_files = os.listdir("%s/%s/%s" % (SRC_PATH, level_dir, col_dir))
+        row_files.sort(pngRowSorter)
+        for row_file in row_files:
+            processTile(int(level_dir), int(col_dir), int(row_file[:-4]), rootEL)    
+
+################################################################################
+# Generate one specific region/resource for a given level/column/row
+################################################################################
+def processTile(level, col, row, rootEL):
+    log("Processing %s %s %s" % (level, col, row))
+    
+    
+################################################################################
+# level/col/row sorter
+################################################################################
+def strNumSorter(l1, l2):
+    n1 = int(l1)
+    n2 = int(l2)
+    if  n1 < n2:
+        return -1
+    elif n1 > n2:
+        return 1
+    else:
+        return 0
+        
+def pngRowSorter(l1, l2):
+    n1 = int(l1[:-4])
+    n2 = int(l2[:-4])
+    if  n1 < n2:
+        return -1
+    elif n1 > n2:
+        return 1
+    else:
+        return 0
+
 
 ################################################################################
 # Create levels for ZUIST scene from source OSM tile hierarchy
