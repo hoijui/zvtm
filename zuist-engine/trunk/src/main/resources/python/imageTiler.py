@@ -202,7 +202,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("h", str(int(ah)))
     objectEL = ET.SubElement(regionEL, "resource")
     objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
-    objectEL.set("type", "image")
+    objectEL.set("type", "img")
     objectEL.set("x", str(int(DX+x+aw/2)))
     objectEL.set("y", str(int(DY-y-ah/2)))
     objectEL.set("w", str(int(aw)))
