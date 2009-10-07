@@ -18,7 +18,7 @@ du client, contenant la configuration correcte pour le load-time weaving
 (aspect: VirtualSpaceReplication, classes a tisser...)
 
 -> Exporter la variable ASPECTPATH contenant le chemin vers le
-binaire de zvtm-cluster (zvtm-0.10.0-SNAPSHOT.jar)
+binaire de zvtm-cluster (zvtm-cluster-proto-ajg-0.1.0-SNAPSHOT.jar)
 
 -> Pour lancer le programme, passer a java l'argument
 -javagent:path.to/aspectjweaver.jar (load-time weaving)
