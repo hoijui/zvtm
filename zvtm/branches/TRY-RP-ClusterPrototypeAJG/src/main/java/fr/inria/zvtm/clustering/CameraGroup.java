@@ -48,8 +48,13 @@ public class CameraGroup {
 			int row = slaveIndex % numRows;
 			int col = slaveIndex / numRows;
 
-			long newX = location.vx + col*virtBlockWidth;
-			long newY = location.vy - row*virtBlockHeight;
+			//xOffset and yOffset: offsets between the center of the top-left
+			//screen and the center of the screen group 
+			long xOffset = -((numCols-1)*virtBlockWidth)/2;
+			long yOffset = ((numRows-1)*virtBlockHeight)/2;
+
+			long newX = xOffset + location.vx + col*virtBlockWidth;
+			long newY = yOffset + location.vy - row*virtBlockHeight;
 
 			slaveCam.setLocation(new Location(newX, newY, loc.alt));
 		}
