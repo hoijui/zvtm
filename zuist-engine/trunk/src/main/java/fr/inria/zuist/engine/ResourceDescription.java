@@ -67,11 +67,14 @@ public abstract class ResourceDescription extends ObjectDescription {
 	/** Set URL of this resource. */
 	public void setURL(URL url){
 		this.src = url;
+		System.out.println("url");
 	}
 	
 	/** Set URL of this resource. */
 	public void setURL(String path){
 		if (path.indexOf(URL_PROTOCOL_SEQ) != -1){
+			//patch fixed
+			path = "http"+path.substring(path.indexOf(URL_PROTOCOL_SEQ));
 			try {
 				this.src  = new URL(path);
 			}
