@@ -35,6 +35,8 @@ public aspect AutoReplay {
 	pointcut glyphAutoReplayMethods(Glyph glyph) : 
 		this(glyph) &&
 		(
+		 execution(public void Glyph.move(long, long))	||
+		 execution(public void Glyph.moveTo(long, long))	||
 		 execution(public void Glyph.setStrokeWidth(float))	||
 		 execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
 		 execution(public void Glyph.setVisible(boolean)) ||
@@ -71,7 +73,7 @@ public aspect AutoReplay {
 		//We want to create a generic, serializable proxy that
 		//calls a remote method. Hence, we catch method invocations.
 		//If this assert fires, chances are that the definition of
-		//the above pointcut "glyphAutoReplayMethods" is incorrect.
+		//the related pointcuts are incorrect.
 		assert(sig instanceof MethodSignature);
 		Method method = ((MethodSignature)sig).getMethod();
 		Object[] args = joinPoint.getArgs();
