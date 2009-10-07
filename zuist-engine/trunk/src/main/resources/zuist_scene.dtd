@@ -40,7 +40,7 @@ ZUIST DTD, for v0.3.0 and above.
                  %width; #REQUIRED
                  %height; #REQUIRED
                  %stroke;
-                 fill CDATA #IMPLIED
+                 %fill;
                  tful (appear|disappear|fadein|fadeout) "appear"
                  tfll (appear|disappear|fadein|fadeout) "appear"
                  ttul (appear|disappear|fadein|fadeout) "disappear"
