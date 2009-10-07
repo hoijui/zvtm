@@ -67,7 +67,6 @@ public abstract class ResourceDescription extends ObjectDescription {
 	/** Set URL of this resource. */
 	public void setURL(URL url){
 		this.src = url;
-		System.out.println("url");
 	}
 	
 	/** Set URL of this resource. */
