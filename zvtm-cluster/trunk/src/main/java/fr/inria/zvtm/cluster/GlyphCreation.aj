@@ -1,3 +1,9 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
@@ -7,23 +13,39 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 //replicates Glyph+ creation on slaves
+//(in fact, waits for the glyphs to be added to a virtual
+//space to replicate them on slaves)
 aspect GlyphCreation {
 	//introduce Glyph.getCreateDelta
-	public Delta Glyph.getCreateDelta(){
+	private Delta Glyph.getCreateDelta(){
 		String poison = System.getProperty("poisonNopDelta");
 		if((poison != null) && (poison.toLowerCase().equals("true"))){
 			throw new Error("NopDelta not allowed");
 		}
 		return new NopDelta();
 	}
-	
+
+	pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
+		execution(public * VirtualSpace.addGlyph(Glyph, boolean, boolean)) 
+		&& args(glyph, ..)
+		&& this(virtualSpace); 
+
+	before(Glyph glyph, VirtualSpace virtualSpace):
+		glyphAdd(glyph, virtualSpace){
+			if(glyph == null){
+				return;
+			}
+			glyph.setParentSpace(virtualSpace);
+		}
+
 	//advise VirtualSpace.addGlyph
+
 	//advise VirtualSpace.removeGlyph
-	
+
 	//overloads for various Glyph subclasses
-	public Delta VRectangle.getCreateDelta(){
-		return new NopDelta();
-		//XXX replace by VRectCreateDelta 
+	@Override private Delta VRectangle.getCreateDelta(){
+		return new VRectangleCreateDelta(this, 
+				this.getParentSpace().getObjId());
 	}
 
 	private static class NopDelta implements Delta{
@@ -74,6 +96,11 @@ aspect GlyphCreation {
 			//beware of z-index
 			//Color.BLACK will be overwritten
 			return new VRectangle(0,0,0,halfWidth,halfHeight,Color.BLACK);
+		}
+
+		@Override public String toString(){
+			return "VRectangleCreateDelta, halfWidth=" + halfWidth
+				+ ", halfHeight=" + halfHeight;
 		}
 	}
 }
