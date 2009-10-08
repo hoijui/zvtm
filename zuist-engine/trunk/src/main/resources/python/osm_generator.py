@@ -175,3 +175,32 @@ log("Tile size: %s" % TILE_SIZE)
 createTargetDir()
 processOSMTiles()
 log("--------------------")
+
+################################################################################
+# The following code might be useful in the future
+# Taken from http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+
+# lon/lat to tile numbers
+
+# import math
+# def deg2num(lat_deg, lon_deg, zoom):
+#   lat_rad = lat_deg * math.pi / 180.0
+#   n = 2.0 ** zoom
+#   xtile = int((lon_deg + 180.0) / 360.0 * n)
+#   ytile = int((1.0 - math.log(math.tan(lat_rad) + (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
+#   return(xtile, ytile)
+
+# tile numbers to lon/lat
+
+# import math
+# def num2deg(xtile, ytile, zoom):
+#   n = 2.0 ** zoom
+#   lon_deg = xtile / n * 360.0 - 180.0
+#   lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * ytile / n)))
+#   lat_deg = lat_rad * 180.0 / math.pi
+#   return(lat_deg, lon_deg)
+
+# This returns the NW-corner of the square. Use the function with xtile+1
+# and/or ytile+1 to get the other corners. With xtile+0.5 & ytile+0.5
+# it will return the center of the tile.
+################################################################################
