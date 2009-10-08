@@ -9,10 +9,11 @@ package fr.inria.zvtm.cluster;
 import java.awt.Color;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
-//replicates Glyph+ creation on slaves
+//Replicates Glyph subtypes creation on slaves
 //(in fact, waits for the glyphs to be added to a virtual
 //space to replicate them on slaves)
 aspect GlyphCreation {
@@ -30,6 +31,11 @@ aspect GlyphCreation {
 		&& args(glyph, ..)
 		&& this(virtualSpace); 
 
+	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
+		execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) 
+		&& args(glyph, ..)
+		&& this(virtualSpace);
+
 	before(Glyph glyph, VirtualSpace virtualSpace):
 		glyphAdd(glyph, virtualSpace){
 			if(glyph == null){
@@ -39,8 +45,18 @@ aspect GlyphCreation {
 		}
 
 	//advise VirtualSpace.addGlyph
+	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
+		glyphAdd(glyph, virtualSpace) {
+			Delta createDelta = glyph.getCreateDelta();
+			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
+		}
 
 	//advise VirtualSpace.removeGlyph
+	after(Glyph glyph, VirtualSpace virtualSpace) returning:
+		glyphRemove(glyph, virtualSpace){
+			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
+					virtualSpace.getObjId());	
+		}
 
 	//overloads for various Glyph subclasses
 	@Override private Delta VRectangle.getCreateDelta(){
@@ -54,6 +70,25 @@ aspect GlyphCreation {
 		@Override public String toString(){
 			return "NopDelta";
 		}
+	}
+
+	private static class GlyphRemoveDelta implements Delta{
+		private final ObjId glyphId;
+		private final ObjId spaceId;
+
+		GlyphRemoveDelta(ObjId glyphId, ObjId spaceId){
+			this.glyphId = glyphId;
+			this.spaceId = spaceId;
+		}	
+
+		public void apply(SlaveUpdater su){
+			Glyph glyph = (Glyph)su.getSlaveObject(glyphId);
+			VirtualSpace virtualSpace = 
+				(VirtualSpace)su.getSlaveObject(spaceId);
+			su.removeSlaveObject(glyphId);
+			virtualSpace.removeGlyph(glyph);
+		}
+
 	}
 
 	private static abstract class AbstractGlyphCreateDelta implements Delta {
