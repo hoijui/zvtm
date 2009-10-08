@@ -17,7 +17,8 @@ aspect VsmReplication {
 
 	//advise virtual space creation and destruction
 	after(VirtualSpaceManager vsm) returning(VirtualSpace vs):
-		target(vsm) && execution(VirtualSpace addVirtualSpace(String)) {
+		target(vsm) && execution(VirtualSpace addVirtualSpace(String)) 
+		&& if(VirtualSpaceManager.INSTANCE.isMaster()) {
 			vsm.sendDelta(
 					new VsCreateDelta(vs.getName(),	vs.getObjId())
 					);
@@ -62,8 +63,6 @@ aspect VsmReplication {
 		public void apply(SlaveUpdater su){
 			su.removeSlaveObject(spaceId);
 			VirtualSpaceManager.INSTANCE.destroyVirtualSpace(spaceName);
-			assert(false); //implementation not complete: need to retrieve
-			//a virtual space by name in order to get its ObjId
 		}
 
 		@Override public String toString(){

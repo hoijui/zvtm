@@ -23,11 +23,6 @@ public class SlaveApp {
 		updater.startOperation();
 	}
 
-	//called back to initialize views once the master
-	//has sent camera specifications.
-	void initView(){
-	}
-
 	public static void main(String[] args){
 		SlaveOptions options = new SlaveOptions();
 		CmdLineParser parser = new CmdLineParser(options);

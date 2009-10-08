@@ -64,7 +64,7 @@ aspect GlyphCreation {
 				this.getParentSpace().getObjId());
 	}
 
-	private static class NopDelta implements Delta{
+	private static class NopDelta implements Delta {
 		public void apply(SlaveUpdater su){}
 
 		@Override public String toString(){
@@ -72,7 +72,7 @@ aspect GlyphCreation {
 		}
 	}
 
-	private static class GlyphRemoveDelta implements Delta{
+	private static class GlyphRemoveDelta implements Delta {
 		private final ObjId glyphId;
 		private final ObjId spaceId;
 
