@@ -75,7 +75,7 @@ The generic way to create an Animation is to use one of the three createAnimatio
 of AnimationFactory. Here is an example:
 
 \begin{SaveVerbatim}{CodeVerb}
-Animation cameraAlt = am.getAnimationFactory().createAnimation(
+Animation cameraAlt = am.getAnimationManager().getAnimationFactory().createAnimation(
    4000, 
    2f,
    Animator.RepeatBehavior.REVERSE,
