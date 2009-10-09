@@ -34,6 +34,7 @@ public aspect AutoReplay {
 	// join points, because these methods will be invoked reflectively.
 	pointcut glyphAutoReplayMethods(Glyph glyph) : 
 		this(glyph) &&
+		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
 		(
 		 execution(public void Glyph.move(long, long))	||
 		 execution(public void Glyph.moveTo(long, long))	||
@@ -55,6 +56,7 @@ public aspect AutoReplay {
 
 	pointcut cameraAutoReplayMethods(Camera camera) :
 		this(camera) &&
+		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
 		(
 		 execution(public void Camera.altitudeOffset(float)) ||
 		 execution(public void Camera.moveTo(long, long)) ||
