@@ -212,3 +212,23 @@ log("--------------------")
 # and/or ytile+1 to get the other corners. With xtile+0.5 & ytile+0.5
 # it will return the center of the tile.
 ################################################################################
+# Empty tile detection
+
+# import hashlib
+
+# EMPTY_SEA_TILE_512 = "5429c11f64f842fa1ef2bdd78c0e91ae"
+# EMPTY_LAND_TILE_512 = "19321692408961898d45d97d70be7313"
+
+# def sumfile(fobj):
+#     m = hashlib.md5()
+#     while True:
+#         d = fobj.read(8096)
+#         if not d:
+#             break
+#         m.update(d)
+#     return m.hexdigest()
+
+# a = sumfile(open('0.png', 'rb'))
+# print a == EMPTY_SEA_TILE_512
+# print a == EMPTY_LAND_TILE_512
+################################################################################
