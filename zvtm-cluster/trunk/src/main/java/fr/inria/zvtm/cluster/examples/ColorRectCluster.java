@@ -30,10 +30,10 @@ public class ColorRectCluster {
 		cameras.add(cam);	
 		ClusteredView cv = 
 			new ClusteredView(0, //origin (block number)
-					400, //block width
-					300, //block height
-					2, //rows,
-					3, //cols
+					options.blockWidth, 
+					options.blockHeight,
+					options.numRows, 
+					options.numCols, 
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);
 
@@ -77,6 +77,18 @@ public class ColorRectCluster {
 }
 
 class CROptions {
+	@Option(name = "-bw", aliases = {"--block-width"}, usage = "clustered view block width")
+	int blockWidth = 400;
+
+	@Option(name = "-bh", aliases = {"--block-height"}, usage = "clustered view block height")
+	int blockHeight = 300;
+
+	@Option(name = "-r", aliases = {"--num-rows"}, usage = "number of rows in the clustered view")
+	int numRows = 2;
+
+	@Option(name = "-c", aliases = {"--num-cols"}, usage = "number of columns in the clustered view")
+	int numCols = 3;
+
 	@Option(name = "-x", aliases = {"--xnum"}, usage = "number of subdivisions along x axis")
 	int xNum = 50;
 
