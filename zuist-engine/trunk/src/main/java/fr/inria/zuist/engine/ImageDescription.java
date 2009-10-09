@@ -18,6 +18,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -86,7 +87,13 @@ public class ImageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
+    	//Preloader
+    	VText loadingText;
+    	
         if (glyph == null){
+        	   loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray, "Loading ...", VText.TEXT_ANCHOR_MIDDLE, this.vh / 14);
+        	   vs.addGlyph(loadingText);
+        	   
                Image i = (new ImageIcon(src)).getImage();
                int ih = i.getHeight(null);
                double sf = vh / ((double)ih);
@@ -99,6 +106,9 @@ public class ImageDescription extends ResourceDescription {
                    if (!sensitive){glyph.setSensitivity(false);}
                    glyph.setInterpolationMethod(interpolationMethod);
                    vs.addGlyph(glyph);
+                   
+                   vs.removeGlyph(loadingText);
+                   loadingText = null;
 //                 VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
