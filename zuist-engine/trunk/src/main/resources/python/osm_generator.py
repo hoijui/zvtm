@@ -81,7 +81,7 @@ def processLevel(level_dir, level_count, rootEL):
 def processTile(level, col, row, level_count, rootEL):
     log("Processing %s %s %s" % (level, col, row), 2)
     ilc = level_count - level
-    ts = TILE_SIZE * math.pow(2, ilc-2)
+    ts = TILE_SIZE * math.pow(2, ilc-1)
     x = (col*ts + ts/2.0)
     y = -(row*ts + ts/2.0)
     w = h = ts
@@ -103,13 +103,13 @@ def processTile(level, col, row, level_count, rootEL):
     resourceEL.set("src", "tiles/%s/%s/%s.png" % (level,col,row))
     if level == 0:
         regionEL.set("levels", "0;%d" % (level_count-1))
-        #resourceEL.set("z-index", "0")
+        resourceEL.set("z-index", "0")
     else:
         regionEL.set("levels", "%d" % level)
         # x / 2 always yields x/2.0 if x is even or floor(x/2) if x is odd
         # e.g., 28 / 2 => 14, 29 / 2 => 14
         regionEL.set("containedIn", "ID-%d-%d-%d" % (level-1, col/2, row/2))
-        #resourceEL.set("z-index", "1")
+        resourceEL.set("z-index", "1")
 
 ################################################################################
 # level/col/row sorters
