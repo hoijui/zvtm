@@ -73,6 +73,7 @@ public abstract class ResourceDescription extends ObjectDescription {
 	public void setURL(String path){
 		if (path.indexOf(URL_PROTOCOL_SEQ) != -1){
 			//patch fixed
+			//XXX:make sure we support file:/, http:/, https:/, ftp:/
 			path = "http"+path.substring(path.indexOf(URL_PROTOCOL_SEQ));
 			try {
 				this.src  = new URL(path);
