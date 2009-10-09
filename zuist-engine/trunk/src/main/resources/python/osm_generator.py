@@ -65,7 +65,7 @@ def generateLevels(rootEL):
 ################################################################################
 def processLevel(level_dir, level_count, rootEL):
     level = int(level_dir)
-    log("Processing level %s" % level, 2)
+    log("Processing level %s" % level, 1)
     col_dirs = os.listdir("%s/%s" % (SRC_PATH, level_dir))
     col_dirs.sort(strNumSorter)
     for col_dir in col_dirs:
@@ -79,7 +79,7 @@ def processLevel(level_dir, level_count, rootEL):
 # Generate one specific region/resource for a given level/column/row
 ################################################################################
 def processTile(level, col, row, level_count, rootEL):
-    log("Processing %s %s %s" % (level, col, row))
+    log("Processing %s %s %s" % (level, col, row), 2)
     ilc = level_count - level
     ts = TILE_SIZE * math.pow(2, ilc-2)
     x = (col*ts + ts/2.0)
@@ -92,10 +92,6 @@ def processTile(level, col, row, level_count, rootEL):
     regionEL.set("y", "%d" % y)
     regionEL.set("w", "%d" % w)
     regionEL.set("h", "%d" % h)
-    regionEL.set("levels", "%d" % level)
-    if level > 0:
-        pass
-        #regionEL.set("containedIn", "ID-%d-%d-%d" % (level-1, , ))
     # image
     resourceEL = ET.SubElement(regionEL, "resource")
     resourceEL.set("id", "T-%d-%d-%d" % (level, col, row))
@@ -105,6 +101,15 @@ def processTile(level, col, row, level_count, rootEL):
     resourceEL.set("h", "%d" % h)
     resourceEL.set("type", "img")
     resourceEL.set("src", "tiles/%s/%s/%s.png" % (level,col,row))
+    if level == 0:
+        regionEL.set("levels", "0;%d" % (level_count-1))
+        #resourceEL.set("z-index", "0")
+    else:
+        regionEL.set("levels", "%d" % level)
+        # x / 2 always yields x/2.0 if x is even or floor(x/2) if x is odd
+        # e.g., 28 / 2 => 14, 29 / 2 => 14
+        regionEL.set("containedIn", "ID-%d-%d-%d" % (level-1, col/2, row/2))
+        #resourceEL.set("z-index", "1")
 
 ################################################################################
 # level/col/row sorters
@@ -138,6 +143,7 @@ def processOSMTiles():
     outputSceneFile = "%s/scene.xml" % TGT_DIR
     # prepare the XML scene
     outputroot = ET.Element("scene")
+    outputroot.set("background", "white")
     # source data
     log("Loading OSM tiles from %s" % SRC_PATH, 2)
     generateLevels(outputroot)    
