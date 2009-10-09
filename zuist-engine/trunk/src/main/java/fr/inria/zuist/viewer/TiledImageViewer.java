@@ -88,7 +88,7 @@ public class TiledImageViewer {
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-	static final Color BACKGROUND_COLOR = Color.BLACK;
+	static Color BACKGROUND_COLOR = Color.BLACK;
     
     boolean UPDATE_TILES = true;
     
@@ -123,6 +123,10 @@ public class TiledImageViewer {
         mCamera.addListener(eh);
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
+			HashMap sa = sm.getSceneAttributes();
+			if (sa.containsKey(SceneManager._background)){
+			    BACKGROUND_COLOR = (Color)sa.get(SceneManager._background);
+			}
 			nm.getGlobalView();
 		}
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
