@@ -28,11 +28,13 @@ aspect GlyphCreation {
 
 	pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
 		execution(public * VirtualSpace.addGlyph(Glyph, boolean, boolean)) 
+		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
 		&& this(virtualSpace); 
 
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) 
+		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
 		&& this(virtualSpace);
 
