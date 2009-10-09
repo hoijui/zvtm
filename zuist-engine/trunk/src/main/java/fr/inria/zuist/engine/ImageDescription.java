@@ -29,6 +29,9 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class ImageDescription extends ResourceDescription {
 
+	static final String textLoader = "Loading ...";
+    static int FONT_SIZE = 14;
+	
     /* necessary info about an image for instantiation */
     long vw, vh;
     Color strokeColor;
@@ -91,7 +94,7 @@ public class ImageDescription extends ResourceDescription {
     	VText loadingText;
     	
         if (glyph == null){
-        	   loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray, "Loading ...", VText.TEXT_ANCHOR_MIDDLE, this.vh / 14);
+        	   loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray, textLoader, VText.TEXT_ANCHOR_MIDDLE, this.vh / FONT_SIZE);
         	   vs.addGlyph(loadingText);
         	   
                Image i = (new ImageIcon(src)).getImage();
@@ -108,7 +111,7 @@ public class ImageDescription extends ResourceDescription {
                    vs.addGlyph(glyph);
                    
                    vs.removeGlyph(loadingText);
-                   loadingText = null;
+                   loadingText = null;                   
 //                 VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
@@ -124,6 +127,13 @@ public class ImageDescription extends ResourceDescription {
                    if (!sensitive){glyph.setSensitivity(false);}
                    glyph.setInterpolationMethod(interpolationMethod);
                    vs.addGlyph(glyph);
+                   //remove with fadeout
+                  Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
+                       1.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
+                   VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                  // vs.removeGlyph(loadingText);
+                  // loadingText = null;
+                  System.out.println("fadeout");
                }
                glyph.setOwner(this);
         }
@@ -167,6 +177,7 @@ class ImageHideAction implements EndAction {
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
+            if(subject instanceof VImage)
             ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
@@ -178,6 +189,7 @@ class ImageHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
+            if(subject instanceof VImage)
             ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
