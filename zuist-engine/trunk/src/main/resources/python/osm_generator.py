@@ -104,12 +104,14 @@ def processTile(level, col, row, level_count, rootEL):
     if level == 0:
         regionEL.set("levels", "0;%d" % (level_count-1))
         resourceEL.set("z-index", "0")
+        resourceEL.set("interpolation", "nearestNeighbor")
     else:
         regionEL.set("levels", "%d" % level)
         # x / 2 always yields x/2.0 if x is even or floor(x/2) if x is odd
         # e.g., 28 / 2 => 14, 29 / 2 => 14
         regionEL.set("containedIn", "ID-%d-%d-%d" % (level-1, col/2, row/2))
         resourceEL.set("z-index", "1")
+        resourceEL.set("interpolation", "bilinear")
 
 ################################################################################
 # level/col/row sorters
