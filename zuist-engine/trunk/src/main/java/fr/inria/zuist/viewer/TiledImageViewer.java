@@ -129,6 +129,14 @@ public class TiledImageViewer {
 			}
 			nm.getGlobalView();
 		}
+        if (BACKGROUND_COLOR.getRGB() == -1){
+            mView.getCursor().setColor(Color.BLACK);
+    		mView.getCursor().setHintColor(Color.BLACK);
+        }
+        else {
+            mView.getCursor().setColor(Color.WHITE);
+    		mView.getCursor().setHintColor(Color.WHITE);
+        }
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
 		nm.updateOverview();
 		eh.cameraMoved();
@@ -159,10 +167,6 @@ public class TiledImageViewer {
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.setAntialiasing(antialiased);
-		mView.getCursor().setColor(Color.WHITE);
-		mView.getCursor().setHintColor(Color.WHITE);
-		mView.getCursor().setDynaSpotColor(Color.WHITE);
-        mView.getCursor().setDynaSpotLagTime(200);
         mView.getPanel().addComponentListener(eh);
         updatePanelSize();
         mView.setActiveLayer(0);
