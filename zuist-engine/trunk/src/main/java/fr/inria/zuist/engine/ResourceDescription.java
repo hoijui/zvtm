@@ -95,4 +95,37 @@ public abstract class ResourceDescription extends ObjectDescription {
 		return src;
 	}
 	
+	/*------------------------- Visual feedback while fetching ----------------------- */
+	
+	/* Visual feedback w.r.t resource fetching */
+	static final String LOADING_LABEL = "Loading ...";
+    static int LOADING_LABEL_FONT_SIZE = 14;
+    static boolean DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING = false;
+    boolean showFeedbackWhenFetching = DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING;
+    
+    /** Set whether, by default, some visual feedback is given in the interface while loading the resource.
+     *  The feedback appears as soon as the object's request starts being processed, and disappears
+     *  when the resource is visually instantiated. Changes to this default value apply only to descriptions
+     *  instantiated after the call to this method.
+     */
+    public static void setDefaultFeedbackWhenFetching(boolean b){
+        DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING = b;
+    }
+    
+    /** Set whether some visual feedback is given in the interface while loading the resource.
+     *  The feedback appears as soon as the object's request starts being processed, and disappears
+     *  when the resource is visually instantiated.
+     */
+    public void setFeedbackWhenFetching(boolean b){
+        showFeedbackWhenFetching = b;
+    }
+    
+    /** Get whether some visual feedback is given in the interface while loading the resource.
+     *  The feedback appears as soon as the object's request starts being processed, and disappears
+     *  when the resource is visually instantiated.
+     */
+    public boolean getFeedbackWhenFetching(){
+        return showFeedbackWhenFetching;
+    }
+	
 }

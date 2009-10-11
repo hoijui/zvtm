@@ -29,9 +29,6 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class ImageDescription extends ResourceDescription {
 
-	static final String textLoader = "Loading ...";
-    static int FONT_SIZE = 14;
-	
     /* necessary info about an image for instantiation */
     long vw, vh;
     Color strokeColor;
@@ -91,11 +88,14 @@ public class ImageDescription extends ResourceDescription {
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
     	//Preloader
-    	VText loadingText;
         if (glyph == null){
-            loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray, textLoader, VText.TEXT_ANCHOR_MIDDLE, this.vh / FONT_SIZE);
-            vs.addGlyph(loadingText);
-
+            VText loadingText = null;
+            if (showFeedbackWhenFetching){
+            	loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray,
+            	                              LOADING_LABEL, VText.TEXT_ANCHOR_MIDDLE,
+            	                              this.vh / LOADING_LABEL_FONT_SIZE, (fadeIn) ? 0f : 1f);
+                vs.addGlyph(loadingText);                
+            }
             Image i = (new ImageIcon(src)).getImage();
             int ih = i.getHeight(null);
             double sf = vh / ((double)ih);
@@ -108,10 +108,12 @@ public class ImageDescription extends ResourceDescription {
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
                 vs.addGlyph(glyph);
-                // remove visual feedback about loading (smoothly)
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
-                    1.0f, false, IdentityInterpolator.getInstance(), new LabelHideAction(vs));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                if (loadingText != null){
+                    // remove visual feedback about loading (smoothly)
+                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
+                        1.0f, false, IdentityInterpolator.getInstance(), new LabelHideAction(vs));
+                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);                    
+                }
                 // smoothly fade glyph in
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
                     1.0f, false, IdentityInterpolator.getInstance(), null);
@@ -125,7 +127,9 @@ public class ImageDescription extends ResourceDescription {
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
-                vs.removeGlyph(loadingText);
+                if (loadingText != null){
+                    vs.removeGlyph(loadingText);
+                }
                 vs.addGlyph(glyph);
             }
             glyph.setOwner(this);
