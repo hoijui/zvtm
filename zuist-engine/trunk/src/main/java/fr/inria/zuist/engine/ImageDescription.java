@@ -92,50 +92,43 @@ public class ImageDescription extends ResourceDescription {
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
     	//Preloader
     	VText loadingText;
-    	
         if (glyph == null){
-        	   loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray, textLoader, VText.TEXT_ANCHOR_MIDDLE, this.vh / FONT_SIZE);
-        	   vs.addGlyph(loadingText);
-        	   
-               Image i = (new ImageIcon(src)).getImage();
-               int ih = i.getHeight(null);
-               double sf = vh / ((double)ih);
-               if (fadeIn){
-                   glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
-                   if (strokeColor != null){
-                       glyph.setBorderColor(strokeColor);
-                       glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-                   }
-                   if (!sensitive){glyph.setSensitivity(false);}
-                   glyph.setInterpolationMethod(interpolationMethod);
-                   vs.addGlyph(glyph);
-                   
-                   vs.removeGlyph(loadingText);
-                   loadingText = null;                   
-//                 VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
-//                     GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
-                   Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
-                       1.0f, false, IdentityInterpolator.getInstance(), null);
-                   VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-               }
-               else {
-                   glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
-                   if (strokeColor != null){
-                       glyph.setBorderColor(strokeColor);
-                       glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-                   }
-                   if (!sensitive){glyph.setSensitivity(false);}
-                   glyph.setInterpolationMethod(interpolationMethod);
-                   vs.addGlyph(glyph);
-                   //remove with fadeout
-                  Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
-                       1.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
-                   VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-                  // vs.removeGlyph(loadingText);
-                  // loadingText = null;
-                  System.out.println("fadeout");
-               }
-               glyph.setOwner(this);
+            loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray, textLoader, VText.TEXT_ANCHOR_MIDDLE, this.vh / FONT_SIZE);
+            vs.addGlyph(loadingText);
+
+            Image i = (new ImageIcon(src)).getImage();
+            int ih = i.getHeight(null);
+            double sf = vh / ((double)ih);
+            if (fadeIn){
+                glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
+                if (strokeColor != null){
+                    glyph.setBorderColor(strokeColor);
+                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+                }
+                if (!sensitive){glyph.setSensitivity(false);}
+                glyph.setInterpolationMethod(interpolationMethod);
+                vs.addGlyph(glyph);
+                // remove visual feedback about loading (smoothly)
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
+                    1.0f, false, IdentityInterpolator.getInstance(), new LabelHideAction(vs));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                // smoothly fade glyph in
+                Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
+                    1.0f, false, IdentityInterpolator.getInstance(), null);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);
+            }
+            else {
+                glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
+                if (strokeColor != null){
+                    glyph.setBorderColor(strokeColor);
+                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+                }
+                if (!sensitive){glyph.setSensitivity(false);}
+                glyph.setInterpolationMethod(interpolationMethod);
+                vs.removeGlyph(loadingText);
+                vs.addGlyph(glyph);
+            }
+            glyph.setOwner(this);
         }
         loadRequest = null;
     }
@@ -144,9 +137,6 @@ public class ImageDescription extends ResourceDescription {
     public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
-//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
-//                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
-//                    new ImageHideAction(vs));
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
@@ -177,7 +167,6 @@ class ImageHideAction implements EndAction {
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            if(subject instanceof VImage)
             ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
@@ -189,11 +178,39 @@ class ImageHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            if(subject instanceof VImage)
-            ((VImage)subject).getImage().flush();
+            ((VImage)subject).getImage().flush();                
         }
         catch(ArrayIndexOutOfBoundsException ex){
             System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");
+        }	
+    }
+
+}
+
+class LabelHideAction implements EndAction {
+    
+    VirtualSpace vs;
+    
+    LabelHideAction(VirtualSpace vs){
+	    this.vs = vs;
+    }
+    
+    public void execute(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
+            recoverFailingAnimationEnded(subject, dimension);
+        }
+    }
+
+    public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Giving up.");
         }	
     }
 
