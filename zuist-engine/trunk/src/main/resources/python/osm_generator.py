@@ -7,7 +7,7 @@
 
 # $Id$
 
-import os, sys, math
+import os, sys, math, shutil
 # http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
 
@@ -27,6 +27,10 @@ MAX_ALT = "100000"
 
 ID_PREFIX = ""
 TILE_SIZE = 512
+
+TILE_NOT_EMPTY = 0
+TILE_EMPTY_SEA = 1
+TILE_EMPTY_LAND = 2
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -72,14 +76,15 @@ def processLevel(level_dir, level_count, rootEL):
         row_files = os.listdir("%s/%s/%s" % (SRC_PATH, level_dir, col_dir))
         row_files.sort(pngRowSorter)
         for row_file in row_files:
-            processTile(int(level_dir), int(col_dir), int(row_file[:-4]),\
-                        level_count, rootEL)    
+            processTile(int(level_dir), int(col_dir),\
+                        int(row_file[:row_file.find(".")]),\
+                        level_count, getTileType(row_file), rootEL)    
 
 ################################################################################
 # Generate one specific region/resource for a given level/column/row
 ################################################################################
-def processTile(level, col, row, level_count, rootEL):
-    log("Processing %s %s %s" % (level, col, row), 2)
+def processTile(level, col, row, level_count, tile_type, rootEL):
+    log("Processing %s %s %s" % (level, col, row), 3)
     ilc = level_count - level
     ts = TILE_SIZE * math.pow(2, ilc-1)
     x = (col*ts + ts/2.0)
@@ -100,7 +105,32 @@ def processTile(level, col, row, level_count, rootEL):
     resourceEL.set("w", "%d" % w)
     resourceEL.set("h", "%d" % h)
     resourceEL.set("type", "img")
-    resourceEL.set("src", "tiles/%s/%s/%s.png" % (level,col,row))
+    #XXX:TBW depending on tile_type, src should be the file
+    #    or one of the default sea/land tiles
+    # and we also have to get rid of the redundant PNG files
+    # first time we encounter the sea or land tile, we have to save it at the root
+    if tile_type == TILE_EMPTY_SEA:
+        sea_path = "%s/sea.png" % SRC_PATH
+        tile_path = "%s/%s/%s/%s.sea.png" % (SRC_PATH, level, col, row)
+        if not os.path.exists(sea_path):
+            log("Creating %s from %s" % (sea_path, tile_path), 2)
+            shutil.move(tile_path, sea_path)
+        else:
+            log("Removing empty sea tile %s" % tile_path, 2)
+            os.remove(tile_path)
+        resourceEL.set("src", "tiles/sea.png")
+    elif tile_type == TILE_EMPTY_LAND:
+        land_path = "%s/land.png" % SRC_PATH
+        tile_path = "%s/%s/%s/%s.lnd.png" % (SRC_PATH, level, col, row)
+        if not os.path.exists(land_path):
+            log("Creating %s from %s" % (land_path, tile_path), 2)
+            shutil.move(tile_path, land_path)
+        else:
+            log("Removing empty land tile %s" % tile_path, 2)
+            os.remove(tile_path)
+        resourceEL.set("src", "tiles/land.png")
+    else:
+        resourceEL.set("src", "tiles/%s/%s/%s.png" % (level,col,row))
     if level == 0:
         regionEL.set("levels", "0;%d" % (level_count-1))
         resourceEL.set("z-index", "0")
@@ -127,8 +157,8 @@ def strNumSorter(l1, l2):
         return 0
         
 def pngRowSorter(l1, l2):
-    n1 = int(l1[:-4])
-    n2 = int(l2[:-4])
+    n1 = int(l1[:l1.find(".")])
+    n2 = int(l2[:l2.find(".")])
     if  n1 < n2:
         return -1
     elif n1 > n2:
@@ -136,6 +166,13 @@ def pngRowSorter(l1, l2):
     else:
         return 0
 
+def getTileType(row_file):
+    if row_file.find("sea") != -1:
+        return TILE_EMPTY_SEA
+    elif row_file.find("lnd") != -1:
+        return TILE_EMPTY_LAND
+    else:
+        return TILE_NOT_EMPTY
 
 ################################################################################
 # Create levels for ZUIST scene from source OSM tile hierarchy
