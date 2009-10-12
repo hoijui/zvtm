@@ -34,6 +34,12 @@ public class SlaveApp {
 			return;
 		}
 
+        if(options.help){
+            System.err.println("Usage: SlaveApp [options] where options are: ");
+            parser.printUsage(System.err);
+            return;
+        }
+
 		new SlaveApp(options);
 	}
 }
@@ -53,5 +59,8 @@ class SlaveOptions {
 
 	@Option(name = "-g", aliases = {"--debug"}, usage = "show ZVTM debug information")
 	boolean debug = false;
+
+    @Option(name = "-h", aliases = {"--help"}, usage = "print this help message and exit")
+    boolean help = false;
 }
 
