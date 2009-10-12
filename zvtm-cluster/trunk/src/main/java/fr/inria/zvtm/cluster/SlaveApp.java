@@ -42,6 +42,7 @@ class SlaveOptions {
 	@Option(name = "-b", aliases = {"--block"}, usage = "metacamera block number (slave index)")
 	int blockNumber = 0; 
 
+    @Option(name = "-n", aliases = {"--app-name"}, usage = "application name (should match master program)")
 	String appName = "zvtmApplication";
 
 	@Option(name = "-f", aliases = {"--fullscreen"}, usage = "open in full screen mode")
