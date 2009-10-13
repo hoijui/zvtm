@@ -41,6 +41,12 @@ public class SlaveApp {
 			return;
 		}
 
+		if(options.help){
+			System.err.println("Usage: SlaveApp [options] where options are: ");
+			parser.printUsage(System.err);
+			return;
+		}
+
 		SlaveApp app = new SlaveApp(options);
 		SlaveUpdater updater = new SlaveUpdater(options.appName,
 				options.blockNumber);
@@ -104,9 +110,10 @@ public class SlaveApp {
 
 class SlaveOptions {
 	@Option(name = "-b", aliases = {"--block"}, usage = "metacamera block number (slave index)")
-		int blockNumber = 0; 
+		int blockNumber = 0;
 
-	String appName = "zvtmApplication";
+	@Option(name = "-n", aliases = {"--app-name"}, usage = "application name (should match master program)")
+		String appName = "zvtmApplication";
 
 	@Option(name = "-f", aliases = {"--fullscreen"}, usage = "open in full screen mode")
 		boolean fullscreen = false;	
@@ -116,5 +123,8 @@ class SlaveOptions {
 
 	@Option(name = "-g", aliases = {"--debug"}, usage = "show ZVTM debug information")
 		boolean debug = false;
+
+	@Option(name = "-h", aliases = {"--help"}, usage = "print this help message and exit")
+		boolean help = false;
 }
 
