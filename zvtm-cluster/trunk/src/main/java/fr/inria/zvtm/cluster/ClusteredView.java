@@ -50,16 +50,21 @@ public class ClusteredView implements Identifiable {
 		}
 		this.blockWidth = blockWidth;
 		this.blockHeight = blockHeight;
-		//propagate changes to the Cameras associated with this View
 	}
 
 	public void setBackgroundColor(Color color){
-	//	
+	//XXX implement	
 	}
+
+	int getOrigin() { return origin; }
 
 	int getBlockWidth(){ return blockWidth; }
 
 	int getBlockHeight(){ return blockHeight; }
+
+	int getNbRows() { return nbRows; }
+
+	int getNbCols() { return nbCols; }
 
 	//vector for compatibility with zvtm views 
 	Vector<Camera> getCameras(){
