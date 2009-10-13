@@ -21,6 +21,7 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
@@ -180,6 +181,12 @@ public aspect VirtualSpaceReplication {
 	pointcut glyphSizeChange(Glyph glyph):
 		(execution(public * Glyph+.sizeTo(float)) || execution(public * Glyph+.reSize(float)))
 		&& this(glyph);
+		
+	/* Closed shapes */
+		
+	pointcut csFillChange(ClosedShape cs):
+		(execution(public * ClosedShape+.setFilled(boolean)))
+		&& this(cs);
 
 
 	/* Section: misc. VS-related pointcuts */
@@ -331,6 +338,29 @@ public aspect VirtualSpaceReplication {
 			throw new Error("Could not retrieve comm channel");
 		}
 	}
+	
+	/* Closed shapes */
+    
+    after(ClosedShape cs) returning: csFillChange(cs){
+		if(null == cs.getOwner()){ return; }
+		if(cs.isOwnerSlave()){ return;}
+
+		boolean isFilled = cs.isFilled();
+
+		Delta delta = new ClosedShapeFillDelta(cs.getObjId(),
+				isFilled);
+
+		Message msg = new Message(null, null, delta);
+		try{
+			VirtualSpace vs = (VirtualSpace)cs.getOwner();
+
+			retrieveChannel(vs.getName()).send(msg);
+		} catch(Exception e){
+			e.printStackTrace();
+			throw new Error("Could not retrieve comm channel");
+		}
+	}
+
 
 	/* Section: misc. VS-related advice */
 	after(VirtualSpace virtualSpace): 
