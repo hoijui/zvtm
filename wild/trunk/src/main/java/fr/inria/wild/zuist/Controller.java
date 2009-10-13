@@ -161,11 +161,11 @@ public class Controller implements Java2DPainter {
         vsm = VirtualSpaceManager.INSTANCE;
         // control view
         zSpace = vsm.addVirtualSpace(zSpaceName);
-        cCamera = vsm.addCamera(zSpace);
+        cCamera = zSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(cCamera);
         short vt = (opengl) ? View.OPENGL_VIEW : View.STD_VIEW;
-        cView = vsm.addExternalView(cameras, CONTROL_VIEW_TITLE, vt,
+        cView = vsm.addFrameView(cameras, CONTROL_VIEW_TITLE, vt,
             DEFAULT_VIEW_WIDTH, Math.round(DEFAULT_VIEW_WIDTH * wc.getSize().height/((float)wc.getSize().width)),
             false, true, true, null);
         cView.setBackgroundColor(Color.WHITE);
@@ -183,12 +183,12 @@ public class Controller implements Java2DPainter {
 		((JFrame)cView.getFrame()).setGlassPane(gp);
         // overview
         rSpace = vsm.addVirtualSpace(rSpaceName);
-        oCamera = vsm.addCamera(zSpace);
-        rCamera = vsm.addCamera(rSpace);
+        oCamera = zSpace.addCamera();
+        rCamera = rSpace.addCamera();
         cameras = new Vector();
         cameras.add(oCamera);
         cameras.add(rCamera);
-        oView = vsm.addExternalView(cameras, OVERVIEW_TITLE, vt,
+        oView = vsm.addFrameView(cameras, OVERVIEW_TITLE, vt,
             1440, 850,
             false, true);
         oView.setBackgroundColor(Color.WHITE);

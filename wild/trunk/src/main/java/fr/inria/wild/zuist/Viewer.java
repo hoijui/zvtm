@@ -143,10 +143,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
-        mCamera = vsm.addCamera(mSpace);
+        mCamera = mSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
-        mView = vsm.addExternalView(cameras, mViewName + " [" + oscPort + "]",
+        mView = vsm.addFrameView(cameras, mViewName + " [" + oscPort + "]",
             (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, (screen == -1), null);
         if (screen != -1){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[screen].setFullScreenWindow((JFrame)mView.getFrame());            
@@ -309,7 +309,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
     
     void centerOnRegion(long w, long n, long e, long s){
-        vsm.centerOnRegion(mCamera, 0, w, n, e, s);
+        mView.centerOnRegion(mCamera, 0, w, n, e, s);
     }
     
     void firstOrderTranslate(int dragX, int dragY){
@@ -383,7 +383,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			Glyph g = od.getGlyph();
 			if (g != null){
 				rememberLocation(mCamera.getLocation());
-				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+				mView.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}
 	}
@@ -394,7 +394,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			Glyph g = r.getBounds();
 			if (g != null){
 				rememberLocation(mCamera.getLocation());
-				vsm.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+				mView.centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}		
 	}
