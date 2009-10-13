@@ -29,6 +29,9 @@ public class SlaveUpdater {
 	private final Map<ObjId, Object> slaveObjects =
 		new HashMap<ObjId, Object>();
 	private final NetworkDelegate networkDelegate;
+	//'SlaveApp' may be replaced by an interface containing 
+	//the essential operations. For now it's overkill.
+	private SlaveApp appDelegate = null;
 
 	/**
 	 * Creates a new Slave updater.
@@ -43,6 +46,10 @@ public class SlaveUpdater {
 
 	public SlaveUpdater(){
 		this("clusterApp", 0);
+	}
+
+	void setAppDelegate(SlaveApp appDelegate){
+		this.appDelegate = appDelegate;
 	}
 
 	/**
@@ -83,6 +90,10 @@ public class SlaveUpdater {
 
 	void stop(){
 		networkDelegate.stop();
+	}
+
+	void createLocalView(ClusteredView cv){
+		appDelegate.createLocalView(cv);
 	}
 
 	class NetworkDelegate {

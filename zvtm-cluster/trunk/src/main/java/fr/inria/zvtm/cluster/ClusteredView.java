@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -22,9 +23,8 @@ public class ClusteredView implements Identifiable {
 			int blockWidth, int blockHeight,
 			int nbRows, int nbCols,
 			List<Camera> cameras){
-		if(!VirtualSpaceManager.INSTANCE.isMaster()){
-			throw new IllegalStateException("Cannot create a ClusteredView on a non-master application");
-		}
+		//clustered view is replicated on the slaves (provides cluster
+		//geometry)
 		if(origin < 0){
 		   throw new IllegalArgumentException("Blocks are 0-based naturals");
 		}
@@ -54,6 +54,16 @@ public class ClusteredView implements Identifiable {
 	}
 
 	public void setBackgroundColor(Color color){
+	//	
+	}
+
+	int getBlockWidth(){ return blockWidth; }
+
+	int getBlockHeight(){ return blockHeight; }
+
+	//vector for compatibility with zvtm views 
+	Vector<Camera> getCameras(){
+		return new Vector(cameras);
 	}
 }
 

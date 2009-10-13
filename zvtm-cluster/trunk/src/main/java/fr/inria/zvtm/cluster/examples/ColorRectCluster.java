@@ -37,6 +37,8 @@ public class ColorRectCluster {
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);
 
+		vsm.addClusteredView(cv);
+
 		//the view below is just a standard, non-clustered view
 		//that lets an user navigate the scene
 		View view = vsm.addFrameView(cameras, "Master View",

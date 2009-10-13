@@ -73,5 +73,20 @@ aspect VsmReplication {
 					);
 		}
 	}
+	
+	public void VirtualSpaceManager.addClusteredView(ClusteredView cv){
+		//sendDelta(new ClusteredViewCreateDelta(cv));
+	}
+
+	//advise clustered view creation
+	after(VirtualSpaceManager vsm) returning(VirtualSpace vs):
+		target(vsm) && execution(VirtualSpace addVirtualSpace(String)) 
+		&& if(VirtualSpaceManager.INSTANCE.isMaster()) {
+			vsm.sendDelta(
+					new VsCreateDelta(vs.getName(),	vs.getObjId())
+					);
+		}
+
+
 }
 
