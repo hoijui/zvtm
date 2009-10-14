@@ -49,12 +49,13 @@ public aspect AutoReplay {
 		)
 		;
 
-	after(Glyph glyph) : 
-		glyphAutoReplayMethods(glyph) {
+	after(Glyph glyph) returning: 
+		glyphAutoReplayMethods(glyph) && 
+		!cflowbelow(glyphAutoReplayMethods(Glyph)){
 			sendGenericDelta(glyph, thisJoinPoint);
 		}
 
-	pointcut cameraAutoReplayMethods(Camera camera) :
+		pointcut cameraAutoReplayMethods(Camera camera) :
 		this(camera) &&
 		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
 		(
@@ -66,7 +67,8 @@ public aspect AutoReplay {
 		;
 
 	after(Camera camera) :
-		cameraAutoReplayMethods(camera){
+		cameraAutoReplayMethods(camera) &&
+		!cflowbelow(cameraAutoReplayMethods(Camera)){
 			sendGenericDelta(camera, thisJoinPoint);
 		}
 
