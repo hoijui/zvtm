@@ -4,6 +4,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 
 import java.util.Map;
 import java.util.HashMap;
+import javax.swing.SwingUtilities;
 
 //Network-related imports
 import org.jgroups.ChannelException;
@@ -119,13 +120,18 @@ public class SlaveUpdater {
 						logger.warn("wrong message type (Delta expected)");
 						return;
 					}
-					Delta delta = (Delta)msg.getObject();
+					final Delta delta = (Delta)msg.getObject();
 
-					//Do whatever needs to be done to update the
-					//state of the slave VirtualSpace (e.g. move a 
-					//Camera, create a rectangle, ...)
-					//In other words, "apply the message"
-					delta.apply(SlaveUpdater.this); 
+					SwingUtilities.invokeLater(new Runnable(){
+						public void run(){
+							//Do whatever needs to be done to update the
+							//state of the slave VirtualSpace (e.g. move a 
+							//Camera, create a rectangle, ...)
+							//In other words, "apply the message"
+
+							delta.apply(SlaveUpdater.this);
+						}
+					});
 				}
 			});
 		}
