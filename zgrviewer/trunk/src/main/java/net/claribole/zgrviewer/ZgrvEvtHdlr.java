@@ -377,7 +377,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			mvx = v.getVCursor().vx;
 			mvy = v.getVCursor().vy;
 			if (wheelDirection == WHEEL_UP){
-				// zooming in
+				// zooming out
 				grMngr.mainCamera.posx -= Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
 				grMngr.mainCamera.posy -= Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
 				grMngr.mainCamera.updatePrecisePosition();
@@ -385,7 +385,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				grMngr.cameraMoved(null, null, 0);
 			}
 			else {
-				// wheelDirection == WHEEL_DOWN, zooming out
+				// wheelDirection == WHEEL_DOWN, zooming in
 				if (grMngr.mainCamera.getAltitude() > -90){
 					grMngr.mainCamera.posx += Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
 					grMngr.mainCamera.posy += Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);

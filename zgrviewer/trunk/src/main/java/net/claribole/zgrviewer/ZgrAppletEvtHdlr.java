@@ -302,11 +302,11 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
         else if (inZoomWindow){
             tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
             if (wheelDirection  == WHEEL_UP){
-                // zooming in
+                // zooming out
                 grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
             }
             else {
-                // wheelDirection == WHEEL_DOWN, zooming out
+                // wheelDirection == WHEEL_DOWN, zooming in
                 grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
             }
             grMngr.updateMagWindow();
@@ -315,12 +315,12 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
         else {
             tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
             if (wheelDirection == WHEEL_UP){
-                // zooming in
+                // zooming out
                 grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
                 grMngr.cameraMoved(null, null, 0);
             }
             else {
-                // wheelDirection == WHEEL_DOWN, zooming out
+                // wheelDirection == WHEEL_DOWN, zooming in
                 grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
                 grMngr.cameraMoved(null, null, 0);
             }
