@@ -19,8 +19,8 @@ import fr.inria.zvtm.engine.PortalEventHandler;
 
 public abstract class BaseEventHandler implements PortalEventHandler {
 
-    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
-    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMIN_FACTOR = 22.0f;
 
     Camera activeCam;
     VSegment navSeg;

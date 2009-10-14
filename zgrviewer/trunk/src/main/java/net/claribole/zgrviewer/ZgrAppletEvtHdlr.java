@@ -303,11 +303,11 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
             tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
             if (wheelDirection  == WHEEL_UP){
                 // zooming out
-                grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
+                grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
             }
             else {
                 // wheelDirection == WHEEL_DOWN, zooming in
-                grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
+                grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
             }
             grMngr.updateMagWindow();
             grMngr.vsm.repaintNow();
@@ -316,12 +316,12 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
             tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
             if (wheelDirection == WHEEL_UP){
                 // zooming out
-                grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
+                grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
                 grMngr.cameraMoved(null, null, 0);
             }
             else {
                 // wheelDirection == WHEEL_DOWN, zooming in
-                grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
+                grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
                 grMngr.cameraMoved(null, null, 0);
             }
         }

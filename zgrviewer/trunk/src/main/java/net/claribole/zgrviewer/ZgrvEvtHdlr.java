@@ -363,11 +363,11 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
 			if (wheelDirection  == WHEEL_UP){
 				// zooming in
-				grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
+				grMngr.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
 			}
 			else {
 				// wheelDirection == WHEEL_DOWN, zooming out
-				grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
+				grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
 			}
 			grMngr.updateMagWindow();
 			grMngr.vsm.repaintNow();
@@ -378,20 +378,20 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 			mvy = v.getVCursor().vy;
 			if (wheelDirection == WHEEL_UP){
 				// zooming out
-				grMngr.mainCamera.posx -= Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
-				grMngr.mainCamera.posy -= Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
+				grMngr.mainCamera.posx -= Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
+				grMngr.mainCamera.posy -= Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
 				grMngr.mainCamera.updatePrecisePosition();
-				grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
+				grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
 				grMngr.cameraMoved(null, null, 0);
 			}
 			else {
 				// wheelDirection == WHEEL_DOWN, zooming in
 				if (grMngr.mainCamera.getAltitude() > -90){
-					grMngr.mainCamera.posx += Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
-					grMngr.mainCamera.posy += Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
+					grMngr.mainCamera.posx += Math.round((mvx - grMngr.mainCamera.posx) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
+					grMngr.mainCamera.posy += Math.round((mvy - grMngr.mainCamera.posy) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
 					grMngr.mainCamera.updatePrecisePosition();
 				}
-				grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
+				grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
 				grMngr.cameraMoved(null, null, 0);
 			}
 		}
