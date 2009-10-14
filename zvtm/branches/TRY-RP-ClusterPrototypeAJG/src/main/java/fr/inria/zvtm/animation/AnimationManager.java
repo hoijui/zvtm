@@ -265,6 +265,14 @@ public class AnimationManager {
 	currentCamAnim.setZspeed(dz);
     }
 
+    public void setZoomOrigin(long x, long y){
+	    currentCamAnim.setZoomOrigin(x, y);
+    }
+
+    public void setZoomOriginEnabled(boolean b){
+	    currentCamAnim.setZoomOriginEnabled(b);
+    }
+
     void onAnimationEnded(Animation anim){
 	listsLock.lock();
 	try{
@@ -369,39 +377,62 @@ public class AnimationManager {
      * animation by providing instantaneous camera speeds.
      */
     class InteractiveCameraAnimation extends DefaultTimingHandler {
-	InteractiveCameraAnimation(VirtualSpaceManager vsm){
-	    this.vsm = vsm;
-	    dx = 0d;
-	    dy = 0d;
-	    dz = 0f;
-	}
+        InteractiveCameraAnimation(VirtualSpaceManager vsm){
+            this.vsm = vsm;
+            dx = 0d;
+            dy = 0d;
+            dz = 0f;
+        }
 
-	@Override public void timingEvent(float fraction, 
-					  Object subject, 
-					  Animation.Dimension dim){
-	    Camera cam = vsm.getActiveCamera();
-	    if(null != cam){
-		if((dx != 0) || (dy != 0)){
-		    cam.move(dx, dy);
-		}
+        @Override public void timingEvent(float fraction, 
+            Object subject, 
+        Animation.Dimension dim){
+            Camera cam = vsm.getActiveCamera();
+            if(null != cam){
+                if((dx != 0) || (dy != 0)){
+                    cam.move(dx, dy);
+                }
 
-		if(dz != 0){
-		    cam.altitudeOffset(dz);
-		}
-	    }
-		VirtualSpace activeSpace = vsm.getActiveSpace();
-		if(!(null == activeSpace)){
-			CameraGroup camGroup = activeSpace.getCameraGroup();
-			Location current = camGroup.getLocation();
-			if((dx != 0) || (dy != 0) || (dz != 0)){
-				camGroup.setLocation(new Location(
-							(long)(current.getX() + dx),
-							(long)(current.getY() +	dy),
-							(long)(current.getAltitude() + dz)));
-			}
-		}
-	}
-
+                if(dz != 0){
+                    if (zoE){
+                        float z = dz / ((cam.focal+Math.abs(cam.altitude))/cam.focal);
+                        cam.setLocation(new Location(cam.posx+Math.round((zoX - cam.posx) * (-z) / Camera.DEFAULT_FOCAL),
+            			                             cam.posy+Math.round((zoY - cam.posy) * (-z) / Camera.DEFAULT_FOCAL),
+            			                             cam.getAltitude()+dz));
+                    }
+                    else {
+                        cam.altitudeOffset(dz);                        
+                    }
+                }
+            }
+            VirtualSpace activeSpace = vsm.getActiveSpace();
+            if(!(null == activeSpace)){
+                CameraGroup camGroup = activeSpace.getCameraGroup();
+                Location current = camGroup.getLocation();
+                if((dx != 0) || (dy != 0)){
+                    camGroup.setLocation(new Location(
+                        (long)(current.getX() + dx),
+                        (long)(current.getY() +	dy),
+                        (long)(current.getAltitude())));
+                }
+                else if(dz != 0){
+                    if (zoE){
+                        float z = dz / ((cam.focal+Math.abs(cam.altitude))/cam.focal);
+                        camGroup.setLocation(new Location(
+                            (long)(current.getX()+(zoX - current.getX()) * (-z) / Camera.DEFAULT_FOCAL),
+                			(long)(current.getY()+(zoY - current.getY()) * (-z) / Camera.DEFAULT_FOCAL),
+                            (long)(current.getAltitude() + dz)));
+                    }
+                    else {
+                        camGroup.setLocation(new Location(
+                            (long)(current.getX()),
+                            (long)(current.getY()),
+                            (long)(current.getAltitude() + dz)));                        
+                    }
+                }
+            }
+        }
+        
 	public void setXspeed(double dx){
 	    this.dx = dx;
 	}
@@ -414,6 +445,15 @@ public class AnimationManager {
 	    this.dz = dz;
 	}
 
+    public void setZoomOrigin(long x, long y){
+	    this.zoX = x;
+	    this.zoY = y;
+    }
+
+    public void setZoomOriginEnabled(boolean b){
+	    this.zoE = b;
+    }
+    
 	public double getXspeed(){
 	    return dx;
 	}
@@ -430,6 +470,9 @@ public class AnimationManager {
 	private volatile double dx;
 	private volatile double dy;
 	private volatile float dz;
+	private volatile long zoX;
+	private volatile long zoY;
+    private volatile boolean zoE;
     }
 
 }
