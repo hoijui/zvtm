@@ -8,6 +8,7 @@ package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 
@@ -70,6 +71,20 @@ public aspect AutoReplay {
 		cameraAutoReplayMethods(camera) &&
 		!cflowbelow(cameraAutoReplayMethods(Camera)){
 			sendGenericDelta(camera, thisJoinPoint);
+		}
+
+	pointcut closedShapeAutoReplayMethods(ClosedShape cs) :
+		this(cs) &&
+		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+		(
+		 execution(public void ClosedShape.setDrawBorder(boolean))
+		 )
+		;
+
+	after(ClosedShape cs) :
+		closedShapeAutoReplayMethods(cs) &&
+		!cflowbelow(closedShapeAutoReplayMethods(ClosedShape)){
+			sendGenericDelta(cs, thisJoinPoint);
 		}
 
 	private static void sendGenericDelta(Identifiable target, 

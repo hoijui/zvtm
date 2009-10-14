@@ -64,8 +64,8 @@ public class ColorRectCluster {
 							rectWidth/2,
 							rectHeight/2,
 							Color.getHSBColor((float)(i*j/(float)(options.xNum*options.yNum)), 1f, 1f));
-				rect.setDrawBorder(false);
 				vs.addGlyph(rect, false);
+				rect.setDrawBorder(false);
 			}
 		}
 	}
