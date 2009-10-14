@@ -61,6 +61,8 @@ public aspect AutoReplay {
 		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
 		(
 		 execution(public void Camera.altitudeOffset(float)) ||
+		 execution(public void Camera.move(long, long)) ||
+		 execution(public void Camera.move(double, double)) ||
 		 execution(public void Camera.moveTo(long, long)) ||
 		 execution(public void Camera.setLocation(Location)) ||
 		 execution(public void Camera.setZoomFloor(float))
@@ -71,20 +73,6 @@ public aspect AutoReplay {
 		cameraAutoReplayMethods(camera) &&
 		!cflowbelow(cameraAutoReplayMethods(Camera)){
 			sendGenericDelta(camera, thisJoinPoint);
-		}
-
-	pointcut closedShapeAutoReplayMethods(ClosedShape cs) :
-		this(cs) &&
-		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-		(
-		 execution(public void ClosedShape.setDrawBorder(boolean))
-		 )
-		;
-
-	after(ClosedShape cs) :
-		closedShapeAutoReplayMethods(cs) &&
-		!cflowbelow(closedShapeAutoReplayMethods(ClosedShape)){
-			sendGenericDelta(cs, thisJoinPoint);
 		}
 
 	private static void sendGenericDelta(Identifiable target, 
