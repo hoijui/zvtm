@@ -395,10 +395,9 @@ public class AnimationManager {
 
                 if(dz != 0){
                     if (zoE){
-                        float z = dz / ((cam.focal+Math.abs(cam.altitude))/cam.focal);
-                        cam.setLocation(new Location(cam.posx+Math.round((zoX - cam.posx) * (-z) / Camera.DEFAULT_FOCAL),
-            			                             cam.posy+Math.round((zoY - cam.posy) * (-z) / Camera.DEFAULT_FOCAL),
-            			                             cam.getAltitude()+dz));
+                        cam.setLocation(new Location(cam.posx+Math.round((cam.posx-zoX)*dz/(cam.getAltitude()+cam.focal)),
+               			                                 cam.posy+Math.round((cam.posy-zoY)*dz/(cam.getAltitude()+cam.focal)),
+               			                                 cam.getAltitude()+dz));
                     }
                     else {
                         cam.altitudeOffset(dz);                        
@@ -417,17 +416,15 @@ public class AnimationManager {
                 }
                 else if(dz != 0){
                     if (zoE){
-                        float z = dz / ((cam.focal+Math.abs(cam.altitude))/cam.focal);
-                        camGroup.setLocation(new Location(
-                            (long)(current.getX()+(zoX - current.getX()) * (-z) / Camera.DEFAULT_FOCAL),
-                			(long)(current.getY()+(zoY - current.getY()) * (-z) / Camera.DEFAULT_FOCAL),
-                            (long)(current.getAltitude() + dz)));
+                        camGroup.setLocation(new Location(current.getX()+Math.round((current.getX()-zoX)*dz/(current.getAltitude()+Camera.DEFAULT_FOCAL)),
+               			                                  current.getY()+Math.round((current.getY()-zoY)*dz/(current.getAltitude()+Camera.DEFAULT_FOCAL)),
+               			                                  current.getAltitude()+dz));
                     }
                     else {
                         camGroup.setLocation(new Location(
                             (long)(current.getX()),
                             (long)(current.getY()),
-                            (long)(current.getAltitude() + dz)));                        
+                            (long)(current.getAltitude()+dz)));                        
                     }
                 }
             }
