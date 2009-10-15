@@ -130,6 +130,8 @@ $Id$
 			<groupId>com.sun.pdfrenderer</groupId>
 			<artifactId>pdfRenderer</artifactId>
 			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/pdfRenderer-1.0.jar</systemPath>
 		</dependency>
 	</dependencies>
 
