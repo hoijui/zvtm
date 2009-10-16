@@ -305,7 +305,7 @@ public class Controller implements Java2DPainter {
 	
     /* Higher view */
     void getHigherView(){
-        Float alt = new Float(cCamera.getAltitude() + cCamera.getFocal());
+        Float alt = new Float(cCamera.getAltitude() + cCamera.getFocal())/2f;
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, cCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -313,7 +313,7 @@ public class Controller implements Java2DPainter {
 
     /* Higher view */
     void getLowerView(){
-        Float alt=new Float(-(cCamera.getAltitude() + cCamera.getFocal())/2.0f);
+        Float alt=new Float(-(cCamera.getAltitude() + cCamera.getFocal())/4.0f);
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, cCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -324,20 +324,20 @@ public class Controller implements Java2DPainter {
         LongPoint trans;
         long[] rb = cView.getVisibleRegion(cCamera);
         if (direction == Controller.MOVE_NORTH){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
+            long qt = Math.round((rb[1]-rb[3])/8.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_SOUTH){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
+            long qt = Math.round((rb[3]-rb[1])/8.0);
             trans = new LongPoint(0,qt);
         }
         else if (direction == Controller.MOVE_EAST){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
+            long qt = Math.round((rb[2]-rb[0])/8.0);
             trans = new LongPoint(qt,0);
         }
         else {
             // direction == Controller.MOVE_WEST
-            long qt = Math.round((rb[0]-rb[2])/4.0);
+            long qt = Math.round((rb[0]-rb[2])/8.0);
             trans = new LongPoint(qt,0);
         }
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, cCamera,
