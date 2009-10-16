@@ -18,6 +18,8 @@ class ClusteredViewCreateDelta implements Delta {
 	private final int blockHeight;
 	private final int nbRows;
 	private final int nbCols;
+	private final int viewRows;
+	private final int viewCols;
 	private final ArrayList<ObjId> camRefs;
 
 	ClusteredViewCreateDelta(ClusteredView cv){
@@ -27,6 +29,8 @@ class ClusteredViewCreateDelta implements Delta {
 		this.blockHeight = cv.getBlockHeight();
 		this.nbRows = cv.getNbRows();
 		this.nbCols = cv.getNbCols();
+		this.viewRows = cv.getViewRows();
+		this.viewCols = cv.getViewCols();
 		this.camRefs = makeCamRefs(cv.getCameras());
 	}
 
@@ -53,6 +57,7 @@ class ClusteredViewCreateDelta implements Delta {
 		ClusteredView cv = new ClusteredView(origin,
 				blockWidth, blockHeight,
 				nbRows, nbCols,
+				viewRows, viewCols,
 				refsToCameras(updater));
 		updater.putSlaveObject(objId, cv);
 		//set owning view for cameras

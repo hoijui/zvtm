@@ -40,7 +40,10 @@ public class ColorRectCluster {
 					options.blockWidth, 
 					options.blockHeight,
 					options.numRows, 
-					options.numCols, 
+					options.numCols, 	
+					options.numRows, //use complete
+					options.numCols, //cluster surface
+
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);
 		vsm.addClusteredView(cv);
