@@ -59,6 +59,10 @@ public class SlaveApp {
 			throw new IllegalStateException("local view already exists");
 		}
 
+		if(!cv.ownsBlock(options.blockNumber)){
+			return;
+		}
+
 		view = vsm.addFrameView(cv.getCameras(), 
 				"slaveView " + options.blockNumber, 
 				View.STD_VIEW,
