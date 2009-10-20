@@ -29,6 +29,7 @@ import org.jdesktop.animation.timing.TimingSource;
 //for active Camera animation
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 
 /**
  * A class that manages Animation instances.
@@ -266,6 +267,14 @@ public class AnimationManager {
     public void setZspeed(float dz){
 	currentCamAnim.setZspeed(dz);
     }
+    
+    public void setZoomInvariantLocation(long x, long y){
+        currentCamAnim.setZoomInvariantLocation(x,y);
+    }
+    
+    public void enableCustomZoomInvariantLocation(boolean b){
+        currentCamAnim.enableCustomZoomInvariantLocation(b);
+    }
 
     void onAnimationEnded(Animation anim){
 	listsLock.lock();
@@ -377,7 +386,7 @@ public class AnimationManager {
 	    dy = 0d;
 	    dz = 0f;
 	}
-
+	
 	@Override public void timingEvent(float fraction, 
 					  Object subject, 
 					  Animation.Dimension dim){
@@ -387,9 +396,17 @@ public class AnimationManager {
 		    cam.move(dx, dy);
 		}
 
-		if(dz != 0){
-		    cam.altitudeOffset(dz);
-		}
+        if(dz != 0){
+            if (zile){
+                cam.setLocation(new Location(cam.posx+Math.round((cam.posx-zilX)*dz/(cam.getAltitude()+cam.focal)),
+                    cam.posy+Math.round((cam.posy-zilY)*dz/(cam.getAltitude()+cam.focal)),
+                    cam.getAltitude()+dz));
+            }
+            else {
+                cam.altitudeOffset(dz);                        
+            }
+        }
+		
 	    }
 	}
 
@@ -417,10 +434,24 @@ public class AnimationManager {
 	    return dz;
 	}
 
+    public void setZoomInvariantLocation(long x, long y){
+        zilX = x;
+        zilY = y;
+    }
+    
+    public void enableCustomZoomInvariantLocation(boolean b){
+        zile = b;
+    }
+    
 	private final VirtualSpaceManager vsm;
 	private volatile double dx;
 	private volatile double dy;
 	private volatile float dz;
+	
+	private boolean zile = false;
+	private long zilX, zilY;
+
+	
     }
 
 }
