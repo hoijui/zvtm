@@ -1,5 +1,6 @@
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
@@ -24,6 +25,7 @@ public class SlaveApp {
 	private final SlaveOptions options;
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
 	private View view = null; //local view
+	private ClusteredView clusteredView = null;
 
 	SlaveApp(SlaveOptions options){
 		this.options = options;
@@ -62,6 +64,8 @@ public class SlaveApp {
 		if(!cv.ownsBlock(options.blockNumber)){
 			return;
 		}
+
+		clusteredView = cv;
 
 		view = vsm.addFrameView(cv.getCameras(), 
 				"slaveView " + options.blockNumber, 
@@ -110,6 +114,35 @@ public class SlaveApp {
 		view.setBackgroundColor(Color.BLACK);
 		view.setVisible(true);
 	}
+
+	//void setCameraLocation(Location masterLoc,
+	//		Camera slaveCamera){
+	//	if(clusteredView == null){
+	//		slaveCamera.setLocation(masterLoc);
+	//		return;
+	//	}
+
+	//	float focal = slaveCamera.getFocal();
+	//	float altCoef = (focal + masterLoc.alt) / focal;
+	//	//block (screen) width in virtualspace coords
+	//	long virtBlockWidth = (long)(clusteredView.getBlockWidth() * altCoef);
+	//	//block (screen) height in virtualspace coords
+	//	long virtBlockHeight = (long)(clusteredView.getBlockHeight() * altCoef);	
+
+	//	//row and col take origin block into account
+	//	int viewRows = clusteredView.getViewRows();
+	//	int viewCols = clusteredView.getViewCols();
+	//	int row = clusteredView.rowNum(options.blockNumber) - clusteredView.rowNum(clusteredView.getOrigin()); 
+	//	int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin()); 
+
+	//	long xOffset = -((viewCols-1)*virtBlockWidth)/2; 
+	//	long yOffset = ((viewRows-1)*virtBlockHeight)/2;
+
+	//	long newX = xOffset + location.vx + col*virtBlockWidth;
+	//	long newY = yOffset + location.vy - row*virtBlockHeight;
+
+	//	slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
+	//}
 }
 
 class SlaveOptions {

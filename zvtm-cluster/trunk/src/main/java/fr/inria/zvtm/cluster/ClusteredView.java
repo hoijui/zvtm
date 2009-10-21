@@ -118,13 +118,13 @@ public class ClusteredView implements Identifiable {
 
 	//returns the column number associated with a block number.
 	//blocks are ordered column-wise
-	private int colNum(int blockNum){
+	int colNum(int blockNum){
 		return blockNum / nbRows;
 	}
 
 	//returns the row number associated with a block number
 	//blocks are ordered column-wise
-	private int rowNum(int blockNum){
+	int rowNum(int blockNum){
 		return blockNum % nbRows;
 	}
 }
