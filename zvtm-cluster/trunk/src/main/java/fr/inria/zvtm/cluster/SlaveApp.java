@@ -23,7 +23,7 @@ import org.kohsuke.args4j.Option;
 public class SlaveApp {
 	private final SlaveOptions options;
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
-	private View view = null;
+	private View view = null; //local view
 
 	SlaveApp(SlaveOptions options){
 		this.options = options;
@@ -106,7 +106,7 @@ public class SlaveApp {
 			}
 		}
 
-		//XXX fix
+		//XXX fix bgcolor
 		view.setBackgroundColor(Color.BLACK);
 		view.setVisible(true);
 	}
