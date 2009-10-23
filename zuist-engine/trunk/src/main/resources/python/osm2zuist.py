@@ -274,7 +274,7 @@ def generateLevels(zf):
 #
 ################################################################################
 def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", num_threads=NUM_THREADS):
-    log("Rendering...")
+    log("Rendering levels %s to %s ..." % (MIN_ZOOM, MAX_ZOOM))
     # Launch rendering threads
     queue = Queue(32)
     printLock = threading.Lock()
