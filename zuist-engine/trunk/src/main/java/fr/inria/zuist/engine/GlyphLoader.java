@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: GlyphLoader.java,v 1.5 2007/06/01 12:54:01 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.engine;

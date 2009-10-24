@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Request.java,v 1.2 2007/06/01 07:14:34 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.engine;

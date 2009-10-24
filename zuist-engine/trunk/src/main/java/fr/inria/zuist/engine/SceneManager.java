@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: SceneManager.java,v 1.24 2007/10/03 06:37:20 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.engine;

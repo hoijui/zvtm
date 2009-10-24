@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ImageDescription.java,v 1.9 2007/10/04 13:59:00 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.engine;

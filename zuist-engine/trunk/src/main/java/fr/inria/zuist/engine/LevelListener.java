@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: LevelListener.java,v 1.1 2007/10/02 09:11:28 pietriga Exp $
+ * $Id$
  */
 
 package fr.inria.zuist.engine;
