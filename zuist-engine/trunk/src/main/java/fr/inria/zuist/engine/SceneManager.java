@@ -331,8 +331,15 @@ public class SceneManager {
                 // region is contained in another region
                 Region r = (Region)id2region.get(rn);
                 Region cr = (Region)id2region.get(regionName2containerRegionName.get(rn));
-                cr.addContainedRegion(r);
-                r.setContainingRegion(cr);
+                if (r != null && cr != null){
+                    cr.addContainedRegion(r);
+                    r.setContainingRegion(cr);                    
+                }
+                else {
+                    System.err.println("Warning: trying to set a containedIn relationship between:\n" +
+                        rn + " => " + r + "\n" +
+                        regionName2containerRegionName.get(rn) + " => " + cr);
+                }
             }
         }
         if (pl != null){
