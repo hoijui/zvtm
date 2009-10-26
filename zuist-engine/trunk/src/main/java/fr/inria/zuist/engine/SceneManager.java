@@ -579,21 +579,26 @@ public class SceneManager {
     }
 
     /** Process XML description of a resource (image, pdf) object. */
-    ImageDescription processResource(Element resourceEL, String id, int zindex, Region region, File sceneFileDirectory){
+    ResourceDescription processResource(Element resourceEL, String id, int zindex, Region region, File sceneFileDirectory){
         String type = resourceEL.getAttribute(_type);
-        // should do something with type
+        long x = Long.parseLong(resourceEL.getAttribute(_x));
+        long y = Long.parseLong(resourceEL.getAttribute(_y));
+        long w = Long.parseLong(resourceEL.getAttribute(_w));
+        long h = Long.parseLong(resourceEL.getAttribute(_h));
+        String src = resourceEL.getAttribute(_src);
+        Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
+        boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
+		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
+		Object interpolation = (resourceEL.hasAttribute(_interpolation)) ? parseInterpolation(resourceEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         if (type.equals(_image)){
-            long x = Long.parseLong(resourceEL.getAttribute(_x));
-            long y = Long.parseLong(resourceEL.getAttribute(_y));
-            long w = Long.parseLong(resourceEL.getAttribute(_w));
-            long h = Long.parseLong(resourceEL.getAttribute(_h));
-            String src = resourceEL.getAttribute(_src);
-            Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
-            boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
-    		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
-    		Object interpolation = (resourceEL.hasAttribute(_interpolation)) ? parseInterpolation(resourceEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
     		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
             return od;            
+        }
+        else if (RESOURCE_HANDLERS.containsKey(type)){
+            ResourceDescription od = ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
+        }
+        else {
+            System.err.println("Error: failed to process resource declatation: "+id);
         }
         return null;
     }

@@ -33,6 +33,8 @@ import fr.inria.zuist.engine.glyphs.VRectProgress;
 
 public class ImageDescription extends ResourceDescription {
 
+    public static final String RESOURCE_TYPE_IMG = "img";
+
     /* necessary info about an image for instantiation */
     long vw, vh;
     Color strokeColor;
@@ -52,7 +54,6 @@ public class ImageDescription extends ResourceDescription {
         *@param pr parent Region in scene
         */
     ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){
-		this.type = RESOURCE_TYPE_IMG;
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -76,7 +77,6 @@ public class ImageDescription extends ResourceDescription {
         *@param pr parent Region in scene
         */
     ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Object im, Region pr){
-		this.type = RESOURCE_TYPE_IMG;
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -88,6 +88,13 @@ public class ImageDescription extends ResourceDescription {
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
     }
+    
+    /** Type of resource.
+	 *@return type of resource.
+	 */
+	public String getType(){
+	    return RESOURCE_TYPE_IMG;
+	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
@@ -191,7 +198,7 @@ public class ImageDescription extends ResourceDescription {
     public Glyph getGlyph(){
 	    return glyph;
     }
-        
+    
 }
 
 class ImageHideAction implements EndAction {

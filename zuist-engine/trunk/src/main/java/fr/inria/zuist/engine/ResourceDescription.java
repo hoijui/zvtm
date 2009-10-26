@@ -30,17 +30,6 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public abstract class ResourceDescription extends ObjectDescription {
 
-	public static final String RESOURCE_TYPE_IMG_STR = "img";
-	public static final String RESOURCE_TYPE_PDF_STR = "pdf";
-
-	/** Resource of unknown type. */
-	public static final short RESOURCE_TYPE_UNKNOWN = -1;
-	/** Resource of type image. */
-	public static final short RESOURCE_TYPE_IMG = 0;
-	/** Resource of type PDF document. */
-	public static final short RESOURCE_TYPE_PDF = 1;
-	short type = RESOURCE_TYPE_UNKNOWN;
-	
 	static final String URL_PROTOCOL_SEQ = ":/";
 	
 	/** URL identifying this resource. */
@@ -58,11 +47,9 @@ public abstract class ResourceDescription extends ObjectDescription {
     }
 
 	/** Type of resource.
-	 *@return one of RESOURCE_TYPE_{IMAGE,PDF,UNKNOWN}
+	 *@return type of resource.
 	 */
-	public short getType(){
-		return type;
-	}
+	public abstract String getType();
 
 	/** Set URL of this resource. */
 	public void setURL(URL url){
