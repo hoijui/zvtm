@@ -129,6 +129,8 @@ public class SceneManager {
     LongPoint origin = new LongPoint(0, 0);
     
     HashMap sceneAttrs;
+    
+    HashMap RESOURCE_HANDLERS;
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vss virtual spaces in which the scene will be loaded
@@ -142,6 +144,23 @@ public class SceneManager {
         id2region = new Hashtable();
         id2object = new Hashtable();
         sceneAttrs = new HashMap();
+        RESOURCE_HANDLERS = new HashMap();
+    }
+    
+    /** Declare a ResourceHandler for a given type of resource.
+     *@param rType type of resource to be handled, e.g., "pdf", "img", ...
+     *@param c class to instantiate to handle a resource of type rType
+     */
+    public void setResourceHandler(String rType, Class c){
+        RESOURCE_HANDLERS.put(rType, c);
+    }
+    
+    /** Get the class handling a given type of resource.
+     *@param rType type of resource to handled, e.g., "pdf", "img", ...
+     *@return c class instantiated to handle a resource of type rType. Null if none associated with rType.
+     */
+    public Class getResourceHandler(String rType){
+        return (Class)RESOURCE_HANDLERS.get(rType);
     }
     
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
