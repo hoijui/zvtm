@@ -353,7 +353,7 @@ def log(msg, level=0):
         if LOG_FILE is not None:
             LOG_FILE.write(msg+"\n")
         
-def initLogFIle():
+def initLogFile():
     global LOG_FILE
     LOG_FILE = open(LOG_FILE_NAME, 'w')
         
