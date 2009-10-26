@@ -138,15 +138,17 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastVX = v.getVCursor().vx;
         lastVY = v.getVCursor().vy;
-        if (nm.lensType != TIVNavigationManager.NO_LENS){
-            nm.zoomInPhase2(lastVX, lastVY);
-        }
-        else {
-            if (cursorNearBorder){
-                // do not activate the lens when cursor is near the border
-                return;
+        if (!inPortal){
+            if (nm.lensType != TIVNavigationManager.NO_LENS){
+                nm.zoomInPhase2(lastVX, lastVY);
             }
-            nm.zoomInPhase1(jpx, jpy);
+            else {
+                if (cursorNearBorder){
+                    // do not activate the lens when cursor is near the border
+                    return;
+                }
+                nm.zoomInPhase1(jpx, jpy);
+            }            
         }
     }
 
