@@ -59,6 +59,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-idprefix=p\tcustom prefix for all region and objects IDs\n"+\
     "\t-dx=y\t\tx offset for all regions and objects\n"+\
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
+    "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
     "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"
 
 TRACE_LEVEL = 1
@@ -80,8 +81,12 @@ TILE_FILE_PREFIX = "tile-"
 
 PROGRESS = 0
 
+# X offset
 DX = 0
+# Y offset
 DY = 0
+# level offset
+DL = 0
 
 ID_PREFIX = ""
 
@@ -128,11 +133,22 @@ def generateLevels(src_sz, rootEL):
         depth = int(res-i-1)
         altitudes.append(int(F*math.pow(2,i+1)-F))
         level = ET.SubElement(rootEL, "level")
-        level.set("depth", str(depth))
+        level.set("depth", str(depth+DL))
         level.set("floor", str(altitudes[-2]))
         level.set("ceiling", str(altitudes[-1]))
-    # fix max scene altitude (for highest region)
-    level.set("ceiling", MAX_ALT)
+    if DL == 0:
+        # fix max scene altitude (for highest region)
+        level.set("ceiling", MAX_ALT)
+    else:
+        # log2 slice of unused space between declared MAX_ALT and actual max alt
+        # for empty levels (exist if DL > 0)
+        faltitudes = [int(MAX_ALT),]
+        for i in range(DL):
+            faltitudes.append((faltitudes[-1]-altitudes[-1])/2)
+            level = ET.SubElement(rootEL, "level")
+            level.set("depth", str(i))
+            level.set("floor", str(faltitudes[-1]))
+            level.set("ceiling", str(faltitudes[-2]))
     return res
 
 ################################################################################
@@ -192,10 +208,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL = ET.SubElement(rootEL, "region")
     regionEL.set("id", "R%s-%s" % (ID_PREFIX, tileIDstr))
     if parentRegionID is None:
-        regionEL.set("levels", "0;%d" % (levelCount-1))
+        regionEL.set("levels", "0;%d" % (levelCount-1+DL))
     else:
         regionEL.set("containedIn", parentRegionID)
-        regionEL.set("levels", str(level))
+        regionEL.set("levels", str(level+DL))
     regionEL.set("x", str(int(DX+x+aw/2)))
     regionEL.set("y", str(int(DY-y-ah/2)))
     regionEL.set("w", str(int(aw)))
@@ -309,6 +325,8 @@ if len(sys.argv) > 2:
                 DX = int(arg[len("-dx="):])
             elif arg.startswith("-dy"):
                 DY = int(arg[len("-dy="):])
+            elif arg.startswith("-dl"):
+                DL = int(arg[len("-dl="):])
             elif arg.startswith("-scale"):
                 PDF_SCALE_FACTOR = float(arg[len("-scale="):])
 else:
