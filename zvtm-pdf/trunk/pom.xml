@@ -54,7 +54,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.10.0-SNAPSHOT</version>
+      <version>0.10.1-SNAPSHOT</version>
     </dependency>
 	<dependency>
 		<groupId>com.sun.pdfrenderer</groupId>
