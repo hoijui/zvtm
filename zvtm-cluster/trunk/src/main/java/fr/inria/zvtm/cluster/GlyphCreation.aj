@@ -11,6 +11,7 @@ import java.awt.Color;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 //Replicates Glyph subtypes creation on slaves
@@ -63,6 +64,11 @@ aspect GlyphCreation {
 	//overloads for various Glyph subclasses
 	@Override private Delta VRectangle.getCreateDelta(){
 		return new VRectangleCreateDelta(this, 
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta VCircle.getCreateDelta(){
+		return new VCircleCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -138,6 +144,25 @@ aspect GlyphCreation {
 		@Override public String toString(){
 			return "VRectangleCreateDelta, halfWidth=" + halfWidth
 				+ ", halfHeight=" + halfHeight;
+		}
+	}
+
+	private static class VCircleCreateDelta extends AbstractGlyphCreateDelta {
+		private final long radius;
+
+		VCircleCreateDelta(VCircle source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.radius = (long)(source.getSize());
+		}
+
+		Glyph createGlyph(){
+			//beware of z-index
+			//Color.BLACK will be overwritten
+			return new VCircle(0,0,0,radius,Color.BLACK);
+		}
+
+		@Override public String toString(){
+			return "VCircleCreateDelta, radius=" + radius;
 		}
 	}
 }
