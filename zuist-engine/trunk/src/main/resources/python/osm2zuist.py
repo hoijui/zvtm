@@ -352,6 +352,7 @@ def log(msg, level=0):
         print msg
         if LOG_FILE is not None:
             LOG_FILE.write(msg+"\n")
+            LOG_FILE.flush()
         
 def initLogFile():
     global LOG_FILE
