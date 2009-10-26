@@ -41,8 +41,8 @@ MAX_ALT = "100000"
 MIN_ZOOM = 0
 MAX_ZOOM = 4
 
-EMPTY_SEA_TILE_512 = "5429c11f64f842fa1ef2bdd78c0e91ae"
-EMPTY_LAND_TILE_512 = "19321692408961898d45d97d70be7313"
+EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae",]
+EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea"]
 
 TRACE_LEVEL = 1
 
@@ -194,7 +194,7 @@ class RenderThread:
                     # empty tile
                     md5sum = sumfile(open(tile_uri, 'rb'))
                     # sea tile
-                    if md5sum == EMPTY_SEA_TILE_512:
+                    if md5sum in EMPTY_SEA_TILES_512:
                         self.printLock.acquire()
                         log("Instantiating top level sea tile %s" % ID, 2)
                         self.printLock.release()
@@ -213,7 +213,7 @@ class RenderThread:
                         self.xmlLock.release()
                         et[ID] = None
                     # land tile
-                    elif md5sum == EMPTY_LAND_TILE_512:
+                    elif md5sum in EMPTY_LAND_TILES_512:
                         self.printLock.acquire()
                         log("Instantiating top level land tile %s" % ID, 2)
                         self.printLock.release()
