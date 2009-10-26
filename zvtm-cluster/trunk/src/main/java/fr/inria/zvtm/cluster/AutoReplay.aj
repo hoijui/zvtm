@@ -46,7 +46,8 @@ public aspect AutoReplay {
 		 execution(public void Glyph.setSensitivity(boolean)) ||
 		 execution(public void VText.setText(String)) || 
 		 execution(public void VText.setScale(float)) || 
-		 execution(public void ClosedShape.setDrawBorder(boolean))  
+		 execution(public void ClosedShape.setDrawBorder(boolean)) || 
+		 execution(public void ClosedShape.setFilled(boolean))  
 		)
 		;
 
