@@ -44,6 +44,8 @@ MAX_ZOOM = 4
 EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae",]
 EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea"]
 
+LOG_FILE_NAME = "osm2zuist.log"
+LOG_FILE = None
 TRACE_LEVEL = 1
 
 INTERPOLATION = "bilinear"
@@ -338,14 +340,23 @@ def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", 
     zf.write("</scene>\n")
     zf.flush()
     zf.close()
+    if LOG_FILE is not None:
+        LOG_FILE.flush()
+        LOG_FILE.close()    
 
 ################################################################################
-# Trace exec on std output
+# Trace exec on std output and log file
 ################################################################################
 def log(msg, level=0):
     if level <= TRACE_LEVEL:
         print msg
-            
+        if LOG_FILE is not None:
+            LOG_FILE.write(msg+"\n")
+        
+def initLogFIle():
+    global LOG_FILE
+    LOG_FILE = open(LOG_FILE_NAME, 'w')
+        
 ################################################################################
 #
 ################################################################################
@@ -359,6 +370,8 @@ if __name__ == "__main__":
                 MIN_ZOOM = int(arg[5:])
             elif arg.startswith("-max="):
                 MAX_ZOOM = int(arg[5:])
+            elif arg.startswith("-log"):
+                initLogFile()
             elif arg.startswith("-h"):
                 log(CMD_LINE_HELP)
                 sys.exit(0)
