@@ -55,7 +55,7 @@ public class VRectProgress extends VRectangle {
 			AffineTransform stdT, int dx, int dy) {
 		
 		g.setColor(bgColor);
-		//g.drawString(val+"%",(int)vW / 2,(int)vH /2);
+
 		//draw just enough
 		super.draw(g, vW-val, vH, i, stdS, stdT, dx, dy);
 		
@@ -75,7 +75,6 @@ public class VRectProgress extends VRectangle {
 		val = (int) count * 100 / ligne;
 
 		label.setText(val + LABEL_TEXT);
-		System.out.println(val);
 		
 		if(val == 100)
 			removePercentLabel();		
