@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Viewer.java 2326 2009-09-08 10:13:11Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;
