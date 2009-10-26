@@ -99,7 +99,7 @@ public abstract class ResourceDescription extends ObjectDescription {
 	
 	/* Visual feedback w.r.t resource fetching */
 	static final String LOADING_LABEL = "Loading ...";
-    static int LOADING_LABEL_FONT_SIZE = 14;
+    static int LOADING_LABEL_FONT_SIZE = 20;
     static boolean DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING = false;
     boolean showFeedbackWhenFetching = DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING;
     

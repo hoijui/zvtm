@@ -11,8 +11,10 @@ import java.awt.Image;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
+import java.io.IOException;
 
 import java.net.URL;
+import java.net.URLConnection;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -22,6 +24,8 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+
+import fr.inria.zuist.engine.glyphs.VRectProgress;
 
 /** Description of image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -87,18 +91,49 @@ public class ImageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
-    	//Preloader
+
         if (glyph == null){
             VText loadingText = null;
+            VRectProgress vrp = null;
+	    	URLConnection yc = null;
+	    	int buffer = 0;
+	    	
             if (showFeedbackWhenFetching){
-            	loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray,
+            	
+		  	loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray,
             	                              LOADING_LABEL, VText.TEXT_ANCHOR_MIDDLE,
-            	                              this.vh / LOADING_LABEL_FONT_SIZE, (fadeIn) ? 0f : 1f);
-                vs.addGlyph(loadingText);                
-            }
+            	                              this.vw / LOADING_LABEL_FONT_SIZE, (fadeIn) ? 1f : 0f);
+            vs.addGlyph(loadingText);  
+            
+		    try {    
+			 yc = src.openConnection();
+		    } catch(IOException e){
+			    e.getMessage();
+		    }
+
+     		// copy of InputStream contents in a bytearray
+			byte[] b= new byte[yc.getContentLength()];
+			buffer=yc.getContentLength();
+			
+			//Progress Bar		
+			vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.BLUE, vs);
+			vrp.setBgColor(Color.RED);
+			vs.addGlyph(vrp);			
+			}
+			
             Image i = (new ImageIcon(src)).getImage();
             int ih = i.getHeight(null);
             double sf = vh / ((double)ih);
+			
+			 if (loadingText != null){
+                    vs.removeGlyph(loadingText);
+             }
+	    	
+	    	for (int j = 0; j <= buffer; j++) {
+			if (vrp != null)
+				vrp.setProgress(j, buffer);
+			}	    	
+	    		    
             if (fadeIn){
                 glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
                 if (strokeColor != null){
@@ -127,12 +162,11 @@ public class ImageDescription extends ResourceDescription {
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
-                if (loadingText != null){
-                    vs.removeGlyph(loadingText);
-                }
+               		
                 vs.addGlyph(glyph);
             }
             glyph.setOwner(this);
+	    	vs.removeGlyph(vrp);
         }
         loadRequest = null;
     }
