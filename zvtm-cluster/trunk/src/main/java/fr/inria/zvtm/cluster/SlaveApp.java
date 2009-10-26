@@ -63,6 +63,7 @@ public class SlaveApp {
 		}
 
 		if(!cv.ownsBlock(options.blockNumber)){
+			System.out.println("clusteredView does NOT own block " + options.blockNumber);
 			return;
 		}
 

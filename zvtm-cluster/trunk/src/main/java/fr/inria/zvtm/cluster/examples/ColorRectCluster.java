@@ -36,14 +36,13 @@ public class ColorRectCluster {
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(cam);	
 		ClusteredView cv = 
-			new ClusteredView(0, //origin (block number)
+			new ClusteredView(options.numRows-1, //origin (block number)
 					options.blockWidth, 
 					options.blockHeight,
 					options.numRows, 
 					options.numCols, 	
 					options.numRows, //use complete
 					options.numCols, //cluster surface
-
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);
 		vsm.addClusteredView(cv);

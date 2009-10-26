@@ -38,25 +38,6 @@ public class ClusteredView implements Identifiable {
 		//'cluster geometry' object and a 'view geometry' object.
 		//Also, we might want to move the cluster geometry into its own
 		//class (separate from ClusterView).
-		if(origin < 0){
-		   throw new IllegalArgumentException("Blocks are 0-based naturals");
-		}
- 		if((blockWidth <=0) || (blockHeight <=0)){
-			throw new IllegalArgumentException("Block dimensions should be greater than 0");
-		}
-		if((nbRows <= 0) || (nbCols <= 0)){
-			throw new IllegalArgumentException("Row and Column counts should be greater than 0");
-		}
-		if((viewRows <= 0) || (viewCols <= 0)){
-			throw new IllegalArgumentException("View row and column counts should be greater than 0");
-		}
-		if(viewRows + rowNum(origin) > nbRows){
-			throw new IllegalArgumentException("View row(s) outside of cluster");
-		}
-		if(viewCols + colNum(origin) > nbCols){
-			throw new IllegalArgumentException("View column(s) outside of cluster");
-		}
-		
 		this.origin = origin;
 		this.blockWidth = blockWidth;
 		this.blockHeight = blockHeight;
@@ -65,6 +46,26 @@ public class ClusteredView implements Identifiable {
 		this.viewRows = viewRows;
 		this.viewCols = viewCols;
 		this.cameras = new ArrayList<Camera>(cameras);
+
+		if(origin < 0){
+			throw new IllegalArgumentException("Blocks are 0-based naturals");
+		}
+		if((blockWidth <=0) || (blockHeight <=0)){
+			throw new IllegalArgumentException("Block dimensions should be greater than 0");
+		}
+		if((nbRows <= 0) || (nbCols <= 0)){
+			throw new IllegalArgumentException("Row and Column counts should be greater than 0");
+		}
+		if((viewRows <= 0) || (viewCols <= 0)){
+			throw new IllegalArgumentException("View row and column counts should be greater than 0");
+		}
+		if(viewRows > nbRows){ //XXX
+			throw new IllegalArgumentException("View row(s) outside of cluster");
+		}
+		if(viewCols + colNum(origin) > nbCols){
+			throw new IllegalArgumentException("View column(s) outside of cluster");
+		}
+
 	}
 
 	public ObjId getObjId(){ return objId; }
@@ -112,8 +113,8 @@ public class ClusteredView implements Identifiable {
 		return 
 			(row <= origRow) &&
 			(col >= origCol) &&
-			(row > (origRow - nbRows)) &&
-			(col < (origCol + nbCols));
+			(row > (origRow - viewRows)) &&
+			(col < (origCol + viewCols));
 	}
 
 	//returns the column number associated with a block number.
