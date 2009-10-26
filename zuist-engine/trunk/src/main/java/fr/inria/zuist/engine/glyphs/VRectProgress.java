@@ -54,16 +54,15 @@ public class VRectProgress extends VRectangle {
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS,
 			AffineTransform stdT, int dx, int dy) {
 		
+		if (alphaC != null && alphaC.getAlpha() == 0) {
+			return;
+		}
 		g.setColor(bgColor);
 
 		//draw just enough
 		super.draw(g, vW-val, vH, i, stdS, stdT, dx, dy);
 		
-		if (alphaC != null && alphaC.getAlpha() == 0) {
-			return;
-		}
 		g.setColor(barColor);
-		
 		g.fillRect(dx+pc[i].cx-(pc[i].cw),dy+pc[i].cy-pc[i].ch,
 					(int)((2*val)*(double)pc[i].cw/100),2*pc[i].ch);
 				
