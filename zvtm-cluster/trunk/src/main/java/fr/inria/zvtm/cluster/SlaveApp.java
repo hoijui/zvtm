@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
@@ -115,34 +116,34 @@ public class SlaveApp {
 		view.setVisible(true);
 	}
 
-	//void setCameraLocation(Location masterLoc,
-	//		Camera slaveCamera){
-	//	if(clusteredView == null){
-	//		slaveCamera.setLocation(masterLoc);
-	//		return;
-	//	}
+	void setCameraLocation(Location masterLoc,
+			Camera slaveCamera){
+		if(clusteredView == null){
+			slaveCamera.setLocation(masterLoc);
+			return;
+		}
 
-	//	float focal = slaveCamera.getFocal();
-	//	float altCoef = (focal + masterLoc.alt) / focal;
-	//	//block (screen) width in virtualspace coords
-	//	long virtBlockWidth = (long)(clusteredView.getBlockWidth() * altCoef);
-	//	//block (screen) height in virtualspace coords
-	//	long virtBlockHeight = (long)(clusteredView.getBlockHeight() * altCoef);	
+		float focal = slaveCamera.getFocal();
+		float altCoef = (focal + masterLoc.alt) / focal;
+		//block (screen) width in virtualspace coords
+		long virtBlockWidth = (long)(clusteredView.getBlockWidth() * altCoef);
+		//block (screen) height in virtualspace coords
+		long virtBlockHeight = (long)(clusteredView.getBlockHeight() * altCoef);	
 
-	//	//row and col take origin block into account
-	//	int viewRows = clusteredView.getViewRows();
-	//	int viewCols = clusteredView.getViewCols();
-	//	int row = clusteredView.rowNum(options.blockNumber) - clusteredView.rowNum(clusteredView.getOrigin()); 
-	//	int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin()); 
+		//row and col take origin block into account
+		int viewRows = clusteredView.getViewRows();
+		int viewCols = clusteredView.getViewCols();
+		int row = clusteredView.rowNum(options.blockNumber) - clusteredView.rowNum(clusteredView.getOrigin()); 
+		int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin()); 
 
-	//	long xOffset = -((viewCols-1)*virtBlockWidth)/2; 
-	//	long yOffset = ((viewRows-1)*virtBlockHeight)/2;
+		long xOffset = -((viewCols-1)*virtBlockWidth)/2; 
+		long yOffset = ((viewRows-1)*virtBlockHeight)/2;
 
-	//	long newX = xOffset + location.vx + col*virtBlockWidth;
-	//	long newY = yOffset + location.vy - row*virtBlockHeight;
+		long newX = xOffset + masterLoc.vx + col*virtBlockWidth;
+		long newY = yOffset + masterLoc.vy - row*virtBlockHeight;
 
-	//	slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
-	//}
+		slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
+	}
 }
 
 class SlaveOptions {

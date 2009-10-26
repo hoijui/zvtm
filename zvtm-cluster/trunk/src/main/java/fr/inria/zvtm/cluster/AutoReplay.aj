@@ -60,11 +60,6 @@ public aspect AutoReplay {
 		this(camera) &&
 		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
 		(
-		 execution(public void Camera.altitudeOffset(float)) ||
-		 execution(public void Camera.move(long, long)) ||
-		 execution(public void Camera.move(double, double)) ||
-		 execution(public void Camera.moveTo(long, long)) ||
-		 execution(public void Camera.setLocation(Location)) ||
 		 execution(public void Camera.setZoomFloor(float))
 		)
 		;

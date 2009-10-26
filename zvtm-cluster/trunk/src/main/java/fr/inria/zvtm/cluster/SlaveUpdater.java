@@ -1,5 +1,13 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 
 import java.util.Map;
@@ -95,6 +103,11 @@ public class SlaveUpdater {
 
 	void createLocalView(ClusteredView cv){
 		appDelegate.createLocalView(cv);
+	}
+
+	void setCameraLocation(Location masterLoc,
+			Camera slaveCamera){
+		appDelegate.setCameraLocation(masterLoc, slaveCamera);
 	}
 
 	class NetworkDelegate {
