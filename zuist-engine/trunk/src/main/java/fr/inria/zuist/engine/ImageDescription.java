@@ -11,13 +11,15 @@ import java.awt.Image;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
-import java.io.IOException;
 
+import java.io.IOException;
+import java.io.BufferedInputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VText;
@@ -25,7 +27,7 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
-import fr.inria.zuist.engine.glyphs.VRectProgress;
+import fr.inria.zuist.glyphs.VRectProgress;
 
 /** Description of image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -97,86 +99,88 @@ public class ImageDescription extends ResourceDescription {
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
+    public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
         if (glyph == null){
-            VText loadingText = null;
-            VRectProgress vrp = null;
-	    	URLConnection yc = null;
-	    	int buffer = 0;
-	    	
+            // open connection to data
             if (showFeedbackWhenFetching){
-
-                loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray,
-                    LOADING_LABEL, VText.TEXT_ANCHOR_MIDDLE,
-                    this.vw / LOADING_LABEL_FONT_SIZE, (fadeIn) ? 1f : 0f);
-                vs.addGlyph(loadingText);  
-
-                try {    
-                    yc = src.openConnection();
-                }
-                catch(IOException e){
-                    e.getMessage();
-                }
-
-                // copy of InputStream contents in a bytearray
-                byte[] b= new byte[yc.getContentLength()];
-                buffer=yc.getContentLength();
-
-                //Progress Bar		
-                vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.BLUE, vs);
+                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.BLUE, vs);
                 vrp.setBgColor(Color.RED);
-                vs.addGlyph(vrp);			
-            }
-			
-            Image i = (new ImageIcon(src)).getImage();
-            int ih = i.getHeight(null);
-            double sf = vh / ((double)ih);
-			
-            if (loadingText != null){
-                vs.removeGlyph(loadingText);
-            }
+                vs.addGlyph(vrp);
+                final SwingWorker worker = new SwingWorker(){
+                    public Object construct(){
+                        try {
+                            URLConnection uc = src.openConnection();
+                            int dataLength = uc.getContentLength();
+                            byte[] imgData = new byte[dataLength];
+                            BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
+                            int bytesRead = 0;
+                            while (bytesRead < dataLength-1){
+                                int av = bis.available();
+                                if (av > 0){
+                                    bis.read(imgData, bytesRead, av);
+                                    bytesRead += av;
+                                    vrp.setProgress(bytesRead, dataLength);                                    
+                                }
+                                else {
+                                    sleep(1000);
+                                }
+                            }
+                            finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
+                        }
+                        catch(IOException e){
+                            System.err.println("Error fetching Image resource "+src.toString());
+                            e.printStackTrace();
+                        }
 
-            for (int j = 0; j <= buffer; j++) {
-                if (vrp != null){
-                    vrp.setProgress(j, buffer);                    
-                }
-            }	    	
-
-            if (fadeIn){
-                glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
-                if (strokeColor != null){
-                    glyph.setBorderColor(strokeColor);
-                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-                }
-                if (!sensitive){glyph.setSensitivity(false);}
-                glyph.setInterpolationMethod(interpolationMethod);
-                vs.addGlyph(glyph);
-                if (loadingText != null){
-                    // remove visual feedback about loading (smoothly)
-                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
-                        1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
-                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);                    
-                }
-                // smoothly fade glyph in
-                Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
-                    1.0f, false, IdentityInterpolator.getInstance(), null);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);
+                        return null; 
+                    }
+                };
+                worker.start();
             }
             else {
-                glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
-                if (strokeColor != null){
-                    glyph.setBorderColor(strokeColor);
-                    glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-                }
-                if (!sensitive){glyph.setSensitivity(false);}
-                glyph.setInterpolationMethod(interpolationMethod);
-
-                vs.addGlyph(glyph);
+                finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);
             }
-            glyph.setOwner(this);
-            vs.removeGlyph(vrp);
+        }                
+        loadRequest = null;    
+    }
+    
+    private synchronized void finishCreatingObject(VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
+        int ih = i.getHeight(null);
+        double sf = vh / ((double)ih);
+        if (fadeIn){
+            glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
+            if (strokeColor != null){
+                glyph.setBorderColor(strokeColor);
+                glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+            }
+            if (!sensitive){glyph.setSensitivity(false);}
+            glyph.setInterpolationMethod(interpolationMethod);
+            vs.addGlyph(glyph);
+            if (showFeedbackWhenFetching){
+                // remove visual feedback about loading (smoothly)
+                Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
+                    1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);                    
+            }
+            // smoothly fade glyph in
+            Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
+                1.0f, false, IdentityInterpolator.getInstance(), null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         }
-        loadRequest = null;
+        else {
+            if (showFeedbackWhenFetching){
+                vs.removeGlyph(vrp);
+            }
+            glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
+            if (strokeColor != null){
+                glyph.setBorderColor(strokeColor);
+                glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+            }
+            if (!sensitive){glyph.setSensitivity(false);}
+            glyph.setInterpolationMethod(interpolationMethod);
+            vs.addGlyph(glyph);
+        }
+        glyph.setOwner(this);
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
