@@ -13,6 +13,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VTriangleOr;
 
 //Replicates Glyph subtypes creation on slaves
@@ -75,6 +76,11 @@ aspect GlyphCreation {
 
 	@Override private Delta VTriangleOr.getCreateDelta(){
 		return new VTriangleOrCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta VSegment.getCreateDelta(){
+		return new VSegmentCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -181,6 +187,22 @@ aspect GlyphCreation {
 		Glyph createGlyph(){
 			//beware of z-index
 			return new VTriangleOr(0,0,0,height,Color.BLACK, 0);
+		}
+	}
+
+	private static class VSegmentCreateDelta extends AbstractGlyphCreateDelta {
+		private final long halfWidth;
+		private final long halfHeight;
+
+		VSegmentCreateDelta(VSegment source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.halfWidth = source.getWidth();
+			this.halfHeight = source.getHeight();
+		}
+
+		Glyph createGlyph(){
+			//beware of z-index
+			return new VSegment(0,0,0,halfWidth,halfHeight,Color.BLACK);
 		}
 	}
 }
