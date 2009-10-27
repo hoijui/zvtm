@@ -13,6 +13,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VTriangleOr;
 
 //Replicates Glyph subtypes creation on slaves
 //(in fact, waits for the glyphs to be added to a virtual
@@ -60,7 +61,7 @@ aspect GlyphCreation {
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
 		}
-
+	
 	//overloads for various Glyph subclasses
 	@Override private Delta VRectangle.getCreateDelta(){
 		return new VRectangleCreateDelta(this, 
@@ -69,6 +70,11 @@ aspect GlyphCreation {
 
 	@Override private Delta VCircle.getCreateDelta(){
 		return new VCircleCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta VTriangleOr.getCreateDelta(){
+		return new VTriangleOrCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -137,7 +143,6 @@ aspect GlyphCreation {
 
 		Glyph createGlyph(){
 			//beware of z-index
-			//Color.BLACK will be overwritten
 			return new VRectangle(0,0,0,halfWidth,halfHeight,Color.BLACK);
 		}
 
@@ -157,12 +162,25 @@ aspect GlyphCreation {
 
 		Glyph createGlyph(){
 			//beware of z-index
-			//Color.BLACK will be overwritten
 			return new VCircle(0,0,0,radius,Color.BLACK);
 		}
 
 		@Override public String toString(){
 			return "VCircleCreateDelta, radius=" + radius;
+		}
+	}
+	
+	private static class VTriangleOrCreateDelta extends AbstractGlyphCreateDelta {
+		private final long height;
+
+		VTriangleOrCreateDelta(VTriangleOr source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.height = (long)(source.getSize());
+		}
+
+		Glyph createGlyph(){
+			//beware of z-index
+			return new VTriangleOr(0,0,0,height,Color.BLACK, 0);
 		}
 	}
 }
