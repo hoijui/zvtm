@@ -98,7 +98,6 @@ public class ImageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
-
         if (glyph == null){
             VText loadingText = null;
             VRectProgress vrp = null;
@@ -106,41 +105,43 @@ public class ImageDescription extends ResourceDescription {
 	    	int buffer = 0;
 	    	
             if (showFeedbackWhenFetching){
-            	
-		  	loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray,
-            	                              LOADING_LABEL, VText.TEXT_ANCHOR_MIDDLE,
-            	                              this.vw / LOADING_LABEL_FONT_SIZE, (fadeIn) ? 1f : 0f);
-            vs.addGlyph(loadingText);  
-            
-		    try {    
-			 yc = src.openConnection();
-		    } catch(IOException e){
-			    e.getMessage();
-		    }
 
-     		// copy of InputStream contents in a bytearray
-			byte[] b= new byte[yc.getContentLength()];
-			buffer=yc.getContentLength();
-			
-			//Progress Bar		
-			vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.BLUE, vs);
-			vrp.setBgColor(Color.RED);
-			vs.addGlyph(vrp);			
-			}
+                loadingText = new VText(this.vx, this.vy, this.zindex, Color.lightGray,
+                    LOADING_LABEL, VText.TEXT_ANCHOR_MIDDLE,
+                    this.vw / LOADING_LABEL_FONT_SIZE, (fadeIn) ? 1f : 0f);
+                vs.addGlyph(loadingText);  
+
+                try {    
+                    yc = src.openConnection();
+                }
+                catch(IOException e){
+                    e.getMessage();
+                }
+
+                // copy of InputStream contents in a bytearray
+                byte[] b= new byte[yc.getContentLength()];
+                buffer=yc.getContentLength();
+
+                //Progress Bar		
+                vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.BLUE, vs);
+                vrp.setBgColor(Color.RED);
+                vs.addGlyph(vrp);			
+            }
 			
             Image i = (new ImageIcon(src)).getImage();
             int ih = i.getHeight(null);
             double sf = vh / ((double)ih);
 			
-			 if (loadingText != null){
-                    vs.removeGlyph(loadingText);
-             }
-	    	
-	    	for (int j = 0; j <= buffer; j++) {
-			if (vrp != null)
-				vrp.setProgress(j, buffer);
-			}	    	
-	    		    
+            if (loadingText != null){
+                vs.removeGlyph(loadingText);
+            }
+
+            for (int j = 0; j <= buffer; j++) {
+                if (vrp != null){
+                    vrp.setProgress(j, buffer);                    
+                }
+            }	    	
+
             if (fadeIn){
                 glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
                 if (strokeColor != null){
@@ -153,7 +154,7 @@ public class ImageDescription extends ResourceDescription {
                 if (loadingText != null){
                     // remove visual feedback about loading (smoothly)
                     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, loadingText,
-                        1.0f, false, IdentityInterpolator.getInstance(), new LabelHideAction(vs));
+                        1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
                     VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);                    
                 }
                 // smoothly fade glyph in
@@ -169,11 +170,11 @@ public class ImageDescription extends ResourceDescription {
                 }
                 if (!sensitive){glyph.setSensitivity(false);}
                 glyph.setInterpolationMethod(interpolationMethod);
-               		
+
                 vs.addGlyph(glyph);
             }
             glyph.setOwner(this);
-	    	vs.removeGlyph(vrp);
+            vs.removeGlyph(vrp);
         }
         loadRequest = null;
     }
@@ -232,11 +233,11 @@ class ImageHideAction implements EndAction {
 
 }
 
-class LabelHideAction implements EndAction {
+class FeedbackHideAction implements EndAction {
     
     VirtualSpace vs;
     
-    LabelHideAction(VirtualSpace vs){
+    FeedbackHideAction(VirtualSpace vs){
 	    this.vs = vs;
     }
     
