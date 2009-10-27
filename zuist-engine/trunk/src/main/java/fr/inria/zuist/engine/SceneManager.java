@@ -438,7 +438,7 @@ public class SceneManager {
      *@param stroke border color of the rectangle symbolizing the region itself
      */
     public Region createRegion(long x, long y, long w, long h, int highestLevel, int lowestLevel,
-                               String id, String title, int li, String[] transitions, String requestOrdering,
+                               String id, String title, int li, short[] transitions, short requestOrdering,
                                boolean sensitivity, Color fill, Color stroke){
         Region region = new Region(x+origin.x, y+origin.y, w, h, highestLevel, lowestLevel, id, li, transitions, requestOrdering, this);
         if (!id2region.containsKey(id)){
@@ -485,10 +485,10 @@ public class SceneManager {
         Color fill = SVGReader.getColor(regionEL.getAttribute(_fill));
         Color stroke = SVGReader.getColor(regionEL.getAttribute(_stroke));
         String id = regionEL.getAttribute(_id);
-        String[] transitions = {regionEL.getAttribute(_tful),
-            regionEL.getAttribute(_tfll),
-            regionEL.getAttribute(_ttul),
-            regionEL.getAttribute(_ttll)};
+        short[] transitions = {regionEL.hasAttribute(_tful) ? Region.parseTransition(regionEL.getAttribute(_tful)) : Region.APPEAR,
+            regionEL.hasAttribute(_tfll) ? Region.parseTransition(regionEL.getAttribute(_tfll)) : Region.APPEAR,
+            regionEL.hasAttribute(_ttul) ? Region.parseTransition(regionEL.getAttribute(_ttul)) : Region.DISAPPEAR,
+            regionEL.hasAttribute(_ttll) ? Region.parseTransition(regionEL.getAttribute(_ttll)) : Region.DISAPPEAR};
         int li = getLayerIndex(regionEL.getAttribute(_layer));
         if (li == -1){
             // put region in first virtual space (assumed to be the only one if yields -1) corresponding to a layer
@@ -507,7 +507,9 @@ public class SceneManager {
         else {// level information given as, e.g., 2, short for 2;2 (single level)
             lowestLevel = highestLevel = Integer.parseInt(levelStr);
         }
-        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title, li, transitions, regionEL.getAttribute(_ro), sensitivity, fill, stroke);
+        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title, li, transitions,
+                                     (regionEL.hasAttribute(_ro)) ? Region.parseOrdering(regionEL.getAttribute(_ro)) : Region.ORDERING_DISTANCE,
+                                     sensitivity, fill, stroke);
         String containerID = (regionEL.hasAttribute(_containedIn)) ? regionEL.getAttribute(_containedIn) : null;
         if (containerID != null){
             rn2crn.put(id, containerID);

@@ -43,16 +43,27 @@ public class Region {
     short requestOrder = ORDERING_DISTANCE;
 
     static short parseOrdering(String o){
-	if (o.equals(ORDERING_DISTANCE_STR)){
-	    return ORDERING_DISTANCE;
-	}
-	else if (o.equals(ORDERING_ARRAY_STR)){
-	    return ORDERING_ARRAY;
-	}
-	else {
-	    System.err.println("Error: unknown load/unload request ordering declaration: "+o);
-	    return -1;
-	}
+        if (o.equals(ORDERING_DISTANCE_STR)){
+            return ORDERING_DISTANCE;
+        }
+        else if (o.equals(ORDERING_ARRAY_STR)){
+            return ORDERING_ARRAY;
+        }
+        else {
+            System.err.println("Error: unknown load/unload request ordering declaration: "+o);
+            return -1;
+        }
+    }
+    
+    static short parseTransition(String t){
+        if (t.equals(FADE_IN_STR)){return FADE_IN;}
+        else if (t.equals(FADE_OUT_STR)){return FADE_OUT;}
+        else if (t.equals(APPEAR_STR)){return APPEAR;}
+        else if (t.equals(DISAPPEAR_STR)){return DISAPPEAR;}
+        else {
+            System.err.println("Error: incorrect transition value: "+t);
+            return -1;
+        }
     }
 
     long x;       // center coordinates of region
@@ -98,7 +109,7 @@ public class Region {
                          transitions from upper level, from lower level, to upper level, to lower level.
      */
     Region(long x, long y, long w, long h, int highestLevel, int lowestLevel,
-           String id, int li, String[] trans, String ro, SceneManager sm){
+           String id, int li, short[] trans, short ro, SceneManager sm){
         this.x = x;
         this.y = y;
         this.w = w;
@@ -113,15 +124,8 @@ public class Region {
         wnes[3] = y - h/2;
         this.id = id;
         this.sm = sm;
-        for (int i=0;i<transitions.length;i++){
-            if (trans[i].equals(FADE_IN_STR)){transitions[i] = FADE_IN;}
-            else if (trans[i].equals(FADE_OUT_STR)){transitions[i] = FADE_OUT;}
-            else if (trans[i].equals(APPEAR_STR)){transitions[i] = APPEAR;}
-            else if (trans[i].equals(DISAPPEAR_STR)){transitions[i] = DISAPPEAR;}
-        }
-        if (ro != null && ro.length() > 0){
-            requestOrder = Region.parseOrdering(ro);
-        }
+        transitions = trans;
+        requestOrder = ro;
     }
 
     public String getID(){
