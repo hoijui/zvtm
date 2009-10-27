@@ -752,6 +752,10 @@ public class SceneManager {
 
     /* ----------- level / region visibility update ----------- */
 
+    public void enableGlyphLoader(boolean b){
+        glyphLoader.setEnabled(b);
+    }
+
     int previousLevel = -2;
     int currentLevel = -1;
     boolean updateLevel = false;
