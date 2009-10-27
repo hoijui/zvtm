@@ -124,6 +124,23 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
               <downloadSources>true</downloadSources>
           </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zuist.viewer.PDFViewer</mainClass>
+              <packageName>fr.inria.zuist.viewer</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   

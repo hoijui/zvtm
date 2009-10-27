@@ -39,6 +39,7 @@ import javax.swing.KeyStroke;
 import java.util.Vector;
 import java.util.HashMap;
 
+import java.net.URL;
 import java.io.File;
 import java.io.IOException;
 
@@ -51,9 +52,6 @@ import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
-import fr.inria.zvtm.glyphs.PieMenu;
-import fr.inria.zvtm.glyphs.PieMenuFactory;
-import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -61,6 +59,7 @@ import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.glyphs.ZPDFPageImg;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -69,14 +68,15 @@ import fr.inria.zuist.engine.RegionListener;
 import fr.inria.zuist.engine.LevelListener;
 import fr.inria.zuist.engine.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.engine.PDFResourceHandler;
+
+import com.sun.pdfview.PDFPage;
 
 /**
  * @author Emmanuel Pietriga
  */
 
 public class PDFViewer {
-    
-    File PDF_FILE;
         
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -113,6 +113,7 @@ public class PDFViewer {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm.setResourceHandler("pdf", new PDFResourceHandler());
         sm.setSceneCameraBounds(mCamera, eh.wnes);
 		previousLocations = new Vector();
         if (pdfFile != null){
@@ -173,18 +174,16 @@ public class PDFViewer {
 		catch (IOException ex){}
 		gp.setValue(0);
 		gp.setVisible(true);
-		PDF_FILE = pdfFile;
-//	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-//	    HashMap sceneAttributes = sm.getSceneAttributes();
-//	    if (sceneAttributes.containsKey(SceneManager._background)){
-//	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-//	    }
-//		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-//	    gp.setVisible(false);
-//	    gp.setLabel(VWGlassPane.EMPTY_STRING);
-//        mCamera.setAltitude(0.0f);
-//        sm.updateLevel(mCamera.altitude);
-//        eh.cameraMoved(null, null, 0);
+		try {
+    		URL pdfURL = pdfFile.toURI().toURL();
+            mSpace.addGlyph(new ZPDFPageImg(0, 0, 0, PDFResourceHandler.getPage(pdfURL, 1), 1, 1));		    
+		}
+		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
+	    gp.setVisible(false);
+	    gp.setLabel(VWGlassPane.EMPTY_STRING);
+        mCamera.setAltitude(0.0f);
+        sm.updateLevel(mCamera.altitude);
+        eh.cameraMoved(null, null, 0);
 	}
     
     /*-------------     Navigation       -------------*/
