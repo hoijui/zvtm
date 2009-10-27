@@ -1,3 +1,9 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -66,8 +72,8 @@ public class ColorRectCluster {
 							rectWidth/2,
 							rectHeight/2,
 							Color.getHSBColor((float)(i*j/(float)(options.xNum*options.yNum)), 1f, 1f));
-				vs.addGlyph(rect, false);
 				rect.setDrawBorder(false);
+				vs.addGlyph(rect, false);
 			}
 		}
 	}
