@@ -121,9 +121,9 @@ public class ImageDescription extends ResourceDescription {
                                     bytesRead += av;
                                     vrp.setProgress(bytesRead, dataLength);                                    
                                 }
-                                else {
-                                    sleep(1000);
-                                }
+                                //else {
+                                //    sleep(10);
+                                //}
                             }
                             finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
                         }
