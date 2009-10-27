@@ -1,4 +1,11 @@
-package fr.inria.zuist.engine.glyphs;
+/*   AUTHOR :           Julien Husson
+ *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+ 
+package fr.inria.zuist.glyphs;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
