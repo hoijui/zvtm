@@ -11,6 +11,7 @@ import java.awt.Color;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
@@ -124,11 +125,20 @@ aspect GlyphCreation {
 
 		abstract Glyph createGlyph();
 
+		void stateTransferHook(Glyph glyph){
+			//left empty. subclasses may use this to transfer
+			//additional state information to the glyph.
+			//'glyph' may be downcast to the type of the object
+			//that was passed to the AbstractGlyphCreateDelta ctor
+			//Important: overrides should chain to their parents
+		}
+
 		public final void apply(SlaveUpdater su){
 			//template method pattern: calls abstract method.
 			//In principle, not meant for inheritance
 			Glyph glyph = createGlyph();
 			baseAttr.moveAttributesToGlyph(glyph);
+			stateTransferHook(glyph);
 
 			su.putSlaveObject(glyphId, glyph);
 			VirtualSpace vs = 
@@ -137,7 +147,31 @@ aspect GlyphCreation {
 		}
 	}
 
-	private static class VRectangleCreateDelta extends AbstractGlyphCreateDelta {
+	private static abstract class ClosedShapeCreateDelta extends AbstractGlyphCreateDelta {
+		private final Color borderColor;
+		private final Color mouseInsideFillColor;
+		private final boolean filled;
+		private final boolean borderDrawn;
+
+		ClosedShapeCreateDelta(ClosedShape source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.borderColor = source.getDefaultBorderColor();
+			this.mouseInsideFillColor = source.mouseInsideFColor;
+			this.filled = source.isFilled();
+			this.borderDrawn = source.isBorderDrawn(); 
+		}
+
+		@Override void stateTransferHook(Glyph glyph){
+			super.stateTransferHook(glyph);
+			ClosedShape dest = (ClosedShape)glyph;
+			dest.bColor = borderColor;
+			dest.setMouseInsideFillColor(mouseInsideFillColor);
+			dest.setFilled(filled);
+			dest.setDrawBorder(borderDrawn);
+		}
+	}
+
+	private static class VRectangleCreateDelta extends ClosedShapeCreateDelta {
 		private final long halfWidth;
 		private final long halfHeight;
 
@@ -158,7 +192,7 @@ aspect GlyphCreation {
 		}
 	}
 
-	private static class VCircleCreateDelta extends AbstractGlyphCreateDelta {
+	private static class VCircleCreateDelta extends ClosedShapeCreateDelta {
 		private final long radius;
 
 		VCircleCreateDelta(VCircle source, ObjId virtualSpaceId){
@@ -176,7 +210,7 @@ aspect GlyphCreation {
 		}
 	}
 	
-	private static class VTriangleOrCreateDelta extends AbstractGlyphCreateDelta {
+	private static class VTriangleOrCreateDelta extends ClosedShapeCreateDelta {
 		private final long height;
 
 		VTriangleOrCreateDelta(VTriangleOr source, ObjId virtualSpaceId){
