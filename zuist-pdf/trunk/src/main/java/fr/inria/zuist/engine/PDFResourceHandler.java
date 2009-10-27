@@ -31,12 +31,34 @@ public class PDFResourceHandler implements ResourceHandler {
     static HashMap URL_2_PDF_FILE = new HashMap();
     
     public static void emptyCache(){
-        URL_2_PDF_FILE.clear();
+        synchronized(URL_2_PDF_FILE){
+            URL_2_PDF_FILE.clear();
+        }
         System.gc();
     }
     
     public static int getCacheEntryCount(){
         return URL_2_PDF_FILE.size();
+    }
+    
+    public static PDFFile getPDF(URL pdfURL){
+        synchronized(URL_2_PDF_FILE){
+            PDFFile pf = null;
+            if (URL_2_PDF_FILE.containsKey(pdfURL)){
+                pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
+            }
+            else {
+                try {
+                    RandomAccessFile raf = new RandomAccessFile(new File(pdfURL.toURI()), "r");
+                    FileChannel channel = raf.getChannel();
+                    ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+                    pf = new PDFFile(buf);
+                    URL_2_PDF_FILE.put(pdfURL, pf);
+                }
+                catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
+            }
+            return pf;
+        }
     }
     
     public static PDFPage getPage(URL pdfURL, int page){
@@ -55,7 +77,7 @@ public class PDFResourceHandler implements ResourceHandler {
                 }
                 catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
             }
-            return (pf != null && page <= pf.getNumPages()) ? pf.getPage(page) : null;            
+            return (pf != null && page <= pf.getNumPages()) ? pf.getPage(page) : null;
         }
     }
     

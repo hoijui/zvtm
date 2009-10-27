@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -51,6 +52,7 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -71,6 +73,7 @@ import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.PDFResourceHandler;
 
 import com.sun.pdfview.PDFPage;
+import com.sun.pdfview.PDFFile;
 
 /**
  * @author Emmanuel Pietriga
@@ -118,7 +121,7 @@ public class PDFViewer {
 		previousLocations = new Vector();
         if (pdfFile != null){
 			loadPDF(pdfFile);
-			getGlobalView();
+			//getGlobalView();
 		}
         mCamera.addListener(eh);
     }
@@ -167,6 +170,8 @@ public class PDFViewer {
 
 	/*-------------  Scene management    -------------*/
 	
+	static final short[] TRANSITIONS = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
+	
 	void loadPDF(File pdfFile){
 		try {
 			mView.setTitle(mViewName + " - " + pdfFile.getCanonicalPath());
@@ -176,9 +181,34 @@ public class PDFViewer {
 		gp.setVisible(true);
 		try {
     		URL pdfURL = pdfFile.toURI().toURL();
-            mSpace.addGlyph(new ZPDFPageImg(0, 0, 0, PDFResourceHandler.getPage(pdfURL, 1), 1, 1));		    
+    		PDFFile pf = PDFResourceHandler.getPDF(pdfURL);
+    		float[] alts = new float[pf.getNumPages()];
+    		Rectangle2D bbox = PDFResourceHandler.getPage(pdfURL, 0).getBBox();
+    		alts[0] = 0;
+    		// all but last level
+    		for (int i=0;i<pf.getNumPages()-1;i++){
+    		    int depth = pf.getNumPages() - i - 1;
+    		    alts[i+1] = Camera.DEFAULT_FOCAL * (float)Math.pow(2, i+1) - Camera.DEFAULT_FOCAL;
+                sm.createLevel(depth, alts[i+1], alts[i]);
+                Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*(i+1)), Math.round(bbox.getHeight()*(i+1)), depth, depth,
+                                "R"+String.valueOf(depth), "Page "+String.valueOf(depth+1),
+                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
+                sm.createTextDescription(0, 0, "P"+String.valueOf(depth), 0, r, i+1, "Page "+String.valueOf(depth+1),
+                                         VText.TEXT_ANCHOR_START, Color.BLACK,
+                                         "Arial", Font.PLAIN, 24, false);
+    		}
+    		// last level
+    		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumPages()-1]);
+    		sm.createRegion(0, 0, Math.round(bbox.getWidth()*(pf.getNumPages())), Math.round(bbox.getHeight()*(pf.getNumPages())), 0, 0,
+                            "R0", "Page 1",
+                            0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
+
+        //mSpace.addGlyph(new ZPDFPageImg(0, 0, 0, PDFResourceHandler.getPage(pdfURL, i+1), 1, 1));
+
+        sm.enableGlyphLoader(true);
+
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
