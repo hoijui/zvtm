@@ -149,18 +149,18 @@ public class SceneManager {
     
     /** Declare a ResourceHandler for a given type of resource.
      *@param rType type of resource to be handled, e.g., "pdf", "img", ...
-     *@param c class to instantiate to handle a resource of type rType
+     *@param rh class implementing ResourceHandler for that type of resource
      */
-    public void setResourceHandler(String rType, Class c){
-        RESOURCE_HANDLERS.put(rType, c);
+    public void setResourceHandler(String rType, ResourceHandler rh){
+        RESOURCE_HANDLERS.put(rType, rh);
     }
     
     /** Get the class handling a given type of resource.
      *@param rType type of resource to handled, e.g., "pdf", "img", ...
-     *@return c class instantiated to handle a resource of type rType. Null if none associated with rType.
+     *@return instance of class implementing ResourceHandler for that type of resource. Null if none associated with rType.
      */
-    public Class getResourceHandler(String rType){
-        return (Class)RESOURCE_HANDLERS.get(rType);
+    public ResourceHandler getResourceHandler(String rType){
+        return (ResourceHandler)RESOURCE_HANDLERS.get(rType);
     }
     
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
