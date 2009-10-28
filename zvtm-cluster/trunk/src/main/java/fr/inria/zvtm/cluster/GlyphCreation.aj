@@ -11,6 +11,7 @@ import java.awt.Color;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.CircleNR;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
@@ -94,6 +95,11 @@ aspect GlyphCreation {
 
 	@Override private Delta RectangleNR.getCreateDelta(){
 		return new RectangleNRCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta CircleNR.getCreateDelta(){
+		return new CircleNRCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -283,6 +289,19 @@ aspect GlyphCreation {
 
 		Glyph createGlyph(){
 			return new RectangleNR(0,0,0,halfWidth,halfHeight,Color.BLACK);
+		}
+	}
+
+	private static class CircleNRCreateDelta extends ClosedShapeCreateDelta {
+		private final long radius;
+		
+		CircleNRCreateDelta(CircleNR source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.radius = (long)(source.getSize());
+		}
+
+		Glyph createGlyph(){
+			return new CircleNR(0,0,0,radius,Color.BLACK);
 		}
 	}
 }
