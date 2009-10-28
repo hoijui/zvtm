@@ -52,14 +52,14 @@ class GeoToolsManager {
     WorldExplorer application;
     GeoNamesParser gnp;
     
-    static final String[] transitions = {Region.APPEAR_STR, Region.APPEAR_STR, Region.DISAPPEAR_STR, Region.DISAPPEAR_STR};
+    static final short[] transitions = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
 
     int polygonID = 0;
     
     GeoToolsManager(WorldExplorer app, boolean queryGN){
         this.application = app;
         Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, 4, "BR0", "Boundaries",
-                                                    1, transitions, Region.ORDERING_DISTANCE_STR,
+                                                    1, transitions, Region.ORDERING_DISTANCE,
                                                     false, null, null);
 
         loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
