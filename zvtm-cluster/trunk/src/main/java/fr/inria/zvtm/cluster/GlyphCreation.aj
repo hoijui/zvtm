@@ -12,6 +12,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
@@ -88,6 +89,11 @@ aspect GlyphCreation {
 
 	@Override private Delta VText.getCreateDelta(){
 		return new VTextCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta RectangleNR.getCreateDelta(){
+		return new RectangleNRCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -260,7 +266,23 @@ aspect GlyphCreation {
 		}
 
 		Glyph createGlyph(){
+			//beware of z-index
 			return new VText(0,0,0,Color.BLACK,text,textAnchor,scaleFactor);
+		}
+	}
+
+	private static class RectangleNRCreateDelta extends ClosedShapeCreateDelta {
+		private final long halfWidth;
+		private final long halfHeight;
+
+		RectangleNRCreateDelta(RectangleNR source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.halfWidth = source.getWidth();
+			this.halfHeight = source.getHeight();
+		}
+
+		Glyph createGlyph(){
+			return new RectangleNR(0,0,0,halfWidth,halfHeight,Color.BLACK);
 		}
 	}
 }
