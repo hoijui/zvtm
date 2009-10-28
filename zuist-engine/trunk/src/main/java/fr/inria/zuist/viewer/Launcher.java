@@ -12,6 +12,8 @@ import java.io.FilenameFilter;
 
 import fr.inria.zvtm.engine.Utilities;
 
+import fr.inria.zuist.engine.Region;
+
 public class Launcher {
     
     static final String VIEWER_TYPE_TILEDIMAGE = "I";
@@ -28,6 +30,7 @@ public class Launcher {
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
+				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Launcher.printCmdLineHelp();System.exit(0);}
 			}
 			else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
@@ -74,6 +77,7 @@ public class Launcher {
 		System.out.println("\nOptions:\n\t-fs: fullscreen mode");
 		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-noaa: no antialiasing");
+        System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
     }
     
 }

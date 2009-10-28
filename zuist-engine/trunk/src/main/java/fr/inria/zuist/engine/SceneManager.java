@@ -485,10 +485,10 @@ public class SceneManager {
         Color fill = SVGReader.getColor(regionEL.getAttribute(_fill));
         Color stroke = SVGReader.getColor(regionEL.getAttribute(_stroke));
         String id = regionEL.getAttribute(_id);
-        short[] transitions = {regionEL.hasAttribute(_tful) ? Region.parseTransition(regionEL.getAttribute(_tful)) : Region.APPEAR,
-            regionEL.hasAttribute(_tfll) ? Region.parseTransition(regionEL.getAttribute(_tfll)) : Region.APPEAR,
-            regionEL.hasAttribute(_ttul) ? Region.parseTransition(regionEL.getAttribute(_ttul)) : Region.DISAPPEAR,
-            regionEL.hasAttribute(_ttll) ? Region.parseTransition(regionEL.getAttribute(_ttll)) : Region.DISAPPEAR};
+        short[] transitions = {regionEL.hasAttribute(_tful) ? Region.parseTransition(regionEL.getAttribute(_tful)) : Region.DEFAULT_F_TRANSITION,
+            regionEL.hasAttribute(_tfll) ? Region.parseTransition(regionEL.getAttribute(_tfll)) : Region.DEFAULT_F_TRANSITION,
+            regionEL.hasAttribute(_ttul) ? Region.parseTransition(regionEL.getAttribute(_ttul)) : Region.DEFAULT_T_TRANSITION,
+            regionEL.hasAttribute(_ttll) ? Region.parseTransition(regionEL.getAttribute(_ttll)) : Region.DEFAULT_T_TRANSITION};
         int li = getLayerIndex(regionEL.getAttribute(_layer));
         if (li == -1){
             // put region in first virtual space (assumed to be the only one if yields -1) corresponding to a layer

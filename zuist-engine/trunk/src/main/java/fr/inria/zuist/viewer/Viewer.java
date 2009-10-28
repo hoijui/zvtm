@@ -640,6 +640,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
+				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
 			}
@@ -673,6 +674,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
         System.out.println("\t-noaa: no antialiasing");
+		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
+        System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
     }
     
 }

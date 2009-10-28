@@ -34,13 +34,23 @@ public class Region {
     public static final short TTUL = 2;  // transition to upper level
     public static final short TTLL = 3;  // transition to lower level
     public static final short TASL = 4;  // transition at same level - not stored, always appear/disappear as this is always off screen
-    short[] transitions = {APPEAR, APPEAR, DISAPPEAR, DISAPPEAR};
-
+    
+    static short DEFAULT_T_TRANSITION = DISAPPEAR;
+    static short DEFAULT_F_TRANSITION = APPEAR;
+    
+    /* Set default transition when none specified.
+     *@param from one of {APPEAR, FADE_IN}
+     *@param to one of {DISAPPEAR, FADE_OUT}
+     */
+    public static void setDefaultTransitions(short from, short to){
+        DEFAULT_F_TRANSITION = from;
+        DEFAULT_T_TRANSITION = to;
+    }
+    
     public static final short ORDERING_ARRAY = 0;
     public static final short ORDERING_DISTANCE = 1;
     public static final String ORDERING_ARRAY_STR = "decl";
     public static final String ORDERING_DISTANCE_STR = "dist";
-    short requestOrder = ORDERING_DISTANCE;
 
     static short parseOrdering(String o){
         if (o.equals(ORDERING_DISTANCE_STR)){
@@ -95,6 +105,10 @@ public class Region {
     SceneManager sm;
     
     boolean isSensitive = false;
+
+    short[] transitions;
+
+    short requestOrder = ORDERING_DISTANCE;
     
     /** Create a new region.
      *@param x center of region
