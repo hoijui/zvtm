@@ -61,7 +61,7 @@ import org.xml.sax.SAXException;
 public class ATCExplorer implements Java2DPainter {
     
     String PATH_TO_HIERARCHY = "data/tgt";
-    String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
+    String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/old_wm_scene.xml";
     File SCENE_FILE = new File(PATH_TO_SCENE);
         
     /* screen dimensions, actual dimensions of windows */
