@@ -1082,43 +1082,45 @@ public class VCursor {
 		dynawnes[2] = vx + unprojectedDSRadius; // east bound
 		dynawnes[3] = vy - unprojectedDSRadius; // south bound
 		dynaspotVSshape.setFrame(dynawnes[0], dynawnes[3], 2*unprojectedDSRadius, 2*unprojectedDSRadius);
-		for (int i=0;i<drawnGlyphs.size();i++){
-			g = (Glyph)drawnGlyphs.elementAt(i);
-			if (!g.isSensitive()){
-			    continue;
-			}
-			// check if cursor hotspot is inside glyph
-			// if hotspot in several glyphs, selected glyph will be the last glyph entered (according to glyphsUnderMouse)
-			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
-			if (cgumIndex > -1){
-				if (cgumIndex > gumIndex){
-					gumIndex = cgumIndex;
-					selectedGlyph = g;
-					distanceToSelectedGlyph = 0;
-				}
-				gida.put(g, null);
-			}
-			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
-			// if they do intersect, peform a finer-grain chec with Areas
-			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
-			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), mx, my, dynaSpotRadius)){
-                // glyph intersects dynaspot area    
-                gida.put(g, null);
-                double d = Math.sqrt(Math.pow(g.vx-vx,2)+Math.pow(g.vy-vy,2));
-                if (distanceToSelectedGlyph == -1 || d < distanceToSelectedGlyph){
-                    selectedGlyph = g;
-                    distanceToSelectedGlyph = d;
-                }
-			}
-			else {
-			    // glyph does not intersect dynaspot area
-			    if (gida.containsKey(g)){
-    		        gida.remove(g);
-    		        if (sl != null){
-    		            sl.glyphSelected(lastDynaPicked, false);
-    		        }
-			    }
-			}
+		synchronized(drawnGlyphs){
+    		for (int i=0;i<drawnGlyphs.size();i++){
+    			g = (Glyph)drawnGlyphs.elementAt(i);
+    			if (!g.isSensitive()){
+    			    continue;
+    			}
+    			// check if cursor hotspot is inside glyph
+    			// if hotspot in several glyphs, selected glyph will be the last glyph entered (according to glyphsUnderMouse)
+    			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
+    			if (cgumIndex > -1){
+    				if (cgumIndex > gumIndex){
+    					gumIndex = cgumIndex;
+    					selectedGlyph = g;
+    					distanceToSelectedGlyph = 0;
+    				}
+    				gida.put(g, null);
+    			}
+    			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
+    			// if they do intersect, peform a finer-grain chec with Areas
+    			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
+    			 	g.visibleInDisc(vx, vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), mx, my, dynaSpotRadius)){
+                    // glyph intersects dynaspot area    
+                    gida.put(g, null);
+                    double d = Math.sqrt(Math.pow(g.vx-vx,2)+Math.pow(g.vy-vy,2));
+                    if (distanceToSelectedGlyph == -1 || d < distanceToSelectedGlyph){
+                        selectedGlyph = g;
+                        distanceToSelectedGlyph = d;
+                    }
+    			}
+    			else {
+    			    // glyph does not intersect dynaspot area
+    			    if (gida.containsKey(g)){
+        		        gida.remove(g);
+        		        if (sl != null){
+        		            sl.glyphSelected(g, false);
+        		        }
+    			    }
+    			}
+    		}		    
 		}
         if (selectedGlyph != null && sl != null){
             sl.glyphSelected(selectedGlyph, true);
