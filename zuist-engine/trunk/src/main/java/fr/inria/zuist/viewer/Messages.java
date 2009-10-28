@@ -11,7 +11,7 @@ import fr.inria.zvtm.engine.LongPoint;
 
 class Messages {
 		
-	static final String VERSION = "0.2.0-SNAPSHOT";
+	static final String VERSION = "0.3.0-SNAPSHOT";
 
     static final String ABOUT_MSG = "ZUIST Viewer " + VERSION + "\n\nA generic visualization tool for ZUIST multi-scale scenes\nhttp://zvtm.sourceforge.net/zuist\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
 	
