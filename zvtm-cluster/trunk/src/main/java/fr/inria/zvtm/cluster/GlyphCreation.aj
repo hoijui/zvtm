@@ -15,6 +15,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTriangleOr;
 
 //Replicates Glyph subtypes creation on slaves
@@ -64,7 +65,7 @@ aspect GlyphCreation {
 					virtualSpace.getObjId());	
 		}
 	
-	//overloads for various Glyph subclasses
+	//overrides for various Glyph subclasses
 	@Override private Delta VRectangle.getCreateDelta(){
 		return new VRectangleCreateDelta(this, 
 				this.getParentSpace().getObjId());
@@ -82,6 +83,11 @@ aspect GlyphCreation {
 
 	@Override private Delta VSegment.getCreateDelta(){
 		return new VSegmentCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta VText.getCreateDelta(){
+		return new VTextCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -162,6 +168,7 @@ aspect GlyphCreation {
 		}
 
 		@Override void stateTransferHook(Glyph glyph){
+			//note that overrides should chain to their parent
 			super.stateTransferHook(glyph);
 			ClosedShape dest = (ClosedShape)glyph;
 			dest.bColor = borderColor;
@@ -237,6 +244,23 @@ aspect GlyphCreation {
 		Glyph createGlyph(){
 			//beware of z-index
 			return new VSegment(0,0,0,halfWidth,halfHeight,Color.BLACK);
+		}
+	}
+
+	private static class VTextCreateDelta extends AbstractGlyphCreateDelta {
+		private final String text;
+		private final float scaleFactor;
+		private final short textAnchor;
+
+		VTextCreateDelta(VText source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.text = source.getText();
+			this.scaleFactor = source.getScale();
+			this.textAnchor = source.getTextAnchor();
+		}
+
+		Glyph createGlyph(){
+			return new VText(0,0,0,Color.BLACK,text,textAnchor,scaleFactor);
 		}
 	}
 }
