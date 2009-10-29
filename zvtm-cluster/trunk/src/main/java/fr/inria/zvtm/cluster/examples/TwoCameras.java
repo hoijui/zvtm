@@ -54,6 +54,8 @@ public class TwoCameras {
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);
 		vsm.addClusteredView(cv);
+		cam.moveTo(300,0);
+		otherCam.moveTo(300,0);
 
 		//the view below is just a standard, non-clustered view
 		//that lets an user navigate the scene
