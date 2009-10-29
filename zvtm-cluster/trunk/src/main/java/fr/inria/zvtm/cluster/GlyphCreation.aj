@@ -8,6 +8,8 @@ package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
 
+import java.net.URL;
+
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -100,6 +102,11 @@ aspect GlyphCreation {
 
 	@Override private Delta CircleNR.getCreateDelta(){
 		return new CircleNRCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta ClusteredImage.getCreateDelta(){
+		return new ClusteredImageCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -302,6 +309,21 @@ aspect GlyphCreation {
 
 		Glyph createGlyph(){
 			return new CircleNR(0,0,0,radius,Color.BLACK);
+		}
+	}
+
+	private static class ClusteredImageCreateDelta extends ClosedShapeCreateDelta {
+		private final double scaleFactor;
+		private final URL imageLocation;
+
+		ClusteredImageCreateDelta(ClusteredImage source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.scaleFactor = source.scaleFactor;
+			this.imageLocation = source.getImageLocation();
+		}
+
+		Glyph createGlyph(){
+			return new ClusteredImage(0,0,0,imageLocation,scaleFactor);
 		}
 	}
 }
