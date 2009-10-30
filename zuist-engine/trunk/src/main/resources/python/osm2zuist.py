@@ -20,6 +20,7 @@ CMD_LINE_HELP = "OSM ZUIST Scene Generator\n\nUsage:\n\n" + \
     " \tosm2zuist [options]\n\n" + \
     "Options:\n\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"+\
+    "\t-log\t\tlog log exec to osm2zuist.log\n"+\
     "\t-min=N\t\tmin zoom level (N in [0:maxN])\n"+\
     "\t-max=N\t\tmax zoom level (N in [minN:18])\n"
     
