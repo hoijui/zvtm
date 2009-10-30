@@ -176,10 +176,15 @@ class RenderThread:
                 log("Descendant of an empty land/sea tile, ignoring %s" % ID, 1)
                 self.printLock.release()
             else:
-                self.printLock.acquire()
-                log("Rendering %s" % ID, 1)
-                self.printLock.release()
-                self.render_tile(tile_uri, x, y, z)
+                if os.path.exists(tile_uri):
+                    self.printLock.acquire()
+                    log("%s exists" % ID, 1)
+                    self.printLock.release()
+                else:
+                    self.printLock.acquire()
+                    log("Rendering %s" % ID, 1)
+                    self.printLock.release()
+                    self.render_tile(tile_uri, x, y, z)
                 # compute coords and size of this tile
                 ilc = MAX_ZOOM - MIN_ZOOM + 1 - z
                 ts = TS_I * math.pow(2, ilc-1)
