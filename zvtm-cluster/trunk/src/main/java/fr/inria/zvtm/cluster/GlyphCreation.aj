@@ -7,6 +7,8 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 
 import java.net.URL;
 
@@ -15,6 +17,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.CircleNR;
 import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -107,6 +110,11 @@ aspect GlyphCreation {
 
 	@Override private Delta ClusteredImage.getCreateDelta(){
 		return new ClusteredImageCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override private Delta DPath.getCreateDelta(){
+		return new DPathCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -324,6 +332,22 @@ aspect GlyphCreation {
 
 		Glyph createGlyph(){
 			return new ClusteredImage(0,0,0,imageLocation,scaleFactor);
+		}
+	}
+
+	private static class DPathCreateDelta extends AbstractGlyphCreateDelta {
+		//note that GeneralPath is only serializable
+		//starting with Java 1.6
+		private final GeneralPath path;
+
+		DPathCreateDelta(DPath source, ObjId virtualSpaceId){
+			super(source, virtualSpaceId);
+			this.path = source.getJava2DGeneralPath();
+		}
+
+		Glyph createGlyph(){
+			return new DPath(path.getPathIterator(new AffineTransform()), 
+					0, Color.BLACK);
 		}
 	}
 }
