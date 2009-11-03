@@ -1,0 +1,24 @@
+\section{Clustering}
+\label{sec:clustering}
+
+Besides desktop applications running on one host, ZVTM can be used to create applications whose 
+rendering tasks will be split among nodes on a display cluster.
+
+Distributed rendering works by replicating the state of one or more VirtualSpace instances 
+on the cluster. In this chapter, we introduce clustered views, which are practically the only
+deviation from a desktop ZVTM application.
+
+\subsection{Clustered Views}
+
+Clustered views describe the display cluster geometry, as well as a viewport within that cluster.
+Views are organized around blocks (the basic unit of views). Blocks are arranged in a matrix
+and numbered column-wise, starting from 0.
+
+\begin{figure}
+\centering
+ \includegraphics[width=17cm]{images/clustered_view.png}
+   \caption{Clustered View Attributes}
+   \label{fig:clview}
+\end{figure}
+
+
