@@ -11,6 +11,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.RectangularShape;
 import fr.inria.zvtm.glyphs.VText;
 
 import java.lang.reflect.Method;
@@ -51,7 +52,9 @@ public aspect AutoReplay {
 		 execution(public void ClosedShape.setFilled(boolean)) || 
 		 execution(public void DPath.addSegment(long, long, boolean)) ||  
 		 execution(public void DPath.addCbCurve(long, long, long, long, long, long, boolean)) ||  
-		 execution(public void DPath.addQdCurve(long, long, long, long, boolean))   
+		 execution(public void DPath.addQdCurve(long, long, long, long, boolean)) ||  
+		 execution(public void RectangularShape.setHeight(long)) ||  
+		 execution(public void RectangularShape.setWidth(long))   
 		)
 		;
 
