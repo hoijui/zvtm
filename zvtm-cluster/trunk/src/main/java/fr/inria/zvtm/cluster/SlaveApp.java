@@ -58,13 +58,12 @@ public class SlaveApp {
 	}
 
 	void createLocalView(ClusteredView cv){
-		if(view != null){
-			throw new IllegalStateException("local view already exists");
+		if(!cv.ownsBlock(options.blockNumber)){
+			return;
 		}
 
-		if(!cv.ownsBlock(options.blockNumber)){
-			System.out.println("clusteredView does NOT own block " + options.blockNumber);
-			return;
+		if(view != null){
+			throw new IllegalStateException("local view already exists");
 		}
 
 		clusteredView = cv;
