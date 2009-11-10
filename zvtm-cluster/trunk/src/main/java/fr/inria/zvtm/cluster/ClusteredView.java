@@ -20,6 +20,7 @@ public class ClusteredView implements Identifiable {
 	private final int viewRows;
 	private final int viewCols;
 	private final ArrayList<Camera> cameras; 
+    private Color bgColor;
 
 	/**
 	 * @param origin
@@ -46,6 +47,7 @@ public class ClusteredView implements Identifiable {
 		this.viewRows = viewRows;
 		this.viewCols = viewCols;
 		this.cameras = new ArrayList<Camera>(cameras);
+        this.bgColor = Color.BLACK;
 
 		if(origin < 0){
 			throw new IllegalArgumentException("Blocks are 0-based naturals");
@@ -78,9 +80,32 @@ public class ClusteredView implements Identifiable {
 		this.blockHeight = blockHeight;
 	}
 
-	public void setBackgroundColor(Color color){
-	//XXX implement	
-	}
+    public void setBackgroundColor(Color color){
+        this.bgColor = color;
+        if(VirtualSpaceManager.INSTANCE.isMaster()){
+            VirtualSpaceManager.INSTANCE.sendDelta(
+                    new ViewBackgroundColorDelta(getObjId(), bgColor)
+                    );
+        }
+    }
+    private static class ViewBackgroundColorDelta implements Delta {
+        private final ObjId viewId; //clustered view ID
+        private final Color bgColor;
+
+        ViewBackgroundColorDelta(ObjId viewId, Color bgColor){
+            this.viewId = viewId;
+            this.bgColor = bgColor;
+        }   
+
+        public void apply(SlaveUpdater su){
+            ClusteredView cv = (ClusteredView)(su.getSlaveObject(viewId));
+            su.setViewBackground(cv, bgColor);
+        }
+    }
+
+    public Color getBackgroundColor(){
+        return bgColor;
+    }
 
 	int getOrigin() { return origin; }
 

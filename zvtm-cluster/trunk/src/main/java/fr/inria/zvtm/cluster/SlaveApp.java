@@ -111,15 +111,21 @@ public class SlaveApp {
 			}
 		}
 
-		//XXX fix bgcolor
-		view.setBackgroundColor(Color.BLACK);
-		view.setVisible(true);
-	}
+        view.setBackgroundColor(cv.getBackgroundColor());
+        view.setVisible(true);
+    }
 
-	void setCameraLocation(Location masterLoc,
-			Camera slaveCamera){
-		if(clusteredView == null){
-			slaveCamera.setLocation(masterLoc);
+    void setViewBackground(ClusteredView cv, Color bgColor){
+        if(!cv.ownsBlock(options.blockNumber)){
+            return;
+        }
+        view.setBackgroundColor(bgColor);
+    }
+
+    void setCameraLocation(Location masterLoc,
+            Camera slaveCamera){
+        if(clusteredView == null){
+            slaveCamera.setLocation(masterLoc);
 			return;
 		}
 
