@@ -56,6 +56,7 @@ public class AnimCircles {
 					options.numRows, //use complete
 					options.numCols, //cluster surface
 					cameras);
+		cv.setBackgroundColor(Color.LIGHT_GRAY);
 		vsm.addClusteredView(cv);
 
 		//the view below is just a standard, non-clustered view
@@ -101,7 +102,6 @@ public class AnimCircles {
 			anim.setStartFraction(rnd.nextFloat());
 			am.startAnimation(anim, false);
 		}
-        cv.setBackgroundColor(Color.GREEN);
 	}
 
 	public static void main(String[] args){

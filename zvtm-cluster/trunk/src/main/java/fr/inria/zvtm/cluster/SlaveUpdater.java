@@ -10,7 +10,6 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 
-import java.awt.Color;
 import java.util.Map;
 import java.util.HashMap;
 import javax.swing.SwingUtilities;
@@ -35,8 +34,7 @@ public class SlaveUpdater {
 		LoggerFactory.getLogger(SlaveUpdater.class);
 	private final int slaveNumber;
 	private final String appId;
-	//examples of slave objects are glyphs, cameras, 
-    //virtual spaces, and clustered views
+	//examples of slave objects are glyphs and cameras
 	private final Map<ObjId, Object> slaveObjects =
 		new HashMap<ObjId, Object>();
 	private final NetworkDelegate networkDelegate;
@@ -106,10 +104,6 @@ public class SlaveUpdater {
 	void createLocalView(ClusteredView cv){
 		appDelegate.createLocalView(cv);
 	}
-
-    void setViewBackground(ClusteredView view, Color bgColor){
-        appDelegate.setViewBackground(view, bgColor);
-    }
 
 	void setCameraLocation(Location masterLoc,
 			Camera slaveCamera){
