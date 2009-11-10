@@ -22,9 +22,17 @@ public class ClusteredView implements Identifiable {
 	private final ArrayList<Camera> cameras; 
 
 	/**
-	 * @param origin
-	 * @param blockWidth
-	 * @param blockHeight
+	 * Constructs a new ClusteredView.
+	 * @param origin origin (bottom-left) block number
+	 * @param blockWidth width of a block, in pixels. Every block
+	 * of a ClusteredView is assumed to have the same width.
+	 * @param blockHeight height of a block, in pixels. Every block 
+	 * of a ClusteredView is assumed to have the same height.
+	 * @param nbRows number of rows in the cluster
+	 * @param nbCols number of columns in the cluster
+	 * @param viewRows number of rows in the view (viewRows <= nbRows)
+	 * @param viewCols number of columns in the view (viewCols <= nbCols)
+	 * @param cameas a list of cameras observed by this ClusteredView.
 	 */
 	public ClusteredView(int origin, 
 			int blockWidth, int blockHeight,
