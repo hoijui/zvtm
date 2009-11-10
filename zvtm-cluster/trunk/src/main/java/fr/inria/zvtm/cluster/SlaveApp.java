@@ -140,7 +140,7 @@ public class SlaveApp {
 		long yOffset = ((viewRows-1)*virtBlockHeight)/2;
 
 		long newX = xOffset + masterLoc.vx + col*virtBlockWidth;
-		long newY = yOffset + masterLoc.vy - row*virtBlockHeight;
+		long newY = -yOffset + masterLoc.vy - row*virtBlockHeight;
 
 		slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
 	}
