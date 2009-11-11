@@ -402,9 +402,29 @@ public class AnimationManager {
                     cam.posy+Math.round((cam.posy-zilY)*dz/(cam.getAltitude()+cam.focal)),
                     cam.getAltitude()+dz));
             }
-            else {
-                cam.altitudeOffset(dz);                        
-            }
+	    else
+	    {
+		// was: cam.altitudeOffset(dz);  
+		double a = (double)cam.getAltitude();
+		double b = 0;
+
+		// FIXME !?!
+		if (a < 10.0 && a >= 0) {
+		    a = 10.0;
+		}
+		if (a > -10.0 && a < 0) {
+		    a = -10.0;
+		}
+
+		if (dz != 0.0) {
+		    b = a + a*0.01*(double)dz;
+		}
+		else {
+		    return;
+		}
+
+		cam.altitudeOffset((float)(b-a));
+	    }
         }
 		
 	    }
