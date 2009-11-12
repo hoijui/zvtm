@@ -12,7 +12,7 @@ $Id$
   <packaging>jar</packaging>
   <name>ZGRViewer</name>
   <version>0.9.0-SNAPSHOT</version>
-  <description>ZGRViewer is a 2.5D graph visualizer implemented in Java and based upon the Zoomable Visual Transformation Machine. It is specifically aimed at displaying graphs expressed using the DOT language from AT&amp;T GraphViz and processed by programs dot, neato or others such as twopi. ZGRViewer is designed to handle large graphs, and offers a zoomable user interface (ZUI), which enables smooth zooming and easy navigation in the visualized structure. ZGRViewer should be able to load any file that uses the DOT language to describe the graph.</description>
+  <description>ZGRViewer is a graph visualizer implemented in Java and based upon the Zoomable Visual Transformation Machine. It is specifically aimed at displaying graphs expressed using the DOT language from AT&amp;T GraphViz and processed by programs dot, neato or others such as twopi. ZGRViewer is designed to handle large graphs, and offers a zoomable user interface (ZUI), which enables smooth zooming and easy navigation in the visualized structure. ZGRViewer should be able to load any file that uses the DOT language to describe the graph.</description>
   <url>http://zvtm.sourceforge.net/zgrviewer.html</url>
   <licenses>
     <license>
