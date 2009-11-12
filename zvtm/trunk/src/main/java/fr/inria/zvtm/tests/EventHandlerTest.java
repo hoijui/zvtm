@@ -90,6 +90,9 @@ public class EventHandlerTest implements ViewEventHandler{
         //application.moveLens(jpx, jpy);
     }
 
+    static float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    static double PAN_SPEED_COEF = 50.0;
+
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
             Camera c=application.vsm.getActiveCamera();
@@ -97,12 +100,12 @@ public class EventHandlerTest implements ViewEventHandler{
             if (mod == META_SHIFT_MOD) {
                 application.vsm.getAnimationManager().setXspeed(0);
                 application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
                 application.vsm.getAnimationManager().setZspeed(0);
             }
         }
