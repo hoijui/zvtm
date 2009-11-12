@@ -21,6 +21,10 @@ import org.kohsuke.args4j.Option;
 /**
  * Generic slave application.
  * Instantiates a View, then hands off control to a SlaveUpdater.
+ * The generic slave application display the contents of one block
+ * of a clustered view (i.e. one slave should be instantiated for
+ * every block of the clustered view).
+ * @see ClusteredView
  */
 public class SlaveApp {
 	private final SlaveOptions options;
