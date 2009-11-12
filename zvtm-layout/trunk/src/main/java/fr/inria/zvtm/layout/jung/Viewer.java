@@ -301,8 +301,6 @@ public class Viewer extends JFrame {
 
 class ViewerEventHandler implements ViewEventHandler {
 	
-	int bob = 0;
-
 	Viewer application;
 	
 	int lastJPX, lastJPY;
@@ -328,24 +326,9 @@ class ViewerEventHandler implements ViewEventHandler {
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-//		Vector v1 = v.getMouse().getIntersectingPaths(application.mCamera, 10);
-//		if (v1 != null && !v1.isEmpty()){
-//			Glyph g = (Glyph)v1.firstElement();
-//			System.out.println(g);
-//			application.mSpace.destroyGlyph(g);
-//		}
-	}
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){	
-//		Glyph g = v.lastGlyphEntered();
-//		if (g != null){
-//			g.setColor(Color.YELLOW);
-//			g.setType("target_"+bob);
-//			bob++;
-//		}
-//	
-	}
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	}
@@ -368,6 +351,9 @@ class ViewerEventHandler implements ViewEventHandler {
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    
+    static float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    static double PAN_SPEED_COEF = 50.0;
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
@@ -376,12 +362,12 @@ class ViewerEventHandler implements ViewEventHandler {
             if (mod == META_SHIFT_MOD) {
                 application.vsm.getAnimationManager().setXspeed(0);
                 application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
                 application.vsm.getAnimationManager().setZspeed(0);
             }
         }
