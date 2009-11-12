@@ -58,13 +58,13 @@ public class CenterOnRegion {
         Vector<Camera> cameras2 = new Vector<Camera>();
         cameras2.add(cam2);
         ClusteredView cv2 = 
-            new ClusteredView(18, //origin (block number)
+            new ClusteredView(27, //origin (block number)
                     2760, 
                     1740,
                     4, 
                     8, 	
+                    4, 
                     2, 
-                    3, 
                     cameras2);
         vsm.addClusteredView(cv2);
 
@@ -72,7 +72,7 @@ public class CenterOnRegion {
         long south = -5000;
         long west = -90000;
         long east = -20000;
-        long radius = 700; //radius (circle) or half width/height (rect)
+        long radius = 1700; //radius (circle) or half width/height (rect)
 
         VRectangle northWest = new VRectangle(west,north,0,radius,radius,Color.GREEN); 
         VCircle    northEast = new VCircle(east,north,0,radius,Color.YELLOW);
