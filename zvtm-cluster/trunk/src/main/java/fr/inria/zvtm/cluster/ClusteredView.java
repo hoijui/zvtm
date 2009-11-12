@@ -78,6 +78,14 @@ public class ClusteredView implements Identifiable {
 
 	public ObjId getObjId(){ return objId; }
 
+	/**
+	 * Sets the dimensions of a block. This is useful e.g. to toggle
+	 * screen borders on/off
+	 * @param blockWidth new block width
+	 * @param blockHeight new block height
+	 * @throws IllegalArgumentException if blockWidth <= 0 or
+	 *                                     blockHeight <= 0
+	 */
 	public void setBlockSize(int blockWidth, int blockHeight){
 		if((blockWidth <=0) || (blockHeight <=0)){
 			throw new IllegalArgumentException("Block dimensions should be greater than 0");
@@ -86,10 +94,20 @@ public class ClusteredView implements Identifiable {
 		this.blockHeight = blockHeight;
 	}
 
+	/** 
+	 * Sets the background color for this ClusteredView.
+	 * Not implemented yet.
+	 * @param color new background color
+	 */
 	public void setBackgroundColor(Color color){
 	//XXX implement	
 	}
 
+	/**
+	 * Gets the origin (bottom-left) block number for
+	 * this ClusteredView. Note that blocks are ordered column-wise,
+	 * and block numbers start at zero.
+	 */
 	int getOrigin() { return origin; }
 
 	int getBlockWidth(){ return blockWidth; }
