@@ -1,12 +1,14 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class ClusteredView implements Identifiable {
@@ -103,6 +105,15 @@ public class ClusteredView implements Identifiable {
 	//XXX implement	
 	}
 
+    /**
+     * Returns the size of this ClusteredView, in pixels.
+     * The width of this view is equal to blockWidth*viewCols
+     * The height of this view is equal to blockHeight*viewRows
+     */
+    public Dimension getSize(){
+        return new Dimension(blockWidth*viewCols, blockHeight*viewRows);
+    }
+
 	/**
 	 * Gets the origin (bottom-left) block number for
 	 * this ClusteredView. Note that blocks are ordered column-wise,
@@ -154,5 +165,35 @@ public class ClusteredView implements Identifiable {
 	int rowNum(int blockNum){
 		return blockNum % nbRows;
 	}
+
+    public Location centerOnRegion(Camera cam, long x1, long y1, long x2, long y2){
+       if(!this.owns(cam)){
+           throw new IllegalArgumentException("this view does not own Camera 'cam'");
+       } 
+
+       long west = Math.min(x1,x2);
+       long north = Math.max(y1,y2);
+       long east = Math.max(x1,x2);
+       long south = Math.min(y1,y2);
+
+       long newX = (west + east) / 2;
+       long newY = (north + south) / 2;
+
+       Dimension viewSize = getSize();
+       //new altitude to fit horizontally
+       float nah = (east-newX)*2*cam.getFocal() / viewSize.width - cam.getFocal();
+       //new altitude to fit vertically
+       float nav = (north-newY)*2*cam.getFocal()/ viewSize.height - cam.getFocal();
+       float newAlt = Math.max(nah, nav);
+
+       return new Location(newX, newY, newAlt);
+    }
+
+   // public Location centerOnGlyph(Camera cam, Glyph glyph){
+   // }
+
+    private boolean owns(Camera cam){
+        return cameras.contains(cam);
+    }
 }
 
