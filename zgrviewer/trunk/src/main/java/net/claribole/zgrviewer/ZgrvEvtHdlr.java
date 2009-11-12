@@ -319,18 +319,17 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 				grMngr.updateZoomWindow();
 			}
 			else {
-				tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 				if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
 					grMngr.vsm.getAnimationManager().setXspeed(0);
                     grMngr.vsm.getAnimationManager().setYspeed(0);
-                    grMngr.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
-					//50 is just a speed factor (too fast otherwise)
+                    grMngr.vsm.getAnimationManager().setZspeed((lastJPY-jpy)*ZOOM_SPEED_COEF);
 				}
 				else {
+    				tfactor = (activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 					jpxD = jpx-lastJPX;
 					jpyD = lastJPY-jpy;
-                    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor)));
-                    grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor)));
+                    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpxD/(tfactor*PAN_SPEED_FACTOR)));
+                    grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpyD/(tfactor*PAN_SPEED_FACTOR)));
                     grMngr.vsm.getAnimationManager().setZspeed(0);
 					if (application.cfgMngr.isSDZoomEnabled()){
 						dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));

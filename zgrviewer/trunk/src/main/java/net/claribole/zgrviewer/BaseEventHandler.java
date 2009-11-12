@@ -21,21 +21,25 @@ public abstract class BaseEventHandler implements PortalEventHandler {
 
     static final float WHEEL_ZOOMOUT_FACTOR = 21.0f;
     static final float WHEEL_ZOOMIN_FACTOR = 22.0f;
+    
+    static final float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    static final float PAN_SPEED_FACTOR = 50.0f;
 
     Camera activeCam;
     VSegment navSeg;
 
     boolean cursorNearBorder = false;
 
-    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    // remember last mouse coords to compute translation  (dragging)
+    int lastJPX,lastJPY;
     long lastVX, lastVY;
     long jpxD, jpyD;
     float tfactor;
-    float cfactor=50.0f;
-    long x1,y1,x2,y2;                     //remember last mouse coords to display selection rectangle (dragging)
+    // remember last mouse coords to display selection rectangle (dragging)
+    long x1,y1,x2,y2;
     
     // lens optimization
-    int lx, ly;    
+    int lx, ly;
 
     boolean zoomingInRegion=false;
     boolean manualLeftButtonMove=false;
