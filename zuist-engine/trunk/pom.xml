@@ -12,7 +12,7 @@ $Id$
   <packaging>jar</packaging>
   <name>ZUIST</name>
   <version>0.3.0-SNAPSHOT</version>
-  <description>ZUIST is a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to develop multi-scale interfaces à la Google Earth (though in 2.5D) in which objects representing a scene at varying levels of detail are load/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera. Multi-scale scenes can be built through the ZUIST API (javadoc) or can be loaded from files using a dedicated XML vocabulary.</description>
+  <description>ZUIST is a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to develop multi-scale interfaces in which objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera. Multi-scale scenes can be built through the ZUIST API (see javadoc) or can be loaded from files using a dedicated XML vocabulary.</description>
   <url>http://zvtm.sourceforge.net/zuist/</url>
   <licenses>
     <license>
