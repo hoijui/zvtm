@@ -2,6 +2,7 @@ package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -110,9 +111,27 @@ public class ClusteredView implements Identifiable {
      * The width of this view is equal to blockWidth*viewCols
      * The height of this view is equal to blockHeight*viewRows
      */
-    public Dimension getSize(){
-        return new Dimension(blockWidth*viewCols, blockHeight*viewRows);
-    }
+	public Dimension getSize(){
+		return new Dimension(blockWidth*viewCols, blockHeight*viewRows);
+	}
+
+	/**
+	 * @throw IllegalArgumentException If cam does not belong to this
+	 *                                 ClusteredView
+	 */
+	public Point spaceToViewCoords(Camera cam, long xPos, long yPos){  
+		if(!this.owns(cam)){
+			throw new IllegalArgumentException("this view does not own Camera 'cam'");
+		} 
+
+		Location camLoc   = cam.getLocation();
+
+		float focal = cam.getFocal();
+		float altCoef = (focal + camLoc.alt) / focal;
+		Dimension viewSize = getSize();
+
+		return new Point(viewSize.width/2+Math.round((xPos-camLoc.vx)/altCoef), viewSize.height/2-Math.round((yPos-camLoc.vy)/altCoef));
+	}
 
 	/**
 	 * Gets the origin (bottom-left) block number for
