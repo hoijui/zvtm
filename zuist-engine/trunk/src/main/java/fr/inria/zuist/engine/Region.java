@@ -234,11 +234,11 @@ public class Region {
 	objects = newObjects;
     }
 
-    void setContainingRegion(Region r){
+    public void setContainingRegion(Region r){
 	containingRegion = r;
     }
 
-    void addContainedRegion(Region r){
+    public void addContainedRegion(Region r){
 	Region[] tmpR = new Region[containedRegions.length+1];
 	System.arraycopy(containedRegions, 0, tmpR, 0, containedRegions.length);
 	tmpR[containedRegions.length] = r;
@@ -398,11 +398,12 @@ public class Region {
     }
 
     public String toString(){
-	String res = "Region " + id + " contained in " + ((containingRegion != null) ? containingRegion.id : "NO REGION") + " and containing regions ";
-	for (int i=0;i<containedRegions.length;i++){
-	    res += containedRegions[i].id + ", ";
-	}
-	return res;
+        String res = "Region " + id + " contained in " + ((containingRegion != null) ? containingRegion.id : "NO REGION") + " and containing regions [";
+        for (int i=0;i<containedRegions.length;i++){
+            res += containedRegions[i].id + ", ";
+        }
+        res += "]";
+        return res;
     }
 
 }
