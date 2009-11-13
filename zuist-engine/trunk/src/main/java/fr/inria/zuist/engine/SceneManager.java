@@ -384,7 +384,7 @@ public class SceneManager {
         regionName2containerRegionName.clear();
         //    	printLevelInfo();
         //   	printRegionInfo();
-        updateLevel = true;
+        setUpdateLevel(true);
         System.gc();
         glyphLoader.setEnabled(true);
         if (pl != null){
@@ -403,6 +403,11 @@ public class SceneManager {
         }
     }
     
+    /** Create a new level in the scene.
+     *@param depth of this level (0 corresponds to the highest level in terms of altitude range)
+     *@param calt ceiling altitude
+     *@param falt floor altitude
+     */
     public Level createLevel(int depth, float calt, float falt){
         if (depth >= levels.length){
             Level[] tmpL = new Level[depth+1];
@@ -420,6 +425,7 @@ public class SceneManager {
     /** Create a new region.
      * Important: when called directly from the client application, Region.setContainingRegion() should also be called manually (if there is any such containing region).
      * Also important: if the region is neither visible nor sensitive at instantiation time, its associated glyph is not added to the virtual space.
+     * Note that containment relationships between regions have to be set manually through calls to Region instance methods.
      *@param x center of region
      *@param y center of region
      *@param w width of region
@@ -436,6 +442,8 @@ public class SceneManager {
      *@param sensitivity should the rectangle symbolizing the region itself be sensitive to mouse events or not.
      *@param fill fill color of the rectangle symbolizing the region itself
      *@param stroke border color of the rectangle symbolizing the region itself
+     *@see Region#setContainingRegion(Region r)
+     *@see Region#addContainedRegion(Region r)
      */
     public Region createRegion(long x, long y, long w, long h, int highestLevel, int lowestLevel,
                                String id, String title, int li, short[] transitions, short requestOrdering,
