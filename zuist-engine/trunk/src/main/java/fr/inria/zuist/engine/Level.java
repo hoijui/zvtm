@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -20,21 +20,25 @@ public class Level {
     
     Region[] regions = new Region[0];
 
+    /** Create a new level.
+     *@param c ceiling altitude
+     *@param f floor altitude
+     */
     Level(float c, float f){
-	ceilingAlt = c;
-	floorAlt = f;
+	    ceilingAlt = c;
+	    floorAlt = f;
     }
 
     /** Get ceiling altitude for this level.
      */
     public float getCeilingAltitude(){
-	return ceilingAlt;
+	    return ceilingAlt;
     }
     
     /** Get floor altitude for this level.
      */
     public float getFloorAltitude(){
-	return floorAlt;
+	    return floorAlt;
     }
 
 	/** Get region whose center is closest to a given location at this level.
@@ -84,12 +88,12 @@ public class Level {
     }
 
     boolean inRange(float alt){
-	return (alt >= floorAlt) && (alt < ceilingAlt);
+	    return (alt >= floorAlt) && (alt < ceilingAlt);
     }
 
     public String toString(){
-	return "Ceiling: " + ceilingAlt + "\n" +
-	    "Floor: " + floorAlt + "\n";
+	    return "Ceiling: " + ceilingAlt + "\n" +
+	        "Floor: " + floorAlt + "\n";
     }
 
 	/** Get the bounding box enclosing all regions at this level.
