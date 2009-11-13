@@ -118,8 +118,7 @@ public class PDFViewer {
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setResourceHandler("pdf", new PDFResourceHandler());
         sm.setSceneCameraBounds(mCamera, eh.wnes);
-		previousLocations = new Vector();
-        if (pdfFile != null){
+		if (pdfFile != null){
 			loadPDF(pdfFile);
 			//getGlobalView();
 		}
@@ -185,6 +184,7 @@ public class PDFViewer {
     		float[] alts = new float[pf.getNumPages()];
     		Rectangle2D bbox = PDFResourceHandler.getPage(pdfURL, 0).getBBox();
     		alts[0] = 0;
+    		Region prevRegion = null;
     		// all but last level
     		for (int i=0;i<pf.getNumPages()-1;i++){
     		    int depth = pf.getNumPages() - i - 1;
@@ -193,22 +193,29 @@ public class PDFViewer {
                 Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*(i+1)), Math.round(bbox.getHeight()*(i+1)), depth, depth,
                                 "R"+String.valueOf(depth), "Page "+String.valueOf(depth+1),
                                 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
-                sm.createTextDescription(0, 0, "P"+String.valueOf(depth), 0, r, i+1, "Page "+String.valueOf(depth+1),
+                sm.createTextDescription(0, 0, "P"+String.valueOf(depth), 0, r, (float)Math.pow(2,i+1), "Page "+String.valueOf(depth+1),
                                          VText.TEXT_ANCHOR_START, Color.BLACK,
                                          "Arial", Font.PLAIN, 24, false);
+                if (prevRegion != null){
+                    prevRegion.setContainingRegion(r);
+                    r.addContainedRegion(prevRegion);
+                }
+                prevRegion = r;
     		}
     		// last level
     		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumPages()-1]);
-    		sm.createRegion(0, 0, Math.round(bbox.getWidth()*(pf.getNumPages())), Math.round(bbox.getHeight()*(pf.getNumPages())), 0, 0,
-                            "R0", "Page 1",
-                            0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
+    		Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*(pf.getNumPages())), Math.round(bbox.getHeight()*(pf.getNumPages())), 0, 0,
+                                       "R0", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
+            if (prevRegion != null){
+                r.addContainedRegion(prevRegion);
+                prevRegion.setContainingRegion(r);
+            }
+                            
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
-
-        //mSpace.addGlyph(new ZPDFPageImg(0, 0, 0, PDFResourceHandler.getPage(pdfURL, i+1), 1, 1));
-
+		// important SM init calls
         sm.enableGlyphLoader(true);
-
+        sm.setUpdateLevel(true);
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
@@ -217,7 +224,7 @@ public class PDFViewer {
 	}
     
     /*-------------     Navigation       -------------*/
-
+    
     void getGlobalView(){
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
@@ -228,26 +235,23 @@ public class PDFViewer {
 			}
 		}
 		if (l > -1){
-			rememberLocation(mCamera.getLocation());
 			long[] wnes = sm.getLevel(l).getBounds();
-	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
+	        mCamera.getOwningView().centerOnRegion(mCamera, PDFViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
 		}
     }
 
     /* Higher view */
     void getHigherView(){
-		rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(PDFViewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
 
     /* Higher view */
     void getLowerView(){
-		rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(PDFViewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
@@ -273,50 +277,10 @@ public class PDFViewer {
             long qt = Math.round((rb[0]-rb[2])/4.0);
             trans = new LongPoint(qt,0);
         }
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(PDFViewer.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
-
-	Vector previousLocations;
-	static final int MAX_PREV_LOC = 100;
-	
-	void rememberLocation(){
-	    rememberLocation(mCamera.getLocation());
-    }
-    
-	void rememberLocation(Location l){
-		if (previousLocations.size() >= MAX_PREV_LOC){
-			// as a result of release/click being undifferentiated)
-			previousLocations.removeElementAt(0);
-		}
-		if (previousLocations.size()>0){
-			if (!Location.equals((Location)previousLocations.lastElement(),l)){
-                previousLocations.add(l);
-            }
-		}
-		else {previousLocations.add(l);}
-	}
-	
-	void moveBack(){		
-		if (previousLocations.size()>0){
-			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
-			sm.setUpdateLevel(false);
-            class LevelUpdater implements EndAction {
-                public void execute(Object subject, Animation.Dimension dimension){
-                    sm.setUpdateLevel(true);
-                    sm.updateLevel(mCamera.altitude);
-                }
-            }
-            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
-            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
-            vsm.getAnimationManager().startAnimation(at, false);
-            vsm.getAnimationManager().startAnimation(aa, false);
-			previousLocations.removeElementAt(previousLocations.size()-1);
-		}
-	}
 	
     void altitudeChanged(){
         sm.updateLevel(mCamera.altitude);
@@ -469,7 +433,14 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
+		if (gum != null){
+		    System.out.println(((Region)((Glyph)gum.lastElement()).getOwner()).getID());
+		    System.out.println(((Region)((Glyph)gum.lastElement()).getOwner()).hashCode());
+    		application.mView.centerOnGlyph((Glyph)gum.lastElement(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+		}
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -485,35 +456,27 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
-    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        //if (dragging){
-        //    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-        //    synchronized(application.mCamera){
-        //        application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
-        //        lastJPX = jpx;
-        //        lastJPY = jpy;
-        //        cameraMoved(null, null, 0);
-        //    }
-        //}
-    }
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		//float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-		//if (wheelDirection  == WHEEL_UP){
-		//	// zooming in
-		//	application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-		//	cameraMoved(null, null, 0);
-		//	application.vsm.repaintNow();
-		//}
-		//else {
-		//	//wheelDirection == WHEEL_DOWN, zooming out
-		//	application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-		//	cameraMoved(null, null, 0);
-		//	application.vsm.repaintNow();
-		//}
+		float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		if (wheelDirection  == WHEEL_UP){
+			// zooming in
+			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+			cameraMoved(null, null, 0);
+			VirtualSpaceManager.INSTANCE.repaintNow();
+		}
+		else {
+			//wheelDirection == WHEEL_DOWN, zooming out
+			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+			cameraMoved(null, null, 0);
+			VirtualSpaceManager.INSTANCE.repaintNow();
+		}
 	}
 
-	public void enterGlyph(Glyph g){}
+	public void enterGlyph(Glyph g){
+	    System.out.println(g.getOwner());
+	}
 
 	public void exitGlyph(Glyph g){}
 

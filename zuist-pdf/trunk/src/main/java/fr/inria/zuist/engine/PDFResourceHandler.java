@@ -20,7 +20,7 @@ import java.nio.channels.FileChannel;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 
-/** Interface implemented by handlers of the various resource types.
+/** ResourceHandler implementation for PDF documents.
  *@author Emmanuel Pietriga
  */
 
@@ -86,7 +86,7 @@ public class PDFResourceHandler implements ResourceHandler {
     public PDFResourceHandler(){}
         
     public PDFPageDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region, 
-                                                               String imagePath, boolean sensitivity, Color stroke, Object im){
+                                                        String imagePath, boolean sensitivity, Color stroke, Object im){
         PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, w, h, imagePath, stroke, im, region);
         pdfd.setSensitive(sensitivity);
         region.addObject(pdfd);
