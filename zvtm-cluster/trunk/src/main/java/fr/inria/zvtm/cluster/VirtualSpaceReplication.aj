@@ -35,6 +35,8 @@ aspect VirtualSpaceReplication {
 		 execution(public void Camera.move(long, long)) ||
 		 execution(public void Camera.move(double, double)) ||
 		 execution(public void Camera.moveTo(long, long)) ||
+		 execution(public void Camera.setAltitude(float)) ||
+		 execution(public void Camera.setAltitude(float, boolean)) ||
 		 execution(public void Camera.setLocation(Location)) 
 		)
 		;
