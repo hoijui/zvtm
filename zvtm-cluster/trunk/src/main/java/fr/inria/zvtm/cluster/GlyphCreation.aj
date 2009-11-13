@@ -71,6 +71,7 @@ aspect GlyphCreation {
 		glyphRemove(glyph, virtualSpace){
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
+			VirtualSpaceManager.INSTANCE.sendDelta(delta);
 		}
 	
 	//overrides for various Glyph subclasses
