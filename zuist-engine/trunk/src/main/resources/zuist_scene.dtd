@@ -101,7 +101,6 @@ ZUIST DTD, for v0.3.0 and above.
                    src CDATA #IMPLIED
 				   %stroke;
 				   %fill;
-				   interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
 	               %takesToObject;
 	               %takesToRegion;
                    %sensitive; "true"

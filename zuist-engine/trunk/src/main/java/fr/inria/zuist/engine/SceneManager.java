@@ -96,7 +96,8 @@ public class SceneManager {
     public static final String _anchor = "anchor";
     public static final String _layer = "layer";
     public static final String _zindex = "z-index";
-    public static final String _interpolation = "interpolation";
+    public static final String _params = "params";
+    public static final String _im = "im=";
     public static final String _nearestNeighbor = "nearestNeighbor";
     public static final String _bilinear = "bilinear";
     public static final String _bicubic = "bicubic";
@@ -107,6 +108,8 @@ public class SceneManager {
     public static final String _italic = "italic";
     public static final String _bold = "bold";
     public static final String _boldItalic = "boldItalic";
+    
+    public static final String PARAM_SEPARATOR = ";";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -602,21 +605,16 @@ public class SceneManager {
         long w = Long.parseLong(resourceEL.getAttribute(_w));
         long h = Long.parseLong(resourceEL.getAttribute(_h));
         String src = resourceEL.getAttribute(_src);
+        String params = resourceEL.getAttribute(_params);
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
 		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
-		Object interpolation = (resourceEL.hasAttribute(_interpolation)) ? parseInterpolation(resourceEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         if (type.equals(_image)){
-    		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
-            return od;            
-        }
-        else if (RESOURCE_HANDLERS.containsKey(type)){
-            ResourceDescription od = ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
+    		return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
         }
         else {
-            System.err.println("Error: failed to process resource declaration: "+id);
+            return createResourceDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, type, sensitivity, stroke, params);
         }
-        return null;
     }
 
     public static URL getAbsoluteURL(String src, File sceneFileDir){
@@ -649,17 +647,17 @@ public class SceneManager {
         *@param type resource type ("img", "pdf", ...)
         *@param sensitivity should the object be sensitive to mouse events or not.
         *@param stroke border color
-        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param region parent Region in scene
+        *@param params custom parameters for a given type of resource
      */
     public ResourceDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region,
-                                                         URL resourceURL, String type, boolean sensitivity, Color stroke, Object im){
+                                                         URL resourceURL, String type, boolean sensitivity, Color stroke, String params){
         if (type.equals(_image)){
-            return createImageDescription(x, y, w, h, id, zindex, region, resourceURL, sensitivity, stroke, im);
+            return createImageDescription(x, y, w, h, id, zindex, region, resourceURL, sensitivity, stroke, params);
         }
         else if (RESOURCE_HANDLERS.containsKey(type)){
             return ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, w, h, id, zindex, region,
-                                                                                            resourceURL, sensitivity, stroke, im);
+                                                                                            resourceURL, sensitivity, stroke, params);
         }
         else {
             System.err.println("Error: failed to process resource declaration: "+id);
@@ -677,18 +675,19 @@ public class SceneManager {
         *@param imageURL path to bitmap resource (should be absolute)
         *@param stroke border color
         *@param sensitivity should the object be sensitive to mouse events or not.
-        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        *@param params allowed parameters: "im=nearestNeighbor", "im=bilinear", "im=bicubic"
         *@param region parent Region in scene
      */
     public ImageDescription createImageDescription(long x, long y, long w, long h, String id, int zindex, Region region,
-                                                   URL imageURL, boolean sensitivity, Color stroke, Object im){
-        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, im, region);
+                                                   URL imageURL, boolean sensitivity, Color stroke, String params){
+        Object interpolation = (params != null && params.startsWith(_im)) ? parseInterpolation(params.substring(3)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, interpolation, region);
         imd.setSensitive(sensitivity);
         region.addObject(imd);
         return imd;
     }
     
-    private Object parseInterpolation(String im){
+    protected static Object parseInterpolation(String im){
         if (im.equals(_bilinear)){
             return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
         }

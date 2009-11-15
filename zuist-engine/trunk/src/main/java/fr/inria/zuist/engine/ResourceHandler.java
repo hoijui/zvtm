@@ -18,6 +18,6 @@ import java.net.URL;
 public interface ResourceHandler {
     
     public ResourceDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region, 
-                                                         URL resourceURL, boolean sensitivity, Color stroke, Object im);
+                                                         URL resourceURL, boolean sensitivity, Color stroke, String params);
                                                          
 }
