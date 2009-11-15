@@ -17,7 +17,8 @@ import java.net.URL;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.ZPDFPage;
+import fr.inria.zvtm.glyphs.ZPDFPageImg;
+import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -27,16 +28,14 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
  */
 
 public class PDFPageDescription extends ResourceDescription {
-
-	/** Resource of type PDF document. */
-    public static final String RESOURCE_TYPE_PDF = "pdf";
 	
     /* necessary info about an image for instantiation */
     long vw, vh;
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    ZPDFPage glyph;
+    ZPDFPageImg glyph;
+    int page = 1;
 
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
@@ -45,17 +44,20 @@ public class PDFPageDescription extends ResourceDescription {
         *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
-        *@param p path to bitmap resource (any valid URI)
+        *@param p path to resource (any valid URL)
+        *@param pg page number (from 1 to N)
         *@param sc border color
         *@param pr parent Region in scene
         */
-    PDFPageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){
+    PDFPageDescription(String id, long x, long y, int z, long w, long h, URL p, int pg, Color sc, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
         this.vw = w;
         this.vh = h;
+		this.setURL(p);
+		this.page = pg;
         this.strokeColor = sc;
         this.parentRegion = pr;
     }
@@ -67,12 +69,13 @@ public class PDFPageDescription extends ResourceDescription {
         *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
-        *@param p path to bitmap resource (any valid URI)
+        *@param p path to resource (any valid URL)
+        *@param pg page number (from 1 to N)
         *@param sc border color
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    PDFPageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Object im, Region pr){
+    PDFPageDescription(String id, long x, long y, int z, long w, long h, URL p, int pg, Color sc, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -80,6 +83,7 @@ public class PDFPageDescription extends ResourceDescription {
         this.vw = w;
         this.vh = h;
 		this.setURL(p);
+		this.page = pg;
         this.strokeColor = sc;
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
@@ -89,21 +93,46 @@ public class PDFPageDescription extends ResourceDescription {
 	 *@return type of resource.
 	 */
 	public String getType(){
-	    return RESOURCE_TYPE_PDF;
+	    return PDFResourceHandler.RESOURCE_TYPE_PDF;
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
-    	//Preloader
-        if (glyph == null){
-
+    public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
+        glyph = new ZPDFPageImg(vx, vy, zindex, PDFResourceHandler.getPage(src, page), 1.0f, 1.0f);
+        if (strokeColor != null){
+            glyph.setBorderColor(strokeColor);
+            glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         }
+        if (!sensitive){glyph.setSensitivity(false);}
+        glyph.setInterpolationMethod(interpolationMethod);
+        if (fadeIn){
+            glyph.setTranslucencyValue(0f);
+            vs.addGlyph(glyph);
+            // smoothly fade glyph in
+            Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
+                1.0f, false, IdentityInterpolator.getInstance(), null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+        }
+        else {
+            vs.addGlyph(glyph);
+        }
+        glyph.setOwner(this);
         loadRequest = null;
     }
-
+    
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
+            if (fadeOut){
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                    0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+            }
+            else {
+                vs.removeGlyph(glyph);
+                glyph.flush();
+            }
+            glyph = null;
         }
         unloadRequest = null;
     }
@@ -112,4 +141,35 @@ public class PDFPageDescription extends ResourceDescription {
 	    return glyph;
     }
     
+}
+
+class PDFPageHideAction implements EndAction {
+    
+    VirtualSpace vs;
+    
+    PDFPageHideAction(VirtualSpace vs){
+	    this.vs = vs;
+    }
+    
+    public void execute(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+            ((ZPDFPageImg)subject).flush();
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying PDF page " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
+            recoverFailingAnimationEnded(subject, dimension);
+        }
+    }
+
+    public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
+        try {
+            vs.removeGlyph((Glyph)subject);
+            ((ZPDFPageImg)subject).flush();
+        }
+        catch(ArrayIndexOutOfBoundsException ex){
+            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");
+        }	
+    }
+
 }

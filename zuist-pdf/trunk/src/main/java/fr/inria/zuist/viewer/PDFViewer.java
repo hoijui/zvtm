@@ -51,6 +51,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.Translucent;
@@ -116,7 +117,7 @@ public class PDFViewer {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setResourceHandler("pdf", new PDFResourceHandler());
+        sm.setResourceHandler(PDFResourceHandler.RESOURCE_TYPE_PDF, new PDFResourceHandler());
         sm.setSceneCameraBounds(mCamera, eh.wnes);
 		if (pdfFile != null){
 			loadPDF(pdfFile);
@@ -146,6 +147,7 @@ public class PDFViewer {
         mView.setEventHandler(eh, 0);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
+        //mView.setJava2DPainter(eh, Java2DPainter.FOREGROUND);
 		mView.getPanel().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
@@ -169,7 +171,8 @@ public class PDFViewer {
 
 	/*-------------  Scene management    -------------*/
 	
-	static final short[] TRANSITIONS = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
+	//static final short[] TRANSITIONS = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
+	static final short[] TRANSITIONS = {Region.FADE_IN, Region.FADE_IN, Region.FADE_OUT, Region.FADE_OUT};
 	
 	void loadPDF(File pdfFile){
 		try {
@@ -190,12 +193,12 @@ public class PDFViewer {
     		    int depth = pf.getNumPages() - i - 1;
     		    alts[i+1] = Camera.DEFAULT_FOCAL * (float)Math.pow(2, i+1) - Camera.DEFAULT_FOCAL;
                 sm.createLevel(depth, alts[i+1], alts[i]);
-                Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*(i+1)), Math.round(bbox.getHeight()*(i+1)), depth, depth,
+                Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i+1)), Math.round(bbox.getHeight()*Math.pow(2, i+1)), depth, depth,
                                 "R"+String.valueOf(depth), "Page "+String.valueOf(depth+1),
                                 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
-                sm.createTextDescription(0, 0, "P"+String.valueOf(depth), 0, r, (float)Math.pow(2,i+1), "Page "+String.valueOf(depth+1),
-                                         VText.TEXT_ANCHOR_START, Color.BLACK,
-                                         "Arial", Font.PLAIN, 24, false);
+                sm.createResourceDescription(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i+1)), Math.round(bbox.getHeight()*Math.pow(2, i+1)),
+                                             "P"+String.valueOf(depth), 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
+                                             false, null, "im=bilinear;pg="+(depth+1));
                 if (prevRegion != null){
                     prevRegion.setContainingRegion(r);
                     r.addContainedRegion(prevRegion);
@@ -204,8 +207,11 @@ public class PDFViewer {
     		}
     		// last level
     		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumPages()-1]);
-    		Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*(pf.getNumPages())), Math.round(bbox.getHeight()*(pf.getNumPages())), 0, 0,
+    		Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumPages())), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumPages())), 0, 0,
                                        "R0", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
+            sm.createResourceDescription(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumPages())), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumPages())),
+                                         "P1", 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
+                                         false, null, "im=bilinear;pg=1");
             if (prevRegion != null){
                 r.addContainedRegion(prevRegion);
                 prevRegion.setContainingRegion(r);
@@ -405,7 +411,7 @@ class ConfigManager {
 
 }
 
-class PDFViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener {
+class PDFViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener/*, Java2DPainter*/ {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -435,7 +441,7 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.0f);				
 		}
     }
 
@@ -523,5 +529,10 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
             application.sm.updateVisibleRegions();
         }
     }
+
+    //public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+    //    g2d.setColor(Color.BLACK);
+    //    g2d.drawString(String.valueOf(application.mCamera.getAltitude()), 10, 100);
+    //}
 
 }

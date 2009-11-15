@@ -8,6 +8,7 @@
 package fr.inria.zuist.engine;
 
 import java.awt.Color;
+import java.awt.RenderingHints;
 
 import java.util.HashMap;
 
@@ -26,8 +27,12 @@ import com.sun.pdfview.PDFPage;
 
 public class PDFResourceHandler implements ResourceHandler {
     
-    /* PDFFile cache management */
+	/** Resource of type PDF document. */
+    public static final String RESOURCE_TYPE_PDF = "pdf";
+    /** Custom parameter names for this type of resource */
+    public static final String _pg = "pg=";
     
+    /* PDFFile cache management */
     static HashMap URL_2_PDF_FILE = new HashMap();
     
     public static void emptyCache(){
@@ -86,8 +91,24 @@ public class PDFResourceHandler implements ResourceHandler {
     public PDFResourceHandler(){}
         
     public PDFPageDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region, 
-                                                        String imagePath, boolean sensitivity, Color stroke, Object im){
-        PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, w, h, imagePath, stroke, im, region);
+                                                        URL resourceURL, boolean sensitivity, Color stroke, String params){
+        Object im = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+        int page = 1;
+        if (params != null){
+            String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
+            for (int i=0;i<paramTokens.length;i++) {
+                if (paramTokens[i].startsWith(PDFResourceHandler._pg)){
+                    page = Integer.parseInt(paramTokens[i].substring(3));
+                }
+                else if (paramTokens[i].startsWith(SceneManager._im)){
+                    im = SceneManager.parseInterpolation(params.substring(3));
+                }
+                else {
+                    System.err.println("Uknown type of resource parameter: "+paramTokens[i]);
+                }
+            }            
+        }
+        PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, w, h, resourceURL, page, stroke, im, region);
         pdfd.setSensitive(sensitivity);
         region.addObject(pdfd);
         return pdfd;
