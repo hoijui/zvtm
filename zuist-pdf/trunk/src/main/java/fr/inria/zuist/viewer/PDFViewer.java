@@ -434,11 +434,8 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
-		if (gum != null){
-		    System.out.println(((Region)((Glyph)gum.lastElement()).getOwner()).getID());
-		    System.out.println(((Region)((Glyph)gum.lastElement()).getOwner()).hashCode());
-    		application.mView.centerOnGlyph((Glyph)gum.lastElement(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+		if (v.lastGlyphEntered() != null){
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 		}
     }
 
@@ -474,9 +471,7 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
 		}
 	}
 
-	public void enterGlyph(Glyph g){
-	    System.out.println(g.getOwner());
-	}
+	public void enterGlyph(Glyph g){}
 
 	public void exitGlyph(Glyph g){}
 
