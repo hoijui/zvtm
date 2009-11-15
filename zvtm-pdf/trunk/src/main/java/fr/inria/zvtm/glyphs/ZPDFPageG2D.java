@@ -63,11 +63,15 @@ public class ZPDFPageG2D extends ZPDFPage {
 	}
 	
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	    //if (renderer == null){
+	    if (alphaC != null){
+            // translucent
+            g.setComposite(alphaC);
+        }
+	    if (renderer == null){
 	        renderer = new PDFRenderer(page, g, imageBounds, null, Color.RED);
 	        try {page.waitForFinish();}
 	        catch(InterruptedException ex){ex.printStackTrace();}
-	    //}
+	    }
         if ((pc[i].cw>1) && (pc[i].ch>1)){
             // translate
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch);
@@ -84,9 +88,15 @@ public class ZPDFPageG2D extends ZPDFPage {
 			g.setColor(this.borderColor);
 			g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
 		}
+		if (alphaC != null){
+            // translucent - restore
+            g.setComposite(acO);
+        }
 	}
 
-	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){/*TBW*/}
+	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	    /*TBW*/
+	}
 
 	public Object clone(){
 		return null;
