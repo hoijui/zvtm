@@ -29,8 +29,6 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
  */
 
 public abstract class ResourceDescription extends ObjectDescription {
-
-	static final String URL_PROTOCOL_SEQ = ":/";
 	
 	/** URL identifying this resource. */
 	URL src;
@@ -56,26 +54,26 @@ public abstract class ResourceDescription extends ObjectDescription {
 		this.src = url;
 	}
 	
-	/** Set URL of this resource. */
-	public void setURL(String path){
-		if (path.indexOf(URL_PROTOCOL_SEQ) != -1){
-			//patch fixed
-			//XXX:make sure we support file:/, http:/, https:/, ftp:/
-			path = "http"+path.substring(path.indexOf(URL_PROTOCOL_SEQ));
-			try {
-				this.src  = new URL(path);
-			}
-			catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}
-		}
-		else {
-			// probably a relative file URL
-			try {
-				this.src  = (new File(path)).toURI().toURL();	
-			}
-			catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}			
-		}
-		
-	}
+	///** Set URL of this resource. */
+	//public void setURL(String path){
+	//	if (path.indexOf(URL_PROTOCOL_SEQ) != -1){
+	//		//patch fixed
+	//		//XXX:make sure we support file:/, http:/, https:/, ftp:/
+	//		path = "http"+path.substring(path.indexOf(URL_PROTOCOL_SEQ));
+	//		try {
+	//			this.src  = new URL(path);
+	//		}
+	//		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}
+	//	}
+	//	else {
+	//		// probably a relative file URL
+	//		try {
+	//			this.src  = (new File(path)).toURI().toURL();	
+	//		}
+	//		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}			
+	//	}
+	//	
+	//}
 
 	/** Get the URI of this resource. */
 	public URL getURL(){

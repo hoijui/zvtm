@@ -51,17 +51,18 @@ public class ImageDescription extends ResourceDescription {
         *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
-        *@param p path to bitmap resource (any valid URI)
+        *@param p path to bitmap resource (any valid absolute URL)
         *@param sc border color
         *@param pr parent Region in scene
         */
-    ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Region pr){
+    ImageDescription(String id, long x, long y, int z, long w, long h, URL p, Color sc, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
         this.vw = w;
         this.vh = h;
+		this.setURL(p);
         this.strokeColor = sc;
         this.parentRegion = pr;
     }
@@ -73,12 +74,12 @@ public class ImageDescription extends ResourceDescription {
         *@param z z-index (layer). Feed 0 if you don't know.
         *@param w width in scene
         *@param h height in scene
-        *@param p path to bitmap resource (any valid URI)
+        *@param p path to bitmap resource (any valid absolute URL)
         *@param sc border color
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    ImageDescription(String id, long x, long y, int z, long w, long h, String p, Color sc, Object im, Region pr){
+    ImageDescription(String id, long x, long y, int z, long w, long h, URL p, Color sc, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;

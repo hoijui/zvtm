@@ -14,6 +14,8 @@ import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.HashMap;
@@ -108,6 +110,10 @@ public class SceneManager {
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
+    
+    
+    static final String URL_PROTOCOL_SEQ = ":/";
+    static final String FILE_PROTOCOL_HEAD = "file://";
 
     GlyphLoader glyphLoader;
 
@@ -598,7 +604,7 @@ public class SceneManager {
         String src = resourceEL.getAttribute(_src);
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
-		String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
+		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
 		Object interpolation = (resourceEL.hasAttribute(_interpolation)) ? parseInterpolation(resourceEL.getAttribute(_interpolation)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         if (type.equals(_image)){
     		ImageDescription od = createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
@@ -608,9 +614,57 @@ public class SceneManager {
             ResourceDescription od = ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, interpolation);
         }
         else {
-            System.err.println("Error: failed to process resource declatation: "+id);
+            System.err.println("Error: failed to process resource declaration: "+id);
         }
         return null;
+    }
+
+    public static URL getAbsoluteURL(String src, File sceneFileDir){
+        if (src.indexOf(URL_PROTOCOL_SEQ) != -1){
+    		try {
+    			return new URL(src);
+    		}
+    		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+src);}
+		}
+    	else {
+    		// probably a local file URL
+    		try {
+    			return new URL(FILE_PROTOCOL_HEAD +
+    			               (((new File(src)).isAbsolute()) ? src
+    			                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
+    		}
+    		catch(MalformedURLException ex){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}			
+    	}
+    	return null;
+    }
+    
+    /** Creates a resource and adds it to a region.
+        *@param id ID of object in scene
+        *@param x x-coordinate in scene
+        *@param y y-coordinate in scene
+        *@param zindex z-index (layer)
+        *@param w width in scene
+        *@param h height in scene
+        *@param resourceURL path to resource (should be absolute)
+        *@param type resource type ("img", "pdf", ...)
+        *@param sensitivity should the object be sensitive to mouse events or not.
+        *@param stroke border color
+        *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+        *@param region parent Region in scene
+     */
+    public ResourceDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region,
+                                                         URL resourceURL, String type, boolean sensitivity, Color stroke, Object im){
+        if (type.equals(_image)){
+            return createImageDescription(x, y, w, h, id, zindex, region, resourceURL, sensitivity, stroke, im);
+        }
+        else if (RESOURCE_HANDLERS.containsKey(type)){
+            return ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, w, h, id, zindex, region,
+                                                                                            resourceURL, sensitivity, stroke, im);
+        }
+        else {
+            System.err.println("Error: failed to process resource declaration: "+id);
+            return null;
+        }
     }
 
     /** Creates an image and adds it to a region.
@@ -620,14 +674,15 @@ public class SceneManager {
         *@param zindex z-index (layer)
         *@param w width in scene
         *@param h height in scene
-        *@param imagePath path to bitmap resource
+        *@param imageURL path to bitmap resource (should be absolute)
         *@param stroke border color
+        *@param sensitivity should the object be sensitive to mouse events or not.
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param region parent Region in scene
      */
     public ImageDescription createImageDescription(long x, long y, long w, long h, String id, int zindex, Region region,
-                                                   String imagePath, boolean sensitivity, Color stroke, Object im){
-        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imagePath, stroke, im, region);
+                                                   URL imageURL, boolean sensitivity, Color stroke, Object im){
+        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, im, region);
         imd.setSensitive(sensitivity);
         region.addObject(imd);
         return imd;

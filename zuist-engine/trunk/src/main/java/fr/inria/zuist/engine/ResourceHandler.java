@@ -9,6 +9,8 @@ package fr.inria.zuist.engine;
 
 import java.awt.Color;
 
+import java.net.URL;
+
 /** Interface implemented by handlers of the various resource types.
  *@author Emmanuel Pietriga
  */
@@ -16,6 +18,6 @@ import java.awt.Color;
 public interface ResourceHandler {
     
     public ResourceDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region, 
-                                                         String imagePath, boolean sensitivity, Color stroke, Object im);
-    
+                                                         URL resourceURL, boolean sensitivity, Color stroke, Object im);
+                                                         
 }
