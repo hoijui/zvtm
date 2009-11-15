@@ -30,6 +30,8 @@ ZUIST DTD, for v0.3.0 and above.
 <!ENTITY % takesToObject "tto IDREF #IMPLIED">
 <!ENTITY % takesToRegion "ttr IDREF #IMPLIED">
 
+<!ENTITY % params "params CDATA #IMPLIED">
+
 <!ELEMENT region (text|rect|polygon|resource)*>
 <!ATTLIST region levels CDATA #REQUIRED
                  %ID;
@@ -102,7 +104,8 @@ ZUIST DTD, for v0.3.0 and above.
 				   interpolation (nearestNeighbor|bilinear|bicubic) #IMPLIED
 	               %takesToObject;
 	               %takesToRegion;
-                   %sensitive; "true">
+                   %sensitive; "true"
+                   %params;>
 
 <!ELEMENT include EMPTY>
 <!ATTLIST include %x;
