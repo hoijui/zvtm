@@ -238,4 +238,11 @@ public class ZPDFPageImg extends ZPDFPage {
 		return null;
 	}
 
+	public void flush(){
+	    if (pageImage != null){
+	        pageImage.flush();
+	        pageImage = null;
+	    }
+	}
+
 }

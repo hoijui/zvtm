@@ -235,5 +235,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 			pc[i].lch = (int)vh;
 		}
 	}
+	
+	public abstract void flush();
 
 }

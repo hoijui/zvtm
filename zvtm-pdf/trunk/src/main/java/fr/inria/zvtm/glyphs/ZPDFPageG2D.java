@@ -91,5 +91,12 @@ public class ZPDFPageG2D extends ZPDFPage {
 	public Object clone(){
 		return null;
 	}
-
+	
+	public void flush(){
+	    if (renderer != null){
+	        renderer.stop();
+	        renderer = null;
+	    }
+	}
+	
 }
