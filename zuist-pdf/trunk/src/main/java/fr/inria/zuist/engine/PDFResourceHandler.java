@@ -30,7 +30,10 @@ public class PDFResourceHandler implements ResourceHandler {
 	/** Resource of type PDF document. */
     public static final String RESOURCE_TYPE_PDF = "pdf";
     /** Custom parameter names for this type of resource */
+    /** Page number */
     public static final String _pg = "pg=";
+    /** Scale factor */
+    public static final String _sc = "sc=";
     
     /* PDFFile cache management */
     static HashMap URL_2_PDF_FILE = new HashMap();
@@ -90,15 +93,19 @@ public class PDFResourceHandler implements ResourceHandler {
 
     public PDFResourceHandler(){}
         
-    public PDFPageDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region, 
+    public PDFPageDescription createResourceDescription(long x, long y, String id, int zindex, Region region, 
                                                         URL resourceURL, boolean sensitivity, Color stroke, String params){
         Object im = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         int page = 1;
+        double scale = 1.0;
         if (params != null){
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
                 if (paramTokens[i].startsWith(PDFResourceHandler._pg)){
                     page = Integer.parseInt(paramTokens[i].substring(3));
+                }
+                else if (paramTokens[i].startsWith(PDFResourceHandler._sc)){
+                    scale = Double.parseDouble(paramTokens[i].substring(3));
                 }
                 else if (paramTokens[i].startsWith(SceneManager._im)){
                     im = SceneManager.parseInterpolation(params.substring(3));
@@ -108,7 +115,7 @@ public class PDFResourceHandler implements ResourceHandler {
                 }
             }            
         }
-        PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, w, h, resourceURL, page, stroke, im, region);
+        PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, scale, resourceURL, page, stroke, im, region);
         pdfd.setSensitive(sensitivity);
         region.addObject(pdfd);
         return pdfd;

@@ -30,7 +30,7 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 public class PDFPageDescription extends ResourceDescription {
 	
     /* necessary info about an image for instantiation */
-    long vw, vh;
+    double scale = 1.0;
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
@@ -41,21 +41,19 @@ public class PDFPageDescription extends ResourceDescription {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
+        *@param sf scale factor
         *@param z z-index (layer). Feed 0 if you don't know.
-        *@param w width in scene
-        *@param h height in scene
         *@param p path to resource (any valid URL)
         *@param pg page number (from 1 to N)
         *@param sc border color
         *@param pr parent Region in scene
         */
-    PDFPageDescription(String id, long x, long y, int z, long w, long h, URL p, int pg, Color sc, Region pr){
+    PDFPageDescription(String id, long x, long y, int z, double sf, URL p, int pg, Color sc, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
-        this.vw = w;
-        this.vh = h;
+        this.scale = sf;
 		this.setURL(p);
 		this.page = pg;
         this.strokeColor = sc;
@@ -66,22 +64,20 @@ public class PDFPageDescription extends ResourceDescription {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
+        *@param sf scale factor
         *@param z z-index (layer). Feed 0 if you don't know.
-        *@param w width in scene
-        *@param h height in scene
         *@param p path to resource (any valid URL)
         *@param pg page number (from 1 to N)
         *@param sc border color
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    PDFPageDescription(String id, long x, long y, int z, long w, long h, URL p, int pg, Color sc, Object im, Region pr){
+    PDFPageDescription(String id, long x, long y, int z, double sf, URL p, int pg, Color sc, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
-        this.vw = w;
-        this.vh = h;
+        this.scale = sf;
 		this.setURL(p);
 		this.page = pg;
         this.strokeColor = sc;
@@ -98,7 +94,7 @@ public class PDFPageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
-        glyph = new ZPDFPageImg(vx, vy, zindex, PDFResourceHandler.getPage(src, page), 1.0f, 1.0f);
+        glyph = new ZPDFPageImg(vx, vy, zindex, PDFResourceHandler.getPage(src, page), 1.0f, scale);
         if (strokeColor != null){
             glyph.setBorderColor(strokeColor);
             glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
