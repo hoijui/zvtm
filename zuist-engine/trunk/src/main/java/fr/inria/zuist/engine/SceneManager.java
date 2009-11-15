@@ -613,7 +613,7 @@ public class SceneManager {
     		return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
         }
         else {
-            return createResourceDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, type, sensitivity, stroke, params);
+            return createResourceDescription(x+origin.x, y+origin.y, id, zindex, region, absoluteSrc, type, sensitivity, stroke, params);
         }
     }
 
@@ -641,8 +641,6 @@ public class SceneManager {
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
         *@param zindex z-index (layer)
-        *@param w width in scene
-        *@param h height in scene
         *@param resourceURL path to resource (should be absolute)
         *@param type resource type ("img", "pdf", ...)
         *@param sensitivity should the object be sensitive to mouse events or not.
@@ -650,13 +648,10 @@ public class SceneManager {
         *@param region parent Region in scene
         *@param params custom parameters for a given type of resource
      */
-    public ResourceDescription createResourceDescription(long x, long y, long w, long h, String id, int zindex, Region region,
+    public ResourceDescription createResourceDescription(long x, long y, String id, int zindex, Region region,
                                                          URL resourceURL, String type, boolean sensitivity, Color stroke, String params){
-        if (type.equals(_image)){
-            return createImageDescription(x, y, w, h, id, zindex, region, resourceURL, sensitivity, stroke, params);
-        }
-        else if (RESOURCE_HANDLERS.containsKey(type)){
-            return ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, w, h, id, zindex, region,
+        if (RESOURCE_HANDLERS.containsKey(type)){
+            return ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
                                                                                             resourceURL, sensitivity, stroke, params);
         }
         else {
