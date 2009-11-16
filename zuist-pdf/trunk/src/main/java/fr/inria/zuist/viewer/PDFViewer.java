@@ -121,9 +121,9 @@ public class PDFViewer {
         sm.setSceneCameraBounds(mCamera, eh.wnes);
 		if (pdfFile != null){
 			loadPDF(pdfFile);
-			//getGlobalView();
 		}
         mCamera.addListener(eh);
+		getGlobalView();        
     }
 
     void initGUI(boolean fullscreen, boolean opengl){
