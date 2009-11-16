@@ -3,9 +3,21 @@
 \section{Displaying PDF documents}
 \label{sec:pdf}
 
-PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. This module has depends on Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}; pdf-renderer is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
+PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. This module depends on Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}; pdf-renderer is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
 
-There are two rendering techniques for a PDF page. Either it is rendered once in an offscreen \cd{BufferedImage} that then gets painted to the screen; or it is rendered each time ZVTM paints the glyph, directly in the corresponding Graphics2D.
+Dependency on \cd{zvtm-pdf} si declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-pdf</artifactId>
+  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\vspace{1em}
+There are two rendering techniques for displaying a PDF page. Either it is rendered once in an offscreen \cd{BufferedImage} that then gets painted to the screen; or it is rendered each time ZVTM paints the glyph, directly in the corresponding Graphics2D.
 
 \subsection{Offscreen Rendering}
 
@@ -14,4 +26,61 @@ This is the preferred method. Rendering of the PDF page only happens once in the
 \subsection{Direct rendering to ZVTM's Graphics2D}
 
 This method is experimental. Rendering of the PDF page happens each time the glyph is rendered on screen. Instantiate the PDF page as a \cd{ZPDFPageG2D} glyph.
+
+\subsection{Example}
+
+The following code sample puts all pages of PDF document \cd{pdfF} in a virtual space. They are laid out horizontally with a small gap between them.
+
+\begin{SaveVerbatim}{CodeVerb}
+VirtualSpace vs = ...;
+RandomAccessFile raf = new RandomAccessFile(pdfF, "r");
+FileChannel channel = raf.getChannel();
+ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+PDFFile pdfFile = new PDFFile(buf);
+int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
+for (int i=0;i<pdfFile.getNumPages();i++){
+    vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f),
+                                i*Math.round(page_width*1.1f),
+                                0, pdfFile.getPage(i+1), 1, 1));
+}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\subsection{PDF pages in ZUIST}
+
+
+
+\subsection{PDF pages in ZUIST}
+
+PDF pages in the form of ZPDFPage instances can be instantiated in a ZUIST scene. For this it is necessary to use an additional module: \cd{zuist-pdf}.
+
+Dependency on \cd{zuist-pdf} si declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zuist-pdf</artifactId>
+  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\vspace{1em}
+
+Similar to bitmap images, PDF pages are handled as ZUIST \cd{resources}. They can be created directly via the API with \cd{createResourceDescription(...)} or declared as \cd{<resource>} XML elements.
+
+The following custom resource parameters are available:\\
+\begin{tabular}{|l|l|l|}
+\hline
+\bf{Parameter Name} & \bf{Description} & \bf{Allowed Values} \\
+\hline
+\cd{pg} & page number & $[1-N]$ (where $N$ is the total number of pages\\
+ &  & in the document)\\
+\cd{sc} & scale in scene (multiplication factor) & $]0;+\infty[$ \\
+\cd{im} & interpolation method & \cd{nearestNeighbor, bilinear, bicubic}\\
+\hline
+\end{tabular}
+
+
+
 
