@@ -147,7 +147,6 @@ public class PDFViewer {
         mView.setEventHandler(eh, 0);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
-        //mView.setJava2DPainter(eh, Java2DPainter.FOREGROUND);
 		mView.getPanel().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
@@ -409,7 +408,7 @@ class ConfigManager {
 
 }
 
-class PDFViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener/*, Java2DPainter*/ {
+class PDFViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -527,10 +526,5 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
             application.sm.updateVisibleRegions();
         }
     }
-
-    //public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-    //    g2d.setColor(Color.BLACK);
-    //    g2d.drawString(String.valueOf(application.mCamera.getAltitude()), 10, 100);
-    //}
 
 }
