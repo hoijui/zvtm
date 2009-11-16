@@ -84,8 +84,8 @@ public class ZPDFPageImg extends ZPDFPage {
 			null,   // null for the ImageObserver
 			true,   // fill background with white
 			true);  // block until drawing is done
-		vw = Math.round(detailFactor*rect.width/2.0);
-		vh = Math.round(detailFactor*rect.height/2.0);
+		vw = Math.round(detailFactor*rect.width*scale/2.0);
+		vh = Math.round(detailFactor*rect.height*scale/2.0);
 		if (vw==0 && vh==0){ar = 1.0f;}
 		else {ar = (float)vw/(float)vh;}
 		computeSize();
@@ -113,8 +113,8 @@ public class ZPDFPageImg extends ZPDFPage {
 			null,   // null for the ImageObserver
 			true,   // fill background with white
 			true);  // block until drawing is done
-		vw = Math.round(rect.width/2.0);
-		vh = Math.round(rect.height/2.0);
+		vw = Math.round(rect.width*scale/2.0);
+		vh = Math.round(rect.height*scale/2.0);
 		if (vw==0 && vh==0){ar = 1.0f;}
 		else {ar = (float)vw/(float)vh;}
 		computeSize();
