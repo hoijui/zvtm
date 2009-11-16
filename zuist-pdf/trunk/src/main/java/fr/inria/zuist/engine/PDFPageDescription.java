@@ -99,6 +99,9 @@ public class PDFPageDescription extends ResourceDescription {
             glyph.setBorderColor(strokeColor);
             glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         }
+        else {
+            glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);            
+        }
         if (!sensitive){glyph.setSensitivity(false);}
         glyph.setInterpolationMethod(interpolationMethod);
         if (fadeIn){
