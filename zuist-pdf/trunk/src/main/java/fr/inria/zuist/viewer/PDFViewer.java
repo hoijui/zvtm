@@ -193,11 +193,11 @@ public class PDFViewer {
     		    int depth = pf.getNumPages() - i - 1;
     		    alts[i+1] = Camera.DEFAULT_FOCAL * (float)Math.pow(2, i+1) - Camera.DEFAULT_FOCAL;
                 sm.createLevel(depth, alts[i+1], alts[i]);
-                Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i+1)), Math.round(bbox.getHeight()*Math.pow(2, i+1)), depth, depth,
+                Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i)), Math.round(bbox.getHeight()*Math.pow(2, i)), depth, depth,
                                 "R"+String.valueOf(depth), "Page "+String.valueOf(depth+1),
-                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
+                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
                 sm.createResourceDescription(0, 0, "P"+String.valueOf(depth), 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
-                                             false, null, "im=bilinear;pg="+(depth+1)+";sc="+Math.pow(2, i+1));
+                                             false, Color.BLACK, "im=bilinear;pg="+(depth+1)+";sc="+Math.pow(2, i));
                 if (prevRegion != null){
                     prevRegion.setContainingRegion(r);
                     r.addContainedRegion(prevRegion);
@@ -206,10 +206,10 @@ public class PDFViewer {
     		}
     		// last level
     		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumPages()-1]);
-    		Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumPages())), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumPages())), 0, 0,
-                                       "R0", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.BLACK);
+		    Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumPages()-1)), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumPages()-1)), 0, 0,
+                                       "R0", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
             sm.createResourceDescription(0, 0, "P1", 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
-                                         false, null, "im=bilinear;pg=1;sc="+Math.pow(2, pf.getNumPages()));
+                                         false, Color.BLACK, "im=bilinear;pg=1;sc="+Math.pow(2, pf.getNumPages()-1));
             if (prevRegion != null){
                 r.addContainedRegion(prevRegion);
                 prevRegion.setContainingRegion(r);
