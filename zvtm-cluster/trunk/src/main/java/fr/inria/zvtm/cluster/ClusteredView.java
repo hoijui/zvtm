@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class ClusteredView implements Identifiable {
@@ -118,19 +119,47 @@ public class ClusteredView implements Identifiable {
 	/**
 	 * @throw IllegalArgumentException If cam does not belong to this
 	 *                                 ClusteredView
+	 * @param xPos point x-coordinate, in VirtualSpace coords
+	 * @param yPos point y-coordinate, in VirtualSpace coords
+	 * @return the coordinates of a point at (xPos, yPos), in view
+	 *         coordinates (ie (0,0) top-left, x increases to the
+	 *         right, y increases downwards)
 	 */
 	public Point spaceToViewCoords(Camera cam, long xPos, long yPos){  
 		if(!this.owns(cam)){
 			throw new IllegalArgumentException("this view does not own Camera 'cam'");
 		} 
 
-		Location camLoc   = cam.getLocation();
+		Location camLoc = cam.getLocation();
 
 		float focal = cam.getFocal();
 		float altCoef = (focal + camLoc.alt) / focal;
 		Dimension viewSize = getSize();
 
 		return new Point(viewSize.width/2+Math.round((xPos-camLoc.vx)/altCoef), viewSize.height/2-Math.round((yPos-camLoc.vy)/altCoef));
+	}
+
+	/**
+	 * @throw IllegalArgumentException If cam does not belong to this
+	 *                                 ClusteredView
+	 */
+	public LongPoint viewToSpaceCoords(Camera cam, int xPos, int yPos){
+		if(!this.owns(cam)){
+			throw new IllegalArgumentException("this view does not own Camera 'cam'");
+		}
+
+		Location camLoc = cam.getLocation();
+		float focal = cam.getFocal();
+		float altCoef = (focal + camLoc.alt) / focal;
+		Dimension viewSize = getSize();
+
+		//find coords of view origin in the virtual space
+		long viewOrigX = camLoc.vx - (long)(0.5*viewSize.width*altCoef);
+		long viewOrigY = camLoc.vy + (long)(0.5*viewSize.height*altCoef);
+
+		return new LongPoint(
+				viewOrigX + (long)(altCoef*xPos),
+				viewOrigY - (long)(altCoef*yPos));
 	}
 
 	/**
@@ -185,6 +214,13 @@ public class ClusteredView implements Identifiable {
 		return blockNum % nbRows;
 	}
 
+	/**
+	 * @param x1 first point x-coordinate, in VirtualSpace coords
+	 * @param y1 first point y-coordinate, in VirtualSpace coords	 
+	 * @param x2 second point x-coordinate, in VirtualSpace coords
+	 * @param y2 second point y-coordinate, in VirtualSpace coords
+
+	 */
     public Location centerOnRegion(Camera cam, long x1, long y1, long x2, long y2){
        if(!this.owns(cam)){
            throw new IllegalArgumentException("this view does not own Camera 'cam'");
