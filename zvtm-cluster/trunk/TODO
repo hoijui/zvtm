@@ -1,0 +1,13 @@
+List of issues and improvements needed in zvtm-cluster,
+in no particular order (yet)
+
+* Better static safety for ObjId (being adressed now)
+* Slave Objects: option to disallow nulls (throw exception, fail
+assertion... ?)
+* Better role description and interface for SlaveUpdater!!
+* Code organization for aspects
+* Some factoring can be done in the generic AutoReplay proxy
+* Support for background color in ClusteredViews
+* Support for portals (throw away portal branch)
+* VirtualSpace#removeAllGlyphs support
+
