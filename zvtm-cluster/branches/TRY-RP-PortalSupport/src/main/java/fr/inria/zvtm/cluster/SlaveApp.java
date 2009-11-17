@@ -158,7 +158,7 @@ public class SlaveApp {
 		int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin()); //pos.
 
 		int transX = masterX - col*clusteredView.getBlockWidth();
-		int transY = masterY + row*clusteredView.getBlockHeight();	 
+		int transY = masterY + (-(clusteredView.getViewRows()-1) - row)*clusteredView.getBlockHeight();	 
 		portal.moveTo(transX, transY);
 	}
 
