@@ -149,6 +149,7 @@ public class ClusteredView implements Identifiable {
 		assert(cam != null); //not production ready
 		CameraPortal portal = new CameraPortal(xOrig, yOrig,
 				width, height, cam);
+        portal.setBorder(Color.RED);
 		ClusteredView cv = (ClusteredView)(updater.getSlaveObject(viewId));
 		assert(cv != null);
 		updater.setPortalLocation(cv, portal, xOrig, yOrig);
@@ -181,6 +182,35 @@ public class ClusteredView implements Identifiable {
 		}
 	}
 
+    public void movePortalTo(CameraPortal portal, int masterX, int masterY){
+        portal.x = masterX;
+        portal.y = masterY;
+        Delta delta = new PortalMoveDelta(this, portal);
+        VirtualSpaceManager.INSTANCE.sendDelta(delta);
+    }
+
+   private static class PortalMoveDelta implements Delta {
+        private final int masterX;
+        private final int masterY;
+        private final ObjId viewId;
+        private final ObjId portalId;
+        PortalMoveDelta(ClusteredView clusteredView, CameraPortal portal){
+            masterX = portal.x;
+            masterY = portal.y;
+            viewId = clusteredView.getObjId();
+            portalId = portal.getObjId();
+        }
+
+        public void apply(SlaveUpdater su){
+            CameraPortal portal = (CameraPortal)(su.getSlaveObject(portalId));
+            assert(portal != null);
+            ClusteredView view = (ClusteredView)(su.getSlaveObject(viewId));
+            assert(view != null);
+            portal.x = masterX;
+            portal.y = masterY;
+            su.setPortalLocation(view, portal, masterX, masterY);
+        }
+    }
 	/**
 	 * @throw IllegalArgumentException If cam does not belong to this
 	 *                                 ClusteredView
