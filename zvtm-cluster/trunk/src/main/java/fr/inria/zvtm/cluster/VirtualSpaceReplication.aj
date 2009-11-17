@@ -71,16 +71,16 @@ aspect VirtualSpaceReplication {
 	}
 
 	private static class CameraLocationDelta implements Delta{
-		private final ObjId camId;
+		private final ObjId<Camera> camId;
 		private final Location newLoc;
 
-		CameraLocationDelta(ObjId camId, Location newLoc){
+		CameraLocationDelta(ObjId<Camera> camId, Location newLoc){
 			this.camId = camId;
 			this.newLoc = newLoc;
 		}
 
 		public void apply(SlaveUpdater updater){
-			Camera cam = (Camera)(updater.getSlaveObject(camId));
+			Camera cam = updater.getSlaveObject(camId);
 			updater.setCameraLocation(newLoc, cam);
 		}
 
