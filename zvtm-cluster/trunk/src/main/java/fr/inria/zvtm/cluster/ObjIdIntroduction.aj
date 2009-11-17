@@ -17,15 +17,15 @@ import fr.inria.zvtm.glyphs.Glyph;
  */
 aspect ObjIdIntroduction {
 	declare parents: VirtualSpace implements Identifiable;
-	private final ObjId VirtualSpace.id = ObjIdFactory.next();
-	public final ObjId VirtualSpace.getObjId(){ return id; }
+	private final ObjId<VirtualSpace> VirtualSpace.id = ObjIdFactory.next();
+	public final ObjId<VirtualSpace> VirtualSpace.getObjId(){ return id; }
 
     declare parents: Glyph implements Identifiable;
-	private final ObjId Glyph.id = ObjIdFactory.next();
-	public final ObjId Glyph.getObjId(){ return id; }
+	private final ObjId<Glyph> Glyph.id = ObjIdFactory.next();
+	public final ObjId<Glyph> Glyph.getObjId(){ return id; }
 
 	declare parents: Camera implements Identifiable;
-	private final ObjId Camera.id = ObjIdFactory.next();
-	public final ObjId Camera.getObjId(){ return id; }
+	private final ObjId<Camera> Camera.id = ObjIdFactory.next();
+	public final ObjId<Camera> Camera.getObjId(){ return id; }
 	}
 

@@ -67,8 +67,8 @@ public class SlaveUpdater {
 	 * @return the value to which this SlaveUpdater maps the specified key, 
 	 * or null if the SlaveUpdater contains no mapping for this key.
 	 */
-	Object getSlaveObject(ObjId id){
-		return slaveObjects.get(id);
+	<T> T getSlaveObject(ObjId<T> id){
+		return (T)(slaveObjects.get(id));
 	}
 
 	/**

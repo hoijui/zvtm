@@ -51,16 +51,16 @@ aspect VirtualSpaceReplication {
 
 
 	private static class CameraCreateDelta implements Delta{
-		private final ObjId vsId;
-		private final ObjId camId;
+		private final ObjId<VirtualSpace> vsId;
+		private final ObjId<Camera> camId;
 
-		CameraCreateDelta(ObjId vsId, ObjId camId){
+		CameraCreateDelta(ObjId<VirtualSpace> vsId, ObjId<Camera> camId){
 			this.vsId = vsId;
 			this.camId = camId;
 		}
 
 		public void apply(SlaveUpdater updater){
-			VirtualSpace vs = (VirtualSpace)(updater.getSlaveObject(vsId));
+			VirtualSpace vs = updater.getSlaveObject(vsId);
 			Camera cam = vs.addCamera();
 			updater.putSlaveObject(camId, cam);
 		}

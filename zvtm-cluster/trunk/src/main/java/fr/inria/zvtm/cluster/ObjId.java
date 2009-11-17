@@ -20,7 +20,7 @@ import java.io.Serializable;
  * (even though they are not in the Java sense, as they are
  * mirrored on different machines).
  */
-public class ObjId implements Serializable {
+public class ObjId<T> implements Serializable {
 	public static final ObjId INVALID_ID = new ObjId(-1);
 
 	private final long id;
