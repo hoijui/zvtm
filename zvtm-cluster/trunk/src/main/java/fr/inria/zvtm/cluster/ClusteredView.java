@@ -140,8 +140,12 @@ public class ClusteredView implements Identifiable {
 	}
 
 	/**
+	 * Converts the coordinates of a point given in ClusteredView 
+	 * coordinates into VirtualSpace coordinates.
 	 * @throw IllegalArgumentException If cam does not belong to this
 	 *                                 ClusteredView
+	 * @param xPos point x-coodinate, in View coords
+	 * @param yPos point y-coordinate, in View coords
 	 */
 	public LongPoint viewToSpaceCoords(Camera cam, int xPos, int yPos){
 		if(!this.owns(cam)){
