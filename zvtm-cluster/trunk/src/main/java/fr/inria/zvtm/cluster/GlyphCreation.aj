@@ -131,18 +131,17 @@ aspect GlyphCreation {
 	}
 
 	private static class GlyphRemoveDelta implements Delta {
-		private final ObjId glyphId;
-		private final ObjId spaceId;
+		private final ObjId<Glyph> glyphId;
+		private final ObjId<VirtualSpace> spaceId;
 
-		GlyphRemoveDelta(ObjId glyphId, ObjId spaceId){
+		GlyphRemoveDelta(ObjId<Glyph> glyphId, ObjId<VirtualSpace> spaceId){
 			this.glyphId = glyphId;
 			this.spaceId = spaceId;
 		}	
 
 		public void apply(SlaveUpdater su){
-			Glyph glyph = (Glyph)su.getSlaveObject(glyphId);
-			VirtualSpace virtualSpace = 
-				(VirtualSpace)su.getSlaveObject(spaceId);
+			Glyph glyph = su.getSlaveObject(glyphId);
+			VirtualSpace virtualSpace = su.getSlaveObject(spaceId);
 			su.removeSlaveObject(glyphId);
 			virtualSpace.removeGlyph(glyph);
 		}
