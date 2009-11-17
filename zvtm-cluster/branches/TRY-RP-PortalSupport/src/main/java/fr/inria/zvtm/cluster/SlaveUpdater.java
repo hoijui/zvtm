@@ -7,6 +7,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.CameraPortal;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 
@@ -108,6 +109,18 @@ public class SlaveUpdater {
 	void setCameraLocation(Location masterLoc,
 			Camera slaveCamera){
 		appDelegate.setCameraLocation(masterLoc, slaveCamera);
+	}
+
+	void addPortal(ClusteredView clusteredView, CameraPortal portal){
+		appDelegate.addPortal(clusteredView, portal);
+	}
+
+	void setPortalLocation(ClusteredView clusteredView, CameraPortal portal, int origX, int origY){
+		appDelegate.setPortalLocation(clusteredView, portal, origX, origY);
+	}
+
+	void destroyPortal(ClusteredView clusteredView, CameraPortal portal){
+		appDelegate.destroyPortal(clusteredView, portal);
 	}
 
 	class NetworkDelegate {

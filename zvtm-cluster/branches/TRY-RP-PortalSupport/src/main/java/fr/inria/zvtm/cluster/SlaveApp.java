@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.CameraPortal;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -147,6 +148,33 @@ public class SlaveApp {
 		long newY = -yOffset + masterLoc.vy - row*virtBlockHeight;
 
 		slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
+	}
+
+	void setPortalLocation(ClusteredView clusteredView, CameraPortal portal, int masterX, int masterY){
+		if(!clusteredView.ownsBlock(options.blockNumber)){
+			return;
+		}
+		int row = clusteredView.rowNum(options.blockNumber) - clusteredView.rowNum(clusteredView.getOrigin()); //neg. 
+		int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin()); //pos.
+
+		int transX = masterX - col*clusteredView.getBlockWidth();
+		int transY = masterY + row*clusteredView.getBlockHeight();	 
+		portal.moveTo(transX, transY);
+	}
+
+	void addPortal(ClusteredView clusteredView, CameraPortal portal){
+		if(!clusteredView.ownsBlock(options.blockNumber)){
+			return;
+		}
+
+		VirtualSpaceManager.INSTANCE.addPortal(portal, view);
+	}
+
+	void destroyPortal(ClusteredView clusteredView, CameraPortal portal){
+		if(!clusteredView.ownsBlock(options.blockNumber)){
+			return;
+		}
+		VirtualSpaceManager.INSTANCE.destroyPortal(portal);	
 	}
 }
 

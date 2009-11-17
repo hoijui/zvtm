@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.CameraPortal;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -114,6 +115,70 @@ public class ClusteredView implements Identifiable {
      */
 	public Dimension getSize(){
 		return new Dimension(blockWidth*viewCols, blockHeight*viewRows);
+	}
+
+	public void addPortal(CameraPortal portal){
+		Delta delta = new PortalCreateDelta(this.getObjId(), portal);
+		VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	}
+
+	private static class PortalCreateDelta implements Delta {
+		//xOrig and yOrig are the supplied origin relative
+		//to the ClusteredView, need translation relative to 
+		//block views (ZVTM views)
+		private final int xOrig;
+		private final int yOrig;
+		private final int width;
+		private final int height;
+		private final ObjId viewId;
+		private final ObjId camId;
+		private final ObjId portalId;
+
+		PortalCreateDelta(ObjId viewId, CameraPortal portal){
+			this.xOrig = portal.x;
+			this.yOrig = portal.y;
+			this.width = portal.w;
+			this.height = portal.h;
+			this.viewId = viewId;
+			this.camId = portal.getCamera().getObjId();
+			this.portalId = portal.getObjId();
+		}
+
+	public void apply(SlaveUpdater updater){
+		Camera cam = (Camera)(updater.getSlaveObject(camId));
+		assert(cam != null); //not production ready
+		CameraPortal portal = new CameraPortal(xOrig, yOrig,
+				width, height, cam);
+		ClusteredView cv = (ClusteredView)(updater.getSlaveObject(viewId));
+		assert(cv != null);
+		updater.setPortalLocation(cv, portal, xOrig, yOrig);
+		updater.addPortal(cv, portal);
+		updater.putSlaveObject(portalId, portal);
+		}
+	}
+
+	public void destroyPortal(CameraPortal portal){
+		Delta delta = new PortalDestroyDelta(this.getObjId(), portal.getObjId());
+		VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	}
+
+	private static class PortalDestroyDelta implements Delta {
+		private final ObjId viewId;
+		private final ObjId portalId;
+
+		PortalDestroyDelta(ObjId viewId, ObjId portalId){
+			this.viewId = viewId;
+			this.portalId = portalId;
+		}
+
+		public void apply(SlaveUpdater updater){
+			CameraPortal portal = (CameraPortal)(updater.getSlaveObject(portalId));
+			assert(portal != null);
+			ClusteredView cv = (ClusteredView)(updater.getSlaveObject(viewId));
+			assert(cv != null);
+			updater.removeSlaveObject(portalId);
+			updater.destroyPortal(cv, portal);
+		}
 	}
 
 	/**
