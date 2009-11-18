@@ -13,7 +13,9 @@ import java.awt.RenderingHints;
 import java.util.HashMap;
 
 import java.net.URL;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -69,17 +71,24 @@ public class PDFResourceHandler implements ResourceHandler {
         }
     }
     
-    public static PDFPage getPage(URL pdfURL, int page){
+    public static PDFPage getPage(URL pdfURL, int page) {
         synchronized(URL_2_PDF_FILE){
             PDFFile pf = null;
+			int n;
             if (URL_2_PDF_FILE.containsKey(pdfURL)){
                 pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
             }
             else {
-                try {                    
-                    RandomAccessFile raf = new RandomAccessFile(new File(pdfURL.toURI()), "r");
-        			FileChannel channel = raf.getChannel();
-        			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+                try {    
+        			InputStream is = pdfURL.openStream();					
+					byte[] buffer = new byte[4096];
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					while ((n = is.read(buffer)) != -1) {
+						baos.write(buffer, 0, n);
+					}
+					is.close();
+					
+        			ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
         			pf = new PDFFile(buf);
                     URL_2_PDF_FILE.put(pdfURL, pf);
                 }
@@ -103,12 +112,15 @@ public class PDFResourceHandler implements ResourceHandler {
             for (int i=0;i<paramTokens.length;i++) {
                 if (paramTokens[i].startsWith(PDFResourceHandler._pg)){
                     page = Integer.parseInt(paramTokens[i].substring(3));
+					System.out.println(page);
                 }
                 else if (paramTokens[i].startsWith(PDFResourceHandler._sc)){
                     scale = Double.parseDouble(paramTokens[i].substring(3));
+					System.out.println(scale);
                 }
                 else if (paramTokens[i].startsWith(SceneManager._im)){
                     im = SceneManager.parseInterpolation(params.substring(3));
+					System.out.println(im);
                 }
                 else {
                     System.err.println("Uknown type of resource parameter: "+paramTokens[i]);
