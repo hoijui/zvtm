@@ -346,7 +346,8 @@ public class ClusteredView implements Identifiable {
    // public Location centerOnGlyph(Camera cam, Glyph glyph){
    // }
 
-    private boolean owns(Camera cam){
+    //note: views may own *blocks *cameras and *portal
+    boolean owns(Camera cam){ //XXX rename to ownsCamera
         return cameras.contains(cam);
     }
 }
