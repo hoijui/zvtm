@@ -7,6 +7,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.CameraPortal;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
@@ -74,9 +75,23 @@ public aspect AutoReplay {
 
 	after(Camera camera) :
 		cameraAutoReplayMethods(camera) &&
-		!cflowbelow(cameraAutoReplayMethods(Camera)){
-			sendGenericDelta(camera, thisJoinPoint);
-		}
+        !cflowbelow(cameraAutoReplayMethods(Camera)){
+            sendGenericDelta(camera, thisJoinPoint);
+        }
+
+    pointcut genericAutoReplayMethods(Identifiable replayTarget) :
+        this(replayTarget) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        (
+         execution(public void CameraPortal.setBackgroundColor(Color))
+        )
+        ;
+
+    after(Identifiable replayTarget) :
+        genericAutoReplayMethods(replayTarget) &&
+        !cflowbelow(genericAutoReplayMethods(Identifiable)){
+            sendGenericDelta(replayTarget, thisJoinPoint);
+        }
 
 	private static void sendGenericDelta(Identifiable target, 
 			JoinPoint joinPoint){
