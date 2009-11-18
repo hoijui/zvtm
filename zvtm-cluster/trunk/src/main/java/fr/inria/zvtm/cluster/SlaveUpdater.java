@@ -78,8 +78,8 @@ public class SlaveUpdater {
 	 * @return previous value associated with specified key, 
 	 * or null  if there was no mapping for key.
 	 */
-	Object putSlaveObject(ObjId id, Object object){
-		return slaveObjects.put(id, object);
+	<T> T putSlaveObject(ObjId<T> id, T object){
+		return (T)slaveObjects.put(id, object);
 	}
 
 	/**
