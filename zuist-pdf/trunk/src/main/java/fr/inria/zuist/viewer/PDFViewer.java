@@ -99,6 +99,8 @@ public class PDFViewer {
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
     
+    static final String PDF_EXT = ".pdf";
+    
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Scene Space";
@@ -112,15 +114,20 @@ public class PDFViewer {
 
 	VWGlassPane gp;
     
-    public PDFViewer(boolean fullscreen, boolean opengl, File pdfFile){
+    public PDFViewer(boolean fullscreen, boolean opengl, File inputFile){
 		initGUI(fullscreen, opengl);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setResourceHandler(PDFResourceHandler.RESOURCE_TYPE_PDF, new PDFResourceHandler());
         sm.setSceneCameraBounds(mCamera, eh.wnes);
-		if (pdfFile != null){
-			loadPDF(pdfFile);
+		if (inputFile != null){
+		    if (inputFile.getName().endsWith(PDF_EXT)){
+    			loadPDF(inputFile);		        
+		    }
+		    else {
+		        loadScene(inputFile);
+		    }
 		}
         mCamera.addListener(eh);
 		getGlobalView();        
@@ -225,6 +232,22 @@ public class PDFViewer {
         sm.updateLevel(mCamera.altitude);
         eh.cameraMoved(null, null, 0);
 	}
+	
+	void loadScene(File xmlFile){
+	    try {
+			mView.setTitle(mViewName + " - " + xmlFile.getCanonicalPath());
+		}
+		catch (IOException ex){}
+	    sm.loadScene(SceneManager.parseXML(xmlFile), xmlFile.getParentFile(), true, null);
+	    HashMap sceneAttributes = sm.getSceneAttributes();
+	    if (sceneAttributes.containsKey(SceneManager._background)){
+	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+	    }
+	    sm.setUpdateLevel(true);
+        mCamera.setAltitude(0.0f);
+        sm.updateLevel(mCamera.altitude);
+        eh.cameraMoved(null, null, 0);
+	}
     
     /*-------------     Navigation       -------------*/
     
@@ -302,7 +325,7 @@ public class PDFViewer {
     }
 
     public static void main(String[] args){
-        File pdfFile = null;
+        File inputFile = null;
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
@@ -316,7 +339,7 @@ public class PDFViewer {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
                 if (f.exists()){
-                    pdfFile = f;                        
+                    inputFile = f;                        
                 }
             }
 		}
@@ -324,7 +347,7 @@ public class PDFViewer {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new PDFViewer(fs, ogl, pdfFile);
+        new PDFViewer(fs, ogl, inputFile);
     }
     
     private static void printCmdLineHelp(){
