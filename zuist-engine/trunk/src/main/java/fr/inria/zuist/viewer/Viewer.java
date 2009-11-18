@@ -327,7 +327,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){
 	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
@@ -609,22 +609,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (SHOW_MISC_INFO){
 			vsm.repaintNow();
 		}
-    }
-    
-    static Document parseXML(File f){
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", new Boolean(false));
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document res = builder.parse(f);
-            return res;
-        }
-        catch (FactoryConfigurationError e){e.printStackTrace();return null;}
-        catch (ParserConfigurationException e){e.printStackTrace();return null;}
-        catch (SAXException e){e.printStackTrace();return null;}
-        catch (IOException e){e.printStackTrace();return null;}
     }
     
     void exit(){
