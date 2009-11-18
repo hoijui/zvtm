@@ -122,7 +122,7 @@ public class SlaveApp {
 
 	void setCameraLocation(Location masterLoc,
 			Camera slaveCamera){
-		if(clusteredView == null){
+		if(clusteredView == null || (!clusteredView.owns(slaveCamera))){
 			slaveCamera.setLocation(masterLoc);
 			return;
 		}
