@@ -112,15 +112,12 @@ public class PDFResourceHandler implements ResourceHandler {
             for (int i=0;i<paramTokens.length;i++) {
                 if (paramTokens[i].startsWith(PDFResourceHandler._pg)){
                     page = Integer.parseInt(paramTokens[i].substring(3));
-					System.out.println(page);
                 }
                 else if (paramTokens[i].startsWith(PDFResourceHandler._sc)){
                     scale = Double.parseDouble(paramTokens[i].substring(3));
-					System.out.println(scale);
                 }
                 else if (paramTokens[i].startsWith(SceneManager._im)){
                     im = SceneManager.parseInterpolation(params.substring(3));
-					System.out.println(im);
                 }
                 else {
                     System.err.println("Uknown type of resource parameter: "+paramTokens[i]);

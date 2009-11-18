@@ -9,10 +9,12 @@ package fr.inria.zuist.glyphs;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Font;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
@@ -30,33 +32,21 @@ public class VRectProgress extends VRectangle {
 
 	final String LABEL_TEXT = "%";
 	static int LOADING_LABEL_FONT_SIZE = 12;
+	
+	int val = 0;
+	
 	Color bgColor = Color.LIGHT_GRAY;
 	Color barColor = Color.BLUE;
-	int val = 0;
+	Color percentColor = Color.BLACK;
 
 	public VRectProgress(long x, long y, int z, long w, long h, Color bgC,
 			Color barC, VirtualSpace vs) {
 
 		super(x, y, z, w, h, bgC);
 
-		this.setTranslucencyValue(.5f);
 		this.bgColor = bgC;
 		this.barColor = barC;
-		this.currentVS = vs;
 
-		addPercentLabel(x, y, z, w, h);
-	}
-
-	/** A message to be displayed to the progress indicator. */
-	private void addPercentLabel(long x, long y, int z, long w, long h) {
-		label = new VText(x, y, z, Color.black, val + LABEL_TEXT,
-				VText.TEXT_ANCHOR_START, h / LOADING_LABEL_FONT_SIZE);
-		currentVS.addGlyph(label);
-	}
-
-	private void removePercentLabel() {
-		currentVS.removeGlyph(label);
-		label = null;
 	}
 
 	@Override
@@ -74,18 +64,19 @@ public class VRectProgress extends VRectangle {
 		g.setColor(barColor);
 		g.fillRect(dx + pc[i].cx - (pc[i].cw), dy + pc[i].cy - pc[i].ch,
 				(int) ((2 * val) * (double) pc[i].cw / 100), 2 * pc[i].ch);
+		
+		/** A message to be displayed to the progress indicator. */
+		g.setColor(percentColor);
+		g.setFont(new Font("Serif",Font.PLAIN,(pc[i].cw >= 0) ? (int)(12 * (double) pc[i].cw / 100) : 12));
+		g.drawString(val+LABEL_TEXT, dx + pc[i].cx - (pc[i].cw), dy + pc[i].cy - pc[i].ch);
+		
+		VirtualSpaceManager.INSTANCE.repaintNow();
 
 	}
 
 	// rough percentage calculator
 	public void setProgress(int count, int ligne) {
-
 		val = (int) count * 100 / ligne;
-
-		label.setText(val + LABEL_TEXT);
-
-		if (val == 100)
-			removePercentLabel();
 	}
 
 	public int getProgress() {
