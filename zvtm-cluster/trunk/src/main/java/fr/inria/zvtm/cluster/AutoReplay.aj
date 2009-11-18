@@ -29,72 +29,61 @@ import java.awt.Color;
  * Use only for "atomic" operations (change one attribute at a time).
  */
 public aspect AutoReplay {
-	//Rules to observe in order to modify this pointcut:
-	// - only add execution join points
-	// - every parameter of every method join point must be
-	// serializable (primitive types are okay)
-	// - exercise caution when adding non-public methods to the 
-	// join points, because these methods will be invoked reflectively.
-	pointcut glyphAutoReplayMethods(Glyph glyph) : 
-		this(glyph) &&
-		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-		(
-		 execution(public void Glyph.move(long, long))	||
-		 execution(public void Glyph.moveTo(long, long))	||
-		 execution(public void Glyph.setStrokeWidth(float))	||
-		 execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
-		 execution(public void Glyph.setVisible(boolean)) ||
-		 execution(public void Glyph.orientTo(float)) ||
-		 execution(public void Glyph.setSensitivity(boolean)) ||
-		 execution(public void VText.setText(String)) || 
-		 execution(public void VText.setScale(float)) || 
-		 execution(public void ClosedShape.setDrawBorder(boolean)) || 
-		 execution(public void ClosedShape.setFilled(boolean)) || 
-		 execution(public void DPath.addSegment(long, long, boolean)) ||  
-		 execution(public void DPath.addCbCurve(long, long, long, long, long, long, boolean)) ||  
-		 execution(public void DPath.addQdCurve(long, long, long, long, boolean)) ||  
-		 execution(public void RectangularShape.setHeight(long)) ||  
-		 execution(public void RectangularShape.setWidth(long))   
-		)
-		;
+    //Rules to observe in order to modify this pointcut:
+    // - only add execution join points
+    // - every parameter of every method join point must be
+    // serializable (primitive types are okay)
+    // - exercise caution when adding non-public methods to the 
+    // join points, because these methods will be invoked reflectively.
+    pointcut genericAutoReplayMethods(Identifiable replayTarget) :
+        this(replayTarget) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        (
+         //Glyph methods
+         execution(public void Glyph.move(long, long))	||
+         execution(public void Glyph.moveTo(long, long))	||
+         execution(public void Glyph.setStrokeWidth(float))	||
+         execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
+         execution(public void Glyph.setVisible(boolean)) ||
+         execution(public void Glyph.orientTo(float)) ||
+         execution(public void Glyph.setSensitivity(boolean)) ||
+         execution(public void VText.setText(String)) || 
+         execution(public void VText.setScale(float)) || 
+         execution(public void ClosedShape.setDrawBorder(boolean)) || 
+         execution(public void ClosedShape.setFilled(boolean)) || 
+         execution(public void DPath.addSegment(long, long, boolean)) ||  
+         execution(public void DPath.addCbCurve(long, long, long, long, long, long, boolean)) ||  
+         execution(public void DPath.addQdCurve(long, long, long, long, boolean)) ||  
+         execution(public void RectangularShape.setHeight(long)) ||  
+         execution(public void RectangularShape.setWidth(long)) ||
 
-	after(Glyph glyph) returning: 
-		glyphAutoReplayMethods(glyph) && 
-		!cflowbelow(glyphAutoReplayMethods(Glyph)){
-			sendGenericDelta(glyph, thisJoinPoint);
-		}
+        //Camera methods
+         execution(public void Camera.setZoomFloor(float))
+        );
 
-		pointcut cameraAutoReplayMethods(Camera camera) :
-		this(camera) &&
-		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-		(
-		 execution(public void Camera.setZoomFloor(float))
-		)
-		;
+    after(Identifiable replayTarget) :
+        genericAutoReplayMethods(replayTarget) &&
+        !cflowbelow(genericAutoReplayMethods(Identifiable)){
+            sendGenericDelta(replayTarget, thisJoinPoint);
+        }
 
-	after(Camera camera) :
-		cameraAutoReplayMethods(camera) &&
-		!cflowbelow(cameraAutoReplayMethods(Camera)){
-			sendGenericDelta(camera, thisJoinPoint);
-		}
+    private static void sendGenericDelta(Identifiable target, 
+            JoinPoint joinPoint){
+        Signature sig = joinPoint.getStaticPart().getSignature();
+        //We want to create a generic, serializable proxy that
+        //calls a remote method. Hence, we catch method invocations.
+        //If this assert fires, chances are that the definition of
+        //the related pointcuts are incorrect.
+        assert(sig instanceof MethodSignature);
+        Method method = ((MethodSignature)sig).getMethod();
+        Object[] args = joinPoint.getArgs();
 
-	private static void sendGenericDelta(Identifiable target, 
-			JoinPoint joinPoint){
-		Signature sig = joinPoint.getStaticPart().getSignature();
-		//We want to create a generic, serializable proxy that
-		//calls a remote method. Hence, we catch method invocations.
-		//If this assert fires, chances are that the definition of
-		//the related pointcuts are incorrect.
-		assert(sig instanceof MethodSignature);
-		Method method = ((MethodSignature)sig).getMethod();
-		Object[] args = joinPoint.getArgs();
+        Delta delta = new GenericDelta(target,
+                method.getName(),
+                method.getParameterTypes(),
+                args);
 
-		GenericDelta glyphDelta = new GenericDelta(target,
-				method.getName(),
-				method.getParameterTypes(),
-				args);
-
-		VirtualSpaceManager.INSTANCE.sendDelta(glyphDelta);
-	}
+        VirtualSpaceManager.INSTANCE.sendDelta(delta);
+    }
 }
 
