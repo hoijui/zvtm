@@ -20,7 +20,7 @@ class ClusteredViewCreateDelta implements Delta {
 	private final int nbCols;
 	private final int viewRows;
 	private final int viewCols;
-	private final ArrayList<ObjId> camRefs;
+	private final ArrayList<ObjId<Camera>> camRefs;
 
 	ClusteredViewCreateDelta(ClusteredView cv){
 		this.objId = cv.getObjId();
@@ -34,9 +34,9 @@ class ClusteredViewCreateDelta implements Delta {
 		this.camRefs = makeCamRefs(cv.getCameras());
 	}
 
-	private static final ArrayList<ObjId> 
+	private static final ArrayList<ObjId<Camera>> 
 		makeCamRefs(Vector<Camera> cameras){
-			ArrayList<ObjId> retval = new ArrayList<ObjId>();
+			ArrayList<ObjId<Camera>> retval = new ArrayList<ObjId<Camera>>();
 			for(Camera cam: cameras){
 				retval.add(cam.getObjId());
 			}
@@ -46,8 +46,8 @@ class ClusteredViewCreateDelta implements Delta {
 	private final Vector<Camera>
 		refsToCameras(SlaveUpdater su){
 			Vector<Camera> retval = new Vector<Camera>();
-			for(ObjId camRef: camRefs){
-				retval.add((Camera)(su.getSlaveObject(camRef)));
+			for(ObjId<Camera> camRef: camRefs){
+				retval.add(su.getSlaveObject(camRef));
 			}
 			return retval;
 		}
