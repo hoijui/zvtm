@@ -28,7 +28,7 @@ DEG_TO_RAD = math.pi/180
 RAD_TO_DEG = 180/math.pi
 
 # Default number of rendering threads to spawn, should be roughly equal to number of CPU cores available
-NUM_THREADS = 2
+NUM_THREADS = 4
 
 TS_F = 512.0
 TS_I = 512
