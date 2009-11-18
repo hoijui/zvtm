@@ -150,10 +150,10 @@ aspect GlyphCreation {
 
 	private static abstract class AbstractGlyphCreateDelta implements Delta {
 		private final GlyphAttributes baseAttr;
-		private final ObjId glyphId;
-		private final ObjId virtualSpaceId;
+		private final ObjId<Glyph> glyphId;
+		private final ObjId<VirtualSpace> virtualSpaceId;
 
-		AbstractGlyphCreateDelta(Glyph source, ObjId virtualSpaceId){
+		AbstractGlyphCreateDelta(Glyph source, ObjId<VirtualSpace> virtualSpaceId){
 			this.baseAttr = GlyphAttributes.fromGlyph(source);
 			this.glyphId = source.getObjId();
 			this.virtualSpaceId = virtualSpaceId;	
@@ -177,8 +177,7 @@ aspect GlyphCreation {
 			stateTransferHook(glyph);
 
 			su.putSlaveObject(glyphId, glyph);
-			VirtualSpace vs = 
-				(VirtualSpace)(su.getSlaveObject(virtualSpaceId));
+			VirtualSpace vs = su.getSlaveObject(virtualSpaceId);
 			vs.addGlyph(glyph);
 		}
 	}
@@ -189,7 +188,7 @@ aspect GlyphCreation {
 		private final boolean filled;
 		private final boolean borderDrawn;
 
-		ClosedShapeCreateDelta(ClosedShape source, ObjId virtualSpaceId){
+		ClosedShapeCreateDelta(ClosedShape source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.borderColor = source.getDefaultBorderColor();
 			this.mouseInsideFillColor = source.mouseInsideFColor;
@@ -212,7 +211,7 @@ aspect GlyphCreation {
 		private final long halfWidth;
 		private final long halfHeight;
 
-		VRectangleCreateDelta(VRectangle source, ObjId virtualSpaceId){
+		VRectangleCreateDelta(VRectangle source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
@@ -232,7 +231,7 @@ aspect GlyphCreation {
 	private static class VCircleCreateDelta extends ClosedShapeCreateDelta {
 		private final long radius;
 
-		VCircleCreateDelta(VCircle source, ObjId virtualSpaceId){
+		VCircleCreateDelta(VCircle source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.radius = (long)(source.getSize());
 		}
@@ -250,7 +249,7 @@ aspect GlyphCreation {
 	private static class VTriangleOrCreateDelta extends ClosedShapeCreateDelta {
 		private final long height;
 
-		VTriangleOrCreateDelta(VTriangleOr source, ObjId virtualSpaceId){
+		VTriangleOrCreateDelta(VTriangleOr source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.height = (long)(source.getSize());
 		}
@@ -265,7 +264,7 @@ aspect GlyphCreation {
 		private final long halfWidth;
 		private final long halfHeight;
 
-		VSegmentCreateDelta(VSegment source, ObjId virtualSpaceId){
+		VSegmentCreateDelta(VSegment source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
@@ -282,7 +281,7 @@ aspect GlyphCreation {
 		private final float scaleFactor;
 		private final short textAnchor;
 
-		VTextCreateDelta(VText source, ObjId virtualSpaceId){
+		VTextCreateDelta(VText source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.text = source.getText();
 			this.scaleFactor = source.getScale();
@@ -299,7 +298,7 @@ aspect GlyphCreation {
 		private final long halfWidth;
 		private final long halfHeight;
 
-		RectangleNRCreateDelta(RectangleNR source, ObjId virtualSpaceId){
+		RectangleNRCreateDelta(RectangleNR source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
@@ -313,7 +312,7 @@ aspect GlyphCreation {
 	private static class CircleNRCreateDelta extends ClosedShapeCreateDelta {
 		private final long radius;
 		
-		CircleNRCreateDelta(CircleNR source, ObjId virtualSpaceId){
+		CircleNRCreateDelta(CircleNR source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.radius = (long)(source.getSize());
 		}
@@ -327,7 +326,7 @@ aspect GlyphCreation {
 		private final double scaleFactor;
 		private final URL imageLocation;
 
-		ClusteredImageCreateDelta(ClusteredImage source, ObjId virtualSpaceId){
+		ClusteredImageCreateDelta(ClusteredImage source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.scaleFactor = source.scaleFactor;
 			this.imageLocation = source.getImageLocation();
@@ -343,7 +342,7 @@ aspect GlyphCreation {
 		//starting with Java 1.6
 		private final GeneralPath path;
 
-		DPathCreateDelta(DPath source, ObjId virtualSpaceId){
+		DPathCreateDelta(DPath source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.path = source.getJava2DGeneralPath();
 		}
