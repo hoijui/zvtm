@@ -132,14 +132,24 @@ public class ImageDescription extends ResourceDescription {
                             System.err.println("Error fetching Image resource "+src.toString());
                             e.printStackTrace();
                         }
-
                         return null; 
                     }
                 };
                 worker.start();
             }
             else {
-                finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);
+                if (this.isLocal()){
+                    finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
+                }
+                else {
+                    final SwingWorker worker = new SwingWorker(){
+                        public Object construct(){
+                            finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);
+                            return null; 
+                        }
+                    };
+                    worker.start();
+                }
             }
         }                
         loadRequest = null;    

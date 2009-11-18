@@ -30,6 +30,8 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public abstract class ResourceDescription extends ObjectDescription {
 	
+	static final String FILE_PROTOCOL = "file";
+	
 	/** URL identifying this resource. */
 	URL src;
 
@@ -78,6 +80,11 @@ public abstract class ResourceDescription extends ObjectDescription {
 	/** Get the URI of this resource. */
 	public URL getURL(){
 		return src;
+	}
+	
+	/** Returns true if the resource is on the computer running this application. */
+	public boolean isLocal(){
+	    return src.getProtocol().equals(FILE_PROTOCOL);
 	}
 	
 	/*------------------------- Visual feedback while fetching ----------------------- */
