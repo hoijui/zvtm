@@ -26,7 +26,6 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
-
 import fr.inria.zuist.glyphs.VRectProgress;
 
 /** Description of image objects to be loaded/unloaded in the scene.
@@ -104,8 +103,7 @@ public class ImageDescription extends ResourceDescription {
         if (glyph == null){
             // open connection to data
             if (showFeedbackWhenFetching){
-                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.BLUE, vs);
-                vrp.setBgColor(Color.RED);
+                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.DARK_GRAY, vs);
                 vs.addGlyph(vrp);
                 final SwingWorker worker = new SwingWorker(){
                     public Object construct(){
