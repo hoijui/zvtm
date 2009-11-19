@@ -103,7 +103,7 @@ public class ImageDescription extends ResourceDescription {
         if (glyph == null){
             // open connection to data
             if (showFeedbackWhenFetching){
-                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, Color.LIGHT_GRAY, Color.DARK_GRAY, vs);
+                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, bgColor, barColor, PercentFontColor, vs);
                 vs.addGlyph(vrp);
                 final SwingWorker worker = new SwingWorker(){
                     public Object construct(){

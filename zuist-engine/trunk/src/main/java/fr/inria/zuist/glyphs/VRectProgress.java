@@ -36,17 +36,18 @@ public class VRectProgress extends VRectangle {
 	
 	int val = 0;
 	
-	Color bgColor = Color.LIGHT_GRAY;
-	Color barColor = Color.DARK_GRAY;
-	Color percentColor = Color.BLACK;
+	Color bgColor;
+	Color barColor;
+	Color percentColor;
 
 	public VRectProgress(long x, long y, int z, long w, long h, Color bgC,
-			Color barC, VirtualSpace vs) {
+			Color barC, Color percentC, VirtualSpace vs) {
 
 		super(x, y, z, w, h, bgC);
 
 		this.bgColor = bgC;
 		this.barColor = barC;
+		this.percentColor = percentC;
 
 	}
 
@@ -57,7 +58,6 @@ public class VRectProgress extends VRectangle {
 		if (alphaC != null && alphaC.getAlpha() == 0) {
 			return;
 		}
-		g.setColor(bgColor);
 
 		// draw just enough
 		super.draw(g, vW - val, vH, i, stdS, stdT, dx, dy);
@@ -83,13 +83,5 @@ public class VRectProgress extends VRectangle {
 
 	public int getProgress() {
 		return val;
-	}
-
-	public void setBgColor(Color c) {
-		this.bgColor = c;
-	}
-
-	public void setBarColor(Color c) {
-		this.barColor = c;
 	}
 }

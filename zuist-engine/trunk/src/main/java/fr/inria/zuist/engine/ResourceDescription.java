@@ -120,4 +120,33 @@ public abstract class ResourceDescription extends ObjectDescription {
         return showFeedbackWhenFetching;
     }
 	
+	/*------------------------- VrectProgress Colors parameters ----------------------- */
+	
+	static Color DEFAULT_BG_COLOR = Color.LIGHT_GRAY;
+	static Color DEFAULT_BAR_COLOR = Color.DARK_GRAY;
+	static Color DEFAULT_PERCENT_FONT_COLOR = Color.BLACK;
+	Color bgColor = DEFAULT_BG_COLOR;
+	Color barColor = DEFAULT_BAR_COLOR;
+	Color PercentFontColor = DEFAULT_PERCENT_FONT_COLOR;
+	
+	public static void setBarProgressColor(Color bg, Color bar, Color font) {
+		
+		DEFAULT_BG_COLOR = bg;
+		DEFAULT_BAR_COLOR = bar;
+		DEFAULT_PERCENT_FONT_COLOR = font;
+		
+	}
+	
+	public void setBgColor(Color c) {
+		bgColor = c;
+	}
+	
+	public void setBarColor(Color c) {
+		barColor = c;
+	}
+	
+	public void setPercentFontColor(Color c) {
+		PercentFontColor = c;
+	}
+	
 }
