@@ -100,7 +100,8 @@ public class PDFPageDescription extends ResourceDescription {
         if (glyph == null){
             // open connection to data
             if (showFeedbackWhenFetching){
-                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale), Color.LIGHT_GRAY, Color.DARK_GRAY, vs);
+                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale),
+                                                            Color.LIGHT_GRAY, Color.DARK_GRAY, Color.BLACK, vs);
                 vs.addGlyph(vrp);
                 final SwingWorker worker = new SwingWorker(){
                     public Object construct(){
