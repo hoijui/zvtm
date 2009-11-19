@@ -90,8 +90,6 @@ public abstract class ResourceDescription extends ObjectDescription {
 	/*------------------------- Visual feedback while fetching ----------------------- */
 	
 	/* Visual feedback w.r.t resource fetching */
-	static final String LOADING_LABEL = "Loading ...";
-    static int LOADING_LABEL_FONT_SIZE = 20;
     static boolean DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING = false;
     boolean showFeedbackWhenFetching = DEFAULT_SHOW_FEEDBACK_WHEN_FETCHING;
     
@@ -127,7 +125,7 @@ public abstract class ResourceDescription extends ObjectDescription {
 	static Color DEFAULT_PERCENT_FONT_COLOR = Color.BLACK;
 	Color bgColor = DEFAULT_BG_COLOR;
 	Color barColor = DEFAULT_BAR_COLOR;
-	Color PercentFontColor = DEFAULT_PERCENT_FONT_COLOR;
+	Color percentFontColor = DEFAULT_PERCENT_FONT_COLOR;
 	
 	public static void setBarProgressColor(Color bg, Color bar, Color font) {
 		
@@ -145,8 +143,8 @@ public abstract class ResourceDescription extends ObjectDescription {
 		barColor = c;
 	}
 	
-	public void setPercentFontColor(Color c) {
-		PercentFontColor = c;
+	public void setpercentFontColor(Color c) {
+		percentFontColor = c;
 	}
 	
 }
