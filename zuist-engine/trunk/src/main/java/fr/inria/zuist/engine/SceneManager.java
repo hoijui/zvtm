@@ -602,15 +602,15 @@ public class SceneManager {
         String type = resourceEL.getAttribute(_type);
         long x = Long.parseLong(resourceEL.getAttribute(_x));
         long y = Long.parseLong(resourceEL.getAttribute(_y));
-        long w = Long.parseLong(resourceEL.getAttribute(_w));
-        long h = Long.parseLong(resourceEL.getAttribute(_h));
         String src = resourceEL.getAttribute(_src);
         String params = resourceEL.getAttribute(_params);
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
 		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
         if (type.equals(_image)){
-    		return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
+    		long w = Long.parseLong(resourceEL.getAttribute(_w));
+            long h = Long.parseLong(resourceEL.getAttribute(_h));
+            return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
         }
         else {
             return createResourceDescription(x+origin.x, y+origin.y, id, zindex, region, absoluteSrc, type, sensitivity, stroke, params);
