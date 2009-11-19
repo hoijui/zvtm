@@ -33,8 +33,10 @@ public class VRectProgress extends VRectangle {
 	final String LABEL_TEXT = "%";
 	static int LOADING_LABEL_FONT_SIZE = 10;
 	static final String FONT_FAMILY = "Arial";
+	static Font PROGRESS_DONT = new Font(FONT_FAMILY, Font.PLAIN, LOADING_LABEL_FONT_SIZE);
 	
 	int val = 0;
+	String valStr = "";
 	
 	Color bgColor;
 	Color barColor;
@@ -68,20 +70,21 @@ public class VRectProgress extends VRectangle {
 		
 		/** A message to be displayed to the progress indicator. */
 		g.setColor(percentColor);
-		g.setFont(new Font(FONT_FAMILY, Font.PLAIN,
-		                   (pc[i].cw >= 0) ? (int)(LOADING_LABEL_FONT_SIZE * (double) pc[i].cw / 100) : LOADING_LABEL_FONT_SIZE));
-		g.drawString(val+LABEL_TEXT, dx + pc[i].cx, dy + pc[i].cy +pc[i].ch/2);
-		
-		VirtualSpaceManager.INSTANCE.repaintNow();
-
+		AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx, dy+pc[i].cy+pc[i].ch/2);
+		at.concatenate(AffineTransform.getScaleInstance(pc[i].cw / 100.0, pc[i].cw / 100.0));
+		g.setTransform(at);
+		g.drawString(valStr, 0, 0);
+		g.setTransform(stdT);
 	}
 
 	// rough percentage calculator
 	public void setProgress(int count, int ligne) {
 		val = (int) count * 100 / ligne;
+		valStr = String.valueOf(val) + LABEL_TEXT;
 	}
 
 	public int getProgress() {
 		return val;
 	}
+	
 }
