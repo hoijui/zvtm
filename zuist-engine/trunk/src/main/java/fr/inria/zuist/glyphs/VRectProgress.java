@@ -31,12 +31,13 @@ public class VRectProgress extends VRectangle {
 	private VirtualSpace currentVS;
 
 	final String LABEL_TEXT = "%";
-	static int LOADING_LABEL_FONT_SIZE = 12;
+	static int LOADING_LABEL_FONT_SIZE = 10;
+	static final String FONT_FAMILY = "Arial";
 	
 	int val = 0;
 	
 	Color bgColor = Color.LIGHT_GRAY;
-	Color barColor = Color.BLUE;
+	Color barColor = Color.DARK_GRAY;
 	Color percentColor = Color.BLACK;
 
 	public VRectProgress(long x, long y, int z, long w, long h, Color bgC,
@@ -67,8 +68,9 @@ public class VRectProgress extends VRectangle {
 		
 		/** A message to be displayed to the progress indicator. */
 		g.setColor(percentColor);
-		g.setFont(new Font("Serif",Font.PLAIN,(pc[i].cw >= 0) ? (int)(12 * (double) pc[i].cw / 100) : 12));
-		g.drawString(val+LABEL_TEXT, dx + pc[i].cx - (pc[i].cw), dy + pc[i].cy - pc[i].ch);
+		g.setFont(new Font(FONT_FAMILY, Font.PLAIN,
+		                   (pc[i].cw >= 0) ? (int)(LOADING_LABEL_FONT_SIZE * (double) pc[i].cw / 100) : LOADING_LABEL_FONT_SIZE));
+		g.drawString(val+LABEL_TEXT, dx + pc[i].cx, dy + pc[i].cy +pc[i].ch/2);
 		
 		VirtualSpaceManager.INSTANCE.repaintNow();
 
