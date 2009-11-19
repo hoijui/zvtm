@@ -10,18 +10,21 @@ package fr.inria.zuist.engine;
 import java.awt.Image;
 import java.awt.Color;
 import java.awt.RenderingHints;
-import javax.swing.ImageIcon;
 
 import java.net.URL;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.ZPDFPageImg;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zuist.glyphs.VRectProgress;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+
+import com.sun.pdfview.PDFPage;
 
 /** Description of image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -94,7 +97,62 @@ public class PDFPageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
-        glyph = new ZPDFPageImg(vx, vy, zindex, PDFResourceHandler.getPage(src, page), 1.0f, scale);
+        if (glyph == null){
+            // open connection to data
+            if (showFeedbackWhenFetching){
+                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale), Color.LIGHT_GRAY, Color.DARK_GRAY, vs);
+                vs.addGlyph(vrp);
+                final SwingWorker worker = new SwingWorker(){
+                    public Object construct(){
+                        //try {
+                            //URLConnection uc = src.openConnection();
+                            //int dataLength = uc.getContentLength();
+                            //byte[] imgData = new byte[dataLength];
+                            //BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
+                            //int bytesRead = 0;
+                            //while (bytesRead < dataLength-1){
+                            //    int av = bis.available();
+                            //    if (av > 0){
+                            //        bis.read(imgData, bytesRead, av);
+                            //        bytesRead += av;
+                            //        vrp.setProgress(bytesRead, dataLength);
+                            //    }
+                            //    //else {
+                            //    //    sleep(10);
+                            //    //}
+                            //}
+                            vrp.setProgress(10, 100);
+                            finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), vrp, fadeIn);
+                        //}
+                        //catch(IOException e){
+                        //    System.err.println("Error fetching Image resource "+src.toString());
+                        //    e.printStackTrace();
+                        //}
+                        return null; 
+                    }
+                };
+                worker.start();
+            }
+            else {
+                if (this.isLocal()){
+                    finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);                    
+                }
+                else {
+                    final SwingWorker worker = new SwingWorker(){
+                        public Object construct(){
+                            finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);
+                            return null; 
+                        }
+                    };
+                    worker.start();
+                }
+            }
+        }                
+        loadRequest = null;    
+    }
+    
+    private synchronized void finishCreatingObject(VirtualSpace vs, PDFPage p, VRectProgress vrp, boolean fadeIn){
+        glyph = new ZPDFPageImg(vx, vy, zindex, p, 1.0f, scale);
         if (strokeColor != null){
             glyph.setBorderColor(strokeColor);
             glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
@@ -107,12 +165,21 @@ public class PDFPageDescription extends ResourceDescription {
         if (fadeIn){
             glyph.setTranslucencyValue(0f);
             vs.addGlyph(glyph);
+            if (showFeedbackWhenFetching){
+                // remove visual feedback about loading (smoothly)
+                Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
+                    1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);                    
+            }
             // smoothly fade glyph in
             Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
                 1.0f, false, IdentityInterpolator.getInstance(), null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         }
         else {
+            if (showFeedbackWhenFetching){
+                vs.removeGlyph(vrp);
+            }
             vs.addGlyph(glyph);
         }
         glyph.setOwner(this);
