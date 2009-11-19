@@ -81,6 +81,8 @@ public class VRectProgress extends VRectangle {
 	public void setProgress(int count, int ligne) {
 		val = (int) count * 100 / ligne;
 		valStr = String.valueOf(val) + LABEL_TEXT;
+		
+		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	public int getProgress() {
