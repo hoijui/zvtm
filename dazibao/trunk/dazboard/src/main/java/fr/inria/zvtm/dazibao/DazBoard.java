@@ -1,5 +1,10 @@
 package fr.inria.zvtm.dazibao;
 
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+
 import fr.inria.zvtm.cluster.ClusteredImage;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
@@ -39,7 +44,7 @@ public class DazBoard {
     private int imgIndex = 0;
 
 
-    DazBoard() throws IOException{
+    DazBoard(DazOptions options) throws IOException{
         server = new DazHttpServer(DEFAULT_SERVER_PORT);
 
         vsm.setMaster("DazBoard");
@@ -47,22 +52,40 @@ public class DazBoard {
         Camera cam = space.addCamera();
         Vector<Camera> cams = new Vector<Camera>();
         cams.add(cam);
-        View view = vsm.addFrameView(cams, "Dazibao view", 
-                View.STD_VIEW, 800, 600, false, true, true, null);
-        view.setEventHandler(new PanZoomEventHandler());
-        ClusteredView clusteredView = new ClusteredView(3,
-                2760,
-                1740,
-                4,8,
-                4,8,
+        if(options.localView){
+            View view = vsm.addFrameView(cams, "Dazibao view", 
+                    View.STD_VIEW, 640, 480, false, true, true, null);
+            view.setEventHandler(new PanZoomEventHandler());
+        }
+        ClusteredView clusteredView = new ClusteredView(options.viewOrigin,
+                options.blockWidth,
+                options.blockHeight,
+                options.numRows, options.numCols,
+                options.viewRows, options.viewCols,
                 cams);
         vsm.addClusteredView(clusteredView);
         cam.moveTo(0,0);
     }
 
     public static void main(String[] args){
+        DazOptions options = new DazOptions();
+		CmdLineParser parser = new CmdLineParser(options);
+		try{
+			parser.parseArgument(args);
+		} catch(CmdLineException ex){
+			System.err.println(ex.getMessage());
+			parser.printUsage(System.err);
+			return;
+		}
+
+		if(options.help){
+			System.err.println("Usage: AnimCircles [options] where options are: ");
+			parser.printUsage(System.err);
+			return;
+		}
+
         try{
-            new DazBoard();
+            new DazBoard(options);
         }catch(IOException ex){
             System.err.println("Couldn't start server:\n" + ex);
             System.exit(-1);
@@ -104,8 +127,7 @@ public class DazBoard {
             try{
                 imgUrl = new URL("http://192.168.0.49:4555/images/" + image);
             } catch (MalformedURLException ex){
-                System.err.println("oops");
-                return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "image URL error\n");
+                return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "image URL error (required image: " + image + ")\n");
             } 
 
             ClusteredImage cImg = new ClusteredImage(currX, currY, 0, imgUrl, 1f);
@@ -118,7 +140,7 @@ public class DazBoard {
             }
             imgIndex++;
 
-            return new NanoHTTPD.Response(HTTP_OK, MIME_PLAINTEXT, "ok\n");
+            return new NanoHTTPD.Response(HTTP_OK, MIME_PLAINTEXT, "addpage successful\n");
         }
     }
     private class PanZoomEventHandler implements ViewEventHandler{
@@ -198,7 +220,24 @@ public class DazBoard {
         public void viewDeiconified(View v){}
 
         public void viewClosing(View v){System.exit(0);}
-
     }
+  }
+
+class DazOptions {
+    @Option(name = "-bw", aliases = {"--block-width"}, usage = "clustered view block width")
+        int blockWidth = 400;
+    @Option(name = "-bh", aliases = {"--block-height"}, usage = "clustered view block height")
+        int blockHeight = 300;
+    @Option(name = "-r", aliases = {"--num-rows"}, usage = "number of rows in the cluster")
+        int numRows = 2;
+    @Option(name = "-c", aliases = {"--num-cols"}, usage = "number of columns in the cluster")
+        int numCols = 3;
+    int viewRows = numRows;
+    int viewCols = numCols;
+    int viewOrigin = numRows - 1;
+    @Option(name = "-v", aliases = {"--local-view"}, usage = "create local view")
+        boolean localView = false;
+    @Option(name = "-h", aliases = {"--help"}, usage = "print this help message and exit")
+        boolean help = false;
 }
 
