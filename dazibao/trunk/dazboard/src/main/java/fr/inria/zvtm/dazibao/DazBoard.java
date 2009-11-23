@@ -1,6 +1,7 @@
 package fr.inria.zvtm.dazibao;
 
 import fr.inria.zvtm.cluster.ClusteredImage;
+import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -46,10 +47,17 @@ public class DazBoard {
         Camera cam = space.addCamera();
         Vector<Camera> cams = new Vector<Camera>();
         cams.add(cam);
-        cam.moveTo(0,0);
         View view = vsm.addFrameView(cams, "Dazibao view", 
                 View.STD_VIEW, 800, 600, false, true, true, null);
         view.setEventHandler(new PanZoomEventHandler());
+        ClusteredView clusteredView = new ClusteredView(3,
+                2760,
+                1740,
+                4,8,
+                4,8,
+                cams);
+        vsm.addClusteredView(clusteredView);
+        cam.moveTo(0,0);
     }
 
     public static void main(String[] args){
@@ -94,7 +102,7 @@ public class DazBoard {
 
             URL imgUrl;
             try{
-                imgUrl = new URL("http://127.0.0.1:4555/images/" + image);
+                imgUrl = new URL("http://192.168.0.49:4555/images/" + image);
             } catch (MalformedURLException ex){
                 System.err.println("oops");
                 return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "image URL error\n");
