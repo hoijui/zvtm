@@ -16,9 +16,7 @@ import java.awt.geom.AffineTransform;
 
 import java.net.URL;
 
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.VImage;
@@ -33,32 +31,28 @@ import fr.inria.zvtm.glyphs.VImage;
  * using a network drive or a similar solution.
  */
 public class ClusteredImage extends VImage {
-	private final URL location;
-	private static final Image DEFAULT_IMAGE;
+    private final URL location;
+    private static final Image DEFAULT_IMAGE;
 
-	static { 
-		DEFAULT_IMAGE = new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB);
-	}
+    static { 
+        DEFAULT_IMAGE = new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB);
+    }
 
-	public ClusteredImage(long x, long y, int z, URL location, double scale){
-		super(x,y,z,DEFAULT_IMAGE,scale);
+    public ClusteredImage(long x, long y, int z, URL location, double scale){
+        super(x,y,z,DEFAULT_IMAGE,scale);
 
-		this.location = location;
-		Image img = null;
-		try{
-			img = ImageIO.read(location);
-		} catch (IOException e){
-			System.out.println("Could not open image, using default");
-		}
+        this.location = location;
+        Image img = null;
+        img = new ImageIcon(location).getImage();
 
-		if(img == null){
-			//img = DEFAULT_IMAGE;
-			throw new Error("Could not create image");
-		}
-		setImage(img);
-	}
+        if(img == null){
+            //img = DEFAULT_IMAGE;
+            throw new Error("Could not create image");
+        }
+        setImage(img);
+    }
 
-	public final URL getImageLocation(){ return location; }
-	public final double getScale(){ return scaleFactor; }
+    public final URL getImageLocation(){ return location; }
+    public final double getScale(){ return scaleFactor; }
 }
 
