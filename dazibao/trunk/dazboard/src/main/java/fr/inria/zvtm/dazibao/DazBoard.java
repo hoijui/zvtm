@@ -81,7 +81,7 @@ public class DazBoard {
 		}
 
 		if(options.help){
-			System.err.println("Usage: AnimCircles [options] where options are: ");
+			System.err.println("Usage: DazBoard [options] where options are: ");
 			parser.printUsage(System.err);
 			return;
 		}
