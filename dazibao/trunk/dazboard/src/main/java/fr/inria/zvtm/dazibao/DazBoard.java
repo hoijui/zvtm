@@ -52,6 +52,8 @@ public class DazBoard {
         Camera cam = space.addCamera();
         Vector<Camera> cams = new Vector<Camera>();
         cams.add(cam);
+        //a local view allows easier debugging, pan and zoom
+        //but is not suitable on a headless server
         if(options.localView){
             View view = vsm.addFrameView(cams, "Dazibao view", 
                     View.STD_VIEW, 640, 480, false, true, true, null);
@@ -125,7 +127,7 @@ public class DazBoard {
 
             URL imgUrl;
             try{
-                imgUrl = new URL("http://192.168.0.49:4555/images/" + image);
+                imgUrl = new URL(image);
             } catch (MalformedURLException ex){
                 return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "image URL error (required image: " + image + ")\n");
             } 
