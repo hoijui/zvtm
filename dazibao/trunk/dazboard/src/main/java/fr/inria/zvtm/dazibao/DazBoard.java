@@ -36,7 +36,7 @@ public class DazBoard {
 
     private VirtualSpace space;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
-    private final long IMG_DIM_MAX_A4=792; //pixels
+    private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
     private long currX = 0;
     private long currY = 0;
