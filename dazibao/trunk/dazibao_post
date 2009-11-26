@@ -7,9 +7,15 @@
 #Dazibao uses two HTTP servers:
 # - one server embedded in DazBoard (ZVTMCluster master)
 # - one that serves the contents of OUT_IMG_DIR for the slaves' benefit
-DAZBOARD_SERVER=127.0.0.1
+if [ -z "$DAZBOARD_SERVER" ]
+then
+    DAZBOARD_SERVER=127.0.0.1
+fi
 DAZBOARD_PORT=3444
-IMGDATA_SERVER=127.0.0.1
+if [ -z "$IMGDATA_SERVER" ]
+then
+    IMGDATA_SERVER=192.168.0.49
+fi
 IMGDATA_PORT=4555
 
 OUT_IMG_DIR=/tmp/dazibao/images
