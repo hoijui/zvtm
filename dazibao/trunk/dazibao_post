@@ -21,6 +21,8 @@ IMGDATA_PORT=4555
 OUT_IMG_DIR=/tmp/dazibao/images
 IMG_NAME_PREFIX=`whoami`_`date +%s`_`basename $1 .pdf`
 
+#make sure produced images are world readable
+umask 0022
 convert $1 $OUT_IMG_DIR/${IMG_NAME_PREFIX}_%04d.png
 
 #make an HTTP request per output file
