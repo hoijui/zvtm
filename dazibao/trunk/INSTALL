@@ -1,0 +1,22 @@
+MANUAL INSTALL INSTRUCTIONS
+===========================
+
+A rough guide to setting up Dazibao.
+
+Install cups-pdf on your machine
+$ sudo apt-get install cups-pdf
+
+Install imagemagick on your machine
+$ sudo apt-get install imagemagick
+
+Overwrite /etc/cups/cups-pdf.conf with the supplied file 
+$ cp cups-pdf.conf /etc/cups/
+
+Create the directory /var/dazibao/images
+$ mkdir -p /var/dazibao/images
+
+Serve the contents of /var/dazibao over HTTP on port 4555
+(e.g. install nginx and use the supplied configuration files)
+
+Test it by accessing your machine over HTTP on port 4555.
+
