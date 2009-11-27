@@ -1,0 +1,14 @@
+# Sample nginx configuration: serves Dazibao images.
+# Adapt to your needs
+server {
+  listen  4555;
+  server_name  dazimages;
+  access_log  /var/log/nginx/dazimages.access.log;
+  error_log  /var/log/nginx/dazimages.error.log;
+  location  / {
+    root  /var/dazibao;
+    index  index.html index.htm;
+    autoindex on;
+  }
+}
+
