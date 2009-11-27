@@ -234,9 +234,12 @@ class DazOptions {
         int numRows = 2;
     @Option(name = "-c", aliases = {"--num-cols"}, usage = "number of columns in the cluster")
         int numCols = 3;
-    int viewRows = numRows;
-    int viewCols = numCols;
-    int viewOrigin = numRows - 1;
+    @Option(name = "-rv", aliases = {"--view-rows"}, usage = "number of rows in the view")
+    int viewRows = 2;
+    @Option(name = "-cv", aliases = {"--view-cols"}, usage = "number of columns in the view")
+    int viewCols = 3;
+    @Option(name = "-n", aliases = {"--view-origin"}, usage = "origin block number (0-based)")
+    int viewOrigin = 1;
     @Option(name = "-v", aliases = {"--local-view"}, usage = "create local view")
         boolean localView = false;
     @Option(name = "-h", aliases = {"--help"}, usage = "print this help message and exit")
