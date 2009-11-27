@@ -18,7 +18,7 @@ then
 fi
 IMGDATA_PORT=4555
 
-OUT_IMG_DIR=/tmp/dazibao/images
+OUT_IMG_DIR=/var/dazibao/images
 IMG_NAME_PREFIX=`whoami`_`date +%s`_`basename $1 .pdf`
 
 #make sure produced images are world readable
