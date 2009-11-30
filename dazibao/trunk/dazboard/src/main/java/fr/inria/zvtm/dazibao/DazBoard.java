@@ -34,8 +34,8 @@ public class DazBoard {
     private DazHttpServer server;
     public static final int DEFAULT_SERVER_PORT = 3444;
 
-    private VirtualSpace space;
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
+    VirtualSpace space;
+    VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
     private long currX = 0;
@@ -69,6 +69,18 @@ public class DazBoard {
         cam.moveTo(0,0);
     }
 
+    void onLeftButton(){
+    }
+
+    void onRightButton(){
+    }
+
+    void onWheel(){
+    }
+
+    void onPointerMoved(int newX, int newY){
+    }
+
     public static void main(String[] args){
         DazOptions options = new DazOptions();
 		CmdLineParser parser = new CmdLineParser(options);
@@ -87,7 +99,9 @@ public class DazBoard {
 		}
 
         try{
-            new DazBoard(options);
+            DazBoard daz = new DazBoard(options);
+            LaserEventSource es = new LaserEventSource(daz);
+            es.start();
         }catch(IOException ex){
             System.err.println("Couldn't start server:\n" + ex);
             System.exit(-1);
