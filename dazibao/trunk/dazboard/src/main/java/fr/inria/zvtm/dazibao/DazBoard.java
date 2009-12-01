@@ -15,7 +15,9 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -39,6 +41,7 @@ public class DazBoard {
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
     private Camera cam;
     private ClusteredView clusteredView;
+    VCircle pointer;
     private boolean dragging = false;
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
@@ -71,6 +74,7 @@ public class DazBoard {
                 cams);
         vsm.addClusteredView(clusteredView);
         cam.moveTo(0,0);
+        pointer = new VCircle(0,0,0,300,Color.RED);
     }
 
     void onLeftPress(){
@@ -94,7 +98,7 @@ public class DazBoard {
     //newX, newY in view coordinates (0,0 top left, x right, y bottom)
     void onLaserMove(int newX, int newY){
         LongPoint spcCoords = clusteredView.viewToSpaceCoords(cam, newX, newY);
-        //moveCursorTo(spcCoords.x, spcCoords.y);
+        pointer.moveTo(spcCoords.x, spcCoords.y);
         if(dragging){
             cam.moveTo(spcCoords.x, spcCoords.y);
         }
