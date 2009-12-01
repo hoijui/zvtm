@@ -9,11 +9,16 @@ import com.illposed.osc.OSCPortIn;
  * (vicon tracking + blind mouse for button press events) 
  */
 class LaserEventSource {
-    private DazBoard app;
+    private final DazBoard app;
     private OSCPortIn receiver; //receives messages from the Vicon tracker
     public static final int LASER_OSC_PORT = 5678;
 
+    private static final int BLOCK_WIDTH = 2760; //code tangling, but hard to avoid
+    private static final int BLOCK_HEIGHT = 1740;
+
 	private static final int 
+        X = 0,
+        Y = 1,
 		SCREEN = 2,
 		NAME = 3,
 		MOUSEL = 4,
@@ -22,19 +27,44 @@ class LaserEventSource {
         FIELD_NUMBER = 7;//#fields in OSC message (==max_index+1)
 
     private enum Event {
-		MOVE,
-		L_PRESS,
-		R_PRESS,
-		L_RELEASE,
-		R_RELEASE,
-		WHEEL
+		MOVE(){
+            @Override void sendEvent(DazBoard app, int xpos, int ypos, int wheel){
+                app.onLaserMove(xpos, ypos);
+            }
+        },
+		L_PRESS(){
+            @Override void sendEvent(DazBoard app, int xpos, int ypos, int wheel){
+                app.onLeftPress();
+            }
+        },
+		R_PRESS(){ 
+            @Override void sendEvent(DazBoard app, int xpos, int ypos, int wheel){
+                app.onRightPress();
+            }
+        },
+		L_RELEASE(){
+            @Override void sendEvent(DazBoard app, int xpos, int ypos, int wheel){
+                app.onLeftRelease();
+            }
+        },
+        R_RELEASE(){
+            @Override void sendEvent(DazBoard app, int xpos, int ypos, int wheel){
+                app.onRightRelease();
+            }
+        },
+		WHEEL(){
+            @Override void sendEvent(DazBoard app, int xpos, int ypos, int wheel){
+                app.onWheel(wheel);
+            }
+        };
+        abstract void sendEvent(DazBoard app, int xpos, int ypos, int wheel);
 	}
 
     private static int LEFT = 0, RIGHT = 1;
     private boolean previouslyPressed[] = new boolean[2];
 
-    public LaserEventSource(DazBoard app){
-        this.app = app;
+    public LaserEventSource(DazBoard theApp){
+        this.app = theApp;
         try {
             receiver = new OSCPortIn(LASER_OSC_PORT);
         } catch(java.net.SocketException ex){
@@ -69,6 +99,31 @@ class LaserEventSource {
 				
 				previouslyPressed[LEFT] = pressedL;
 				previouslyPressed[RIGHT] = pressedR;
+
+                String screenName = message.getArguments()[2].toString();
+				int screenX = ((Integer)(message.getArguments()[X])).intValue();
+				int screenY = ((Integer)(message.getArguments()[Y])).intValue();
+				if (screenName != null && screenName.length() > 0) {
+					int screenCoordsX = -1;
+					
+					if (screenName.contains("A"))
+						screenCoordsX = 0;
+					else if (screenName.contains("B"))
+						screenCoordsX = 2;
+					else if (screenName.contains("C"))
+						screenCoordsX = 4;
+					else if (screenName.contains("D"))
+						screenCoordsX = 6;
+					
+					if (screenName.contains("R"))
+						screenCoordsX ++;
+					
+					int screenCoordsY = new Integer(""+screenName.charAt(1)).intValue()-1;
+					int xpos = screenCoordsX * BLOCK_WIDTH + screenX;
+					int ypos = screenCoordsY * BLOCK_WIDTH + screenY;
+
+                    event.sendEvent(app, xpos, ypos, wheel);
+            }
             }
         };
         receiver.addListener("/osclaser", listener);

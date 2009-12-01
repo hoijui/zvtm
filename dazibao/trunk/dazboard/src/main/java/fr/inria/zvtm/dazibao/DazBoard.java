@@ -69,16 +69,23 @@ public class DazBoard {
         cam.moveTo(0,0);
     }
 
-    void onLeftButton(){
+    void onLeftPress(){
     }
 
-    void onRightButton(){
+    void onRightPress(){
     }
 
-    void onWheel(){
+    void onLeftRelease(){
     }
 
-    void onPointerMoved(int newX, int newY){
+    void onRightRelease(){
+    }
+
+    void onWheel(int wheel){
+    }
+
+    //newX, newY in ??? coordinates
+    void onLaserMove(int newX, int newY){
     }
 
     public static void main(String[] args){
