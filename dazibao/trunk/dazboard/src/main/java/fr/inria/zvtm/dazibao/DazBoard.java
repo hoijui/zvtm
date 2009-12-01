@@ -8,6 +8,7 @@ import org.kohsuke.args4j.Option;
 import fr.inria.zvtm.cluster.ClusteredImage;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.View;
@@ -36,6 +37,9 @@ public class DazBoard {
 
     VirtualSpace space;
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
+    private Camera cam;
+    private ClusteredView clusteredView;
+    private boolean dragging = false;
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
     private long currX = 0;
@@ -49,7 +53,7 @@ public class DazBoard {
 
         vsm.setMaster("DazBoard");
         space = vsm.addVirtualSpace("DazBoard");
-        Camera cam = space.addCamera();
+        cam = space.addCamera();
         Vector<Camera> cams = new Vector<Camera>();
         cams.add(cam);
         //a local view allows easier debugging, pan and zoom
@@ -59,7 +63,7 @@ public class DazBoard {
                     View.STD_VIEW, 640, 480, false, true, true, null);
             view.setEventHandler(new PanZoomEventHandler());
         }
-        ClusteredView clusteredView = new ClusteredView(options.viewOrigin,
+        clusteredView = new ClusteredView(options.viewOrigin,
                 options.blockWidth,
                 options.blockHeight,
                 options.numRows, options.numCols,
@@ -70,22 +74,30 @@ public class DazBoard {
     }
 
     void onLeftPress(){
+        dragging = true;
     }
 
     void onRightPress(){
     }
 
     void onLeftRelease(){
+        dragging = false;
     }
 
     void onRightRelease(){
     }
 
     void onWheel(int wheel){
+        cam.setAltitude(wheel>0 ? 1.2f*cam.getAltitude() : 0.8f*cam.getAltitude());
     }
 
-    //newX, newY in ??? coordinates
+    //newX, newY in view coordinates (0,0 top left, x right, y bottom)
     void onLaserMove(int newX, int newY){
+        LongPoint spcCoords = clusteredView.viewToSpaceCoords(cam, newX, newY);
+        //moveCursorTo(spcCoords.x, spcCoords.y);
+        if(dragging){
+            cam.moveTo(spcCoords.x, spcCoords.y);
+        }
     }
 
     public static void main(String[] args){
