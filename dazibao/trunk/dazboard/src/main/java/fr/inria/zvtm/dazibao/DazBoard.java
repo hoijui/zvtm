@@ -43,6 +43,7 @@ public class DazBoard {
     private ClusteredView clusteredView;
     CircleNR pointer;
     private boolean panning = false;
+    private LongPoint panOrigin = new LongPoint(0,0);
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
     private long currX = 0;
@@ -81,6 +82,8 @@ public class DazBoard {
 
     void onLeftPress(){
         panning = true;
+        panOrigin.x = pointer.vx;
+        panOrigin.y = pointer.vy;
     }
 
     void onRightPress(){
@@ -106,7 +109,7 @@ public class DazBoard {
         if(panning){
             long oldX = cam.posx;
             long oldY = cam.posy;
-            cam.move((spcCoords.x - oldX)*0.05, (spcCoords.y - oldY)*0.05);
+            cam.move((spcCoords.x - panOrigin.x)*0.01, (spcCoords.y - panOrigin.y)*0.01);
         }
     }
 
