@@ -29,9 +29,14 @@ import javax.swing.JFrame;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -47,6 +52,9 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.RImage;
+
+import fr.inria.zvtm.nodetrix.NodeTrixViz;
+import fr.inria.zvtm.nodetrix.NTNode;
 
 public class Viewer {
 
@@ -65,9 +73,12 @@ public class Viewer {
     VirtualSpaceManager vsm;
     VirtualSpace mSpace, aboutSpace;
     EView mView;
+    
     MainEventHandler eh;
     NavigationManager nm;
     Overlay ovm;
+    
+    NodeTrixViz ntv;
     
     VWGlassPane gp;
     
@@ -142,7 +153,7 @@ public class Viewer {
     
     /* --------------- Input Data ------------------*/
     
-    void reset(){/*TBW*/}
+    void reset(){/*TBW deal with ntv*/}
 	
 	void openFile(){
 		final JFileChooser fc = new JFileChooser(INPUT_FILE_DIR);
@@ -177,15 +188,92 @@ public class Viewer {
         if (inputFile == null){return;}
 		INPUT_FILE = inputFile;
 	    INPUT_FILE_DIR = INPUT_FILE.getParentFile();
-        gp.setValue(10);
+        gp.setValue(5);
 		gp.setVisible(true);
 		gp.setLabel(Messages.PROCESSING+INPUT_FILE.toString());
-        //XXX:TBW
+        createGraph();
         gp.setVisible(false);
 	    gp.setLabel(Messages.EMPTY_STRING);
     }
     
-    /* --------------- Main/exit ------------------*/    
+    /* --------------- Graph / NodeTrix ------------------*/
+    
+    void createGraph(){
+        gp.setValue(10);
+        HashMap<String,Vector> group2node = new HashMap();
+        HashMap<String,Vector<String>> edges = new HashMap();
+        HashMap<String,NTNode> name2node = new HashMap();
+        try {
+            FileInputStream fis = new FileInputStream(INPUT_FILE);
+    	    BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+    	    String line = br.readLine();
+            while (line != null){
+                if (line.length() > 0){
+                    parseLine(line, group2node, name2node, edges);
+                }
+                line = br.readLine();
+            }
+            fis.close();            
+        }
+        catch (IOException ex){
+            System.err.println("Error loading file "+INPUT_FILE);
+            ex.printStackTrace();
+        }
+        gp.setValue(40);
+        ntv = new NodeTrixViz(group2node.size());
+        for (String group : group2node.keySet()){
+            ntv.addMatrix(group, group2node.get(group));
+        }
+        for (String tail : edges.keySet()){
+            for (String head : edges.get(tail)){
+                ntv.addEdge(name2node.get(tail), name2node.get(head));                
+            }
+        }
+    }
+    
+    static final String EDGE_SYMB = "->";
+    static final String GROUP_ATTR = "group";
+    static final String ATTR_ASSIGN = "=";
+    
+    void parseLine(String line, HashMap<String,Vector> g2n, HashMap<String,NTNode> n2n, HashMap<String,Vector<String>> e){
+        System.out.println("processing "+line);
+        String[] tokens = line.trim().split(EDGE_SYMB);
+        if (tokens.length > 1){
+            // edge declaration
+            String tail = tokens[0].trim();
+            if (e.containsKey(tail)){
+                e.get(tail).add(tokens[1].trim());
+            }
+            else {
+                Vector<String> v = new Vector();
+                v.add(tokens[1].trim());
+                e.put(tail, v);                
+            }
+        }
+        else {
+            // node declaration
+            tokens = tokens[0].split(GROUP_ATTR);
+            String node = tokens[0].substring(0, tokens[0].length()-1).trim();
+            String group = tokens[1].substring(tokens[1].indexOf(ATTR_ASSIGN)+1, tokens[1].length()-1);
+            if (n2n.containsKey(node)){
+                System.out.println("Error: node declared more than once: "+node);
+                return;
+            }
+            else {
+                n2n.put(node, new NTNode(node));
+            }
+            if (g2n.containsKey(group)){
+                g2n.get(group).add(n2n.get(node));
+            }
+            else {
+                Vector<NTNode> v = new Vector();
+                v.add(n2n.get(node));
+                g2n.put(group, v);                
+            }
+        }
+    }
+    
+    /* --------------- Main/exit ------------------*/
     
     void exit(){
         System.exit(0);
