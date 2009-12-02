@@ -15,7 +15,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.CircleNR;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -41,7 +41,7 @@ public class DazBoard {
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
     private Camera cam;
     private ClusteredView clusteredView;
-    VCircle pointer;
+    CircleNR pointer;
     private boolean dragging = false;
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
@@ -50,6 +50,7 @@ public class DazBoard {
     private int nbRows = 4;
     private int imgIndex = 0;
 
+    private static final float WHEEL_ZOOM_FACTOR = 21.0f;
 
     DazBoard(DazOptions options) throws IOException{
         server = new DazHttpServer(DEFAULT_SERVER_PORT);
@@ -74,7 +75,8 @@ public class DazBoard {
                 cams);
         vsm.addClusteredView(clusteredView);
         cam.moveTo(0,0);
-        pointer = new VCircle(0,0,0,300,Color.RED);
+        pointer = new CircleNR(0,0,0,100,Color.RED);
+        space.addGlyph(pointer);
     }
 
     void onLeftPress(){
@@ -92,7 +94,9 @@ public class DazBoard {
     }
 
     void onWheel(int wheel){
-        cam.setAltitude(wheel>0 ? 1.2f*cam.getAltitude() : 0.8f*cam.getAltitude());
+        int normWheel = (wheel>0)?1:-1;
+        float a = (cam.focal+Math.abs(cam.altitude)) / cam.focal;
+        cam.altitudeOffset(a*normWheel*WHEEL_ZOOM_FACTOR);
     }
 
     //newX, newY in view coordinates (0,0 top left, x right, y bottom)
@@ -100,7 +104,9 @@ public class DazBoard {
         LongPoint spcCoords = clusteredView.viewToSpaceCoords(cam, newX, newY);
         pointer.moveTo(spcCoords.x, spcCoords.y);
         if(dragging){
-            cam.moveTo(spcCoords.x, spcCoords.y);
+            long oldX = cam.posx;
+            long oldY = cam.posy;
+            cam.move((spcCoords.x - oldX)*0.05, (spcCoords.y - oldY)*0.05);
         }
     }
 

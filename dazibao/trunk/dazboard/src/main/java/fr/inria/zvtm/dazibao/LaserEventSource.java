@@ -7,6 +7,7 @@ import com.illposed.osc.OSCPortIn;
 /*
  * Handles input from a laser pointer type device
  * (vicon tracking + blind mouse for button press events) 
+ * ICON config: dazibao2
  */
 class LaserEventSource {
     private final DazBoard app;
