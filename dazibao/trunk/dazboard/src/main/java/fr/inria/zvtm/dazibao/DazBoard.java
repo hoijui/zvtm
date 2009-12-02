@@ -42,7 +42,7 @@ public class DazBoard {
     private Camera cam;
     private ClusteredView clusteredView;
     CircleNR pointer;
-    private boolean dragging = false;
+    private boolean panning = false;
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
     private long currX = 0;
@@ -80,14 +80,14 @@ public class DazBoard {
     }
 
     void onLeftPress(){
-        dragging = true;
+        panning = true;
     }
 
     void onRightPress(){
     }
 
     void onLeftRelease(){
-        dragging = false;
+        panning = false;
     }
 
     void onRightRelease(){
@@ -103,7 +103,7 @@ public class DazBoard {
     void onLaserMove(int newX, int newY){
         LongPoint spcCoords = clusteredView.viewToSpaceCoords(cam, newX, newY);
         pointer.moveTo(spcCoords.x, spcCoords.y);
-        if(dragging){
+        if(panning){
             long oldX = cam.posx;
             long oldY = cam.posy;
             cam.move((spcCoords.x - oldX)*0.05, (spcCoords.y - oldY)*0.05);
