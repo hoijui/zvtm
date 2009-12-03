@@ -7,6 +7,10 @@
 
 package fr.inria.zvtm.nodetrix;
 
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VTextOr;
+
 public class NTNode {
 
     String name;
@@ -16,6 +20,13 @@ public class NTNode {
     
     NTEdge[] outgoingEdges, incomingEdges;
     
+    /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
+	long hdx, hdy, vdx, vdy;
+	/* Vertical label */
+	VTextOr labelV;
+	/* Horizontal label */
+	VText labelH;
+	
     public NTNode(String name){
         this.name = name;
     }
@@ -70,6 +81,22 @@ public class NTNode {
 
     public String toString(){
         return name+"@"+hashCode();
+    }
+    
+    void createGraphics(long hdx, long hdy, long vdx, long vdy, VirtualSpace vs){
+        this.hdx = hdx;
+	    this.hdy = hdy;
+	    this.vdx = vdx;
+	    this.vdy = vdy;
+	    labelH = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_END);
+	    labelV = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    vs.addGlyph(labelH);
+	    vs.addGlyph(labelV);
+    }
+    
+    public void moveTo(long x, long y){
+        labelH.moveTo(x+hdx, y+hdy);
+        labelV.moveTo(x+vdx, y+vdy);
     }
 
 }

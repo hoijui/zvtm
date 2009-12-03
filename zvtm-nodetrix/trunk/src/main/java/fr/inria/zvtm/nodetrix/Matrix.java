@@ -11,6 +11,7 @@ import java.io.File;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 
 public class Matrix {
     
@@ -18,6 +19,8 @@ public class Matrix {
     NTNode[] nodes;
     
     VRectangle bkg;
+    VText matrixLb;
+    long matrixLbDY = 0;
     
     public Matrix(String name, NTNode[] nodes){
         this.name = name;
@@ -28,10 +31,23 @@ public class Matrix {
     }
     
     public void createGraphics(long x, long y, VirtualSpace vs){
+        // matrix background
         bkg = new VRectangle(x, y, 0,
                              nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
                              NodeTrixViz.MATRIX_FILL_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
         vs.addGlyph(bkg);
+        // matrix label
+	    matrixLbDY = Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.length+.5+Math.sqrt(2*nodes.length)));
+	    matrixLb = new VText(x, y-matrixLbDY, 0, NodeTrixViz.MATRIX_LABEL_COLOR, name, VText.TEXT_ANCHOR_MIDDLE, (float)Math.sqrt(2*nodes.length));
+	    vs.addGlyph(matrixLb);
+        for (int i=0;i<nodes.length;i++){
+    	    nodes[i].createGraphics(-NodeTrixViz.CELL_SIZE/2*nodes.length-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
+    	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.length-2*i-1)),
+    	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.length+2*i+1)),
+    	                            NodeTrixViz.CELL_SIZE/2*nodes.length+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
+    	                            vs);
+    	    nodes[i].moveTo(x, y);
+        }
     }
     
     public boolean isConnectedTo(Matrix m){

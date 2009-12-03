@@ -25,7 +25,7 @@ import fr.inria.zvtm.nodetrix.lll.OptimizerModularity;
 public class NodeTrixViz {
     
     /* Matrix appearance */
-    static long CELL_SIZE = 10;
+    static long CELL_SIZE = 20;
     static Color MATRIX_FILL_COLOR = Color.WHITE;
     static Color MATRIX_STROKE_COLOR = Color.BLACK;
     static Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
@@ -82,7 +82,7 @@ public class NodeTrixViz {
     }
     
     // have to find something better than this constant...
-    double SCALE = 20;
+    double SCALE = 40;
     
     public void createViz(VirtualSpace vs){
         Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
