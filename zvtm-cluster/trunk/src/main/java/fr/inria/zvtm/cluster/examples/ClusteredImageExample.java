@@ -12,6 +12,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import fr.inria.zvtm.cluster.ClusteredView;
+import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -35,30 +36,33 @@ import java.net.URL;
  */
 public class ClusteredImageExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
 
-	ClusteredImageExample(ImOptions options){
-		vsm.setMaster("ClusteredImageExample");
-		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
-		Camera cam = vs.addCamera();
-		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
-		ClusteredView cv = 
-			new ClusteredView(options.numRows-1, //origin (block number)
-					options.blockWidth, 
-					options.blockHeight,
-					options.numRows, 
-					options.numCols, 	
-					options.numRows, //use complete
-					options.numCols, //cluster surface
-					cameras);
-		cv.setBackgroundColor(Color.LIGHT_GRAY);
-		vsm.addClusteredView(cv);
+    ClusteredImageExample(ImOptions options){
+        vsm.setMaster("ClusteredImageExample");
+        VirtualSpace vs = vsm.addVirtualSpace("testSpace");
+        Camera cam = vs.addCamera();
+        Vector<Camera> cameras = new Vector<Camera>();
+        cameras.add(cam);	
+        ClusterGeometry clGeom = new ClusterGeometry(
+                options.blockWidth,
+                options.blockHeight,
+                options.numCols,
+                options.numRows);
+        ClusteredView cv = 
+            new ClusteredView(
+                    clGeom,
+                    options.numRows-1, //origin (block number)
+                    options.numRows, //use complete
+                    options.numCols, //cluster surface
+                    cameras);
+        cv.setBackgroundColor(Color.LIGHT_GRAY);
+        vsm.addClusteredView(cv);
 
-		//the view below is just a standard, non-clustered view
-		//that lets an user navigate the scene
-		View view = vsm.addFrameView(cameras, "Master View",
-			   View.STD_VIEW, 800, 600, false, true, true, null);	
+        //the view below is just a standard, non-clustered view
+        //that lets an user navigate the scene
+        View view = vsm.addFrameView(cameras, "Master View",
+                View.STD_VIEW, 800, 600, false, true, true, null);	
 		view.setEventHandler(new PanZoomEventHandler());
 
 		URL imgURL = null;

@@ -16,45 +16,25 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class ClusteredView implements Identifiable {
 	private final ObjId objId = ObjIdFactory.next();
 	private final int origin; //bottom-left block number
-	//width of a screen, in pixels, possibly including bezels
-	private int blockWidth;
-	private int blockHeight;
-	private final int nbRows;
-	private final int nbCols;
 	private final int viewRows;
 	private final int viewCols;
+    private ClusterGeometry clGeom;
 	private final ArrayList<Camera> cameras; 
 
 	/**
 	 * Constructs a new ClusteredView.
+     * @param clGeom cluster geometry
 	 * @param origin origin (bottom-left) block number
-	 * @param blockWidth width of a block, in pixels. Every block
-	 * of a ClusteredView is assumed to have the same width.
-	 * @param blockHeight height of a block, in pixels. Every block 
-	 * of a ClusteredView is assumed to have the same height.
-	 * @param nbRows number of rows in the cluster
-	 * @param nbCols number of columns in the cluster
 	 * @param viewRows number of rows in the view (viewRows <= nbRows)
 	 * @param viewCols number of columns in the view (viewCols <= nbCols)
 	 * @param cameas a list of cameras observed by this ClusteredView.
 	 */
-	public ClusteredView(int origin, 
-			int blockWidth, int blockHeight,
-			int nbRows, int nbCols,
-			int viewRows, int viewCols,
+	public ClusteredView(ClusterGeometry clGeom,
+            int origin, 
+            int viewRows, int viewCols,
 			List<Camera> cameras){
-		//clustered view is replicated on the slaves (provides cluster
-		//geometry)
-		//
-		//We might want to group all these parameters into a 
-		//'cluster geometry' object and a 'view geometry' object.
-		//Also, we might want to move the cluster geometry into its own
-		//class (separate from ClusterView).
-		this.origin = origin;
-		this.blockWidth = blockWidth;
-		this.blockHeight = blockHeight;
-		this.nbRows = nbRows;
-		this.nbCols = nbCols;
+        this.clGeom = clGeom;
+        this.origin = origin;
 		this.viewRows = viewRows;
 		this.viewCols = viewCols;
 		this.cameras = new ArrayList<Camera>(cameras);
@@ -62,41 +42,18 @@ public class ClusteredView implements Identifiable {
 		if(origin < 0){
 			throw new IllegalArgumentException("Blocks are 0-based naturals");
 		}
-		if((blockWidth <=0) || (blockHeight <=0)){
-			throw new IllegalArgumentException("Block dimensions should be greater than 0");
-		}
-		if((nbRows <= 0) || (nbCols <= 0)){
-			throw new IllegalArgumentException("Row and Column counts should be greater than 0");
-		}
-		if((viewRows <= 0) || (viewCols <= 0)){
+        if((viewRows <= 0) || (viewCols <= 0)){
 			throw new IllegalArgumentException("View row and column counts should be greater than 0");
 		}
-		if(viewRows > nbRows){ //XXX
+		if(viewRows > clGeom.getRows()){ //XXX
 			throw new IllegalArgumentException("View row(s) outside of cluster");
 		}
-		if(viewCols + colNum(origin) > nbCols){
+		if(viewCols + colNum(origin) > clGeom.getColumns()){
 			throw new IllegalArgumentException("View column(s) outside of cluster");
 		}
-
 	}
 
 	public ObjId getObjId(){ return objId; }
-
-	/**
-	 * Sets the dimensions of a block. This is useful e.g. to toggle
-	 * screen borders on/off
-	 * @param blockWidth new block width
-	 * @param blockHeight new block height
-	 * @throws IllegalArgumentException if blockWidth <= 0 or
-	 *                                     blockHeight <= 0
-	 */
-	public void setBlockSize(int blockWidth, int blockHeight){
-		if((blockWidth <=0) || (blockHeight <=0)){
-			throw new IllegalArgumentException("Block dimensions should be greater than 0");
-		}
-		this.blockWidth = blockWidth;
-		this.blockHeight = blockHeight;
-	}
 
 	/** 
 	 * Sets the background color for this ClusteredView.
@@ -113,7 +70,8 @@ public class ClusteredView implements Identifiable {
      * The height of this view is equal to blockHeight*viewRows
      */
 	public Dimension getSize(){
-		return new Dimension(blockWidth*viewCols, blockHeight*viewRows);
+		return new Dimension(clGeom.getBlockWidth()*viewCols, 
+                clGeom.getBlockHeight()*viewRows);
 	}
 
 	/**
@@ -173,13 +131,7 @@ public class ClusteredView implements Identifiable {
 	 */
 	int getOrigin() { return origin; }
 
-	int getBlockWidth(){ return blockWidth; }
-
-	int getBlockHeight(){ return blockHeight; }
-
-	int getNbRows() { return nbRows; }
-
-	int getNbCols() { return nbCols; }
+    ClusterGeometry getClusterGeometry(){ return clGeom; }
 
 	int getViewRows() { return viewRows; }
 
@@ -208,14 +160,18 @@ public class ClusteredView implements Identifiable {
 
 	//returns the column number associated with a block number.
 	//blocks are ordered column-wise
+    //column 0 is the leftmost column
+    //XXX move to ClusterGeometry?
 	int colNum(int blockNum){
-		return blockNum / nbRows;
+		return blockNum / clGeom.getRows();
 	}
 
 	//returns the row number associated with a block number
 	//blocks are ordered column-wise
+    //row 0 is the topmost one
+    //XXX move to ClusterGeometry?
 	int rowNum(int blockNum){
-		return blockNum % nbRows;
+		return blockNum % clGeom.getRows();
 	}
 
 	/**

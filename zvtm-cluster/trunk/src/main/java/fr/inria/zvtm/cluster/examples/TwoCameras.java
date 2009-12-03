@@ -12,6 +12,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import fr.inria.zvtm.cluster.ClusteredView;
+import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -43,13 +44,16 @@ public class TwoCameras {
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(cam);	
 		cameras.add(otherCam);
+        ClusterGeometry clGeom = new ClusterGeometry(
+                options.blockWidth,
+                options.blockHeight,
+                options.numCols,
+                options.numRows);
 		ClusteredView cv = 
-			new ClusteredView(options.numRows-1, //origin (block number)
-					options.blockWidth, 
-					options.blockHeight,
-					options.numRows, 
-					options.numCols, 	
-					options.numRows, //use complete
+			new ClusteredView(
+                    clGeom,
+                    options.numRows-1, //origin (block number)
+                    options.numRows, //use complete
 					options.numCols, //cluster surface
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);

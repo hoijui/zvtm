@@ -75,8 +75,9 @@ public class SlaveApp {
 		view = vsm.addFrameView(cv.getCameras(), 
 				"slaveView " + options.blockNumber, 
 				View.STD_VIEW,
-				cv.getBlockWidth(), 
-				cv.getBlockHeight(), false, false, true, null);
+				cv.getClusterGeometry().getBlockWidth(), 
+				cv.getClusterGeometry().getBlockHeight(), 
+                false, false, true, null);
 
 		// inputs: block width, block height, fullscreen
 		if(options.fullscreen){
@@ -130,9 +131,9 @@ public class SlaveApp {
 		float focal = slaveCamera.getFocal();
 		float altCoef = (focal + masterLoc.alt) / focal;
 		//block (screen) width in virtualspace coords
-		long virtBlockWidth = (long)(clusteredView.getBlockWidth() * altCoef);
+		long virtBlockWidth = (long)(clusteredView.getClusterGeometry().getBlockWidth() * altCoef);
 		//block (screen) height in virtualspace coords
-		long virtBlockHeight = (long)(clusteredView.getBlockHeight() * altCoef);	
+		long virtBlockHeight = (long)(clusteredView.getClusterGeometry().getBlockHeight() * altCoef);	
 
 		//row and col take origin block into account
 		int viewRows = clusteredView.getViewRows();

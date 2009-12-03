@@ -12,6 +12,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import fr.inria.zvtm.cluster.ClusteredView;
+import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
@@ -43,12 +44,15 @@ public class CenterOnRegion {
         Camera cam = vs.addCamera();
         Vector<Camera> cameras = new Vector<Camera>();
         cameras.add(cam);	
+        ClusterGeometry clGeom = new ClusterGeometry(
+                2760,
+                1740,
+                8,
+                4);
         ClusteredView cv = 
-            new ClusteredView(3, //origin (block number)
-                    2760, 
-                    1740,
-                    4, 
-                    8, 	
+            new ClusteredView(
+                    clGeom,
+                    3, //origin (block number)
                     3, 
                     4, 
                     cameras);
@@ -58,11 +62,9 @@ public class CenterOnRegion {
         Vector<Camera> cameras2 = new Vector<Camera>();
         cameras2.add(cam2);
         ClusteredView cv2 = 
-            new ClusteredView(27, //origin (block number)
-                    2760, 
-                    1740,
-                    4, 
-                    8, 	
+            new ClusteredView(
+                    clGeom,
+                    27, //origin (block number)
                     4, 
                     2, 
                     cameras2);

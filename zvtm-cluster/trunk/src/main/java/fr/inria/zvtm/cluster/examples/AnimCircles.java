@@ -15,6 +15,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.cluster.ClusteredView;
+import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -47,12 +48,15 @@ public class AnimCircles {
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(cam);	
+        ClusterGeometry clGeom = new ClusterGeometry(
+                options.blockWidth,
+                options.blockHeight,
+                options.numCols,
+                options.numRows);
 		ClusteredView cv = 
-			new ClusteredView(options.numRows-1, //origin (block number)
-					options.blockWidth, 
-					options.blockHeight,
-					options.numRows, 
-					options.numCols, 	
+			new ClusteredView(
+                    clGeom,
+                    options.numRows-1, //origin (block number)
 					options.numRows, //use complete
 					options.numCols, //cluster surface
 					cameras);

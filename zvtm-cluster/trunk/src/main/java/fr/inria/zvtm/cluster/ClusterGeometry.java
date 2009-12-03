@@ -1,12 +1,14 @@
 package fr.inria.zvtm.cluster;
 
+import java.io.Serializable;
+
 /**
  * A rectangular display wall.
  * Attributes are the size of a block (ie screen),
  * the number of rows and the number of columns of the wall.
  */
 //@Immutable
-public class ClusterGeometry {
+public class ClusterGeometry implements java.io.Serializable{
     private final int blockWidth;
     private final int blockHeight;
     private final int cols;

@@ -13,22 +13,16 @@ import fr.inria.zvtm.engine.Camera;
 
 class ClusteredViewCreateDelta implements Delta {
 	private final ObjId objId;
+    private final ClusterGeometry clGeom;
 	private final int origin;
-	private final int blockWidth;
-	private final int blockHeight;
-	private final int nbRows;
-	private final int nbCols;
 	private final int viewRows;
 	private final int viewCols;
 	private final ArrayList<ObjId<Camera>> camRefs;
 
 	ClusteredViewCreateDelta(ClusteredView cv){
 		this.objId = cv.getObjId();
+        this.clGeom = cv.getClusterGeometry();
 		this.origin = cv.getOrigin();
-		this.blockWidth = cv.getBlockWidth();
-		this.blockHeight = cv.getBlockHeight();
-		this.nbRows = cv.getNbRows();
-		this.nbCols = cv.getNbCols();
 		this.viewRows = cv.getViewRows();
 		this.viewCols = cv.getViewCols();
 		this.camRefs = makeCamRefs(cv.getCameras());
@@ -54,9 +48,9 @@ class ClusteredViewCreateDelta implements Delta {
 
 	public void apply(SlaveUpdater updater){
 		//create and register the local clustered view
-		ClusteredView cv = new ClusteredView(origin,
-				blockWidth, blockHeight,
-				nbRows, nbCols,
+		ClusteredView cv = new ClusteredView(
+                clGeom,
+                origin,
 				viewRows, viewCols,
 				refsToCameras(updater));
 		updater.putSlaveObject(objId, cv);
