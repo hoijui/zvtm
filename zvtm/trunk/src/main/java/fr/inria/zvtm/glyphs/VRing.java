@@ -165,6 +165,15 @@ public class VRing extends VSlice {
 		pr = (ProjRing[])pc;
 	}
 
+    /**
+     * Returns the inner radius ratio, as a percentage
+     * of the outer radius.
+     * @returns the inner radius ratio
+     */
+    public float getInnerRatio(){
+        return irr_p;
+    }
+
 	public void addCamera(int verifIndex){
 		if (pc != null){
 			if (verifIndex == pc.length){
