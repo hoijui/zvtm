@@ -23,6 +23,25 @@ public class ClusterGeometry {
         this.rows = rows;
     }
 
+    public ClusterGeometry(ClusterGeometry cg){
+        this.blockWidth = cg.blockWidth;
+        this.blockHeight = cg.blockHeight;
+        this.cols = cg.cols;
+        this.rows = cg.rows;
+    }
+
+    /**
+     * Returns a new ClusterGeometry that adds bezels to the dimensions
+     * of the current one (e.g. to allow drawing under the bezels).
+     * @param bezelWidth total bezel width (left+right)
+     * @param bezelHeight total bezel height (top+bottom)
+     */
+    public ClusterGeometry addBezels(int bezelWidth, int bezelHeight){
+        return new ClusterGeometry(this.blockWidth + bezelWidth,
+                this.blockHeight + bezelHeight,
+                cols, rows);
+    }
+
     /**
      * Returns the total width of the display wall
      */
