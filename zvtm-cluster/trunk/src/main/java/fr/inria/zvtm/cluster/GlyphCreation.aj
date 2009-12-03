@@ -20,6 +20,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
@@ -121,6 +122,11 @@ aspect GlyphCreation {
 		return new DPathCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
+
+    @Override private Delta VEllipse.getCreateDelta(){
+        return new VEllipseCreateDelta(this,
+                this.getParentSpace().getObjId());
+    }
 
 	private static class NopDelta implements Delta {
 		public void apply(SlaveUpdater su){}
@@ -352,5 +358,20 @@ aspect GlyphCreation {
 					0, Color.BLACK);
 		}
 	}
+
+    private static class VEllipseCreateDelta extends ClosedShapeCreateDelta {
+        private final long sx;
+        private final long sy;
+        
+        VEllipseCreateDelta(VEllipse source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+            this.sx = source.getWidth();
+            this.sy = source.getHeight();
+        }
+
+        Glyph createGlyph(){
+            return new VEllipse(0,0,0,sx,sy,Color.BLACK);
+        }
+    }
 }
 
