@@ -14,8 +14,50 @@ public class NTNode {
     /* Owning matrix */
     Matrix matrix;
     
+    NTEdge[] outgoingEdges, incomingEdges;
+    
     public NTNode(String name){
         this.name = name;
+    }
+    
+    public void addOutgoingEdge(NTEdge e){
+        if (outgoingEdges == null){
+            outgoingEdges = new NTEdge[1];
+            outgoingEdges[0] = e;
+        }
+        else {
+            NTEdge[] na = new NTEdge[outgoingEdges.length+1];
+            System.arraycopy(outgoingEdges, 0, na, 0, outgoingEdges.length);
+            na[outgoingEdges.length] = e;
+            outgoingEdges = na;
+        }
+    }
+    
+    public void addIncomingEdge(NTEdge e){
+        if (incomingEdges == null){
+            incomingEdges = new NTEdge[1];
+            incomingEdges[0] = e;
+        }
+        else {
+            NTEdge[] na = new NTEdge[incomingEdges.length+1];
+            System.arraycopy(incomingEdges, 0, na, 0, incomingEdges.length);
+            na[incomingEdges.length] = e;
+            incomingEdges = na;
+        }
+    }
+    
+    /**
+     *@return null if empty
+     */
+    public NTEdge[] getIncomingEdges(){
+        return incomingEdges;
+    }
+
+    /**
+     *@return null if empty
+     */
+    public NTEdge[] getOutgoingEdges(){
+        return outgoingEdges;
     }
     
     public void setMatrix(Matrix m){
@@ -27,7 +69,7 @@ public class NTNode {
     }
 
     public String toString(){
-        return name;
+        return name+"@"+hashCode();
     }
 
 }

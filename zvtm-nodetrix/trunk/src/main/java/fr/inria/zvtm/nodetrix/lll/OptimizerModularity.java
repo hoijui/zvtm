@@ -165,7 +165,7 @@ public class OptimizerModularity {
             
             System.out.println(" Contracting " + edge);
             Node contrNode = new Node(
-                    edge.startNode.name + " " + edge.endNode.name,
+                    null,
                     edge.startNode.weight + edge.endNode.weight);
             nodeToContr.put(edge.startNode, contrNode);
             nodeToContr.put(edge.endNode, contrNode);
@@ -181,7 +181,7 @@ public class OptimizerModularity {
         // "contract" singleton clusters
         for (Node node : nodes) {
             if (!nodeToContr.containsKey(node)) {
-                Node contrNode = new Node(node.name, node.weight);
+                Node contrNode = new Node(node.getMatrix(), node.weight);
                 nodeToContr.put(node, contrNode);
                 contrNodes.add(contrNode);
             }

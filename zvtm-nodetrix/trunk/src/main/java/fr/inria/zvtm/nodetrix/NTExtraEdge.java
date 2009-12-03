@@ -9,4 +9,9 @@ package fr.inria.zvtm.nodetrix;
 
 public class NTExtraEdge extends NTEdge {
 
+    public NTExtraEdge(NTNode t, NTNode h){
+        this.tail = t;
+        this.head = h;
+    }
+    
 }

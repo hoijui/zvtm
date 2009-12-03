@@ -9,4 +9,11 @@ package fr.inria.zvtm.nodetrix;
 
 public abstract class NTEdge {
 
+    NTNode tail, head;
+    
+    public void setNodes(NTNode t, NTNode h){
+        this.tail = t;
+        this.head = h;
+    }
+
 }

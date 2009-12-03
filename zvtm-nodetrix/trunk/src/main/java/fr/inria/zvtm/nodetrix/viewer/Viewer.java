@@ -191,7 +191,12 @@ public class Viewer {
         gp.setValue(5);
 		gp.setVisible(true);
 		gp.setLabel(Messages.PROCESSING+INPUT_FILE.toString());
+        gp.setValue(10);
         createGraph();
+        gp.setValue(50);
+        ntv.createViz(mSpace);
+        nm.getGlobalView();
+	    nm.updateOverview();
         gp.setVisible(false);
 	    gp.setLabel(Messages.EMPTY_STRING);
     }
@@ -199,7 +204,6 @@ public class Viewer {
     /* --------------- Graph / NodeTrix ------------------*/
     
     void createGraph(){
-        gp.setValue(10);
         HashMap<String,Vector> group2node = new HashMap();
         HashMap<String,Vector<String>> edges = new HashMap();
         HashMap<String,NTNode> name2node = new HashMap();
@@ -219,13 +223,15 @@ public class Viewer {
             System.err.println("Error loading file "+INPUT_FILE);
             ex.printStackTrace();
         }
-        gp.setValue(40);
         ntv = new NodeTrixViz(group2node.size());
         for (String group : group2node.keySet()){
             ntv.addMatrix(group, group2node.get(group));
         }
         for (String tail : edges.keySet()){
             for (String head : edges.get(tail)){
+                System.out.println("------------");
+                System.out.println(tail+" "+head);
+                System.out.println(name2node.get(tail)+" "+name2node.get(head));
                 ntv.addEdge(name2node.get(tail), name2node.get(head));                
             }
         }
@@ -236,7 +242,6 @@ public class Viewer {
     static final String ATTR_ASSIGN = "=";
     
     void parseLine(String line, HashMap<String,Vector> g2n, HashMap<String,NTNode> n2n, HashMap<String,Vector<String>> e){
-        System.out.println("processing "+line);
         String[] tokens = line.trim().split(EDGE_SYMB);
         if (tokens.length > 1){
             // edge declaration

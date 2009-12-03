@@ -20,23 +20,12 @@ import java.awt.event.KeyEvent;
 
 class ConfigManager {
     
-    /* Matrix appearance */
-    static final long NODE_SIZE = 10;
-    static final Color MATRIX_FILL_COLOR = Color.WHITE;
-    static final Color MATRIX_STROKE_COLOR = Color.BLACK;
-    static final Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
-    static final Color INTRA_LINK_COLOR = Color.BLUE;
-    static final int MATRIX_NODE_LABEL_DIST_BORDER = 2;
-
-    /* Links between matrices */
-    static final Color INTER_LINK_COLOR = Color.BLACK;
-
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
     static final Font SAY_MSG_FONT = new Font("Arial", Font.PLAIN, 24);
     static final Font MONOSPACE_ABOUT_FONT = new Font("Courier", Font.PLAIN, 8);
-
+    
     /* Other colors */
     static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
     static Color BACKGROUND_COLOR  = Color.LIGHT_GRAY;

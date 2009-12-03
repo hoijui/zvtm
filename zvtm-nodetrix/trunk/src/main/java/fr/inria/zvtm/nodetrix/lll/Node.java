@@ -18,6 +18,8 @@
    to avoid conflicts between class names (mostly Node/Edge) */
 package fr.inria.zvtm.nodetrix.lll;
 
+import fr.inria.zvtm.nodetrix.Matrix;
+
 /**
  * Weighted graph node.
  * 
@@ -25,16 +27,16 @@ package fr.inria.zvtm.nodetrix.lll;
  * @version 13.01.2008
  */
 public class Node {
-    /** Node name. */
-    public final String name;
+    
+    public final Matrix matrix;
     /** Node weight. */
     public final double weight;
     
     /**
      * Initializes the attributes.
      */
-    public Node (String name, double weight) {
-        this.name = name;
+    public Node (Matrix m, double weight) {
+        this.matrix = m;
         this.weight = weight;
     }
 
@@ -42,6 +44,15 @@ public class Node {
      * Returns a string representation of the object.
      */
     public String toString() {
-        return name + " " + weight;
+        return matrix.getName() + " " + weight;
     }
+    
+    public String getName(){
+        return (matrix != null) ? matrix.getName() : "null";
+    }
+    
+    public Matrix getMatrix(){
+        return matrix;
+    }
+    
 }

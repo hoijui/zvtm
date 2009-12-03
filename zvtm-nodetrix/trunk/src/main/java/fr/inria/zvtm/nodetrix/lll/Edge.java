@@ -48,7 +48,7 @@ public class Edge {
      * Returns a string representation of the object.
      */
     public String toString() {
-        return startNode.name + "->" + endNode.name + " " + weight;
+        return startNode.getName() + "->" + endNode.getName() + " " + weight;
     }
 }
 
