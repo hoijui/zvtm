@@ -23,6 +23,7 @@ import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTriangleOr;
@@ -131,6 +132,11 @@ aspect GlyphCreation {
 
     @Override private Delta VPoint.getCreateDelta(){
         return new VPointCreateDelta(this,
+                this.getParentSpace().getObjId());
+    }
+
+    @Override private Delta VRing.getCreateDelta(){
+        return new VRingCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
@@ -388,6 +394,25 @@ aspect GlyphCreation {
 
         Glyph createGlyph(){
             return new VPoint();
+        }
+    }
+
+    private static class VRingCreateDelta extends ClosedShapeCreateDelta {
+        private final long arcRadius;
+        private final double arcAngle;
+        private final float irRad; //inner ring radius (%outer ring radius)
+        private final double sliceOrient;
+        VRingCreateDelta(VRing source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+            this.arcRadius = source.vr;
+            this.arcAngle = source.angle;
+            this.irRad = source.getInnerRatio();
+            this.sliceOrient = source.orient;
+        }
+
+        Glyph createGlyph(){
+            return new VRing(0,0,0,arcRadius,arcAngle,irRad,sliceOrient,
+                    Color.BLACK, Color.BLACK);
         }
     }
 }
