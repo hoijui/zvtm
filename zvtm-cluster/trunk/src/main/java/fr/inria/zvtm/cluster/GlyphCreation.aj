@@ -21,6 +21,7 @@ import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
+import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
@@ -125,6 +126,11 @@ aspect GlyphCreation {
 
     @Override private Delta VEllipse.getCreateDelta(){
         return new VEllipseCreateDelta(this,
+                this.getParentSpace().getObjId());
+    }
+
+    @Override private Delta VPoint.getCreateDelta(){
+        return new VPointCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
@@ -371,6 +377,17 @@ aspect GlyphCreation {
 
         Glyph createGlyph(){
             return new VEllipse(0,0,0,sx,sy,Color.BLACK);
+        }
+    }
+
+    private static class VPointCreateDelta extends AbstractGlyphCreateDelta {
+
+        VPointCreateDelta(VPoint source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+        }
+
+        Glyph createGlyph(){
+            return new VPoint();
         }
     }
 }
