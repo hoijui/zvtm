@@ -14,8 +14,13 @@
 //License along with this library; if not, write to the Free Software
 //Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA 
 
-/* Putting Andreas Noack's code into a subpackage of this project
-   to avoid conflicts between class names (mostly Node/Edge) */
+/* $Id$*/
+
+/* Modified version of Andreas Noack's code from
+   http://code.google.com/p/linloglayout/
+   also licensed under LGPL. Modifications only
+   to integrate it better with the zvtm-nodetrix
+   datastructure */
 package fr.inria.zvtm.nodetrix.lll;
 
 import java.util.*;
