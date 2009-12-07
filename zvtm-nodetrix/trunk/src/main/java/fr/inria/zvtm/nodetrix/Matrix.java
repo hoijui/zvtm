@@ -10,6 +10,7 @@ package fr.inria.zvtm.nodetrix;
 import java.io.File;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
@@ -73,6 +74,10 @@ public class Matrix {
             }
         }
         return false;
+    }
+    
+    public LongPoint getPosition(){
+        return bkg.getLocation();
     }
     
     public String getName(){

@@ -23,7 +23,11 @@ public class NTIntraEdge extends NTEdge {
     
     public void createGraphics(long dx, long dy, VirtualSpace vs){
         this.offset = new LongPoint(dx, dy);
-        this.edgeRect = new VRectangle();
+        LongPoint mp = this.getTail().getMatrix().getPosition();
+        this.edgeRect = new VRectangle(mp.x+dx, mp.y+dy, 0,
+                                       NodeTrixViz.CELL_SIZE/2, NodeTrixViz.CELL_SIZE/2,
+                                       NodeTrixViz.INTRA_LINK_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
+        vs.addGlyph(edgeRect);
     }
 
 }
