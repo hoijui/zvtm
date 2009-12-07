@@ -110,8 +110,10 @@ public class NodeTrixViz {
 		// EOU
         for (Node node : nodeToPosition.keySet()) {
 			double[] position = nodeToPosition.get(node);
-			node.getMatrix().createGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
-            
+			node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
+		}
+		for (Matrix m:matrices){
+		    m.createEdgeGraphics(vs);
 		}
     }
     

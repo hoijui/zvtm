@@ -30,7 +30,7 @@ public class Matrix {
         }
     }
     
-    public void createGraphics(long x, long y, VirtualSpace vs){
+    public void createNodeGraphics(long x, long y, VirtualSpace vs){
         // matrix background
         bkg = new VRectangle(x, y, 0,
                              nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
@@ -47,6 +47,18 @@ public class Matrix {
     	                            NodeTrixViz.CELL_SIZE/2*nodes.length+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
     	                            vs);
     	    nodes[i].moveTo(x, y);
+        }
+    }
+    
+    public void createEdgeGraphics(VirtualSpace vs){
+        for (NTNode node:nodes){
+            if (node.getOutgoingEdges() != null){
+                for (NTEdge oe:node.getOutgoingEdges()){
+                    if (oe instanceof NTIntraEdge){
+                        oe.createGraphics(oe.getHead().vdx, oe.getTail().hdy, vs);
+                    }
+                }
+            }
         }
     }
     

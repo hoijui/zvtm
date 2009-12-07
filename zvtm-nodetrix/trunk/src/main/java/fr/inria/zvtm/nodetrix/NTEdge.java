@@ -7,6 +7,8 @@
 
 package fr.inria.zvtm.nodetrix;
 
+import fr.inria.zvtm.engine.VirtualSpace;
+
 public abstract class NTEdge {
 
     NTNode tail, head;
@@ -14,6 +16,16 @@ public abstract class NTEdge {
     public void setNodes(NTNode t, NTNode h){
         this.tail = t;
         this.head = h;
+    }
+
+    public abstract void createGraphics(long dx, long dy, VirtualSpace vs);
+    
+    public NTNode getTail(){
+        return tail;
+    }
+    
+    public NTNode getHead(){
+        return head;
     }
 
 }
