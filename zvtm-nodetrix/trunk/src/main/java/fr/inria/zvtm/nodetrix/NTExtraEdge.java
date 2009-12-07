@@ -13,7 +13,7 @@ import fr.inria.zvtm.glyphs.DPath;
 
 public class NTExtraEdge extends NTEdge {
     
-    fr.inria.zvtm.glyphs.VSegment edgePath;
+    DPath edgePath;
     // start and end point offsets w.r.t respective matrices
     LongPoint[] offsets;
 
@@ -28,14 +28,24 @@ public class NTExtraEdge extends NTEdge {
         offsets[1] = new LongPoint(x2, y2);
         LongPoint tmp = this.getTail().getMatrix().getPosition();
         LongPoint hmp = this.getHead().getMatrix().getPosition();
-        edgePath = new fr.inria.zvtm.glyphs.VSegment(tmp.x+offsets[0].x, tmp.y+offsets[0].y,
-                                                     0, NodeTrixViz.EXTRA_LINK_COLOR,
-                                                     hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+        edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+        long tm_sz = NodeTrixViz.CELL_SIZE * getTail().getMatrix().getSize()*2;
+        long hm_sz = NodeTrixViz.CELL_SIZE * getHead().getMatrix().getSize()*2;
+        edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y, tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y, hmp.x+offsets[1].x, hmp.y+offsets[1].y-hm_sz, true);        
         vs.addGlyph(edgePath);
     }
     
     void moveTo(long x, long y){
-        
+        // does not make sense, moving either head or tail
+        // see moveHeadTo() and moveTailTo()
+    }
+    
+    void moveHeadTo(long x, long y){
+        // TBW
+    }
+
+    void moveTailTo(long x, long y){
+        // TBW
     }
     
 }

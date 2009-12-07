@@ -61,7 +61,8 @@ public class Matrix {
                     }
                     else {
                         // instanceof NTExtraEdge
-                        oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().hdy, oe.getHead().vdx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2, vs);
+                        oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().hdy, oe.getHead().vdx,
+                                          -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2, vs);
                     }
                 }
             }
@@ -79,6 +80,10 @@ public class Matrix {
             }
         }
         return false;
+    }
+    
+    public void moveTo(long x, long y){
+        //TBW move matrix, its nodes, and all edges (inter/intra)
     }
     
     public LongPoint getPosition(){
