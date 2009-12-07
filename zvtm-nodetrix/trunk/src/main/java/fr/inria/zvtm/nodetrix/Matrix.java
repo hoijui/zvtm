@@ -55,8 +55,13 @@ public class Matrix {
         for (NTNode node:nodes){
             if (node.getOutgoingEdges() != null){
                 for (NTEdge oe:node.getOutgoingEdges()){
+                    // values that are 0 is because we do not care (not used)
                     if (oe instanceof NTIntraEdge){
-                        oe.createGraphics(oe.getHead().vdx, oe.getTail().hdy, vs);
+                        oe.createGraphics(0, oe.getTail().hdy, oe.getHead().vdx, 0, vs);
+                    }
+                    else {
+                        // instanceof NTExtraEdge
+                        oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().hdy, oe.getHead().vdx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2, vs);
                     }
                 }
             }
@@ -78,6 +83,10 @@ public class Matrix {
     
     public LongPoint getPosition(){
         return bkg.getLocation();
+    }
+    
+    public int getSize(){
+        return nodes.length;
     }
     
     public String getName(){

@@ -18,7 +18,9 @@ public abstract class NTEdge {
         this.head = h;
     }
 
-    public abstract void createGraphics(long dx, long dy, VirtualSpace vs);
+    abstract void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs);
+    
+    abstract void moveTo(long x, long y);
     
     public NTNode getTail(){
         return tail;
