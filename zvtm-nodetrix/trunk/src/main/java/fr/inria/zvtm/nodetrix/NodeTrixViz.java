@@ -39,7 +39,7 @@ public class NodeTrixViz {
     /* Matrices in this visualization */
     Matrix[] matrices;
     
-    public NodeTrixViz(int ic){
+    public NodeTrixViz(){
         matrices = new Matrix[0];
     }
     

@@ -223,15 +223,12 @@ public class Viewer {
             System.err.println("Error loading file "+INPUT_FILE);
             ex.printStackTrace();
         }
-        ntv = new NodeTrixViz(group2node.size());
+        ntv = new NodeTrixViz();
         for (String group : group2node.keySet()){
             ntv.addMatrix(group, group2node.get(group));
         }
         for (String tail : edges.keySet()){
             for (String head : edges.get(tail)){
-                System.out.println("------------");
-                System.out.println(tail+" "+head);
-                System.out.println(name2node.get(tail)+" "+name2node.get(head));
                 ntv.addEdge(name2node.get(tail), name2node.get(head));                
             }
         }
