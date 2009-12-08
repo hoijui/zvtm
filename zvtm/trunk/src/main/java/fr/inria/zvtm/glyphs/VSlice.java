@@ -197,6 +197,26 @@ public class VSlice extends ClosedShape {
 		xpcoords = new int[n];
 	    ypcoords = new int[n];
 	}
+	
+	public void moveTo(long x, long y){
+	    p1.translate(x-vx, y-vy);
+	    p2.translate(x-vx, y-vy);
+	    super.moveTo(x, y);
+	    computeSize();
+        computeOrient();
+        computeAngle();
+        computePolygonEdges();
+    }
+
+	public void move(long x, long y){
+	    p1.translate(x, y);
+	    p2.translate(x, y);
+	    super.move(x, y);
+	    computeSize();
+        computeOrient();
+        computeAngle();
+        computePolygonEdges();
+    }
 
 	/** FOR INTERNAL USE ONLY */
     public void computeSize(){
