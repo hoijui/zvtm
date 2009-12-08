@@ -18,6 +18,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import java.awt.Shape;
 
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.VSlice;
@@ -155,6 +156,20 @@ public class VRing extends VSlice {
         setColor(c);
         setBorderColor(bc);
         setTranslucencyValue(alpha);
+    }
+
+    public void move(long x, long y){
+        vx += x;
+        vy += y;
+        propagateMove(x, y);
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+
+    public void moveTo(long x, long y){
+        propagateMove(x-vx, y-vy);
+        vx = x;
+        vy = y;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	public void initCams(int nbCam){
