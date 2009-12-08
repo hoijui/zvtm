@@ -12,6 +12,7 @@ import java.awt.geom.GeneralPath;
 
 import java.net.URL;
 
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -22,6 +23,7 @@ import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VPoint;
+import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
@@ -143,6 +145,11 @@ aspect GlyphCreation {
 
     @Override private Delta VSlice.getCreateDelta(){
         return new VSliceCreateDelta(this,
+                this.getParentSpace().getObjId());
+    }
+
+    @Override private Delta VPolygon.getCreateDelta(){
+        return new VPolygonCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
@@ -438,6 +445,19 @@ aspect GlyphCreation {
         Glyph createGlyph(){
             return new VSlice(0,0,0,arcRadius,arcAngle,sliceOrient,
                     Color.BLACK,Color.BLACK);
+        }
+    }
+
+    private static class VPolygonCreateDelta extends ClosedShapeCreateDelta {
+        private final LongPoint[] coords;
+
+        VPolygonCreateDelta(VPolygon source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+            this.coords = source.getAbsoluteVertices();
+        }
+
+        Glyph createGlyph(){
+            return new VPolygon(coords, 0, Color.BLACK);
         }
     }
 }

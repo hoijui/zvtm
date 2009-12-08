@@ -17,6 +17,7 @@ import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -24,6 +25,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VEllipse;
+import fr.inria.zvtm.glyphs.VPolygon;
 
 import java.awt.Color;
 import java.util.Random;
@@ -75,26 +77,37 @@ public class AnimEllipses {
 		long sceneHeight = (long)(0.6*sceneWidth);
 		long posIncr = (long)(sceneHeight / options.numGlyphs);
 		long radius = (long)(0.45 * posIncr);
-		for(int i=0; i<options.numGlyphs; ++i){
-			final Glyph ellipse = new VEllipse(i*posIncr,i*posIncr,
-					0,
-					radius,
-                    (long)(0.3*radius),
-					Color.getHSBColor(
-						rnd.nextFloat(),
-						rnd.nextFloat(),
-						rnd.nextFloat()));
-			vs.addGlyph(ellipse);
+        for(int i=0; i<options.numGlyphs; ++i){
+            final Glyph glyph;
+            final Color nextColor = Color.getHSBColor(
+                    rnd.nextFloat(),
+                    rnd.nextFloat(),
+                    rnd.nextFloat());
+            if(i%2 == 0){
+                glyph = new VEllipse(i*posIncr,i*posIncr,
+                        0,
+                        radius,
+                        (long)(0.3*radius),
+                        nextColor);
+            } else {
+                LongPoint[] coords = new LongPoint[3];
+                coords[0] = new LongPoint(i*posIncr, i*posIncr);
+                coords[1] = new LongPoint(i*posIncr, (i+0.9)*posIncr);
+                coords[2] = new LongPoint((i+0.9)*posIncr, i*posIncr);
 
-			Animation anim = am.getAnimationFactory().createAnimation(
-					3000,
-					Animation.INFINITE,
+                glyph = new VPolygon(coords, 0, nextColor);
+            }
+            vs.addGlyph(glyph);
+
+            Animation anim = am.getAnimationFactory().createAnimation(
+                    3000,
+                    Animation.INFINITE,
 					Animation.RepeatBehavior.REVERSE,
-					ellipse,
+					glyph,
 					Animation.Dimension.POSITION,
 					new DefaultTimingHandler(){
-						final long initX = ellipse.vx;
-						final long initY = ellipse.vy;
+						final long initX = glyph.vx;
+						final long initY = glyph.vy;
 
 						public void timingEvent(float fraction, 
 							Object subject, Animation.Dimension dim){
