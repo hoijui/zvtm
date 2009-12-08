@@ -24,6 +24,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRing;
+import fr.inria.zvtm.glyphs.VSlice;
 
 import java.awt.Color;
 import java.util.Random;
@@ -74,30 +75,42 @@ public class AnimRings {
 		long sceneWidth = options.width;
 		long sceneHeight = (long)(0.6*sceneWidth);
 		long posIncr = (long)(sceneHeight / options.numGlyphs);
-		long radius = (long)(0.45 * posIncr);
+        long radius = (long)(0.45 * posIncr);
         for(int i=0; i<options.numGlyphs; ++i){
-            final Glyph ring = new VRing(i*posIncr,i*posIncr,
-                    0,
-                    radius,
-                    Math.PI/8,
-                    0.5f,
-                    0, 
-                    Color.getHSBColor(
-                        rnd.nextFloat(),
-                        rnd.nextFloat(),
-                        rnd.nextFloat()),
-                    Color.RED);
-            vs.addGlyph(ring);
+            final Glyph glyph;
+            final Color nextColor =  Color.getHSBColor(
+                    rnd.nextFloat(),
+                    rnd.nextFloat(),
+                    rnd.nextFloat());
+            if(i%2 == 0){
+                glyph = new VRing(i*posIncr,i*posIncr,
+                        0,
+                        radius,
+                        Math.PI/8,
+                        0.5f,
+                        0, 
+                        nextColor,
+                        Color.RED);
+            } else {
+                glyph = new VSlice(i*posIncr,i*posIncr,
+                        0,
+                        radius,
+                        Math.PI/8,
+                        0d, 
+                        nextColor,
+                        Color.RED);
+            }
+            vs.addGlyph(glyph);
 
             Animation anim = am.getAnimationFactory().createAnimation(
                     3000,
 					Animation.INFINITE,
 					Animation.RepeatBehavior.REVERSE,
-					ring,
+					glyph,
 					Animation.Dimension.POSITION,
 					new DefaultTimingHandler(){
-						final long initX = ring.vx;
-						final long initY = ring.vy;
+						final long initX = glyph.vx;
+						final long initY = glyph.vy;
 
 						public void timingEvent(float fraction, 
 							Object subject, Animation.Dimension dim){
@@ -105,12 +118,12 @@ public class AnimRings {
 							g.moveTo(initX,
 								Float.valueOf((1-fraction)*initY).longValue());
 						}
-					},
-					new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
-			anim.setStartFraction(rnd.nextFloat());
-			am.startAnimation(anim, false);
-		}
-	}
+                    },
+                    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
+            anim.setStartFraction(rnd.nextFloat());
+            am.startAnimation(anim, false);
+        }
+    }
 
 	public static void main(String[] args){
 		AROptions options = new AROptions();
