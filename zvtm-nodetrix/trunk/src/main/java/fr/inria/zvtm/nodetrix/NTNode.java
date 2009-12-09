@@ -84,7 +84,7 @@ public class NTNode {
     }
     
     long getLabelWidth(){
-        return labelE.getBounds(0).x;
+        return (labelE == null) ? 0 : labelE.getBounds(0).x;
     }
     
     void createGraphics(long wdx, long wdy, long ndx, long ndy, long edx, long edy, long sdx, long sdy, VirtualSpace vs){

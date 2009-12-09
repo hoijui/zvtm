@@ -90,17 +90,30 @@ public class NodeTrixViz {
     
     public void createViz(VirtualSpace vs){
         Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
+        // keep trace of matrices tha are not part of the graph ; we still want to display them
+        HashMap<Matrix,Object> orphanMatrices = new HashMap();
+        for (Matrix m:matrices){
+            orphanMatrices.put(m, null);
+        }
         // building LLL graph to feed to the layout algorithm
         for (Matrix matrix : matrices){
             for (Matrix matrix2 : matrices){
                 if (matrix != matrix2 && matrix.isConnectedTo(matrix2)){
                     if (llg.get(matrix) == null){
                         llg.put(matrix, new HashMap<Matrix,Double>());
+                        orphanMatrices.remove(matrix);
                     }
                     llg.get(matrix).put(matrix2, new Double(matrix.nodes.length));
                 }
             }
         }
+        // for each orphan matrix, create an artifical link (that will not be displayed)
+        // between orphan matrix and one random matrix that is part of the main graph
+        // give it a weak weight (0.1) 
+		for (Matrix m:orphanMatrices.keySet()){
+		    llg.put(m, new HashMap<Matrix,Double>());
+		    llg.get(m).put(llg.keySet().iterator().next(), new Double(0.1));
+		}
         llg = makeSymmetricGraph(llg);
         Map<Matrix,Node> matrixToLLNode = makeNodes(llg);
         List<Node> llnodes = new ArrayList<Node>(matrixToLLNode.values());
