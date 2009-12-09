@@ -31,7 +31,11 @@ public class NTExtraEdge extends NTEdge {
         edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
         long tm_sz = NodeTrixViz.CELL_SIZE * getTail().getMatrix().getSize()*2;
         long hm_sz = NodeTrixViz.CELL_SIZE * getHead().getMatrix().getSize()*2;
-        edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y, tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y, hmp.x+offsets[1].x, hmp.y+offsets[1].y-hm_sz, true);        
+        if (x1 < 0){tm_sz = -tm_sz;}
+        if (y2 < 0){hm_sz = -hm_sz;}
+        edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                            tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y,
+                            hmp.x+offsets[1].x, hmp.y+offsets[1].y+hm_sz, true);        
         vs.addGlyph(edgePath);
     }
     

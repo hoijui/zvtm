@@ -99,8 +99,36 @@ public class Matrix {
                     }
                     else {
                         // instanceof NTExtraEdge
-                        oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy, oe.getHead().ndx,
-                                          -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2, vs);
+                        long dx = oe.head.getMatrix().bkg.vx - oe.tail.getMatrix().bkg.vx;
+                        long dy = oe.head.getMatrix().bkg.vy - oe.tail.getMatrix().bkg.vy;
+                        if (dx < 0){
+                            if (dy < 0){
+                                // south west of start point
+                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
+                                                  vs);                                
+                            }
+                            else {
+                                // north west of start point
+                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                                  oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
+                                                  vs);                                
+                            }
+                        }
+                        else {
+                            if (dy < 0){
+                                // south east of start point
+                                oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
+                                                  vs);                                
+                            }
+                            else {
+                                // north east of start point
+                                oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                                  oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
+                                                  vs);                                
+                            }                            
+                        }
                     }
                 }
             }
