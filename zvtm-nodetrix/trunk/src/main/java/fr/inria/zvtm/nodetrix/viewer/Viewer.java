@@ -40,6 +40,7 @@ import java.io.InputStreamReader;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.RepaintAdapter;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -161,14 +162,7 @@ public class Viewer {
 		fc.setDialogTitle(Messages.LOAD_FILE);
 		int returnVal= fc.showOpenDialog(mView.getFrame());
 		if (returnVal == JFileChooser.APPROVE_OPTION){
-		    final SwingWorker worker = new SwingWorker(){
-			    public Object construct(){
-					reset();
-					load(fc.getSelectedFile());
-					return null; 
-			    }
-			};
-		    worker.start();
+			load(fc.getSelectedFile());
 		}
 	}
 
@@ -188,17 +182,26 @@ public class Viewer {
         if (inputFile == null){return;}
 		INPUT_FILE = inputFile;
 	    INPUT_FILE_DIR = INPUT_FILE.getParentFile();
-        gp.setValue(5);
-		gp.setVisible(true);
-		gp.setLabel(Messages.PROCESSING+INPUT_FILE.toString());
-        gp.setValue(10);
-        createGraph();
-        gp.setValue(50);
-        ntv.createViz(mSpace);
-        nm.getGlobalView();
-	    nm.updateOverview();
-        gp.setVisible(false);
-	    gp.setLabel(Messages.EMPTY_STRING);
+	    final SwingWorker worker = new SwingWorker(){
+		    public Object construct(){
+        		reset();
+                gp.setValue(5);
+        		gp.setVisible(true);
+        		gp.setLabel(Messages.PROCESSING+INPUT_FILE.toString());
+                gp.setValue(10);
+                createGraph();
+                gp.setValue(50);
+                ntv.createViz(mSpace);
+                nm.mCamera.setLocation(mView.getGlobalView(nm.mCamera, 1.05f));
+                sleep(500);
+                ntv.finishCreateViz(mSpace);
+        	    nm.updateOverview();
+                gp.setVisible(false);
+        	    gp.setLabel(Messages.EMPTY_STRING);
+				return null; 
+		    }
+		};
+	    worker.start();
     }
     
     /* --------------- Graph / NodeTrix ------------------*/

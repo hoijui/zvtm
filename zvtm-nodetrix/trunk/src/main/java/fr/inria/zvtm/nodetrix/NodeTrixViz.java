@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.ArrayList;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.RepaintAdapter;
 
 import fr.inria.zvtm.nodetrix.lll.Node;
 import fr.inria.zvtm.nodetrix.lll.Edge;
@@ -32,7 +34,8 @@ public class NodeTrixViz {
     static Color INTRA_LINK_COLOR = Color.BLUE;
     static Color EXTRA_LINK_COLOR = Color.BLUE;
     static int MATRIX_NODE_LABEL_DIST_BORDER = 2;
-
+    static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(247,255,180);
+    
     /* Links between matrices */
     static Color INTER_LINK_COLOR = Color.BLACK;
 
@@ -107,13 +110,23 @@ public class NodeTrixViz {
 		// for classical "nice" layout (uniformly distributed nodes), use
 		new MinimizerBarnesHut(llnodes, lledges, -1.0, 2.0, 0.05).minimizeEnergy(nodeToPosition, 100);
 		// following might actually be useless, not sure yet...
-		Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
+		//Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
 		// EOU
         for (Node node : nodeToPosition.keySet()) {
 			double[] position = nodeToPosition.get(node);
 			node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
 		}
-		for (Matrix m:matrices){
+    }
+
+	/** Finish creating the visualization.
+	 *  Make sure the view has been painted once so that we have access to VText bounding boxes
+	 *  before instantiating the remaining graphical elements
+	 */
+    public void finishCreateViz(VirtualSpace vs){
+        for (Matrix m:matrices){
+            m.finishCreateNodeGraphics(vs);
+        }
+        for (Matrix m:matrices){
 		    m.createEdgeGraphics(vs);
 		}
     }

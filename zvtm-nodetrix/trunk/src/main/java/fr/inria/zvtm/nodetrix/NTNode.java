@@ -21,11 +21,11 @@ public class NTNode {
     NTEdge[] outgoingEdges, incomingEdges;
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
-	long hdx, hdy, vdx, vdy;
+	long wdx, wdy, ndx, ndy, edx, edy, sdx, sdy;
 	/* Vertical label */
-	VTextOr labelV;
+	VTextOr labelN, labelS;
 	/* Horizontal label */
-	VText labelH;
+	VText labelW, labelE;
 	
     public NTNode(String name){
         this.name = name;
@@ -83,20 +83,34 @@ public class NTNode {
         return name+"@"+hashCode();
     }
     
-    void createGraphics(long hdx, long hdy, long vdx, long vdy, VirtualSpace vs){
-        this.hdx = hdx;
-	    this.hdy = hdy;
-	    this.vdx = vdx;
-	    this.vdy = vdy;
-	    labelH = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_END);
-	    labelV = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
-	    vs.addGlyph(labelH);
-	    vs.addGlyph(labelV);
+    long getLabelWidth(){
+        return labelE.getBounds(0).x;
+    }
+    
+    void createGraphics(long wdx, long wdy, long ndx, long ndy, long edx, long edy, long sdx, long sdy, VirtualSpace vs){
+        this.wdx = wdx;
+	    this.wdy = wdy;
+	    this.ndx = ndx;
+	    this.ndy = ndy;
+        this.edx = edx;
+	    this.edy = edy;
+	    this.sdx = sdx;
+	    this.sdy = sdy;
+	    labelW = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_END);
+	    labelN = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    labelE = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_START);
+	    labelS = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, -(float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    vs.addGlyph(labelW);
+	    vs.addGlyph(labelN);
+	    vs.addGlyph(labelE);
+	    vs.addGlyph(labelS);
     }
     
     public void moveTo(long x, long y){
-        labelH.moveTo(x+hdx, y+hdy);
-        labelV.moveTo(x+vdx, y+vdy);
+        labelW.moveTo(x+wdx, y+wdy);
+        labelN.moveTo(x+ndx, y+ndy);
+        labelE.moveTo(x+edx, y+edy);
+        labelS.moveTo(x+sdx, y+sdy);
     }
 
 }
