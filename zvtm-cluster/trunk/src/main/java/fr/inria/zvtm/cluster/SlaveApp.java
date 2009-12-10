@@ -116,14 +116,13 @@ public class SlaveApp {
 			}
 		}
 
-		//XXX fix bgcolor
 		view.setBackgroundColor(Color.BLACK);
 		view.setVisible(true);
 	}
 
 	void setCameraLocation(Location masterLoc,
 			Camera slaveCamera){
-		if(clusteredView == null || (!clusteredView.owns(slaveCamera))){
+		if(clusteredView == null || (!clusteredView.ownsCamera(slaveCamera))){
 			slaveCamera.setLocation(masterLoc);
 			return;
 		}

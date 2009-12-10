@@ -84,7 +84,7 @@ public class ClusteredView implements Identifiable {
 	 *         right, y increases downwards)
 	 */
 	public Point spaceToViewCoords(Camera cam, long xPos, long yPos){  
-		if(!this.owns(cam)){
+		if(!this.ownsCamera(cam)){
 			throw new IllegalArgumentException("this view does not own Camera 'cam'");
 		} 
 
@@ -106,7 +106,7 @@ public class ClusteredView implements Identifiable {
 	 * @param yPos point y-coordinate, in View coords
 	 */
 	public LongPoint viewToSpaceCoords(Camera cam, int xPos, int yPos){
-		if(!this.owns(cam)){
+		if(!this.ownsCamera(cam)){
 			throw new IllegalArgumentException("this view does not own Camera 'cam'");
 		}
 
@@ -182,7 +182,7 @@ public class ClusteredView implements Identifiable {
 
 	 */
     public Location centerOnRegion(Camera cam, long x1, long y1, long x2, long y2){
-       if(!this.owns(cam)){
+       if(!this.ownsCamera(cam)){
            throw new IllegalArgumentException("this view does not own Camera 'cam'");
        } 
 
@@ -207,7 +207,7 @@ public class ClusteredView implements Identifiable {
    // public Location centerOnGlyph(Camera cam, Glyph glyph){
    // }
 
-    boolean owns(Camera cam){
+    boolean ownsCamera(Camera cam){
         return cameras.contains(cam);
     }
 }
