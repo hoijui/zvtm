@@ -20,6 +20,7 @@ public class ClusteredView implements Identifiable {
 	private final int viewCols;
     private ClusterGeometry clGeom;
 	private final ArrayList<Camera> cameras; 
+    private Color bgColor;
 
 	/**
 	 * Constructs a new ClusteredView.
@@ -38,6 +39,7 @@ public class ClusteredView implements Identifiable {
 		this.viewRows = viewRows;
 		this.viewCols = viewCols;
 		this.cameras = new ArrayList<Camera>(cameras);
+        this.bgColor = Color.DARK_GRAY;
 
 		if(origin < 0){
 			throw new IllegalArgumentException("Blocks are 0-based naturals");
@@ -57,12 +59,19 @@ public class ClusteredView implements Identifiable {
 
 	/** 
 	 * Sets the background color for this ClusteredView.
-	 * Not implemented yet.
 	 * @param color new background color
 	 */
 	public void setBackgroundColor(Color color){
-	//XXX implement	
+        this.bgColor = color;
 	}
+
+    /** 
+     * Gets the background color.
+     * @return the current background color
+     */
+    public Color getBackgroundColor(){
+        return bgColor;
+    }
 
     /**
      * Returns the size of this ClusteredView, in pixels.
@@ -179,7 +188,6 @@ public class ClusteredView implements Identifiable {
 	 * @param y1 first point y-coordinate, in VirtualSpace coords	 
 	 * @param x2 second point x-coordinate, in VirtualSpace coords
 	 * @param y2 second point y-coordinate, in VirtualSpace coords
-
 	 */
     public Location centerOnRegion(Camera cam, long x1, long y1, long x2, long y2){
        if(!this.ownsCamera(cam)){

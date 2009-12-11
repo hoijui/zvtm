@@ -10,6 +10,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 
+import java.awt.Color;
 import java.util.Map;
 import java.util.HashMap;
 import javax.swing.SwingUtilities;
@@ -109,6 +110,10 @@ public class SlaveUpdater {
 			Camera slaveCamera){
 		appDelegate.setCameraLocation(masterLoc, slaveCamera);
 	}
+
+    void setBackgroundColor(ClusteredView cv, Color bgColor){
+        appDelegate.setBackgroundColor(cv, bgColor);
+    }
 
 	class NetworkDelegate {
 		private JChannel channel;

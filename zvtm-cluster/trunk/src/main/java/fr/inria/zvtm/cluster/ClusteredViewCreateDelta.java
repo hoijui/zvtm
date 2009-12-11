@@ -6,6 +6,7 @@
  */ 
 package fr.inria.zvtm.cluster;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Vector;
  
@@ -18,6 +19,7 @@ class ClusteredViewCreateDelta implements Delta {
 	private final int viewRows;
 	private final int viewCols;
 	private final ArrayList<ObjId<Camera>> camRefs;
+    private final Color bgColor;
 
 	ClusteredViewCreateDelta(ClusteredView cv){
 		this.objId = cv.getObjId();
@@ -26,6 +28,7 @@ class ClusteredViewCreateDelta implements Delta {
 		this.viewRows = cv.getViewRows();
 		this.viewCols = cv.getViewCols();
 		this.camRefs = makeCamRefs(cv.getCameras());
+        this.bgColor = cv.getBackgroundColor();
 	}
 
 	private static final ArrayList<ObjId<Camera>> 
@@ -53,6 +56,7 @@ class ClusteredViewCreateDelta implements Delta {
                 origin,
 				viewRows, viewCols,
 				refsToCameras(updater));
+        cv.setBackgroundColor(bgColor);
 		updater.putSlaveObject(objId, cv);
 		//set owning view for cameras
 		//ask slaveupdater to create a local view

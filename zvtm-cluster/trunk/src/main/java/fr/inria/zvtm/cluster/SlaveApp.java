@@ -78,6 +78,7 @@ public class SlaveApp {
 				cv.getClusterGeometry().getBlockWidth(), 
 				cv.getClusterGeometry().getBlockHeight(), 
                 false, false, true, null);
+        view.setBackgroundColor(cv.getBackgroundColor());
 
 		// inputs: block width, block height, fullscreen
 		if(options.fullscreen){
@@ -115,8 +116,6 @@ public class SlaveApp {
 				((JFrame)view.getFrame()).addNotify();
 			}
 		}
-
-		view.setBackgroundColor(Color.BLACK);
 		view.setVisible(true);
 	}
 
@@ -148,6 +147,17 @@ public class SlaveApp {
 
 		slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
 	}
+
+    void setBackgroundColor(ClusteredView cv, Color bgColor){
+        //find if cv owns the local view. 	
+        if(!cv.ownsBlock(options.blockNumber)){
+			return;
+		}
+        if(view == null){
+            return;
+        }
+        view.setBackgroundColor(bgColor);
+    }
 }
 
 class SlaveOptions {
