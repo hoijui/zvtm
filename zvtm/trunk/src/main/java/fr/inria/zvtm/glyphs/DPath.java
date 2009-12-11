@@ -183,11 +183,13 @@ public class DPath extends Glyph implements RectangularShape {
 	public void addCbCurve(long x, long y, long x1, long y1, long x2, long y2, boolean abs){
 		CBCElement e;
 		if (abs){
-			e = new CBCElement(x, y, x1, y1, x2, y2);
+		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
+			e = new CBCElement(x, y, x1, y1, x2, y2, (pc!=null) ? pc.length : 0);
 			endPoint.setLocation(x, y);
 		}
 		else {
-			e = new CBCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, endPoint.x+x2, endPoint.y+y2);
+		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
+			e = new CBCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, endPoint.x+x2, endPoint.y+y2, (pc!=null) ? pc.length : 0);
 			endPoint.translate(x, y);
 		}
 		PathElement[] tmp = new PathElement[elements.length+1];
@@ -209,11 +211,13 @@ public class DPath extends Glyph implements RectangularShape {
 	public void addQdCurve(long x, long y, long x1, long y1, boolean abs){
 		QDCElement e;
 		if (abs){
-			e = new QDCElement(x, y, x1, y1);
+		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
+			e = new QDCElement(x, y, x1, y1, (pc!=null) ? pc.length : 0);
 			endPoint.setLocation(x, y);
 		}
 		else {
-			e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1);
+		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
+			e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, (pc!=null) ? pc.length : 0);
 			endPoint.translate(x, y);
 		}
 		PathElement[] tmp = new PathElement[elements.length+1];
@@ -235,7 +239,8 @@ public class DPath extends Glyph implements RectangularShape {
 		else {endPoint.translate(x, y);}
 		PathElement[] tmp = new PathElement[elements.length+1];
 		System.arraycopy(elements, 0, tmp, 0, elements.length);
-		tmp[elements.length] = new SEGElement(endPoint.x, endPoint.y);
+	    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
+		tmp[elements.length] = new SEGElement(endPoint.x, endPoint.y, (pc!=null) ? pc.length : 0);
 		Arrays.fill(elements, null);
 		elements = tmp;
 		computeBounds();
@@ -259,7 +264,8 @@ public class DPath extends Glyph implements RectangularShape {
 		else {
 			PathElement[] tmp = new PathElement[elements.length+1];
 			System.arraycopy(elements, 0, tmp, 0, elements.length);
-			tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y);
+		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
+			tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y, (pc!=null) ? pc.length : 0);
 			Arrays.fill(elements, null);
 			elements = tmp;			
 		}
@@ -1218,10 +1224,13 @@ class MOVElement extends PathElement {
     Point2D[] pc;
     Point2D[] lpc;
 
-    MOVElement(long x, long y){
-	type = DPath.MOV;
-	this.x = x;
-	this.y = y;
+    MOVElement(long x, long y, int nbCam){
+        type = DPath.MOV;
+        this.x = x;
+        this.y = y;
+        if (nbCam > 0){
+            initCams(nbCam);
+        }
     }
     
     void initCams(int nbCam){
@@ -1303,11 +1312,14 @@ class SEGElement extends PathElement {
 
     Line2D[] pc;
     Line2D[] lpc;
-    
-    SEGElement(long x, long y){
-	type = DPath.SEG;
-	this.x = x;
-	this.y = y;
+
+    SEGElement(long x, long y, int nbCam){
+        type = DPath.SEG;
+        this.x = x;
+        this.y = y;
+        if (nbCam > 0){
+            initCams(nbCam);
+        }
     }
 
     void initCams(int nbCam){
@@ -1394,12 +1406,15 @@ class QDCElement extends PathElement {
     QuadCurve2D[] pc;
     QuadCurve2D[] lpc;
 
-    QDCElement(long x, long y, long ctrlx, long ctrly){
-	type = DPath.QDC;
-	this.x = x;
-	this.y = y;
-	this.ctrlx = ctrlx;
-	this.ctrly = ctrly;
+    QDCElement(long x, long y, long ctrlx, long ctrly, int nbCam){
+        type = DPath.QDC;
+        this.x = x;
+        this.y = y;
+        this.ctrlx = ctrlx;
+        this.ctrly = ctrly;
+        if (nbCam > 0){
+            initCams(nbCam);
+        }
     }
 
     void initCams(int nbCam){
@@ -1488,14 +1503,17 @@ class CBCElement extends PathElement {
     CubicCurve2D[] pc;
     CubicCurve2D[] lpc;
 
-    CBCElement(long x, long y, long ctrlx1, long ctrly1, long ctrlx2, long ctrly2){
-	type = DPath.CBC;
-	this.x = x;
-	this.y = y;
-	this.ctrlx1 = ctrlx1;
-	this.ctrly1 = ctrly1;
-	this.ctrlx2 = ctrlx2;
-	this.ctrly2 = ctrly2;
+    CBCElement(long x, long y, long ctrlx1, long ctrly1, long ctrlx2, long ctrly2, int nbCam){
+        type = DPath.CBC;
+        this.x = x;
+        this.y = y;
+        this.ctrlx1 = ctrlx1;
+        this.ctrly1 = ctrly1;
+        this.ctrlx2 = ctrlx2;
+        this.ctrly2 = ctrly2;
+        if (nbCam > 0){
+            initCams(nbCam);
+        }
     }
 
     void initCams(int nbCam){
