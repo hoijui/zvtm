@@ -42,6 +42,7 @@ public aspect AutoReplay {
          //Glyph methods
          execution(public void Glyph.move(long, long))	||
          execution(public void Glyph.moveTo(long, long))	||
+         execution(public void Glyph.setColor(Color))	||
          execution(public void Glyph.setStrokeWidth(float))	||
          execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
          execution(public void Glyph.setVisible(boolean)) ||
