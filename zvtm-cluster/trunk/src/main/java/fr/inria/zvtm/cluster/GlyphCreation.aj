@@ -379,7 +379,7 @@ aspect GlyphCreation {
 		}
 
 		Glyph createGlyph(){
-			return new DPath(path.getPathIterator(new AffineTransform()), 
+			return new DPath(path.getPathIterator(null), 
 					0, Color.BLACK);
 		}
 	}

@@ -50,27 +50,28 @@ public class DPathExample {
                 options.numCols,
                 options.numRows);
 		ClusteredView cv = 
-			new ClusteredView(
+            new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
-					options.numRows, //use complete
-					options.numCols, //cluster surface
-					cameras);
-		cv.setBackgroundColor(Color.LIGHT_GRAY);
-		vsm.addClusteredView(cv);
+                    options.numRows, //use complete
+                    options.numCols, //cluster surface
+                    cameras);
+        cv.setBackgroundColor(Color.BLACK);
+        vsm.addClusteredView(cv);
 
-		//the view below is just a standard, non-clustered view
-		//that lets an user navigate the scene
-		View view = vsm.addFrameView(cameras, "Master View",
-			   View.STD_VIEW, 800, 600, false, true, true, null);	
-		view.setEventHandler(new PanZoomEventHandler());
+        //the view below is just a standard, non-clustered view
+        //that lets an user navigate the scene
+        View view = vsm.addFrameView(cameras, "Master View",
+                View.STD_VIEW, 800, 600, false, true, true, null);	
+        view.setEventHandler(new PanZoomEventHandler());
 
-		DPath path = new DPath(0,0,0,Color.GREEN);	
-		path.addSegment(100,200,true);
-		path.addSegment(200,0,true);
-		path.addSegment(0,0,true);
-		vs.addGlyph(path, false);
-	}
+        DPath path = new DPath(0,0,0,Color.GREEN);	
+        path.addSegment(100,200,true);
+        path.addSegment(200,0,true);
+        path.addSegment(0,0,true);
+        vs.addGlyph(path, false);	
+        path.moveTo(10,10);
+    }
 
 	public static void main(String[] args){
 		PathOptions options = new PathOptions();
