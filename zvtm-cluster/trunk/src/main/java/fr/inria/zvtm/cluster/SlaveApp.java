@@ -80,6 +80,11 @@ public class SlaveApp {
                 false, false, true, null);
         view.setBackgroundColor(cv.getBackgroundColor());
 
+        //move cameras to their 'proper' location
+        for(Camera cam: clusteredView.getCameras()){
+            setCameraLocation(cam.getLocation(), cam);
+        }
+
 		// inputs: block width, block height, fullscreen
 		if(options.fullscreen){
 			GraphicsEnvironment ge = 
