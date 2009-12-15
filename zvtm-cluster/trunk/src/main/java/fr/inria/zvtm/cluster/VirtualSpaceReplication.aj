@@ -10,6 +10,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.Glyph;
 
 /**
  * Replicate interesting events on virtual spaces
@@ -88,5 +89,71 @@ aspect VirtualSpaceReplication {
 			return "CameraLocationDelta";
 		}
 	}
+
+	pointcut glyphAbove(VirtualSpace virtualSpace, Glyph g1, Glyph g2):
+		execution(public void VirtualSpace.above(Glyph, Glyph))
+		&& this(virtualSpace)
+        && args(g1, g2)
+		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+
+	after(VirtualSpace vs, Glyph g1, Glyph g2) returning:
+	   glyphAbove(vs, g1, g2) && !cflowbelow(glyphAbove(VirtualSpace, Glyph, Glyph)){
+		   Delta delta = new GlyphAboveDelta(vs.getObjId(),
+                   g1.getObjId(), g2.getObjId());
+		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	   }
+
+	pointcut glyphBelow(VirtualSpace virtualSpace, Glyph g1, Glyph g2):
+		execution(public void VirtualSpace.below(Glyph, Glyph))
+		&& this(virtualSpace)
+        && args(g1, g2)
+		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+
+	after(VirtualSpace vs, Glyph g1, Glyph g2) returning:
+	   glyphBelow(vs, g1, g2) && !cflowbelow(glyphBelow(VirtualSpace, Glyph, Glyph)){
+		   Delta delta = new GlyphBelowDelta(vs.getObjId(),
+                   g1.getObjId(), g2.getObjId());
+		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	   }
+
+    private abstract static class ZIndexDelta implements Delta {
+        protected final ObjId<VirtualSpace> space;
+        protected final ObjId<Glyph> g1;
+        protected final ObjId<Glyph> g2;
+
+        ZIndexDelta(ObjId<VirtualSpace> space, ObjId<Glyph> g1, ObjId<Glyph> g2){
+            this.space = space;
+            this.g1 = g1;
+            this.g2 = g2;
+        }
+
+        public abstract void apply(SlaveUpdater updater);
+    }
+
+    private static class GlyphAboveDelta extends ZIndexDelta {
+        GlyphAboveDelta(ObjId<VirtualSpace> space, ObjId<Glyph> g1, ObjId<Glyph> g2){
+            super(space,g1,g2);
+        }
+
+        @Override public void apply(SlaveUpdater updater){
+            VirtualSpace vs = updater.getSlaveObject(space);
+            Glyph gl1 = updater.getSlaveObject(g1);
+            Glyph gl2 = updater.getSlaveObject(g2);
+            vs.above(gl1, gl2);
+        }
+    }
+
+    private static class GlyphBelowDelta extends ZIndexDelta {
+        GlyphBelowDelta(ObjId<VirtualSpace> space, ObjId<Glyph> g1, ObjId<Glyph> g2){
+            super(space,g1,g2);
+        }
+
+        @Override public void apply(SlaveUpdater updater){
+            VirtualSpace vs = updater.getSlaveObject(space);
+            Glyph gl1 = updater.getSlaveObject(g1);
+            Glyph gl2 = updater.getSlaveObject(g2);
+            vs.below(gl1, gl2);
+        }
+    }
 }
 
