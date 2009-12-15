@@ -24,6 +24,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VDiamond;
 
 import java.awt.Color;
 import java.util.Random;
@@ -76,24 +77,33 @@ public class AnimCircles {
 		long posIncr = (long)(sceneHeight / options.numGlyphs);
 		long radius = (long)(0.45 * posIncr);
 		for(int i=0; i<options.numGlyphs; ++i){
-			final Glyph circle = new VCircle(i*posIncr,i*posIncr,
-					0,
-					radius,
-					Color.getHSBColor(
-						rnd.nextFloat(),
-						rnd.nextFloat(),
-						rnd.nextFloat()));
-			vs.addGlyph(circle);
+		  final Glyph glyph;
+            final Color nextColor = Color.getHSBColor(
+                    rnd.nextFloat(),
+                    rnd.nextFloat(),
+                    rnd.nextFloat());
+            if(i%2 == 0){
+                glyph = new VCircle(i*posIncr,i*posIncr,
+                        0,
+                        radius,
+                        nextColor);
+            } else {
+                glyph = new VDiamond(i*posIncr,i*posIncr,
+                        0,
+                        radius,
+                        nextColor);
+            }
+            vs.addGlyph(glyph);
 
-			Animation anim = am.getAnimationFactory().createAnimation(
+            Animation anim = am.getAnimationFactory().createAnimation(
 					3000,
 					Animation.INFINITE,
 					Animation.RepeatBehavior.REVERSE,
-					circle,
+					glyph,
 					Animation.Dimension.POSITION,
 					new DefaultTimingHandler(){
-						final long initX = circle.vx;
-						final long initY = circle.vy;
+						final long initX = glyph.vx;
+						final long initY = glyph.vy;
 
 						public void timingEvent(float fraction, 
 							Object subject, Animation.Dimension dim){

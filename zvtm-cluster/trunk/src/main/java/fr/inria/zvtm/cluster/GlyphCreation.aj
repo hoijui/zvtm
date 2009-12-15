@@ -21,6 +21,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VPolygon;
@@ -150,6 +151,11 @@ aspect GlyphCreation {
 
     @Override private Delta VPolygon.getCreateDelta(){
         return new VPolygonCreateDelta(this,
+                this.getParentSpace().getObjId());
+    }
+
+    @Override private Delta VDiamond.getCreateDelta(){
+        return new VDiamondCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
@@ -458,6 +464,19 @@ aspect GlyphCreation {
 
         Glyph createGlyph(){
             return new VPolygon(coords, 0, Color.BLACK);
+        }
+    }
+
+    private static class VDiamondCreateDelta extends ClosedShapeCreateDelta {
+        private final long size; //width = height
+
+        VDiamondCreateDelta(VDiamond source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+            this.size = (long)source.getSize();
+        }
+
+        Glyph createGlyph(){
+            return new VDiamond(0,0,0,size,Color.BLACK);
         }
     }
 }
