@@ -241,7 +241,7 @@ public class VCircle extends ClosedShape {
                 return;
             }
             // glyph is translucent
-            if (pc[i].cr>1){
+            if (pc[i].cr>=1){
                 g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
@@ -269,7 +269,7 @@ public class VCircle extends ClosedShape {
         }
         else {
             // glyph is opaque
-            if (pc[i].cr>1){
+            if (pc[i].cr>=1){
                 if (filled){
                     g.setColor(this.color);
                     g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
@@ -301,7 +301,7 @@ public class VCircle extends ClosedShape {
                 return;
             }
             // glyph is translucent
-            if (pc[i].lcr>1){
+            if (pc[i].lcr>=1){
                 g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
@@ -329,7 +329,7 @@ public class VCircle extends ClosedShape {
         }
         else {
             // glyph is opaque
-            if (pc[i].lcr>1){
+            if (pc[i].lcr>=1){
                 if (filled){
                     g.setColor(this.color);
                     g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
