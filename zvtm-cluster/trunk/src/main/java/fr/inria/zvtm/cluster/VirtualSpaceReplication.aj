@@ -155,5 +155,112 @@ aspect VirtualSpaceReplication {
             vs.below(gl1, gl2);
         }
     }
+
+	pointcut glyphOnTop(VirtualSpace virtualSpace, Glyph glyph):
+		execution(public void VirtualSpace.onTop(Glyph))
+		&& this(virtualSpace)
+        && args(glyph)
+		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+
+	after(VirtualSpace vs, Glyph glyph) returning:
+	   glyphOnTop(vs, glyph) && !cflowbelow(glyphOnTop(VirtualSpace, Glyph)){
+		   Delta delta = new GlyphOnTopDelta(vs.getObjId(), glyph.getObjId());
+		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	   }
+
+	pointcut glyphOnTopIndex(VirtualSpace virtualSpace, Glyph glyph, int index):
+		execution(public void VirtualSpace.onTop(Glyph, int))
+		&& this(virtualSpace)
+        && args(glyph, index)
+		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+
+	after(VirtualSpace vs, Glyph glyph, int index) returning:
+	   glyphOnTopIndex(vs, glyph, index) 
+       && !cflowbelow(glyphOnTopIndex(VirtualSpace, Glyph, int)){
+		   Delta delta = new GlyphOnTopDelta(vs.getObjId(), glyph.getObjId(), index);
+		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	   }
+
+    private static class GlyphOnTopDelta implements Delta {
+        static final int NO_INDEX = -1;
+        private final ObjId<VirtualSpace> space;
+        private final ObjId<Glyph> glyph;
+        private final int index;
+
+        GlyphOnTopDelta(ObjId<VirtualSpace> space, ObjId<Glyph> glyph, 
+                int index){
+            this.space = space;
+            this.glyph = glyph;
+            this.index = index;
+        }
+
+        GlyphOnTopDelta(ObjId<VirtualSpace> space, ObjId<Glyph> glyph){
+            this(space, glyph, NO_INDEX);
+        }
+
+        public void apply(SlaveUpdater updater){
+            VirtualSpace vs = updater.getSlaveObject(space);
+            Glyph g = updater.getSlaveObject(glyph);
+            if(index == NO_INDEX){
+                vs.onTop(g);
+            } else {
+                vs.onTop(g, index);
+            }
+        }
+    }
+
+	pointcut glyphAtBottom(VirtualSpace virtualSpace, Glyph glyph):
+		execution(public void VirtualSpace.atBottom(Glyph))
+		&& this(virtualSpace)
+        && args(glyph)
+		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+
+	after(VirtualSpace vs, Glyph glyph) returning:
+	   glyphAtBottom(vs, glyph) 
+       && !cflowbelow(glyphAtBottom(VirtualSpace, Glyph)){
+		   Delta delta = new GlyphAtBottomDelta(vs.getObjId(), glyph.getObjId());
+		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
+	   }
+
+	pointcut glyphAtBottomIndex(VirtualSpace virtualSpace, Glyph glyph, int index):
+		execution(public void VirtualSpace.atBottom(Glyph, int))
+		&& this(virtualSpace)
+        && args(glyph, index)
+		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+
+	after(VirtualSpace vs, Glyph glyph, int index) returning:
+	   glyphAtBottomIndex(vs, glyph, index) 
+       && !cflowbelow(glyphAtBottomIndex(VirtualSpace, Glyph, int)){
+           Delta delta = new GlyphAtBottomDelta(vs.getObjId(), glyph.getObjId(), index);
+           VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+
+    private static class GlyphAtBottomDelta implements Delta {
+        static final int NO_INDEX = -1;
+        private final ObjId<VirtualSpace> space;
+        private final ObjId<Glyph> glyph;
+        private final int index;
+
+        GlyphAtBottomDelta(ObjId<VirtualSpace> space, ObjId<Glyph> glyph, 
+                int index){
+            this.space = space;
+            this.glyph = glyph;
+            this.index = index;
+        }
+
+        GlyphAtBottomDelta(ObjId<VirtualSpace> space, ObjId<Glyph> glyph){
+            this(space, glyph, NO_INDEX);
+        }
+
+        public void apply(SlaveUpdater updater){
+            VirtualSpace vs = updater.getSlaveObject(space);
+            Glyph g = updater.getSlaveObject(glyph);
+            if(index == NO_INDEX){
+                vs.atBottom(g);
+            } else {
+                vs.atBottom(g, index);
+            }
+        }
+    }
 }
 
