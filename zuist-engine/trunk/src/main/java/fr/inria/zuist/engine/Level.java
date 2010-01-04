@@ -48,7 +48,7 @@ public class Level {
 		if (regions.length > 1){
 			Region res = regions[0];
 			for (int i=1;i<regions.length;i++){
-				if (Math.sqrt(Math.pow(regions[i].x-lp.x, 2) + Math.pow(regions[i].y-lp.y, 2)) < Math.sqrt(Math.pow(res.x-lp.x, 2) + Math.pow(res.y-lp.y, 2))){
+				if (Math.pow(regions[i].x-lp.x, 2) + Math.pow(regions[i].y-lp.y, 2) < Math.pow(res.x-lp.x, 2) + Math.pow(res.y-lp.y, 2)){
 					res = regions[i];
 				}
 			}
