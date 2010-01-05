@@ -54,15 +54,22 @@ public class PDFResourceHandler implements ResourceHandler {
     public static PDFFile getPDF(URL pdfURL){
         synchronized(URL_2_PDF_FILE){
             PDFFile pf = null;
+			int n;
             if (URL_2_PDF_FILE.containsKey(pdfURL)){
                 pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
             }
             else {
                 try {
-                    RandomAccessFile raf = new RandomAccessFile(new File(pdfURL.toURI()), "r");
-                    FileChannel channel = raf.getChannel();
-                    ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-                    pf = new PDFFile(buf);
+					InputStream is = pdfURL.openStream();					
+					byte[] buffer = new byte[4096];
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					while ((n = is.read(buffer)) != -1) {
+						baos.write(buffer, 0, n);
+					}
+					is.close();
+					
+        			ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
+        			pf = new PDFFile(buf);
                     URL_2_PDF_FILE.put(pdfURL, pf);
                 }
                 catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
