@@ -209,6 +209,14 @@ public class Region {
     public VRectangle getBounds(){
 	return bounds;
     }
+	
+	public long getX(){
+		return x;
+	}
+	
+	public long getY(){
+		return y;
+	}
 
 	public long getWidth(){
 		return w;
