@@ -31,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -61,6 +62,7 @@ public class ZGRViewer implements ZGRApplication {
 
 
     ZGRViewer(short acc){
+        VirtualSpaceManager.INSTANCE.setMaster("ZgrViewer");
 	initConfig();
 	//init GUI after config as we load some GUI prefs from the config file
 	initGUI(acc);

@@ -36,6 +36,8 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Arrays;
 
+import fr.inria.zvtm.cluster.ClusterGeometry;
+import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.Location;
@@ -230,6 +232,23 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         mainView = vsm.addFrameView(cameras, ConfigManager.MAIN_TITLE, vt,
             ConfigManager.mainViewW, ConfigManager.mainViewH,
             true, false, jmb);
+
+        //experimental cluster stuff
+         ClusterGeometry clGeom = new ClusterGeometry(
+                2760,
+                1740,
+                8,
+                4);
+		ClusteredView cv = 
+            new ClusteredView(
+                    clGeom,
+                    3, //origin (block number)
+                    4, //use complete
+                    8, //cluster surface
+                    cameras);
+        cv.setBackgroundColor(Color.WHITE);
+        vsm.addClusteredView(cv);
+
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
         mainView.getFrame().addComponentListener(this);
         gp = new ZGRGlassPane(this);
