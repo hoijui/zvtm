@@ -21,6 +21,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 import java.awt.Color;
 import java.util.Vector;
@@ -56,21 +57,28 @@ public class DPathExample {
                     options.numRows, //use complete
                     options.numCols, //cluster surface
                     cameras);
-        cv.setBackgroundColor(Color.BLACK);
+        cv.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(cv);
 
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
+        view.setBackgroundColor(Color.GRAY);
         view.setEventHandler(new PanZoomEventHandler());
 
-        DPath path = new DPath(0,0,0,Color.GREEN);	
+        DPath path = new DPath(30,50,0,Color.GREEN);	
         path.addSegment(100,200,true);
         path.addSegment(200,0,true);
         path.addSegment(0,0,true);
         vs.addGlyph(path, false);	
-        path.moveTo(10,10);
+        path.moveTo(100,200);
+        System.out.println("path position: (" + path.vx + ", " + path.vy + ")");
+        path.moveTo(100,-200);
+        System.out.println("path position: (" + path.vx + ", " + path.vy + ")");
+
+        VRectangle rect = new VRectangle(0,0,0,100,200,Color.YELLOW);
+        vs.addGlyph(rect);
     }
 
 	public static void main(String[] args){
