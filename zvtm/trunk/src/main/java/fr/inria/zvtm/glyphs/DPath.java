@@ -360,7 +360,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public void moveTo(long x, long y){
 		propagateMove(x-vx, y-vy);  //take care of sticked glyphs
 		LongPoint[] t = new LongPoint[getNumberOfPoints()];
-		Arrays.fill(t, new LongPoint(x-spx, y-spy));
+		Arrays.fill(t, new LongPoint(x-vx, y-vy));
 		this.edit(t, false);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
