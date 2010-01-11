@@ -48,8 +48,6 @@ import fr.inria.zvtm.glyphs.CGlyph;
 import fr.inria.zvtm.lens.Lens;
 
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.RectangularShape;
-import fr.inria.zvtm.glyphs.VPath;
 import fr.inria.zvtm.glyphs.VText;
 
 /**

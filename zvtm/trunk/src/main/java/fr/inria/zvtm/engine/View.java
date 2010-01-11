@@ -48,7 +48,6 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.lens.Lens;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.glyphs.VPath;
 import fr.inria.zvtm.glyphs.RectangularShape;
 
   /**
@@ -748,11 +747,6 @@ public abstract class View {
                 dx=g.vx-p.x/2-c.posx;
                 dy=g.vy-p.y/2-c.posy;
             }
-        }
-        else if (g instanceof VPath){
-            VPath p=(VPath)g;
-            dx=p.realHotSpot.x-c.posx;
-            dy=p.realHotSpot.y-c.posy;
         }
         else {
             dx=g.vx-c.posx;

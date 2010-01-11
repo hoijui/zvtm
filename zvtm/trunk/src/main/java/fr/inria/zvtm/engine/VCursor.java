@@ -38,7 +38,6 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.lens.Lens;
 
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VPath;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
@@ -282,7 +281,7 @@ public class VCursor {
     /**tells whether mouse sends events related to entry/exit in glyphs or not*/
     public boolean isSensitive(){return sensit;}
 
-	/**returns a list of all VPaths under the mouse cursor - returns null if none
+	/**returns a list of all DPaths under the mouse cursor - returns null if none
 		*@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
 		*@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
 		*@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
@@ -300,7 +299,7 @@ public class VCursor {
 			return res;
 	}
     
-    /**returns a list of all VPaths under the mouse cursor (default tolerance, 5) - returns null if none
+    /**returns a list of all DPaths under the mouse cursor (default tolerance, 5) - returns null if none
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
      */
@@ -308,7 +307,7 @@ public class VCursor {
 	return getIntersectingPaths(c, 5, vx, vy);
     }
 
-    /**returns a list of all VPaths under the mouse cursor (default tolerance, 5) - returns null if none
+    /**returns a list of all DPaths under the mouse cursor (default tolerance, 5) - returns null if none
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
@@ -346,36 +345,6 @@ public class VCursor {
      */
     public boolean intersectsPath(DPath p){
 		return intersectsPath(p, 5, vx, vy);
-    }
-
-    /**tells if the mouse is above VPath p
-     *@param p VPath instance to be tested
-     *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
-     *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
-     *@see #intersectsVPath(VPath p)
-     */
-    public boolean intersectsVPath(VPath p, int tolerance, long cursorX, long cursorY){
-		int dtol = tolerance * 2;
-		return p.getJava2DGeneralPath().intersects(cursorX-dtol, -cursorY-dtol, dtol, dtol) &&
-			   p.getJava2DGeneralPath().contains(cursorX-tolerance, -cursorY-tolerance, tolerance, tolerance);
-	}
-
-    /**tells if the mouse is above VPath p (default tolerance, 5)
-     *@param p VPath instance to be tested
-     *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@see #intersectsVPath(VPath p, int tolerance, long cursorX, long cursorY)
-     */
-    public boolean intersectsVPath(VPath p, int tolerance){
-	return intersectsVPath(p, tolerance, vx, vy);
-    }
-
-    /**tells if the mouse is above VPath p (default tolerance, 5)
-     *@param p VPath instance to be tested
-     *@see #intersectsVPath(VPath p, int tolerance, long cursorX, long cursorY)
-     */
-    public boolean intersectsVPath(VPath p){
-	return intersectsVPath(p, 5, vx, vy);
     }
 
     /**returns a list of all VTexts under the mouse cursor - returns null if none<br>
@@ -519,7 +488,7 @@ public class VCursor {
 				else if (glyph instanceof VText && intersectsVText((VText)glyph, c.getIndex())){
 					res.add(glyph);
 				}
-				else if (glyph instanceof VPath && intersectsVPath((VPath)glyph)){
+				else if (glyph instanceof DPath && intersectsPath((DPath)glyph)){
 					res.add(glyph);
 				}
 			}

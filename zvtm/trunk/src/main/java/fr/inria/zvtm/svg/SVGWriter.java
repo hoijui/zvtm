@@ -53,7 +53,6 @@ import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
-import fr.inria.zvtm.glyphs.VPath;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -225,7 +224,6 @@ public class SVGWriter {
 	if (o.isVisible()){
 	    if (o instanceof VEllipse){return createEllipse((VEllipse)o);}
 	    else if (o instanceof VRectangle){return createRect((VRectangle)o);}
-	    else if (o instanceof VPath){return createPath((VPath)o);}
 	    else if (o instanceof DPath){return createPath((DPath)o);}
 	    else if (o instanceof VText){return createText((VText)o);}
 	    else if (o instanceof VTriangle){return createPolygon((VTriangle)o);}
@@ -390,10 +388,6 @@ public class SVGWriter {
 		return shape;
 	}
 
-    public String getSVGPathCoordinates(VPath p){
-		return getSVGPathCoordinates(p.getJava2DPathIterator());
-	}
-
     public String getSVGPathCoordinates(DPath p){
 		return getSVGPathCoordinates(p.getSVGPathIterator());
 	}
@@ -436,19 +430,6 @@ public class SVGWriter {
 			pi.next();
 		}
 		return coords.toString();
-	}
-
-	private Element createPath(VPath p){
-		Element path=svgDoc.createElementNS(svgURI,SVGReader._path);
-		path.setAttribute(SVGReader._d,getSVGPathCoordinates(p));
-		Color c=p.getColor();
-		String color="stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
-		path.setAttribute(SVGReader._style,"fill:none;"+color);
-		if (p.getStroke()!=null){
-			createStrokeInformation(p,path);
-		}
-		createClassInforation(p, path);
-		return path;
 	}
 
 	private Element createPath(DPath p){
