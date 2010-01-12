@@ -243,8 +243,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             new ClusteredView(
                     clGeom,
                     3, //origin (block number)
-                    4, //use complete
-                    8, //cluster surface
+                    8, //use complete
+                    4, //cluster surface
                     cameras);
         cv.setBackgroundColor(Color.WHITE);
         vsm.addClusteredView(cv);
