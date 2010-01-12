@@ -13,6 +13,8 @@ import fr.inria.zvtm.glyphs.VTextOr;
 
 public class NTNode {
 
+    static int LABEL_Y_CENTERING_OFFSET = -3;
+
     String name;
     
     /* Owning matrix */
@@ -89,11 +91,11 @@ public class NTNode {
     
     void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single){
         this.wdx = wdx;
-	    this.wdy = wdy;
+	    this.wdy = wdy + LABEL_Y_CENTERING_OFFSET;
 	    labelW = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    vs.addGlyph(labelW);
         if (!single){
-    	    this.ndx = ndx;
+    	    this.ndx = ndx - LABEL_Y_CENTERING_OFFSET;
     	    this.ndy = ndy;
     	    labelN = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    vs.addGlyph(labelN);            
