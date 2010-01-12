@@ -16,8 +16,8 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class ClusteredView implements Identifiable {
 	private final ObjId objId = ObjIdFactory.next();
 	private final int origin; //bottom-left block number
-	private final int viewRows;
 	private final int viewCols;
+	private final int viewRows;
     private ClusterGeometry clGeom;
 	private final ArrayList<Camera> cameras; 
     private Color bgColor;
@@ -32,12 +32,12 @@ public class ClusteredView implements Identifiable {
 	 */
 	public ClusteredView(ClusterGeometry clGeom,
             int origin, 
-            int viewRows, int viewCols,
+            int viewCols, int viewRows,
 			List<Camera> cameras){
         this.clGeom = clGeom;
         this.origin = origin;
-		this.viewRows = viewRows;
 		this.viewCols = viewCols;
+		this.viewRows = viewRows;
 		this.cameras = new ArrayList<Camera>(cameras);
         this.bgColor = Color.DARK_GRAY;
 

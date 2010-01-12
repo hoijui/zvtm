@@ -59,8 +59,8 @@ public class AnimEllipses {
 			new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
-					options.numRows, //use complete
-					options.numCols, //cluster surface
+					options.numCols, //use complete
+					options.numRows, //cluster surface
 					cameras);
 		cv.setBackgroundColor(Color.LIGHT_GRAY);
 		vsm.addClusteredView(cv);

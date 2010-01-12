@@ -65,8 +65,8 @@ public class CenterOnRegion {
             new ClusteredView(
                     clGeom,
                     27, //origin (block number)
-                    4, 
                     2, 
+                    4, 
                     cameras2);
         vsm.addClusteredView(cv2);
 
