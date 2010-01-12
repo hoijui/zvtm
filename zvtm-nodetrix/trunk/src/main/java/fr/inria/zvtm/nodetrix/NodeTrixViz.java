@@ -31,10 +31,10 @@ public class NodeTrixViz {
     static Color MATRIX_FILL_COLOR = Color.WHITE;
     static Color MATRIX_STROKE_COLOR = Color.BLACK;
     static Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
-    static Color INTRA_LINK_COLOR = Color.BLUE;
-    static Color EXTRA_LINK_COLOR = Color.BLUE;
+    static Color INTRA_LINK_COLOR = new Color(160,202,254);
+    static Color EXTRA_LINK_COLOR = new Color(118,98,252);
     static int MATRIX_NODE_LABEL_DIST_BORDER = 2;
-    static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(247,255,180);
+    static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
     
     /* Links between matrices */
     static Color INTER_LINK_COLOR = Color.BLACK;
