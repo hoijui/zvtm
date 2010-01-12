@@ -50,10 +50,6 @@ public class Matrix {
     	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.length-2*i-1)),
     	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.length+2*i+1)),
     	                            NodeTrixViz.CELL_SIZE/2*nodes.length+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
-    	                            NodeTrixViz.CELL_SIZE/2*nodes.length+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
-    	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.length-2*i-1)),
-    	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.length+2*i+1)),
-    	                            -NodeTrixViz.CELL_SIZE/2*nodes.length-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
     	                            vs);
     	    nodes[i].moveTo(x, y);
         }
@@ -66,21 +62,13 @@ public class Matrix {
                 max_length = nodes[i].getLabelWidth();
             }
         }
-        label_bkg = new VRectangle[4];
+        label_bkg = new VRectangle[2];
         // west
         label_bkg[0] = new VRectangle(bkg.vx-bkg.getWidth()-max_length/2-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.vy, 0,
                                       max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.getHeight(),
                                       NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
         // north
         label_bkg[1] = new VRectangle(bkg.vx, bkg.vy+bkg.getHeight()+max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0,
-                                      bkg.getWidth(), max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
-                                      NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
-        // east
-        label_bkg[2] = new VRectangle(bkg.vx+bkg.getWidth()+max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.vy, 0,
-                                      max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.getHeight(),
-                                      NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
-        // south
-        label_bkg[3] = new VRectangle(bkg.vx, bkg.vy-bkg.getHeight()-max_length/2-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0,
                                       bkg.getWidth(), max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
                                       NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
         for (VRectangle lb:label_bkg){

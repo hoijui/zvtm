@@ -21,11 +21,11 @@ public class NTNode {
     NTEdge[] outgoingEdges, incomingEdges;
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
-	long wdx, wdy, ndx, ndy, edx, edy, sdx, sdy;
+	long wdx, wdy, ndx, ndy;
 	/* Vertical label */
-	VTextOr labelN, labelS;
+	VTextOr labelN;
 	/* Horizontal label */
-	VText labelW, labelE;
+	VText labelW;
 	
     public NTNode(String name){
         this.name = name;
@@ -84,33 +84,23 @@ public class NTNode {
     }
     
     long getLabelWidth(){
-        return (labelE == null) ? 0 : labelE.getBounds(0).x;
+        return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
     
-    void createGraphics(long wdx, long wdy, long ndx, long ndy, long edx, long edy, long sdx, long sdy, VirtualSpace vs){
+    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs){
         this.wdx = wdx;
 	    this.wdy = wdy;
 	    this.ndx = ndx;
 	    this.ndy = ndy;
-        this.edx = edx;
-	    this.edy = edy;
-	    this.sdx = sdx;
-	    this.sdy = sdy;
 	    labelW = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_END);
 	    labelN = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
-	    labelE = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_START);
-	    labelS = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, -(float)Math.PI/2f, VText.TEXT_ANCHOR_START);
 	    vs.addGlyph(labelW);
 	    vs.addGlyph(labelN);
-	    vs.addGlyph(labelE);
-	    vs.addGlyph(labelS);
     }
     
     public void moveTo(long x, long y){
         labelW.moveTo(x+wdx, y+wdy);
         labelN.moveTo(x+ndx, y+ndy);
-        labelE.moveTo(x+edx, y+edy);
-        labelS.moveTo(x+sdx, y+sdy);
     }
 
 }
