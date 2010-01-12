@@ -16,8 +16,8 @@ class ClusteredViewCreateDelta implements Delta {
 	private final ObjId objId;
     private final ClusterGeometry clGeom;
 	private final int origin;
-	private final int viewRows;
 	private final int viewCols;
+	private final int viewRows;
 	private final ArrayList<ObjId<Camera>> camRefs;
     private final Color bgColor;
 
@@ -25,8 +25,8 @@ class ClusteredViewCreateDelta implements Delta {
 		this.objId = cv.getObjId();
         this.clGeom = cv.getClusterGeometry();
 		this.origin = cv.getOrigin();
-		this.viewRows = cv.getViewRows();
 		this.viewCols = cv.getViewCols();
+		this.viewRows = cv.getViewRows();
 		this.camRefs = makeCamRefs(cv.getCameras());
         this.bgColor = cv.getBackgroundColor();
 	}
@@ -54,7 +54,7 @@ class ClusteredViewCreateDelta implements Delta {
 		ClusteredView cv = new ClusteredView(
                 clGeom,
                 origin,
-				viewRows, viewCols,
+				viewCols, viewRows,
 				refsToCameras(updater));
         cv.setBackgroundColor(bgColor);
 		updater.putSlaveObject(objId, cv);
