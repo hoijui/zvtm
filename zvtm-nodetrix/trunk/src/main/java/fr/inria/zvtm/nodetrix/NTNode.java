@@ -22,7 +22,7 @@ public class NTNode {
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
-	/* Vertical label */
+	/* Vertical label, can be null if matrix contains this node only */
 	VTextOr labelN;
 	/* Horizontal label */
 	VText labelW;
@@ -87,20 +87,24 @@ public class NTNode {
         return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
     
-    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs){
+    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single){
         this.wdx = wdx;
 	    this.wdy = wdy;
-	    this.ndx = ndx;
-	    this.ndy = ndy;
-	    labelW = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, VText.TEXT_ANCHOR_END);
-	    labelN = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    labelW = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    vs.addGlyph(labelW);
-	    vs.addGlyph(labelN);
+        if (!single){
+    	    this.ndx = ndx;
+    	    this.ndy = ndy;
+    	    labelN = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+    	    vs.addGlyph(labelN);            
+        }
     }
     
     public void moveTo(long x, long y){
         labelW.moveTo(x+wdx, y+wdy);
-        labelN.moveTo(x+ndx, y+ndy);
+        if (labelN != null){
+            labelN.moveTo(x+ndx, y+ndy);            
+        }
     }
 
 }
