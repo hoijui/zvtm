@@ -112,15 +112,17 @@ public class Matrix {
                         long dx = oe.head.getMatrix().bkg.vx - oe.tail.getMatrix().bkg.vx;
                         long dy = oe.head.getMatrix().bkg.vy - oe.tail.getMatrix().bkg.vy;
                         if (dx < 0){
+                            long wo = (nodes.length > 1) ? 2*label_bkg[0].getWidth() : label_bkg[0].getWidth();
                             if (dy < 0){
                                 // south west of start point
-                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
-                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
+                                long no = (oe.getHead().getMatrix().nodes.length > 1) ? 2*oe.getHead().getMatrix().label_bkg[1].getHeight() : 0;
+                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2-wo, oe.getTail().wdy,
+                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2+no,
                                                   vs);                                
                             }
                             else {
                                 // north west of start point
-                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2-wo, oe.getTail().wdy,
                                                   oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
                                                   vs);                                
                             }
@@ -128,8 +130,9 @@ public class Matrix {
                         else {
                             if (dy < 0){
                                 // south east of start point
+                                long no = (oe.getHead().getMatrix().nodes.length > 1) ? 2*oe.getHead().getMatrix().label_bkg[1].getHeight() : 0;
                                 oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
-                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
+                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2+no,
                                                   vs);                                
                             }
                             else {
