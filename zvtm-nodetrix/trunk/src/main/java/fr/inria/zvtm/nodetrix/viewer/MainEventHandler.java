@@ -32,7 +32,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     static float WHEEL_MM_STEP = 1.0f;
     
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    
+    long x1, y1, x2, y2;
     Viewer application;
     
     boolean pcameraStickedToMouse = false;
@@ -40,6 +40,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     boolean inPortal = false;
     
     boolean panning = false;
+    boolean selectingRegion = false;
     
     MainEventHandler(Viewer app){
         this.application = app;
@@ -56,11 +57,29 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 				pcameraStickedToMouse = true;
 		    }
 		}
+		else {
+		    if (mod == ALT_MOD){
+                selectingRegion = true;
+                x1 = v.getVCursor().vx;
+                y1 = v.getVCursor().vy;
+                v.setDrawRect(true);
+            }
+		}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	    regionStickedToMouse = false;
 	    pcameraStickedToMouse = false;
+	    if (selectingRegion){
+			v.setDrawRect(false);
+			x2 = v.getVCursor().vx;
+			y2 = v.getVCursor().vy;
+			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
+				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, ConfigManager.ANIM_MOVE_LENGTH,
+				                                                      x1, y1, x2, y2);
+			}
+			selectingRegion = false;
+		}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
