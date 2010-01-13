@@ -22,6 +22,8 @@ public abstract class NTEdge {
     
     abstract void moveTo(long x, long y);
     
+    abstract void move(long x, long y);
+    
     public NTNode getTail(){
         return tail;
     }

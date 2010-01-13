@@ -23,6 +23,9 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.OverviewPortal;
 import fr.inria.zvtm.engine.PortalEventHandler;
 
+import fr.inria.zvtm.nodetrix.Matrix;
+import fr.inria.zvtm.nodetrix.NTNode;
+
 class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
@@ -41,6 +44,12 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     
     boolean panning = false;
     boolean selectingRegion = false;
+    // draggedMatrix being non-null means that we are draggina a matrix
+    Matrix draggedMatrix = null;
+    
+    // temp glyph, never assume it has been set correctly by another callback
+    // for intra method use only
+    Glyph g;
     
     MainEventHandler(Viewer app){
         this.application = app;
@@ -57,12 +66,15 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 				pcameraStickedToMouse = true;
 		    }
 		}
-		else {
-		    if (mod == ALT_MOD){
+		else if (mod == ALT_MOD){
                 selectingRegion = true;
                 x1 = v.getVCursor().vx;
                 y1 = v.getVCursor().vy;
                 v.setDrawRect(true);
+		}
+		else if ((g=v.lastGlyphEntered()) != null){
+            if (g.getOwner() instanceof Matrix){
+                draggedMatrix = (Matrix)g.getOwner();
             }
 		}
     }
@@ -70,6 +82,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	    regionStickedToMouse = false;
 	    pcameraStickedToMouse = false;
+	    draggedMatrix = null;
 	    if (selectingRegion){
 			v.setDrawRect(false);
 			x2 = v.getVCursor().vx;
@@ -83,9 +96,6 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
-		}
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -109,7 +119,11 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
         panning = false;
 	}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        if (v.lastGlyphEntered() != null){
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
+		}
+    }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
@@ -140,6 +154,12 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
                 application.vsm.getAnimationManager().setYspeed((long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
                 application.vsm.getAnimationManager().setZspeed(0);
             }		    
+		}
+		else if (draggedMatrix != null){
+		    float a = (application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude)) / application.nm.mCamera.focal;
+		    draggedMatrix.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+			lastJPX = jpx;
+			lastJPY = jpy;
 		}
     }
 

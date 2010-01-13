@@ -37,11 +37,16 @@ public class NTExtraEdge extends NTEdge {
                             tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y,
                             hmp.x+offsets[1].x, hmp.y+offsets[1].y+hm_sz, true);        
         vs.addGlyph(edgePath);
+        edgePath.setOwner(this);
     }
     
     void moveTo(long x, long y){
         // does not make sense, moving either head or tail
         // see moveHeadTo() and moveTailTo()
+    }
+    
+    void move(long x, long y){
+        
     }
     
     void moveHeadTo(long x, long y){

@@ -82,7 +82,7 @@ public class NTNode {
     }
 
     public String toString(){
-        return name+"@"+hashCode();
+        return "N::"+name+"@"+hashCode();
     }
     
     long getLabelWidth(){
@@ -94,11 +94,13 @@ public class NTNode {
 	    this.wdy = wdy;
 	    labelW = new VText(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    vs.addGlyph(labelW);
+	    labelW.setOwner(this);
         if (!single){
     	    this.ndx = ndx;
     	    this.ndy = ndy;
     	    labelN = new VTextOr(0, 0, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
-    	    vs.addGlyph(labelN);            
+    	    vs.addGlyph(labelN);
+    	    labelN.setOwner(this);
         }
     }
     
@@ -106,6 +108,13 @@ public class NTNode {
         labelW.moveTo(x+wdx, y+wdy + LABEL_Y_CENTERING_OFFSET);
         if (labelN != null){
             labelN.moveTo(x+ndx - LABEL_Y_CENTERING_OFFSET, y+ndy);            
+        }
+    }
+    
+    public void move(long x, long y){
+        labelW.move(x, y);
+        if (labelN != null){
+            labelN.move(x, y);
         }
     }
 

@@ -42,11 +42,13 @@ public class Matrix {
                                  nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
                                  NodeTrixViz.MATRIX_FILL_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
             vs.addGlyph(bkg);
+            bkg.setOwner(this);
             // matrix label
     	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1*nodes.length));
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.length+.5+Math.sqrt(2*nodes.length)));
     	    matrixLb = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.length));
     	    vs.addGlyph(matrixLb);
+    	    matrixLb.setOwner(this);
     	    // node labels
             for (int i=0;i<nodes.length;i++){
         	    nodes[i].createGraphics(-NodeTrixViz.CELL_SIZE/2*nodes.length-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
@@ -63,6 +65,7 @@ public class Matrix {
                                  nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
                                  NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
             vs.addGlyph(bkg);
+            bkg.setOwner(this);
 	        // if matrix contains a single node, only show a horizontal label
 	        nodes[0].createGraphics(0, 0, 0, 0, vs, true);
     	    nodes[0].moveTo(x, y);
@@ -89,9 +92,12 @@ public class Matrix {
             for (VRectangle lb:label_bkg){
                 if (lb != null){
                     vs.addGlyph(lb);
-                    vs.atBottom(lb);                
+                    vs.atBottom(lb);
+                    lb.setOwner(this);
+                    bkg.stick(lb);
                 }
             }
+            bkg.stick(matrixLb);
         }
         else {
             label_bkg[0] = bkg;
@@ -112,32 +118,33 @@ public class Matrix {
                         long dx = oe.head.getMatrix().bkg.vx - oe.tail.getMatrix().bkg.vx;
                         long dy = oe.head.getMatrix().bkg.vy - oe.tail.getMatrix().bkg.vy;
                         if (dx < 0){
-                            long wo = (nodes.length > 1) ? 2*label_bkg[0].getWidth() : label_bkg[0].getWidth();
+                            long wo = (nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*nodes.length/2-2*label_bkg[0].getWidth() : -bkg.getWidth();
                             if (dy < 0){
                                 // south west of start point
                                 long no = (oe.getHead().getMatrix().nodes.length > 1) ? 2*oe.getHead().getMatrix().label_bkg[1].getHeight() : 0;
-                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2-wo, oe.getTail().wdy,
+                                oe.createGraphics(wo, oe.getTail().wdy,
                                                   oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2+no,
                                                   vs);                                
                             }
                             else {
                                 // north west of start point
-                                oe.createGraphics(-NodeTrixViz.CELL_SIZE*nodes.length/2-wo, oe.getTail().wdy,
+                                oe.createGraphics(wo, oe.getTail().wdy,
                                                   oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
                                                   vs);                                
                             }
                         }
                         else {
+                            long wo = (nodes.length > 1) ? NodeTrixViz.CELL_SIZE*nodes.length/2 : bkg.getWidth();
                             if (dy < 0){
                                 // south east of start point
                                 long no = (oe.getHead().getMatrix().nodes.length > 1) ? 2*oe.getHead().getMatrix().label_bkg[1].getHeight() : 0;
-                                oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                oe.createGraphics(wo, oe.getTail().wdy,
                                                   oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2+no,
                                                   vs);                                
                             }
                             else {
                                 // north east of start point
-                                oe.createGraphics(NodeTrixViz.CELL_SIZE*nodes.length/2, oe.getTail().wdy,
+                                oe.createGraphics(wo, oe.getTail().wdy,
                                                   oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
                                                   vs);                                
                             }                            
@@ -161,8 +168,26 @@ public class Matrix {
         return false;
     }
     
-    public void moveTo(long x, long y){
-        //TBW move matrix, its nodes, and all edges (inter/intra)
+    public void move(long x, long y){
+        bkg.move(x, y);
+        for (NTNode node : nodes){
+            node.move(x, y);
+            if (node.getOutgoingEdges() != null){
+                for (NTEdge edge : node.getOutgoingEdges()){
+                    edge.move(x,y);
+                }
+            }
+            if (node.getIncomingEdges() != null){
+                for (NTEdge edge : node.getIncomingEdges()){
+                    if (edge instanceof NTExtraEdge){
+                        // do it only for extra edges because for intra edges
+                        // we have already moved them in the above loop
+                        // (intra edges connect nodes within the same matrix)
+                        edge.move(x,y);
+                    }
+                }
+            }
+        }
     }
     
     public LongPoint getPosition(){
