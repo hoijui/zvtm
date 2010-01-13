@@ -46,7 +46,18 @@ public class NTExtraEdge extends NTEdge {
     }
     
     void move(long x, long y){
-        
+        // x & y are actually ignored, computing new path geometry from matrix position
+        LongPoint tmp = this.getTail().getMatrix().getPosition();
+        LongPoint hmp = this.getHead().getMatrix().getPosition();
+        long tm_sz = NodeTrixViz.CELL_SIZE * getTail().getMatrix().getSize()*2;
+        long hm_sz = NodeTrixViz.CELL_SIZE * getHead().getMatrix().getSize()*2;
+        if (offsets[0].x < 0){tm_sz = -tm_sz;}
+        if (offsets[1].y < 0){hm_sz = -hm_sz;}
+        LongPoint[] npos = {new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y),
+            new LongPoint(tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y),
+            new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y+hm_sz),
+            new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y)};
+        edgePath.edit(npos, true);
     }
     
     void moveHeadTo(long x, long y){
