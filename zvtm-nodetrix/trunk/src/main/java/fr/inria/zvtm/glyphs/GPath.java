@@ -14,8 +14,15 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.RadialGradientPaint;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.MultipleGradientPaint.CycleMethod;
 
 public class GPath extends DPath {
+    
+    Color[] gradientColors = {new Color(118,98,252), Color.WHITE};
+    float[] gradientDist = {0.0f, 1.0f};
+    Point2D gradientCenter = new Point2D.Float();
+    RadialGradientPaint p;
     
     public GPath(){
 		super();
@@ -61,23 +68,18 @@ public class GPath extends DPath {
 		super(pi, z, c, alpha);
     }
     
-    Color START_COLOR = new Color(118,98,252);
-    //Color END_COLOR = new Color(171,158,255);
-    Color END_COLOR = Color.WHITE;
-    Color[] GRADIENT_COLORS = {START_COLOR, END_COLOR};
-    float[] GRADIENT_DIST = {0.0f, 1.0f};
-    Point2D gradientCenter = new Point2D.Float();
+    public void setGradient(Color[] gc, float[] gd){
+        this.gradientColors = gc;
+        this.gradientDist = gd;
+    }
     
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
-
-        gradientCenter.setLocation((float)elements[0].getX(i), (float)elements[0].getY(i));
-        RadialGradientPaint p = new RadialGradientPaint(gradientCenter,
-                                                        (float)Math.sqrt(Math.pow(elements[elements.length-1].getX(i)-pc[i].cx,2) + Math.pow(elements[elements.length-1].getY(i)-pc[i].cy,2)),
-                                                        GRADIENT_DIST, GRADIENT_COLORS);
+        gradientCenter.setLocation(pc[i].cx, pc[i].cy);
+        p = new RadialGradientPaint(gradientCenter,
+                                    (float)Math.sqrt(Math.pow(elements[elements.length-1].getX(i)-pc[i].cx,2) + Math.pow(elements[elements.length-1].getY(i)-pc[i].cy,2)),
+                                    gradientDist, gradientColors, CycleMethod.NO_CYCLE);
         g.setPaint(p);
-        
-        
         if (stroke!=null) {
             g.setStroke(stroke);
             g.translate(dx,dy);
@@ -116,6 +118,57 @@ public class GPath extends DPath {
                 for (int j=0;j<elements.length;j++){
                     if (elements[j].type == GPath.MOV){continue;}
                     g.draw(elements[j].getShape(i));
+                }
+            }
+            g.translate(-dx,-dy);
+        }
+    }
+    
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        gradientCenter.setLocation(pc[i].lcx, pc[i].lcy);
+        p = new RadialGradientPaint(gradientCenter,
+                                    (float)Math.sqrt(Math.pow(elements[elements.length-1].getlX(i)-pc[i].lcx,2) + Math.pow(elements[elements.length-1].getlY(i)-pc[i].lcy,2)),
+                                    gradientDist, gradientColors, CycleMethod.NO_CYCLE);
+        g.setPaint(p);
+        if (stroke!=null) {
+            g.setStroke(stroke);
+            g.translate(dx,dy);
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+            }
+            g.translate(-dx,-dy);
+            g.setStroke(stdS);
+        }
+        else {
+            g.translate(dx,dy);
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
+                }
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                for (int j=0;j<elements.length;j++){
+                    if (elements[j].type == DPath.MOV){continue;}
+                    g.draw(elements[j].getlShape(i));
                 }
             }
             g.translate(-dx,-dy);
