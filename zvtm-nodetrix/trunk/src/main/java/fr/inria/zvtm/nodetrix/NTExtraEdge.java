@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -9,11 +9,11 @@ package fr.inria.zvtm.nodetrix;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
-import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.GPath;
 
 public class NTExtraEdge extends NTEdge {
     
-    DPath edgePath;
+    GPath edgePath;
     // start and end point offsets w.r.t respective matrices
     LongPoint[] offsets;
 
@@ -28,7 +28,7 @@ public class NTExtraEdge extends NTEdge {
         offsets[1] = new LongPoint(x2, y2);
         LongPoint tmp = this.getTail().getMatrix().getPosition();
         LongPoint hmp = this.getHead().getMatrix().getPosition();
-        edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+        edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
         long tm_sz = NodeTrixViz.CELL_SIZE * getTail().getMatrix().getSize()*2;
         long hm_sz = NodeTrixViz.CELL_SIZE * getHead().getMatrix().getSize()*2;
         if (x1 < 0){tm_sz = -tm_sz;}
