@@ -115,40 +115,7 @@ public class Matrix {
                     }
                     else {
                         // instanceof NTExtraEdge
-                        long dx = oe.head.getMatrix().bkg.vx - oe.tail.getMatrix().bkg.vx;
-                        long dy = oe.head.getMatrix().bkg.vy - oe.tail.getMatrix().bkg.vy;
-                        if (dx < 0){
-                            long wo = (nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*nodes.length/2-2*label_bkg[0].getWidth() : -bkg.getWidth();
-                            if (dy < 0){
-                                // south west of start point
-                                long no = (oe.getHead().getMatrix().nodes.length > 1) ? 2*oe.getHead().getMatrix().label_bkg[1].getHeight() : 0;
-                                oe.createGraphics(wo, oe.getTail().wdy,
-                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2+no,
-                                                  vs);                                
-                            }
-                            else {
-                                // north west of start point
-                                oe.createGraphics(wo, oe.getTail().wdy,
-                                                  oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
-                                                  vs);                                
-                            }
-                        }
-                        else {
-                            long wo = (nodes.length > 1) ? NodeTrixViz.CELL_SIZE*nodes.length/2 : bkg.getWidth();
-                            if (dy < 0){
-                                // south east of start point
-                                long no = (oe.getHead().getMatrix().nodes.length > 1) ? 2*oe.getHead().getMatrix().label_bkg[1].getHeight() : 0;
-                                oe.createGraphics(wo, oe.getTail().wdy,
-                                                  oe.getHead().ndx, NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2+no,
-                                                  vs);                                
-                            }
-                            else {
-                                // north east of start point
-                                oe.createGraphics(wo, oe.getTail().wdy,
-                                                  oe.getHead().ndx, -NodeTrixViz.CELL_SIZE*oe.getHead().getMatrix().getSize()/2,
-                                                  vs);                                
-                            }                            
-                        }
+                        oe.createGraphics(0, 0, 0, 0, vs);
                     }
                 }
             }

@@ -23,6 +23,44 @@ public class NTExtraEdge extends NTEdge {
     }
 
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
+        long dx = head.getMatrix().bkg.vx - tail.getMatrix().bkg.vx;
+        long dy = head.getMatrix().bkg.vy - tail.getMatrix().bkg.vy;
+        if (dx < 0){
+            long wo = (tail.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2-2*tail.getMatrix().label_bkg[0].getWidth() : -tail.getMatrix().bkg.getWidth();
+            if (dy < 0){
+                // south west of start point
+                long no = (head.getMatrix().nodes.length > 1) ? 2*head.getMatrix().label_bkg[1].getHeight() : 0;
+                x1 = wo;
+                y1 = tail.wdy;
+                x2 = head.ndx;
+                y2 = NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2+no;
+            }
+            else {
+                // north west of start point
+                x1 = wo;
+                y1 = tail.wdy;
+                x2 = head.ndx;
+                y2 = -NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2;                
+            }
+        }
+        else {
+            long wo = (tail.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2 : tail.getMatrix().bkg.getWidth();
+            if (dy < 0){
+                // south east of start point
+                long no = (head.getMatrix().nodes.length > 1) ? 2*head.getMatrix().label_bkg[1].getHeight() : 0;
+                x1 = wo;
+                y1 = tail.wdy;
+                x2 = head.ndx;
+                y2 = NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2+no;
+            }
+            else {
+                // north east of start point
+                x1 = wo;
+                y1 = tail.wdy;
+                x2 = head.ndx;
+                y2 = -NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2;                
+            }
+        }
         offsets = new LongPoint[2];
         offsets[0] = new LongPoint(x1, y1);
         offsets[1] = new LongPoint(x2, y2);
