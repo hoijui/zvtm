@@ -22,58 +22,63 @@ public class NTExtraEdge extends NTEdge {
         this.head = h;
     }
 
+    static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
+
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
-        long dx = head.getMatrix().bkg.vx - tail.getMatrix().bkg.vx;
-        long dy = head.getMatrix().bkg.vy - tail.getMatrix().bkg.vy;
-        if (dx < 0){
-            long wo = (tail.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2-2*tail.getMatrix().label_bkg[0].getWidth() : -tail.getMatrix().bkg.getWidth();
-            if (dy < 0){
-                // south west of start point
-                long no = (head.getMatrix().nodes.length > 1) ? 2*head.getMatrix().label_bkg[1].getHeight() : 0;
-                x1 = wo;
-                y1 = tail.wdy;
-                x2 = head.ndx;
-                y2 = NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2+no;
-            }
-            else {
-                // north west of start point
-                x1 = wo;
-                y1 = tail.wdy;
-                x2 = head.ndx;
-                y2 = -NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2;                
-            }
-        }
-        else {
-            long wo = (tail.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2 : tail.getMatrix().bkg.getWidth();
-            if (dy < 0){
-                // south east of start point
-                long no = (head.getMatrix().nodes.length > 1) ? 2*head.getMatrix().label_bkg[1].getHeight() : 0;
-                x1 = wo;
-                y1 = tail.wdy;
-                x2 = head.ndx;
-                y2 = NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2+no;
-            }
-            else {
-                // north east of start point
-                x1 = wo;
-                y1 = tail.wdy;
-                x2 = head.ndx;
-                y2 = -NodeTrixViz.CELL_SIZE*head.getMatrix().getSize()/2;                
-            }
-        }
+        // initial values of x1, y1, x2, y2 are ignored (should be 0 anyway)
         offsets = new LongPoint[2];
-        offsets[0] = new LongPoint(x1, y1);
-        offsets[1] = new LongPoint(x2, y2);
         LongPoint tmp = this.getTail().getMatrix().getPosition();
         LongPoint hmp = this.getHead().getMatrix().getPosition();
-        edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
-        long tm_sz = NodeTrixViz.CELL_SIZE * getTail().getMatrix().getSize()*2;
-        long hm_sz = NodeTrixViz.CELL_SIZE * getHead().getMatrix().getSize()*2;
-        if (x1 < 0){tm_sz = -tm_sz;}
-        if (y2 < 0){hm_sz = -hm_sz;}
-        edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
-                            tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y,
-                            hmp.x+offsets[1].x, hmp.y+offsets[1].y+hm_sz, true);        
+        double angle = Math.atan2(tail.getMatrix().bkg.vy-head.getMatrix().bkg.vy, tail.getMatrix().bkg.vx-head.getMatrix().bkg.vx) + Math.PI;        
+        if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
+            x1 = (tail.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2 : tail.getMatrix().bkg.getWidth();
+            y1 = tail.wdy;
+            x2 = (head.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2-2*head.getMatrix().label_bkg[0].getWidth() : -head.getMatrix().bkg.getWidth();
+            y2 = head.wdy;
+            offsets[0] = new LongPoint(x1, y1);
+            offsets[1] = new LongPoint(x2, y2);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
+                                hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
+        }
+        else if (angle > 5*Math.PI/4.0){
+            x1 = tail.ndx;
+            y1 = (tail.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2 : -tail.getMatrix().bkg.getHeight();
+            x2 = head.ndx;
+            y2 = (head.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2+2*head.getMatrix().label_bkg[0].getWidth() : head.getMatrix().bkg.getHeight();
+            offsets[0] = new LongPoint(x1, y1);
+            offsets[1] = new LongPoint(x2, y2);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET,
+                                hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET, true);
+        }
+        else if (angle > 3*Math.PI/4.0){
+            x1 = (tail.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2-2*tail.getMatrix().label_bkg[0].getWidth() : -tail.getMatrix().bkg.getWidth();
+            y1 = tail.wdy;
+            x2 = (head.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2 : head.getMatrix().bkg.getWidth();
+            y2 = head.wdy;
+            offsets[0] = new LongPoint(x1, y1);
+            offsets[1] = new LongPoint(x2, y2);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
+                                hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
+        }
+        else {
+            // angle >= Math.PI/4.0
+            x1 = tail.ndx;
+            y1 = (tail.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2+2*tail.getMatrix().label_bkg[0].getWidth() : tail.getMatrix().bkg.getHeight();
+            x2 = head.ndx;
+            y2 = (head.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2 : -head.getMatrix().bkg.getHeight();
+            offsets[0] = new LongPoint(x1, y1);
+            offsets[1] = new LongPoint(x2, y2);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
+                                hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
+        }
         vs.addGlyph(edgePath);
         edgePath.setOwner(this);
     }
@@ -87,14 +92,49 @@ public class NTExtraEdge extends NTEdge {
         // x & y are actually ignored, computing new path geometry from matrix position
         LongPoint tmp = this.getTail().getMatrix().getPosition();
         LongPoint hmp = this.getHead().getMatrix().getPosition();
-        long tm_sz = NodeTrixViz.CELL_SIZE * getTail().getMatrix().getSize()*2;
-        long hm_sz = NodeTrixViz.CELL_SIZE * getHead().getMatrix().getSize()*2;
-        if (offsets[0].x < 0){tm_sz = -tm_sz;}
-        if (offsets[1].y < 0){hm_sz = -hm_sz;}
-        LongPoint[] npos = {new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y),
-            new LongPoint(tmp.x+offsets[0].x+tm_sz, tmp.y+offsets[0].y),
-            new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y+hm_sz),
-            new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y)};
+        LongPoint[] npos = new LongPoint[4];        
+        double angle = Math.atan2(tail.getMatrix().bkg.vy-head.getMatrix().bkg.vy, tail.getMatrix().bkg.vx-head.getMatrix().bkg.vx) + Math.PI;        
+        if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
+            offsets[0].setLocation((tail.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2 : tail.getMatrix().bkg.getWidth(),
+                                   tail.wdy);
+            offsets[1].setLocation((head.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2-2*head.getMatrix().label_bkg[0].getWidth() : -head.getMatrix().bkg.getWidth(),
+                                   head.wdy);
+            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new LongPoint(tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
+            npos[2] = new LongPoint(hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y);
+            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+        }
+        else if (angle > 5*Math.PI/4.0){
+            offsets[0].setLocation(tail.ndx,
+                                   (tail.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2 : -tail.getMatrix().bkg.getHeight());
+            offsets[1].setLocation(head.ndx,
+                                   (head.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2+2*head.getMatrix().label_bkg[0].getWidth() : head.getMatrix().bkg.getHeight());
+            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET);
+            npos[2] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET);
+            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+        }
+        else if (angle > 3*Math.PI/4.0){
+            offsets[0].setLocation((tail.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2-2*tail.getMatrix().label_bkg[0].getWidth() : -tail.getMatrix().bkg.getWidth(),
+                                   tail.wdy);
+            offsets[1].setLocation((head.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2 : head.getMatrix().bkg.getWidth(),
+                                   head.wdy);
+            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new LongPoint(tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
+            npos[2] = new LongPoint(hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y);
+            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+        }
+        else {
+            // angle >= Math.PI/4.0
+            offsets[0].setLocation(tail.ndx,
+                                   (tail.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.length/2+2*tail.getMatrix().label_bkg[0].getWidth() : tail.getMatrix().bkg.getHeight());
+            offsets[1].setLocation(head.ndx,
+                                   (head.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2 : -head.getMatrix().bkg.getHeight());
+            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET);
+            npos[2] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET);
+            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+        }
         edgePath.edit(npos, true);
     }
     
