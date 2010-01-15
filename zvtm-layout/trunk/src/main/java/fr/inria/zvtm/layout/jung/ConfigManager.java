@@ -49,14 +49,14 @@ class ConfigManager {
     static final String INRIA_LOGO_PATH = "/images/inria.png";
  
  	static JMenuBar initMenu(final Viewer app){
-	//	final JMenuItem openMI = new JMenuItem("Open...");
-	//	openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem openMI = new JMenuItem("Open...");
+		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem exitMI = new JMenuItem("Exit");
 		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-	//			if (e.getSource()==openMI){app.openFile();}
+				if (e.getSource()==openMI){app.openFile();}
 				if (e.getSource()==exitMI){app.exit();}
 				else if (e.getSource()==aboutMI){app.ovm.showAbout();}
 			}
@@ -64,13 +64,13 @@ class ConfigManager {
 		JMenuBar jmb = new JMenuBar();
 		JMenu fileM = new JMenu("File");
 		JMenu helpM = new JMenu("Help");
-	//	fileM.add(openMI);
-	//	fileM.addSeparator();
+		fileM.add(openMI);
+		fileM.addSeparator();
 		fileM.add(exitMI);
 		helpM.add(aboutMI);
 		jmb.add(fileM);
 		jmb.add(helpM);
-	//	openMI.addActionListener(a0);
+		openMI.addActionListener(a0);
 		exitMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
 		return jmb;

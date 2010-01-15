@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 
+import java.io.File;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -45,6 +46,8 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.RImage;
+
+import edu.uci.ics.jung.io.GraphMLReader;
 
 public class Viewer {
 
@@ -68,10 +71,16 @@ public class Viewer {
     
     VWGlassPane gp;
     
+    GraphManager gm;
+    
+    File INPUT_FILE, INPUT_FILE_DIR;
+    
     /* --------------- init ------------------*/
 
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased){
+    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File inputFile){
         initGUI(fullscreen, opengl, antialiased);
+        gm = new GraphManager(this);
+        load(inputFile);
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -134,6 +143,43 @@ public class Viewer {
 		panelHeight = d.height;
 		nm.updateOverviewLocation();
 	}
+	
+	/* --------------- Input Data ------------------*/
+    
+    void reset(){/*TBW*/}
+	
+	void openFile(){
+		final JFileChooser fc = new JFileChooser(INPUT_FILE_DIR);
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fc.setDialogTitle(Messages.LOAD_FILE);
+		int returnVal= fc.showOpenDialog(mView.getFrame());
+		if (returnVal == JFileChooser.APPROVE_OPTION){
+		    final SwingWorker worker = new SwingWorker(){
+			    public Object construct(){
+					reset();
+					load(fc.getSelectedFile());
+					return null; 
+			    }
+			};
+		    worker.start();
+		}
+	}
+	
+    void load(File inputFile){
+        if (inputFile == null){return;}
+        INPUT_FILE = inputFile;
+	    INPUT_FILE_DIR = INPUT_FILE.getParentFile();
+        gp.setValue(5);
+		gp.setVisible(true);
+		gp.setLabel(Messages.PROCESSING+INPUT_FILE.toString());
+        gp.setValue(50);
+        gm.loadGraphML(inputFile);
+        gp.setValue(80);
+        nm.getGlobalView();
+	    nm.updateOverview();
+        gp.setVisible(false);
+	    gp.setLabel(Messages.EMPTY_STRING);
+    }
     
     /* --------------- Main/exit ------------------*/
     
@@ -145,6 +191,7 @@ public class Viewer {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+		File inputFile = null;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
@@ -153,14 +200,21 @@ public class Viewer {
 				    ogl = true;
 				}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Messages.printCmdLineHelp();System.exit(0);}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("-help")){Messages.printCmdLineHelp();System.exit(0);}
 			}
+			else {
+                // the only other thing allowed as a cmd line param is a scene file
+                File f = new File(args[i]);
+                if (f.exists()){
+                    inputFile = f;                        
+                }
+            }
 		}
         if (!fs && Utilities.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
-        new Viewer(fs, ogl, aa);
+        new Viewer(fs, ogl, aa, inputFile);
     }
     
 }
