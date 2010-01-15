@@ -175,6 +175,7 @@ public class Viewer {
         gp.setValue(50);
         gm.loadGraphML(inputFile);
         gp.setValue(80);
+        gm.createLayout();
         nm.getGlobalView();
 	    nm.updateOverview();
         gp.setVisible(false);

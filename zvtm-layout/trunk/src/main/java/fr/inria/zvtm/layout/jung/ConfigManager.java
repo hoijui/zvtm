@@ -20,6 +20,12 @@ import java.awt.event.KeyEvent;
 
 class ConfigManager {
     
+    /* Graph appearance */
+    static final int DEFAULT_GRAPH_SIZE = 1000;
+    static final int DEFAULT_NODE_SIZE = 10;
+    static final Color DEFAULT_NODE_COLOR = Color.RED;
+    static final Color DEFAULT_EDGE_COLOR = Color.BLACK;
+    
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
