@@ -29,7 +29,7 @@ public class Messages {
     static final String mViewName = "Basic UI";
     
     protected static void printCmdLineHelp(){
-		System.out.println("Usage:\n\tjava -jar target/zvtm-basicui-1.0.jar <path_to_file> [options]");
+		System.out.println("Usage:\n\tjava -jar target/zvtm-basicui-"+VERSION+".jar <path_to_file> [options]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
         System.out.println("\t-noaa: no antialiasing");
 		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");

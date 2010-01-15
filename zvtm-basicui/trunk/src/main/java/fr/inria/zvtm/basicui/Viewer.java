@@ -153,7 +153,7 @@ public class Viewer {
 				    ogl = true;
 				}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Messages.printCmdLineHelp();System.exit(0);}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("-help")){Messages.printCmdLineHelp();System.exit(0);}
 			}
 		}
         if (!fs && Utilities.osIsMacOS()){
