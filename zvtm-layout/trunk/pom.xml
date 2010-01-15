@@ -11,7 +11,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <artifactId>zvtm-layout</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-LAYOUT</name>
-  <version>0.2.0</version>
+  <version>0.3.0-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
     <license>
@@ -54,12 +54,22 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.10.0-SNAPSHOT</version>
+      <version>0.10.1-SNAPSHOT</version>
     </dependency>
-	<dependency>
-      <groupId>jung</groupId>
-      <artifactId>jung</artifactId>
-      <version>1.7.6</version>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-api</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-algorithms</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jung</groupId>
+      <artifactId>jung-graph-impl</artifactId>
+      <version>2.0</version>
     </dependency>
   </dependencies>
   
@@ -110,6 +120,23 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
               <downloadSources>true</downloadSources>
           </configuration>
       </plugin>
+	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zvtm.layout.jung.Viewer</mainClass>
+              <packageName>fr.inria.zvtm.layout.jung</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   
@@ -122,7 +149,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         <configuration>
           <aggregate>true</aggregate>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
-          <bottom><![CDATA[Copyright &#169; 2007-2009 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <bottom><![CDATA[Copyright &#169; 2007-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
             <link>http://zvtm.sourceforge.net/apidocs</link>
