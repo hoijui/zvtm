@@ -22,18 +22,17 @@ public class NTIntraEdge extends NTEdge {
     }
     
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
-        // hdx and vdy are not used in this one
         this.offset = new LongPoint(x2, y1);
-        LongPoint mp = this.getTail().getMatrix().getPosition();
+        LongPoint mp = tail.getMatrix().getPosition();
         this.edgeRect = new VRectangle(mp.x+offset.x, mp.y+offset.y, 0,
-                                       NodeTrixViz.CELL_SIZE/2, NodeTrixViz.CELL_SIZE/2,
-                                       NodeTrixViz.INTRA_LINK_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
+            NodeTrixViz.CELL_SIZE/2, NodeTrixViz.CELL_SIZE/2,
+            NodeTrixViz.INTRA_LINK_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);            
         vs.addGlyph(edgeRect);
         edgeRect.setOwner(this);
     }
 
     void moveTo(long x, long y){
-        LongPoint mp = this.getTail().getMatrix().getPosition();
+        LongPoint mp = tail.getMatrix().getPosition();
         edgeRect.moveTo(mp.x+offset.x, mp.y+offset.y);
     }
     

@@ -106,12 +106,24 @@ public class Matrix {
     }
     
     void createEdgeGraphics(VirtualSpace vs){
+        long reflexiveProp4SingleNodeMatOffset = NodeTrixViz.CELL_SIZE / 2;
         for (NTNode node:nodes){
             if (node.getOutgoingEdges() != null){
                 for (NTEdge oe:node.getOutgoingEdges()){
                     // values that are 0 is because we do not care (not used)
                     if (oe instanceof NTIntraEdge){
-                        oe.createGraphics(0, oe.getTail().wdy, oe.getHead().ndx, 0, vs);
+                        if (oe.tail == oe.head && nodes.length == 1){
+                            oe.createGraphics(0, oe.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
+                                              oe.getHead().ndx-bkg.getWidth()+reflexiveProp4SingleNodeMatOffset, 0, vs);
+
+                            // remember
+                            reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
+
+                        }
+                        else {
+                            oe.createGraphics(0, oe.getTail().wdy,
+                                              oe.getHead().ndx, 0, vs);
+                        }
                     }
                     else {
                         // instanceof NTExtraEdge
