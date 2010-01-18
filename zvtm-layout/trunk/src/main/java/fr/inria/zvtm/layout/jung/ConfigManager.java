@@ -21,7 +21,7 @@ import java.awt.event.KeyEvent;
 class ConfigManager {
     
     /* Graph appearance */
-    static final int DEFAULT_GRAPH_SIZE = 1000;
+    static final int GRAPH_SIZE_FACTOR = 10;
     static final int DEFAULT_NODE_SIZE = 10;
     static final Color DEFAULT_NODE_COLOR = Color.RED;
     static final Color DEFAULT_EDGE_COLOR = Color.BLACK;
