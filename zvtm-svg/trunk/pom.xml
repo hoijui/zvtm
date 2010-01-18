@@ -11,7 +11,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
   <artifactId>zvtm-svg</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-SVG</name>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   <description>The ZVTM is a Zoomable User Interface (ZUI) toolkit implemented in Java, designed to ease the task of creating complex visual editors in which large amounts of objects have to be displayed, or which contain complex geometrical shapes that need to be animated. It is based on the metaphor of universes that can be observed through smart movable/zoomable cameras, and offers features such as perceptual continuity in object animations and camera movements, which should make the end-user's overall experience more pleasing. This package contains classes to import and export SVG documents to/from virtual spaces.</description>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
@@ -58,7 +58,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.10.0</version>
+      <version>[0.10.0,)</version>
     </dependency>
   </dependencies>
 
