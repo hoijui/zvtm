@@ -70,3 +70,17 @@ and add the following dependency in your own \cd{pom.xml} file:
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\vspace{\parskip}
+
+If using the SVG import/export capabilities of ZVTM, you must also declare the following dependency, as package \cd{fr.inria.zvtm.svg} was moved to a separate module in zvtm-0.10.1.
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-svg</artifactId>
+  <version>0.1.1-SNAPSHOT</version>
+  <!-- update to a suitable version, not necessarily with -SNAPSHOT -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
