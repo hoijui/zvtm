@@ -120,7 +120,7 @@ class CyclicMenu {
     }
 
     //dumb struct, associates a menu item and its representation
-    static class MenuElement {
+    private static class MenuElement {
         public CyclicMenuItem item;
         public MenuItemRepr repr; 
 
