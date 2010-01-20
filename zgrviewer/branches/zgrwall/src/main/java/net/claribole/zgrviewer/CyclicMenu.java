@@ -33,6 +33,10 @@ class CyclicMenu {
      */
     CyclicMenu(VirtualSpace targetSpace, List<CyclicMenuItem> items,
             long x, long y, long halfWidth, long halfHeight){
+        this.targetSpace = targetSpace;
+        box = new VRectangle(x,y,0,halfWidth,halfHeight,Color.BLUE);
+        box.setTranslucencyValue(0.5f);
+        targetSpace.addGlyph(box);
         if(items.size() == 0){
             throw new IllegalArgumentException("'items' should contain at least one element");
         }
@@ -47,7 +51,6 @@ class CyclicMenu {
             elems.add(elem);
             ++idx;
         }
-        this.targetSpace = targetSpace;
         setCurrentItemHighlight(true);
     }
 
@@ -107,28 +110,30 @@ class CyclicMenu {
      * Needs a reference to the target VirtualSpace, so cannot be static.
      */
      class MenuItemRepr {
-        private VRectangle box;
+        private VRectangle itemBox;
         private ClusteredImage icon;
         private final Color hiColor = Color.GREEN;
         private final Color stdColor = Color.DARK_GRAY;
+        private final long padding = 12;
 
         MenuItemRepr(CyclicMenuItem mi, long x, long y, long halfWidth, long halfHeight){
-            box = new VRectangle(x,y,0,halfWidth,halfHeight,stdColor); 
-            targetSpace.addGlyph(box);
+            itemBox = new VRectangle(x,y,0,halfWidth-padding,halfHeight-padding,stdColor); 
+            itemBox.setTranslucencyValue(0.5f);
+            targetSpace.addGlyph(itemBox);
         }
 
         void show(){
-            targetSpace.show(box);
-            targetSpace.show(icon);
+            targetSpace.show(itemBox);
+            //targetSpace.show(icon);
         }
 
         void hide(){
-            targetSpace.hide(box);
-            targetSpace.hide(icon);
+            targetSpace.hide(itemBox);
+            //targetSpace.hide(icon);
         }
 
         void highlight(boolean on){
-            box.setColor(on? hiColor : stdColor);
+            itemBox.setColor(on? hiColor : stdColor);
         }
     }
 

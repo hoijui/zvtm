@@ -32,8 +32,11 @@ import javax.swing.JComponent;
 import javax.swing.JMenuBar;
 import java.awt.event.ComponentListener;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import fr.inria.zvtm.cluster.ClusterGeometry;
@@ -86,6 +89,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     VirtualSpace mSpace;   // virtual space containing graph
     VirtualSpace mnSpace;  // virtual space containing pie menu
     VirtualSpace rSpace;   // virtual space containing rectangle representing region seen through main camera (used in overview)
+    VirtualSpace cyclicSpace = VirtualSpaceManager.INSTANCE.addVirtualSpace("cyclicSpace"); //virtual space for the cyclic (alt-tab) menu
+    Camera cyclicCamera = cyclicSpace.addCamera();
     static final String mainSpaceName = "graphSpace";
     static final String menuSpace = "menuSpace";
     /*name of the VTM virtual space holding the rectangle delimiting the region seen by main view in radar view*/
@@ -225,6 +230,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         cameras.add(mSpace.getCamera(0));
         cameras.add(mnSpace.getCamera(0));
         cameras.add(tp.getPaletteCamera());
+        cameras.add(cyclicCamera);
         return cameras;
     }
 
@@ -236,7 +242,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         //experimental cluster stuff
          ClusterGeometry clGeom = new ClusterGeometry(
                 2760,
-                1740,
+                1840,
                 8,
                 4);
 		ClusteredView cv = 
@@ -247,12 +253,28 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                     4, //cluster surface
                     cameras);
         cv.setBackgroundColor(Color.WHITE);
+        createCyclicMenu();
         vsm.addClusteredView(cv);
-
+      
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
         mainView.getFrame().addComponentListener(this);
         gp = new ZGRGlassPane(this);
         ((JFrame)mainView.getFrame()).setGlassPane(gp);
+    }
+
+    void createCyclicMenu(){
+        try{
+        CyclicMenuItem itCursor = new CyclicMenuItem("Cursor", new URL("http://www.example.com/cursor.png"));
+        CyclicMenuItem itHighlight = new CyclicMenuItem("Highlight", new URL("http://www.example.com/highlight.png"));
+        CyclicMenuItem itTool = new CyclicMenuItem("Random tool", new URL("http://www.example.com/tool.png"));
+        ArrayList<CyclicMenuItem> menuItems = new ArrayList<CyclicMenuItem>();
+        menuItems.add(itCursor);
+        menuItems.add(itHighlight);
+        menuItems.add(itTool);
+        CyclicMenu menu = new CyclicMenu(cyclicSpace, menuItems, 0, 0, 2800, 1900);
+        } catch(MalformedURLException e){
+            throw new Error("Invalid URL: " + e);
+        }
     }
 
     JPanel createPanelView(Vector cameras, int w, int h){
