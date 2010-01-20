@@ -45,11 +45,12 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.RImage;
 
 import edu.uci.ics.jung.io.GraphMLReader;
 
-public class Viewer {
+public class Viewer implements Java2DPainter {
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -123,6 +124,7 @@ public class Viewer {
 		};
 		mView.getFrame().addComponentListener(ca0);
 		nm.createOverview();
+		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
     }
 
     void windowLayout(){
@@ -180,6 +182,14 @@ public class Viewer {
 	    nm.updateOverview();
         gp.setVisible(false);
 	    gp.setLabel(Messages.EMPTY_STRING);
+    }
+    
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (gm.lu.isEnabled()){
+            // feedback about layout algo auto step
+            g2d.setColor(Color.RED);
+            g2d.fillOval(viewWidth-8, 4, 4, 4);
+        }
     }
     
     /* --------------- Main/exit ------------------*/

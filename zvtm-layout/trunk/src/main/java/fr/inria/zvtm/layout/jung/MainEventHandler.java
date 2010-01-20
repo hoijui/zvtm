@@ -181,7 +181,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(NavigationManager.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(NavigationManager.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(NavigationManager.MOVE_RIGHT);}
-    	else if (code==KeyEvent.VK_SPACE){application.gm.incLayout();}
+    	else if (code==KeyEvent.VK_SPACE){application.gm.toggleAutoLayout();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

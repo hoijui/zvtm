@@ -14,7 +14,10 @@ import java.io.FileReader;
 import java.util.Set;
 import java.util.Map;
 import java.util.Collection;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
@@ -34,13 +37,20 @@ import org.apache.commons.collections15.Factory;
 
 class GraphManager {
     
+    static final int LAYOUT_UPDATE_FREQUENCY = 50;
+    
     Viewer application;
     SparseMultigraph<Glyph,DPath> graph;
     //CircleLayout<Glyph,DPath> layout;
     SpringLayout<Glyph,DPath> layout;
     
+    LayoutUpdater lu;
+    
     GraphManager(Viewer app){
         this.application = app;
+        Timer timer = new Timer();
+		lu = new LayoutUpdater(this);
+		timer.scheduleAtFixedRate(lu, LAYOUT_UPDATE_FREQUENCY, LAYOUT_UPDATE_FREQUENCY);
     }
     
     void loadGraphML(File f){
@@ -104,4 +114,35 @@ class GraphManager {
         }
     }
     
+    void toggleAutoLayout(){
+        lu.setEnabled(!lu.isEnabled());
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+    
+}
+
+class LayoutUpdater extends TimerTask {
+
+    private boolean enabled = false;
+    GraphManager gm;
+
+	LayoutUpdater(GraphManager gm){
+		super();
+		this.gm = gm;
+	}
+
+	public void setEnabled(boolean b){
+		enabled = b;
+	}
+    
+	public boolean isEnabled(){
+		return enabled;
+	}
+    
+	public void run(){		
+		if (enabled){
+			gm.incLayout();
+		}
+	}
+
 }
