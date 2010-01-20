@@ -21,10 +21,11 @@ import java.awt.event.KeyEvent;
 class ConfigManager {
     
     /* Graph appearance */
-    static final int GRAPH_SIZE_FACTOR = 10;
+    static final int GRAPH_SIZE_FACTOR = 20;
     static final int DEFAULT_NODE_SIZE = 10;
     static final Color DEFAULT_NODE_COLOR = Color.RED;
     static final Color DEFAULT_EDGE_COLOR = Color.BLACK;
+    static final short NUMBER_OF_UPDATES_PER_CYCLE = 5;
     
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
@@ -54,6 +55,7 @@ class ConfigManager {
     static final String INSITU_LOGO_PATH = "/images/insitu.png";
     static final String INRIA_LOGO_PATH = "/images/inria.png";
  
+    /* Swing Menu */
  	static JMenuBar initMenu(final Viewer app){
 		final JMenuItem openMI = new JMenuItem("Open...");
 		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -80,5 +82,19 @@ class ConfigManager {
 		exitMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
 		return jmb;
-	}   
+	}
+	
+	/* Pie menu */
+	
+	static final Font PIEMENU_MAIN_FONT = new Font("Arial", 0, 10);
+	static final Font PIEMENU_SUB_FONT = new Font("Arial", 0, 8);
+	
+	static Color PIEMENU_FILL_COLOR = Color.BLACK;
+    static Color PIEMENU_BORDER_COLOR = Color.WHITE;
+    static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
+	static final float PIEMENU_MAIN_ALPHA = 0.85f;
+	static final float PIEMENU_SUB_ALPHA = 0.95f;
+	static final int PIEMENU_MAIN_RADIUS = 75;
+	static final int PIEMENU_SUB_RADIUS = 60;
+
 }

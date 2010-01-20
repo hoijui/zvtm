@@ -72,12 +72,15 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
             y1 = v.getVCursor().vy;
             v.setDrawRect(true);
         }
+        else {
+            panning = true;
+            v.setDrawDrag(true);            
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	    regionStickedToMouse = false;
 	    pcameraStickedToMouse = false;
-	    panning = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
 			x2 = v.getVCursor().vx;
@@ -88,9 +91,20 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 			}
 			selectingRegion = false;
 		}
+		else if (panning){
+		    application.vsm.getAnimationManager().setXspeed(0);
+            application.vsm.getAnimationManager().setYspeed(0);
+            application.vsm.getAnimationManager().setZspeed(0);
+            v.setDrawDrag(false);
+            panning = false;
+		}
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        if (v.lastGlyphEntered() != null){
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
+		}
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -99,25 +113,13 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        lastJPX = jpx;
-        lastJPY = jpy;
-        panning = true;
-        v.setDrawDrag(true);
+        v.parent.setActiveLayer(1);
+		application.displayMainPieMenu(true);
     }
 
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
-        v.setDrawDrag(false);
-        panning = false;
-	}
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
-		}
-    }
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
@@ -181,7 +183,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(NavigationManager.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(NavigationManager.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(NavigationManager.MOVE_RIGHT);}
-    	else if (code==KeyEvent.VK_SPACE){application.gm.toggleAutoLayout();}
+    	else if (code==KeyEvent.VK_SPACE){application.gm.toggleLayoutUpdate();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

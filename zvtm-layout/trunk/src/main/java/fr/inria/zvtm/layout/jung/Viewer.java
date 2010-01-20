@@ -48,7 +48,15 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.RImage;
 
+import fr.inria.zvtm.glyphs.PieMenu;
+import fr.inria.zvtm.glyphs.PieMenuFactory;
+
 import edu.uci.ics.jung.io.GraphMLReader;
+
+//import java.awt.event.KeyListener;
+//import com.xerox.VTM.engine.LongPoint;
+//import com.xerox.VTM.glyphs.Glyph;
+
 
 public class Viewer implements Java2DPainter {
 
@@ -63,7 +71,7 @@ public class Viewer implements Java2DPainter {
     int panelWidth, panelHeight;
     
     VirtualSpaceManager vsm;
-    VirtualSpace mSpace, aboutSpace;
+    VirtualSpace mSpace, aboutSpace, menuSpace;
     EView mView;
     
     MainEventHandler eh;
@@ -90,12 +98,14 @@ public class Viewer implements Java2DPainter {
         ovm = new Overlay(this);
         nm = new NavigationManager(this);
         mSpace = vsm.addVirtualSpace(Messages.mSpaceName);
-        Camera mCamera = mSpace.addCamera();
+        menuSpace = vsm.addVirtualSpace(Messages.menuSpaceName);
+		Camera mCamera = mSpace.addCamera();
         nm.ovCamera = mSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
 		aboutSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
+        cameras.add(menuSpace.addCamera());
         nm.setCamera(mCamera);
         cameras.add(aboutSpace.getCamera(0));
         mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
@@ -112,7 +122,8 @@ public class Viewer implements Java2DPainter {
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
         mView.setEventHandler(eh, 0);
-        mView.setEventHandler(ovm, 1);
+        mView.setEventHandler(new PieMenuEventHandler(this), 1);
+        mView.setEventHandler(ovm, 2);
         mView.setNotifyMouseMoved(true);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
@@ -177,12 +188,101 @@ public class Viewer implements Java2DPainter {
         gp.setValue(50);
         gm.loadGraphML(inputFile);
         gp.setValue(80);
-        gm.createLayout();
+        gm.createInitialLayout();
         nm.getGlobalView();
 	    nm.updateOverview();
         gp.setVisible(false);
 	    gp.setLabel(Messages.EMPTY_STRING);
     }
+    
+    /* -------------- pie menu -------------- */
+	
+	PieMenu mainPieMenu, subPieMenu;
+	
+	void displayMainPieMenu(boolean b){
+		if (b){
+			PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+			PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
+			PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
+			PieMenuFactory.setSelectedItemBorderColor(null);
+			PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
+			PieMenuFactory.setFont(ConfigManager.PIEMENU_MAIN_FONT);
+			if (Utilities.osIsWindows() || Utilities.osIsMacOS()){
+				PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_MAIN_ALPHA);
+			}
+			PieMenuFactory.setSensitivityRadius(0.5);
+			PieMenuFactory.setAngle(-Math.PI/2.0);
+			PieMenuFactory.setRadius(ConfigManager.PIEMENU_MAIN_RADIUS);
+			mainPieMenu = PieMenuFactory.createPieMenu(Messages.MAIN_MENU_LABELS, Messages.MAIN_MENU_LABEL_OFFSETS, 0, mView, vsm);
+			Glyph[] items = mainPieMenu.getItems();
+			items[0].setType(Messages.PM_ENTRY);
+			items[1].setType(Messages.PM_SUBMN);
+			items[2].setType(Messages.PM_ENTRY);
+			items[3].setType(Messages.PM_ENTRY);
+		}
+		else {
+			mainPieMenu.destroy(0);
+			mainPieMenu = null;
+		}
+	}
+
+	void displaySubMenu(Glyph menuItem, boolean b){
+		if (b){
+			int index = mainPieMenu.getItemIndex(menuItem);
+			if (index != -1){
+				String label = mainPieMenu.getLabels()[index].getText();
+				PieMenuFactory.setFont(ConfigManager.PIEMENU_SUB_FONT);
+				PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+				PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
+				PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
+				PieMenuFactory.setSelectedItemBorderColor(null);
+				PieMenuFactory.setSensitivityRadius(1.0);
+				PieMenuFactory.setAngle(Math.PI/2.0);
+				if (Utilities.osIsWindows() || Utilities.osIsMacOS()){
+					PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_SUB_ALPHA);
+				}
+				PieMenuFactory.setRadius(ConfigManager.PIEMENU_SUB_RADIUS);
+				Glyph[] items;
+				if (label == Messages.PM_LAYOUT){
+					subPieMenu = PieMenuFactory.createPieMenu(Messages.LAYOUT_MENU_LABELS, Messages.LAYOUT_MENU_LABEL_OFFSETS, 0 , mView, vsm);
+					items = subPieMenu.getItems();
+					for (int i=0;i<items.length;i++){
+						items[i].setType(Messages.PM_ENTRY);
+					}
+				}
+			}
+		}
+		else {
+			subPieMenu.destroy(0);
+			subPieMenu = null;
+		}
+	}
+
+	void pieMenuEvent(Glyph menuItem){
+		int index = mainPieMenu.getItemIndex(menuItem);
+		String label;
+		if (index != -1){
+			label = mainPieMenu.getLabels()[index].getText();
+			if (label == Messages.PM_GLOBALVIEW){nm.getGlobalView();}
+			// NOT IMPLEMENTED YET
+			//else if (label == Messages.PM_BACK){moveBack();}
+			//else if (label == Messages.PM_FIND){showFindZone(true);}
+		}
+		else {
+			index = subPieMenu.getItemIndex(menuItem);
+			if (index != -1){
+				label = subPieMenu.getLabels()[index].getText();
+				if (label == Messages.PM_LAYOUT_SPRING){gm.chooseLayout(GraphManager.LAYOUT_SPRING);}
+				else if (label == Messages.PM_LAYOUT_CIRCLE){gm.chooseLayout(GraphManager.LAYOUT_CIRCLE);}
+				else if (label == Messages.PM_LAYOUT_KK){gm.chooseLayout(GraphManager.LAYOUT_KK);}
+				else if (label == Messages.PM_LAYOUT_ISOM){gm.chooseLayout(GraphManager.LAYOUT_ISOM);}
+				else if (label == Messages.PM_LAYOUT_FR){gm.chooseLayout(GraphManager.LAYOUT_FR);}
+				else if (label == Messages.PM_LAYOUT_UPDATE){gm.toggleLayoutUpdate();}
+			}
+		}
+	}
+	
+	/* -------------- G2D graphics ---------------- */
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (gm.lu.isEnabled()){
@@ -341,7 +441,7 @@ class Overlay implements ViewEventHandler {
 			}
             showingAbout = true;
         }
-		application.mView.setActiveLayer(1);
+		application.mView.setActiveLayer(2);
 		if (application.nm.ovPortal.isVisible()){application.nm.toggleOverview();}
     }
 
@@ -450,4 +550,85 @@ class Overlay implements ViewEventHandler {
 	public void viewClosing(View v){
 		application.exit();
 	}
+}
+
+class PieMenuEventHandler implements ViewEventHandler {
+	
+	Viewer application;
+	
+	PieMenuEventHandler(Viewer app){
+		this.application = app;
+	}
+
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		Glyph g = v.getMouse().lastGlyphEntered;
+		if (g != null && g.getType() == Messages.PM_ENTRY){
+			application.pieMenuEvent(g);
+		}
+		if (application.mainPieMenu != null){
+			application.displayMainPieMenu(false);
+		}
+		if (application.subPieMenu != null){
+			application.displaySubMenu(null, false);
+		}
+		v.parent.setActiveLayer(0);
+	}
+
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
+
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
+
+    public void enterGlyph(Glyph g){
+        g.highlight(true, null);
+    }
+
+	public void exitGlyph(Glyph g){
+		g.highlight(false, null);
+		if (application.mainPieMenu != null && g == application.mainPieMenu.getBoundary()){
+			Glyph lge = application.vsm.getActiveView().mouse.lastGlyphEntered;
+			if (lge != null && lge.getType() == Messages.PM_SUBMN){
+				application.mainPieMenu.setSensitivity(false);
+				application.displaySubMenu(lge, true);
+			}
+		}
+		else if (application.subPieMenu != null && g == application.subPieMenu.getBoundary()){
+			application.displaySubMenu(null, false);
+			application.mainPieMenu.setSensitivity(true);
+		}
+	}
+
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void viewActivated(View v){}
+
+    public void viewDeactivated(View v){}
+
+    public void viewIconified(View v){}
+
+    public void viewDeiconified(View v){}
+
+    public void viewClosing(View v){System.exit(0);}
+
 }
