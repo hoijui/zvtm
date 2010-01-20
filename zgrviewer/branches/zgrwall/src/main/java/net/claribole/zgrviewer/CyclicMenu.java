@@ -4,6 +4,7 @@
  */
 package net.claribole.zgrviewer;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,14 +31,22 @@ class CyclicMenu {
      * @param item a List containing the menu items. The list should contain
      * at least one item.
      */
-    CyclicMenu(VirtualSpace targetSpace, List<CyclicMenuItem> items){
+    CyclicMenu(VirtualSpace targetSpace, List<CyclicMenuItem> items,
+            long x, long y, long halfWidth, long halfHeight){
         if(items.size() == 0){
             throw new IllegalArgumentException("'items' should contain at least one element");
         }
         this.elems = new ArrayList<MenuElement>();
-      //  for(){
-      //      elems.add(elem);
-      //  }
+        int idx = 0;
+        for(CyclicMenuItem item: items){
+            long itemHW = halfWidth / items.size(); //itemH == halfHeight
+            long itemX = x - halfWidth + (long)((idx + 1) * itemHW); //itemY == y
+            MenuElement elem = new MenuElement();
+            elem.item = item;
+            elem.repr = new MenuItemRepr(item, itemX, y, itemHW, halfHeight);
+            elems.add(elem);
+            ++idx;
+        }
         this.targetSpace = targetSpace;
         setCurrentItemHighlight(true);
     }
@@ -100,9 +109,12 @@ class CyclicMenu {
      class MenuItemRepr {
         private VRectangle box;
         private ClusteredImage icon;
+        private final Color hiColor = Color.GREEN;
+        private final Color stdColor = Color.DARK_GRAY;
 
-        MenuItemRepr(CyclicMenuItem mi, long halfWidth, long halfHeight){
-            //??
+        MenuItemRepr(CyclicMenuItem mi, long x, long y, long halfWidth, long halfHeight){
+            box = new VRectangle(x,y,0,halfWidth,halfHeight,stdColor); 
+            targetSpace.addGlyph(box);
         }
 
         void show(){
@@ -115,11 +127,14 @@ class CyclicMenu {
             targetSpace.hide(icon);
         }
 
-        void highlight(boolean value){
+        void highlight(boolean on){
+            box.setColor(on? hiColor : stdColor);
         }
     }
 
-    //dumb struct, associates a menu item and its representation
+    /**
+     * Dumb struct, associates a menu item and its representation.
+     */
     private static class MenuElement {
         public CyclicMenuItem item;
         public MenuItemRepr repr; 
