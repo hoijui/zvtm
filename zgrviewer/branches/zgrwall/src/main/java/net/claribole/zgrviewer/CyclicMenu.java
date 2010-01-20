@@ -44,7 +44,7 @@ class CyclicMenu {
         int idx = 0;
         for(CyclicMenuItem item: items){
             long itemHW = halfWidth / items.size(); //itemH == halfHeight
-            long itemX = x - halfWidth + (long)((idx + 1) * itemHW); //itemY == y
+            long itemX = x - halfWidth + (long)((2 * idx + 1) * itemHW); //itemY == y
             MenuElement elem = new MenuElement();
             elem.item = item;
             elem.repr = new MenuItemRepr(item, itemX, y, itemHW, halfHeight);
