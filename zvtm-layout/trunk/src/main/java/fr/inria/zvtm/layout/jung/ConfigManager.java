@@ -23,9 +23,8 @@ class ConfigManager {
     /* Graph appearance */
     static final int GRAPH_SIZE_FACTOR = 20;
     static final int DEFAULT_NODE_SIZE = 10;
-    static final Color DEFAULT_NODE_COLOR = Color.RED;
+    static final Color DEFAULT_NODE_COLOR = Color.WHITE;
     static final Color DEFAULT_EDGE_COLOR = Color.BLACK;
-    static final short NUMBER_OF_UPDATES_PER_CYCLE = 5;
     
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);

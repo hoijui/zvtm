@@ -180,6 +180,13 @@ class GraphManager {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
     
+    int getIterationsPerCycle(){
+        switch(cla){
+    		case LAYOUT_SPRING:{return 5;}
+    		case LAYOUT_CIRCLE:{return 0;}
+    		default:{return 1;}            
+        }
+    }
 }
 
 class LayoutUpdater extends TimerTask {
@@ -202,7 +209,7 @@ class LayoutUpdater extends TimerTask {
     
 	public void run(){		
 		if (enabled){
-		    for (short i=0;i<ConfigManager.NUMBER_OF_UPDATES_PER_CYCLE;i++){
+		    for (short i=0;i<gm.getIterationsPerCycle();i++){
     			gm.incLayout();		        
 		    }
 		}

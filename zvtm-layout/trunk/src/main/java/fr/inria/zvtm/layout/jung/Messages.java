@@ -36,11 +36,11 @@ public class Messages {
     static final String PM_SUBMN = "mpmS";
 
     static final String PM_LAYOUT = "Layout...";
-    static final String PM_FIND = "Find...";
+    static final String PM_OPEN = "Open...";
     static final String PM_BACK = "Back";
     static final String PM_GLOBALVIEW = "Global View";
 
-    static final String[] MAIN_MENU_LABELS = {PM_GLOBALVIEW, PM_LAYOUT, PM_BACK, PM_FIND};
+    static final String[] MAIN_MENU_LABELS = {PM_GLOBALVIEW, PM_LAYOUT, PM_BACK, PM_OPEN};
     static final LongPoint[] MAIN_MENU_LABEL_OFFSETS = {new LongPoint(5, -3), new LongPoint(0, 0),
 						                                new LongPoint(-10, -3), new LongPoint(0, -10)};
 

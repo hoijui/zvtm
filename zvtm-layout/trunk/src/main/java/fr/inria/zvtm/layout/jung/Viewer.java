@@ -267,9 +267,9 @@ public class Viewer implements Java2DPainter {
 		if (index != -1){
 			label = mainPieMenu.getLabels()[index].getText();
 			if (label == Messages.PM_GLOBALVIEW){nm.getGlobalView();}
+			else if (label == Messages.PM_OPEN){openFile();}
 			// NOT IMPLEMENTED YET
 			//else if (label == Messages.PM_BACK){moveBack();}
-			//else if (label == Messages.PM_FIND){showFindZone(true);}
 		}
 		else {
 			index = subPieMenu.getItemIndex(menuItem);
