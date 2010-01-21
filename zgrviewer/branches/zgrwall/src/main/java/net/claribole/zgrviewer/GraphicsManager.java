@@ -185,6 +185,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
        was used to generate the SVG file (e.g. 2.13, maybe earlier) */
     LogicalStructure lstruct = null;
 
+    private static final int BLOCK_WIDTH = 2760;
+    private static final int BLOCK_HEIGHT = 1840;
+    private static final int BLOCK_COUNT_HORIZ = 8;
+    private static final int BLOCK_COUNT_VERT = 4;
+
     GraphicsManager(ZGRApplication za){
 	this.zapp = za;
     }
@@ -241,16 +246,16 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
         //experimental cluster stuff
          ClusterGeometry clGeom = new ClusterGeometry(
-                2760,
-                1840,
-                8,
-                4);
+                BLOCK_WIDTH,
+                BLOCK_HEIGHT,
+                BLOCK_COUNT_HORIZ,
+                BLOCK_COUNT_VERT);
 		ClusteredView cv = 
             new ClusteredView(
                     clGeom,
-                    3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
+                    BLOCK_COUNT_VERT-1, //origin (block number)
+                    BLOCK_COUNT_HORIZ, //use complete
+                    BLOCK_COUNT_VERT,  //cluster surface
                     cameras);
         cv.setBackgroundColor(Color.WHITE);
         createCyclicMenu();
