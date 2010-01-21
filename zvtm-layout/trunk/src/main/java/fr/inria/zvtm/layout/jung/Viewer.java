@@ -159,7 +159,10 @@ public class Viewer implements Java2DPainter {
 	
 	/* --------------- Input Data ------------------*/
     
-    void reset(){/*TBW*/}
+    void reset(){
+        gm.reset();
+        mSpace.removeAllGlyphs();
+    }
 	
 	void openFile(){
 		final JFileChooser fc = new JFileChooser(INPUT_FILE_DIR);

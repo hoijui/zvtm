@@ -62,6 +62,12 @@ class GraphManager {
 		timer.scheduleAtFixedRate(lu, LAYOUT_UPDATE_FREQUENCY, LAYOUT_UPDATE_FREQUENCY);
     }
     
+    void reset(){
+        lu.setEnabled(false);
+        graph = null;
+        layout = null;
+    }
+    
     void loadGraphML(File f){
         if (lu.isEnabled()){
             lu.setEnabled(false);
