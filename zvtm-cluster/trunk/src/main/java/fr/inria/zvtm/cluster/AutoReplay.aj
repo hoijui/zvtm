@@ -20,6 +20,7 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 
 import java.awt.Color;
+import java.awt.Font;
 
 /**
  * Define methods that will be replayed automatically
@@ -49,6 +50,7 @@ public aspect AutoReplay {
          execution(public void Glyph.setVisible(boolean)) ||
          execution(public void Glyph.orientTo(float)) ||
          execution(public void Glyph.setSensitivity(boolean)) ||
+         execution(public void VText.setSpecialFont(Font)) || 
          execution(public void VText.setText(String)) || 
          execution(public void VText.setScale(float)) || 
          execution(public void ClosedShape.setDrawBorder(boolean)) || 
