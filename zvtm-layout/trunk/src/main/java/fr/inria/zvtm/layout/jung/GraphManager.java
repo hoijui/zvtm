@@ -23,6 +23,8 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import edu.uci.ics.jung.graph.SparseMultigraph;
 import edu.uci.ics.jung.io.GraphMLReader;
@@ -105,43 +107,25 @@ class GraphManager {
 	}
 	
 	void changeLayout(AbstractLayout<Glyph,DPath> al){
+	    if (lu.isEnabled()){
+	        lu.setEnabled(false);
+	    }
 		layout = al;
 		layout.setSize(new Dimension(ConfigManager.GRAPH_SIZE_FACTOR*graph.getVertexCount(), ConfigManager.GRAPH_SIZE_FACTOR*graph.getVertexCount()));
 		layout.initialize();
-		//Iterator i = layout.getVisibleEdges().iterator();
-		//while (i.hasNext()){
-		//	Edge e = (Edge)i.next();
-		//	DPath p = (DPath)e.getUserDatum(_glyph);
-		//	EdgeTransformer.updateLine(e, layout, p, GraphicsManager.ANIM_MOVE_DURATION, grMngr.vsm.animator);
-		//}
-		//i = layout.getVisibleVertices().iterator();
-		//while (true){
-		//	Vertex v = (Vertex)i.next();
-		//	Coordinates c = layout.getCoordinates(v);
-        //
-		//	Glyph cl = (Glyph)v.getUserDatum(_glyph);			
-		//	LongPoint translation = new LongPoint((long)c.getX()-cl.vx, (long)c.getY()-cl.vy);
-		//	VTextST t = (VTextST)v.getUserDatum(_glyphLabel);
-		//	// label
-		//	if (t != null){
-		//		grMngr.vsm.animator.createGlyphAnimation(GraphicsManager.ANIM_MOVE_DURATION, AnimManager.GL_TRANS_SIG,
-		//		                                         translation, t.getID());
-		//	}
-		//	// node shape
-		//	if (i.hasNext()){
-		//		grMngr.vsm.animator.createGlyphAnimation(GraphicsManager.ANIM_MOVE_DURATION, AnimManager.GL_TRANS_SIG,
-		//		                                         translation, cl.getID());
-		//	}
-		//	else {
-		//		// one call to update overview (triggered after last animation has ended)
-		//		grMngr.vsm.animator.createGlyphAnimation(GraphicsManager.ANIM_MOVE_DURATION, AnimManager.GL_TRANS_SIG,
-		//		                                         translation, cl.getID(),
-		//		                                         new PostAnimationAdapter(){
-		//			public void animationEnded(Object target, short type, String dimension){grMngr.updateOverview();}
-		//		});
-		//		break;
-		//	}
-		//}		
+		for (Glyph g:graph.getVertices()){
+		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(ConfigManager.ANIM_MOVE_LENGTH,
+		        g, new LongPoint(layout.getX(g), layout.getY(g)), false, SlowInSlowOutInterpolator.getInstance(), null);
+		    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
+		}
+        for (DPath d:graph.getEdges()){
+            Pair p = graph.getEndpoints(d);
+            LongPoint[] points = {new LongPoint(Math.round(layout.getX((Glyph)p.getFirst())), Math.round(layout.getY((Glyph)p.getFirst()))),
+                                  new LongPoint(Math.round(layout.getX((Glyph)p.getSecond())), Math.round(layout.getY((Glyph)p.getSecond())))};
+            Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(ConfigManager.ANIM_MOVE_LENGTH,
+                d, points, false, SlowInSlowOutInterpolator.getInstance(), null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
+        }
 	}
 	
     void createInitialLayout(){
