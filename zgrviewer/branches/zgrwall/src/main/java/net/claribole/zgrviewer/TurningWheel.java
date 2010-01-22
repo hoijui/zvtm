@@ -143,12 +143,14 @@ public class TurningWheel{
 			step = (d - previous_d);
 
             //experimental: half wheel
-            int half = (int)Math.floor(yaw/Math.PI);
-            int prev_half = (int)Math.floor(previous_yaw/Math.PI);
-            if(half > prev_half){
+            int quarter = (int)Math.floor(yaw/(Math.PI/2d));
+            int prev_quarter = (int)Math.floor(previous_yaw/(Math.PI/2d));
+            if((quarter == 2 && prev_quarter == 1) || 
+                    (quarter == 0 && prev_quarter == 3)){
+                tick_minus();
+            } else if((quarter == 1 && prev_quarter == 2) || 
+                    (quarter == 3 && prev_quarter == 0)) {
                 tick_plus();
-            } else if(prev_half > half) {
-                //tick_minus();
             } else {
                 //nop
             }
