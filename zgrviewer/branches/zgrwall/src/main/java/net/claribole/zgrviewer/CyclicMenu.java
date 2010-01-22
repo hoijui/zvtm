@@ -105,6 +105,15 @@ class CyclicMenu {
         targetSpace.hide(box);
     }
 
+    //XXX make more generic later
+    void onWheel(int direction){
+        if(direction > 0){
+            next();
+        } else {
+            previous();
+        }
+    }
+
     /**
      * ZVTM Representation of a menu item.
      * Needs a reference to the target VirtualSpace, so cannot be static.

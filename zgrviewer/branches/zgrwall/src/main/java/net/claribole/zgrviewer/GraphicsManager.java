@@ -190,6 +190,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     private static final int BLOCK_COUNT_HORIZ = 8;
     private static final int BLOCK_COUNT_VERT = 4;
 
+    TurningWheel wheel = new TurningWheel();
+
     GraphicsManager(ZGRApplication za){
 	this.zapp = za;
     }
@@ -277,6 +279,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         menuItems.add(itHighlight);
         menuItems.add(itTool);
         CyclicMenu menu = new CyclicMenu(cyclicSpace, menuItems, 0, 0, 2800, 1900);
+        wheel.setListener(menu);
         } catch(MalformedURLException e){
             throw new Error("Invalid URL: " + e);
         }

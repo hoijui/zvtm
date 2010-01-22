@@ -13,10 +13,7 @@ import com.illposed.osc.OSCPortIn;
  */
 
 public class TurningWheel{
-	
-	
 	public static final double TWO_PI = 2 * Math.PI;
-	
 	
 	/**
 	 * Maximum difference between the previous glove 'angle' and the current one. Angles are computed from glove coordinates.
@@ -96,6 +93,10 @@ public class TurningWheel{
 	protected boolean alreadyMentionnedBounds = false;
 
     public static final int DEFAULT_OSC_PORT = 6789;
+    private CyclicMenu listener = null;
+
+    private float yaw = 0;
+    private float previous_yaw = 0;
 	
 	
 	public TurningWheel(int portIn) {
@@ -104,16 +105,35 @@ public class TurningWheel{
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
+        initListeners();
+        startListening();
 	}
 
     public TurningWheel(){
         this(DEFAULT_OSC_PORT);
     }
+
+    public void setListener(CyclicMenu listener){
+        this.listener = listener;
+    }
+
+    private void tick_plus(){
+        System.out.println("tick_plus");
+        if(listener != null){
+            listener.onWheel(1);
+        }
+    }
+
+    private void tick_minus(){
+        System.out.println("tick_minus");
+        if(listener != null){
+            listener.onWheel(-1);
+        }
+    }
 	
 	/* -------------------turning wheel gesture ------------*/
 	void turningWheel()
 	{	
-		
 		if (sinus_pitch > MIN_SIN_PITCH) {
 			
 			alreadyMentionnedPitch = false;
@@ -121,6 +141,17 @@ public class TurningWheel{
 			// Computing the angle difference
 			
 			step = (d - previous_d);
+
+            //experimental: half wheel
+            int half = (int)Math.floor(yaw/Math.PI);
+            int prev_half = (int)Math.floor(previous_yaw/Math.PI);
+            if(half > prev_half){
+                tick_plus();
+            } else if(prev_half > half) {
+                //tick_minus();
+            } else {
+                //nop
+            }
 			
 //			System.out.println("yaw : " + yaw);
 //			System.out.println("step1 : " + step);
@@ -215,8 +246,9 @@ public class TurningWheel{
 				
 				sinus_pitch = ((Float)parts[0]).floatValue();
 				
-				// d = yaw * (1 - sinus_pitch)
 				d = ((Float)parts[2]).floatValue() * 1 - sinus_pitch;
+                previous_yaw = yaw;
+                yaw = ((Float)parts[2]).floatValue();
 				
 				turningWheel();
 				
@@ -230,7 +262,6 @@ public class TurningWheel{
 	
 	public void startListening() {
 		dataReceiver.startListening();
-		
 		System.out.println("Listeners listening");
     }
 	
@@ -295,8 +326,6 @@ public class TurningWheel{
 		
 	}
 	
-	
-	
 	/**
 	 * Multiplier value for the multTF() function
 	 */
@@ -308,9 +337,7 @@ public class TurningWheel{
 	 * @return
 	 */
 	protected float multTF(float param) {
-		
 		return param * ZOOM_MULTIPLIER;
-		
 	}
-	
 }
+
