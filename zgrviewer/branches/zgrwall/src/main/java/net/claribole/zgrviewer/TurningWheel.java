@@ -84,8 +84,6 @@ public class TurningWheel{
 	protected float step = 0;
 	protected float previous_step = 0;
 	
-	protected int sens;
-	
 	protected double[] smoothBox = new double[NB_SMOOTHING_SAMPLES];
 	protected int currentSmoothBoxIndex = -1;
 	
@@ -165,79 +163,43 @@ public class TurningWheel{
 			}
 			
 			// System.out.println("step2 : " + step);
-			
-
-			
 			if (currentSmoothBoxIndex == -1) {
 				
 				// In this case you can't take previous_d into account (it is updated lower in the code)
 				currentSmoothBoxIndex++;
-				
 				alreadyMentionnedBounds = false;
 				
 			} else if ( 
 					step * previous_step < 0 // i.e. opposite directions 
 					&& Math.abs(previous_step) + Math.abs(step) > MAX_OPPOSITE_DIFFERENCE ) { // Too much difference
-				
 				// This step is not taken into account (the difference is probably due to missed steps)
 				// (previous_d is updated lower in the code)
-				
 				System.out.println("Too much reverse difference : |" + previous_step + "| + |" + step + "| = " + (Math.abs(previous_step) + Math.abs(step)));
-				
 			} else if (Math.abs(step) > MIN_STEP && Math.abs(step) < MAX_STEP) {
-				
 				alreadyMentionnedBounds = false;
-				
 				smoothBox[currentSmoothBoxIndex % NB_SMOOTHING_SAMPLES] = step;
-				
 				currentSmoothBoxIndex++;
-				
 				if (currentSmoothBoxIndex > NB_SMOOTHING_SAMPLES) {
-				
 					// Computing the major direction and zoomFactors
-					
-					sens = 0;
-					
-					for (double v : smoothBox) {
-						if (v > 0) {
-							sens ++;
-						} else if (v < 0) {
-							sens --;
-						}
-					}
-					
-                    sens = (int)Math.signum(sens); // Mapped to {-1, 1}.
-				
 				} else {
 					// System.out.println("Not enough samples : " + currentSmoothBoxIndex);
 				}
 			} else {
-				//if (!alreadyMentionnedBounds) {
-					//System.out.println("Absolute value of step is outside its boundaries : " + Math.abs(step));
 					System.out.print("!");
-				//	alreadyMentionnedBounds = true;
-				//}
 			}
-			
 			previous_d = d;
-			
-			// System.out.println();
-			
 		} else {
-			
 			if (!alreadyMentionnedPitch) {
 				System.out.println("Not enough pitch : " + sinus_pitch);
 				alreadyMentionnedPitch = true;
 			}
-			
-			// In this case we ignore the values
+            // In this case we ignore the values
 			currentSmoothBoxIndex = -1;
 		}
 	}
 	
 	public void initListeners() {
 		VICONListener = new OSCListener() {
-			
 			public void acceptMessage(Date date, OSCMessage msg) {
 				Object[] parts = msg.getArguments();
 				
@@ -249,16 +211,15 @@ public class TurningWheel{
 				sinus_pitch = ((Float)parts[0]).floatValue();
 				
 				d = ((Float)parts[2]).floatValue() * 1 - sinus_pitch;
+
                 previous_yaw = yaw;
                 yaw = ((Float)parts[2]).floatValue();
 				
 				turningWheel();
-				
 			}
 		};
 		
 		dataReceiver.addListener("/inclinaison", VICONListener);
-		
 		System.out.println("Listeners initialized");
 	}
 	
@@ -274,18 +235,6 @@ public class TurningWheel{
 	
 	public void close() {
 		dataReceiver.close();
-	}
-	
-	/**
-	 * Power-based transfer function.
-	 * @param param
-	 * @return
-	 */
-	protected float powTF(float param) {
-		// x is mapped into [0 ; 1] from [ MIN_STEP ; MAX_STEP ] 
-		float mx = (param - MIN_STEP) / (MAX_STEP - MIN_STEP);
-		
-		return MIN_ZOOM_FACTOR + (float)Math.pow(MAX_ZOOM_FACTOR - MIN_ZOOM_FACTOR, mx);
 	}
 	
 	/**
@@ -326,20 +275,6 @@ public class TurningWheel{
 		
 		return MIN_ZOOM_FACTOR + (MAX_ZOOM_FACTOR - MIN_ZOOM_FACTOR) * ( 1f / ( 1f + (float)Math.exp( -SIGMOID_LAMBDA * mx) ) );
 		
-	}
-	
-	/**
-	 * Multiplier value for the multTF() function
-	 */
-	protected static final float ZOOM_MULTIPLIER = 100;
-	
-	/**
-	 * Simple multiplier function
-	 * @param param
-	 * @return
-	 */
-	protected float multTF(float param) {
-		return param * ZOOM_MULTIPLIER;
 	}
 }
 
