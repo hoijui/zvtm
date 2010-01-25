@@ -57,6 +57,11 @@ $Id$
       <artifactId>zvtm</artifactId>
       <version>0.10.1-SNAPSHOT</version>
     </dependency>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-svg</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
   
   <!-- Build -->
