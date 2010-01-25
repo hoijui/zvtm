@@ -31,7 +31,9 @@ class WallCursor {
         this.color = color;
 
         hRect = new RectangleNR(xPos, yPos, 0, halfLength, thickness, color);
+        hRect.setDrawBorder(false);
         vRect = new RectangleNR(xPos, yPos, 0, thickness, halfLength, color);
+        vRect.setDrawBorder(false);
         target.addGlyph(hRect);
         target.addGlyph(vRect);
     }

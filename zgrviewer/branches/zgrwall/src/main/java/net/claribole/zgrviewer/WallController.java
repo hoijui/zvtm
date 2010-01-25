@@ -39,8 +39,8 @@ class WallController {
                     String screenName = message.getArguments()[SCREEN].toString();
                     int screenX = ((Integer)(message.getArguments()[X])).intValue();
                     int screenY = ((Integer)(message.getArguments()[Y])).intValue();
-                    int screenCoordsX = -1;
-                    int screenCoordsY = -1;
+                    int screenCoordsX = 0;
+                    int screenCoordsY = 0;
 
                     if (screenName.contains("A"))
                         screenCoordsX = 0;
@@ -63,7 +63,7 @@ class WallController {
 
                     int coordsX = screenCoordsX * WallController.this.geom.getBlockWidth() + screenX;
                     int coordsY = screenCoordsY * WallController.this.geom.getBlockHeight() + screenY;
-                    System.out.println("coordsX: " + coordsX + ", coordsY: " + coordsY);
+                    //System.out.println("coordsX: " + coordsX + ", coordsY: " + coordsY);
                     boolean leftMouse = (Boolean)(message.getArguments()[LEFT_BTN]);
                     boolean rightMouse = (Boolean)(message.getArguments()[RIGHT_BTN]);
                     int wheel = ((Integer)(message.getArguments()[WHEEL])).intValue();

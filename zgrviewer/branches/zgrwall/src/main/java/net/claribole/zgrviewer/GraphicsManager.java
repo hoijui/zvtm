@@ -101,6 +101,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     private ClusteredView clusteredView;
     private WallCursor wallCursor;
     private WallController wallController;
+    private VirtualSpace wCursorVs;
+    private Camera wCursorCam;
     boolean dragging = false;
 
     View rView;
@@ -205,7 +207,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         animator = vsm.getAnimationManager();
         //vsm.setDebug(true);
         mSpace = vsm.addVirtualSpace(mainSpaceName);
-        wallCursor = new WallCursor(mSpace);
+        wCursorVs = vsm.addVirtualSpace("cursorSpace");
+        wCursorCam = wCursorVs.addCamera();
+        wallCursor = new WallCursor(wCursorVs);
         // camera #0 for main view
         mainCamera = mSpace.addCamera();
         mainCamera.setZoomFloor(-90);
@@ -240,6 +244,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         cameras.add(mSpace.getCamera(0));
         cameras.add(mnSpace.getCamera(0));
         cameras.add(tp.getPaletteCamera());
+        cameras.add(wCursorCam);
         return cameras;
     }
 
@@ -312,16 +317,26 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /** 
      * Currently called by WallController
      */
-    void onPointerCoordsUpdate(final int x, final int y, boolean leftMouse, boolean rightMouse, int wheel){
+    void onPointerCoordsUpdate(final int x, final int y, final boolean leftMouse, final boolean rightMouse, final int wheel){
         //update cursor position
         //if dragging, update main camera position
         SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-                LongPoint spcCoords = clusteredView.viewToSpaceCoords(mainCamera, x, y); 
-                wallCursor.moveTo(spcCoords.x, spcCoords.y);
-                if(dragging){
-                    //move main camera
+            public void run(){ 
+                LongPoint spcCoords = clusteredView.viewToSpaceCoords(wCursorCam, x, y); 
+                if(leftMouse){
+                    //drag camera
+                    //mainCamera.moveTo(spcCoords.x, spcCoords.y);
                 }
+
+                if(wheel != 0){
+                    if(wheel > 0){
+                        //zoomIn();
+                    } else {
+                        //zoomOut();
+                    }
+                }
+
+                wallCursor.moveTo(spcCoords.x, spcCoords.y);
             }
         });
     }
