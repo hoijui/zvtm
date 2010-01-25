@@ -263,18 +263,5 @@ public class TurningWheel{
 	 * If the offset is equal to zero, SIGMOID_MAX_X_BOUND = MAX_STEP
 	 */
 	protected static final float SIGMOID_MAX_X_BOUND = (SIGMOID_X_OFFSET < 0) ? MAX_STEP - 2 * SIGMOID_X_OFFSET * (MAX_STEP - MIN_STEP) : MAX_STEP;
-	
-	/**
-	 * Sigmoid-based transfer function.
-	 * @return
-	 */
-	protected float sigmoidTF(float param) {
-		
-		// |x| is mapped into [-1 ; 1] from [ SIGMOID_MIN_BOUND ; SIGMOID_MAX_BOUND ] 
-		float mx = 2 * (Math.abs(param) - SIGMOID_MIN_X_BOUND ) / (SIGMOID_MAX_X_BOUND - SIGMOID_MIN_X_BOUND ) - 1;
-		
-		return MIN_ZOOM_FACTOR + (MAX_ZOOM_FACTOR - MIN_ZOOM_FACTOR) * ( 1f / ( 1f + (float)Math.exp( -SIGMOID_LAMBDA * mx) ) );
-		
-	}
 }
 
