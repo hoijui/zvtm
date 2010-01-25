@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 import java.awt.event.ComponentListener;
 
 import java.net.MalformedURLException;
@@ -97,6 +98,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     VRectangle observedRegion;
 
     public View mainView;
+    private ClusteredView clusteredView;
+    private WallCursor wallCursor;
+    private WallController wallController;
+    boolean dragging = false;
+
     View rView;
     static final String RADAR_VIEW_NAME = "Overview";
     Camera mainCamera;
@@ -199,6 +205,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         animator = vsm.getAnimationManager();
         //vsm.setDebug(true);
         mSpace = vsm.addVirtualSpace(mainSpaceName);
+        wallCursor = new WallCursor(mSpace);
         // camera #0 for main view
         mainCamera = mSpace.addCamera();
         mainCamera.setZoomFloor(-90);
@@ -247,15 +254,17 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 BLOCK_HEIGHT,
                 BLOCK_COUNT_HORIZ,
                 BLOCK_COUNT_VERT);
-		ClusteredView cv = 
+		clusteredView = 
             new ClusteredView(
                     clGeom,
                     BLOCK_COUNT_VERT-1, //origin (block number)
                     BLOCK_COUNT_HORIZ, //use complete
                     BLOCK_COUNT_VERT,  //cluster surface
                     cameras);
-        cv.setBackgroundColor(Color.WHITE);
-        vsm.addClusteredView(cv);
+        clusteredView.setBackgroundColor(Color.WHITE);
+        vsm.addClusteredView(clusteredView);
+        wallController = new WallController(clGeom);
+        wallController.setListener(this);
       
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
         mainView.getFrame().addComponentListener(this);
@@ -298,6 +307,23 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	updatePanelSize();
 	previousLocations=new Vector();
 
+    }
+
+    /** 
+     * Currently called by WallController
+     */
+    void onPointerCoordsUpdate(final int x, final int y, boolean leftMouse, boolean rightMouse, int wheel){
+        //update cursor position
+        //if dragging, update main camera position
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                LongPoint spcCoords = clusteredView.viewToSpaceCoords(mainCamera, x, y); 
+                wallCursor.moveTo(spcCoords.x, spcCoords.y);
+                if(dragging){
+                    //move main camera
+                }
+            }
+        });
     }
 
     void activateDynaSpot(boolean b, boolean updatePrefs){
