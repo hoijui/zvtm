@@ -48,6 +48,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        grMngr.onLeftPress();
+
 		if (toolPaletteIsActive){return;}
 		else {
 			lastJPX = jpx;
@@ -102,6 +104,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewEventHandler {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        grMngr.onLeftRelease();
+
 	    if (ConfigManager.DYNASPOT && !toolPaletteIsActive && !v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
 		if (grMngr.isBringingAndGoing){
 			grMngr.endBringAndGo(v.lastGlyphEntered());

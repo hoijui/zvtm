@@ -314,6 +314,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     }
 
+    public void onLeftPress(){
+        dragging = true;
+    }
+
+    public void onLeftRelease(){
+        dragging = false;
+    }
+
     /** 
      * Currently called by WallController
      */
@@ -322,10 +330,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         //if dragging, update main camera position
         SwingUtilities.invokeLater(new Runnable(){
             public void run(){ 
-                LongPoint spcCoords = clusteredView.viewToSpaceCoords(wCursorCam, x, y); 
-                if(leftMouse){
+                LongPoint spcCoordsCursor = clusteredView.viewToSpaceCoords(wCursorCam, x, y); 
+                LongPoint spcCoordsMain = clusteredView.viewToSpaceCoords(mainCamera, x, y); 
+
+                if(dragging){
                     //drag camera
-                    //mainCamera.moveTo(spcCoords.x, spcCoords.y);
+                    //mainCamera.moveTo(spcCoordsMain.x, spcCoordsMain.y);
+                    mainCamera.move(0.01*(spcCoordsMain.x - mainCamera.posx), 
+                        0.01*(spcCoordsMain.y - mainCamera.posy));
                 }
 
                 if(wheel != 0){
@@ -336,7 +348,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                     }
                 }
 
-                wallCursor.moveTo(spcCoords.x, spcCoords.y);
+                wallCursor.moveTo(spcCoordsCursor.x, spcCoordsCursor.y);
             }
         });
     }
