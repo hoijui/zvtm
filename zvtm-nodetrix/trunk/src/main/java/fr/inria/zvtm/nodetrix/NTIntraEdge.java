@@ -7,6 +7,8 @@
 
 package fr.inria.zvtm.nodetrix;
 
+import java.awt.Color;
+
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -16,9 +18,10 @@ public class NTIntraEdge extends NTEdge {
     VRectangle edgeRect;
     LongPoint offset;
 
-    public NTIntraEdge(NTNode t, NTNode h){
+    public NTIntraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
         this.head = h;
+        this.edgeColor = c;
     }
     
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){

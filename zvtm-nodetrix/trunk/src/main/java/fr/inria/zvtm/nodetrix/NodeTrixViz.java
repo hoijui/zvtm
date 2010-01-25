@@ -54,6 +54,14 @@ public class NodeTrixViz {
         matrices = na;
         return res;
     }
+
+    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head){
+        return addExtraEdge(tail, head, EXTRA_LINK_COLOR);
+    }
+    
+    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
+        return addIntraEdge(tail, head, INTRA_LINK_COLOR);
+    }
     
     public NTEdge addEdge(NTNode tail, NTNode head){
         if (tail.getMatrix() == head.getMatrix()){
@@ -64,15 +72,15 @@ public class NodeTrixViz {
         }
     }
     
-    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head){
-        NTExtraEdge e = new NTExtraEdge(tail, head);
+    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head, Color c){
+        NTExtraEdge e = new NTExtraEdge(tail, head, c);
         tail.addOutgoingEdge(e);
         head.addIncomingEdge(e);
         return e;
     }
     
-    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
-        NTIntraEdge e = new NTIntraEdge(tail, head);
+    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c){
+        NTIntraEdge e = new NTIntraEdge(tail, head, c);
         tail.addOutgoingEdge(e);
         head.addIncomingEdge(e);
         return e;

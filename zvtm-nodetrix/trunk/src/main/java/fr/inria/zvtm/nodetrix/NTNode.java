@@ -29,6 +29,8 @@ public class NTNode {
 	/* Horizontal label */
 	VText labelW;
 	
+	Object owner;
+	
     public NTNode(String name){
         this.name = name;
     }
@@ -83,6 +85,14 @@ public class NTNode {
 
     public String toString(){
         return "N::"+name+"@"+hashCode();
+    }
+    
+    public void setOwner(Object o){
+        this.owner = o;
+    }
+    
+    public Object getOwner(){
+        return owner;
     }
     
     long getLabelWidth(){

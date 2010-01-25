@@ -7,6 +7,8 @@
 
 package fr.inria.zvtm.nodetrix;
 
+import java.awt.Color;
+
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.GPath;
@@ -17,9 +19,10 @@ public class NTExtraEdge extends NTEdge {
     // start and end point offsets w.r.t respective matrices
     LongPoint[] offsets;
 
-    public NTExtraEdge(NTNode t, NTNode h){
+    public NTExtraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
         this.head = h;
+        this.edgeColor = c;
     }
 
     static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
@@ -37,7 +40,7 @@ public class NTExtraEdge extends NTEdge {
             y2 = head.wdy;
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edgeColor);
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
                                 hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
@@ -49,7 +52,7 @@ public class NTExtraEdge extends NTEdge {
             y2 = (head.getMatrix().nodes.length > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2+2*head.getMatrix().label_bkg[0].getWidth() : head.getMatrix().bkg.getHeight();
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edgeColor);
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET, true);
@@ -61,7 +64,7 @@ public class NTExtraEdge extends NTEdge {
             y2 = head.wdy;
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edgeColor);
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
                                 hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
@@ -74,7 +77,7 @@ public class NTExtraEdge extends NTEdge {
             y2 = (head.getMatrix().nodes.length > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.length/2 : -head.getMatrix().bkg.getHeight();
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, NodeTrixViz.EXTRA_LINK_COLOR);
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edgeColor);
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);

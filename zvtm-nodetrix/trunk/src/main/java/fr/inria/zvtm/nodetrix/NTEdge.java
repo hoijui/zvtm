@@ -7,11 +7,16 @@
 
 package fr.inria.zvtm.nodetrix;
 
+import java.awt.Color;
+
 import fr.inria.zvtm.engine.VirtualSpace;
 
 public abstract class NTEdge {
 
     NTNode tail, head;
+    Color edgeColor;
+    
+    Object owner;
     
     public void setNodes(NTNode t, NTNode h){
         this.tail = t;
@@ -30,6 +35,14 @@ public abstract class NTEdge {
     
     public NTNode getHead(){
         return head;
+    }
+    
+    public void setOwner(Object o){
+        this.owner = o;
+    }
+    
+    public Object getOwner(){
+        return owner;
     }
 
 }
