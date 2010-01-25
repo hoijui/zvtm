@@ -651,8 +651,15 @@ public class SceneManager {
     public ResourceDescription createResourceDescription(long x, long y, String id, int zindex, Region region,
                                                          URL resourceURL, String type, boolean sensitivity, Color stroke, String params){
         if (RESOURCE_HANDLERS.containsKey(type)){
-            return ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
-                                                                                            resourceURL, sensitivity, stroke, params);
+            ResourceDescription rd = ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
+                                                                                                              resourceURL, sensitivity, stroke, params);            
+            if (!id2object.containsKey(id)){
+                id2object.put(id, rd);
+            }
+            else {
+                System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+            }
+            return rd;
         }
         else {
             System.err.println("Error: failed to process resource declaration: "+id);
@@ -679,6 +686,12 @@ public class SceneManager {
         ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, interpolation, region);
         imd.setSensitive(sensitivity);
         region.addObject(imd);
+        if (!id2object.containsKey(id)){
+            id2object.put(id, imd);
+        }
+        else {
+            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+        }
         return imd;
     }
     
@@ -700,6 +713,12 @@ public class SceneManager {
     public ClosedShapeDescription createClosedShapeDescription(ClosedShape g, String id, int zindex, Region region, boolean sensitivity){
         ClosedShapeDescription gd = new ClosedShapeDescription(id, g, zindex, region, sensitivity);
         region.addObject(gd);
+        if (!id2object.containsKey(id)){
+            id2object.put(id, gd);
+        }
+        else {
+            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+        }
         return gd;
     }
 
@@ -790,6 +809,12 @@ public class SceneManager {
         }
         td.setSensitive(sensitivity);
         region.addObject(td);
+        if (!id2object.containsKey(id)){
+            id2object.put(id, td);
+        }
+        else {
+            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+        }
         return td;
     }
     
