@@ -91,14 +91,14 @@ ZUIST DTD, for v0.3.0 and above.
 
 <!ELEMENT resource ANY>
 <!ATTLIST resource %ID;
-                   type (img|pdf) #REQUIRED
+                   type (img|pdf|scn) #REQUIRED
                    %x;
                    %y;
                    %zindex;
                    %width; #IMPLIED
                    %height; #IMPLIED
                    %scale;
-                   src CDATA #IMPLIED
+                   src CDATA #REQUIRED
 				   %stroke;
 				   %fill;
 	               %takesToObject;
