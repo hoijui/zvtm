@@ -89,8 +89,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     VirtualSpace mSpace;   // virtual space containing graph
     VirtualSpace mnSpace;  // virtual space containing pie menu
     VirtualSpace rSpace;   // virtual space containing rectangle representing region seen through main camera (used in overview)
-    VirtualSpace cyclicSpace = VirtualSpaceManager.INSTANCE.addVirtualSpace("cyclicSpace"); //virtual space for the cyclic (alt-tab) menu
-    Camera cyclicCamera = cyclicSpace.addCamera();
     static final String mainSpaceName = "graphSpace";
     static final String menuSpace = "menuSpace";
     /*name of the VTM virtual space holding the rectangle delimiting the region seen by main view in radar view*/
@@ -190,8 +188,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     private static final int BLOCK_COUNT_HORIZ = 8;
     private static final int BLOCK_COUNT_VERT = 4;
 
-    TurningWheel wheel = new TurningWheel();
-
     GraphicsManager(ZGRApplication za){
 	this.zapp = za;
     }
@@ -237,7 +233,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         cameras.add(mSpace.getCamera(0));
         cameras.add(mnSpace.getCamera(0));
         cameras.add(tp.getPaletteCamera());
-        cameras.add(cyclicCamera);
         return cameras;
     }
 
@@ -260,7 +255,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                     BLOCK_COUNT_VERT,  //cluster surface
                     cameras);
         cv.setBackgroundColor(Color.WHITE);
-        createCyclicMenu();
         vsm.addClusteredView(cv);
       
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
@@ -269,21 +263,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         ((JFrame)mainView.getFrame()).setGlassPane(gp);
     }
 
-    void createCyclicMenu(){
-        try{
-        CyclicMenuItem itCursor = new CyclicMenuItem("Cursor", new URL("http://www.example.com/cursor.png"));
-        CyclicMenuItem itHighlight = new CyclicMenuItem("Highlight", new URL("http://www.example.com/highlight.png"));
-        CyclicMenuItem itTool = new CyclicMenuItem("Random tool", new URL("http://www.example.com/tool.png"));
-        ArrayList<CyclicMenuItem> menuItems = new ArrayList<CyclicMenuItem>();
-        menuItems.add(itCursor);
-        menuItems.add(itHighlight);
-        menuItems.add(itTool);
-        CyclicMenu menu = new CyclicMenu(cyclicSpace, menuItems, 0, 0, 2800, 1900);
-        wheel.setListener(menu);
-        } catch(MalformedURLException e){
-            throw new Error("Invalid URL: " + e);
-        }
-    }
 
     JPanel createPanelView(Vector cameras, int w, int h){
 	vsm.addPanelView(cameras, ConfigManager.MAIN_TITLE, w, h);
