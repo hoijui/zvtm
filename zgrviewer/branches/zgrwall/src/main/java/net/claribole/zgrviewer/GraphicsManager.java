@@ -342,15 +342,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                     mainCamera.move(0.01*(spcCoordsMain.x - dragStart.vx), 
                         0.01*(spcCoordsMain.y - dragStart.vy));
                 }
-
-                if(wheel != 0){
-                    if(wheel > 0){
-                        //zoomIn();
-                    } else {
-                        //zoomOut();
-                    }
-                }
-
+            
                 wallCursor.moveTo(spcCoordsCursor.x, spcCoordsCursor.y);
             }
         });
