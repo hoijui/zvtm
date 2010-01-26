@@ -130,6 +130,8 @@ public class SceneManager {
     Hashtable id2region;
     /** Contains a mapping from object IDs to actual objects. */
     Hashtable id2object;
+    /** Contains a mapping from scene IDs to actual scenes. */
+    Hashtable id2scene;
     
     LevelListener levelListener;
     RegionListener regionListener;
@@ -152,6 +154,7 @@ public class SceneManager {
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
         id2object = new Hashtable();
+        id2scene = new Hashtable();
         sceneAttrs = new HashMap();
         RESOURCE_HANDLERS = new HashMap();
     }
@@ -292,6 +295,7 @@ public class SceneManager {
 	public void reset(){
 		id2region.clear();
 		id2object.clear();
+		id2scene.clear();
 		sceneAttrs.clear();
 	}
 
@@ -335,10 +339,10 @@ public class SceneManager {
                 }
             }            
         }
-        // temporary hashtable used to build structure
         if (pl != null){
             pl.setLabel("Creating regions, loading object descriptions...");
         }
+        // temporary hashtable used to build structure
         Hashtable regionName2containerRegionName = new Hashtable();
         Vector regions = new Vector();
         for (int i=0;i<nl.getLength();i++){
@@ -413,8 +417,15 @@ public class SceneManager {
     }
     
     public SceneDescription createSceneDescription(long x, long y, String id, Region region, URL resourceURL){
-        System.out.println("loading subtree "+resourceURL);
-        return new SceneDescription(id, x, y, resourceURL, region);
+        SceneDescription sd = new SceneDescription(id, x, y, resourceURL, region, this);
+        region.addObject(sd);
+        if (!id2scene.containsKey(id)){
+            id2scene.put(id, sd);
+        }
+        else {
+            System.err.println("Warning: ID: "+id+" used to identify more than one scene.");
+        }
+        return sd;
     }
     
     /** Create a new level in the scene.
