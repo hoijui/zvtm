@@ -110,6 +110,7 @@ public class SceneManager {
     public static final String _boldItalic = "boldItalic";
     
     public static final String PARAM_SEPARATOR = ";";
+    public static final String COORD_SEPARATOR = ",";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
@@ -516,7 +517,7 @@ public class SceneManager {
         int lowestLevel = 0;
         int highestLevel = 0;
         String levelStr = regionEL.getAttribute(_levels);
-        int scIndex = levelStr.indexOf(";");
+        int scIndex = levelStr.indexOf(PARAM_SEPARATOR);
         if (scIndex != -1){// level information given as, e.g., 2;4 (region spans multiple levels)
             highestLevel = Integer.parseInt(levelStr.substring(0, scIndex));
             lowestLevel = Integer.parseInt(levelStr.substring(scIndex+1));
@@ -744,11 +745,11 @@ public class SceneManager {
     }
     
     public static LongPoint[] parseVertexCoordinates(String s, LongPoint orig){
-        String[] points = s.split(";");
+        String[] points = s.split(PARAM_SEPARATOR);
         LongPoint[] res = new LongPoint[points.length];
         String[] xy;
         for (int i=0;i<points.length;i++){
-            xy = points[i].split(",");
+            xy = points[i].split(COORD_SEPARATOR);
             res[i] = new LongPoint(SVGReader.getLong(xy[0])+orig.x, SVGReader.getLong(xy[1])+orig.y);
         }
         return res;
