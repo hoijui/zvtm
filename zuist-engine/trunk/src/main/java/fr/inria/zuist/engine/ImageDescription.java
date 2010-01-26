@@ -26,7 +26,7 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
-import fr.inria.zuist.glyphs.VRectProgress;
+import fr.inria.zvtm.glyphs.VRectProgress;
 
 /** Description of image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga

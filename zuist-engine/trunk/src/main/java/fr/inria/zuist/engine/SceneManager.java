@@ -59,7 +59,6 @@ public class SceneManager {
     public static final String _title = "title";
     public static final String _containedIn = "containedIn";
     public static final String _resource = "resource";
-    public static final String _image = "img";
     public static final String _type = "type";
     public static final String _text = "text";
     public static final String _rect = "rect";
@@ -413,6 +412,11 @@ public class SceneManager {
         }
     }
     
+    public SceneDescription createSceneDescription(long x, long y, String id, Region region, URL resourceURL){
+        System.out.println("loading subtree "+resourceURL);
+        return new SceneDescription(id, x, y, resourceURL, region);
+    }
+    
     /** Create a new level in the scene.
      *@param depth of this level (0 corresponds to the highest level in terms of altitude range)
      *@param calt ceiling altitude
@@ -602,35 +606,19 @@ public class SceneManager {
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
 		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
-        if (type.equals(_image)){
+        if (type.equals(ImageDescription.RESOURCE_TYPE_IMG)){
     		long w = Long.parseLong(resourceEL.getAttribute(_w));
             long h = Long.parseLong(resourceEL.getAttribute(_h));
             return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
+        }
+        else if (type.equals(SceneDescription.RESOURCE_TYPE_SCENE)){
+            return createSceneDescription(x+origin.x, y+origin.y, id, region, absoluteSrc);
         }
         else {
             return createResourceDescription(x+origin.x, y+origin.y, id, zindex, region, absoluteSrc, type, sensitivity, stroke, params);
         }
     }
 
-    public static URL getAbsoluteURL(String src, File sceneFileDir){
-        if (src.indexOf(URL_PROTOCOL_SEQ) != -1){
-    		try {
-    			return new URL(src);
-    		}
-    		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+src);}
-		}
-    	else {
-    		// probably a local file URL
-    		try {
-    			return new URL(FILE_PROTOCOL_HEAD +
-    			               (((new File(src)).isAbsolute()) ? src
-    			                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
-    		}
-    		catch(MalformedURLException ex){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}			
-    	}
-    	return null;
-    }
-    
     /** Creates a resource and adds it to a region.
         *@param id ID of object in scene
         *@param x x-coordinate in scene
@@ -657,7 +645,7 @@ public class SceneManager {
             return rd;
         }
         else {
-            System.err.println("Error: failed to process resource declaration: "+id);
+            System.err.println("Error: failed to process resource declaration "+id+" : no appropriate handler for this type of resource");
             return null;
         }
     }
@@ -993,6 +981,8 @@ public class SceneManager {
 		}
     }
 
+    /* -------------- Utils ------------------- */
+
     public static Document parseXML(File f){
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -1008,5 +998,24 @@ public class SceneManager {
         catch (SAXException e){e.printStackTrace();return null;}
         catch (IOException e){e.printStackTrace();return null;}
     }
-    
+
+    public static URL getAbsoluteURL(String src, File sceneFileDir){
+        if (src.indexOf(URL_PROTOCOL_SEQ) != -1){
+    		try {
+    			return new URL(src);
+    		}
+    		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+src);}
+		}
+    	else {
+    		// probably a local file URL
+    		try {
+    			return new URL(FILE_PROTOCOL_HEAD +
+    			               (((new File(src)).isAbsolute()) ? src
+    			                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
+    		}
+    		catch(MalformedURLException ex){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}			
+    	}
+    	return null;
+    }
+        
 }
