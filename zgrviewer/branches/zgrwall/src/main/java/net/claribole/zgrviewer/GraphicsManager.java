@@ -55,6 +55,7 @@ import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.View;
@@ -103,7 +104,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     private WallController wallController;
     private VirtualSpace wCursorVs;
     private Camera wCursorCam;
-    boolean dragging = false;
+    private boolean dragging = false;
+    private Location dragStart;
 
     View rView;
     static final String RADAR_VIEW_NAME = "Overview";
@@ -316,6 +318,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     public void onLeftPress(){
         dragging = true;
+        dragStart = mainCamera.getLocation();
     }
 
     public void onLeftRelease(){
@@ -336,8 +339,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 if(dragging){
                     //drag camera
                     //mainCamera.moveTo(spcCoordsMain.x, spcCoordsMain.y);
-                    mainCamera.move(0.01*(spcCoordsMain.x - mainCamera.posx), 
-                        0.01*(spcCoordsMain.y - mainCamera.posy));
+                    mainCamera.move(0.01*(spcCoordsMain.x - dragStart.vx), 
+                        0.01*(spcCoordsMain.y - dragStart.vy));
                 }
 
                 if(wheel != 0){
