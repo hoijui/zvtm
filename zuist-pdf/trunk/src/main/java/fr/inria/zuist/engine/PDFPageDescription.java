@@ -19,7 +19,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.ZPDFPageImg;
 import fr.inria.zvtm.glyphs.VImage;
-import fr.inria.zuist.glyphs.VRectProgress;
+import fr.inria.zvtm.glyphs.VRectProgress;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
