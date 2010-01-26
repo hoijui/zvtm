@@ -588,12 +588,6 @@ public class SceneManager {
         else if (ttr != null && ttr.length() > 0){
             od.setTakesTo(ttr, TAKES_TO_REGION);
         }
-        if (!id2object.containsKey(id)){
-            id2object.put(id, od);
-        }
-        else {
-            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
-        }
         return od;
     }
 
