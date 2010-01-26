@@ -338,9 +338,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
                 if(dragging){
                     //drag camera
-                    //mainCamera.moveTo(spcCoordsMain.x, spcCoordsMain.y);
-                    mainCamera.move(0.01*(spcCoordsMain.x - dragStart.vx), 
+                    mainCamera.move(0.01*(spcCoordsMain.x - dragStart.vx),
                         0.01*(spcCoordsMain.y - dragStart.vy));
+                    dragStart = mainCamera.getLocation();
                 }
             
                 wallCursor.moveTo(spcCoordsCursor.x, spcCoordsCursor.y);
