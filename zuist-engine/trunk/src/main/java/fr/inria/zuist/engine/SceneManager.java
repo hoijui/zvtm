@@ -416,8 +416,8 @@ public class SceneManager {
         }
     }
     
-    public SceneDescription createSceneDescription(long x, long y, String id, Region region, URL resourceURL){
-        SceneDescription sd = new SceneDescription(id, x, y, resourceURL, region, this);
+    public SceneFragmentDescription createSceneFragmentDescription(long x, long y, String id, Region region, URL resourceURL){
+        SceneFragmentDescription sd = new SceneFragmentDescription(id, x, y, resourceURL, region, this);
         region.addObject(sd);
         if (!id2scene.containsKey(id)){
             id2scene.put(id, sd);
@@ -622,8 +622,8 @@ public class SceneManager {
             long h = Long.parseLong(resourceEL.getAttribute(_h));
             return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
         }
-        else if (type.equals(SceneDescription.RESOURCE_TYPE_SCENE)){
-            return createSceneDescription(x+origin.x, y+origin.y, id, region, absoluteSrc);
+        else if (type.equals(SceneFragmentDescription.RESOURCE_TYPE_SCENE)){
+            return createSceneFragmentDescription(x+origin.x, y+origin.y, id, region, absoluteSrc);
         }
         else {
             return createResourceDescription(x+origin.x, y+origin.y, id, zindex, region, absoluteSrc, type, sensitivity, stroke, params);

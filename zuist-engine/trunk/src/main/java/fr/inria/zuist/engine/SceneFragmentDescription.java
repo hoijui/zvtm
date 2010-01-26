@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
  *@author Emmanuel Pietriga
  */
 
-public class SceneDescription extends ResourceDescription {
+public class SceneFragmentDescription extends ResourceDescription {
 
     public static final String RESOURCE_TYPE_SCENE = "scn";
     SceneManager sm;
@@ -44,7 +44,7 @@ public class SceneDescription extends ResourceDescription {
     *@param sc border color
     *@param pr parent Region in scene
     */
-    SceneDescription(String id, long x, long y, URL p, Region pr, SceneManager sm){
+    SceneFragmentDescription(String id, long x, long y, URL p, Region pr, SceneManager sm){
         this.id = id;
         this.vx = x;
         this.vy = y;
