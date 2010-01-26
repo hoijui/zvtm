@@ -5,7 +5,7 @@
  * $Id$
  */
  
-package fr.inria.zuist.glyphs;
+package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
