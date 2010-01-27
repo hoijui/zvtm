@@ -417,6 +417,7 @@ public class SceneManager {
     }
     
     public SceneFragmentDescription createSceneFragmentDescription(long x, long y, String id, Region region, URL resourceURL){
+        //System.out.println("Creating scene fragment "+resourceURL);
         SceneFragmentDescription sd = new SceneFragmentDescription(id, x, y, resourceURL, region, this);
         region.addObject(sd);
         if (!id2scene.containsKey(id)){
@@ -426,6 +427,11 @@ public class SceneManager {
             System.err.println("Warning: ID: "+id+" used to identify more than one scene.");
         }
         return sd;
+    }
+    
+    public void destroySceneFragment(SceneFragmentDescription sd){
+        //System.out.println("Destroying fragment "+sd.getID());
+        id2scene.remove(sd.getID());
     }
     
     /** Create a new level in the scene.
