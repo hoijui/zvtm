@@ -62,6 +62,7 @@ public class SceneFragmentDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
+        //System.out.println("Loading fragment: "+src);
         if (regions == null){
             try {
                 File sceneFile = new File(src.toURI());
@@ -90,12 +91,14 @@ public class SceneFragmentDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
+        //System.out.println("Unloading fragment "+src);
         if (regions != null){
             for (Region region:regions){
                 sm.destroyRegion(region);
             }
             regions = null;            
         }
+        sm.destroySceneFragment(this);
         unloadRequest = null;
     }
     
