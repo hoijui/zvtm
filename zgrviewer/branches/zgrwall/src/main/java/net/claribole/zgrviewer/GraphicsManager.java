@@ -1712,29 +1712,14 @@ class Ring {
 
 	/* rank of this ring (starts at 1) */
 	int rank;
-//  /* nodes on this ring */
-//  LNode[] nodes = new LNode[0];
-//  /* nodes on this ring */
-//  LongPoint[] broughtPositions = new LongPoint[0];
-//  /* cones of influence, for each item, first element is the smallest angle in [0, 2Pi[, second the largest angle in [0, 2Pi[ */
+  /* cones of influence, for each item, first element is the smallest angle in [0, 2Pi[, second the largest angle in [0, 2Pi[ */
 	double[][] cones = new double[0][2];
 	
 	Ring(int r){
 		this.rank = r;
 	}
 	
-//	void addNode(/*LNode n, LongPoint p,*/ double a1, double a2){
 	void addNode(double a1, double a2){
-//		// add node
-//		LNode[] ta = new LNode[nodes.length+1];
-//		System.arraycopy(nodes, 0, ta, 0, nodes.length);
-//		ta[nodes.length] = n;
-//		nodes = ta;
-//		// add node
-//		LongPoint[] tp = new LongPoint[broughtPositions.length+1];
-//		System.arraycopy(broughtPositions, 0, tp, 0, broughtPositions.length);
-//		tp[nodes.length] = p;
-//		broughtPositions = tp;
 		// compute its cone of influence
 		double[][] tc = new double[cones.length+1][2];
 		System.arraycopy(cones, 0, tc, 0, cones.length);
