@@ -80,7 +80,7 @@ public class SlaveApp {
 
 		view = vsm.addFrameView(cv.getCameras(), 
 				"slaveView " + options.blockNumber, 
-				View.STD_VIEW,
+				options.openGl? View.OPENGL_VIEW : View.STD_VIEW,
 				cv.getClusterGeometry().getBlockWidth(), 
 				cv.getClusterGeometry().getBlockHeight(), 
                 false, false, true, null);
@@ -207,7 +207,10 @@ class SlaveOptions {
 		String appName = "zvtmApplication";
 
 	@Option(name = "-f", aliases = {"--fullscreen"}, usage = "open in full screen mode")
-		boolean fullscreen = false;	
+		boolean fullscreen = false;		
+    
+    @Option(name = "-o", usage = "enable OpenGL acceleration")
+		boolean openGl = false;
 
 	@Option(name = "-d", aliases = {"--device-name"}, usage = "use chosen device (fullscreen only)")
 		String device = "";
