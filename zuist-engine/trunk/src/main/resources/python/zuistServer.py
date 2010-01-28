@@ -1,3 +1,9 @@
+# AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+# Copyright (c) INRIA, 2010. All Rights Reserved
+# Licensed under the GNU LGPL. For full terms see the file COPYING.
+
+# $Id$
+
 # Usage example: GET http://data.wild.lri.fr/py/zuistServer/getTile?z=9&col=322&row=224
 
 from mod_python import apache
