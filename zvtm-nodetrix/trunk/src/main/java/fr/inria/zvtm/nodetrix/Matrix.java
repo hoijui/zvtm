@@ -7,7 +7,9 @@
 
 package fr.inria.zvtm.nodetrix;
 
+import java.awt.Color;
 import java.io.File;
+import java.util.HashMap;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
@@ -21,7 +23,7 @@ public class Matrix {
     
     // bkg is both the matrix background and the label background for single node matrices
     VRectangle bkg;
-    VRectangle[] label_bkg;
+//    VRectangle[] label_bkg;
     VText matrixLb;
     long matrixLbDX = 0;
     long matrixLbDY = 0;
@@ -33,6 +35,8 @@ public class Matrix {
             node.setMatrix(this);
         }
     }
+    
+    
     
     void createNodeGraphics(long x, long y, VirtualSpace vs){
 	    // nodes
@@ -49,25 +53,38 @@ public class Matrix {
     	    matrixLb = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.length));
     	    vs.addGlyph(matrixLb);
     	    matrixLb.setOwner(this);
+    	    
     	    // node labels
-            for (int i=0;i<nodes.length;i++){
-        	    nodes[i].createGraphics(-NodeTrixViz.CELL_SIZE/2*nodes.length-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
+    	    Color c;
+        	float b;
+    	    int a = this.nodes.length;
+        	float min = .7f;
+        	float max = 1.0f;
+        	float diff = max-min;
+        	float step = (1/((float)a-1))*diff;
+        	boolean odd = false;
+    	    for (int i=0;i<nodes.length;i++)
+    	    {
+        		b = max - step*i;
+        		c = Color.getHSBColor(0.1f, 0.8f, b);
+        		nodes[i].createGraphics(-NodeTrixViz.CELL_SIZE/2*nodes.length,
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.length-2*i-1)),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.length+2*i+1)),
-        	                            NodeTrixViz.CELL_SIZE/2*nodes.length+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
-        	                            vs, false);
+        	                            NodeTrixViz.CELL_SIZE/2*nodes.length,
+        	                            vs, false, c, odd);
+        		odd = !odd;
         	    nodes[i].moveTo(x, y);
             }	        
 	    }
 	    else {
 	        // bkg is both the matrix background and the label background for single node matrices
-            bkg = new VRectangle(x, y, 0,
-                                 nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
-                                 NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
-            vs.addGlyph(bkg);
-            bkg.setOwner(this);
+//            bkg = new VRectangle(x, y, 0,
+//                                 nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
+//                                 NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
+//            vs.addGlyph(bkg);
+//            bkg.setOwner(this);
 	        // if matrix contains a single node, only show a horizontal label
-	        nodes[0].createGraphics(0, 0, 0, 0, vs, true);
+	        nodes[0].createGraphics(0, 0, 0, 0, vs, true, Color.getHSBColor(0.1f, 0.5f, 0.8f), false);
     	    nodes[0].moveTo(x, y);
 	    }
     }
@@ -79,41 +96,65 @@ public class Matrix {
                 max_length = nodes[i].getLabelWidth();
             }
         }
-        label_bkg = new VRectangle[2];
-        if (nodes.length > 1){
-            // west
-            label_bkg[0] = new VRectangle(bkg.vx-bkg.getWidth()-max_length/2-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.vy, 0,
-                                          max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.getHeight(),
-                                          NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
-            // north
-            label_bkg[1] = new VRectangle(bkg.vx, bkg.vy+bkg.getHeight()+max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0,
-                                          bkg.getWidth(), max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
-                                          NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);            
-            for (VRectangle lb:label_bkg){
-                if (lb != null){
-                    vs.addGlyph(lb);
-                    vs.atBottom(lb);
-                    lb.setOwner(this);
-                    bkg.stick(lb);
-                }
-            }
-            bkg.stick(matrixLb);
+        max_length += NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2;
+        //creating particular background boxes for each node.s
+        for(NTNode n : this.nodes)
+        {
+        	n.setBackgroundBox(max_length);
         }
-        else {
-            label_bkg[0] = bkg;
-            bkg.setWidth(max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER);
-        }
+        
+//        label_bkg = new VRectangle[2];
+//        if (nodes.length > 1){
+//            // west
+//            label_bkg[0] = new VRectangle(bkg.vx-bkg.getWidth()-max_length/2-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.vy, 0,
+//                                          max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.getHeight(),
+//                                          NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
+//            // north
+//            label_bkg[1] = new VRectangle(bkg.vx, bkg.vy+bkg.getHeight()+max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0,
+//                                          bkg.getWidth(), max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
+//                                          NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);            
+//            for (VRectangle lb:label_bkg){
+//                if (lb != null){
+//                    vs.addGlyph(lb);
+//                    vs.atBottom(lb);
+//                    lb.setOwner(this);
+//                    bkg.stick(lb);
+//                }
+//            }
+//            bkg.stick(matrixLb);
+//        }
+//        else {
+//            label_bkg[0] = bkg;
+//            bkg.setWidth(max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER);
+//        }
     }
+    
     
     void createEdgeGraphics(VirtualSpace vs){
         long reflexiveProp4SingleNodeMatOffset = NodeTrixViz.CELL_SIZE / 2;
         for (NTNode node:nodes){
             if (node.getOutgoingEdges() != null){
+            	HashMap<NTNode, Integer[]> rMap = new HashMap<NTNode, Integer[]>();
+            	
+                for (NTEdge oe:node.getOutgoingEdges()){
+                	 if (oe instanceof NTIntraEdge){
+              	       	 NTNode n = oe.head;
+              	       	 if (rMap.containsKey(n)) {
+              	       		 rMap.get(n)[0] += 1; ;
+              	       	 }
+              	        else {
+                			 Integer[] i = new Integer[2];
+                			 i[0] = 1;
+                			 i[1] = 0;
+                			 rMap.put(n, i);}
+                	 }
+                }
+                 
                 for (NTEdge oe:node.getOutgoingEdges()){
                     // values that are 0 is because we do not care (not used)
                     if (oe instanceof NTIntraEdge){
-                        if (oe.tail == oe.head && nodes.length == 1){
-                            oe.createGraphics(0, oe.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
+                    	if (oe.tail == oe.head && nodes.length == 1){
+                            oe.createGraphics(NodeTrixViz.CELL_SIZE/2, oe.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
                                               oe.getHead().ndx-bkg.getWidth()+reflexiveProp4SingleNodeMatOffset, 0, vs);
 
                             // remember
@@ -121,8 +162,11 @@ public class Matrix {
 
                         }
                         else {
-                            oe.createGraphics(0, oe.getTail().wdy,
-                                              oe.getHead().ndx, 0, vs);
+                        	int h = (int) ((NodeTrixViz.CELL_SIZE) / rMap.get(oe.head)[0]);
+                        	int i = rMap.get(oe.head)[1];rMap.get(oe.head)[1]++;
+                        	long y = oe.getTail().wdy - NodeTrixViz.CELL_SIZE/2 + i*h + h/2; 
+//                        	oe.createGraphics(h, oe.getTail().wdy, oe.getHead().ndx, 0, vs);
+                        	oe.createGraphics(h, y, oe.getHead().ndx, 0, vs);
                         }
                     }
                     else {
@@ -131,7 +175,7 @@ public class Matrix {
                     }
                 }
             }
-        }
+         }
     }
     
     public boolean isConnectedTo(Matrix m){

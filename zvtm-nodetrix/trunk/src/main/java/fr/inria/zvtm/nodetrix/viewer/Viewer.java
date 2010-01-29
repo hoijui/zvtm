@@ -56,6 +56,7 @@ import fr.inria.zvtm.glyphs.RImage;
 
 import fr.inria.zvtm.nodetrix.NodeTrixViz;
 import fr.inria.zvtm.nodetrix.NTNode;
+import fr.inria.zvtm.nodetrix.viewer.Messages;
 
 public class Viewer {
 

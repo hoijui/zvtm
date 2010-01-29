@@ -19,22 +19,25 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.RepaintAdapter;
 
-import fr.inria.zvtm.nodetrix.lll.Node;
 import fr.inria.zvtm.nodetrix.lll.Edge;
 import fr.inria.zvtm.nodetrix.lll.MinimizerBarnesHut;
+import fr.inria.zvtm.nodetrix.lll.Node;
 import fr.inria.zvtm.nodetrix.lll.OptimizerModularity;
 
 public class NodeTrixViz {
     
-    /* Matrix appearance */
+    public static final Color GRID_COLOR = Color.getHSBColor(1f, 0.0f, 0.9f);
+	public static final float GRID_TRANSLUCENCY = 0.5f;
     static long CELL_SIZE = 20;
     static Color MATRIX_FILL_COLOR = Color.WHITE;
     static Color MATRIX_STROKE_COLOR = Color.BLACK;
     static Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
     static Color INTRA_LINK_COLOR = new Color(160,202,254);
     static Color EXTRA_LINK_COLOR = new Color(118,98,252);
-    static int MATRIX_NODE_LABEL_DIST_BORDER = 2;
+    static int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
+    static float NODE_BACKGROUND_TRANSLUCENCY = 0.6f;
+    static int LINLOG_ITERATIONS = 20;
     
     /* Links between matrices */
     static Color INTER_LINK_COLOR = Color.BLACK;
@@ -129,7 +132,7 @@ public class NodeTrixViz {
 		Map<Node,double[]> nodeToPosition = makeInitialPositions(llnodes);
 		// see class MinimizerBarnesHut for a description of the parameters;
 		// for classical "nice" layout (uniformly distributed nodes), use
-		new MinimizerBarnesHut(llnodes, lledges, -1.0, 2.0, 0.05).minimizeEnergy(nodeToPosition, 100);
+		new MinimizerBarnesHut(llnodes, lledges, -1.0, 2.0, 0.05).minimizeEnergy(nodeToPosition, LINLOG_ITERATIONS);
 		// following might actually be useless, not sure yet...
 		//Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
 		// EOU

@@ -24,12 +24,12 @@ public class NTIntraEdge extends NTEdge {
         this.edgeColor = c;
     }
     
-    void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
-        this.offset = new LongPoint(x2, y1);
+    void createGraphics(long height, long y, long x, long noMeaning, VirtualSpace vs){
+        this.offset = new LongPoint(x, y);
         LongPoint mp = tail.getMatrix().getPosition();
         this.edgeRect = new VRectangle(mp.x+offset.x, mp.y+offset.y, 0,
-            NodeTrixViz.CELL_SIZE/2, NodeTrixViz.CELL_SIZE/2,
-            NodeTrixViz.INTRA_LINK_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);            
+            NodeTrixViz.CELL_SIZE/2, height/2,
+            this.edgeColor, Color.white);            
         vs.addGlyph(edgeRect);
         edgeRect.setOwner(this);
     }
