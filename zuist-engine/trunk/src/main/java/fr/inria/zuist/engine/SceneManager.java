@@ -297,6 +297,7 @@ public class SceneManager {
 		id2object.clear();
 		id2scene.clear();
 		sceneAttrs.clear();
+		levels = new Level[0];
 	}
 
     /** Load a multi-scale scene configuration described in an XML document.
