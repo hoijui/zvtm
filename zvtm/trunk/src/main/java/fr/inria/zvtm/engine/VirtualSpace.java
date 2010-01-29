@@ -329,10 +329,6 @@ public class VirtualSpace {
                 else if (g.stickedTo instanceof Camera){((Camera)g.stickedTo).unstick(g);}
                 else {((VCursor)g.stickedTo).unstickSpecificGlyph(g);}
             }
-            if (g.getCGlyph()!=null){
-                //remove from composite glyph if was part of one
-                g.getCGlyph().removeSecondaryGlyph(g);
-            }
             for (int i=0;i<camera2drawnList.length;i++){
                 if (camera2drawnList[i]!=null){
                     //camera2drawnlist[i] can be null if camera i has been removed from the virtual space

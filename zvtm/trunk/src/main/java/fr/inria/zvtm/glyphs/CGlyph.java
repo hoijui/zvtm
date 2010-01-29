@@ -64,7 +64,6 @@ public class CGlyph extends Glyph implements Cloneable {
 			sGlyphs=secondaries;
 			for (int i=0;i<sGlyphs.length;i++){
 				sGlyphs[i].g.moveTo(pGlyph.vx+Math.round(sGlyphs[i].xoffset), pGlyph.vy+Math.round(sGlyphs[i].yoffset));
-				sGlyphs[i].g.setCGlyph(this);
 			}
 		}
 	}
@@ -249,7 +248,6 @@ public class CGlyph extends Glyph implements Cloneable {
      */
     public void setPrimaryGlyph(Glyph g){
 	pGlyph=g;
-	g.setCGlyph(this);
 	this.vx=pGlyph.vx;
 	this.vy=pGlyph.vy;
     }
@@ -275,8 +273,7 @@ public class CGlyph extends Glyph implements Cloneable {
 	    sGlyphs=tmpA;
 	    sGlyphs[sGlyphs.length-1].g.moveTo(pGlyph.vx+Math.round(sGlyphs[sGlyphs.length-1].xoffset),
 					       pGlyph.vy+Math.round(sGlyphs[sGlyphs.length-1].yoffset));
-	}
-	g.setCGlyph(this);
+    }
     }
 
     /** Add one secondary glyph more to the composition.
@@ -290,7 +287,6 @@ public class CGlyph extends Glyph implements Cloneable {
 	    sGlyphs[0] = g;
 	    sGlyphs[0].g.moveTo(pGlyph.vx+Math.round(sGlyphs[0].xoffset),
 				pGlyph.vy+Math.round(sGlyphs[0].yoffset));
-	    sGlyphs[0].g.setCGlyph(this);
 	}
 	else {
 	    SGlyph[] tmpA=new SGlyph[sGlyphs.length+1];
@@ -299,7 +295,6 @@ public class CGlyph extends Glyph implements Cloneable {
 	    sGlyphs=tmpA;	    
 	    sGlyphs[sGlyphs.length-1].g.moveTo(pGlyph.vx+Math.round(sGlyphs[sGlyphs.length-1].xoffset),
 					       pGlyph.vy+Math.round(sGlyphs[sGlyphs.length-1].yoffset));
-	    sGlyphs[sGlyphs.length-1].g.setCGlyph(this);
 	}
     }
 
@@ -312,7 +307,6 @@ public class CGlyph extends Glyph implements Cloneable {
 	if (sGlyphs!=null){
 	    for (int i=0;i<sGlyphs.length;i++){
 		if (sGlyphs[i].g==g){
-		    g.setCGlyph(null);
 		    SGlyph[] tmpA=new SGlyph[sGlyphs.length-1];
 		    System.arraycopy(sGlyphs,0,tmpA,0,i);
 		    System.arraycopy(sGlyphs,i+1,tmpA,i,sGlyphs.length-i-1);

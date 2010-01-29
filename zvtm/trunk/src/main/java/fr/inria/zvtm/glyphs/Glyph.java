@@ -33,8 +33,6 @@ import java.awt.geom.Area;
 import java.awt.Shape;
 import java.awt.AlphaComposite;
 
-import fr.inria.zvtm.glyphs.CGlyph;
-
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -507,25 +505,6 @@ public abstract class Glyph implements Cloneable, Translucent {
 	if (stroke!=null){return stroke.getLineWidth();}
 	else return strokeWidth;
     }
-
-
-    /*---------Composite glyphs----------------------------------*/
-
-    /** Composite glyph associated with this glyph.
-     * Means that this glyph is either a primary or secondary glyph inside a CGlyph.
-     */
-    private CGlyph cGlyph=null;
-
-    /** Set the composite glyph associated with this glyph.
-     * Means that this glyph is either a primary or secondary glyph inside a CGlyph. Do not call this method manually ; called automatically when adding the glyph in a CGlyph. */
-    public void setCGlyph(CGlyph c){cGlyph=c;}
-
-
-    /** Get the composite glyph associated with this glyph.
-     *@return null if this glyph is not part of a composite glyph.
-     */
-    public CGlyph getCGlyph(){return cGlyph;}
-
 
     /*---------Sticked glyphs----------------------------------*/
 
