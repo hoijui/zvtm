@@ -18,7 +18,8 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
-/**Default implementation of ViewEventHandler - serves as an example and ready-to-use generic view event handler implementing rate-based scrolling
+/** 
+ * Default, empty concrete implementation of ViewEventHandler.
  * @author Emmanuel Pietriga
  */
 
@@ -79,13 +80,9 @@ public class DefaultEventHandler implements ViewEventHandler {
      */
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
-    public void enterGlyph(Glyph g){
-	g.highlight(true, null);
-    }
+    public void enterGlyph(Glyph g){}
 
-    public void exitGlyph(Glyph g){
-	g.highlight(false, null);
-    }
+    public void exitGlyph(Glyph g){}
 
     /**beware: code is always 0 in Ktype (it is the value of KeyEvent.getKeyCode() which is always equal to VK_UNDEFINED according to Sun). If you need to access code, use Kpress or Krelease.*/
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
