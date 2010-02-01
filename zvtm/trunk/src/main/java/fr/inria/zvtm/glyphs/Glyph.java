@@ -779,6 +779,12 @@ public abstract class Glyph implements Cloneable, Translucent {
 
     /*-------------Cloning--------------------------------------*/
 
-    public abstract Object clone();
+    public Object clone(){
+        try{
+        return super.clone();
+        } catch(CloneNotSupportedException ex){
+            throw new AssertionError();
+        }
+    }
 
 }
