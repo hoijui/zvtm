@@ -12,6 +12,7 @@ package net.claribole.zgrviewer;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Point;
 import java.util.Vector;
 
 //import fr.inria.zvtm.engine.AnimManager;
@@ -44,44 +45,63 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){return;}
-	else {
-	    lastJPX = jpx;
-	    lastJPY = jpy;
-	    if (inZoomWindow){
-		if (grMngr.dmPortal.coordInsideBar(jpx, jpy)){
-		    draggingZoomWindow = true;
-		}
-		else {
-		    draggingZoomWindowContent = true;
-		}
-	    }
-	    else if (inMagWindow){
-			v.getVCursor().stickGlyph(grMngr.magWindow);
-			draggingMagWindow = true;
-	    }
-	    else {
-		grMngr.rememberLocation(v.cams[0].getLocation());
-		if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
-		    manualLeftButtonMove=true;
-		    lastJPX=jpx;
-		    lastJPY=jpy;
-		    //grMngr.vsm.setActiveCamera(v.cams[0]);
-		    v.setDrawDrag(true);
-		    grMngr.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-		    activeCam=grMngr.vsm.getActiveCamera();
-		}
-		else if (mod == ALT_MOD){
-		    zoomingInRegion=true;
-		    x1=v.getVCursor().vx;
-		    y1=v.getVCursor().vy;
-		    v.setDrawRect(true);
-		}
-	    }
-	}
+        if (toolPaletteIsActive){return;}
+        else {
+            lastJPX = jpx;
+            lastJPY = jpy;
+			Glyph g;
+            if (inZoomWindow){
+                if (grMngr.dmPortal.coordInsideBar(jpx, jpy)){
+                    draggingZoomWindow = true;
+                }
+                else {
+                    draggingZoomWindowContent = true;
+                }
+            }
+            else if (inMagWindow){
+                v.getVCursor().stickGlyph(grMngr.magWindow);
+                draggingMagWindow = true;
+            }
+            else if (grMngr.tp.isBringAndGoMode() && (g = v.lastGlyphEntered()) != null){
+                grMngr.startBringAndGo(g);
+            }
+            else if (grMngr.tp.isLinkSlidingMode()){
+                // link sliding is not possible in Applet mode (java.awt.Robot security exception)
+                //Point location = e.getComponent().getLocationOnScreen();
+                //relative = e.getPoint();
+                //LS_SX = v.getVCursor().vx;
+                //LS_SY = v.getVCursor().vy;
+                //grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
+            }
+            else {
+                grMngr.rememberLocation(v.cams[0].getLocation());
+                if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
+                    manualLeftButtonMove=true;
+                    lastJPX=jpx;
+                    lastJPY=jpy;
+                    //grMngr.vsm.setActiveCamera(v.cams[0]);
+                    v.setDrawDrag(true);
+                    grMngr.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+                    activeCam=grMngr.vsm.getActiveCamera();
+                }
+                else if (mod == ALT_MOD){
+                    zoomingInRegion=true;
+                    x1=v.getVCursor().vx;
+                    y1=v.getVCursor().vy;
+                    v.setDrawRect(true);
+                }
+            }
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        if (grMngr.isBringingAndGoing){
+			grMngr.endBringAndGo(v.lastGlyphEntered());
+		}
+		else if (grMngr.isLinkSliding){
+            // link sliding is not possible in Applet mode (java.awt.Robot security exception)
+			//grMngr.endLinkSliding();
+		}
         if (toolPaletteIsActive){return;}
         else {
             draggingZoomWindow = false;
@@ -112,43 +132,45 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (toolPaletteIsActive){
-	    if (v.lastGlyphEntered() != null){grMngr.tp.selectButton((VImage)v.lastGlyphEntered());}
-	}
-	else {
-	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
-		lastJPX = jpx;
-		lastJPY = jpy;
-		lastVX = v.getVCursor().vx;
-		lastVY = v.getVCursor().vy;
-		if (grMngr.lensType != GraphicsManager.NO_LENS){
-		    grMngr.zoomInPhase2(lastVX, lastVY);
-		}
-		else {
-		    if (cursorNearBorder){// do not activate the lens when cursor is near the border
-			return;
-		    }
-		    grMngr.zoomInPhase1(jpx, jpy);
-		}
-	    }
-	    else if (grMngr.tp.isDragMagNavMode()){
-		grMngr.triggerDM(jpx, jpy);
-	    }
-	    else {
-		if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
-		else {
-		    Glyph g = v.lastGlyphEntered();
-		    if (mod == SHIFT_MOD){
-			grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true);
-		    }
-		    else {
-			if (g != null && g != grMngr.boundingBox){
-			    grMngr.mainView.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
-			}
-		    }
-		}
-	    }
-	}
+        if (toolPaletteIsActive){
+            if (v.lastGlyphEntered() != null){grMngr.tp.selectButton((VImage)v.lastGlyphEntered());}
+        }
+        else {
+            if (grMngr.tp.isBringAndGoMode()){return;}
+            if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
+                lastJPX = jpx;
+                lastJPY = jpy;
+                lastVX = v.getVCursor().vx;
+                lastVY = v.getVCursor().vy;
+                if (grMngr.lensType != GraphicsManager.NO_LENS){
+                    grMngr.zoomInPhase2(lastVX, lastVY);
+                }
+                else {
+                    if (cursorNearBorder){
+                        // do not activate the lens when cursor is near the border
+                        return;
+                    }
+                    grMngr.zoomInPhase1(jpx, jpy);
+                }
+            }
+            else if (grMngr.tp.isDragMagNavMode()){
+                grMngr.triggerDM(jpx, jpy);
+            }
+            else {
+                if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
+                else {
+                    Glyph g = v.lastGlyphEntered();
+                    if (mod == SHIFT_MOD){
+                        grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true);
+                    }
+                    else {
+                        if (g != null && g != grMngr.boundingBox){
+                            grMngr.mainView.centerOnGlyph(g, v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -237,57 +259,62 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){return;}
-	if (mod != ALT_MOD && buttonNumber == 1){
-	    if (draggingZoomWindow){
-		grMngr.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
-		lastJPX = jpx;
-		lastJPY = jpy;
-		grMngr.vsm.repaintNow();
-	    }
-	    else if (draggingZoomWindowContent){
-		tfactor = (grMngr.dmCamera.focal+(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
-		synchronized(grMngr.dmCamera){
-		    grMngr.dmCamera.move(Math.round(tfactor*(lastJPX-jpx)),
-					      Math.round(tfactor*(jpy-lastJPY)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
-		    grMngr.updateMagWindow();
-		}
-	    }
-	    else if (draggingMagWindow){
-		grMngr.updateZoomWindow();
-	    }
-	    else {
-		tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
-		if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-		    grMngr.vsm.getAnimationManager().setXspeed(0);
-            grMngr.vsm.getAnimationManager().setYspeed(0);
-            grMngr.vsm.getAnimationManager().setZspeed((lastJPY-jpy)*ZOOM_SPEED_COEF);
-		    //50 is just a speed factor (too fast otherwise)
-		}
-		else {
-		    jpxD = jpx-lastJPX;
-		    jpyD = lastJPY-jpy;
-		    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpxD/(tfactor*PAN_SPEED_FACTOR)));
-            grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpyD/(tfactor*PAN_SPEED_FACTOR)));
-            grMngr.vsm.getAnimationManager().setZspeed(0);
-		    if (application.cfgMngr.isSDZoomEnabled()){
-			dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
-			if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
-			    autoZooming = true;
-			    Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
-                    new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
-                    IdentityInterpolator.getInstance(), null);
-                grMngr.vsm.getAnimationManager().startAnimation(a, false);
-			}
-		    }
-		}
-	    }
-	}
-	if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
-	    grMngr.moveLens(jpx, jpy, e.getWhen());
-	}
+        if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
+        // link sliding is not possible in Applet mode (java.awt.Robot security exception)
+        //if (grMngr.isLinkSliding){
+		//	// ignore events triggered by AWT robot
+		//	grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy, false);
+		//}
+        else if (mod != ALT_MOD && buttonNumber == 1){
+            if (draggingZoomWindow){
+                grMngr.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
+                lastJPX = jpx;
+                lastJPY = jpy;
+                grMngr.vsm.repaintNow();
+            }
+            else if (draggingZoomWindowContent){
+                tfactor = (grMngr.dmCamera.focal+(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
+                synchronized(grMngr.dmCamera){
+                    grMngr.dmCamera.move(Math.round(tfactor*(lastJPX-jpx)),
+                        Math.round(tfactor*(jpy-lastJPY)));
+                    lastJPX = jpx;
+                    lastJPY = jpy;
+                    grMngr.updateMagWindow();
+                }
+            }
+            else if (draggingMagWindow){
+                grMngr.updateZoomWindow();
+            }
+            else {
+                tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
+                if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
+                    grMngr.vsm.getAnimationManager().setXspeed(0);
+                    grMngr.vsm.getAnimationManager().setYspeed(0);
+                    grMngr.vsm.getAnimationManager().setZspeed((lastJPY-jpy)*ZOOM_SPEED_COEF);
+                    //50 is just a speed factor (too fast otherwise)
+                }
+                else {
+                    jpxD = jpx-lastJPX;
+                    jpyD = lastJPY-jpy;
+                    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpxD/(tfactor*PAN_SPEED_FACTOR)));
+                    grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpyD/(tfactor*PAN_SPEED_FACTOR)));
+                    grMngr.vsm.getAnimationManager().setZspeed(0);
+                    if (application.cfgMngr.isSDZoomEnabled()){
+                        dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
+                        if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
+                            autoZooming = true;
+                            Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
+                                new Float(application.cfgMngr.autoZoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
+                                IdentityInterpolator.getInstance(), null);
+                            grMngr.vsm.getAnimationManager().startAnimation(a, false);
+                        }
+                    }
+                }
+            }
+        }
+        if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
+            grMngr.moveLens(jpx, jpy, e.getWhen());
+        }
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
