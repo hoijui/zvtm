@@ -3,7 +3,10 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2003. All Rights Reserved
+ *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$  
  */
 
 package fr.inria.zvtm.svg;
@@ -14,12 +17,14 @@ public class Metadata {
 
     String url;
     String title;
+    String closestAncestorGroupClass;
     String closestGroupID;
 
-    public Metadata(String url, String title, String cagid){
-	this.url=url;
-	this.title=title;
-	this.closestGroupID = cagid;
+    public Metadata(String url, String title, String cagid, String cagc){
+        this.url=url;
+        this.title=title;
+        this.closestGroupID = cagid;
+        this.closestAncestorGroupClass = cagc;
     }
 
     public void setURL(String s){url=s;}
@@ -31,6 +36,11 @@ public class Metadata {
     
     /**null if none*/
     public String getTitle(){return title;}
+
+    public void setClosestAncestorGroupClass(String s){closestAncestorGroupClass = s;}
+    
+    /**null if none*/
+    public String getClosestAncestorGroupClass(){return closestAncestorGroupClass;}
 
     public void setClosestAncestorGroupID(String s){closestGroupID = s;}
     

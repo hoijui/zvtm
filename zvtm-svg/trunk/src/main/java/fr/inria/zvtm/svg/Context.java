@@ -4,8 +4,10 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
  */
 
 package fr.inria.zvtm.svg;
@@ -32,8 +34,10 @@ public class Context {
     /*metadata associated with a group/link*/
     String url;
     String title;
+    String css_class;
     String closestAncestorGroupID;
-
+    String closestAncestorGroupClass;
+    
     /*give it the value of a style attribute*/
     Context(){}
 
@@ -163,21 +167,27 @@ public class Context {
     /**null if none*/
     public String getClosestAncestorGroupID(){return closestAncestorGroupID;}
 
+    public void setClosestAncestorGroupClass(String s){closestAncestorGroupClass = s;}
+    
+    /**null if none*/
+    public String getClosestAncestorGroupClass(){return closestAncestorGroupClass;}
+
     public Context duplicate(){
-	Context copy = new Context(null);
-	copy.font_family = this.font_family;
-	copy.font_size = this.font_size;
-	copy.font_weight = this.font_weight;
-	copy.font_style = this.font_style;
-	copy.fill = this.fill;
-	copy.stroke = this.stroke;
-	copy.fillColorDefined = this.fillColorDefined;
-	copy.strokeColorDefined = this.strokeColorDefined;
-	copy.fill_opacity = this.fill_opacity;
-	copy.url = this.url;
-	copy.title = this.title;
-	copy.closestAncestorGroupID = this.closestAncestorGroupID;
-	return copy;
+        Context copy = new Context(null);
+        copy.font_family = this.font_family;
+        copy.font_size = this.font_size;
+        copy.font_weight = this.font_weight;
+        copy.font_style = this.font_style;
+        copy.fill = this.fill;
+        copy.stroke = this.stroke;
+        copy.fillColorDefined = this.fillColorDefined;
+        copy.strokeColorDefined = this.strokeColorDefined;
+        copy.fill_opacity = this.fill_opacity;
+        copy.url = this.url;
+        copy.title = this.title;
+        copy.closestAncestorGroupID = this.closestAncestorGroupID;
+        copy.closestAncestorGroupClass = this.closestAncestorGroupClass;
+        return copy;
     }
 
 }

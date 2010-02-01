@@ -1816,6 +1816,13 @@ public class SVGReader {
                 }
                 catch(Exception ex){}
             }
+            if (e.hasAttribute(SVGReader._id)){
+                try {
+                    //try to get the group's id, be quiet if anything goes wrong
+                    ctx.setClosestAncestorGroupClass(e.getAttribute(SVGReader._class));
+                }
+                catch(Exception ex){}
+            }
             for (int i=0;i<objects.getLength();i++){
                 Node obj=objects.item(i);
                 if (obj.getNodeType()==Node.ELEMENT_NODE){
@@ -1903,8 +1910,8 @@ public class SVGReader {
     }
 
     private static void setMetadata(Glyph g,Context ctx){
-        if (ctx!=null && (ctx.getURL()!=null || ctx.getTitle()!=null || ctx.getClosestAncestorGroupID() != null)){
-            g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getClosestAncestorGroupID()));
+        if (ctx!=null && (ctx.getURL()!=null || ctx.getTitle()!=null || ctx.getClosestAncestorGroupID() != null || ctx.getClosestAncestorGroupClass() != null)){
+            g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getClosestAncestorGroupID(), ctx.getClosestAncestorGroupClass()));
         }
     }
 
