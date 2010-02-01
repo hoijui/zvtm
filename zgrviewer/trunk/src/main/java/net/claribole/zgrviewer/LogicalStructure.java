@@ -19,6 +19,9 @@ import fr.inria.zvtm.svg.Metadata;
 
 class LogicalStructure {
 
+    static final String NODE_PREFIX = "node";    
+    static final String EDGE_PREFIX = "edge";
+
 	public static LogicalStructure build(Vector glyphs){
 		Glyph g;
 		Metadata md;
@@ -33,15 +36,16 @@ class LogicalStructure {
 		String title;
 		Vector v;
 		Hashtable t;
-		String cagid;
+		String cagid, cgac;
 		int edgeCount = 0;
 		for (int i=0;i<glyphs.size();i++){
 			g = (Glyph)glyphs.elementAt(i);
 			md = (Metadata)g.getOwner();
 			if (md != null && (title=md.getTitle()) != null){
-				if (title.indexOf(LEdge.DIRECTED_STR) != -1 || title.indexOf(LEdge.UNDIRECTED_STR) != -1){
+				cagid = md.getClosestAncestorGroupID();
+				cgac = md.getClosestAncestorGroupClass();
+				if (cgac.equals(EDGE_PREFIX) || cagid.startsWith(EDGE_PREFIX)){
 					// dealing with a glyph that is part of an edge
-					cagid = md.getClosestAncestorGroupID();
 					if (title2edgeGroup.containsKey(title)){
 						t = (Hashtable)title2edgeGroup.get(title);
 						if (t.containsKey(cagid)){
@@ -65,7 +69,7 @@ class LogicalStructure {
 						edgeCount++;
 					}
 				}
-				else {
+				else if (cgac.equals(NODE_PREFIX) || cagid.startsWith(NODE_PREFIX)){
 					// dealing with a glyph that is part of a node
 					if (title2node.containsKey(title)){
 						v = (Vector)title2node.get(title);
@@ -77,6 +81,8 @@ class LogicalStructure {
 						title2node.put(title, v);
 					}
 				}
+				// else, other stuff that is probably not part of the graph structure, like a graph's background
+				// do nothing
 			}
 			// remain silent if structural information could not be extracted
 		}
