@@ -20,7 +20,7 @@ public class NTNode {
      String name;
     
     /* Owning matrix */
-    Matrix matrix;
+    public Matrix matrix;
     
     NTEdge[] outgoingEdges, incomingEdges;
     
@@ -43,6 +43,8 @@ public class NTNode {
 	VirtualSpace vs;
 	
 	Object owner;
+
+	private long width;
 	
     public NTNode(String name){
         this.name = name;
@@ -143,22 +145,23 @@ public class NTNode {
     	    this.gBackgroundN.setTranslucencyValue(NodeTrixViz.NODE_BACKGROUND_TRANSLUCENCY);
     		this.gBackgroundN.setDrawBorder(false);
     		this.gBackgroundN.setOwner(this);
-			
+		
+    		//applying grid
     		if(this.odd)
     		{
 	    		this.gGridV = new VRectangle(0,0,0, NodeTrixViz.CELL_SIZE/2, this.matrix.bkg.getWidth(), NodeTrixViz.GRID_COLOR);
-	//			this.gGridV = new VRectangle(0,0,0, this.matrix.bkg.getWidth(),NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR);
 				gGridV.setDrawBorder(false);
 				gGridV.setTranslucencyValue( NodeTrixViz.GRID_TRANSLUCENCY);
 	    	    vs.addGlyph(gGridV);
+	    	    gGridV.setSensitivity(false);
 	    	    this.gBackgroundN.stick(gGridV);
 	    	  
 	    	    this.gGridH = new VRectangle(0,0,0, this.matrix.bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR);
-	//    	    this.gGridH = new VRectangle(0,0,0, NodeTrixViz.CELL_SIZE/2, this.matrix.bkg.getWidth(), NodeTrixViz.GRID_COLOR);
 				gGridH.setDrawBorder(false);
 				gGridH.setTranslucencyValue( NodeTrixViz.GRID_TRANSLUCENCY);
 				vs.addGlyph(gGridH);
-	    	    this.gBackgroundW.stick(gGridH);
+	    	    gGridH.setSensitivity(false);
+				this.gBackgroundW.stick(gGridH);
     		}   
     	}
     }
@@ -181,6 +184,7 @@ public class NTNode {
      * the matrix. A gradiant is applied according to the position of the node in the list.
      */
 	public void setBackgroundBox(long maxLength) {
+		this.width = maxLength;
 		this.gBackgroundW.setWidth(maxLength/2);
 		if (!this.single){
 			this.gBackgroundW.move(-maxLength/2, 0);
@@ -199,8 +203,13 @@ public class NTNode {
 	}
 
 	public int getBoxWidth(boolean west) {
-		return west ? this.gBackgroundW.getBounds().length : ((this.gBackgroundN != null) ? this.gBackgroundN.getBounds().length : 0);
-		
+//		return west ? this.gBackgroundW.getBounds().length : ((this.gBackgroundN != null) ? this.gBackgroundN.getBounds().length : 0);
+		return (int)this.width/2;
+	}
+
+	public long getWidth() 
+	{
+		return this.width/2;
 	}
 
 }

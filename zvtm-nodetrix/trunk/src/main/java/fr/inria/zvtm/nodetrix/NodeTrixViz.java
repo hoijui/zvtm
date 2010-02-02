@@ -36,7 +36,7 @@ public class NodeTrixViz {
     static Color EXTRA_LINK_COLOR = new Color(118,98,252);
     static int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
-    static float NODE_BACKGROUND_TRANSLUCENCY = 0.6f;
+    static float NODE_BACKGROUND_TRANSLUCENCY = 1f;
     static int LINLOG_ITERATIONS = 20;
     
     /* Links between matrices */
@@ -63,9 +63,10 @@ public class NodeTrixViz {
     }
     
     public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
-        return addIntraEdge(tail, head, INTRA_LINK_COLOR);
+        return addIntraEdge(tail, head, INTRA_LINK_COLOR, true);
     }
     
+    /** Method is used if inputfile is passed directly to zvtm-ontotrix*/
     public NTEdge addEdge(NTNode tail, NTNode head){
         if (tail.getMatrix() == head.getMatrix()){
             return addIntraEdge(tail, head);
@@ -82,8 +83,8 @@ public class NodeTrixViz {
         return e;
     }
     
-    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c){
-        NTIntraEdge e = new NTIntraEdge(tail, head, c);
+    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c, boolean outGoing){
+        NTIntraEdge e = new NTIntraEdge(tail, head, c, outGoing);
         tail.addOutgoingEdge(e);
         head.addIncomingEdge(e);
         return e;
