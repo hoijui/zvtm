@@ -15,23 +15,46 @@ import fr.inria.zvtm.engine.Camera;
 public class Composite extends Glyph {
     private ArrayList<Glyph> children;
 
+    //transform pair struct
     private static class TPair {
         public AffineTransform drawTransform;
-        public AffineTransform pickTransform;
+        public AffineTransform invTransform;
+        public TPair(){
+            drawTransform = new AffineTransform();
+            invTransform = new AffineTransform();
+        }
     }
 
     //not the object state proper
     private transient ArrayList<TPair> transforms; //one per camera
+    private transient float radius; //radius of the bounding circle
 
     public Composite(){
         children = new ArrayList<Glyph>();
+        radius = 0;
     }
 
+    /**
+     * Adds a child Glyph to this Composite
+     * @param Glyph to add
+     */
     public void addChild(Glyph child){
         children.add(child);
+        //recompute bounding radius?
     }
 
-    public void removeChild(Glyph child){
+    /**
+     * Removes a child Glyph from this Composite.
+     * @param child Glyph to remove
+     * @return <code>true</code> if child has been removed, <code>false</code> 
+     * otherwise
+     */
+    public boolean removeChild(Glyph child){
+        boolean removed = children.remove(child);
+        if(removed){
+            //recompute bounding radius?
+        }
+        return removed;
     }
 
     /**
@@ -91,17 +114,27 @@ public class Composite extends Glyph {
 
     @Override 
     public void removeCamera(int index){
-        //XXX implement
+        if( (index >= transforms.size()) ||
+                (transforms.get(index) == null) ){
+            System.err.println("Cannot remove camera at index " + index);
+            return;
+        }
+        transforms.set(index, null);
     }
 
     @Override 
     public void addCamera(int index){
-        //XXX implement
+        //'index' is just a verification index, should be transforms.size()
+        if(index != transforms.size()){
+            System.err.println("Could not add camera at index " + index);
+            return;
+        }
+        transforms.add(new TPair());
     }
 
     @Override
     public void initCams(int nbCam){
-        //XXX implement
+        //nop (no init step necessary)
     }
 
     @Override
@@ -113,8 +146,12 @@ public class Composite extends Glyph {
            AffineTransform stdT,
            int dx,
            int dy){
-            //XXX implement
-    }
+        g.transform(transforms.get(i).drawTransform);
+        for(Glyph child: children){
+            child.drawForLens(g,vW,vH,i,stdS,stdT,dx,dy);
+        }
+        g.transform(transforms.get(i).invTransform);
+  }
 
     @Override
     public void draw(Graphics2D g,
@@ -125,7 +162,11 @@ public class Composite extends Glyph {
                           AffineTransform stdT,
                           int dx,
                           int dy){
-        //XXX implement
+        g.transform(transforms.get(i).drawTransform);
+        for(Glyph child: children){
+            child.draw(g,vW,vH,i,stdS,stdT,dx,dy);
+        }
+        g.transform(transforms.get(i).invTransform);
     }
 
     @Override
@@ -140,8 +181,25 @@ public class Composite extends Glyph {
 
     @Override
     public void project(Camera c,
-                             Dimension d){
+            Dimension d){
         //XXX implement
+        //d: view dimension
+        int camIdx = c.getIndex();
+        if(camIdx >= transforms.size()){
+            System.err.println("Could not find camera at index " + camIdx);
+            return;
+        }
+        coef=(float)(c.focal/(c.focal+c.altitude));
+
+        transforms.get(camIdx).drawTransform.setToIdentity();
+        transforms.get(camIdx).drawTransform.translate(vx - c.posx,
+                -(vy - c.posy));
+        transforms.get(camIdx).drawTransform.scale(coef,coef);
+        try{
+        transforms.get(camIdx).invTransform = transforms.get(camIdx).drawTransform.createInverse();
+        } catch(java.awt.geom.NoninvertibleTransformException ex){
+            throw new AssertionError();
+        }
     }
 
     @Override
@@ -174,16 +232,14 @@ public class Composite extends Glyph {
 
     @Override
     public float getSize(){
-        //XXX ?
-        return 1f;
+        return radius;
     }
 
     @Override 
     public void move(long dx, long dy){
         vx += dx;
         vy += dy;
-        for(Glyph g: children){
-        }
+        //
     }
 }
 
