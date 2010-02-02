@@ -86,6 +86,7 @@ public class Matrix {
 	        // if matrix contains a single node, only show a horizontal label
 	        nodes[0].createGraphics(0, 0, 0, 0, vs, true, Color.getHSBColor(0.1f, 0.5f, 0.8f), false);
     	    nodes[0].moveTo(x, y);
+    	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, Color.white,  Color.white, 0f);
 	    }
     }
     
