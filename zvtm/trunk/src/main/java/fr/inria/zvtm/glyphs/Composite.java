@@ -15,21 +15,11 @@ import fr.inria.zvtm.engine.Camera;
 public class Composite extends Glyph {
     private ArrayList<Glyph> children;
 
-    //transform pair struct
-    private static class TPair {
-        public AffineTransform drawTransform;
-        public AffineTransform invTransform;
-        public TPair(){
-            drawTransform = new AffineTransform();
-            invTransform = new AffineTransform();
-        }
-    }
-
-    //not the object state proper
-    private transient ArrayList<TPair> transforms; //one per camera
     private transient float radius; //radius of the bounding circle
 
     public Composite(){
+        vx = 0;
+        vy = 0;
         children = new ArrayList<Glyph>();
         radius = 0;
     }
@@ -40,7 +30,7 @@ public class Composite extends Glyph {
      */
     public void addChild(Glyph child){
         children.add(child);
-        //recompute bounding radius?
+        computeRadius(); 
     }
 
     /**
@@ -52,7 +42,7 @@ public class Composite extends Glyph {
     public boolean removeChild(Glyph child){
         boolean removed = children.remove(child);
         if(removed){
-            //recompute bounding radius?
+            computeRadius(); 
         }
         return removed;
     }
@@ -114,27 +104,23 @@ public class Composite extends Glyph {
 
     @Override 
     public void removeCamera(int index){
-        if( (index >= transforms.size()) ||
-                (transforms.get(index) == null) ){
-            System.err.println("Cannot remove camera at index " + index);
-            return;
+        for(Glyph child: children){
+            child.removeCamera(index);
         }
-        transforms.set(index, null);
     }
 
     @Override 
     public void addCamera(int index){
-        //'index' is just a verification index, should be transforms.size()
-        if(index != transforms.size()){
-            System.err.println("Could not add camera at index " + index);
-            return;
+        for(Glyph child: children){
+            child.addCamera(index);
         }
-        transforms.add(new TPair());
     }
 
     @Override
     public void initCams(int nbCam){
-        //nop (no init step necessary)
+       for(Glyph child: children){
+           child.initCams(nbCam);
+       } 
     }
 
     @Override
@@ -146,11 +132,9 @@ public class Composite extends Glyph {
            AffineTransform stdT,
            int dx,
            int dy){
-        g.transform(transforms.get(i).drawTransform);
         for(Glyph child: children){
             child.drawForLens(g,vW,vH,i,stdS,stdT,dx,dy);
         }
-        g.transform(transforms.get(i).invTransform);
   }
 
     @Override
@@ -162,11 +146,9 @@ public class Composite extends Glyph {
                           AffineTransform stdT,
                           int dx,
                           int dy){
-        g.transform(transforms.get(i).drawTransform);
         for(Glyph child: children){
             child.draw(g,vW,vH,i,stdS,stdT,dx,dy);
         }
-        g.transform(transforms.get(i).invTransform);
     }
 
     @Override
@@ -176,29 +158,16 @@ public class Composite extends Glyph {
                                     float lensMag,
                                     long lensx,
                                     long lensy){
-        //XXX implement
+        for(Glyph child: children){
+            child.projectForLens(c,lensWidth,lensHeight,lensMag,lensx,lensy);
+        }
     }
 
     @Override
     public void project(Camera c,
             Dimension d){
-        //XXX implement
-        //d: view dimension
-        int camIdx = c.getIndex();
-        if(camIdx >= transforms.size()){
-            System.err.println("Could not find camera at index " + camIdx);
-            return;
-        }
-        coef=(float)(c.focal/(c.focal+c.altitude));
-
-        transforms.get(camIdx).drawTransform.setToIdentity();
-        transforms.get(camIdx).drawTransform.translate(vx - c.posx,
-                -(vy - c.posy));
-        transforms.get(camIdx).drawTransform.scale(coef,coef);
-        try{
-        transforms.get(camIdx).invTransform = transforms.get(camIdx).drawTransform.createInverse();
-        } catch(java.awt.geom.NoninvertibleTransformException ex){
-            throw new AssertionError();
+        for(Glyph child: children){
+            child.project(c,d);
         }
     }
 
@@ -222,7 +191,10 @@ public class Composite extends Glyph {
 
     @Override 
     public void reSize(float factor){
-        //XXX ?
+        radius *= factor;
+        for(Glyph child: children){
+            child.reSize(factor);
+        }
     }
 
     @Override
@@ -239,7 +211,18 @@ public class Composite extends Glyph {
     public void move(long dx, long dy){
         vx += dx;
         vy += dy;
-        //
+        for(Glyph child: children){
+            child.move(dx, dy);
+        } 
+    }
+
+    @Override
+    public void moveTo(long x, long y){
+        move(x - vx, y - vy);
+    }
+
+    private void computeRadius(){
+        radius = 10f;
     }
 }
 
