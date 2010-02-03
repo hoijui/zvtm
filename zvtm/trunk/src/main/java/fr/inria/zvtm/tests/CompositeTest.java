@@ -45,6 +45,7 @@ public class CompositeTest {
         comp.addChild(redC);
         comp.addChild(yellC);
         comp.addChild(blueC);
+        //comp.reSize(0.3f);
         vs.addGlyph(comp);
     }
 

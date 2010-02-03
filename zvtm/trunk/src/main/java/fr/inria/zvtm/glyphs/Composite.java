@@ -1,3 +1,9 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
@@ -25,7 +31,9 @@ public class Composite extends Glyph {
     }
 
     /**
-     * Adds a child Glyph to this Composite
+     * Adds a child Glyph to this Composite.
+     * Contrary to CGlyph, you do not need to add the children 
+     * to the virtual space.
      * @param Glyph to add
      */
     public void addChild(Glyph child){
@@ -194,12 +202,15 @@ public class Composite extends Glyph {
         radius *= factor;
         for(Glyph child: children){
             child.reSize(factor);
+
+            child.move((long)((vx - child.vx) * (1. - factor)), 
+                    (long)((vy - child.vy) * (1. - factor)));
         }
     }
 
     @Override
     public void sizeTo(float radius){
-        //XXX ?
+        reSize(radius/this.radius); 
     }
 
     @Override
@@ -222,7 +233,15 @@ public class Composite extends Glyph {
     }
 
     private void computeRadius(){
-        radius = 10f;
+        float maxRad = 0f;
+        for(Glyph child: children){
+            maxRad = Math.max(maxRad, distance(child) + child.getSize());
+        }
+        radius = maxRad;
+    }
+
+    private float distance(Glyph g){
+        return (float)Math.sqrt((g.vx - vx) * (g.vx - vx) + (g.vy - vy) * (g.vy - vy));
     }
 }
 
