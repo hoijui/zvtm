@@ -8,7 +8,7 @@
 package fr.inria.zuist.engine;
 
 import java.util.Hashtable;
-import java.util.Vector;
+import java.util.LinkedList;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.*;
@@ -39,14 +39,14 @@ class GlyphLoader implements Runnable {
     /* load/unload requests accessible by ID */
     Hashtable id2request;
     /* pending requests ordered by creation date */
-    Vector requestQueue;
+    LinkedList<Integer> requestQueue;
     /* give a unique identifier to each request (serves as key in id2request) */
     int nextRequestID = -1;
 
     GlyphLoader(SceneManager sm){
 	this.sm = sm;
 	id2request = new Hashtable();
-	requestQueue = new Vector();
+	requestQueue = new LinkedList<Integer>();
 	start();
     }
 
@@ -97,10 +97,8 @@ class GlyphLoader implements Runnable {
     /*called by thread on a regular basis ; pops request from queue in a FIFO manner*/
     void processRequests(){
 	synchronized(requestQueue){
-	    if (requestQueue.size() > 0){
-		// (rid is actually an Integer)
-		Object rid = requestQueue.firstElement();
-		requestQueue.removeElementAt(0);
+	    if (!requestQueue.isEmpty()){
+		Integer rid = requestQueue.remove();
 		Request r = (Request)id2request.get(rid);
 		if (r != null){// r might be null if the request got canceled
 		    id2request.remove(rid);
@@ -149,7 +147,7 @@ class GlyphLoader implements Runnable {
 	    Request r = new Request(requestID, Request.TYPE_LOAD, od, transition);
 	    od.loadRequest = requestID;
 	    id2request.put(requestID, r);
-	    requestQueue.addElement(requestID);
+	    requestQueue.offer(requestID);
 	    }
 	}
     }
@@ -173,7 +171,7 @@ class GlyphLoader implements Runnable {
 	    Request r = new Request(requestID, Request.TYPE_UNLOAD, od, transition);
 	    od.unloadRequest = requestID;
 	    id2request.put(requestID, r);
-	    requestQueue.addElement(requestID);
+	    requestQueue.offer(requestID);
 	    }
 	}
     }
