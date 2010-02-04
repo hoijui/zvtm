@@ -16,17 +16,17 @@ package fr.inria.zuist.engine;
 
 class Request {
 
-    Integer ID;
+    final Integer ID;
 
-    ObjectDescription od;
+    final ObjectDescription od;
 
     static final short TYPE_LOAD = 0;
     static final short TYPE_UNLOAD = 1;
-    short type;
+    final short type;
 
     static final short NO_TRANSITION = 0;
     static final short TRANSITION_FADE = 1;
-    short transition;
+    final short transition;
 
     Request(Integer id, short type, ObjectDescription od, boolean transition){
 	this.ID = id;
