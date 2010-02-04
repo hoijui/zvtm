@@ -16,18 +16,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.RepaintAdapter;
-
 import fr.inria.zvtm.nodetrix.lll.Edge;
 import fr.inria.zvtm.nodetrix.lll.MinimizerBarnesHut;
 import fr.inria.zvtm.nodetrix.lll.Node;
-import fr.inria.zvtm.nodetrix.lll.OptimizerModularity;
+
 
 public class NodeTrixViz {
     
     public static final Color GRID_COLOR = Color.getHSBColor(1f, 0.0f, 0.9f);
 	public static final float GRID_TRANSLUCENCY = 0.5f;
+	public static final float RELATION_ARROW_ALPHA = .2f;
     static long CELL_SIZE = 20;
     static Color MATRIX_FILL_COLOR = Color.WHITE;
     static Color MATRIX_STROKE_COLOR = Color.BLACK;
@@ -63,7 +61,7 @@ public class NodeTrixViz {
     }
     
     public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
-        return addIntraEdge(tail, head, INTRA_LINK_COLOR, true);
+        return addIntraEdge(tail, head, INTRA_LINK_COLOR);
     }
     
     /** Method is used if inputfile is passed directly to zvtm-ontotrix*/
@@ -83,10 +81,10 @@ public class NodeTrixViz {
         return e;
     }
     
-    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c, boolean outGoing){
-        NTIntraEdge e = new NTIntraEdge(tail, head, c, outGoing);
-        tail.addOutgoingEdge(e);
-        head.addIncomingEdge(e);
+    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c){
+        NTIntraEdge e = new NTIntraEdge(tail, head, c);
+      	tail.addOutgoingEdge(e);
+       	head.addIncomingEdge(e);
         return e;
     }
     

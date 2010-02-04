@@ -14,57 +14,56 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTriangleOr;
 
 public class NTIntraEdge extends NTEdge {
     
 //    VRectangle edgeRect;
-    Glyph edgeRect;
+    Glyph edgeRect, edgeRectInverse;
 	LongPoint offset;
-    boolean directedInverse; //true if this edge is the inverse of a directed one.
-
-    public NTIntraEdge(NTNode t, NTNode h, Color c, boolean directedInverse){
+   
+    public NTIntraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
         this.head = h;
         this.edgeColor = c;
-        this.directedInverse = directedInverse;
     }
     
-    void createGraphics(long height, long y, long x, long noMeaning, VirtualSpace vs){
-        this.offset = new LongPoint(x, y);
-        LongPoint mp = tail.getMatrix().getPosition();
-        float alpha = 1;
-//        LongPoint[] p = new LongPoint[3];
-//        long cs = NodeTrixViz.CELL_SIZE/2;
-//        
-//        p[0] = new LongPoint(mp.x +offset.x - cs, mp.y +offset.y + cs);
-//        p[2] = new LongPoint(mp.x +offset.x + cs, mp.y +offset.y - cs);
-        if(this.directedInverse)
-        {
-        	alpha = 0.4f;
-//        	p[1] = new LongPoint(mp.x +offset.x - cs, mp.y + offset.y - cs);
-//    	}else{
-//        	p[1] = new LongPoint(mp.x +offset.x + cs, mp.y + offset.y + cs);
-    	}
-//        
-//        this.edgeRect = new VPolygon(p, 0, this.edgeColor, Color.white, alpha);
-//        vs.addGlyph(edgeRect);
-//        edgeRect.setOwner(this);
+    @Override
+    void createGraphics(long height, long y, long x, long noMeaning, VirtualSpace vs) 
+    {
+    	this.offset = new LongPoint(x, y);
+    	LongPoint mp = tail.getMatrix().getPosition();
+    	long cs = NodeTrixViz.CELL_SIZE/2;
+    	float alpha = 1f;
     	
-      this.edgeRect = new VRectangle(mp.x+offset.x, mp.y+offset.y, 0,
-      NodeTrixViz.CELL_SIZE/2, height/2,
-      this.edgeColor, Color.white, alpha);
-      vs.addGlyph(edgeRect);
-      edgeRect.setOwner(this);
-    }
+		VText text = new VText(mp.x+x + 10 , mp.y+y, 0, Color.black, head.labelW.getText()); 
+//		vs.addGlyph(text);
 
+    	
+    	this.edgeRect = new VRectangle(mp.x+offset.x, mp.y+offset.y, 0, NodeTrixViz.CELL_SIZE/2, height/2, this.edgeColor, Color.white, alpha);	        
+    	vs.addGlyph(edgeRect);
+    	edgeRect.setOwner(this);
+    	
+    	//drawing inverse relation
+    	this.edgeRectInverse = new VRectangle(mp.x-offset.y, mp.y-offset.x, 0, NodeTrixViz.CELL_SIZE/2, height/2, this.edgeColor, Color.white, alpha);	        
+//    	vs.addGlyph(edgeRectInverse);
+    	edgeRectInverse.setOwner(this);
+    	
+    	
+    }
+    
     void moveTo(long x, long y){
         LongPoint mp = tail.getMatrix().getPosition();
         edgeRect.moveTo(mp.x+offset.x, mp.y+offset.y);
+        edgeRectInverse.moveTo(mp.x+offset.x, mp.y+offset.y);
+
     }
     
     void move(long x, long y){
         edgeRect.move(x, y);
+        edgeRectInverse.move(x, y);
     }
+    
 
 }

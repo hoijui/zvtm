@@ -8,6 +8,7 @@
 package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -23,6 +24,7 @@ public class NTNode {
     public Matrix matrix;
     
     NTEdge[] outgoingEdges, incomingEdges;
+    Vector <NTIntraEdgeSet> intraEdgeSets = new Vector<NTIntraEdgeSet>();
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
@@ -38,7 +40,6 @@ public class NTNode {
 	
 	/* If this node has no matrix*/
 	boolean single;
-	boolean odd;
 	/* The Virtual Space this NTNode belongs to - stored here to simplify interaction*/
 	VirtualSpace vs;
 	
@@ -74,6 +75,11 @@ public class NTNode {
             na[incomingEdges.length] = e;
             incomingEdges = na;
         }
+    }
+    
+    public void addIntraEdgeSet(NTIntraEdgeSet ies)
+    {
+    	this.intraEdgeSets.add(ies);
     }
     
     /**
@@ -115,7 +121,7 @@ public class NTNode {
         return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
     
-    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color c, boolean b){
+    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color c){
         this.wdx = wdx;
 	    this.wdy = wdy;
 	    this.vs = vs;
@@ -131,7 +137,7 @@ public class NTNode {
 	    this.gBackgroundW.setOwner(this);
 	    this.gBackgroundW.stick(this.labelW);
 	    this.single = single;
-	    this.odd = b;
+	  
 	    if (!single){
     	    this.ndx = ndx;
     	    this.ndy = ndy;
@@ -145,25 +151,7 @@ public class NTNode {
     	    this.gBackgroundN.setTranslucencyValue(NodeTrixViz.NODE_BACKGROUND_TRANSLUCENCY);
     		this.gBackgroundN.setDrawBorder(false);
     		this.gBackgroundN.setOwner(this);
-		
-    		//applying grid
-    		if(this.odd)
-    		{
-	    		this.gGridV = new VRectangle(0,0,0, NodeTrixViz.CELL_SIZE/2, this.matrix.bkg.getWidth(), NodeTrixViz.GRID_COLOR);
-				gGridV.setDrawBorder(false);
-				gGridV.setTranslucencyValue( NodeTrixViz.GRID_TRANSLUCENCY);
-	    	    vs.addGlyph(gGridV);
-	    	    gGridV.setSensitivity(false);
-	    	    this.gBackgroundN.stick(gGridV);
-	    	  
-	    	    this.gGridH = new VRectangle(0,0,0, this.matrix.bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR);
-				gGridH.setDrawBorder(false);
-				gGridH.setTranslucencyValue( NodeTrixViz.GRID_TRANSLUCENCY);
-				vs.addGlyph(gGridH);
-	    	    gGridH.setSensitivity(false);
-				this.gBackgroundW.stick(gGridH);
-    		}   
-    	}
+		}
     }
     
     public void moveTo(long x, long y){
@@ -177,7 +165,7 @@ public class NTNode {
 //        labelW.move(x, y);
         gBackgroundW.move(x,y);
 //        if (labelN != null)		    labelN.move(x, y);
-        if (gBackgroundN != null)	gBackgroundN.move(x,y);            
+        if (gBackgroundN != null)	gBackgroundN.move(x,y);        
     }
 
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
@@ -192,13 +180,6 @@ public class NTNode {
 			gBackgroundN.setWidth(maxLength/2);
 			this.gBackgroundN.move(0, maxLength/2);
 			this.labelN.move(0,-maxLength/2);
-			
-			if(odd){
-				this.gGridH.vx += this.gBackgroundW.getWidth() + this.matrix.bkg.getWidth();
-				this.gGridV.vy -= (this.gBackgroundN.getWidth() + this.matrix.bkg.getWidth());
-			}
-	  	    
-
 		}
 	}
 

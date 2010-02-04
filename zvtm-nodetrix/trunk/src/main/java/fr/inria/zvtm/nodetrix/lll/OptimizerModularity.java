@@ -25,6 +25,8 @@ package fr.inria.zvtm.nodetrix.lll;
 
 import java.util.*;
 
+
+
 /**
  * Optimizer for a generalization of Newman and Girvan's Modularity measure,
  *   for computing graph clusterings.
