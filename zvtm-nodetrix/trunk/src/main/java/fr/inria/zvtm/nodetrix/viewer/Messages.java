@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -13,7 +13,7 @@ public class Messages {
 
 	static final String V = "v";
 	static final String VERSION = "0.1.0-SNAPSHOT";
-    static final String AUTHORS = "Author: Emmanuel Pietriga";
+    static final String AUTHORS = "Author: Emmanuel Pietriga and Benjamin Bach";
     static final String APP_NAME = "ZVTM NodeTrix Visualizer";
     static final String CREDITS_NAMES = "Based on: ZVTM, LinLogLayout";
     static final String ABOUT_DEPENDENCIES = "Based upon: ZVTM (http://zvtm.sf.net), LinLogLayout (http://code.google.com/p/linloglayout/)";
