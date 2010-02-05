@@ -36,11 +36,13 @@ TILE_SIZE = 512
 def getTile(req, z=-1, col=-1, row=-1):
     try:
         req.log_error('handler')
+        req.content_type = 'image/png'
+        req.send_http_header()
         if int(z) < 10:
             # tiles for levels up to z=9 have been pre-rendered and stored
-            req.content_type = 'image/png'
-            req.send_http_header()
-            req.sendfile("%s/%s/%s/%s.png" % (TILE_DIR, z,col,row))
+            req.sendfile("%s/%s/%s/%s.png" % (TILE_DIR, z, col, row))
+        elif os.path.exists("%s/%s/%s/%s.png" % (CACHE_DIR, z, col, row)):
+            req.sendfile("%s/%s/%s/%s.png" % (CACHE_DIR, z, col, row))            
         else:
             generateTile(req, z, col, row)
         return apache.OK
@@ -48,7 +50,7 @@ def getTile(req, z=-1, col=-1, row=-1):
         return apache.HTTP_NOT_FOUND
 
 def generateTile(req, z=-1, col=-1, row=-1):
-    ll = (-6.5, 49.5, -6.4, 51)
+    ll = (-8.5, 49.5, -6.4, 51)
     m = Map(TILE_SIZE, TILE_SIZE)
     load_map(m, os.environ['MAPNIK_MAP_FILE'])
     prj = Projection("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over")
