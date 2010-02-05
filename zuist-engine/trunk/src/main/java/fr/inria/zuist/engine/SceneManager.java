@@ -118,12 +118,12 @@ public class SceneManager {
     static final String URL_PROTOCOL_SEQ = ":/";
     static final String FILE_PROTOCOL_HEAD = "file://";
 
-    GlyphLoader glyphLoader;
+    final GlyphLoader glyphLoader;
 
     Level[] levels = new Level[0];
 
-    VirtualSpace[] sceneLayers;
-    Camera[] sceneCameras;
+    final VirtualSpace[] sceneLayers;
+    final Camera[] sceneCameras;
     long[][] sceneCameraBounds;
 
     /** Contains a mapping from region IDs to actual Region objects. */
