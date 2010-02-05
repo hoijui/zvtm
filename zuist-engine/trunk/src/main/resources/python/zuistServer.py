@@ -114,12 +114,9 @@ def generateTile(req, z=-1, col=-1, row=-1):
     m.zoom_to_box(bbox)
     m.buffer_size = 256
     im = Image(TS_I, TS_I)
-    render(m, im)
-    
+    render(m, im)    
     view = im.view(0, 0, TS_I, TS_I) # x,y,width,height
     view.save(map_path, 'png')
-    #im.save(map_uri, 'png256')
-    
     req.content_type = 'image/png'
     req.send_http_header()
     req.sendfile(map_path)
