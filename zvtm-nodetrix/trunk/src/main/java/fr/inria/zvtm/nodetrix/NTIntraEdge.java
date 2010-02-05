@@ -9,8 +9,12 @@ package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
 
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator2;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -19,10 +23,12 @@ import fr.inria.zvtm.glyphs.VTriangleOr;
 
 public class NTIntraEdge extends NTEdge {
     
-//    VRectangle edgeRect;
-    Glyph edgeRect, edgeRectInverse;
+    Glyph glyph, glyphTranslucent, glyphInverse;
 	LongPoint offset;
-   
+	AnimationManager animManager;
+	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
+	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
+	
     public NTIntraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
         this.head = h;
@@ -30,36 +36,121 @@ public class NTIntraEdge extends NTEdge {
     }
     
     @Override
-    void createGraphics(long height, long y, long x, long noMeaning, VirtualSpace vs) 
+    void createGraphics(long height, long y, long x, long index, VirtualSpace vs) 
     {
+    	this.animManager = VirtualSpaceManager.INSTANCE.getAnimationManager();
     	this.offset = new LongPoint(x, y);
     	LongPoint mp = tail.getMatrix().getPosition();
-    	long cs = NodeTrixViz.CELL_SIZE/2;
-    	float alpha = 1f;
     	
-    	this.edgeRect = new VRectangle(mp.x+offset.x, mp.y+offset.y, 0, NodeTrixViz.CELL_SIZE/2, height/2, this.edgeColor, Color.white, alpha);	        
-    	vs.addGlyph(edgeRect);
-    	edgeRect.setOwner(this);
+    	long west = mp.x + x - NodeTrixViz.CELL_SIZE_HALF;
+		long north =  mp.y + y + NodeTrixViz.CELL_SIZE_HALF;
+		long east = mp.x + x + NodeTrixViz.CELL_SIZE_HALF;
+		
+		//non translucent glyph part
+    	LongPoint[] p = new LongPoint[4];
+    	p[0] = new LongPoint(east, north - index*height);
+    	p[1] = new LongPoint(east, north - (index+1)*height );
+    	p[2] = new LongPoint(west + (index+1)*height, north - (index+1)*height );
+    	p[3] = new LongPoint(west + index*height, north - index*height );
+    	glyph = new VPolygon(p, 0, edgeColor, edgeColor);
+    	glyph.setStrokeWidth(0);
+    	vs.addGlyph(glyph);
+    	glyph.setOwner(this);
     	
-    	//drawing inverse relation
-    	this.edgeRectInverse = new VRectangle(mp.x-offset.y, mp.y-offset.x, 0, NodeTrixViz.CELL_SIZE/2, height/2, this.edgeColor, Color.white, alpha);	        
-//    	vs.addGlyph(edgeRectInverse);
-    	edgeRectInverse.setOwner(this);
-    	
-    	
-    }
-    
-    void moveTo(long x, long y){
-        LongPoint mp = tail.getMatrix().getPosition();
-        edgeRect.moveTo(mp.x+offset.x, mp.y+offset.y);
-        edgeRectInverse.moveTo(mp.x+offset.x, mp.y+offset.y);
+    	//translucent glyph part
+    	p = new LongPoint[4];
+    	p[0] = new LongPoint(west, north - index*height);
+    	p[1] = new LongPoint(west + index*height, north - index*height);
+    	p[2] = new LongPoint(west + (index+1)*height, north - (index+1)*height);
+    	p[3] = new LongPoint(west, north - (index+1)*height );
+    	glyphTranslucent = new VPolygon(p, 0, edgeColor, edgeColor, NodeTrixViz.INTRA_TRANSLUCENCY);
+    	glyphTranslucent.setStrokeWidth(0);
+    	vs.addGlyph(glyphTranslucent);
+    	glyphTranslucent.setOwner(this);
+    	glyph.stick(glyphTranslucent);
 
     }
     
-    void move(long x, long y){
-        edgeRect.move(x, y);
-        edgeRectInverse.move(x, y);
+    //INTERACTION----------------------------------------------INTERACTION-----------------------------------------------INTERACTION-----------------------------------
+    
+    public void setState(int newState)
+    {
+    	if(interactionState == NodeTrixViz.IA_STATE_SELECTED && newState == NodeTrixViz.IA_STATE_FADE) return;
+    	
+    	newInteractionState = newState;
     }
     
+    public void perfomStateChange()
+    {
+    	if(newInteractionState == interactionState) return;
+    	
+	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHTED) highlight();
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
+	    else reset();
+	    interactionState = newInteractionState;
+    }
+    
+    private void reset()
+    {
+    	
+    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+    			glyph,
+      			1,
+    			false, 
+    			SlowInSlowOutInterpolator2.getInstance(), 
+    			null);	
+    	animManager.startAnimation(a, true);
+    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+    			glyphTranslucent,
+       			NodeTrixViz.INTRA_TRANSLUCENCY,
+    			false, 
+    			SlowInSlowOutInterpolator2.getInstance(), 
+    			null);	
+    	animManager.startAnimation(a, true);
+    }
+    
+    private void highlight()
+    {	
+    }
+    
+    private void select()
+    {
+    	
+    }
+    
+    private void fade()
+    {
+    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+				glyph,
+				NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
+				false, 
+				SlowInSlowOutInterpolator2.getInstance(), 
+				null);	
+		animManager.startAnimation(a, true);
+    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+				glyphTranslucent,
+				NodeTrixViz.INTRA_TRANSLUCENCY * NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
+				false, 
+				SlowInSlowOutInterpolator2.getInstance(), 
+				null);	
+		animManager.startAnimation(a, true);
+	}
+    
+    
+    
+    
+    
+  //MOVING----------------------------------------------MOVING-----------------------------------------------MOVING-----------------------------------
+    void moveTo(long x, long y){
+        LongPoint mp = tail.getMatrix().getPosition();
+        glyph.moveTo(mp.x+offset.x, mp.y+offset.y);
+    }
+    
+    void move(long x, long y){
+        glyph.move(x, y);
+    }
+    
+   
 
 }

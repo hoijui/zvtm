@@ -26,7 +26,7 @@ public class Messages {
     
     static final String mSpaceName = "Main Space";
     static final String aboutSpaceName = "About layer";
-    static final String mViewName = "ZVTM-NodeTrix";
+    public static final String mViewName = "ZVTM-NodeTrix";
     
     protected static void printCmdLineHelp(){
 		System.out.println("Usage:\n\tjava -jar target/zvtm-nodetrix-0.1.0-SNAPSHOT.jar <path_to_file> [options]");

@@ -24,9 +24,12 @@ import fr.inria.zvtm.nodetrix.lll.Node;
 public class NodeTrixViz {
     
     public static final Color GRID_COLOR = Color.getHSBColor(1f, 0.0f, 0.9f);
-	public static final float GRID_TRANSLUCENCY = 0.5f;
-	public static final float RELATION_ARROW_ALPHA = .2f;
+	public static final float GRID_TRANSLUCENCY = .5f;
+	public static final float INTRA_TRANSLUCENCY = .7f;
+	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
+	public static final int ANIM_DURATION = 300;
     static long CELL_SIZE = 20;
+    static long CELL_SIZE_HALF = CELL_SIZE/2;
     static Color MATRIX_FILL_COLOR = Color.WHITE;
     static Color MATRIX_STROKE_COLOR = Color.BLACK;
     static Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
@@ -36,6 +39,12 @@ public class NodeTrixViz {
     static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
     static float NODE_BACKGROUND_TRANSLUCENCY = 1f;
     static int LINLOG_ITERATIONS = 20;
+    
+    //INTERACTION STATES
+	public static final int IA_STATE_DEFAULT = 0;
+	public static final int IA_STATE_HIGHLIGHTED = 1;
+	public static final int IA_STATE_SELECTED = 2;
+	public static final int IA_STATE_FADE = 3;
     
     /* Links between matrices */
     static Color INTER_LINK_COLOR = Color.BLACK;

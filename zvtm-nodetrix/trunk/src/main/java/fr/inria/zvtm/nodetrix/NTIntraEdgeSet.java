@@ -17,8 +17,6 @@ public class NTIntraEdgeSet {
 	private LongPoint mp;
 	Glyph gTriangle, gTriangleInverse;
 	LongPoint offset;
-	Glyph[] triangles;
-	Glyph[] relationGlyphsInverse;
 	
 	public NTIntraEdgeSet()
 	{
@@ -28,30 +26,26 @@ public class NTIntraEdgeSet {
     {
     	this.offset = new LongPoint(x, y);
     	long h = (NodeTrixViz.CELL_SIZE) / this.intraEdges.size();
-		triangles = new Glyph[intraEdges.size()];
-		relationGlyphsInverse = new Glyph[intraEdges.size()];
 //		long csHalf = NodeTrixViz.CELL_SIZE/2;
 		
-		triangles = new Glyph[2];
 		int i = 0;
 		for(NTIntraEdge ie : this.intraEdges)
 		{ 
-			long y1 = (long) (y - NodeTrixViz.CELL_SIZE/2 + i*h + h/2); 
-			ie.createGraphics(h, y1,  x, 0, vs);
+			ie.createGraphics(h, y,  x, i, vs);
 			i++;
 		}
 		
-		//Triangle
-		LongPoint[] p = new LongPoint[3];
-		long cs = NodeTrixViz.CELL_SIZE/2;
-		p[0] = new LongPoint(m.getPosition().x + x - cs, m.getPosition().y + y + cs);
-		p[1] = new LongPoint(m.getPosition().x + x - cs, m.getPosition().y + y - cs);
-		p[2] = new LongPoint(m.getPosition().x + x + cs, m.getPosition().y + y - cs);
-		gTriangle = new VPolygon(p, 0, Color.white, Color.white, NodeTrixViz.RELATION_ARROW_ALPHA);
-		vs.addGlyph(gTriangle);
-		gTriangle.setSensitivity(false);
-		this.triangles[0]= gTriangle;
-		m.bkg.stick(gTriangle);
+//		//Triangle
+//		LongPoint[] p = new LongPoint[3];
+//		long cs = NodeTrixViz.CELL_SIZE/2;
+//		p[0] = new LongPoint(m.getPosition().x + x - cs, m.getPosition().y + y + cs);
+//		p[1] = new LongPoint(m.getPosition().x + x - cs, m.getPosition().y + y - cs);
+//		p[2] = new LongPoint(m.getPosition().x + x + cs, m.getPosition().y + y - cs);
+//		gTriangle = new VPolygon(p, 0, Color.white, Color.white, NodeTrixViz.RELATION_ARROW_ALPHA);
+//		vs.addGlyph(gTriangle);
+//		gTriangle.setSensitivity(false);
+//		this.triangles[0]= gTriangle;
+//		m.bkg.stick(gTriangle);
 		
 //		//inverse Triangle
 //		p = new LongPoint[3];

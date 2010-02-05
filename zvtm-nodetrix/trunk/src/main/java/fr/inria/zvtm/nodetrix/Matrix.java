@@ -10,6 +10,8 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
@@ -21,10 +23,11 @@ public class Matrix {
     
     String name;
     NTNode[] nodes;
+    HashSet<NTIntraEdge> intraEdges = new HashSet<NTIntraEdge>();
     
     // bkg is both the matrix background and the label background for single node matrices
     VRectangle bkg;
-//    VRectangle[] label_bkg;
+//  VRectangle[] label_bkg;
     VText matrixLb;
     long matrixLbDX = 0;
     long matrixLbDY = 0;
@@ -100,7 +103,6 @@ public class Matrix {
         for(NTNode n : this.nodes)
         {
         	n.setBackgroundBox(max_length);
-        
         	if(this.nodes.length == 1) break;
         	
         	//GRID PATTERN
@@ -179,6 +181,7 @@ public class Matrix {
             	//Instantiate
             	for(NTEdge e : n.getOutgoingEdges()){
             		 if (e instanceof NTIntraEdge){
+            			 intraEdges.add((NTIntraEdge) e);
             			 NTIntraEdgeSet ies = new NTIntraEdgeSet();
             			 n.addIntraEdgeSet(ies);
             			 intraEdgeSetMap.put(e.head, ies);
@@ -267,4 +270,8 @@ public class Matrix {
         CELL_SIZE = cs;
     }
     
+    public HashSet<NTIntraEdge> getIntraEdges()
+    {
+    	return this.intraEdges;
+    }
 }
