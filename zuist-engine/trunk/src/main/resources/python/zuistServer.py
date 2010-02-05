@@ -26,6 +26,9 @@ from mapnik import *
 import os
 
 TILE_DIR = "/var/www/tiles"
+CACHE_DIR = "%s/cache" % TILE_DIR
+
+TILE_SIZE = 512
 
 ###############################################################################
 # MAIN
@@ -46,20 +49,21 @@ def getTile(req, z=-1, col=-1, row=-1):
 
 def generateTile(req, z=-1, col=-1, row=-1):
     ll = (-6.5, 49.5, -6.4, 51)
-    z = 1
-    imgx = 512 * z
-    imgy = 512 * z
-    m = Map(imgx,imgy)
+    m = Map(TILE_SIZE, TILE_SIZE)
     load_map(m, os.environ['MAPNIK_MAP_FILE'])
     prj = Projection("+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over")
     c0 = prj.forward(Coord(ll[0],ll[1]))
     c1 = prj.forward(Coord(ll[2],ll[3]))
     bbox = Envelope(c0.x,c0.y,c1.x,c1.y)
     m.zoom_to_box(bbox)
-    im = Image(imgx,imgy)
+    im = Image(TILE_SIZE, TILE_SIZE)
     render(m, im)
-    view = im.view(0,0,imgx,imgy) # x,y,width,height
-    map_path = "%s/cache/%s" % (TILE_DIR, "image.png")
+    view = im.view(0, 0, TILE_SIZE, TILE_SIZE) # x,y,width,height
+    map_path = "%s/%s/%s/%s.png" % (CACHE_DIR, z, col, row)
+    if not os.path.exists("%s/%s/%s" % (CACHE_DIR, z, col)):
+        if not os.path.exists("%s/%s" % (CACHE_DIR, z)):
+            os.mkdir("%s/%s" % (CACHE_DIR, z))
+        os.mkdir("%s/%s/%s" % (CACHE_DIR, z, col))
     view.save(map_path, 'png')
     req.content_type = 'image/png'
     req.send_http_header()
