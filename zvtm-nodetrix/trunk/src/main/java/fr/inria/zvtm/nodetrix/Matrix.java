@@ -76,12 +76,6 @@ public class Matrix {
             }	        
 	    }
 	    else {
-	        // bkg is both the matrix background and the label background for single node matrices
-//            bkg = new VRectangle(x, y, 0,
-//                                 nodes.length*NodeTrixViz.CELL_SIZE/2, nodes.length*NodeTrixViz.CELL_SIZE/2,
-//                                 NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
-//            vs.addGlyph(bkg);
-//            bkg.setOwner(this);
 	        // if matrix contains a single node, only show a horizontal label
 	        nodes[0].createGraphics(0, 0, 0, 0, vs, true, Color.getHSBColor(0.1f, 0.8f, 1.0f));
     	    nodes[0].moveTo(x, y);
@@ -90,7 +84,8 @@ public class Matrix {
     }
     
     void finishCreateNodeGraphics(VirtualSpace vs){
-        long max_length = nodes[0].getLabelWidth();
+        //estimating maximal length of node labels
+    	long max_length = nodes[0].getLabelWidth();
         int i =0;
         for (NTNode n : this.nodes){
         	if (nodes[i].getLabelWidth() > max_length){
@@ -98,30 +93,40 @@ public class Matrix {
             }
         	i++;
         }
-        
         max_length += NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2;
-        //creating particular background boxes for each node.s
-        i = 0;
+        
+        //creating background boxes for each node
+        i = 1;
         for(NTNode n : this.nodes)
         {
         	n.setBackgroundBox(max_length);
+        
+        	if(this.nodes.length == 1) break;
         	
         	//GRID PATTERN
         	if(i % 2 == 0)
         	{
-        		VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE/2, bkg.getWidth(), NodeTrixViz.GRID_COLOR);
+        		VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE/2, bkg.getWidth(), NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
         		gGridV.setDrawBorder(false);
-        		gGridV.setTranslucencyValue( NodeTrixViz.GRID_TRANSLUCENCY);
         		vs.addGlyph(gGridV);
         		gGridV.setSensitivity(false);
         		bkg.stick(gGridV);
         		
-        		VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR);
+        		VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR,  NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
         		gGridH.setDrawBorder(false);
-        		gGridH.setTranslucencyValue( NodeTrixViz.GRID_TRANSLUCENCY);
         		vs.addGlyph(gGridH);
         		gGridH.setSensitivity(false);
         		bkg.stick(gGridH);
+        		
+        		if(i % 10 == 0)
+        		{
+        			gGridV.setColor(Color.LIGHT_GRAY);
+        			gGridV.setBorderColor(Color.LIGHT_GRAY);
+        			gGridV.setTranslucencyValue(NodeTrixViz.GRID_TRANSLUCENCY * .7f);
+        			gGridH.setColor(Color.LIGHT_GRAY);
+        			gGridH.setBorderColor(Color.LIGHT_GRAY);
+        			gGridH.setTranslucencyValue(NodeTrixViz.GRID_TRANSLUCENCY * .7f);
+                }
         	}   
         	
         	//SYMMETRY AXIS
@@ -189,18 +194,11 @@ public class Matrix {
 
                             // remember
                             reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
-                    	}
-                        else {
+                    	}else {
+                    		// add intraedge to edgeset
                         	intraEdgeSetMap.get(e.head).addIntraEdge((NTIntraEdge)e);
-                        	
-//                        	int h = (int) ((NodeTrixViz.CELL_SIZE) / rMap.get(oe.head)[0]);
-//                        	int i = rMap.get(oe.head)[1];rMap.get(oe.head)[1]++;
-//                        	long y = oe.getTail().wdy - NodeTrixViz.CELL_SIZE/2 + i*h + h/2; 
-//                        	oe.createGraphics(h, oe.getTail().wdy, oe.getHead().ndx, 0, vs);
-//                        	oe.createGraphics(h, y, oe.getHead().ndx, 0, vs);
                         }
-                    }
-                    else {
+                    }else {
                         // instanceof NTExtraEdge
                         e.createGraphics(0, 0, 0, 0, vs);
                     }
@@ -212,44 +210,6 @@ public class Matrix {
             		intraEdgeSetMap.get(nRel).createGraphics(0, n.wdy, nRel.ndx, 0 , vs, this);
             	}
             }
-            	
-//                for (NTEdge oe:node.getOutgoingEdges()){
-//                	 if (oe instanceof NTIntraEdge){
-//              	       	 NTNode n = oe.head;
-//              	       	 if (rMap.containsKey(n)) {
-//              	       		 rMap.get(n)[0] += 1; ;
-//              	       	 }
-//              	        else {
-//                			 Integer[] i = new Integer[2];
-//                			 i[0] = 1;
-//                			 i[1] = 0;
-//                			 rMap.put(n, i);}
-//                	 }
-//                }                 
-//                for (NTEdge oe:node.getOutgoingEdges()){
-//                    // values that are 0 is because we do not care (not used)
-//                    if (oe instanceof NTIntraEdge){
-//                    	if (oe.tail == oe.head && nodes.length == 1){
-//                            oe.createGraphics(NodeTrixViz.CELL_SIZE/2, oe.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
-//                                              oe.getHead().ndx-bkg.getWidth()+reflexiveProp4SingleNodeMatOffset, 0, vs);
-//
-//                            // remember
-//                            reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
-//
-//                        }
-//                        else {
-////                        	int h = (int) ((NodeTrixViz.CELL_SIZE) / rMap.get(oe.head)[0]);
-////                        	int i = rMap.get(oe.head)[1];rMap.get(oe.head)[1]++;
-//                        	long y = oe.getTail().wdy - NodeTrixViz.CELL_SIZE/2 + i*h + h/2; 
-////                        	oe.createGraphics(h, oe.getTail().wdy, oe.getHead().ndx, 0, vs);
-//                        	oe.createGraphics(h, y, oe.getHead().ndx, 0, vs);
-//                        }
-//                    }
-//                    else {
-//                        // instanceof NTExtraEdge
-//                        oe.createGraphics(0, 0, 0, 0, vs);
-//                    }
-//                }
          }
         
     }
@@ -271,8 +231,8 @@ public class Matrix {
         bkg.move(x, y);
         for (NTNode node : nodes){
             node.move(x, y);
-            if (node.getOutgoingEdges() != null){
-                for (NTEdge edge : node.getOutgoingEdges()){
+            if (node.intraEdgeSets != null){
+                for (NTIntraEdgeSet edge : node.intraEdgeSets){
                     edge.move(x,y);
                 }
             }

@@ -37,10 +37,6 @@ public class NTIntraEdge extends NTEdge {
     	long cs = NodeTrixViz.CELL_SIZE/2;
     	float alpha = 1f;
     	
-		VText text = new VText(mp.x+x + 10 , mp.y+y, 0, Color.black, head.labelW.getText()); 
-//		vs.addGlyph(text);
-
-    	
     	this.edgeRect = new VRectangle(mp.x+offset.x, mp.y+offset.y, 0, NodeTrixViz.CELL_SIZE/2, height/2, this.edgeColor, Color.white, alpha);	        
     	vs.addGlyph(edgeRect);
     	edgeRect.setOwner(this);
