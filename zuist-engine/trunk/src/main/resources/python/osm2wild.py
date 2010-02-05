@@ -216,7 +216,7 @@ class RenderThread:
                         levels = "%s;%s" % (z, MAX_ZOOM)
                         self.xmlLock.acquire()
                         self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, x, y, w, h))
-                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"sea.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, x, y, w, h, zi))
+                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"http://data.wild.lri.fr/tiles/sea.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, x, y, w, h, zi))
                         self.zf.write("  </region>\n")
                         self.xmlLock.release()
                         et[ID] = None
@@ -235,7 +235,7 @@ class RenderThread:
                         levels = "%s;%s" % (z, MAX_ZOOM)
                         self.xmlLock.acquire()
                         self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, x, y, w, h))
-                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"lnd.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, x, y, w, h, zi))
+                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"http://data.wild.lri.fr/tiles/lnd.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, x, y, w, h, zi))
                         self.zf.write("  </region>\n")
                         self.xmlLock.release()
                         et[ID] = None
@@ -246,7 +246,8 @@ class RenderThread:
                         self.printLock.release()
                 else:
                     # non-empty tile
-                    src = tile_uri[len(tile_dir):]
+                    #src = tile_uri[len(tile_dir):]
+                    src = "http://data.wild.lri.fr/tiles/%s/%s/%s.png" % (z, x, y)
                     if z == 0:
                         levels = "0;%s" % MAX_ZOOM
                         ci = ""
@@ -257,7 +258,7 @@ class RenderThread:
                     self.zf.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, x, y, w, h))
                     self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, x, y, w, h, zi))
                     self.zf.write("  </region>\n")
-                    self.xmlLock.release()                
+                    self.xmlLock.release()
             
             self.zf.flush()
             self.q.task_done()
@@ -391,7 +392,7 @@ if __name__ == "__main__":
     try:
         tile_dir = os.environ['MAPNIK_TILE_DIR']
     except KeyError:
-        tile_dir = home + "/osm/tiles/"
+        tile_dir = home + "/mapnik/tiles/"
     
-    bbox = (-180.0,-90.0, 180.0,90.0)
+    bbox = (-5.24, -41.25, 10.16, 51.11)
     render_tiles(bbox, mapfile, tile_dir, MIN_ZOOM, MAX_ZOOM, "World")
