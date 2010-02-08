@@ -15,14 +15,14 @@ public class NTIntraEdgeSet {
 
 	private Vector<NTIntraEdge> intraEdges = new Vector<NTIntraEdge>();
 	private LongPoint mp;
-	Glyph gTriangle, gTriangleInverse;
+	Glyph g;
 	LongPoint offset;
 	
 	public NTIntraEdgeSet()
 	{
 	}
 	
-    void createGraphics(long height, long y, long x, long noMeaning, VirtualSpace vs, Matrix m)
+    void createGraphics(long noMeaning1, long y, long x, long noMeaning2, VirtualSpace vs, Matrix m)
     {
     	this.offset = new LongPoint(x, y);
     	long h = (NodeTrixViz.CELL_SIZE) / this.intraEdges.size();
@@ -34,6 +34,13 @@ public class NTIntraEdgeSet {
 			ie.createGraphics(h, y,  x, i, vs);
 			i++;
 		}
+		
+		//adding invisible rectangle triggering events
+		g = new VRectangle(m.bkg.vx + x, m.bkg.vy + y,0, NodeTrixViz.CELL_SIZE_HALF - 3, NodeTrixViz.CELL_SIZE_HALF - 3, Color.BLACK);
+		g.setVisible(false);
+		g.setOwner(intraEdges.firstElement());
+		vs.addGlyph(g);
+		m.bkg.stick(g);
 		
 //		//Triangle
 //		LongPoint[] p = new LongPoint[3];
@@ -161,14 +168,21 @@ public class NTIntraEdgeSet {
 //		
 	}
     
+    public void onTop(VirtualSpace vs){
+    	for(NTIntraEdge ie: this.intraEdges){ ie.onTop(vs);}
+    	vs.onTop(g);
+    }
+    
     public void move(long x, long y)
     {
     	for(NTIntraEdge ie: this.intraEdges){ ie.move(x, y);}
+//    	this.g.move(x,y);
     }
     
     public void moveTo(long x, long y)
     {
      	for(NTIntraEdge ie: this.intraEdges){ ie.moveTo(x, y);}
+//    	this.g.moveTo(x,y);
     }
  
    

@@ -33,12 +33,14 @@ public class NTNode {
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
+	/* stores the matrix centre coordinates*/
+	long mx, my; 
 	/* Vertical label, can be null if matrix contains this node only */
 	VTextOr labelN;
 	/* Horizontal label */
 	VText labelW;
 	/* Background box*/
-	VRectangle gBackgroundW, gGridV, gGridH;
+	VRectangle gBackgroundW;
 	VRectangleOr gBackgroundN;
 	Color backgroundColor;
 	/* If this node has no matrix*/
@@ -47,13 +49,15 @@ public class NTNode {
 	VirtualSpace vs;
 	
 	Object owner;
-
-	private long width;
+	
+	/**Stores the half width, since double width is never used */
+	private long widthHalf;
 	
 	/* interaction*/
 	AnimationManager animManager; 
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
 	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
+
 	
 	
 	
@@ -77,13 +81,9 @@ public class NTNode {
 	    gBackgroundW.stick(this.labelW);
 	    gBackgroundW.setOwner(this);
 		vs.addGlyph(gBackgroundW);
+//		vs.onTop(gBackgroundW);
 	    vs.addGlyph(labelW);
 	    
-//	    gGridV = new VRectangle(vx + n.ndx, vy,0, NodeTrixViz.CELL_SIZE/2, bkg.getWidth(), NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
-//		gGridV.setDrawBorder(false);
-//		vs.addGlyph(gGridV);
-//		gGridV.setSensitivity(false);
-//		
 	    
 	    if (!single){
     	    this.ndx = ndx;
@@ -94,29 +94,24 @@ public class NTNode {
     	    gBackgroundN.setDrawBorder(false);
     	    gBackgroundN.setOwner(this);
     	    gBackgroundN.stick(this.labelN);
-    		vs.addGlyph(gBackgroundN);
-    		vs.addGlyph(labelN);
     	    gBackgroundN.setOwner(this);
+    		vs.addGlyph(gBackgroundN);
+//    		vs.onTop(gBackgroundN);
+    		vs.addGlyph(labelN);
 
-//    	    VRectangle gGridH = new VRectangle(0,0,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR,  NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
-//    	    gGridH.setDrawBorder(false);
-//    	    vs.addGlyph(gGridH);
-//    	    gGridH.setSensitivity(false);
-//    	    bkg.stick(gGridH);
+
 		}
     }
     
     public void moveTo(long x, long y){
-//        labelW.moveTo(x+wdx, y+wdy + LABEL_Y_CENTERING_OFFSET);
         gBackgroundW.moveTo(x+wdx, y+wdy);
-//        if (labelN != null)			labelN.moveTo(x+ndx - LABEL_Y_CENTERING_OFFSET, y+ndy);            
+        mx = x; my = y;
         if (gBackgroundN != null)	gBackgroundN.moveTo(x+ndx, y+ndy);            
     }
     
     public void move(long x, long y){
-//        labelW.move(x, y);
-        gBackgroundW.move(x,y);
-//        if (labelN != null)		    labelN.move(x, y);
+    	mx += x; my += y;
+    	gBackgroundW.move(x,y);
         if (gBackgroundN != null)	gBackgroundN.move(x,y);        
     }
     
@@ -138,26 +133,31 @@ public class NTNode {
 	    interactionState = newInteractionState;
     }
     
-    private void reset()
+    public void reset()
     {
-        Animation a;
-//    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
-//    			labelW, 1, false, SlowInSlowOutInterpolator2.getInstance(),null);	
-//    	animManager.startAnimation(a, true);
-//		a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
-//				gBackgroundW, 1, false, SlowInSlowOutInterpolator2.getInstance(),null);	
-//		animManager.startAnimation(a, true);
+		//COLOR
+		this.gBackgroundW.setColor(backgroundColor);
+		
 		if(!single)
 		{
-//			a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
-//					labelN, 1, false, SlowInSlowOutInterpolator2.getInstance(),null);	
-//			animManager.startAnimation(a, true);
-//			a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
-//					gBackgroundN, 1, false, SlowInSlowOutInterpolator2.getInstance(),null);	
-//			animManager.startAnimation(a, true);
+			//POSITIONS
+			Animation a = animManager.getAnimationFactory()
+			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
+					new LongPoint(mx + wdx,my + wdy),
+					false, 
+					SlowInSlowOutInterpolator2.getInstance(), 
+					null);
+			animManager.startAnimation(a, true);
+			
+			a = animManager.getAnimationFactory()
+			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
+					new LongPoint(mx + ndx,my + ndy),
+					false, 
+					SlowInSlowOutInterpolator2.getInstance(), 
+					null);
+			animManager.startAnimation(a, true);
 			this.gBackgroundN.setColor(backgroundColor);
 		}
-		this.gBackgroundW.setColor(backgroundColor);
     }
     
     private void highlight()
@@ -174,6 +174,47 @@ public class NTNode {
     {
     }
     
+    /**Method that is called to force the labels of this Node come onto sceen when user clicks and holds
+     * on a relation in the matrix.
+     * @param tail - if true, the western label is moved, if false, the northern one.
+     */
+    public void forceEnterScreen(boolean tail)
+    {
+    	if(single) return;	
+    	
+    	long[] p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
+    	if(tail){
+    		if((mx + wdx - widthHalf) < p[0]){
+    			Animation a = animManager.getAnimationFactory()
+ 					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
+ 							new LongPoint(p[0] + widthHalf, gBackgroundW.vy),
+ 							false, 
+ 							SlowInSlowOutInterpolator2.getInstance(), 
+ 							null);
+ 				animManager.startAnimation(a, true);
+    		}
+    	}else{
+    		if((my + ndy + widthHalf) > p[1]){	
+ 				Animation a = animManager.getAnimationFactory()
+ 					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
+ 							new LongPoint(gBackgroundN.vx, p[1] - widthHalf),
+ 							false, 
+ 							SlowInSlowOutInterpolator2.getInstance(), 
+ 							null);
+ 				animManager.startAnimation(a, true);
+ 	    	}
+    	}
+    }
+    
+    public void onTop() {
+    	vs.onTop(gBackgroundW);
+    	vs.onTop(labelW);
+    	if(!single){
+    		vs.onTop(gBackgroundN);
+    		vs.onTop(labelN);
+    	}
+    }
+    
     
     //GETTER/SETTER--------------------------------------------------------------------------------------------
     
@@ -182,25 +223,27 @@ public class NTNode {
      * the matrix. A gradiant is applied according to the position of the node in the list.
      */
 	public void setBackgroundBox(long maxLength) {
-		this.width = maxLength;
-		this.gBackgroundW.setWidth(maxLength/2);
+		this.widthHalf = maxLength/2;
+		wdx -= widthHalf;
+		ndy += widthHalf;
+		this.gBackgroundW.setWidth(widthHalf);
 		if (!this.single){
-			this.gBackgroundW.move(-maxLength/2, 0);
-			this.labelW.move(maxLength/2, 0);
-			gBackgroundN.setWidth(maxLength/2);
-			this.gBackgroundN.move(0, maxLength/2);
-			this.labelN.move(0,-maxLength/2);
+			this.gBackgroundW.move(-widthHalf, 0);
+			this.labelW.move(widthHalf, 0);
+			gBackgroundN.setWidth(widthHalf);
+			this.gBackgroundN.move(0, widthHalf);
+			this.labelN.move(0,-widthHalf);
 		}
 	}
 
 	public int getBoxWidth(boolean west) {
 //		return west ? this.gBackgroundW.getBounds().length : ((this.gBackgroundN != null) ? this.gBackgroundN.getBounds().length : 0);
-		return (int)this.width/2;
+		return (int)this.widthHalf;
 	}
 
 	public long getWidth() 
 	{
-		return this.width/2;
+		return this.widthHalf;
 	}
     public void addOutgoingEdge(NTEdge e){
     	if (outgoingEdges == null){
@@ -227,30 +270,6 @@ public class NTNode {
     		incomingEdges = na;
     	}
     }
-    
-    public void approachRelation(boolean west)
-    {
-    	if(single) return;
- 		
- 		long[] p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
- 		if(west){
- 			if((gBackgroundW.vx - width) < p[0]){
-// 				Animation a = animManager.getAnimationFactory().createGlyphTranslation(10000, gBackgroundW, new LongPoint(p[0], gBackgroundW.vy),false, SlowInSlowOutInterpolator2.getInstance(), null);
- 				gBackgroundW.vx = p[0];
-// 				animManager.startAnimation(a, true);
- 			}
-    	}else{
- 			if((gBackgroundN.vy + width) > p[1]){	
- 				gBackgroundN.vy = ndy - p[1];
- 			}
-    	}
-    }
-  
-    public void resetPosition()
-    {
-		gBackgroundW.moveTo(0, 0);
-		if(!single)gBackgroundN.moveTo(0, 0);
- 	}
     
     public void addIntraEdgeSet(NTIntraEdgeSet ies)
     {
@@ -294,6 +313,8 @@ public class NTNode {
     long getLabelWidth(){
     	return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
+
+
 
 
 }

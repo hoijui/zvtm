@@ -23,7 +23,7 @@ import fr.inria.zvtm.glyphs.VTriangleOr;
 
 public class NTIntraEdge extends NTEdge {
     
-    Glyph glyph, glyphTranslucent, glyphInverse;
+    Glyph glyph, glyphTranslucent;
 	LongPoint offset;
 	AnimationManager animManager;
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
@@ -54,8 +54,9 @@ public class NTIntraEdge extends NTEdge {
     	p[3] = new LongPoint(west + index*height, north - index*height );
     	glyph = new VPolygon(p, 0, edgeColor, edgeColor);
     	glyph.setStrokeWidth(0);
+//    	glyph.setOwner(this);
+    	glyph.setSensitivity(false);
     	vs.addGlyph(glyph);
-    	glyph.setOwner(this);
     	
     	//translucent glyph part
     	p = new LongPoint[4];
@@ -65,9 +66,10 @@ public class NTIntraEdge extends NTEdge {
     	p[3] = new LongPoint(west, north - (index+1)*height );
     	glyphTranslucent = new VPolygon(p, 0, edgeColor, edgeColor, NodeTrixViz.INTRA_TRANSLUCENCY);
     	glyphTranslucent.setStrokeWidth(0);
-    	vs.addGlyph(glyphTranslucent);
-    	glyphTranslucent.setOwner(this);
+//    	glyphTranslucent.setOwner(this);
+    	glyphTranslucent.setSensitivity(false);
     	glyph.stick(glyphTranslucent);
+    	vs.addGlyph(glyphTranslucent);
 
     }
     
@@ -94,14 +96,14 @@ public class NTIntraEdge extends NTEdge {
     private void reset()
     {
     	
-    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
     			glyph,
       			1,
     			false, 
     			SlowInSlowOutInterpolator2.getInstance(), 
     			null);	
     	animManager.startAnimation(a, true);
-    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
     			glyphTranslucent,
        			NodeTrixViz.INTRA_TRANSLUCENCY,
     			false, 
@@ -121,14 +123,14 @@ public class NTIntraEdge extends NTEdge {
     
     private void fade()
     {
-    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
 				glyph,
 				NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
 				false, 
 				SlowInSlowOutInterpolator2.getInstance(), 
 				null);	
 		animManager.startAnimation(a, true);
-    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.ANIM_DURATION,
+    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
 				glyphTranslucent,
 				NodeTrixViz.INTRA_TRANSLUCENCY * NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
 				false, 
@@ -150,6 +152,11 @@ public class NTIntraEdge extends NTEdge {
     void move(long x, long y){
         glyph.move(x, y);
     }
+
+	public void onTop(VirtualSpace vs) {
+		vs.onTop(this.glyph);
+		vs.onTop(this.glyphTranslucent);
+	}
     
    
 

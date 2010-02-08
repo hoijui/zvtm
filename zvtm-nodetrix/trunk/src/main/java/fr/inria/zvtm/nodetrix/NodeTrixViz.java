@@ -9,6 +9,8 @@ package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.Map;
 import java.util.HashMap;
@@ -27,7 +29,6 @@ public class NodeTrixViz {
 	public static final float GRID_TRANSLUCENCY = .5f;
 	public static final float INTRA_TRANSLUCENCY = .7f;
 	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
-	public static final int ANIM_DURATION = 300;
     static long CELL_SIZE = 20;
     static long CELL_SIZE_HALF = CELL_SIZE/2;
     static Color MATRIX_FILL_COLOR = Color.WHITE;
@@ -40,7 +41,11 @@ public class NodeTrixViz {
     static float NODE_BACKGROUND_TRANSLUCENCY = 1f;
     static int LINLOG_ITERATIONS = 20;
     
-    //INTERACTION STATES
+    //ANIMATION DURATIOS in msec
+    public static final int DURATION_GENERAL = 300;
+	public static final int DURATION_NODEMOVE = 300;    
+
+	//INTERACTION STATES
 	public static final int IA_STATE_DEFAULT = 0;
 	public static final int IA_STATE_HIGHLIGHTED = 1;
 	public static final int IA_STATE_SELECTED = 2;
@@ -57,8 +62,9 @@ public class NodeTrixViz {
     }
     
     public Matrix addMatrix(String name, Vector<NTNode> nodes){
-        Matrix res = new Matrix(name, nodes.toArray(new NTNode[nodes.size()]));
-        Matrix[] na = new Matrix[matrices.length+1];
+//        Matrix res = new Matrix(name, nodes.toArray(new NTNode[nodes.size()]));
+        Matrix res = new Matrix(name, nodes);
+    	Matrix[] na = new Matrix[matrices.length+1];
         System.arraycopy(matrices, 0, na, 0, matrices.length);
         na[matrices.length] = res;
         matrices = na;
@@ -122,7 +128,7 @@ public class NodeTrixViz {
                         llg.put(matrix, new HashMap<Matrix,Double>());
                         orphanMatrices.remove(matrix);
                     }
-                    llg.get(matrix).put(matrix2, new Double(matrix.nodes.length));
+                    llg.get(matrix).put(matrix2, new Double(matrix.nodes.size()));
                 }
             }
         }
@@ -161,6 +167,12 @@ public class NodeTrixViz {
         for (Matrix m:matrices){
 		    m.createEdgeGraphics(vs);
 		}
+        
+        Arrays.sort(matrices, new MatrixSizeComparator());
+        for (Matrix m:matrices){
+		    m.bringToFront(vs);
+		}
+        
     }
     
     private static Map<Matrix,Map<Matrix,Double>> makeSymmetricGraph(Map<Matrix,Map<Matrix,Double>> graph){
