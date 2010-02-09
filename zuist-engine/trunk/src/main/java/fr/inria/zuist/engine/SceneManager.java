@@ -7,11 +7,14 @@
 
 package fr.inria.zuist.engine;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Font;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
+import javax.swing.Timer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -19,6 +22,7 @@ import java.net.MalformedURLException;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Enumeration;
 
 import org.w3c.dom.Element;
@@ -126,6 +130,7 @@ public class SceneManager implements CameraListener {
     final VirtualSpace[] sceneLayers;
     final Camera[] sceneCameras;
     final float[] prevAlts; //previous altitudes
+    private final RegionUpdater regUpdater = new RegionUpdater();
 
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable id2region;
@@ -143,6 +148,54 @@ public class SceneManager implements CameraListener {
     HashMap sceneAttrs;
     
     HashMap RESOURCE_HANDLERS;
+
+    private class RegionUpdater {
+        private final HashMap<Camera, Location> toUpdate;
+        private boolean active;
+        private static final int DEFAULT_PERIOD = 200; //milliseconds
+
+        RegionUpdater(){
+            toUpdate = new HashMap<Camera, Location>();
+            active = false;
+        }
+
+        void addEntry(Camera cam, Location loc){
+            //add or overwrite update target 
+            toUpdate.put(cam, loc);
+
+            //if not active, create timer task and start it
+            if(active) return;
+            ActionListener action = new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent event){
+                    for(Map.Entry<Camera, Location> entry: toUpdate.entrySet()){
+                        Camera cam = entry.getKey();
+                        float alt = entry.getValue().alt;
+                        int layerIndex = getLayerIndex(cam);
+                        if(layerIndex == -1){
+                            System.err.println("Camera " + cam + "is not tracked by ZUIST");
+                            return;
+                        }
+                        long[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
+                        //update regions
+                        if(alt != prevAlts[layerIndex]){
+                            prevAlts[layerIndex] = alt;
+                            updateLevel(layerIndex, cameraBounds, alt);
+                        } else {
+                            updateVisibleRegions(layerIndex, cameraBounds);
+                        }
+
+                    }
+                    active = false;
+                    toUpdate.clear(); 
+                 }
+        };
+        active = true;
+        Timer t = new Timer(DEFAULT_PERIOD, action);
+        t.setRepeats(false);
+        t.start();
+    }
+}
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vss virtual spaces in which the scene will be loaded
@@ -1043,20 +1096,7 @@ public class SceneManager implements CameraListener {
     /* Camera events handling */
     @Override
     public void cameraMoved(Camera cam, LongPoint loc, float alt){
-        //XXX ugly: getOwningSpace should be an operation of Camera
-        long[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
-        int layerIndex = getLayerIndex(cam);
-        if(layerIndex == -1){
-            System.err.println("Camera " + cam + "is not tracked by ZUIST");
-            return;
-        }
-
-        if(alt != prevAlts[layerIndex]){
-            prevAlts[layerIndex] = alt;
-            updateLevel(layerIndex, cameraBounds, alt);
-        } else {
-            updateVisibleRegions(layerIndex, cameraBounds);
-        }
+        regUpdater.addEntry(cam, new Location(loc.x, loc.y, alt));
     }
 
     /** 
