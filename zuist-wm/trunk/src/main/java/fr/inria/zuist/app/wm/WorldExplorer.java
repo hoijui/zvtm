@@ -126,8 +126,6 @@ public class WorldExplorer implements Java2DPainter {
         Camera[] sceneCameras = {mCamera, bCamera};
 		//vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setSceneCameraBounds(mCamera, eh.wnes);
-        sm.setSceneCameraBounds(bCamera, eh.wnes);
         sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
         if (grid){buildGrid();}
         gm = new GeoToolsManager(this, queryGN);
@@ -297,7 +295,6 @@ public class WorldExplorer implements Java2DPainter {
     }
     
     void altitudeChanged(){
-        sm.updateLevel(mCamera.altitude);
     }
     
     void updatePanelSize(){

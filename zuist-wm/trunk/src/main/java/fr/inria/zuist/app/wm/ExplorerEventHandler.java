@@ -325,14 +325,11 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
         application.mView.getVisibleRegion(application.mCamera, wnes);
         float alt = application.mCamera.getAltitude();
         if (alt != oldCameraAltitude){
-            // camera was an altitude change
-            application.altitudeChanged();
             oldCameraAltitude = alt;
         }
         else {
             // camera movement was a simple translation
 			//dut.cancelUpdate();
-            application.sm.updateVisibleRegions();
         }        
     }
 
