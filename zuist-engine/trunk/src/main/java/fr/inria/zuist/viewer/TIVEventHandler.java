@@ -15,8 +15,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
 import java.util.Vector;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VCursor;
@@ -27,7 +25,6 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.engine.OverviewPortal;
 import fr.inria.zvtm.engine.PortalEventHandler;
@@ -38,7 +35,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, ComponentListener, PortalEventHandler {
+class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -54,10 +51,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     long lastVX, lastVY;
     int currentJPX, currentJPY;
 
-    /* bounds of region in virtual space currently observed through mCamera */
-    long[] wnes = new long[4];
-    float oldCameraAltitude;
-
     boolean mCamStickedToMouse = false;
     boolean regionStickedToMouse = false;
     boolean inPortal = false;
@@ -65,28 +58,16 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     TiledImageViewer application;
     TIVNavigationManager nm;
     
-    Glyph g;
-    
     boolean cursorNearBorder = false;
     boolean panning = false;
     
-	DelayedUpdateTimer dut;
-	
 	// region selection
 	boolean selectingRegion = false;
 	long x1, y1, x2, y2;
 
     TIVExplorerEventHandler(TiledImageViewer app){
         this.application = app;
-        oldCameraAltitude = this.application.mCamera.getAltitude();
-		initDelayedUpdateTimer();
     }
-
-	void initDelayedUpdateTimer(){
-		Timer timer = new Timer();
-		dut = new DelayedUpdateTimer(this);
-		timer.scheduleAtFixedRate(dut, DELAYED_UPDATE_FREQUENCY, DELAYED_UPDATE_FREQUENCY);
-	}
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
@@ -102,7 +83,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 				double rh = (jpy-application.nm.ovPortal.y) / (double)application.nm.ovPortal.h;
                 application.mCamera.moveTo(Math.round(rw*(application.nm.scene_bounds[2]-application.nm.scene_bounds[0]) + application.nm.scene_bounds[0]),
                                            Math.round(rh*(application.nm.scene_bounds[3]-application.nm.scene_bounds[1]) + application.nm.scene_bounds[1]));
-				cameraMoved(null, null, 0);
 				// position camera where user has pressed, and then allow seamless dragging
 				regionStickedToMouse = true;
 			}
@@ -213,7 +193,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
                 application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
                 lastJPX = jpx;
                 lastJPY = jpy;
-                cameraMoved(null, null, 0);
             }
             if (nm.lensType != 0 && nm.lens != null){
         	    nm.moveLens(jpx, jpy, e.getWhen());
@@ -222,7 +201,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 		else if (regionStickedToMouse){
 			float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
 			application.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
-			dut.requestUpdate();
 			lastJPX = jpx;
 			lastJPY = jpy;
 		}
@@ -242,13 +220,11 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
             if (wheelDirection  == WHEEL_UP){
                 // zooming in
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-                dut.requestUpdate();
                 VirtualSpaceManager.INSTANCE.repaintNow();
             }
             else {
                 //wheelDirection == WHEEL_DOWN, zooming out
                 application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                dut.requestUpdate();
                 VirtualSpaceManager.INSTANCE.repaintNow();
             }
     	}
@@ -304,28 +280,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
     }
     public void componentShown(ComponentEvent e){}
 
-    /** Camera listener interface (delayed call to cameraMoved()) */
-    public void cameraMoved(Camera cam, LongPoint coord, float a){
-        dut.requestUpdate();
-    }
-    
-    /** Actual actions to take when camera is moved */
-    void cameraMoved(){
-        // region seen through camera
-        application.mView.getVisibleRegion(application.mCamera, wnes);
-        float alt = application.mCamera.getAltitude();
-        if (alt != oldCameraAltitude){
-            // camera was an altitude change
-            application.nm.altitudeChanged();
-            oldCameraAltitude = alt;
-        }
-        else {
-            // camera movement was a simple translation
-			//dut.cancelUpdate();
-            application.sm.updateVisibleRegions();
-        }        
-    }
-
 	/* Overview Portal */
 	public void enterPortal(Portal p){
 		inPortal = true;
@@ -338,42 +292,4 @@ class TIVExplorerEventHandler implements ViewEventHandler, CameraListener, Compo
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
-	
-}
-
-class DelayedUpdateTimer extends TimerTask {
-
-    private boolean enabled = false;
-	private boolean update = false;
-	
-	TIVExplorerEventHandler eh;
-
-	DelayedUpdateTimer(TIVExplorerEventHandler eh){
-		super();
-		this.eh = eh;
-	}
-
-	public void setEnabled(boolean b){
-		enabled = b;
-	}
-
-	public boolean isEnabled(){
-		return enabled;
-	}
-
-	public void run(){		
-		if (enabled && update){
-			eh.cameraMoved();
-			update = false;
-		}
-	}
-	
-	void requestUpdate(){
-		update = true;
-	}
-	
-	void cancelUpdate(){
-		update = false;
-	}
-
 }

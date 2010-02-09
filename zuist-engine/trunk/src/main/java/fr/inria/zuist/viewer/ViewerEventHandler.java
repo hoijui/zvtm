@@ -27,14 +27,13 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.CameraListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener {
+class ViewerEventHandler implements ViewEventHandler, ComponentListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -49,10 +48,6 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
     long lastVX, lastVY;
     int currentJPX, currentJPY;
 
-    /* bounds of region in virtual space currently observed through mCamera */
-    long[] wnes = new long[4];
-    float oldCameraAltitude;
-
     boolean mCamStickedToMouse = false;
 
     Viewer application;
@@ -64,14 +59,8 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
 
 	Glyph objectJustSelected = null;
 	
-	CameraMotionNotifier cmn;
-    
     ViewerEventHandler(Viewer app){
         this.application = app;
-        cmn = new CameraMotionNotifier(this);
-    	Timer cmnTimer = new Timer();
-    	cmnTimer.scheduleAtFixedRate(cmn, CAMERA_MOTION_NOTIFICATION_PERIOD, CAMERA_MOTION_NOTIFICATION_PERIOD);
-        oldCameraAltitude = this.application.mCamera.getAltitude();
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -142,12 +131,9 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (dragging){
             float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-            synchronized(application.mCamera){
-                application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
-                lastJPX = jpx;
-                lastJPY = jpy;
-                cameraMoved(null, null, 0);
-            }
+            application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            lastJPX = jpx;
+            lastJPY = jpy;
         }
     }
 
@@ -156,13 +142,11 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			cameraMoved(null, null, 0);
 			application.vsm.repaintNow();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			cameraMoved(null, null, 0);
 			application.vsm.repaintNow();
 		}
 	}
@@ -222,47 +206,6 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
         application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
-
-    public void cameraMoved(Camera cam, LongPoint coord, float a){
-        cmn.notifyMove();
-    }
-    
-    void cameraMoved(){
-        // region seen through camera
-        application.mView.getVisibleRegion(application.mCamera, wnes);
-        float alt = application.mCamera.getAltitude();
-        if (alt != oldCameraAltitude){
-            // camera was an altitude change
-            application.altitudeChanged();
-            oldCameraAltitude = alt;
-        }
-        else {
-            // camera movement was a simple translation
-            application.sm.updateVisibleRegions();
-        }
-    }
-
 }
 
-class CameraMotionNotifier extends TimerTask {
-	
-	ViewerEventHandler veh;
-	boolean notify = false;
-	
-	CameraMotionNotifier(ViewerEventHandler veh){
-		super();
-		this.veh = veh;
-	}
-	
-	void notifyMove(){
-	    notify = true;
-	}
-	
-	public void run(){
-		if (notify){
-		    veh.cameraMoved();
-		    notify = false;
-		}
-	}
-	
-}
+

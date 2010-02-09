@@ -129,7 +129,7 @@ class TIVNavigationManager {
     }
     
     void altitudeChanged(){
-        application.sm.updateLevel(mCamera.altitude);
+
     }
 
 	/* -------------- Overview ------------------- */

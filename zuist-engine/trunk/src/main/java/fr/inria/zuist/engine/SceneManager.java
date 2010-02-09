@@ -37,6 +37,7 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
@@ -49,7 +50,7 @@ import fr.inria.zvtm.engine.Location;
  *@author Emmanuel Pietriga
  */
 
-public class SceneManager {
+public class SceneManager implements CameraListener {
     
     public static final String _none = "none";
     public static final String _level = "level";
@@ -124,7 +125,7 @@ public class SceneManager {
 
     final VirtualSpace[] sceneLayers;
     final Camera[] sceneCameras;
-    long[][] sceneCameraBounds;
+    final float[] prevAlts; //previous altitudes
 
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable id2region;
@@ -150,13 +151,17 @@ public class SceneManager {
     public SceneManager(VirtualSpace[] vss, Camera[] cs){
         this.sceneLayers = vss;
         this.sceneCameras = cs;
-        sceneCameraBounds = new long[cs.length][];
+        prevAlts = new float[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
         id2object = new Hashtable();
         id2scene = new Hashtable();
         sceneAttrs = new HashMap();
         RESOURCE_HANDLERS = new HashMap();
+
+        for(Camera cam: sceneCameras){
+            cam.addListener(this);
+        }
     }
     
     /** Declare a ResourceHandler for a given type of resource.
@@ -192,19 +197,6 @@ public class SceneManager {
         return sceneAttrs;
     }
 
-    /** Set the array containing information about the bounds of the region of virtual space seen through the camera observing the scene.
-     *@param bounds array containing information about the bounds of the region of virtual space seen through the camera observing the scene. It is up to the client application to update the values in this array whenever the camera is moved (through any mean).
-     *@see fr.inria.zvtm.engine.View#getVisibleRegion(Camera c, long[] res)
-     *@see fr.inria.zvtm.engine.View#getVisibleRegion(Camera c)
-     */
-    public void setSceneCameraBounds(Camera c, long[] bounds){
-	    for (int i=0;i<sceneCameras.length;i++){
-	        if (sceneCameras[i] == c){
-	            sceneCameraBounds[i] = bounds;
-	            break;
-            }
-        }
-    }
 
     public Enumeration getRegionIDs(){
 	return id2region.keys();
@@ -849,13 +841,20 @@ public class SceneManager {
      */
     public void setUpdateLevel(boolean b){
 	updateLevel = b;
+    //update level for every camera
+    if(updateLevel){
+        for(Camera cam: sceneCameras){
+            updateLevel(getLayerIndex(cam), 
+                    cam.getOwningView().getVisibleRegion(cam),
+                    cam.getAltitude());
+        }
+    }
     }
 
     /** Notify altitude changes.
-     * It is up to the client application to notify the scene manager each time the altitude of the camera used to observe the scene changes.
      *@param altitude the new camera's altitude
      */
-    public void updateLevel(float altitude){
+    private void updateLevel(int layerIndex, long[] cameraBounds, float altitude){
         if (!updateLevel){return;}
         // find out new level
         for (int i=0;i<levels.length;i++){
@@ -868,13 +867,13 @@ public class SceneManager {
             if (previousLevel >= 0){
                 exitLevel(previousLevel, currentLevel);
             }
-            enterLevel(currentLevel, previousLevel);
+            enterLevel(layerIndex, cameraBounds, currentLevel, previousLevel);
             previousLevel = currentLevel;
         }
         else {
             // if level hasn't changed, it is still necessary to update
             // visible regions as some of them might have become (in)visible
-            updateVisibleRegions();
+            updateVisibleRegions(layerIndex, cameraBounds);
         }
     }
 
@@ -885,15 +884,15 @@ public class SceneManager {
 	return currentLevel;
     }
 
-    void enterLevel(int depth, int prev_depth){
+    private void enterLevel(int layerIndex, long[] cameraBounds, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
-	    updateVisibleRegions(depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+	    updateVisibleRegions(layerIndex, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
 	    if (levelListener != null){
 	        levelListener.enteredLevel(depth);
 	    }
     }
 
-    void exitLevel(int depth, int new_depth){
+    private void exitLevel(int depth, int new_depth){
         boolean goingToLowerAltLevel = new_depth > depth;
         for (int i=0;i<levels[depth].regions.length;i++){            
             // hide only if region does not span the level where we are going
@@ -916,14 +915,19 @@ public class SceneManager {
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-    public void updateVisibleRegions(){
-	updateVisibleRegions(currentLevel, Region.TASL);
+     //called when an x-y movement occurs but no altitude change (??)
+    private void updateVisibleRegions(int layerIndex, long[] cameraBounds){
+        updateVisibleRegions(layerIndex, cameraBounds, currentLevel, Region.TASL);
     }
 
-    void updateVisibleRegions(int level, short transition){
+   
+    private void updateVisibleRegions(int layerIndex, long[] cameraBounds, int level, short transition){
         try {
 	        for (int i=0;i<levels[level].regions.length;i++){
-	            levels[level].regions[i].updateVisibility(sceneCameraBounds[levels[level].regions[i].li], currentLevel, transition, regionListener);
+                if(layerIndex != levels[level].regions[i].li){
+                    continue;
+                }
+	            levels[level].regions[i].updateVisibility(cameraBounds, currentLevel, transition, regionListener);
 	        }
         }
         catch ( Exception e) { 
@@ -1036,4 +1040,36 @@ public class SceneManager {
     	return null;
     }
         
+    /* Camera events handling */
+    @Override
+    public void cameraMoved(Camera cam, LongPoint loc, float alt){
+        //XXX ugly: getOwningSpace should be an operation of Camera
+        long[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
+        int layerIndex = getLayerIndex(cam);
+        if(layerIndex == -1){
+            System.err.println("Camera " + cam + "is not tracked by ZUIST");
+            return;
+        }
+
+        if(alt != prevAlts[layerIndex]){
+            prevAlts[layerIndex] = alt;
+            updateLevel(layerIndex, cameraBounds, alt);
+        } else {
+            updateVisibleRegions(layerIndex, cameraBounds);
+        }
+    }
+
+    /** 
+     * returns the layer index (0-based)
+     * of camera 'cam', or -1 if 'cam' does not belong
+     * to cameras tracked by this ZUIST instance.
+     */
+    private int getLayerIndex(Camera cam){
+        for(int i=0; i<sceneCameras.length; ++i){
+            if(sceneCameras[i] == cam){
+                return i;
+            }
+        }
+        return -1;
+    }
 }

@@ -120,8 +120,6 @@ public class TiledImageViewer {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setSceneCameraBounds(mCamera, eh.wnes);
-        mCamera.addListener(eh);
         if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			HashMap sa = sm.getSceneAttributes();
@@ -140,8 +138,6 @@ public class TiledImageViewer {
         }
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
 		nm.updateOverview();
-		eh.cameraMoved();
-        eh.dut.setEnabled(true);
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -275,8 +271,6 @@ public class TiledImageViewer {
 	    gp.setVisible(false);
 	    gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
-        sm.updateLevel(mCamera.altitude);
-        eh.cameraMoved(null, null, 0);
 	}
     
     void updatePanelSize(){
