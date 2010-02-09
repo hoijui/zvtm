@@ -39,7 +39,7 @@ public class NodeTrixViz {
     static int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
     static float NODE_BACKGROUND_TRANSLUCENCY = 1f;
-    static int LINLOG_ITERATIONS = 20;
+    static int LINLOG_ITERATIONS = 30;
     
     //ANIMATION DURATIOS in msec
     public static final int DURATION_GENERAL = 300;
@@ -50,7 +50,9 @@ public class NodeTrixViz {
 	public static final int IA_STATE_HIGHLIGHTED = 1;
 	public static final int IA_STATE_SELECTED = 2;
 	public static final int IA_STATE_FADE = 3;
+	public static final int IA_STATE_SCREENSURF= 4;
     
+	public static final int VICINITY_RADIUS = 3;
     /* Links between matrices */
     static Color INTER_LINK_COLOR = Color.BLACK;
 

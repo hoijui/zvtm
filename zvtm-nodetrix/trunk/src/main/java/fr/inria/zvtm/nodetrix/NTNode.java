@@ -58,6 +58,11 @@ public class NTNode {
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
 	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
 
+	private boolean westToScreen = false;
+	private boolean northToScreen = false;
+
+	private long surfStop_x = 100000000, surfStop_y = -10000000;
+
 	
 	
 	
@@ -128,6 +133,7 @@ public class NTNode {
     	if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHTED) highlight();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_SCREENSURF) surfToScreen();
 	    else reset();
 	    
 	    interactionState = newInteractionState;
@@ -136,7 +142,13 @@ public class NTNode {
     public void reset()
     {
 		//COLOR
-		this.gBackgroundW.setColor(backgroundColor);
+		gBackgroundW.setColor(backgroundColor);
+		gBackgroundW.setTranslucencyValue(1);
+		
+		northToScreen = false;
+		westToScreen = false;
+		surfStop_x = 100000000; 
+		surfStop_y = -100000000;
 		
 		if(!single)
 		{
@@ -156,7 +168,8 @@ public class NTNode {
 					SlowInSlowOutInterpolator2.getInstance(), 
 					null);
 			animManager.startAnimation(a, true);
-			this.gBackgroundN.setColor(backgroundColor);
+			gBackgroundN.setColor(backgroundColor);
+			gBackgroundN.setTranslucencyValue(1);
 		}
     }
     
@@ -174,30 +187,35 @@ public class NTNode {
     {
     }
     
+    
     /**Method that is called to force the labels of this Node come onto sceen when user clicks and holds
      * on a relation in the matrix.
      * @param tail - if true, the western label is moved, if false, the northern one.
      */
-    public void forceEnterScreen(boolean tail)
+    public void surfToScreen()
     {
+    	System.out.println("CHECK SURFING " + this.name);
     	if(single) return;	
-    	
     	long[] p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
-    	if(tail){
+    	if(westToScreen){
     		if((mx + wdx - widthHalf) < p[0]){
+    			long xNew = Math.min(p[0] + widthHalf, this.surfStop_x - widthHalf);
     			Animation a = animManager.getAnimationFactory()
  					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
- 							new LongPoint(p[0] + widthHalf, gBackgroundW.vy),
+ 							new LongPoint(xNew, gBackgroundW.vy),
  							false, 
  							SlowInSlowOutInterpolator2.getInstance(), 
  							null);
  				animManager.startAnimation(a, true);
     		}
-    	}else{
+    	}
+    	if(northToScreen){
+    		
     		if((my + ndy + widthHalf) > p[1]){	
- 				Animation a = animManager.getAnimationFactory()
+    			long yNew = Math.max(p[1] - widthHalf, this.surfStop_y + widthHalf);
+    			Animation a = animManager.getAnimationFactory()
  					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
- 							new LongPoint(gBackgroundN.vx, p[1] - widthHalf),
+ 							new LongPoint(gBackgroundN.vx, yNew),
  							false, 
  							SlowInSlowOutInterpolator2.getInstance(), 
  							null);
@@ -205,6 +223,7 @@ public class NTNode {
  	    	}
     	}
     }
+
     
     public void onTop() {
     	vs.onTop(gBackgroundW);
@@ -218,6 +237,16 @@ public class NTNode {
     
     //GETTER/SETTER--------------------------------------------------------------------------------------------
     
+    public void setTailToScreen(long x, long y){
+    	westToScreen = true;
+    	this.surfStop_x = Math.min(this.surfStop_x, x - NodeTrixViz.CELL_SIZE_HALF);
+    	this.surfStop_y = Math.max(this.surfStop_y, y + NodeTrixViz.CELL_SIZE_HALF);
+    }
+    public void setHeadToScreen(long x, long y){
+    	northToScreen = true;
+    	this.surfStop_x = Math.min(this.surfStop_x, x - NodeTrixViz.CELL_SIZE_HALF);
+    	this.surfStop_y = Math.max(this.surfStop_y, y + NodeTrixViz.CELL_SIZE_HALF);
+    }
     
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
      * the matrix. A gradiant is applied according to the position of the node in the list.
@@ -313,8 +342,5 @@ public class NTNode {
     long getLabelWidth(){
     	return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
-
-
-
 
 }

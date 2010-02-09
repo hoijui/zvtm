@@ -24,7 +24,8 @@ public class Matrix {
     String name;
     Vector<NTNode> nodes = new Vector<NTNode>();
     Vector<NTIntraEdgeSet> intraEdgeSets = new Vector<NTIntraEdgeSet>();
- 
+	static int CELL_SIZE = 10;
+
     //GLYPHS
     VRectangle bkg;
     VText matrixLabel;
@@ -57,6 +58,7 @@ public class Matrix {
     	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
     	    vs.addGlyph(matrixLabel);
     	    matrixLabel.setOwner(this);
+    	    bkg.stick(matrixLabel);
     	    
     	    // node labels
     	    Color c;
@@ -187,8 +189,7 @@ public class Matrix {
         	// FINISH RELATIONS
     		if (n.getOutgoingEdges() != null)
             {
-            	HashMap<NTNode, NTIntraEdgeSet> intraEdgeSetMap = new HashMap<NTNode, NTIntraEdgeSet>();
-            	
+    			HashMap<NTNode, NTIntraEdgeSet> intraEdgeSetMap = new HashMap<NTNode, NTIntraEdgeSet>();
             	//Instantiate
             	for(NTEdge e : n.getOutgoingEdges()){
             		 if (e instanceof NTIntraEdge){
@@ -224,6 +225,7 @@ public class Matrix {
             		intraEdgeSetMap.get(nRel).createGraphics(0, n.wdy, nRel.ndx, 0 , vs, this);
             	}
             }
+
          }
     }
     
@@ -242,17 +244,16 @@ public class Matrix {
     		n.onTop(); //Vitrtual space is already known in NTNode
     	}
     }
+   
     
     public void highlightGrid(NTNode tail, NTNode head)
     {
     	Glyph g1 = gridBarsH[nodes.indexOf(tail)];
     	g1.setColor(Color.yellow);
-//    	g1.setTranslucencyValue(0.2f);
     	g1.setVisible(true);
     	
     	Glyph g2 = gridBarsV[nodes.indexOf(head)];
     	g2.setColor(Color.yellow);
-//    	g2.setTranslucencyValue(0.2f);
     	g2.setVisible(true);
     }
     
@@ -317,10 +318,13 @@ public class Matrix {
         return name;
     }
     
-    static int CELL_SIZE = 10;
     
     public static void setCellSize(int cs){
         CELL_SIZE = cs;
     }
-
+    public Vector<NTIntraEdgeSet>getNTIntraEdgeSets()
+    {
+    	return this.intraEdgeSets;
+    }
+    
 }
