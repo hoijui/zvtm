@@ -129,7 +129,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setSceneCameraBounds(mCamera, eh.wnes);
         sm.setRegionListener(this);
         sm.setLevelListener(this);
 		previousLocations = new Vector();
@@ -261,7 +260,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
-        sm.updateLevel(mCamera.altitude);
         eh.cameraMoved(null, null, 0);
 	}
     
@@ -426,7 +424,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             class LevelUpdater implements EndAction {
                 public void execute(Object subject, Animation.Dimension dimension){
                     sm.setUpdateLevel(true);
-                    sm.updateLevel(mCamera.altitude);
                 }
             }
             Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
@@ -440,7 +437,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	}
 	
     void altitudeChanged(){
-        sm.updateLevel(mCamera.altitude);
         mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
     }
     

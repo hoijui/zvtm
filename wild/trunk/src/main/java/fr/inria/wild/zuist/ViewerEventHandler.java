@@ -199,20 +199,7 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
         cmn.notifyMove();
     }
     
-    void cameraMoved(){
-        // region seen through camera
-        application.mView.getVisibleRegion(application.mCamera, wnes);
-        float alt = application.mCamera.getAltitude();
-        if (alt != oldCameraAltitude){
-            // camera was an altitude change
-            application.altitudeChanged();
-            oldCameraAltitude = alt;
-        }
-        else {
-            // camera movement was a simple translation
-            application.sm.updateVisibleRegions();
-        }
-    }
+    void cameraMoved(){}
 
 }
 

@@ -148,7 +148,6 @@ public class Controller implements Java2DPainter {
         VirtualSpace[]  sceneSpaces = {zSpace};
         Camera[] sceneCameras = {cCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setSceneCameraBounds(cCamera, ceh.wnes);
         if (zuistFile != null){
 			loadScene(zuistFile);
 			getGlobalView(cCamera);
@@ -277,7 +276,6 @@ public class Controller implements Java2DPainter {
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         cCamera.setAltitude(0.0f);
-        sm.updateLevel(cCamera.altitude);
         ceh.cameraMoved(null, null, 0);
 	}
     
@@ -293,9 +291,7 @@ public class Controller implements Java2DPainter {
         sm.getGlobalView(c, Viewer.ANIM_MOVE_LENGTH);
     }
     
-    void altitudeChanged(){
-        sm.updateLevel(cCamera.altitude);
-    }
+    void altitudeChanged(){}
     
     void updatePanelSize(){
         Dimension d = cView.getPanel().getSize();
@@ -669,18 +665,6 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     public void viewClosing(View v){System.exit(0);}
 
     public void cameraMoved(Camera cam, LongPoint coord, float a){
-        // region seen through camera
-        application.cView.getVisibleRegion(application.cCamera, wnes);
-        float alt = application.cCamera.getAltitude();
-        if (alt != oldCameraAltitude){
-            // camera was an altitude change
-            application.altitudeChanged();
-            oldCameraAltitude = alt;
-        }
-        else {
-            // camera movement was a simple translation
-            application.sm.updateVisibleRegions();
-        }
         // tests when zooming beyond max res limit (beyond this limit camera positions on cluster nodes are just crazy, have to fix it eventually)
         application.setBeyondLimit((wnes[2]-wnes[0]) < application.wc.size.width || (wnes[1]-wnes[3]) < application.wc.size.height);
         // update camera group
