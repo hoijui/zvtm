@@ -121,7 +121,7 @@ class GlyphLoader implements Runnable {
     }
 
     /* request ID generator */
-    Integer incRequestID(){
+    private Integer incRequestID(){
 	nextRequestID += 1;
 	return new Integer(nextRequestID);
     }
