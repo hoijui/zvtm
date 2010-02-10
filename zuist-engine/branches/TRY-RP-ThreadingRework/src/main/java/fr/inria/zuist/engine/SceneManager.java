@@ -135,7 +135,7 @@ public class SceneManager implements CameraListener {
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable id2region;
     /** Contains a mapping from object IDs to actual objects. */
-    Hashtable id2object;
+    Hashtable<String, ObjectDescription> id2object;
     /** Contains a mapping from scene IDs to actual scenes. */
     Hashtable id2scene;
     
@@ -207,7 +207,7 @@ public class SceneManager implements CameraListener {
         prevAlts = new float[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
-        id2object = new Hashtable();
+        id2object = new Hashtable<String, ObjectDescription>();
         id2scene = new Hashtable();
         sceneAttrs = new HashMap();
         RESOURCE_HANDLERS = new HashMap();
@@ -273,7 +273,7 @@ public class SceneManager implements CameraListener {
      *@return null if no object associated with this ID.
      */
     public ObjectDescription getObject(String id){
-	return (ObjectDescription)id2object.get(id);
+	return id2object.get(id);
     }
 
 	/** Get the total number of objects (at any level and in any region) in the scene. */
