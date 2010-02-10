@@ -99,7 +99,7 @@ public class ImageDescription extends ResourceDescription {
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
+    public void createObject(final VirtualSpace vs, final boolean fadeIn){
         if (glyph == null){
             // open connection to data
             if (showFeedbackWhenFetching){
@@ -153,7 +153,7 @@ public class ImageDescription extends ResourceDescription {
         loadRequest = null;    
     }
     
-    private synchronized void finishCreatingObject(VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
+    private void finishCreatingObject(VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
         int ih = i.getHeight(null);
         double sf = vh / ((double)ih);
         if (fadeIn){
@@ -193,7 +193,7 @@ public class ImageDescription extends ResourceDescription {
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,

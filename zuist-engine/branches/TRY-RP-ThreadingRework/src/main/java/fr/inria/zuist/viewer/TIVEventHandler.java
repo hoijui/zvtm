@@ -187,18 +187,16 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (panning){
-            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-            synchronized(application.mCamera){
-                application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
-                lastJPX = jpx;
-                lastJPY = jpy;
-            }
-            if (nm.lensType != 0 && nm.lens != null){
-        	    nm.moveLens(jpx, jpy, e.getWhen());
-        	}
-        }
-		else if (regionStickedToMouse){
+	    if (panning){
+		    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		    application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+		    lastJPX = jpx;
+		    lastJPY = jpy;
+		    if (nm.lensType != 0 && nm.lens != null){
+			    nm.moveLens(jpx, jpy, e.getWhen());
+		    }
+	    }
+	    else if (regionStickedToMouse){
 			float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
 			application.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
 			lastJPX = jpx;

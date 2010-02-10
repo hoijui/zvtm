@@ -300,51 +300,49 @@ class TIVNavigationManager {
         INV_MAG_FACTOR = 1 / MAG_FACTOR;
     }
 
-    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
-        synchronized (lens){
-            double nmf = MAG_FACTOR + magOffset;
-            if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
-                setMagFactor(nmf);
-                if (zooming == ZOOMOUT_LENS){
-                    /* if unzooming, we want to keep the focus point stable, and unzoom the context
-                        this means that camera altitude must be adjusted to keep altitude + lens mag
-                        factor constant in the lens focus region. The camera must also be translated
-                        to keep the same region of the virtual space under the focus region */
-                        float a1 = application.mCamera.getAltitude();
-                    lens.setMaximumMagnification((float)nmf, true);
-                    /* explanation for the altitude offset computation: the projected size of an object
-                        in the focus region (in lens space) should remain the same before and after the
-                        change of magnification factor. The size of an object is a function of the
-                        projection coefficient (see any Glyph.projectForLens() method). This means that
-                        the following equation must be true, where F is the camera's focal distance, a1
-                        is the camera's altitude before the move and a2 is the camera altitude after the
-                        move:
-                        MAG_FACTOR * F / (F + a1) = MAG_FACTOR + magOffset * F / (F + a2)
-                        From this we can get the altitude difference (a2 - a1)                       */
-                        application.mCamera.altitudeOffset((float)((a1+application.mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset)));
-                    /* explanation for the X offset computation: the position in X of an object in the
-                        focus region (lens space) should remain the same before and after the change of
-                        magnification factor. This means that the following equation must be true (taken
-                        by simplifying pc[i].lcx computation in a projectForLens() method):
-                        (vx-(lensx1))*coef1 = (vx-(lensx2))*coef2
-                        -- coef1 is actually MAG_FACTOR * F/(F+a1)
-                        -- coef2 is actually (MAG_FACTOR + magOffset) * F/(F+a2)
-                        -- lensx1 is actually camera.posx1 + ((F+a1)/F) * lens.lx
-                        -- lensx2 is actually camera.posx2 + ((F+a2)/F) * lens.lx
-                        Given that (MAG_FACTOR + magOffset) / (F+a2) = MAG_FACTOR / (F+a1)
-                        we eventually have:
-                        Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
-                        JPanel coordinates w.r.t the view's center - see Lens.java)                */
-                        application.mCamera.move(Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.lx),
-                        -Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly));
-                }
-                else {
-                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
-                        new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
-                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-                }
-            }
-        }
+    void magnifyFocus(double magOffset, int zooming, Camera ca){
+	    double nmf = MAG_FACTOR + magOffset;
+	    if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
+		    setMagFactor(nmf);
+		    if (zooming == ZOOMOUT_LENS){
+			    /* if unzooming, we want to keep the focus point stable, and unzoom the context
+			       this means that camera altitude must be adjusted to keep altitude + lens mag
+			       factor constant in the lens focus region. The camera must also be translated
+			       to keep the same region of the virtual space under the focus region */
+			    float a1 = application.mCamera.getAltitude();
+			    lens.setMaximumMagnification((float)nmf, true);
+			    /* explanation for the altitude offset computation: the projected size of an object
+			       in the focus region (in lens space) should remain the same before and after the
+			       change of magnification factor. The size of an object is a function of the
+			       projection coefficient (see any Glyph.projectForLens() method). This means that
+			       the following equation must be true, where F is the camera's focal distance, a1
+			       is the camera's altitude before the move and a2 is the camera altitude after the
+move:
+MAG_FACTOR * F / (F + a1) = MAG_FACTOR + magOffset * F / (F + a2)
+From this we can get the altitude difference (a2 - a1)                       */
+			    application.mCamera.altitudeOffset((float)((a1+application.mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset)));
+			    /* explanation for the X offset computation: the position in X of an object in the
+			       focus region (lens space) should remain the same before and after the change of
+			       magnification factor. This means that the following equation must be true (taken
+			       by simplifying pc[i].lcx computation in a projectForLens() method):
+			       (vx-(lensx1))*coef1 = (vx-(lensx2))*coef2
+			       -- coef1 is actually MAG_FACTOR * F/(F+a1)
+			       -- coef2 is actually (MAG_FACTOR + magOffset) * F/(F+a2)
+			       -- lensx1 is actually camera.posx1 + ((F+a1)/F) * lens.lx
+			       -- lensx2 is actually camera.posx2 + ((F+a2)/F) * lens.lx
+			       Given that (MAG_FACTOR + magOffset) / (F+a2) = MAG_FACTOR / (F+a1)
+			       we eventually have:
+			       Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
+			       JPanel coordinates w.r.t the view's center - see Lens.java)                */
+			    application.mCamera.move(Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.lx),
+					    -Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly));
+		    }
+		    else {
+			    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
+					    new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
+			    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+		    }
+	    }
     }
 
     Lens getLensDefinition(int x, int y){

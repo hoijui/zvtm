@@ -43,7 +43,7 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
+    public void createObject(VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
             if (fadeIn){
                 ((Translucent)glyph).setTranslucencyValue(0.0f);
@@ -68,7 +68,7 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
-    public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(VirtualSpace vs, boolean fadeOut){
         if (inSpace){
             if (fadeOut){
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,

@@ -96,16 +96,14 @@ class GlyphLoader implements Runnable {
 
     /*called by thread on a regular basis ; pops request from queue in a FIFO manner*/
     void processRequests(){
-	synchronized(requestQueue){
 	    if (!requestQueue.isEmpty()){
-		Integer rid = requestQueue.remove();
-		Request r = (Request)id2request.get(rid);
-		if (r != null){// r might be null if the request got canceled
-		    id2request.remove(rid);
-		    processRequest(r);
-		}
+		    Integer rid = requestQueue.remove();
+		    Request r = (Request)id2request.get(rid);
+		    if (r != null){// r might be null if the request got canceled
+			    id2request.remove(rid);
+			    processRequest(r);
+		    }
 	    }
-	}
     }
     
     /*process a specific request*/
@@ -130,50 +128,44 @@ class GlyphLoader implements Runnable {
 
     /* create a request for loading an object */
     void addLoadRequest(ObjectDescription od, boolean transition){
-	if (DEBUG){
-	    System.out.println("Considering adding a load request for " + od.toString());
-	}
-	synchronized(requestQueue){synchronized(od){
+	    if (DEBUG){
+		    System.out.println("Considering adding a load request for " + od.toString());
+	    }
 	    if (od.unloadRequest != null){
-		cancelRequest(od.unloadRequest);
-		od.unloadRequest = null;
-		return;
+		    cancelRequest(od.unloadRequest);
+		    od.unloadRequest = null;
+		    return;
 	    }
 	    if (od.loadRequest != null){return;}
 	    if (DEBUG){
-		System.out.println("Adding load request for " + od.toString());
+		    System.out.println("Adding load request for " + od.toString());
 	    }
 	    Integer requestID = incRequestID();
 	    Request r = new Request(requestID, Request.TYPE_LOAD, od, transition);
 	    od.loadRequest = requestID;
 	    id2request.put(requestID, r);
 	    requestQueue.offer(requestID);
-	    }
-	}
     }
 
     /*create a request for unloading a map*/
     void addUnloadRequest(ObjectDescription od, boolean transition){
-	if (DEBUG){
-	    System.out.println("Considering adding an unload request for " + od.toString());
-	}
-	synchronized(requestQueue){synchronized(od){
+	    if (DEBUG){
+		    System.out.println("Considering adding an unload request for " + od.toString());
+	    }
 	    if (od.loadRequest != null){
-		cancelRequest(od.loadRequest);
-		od.loadRequest = null;
-		return;
+		    cancelRequest(od.loadRequest);
+		    od.loadRequest = null;
+		    return;
 	    }
 	    if (od.unloadRequest != null){return;}
 	    if (DEBUG){
-		System.out.println("Adding unload request for " + od.toString());
+		    System.out.println("Adding unload request for " + od.toString());
 	    }
 	    Integer requestID = incRequestID();
 	    Request r = new Request(requestID, Request.TYPE_UNLOAD, od, transition);
 	    od.unloadRequest = requestID;
 	    id2request.put(requestID, r);
 	    requestQueue.offer(requestID);
-	    }
-	}
     }
 
     /*cancel a pending request*/
