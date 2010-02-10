@@ -120,7 +120,6 @@ public class PDFViewer {
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setResourceHandler(PDFResourceHandler.RESOURCE_TYPE_PDF, new PDFResourceHandler());
-        sm.setSceneCameraBounds(mCamera, eh.wnes);
 		if (inputFile != null){
 		    if (inputFile.getName().endsWith(PDF_EXT)){
     			loadPDF(inputFile);		        
@@ -229,7 +228,6 @@ public class PDFViewer {
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
-        sm.updateLevel(mCamera.altitude);
         eh.cameraMoved(null, null, 0);
 	}
 	
@@ -245,7 +243,6 @@ public class PDFViewer {
 	    }
 	    sm.setUpdateLevel(true);
         mCamera.setAltitude(0.0f);
-        sm.updateLevel(mCamera.altitude);
         eh.cameraMoved(null, null, 0);
 	}
     
@@ -308,9 +305,7 @@ public class PDFViewer {
         vsm.getAnimationManager().startAnimation(a, false);
     }
 	
-    void altitudeChanged(){
-        sm.updateLevel(mCamera.altitude);
-    }
+    void altitudeChanged(){ }
     
     void updatePanelSize(){
         Dimension d = mView.getPanel().getSize();
@@ -535,19 +530,6 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
     }
     public void componentShown(ComponentEvent e){}
     
-    public void cameraMoved(Camera cam, LongPoint coord, float a){
-        // region seen through camera
-        application.mView.getVisibleRegion(application.mCamera, wnes);
-        float alt = application.mCamera.getAltitude();
-        if (alt != oldCameraAltitude){
-            // camera was an altitude change
-            application.altitudeChanged();
-            oldCameraAltitude = alt;
-        }
-        else {
-            // camera movement was a simple translation
-            application.sm.updateVisibleRegions();
-        }
-    }
+    public void cameraMoved(Camera cam, LongPoint coord, float a){}
 
 }
