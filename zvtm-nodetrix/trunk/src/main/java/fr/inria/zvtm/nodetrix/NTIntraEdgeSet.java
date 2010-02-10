@@ -38,7 +38,7 @@ public class NTIntraEdgeSet {
 		
 		//adding invisible rectangle triggering events
 		g = new VRectangle(m.bkg.vx + x, m.bkg.vy + y,0, NodeTrixViz.CELL_SIZE_HALF - 3, NodeTrixViz.CELL_SIZE_HALF - 3, Color.BLACK);
-		g.setVisible(true);
+		g.setVisible(false);
 		g.setTranslucencyValue(.5f);
 		g.setOwner(intraEdges.firstElement());
 		vs.addGlyph(g);

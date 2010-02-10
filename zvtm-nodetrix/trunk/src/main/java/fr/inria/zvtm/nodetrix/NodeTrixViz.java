@@ -51,6 +51,7 @@ public class NodeTrixViz {
 	public static final int IA_STATE_SELECTED = 2;
 	public static final int IA_STATE_FADE = 3;
 	public static final int IA_STATE_SCREENSURF= 4;
+
     
 	public static final int VICINITY_RADIUS = 3;
     /* Links between matrices */

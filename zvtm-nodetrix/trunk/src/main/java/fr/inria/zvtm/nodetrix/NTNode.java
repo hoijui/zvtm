@@ -58,13 +58,12 @@ public class NTNode {
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
 	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
 
-	private boolean westToScreen = false;
-	private boolean northToScreen = false;
+	private boolean affectWest = false;
+	private boolean affectNorth = false;
+	private boolean highlight = false;
 
 	private long surfStop_x = 100000000, surfStop_y = -10000000;
 
-	
-	
 	
 	public NTNode(String name){
         this.name = name;
@@ -103,8 +102,6 @@ public class NTNode {
     		vs.addGlyph(gBackgroundN);
 //    		vs.onTop(gBackgroundN);
     		vs.addGlyph(labelN);
-
-
 		}
     }
     
@@ -124,6 +121,8 @@ public class NTNode {
     public void setState(int newState)
     {
     	newInteractionState = newState;
+    	if(newState == NodeTrixViz.IA_STATE_HIGHLIGHTED)
+    		highlight = true;
     }
     
     public void perfomStateChange()
@@ -145,8 +144,9 @@ public class NTNode {
 		gBackgroundW.setColor(backgroundColor);
 		gBackgroundW.setTranslucencyValue(1);
 		
-		northToScreen = false;
-		westToScreen = false;
+		affectNorth = false;
+		affectWest = false;
+		highlight = false;
 		surfStop_x = 100000000; 
 		surfStop_y = -100000000;
 		
@@ -175,8 +175,12 @@ public class NTNode {
     
     private void highlight()
     {
-    	this.gBackgroundW.setColor(Color.yellow);
-    	if(!single) this.gBackgroundN.setColor(Color.yellow);
+    	if(affectWest || single){
+    		this.gBackgroundW.setColor(Color.yellow);
+    	}
+    	if(affectNorth){
+    		this.gBackgroundN.setColor(Color.yellow);
+    	}
     }
     
     private void select()
@@ -194,12 +198,15 @@ public class NTNode {
      */
     public void surfToScreen()
     {
-    	System.out.println("CHECK SURFING " + this.name);
-    	if(single) return;	
+    	if(single) return;
+    	if(highlight) this.highlight();
+    	
     	long[] p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
-    	if(westToScreen){
+    	if(affectWest){
     		if((mx + wdx - widthHalf) < p[0]){
-    			long xNew = Math.min(p[0] + widthHalf, this.surfStop_x - widthHalf);
+    			long xNew;
+    			if(highlight) xNew = p[0] + widthHalf;
+    			else xNew = Math.min(p[0] + widthHalf, this.surfStop_x - widthHalf);
     			Animation a = animManager.getAnimationFactory()
  					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
  							new LongPoint(xNew, gBackgroundW.vy),
@@ -209,10 +216,11 @@ public class NTNode {
  				animManager.startAnimation(a, true);
     		}
     	}
-    	if(northToScreen){
-    		
+    	if(affectNorth){
     		if((my + ndy + widthHalf) > p[1]){	
-    			long yNew = Math.max(p[1] - widthHalf, this.surfStop_y + widthHalf);
+    			long yNew;
+    			if(highlight) yNew = p[1] - widthHalf;
+    			else yNew = Math.max(p[1] - widthHalf, this.surfStop_y + widthHalf);
     			Animation a = animManager.getAnimationFactory()
  					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
  							new LongPoint(gBackgroundN.vx, yNew),
@@ -238,15 +246,23 @@ public class NTNode {
     //GETTER/SETTER--------------------------------------------------------------------------------------------
     
     public void setTailToScreen(long x, long y){
-    	westToScreen = true;
+    	affectWest = true;
     	this.surfStop_x = Math.min(this.surfStop_x, x - NodeTrixViz.CELL_SIZE_HALF);
     	this.surfStop_y = Math.max(this.surfStop_y, y + NodeTrixViz.CELL_SIZE_HALF);
     }
     public void setHeadToScreen(long x, long y){
-    	northToScreen = true;
+    	affectNorth = true;
     	this.surfStop_x = Math.min(this.surfStop_x, x - NodeTrixViz.CELL_SIZE_HALF);
     	this.surfStop_y = Math.max(this.surfStop_y, y + NodeTrixViz.CELL_SIZE_HALF);
     }
+    
+    public void stateAffectsNorth(){
+    	affectNorth = true;
+    }
+    public void stateAffectsWest(){
+    	affectWest = true;
+    }
+    
     
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
      * the matrix. A gradiant is applied according to the position of the node in the list.
