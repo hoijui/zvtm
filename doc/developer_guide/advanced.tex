@@ -246,9 +246,31 @@ for (int i=0;i<pdfFile.getNumPages();i++){
 \subsection{SVG Documents}
 \label{sec:svg}
 
+Dependency on \cd{zvtm-svg} is declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-svg</artifactId>
+  <version>0.1.1-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
 %%%%%
 \subsection{FITS Images}
 \label{sec:fits}
+
+Dependency on \cd{zvtm-fits} is declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-fits</artifactId>
+  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 %%%%%%%%%%
 \subsection{Tree and Graph Layout}
@@ -257,5 +279,33 @@ for (int i=0;i<pdfFile.getNumPages();i++){
 \subsubsection{Using Jung 2.0}
 \label{sec:jung}
 
+ZVTM Layout uses the Jung 2.0\fref{http://jung.sf.net} (Java Universal Network/Graph) framework to layout complex data structures such as trees or graphs represented as ZVTM glyphs in virtual spaces.
+
+\todo{Show screenshots, give examples}
+
+Dependency on \cd{zvtm-layout} is declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-layout</artifactId>
+  <version>0.3.0-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
 \subsubsection{Using NodeTrix}
 \label{sec:nodetrix}
+
+\todo{Refer to paper, show screenshots}
+
+Dependency on \cd{zvtm-nodetrix} is declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-nodetrix</artifactId>
+  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
