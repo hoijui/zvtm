@@ -6,6 +6,8 @@
 \subsection{Getting source code}
   
 The source code is available in each zvtm-sources release on SourceForge.net\fref{http://sourceforge.net/project/showfiles.php?group_id=63244&package_id=69949} and via the SVN repository\fref{http://zvtm.sourceforge.net/download.html\#svn}.
+
+The core zvtm module is \cd{zvtm}. See section \ref{sec:modules} for a list and short description of all modules.
   
 \subsection{Building with Maven 2.x}
  
@@ -84,3 +86,36 @@ If using the SVG import/export capabilities of ZVTM, you must also declare the f
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\subsection{Available Modules}
+
+The following modules provide additional features for ZVTM. All are available from SVN, and some are made available as file releases.
+
+\begin{tabular}{|l|l|p{11cm}|}
+\hline
+Name & SVN/Maven name & Description \\
+\hline
+zvtm core & \cd{zvtm} & Main ZVTM module with engine, glyphs, etc. \\
+\hline
+zvtm-cluster & \cd{zvtm-cluster} &  \\
+\hline
+zvtm-svg & \cd{zvtm-svg} & Import/Export SVG documents to/from Virtual Spaces \\
+\hline
+zvtm-pdf & \cd{zvtm-pdf} &  \\
+\hline
+zvtm-layout & \cd{zvtm-layout} &  \\
+\hline
+zvtm-fits & \cd{zvtm-fits} &  \\
+\hline
+zvtm-demos & \cd{zvtm-demos} &  \\
+\hline
+zvtm-basicui & \cd{zvtm-basicui} &  \\
+\hline
+zuist & \cd{zuist-engine} &  \\
+\hline
+zuist-pdf & \cd{zuist-pdf} &  \\
+\hline
+\end{tabular}
+
+
+
