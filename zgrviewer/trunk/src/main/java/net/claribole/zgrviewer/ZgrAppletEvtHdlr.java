@@ -389,11 +389,17 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 	}
     }
 
-    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        application.keyTyped(e);
+    }
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        application.keyPressed(e);
+    }
 
-    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        application.keyReleased(e);
+    }
 
     public void viewActivated(View v){}
     
