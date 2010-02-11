@@ -355,15 +355,12 @@ public class Region {
     }
 
     void forceShow(short transition, long x, long y){
-	if (GlyphLoader.DEBUG){
-	    System.err.println("Prepare requests to load objects for "+id);
-	}
 	if (requestOrder == ORDERING_DISTANCE){
 	    Arrays.sort(objects, new DistanceComparator(x, y));
 	}
 	boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
 	for (int i=0;i<objects.length;i++){
-	    sm.glyphLoader.addLoadRequest(objects[i], fade);
+	    sm.glyphLoader.addLoadRequest(li, objects[i], fade);
 	}
 	wviv = true;
     }
@@ -375,15 +372,12 @@ public class Region {
     }
     
     void forceHide(short transition, long x, long y){
-	if (GlyphLoader.DEBUG){
-	    System.err.println("Prepare requests to unload objects for "+id);
-	}
 	if (requestOrder == ORDERING_DISTANCE){
 	    Arrays.sort(objects, new DistanceComparator(x, y));
 	}
 	boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
 	for (int i=0;i<objects.length;i++){
-	    sm.glyphLoader.addUnloadRequest(objects[i], fade);
+	    sm.glyphLoader.addUnloadRequest(li, objects[i], fade);
 	}
 	wviv = false;
     }

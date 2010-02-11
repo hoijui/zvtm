@@ -332,7 +332,8 @@ public class SceneManager implements CameraListener {
     }
     
     public int getPendingRequestQueueSize(){
-        return glyphLoader.requestQueue.size();
+        //return glyphLoader.requestQueue.size();
+	    return 0; //XXX fix or drop the method
     }
 
     /* ----------- level / region / object creation (API and XML) ----------- */
@@ -993,7 +994,7 @@ public class SceneManager implements CameraListener {
      *@param nbRequests number of queued requests processed by the load/unload request handling thread before going to sleep (default is 5)
      */
     public void setNumberOfRequestsHandledPerCycle(int nbRequests){
-	glyphLoader.setNumberOfRequestsHandledPerCycle(nbRequests);
+        //delegate to GlyphLoader or remove this method	
     }
 
     public void setFadeInDuration(int d){
@@ -1012,6 +1013,13 @@ public class SceneManager implements CameraListener {
         }
         return -1;
     }
+
+    VirtualSpace getSpaceByIndex(int layerIndex){
+	if((layerIndex < 0) || (layerIndex > sceneLayers.length)){
+	    return null;
+	}
+        return sceneLayers[layerIndex];
+    } 
 
     // debug
 //     void printLevelInfo(){

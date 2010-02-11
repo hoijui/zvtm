@@ -31,10 +31,10 @@ public abstract class ObjectDescription {
     short takesToType;
     
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public abstract void createObject(VirtualSpace vs, boolean fadeIn);
+    public abstract void createObject(final VirtualSpace vs, boolean fadeIn);
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public abstract void destroyObject(VirtualSpace vs, boolean fadeOut);
+    public abstract void destroyObject(final VirtualSpace vs, boolean fadeOut);
 
     public void setSensitive(boolean b){
 	sensitive = b;

@@ -9,6 +9,7 @@ package fr.inria.zuist.engine;
 
 import java.awt.Color;
 import java.awt.Font;
+import javax.swing.SwingUtilities;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -37,7 +38,7 @@ public class TextDescription extends ObjectDescription {
     
     Color fillColor;
     
-    VText glyph;
+    volatile VText glyph;
 
     /** Constructs the description of an image (VTextST).
         *@param id ID of object in scene
@@ -84,13 +85,13 @@ public class TextDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public void createObject(VirtualSpace vs, boolean fadeIn){
+    @Override
+    public void createObject(final VirtualSpace vs, boolean fadeIn){
         if (glyph == null){
             if (fadeIn){
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-                vs.addGlyph(glyph);
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
@@ -101,15 +102,20 @@ public class TextDescription extends ObjectDescription {
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 1.0f);
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-                vs.addGlyph(glyph);
             }
-            glyph.setOwner(this);
+	    SwingUtilities.invokeLater(new Runnable(){
+                public void run(){
+	    	    vs.addGlyph(glyph);
+            	glyph.setOwner(this);
+		}
+	    });
         }
         loadRequest = null;
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public void destroyObject(VirtualSpace vs, boolean fadeOut){
+    @Override
+    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
@@ -120,10 +126,14 @@ public class TextDescription extends ObjectDescription {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
+		SwingUtilities.invokeLater(new Runnable(){
+		     public void run(){
                 vs.removeGlyph(glyph);
-            }
+		     }
+            });
             glyph = null;
         }
+	}
         unloadRequest = null;
     }
 

@@ -4,8 +4,9 @@
  *
  * $Id$
  */
-
 package fr.inria.zuist.engine;
+
+import fr.inria.zvtm.engine.VirtualSpace;
 
 /** Load/unload requests.
  * Requests for loading/unloading objects described by ObjectDescription instances are queued
@@ -14,29 +15,34 @@ package fr.inria.zuist.engine;
  *@see GlyphLoader
  */
 
-class Request {
+class Request implements Runnable {
 
-    final Integer ID;
-
+    final VirtualSpace target;
     final ObjectDescription od;
 
     static final short TYPE_LOAD = 0;
     static final short TYPE_UNLOAD = 1;
     final short type;
 
-    static final short NO_TRANSITION = 0;
-    static final short TRANSITION_FADE = 1;
-    final short transition;
+    final boolean transition;
 
-    Request(Integer id, short type, ObjectDescription od, boolean transition){
-	this.ID = id;
+    Request(VirtualSpace target, short type, ObjectDescription od, boolean transition){
+	this.target = target;
 	this.type = type;
 	this.od = od;
-	this.transition = (transition) ? TRANSITION_FADE : NO_TRANSITION;
+	this.transition = transition;
     }
 
     public String toString(){
 	return ((type == TYPE_LOAD) ? "LOAD " : "UNLOAD ") + od.toString();
+    }
+
+    public void run(){
+	if(type == TYPE_LOAD){
+	    od.createObject(target, transition);
+	} else {
+	    od.destroyObject(target, transition);
+	}
     }
 
 }

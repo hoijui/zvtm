@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
 
 import java.io.IOException;
 import java.io.BufferedInputStream;
@@ -105,9 +106,7 @@ public class ImageDescription extends ResourceDescription {
             if (showFeedbackWhenFetching){
                 final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, bgColor, barColor, percentFontColor, vs);
                 vs.addGlyph(vrp);
-                final SwingWorker worker = new SwingWorker(){
-                    public Object construct(){
-                        try {
+                 try {
                             URLConnection uc = src.openConnection();
                             int dataLength = uc.getContentLength();
                             byte[] imgData = new byte[dataLength];
@@ -120,9 +119,6 @@ public class ImageDescription extends ResourceDescription {
                                     bytesRead += av;
                                     vrp.setProgress(bytesRead, dataLength);                                    
                                 }
-                                //else {
-                                //    sleep(10);
-                                //}
                             }
                             finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
                         }
@@ -130,30 +126,15 @@ public class ImageDescription extends ResourceDescription {
                             System.err.println("Error fetching Image resource "+src.toString());
                             e.printStackTrace();
                         }
-                        return null; 
-                    }
-                };
-                worker.start();
             }
             else {
-                if (this.isLocal()){
                     finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
                 }
-                else {
-                    final SwingWorker worker = new SwingWorker(){
-                        public Object construct(){
-                            finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);
-                            return null; 
-                        }
-                    };
-                    worker.start();
-                }
-            }
         }                
         loadRequest = null;    
     }
     
-    private void finishCreatingObject(VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
+    private void finishCreatingObject(final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
         int ih = i.getHeight(null);
         double sf = vh / ((double)ih);
         if (fadeIn){
@@ -164,7 +145,6 @@ public class ImageDescription extends ResourceDescription {
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
-            vs.addGlyph(glyph);
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
@@ -187,13 +167,17 @@ public class ImageDescription extends ResourceDescription {
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
-            vs.addGlyph(glyph);
         }
-        glyph.setOwner(this);
+	SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+	    vs.addGlyph(glyph);
+            glyph.setOwner(this);
+            }
+	});
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public void destroyObject(VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
@@ -201,8 +185,12 @@ public class ImageDescription extends ResourceDescription {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
-                vs.removeGlyph(glyph);
-                glyph.getImage().flush();
+                SwingUtilities.invokeLater(new Runnable(){
+                public void run(){
+	            vs.removeGlyph(glyph);
+                    glyph.getImage().flush();
+                }
+	        });
             }
             glyph = null;
         }
