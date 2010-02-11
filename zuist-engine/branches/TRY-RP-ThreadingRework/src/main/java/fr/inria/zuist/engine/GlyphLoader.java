@@ -24,24 +24,24 @@ class GlyphLoader implements Runnable {
     static int FADE_IN_DURATION = 300;
     static int FADE_OUT_DURATION = 300;
 
-    int NUMBER_OF_REQUESTS_PER_CYCLE = 5;
+    private int NUMBER_OF_REQUESTS_PER_CYCLE = 5;
 
     /* thread sleeping time */
-    static final int SLEEP_TIME = 5;
+    private static final int SLEEP_TIME = 5;
 
     static boolean DEBUG = false;
 
-    Thread runView;
-    boolean enabled = false;
+    private Thread runView;
+    private boolean enabled = false;
 
-    SceneManager sm;
+    private SceneManager sm;
 
     /* load/unload requests accessible by ID */
-    Hashtable id2request;
+    private Hashtable id2request;
     /* pending requests ordered by creation date */
     LinkedList<Integer> requestQueue;
     /* give a unique identifier to each request (serves as key in id2request) */
-    int nextRequestID = -1;
+    private int nextRequestID = -1;
 
     GlyphLoader(SceneManager sm){
 	this.sm = sm;
