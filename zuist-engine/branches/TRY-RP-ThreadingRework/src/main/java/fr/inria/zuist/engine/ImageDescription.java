@@ -41,7 +41,7 @@ public class ImageDescription extends ResourceDescription {
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    VImage glyph;
+    volatile VImage glyph;
 
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene

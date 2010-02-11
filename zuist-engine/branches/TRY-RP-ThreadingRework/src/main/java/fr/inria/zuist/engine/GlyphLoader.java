@@ -169,7 +169,7 @@ class GlyphLoader implements Runnable {
     }
 
     /*cancel a pending request*/
-    void cancelRequest(Integer requestID){
+    private void cancelRequest(Integer requestID){
 	if (DEBUG){
 	    System.out.println("Canceling request to " + id2request.get(requestID).toString());
 	}
