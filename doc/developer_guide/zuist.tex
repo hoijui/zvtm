@@ -72,3 +72,35 @@ Navigating in a multi-scale version of NASA's Blue Marble Next Generation world 
 %%%%%%%%%%
 \subsection{Multi-scale Scenes in ZUIST}
 
+%%%%%%%%%%
+\subsection{PDF pages in ZUIST}
+
+PDF pages in the form of ZPDFPage instances can be instantiated in a ZUIST scene. For this it is necessary to use an additional module: \cd{zuist-pdf}.
+
+Dependency on \cd{zuist-pdf} si declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zuist-pdf</artifactId>
+  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\vspace{1em}
+\label{sec:zuistpdf}
+
+Similar to bitmap images, PDF pages are handled as ZUIST \cd{resources}. They can be created directly via the API with \cd{createResourceDescription(...)} or declared as \cd{<resource>} XML elements.
+
+The following custom resource parameters are available:\\
+\begin{tabular}{|l|l|l|}
+\hline
+\bf{Parameter Name} & \bf{Description} & \bf{Allowed Values} \\
+\hline
+\cd{pg} & page number & $[1-N]$ (where $N$ is the total number of pages\\
+ &  & in the document)\\
+\cd{sc} & scale in scene (multiplication factor) & $]0;+\infty[$ \\
+\cd{im} & interpolation method & \cd{nearestNeighbor, bilinear, bicubic}\\
+\hline
+\end{tabular}

@@ -88,32 +88,35 @@ If using the SVG import/export capabilities of ZVTM, you must also declare the f
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 \subsection{Available Modules}
+\label{sec:modules}
 
-The following modules provide additional features for ZVTM. All are available from SVN, and some are made available as file releases.
+The following modules provide additional features for ZVTM. All are available from SVN, and some are made available as file releases. Detailed information about each module is available from the corresponding section in this manual.
 
-\begin{tabular}{|l|l|p{11cm}|}
+\begin{tabular}{|l|l|p{8cm}|p{2cm}|}
 \hline
-Name & SVN/Maven name & Description \\
+Module Name & Name in SVN/Maven & Description & Section \\
 \hline
-zvtm core & \cd{zvtm} & Main ZVTM module with engine, glyphs, etc. \\
+ZVTM & \cd{zvtm} & Core ZVTM module with engine, glyphs, etc. & \ref{sec:basic}, \ref{sec:animations}, \ref{sec:nav}, \ref{sec:advanced} \\
 \hline
-zvtm-cluster & \cd{zvtm-cluster} &  \\
+ZVTM Cluster & \cd{zvtm-cluster} & Run ZVTM applications on clusters of computers driving high-resolution large displays such as the WILD wall-sized display \url{http://insitu.lri.fr/Projects/WILD} & \ref{sec:clustering} \\
 \hline
-zvtm-svg & \cd{zvtm-svg} & Import/Export SVG documents to/from Virtual Spaces \\
+ZVTM FITS & \cd{zvtm-fits} & Display 2D FITS images in Virtual Spaces & \ref{sec:fits} \\
 \hline
-zvtm-pdf & \cd{zvtm-pdf} &  \\
+ZVTM Layout & \cd{zvtm-layout} & Structured data layout (trees, graphs) using Jung 2.0 & \ref{sec:jung} \\
 \hline
-zvtm-layout & \cd{zvtm-layout} &  \\
+ZVTM NodeTrix & \cd{zvtm-nodetrix} & Graph visualization with the NodeTrix visualization technique & \ref{sec:nodetrix} \\
 \hline
-zvtm-fits & \cd{zvtm-fits} &  \\
+ZVTM PDF & \cd{zvtm-pdf} & Display PDF Documents in Virtual Spaces & \ref{sec:pdf} \\
 \hline
-zvtm-demos & \cd{zvtm-demos} &  \\
+ZVTM SVG & \cd{zvtm-svg} & Import/Export SVG documents to/from Virtual Spaces & \ref{sec:svg} \\
 \hline
-zvtm-basicui & \cd{zvtm-basicui} &  \\
+ZVTM Demos & \cd{zvtm-demos} & Basic demos of ZVTM's core features & \\
 \hline
-zuist & \cd{zuist-engine} &  \\
+ZVTM BasicUI & \cd{zvtm-basicui} & Skeleton of a basic application that instantiates several multi-scale navigation techniques & \\
 \hline
-zuist-pdf & \cd{zuist-pdf} &  \\
+ZUIST & \cd{zuist-engine} & Multi-scale scene graph for ZVTM & \ref{sec:zuist} \\
+\hline
+ZUIST PDF & \cd{zuist-pdf} & Adds support for PDF documents in ZUIST scene graphs & \ref{sec:zuistpdf} \\
 \hline
 \end{tabular}
 
