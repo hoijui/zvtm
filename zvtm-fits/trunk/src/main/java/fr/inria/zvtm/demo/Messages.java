@@ -12,7 +12,7 @@ public class Messages {
 	static final String EMPTY_STRING = "";
 
 	static final String V = "v";
-	static final String VERSION = "1.0";
+	static final String VERSION = "0.1.0-SNAPSHOT";
     static final String AUTHORS = "Author: Emmanuel Pietriga";
     static final String APP_NAME = "ZVTM FITS Viewer";
     static final String CREDITS_NAMES = "Based on: ZVTM";
