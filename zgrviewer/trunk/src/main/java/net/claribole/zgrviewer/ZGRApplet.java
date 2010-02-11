@@ -2,13 +2,23 @@
  *   DATE OF CREATION:   Fri May 09 09:52:34 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */ 
 
 package net.claribole.zgrviewer;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.AlphaComposite;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Container;
+import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -82,19 +92,19 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     ZGRAGlassPane gp;
 
     public ZGRApplet(){
-	getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
+        getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
     }
 
     public void init(){
-	initConfig();
-	initGUI();
+        initConfig();
+        initGUI();
     }
 
     void initConfig(){
-	grMngr = new GraphicsManager(this);
-	cfgMngr = new ConfigManager(grMngr, true);
-	grMngr.setConfigManager(cfgMngr);
-	gvLdr = new GVLoader(this, grMngr, cfgMngr, null);
+        grMngr = new GraphicsManager(this);
+        cfgMngr = new ConfigManager(grMngr, true);
+        grMngr.setConfigManager(cfgMngr);
+        gvLdr = new GVLoader(this, grMngr, cfgMngr, null);
     }
 
     void initGUI(){
@@ -267,12 +277,12 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     boolean paintedAtLeastOnce = false;
 
     public void viewRepainted(View v){
-	paintedAtLeastOnce = true;
-	v.removeRepaintListener();
+        paintedAtLeastOnce = true;
+        v.removeRepaintListener();
     }
 
     public void setStatusBarText(String s){
-	statusBar.setText(s);
+        statusBar.setText(s);
     }
 
     //open up the default or user-specified browser (netscape, ie,...) and try to display the content uri
@@ -301,7 +311,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     }
 
     public void about(){
-	JOptionPane.showMessageDialog(this, Messages.about);
+        JOptionPane.showMessageDialog(this, Messages.about);
     }
 
     /* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */
@@ -366,12 +376,12 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     public void mouseReleased(MouseEvent e){}
 
     static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
-	gbc.gridx = gx;
-	gbc.gridy = gy;
-	gbc.gridwidth = gw;
-	gbc.gridheight = gh;
-	gbc.weightx = wx;
-	gbc.weighty = wy;
+        gbc.gridx = gx;
+        gbc.gridy = gy;
+        gbc.gridwidth = gw;
+        gbc.gridheight = gh;
+        gbc.weightx = wx;
+        gbc.weighty = wy;
     }
 
 }
