@@ -131,7 +131,6 @@ public class ImageDescription extends ResourceDescription {
                     finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
                 }
         }                
-        loadRequest = null;    
     }
     
     private void finishCreatingObject(final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
@@ -194,7 +193,6 @@ public class ImageDescription extends ResourceDescription {
             }
             glyph = null;
         }
-        unloadRequest = null;
     }
 
     public Glyph getGlyph(){

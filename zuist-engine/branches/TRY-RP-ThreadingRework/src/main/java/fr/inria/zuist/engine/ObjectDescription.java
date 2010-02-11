@@ -23,8 +23,6 @@ public abstract class ObjectDescription {
 
     boolean sensitive = true;
 
-    Integer loadRequest, unloadRequest;
-
     Region parentRegion;
 
     String takesTo;

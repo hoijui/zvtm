@@ -86,7 +86,6 @@ public class SceneFragmentDescription extends ResourceDescription {
             }
             catch (URISyntaxException ex){System.err.println();ex.printStackTrace();}            
         }
-        loadRequest = null;    
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
@@ -99,7 +98,6 @@ public class SceneFragmentDescription extends ResourceDescription {
             regions = null;            
         }
         sm.destroySceneFragment(this);
-        unloadRequest = null;
     }
     
     public Glyph getGlyph(){

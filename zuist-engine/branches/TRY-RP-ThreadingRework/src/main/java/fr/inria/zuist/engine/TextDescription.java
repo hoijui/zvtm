@@ -110,7 +110,6 @@ public class TextDescription extends ObjectDescription {
 		}
 	    });
         }
-        loadRequest = null;
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
@@ -134,7 +133,6 @@ public class TextDescription extends ObjectDescription {
             glyph = null;
         }
 	}
-        unloadRequest = null;
     }
 
     public void setFont(Font f){

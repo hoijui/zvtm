@@ -69,7 +69,6 @@ public class ClosedShapeDescription extends ObjectDescription {
             }
             });
         }
-        loadRequest = null;
     }
 
     /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
@@ -93,7 +92,6 @@ public class ClosedShapeDescription extends ObjectDescription {
             }
             inSpace = false;
         }
-        unloadRequest = null;
     }
 
     public Glyph getGlyph(){
