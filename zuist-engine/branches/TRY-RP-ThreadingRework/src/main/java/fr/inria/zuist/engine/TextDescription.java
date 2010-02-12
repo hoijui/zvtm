@@ -123,14 +123,15 @@ public class TextDescription extends ObjectDescription {
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new TextHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                glyph = null;
             }
             else {
 		SwingUtilities.invokeLater(new Runnable(){
 		     public void run(){
                 vs.removeGlyph(glyph);
+                glyph = null;
 		     }
             });
-            glyph = null;
         }
 	}
     }
