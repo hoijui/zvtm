@@ -166,7 +166,6 @@ public class SceneManager implements CameraListener {
             //if not active, create timer task and start it
             if(active) return;
             ActionListener action = new ActionListener(){
-                @Override
                 public void actionPerformed(ActionEvent event){
                     for(Map.Entry<Camera, Location> entry: toUpdate.entrySet()){
                         Camera cam = entry.getKey();
@@ -1102,7 +1101,6 @@ public class SceneManager implements CameraListener {
     }
         
     /* Camera events handling */
-    @Override
     public void cameraMoved(Camera cam, LongPoint loc, float alt){
         regUpdater.addEntry(cam, new Location(loc.x, loc.y, alt));
     }
