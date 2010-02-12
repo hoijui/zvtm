@@ -187,11 +187,11 @@ public class ImageDescription extends ResourceDescription {
                 SwingUtilities.invokeLater(new Runnable(){
                 public void run(){
 	            vs.removeGlyph(glyph);
-                    glyph.getImage().flush();
+                glyph.getImage().flush();
+                glyph = null;
                 }
 	        });
             }
-            glyph = null;
         }
     }
 
