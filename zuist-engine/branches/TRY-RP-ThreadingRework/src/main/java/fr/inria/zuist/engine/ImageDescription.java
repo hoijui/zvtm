@@ -169,8 +169,8 @@ public class ImageDescription extends ResourceDescription {
         }
 	SwingUtilities.invokeLater(new Runnable(){
             public void run(){
-	    vs.addGlyph(glyph);
-            glyph.setOwner(this);
+                vs.addGlyph(glyph);
+                glyph.setOwner(this);
             }
 	});
     }
@@ -182,6 +182,7 @@ public class ImageDescription extends ResourceDescription {
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                glyph = null;
             }
             else {
                 SwingUtilities.invokeLater(new Runnable(){
