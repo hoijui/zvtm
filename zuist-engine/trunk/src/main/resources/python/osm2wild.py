@@ -391,11 +391,11 @@ if __name__ == "__main__":
     try:
         mapfile = os.environ['MAPNIK_MAP_FILE']
     except KeyError:
-        mapfile = home + "/mapnik/osm.xml"
+        mapfile = home + "/mapnik/zuist_osm.xml"
     try:
         tile_dir = os.environ['MAPNIK_TILE_DIR']
     except KeyError:
-        tile_dir = home + "/mapnik/tiles/"
+        tile_dir = home + "/zuist/tiles/"
     
     bbox = (-5.24, -41.25, 10.16, 51.11)
     render_tiles(bbox, mapfile, tile_dir, MIN_ZOOM, MAX_ZOOM, "World")
