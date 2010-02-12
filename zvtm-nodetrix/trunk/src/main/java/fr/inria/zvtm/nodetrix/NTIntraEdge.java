@@ -77,8 +77,7 @@ public class NTIntraEdge extends NTEdge {
     
     public void setState(int newState)
     {
-    	if(interactionState == NodeTrixViz.IA_STATE_SELECTED && newState == NodeTrixViz.IA_STATE_FADE) return;
-    	
+//    	if(interactionState == NodeTrixViz.IA_STATE_SELECTED && newState == NodeTrixViz.IA_STATE_FADE) return;
     	newInteractionState = newState;
     }
     

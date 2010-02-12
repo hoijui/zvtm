@@ -9,12 +9,14 @@ package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
@@ -33,7 +35,14 @@ public class Matrix {
     
     long matrixLbDX = 0;
     long matrixLbDY = 0;
-    
+	
+	private long labelWidth; // maximal length of label in pixel
+	private boolean shiftNodesN = false;
+	private boolean shiftNodesW = false;
+    private boolean exploringModeGlobal = false;
+	private Glyph gOverview;
+	
+	
     public Matrix(String name, Vector<NTNode> nodes){
         this.name = name;
         this.nodes = nodes;
@@ -86,17 +95,23 @@ public class Matrix {
     	    nodes.firstElement().moveTo(x, y);
     	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, Color.white,  Color.white, 0f);
 	    }
+    	
+    	//Creating and disabling the overview glyph
+    	gOverview = new VRectangle(0,0,0, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, Color.white );
+    	vs.addGlyph(gOverview);
+    	gOverview.setSensitivity(false);
+    	gOverview.setTranslucencyValue(0);
     }
     
     void finishCreateNodeGraphics(VirtualSpace vs){
         //estimating maximal length of node labels
-    	long max_length = nodes.firstElement().getLabelWidth();
+    	labelWidth = nodes.firstElement().getLabelWidth();
         for (NTNode n : this.nodes){
-        	if (n.getLabelWidth() > max_length){
-                max_length = n.getLabelWidth();
+        	if (n.getLabelWidth() > labelWidth){
+                labelWidth = n.getLabelWidth();
             }
         }
-        max_length += NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2;
+        labelWidth += (NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2);
         
         //creating background boxes for each node
         int i = 0;
@@ -106,7 +121,7 @@ public class Matrix {
         
         for(NTNode n : this.nodes)
         {
-        	n.setBackgroundBox(max_length);
+        	n.setBackgroundBox(labelWidth);
         	if(this.nodes.size() == 1) break;
         	
         	//GRID PATTERN
@@ -152,31 +167,6 @@ public class Matrix {
 
         	i++;
         }
-        
-//        label_bkg = new VRectangle[2];
-//        if (nodes.size() > 1){
-//            // west
-//            label_bkg[0] = new VRectangle(bkg.vx-bkg.getWidth()-max_length/2-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.vy, 0,
-//                                          max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, bkg.getHeight(),
-//                                          NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
-//            // north
-//            label_bkg[1] = new VRectangle(bkg.vx, bkg.vy+bkg.getHeight()+max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0,
-//                                          bkg.getWidth(), max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER,
-//                                          NodeTrixViz.MATRIX_NODE_LABEL_BKG_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);            
-//            for (VRectangle lb:label_bkg){
-//                if (lb != null){
-//                    vs.addGlyph(lb);
-//                    vs.atBottom(lb);
-//                    lb.setOwner(this);
-//                    bkg.stick(lb);
-//                }
-//            }
-//            bkg.stick(matrixLb);
-//        }
-//        else {
-//            label_bkg[0] = bkg;
-//            bkg.setWidth(max_length/2+NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER);
-//        }
     }
     
     
@@ -228,6 +218,77 @@ public class Matrix {
 
          }
     }
+
+    public void enableExploringMode(long[] p){
+//    	if(selectedEdge != null)
+//    	{
+//	    	selectedEdge.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED);
+//	    	selectedEdge.perfomStateChange();
+//	    	
+//			NTNode head = selectedEdge.getHead();
+//			NTNode tail = selectedEdge.getTail();
+//			head.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED, false, true);
+//			tail.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED, true, false);
+//    	}
+    	
+		//SHIFT NODES TO SCREEN
+//		long labelOcclusion = Math.min(maxLabelLength, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH);
+//		presentNodesN = new Vector<NTNode>();
+//		presentNodesW = new Vector<NTNode>();
+//		for(NTNode n : nodes){
+//			if(n.gBackgroundN.vx >= p[0] + labelOcclusion){
+//				presentNodesN.add(n);
+//				n.setPermanentN(true);
+//			}else if(n.gBackgroundN.vx > p[2])
+//				break;
+//		}
+//		for(NTNode n : nodes){
+//			if(n.gBackgroundW.vy <= p[1] - labelOcclusion){
+//				presentNodesW.add(n);
+//				n.setPermanentW(true);
+//			}else if(n.gBackgroundW.vy < p[3])
+//				break;
+//		}
+    	//performing movement
+//    	for(NTNode n : presentNodesN){	n.performSurf();}
+//    	for(NTNode n : presentNodesW){	n.performSurf();}
+//    	
+    	//SHIFT NODES TO SCREEN BORDERS
+		exploringModeGlobal = true;
+		long offset = Math.min(this.labelWidth, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH);
+    	shiftNodesN = (bkg.vy + bkg.getHeight() > p[1] - offset);
+		shiftNodesW = (bkg.vx - bkg.getHeight() < p[0] + offset);
+		for (NTNode node : nodes){
+        	if(shiftNodesN) {
+        		node.shiftNorth((p[1] - offset) + labelWidth/2, true);
+        	}
+        	if(shiftNodesW) {
+        		node.shiftWest((p[0] + offset) - labelWidth/2, true);
+        	}
+		}
+		if(shiftNodesN || shiftNodesW){
+			gOverview.moveTo(p[0] + NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, p[1] - NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2);
+			gOverview.setTranslucencyValue(1);
+		}
+	}
+    
+    public void disableExploringMode()
+    {
+    	for (NTNode node : nodes){
+        	if(shiftNodesN) {
+        		node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, true);
+        	}
+        	if(shiftNodesW) {
+        		node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, true);
+            }
+		}
+    	gOverview.setTranslucencyValue(0);
+
+    	shiftNodesN = false;
+		shiftNodesW = false;
+		exploringModeGlobal = false;
+    }
+    
     
     /** Brings all glyphs of this matrix to the top of the drawing stack*/
     public void bringToFront(VirtualSpace vs)
@@ -243,6 +304,7 @@ public class Matrix {
     	for(NTNode n : this.nodes){
     		n.onTop(); //Vitrtual space is already known in NTNode
     	}
+    	vs.onTop(gOverview);
     }
    
     
@@ -286,15 +348,61 @@ public class Matrix {
     
     public void move(long x, long y){
         bkg.move(x, y);
-        for (NTNode node : nodes){
-            node.move(x, y);
-            if (node.intraEdgeSets != null){
+        long[] p = new long[2];
+        long offset = 0;
+        if(exploringModeGlobal){
+        	p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
+        	offset = Math.min(this.labelWidth, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH);
+        	shiftNodesN = (bkg.vy + bkg.getHeight() > p[1] - offset);
+    		shiftNodesW = (bkg.vx - bkg.getHeight() < p[0] + offset);
+ 
+    		if(shiftNodesN || shiftNodesW){
+    			gOverview.moveTo(p[0] + NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, p[1] - NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2);
+    			gOverview.setTranslucencyValue(1);
+    		}else{
+    			gOverview.setTranslucencyValue(0);
+    		}
+        }
+		
+    	for (NTNode node : nodes){
+    		if(!(shiftNodesN || shiftNodesW))
+    		{
+    			node.move(x, y);
+    		}else{
+    			if(shiftNodesN){
+    				node.shiftNorth((p[1] - offset) + labelWidth/2, false);
+    				node.move(x, 0);
+    			}else{
+    				node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, false);
+    			}
+    			if(shiftNodesW){
+    				node.shiftWest((p[0] + offset) - labelWidth/2, false);
+    				node.move(0, y);
+    	    	}else{
+    				node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, false);
+    			}
+    		}
+
+        	
+        	if (node.intraEdgeSets != null){
                 for (NTIntraEdgeSet edge : node.intraEdgeSets){
-                    edge.move(x,y);
+                    edge.move(x, y);
                 }
             }
-            if (node.getIncomingEdges() != null){
+            
+        	if (node.getIncomingEdges() != null){
                 for (NTEdge edge : node.getIncomingEdges()){
+                    if (edge instanceof NTExtraEdge){
+                        // do it only for extra edges because for intra edges
+                        // we have already moved them in the above loop
+                        // (intra edges connect nodes within the same matrix)
+                        edge.move(x,y);
+                    }
+                }
+            }
+            
+        	if (node.getOutgoingEdges() != null){
+                for (NTEdge edge : node.getOutgoingEdges()){
                     if (edge instanceof NTExtraEdge){
                         // do it only for extra edges because for intra edges
                         // we have already moved them in the above loop
@@ -326,5 +434,8 @@ public class Matrix {
     {
     	return this.intraEdgeSets;
     }
+
+    public boolean isExploringMode(){return exploringModeGlobal;}
+
     
 }

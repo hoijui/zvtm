@@ -29,17 +29,18 @@ public class NodeTrixViz {
 	public static final float GRID_TRANSLUCENCY = .5f;
 	public static final float INTRA_TRANSLUCENCY = .7f;
 	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
-    static long CELL_SIZE = 20;
-    static long CELL_SIZE_HALF = CELL_SIZE/2;
-    static Color MATRIX_FILL_COLOR = Color.WHITE;
-    static Color MATRIX_STROKE_COLOR = Color.BLACK;
-    static Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
-    static Color INTRA_LINK_COLOR = new Color(160,202,254);
-    static Color EXTRA_LINK_COLOR = new Color(118,98,252);
-    static int MATRIX_NODE_LABEL_DIST_BORDER = 3;
-    static Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
-    static float NODE_BACKGROUND_TRANSLUCENCY = 1f;
-    static int LINLOG_ITERATIONS = 30;
+    public static final long CELL_SIZE = 20;
+    public static final long CELL_SIZE_HALF = CELL_SIZE/2;
+    public static final int MATRIX_NODE_LABEL_DIST_BORDER = 3;
+    public static final int MATRIX_LABEL_OCCLUSION_WIDTH = 150; //half of the width/lenght in pixel that can be occupied by labels when enabling local exploration
+    public static final float MATRX_NODE_BACKGROUND_TRANSLUCENCY = .8f;
+    public static final int LINLOG_ITERATIONS = 20;
+    public static final Color MATRIX_FILL_COLOR = Color.WHITE;
+    public static final Color MATRIX_STROKE_COLOR = Color.BLACK;
+    public static final Color MATRIX_LABEL_COLOR = Color.DARK_GRAY;
+    public static final Color INTRA_LINK_COLOR = new Color(160,202,254);
+    public static final Color EXTRA_LINK_COLOR = new Color(118,98,252);
+    public static final Color MATRIX_NODE_LABEL_BKG_COLOR = new Color(250,205,155);
     
     //ANIMATION DURATIOS in msec
     public static final int DURATION_GENERAL = 300;
@@ -50,7 +51,6 @@ public class NodeTrixViz {
 	public static final int IA_STATE_HIGHLIGHTED = 1;
 	public static final int IA_STATE_SELECTED = 2;
 	public static final int IA_STATE_FADE = 3;
-	public static final int IA_STATE_SCREENSURF= 4;
 
     
 	public static final int VICINITY_RADIUS = 3;

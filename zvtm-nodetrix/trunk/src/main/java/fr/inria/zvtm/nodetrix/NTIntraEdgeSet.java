@@ -44,8 +44,6 @@ public class NTIntraEdgeSet {
 		vs.addGlyph(g);
 		m.bkg.stick(g);
 		
-		System.out.println(g.vx);
-		
 //		//Triangle
 //		LongPoint[] p = new LongPoint[3];
 //		long cs = NodeTrixViz.CELL_SIZE/2;

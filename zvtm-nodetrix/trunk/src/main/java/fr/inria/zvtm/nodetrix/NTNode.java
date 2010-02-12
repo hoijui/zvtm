@@ -57,13 +57,16 @@ public class NTNode {
 	AnimationManager animManager; 
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
 	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
-
+	/* which labels of the node should be affected by the next state */
 	private boolean affectWest = false;
 	private boolean affectNorth = false;
-	private boolean highlight = false;
+	/* if the node is permanent visible at the side of the screen.*/
+	private boolean permanentNorth = false;	
+	private boolean permanentWest = false;
 
-	private long surfStop_x = 100000000, surfStop_y = -10000000;
 
+	
+	
 	
 	public NTNode(String name){
         this.name = name;
@@ -80,12 +83,10 @@ public class NTNode {
 
 	    labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
-	    gBackgroundW.setTranslucencyValue(NodeTrixViz.NODE_BACKGROUND_TRANSLUCENCY);
 	    gBackgroundW.setDrawBorder(false);
 	    gBackgroundW.stick(this.labelW);
 	    gBackgroundW.setOwner(this);
 		vs.addGlyph(gBackgroundW);
-//		vs.onTop(gBackgroundW);
 	    vs.addGlyph(labelW);
 	    
 	    
@@ -94,13 +95,11 @@ public class NTNode {
     	    this.ndy = ndy;
     	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
-    	    gBackgroundN.setTranslucencyValue(NodeTrixViz.NODE_BACKGROUND_TRANSLUCENCY);
     	    gBackgroundN.setDrawBorder(false);
     	    gBackgroundN.setOwner(this);
     	    gBackgroundN.stick(this.labelN);
     	    gBackgroundN.setOwner(this);
     		vs.addGlyph(gBackgroundN);
-//    		vs.onTop(gBackgroundN);
     		vs.addGlyph(labelN);
 		}
     }
@@ -118,24 +117,142 @@ public class NTNode {
     }
     
     //INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------
-    public void setState(int newState)
+    public void setState(int newState, boolean west, boolean north)
     {
     	newInteractionState = newState;
-    	if(newState == NodeTrixViz.IA_STATE_HIGHLIGHTED)
-    		highlight = true;
+    	this.affectNorth = affectNorth || north;
+    	this.affectWest = affectWest || west;
     }
+    
+    public void shiftWest(long xNew, boolean animated)
+    {
+    	if(animated){
+    		animManager.startAnimation(animManager.getAnimationFactory()
+    				.createGlyphTranslation(
+    						NodeTrixViz.DURATION_NODEMOVE,
+    						gBackgroundW, 
+    						new LongPoint(xNew,	gBackgroundW.vy ),
+    						false, 
+    						SlowInSlowOutInterpolator2.getInstance(), 
+    						null),
+    						true);
+    	}else{
+    		gBackgroundW.move(xNew - gBackgroundW.vx, 0);
+    	}
+    	gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRX_NODE_BACKGROUND_TRANSLUCENCY);
+    }
+    
+    public void shiftNorth(long yNew, boolean animated)
+    {
+    	if(animated){
+    		animManager.startAnimation(animManager.getAnimationFactory()
+    				.createGlyphTranslation(
+    						NodeTrixViz.DURATION_NODEMOVE,
+    						gBackgroundN, 
+    						new LongPoint(gBackgroundN.vx, yNew),
+    						false, 
+    						SlowInSlowOutInterpolator2.getInstance(), 
+    						null),
+    						true);
+      	}else{
+      		gBackgroundN.move(0, yNew - gBackgroundN.vy);
+        }
+      	gBackgroundN.setTranslucencyValue(NodeTrixViz.MATRX_NODE_BACKGROUND_TRANSLUCENCY);
+    }
+    
+    public void surfBackNorth(long yNew, boolean animated)
+    {
+    	if(animated){
+    		animManager.startAnimation(animManager.getAnimationFactory()
+    				.createGlyphTranslation(
+    						NodeTrixViz.DURATION_NODEMOVE,
+    						gBackgroundN, 
+    						new LongPoint(gBackgroundN.vx, yNew),
+    						false, 
+    						SlowInSlowOutInterpolator2.getInstance(), 
+    						null),
+    						true);
+    	}else{
+      		gBackgroundN.move(0, yNew - gBackgroundN.vy);
+        }
+    	gBackgroundN.setTranslucencyValue(1);
+    }
+    
+    public void surfBackWest(long xNew, boolean animated)
+    {
+    	if(animated){
+    		animManager.startAnimation(animManager.getAnimationFactory()
+	        		.createGlyphTranslation(
+	        			NodeTrixViz.DURATION_NODEMOVE,
+	        			gBackgroundW, 
+	        			new LongPoint(xNew, gBackgroundW.vy),
+	        			false, 
+	        			SlowInSlowOutInterpolator2.getInstance(), 
+	        			null),
+        		true);
+    	}else{
+    		gBackgroundW.move(xNew - gBackgroundW.vx, 0);
+    	}
+    	gBackgroundW.setTranslucencyValue(1);
+    }
+    
+    	//    	if(permanentWest){
+//    		if((mx + wdx - widthHalf) < p[0]){
+//    			Animation a = animManager.getAnimationFactory()
+//    			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
+//    					new LongPoint(xNew, gBackgroundW.vy),
+//    					false, 
+//    					SlowInSlowOutInterpolator2.getInstance(), 
+//    					null);
+//    			animManager.startAnimation(a, true);
+//    			this.gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_LABEL_TRANSLUCENCY);
+//    		}
+//    	}else{
+//    		if(!permanentWest){
+//    			Animation a = animManager.getAnimationFactory()
+//    			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
+//    					new LongPoint(mx + wdx,my + wdy),
+//    					false, 
+//    					SlowInSlowOutInterpolator2.getInstance(), 
+//    					null);
+//    			animManager.startAnimation(a, true);
+//    		}
+//    	}
+//    	
+//    	if(permanentNorth){
+//    		if((my + ndy + widthHalf) > p[1]){	
+//    			Animation a = animManager.getAnimationFactory()
+//    			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
+//    					new LongPoint(gBackgroundN.vx, yNew),
+//    					false, 
+//    					SlowInSlowOutInterpolator2.getInstance(), 
+//    					null);
+//    			animManager.startAnimation(a, true);
+//    			this.gBackgroundN.setTranslucencyValue(.6f);
+//    		}
+//    	}else{
+//        	if(!permanentNorth){
+//        		.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
+//    	    			new LongPoint(mx + ndx,my + ndy),
+//    	    			false, 
+//    	    			SlowInSlowOutInterpolator2.getInstance(), 
+//    	    			null);
+//    	    	animManager.startAnimation(a, true);
+//        	}
+//    	}
+//    }
+    
     
     public void perfomStateChange()
     {
-    	if(newInteractionState == interactionState) return;
-    	
+//    	if(newInteractionState == interactionState) return;
+
     	if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHTED) highlight();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_SCREENSURF) surfToScreen();
 	    else reset();
 	    
-	    interactionState = newInteractionState;
+        interactionState = newInteractionState;
     }
     
     public void reset()
@@ -146,41 +263,31 @@ public class NTNode {
 		
 		affectNorth = false;
 		affectWest = false;
-		highlight = false;
-		surfStop_x = 100000000; 
-		surfStop_y = -100000000;
 		
 		if(!single)
 		{
-			//POSITIONS
-			Animation a = animManager.getAnimationFactory()
-			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
-					new LongPoint(mx + wdx,my + wdy),
-					false, 
-					SlowInSlowOutInterpolator2.getInstance(), 
-					null);
-			animManager.startAnimation(a, true);
-			
-			a = animManager.getAnimationFactory()
-			.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
-					new LongPoint(mx + ndx,my + ndy),
-					false, 
-					SlowInSlowOutInterpolator2.getInstance(), 
-					null);
-			animManager.startAnimation(a, true);
 			gBackgroundN.setColor(backgroundColor);
 			gBackgroundN.setTranslucencyValue(1);
 		}
+		
     }
     
     private void highlight()
     {
-    	if(affectWest || single){
-    		this.gBackgroundW.setColor(Color.yellow);
-    	}
+    	boolean oldNorth = this.permanentNorth;
+    	boolean oldWest = this.permanentWest;
+    	
     	if(affectNorth){
     		this.gBackgroundN.setColor(Color.yellow);
+    		this.permanentNorth = true;
     	}
+    	if(affectWest || single){
+    		this.gBackgroundW.setColor(Color.yellow);
+    		this.permanentWest = true;
+    	}
+    	
+    	this.permanentNorth = oldNorth;
+    	this.permanentWest = oldWest;
     }
     
     private void select()
@@ -189,49 +296,14 @@ public class NTNode {
     
     private void fade()
     {
+//    	if(affectWest || single){
+//    		this.gBackgroundW.setTranslucencyValue(.6f);
+//    	}
+//    	if(affectNorth){
+//    		this.gBackgroundN.setTranslucencyValue(.6f);
+//    	}
     }
     
-    
-    /**Method that is called to force the labels of this Node come onto sceen when user clicks and holds
-     * on a relation in the matrix.
-     * @param tail - if true, the western label is moved, if false, the northern one.
-     */
-    public void surfToScreen()
-    {
-    	if(single) return;
-    	if(highlight) this.highlight();
-    	
-    	long[] p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
-    	if(affectWest){
-    		if((mx + wdx - widthHalf) < p[0]){
-    			long xNew;
-    			if(highlight) xNew = p[0] + widthHalf;
-    			else xNew = Math.min(p[0] + widthHalf, this.surfStop_x - widthHalf);
-    			Animation a = animManager.getAnimationFactory()
- 					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundW, 
- 							new LongPoint(xNew, gBackgroundW.vy),
- 							false, 
- 							SlowInSlowOutInterpolator2.getInstance(), 
- 							null);
- 				animManager.startAnimation(a, true);
-    		}
-    	}
-    	if(affectNorth){
-    		if((my + ndy + widthHalf) > p[1]){	
-    			long yNew;
-    			if(highlight) yNew = p[1] - widthHalf;
-    			else yNew = Math.max(p[1] - widthHalf, this.surfStop_y + widthHalf);
-    			Animation a = animManager.getAnimationFactory()
- 					.createGlyphTranslation(NodeTrixViz.DURATION_NODEMOVE, gBackgroundN, 
- 							new LongPoint(gBackgroundN.vx, yNew),
- 							false, 
- 							SlowInSlowOutInterpolator2.getInstance(), 
- 							null);
- 				animManager.startAnimation(a, true);
- 	    	}
-    	}
-    }
-
     
     public void onTop() {
     	vs.onTop(gBackgroundW);
@@ -244,25 +316,6 @@ public class NTNode {
     
     
     //GETTER/SETTER--------------------------------------------------------------------------------------------
-    
-    public void setTailToScreen(long x, long y){
-    	affectWest = true;
-    	this.surfStop_x = Math.min(this.surfStop_x, x - NodeTrixViz.CELL_SIZE_HALF);
-    	this.surfStop_y = Math.max(this.surfStop_y, y + NodeTrixViz.CELL_SIZE_HALF);
-    }
-    public void setHeadToScreen(long x, long y){
-    	affectNorth = true;
-    	this.surfStop_x = Math.min(this.surfStop_x, x - NodeTrixViz.CELL_SIZE_HALF);
-    	this.surfStop_y = Math.max(this.surfStop_y, y + NodeTrixViz.CELL_SIZE_HALF);
-    }
-    
-    public void stateAffectsNorth(){
-    	affectNorth = true;
-    }
-    public void stateAffectsWest(){
-    	affectWest = true;
-    }
-    
     
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
      * the matrix. A gradiant is applied according to the position of the node in the list.
