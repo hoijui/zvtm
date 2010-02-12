@@ -21,7 +21,7 @@
 from mod_python import apache
 #http://www.modpython.org/live/current/doc-html/
 
-from mapnik import *
+import mapnik
 
 import os, math
 
@@ -95,9 +95,12 @@ def generateTile(req, z=-1, col=-1, row=-1):
         if not os.path.exists("%s/%s" % (CACHE_DIR, z)):
             os.mkdir("%s/%s" % (CACHE_DIR, z))
         os.mkdir("%s/%s/%s" % (CACHE_DIR, z, col))
-    m = Map(TS_I, TS_I)
-    load_map(m, os.environ['MAPNIK_MAP_FILE'])
-    prj = Projection(m.srs)
+    m = mapnik.Map(TS_I, TS_I)
+    try:
+        mapfile = os.environ['MAPNIK_MAP_FILE']
+    except KeyError:
+        mapfile = "/home/osm/mapnik/osm.xml"
+    prj = mapnik.Projection(m.srs)
     gprj = GoogleProjection(MAX_ZOOM+1)
     # Calculate pixel positions of bottom-left & top-right
     p0 = (col * TS_I, (row + 1) * TS_I)
@@ -106,15 +109,18 @@ def generateTile(req, z=-1, col=-1, row=-1):
     l0 = gprj.fromPixelToLL(p0, z);
     l1 = gprj.fromPixelToLL(p1, z);
     # Convert to map projection (e.g. mercator co-ords EPSG:900913)
-    c0 = prj.forward(Coord(l0[0],l0[1]))
-    c1 = prj.forward(Coord(l1[0],l1[1]))
+    c0 = prj.forward(mapnik.Coord(l0[0],l0[1]))
+    c1 = prj.forward(mapnik.Coord(l1[0],l1[1]))
     # Bounding box for the tile
-    bbox = Envelope(c0.x, c0.y, c1.x, c1.y)
+    if hasattr(mapnik,'mapnik_version') and mapnik.mapnik_version() >= 800:
+        bbox = mapnik.Box2d(c0.x,c0.y, c1.x,c1.y)
+    else:
+        bbox = mapnik.Envelope(c0.x,c0.y, c1.x,c1.y)    
     m.resize(TS_I, TS_I)
     m.zoom_to_box(bbox)
     m.buffer_size = 256
-    im = Image(TS_I, TS_I)
-    render(m, im)    
+    im = mapnik.Image(TS_I, TS_I)
+    mapnik.render(m, im)    
     view = im.view(0, 0, TS_I, TS_I) # x,y,width,height
     view.save(map_path, 'png')
     req.content_type = 'image/png'
