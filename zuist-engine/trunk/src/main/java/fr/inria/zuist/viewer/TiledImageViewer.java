@@ -512,20 +512,16 @@ class Overlay implements ViewEventHandler {
     }
 
     void showMessage(String msg){
-        synchronized(this){
-            fadedRegion.setWidth(application.panelWidth/2-1);
-            fadedRegion.setHeight(50);
-            sayGlyph.setText(msg);
-            fadedRegion.setVisible(true);
-            sayGlyph.setVisible(true);
-        }
+	    fadedRegion.setWidth(application.panelWidth/2-1);
+	    fadedRegion.setHeight(50);
+	    sayGlyph.setText(msg);
+	    fadedRegion.setVisible(true);
+	    sayGlyph.setVisible(true);
     }
 
     void hideMessage(){
-        synchronized(this){
-            fadedRegion.setVisible(false);
-            sayGlyph.setVisible(false);
-        }
+	    fadedRegion.setVisible(false);
+	    sayGlyph.setVisible(false);
     }
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){

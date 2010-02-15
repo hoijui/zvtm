@@ -8,6 +8,7 @@
 package fr.inria.zuist.engine;
 
 import java.awt.Color;
+import javax.swing.SwingUtilities;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -24,7 +25,7 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class ClosedShapeDescription extends ObjectDescription {
 
-    ClosedShape glyph;
+    volatile ClosedShape glyph;
     boolean inSpace = false;
 
     /** Constructs the description of an image (VImageST).
@@ -43,12 +44,12 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
 
     /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(VirtualSpace vs, boolean fadeIn){
+    @Override
+    public void createObject(final VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
             if (fadeIn){
                 ((Translucent)glyph).setTranslucencyValue(0.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
-                vs.addGlyph(glyph);
                 //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
                 //        not necessarily 1.0f
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
@@ -59,16 +60,20 @@ public class ClosedShapeDescription extends ObjectDescription {
             }
             else {
                 if (!sensitive){glyph.setSensitivity(false);}
-                vs.addGlyph(glyph);
             }
             inSpace = true;
-            glyph.setOwner(this);
+	    SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+	        vs.addGlyph(glyph);
+                glyph.setOwner(this);
+            }
+            });
         }
-        loadRequest = null;
     }
 
     /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
-    public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
+    @Override
+    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
         if (inSpace){
             if (fadeOut){
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
@@ -79,11 +84,14 @@ public class ClosedShapeDescription extends ObjectDescription {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
-                vs.removeGlyph(glyph);
+            SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+	        vs.removeGlyph(glyph);
+            }
+            });
             }
             inSpace = false;
         }
-        unloadRequest = null;
     }
 
     public Glyph getGlyph(){

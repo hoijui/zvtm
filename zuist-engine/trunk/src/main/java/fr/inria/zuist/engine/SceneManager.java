@@ -135,7 +135,7 @@ public class SceneManager implements CameraListener {
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable id2region;
     /** Contains a mapping from object IDs to actual objects. */
-    Hashtable id2object;
+    Hashtable<String, ObjectDescription> id2object;
     /** Contains a mapping from scene IDs to actual scenes. */
     Hashtable id2scene;
     
@@ -206,7 +206,7 @@ public class SceneManager implements CameraListener {
         prevAlts = new float[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
-        id2object = new Hashtable();
+        id2object = new Hashtable<String, ObjectDescription>();
         id2scene = new Hashtable();
         sceneAttrs = new HashMap();
         RESOURCE_HANDLERS = new HashMap();
@@ -272,7 +272,7 @@ public class SceneManager implements CameraListener {
      *@return null if no object associated with this ID.
      */
     public ObjectDescription getObject(String id){
-	return (ObjectDescription)id2object.get(id);
+	return id2object.get(id);
     }
 
 	/** Get the total number of objects (at any level and in any region) in the scene. */
@@ -331,7 +331,8 @@ public class SceneManager implements CameraListener {
     }
     
     public int getPendingRequestQueueSize(){
-        return glyphLoader.requestQueue.size();
+        //return glyphLoader.requestQueue.size();
+	    return 0; //XXX fix or drop the method
     }
 
     /* ----------- level / region / object creation (API and XML) ----------- */
@@ -992,7 +993,7 @@ public class SceneManager implements CameraListener {
      *@param nbRequests number of queued requests processed by the load/unload request handling thread before going to sleep (default is 5)
      */
     public void setNumberOfRequestsHandledPerCycle(int nbRequests){
-	glyphLoader.setNumberOfRequestsHandledPerCycle(nbRequests);
+        //delegate to GlyphLoader or remove this method	
     }
 
     public void setFadeInDuration(int d){
@@ -1011,6 +1012,13 @@ public class SceneManager implements CameraListener {
         }
         return -1;
     }
+
+    VirtualSpace getSpaceByIndex(int layerIndex){
+	if((layerIndex < 0) || (layerIndex > sceneLayers.length)){
+	    return null;
+	}
+        return sceneLayers[layerIndex];
+    } 
 
     // debug
 //     void printLevelInfo(){
