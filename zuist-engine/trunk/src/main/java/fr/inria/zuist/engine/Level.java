@@ -45,7 +45,7 @@ public class Level {
 		*@return null if no region at this level
 		*/
 	public Region getClosestRegion(LongPoint lp){
-		if (regions.length > 1){
+		if (regions.length >= 1){
 			Region res = regions[0];
 			for (int i=1;i<regions.length;i++){
 				if (Math.pow(regions[i].x-lp.x, 2) + Math.pow(regions[i].y-lp.y, 2) < Math.pow(res.x-lp.x, 2) + Math.pow(res.y-lp.y, 2)){
