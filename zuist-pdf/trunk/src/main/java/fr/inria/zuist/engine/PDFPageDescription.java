@@ -10,6 +10,7 @@ package fr.inria.zuist.engine;
 import java.awt.Image;
 import java.awt.Color;
 import java.awt.RenderingHints;
+import javax.swing.SwingUtilities;
 
 import java.net.URL;
 
@@ -37,7 +38,7 @@ public class PDFPageDescription extends ResourceDescription {
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    ZPDFPageImg glyph;
+    volatile ZPDFPageImg glyph;
     int page = 1;
 
     /** Constructs the description of an image (VImageST).
@@ -96,63 +97,45 @@ public class PDFPageDescription extends ResourceDescription {
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public synchronized void createObject(final VirtualSpace vs, final boolean fadeIn){
+    public void createObject(final VirtualSpace vs, final boolean fadeIn){
         if (glyph == null){
             // open connection to data
             if (showFeedbackWhenFetching){
                 final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale),
                                                             Color.LIGHT_GRAY, Color.DARK_GRAY, Color.BLACK, vs);
                 vs.addGlyph(vrp);
-                final SwingWorker worker = new SwingWorker(){
-                    public Object construct(){
-                        //try {
-                            //URLConnection uc = src.openConnection();
-                            //int dataLength = uc.getContentLength();
-                            //byte[] imgData = new byte[dataLength];
-                            //BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
-                            //int bytesRead = 0;
-                            //while (bytesRead < dataLength-1){
-                            //    int av = bis.available();
-                            //    if (av > 0){
-                            //        bis.read(imgData, bytesRead, av);
-                            //        bytesRead += av;
-                            //        vrp.setProgress(bytesRead, dataLength);
-                            //    }
-                            //    //else {
-                            //    //    sleep(10);
-                            //    //}
-                            //}
-                            vrp.setProgress(10, 100);
-                            finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), vrp, fadeIn);
-                        //}
-                        //catch(IOException e){
-                        //    System.err.println("Error fetching Image resource "+src.toString());
-                        //    e.printStackTrace();
-                        //}
-                        return null; 
-                    }
-                };
-                worker.start();
+                //try {
+                //URLConnection uc = src.openConnection();
+                //int dataLength = uc.getContentLength();
+                //byte[] imgData = new byte[dataLength];
+                //BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
+                //int bytesRead = 0;
+                //while (bytesRead < dataLength-1){
+                //    int av = bis.available();
+                //    if (av > 0){
+                //        bis.read(imgData, bytesRead, av);
+                //        bytesRead += av;
+                //        vrp.setProgress(bytesRead, dataLength);
+                //    }
+                //    //else {
+                //    //    sleep(10);
+                //    //}
+                //}
+                vrp.setProgress(10, 100);
+                finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), vrp, fadeIn);
+                //}
+                //catch(IOException e){
+                //    System.err.println("Error fetching Image resource "+src.toString());
+                //    e.printStackTrace();
+                //}
             }
             else {
-                if (this.isLocal()){
-                    finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);                    
-                }
-                else {
-                    final SwingWorker worker = new SwingWorker(){
-                        public Object construct(){
-                            finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);
-                            return null; 
-                        }
-                    };
-                    worker.start();
-                }
+                    finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);
             }
         }                
-        loadRequest = null;    
     }
     
-    private synchronized void finishCreatingObject(VirtualSpace vs, PDFPage p, VRectProgress vrp, boolean fadeIn){
+    private void finishCreatingObject(final VirtualSpace vs, PDFPage p, VRectProgress vrp, boolean fadeIn){
         glyph = new ZPDFPageImg(vx, vy, zindex, p, 1.0f, scale);
         if (strokeColor != null){
             glyph.setBorderColor(strokeColor);
@@ -165,7 +148,11 @@ public class PDFPageDescription extends ResourceDescription {
         glyph.setInterpolationMethod(interpolationMethod);
         if (fadeIn){
             glyph.setTranslucencyValue(0f);
-            vs.addGlyph(glyph);
+            SwingUtilities.invokeLater(new Runnable(){
+                public void run(){
+                    vs.addGlyph(glyph);
+                }
+            });
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
@@ -181,27 +168,34 @@ public class PDFPageDescription extends ResourceDescription {
             if (showFeedbackWhenFetching){
                 vs.removeGlyph(vrp);
             }
-            vs.addGlyph(glyph);
+            SwingUtilities.invokeLater(new Runnable(){
+                public void run(){
+                    vs.addGlyph(glyph);
+                }
+            });
         }
         glyph.setOwner(this);
-        loadRequest = null;
     }
     
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public synchronized void destroyObject(VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                glyph = null;
             }
             else {
-                vs.removeGlyph(glyph);
-                glyph.flush();
+                SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        vs.removeGlyph(glyph);
+                        glyph.flush();
+                        glyph = null;
+                    }
+                });
             }
-            glyph = null;
         }
-        unloadRequest = null;
     }
 
     public Glyph getGlyph(){
