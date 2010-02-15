@@ -989,13 +989,6 @@ public class SceneManager implements CameraListener {
         }
     }
 
-    /** Set the number of queued requests processed by the load/unload request handling thread before going to sleep.
-     *@param nbRequests number of queued requests processed by the load/unload request handling thread before going to sleep (default is 5)
-     */
-    public void setNumberOfRequestsHandledPerCycle(int nbRequests){
-        //delegate to GlyphLoader or remove this method	
-    }
-
     public void setFadeInDuration(int d){
 	glyphLoader.FADE_IN_DURATION = d;
     }
