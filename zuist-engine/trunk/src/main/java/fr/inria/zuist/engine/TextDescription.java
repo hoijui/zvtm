@@ -106,7 +106,7 @@ public class TextDescription extends ObjectDescription {
 	    SwingUtilities.invokeLater(new Runnable(){
                 public void run(){
 	    	    vs.addGlyph(glyph);
-            	glyph.setOwner(this);
+            	glyph.setOwner(TextDescription.this);
 		}
 	    });
         }

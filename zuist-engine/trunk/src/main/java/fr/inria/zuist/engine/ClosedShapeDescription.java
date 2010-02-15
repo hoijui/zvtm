@@ -65,7 +65,7 @@ public class ClosedShapeDescription extends ObjectDescription {
 	    SwingUtilities.invokeLater(new Runnable(){
             public void run(){
 	        vs.addGlyph(glyph);
-                glyph.setOwner(this);
+                glyph.setOwner(ClosedShapeDescription.this);
             }
             });
         }

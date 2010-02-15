@@ -20,7 +20,6 @@ import java.net.URLConnection;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VText;
@@ -170,7 +169,7 @@ public class ImageDescription extends ResourceDescription {
 	SwingUtilities.invokeLater(new Runnable(){
             public void run(){
                 vs.addGlyph(glyph);
-                glyph.setOwner(this);
+                glyph.setOwner(ImageDescription.this);
             }
 	});
     }
