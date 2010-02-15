@@ -16,6 +16,7 @@ class GlyphLoader {
     private final int NTHREADS = 40;
     private final int CAPACITY = 200;
     private final ThreadPoolExecutor executor;
+    private volatile boolean enabled = true;
 
     static int FADE_IN_DURATION = 300; //milliseconds
     static int FADE_OUT_DURATION = 300; //milliseconds
@@ -30,6 +31,10 @@ class GlyphLoader {
 
     //layerIndex maps to a VirtualSpace
     public void addLoadRequest(int layerIndex, ObjectDescription od, boolean transition){
+        if(!enabled){
+            return;
+        }
+
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
         if(target == null){
             System.err.println("addLoadRequest: could not retrieve virtual space");
@@ -40,6 +45,10 @@ class GlyphLoader {
 
     //layerIndex maps to a VirtualSpace
     public void addUnloadRequest(int layerIndex, ObjectDescription od, boolean transition){
+        if(!enabled){
+            return;
+        }
+
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
         if(target == null){
             System.err.println("addLoadRequest: could not retrieve virtual space");
@@ -48,8 +57,19 @@ class GlyphLoader {
         executor.submit(new Request(target, Request.TYPE_UNLOAD, od, transition));
     }
 
-    public void setEnabled(boolean enable){}
+    /**
+     * Enables or disables this GlyphLoader.
+     * A disabled GlyphLoader silently discards requests.
+     * (i.e. addLoadRequest and addUnloadRequest have no effect).
+     */
+    public void setEnabled(boolean enable){
+        this.enabled = enable;
+    }
 
+    /**
+     * Initiates an orderly shutdown in which previously submitted 
+     * tasks are executed, but no new tasks will be accepted.
+     */
     public void shutdown(){ executor.shutdown(); }
 
 }
