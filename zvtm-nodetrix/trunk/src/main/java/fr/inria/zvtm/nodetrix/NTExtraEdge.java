@@ -20,6 +20,7 @@ public class NTExtraEdge extends NTEdge {
     LongPoint[] offsets;
     private int state = NodeTrixViz.IA_STATE_DEFAULT;
     static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
+    private float alpha = 1f;
     
     public NTExtraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
@@ -35,13 +36,14 @@ public class NTExtraEdge extends NTEdge {
     
     @Override
     protected void highlight(Color c) {
-    	System.out.println("HIGHLIGHT");
     	edgePath.setColor(c);
+    	edgePath.setTranslucencyValue(1);
     }
     
     @Override
     protected void reset() {
     	edgePath.setColor(edgeColor);
+    	edgePath.setTranslucencyValue(alpha);
     }
     
     @Override
@@ -54,8 +56,8 @@ public class NTExtraEdge extends NTEdge {
      */
     public void assignAlpha()
     {
-    	float a = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
-    	edgePath.setTranslucencyValue(a);
+    	alpha = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
+    	edgePath.setTranslucencyValue(alpha);
     }
     
     
@@ -118,6 +120,8 @@ public class NTExtraEdge extends NTEdge {
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
         }
         vs.addGlyph(edgePath);
+//        edgePath.setColor(edgeColor);
+        edgePath.setStrokeWidth(3);
         edgePath.setOwner(this);
         assignAlpha();
     }

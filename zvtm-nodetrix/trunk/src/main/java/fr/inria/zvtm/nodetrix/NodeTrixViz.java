@@ -64,7 +64,7 @@ public class NodeTrixViz {
     public final static Color EXTRA_EDGE_RELATED_COLOR = Color.yellow;
 	public static final float EXTRA_ALPHA_MAX_LENGHT = 1500;  
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
-	public static final float EXTRA_ALPHA_MIN = .4f;  
+	public static final float EXTRA_ALPHA_MIN = .25f;  
     /* Matrices in this visualization */
     Matrix[] matrices;
     

@@ -311,7 +311,6 @@ public class Matrix {
     			highlightedNodes.add(e.getHead());
     			highlightedEdges.add(e);
     		}
-    		System.out.println(i);
     	}
     	for(NTNode nRel : highlightedNodes){
     		highlightGrid(n, nRel, NodeTrixViz.MATRIX_NODE_RELATED_COLOR);
@@ -454,6 +453,7 @@ public class Matrix {
                         // we have already moved them in the above loop
                         // (intra edges connect nodes within the same matrix)
                         edge.move(x,y);
+                        ((NTExtraEdge) edge).assignAlpha();
                     }
                 }
             }
