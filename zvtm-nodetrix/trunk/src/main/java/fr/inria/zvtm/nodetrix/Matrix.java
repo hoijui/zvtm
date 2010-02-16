@@ -37,11 +37,14 @@ public class Matrix {
     long matrixLbDY = 0;
 	
 	private long labelWidth; // maximal length of label in pixel
-	private boolean shiftNodesN = false;
-	private boolean shiftNodesW = false;
+	private boolean nodesUnvisibleN = false;
+	private boolean nodesUnvisibleW = false;
     private boolean exploringModeGlobal = false;
 	private Glyph gOverview;
 	
+	//TEMPORARY STUFF
+	private Vector<NTNode> highlightedNodes = new Vector<NTNode>();
+	private Vector<NTEdge> highlightedEdges = new Vector<NTEdge>();
 	
     public Matrix(String name, Vector<NTNode> nodes){
         this.name = name;
@@ -64,7 +67,7 @@ public class Matrix {
             // matrix label
     	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1*nodes.size()));
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()+.5+Math.sqrt(2*nodes.size())));
-    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
+    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
     	    vs.addGlyph(matrixLabel);
     	    matrixLabel.setOwner(this);
     	    bkg.stick(matrixLabel);
@@ -97,7 +100,7 @@ public class Matrix {
 	    }
     	
     	//Creating and disabling the overview glyph
-    	gOverview = new VRectangle(0,0,0, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, Color.white );
+    	gOverview = new VRectangle(0,0,0, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, Color.white );
     	vs.addGlyph(gOverview);
     	gOverview.setSensitivity(false);
     	gOverview.setTranslucencyValue(0);
@@ -255,19 +258,19 @@ public class Matrix {
 //    	
     	//SHIFT NODES TO SCREEN BORDERS
 		exploringModeGlobal = true;
-		long offset = Math.min(this.labelWidth, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH);
-    	shiftNodesN = (bkg.vy + bkg.getHeight() > p[1] - offset);
-		shiftNodesW = (bkg.vx - bkg.getHeight() < p[0] + offset);
+		long offset = Math.min(this.labelWidth, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH);
+    	nodesUnvisibleN = (bkg.vy + bkg.getHeight() > p[1] - offset);
+		nodesUnvisibleW = (bkg.vx - bkg.getHeight() < p[0] + offset);
 		for (NTNode node : nodes){
-        	if(shiftNodesN) {
+        	if(nodesUnvisibleN) {
         		node.shiftNorth((p[1] - offset) + labelWidth/2, true);
         	}
-        	if(shiftNodesW) {
+        	if(nodesUnvisibleW) {
         		node.shiftWest((p[0] + offset) - labelWidth/2, true);
         	}
 		}
-		if(shiftNodesN || shiftNodesW){
-			gOverview.moveTo(p[0] + NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, p[1] - NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2);
+		if(nodesUnvisibleN || nodesUnvisibleW){
+			gOverview.moveTo(p[0] + NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, p[1] - NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2);
 			gOverview.setTranslucencyValue(1);
 		}
 	}
@@ -275,18 +278,64 @@ public class Matrix {
     public void disableExploringMode()
     {
     	for (NTNode node : nodes){
-        	if(shiftNodesN) {
+        	if(nodesUnvisibleN) {
         		node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, true);
         	}
-        	if(shiftNodesW) {
+        	if(nodesUnvisibleW) {
         		node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, true);
             }
 		}
     	gOverview.setTranslucencyValue(0);
 
-    	shiftNodesN = false;
-		shiftNodesW = false;
+    	nodesUnvisibleN = false;
+		nodesUnvisibleW = false;
 		exploringModeGlobal = false;
+    }
+    
+    /**
+     * highlights all relations and related nodes of te given one.
+     */
+    public void highlightNodeContext(NTNode n)
+    {
+    	n.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED, true, true);
+    	//set related nodes
+    	highlightedNodes = new Vector<NTNode>();
+    	highlightedEdges = new Vector<NTEdge>();
+    	if(n.getOutgoingEdges() != null){
+    		int i = 0;
+    		for(NTEdge e : n.getOutgoingEdges()){
+    			e.getHead().setState(NodeTrixViz.IA_STATE_RELATED, true, true);
+    			i++;
+    			e.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED);
+    			e.performStateChange();
+    			highlightedNodes.add(e.getHead());
+    			highlightedEdges.add(e);
+    		}
+    		System.out.println(i);
+    	}
+    	for(NTNode nRel : highlightedNodes){
+    		highlightGrid(n, nRel, NodeTrixViz.MATRIX_NODE_RELATED_COLOR);
+    		nRel.perfomStateChange();
+    	}
+    	
+    	n.perfomStateChange();
+    	highlightGrid(n, n, NodeTrixViz.MATRIX_NODE_HIGHLIGHT_COLOR);
+    }
+    
+    public void resetNodeContext(NTNode n)
+    {
+    	n.setState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
+    	resetGrid(n,n);
+    	for(NTNode nRel : highlightedNodes){
+    		nRel.setState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
+    		resetGrid(n, nRel);
+    		nRel.perfomStateChange();
+    	}
+    	for(NTEdge e : highlightedEdges){
+    		e.setState(NodeTrixViz.IA_STATE_DEFAULT);
+    		e.performStateChange();
+    	}
+    	n.perfomStateChange();
     }
     
     
@@ -308,28 +357,39 @@ public class Matrix {
     }
    
     
-    public void highlightGrid(NTNode tail, NTNode head)
+    public void highlightGrid(NTNode tail, NTNode head, Color c)
     {
-    	Glyph g1 = gridBarsH[nodes.indexOf(tail)];
-    	g1.setColor(Color.yellow);
-    	g1.setVisible(true);
+    	int i1 = nodes.indexOf(tail);
+    	if(i1 > -1){
+    		Glyph g1 = gridBarsH[nodes.indexOf(tail)];
+    		g1.setColor(c);
+    		g1.setVisible(true);
+    	}
+ 
+    	int i2 = nodes.indexOf(head);
+    	if(i2 > -1){
+    		Glyph g2 = gridBarsV[nodes.indexOf(head)];
+    		g2.setColor(c);
+    		g2.setVisible(true);
+    	}
     	
-    	Glyph g2 = gridBarsV[nodes.indexOf(head)];
-    	g2.setColor(Color.yellow);
-    	g2.setVisible(true);
     }
     
     public void resetGrid(NTNode tail, NTNode head)
     {
     	int i1 = nodes.indexOf(tail);
-    	Glyph g1 = gridBarsH[i1];
-    	g1.setColor(NodeTrixViz.GRID_COLOR);
-    	if(i1 % 2 != 0) g1.setVisible(false);
+    	if(i1 > -1){
+    		Glyph g1 = gridBarsH[i1];
+    		g1.setColor(NodeTrixViz.GRID_COLOR);
+    		if(i1 % 2 != 0) g1.setVisible(false);
+    	}
 
     	int i2 = nodes.indexOf(head);
-    	Glyph g2 = gridBarsV[i2];
-    	g2.setColor(NodeTrixViz.GRID_COLOR);
-    	if(i2 % 2 != 0) g2.setVisible(false);
+    	if(i2 > -1){
+    		Glyph g2 = gridBarsV[i2];
+    		g2.setColor(NodeTrixViz.GRID_COLOR);
+    		if(i2 % 2 != 0) g2.setVisible(false);
+    	}
     }
     
     
@@ -350,42 +410,39 @@ public class Matrix {
         bkg.move(x, y);
         long[] p = new long[2];
         long offset = 0;
-        if(exploringModeGlobal){
-        	p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
-        	offset = Math.min(this.labelWidth, NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH);
-        	shiftNodesN = (bkg.vy + bkg.getHeight() > p[1] - offset);
-    		shiftNodesW = (bkg.vx - bkg.getHeight() < p[0] + offset);
- 
-    		if(shiftNodesN || shiftNodesW){
-    			gOverview.moveTo(p[0] + NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2, p[1] - NodeTrixViz.MATRIX_LABEL_OCCLUSION_WIDTH/2);
-    			gOverview.setTranslucencyValue(1);
-    		}else{
-    			gOverview.setTranslucencyValue(0);
-    		}
-        }
-		
+        p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
+        offset = Math.min(this.labelWidth, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH);
+        nodesUnvisibleN = (bkg.vy + bkg.getHeight() > p[1] - offset);
+        nodesUnvisibleW = (bkg.vx - bkg.getHeight() < p[0] + offset);
+    	if(exploringModeGlobal && (nodesUnvisibleN || nodesUnvisibleW)){
+    		gOverview.moveTo(p[0] + NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, p[1] - NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2);
+    		gOverview.setTranslucencyValue(1);
+    	}else{
+   			gOverview.setTranslucencyValue(0);
+   		}
+   	
     	for (NTNode node : nodes){
-    		if(!(shiftNodesN || shiftNodesW))
+    		if(exploringModeGlobal)
     		{
-    			node.move(x, y);
-    		}else{
-    			if(shiftNodesN){
+    			if(nodesUnvisibleN){
     				node.shiftNorth((p[1] - offset) + labelWidth/2, false);
     				node.move(x, 0);
     			}else{
     				node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, false);
     			}
-    			if(shiftNodesW){
+    			if(nodesUnvisibleW){
     				node.shiftWest((p[0] + offset) - labelWidth/2, false);
     				node.move(0, y);
-    	    	}else{
+    			}else{
     				node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, false);
     			}
+    		}else{
+    			node.move(x, y);
     		}
 
         	
-        	if (node.intraEdgeSets != null){
-                for (NTIntraEdgeSet edge : node.intraEdgeSets){
+        	if (node.getIntraEdgeSets() != null){
+                for (NTIntraEdgeSet edge : node.getIntraEdgeSets()){
                     edge.move(x, y);
                 }
             }
@@ -408,6 +465,7 @@ public class Matrix {
                         // we have already moved them in the above loop
                         // (intra edges connect nodes within the same matrix)
                         edge.move(x,y);
+                        ((NTExtraEdge) edge).assignAlpha();
                     }
                 }
             }
@@ -437,5 +495,7 @@ public class Matrix {
 
     public boolean isExploringMode(){return exploringModeGlobal;}
 
-    
+    public boolean isNodeVisibleNorth(){return !this.nodesUnvisibleN;}
+    public boolean isNodesVisibleWest(){return !this.nodesUnvisibleW;}
+
 }

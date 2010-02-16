@@ -18,14 +18,48 @@ public class NTExtraEdge extends NTEdge {
     GPath edgePath;
     // start and end point offsets w.r.t respective matrices
     LongPoint[] offsets;
-
+    private int state = NodeTrixViz.IA_STATE_DEFAULT;
+    static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
+    
     public NTExtraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
         this.head = h;
         this.edgeColor = c;
     }
+    
+    @Override
+    protected void fade() {
+    	// TODO Auto-generated method stub
+    	
+    }
+    
+    @Override
+    protected void highlight(Color c) {
+    	System.out.println("HIGHLIGHT");
+    	edgePath.setColor(c);
+    }
+    
+    @Override
+    protected void reset() {
+    	edgePath.setColor(edgeColor);
+    }
+    
+    @Override
+    protected void select() {
+    	// TODO Auto-generated method stub
+    	
+    }
 
-    static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
+    /**Assigns a new alpha value for this curve according to its length.
+     */
+    public void assignAlpha()
+    {
+    	float a = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
+    	edgePath.setTranslucencyValue(a);
+    }
+    
+    
+
 
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
         // initial values of x1, y1, x2, y2 are ignored (should be 0 anyway)
@@ -85,6 +119,7 @@ public class NTExtraEdge extends NTEdge {
         }
         vs.addGlyph(edgePath);
         edgePath.setOwner(this);
+        assignAlpha();
     }
     
     void moveTo(long x, long y){
@@ -149,5 +184,6 @@ public class NTExtraEdge extends NTEdge {
     void moveTailTo(long x, long y){
         // TBW
     }
+
     
 }

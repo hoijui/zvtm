@@ -26,8 +26,6 @@ public class NTIntraEdge extends NTEdge {
     Glyph glyph, glyphTranslucent;
 	LongPoint offset;
 	AnimationManager animManager;
-	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
-	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
 	
     public NTIntraEdge(NTNode t, NTNode h, Color c){
         this.tail = t;
@@ -75,52 +73,37 @@ public class NTIntraEdge extends NTEdge {
     
     //INTERACTION----------------------------------------------INTERACTION-----------------------------------------------INTERACTION-----------------------------------
     
-    public void setState(int newState)
+    
+    protected void reset()
     {
-//    	if(interactionState == NodeTrixViz.IA_STATE_SELECTED && newState == NodeTrixViz.IA_STATE_FADE) return;
-    	newInteractionState = newState;
+//    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
+//    			glyph,
+//      			1,
+//    			false, 
+//    			SlowInSlowOutInterpolator2.getInstance(), 
+//    			null);	
+//    	animManager.startAnimation(a, true);
+//    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
+//    			glyphTranslucent,
+//       			NodeTrixViz.INTRA_TRANSLUCENCY,
+//    			false, 
+//    			SlowInSlowOutInterpolator2.getInstance(), 
+//    			null);	
+//    	animManager.startAnimation(a, true);
+
+    	glyphTranslucent.setColor(edgeColor);
     }
     
-    public void perfomStateChange()
-    {
-    	if(newInteractionState == interactionState) return;
-    	
-	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHTED) highlight();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
-	    else reset();
-	    interactionState = newInteractionState;
-    }
-    
-    private void reset()
-    {
-    	
-    	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
-    			glyph,
-      			1,
-    			false, 
-    			SlowInSlowOutInterpolator2.getInstance(), 
-    			null);	
-    	animManager.startAnimation(a, true);
-    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
-    			glyphTranslucent,
-       			NodeTrixViz.INTRA_TRANSLUCENCY,
-    			false, 
-    			SlowInSlowOutInterpolator2.getInstance(), 
-    			null);	
-    	animManager.startAnimation(a, true);
-    }
-    
-    private void highlight()
+    protected void highlight(Color c)
     {	
+    	glyphTranslucent.setColor(c);
     }
     
-    private void select()
+    protected void select()
     {
-    	
     }
     
-    private void fade()
+    protected void fade()
     {
     	Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
 				glyph,
@@ -156,6 +139,7 @@ public class NTIntraEdge extends NTEdge {
 		vs.onTop(this.glyph);
 		vs.onTop(this.glyphTranslucent);
 	}
+
     
    
 
