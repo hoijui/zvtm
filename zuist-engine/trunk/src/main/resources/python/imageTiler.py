@@ -207,16 +207,20 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     # generate ZUIST region and image object
     regionEL = ET.SubElement(rootEL, "region")
     regionEL.set("id", "R%s-%s" % (ID_PREFIX, tileIDstr))
+    objectEL = ET.SubElement(regionEL, "resource")
     if parentRegionID is None:
         regionEL.set("levels", "0;%d" % (levelCount-1+DL))
+        # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
+        objectEL.set("z-index", "0")
     else:
         regionEL.set("containedIn", parentRegionID)
         regionEL.set("levels", str(level+DL))
+        # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
+        objectEL.set("z-index", "1")
     regionEL.set("x", str(int(DX+x+aw/2)))
     regionEL.set("y", str(int(DY-y-ah/2)))
     regionEL.set("w", str(int(aw)))
     regionEL.set("h", str(int(ah)))
-    objectEL = ET.SubElement(regionEL, "resource")
     objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
     objectEL.set("type", "img")
     objectEL.set("x", str(int(DX+x+aw/2)))
