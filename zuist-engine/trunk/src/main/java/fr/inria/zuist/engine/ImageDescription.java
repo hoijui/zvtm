@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -42,6 +45,58 @@ public class ImageDescription extends ResourceDescription {
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
     private volatile VImage glyph;
+    private static final ThreadPoolExecutor imageLoader;
+    private static int N_THREADS = 20;
+    private static int CAPACITY = 2000;
+
+    static {   
+        imageLoader = new ThreadPoolExecutor(N_THREADS, N_THREADS, 
+                0L, TimeUnit.MILLISECONDS, 
+                new LinkedBlockingQueue<Runnable>(CAPACITY));
+        imageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    private class ImageLoadTask implements Runnable {
+        private final VirtualSpace vs;
+        private final boolean fadeIn;
+
+        ImageLoadTask(VirtualSpace vs, boolean fadeIn){
+            this.vs = vs;
+            this.fadeIn = fadeIn;
+        }
+
+        public void run(){
+            if (glyph == null){
+                // open connection to data
+                if (showFeedbackWhenFetching){
+                    final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, bgColor, barColor, percentFontColor, vs);
+                    vs.addGlyph(vrp);
+                    try {
+                        URLConnection uc = src.openConnection();
+                        int dataLength = uc.getContentLength();
+                        byte[] imgData = new byte[dataLength];
+                        BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
+                        int bytesRead = 0;
+                        while (bytesRead < dataLength-1){
+                            int av = bis.available();
+                            if (av > 0){
+                                bis.read(imgData, bytesRead, av);
+                                bytesRead += av;
+                                vrp.setProgress(bytesRead, dataLength);                                    
+                            }
+                        }
+                        finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
+                    }
+                    catch(IOException e){
+                        System.err.println("Error fetching Image resource "+src.toString());
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
+                }
+            }     }
+    }
 
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
@@ -92,36 +147,7 @@ public class ImageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
-        if (glyph == null){
-            // open connection to data
-            if (showFeedbackWhenFetching){
-                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80, bgColor, barColor, percentFontColor, vs);
-                vs.addGlyph(vrp);
-                 try {
-                            URLConnection uc = src.openConnection();
-                            int dataLength = uc.getContentLength();
-                            byte[] imgData = new byte[dataLength];
-                            BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
-                            int bytesRead = 0;
-                            while (bytesRead < dataLength-1){
-                                int av = bis.available();
-                                if (av > 0){
-                                    bis.read(imgData, bytesRead, av);
-                                    bytesRead += av;
-                                    vrp.setProgress(bytesRead, dataLength);                                    
-                                }
-                            }
-                            finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
-                        }
-                        catch(IOException e){
-                            System.err.println("Error fetching Image resource "+src.toString());
-                            e.printStackTrace();
-                        }
-            }
-            else {
-                    finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
-                }
-        }                
+        imageLoader.submit(new ImageLoadTask(vs, fadeIn));
     }
     
     private void finishCreatingObject(final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
