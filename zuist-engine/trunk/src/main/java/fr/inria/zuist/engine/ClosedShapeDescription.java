@@ -25,7 +25,7 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class ClosedShapeDescription extends ObjectDescription {
 
-    volatile ClosedShape glyph;
+    private volatile ClosedShape glyph;
     boolean inSpace = false;
 
     /** Constructs the description of an image (VImageST).

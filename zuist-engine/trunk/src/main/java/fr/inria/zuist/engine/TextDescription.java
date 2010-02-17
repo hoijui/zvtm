@@ -38,7 +38,7 @@ public class TextDescription extends ObjectDescription {
     
     Color fillColor;
     
-    volatile VText glyph;
+    private volatile VText glyph;
 
     /** Constructs the description of an image (VTextST).
         *@param id ID of object in scene
