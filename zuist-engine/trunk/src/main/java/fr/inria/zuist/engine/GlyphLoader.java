@@ -4,57 +4,72 @@
  */
 package fr.inria.zuist.engine;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.ThreadPoolExecutor;
-
 import fr.inria.zvtm.engine.VirtualSpace;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadFactory;
 
+/**
+ * Thread safety: GlyphLoader public methods should be invoked
+ * from the same thread, normally the Swing EDT.
+ */
 class GlyphLoader {
 
     private final SceneManager sceneManager;
-    private final int NTHREADS = 40;
-    private final int CAPACITY = 200;
-    private final ThreadPoolExecutor executor;
+    private final ConcurrentHashMap<ObjectDescription, LoadAction> tasks;
+    private final ExecutorService loader;
     private volatile boolean enabled = true;
+
+    private enum LoadAction {LOAD, UNLOAD};
 
     static int FADE_IN_DURATION = 300; //milliseconds
     static int FADE_OUT_DURATION = 300; //milliseconds
 
     GlyphLoader(SceneManager sm){
         this.sceneManager = sm;
-        executor = new ThreadPoolExecutor(NTHREADS, NTHREADS, 0L,
-                TimeUnit.MILLISECONDS, 
-                new LinkedBlockingQueue<Runnable>(CAPACITY));
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        loader = Executors.newSingleThreadExecutor(new LoaderThreadFactory());
+        tasks = new ConcurrentHashMap<ObjectDescription, LoadAction>();
     }
 
     //layerIndex maps to a VirtualSpace
     public void addLoadRequest(int layerIndex, ObjectDescription od, boolean transition){
+        if(tasks.remove(od, LoadAction.UNLOAD)){
+            return;
+        }
+
         if(!enabled){
             return;
         }
+
+        tasks.put(od, LoadAction.LOAD);
 
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
         if(target == null){
             System.err.println("addLoadRequest: could not retrieve virtual space");
             return;
         }
-        executor.submit(new Request(target, Request.TYPE_LOAD, od, transition));	
+        loader.submit(new Request(target, od, transition));	
     }
 
     //layerIndex maps to a VirtualSpace
     public void addUnloadRequest(int layerIndex, ObjectDescription od, boolean transition){
+        if(tasks.remove(od, LoadAction.LOAD)){
+            return;
+        }
+
         if(!enabled){
             return;
         }
+
+        tasks.put(od, LoadAction.UNLOAD);
 
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
         if(target == null){
             System.err.println("addLoadRequest: could not retrieve virtual space");
             return;
         }
-        executor.submit(new Request(target, Request.TYPE_UNLOAD, od, transition));
+        loader.submit(new Request(target, od, transition));
     }
 
     /**
@@ -66,11 +81,35 @@ class GlyphLoader {
         this.enabled = enable;
     }
 
-    /**
-     * Initiates an orderly shutdown in which previously submitted 
-     * tasks are executed, but no new tasks will be accepted.
-     */
-    public void shutdown(){ executor.shutdown(); }
+    private class Request implements Runnable {
+        final VirtualSpace target;
+        final ObjectDescription od;
+        final boolean transition;
 
+        Request(VirtualSpace target, ObjectDescription od, boolean transition){
+            this.target = target;
+            this.od = od;
+            this.transition = transition;
+        }
+
+        public void run(){
+            LoadAction action = tasks.remove(od);
+           if(action == null){
+               return;
+           } else if(action.equals(LoadAction.LOAD)){
+               od.createObject(target, transition);
+           } else {
+               od.destroyObject(target, transition);
+           }
+        }
+    }
+
+    private static class LoaderThreadFactory implements ThreadFactory {
+        public Thread newThread(Runnable r){
+            Thread retval = new Thread(r, "loader");
+            retval.setDaemon(true);
+            return retval;
+        }
+    }
 }
 
