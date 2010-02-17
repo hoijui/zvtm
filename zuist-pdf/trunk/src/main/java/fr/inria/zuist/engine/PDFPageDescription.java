@@ -53,15 +53,7 @@ public class PDFPageDescription extends ResourceDescription {
         *@param pr parent Region in scene
         */
     PDFPageDescription(String id, long x, long y, int z, double sf, URL p, int pg, Color sc, Region pr){
-        this.id = id;
-        this.vx = x;
-        this.vy = y;
-        this.zindex = z;
-        this.scale = sf;
-		this.setURL(p);
-		this.page = pg;
-        this.strokeColor = sc;
-        this.parentRegion = pr;
+        this(id,x,y,z,sf,p,pg,sc,null,pr);
     }
     
     /** Constructs the description of an image (VImageST).
