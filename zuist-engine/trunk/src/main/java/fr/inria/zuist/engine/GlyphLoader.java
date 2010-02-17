@@ -106,7 +106,7 @@ class GlyphLoader {
 
     private static class LoaderThreadFactory implements ThreadFactory {
         public Thread newThread(Runnable r){
-            Thread retval = new Thread(r, "loader");
+            Thread retval = new Thread(r, "sceneLoader");
             retval.setDaemon(true);
             return retval;
         }
