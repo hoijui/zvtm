@@ -199,7 +199,9 @@ class ViewerEventHandler implements ViewEventHandler, CameraListener, ComponentL
         cmn.notifyMove();
     }
     
-    void cameraMoved(){}
+    void cameraMoved(){
+        application.mView.getVisibleRegion(application.mCamera, wnes);
+    }
 
 }
 

@@ -90,10 +90,16 @@ public class Controller implements Java2DPainter {
     static final String CMD_CONSOLE = "cs";
     static final String CMD_QUIT = "quit";
     
-    static final String IN_CMD_PAN = "pan";
-    static final String IN_CMD_ZOOM = "zoom";
-    static final String IN_CMD_GGV = "ggv";
     static final String IN_CMD_STOP = CMD_STOP;
+    static final String IN_CMD_PAN1 = "pan";
+    static final String IN_CMD_ZOOM1 = "zoom";
+    static final String IN_CMD_PAN0 = "pan0";
+    static final String IN_CMD_ZOOM0 = "zoom0";
+    static final String IN_CMD_GGV = "ggv";
+    /* zoom origin */
+    static final String IN_CMD_ZORIG_ENABLED = "zoe";
+    static final String IN_CMD_ZORIG_DISABLED = "zod";
+    static final String IN_CMD_ZORIG = "zo";
     
     static final Integer VALUE_NONE = new Integer(0);
     
@@ -246,11 +252,11 @@ public class Controller implements Java2DPainter {
     
     void initViewFinders(){
         // viewfinders
-        viewFinder = new VRectangle(0, 0, 0, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
+        viewFinder = new VRectangle(0, 0, 1000, 10, 10, Color.GREEN, Color.GREEN, VIEWFINDER_OPACITY);
         rSpace.addGlyph(viewFinder);
         viewportFinders = new VRectangle[viewports.length];
         for (int i=0;i<viewportFinders.length;i++){
-            viewportFinders[i] = new VRectangle(0, 0, 0, 10, 10, Color.RED, Color.RED, VIEWPORT_OPACITY);
+            viewportFinders[i] = new VRectangle(0, 0, 1000, 10, 10, Color.RED, Color.RED, VIEWPORT_OPACITY);
             rSpace.addGlyph(viewportFinders[i]);
         }
     }
@@ -387,7 +393,7 @@ public class Controller implements Java2DPainter {
         vsm.getAnimationManager().setZspeed(0);
     }
     
-    void firstOrderZoom(int z){
+    void firstOrderZoom(float z){
         float a = (cCamera.focal+Math.abs(cCamera.altitude)) / cCamera.focal;
         vsm.getAnimationManager().setXspeed(0);
         vsm.getAnimationManager().setYspeed(0);
@@ -401,26 +407,60 @@ public class Controller implements Java2DPainter {
         sendToAll(CMD_STOP, VALUE_NONE, VALUE_NONE);
     }
     
+    boolean zoomInvariantEnabled = false;
+    long zilX,zilY;
+
+    /* providing virtual space coordinates */
+    void setZoomInvariantLocationW(long x, long y){
+        double a = (cCamera.focal+Math.abs(cCamera.altitude)) / cCamera.focal;
+        setZoomInvariantLocation(cCamera.posx + Math.round(a*x), cCamera.posy + Math.round(a*y));
+    }
+        
+    /* providing virtual space coordinates */
+    void setZoomInvariantLocation(long x, long y){
+        this.zilX = x;
+        this.zilY = y;
+        vsm.getAnimationManager().setZoomInvariantLocation(zilX, zilY);
+    }
+    
+    void enableZoomInvariant(boolean b){
+        this.zoomInvariantEnabled = b;
+        vsm.getAnimationManager().enableCustomZoomInvariantLocation(zoomInvariantEnabled);
+        System.out.println("ZO " + ((zoomInvariantEnabled) ? "enabled" : "disabled"));
+    }
+    
     /* ------------------ OSC in  ----------------- */
 
     public void processIncomingMessage(OSCMessage msg){
         Object[] params = msg.getArguments();
         String cmd = (String)params[0];
-        if (cmd.equals(IN_CMD_PAN)){
-            firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
-            System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
+        if (cmd.equals(IN_CMD_PAN1)){
+            //firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
+            //System.out.println("pan "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
         }
-        else if (cmd.equals(IN_CMD_ZOOM)){
-            firstOrderZoom(((Integer)params[1]).intValue());
-            System.out.println("zoom "+((Integer)params[1]).intValue());
-        }
-        else if (cmd.equals(IN_CMD_GGV)){
-            getGlobalView(cCamera);
-            System.out.println("ggv ");
+        else if (cmd.equals(IN_CMD_ZOOM1)){
+            //firstOrderZoom(((Float)params[1]).floatValue());
+            //System.out.println("zoom "+((Float)params[1]).floatValue());
         }
         else if (cmd.equals(IN_CMD_STOP)){
             stop();
-            System.out.println("stop ");
+            System.out.println("stop");
+        }
+        else if (cmd.equals(IN_CMD_ZORIG)){
+            setZoomInvariantLocationW(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
+            System.out.println("set zoom origin "+((Integer)params[1]).intValue()+" "+((Integer)params[2]).intValue());
+        }
+        else if (cmd.equals(IN_CMD_ZORIG_ENABLED)){
+            enableZoomInvariant(true);
+            System.out.println("Mode: zoom to origin");
+        }        
+        else if (cmd.equals(IN_CMD_ZORIG_DISABLED)){
+            enableZoomInvariant(false);
+            System.out.println("Mode: zoom to center of screen");
+        }
+        else if (cmd.equals(IN_CMD_GGV)){
+            getGlobalView(cCamera);
+            System.out.println("ggv");
         }
     }
 
@@ -601,7 +641,9 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        application.setZoomInvariantLocation(v.getVCursor().vx, v.getVCursor().vy);
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
@@ -649,6 +691,7 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
         	else if (code==KeyEvent.VK_C){application.consoleNodes();}
         	else if (code==KeyEvent.VK_P){System.out.println(application.panelWidth+" "+application.panelHeight);}
         	else if (code==KeyEvent.VK_B){application.togglePixelsBehindBezels();}
+        	else if (code==KeyEvent.VK_Z){application.enableZoomInvariant(!application.zoomInvariantEnabled);}
         }
     }
 
@@ -665,6 +708,7 @@ class ControllerEventHandler implements ViewEventHandler, CameraListener {
     public void viewClosing(View v){System.exit(0);}
 
     public void cameraMoved(Camera cam, LongPoint coord, float a){
+        application.cView.getVisibleRegion(application.cCamera, wnes);
         // tests when zooming beyond max res limit (beyond this limit camera positions on cluster nodes are just crazy, have to fix it eventually)
         application.setBeyondLimit((wnes[2]-wnes[0]) < application.wc.size.width || (wnes[1]-wnes[3]) < application.wc.size.height);
         // update camera group
