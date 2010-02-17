@@ -51,14 +51,7 @@ public class TextDescription extends ObjectDescription {
         *@param pr parent Region in scene
         */
     TextDescription(String id, long x, long y, int z, float s, String tx, Color c, Region pr){
-        this.id = id;
-        this.vx = x;
-        this.vy = y;
-    	this.zindex = z;
-        this.scale = s;
-        this.text = tx;
-        this.fillColor = c;
-        this.parentRegion = pr;
+        this(id, x, y, z, s, tx, c, VText.TEXT_ANCHOR_MIDDLE, pr);
     }
 
     /** Constructs the description of an image (VTextST).
