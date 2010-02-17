@@ -38,7 +38,7 @@ public class PDFPageDescription extends ResourceDescription {
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    volatile ZPDFPageImg glyph;
+    private volatile ZPDFPageImg glyph;
     int page = 1;
 
     /** Constructs the description of an image (VImageST).
