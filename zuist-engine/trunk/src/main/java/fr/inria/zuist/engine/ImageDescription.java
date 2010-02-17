@@ -55,15 +55,7 @@ public class ImageDescription extends ResourceDescription {
         *@param pr parent Region in scene
         */
     ImageDescription(String id, long x, long y, int z, long w, long h, URL p, Color sc, Region pr){
-        this.id = id;
-        this.vx = x;
-        this.vy = y;
-        this.zindex = z;
-        this.vw = w;
-        this.vh = h;
-		this.setURL(p);
-        this.strokeColor = sc;
-        this.parentRegion = pr;
+        this(id,x,y,z,w,h,p,sc,null,pr);
     }
     
     /** Constructs the description of an image (VImageST).
