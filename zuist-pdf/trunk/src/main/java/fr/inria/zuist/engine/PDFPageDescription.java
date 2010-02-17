@@ -13,6 +13,9 @@ import java.awt.RenderingHints;
 import javax.swing.SwingUtilities;
 
 import java.net.URL;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -40,9 +43,46 @@ public class PDFPageDescription extends ResourceDescription {
 
     private volatile ZPDFPageImg glyph;
     int page = 1;
+    private static final ThreadPoolExecutor pageLoader;
+    private static int CORE_THREADS = 5;
+    private static int MAX_THREADS = 20;
+    private static int CAPACITY = 2000;
+
+    static {   
+        pageLoader = new ThreadPoolExecutor(CORE_THREADS, MAX_THREADS, 
+                10000L, TimeUnit.MILLISECONDS, 
+                new LinkedBlockingQueue<Runnable>(CAPACITY));
+        pageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    }
+
+    private class PageLoadTask implements Runnable {
+        private final VirtualSpace vs;
+        private final boolean fadeIn;
+
+        PageLoadTask(VirtualSpace vs, boolean fadeIn){
+            this.vs = vs;
+            this.fadeIn = fadeIn;
+        }
+
+        public void run(){
+            if (glyph == null){
+                // open connection to data
+                if (showFeedbackWhenFetching){
+                    final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale),
+                            Color.LIGHT_GRAY, Color.DARK_GRAY, Color.BLACK, vs);
+                    vs.addGlyph(vrp);
+                    vrp.setProgress(10, 100);
+                    finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), vrp, fadeIn);
+                }
+                else {
+                    finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);
+                }
+            }
+        }
+    }
 
     /** Constructs the description of an image (VImageST).
-        *@param id ID of object in scene
+     *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
         *@param sf scale factor
@@ -90,41 +130,7 @@ public class PDFPageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
-        if (glyph == null){
-            // open connection to data
-            if (showFeedbackWhenFetching){
-                final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale),
-                                                            Color.LIGHT_GRAY, Color.DARK_GRAY, Color.BLACK, vs);
-                vs.addGlyph(vrp);
-                //try {
-                //URLConnection uc = src.openConnection();
-                //int dataLength = uc.getContentLength();
-                //byte[] imgData = new byte[dataLength];
-                //BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
-                //int bytesRead = 0;
-                //while (bytesRead < dataLength-1){
-                //    int av = bis.available();
-                //    if (av > 0){
-                //        bis.read(imgData, bytesRead, av);
-                //        bytesRead += av;
-                //        vrp.setProgress(bytesRead, dataLength);
-                //    }
-                //    //else {
-                //    //    sleep(10);
-                //    //}
-                //}
-                vrp.setProgress(10, 100);
-                finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), vrp, fadeIn);
-                //}
-                //catch(IOException e){
-                //    System.err.println("Error fetching Image resource "+src.toString());
-                //    e.printStackTrace();
-                //}
-            }
-            else {
-                    finishCreatingObject(vs, PDFResourceHandler.getPage(src, page), null, fadeIn);
-            }
-        }                
+        pageLoader.submit(new PageLoadTask(vs, fadeIn)); 
     }
     
     private void finishCreatingObject(final VirtualSpace vs, PDFPage p, VRectProgress vrp, boolean fadeIn){
