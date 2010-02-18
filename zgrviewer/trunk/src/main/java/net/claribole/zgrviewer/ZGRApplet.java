@@ -368,7 +368,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
     public void mouseClicked(MouseEvent e){}
 
-    public void mouseEntered(MouseEvent e){requestFocus();}
+    public void mouseEntered(MouseEvent e){}
 
     public void mouseExited(MouseEvent e){}
 
