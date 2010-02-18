@@ -13,9 +13,12 @@ import java.awt.RenderingHints;
 import javax.swing.SwingUtilities;
 
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.lang.reflect.InvocationTargetException;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -44,6 +47,7 @@ public class PDFPageDescription extends ResourceDescription {
     private volatile ZPDFPageImg glyph;
     int page = 1;
     private static final ThreadPoolExecutor pageLoader;
+    private Future loadTask;
     private static int CORE_THREADS = 5;
     private static int MAX_THREADS = 20;
     private static int CAPACITY = 2000;
@@ -130,7 +134,7 @@ public class PDFPageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
-        pageLoader.submit(new PageLoadTask(vs, fadeIn)); 
+        loadTask = pageLoader.submit(new PageLoadTask(vs, fadeIn)); 
     }
     
     private void finishCreatingObject(final VirtualSpace vs, PDFPage p, VRectProgress vrp, boolean fadeIn){
@@ -146,11 +150,16 @@ public class PDFPageDescription extends ResourceDescription {
         glyph.setInterpolationMethod(interpolationMethod);
         if (fadeIn){
             glyph.setTranslucencyValue(0f);
-            SwingUtilities.invokeLater(new Runnable(){
-                public void run(){
-                    vs.addGlyph(glyph);
-                }
-            });
+            assert(!SwingUtilities.isEventDispatchThread());
+            try {
+                SwingUtilities.invokeAndWait(new Runnable(){
+                    public void run(){
+                        vs.addGlyph(glyph);
+                    }
+                });
+            }  catch(InterruptedException ie){ /* swallow */ }
+            catch(InvocationTargetException ite){ /* swallow */ }
+
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
@@ -166,17 +175,30 @@ public class PDFPageDescription extends ResourceDescription {
             if (showFeedbackWhenFetching){
                 vs.removeGlyph(vrp);
             }
-            SwingUtilities.invokeLater(new Runnable(){
-                public void run(){
-                    vs.addGlyph(glyph);
-                }
-            });
+            assert(!SwingUtilities.isEventDispatchThread());
+            try {
+                SwingUtilities.invokeAndWait(new Runnable(){
+                    public void run(){
+                        vs.addGlyph(glyph);
+                    }
+                });
+            } catch(InterruptedException ie){ /* swallow */ }
+            catch(InvocationTargetException ite){ /* swallow */ }
         }
         glyph.setOwner(this);
     }
     
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
+        if(loadTask.cancel(true)){
+            return;
+        }
+        try {
+        loadTask.get();
+        } 
+        catch(InterruptedException ie){ /* swallow */ }
+        catch(ExecutionException ee){ /* swallow */ }
+
         if (glyph != null){
             if (fadeOut){
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
@@ -185,13 +207,17 @@ public class PDFPageDescription extends ResourceDescription {
                 glyph = null;
             }
             else {
-                SwingUtilities.invokeLater(new Runnable(){
-                    public void run(){
-                        vs.removeGlyph(glyph);
-                        glyph.flush();
-                        glyph = null;
-                    }
-                });
+                assert(!SwingUtilities.isEventDispatchThread());
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable(){
+                        public void run(){
+                            vs.removeGlyph(glyph);
+                            glyph.flush();
+                            glyph = null;
+                        }
+                    });
+                } catch(InterruptedException ie){ /* swallow */ }
+                catch(InvocationTargetException ite){ /* swallow */ }
             }
         }
     }
