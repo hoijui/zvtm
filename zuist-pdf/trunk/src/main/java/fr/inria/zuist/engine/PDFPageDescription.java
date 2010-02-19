@@ -190,7 +190,7 @@ public class PDFPageDescription extends ResourceDescription {
     
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
-        if(loadTask.cancel(true)){
+        if(loadTask.cancel(false)){
             return;
         }
         try {
