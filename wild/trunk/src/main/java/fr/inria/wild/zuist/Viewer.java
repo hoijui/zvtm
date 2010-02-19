@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
 import javax.swing.JLayeredPane;
+import javax.swing.SwingUtilities;
 import java.awt.Container;
 
 import java.util.Vector;
@@ -265,45 +266,50 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     
     /*-------------     Navigation       -------------*/
     
-    void processMessage(OSCMessage msg){
-        Object[] params = msg.getArguments();
-        String cmd = (String)params[0];
-        if (cmd.equals(Controller.CMD_CENTER_REGION)){
-            centerOnRegion(Long.parseLong((String)params[1]), Long.parseLong((String)params[2]), Long.parseLong((String)params[3]), Long.parseLong((String)params[4]));
+    void processMessage(final OSCMessage msg){
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run(){
+                Object[] params = msg.getArguments();
+                String cmd = (String)params[0];
+                if (cmd.equals(Controller.CMD_CENTER_REGION)){
+                    centerOnRegion(Long.parseLong((String)params[1]), Long.parseLong((String)params[2]), Long.parseLong((String)params[3]), Long.parseLong((String)params[4]));
+                }
+                else if (cmd.equals(Controller.CMD_MOVE_WEST)){
+                    translateView(Controller.MOVE_WEST);
+                }
+                else if (cmd.equals(Controller.CMD_MOVE_NORTH)){
+                    translateView(Controller.MOVE_NORTH);
+                }
+                else if (cmd.equals(Controller.CMD_MOVE_EAST)){
+                    translateView(Controller.MOVE_EAST);
+                }
+                else if (cmd.equals(Controller.CMD_MOVE_SOUTH)){
+                    translateView(Controller.MOVE_SOUTH);
+                }
+                else if (cmd.equals(Controller.CMD_TRANSLATION_SPEED)){
+                    firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
+                }
+                else if (cmd.equals(Controller.CMD_ZOOM_SPEED)){
+                    firstOrderZoom(((Integer)params[1]).intValue());
+                }
+                else if (cmd.equals(Controller.CMD_STOP)){
+                    stop();
+                }
+                else if (cmd.equals(Controller.CMD_GC)){
+                    gc();
+                }
+                else if (cmd.equals(Controller.CMD_INFO)){
+                    toggleMiscInfoDisplay();
+                }
+                else if (cmd.equals(Controller.CMD_CONSOLE)){
+                    toggleConsole();
+                }
+                else if (cmd.equals(Controller.CMD_QUIT)){
+                    System.exit(0);
+                }                
+            }
         }
-        else if (cmd.equals(Controller.CMD_MOVE_WEST)){
-            translateView(Controller.MOVE_WEST);
-        }
-        else if (cmd.equals(Controller.CMD_MOVE_NORTH)){
-            translateView(Controller.MOVE_NORTH);
-        }
-        else if (cmd.equals(Controller.CMD_MOVE_EAST)){
-            translateView(Controller.MOVE_EAST);
-        }
-        else if (cmd.equals(Controller.CMD_MOVE_SOUTH)){
-            translateView(Controller.MOVE_SOUTH);
-        }
-        else if (cmd.equals(Controller.CMD_TRANSLATION_SPEED)){
-            firstOrderTranslate(((Integer)params[1]).intValue(), ((Integer)params[2]).intValue());
-        }
-        else if (cmd.equals(Controller.CMD_ZOOM_SPEED)){
-            firstOrderZoom(((Integer)params[1]).intValue());
-        }
-        else if (cmd.equals(Controller.CMD_STOP)){
-            stop();
-        }
-        else if (cmd.equals(Controller.CMD_GC)){
-            gc();
-        }
-        else if (cmd.equals(Controller.CMD_INFO)){
-            toggleMiscInfoDisplay();
-        }
-        else if (cmd.equals(Controller.CMD_CONSOLE)){
-            toggleConsole();
-        }
-        else if (cmd.equals(Controller.CMD_QUIT)){
-            System.exit(0);
-        }
+        );
     }
     
     void centerOnRegion(long w, long n, long e, long s){
