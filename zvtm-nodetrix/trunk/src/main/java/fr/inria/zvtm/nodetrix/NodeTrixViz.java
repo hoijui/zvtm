@@ -8,20 +8,23 @@
 package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
-
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Vector;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.nodetrix.lll.Edge;
+import fr.inria.zvtm.nodetrix.lll.LinLogEdge;
+import fr.inria.zvtm.nodetrix.lll.LinLogNode;
+import fr.inria.zvtm.nodetrix.lll.LinLogOptimizerModularity;
 import fr.inria.zvtm.nodetrix.lll.MinimizerBarnesHut;
 import fr.inria.zvtm.nodetrix.lll.Node;
-
+import fr.inria.zvtm.nodetrix.MatrixSizeComparator;
 
 public class NodeTrixViz {
     
@@ -64,30 +67,106 @@ public class NodeTrixViz {
     public final static Color EXTRA_EDGE_RELATED_COLOR = Color.yellow;
 	public static final float EXTRA_ALPHA_MAX_LENGHT = 1500;  
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
-	public static final float EXTRA_ALPHA_MIN = .25f;  
+	public static final float EXTRA_ALPHA_MIN = .25f;
+	
+	public static final double LINLOG_QUALITY = 10;  
     /* Matrices in this visualization */
-    Matrix[] matrices;
+//    Matrix[] matrices;
+	Vector<Matrix> matrices;
+	/**Vector that stores all edges considered by the linLog cluster algorithm*
+     * @author benjamin bach bbach@lri.fr
+     */
     
     public NodeTrixViz(){
-        matrices = new Matrix[0];
+//        matrices = new Matrix[0];
+    	matrices = new Vector<Matrix>();
     }
+    
+    //-------------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------
     
     public Matrix addMatrix(String name, Vector<NTNode> nodes){
 //        Matrix res = new Matrix(name, nodes.toArray(new NTNode[nodes.size()]));
         Matrix res = new Matrix(name, nodes);
-    	Matrix[] na = new Matrix[matrices.length+1];
-        System.arraycopy(matrices, 0, na, 0, matrices.length);
-        na[matrices.length] = res;
-        matrices = na;
+//    	Matrix[] na = new Matrix[matrices.length+1];
+//        System.arraycopy(matrices, 0, na, 0, matrices.length);
+//        na[matrices.length] = res;
+//        matrices = na;
+        matrices.add(res);
         return res;
     }
+	
+	/**This method causes the NTNodes to be clustered using the LinLog Algorithm. 
+	 * It returns a HashMap mapping each NTNode to an integer depicting its cluster.
+	 * Use this method as an alternative to <code>addMatrix(String name, Vector<NTNode> nodes)</code>
+	 **/
+	public void createMatrixesByClustering(Collection<NTNode> nodes, List<LinLogEdge> edges)
+	{ 
+		LinLogOptimizerModularity llalgo = new LinLogOptimizerModularity();
+		ArrayList<LinLogNode> llNodes = new ArrayList<LinLogNode>();
+		for(NTNode nn : nodes){llNodes.add(nn);}
+		Map<LinLogNode, Integer> resultMap = llalgo.execute(llNodes, edges , false);
+		int i = 0;
+		//Obtaining clusters and creating matrices
+		HashMap<Integer, Vector<NTNode>> temp = new HashMap<Integer, Vector<NTNode>>();
+		for(LinLogNode lln : resultMap.keySet()){
+			NTNode nn = (NTNode)lln;
+			int cluster = resultMap.get(lln);
+			Vector<NTNode> v = temp.get(cluster);
+			if(v == null){
+				v = new Vector<NTNode>();
+				temp.put(cluster, v);
+			}
+			v.add(nn);
+			i++;
+		}
+		
+		System.out.println("[NODETRIXVIZ] " + i + " MATRICES CREATED");
+		i = 0;
+		for(Vector<NTNode> v : temp.values()){
+			matrices.add(new Matrix("[" + i + "]", v));
+			i++;
+		}
+		
+		System.out.println("[NODETRIXVIZ] " + matrices.size() + " MATRICES IN TOTAL");
+		
+		//Create Internal Edges
+		for(NTNode nn : nodes){
+			Vector<NTEdge> toAdd = new Vector<NTEdge>();
+			Vector<NTEdge> toRemove = new Vector<NTEdge>();
+			for(NTEdge ee : nn.getOutgoingEdges())
+			{
+				if(ee.head.getMatrix().equals(nn.getMatrix()))
+				{
+					NTIntraEdge ie = new NTIntraEdge(ee.tail, ee.head, ee.edgeColor);
+					toAdd.add(ie);
+					toRemove.add(ee);
+				}
+			}
+			for(NTEdge ee : toAdd){ nn.addOutgoingEdge(ee); }
+			for(NTEdge ee : toRemove){nn.removeOutgoingEdge(ee);}
 
+			toAdd = new Vector<NTEdge>();
+			toRemove = new Vector<NTEdge>();
+			for(NTEdge ee : nn.getIncomingEdges())
+			{
+				if(nn.getMatrix().equals(ee.tail.getMatrix()))
+				{
+					NTIntraEdge ie = new NTIntraEdge(ee.tail, ee.head, ee.edgeColor);
+					toAdd.add(ie);
+					toRemove.add(ee);
+				}
+			}
+			for(NTEdge ee : toAdd){nn.addIncomingEdge(ee);}
+			for(NTEdge ee : toRemove){nn.removeIncomingEdge(ee);}
+		}
+	}
+	
     public NTExtraEdge addExtraEdge(NTNode tail, NTNode head){
-        return addExtraEdge(tail, head, EXTRA_LINK_COLOR);
+        return addExtraEdge(tail, head, EXTRA_LINK_COLOR, null);
     }
     
     public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
-        return addIntraEdge(tail, head, INTRA_LINK_COLOR);
+        return addIntraEdge(tail, head, INTRA_LINK_COLOR, null);
     }
     
     /** Method is used if inputfile is passed directly to zvtm-ontotrix*/
@@ -100,16 +179,28 @@ public class NodeTrixViz {
         }
     }
     
-    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head, Color c){
+    /**Creates a new External edge between the two nodes.
+     * @param NTNode tail, NTNode head
+     * @pararm Color c - colour of the edge
+     * @param Object owner - can be null, but can be used to attach an arbitrary object to this edge.
+     **/
+    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head, Color c, Object owner){
         NTExtraEdge e = new NTExtraEdge(tail, head, c);
+        e.setOwner(owner);
         tail.addOutgoingEdge(e);
         head.addIncomingEdge(e);
         return e;
     }
     
-    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c){
+    /**Creates a new matrix-internal edge between the two nodes.
+     * @param NTNode tail, NTNode head
+     * @pararm Color c - colour of the edge
+     * @param Object owner - can be null, but can be used to attach an arbitrary object to this edge.
+     **/
+    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c, Object owner){
         NTIntraEdge e = new NTIntraEdge(tail, head, c);
-      	tail.addOutgoingEdge(e);
+        e.setOwner(owner);
+       tail.addOutgoingEdge(e);
        	head.addIncomingEdge(e);
         return e;
     }
@@ -117,12 +208,17 @@ public class NodeTrixViz {
     /**
      *@return all matrices in this visualization
      */
-    public Matrix[] getMatrices(){
+//    public Matrix[] getMatrices(){
+//        return matrices;
+//    }
+    public Vector<Matrix> getMatrices(){
         return matrices;
     }
     
     // have to find something better than this constant...
     double SCALE = 40;
+    
+    //---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE
     
     public void createViz(VirtualSpace vs){
         Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
@@ -133,8 +229,10 @@ public class NodeTrixViz {
         }
         // building LLL graph to feed to the layout algorithm
         for (Matrix matrix : matrices){
+//        	if(matrix == null) continue;
             for (Matrix matrix2 : matrices){
-                if (matrix != matrix2 && matrix.isConnectedTo(matrix2)){
+//            	if(matrix2 == null) continue;
+            	if (matrix != matrix2 && matrix.isConnectedTo(matrix2)){
                     if (llg.get(matrix) == null){
                         llg.put(matrix, new HashMap<Matrix,Double>());
                         orphanMatrices.remove(matrix);
@@ -179,12 +277,12 @@ public class NodeTrixViz {
 		    m.createEdgeGraphics(vs);
 		}
         
-        Arrays.sort(matrices, new MatrixSizeComparator());
+        Collections.sort(matrices, new MatrixSizeComparator());
         for (Matrix m:matrices){
 		    m.bringToFront(vs);
 		}
-        
     }
+    
     
     private static Map<Matrix,Map<Matrix,Double>> makeSymmetricGraph(Map<Matrix,Map<Matrix,Double>> graph){
 		Map<Matrix,Map<Matrix,Double>> result = new HashMap<Matrix,Map<Matrix,Double>>();
@@ -243,5 +341,104 @@ public class NodeTrixViz {
 		}
 		return result;
 	}
+    
+    
+    //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
+    
+    
+    /**
+     * Runs over all matrices and group their nodes according to their assigned
+     * groupname.
+     */
+    public void regroup(VirtualSpace vs)
+    {
+    	for(Matrix m : matrices){
+    		//removing old groupLabels
+    		m.cleanGroupLabels();
+
+    		//grouping Nodes
+    		HashMap<String, Vector<NTNode>> groups = new HashMap<String, Vector<NTNode>>();
+    		for(NTNode n : m.nodes){
+    			String name = n.getGroupName();
+    			if(name == null) name = "null";
+    			
+    			Vector<NTNode> v = groups.get(name); 
+    			if(v == null){
+    				v = new Vector<NTNode>();
+    				groups.put(name, v);
+    			}
+    			v.add(n);
+    		}
+    		
+    		//putting nodes back into matrix
+    		m.nodes = new Vector<NTNode>();
+    		for(Vector<NTNode> v : groups.values()){
+    			m.nodes.addAll(v);
+    		}
+    		
+    		//repositioning nodes
+    		m.repositionNodes(vs);
+    		
+    		//adding new group labels
+    		for(Vector<NTNode> v : groups.values()){
+    			m.addGroupLabel(v, v.firstElement().getGroupName());
+    		}
+    		
+    		m.bringToFront(vs);
+    		
+    	}
+    }
+    
+    
+    
+    public void reorderMatricesCMK()
+	{
+//		//Iterating Matrices
+		for(Matrix m : matrices)
+		{	
+			Vector<NTNode> queue = new Vector<NTNode>();
+			Vector<NTNode> finalOrdering = new Vector<NTNode>();
+			Vector<NTNode> initialOrdering  = m.nodes;
+			if(initialOrdering.size() == 1) continue;
+			Collections.sort(initialOrdering, new NTNodeDegreeComparator());
+			
+			NTNode xnStart;
+			while(!initialOrdering.isEmpty())
+			{
+				xnStart = initialOrdering.remove(0);
+				System.out.println("[NTV] " + xnStart.getDegree());
+				finalOrdering.add(xnStart);
+				initialOrdering.remove(xnStart);
+				addChildrenToQueue(xnStart, queue, initialOrdering);
 	
+				while(!queue.isEmpty())
+				{
+					NTNode xn = queue.remove(0);
+					finalOrdering.add(xn);
+					initialOrdering.remove(xn);
+					addChildrenToQueue(xn, queue, initialOrdering);
+				}
+			}
+			m.nodes = finalOrdering;
+		}	
+	}
+    public void addChildrenToQueue(NTNode xn, Vector<NTNode> queue, Vector<NTNode> initialOrdering)
+	{
+		Vector<NTNode> orderedChildren = new Vector<NTNode>();
+		NTNode xnRel;
+		for(NTEdge xr : xn.getOutgoingEdges())
+		{
+			if(xr instanceof NTExtraEdge)
+			{
+				xnRel = xr.getHead();
+				if(xn.equals(xnRel)) continue;
+				if(!initialOrdering.contains(xnRel)) continue;
+				orderedChildren.add(xnRel);
+				initialOrdering.remove(xnRel);
+			}
+		}
+		
+		Collections.sort(orderedChildren, new NTNodeDegreeComparator());
+		queue.addAll(orderedChildren);
+	}
 }

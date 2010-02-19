@@ -28,6 +28,7 @@ public class NTIntraEdge extends NTEdge {
 	AnimationManager animManager;
 	
     public NTIntraEdge(NTNode t, NTNode h, Color c){
+    	super(t,h,1);
         this.tail = t;
         this.head = h;
         this.edgeColor = c;
@@ -128,7 +129,7 @@ public class NTIntraEdge extends NTEdge {
   //MOVING----------------------------------------------MOVING-----------------------------------------------MOVING-----------------------------------
     void moveTo(long x, long y){
         LongPoint mp = tail.getMatrix().getPosition();
-        glyph.moveTo(mp.x+offset.x, mp.y+offset.y);
+        glyph.moveTo(mp.x +x, mp.y + y);
     }
     
     void move(long x, long y){

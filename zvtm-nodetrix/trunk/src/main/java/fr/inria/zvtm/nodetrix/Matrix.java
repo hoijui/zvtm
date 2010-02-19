@@ -32,6 +32,9 @@ public class Matrix {
     VRectangle bkg;
     VText matrixLabel;
     VRectangle[] gridBarsH, gridBarsV, gridReflexiveSquares;
+    Vector<VRectangle> groupLabelsW = new Vector<VRectangle>();
+    Vector<VRectangle> groupLabelsN = new Vector<VRectangle>();
+    
     
     long matrixLbDX = 0;
     long matrixLbDY = 0;
@@ -80,7 +83,7 @@ public class Matrix {
         	float max = 1.0f;
         	float diff = max-min;
         	float step = (1/((float)a-1))*diff;
-        	for (int i=0;i<nodes.size();i++)
+        	for (int i=0 ; i < nodes.size() ; i++ )
     	    {
         		b = max - step*i;
         		c = Color.getHSBColor(0.1f, 0.8f, b);
@@ -104,6 +107,22 @@ public class Matrix {
     	vs.addGlyph(gOverview);
     	gOverview.setSensitivity(false);
     	gOverview.setTranslucencyValue(0);
+    }
+    
+    /**Has to be called when node order has changed
+     * 
+     */
+    public void repositionNodes(VirtualSpace vs)
+    {
+    	for(int i=0 ; i < nodes.size() ; i++ )
+	    {
+    		nodes.get(i).repositionLabels(Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
+                    				 Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)));
+	    }
+    	
+    	for(NTIntraEdgeSet ies : this.intraEdgeSets){
+    		ies.reposition();
+    	}
     }
     
     void finishCreateNodeGraphics(VirtualSpace vs){
@@ -297,36 +316,36 @@ public class Matrix {
      */
     public void highlightNodeContext(NTNode n)
     {
-    	n.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED, true, true);
+    	n.setNewState(NodeTrixViz.IA_STATE_HIGHLIGHTED, true, true);
     	//set related nodes
     	highlightedNodes = new Vector<NTNode>();
     	highlightedEdges = new Vector<NTEdge>();
     	if(n.getOutgoingEdges() != null){
     		int i = 0;
     		for(NTEdge e : n.getOutgoingEdges()){
-    			e.getHead().setState(NodeTrixViz.IA_STATE_RELATED, true, true);
+    			e.getHead().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
     			i++;
-    			e.setState(NodeTrixViz.IA_STATE_HIGHLIGHTED);
     			e.performStateChange();
     			highlightedNodes.add(e.getHead());
     			highlightedEdges.add(e);
     		}
     	}
+    
     	for(NTNode nRel : highlightedNodes){
     		highlightGrid(n, nRel, NodeTrixViz.MATRIX_NODE_RELATED_COLOR);
     		nRel.perfomStateChange();
     	}
-    	
+    
     	n.perfomStateChange();
     	highlightGrid(n, n, NodeTrixViz.MATRIX_NODE_HIGHLIGHT_COLOR);
     }
     
     public void resetNodeContext(NTNode n)
     {
-    	n.setState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
+    	n.setNewState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
     	resetGrid(n,n);
     	for(NTNode nRel : highlightedNodes){
-    		nRel.setState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
+    		nRel.setNewState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
     		resetGrid(n, nRel);
     		nRel.perfomStateChange();
     	}
@@ -425,18 +444,18 @@ public class Matrix {
     		{
     			if(nodesUnvisibleN){
     				node.shiftNorth((p[1] - offset) + labelWidth/2, false);
-    				node.move(x, 0);
+    				node.moveMatrix(x, 0);
     			}else{
     				node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, false);
     			}
     			if(nodesUnvisibleW){
     				node.shiftWest((p[0] + offset) - labelWidth/2, false);
-    				node.move(0, y);
+    				node.moveMatrix(0, y);
     			}else{
     				node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, false);
     			}
     		}else{
-    			node.move(x, y);
+    			node.moveMatrix(x, y);
     		}
 
         	
@@ -497,5 +516,30 @@ public class Matrix {
 
     public boolean isNodeVisibleNorth(){return !this.nodesUnvisibleN;}
     public boolean isNodesVisibleWest(){return !this.nodesUnvisibleW;}
+    public void addNode(NTNode n){
+    	nodes.add(n);
+    	n.setMatrix(this);
+    }
 
+
+	public void setNodesOrdered(Vector<NTNode> finalOrdering) {
+		nodes = finalOrdering;
+	}
+	
+	public void cleanGroupLabels(){
+		groupLabelsN = new Vector<VRectangle>();
+		groupLabelsW = new Vector<VRectangle>();
+	}
+	
+	public void addGroupLabel(Vector<NTNode> v, String label){
+//		VRectangle.
+	}
+
+	
+	
+	
+	
+	
+	
+	
 }

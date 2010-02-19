@@ -10,17 +10,25 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.nodetrix.lll.LinLogEdge;
+import fr.inria.zvtm.nodetrix.lll.LinLogNode;
 
-public abstract class NTEdge {
+public abstract class NTEdge extends LinLogEdge{
 
-    NTNode tail, head;
+
+	NTNode tail, head;
     Color edgeColor;
     int state = NodeTrixViz.IA_STATE_DEFAULT;
     int newState = NodeTrixViz.IA_STATE_HIGHLIGHTED;
     Object owner;
     
+    public NTEdge(LinLogNode startNode, LinLogNode endNode, double weight) {
+    	super(startNode, endNode, weight);
+    	// TODO Auto-generated constructor stub
+    }
+
     public void setNodes(NTNode t, NTNode h){
-        this.tail = t;
+    	this.tail = t;
         this.head = h;
     }
 

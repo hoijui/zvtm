@@ -19,15 +19,17 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
+import fr.inria.zvtm.nodetrix.lll.LinLogNode;
 
-public class NTNode {
+public class NTNode extends LinLogNode{
 
      String name;
     
     /* Owning matrix */
     public Matrix matrix;
-    NTEdge[] outgoingEdges, incomingEdges;
+    Vector<NTEdge> outgoingEdges, incomingEdges;
     private Vector <NTIntraEdgeSet> intraEdgeSets = new Vector<NTIntraEdgeSet>();
+    private Vector<NTEdge> internalRelations = new Vector<NTEdge>();
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
@@ -46,7 +48,7 @@ public class NTNode {
 	/* The Virtual Space this NTNode belongs to - stored here to simplify interaction*/
 	VirtualSpace vs;
 	
-	Object owner;
+	private Object owner;
 	
 	/**Stores the half width, since double width is never used */
 	private long widthHalf;
@@ -56,15 +58,23 @@ public class NTNode {
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
 	int newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
 	/* which labels of the node should be affected by the next state */
-	private boolean affectWest = false;
-	private boolean affectNorth = false;
+	private boolean affectWest = true;
+	private boolean affectNorth = true;
+	
+	/*Name of the the group this node belongs to, null if no group is assigned*/
+	private String group = null;
+
 	
 	
 	public NTNode(String name){
+		super(name, 1);
         this.name = name;
         animManager = VirtualSpaceManager.INSTANCE.getAnimationManager();
+        outgoingEdges = new Vector<NTEdge>();
+      	incomingEdges = new Vector<NTEdge>();
     }
     
+	
     
     void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color colour){
         this.wdx = wdx;
@@ -77,6 +87,7 @@ public class NTNode {
 	    gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
 	    gBackgroundW.setDrawBorder(false);
 	    gBackgroundW.stick(this.labelW);
+//	    gBackgroundW.setTranslucencyValue(.2f);
 	    vs.addGlyph(gBackgroundW);
 	    vs.addGlyph(labelW);
 
@@ -104,20 +115,34 @@ public class NTNode {
 	    }
     }
     
-    public void moveTo(long x, long y){
-        gBackgroundW.moveTo(x+wdx, y+wdy);
-        mx = x; my = y;
-        if (gBackgroundN != null)	gBackgroundN.moveTo(x+ndx, y+ndy);            
+    public void moveTo(long mx, long my){
+        gBackgroundW.moveTo(mx+wdx, my+wdy);
+        this.mx = mx; this.my = my;
+        if (gBackgroundN != null)	gBackgroundN.moveTo(mx+ndx, my+ndy);            
     }
-    
-    public void move(long x, long y){
-    	mx += x; my += y;
-    	gBackgroundW.move(x,y);
-        if (gBackgroundN != null)	gBackgroundN.move(x,y);        
+	
+    /** Moves booth labels to differentLocations
+     */
+	public void repositionLabels(long wdy, long ndx){
+		//repositioning labels
+		gBackgroundW.move(0, wdy - this.wdy);
+		this.wdy = wdy;
+		if(!single) {
+			gBackgroundN.move(ndx - this.ndx, 0);
+			this.ndx = ndx;
+		}
+	}
+	
+
+    public void moveMatrix(long mx, long my){
+    	this.mx += mx; 
+    	this.my += my;
+    	gBackgroundW.move(mx,my);
+        if (gBackgroundN != null)	gBackgroundN.move(mx,my);        
     }
     
     //INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------
-    public void setState(int newState, boolean west, boolean north)
+    public void setNewState(int newState, boolean west, boolean north)
     {
     	newInteractionState = newState;
     	this.affectNorth = affectNorth || north;
@@ -228,17 +253,17 @@ public class NTNode {
 			gBackgroundN.setColor(backgroundColor);
 			gBackgroundN.setTranslucencyValue(1);
 		}
-		
-    }
+	}
+    
     
     private void highlight(Color c)
     {
 //    	boolean oldNorth = this.permanentNorth;
 //    	boolean oldWest = this.permanentWest;
-		long[] p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
 		
-    	if(affectNorth){
+    	if(affectNorth && !single){
     		this.gBackgroundN.setColor(c);
+    		
 //    		if(!matrix.isNodesVisibleNorth()) this.shiftNorth(p[1] - Math.min(widthHalf, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2), true);
     	}
     	if(affectWest || single){
@@ -310,29 +335,13 @@ public class NTNode {
 		return this.widthHalf;
 	}
     public void addOutgoingEdge(NTEdge e){
-    	if (outgoingEdges == null){
-    		outgoingEdges = new NTEdge[1];
-    		outgoingEdges[0] = e;
-    	}
-    	else {
-    		NTEdge[] na = new NTEdge[outgoingEdges.length+1];
-    		System.arraycopy(outgoingEdges, 0, na, 0, outgoingEdges.length);
-    		na[outgoingEdges.length] = e;
-    		outgoingEdges = na;
-    	}
+    	if(e instanceof NTIntraEdge){internalRelations.add(e);}
+    	outgoingEdges.add(e);
     }
     
     public void addIncomingEdge(NTEdge e){
-    	if (incomingEdges == null){
-    		incomingEdges = new NTEdge[1];
-    		incomingEdges[0] = e;
-    	}
-    	else {
-    		NTEdge[] na = new NTEdge[incomingEdges.length+1];
-    		System.arraycopy(incomingEdges, 0, na, 0, incomingEdges.length);
-    		na[incomingEdges.length] = e;
-    		incomingEdges = na;
-    	}
+//    	if(e instanceof NTIntraEdge){internalRelations.add(e);}
+    	incomingEdges.add(e);
     }
     
     public void addIntraEdgeSet(NTIntraEdgeSet ies)
@@ -343,14 +352,14 @@ public class NTNode {
     /**
      *@return null if empty
      */
-    public NTEdge[] getIncomingEdges(){
+    public Vector<NTEdge> getIncomingEdges(){
     	return incomingEdges;
     }
     
     /**
      *@return null if empty
      */
-    public NTEdge[] getOutgoingEdges(){
+    public Vector<NTEdge> getOutgoingEdges(){
     	return outgoingEdges;
     }
     
@@ -382,7 +391,33 @@ public class NTNode {
 	public Vector<NTIntraEdgeSet> getIntraEdgeSets() {
 		return this.intraEdgeSets;
 	}
-    
-    
+
+
+	public Object getInternalRelations() {
+		return internalRelations;
+	}
+
+
+	public int getDegree() {
+		return internalRelations.size();
+	}
+
+
+	public void removeOutgoingEdge(NTEdge ee) {
+		if(ee instanceof NTIntraEdge) internalRelations.remove(ee);
+		outgoingEdges.remove(ee);	
+	}
+	public void removeIncomingEdge(NTEdge ee) {
+//		if(ee instanceof NTIntraEdge) internalRelations.remove(ee);
+		incomingEdges.remove(ee);	
+	}
+	
+	public void setGroup(String name){
+		group = name;
+	}
+	public String getGroupName(){
+		return group;
+	}
+
 
 }

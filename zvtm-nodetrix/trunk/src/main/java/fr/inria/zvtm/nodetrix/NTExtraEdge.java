@@ -23,6 +23,7 @@ public class NTExtraEdge extends NTEdge {
     private float alpha = 1f;
     
     public NTExtraEdge(NTNode t, NTNode h, Color c){
+    	super(t,h,1);
         this.tail = t;
         this.head = h;
         this.edgeColor = c;

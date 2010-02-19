@@ -170,6 +170,11 @@ public class NTIntraEdgeSet {
 //		
 	}
     
+    public void reposition() {
+		this.moveTo( this.intraEdges.firstElement().getHead().ndx,
+					 this.intraEdges.firstElement().getTail().wdy);	
+	}
+    
     public void onTop(VirtualSpace vs){
     	for(NTIntraEdge ie: this.intraEdges){ ie.onTop(vs);}
     	vs.onTop(g);
@@ -202,4 +207,6 @@ public class NTIntraEdgeSet {
 	public long getY() {
 		return this.g.vy;
 	}
+
+	
 }

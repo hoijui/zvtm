@@ -131,8 +131,9 @@ public class Viewer {
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
+//		mView.getCursor().setColor(Color.white);
 		nm.createOverview();
-    }
+	}
 
     void windowLayout(){
         if (Utilities.osIsWindows()){
