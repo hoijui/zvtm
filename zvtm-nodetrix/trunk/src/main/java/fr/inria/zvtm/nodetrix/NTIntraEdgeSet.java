@@ -38,7 +38,7 @@ public class NTIntraEdgeSet {
 		
 		//adding invisible rectangle triggering events
 		g = new VRectangle(m.bkg.vx + x, m.bkg.vy + y,0, NodeTrixViz.CELL_SIZE_HALF - 3, NodeTrixViz.CELL_SIZE_HALF - 3, Color.BLACK);
-		g.setVisible(false);
+//		g.setVisible(false);
 		g.setTranslucencyValue(.5f);
 		g.setOwner(intraEdges.firstElement());
 		vs.addGlyph(g);
@@ -173,6 +173,8 @@ public class NTIntraEdgeSet {
     public void reposition() {
 		this.moveTo( this.intraEdges.firstElement().getHead().ndx,
 					 this.intraEdges.firstElement().getTail().wdy);	
+		this.g.moveTo( this.intraEdges.firstElement().getHead().ndx,
+					this.intraEdges.firstElement().getTail().wdy);	
 	}
     
     public void onTop(VirtualSpace vs){

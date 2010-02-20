@@ -350,7 +350,7 @@ public class NodeTrixViz {
      * Runs over all matrices and group their nodes according to their assigned
      * groupname.
      */
-    public void regroup(VirtualSpace vs)
+    public void regroupMatrices(VirtualSpace vs)
     {
     	for(Matrix m : matrices){
     		//removing old groupLabels
@@ -379,13 +379,12 @@ public class NodeTrixViz {
     		//repositioning nodes
     		m.repositionNodes(vs);
     		
-    		//adding new group labels
+    		//add new group labels
     		for(Vector<NTNode> v : groups.values()){
-    			m.addGroupLabel(v, v.firstElement().getGroupName());
+    			m.addGroupLabel(v, v.firstElement().getGroupName(), vs);
     		}
     		
-    		m.bringToFront(vs);
-    		
+//    		m.bringToFront(vs);
     	}
     }
     

@@ -20,6 +20,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VTextOr;
 
 public class Matrix {
     
@@ -32,8 +33,8 @@ public class Matrix {
     VRectangle bkg;
     VText matrixLabel;
     VRectangle[] gridBarsH, gridBarsV, gridReflexiveSquares;
-    Vector<VRectangle> groupLabelsW = new Vector<VRectangle>();
-    Vector<VRectangle> groupLabelsN = new Vector<VRectangle>();
+    Vector<Glyph> groupLabelsW = new Vector<Glyph>();
+    Vector<Glyph> groupLabelsN = new Vector<Glyph>();
     
     
     long matrixLbDX = 0;
@@ -527,12 +528,35 @@ public class Matrix {
 	}
 	
 	public void cleanGroupLabels(){
-		groupLabelsN = new Vector<VRectangle>();
-		groupLabelsW = new Vector<VRectangle>();
+		groupLabelsN = new Vector<Glyph>();
+		groupLabelsW = new Vector<Glyph>();
 	}
 	
-	public void addGroupLabel(Vector<NTNode> v, String label){
-//		VRectangle.
+	public void addGroupLabel(Vector<NTNode> v, String label, VirtualSpace vs){
+		if(nodes.size() > 1){
+			long x = -this.bkg.getWidth() - labelWidth - NodeTrixViz.CELL_SIZE_HALF;
+			VRectangle groupLabelW = new VRectangle(bkg.vx + x, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, NodeTrixViz.CELL_SIZE, v.size()*NodeTrixViz.CELL_SIZE_HALF,Color.orange);
+			VTextOr groupTextW = new VTextOr(bkg.vx + x, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, Color.black, label,  (float)Math.PI/2);
+			groupTextW.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
+			vs.addGlyph(groupLabelW);
+			vs.addGlyph(groupTextW);
+			bkg.stick(groupLabelW);
+			bkg.stick(groupTextW);
+			this.groupLabelsW.add(groupLabelW);
+			this.groupLabelsW.add(groupTextW);
+				
+			long y = this.bkg.getWidth() + labelWidth + NodeTrixViz.CELL_SIZE_HALF;
+			VRectangle groupLabelN = new VRectangle(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + y, 0, v.size()*NodeTrixViz.CELL_SIZE_HALF, NodeTrixViz.CELL_SIZE,Color.orange);
+			VText groupTextN = new VText(bkg.vx + v.firstElement().ndx - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + y, 0, Color.black, label);
+			groupTextN.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
+			vs.addGlyph(groupLabelN);
+			vs.addGlyph(groupTextN);
+			bkg.stick(groupLabelN);
+			bkg.stick(groupTextN);
+			this.groupLabelsN.add(groupLabelN);
+			this.groupLabelsN.add(groupTextN);
+		}
+	
 	}
 
 	
