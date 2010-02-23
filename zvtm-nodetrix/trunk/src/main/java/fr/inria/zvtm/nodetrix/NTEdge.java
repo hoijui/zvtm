@@ -76,6 +76,7 @@ public abstract class NTEdge extends LinLogEdge{
         return owner;
     }
     
+    public abstract void cleanGraphics(VirtualSpace vs);
     
 
 }

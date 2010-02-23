@@ -1,4 +1,4 @@
-/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+	/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
@@ -21,6 +21,7 @@ public class NTExtraEdge extends NTEdge {
     private int state = NodeTrixViz.IA_STATE_DEFAULT;
     static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
     private float alpha = 1f;
+    private boolean isdrawn = false;
     
     public NTExtraEdge(NTNode t, NTNode h, Color c){
     	super(t,h,1);
@@ -65,11 +66,17 @@ public class NTExtraEdge extends NTEdge {
 
 
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
+    	System.out.println("DRAW EXTRA EDGE");
+
+    	this.isdrawn = true;
         // initial values of x1, y1, x2, y2 are ignored (should be 0 anyway)
+    	
+//    	System.out.println("[NT_EXTRA_EDGE] create graphics ");
+    	
         offsets = new LongPoint[2];
         LongPoint tmp = this.getTail().getMatrix().getPosition();
         LongPoint hmp = this.getHead().getMatrix().getPosition();
-      double angle = Math.atan2(tail.getMatrix().bkg.vy-head.getMatrix().bkg.vy, tail.getMatrix().bkg.vx-head.getMatrix().bkg.vx) + Math.PI;       
+        double angle = Math.atan2(tail.getMatrix().bkg.vy-head.getMatrix().bkg.vy, tail.getMatrix().bkg.vx-head.getMatrix().bkg.vx) + Math.PI;       
            
         if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
             x1 = (tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2 : tail.getWidth();
@@ -127,21 +134,36 @@ public class NTExtraEdge extends NTEdge {
         assignAlpha();
     }
     
+	@Override
+    public void cleanGraphics(VirtualSpace vs){
+    	vs.removeGlyph(edgePath);
+    	edgePath = null;
+//    	offsets = new LongPoint[0];
+    }
+    
     void moveTo(long x, long y){
         // does not make sense, moving either head or tail
         // see moveHeadTo() and moveTailTo()
     }
     
     void move(long x, long y){
-        // x & y are actually ignored, computing new path geometry from matrix position
+    	System.out.println("[NT_EXTRA_EDGE] HEAD " + head.getMatrix().name + ", "+ head.name);
+    	System.out.println("[NT_EXTRA_EDGE] TAIL " + tail.getMatrix().name + ", "+ tail.name);
+    	System.out.println("[NT_EXTRA_EDGE] is Drawn: " + this.isdrawn );
+    	try{
+    		
+    	// x & y are actually ignored, computing new path geometry from matrix position
         LongPoint tmp = this.getTail().getMatrix().getPosition();
         LongPoint hmp = this.getHead().getMatrix().getPosition();
         LongPoint[] npos = new LongPoint[4];        
         double angle = Math.atan2(tail.getMatrix().bkg.vy-head.getMatrix().bkg.vy, tail.getMatrix().bkg.vx-head.getMatrix().bkg.vx) + Math.PI;        
         if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
-            offsets[0].setLocation((tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2 : tail.getWidth(),
+            offsets[0].
+            setLocation((tail.
+            		getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2 : tail.getWidth(),
                                    tail.wdy);
-            offsets[1].setLocation((head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.size()/2-2*head.getMatrix().nodes.firstElement().getBoxWidth(true) : -head.getWidth(),
+            offsets[1].
+            setLocation((head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.size()/2-2*head.getMatrix().nodes.firstElement().getBoxWidth(true) : -head.getWidth(),
                                    head.wdy);
             npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new LongPoint(tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
@@ -149,9 +171,11 @@ public class NTExtraEdge extends NTEdge {
             npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else if (angle > 5*Math.PI/4.0){
-            offsets[0].setLocation(tail.ndx,
+            offsets[0].
+            setLocation(tail.ndx,
                                    (tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2 : -tail.getWidth());
-            offsets[1].setLocation(head.ndx,
+            offsets[1].
+            setLocation(head.ndx,
                                    (head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.size()/2+2*head.getMatrix().nodes.firstElement().getBoxWidth(true) : head.getWidth());
             npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET);
@@ -159,9 +183,11 @@ public class NTExtraEdge extends NTEdge {
             npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else if (angle > 3*Math.PI/4.0){
-            offsets[0].setLocation((tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2-2*tail.getMatrix().nodes.firstElement().getBoxWidth(true) : -tail.getWidth(),
+            offsets[0].
+            setLocation((tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2-2*tail.getMatrix().nodes.firstElement().getBoxWidth(true) : -tail.getWidth(),
                                    tail.wdy);
-            offsets[1].setLocation((head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.size()/2 : head.getWidth(),
+            offsets[1].
+            setLocation((head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.size()/2 : head.getWidth(),
                                    head.wdy);
             npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new LongPoint(tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
@@ -170,9 +196,11 @@ public class NTExtraEdge extends NTEdge {
         }
         else {
             // angle >= Math.PI/4.0
-            offsets[0].setLocation(tail.ndx,
+            offsets[0].
+            setLocation(tail.ndx,
                                    (tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*tail.getMatrix().nodes.size()/2+2*tail.getMatrix().nodes.firstElement().getBoxWidth(true) : tail.getWidth());
-            offsets[1].setLocation(head.ndx,
+            offsets[1].
+            setLocation(head.ndx,
                                    (head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*head.getMatrix().nodes.size()/2 : -head.getWidth());
             npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET);
@@ -180,6 +208,7 @@ public class NTExtraEdge extends NTEdge {
             npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         edgePath.edit(npos, true);
+    	}catch(Exception e){e.printStackTrace();}
     }
     
     void moveHeadTo(long x, long y){
@@ -189,6 +218,7 @@ public class NTExtraEdge extends NTEdge {
     void moveTailTo(long x, long y){
         // TBW
     }
+
 
     
 }

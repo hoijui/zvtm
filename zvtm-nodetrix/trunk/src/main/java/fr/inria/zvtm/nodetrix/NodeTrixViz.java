@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.nodetrix.lll.Edge;
 import fr.inria.zvtm.nodetrix.lll.LinLogEdge;
@@ -94,6 +95,11 @@ public class NodeTrixViz {
         matrices.add(res);
         return res;
     }
+    
+    public Matrix addMatrix(Matrix res){
+      matrices.add(res);
+      return res;
+    }
 	
 	/**This method causes the NTNodes to be clustered using the LinLog Algorithm. 
 	 * It returns a HashMap mapping each NTNode to an integer depicting its cluster.
@@ -120,44 +126,17 @@ public class NodeTrixViz {
 			i++;
 		}
 		
-		System.out.println("[NODETRIXVIZ] " + i + " MATRICES CREATED");
+//		System.out.println("[NODETRIXVIZ] " + i + " MATRICES CREATED");
 		i = 0;
 		for(Vector<NTNode> v : temp.values()){
 			matrices.add(new Matrix("[" + i + "]", v));
 			i++;
 		}
 		
-		System.out.println("[NODETRIXVIZ] " + matrices.size() + " MATRICES IN TOTAL");
-		
+//		System.out.println("[NODETRIXVIZ] " + matrices.size() + " MATRICES IN TOTAL");
 		//Create Internal Edges
-		for(NTNode nn : nodes){
-			Vector<NTEdge> toAdd = new Vector<NTEdge>();
-			Vector<NTEdge> toRemove = new Vector<NTEdge>();
-			for(NTEdge ee : nn.getOutgoingEdges())
-			{
-				if(ee.head.getMatrix().equals(nn.getMatrix()))
-				{
-					NTIntraEdge ie = new NTIntraEdge(ee.tail, ee.head, ee.edgeColor);
-					toAdd.add(ie);
-					toRemove.add(ee);
-				}
-			}
-			for(NTEdge ee : toAdd){ nn.addOutgoingEdge(ee); }
-			for(NTEdge ee : toRemove){nn.removeOutgoingEdge(ee);}
-
-			toAdd = new Vector<NTEdge>();
-			toRemove = new Vector<NTEdge>();
-			for(NTEdge ee : nn.getIncomingEdges())
-			{
-				if(nn.getMatrix().equals(ee.tail.getMatrix()))
-				{
-					NTIntraEdge ie = new NTIntraEdge(ee.tail, ee.head, ee.edgeColor);
-					toAdd.add(ie);
-					toRemove.add(ee);
-				}
-			}
-			for(NTEdge ee : toAdd){nn.addIncomingEdge(ee);}
-			for(NTEdge ee : toRemove){nn.removeIncomingEdge(ee);}
+		for(Matrix m : matrices){
+			m.adjustEdges();
 		}
 	}
 	
@@ -279,7 +258,7 @@ public class NodeTrixViz {
         
         Collections.sort(matrices, new MatrixSizeComparator());
         for (Matrix m:matrices){
-		    m.bringToFront(vs);
+		    m.toFront(vs);
 		}
     }
     
@@ -345,6 +324,21 @@ public class NodeTrixViz {
     
     //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
     
+    public void splitMatrices(VirtualSpace vs, AnimationManager am){
+//    	System.out.println("[NODE_TRIX_VIZ] SPLIT MATRICES");
+    	HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
+    	Vector<Matrix> toRemove = new Vector<Matrix>();
+    	for(Matrix m : matrices){
+    		newMatrices.putAll(m.split(vs, am));
+    		toRemove.add(m);
+    	}
+ 
+    	for(Matrix m : toRemove){
+    		matrices.remove(m);
+    	}
+    	
+    	matrices.addAll(newMatrices.values());
+    }
     
     /**
      * Runs over all matrices and group their nodes according to their assigned
@@ -353,91 +347,16 @@ public class NodeTrixViz {
     public void regroupMatrices(VirtualSpace vs)
     {
     	for(Matrix m : matrices){
-    		//removing old groupLabels
-    		m.cleanGroupLabels();
-
-    		//grouping Nodes
-    		HashMap<String, Vector<NTNode>> groups = new HashMap<String, Vector<NTNode>>();
-    		for(NTNode n : m.nodes){
-    			String name = n.getGroupName();
-    			if(name == null) name = "null";
-    			
-    			Vector<NTNode> v = groups.get(name); 
-    			if(v == null){
-    				v = new Vector<NTNode>();
-    				groups.put(name, v);
-    			}
-    			v.add(n);
-    		}
-    		
-    		//putting nodes back into matrix
-    		m.nodes = new Vector<NTNode>();
-    		for(Vector<NTNode> v : groups.values()){
-    			m.nodes.addAll(v);
-    		}
-    		
-    		//repositioning nodes
-    		m.repositionNodes(vs);
-    		
-    		//add new group labels
-    		for(Vector<NTNode> v : groups.values()){
-    			m.addGroupLabel(v, v.firstElement().getGroupName(), vs);
-    		}
-    		
-//    		m.bringToFront(vs);
+    		m.regroup(vs);
     	}
     }
     
-    
-    
     public void reorderMatricesCMK()
 	{
-//		//Iterating Matrices
 		for(Matrix m : matrices)
 		{	
-			Vector<NTNode> queue = new Vector<NTNode>();
-			Vector<NTNode> finalOrdering = new Vector<NTNode>();
-			Vector<NTNode> initialOrdering  = m.nodes;
-			if(initialOrdering.size() == 1) continue;
-			Collections.sort(initialOrdering, new NTNodeDegreeComparator());
-			
-			NTNode xnStart;
-			while(!initialOrdering.isEmpty())
-			{
-				xnStart = initialOrdering.remove(0);
-				System.out.println("[NTV] " + xnStart.getDegree());
-				finalOrdering.add(xnStart);
-				initialOrdering.remove(xnStart);
-				addChildrenToQueue(xnStart, queue, initialOrdering);
-	
-				while(!queue.isEmpty())
-				{
-					NTNode xn = queue.remove(0);
-					finalOrdering.add(xn);
-					initialOrdering.remove(xn);
-					addChildrenToQueue(xn, queue, initialOrdering);
-				}
-			}
-			m.nodes = finalOrdering;
+			m.reorderCutHillMcKee();
 		}	
 	}
-    public void addChildrenToQueue(NTNode xn, Vector<NTNode> queue, Vector<NTNode> initialOrdering)
-	{
-		Vector<NTNode> orderedChildren = new Vector<NTNode>();
-		NTNode xnRel;
-		for(NTEdge xr : xn.getOutgoingEdges())
-		{
-			if(xr instanceof NTExtraEdge)
-			{
-				xnRel = xr.getHead();
-				if(xn.equals(xnRel)) continue;
-				if(!initialOrdering.contains(xnRel)) continue;
-				orderedChildren.add(xnRel);
-				initialOrdering.remove(xnRel);
-			}
-		}
-		
-		Collections.sort(orderedChildren, new NTNodeDegreeComparator());
-		queue.addAll(orderedChildren);
-	}
+    
 }

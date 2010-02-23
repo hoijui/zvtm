@@ -35,7 +35,7 @@ public class NTIntraEdge extends NTEdge {
     }
     
     @Override
-    void createGraphics(long height, long y, long x, long index, VirtualSpace vs) 
+    protected void createGraphics(long height, long y, long x, long index, VirtualSpace vs) 
     {
     	this.animManager = VirtualSpaceManager.INSTANCE.getAnimationManager();
     	this.offset = new LongPoint(x, y);
@@ -69,7 +69,13 @@ public class NTIntraEdge extends NTEdge {
     	glyphTranslucent.setSensitivity(false);
     	glyph.stick(glyphTranslucent);
     	vs.addGlyph(glyphTranslucent);
-
+    }
+    
+    @Override 
+    public void cleanGraphics(VirtualSpace vs){
+    	System.out.println("GLYPH: "+ glyph.vx);
+    	vs.removeGlyph(glyph);
+    	vs.removeGlyph(glyphTranslucent);
     }
     
     //INTERACTION----------------------------------------------INTERACTION-----------------------------------------------INTERACTION-----------------------------------

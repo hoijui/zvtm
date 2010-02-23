@@ -18,6 +18,7 @@ package fr.inria.zvtm.nodetrix.lll;
 import java.util.*;
 
 import fr.inria.zvtm.nodetrix.NodeTrixViz;
+import fr.inria.zvtm.nodetrix.lll.*;
 
 
 /**

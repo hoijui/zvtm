@@ -10,10 +10,15 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
 
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator2;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -36,7 +41,6 @@ public class Matrix {
     Vector<Glyph> groupLabelsW = new Vector<Glyph>();
     Vector<Glyph> groupLabelsN = new Vector<Glyph>();
     
-    
     long matrixLbDX = 0;
     long matrixLbDY = 0;
 	
@@ -50,7 +54,10 @@ public class Matrix {
 	private Vector<NTNode> highlightedNodes = new Vector<NTNode>();
 	private Vector<NTEdge> highlightedEdges = new Vector<NTEdge>();
 	
+	private AnimationManager am;
+	
     public Matrix(String name, Vector<NTNode> nodes){
+    	this.am = am;
         this.name = name;
         this.nodes = nodes;
         for (NTNode node : nodes){
@@ -62,6 +69,7 @@ public class Matrix {
     void createNodeGraphics(long x, long y, VirtualSpace vs){
 	    // nodes
     	if (nodes.size() > 1){
+    		
             // matrix background
             bkg = new VRectangle(x, y, 0,
                                  nodes.size()*NodeTrixViz.CELL_SIZE/2, nodes.size()*NodeTrixViz.CELL_SIZE/2,
@@ -129,20 +137,20 @@ public class Matrix {
     void finishCreateNodeGraphics(VirtualSpace vs){
         //estimating maximal length of node labels
     	labelWidth = nodes.firstElement().getLabelWidth();
-        for (NTNode n : this.nodes){
+        for (NTNode n : nodes){
         	if (n.getLabelWidth() > labelWidth){
                 labelWidth = n.getLabelWidth();
             }
         }
         labelWidth += (NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2);
         
-        //creating background boxes for each node
+        //creating grid for each node
         int i = 0;
         gridBarsH = new VRectangle[nodes.size()];
         gridBarsV = new VRectangle[nodes.size()];
         gridReflexiveSquares = new VRectangle[nodes.size()];
         
-        for(NTNode n : this.nodes)
+        for(NTNode n : nodes)
         {
         	n.setBackgroundBox(labelWidth);
         	if(this.nodes.size() == 1) break;
@@ -241,6 +249,10 @@ public class Matrix {
 
          }
     }
+    
+    public void clearGraphic(){
+    	
+    }
 
     public void enableExploringMode(long[] p){
 //    	if(selectedEdge != null)
@@ -283,10 +295,10 @@ public class Matrix {
 		nodesUnvisibleW = (bkg.vx - bkg.getHeight() < p[0] + offset);
 		for (NTNode node : nodes){
         	if(nodesUnvisibleN) {
-        		node.shiftNorth((p[1] - offset) + labelWidth/2, true);
+        		node.shiftNorthernLabels((p[1] - offset) + labelWidth/2, true);
         	}
         	if(nodesUnvisibleW) {
-        		node.shiftWest((p[0] + offset) - labelWidth/2, true);
+        		node.shiftWesternLabels((p[0] + offset) - labelWidth/2, true);
         	}
 		}
 		if(nodesUnvisibleN || nodesUnvisibleW){
@@ -299,10 +311,12 @@ public class Matrix {
     {
     	for (NTNode node : nodes){
         	if(nodesUnvisibleN) {
-        		node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, true);
+//        		node.resetNorthernLabels(bkg.vy + bkg.getHeight() + labelWidth/2, true);
+        		node.resetNorthernLabels(true);
         	}
         	if(nodesUnvisibleW) {
-        		node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, true);
+//        		node.resetWesternLabels(bkg.vx - bkg.getHeight() - labelWidth/2, true);
+        		node.resetWesternLabels(true);
             }
 		}
     	gOverview.setTranslucencyValue(0);
@@ -359,7 +373,7 @@ public class Matrix {
     
     
     /** Brings all glyphs of this matrix to the top of the drawing stack*/
-    public void bringToFront(VirtualSpace vs)
+    public void toFront(VirtualSpace vs)
     {	
     	vs.onTop(bkg);
     	for(Glyph g : gridBarsH){ vs.onTop(g); }
@@ -394,6 +408,7 @@ public class Matrix {
     	
     }
     
+    
     public void resetGrid(NTNode tail, NTNode head)
     {
     	int i1 = nodes.indexOf(tail);
@@ -425,8 +440,9 @@ public class Matrix {
         return false;
     }
     
+    
     public void move(long x, long y){
-        bkg.move(x, y);
+    	bkg.move(x, y);
         long[] p = new long[2];
         long offset = 0;
         p = VirtualSpaceManager.INSTANCE.getActiveView().getVisibleRegion(VirtualSpaceManager.INSTANCE.getActiveCamera());
@@ -444,21 +460,22 @@ public class Matrix {
     		if(exploringModeGlobal)
     		{
     			if(nodesUnvisibleN){
-    				node.shiftNorth((p[1] - offset) + labelWidth/2, false);
-    				node.moveMatrix(x, 0);
+    				node.shiftNorthernLabels((p[1] - offset) + labelWidth/2, false);
+    				node.matrixMoved(x, 0);
     			}else{
-    				node.surfBackNorth(bkg.vy + bkg.getHeight() + labelWidth/2, false);
-    			}
+//    				node.resetNorthernLabels(bkg.vy + bkg.getHeight() + labelWidth/2, false);
+       				node.resetNorthernLabels(false);
+       			}
     			if(nodesUnvisibleW){
-    				node.shiftWest((p[0] + offset) - labelWidth/2, false);
-    				node.moveMatrix(0, y);
+    				node.shiftWesternLabels((p[0] + offset) - labelWidth/2, false);
+    				node.matrixMoved(0, y);
     			}else{
-    				node.surfBackWest(bkg.vx - bkg.getHeight() - labelWidth/2, false);
+//    				node.resetWesternLabels(bkg.vx - bkg.getHeight() - labelWidth/2, false);
+    				node.resetWesternLabels(false);
     			}
     		}else{
-    			node.moveMatrix(x, y);
+    			node.matrixMoved(x, y);
     		}
-
         	
         	if (node.getIntraEdgeSets() != null){
                 for (NTIntraEdgeSet edge : node.getIntraEdgeSets()){
@@ -472,7 +489,9 @@ public class Matrix {
                         // do it only for extra edges because for intra edges
                         // we have already moved them in the above loop
                         // (intra edges connect nodes within the same matrix)
-                        edge.move(x,y);
+//                    	System.out.println("[MATRIX] move incomming edge HEAD " + edge.head.getMatrix().name);
+//                    	System.out.println("[MATRIX] move incomming edge HEAD " + edge.tail.getMatrix().name);
+                    	edge.move(x,y);
                         ((NTExtraEdge) edge).assignAlpha();
                     }
                 }
@@ -484,6 +503,7 @@ public class Matrix {
                         // do it only for extra edges because for intra edges
                         // we have already moved them in the above loop
                         // (intra edges connect nodes within the same matrix)
+//                    	System.out.println("[MATRIX] move outgoing edge");
                         edge.move(x,y);
                         ((NTExtraEdge) edge).assignAlpha();
                     }
@@ -492,46 +512,34 @@ public class Matrix {
         }
     }
     
-    public LongPoint getPosition(){
-        return bkg.getLocation();
-    }
-    
-    public int getSize(){
-        return nodes.size();
-    }
-    
-    public String getName(){
-        return name;
-    }
-    
-    
-    public static void setCellSize(int cs){
-        CELL_SIZE = cs;
-    }
-    public Vector<NTIntraEdgeSet>getNTIntraEdgeSets()
-    {
-    	return this.intraEdgeSets;
-    }
 
-    public boolean isExploringMode(){return exploringModeGlobal;}
-
-    public boolean isNodeVisibleNorth(){return !this.nodesUnvisibleN;}
-    public boolean isNodesVisibleWest(){return !this.nodesUnvisibleW;}
-    public void addNode(NTNode n){
-    	nodes.add(n);
-    	n.setMatrix(this);
-    }
-
-
-	public void setNodesOrdered(Vector<NTNode> finalOrdering) {
-		nodes = finalOrdering;
-	}
-	
-	public void cleanGroupLabels(){
+    public void cleanGroupLabels(){
 		groupLabelsN = new Vector<Glyph>();
 		groupLabelsW = new Vector<Glyph>();
 	}
 	
+	
+    public void addChildrenToQueue(NTNode xn, Vector<NTNode> queue, Vector<NTNode> initialOrdering)
+	{
+		Vector<NTNode> orderedChildren = new Vector<NTNode>();
+		NTNode xnRel;
+		for(NTEdge xr : xn.getOutgoingEdges())
+		{
+			if(xr instanceof NTExtraEdge)
+			{
+				xnRel = xr.getHead();
+				if(xn.equals(xnRel)) continue;
+				if(!initialOrdering.contains(xnRel)) continue;
+				orderedChildren.add(xnRel);
+				initialOrdering.remove(xnRel);
+			}
+		}
+		
+		Collections.sort(orderedChildren, new NTNodeDegreeComparator());
+		queue.addAll(orderedChildren);
+	}
+	
+    
 	public void addGroupLabel(Vector<NTNode> v, String label, VirtualSpace vs){
 		if(nodes.size() > 1){
 			long x = -this.bkg.getWidth() - labelWidth - NodeTrixViz.CELL_SIZE_HALF;
@@ -556,14 +564,260 @@ public class Matrix {
 			this.groupLabelsN.add(groupLabelN);
 			this.groupLabelsN.add(groupTextN);
 		}
-	
 	}
 
+	public void setLabelsTo(){
+		
+	}
+	
+	
+	//-----ORGANISING MATRIX------------------------ORGANISING MATRIX------------------------ORGANISING MATRIX-------------------
+	
+	public void reorderCutHillMcKee(){
+		Vector<NTNode> queue = new Vector<NTNode>();
+		Vector<NTNode> finalOrdering = new Vector<NTNode>();
+		Vector<NTNode> initialOrdering  = nodes;
+		if(initialOrdering.size() == 1) return;
+		Collections.sort(initialOrdering, new NTNodeDegreeComparator());
+		
+		NTNode xnStart;
+		while(!initialOrdering.isEmpty())
+		{
+			xnStart = initialOrdering.remove(0);
+//			System.out.println("[NTV] " + xnStart.getDegree());
+			finalOrdering.add(xnStart);
+			initialOrdering.remove(xnStart);
+			addChildrenToQueue(xnStart, queue, initialOrdering);
+
+			while(!queue.isEmpty())
+			{
+				NTNode xn = queue.remove(0);
+				finalOrdering.add(xn);
+				initialOrdering.remove(xn);
+				addChildrenToQueue(xn, queue, initialOrdering);
+			}
+		}
+		nodes = finalOrdering;
+	}
+	
+	public void regroup(VirtualSpace vs){
+		//removing old groupLabels
+		cleanGroupLabels();
+
+		//grouping Nodes
+		HashMap<String, Vector<NTNode>> groups = new HashMap<String, Vector<NTNode>>();
+		for(NTNode n : nodes){
+			String name = n.getGroupName();
+			if(name == null) name = "null";
+			
+			Vector<NTNode> v = groups.get(name); 
+			if(v == null){
+				v = new Vector<NTNode>();
+				groups.put(name, v);
+			}
+			v.add(n);
+		}
+		
+		//putting nodes back into matrix
+		nodes = new Vector<NTNode>();
+		for(Vector<NTNode> v : groups.values()){
+			nodes.addAll(v);
+		}
+		
+		//repositioning nodes
+		repositionNodes(vs);
+		
+		//add new group labels
+		for(Vector<NTNode> v : groups.values()){
+			addGroupLabel(v, v.firstElement().getGroupName(), vs);
+		}
+	}
+	
+	public HashMap<String, Matrix> split(VirtualSpace vs, AnimationManager am)
+	{
+//		if(!name.equals("[0]")) return new HashMap<String, Matrix>();
+		System.out.println("[MATRIX] split " + this.name + "- "+ bkg.vx + "," + bkg.vy);
+		if(nodes.size() <= 1) return new HashMap<String, Matrix>();
+		
+		// 1. CREATE MATRICES
+		HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
+		String groupname = "";
+		Matrix mNew = null;
+		long x = 0, y = 0;
+		for(NTNode n : nodes){
+			if(!n.getGroupName().equals(groupname)){
+				//finish old matrix
+				if(mNew != null){
+//					System.out.println("[MATRIX] NEW MATRIX " + mNew.name + " CONTAINING " + mNew.getSize() + " NODES");
+					mNew.createNodeGraphics(bkg.vx + x/mNew.getSize(), bkg.vy + y/mNew.getSize(), vs);
+					mNew.finishCreateNodeGraphics(vs);
+					x = 0;y = 0;
+				}
+				//-- create new matrix
+				groupname = n.getGroupName();
+				mNew = new Matrix(groupname, new Vector<NTNode>());
+				newMatrices.put(mNew.name, mNew);
+			}
+			mNew.addNode(n);
+			x += n.ndx;
+			y += n.wdy;
+			for(NTEdge e : n.outgoingEdges){
+				e.cleanGraphics(vs);
+			}
+		}
+		mNew.createNodeGraphics(bkg.vx + x/mNew.getSize(), bkg.vy + y/mNew.getSize(), vs);
+		mNew.finishCreateNodeGraphics(vs);
+		
+		// 2. SHIFT LABELS TO OLD PLACES
+		for(Matrix m : newMatrices.values()){
+			for(NTNode n : m.nodes){
+				n.shiftNorthernLabels(bkg.vy + bkg.vw, false);
+				n.shiftWesternLabels(bkg.vx - bkg.vw, false);
+			}
+			mNew.adjustEdges();
+			// 3. ADJUST EDGES
+		}
+		
+		// 4. FADE OUT GRAPHICS OF OLD MATRIX
+		this.cleanGraphics(vs, am);
+		
+		// 5. RESET NEW NODE LABELS 
+		for(Matrix m : newMatrices.values()){
+			for(NTNode n : m.nodes){
+				n.resetNorthernLabels(false);
+				n.resetWesternLabels(false);
+			}
+		}
+		
+		// 5. DISPLACE MATRICES 
+		for(Matrix m : newMatrices.values())
+		{
+			// 6. CREATE NEW EDGE GRAPHICS
+			mNew.createEdgeGraphics(vs);
+			mNew.toFront(vs);
+		}
+		
+		return newMatrices;
+	}
+	
+	
+	/**
+	 */
+	public void adjustEdges(){
+//		System.out.println("[MATRIX] nodeamount: " + nodes.size());
+		for(NTNode nn : nodes){
+			if(nn.incomingEdges.size() == 0 && nn.outgoingEdges.size() == 0) continue;
+			
+			Object[] outgoingOld = nn.getOutgoingEdges().toArray();
+//			Object[] incomingOld = nn.getIncomingEdges().toArray();
+			
+//			nn.incomingEdges = new Vector<NTEdge>();
+			nn.outgoingEdges = new Vector<NTEdge>();
+			
+			for(Object o : outgoingOld)
+			{
+				NTEdge edgeOld = (NTEdge)o;
+				NTEdge edgeNew;
+				NTNode head = edgeOld.head;
+				head.removeIncomingEdge(edgeOld);
+				if(nn.getMatrix().equals(head.getMatrix()))
+				{
+					edgeNew = new NTIntraEdge(nn, head, edgeOld.edgeColor);
+				}else{
+					edgeNew = new NTExtraEdge(nn, head, edgeOld.edgeColor);
+				}
+				nn.addOutgoingEdge(edgeNew);
+				head.addIncomingEdge(edgeNew);
+			}
+		
+//			for(Object o : incomingOld)
+//			{
+//				NTEdge e = (NTEdge)o;
+//				NTEdge ie;
+//				e.tail.removeOutgoingEdge(e);
+//				if(nn.getMatrix().equals(e.tail.getMatrix()))
+//				{
+//					ie = new NTIntraEdge(e.head, e.tail, e.edgeColor);
+//				}else{
+//					ie = new NTExtraEdge(e.head, e.tail, e.edgeColor);
+//				}
+//				nn.addIncomingEdge(ie);
+//				ie.tail.addOutgoingEdge(ie);
+//			}
+		}
+	}
 	
 	
 	
+	//----------------------------GETTER-SETTER------------------------------------GETTER-SETTER------------------------------------GETTER-SETTER--------
+	
+	public LongPoint getPosition(){
+		return bkg.getLocation();
+	}
+	
+	public int getSize(){
+		return nodes.size();
+	}
+	
+	public String getName(){
+		return name;
+	}
 	
 	
+	public static void setCellSize(int cs){
+		CELL_SIZE = cs;
+	}
+	public Vector<NTIntraEdgeSet>getNTIntraEdgeSets()
+	{
+		return this.intraEdgeSets;
+	}
 	
+	public boolean isExploringMode(){return exploringModeGlobal;}
+	
+	public boolean isNodeVisibleNorth(){return !this.nodesUnvisibleN;}
+	public boolean isNodesVisibleWest(){return !this.nodesUnvisibleW;}
+	public void addNode(NTNode n){
+		nodes.add(n);
+		n.setMatrix(this);
+	}
+	
+	
+	public void setNodesOrdered(Vector<NTNode> finalOrdering) {
+		nodes = finalOrdering;
+	}
+	
+	public void cleanGraphics(final VirtualSpace vs, AnimationManager am){
+		Animation a;
+		int duration = 3000;
+		a = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){
+					public void execute(Object o, Animation.Dimension dimension){
+						vs.removeGlyph((Glyph)o);}});
+		am.startAnimation(a, true);
+		a = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+						vs.removeGlyph((Glyph)o);}});
+		am.startAnimation(a, true);
+		for(Glyph g : this.gridBarsH){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+					vs.removeGlyph((Glyph)o);}});
+			am.startAnimation(a, true);}
+		for(Glyph g : this.gridBarsV){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+					vs.removeGlyph((Glyph)o);}});
+			am.startAnimation(a, true);}
+		for(Glyph g : this.groupLabelsN){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+					vs.removeGlyph((Glyph)o);}});
+			am.startAnimation(a, true);}
+		for(Glyph g : this.groupLabelsW){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+					vs.removeGlyph((Glyph)o);}});
+			am.startAnimation(a, true);}
+		for(Glyph g : this.gridReflexiveSquares){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+					vs.removeGlyph((Glyph)o);}});
+			am.startAnimation(a, true);}
+	}
 	
 }

@@ -40,7 +40,6 @@ import java.io.InputStreamReader;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.engine.RepaintAdapter;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -56,7 +55,6 @@ import fr.inria.zvtm.glyphs.RImage;
 
 import fr.inria.zvtm.nodetrix.NodeTrixViz;
 import fr.inria.zvtm.nodetrix.NTNode;
-import fr.inria.zvtm.nodetrix.viewer.Messages;
 
 public class Viewer {
 
@@ -131,7 +129,6 @@ public class Viewer {
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
-//		mView.getCursor().setColor(Color.white);
 		nm.createOverview();
 	}
 

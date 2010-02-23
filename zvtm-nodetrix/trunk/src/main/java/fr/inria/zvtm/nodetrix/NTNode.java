@@ -51,7 +51,7 @@ public class NTNode extends LinLogNode{
 	private Object owner;
 	
 	/**Stores the half width, since double width is never used */
-	private long widthHalf;
+	private long widthHalf = 0;
 	
 	/* interaction*/
 	AnimationManager animManager; 
@@ -63,7 +63,11 @@ public class NTNode extends LinLogNode{
 	
 	/*Name of the the group this node belongs to, null if no group is assigned*/
 	private String group = null;
+	private boolean reDraw = true;
 
+	private long yOld;
+
+	private long xOld;
 	
 	
 	public NTNode(String name){
@@ -76,43 +80,44 @@ public class NTNode extends LinLogNode{
     
 	
     
-    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color colour){
+    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color colour)
+    {
+    	cleanGraphics(vs);
+    	
         this.wdx = wdx;
 	    this.wdy = wdy;
+	    this.ndx = ndx;
+	    this.ndy = ndy;
 	    this.vs = vs;
 	    this.backgroundColor = colour;
 	    this.single = single;
-
-	    labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
-	    gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
-	    gBackgroundW.setDrawBorder(false);
-	    gBackgroundW.stick(this.labelW);
-//	    gBackgroundW.setTranslucencyValue(.2f);
-	    vs.addGlyph(gBackgroundW);
-	    vs.addGlyph(labelW);
-
-	    gBackgroundWSensitive = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
-	    gBackgroundWSensitive.setTranslucencyValue(0f);
-	    gBackgroundW.stick(this.gBackgroundWSensitive);
-	    gBackgroundWSensitive.setOwner(this);
-		vs.addGlyph(gBackgroundWSensitive);
 	    
+	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
+	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
+	    	gBackgroundW.setDrawBorder(false);
+	    	gBackgroundW.stick(this.labelW);
+	    	vs.addGlyph(gBackgroundW);
+	    	vs.addGlyph(labelW);
+	    	
+	    	gBackgroundWSensitive = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
+	    	gBackgroundWSensitive.setTranslucencyValue(0f);
+	    	gBackgroundW.stick(this.gBackgroundWSensitive);
+	    	gBackgroundWSensitive.setOwner(this);
+	    	vs.addGlyph(gBackgroundWSensitive);
 	    
-	    if (!single){
-    	    this.ndx = ndx;
-    	    this.ndy = ndy;
-    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
-    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
-    	    gBackgroundN.setDrawBorder(false);
-    	    gBackgroundN.stick(this.labelN);
-    		vs.addGlyph(gBackgroundN);
-    		vs.addGlyph(labelN);
-    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2,  Color.red,  (float)Math.PI/2f);
-    	    gBackgroundNSensitive.setTranslucencyValue(0f);
-    	    gBackgroundN.stick(this.gBackgroundNSensitive);
-    	    gBackgroundNSensitive.setOwner(this);
-    		vs.addGlyph(gBackgroundNSensitive);
-	    }
+		    if (!single){
+	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
+	    	    gBackgroundN.setDrawBorder(false);
+	    	    gBackgroundN.stick(this.labelN);
+	    		vs.addGlyph(gBackgroundN);
+	    		vs.addGlyph(labelN);
+	    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2,  Color.red,  (float)Math.PI/2f);
+	    	    gBackgroundNSensitive.setTranslucencyValue(0f);
+	    	    gBackgroundN.stick(this.gBackgroundNSensitive);
+	    	    gBackgroundNSensitive.setOwner(this);
+	    		vs.addGlyph(gBackgroundNSensitive);
+		   }
     }
     
     public void moveTo(long mx, long my){
@@ -121,10 +126,10 @@ public class NTNode extends LinLogNode{
         if (gBackgroundN != null)	gBackgroundN.moveTo(mx+ndx, my+ndy);            
     }
 	
-    /** Moves booth labels to differentLocations
+    /** Moves booth labels to differentLocations along the matrix side.
+     * This method is used for label reordering. 
      */
 	public void repositionLabels(long wdy, long ndx){
-		//repositioning labels
 		gBackgroundW.move(0, wdy - this.wdy);
 		this.wdy = wdy;
 		if(!single) {
@@ -134,10 +139,10 @@ public class NTNode extends LinLogNode{
 	}
 	
 
-    public void moveMatrix(long mx, long my){
+    public void matrixMoved(long mx, long my){
     	this.mx += mx; 
     	this.my += my;
-    	gBackgroundW.move(mx,my);
+    	gBackgroundW.move(mx, my);
         if (gBackgroundN != null)	gBackgroundN.move(mx,my);        
     }
     
@@ -149,8 +154,13 @@ public class NTNode extends LinLogNode{
     	this.affectWest = affectWest || west;
     }
     
-    public void shiftWest(long xNew, boolean animated)
+    /** shifts the western labels to the west
+     * @param xNew - absolute value in virtual space
+     * @param animated - animated shifting, if true;
+     **/
+    public void shiftWesternLabels(long xNew, boolean animated)
     {
+    	xOld = gBackgroundW.vx;
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
     				.createGlyphTranslation(
@@ -164,11 +174,16 @@ public class NTNode extends LinLogNode{
     	}else{
     		gBackgroundW.move(xNew - gBackgroundW.vx, 0);
     	}
-    	gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
+//    	gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
     }
     
-    public void shiftNorth(long yNew, boolean animated)
+    /** shifts the northern labels to the west
+     * @param yNew - absolute value in virtual space
+     * @param animated - animated shifting, if true;
+     **/
+    public void shiftNorthernLabels(long yNew, boolean animated)
     {
+    	yOld = gBackgroundN.vy;
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
     				.createGlyphTranslation(
@@ -182,41 +197,46 @@ public class NTNode extends LinLogNode{
       	}else{
       		gBackgroundN.move(0, yNew - gBackgroundN.vy);
         }
-      	gBackgroundN.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
+//      gBackgroundN.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
     }
     
-    public void surfBackNorth(long yNew, boolean animated)
+    
+    /** Sets the northern labels to their initial position
+     **/
+    public void resetNorthernLabels(boolean animated)
     {
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
     				.createGlyphTranslation(
     						NodeTrixViz.DURATION_NODEMOVE,
     						gBackgroundN, 
-    						new LongPoint(gBackgroundN.vx, yNew),
+    						new LongPoint(gBackgroundN.vx, yOld),
     						false, 
     						SlowInSlowOutInterpolator2.getInstance(), 
     						null),
     						true);
     	}else{
-      		gBackgroundN.move(0, yNew - gBackgroundN.vy);
+      		gBackgroundN.move(0, yOld - gBackgroundN.vy);
         }
     	gBackgroundN.setTranslucencyValue(1);
     }
     
-    public void surfBackWest(long xNew, boolean animated)
+    /** Sets the northern labels to their initial position
+     **/
+    public void resetWesternLabels(boolean animated)
     {
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
 	        		.createGlyphTranslation(
 	        			NodeTrixViz.DURATION_NODEMOVE,
 	        			gBackgroundW, 
-	        			new LongPoint(xNew, gBackgroundW.vy),
+	        			new LongPoint(xOld, gBackgroundW.vy),
 	        			false, 
 	        			SlowInSlowOutInterpolator2.getInstance(), 
 	        			null),
         		true);
     	}else{
-    		gBackgroundW.move(xNew - gBackgroundW.vx, 0);
+    		gBackgroundW.move(xOld - gBackgroundW.vx, 0);
     	}
     	gBackgroundW.setTranslucencyValue(1);
     }
@@ -310,10 +330,11 @@ public class NTNode extends LinLogNode{
      * the matrix. A gradiant is applied according to the position of the node in the list.
      */
 	public void setBackgroundBox(long maxLength) {
-		this.widthHalf = maxLength/2;
+		if(widthHalf == 0) this.widthHalf = maxLength/2;
 		wdx -= widthHalf;
 		ndy += widthHalf;
 		this.gBackgroundW.setWidth(widthHalf);
+
 		gBackgroundWSensitive.setWidth(widthHalf-2);
 		if (!this.single){
 			this.gBackgroundW.move(-widthHalf, 0);
@@ -417,6 +438,15 @@ public class NTNode extends LinLogNode{
 	}
 	public String getGroupName(){
 		return group;
+	}
+
+
+
+	void cleanGraphics(VirtualSpace vs) {
+		if(this.gBackgroundW != null) vs.removeGlyph(this.gBackgroundW);
+		if(this.labelW != null) vs.removeGlyph(this.labelW);
+		if(this.gBackgroundN != null) vs.removeGlyph(this.gBackgroundN);
+		if(this.labelN != null) vs.removeGlyph(this.labelN);
 	}
 
 
