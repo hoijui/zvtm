@@ -147,7 +147,7 @@ public class SceneManager implements CameraListener {
     
     HashMap sceneAttrs;
     
-    HashMap RESOURCE_HANDLERS;
+    HashMap<String, ResourceHandler> RESOURCE_HANDLERS;
 
     private class RegionUpdater {
         private final HashMap<Camera, Location> toUpdate;
@@ -221,7 +221,7 @@ public class SceneManager implements CameraListener {
         id2object = new Hashtable<String, ObjectDescription>();
         id2scene = new Hashtable();
         sceneAttrs = new HashMap();
-        RESOURCE_HANDLERS = new HashMap();
+        RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>();
 
         for(Camera cam: sceneCameras){
             cam.addListener(this);
@@ -251,7 +251,7 @@ public class SceneManager implements CameraListener {
      *@return instance of class implementing ResourceHandler for that type of resource. Null if none associated with rType.
      */
     public ResourceHandler getResourceHandler(String rType){
-        return (ResourceHandler)RESOURCE_HANDLERS.get(rType);
+        return RESOURCE_HANDLERS.get(rType);
     }
     
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
@@ -719,7 +719,7 @@ public class SceneManager implements CameraListener {
     public ResourceDescription createResourceDescription(long x, long y, String id, int zindex, Region region,
                                                          URL resourceURL, String type, boolean sensitivity, Color stroke, String params){
         if (RESOURCE_HANDLERS.containsKey(type)){
-            ResourceDescription rd = ((ResourceHandler)RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
+            ResourceDescription rd = (RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
                                                                                                               resourceURL, sensitivity, stroke, params);            
             if (!id2object.containsKey(id)){
                 id2object.put(id, rd);
