@@ -9,6 +9,7 @@ package fr.inria.zuist.engine;
 
 import java.awt.Color;
 import javax.swing.SwingUtilities;
+import java.lang.reflect.InvocationTargetException;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -62,12 +63,18 @@ public class ClosedShapeDescription extends ObjectDescription {
                 if (!sensitive){glyph.setSensitivity(false);}
             }
             inSpace = true;
-	    SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-	        vs.addGlyph(glyph);
-                glyph.setOwner(ClosedShapeDescription.this);
+            try{
+                SwingUtilities.invokeAndWait(new Runnable(){
+                    public void run(){
+                        vs.addGlyph(glyph);
+                        glyph.setOwner(ClosedShapeDescription.this);
+                    }
+                });
+            } catch(InterruptedException ie) {
+                /* swallowed */
+            } catch(InvocationTargetException ite) {
+                /* swallowed */
             }
-            });
         }
     }
 
@@ -84,11 +91,17 @@ public class ClosedShapeDescription extends ObjectDescription {
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
-            SwingUtilities.invokeLater(new Runnable(){
-            public void run(){
-	        vs.removeGlyph(glyph);
-            }
-            });
+                try{
+                    SwingUtilities.invokeAndWait(new Runnable(){
+                        public void run(){
+                            vs.removeGlyph(glyph);
+                        }
+                    });
+                } catch(InterruptedException ie) {
+                    /* swallowed */
+                } catch(InvocationTargetException ite) {
+                    /* swallowed */
+                }
             }
             inSpace = false;
         }
