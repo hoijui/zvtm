@@ -15,7 +15,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
-import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -49,13 +48,13 @@ public class ClosedShapeDescription extends ObjectDescription {
     public void createObject(final VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
             if (fadeIn){
-                ((Translucent)glyph).setTranslucencyValue(0.0f);
+                glyph.setTranslucencyValue(0.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
                 //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
                 //        not necessarily 1.0f
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, (Translucent)glyph,
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
                     1.0f, false, IdentityInterpolator.getInstance(), null);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
@@ -86,7 +85,7 @@ public class ClosedShapeDescription extends ObjectDescription {
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
 //                    new ClosedShapeHideAction(vs));
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, (Translucent)glyph,
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new ClosedShapeHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
