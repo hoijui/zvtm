@@ -225,7 +225,7 @@ public class StdViewPanel extends ViewPanel {
 				gll = cams[nbcam].parentSpace.getDrawingList();
 				for (int i=0;i<gll.length;i++){
 					if (gll[i] != null){
-						if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+						if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){
 							/* if glyph is at least partially visible in the reg. seen from this view,
 							   compute in which buffer it should be rendered: */
 							/* always draw in the main buffer */
@@ -235,7 +235,7 @@ public class StdViewPanel extends ViewPanel {
 										standardStroke, standardTransform, 0, 0);
 							}
 							if(drawLens){	
-								if (gll[i].visibleInRegion(lviewWC, lviewNC, lviewEC, lviewSC, camIndex)){
+								if (gll[i].visibleInViewport(lviewWC, lviewNC, lviewEC, lviewSC, cams[nbcam])){
 									/* partially within the region seen through the lens
 									   draw it in both buffers */
 									gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -58,6 +58,19 @@ public class CircleNR extends VCircle {
 		super(x, y, z, r, c, bc, alpha);
 	}
 	
+	public boolean visibleInViewport(long wb, long nb, long eb, long sb, Camera c){
+        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+            return true;
+        }
+        else {
+            long trueSize = Math.round(size * (c.focal+c.altitude) / c.focal);
+            if (((vx-trueSize)<=eb) && ((vx+trueSize)>=wb) && ((vy-trueSize)<=nb) && ((vy+trueSize)>=sb)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
 	public void project(Camera c, Dimension d){
 		int i=c.getIndex();
 		coef=(float)(c.focal/(c.focal+c.altitude));

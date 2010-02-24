@@ -272,7 +272,7 @@ public class CameraPortal extends Portal {
 	    for (int i=0;i<gll.length;i++){
 		if (gll[i] != null){
 		    synchronized(gll[i]){
-			if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+			if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
 			    //if glyph is at least partially visible in the reg. seen from this view, display
 			    gll[i].project(camera, size); // an invisible glyph should still be projected
 			    if (gll[i].isVisible()){      // as it can be sensitive

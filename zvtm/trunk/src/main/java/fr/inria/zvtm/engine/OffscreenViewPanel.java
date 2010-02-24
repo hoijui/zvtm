@@ -89,7 +89,7 @@ public class OffscreenViewPanel extends ViewPanel {
 		    long viewSC = (long)(cams[nbcam].posy-viewH/2*uncoef);
 		    gll = cams[nbcam].parentSpace.getDrawingList();
 		    for (int i=0;i<gll.length;i++){
-			if (gll[i].visibleInRegion(viewWC, viewNC, viewEC, viewSC, camIndex)){
+			if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){
 			    synchronized(gll[i]){
 				gll[i].project(cams[nbcam], size);
 				if (gll[i].isVisible()){

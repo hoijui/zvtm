@@ -105,7 +105,7 @@ public class DPath extends Glyph implements RectangularShape {
 		updateJava2DGeneralPath();
 		sensit = true;
 		setColor(c);
-		setTranslucencyValue(1.0f);
+		setTranslucencyValue(alpha);
 	}
 
     /**
@@ -167,7 +167,7 @@ public class DPath extends Glyph implements RectangularShape {
 		updateJava2DGeneralPath();
 		sensit = true;
 		setColor(c);
-		setTranslucencyValue(1.0f);
+		setTranslucencyValue(alpha);
     }
 
 	/** Add a new cubic curve to the path, from current point to point (x,y), controlled by (x1,y1)
