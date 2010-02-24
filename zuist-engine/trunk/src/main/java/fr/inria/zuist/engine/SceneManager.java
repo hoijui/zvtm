@@ -153,10 +153,22 @@ public class SceneManager implements CameraListener {
         private final HashMap<Camera, Location> toUpdate;
         private boolean active;
         private static final int DEFAULT_PERIOD = 200; //milliseconds
+        private int period;
 
         RegionUpdater(){
             toUpdate = new HashMap<Camera, Location>();
             active = false;
+            period = DEFAULT_PERIOD;
+        }
+
+        /**
+         * Sets the RegionUpdater period.
+         * Region updates will be spaced by at least <code>period</code>
+         * milliseconds.
+         * @param period the new period, in milliseconds.
+         */
+        void setPeriod(int period){
+            this.period = period;
         }
 
         void addEntry(Camera cam, Location loc){
@@ -190,7 +202,7 @@ public class SceneManager implements CameraListener {
                  }
         };
         active = true;
-        Timer t = new Timer(DEFAULT_PERIOD, action);
+        Timer t = new Timer(period, action);
         t.setRepeats(false);
         t.start();
     }
@@ -214,6 +226,16 @@ public class SceneManager implements CameraListener {
         for(Camera cam: sceneCameras){
             cam.addListener(this);
         }
+    }
+
+    /**
+     * Sets the RegionUpdater period.
+     * Region updates will be spaced by at least <code>period</code>
+     * milliseconds.
+     * @param period the new period, in milliseconds.
+     */
+    public void setRegionUpdatePeriod(int period){
+        regUpdater.setPeriod(period);
     }
     
     /** Declare a ResourceHandler for a given type of resource.
