@@ -10,6 +10,7 @@ package fr.inria.zuist.engine;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.SwingUtilities;
+import java.lang.reflect.InvocationTargetException;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -96,12 +97,19 @@ public class TextDescription extends ObjectDescription {
                 if (font != null){((VText)glyph).setSpecialFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
             }
-	    SwingUtilities.invokeLater(new Runnable(){
-                public void run(){
-	    	    vs.addGlyph(glyph);
-            	glyph.setOwner(TextDescription.this);
-		}
-	    });
+            try {
+                assert(!SwingUtilities.isEventDispatchThread());
+                SwingUtilities.invokeAndWait(new Runnable(){
+                    public void run(){
+                        vs.addGlyph(glyph);
+                        glyph.setOwner(TextDescription.this);
+                    }
+                });
+            } catch(InterruptedException ie) {
+                /* swallowed */
+            } catch(InvocationTargetException ite) {
+                /* swallowed */
+            }
         }
     }
 
@@ -119,14 +127,21 @@ public class TextDescription extends ObjectDescription {
                 glyph = null;
             }
             else {
-		SwingUtilities.invokeLater(new Runnable(){
-		     public void run(){
-                vs.removeGlyph(glyph);
-                glyph = null;
-		     }
-            });
+                try {
+                    assert(!SwingUtilities.isEventDispatchThread());
+                    SwingUtilities.invokeAndWait(new Runnable(){
+                        public void run(){
+                            vs.removeGlyph(glyph);
+                            glyph = null;
+                        }
+                    });
+                } catch(InterruptedException ie) {
+                    /* swallowed */
+                } catch(InvocationTargetException ite) {
+                    /* swallowed */
+                }
+            }
         }
-	}
     }
 
     public void setFont(Font f){
