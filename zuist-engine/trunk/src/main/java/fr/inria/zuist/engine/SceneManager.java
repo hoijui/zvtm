@@ -979,8 +979,8 @@ public class SceneManager implements CameraListener {
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-     //called when an x-y movement occurs but no altitude change (??)
     private void updateVisibleRegions(int layerIndex, long[] cameraBounds){
+        //called when an x-y movement occurs but no altitude change 
         updateVisibleRegions(layerIndex, cameraBounds, currentLevel, Region.TASL);
     }
 
