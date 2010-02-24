@@ -71,11 +71,9 @@ public class Test {
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(1000);
-        for (int i=0;i<10;i++){
-            for (int j=0;j<10;j++){
-        		vs.addGlyph(new VRectangle(i*300,j*300,0,100,100,Color.WHITE));            
-            }
-        }
+        
+        vs.addGlyph(new CircleNR(0,0,0,100,Color.RED));
+        vs.addGlyph(new VCircle(0,200,0,100,Color.RED));
         vsm.repaintNow();
     }
     
