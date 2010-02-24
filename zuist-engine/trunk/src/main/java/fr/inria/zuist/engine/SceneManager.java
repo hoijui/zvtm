@@ -136,8 +136,6 @@ public class SceneManager implements CameraListener {
     Hashtable id2region;
     /** Contains a mapping from object IDs to actual objects. */
     Hashtable<String, ObjectDescription> id2object;
-    /** Contains a mapping from scene IDs to actual scenes. */
-    Hashtable id2scene;
     
     LevelListener levelListener;
     RegionListener regionListener;
@@ -219,7 +217,6 @@ public class SceneManager implements CameraListener {
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
         id2object = new Hashtable<String, ObjectDescription>();
-        id2scene = new Hashtable();
         sceneAttrs = new HashMap();
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>();
 
@@ -362,7 +359,6 @@ public class SceneManager implements CameraListener {
 	public void reset(){
 		id2region.clear();
 		id2object.clear();
-		id2scene.clear();
 		sceneAttrs.clear();
 		levels = new Level[0];
 	}
@@ -488,18 +484,11 @@ public class SceneManager implements CameraListener {
         //System.out.println("Creating scene fragment "+resourceURL);
         SceneFragmentDescription sd = new SceneFragmentDescription(id, x, y, resourceURL, region, this);
         region.addObject(sd);
-        if (!id2scene.containsKey(id)){
-            id2scene.put(id, sd);
-        }
-        else {
-            System.err.println("Warning: ID: "+id+" used to identify more than one scene.");
-        }
         return sd;
     }
     
     public void destroySceneFragment(SceneFragmentDescription sd){
         //System.out.println("Destroying fragment "+sd.getID());
-        id2scene.remove(sd.getID());
     }
     
     /** Create a new level in the scene.
