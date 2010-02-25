@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */ 
@@ -12,7 +12,15 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class GenericDelta implements Delta {
+/**
+ * A generic Delta that replays a method call remotely.
+ * Method target must be Identifiable and must exist in the remote
+ * address space.
+ * If a method argument is an instance of Identifiable, this
+ * argument will be converted to the corresponding ObjectId
+ * (and the counterpart object will be retrieved on Delta execution).
+ */
+public class GenericDelta implements Delta {
 	private final ObjId objId;
 	private final String methodName;
 	private final Class[] parameterTypes;
@@ -29,6 +37,12 @@ class GenericDelta implements Delta {
 		this.methodName = methodName;
 		this.parameterTypes = parameterTypes;
 		this.arguments = arguments;
+
+        for(int i=0; i<arguments.length; ++i){
+            if(arguments[i] instanceof Identifiable){
+                arguments[i] = ((Identifiable)arguments[i]).getObjId();
+            }
+        }
 	}
 
 	public void apply(SlaveUpdater updater){
@@ -36,9 +50,14 @@ class GenericDelta implements Delta {
 			Object target = updater.getSlaveObject(objId);
 			Method method = target.getClass().getMethod(methodName, 
 					parameterTypes);
+            for(int i=0; i<arguments.length; ++i){
+                if(arguments[i] instanceof ObjId){
+                    arguments[i] = updater.getSlaveObject((ObjId)arguments[i]);
+                }
+            }
 			method.invoke(target, arguments);
 		} catch (Exception e){
-			logger.error("Could not invoke remove method", e);
+			logger.error("Could not invoke remote method", e);
 		}
 	}
 
