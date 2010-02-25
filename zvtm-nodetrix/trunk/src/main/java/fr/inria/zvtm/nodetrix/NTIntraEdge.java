@@ -146,7 +146,9 @@ public class NTIntraEdge extends NTEdge {
 		vs.onTop(this.glyph);
 		vs.onTop(this.glyphTranslucent);
 	}
-
+	
+	public void reposition(){
+	}
     
    
 

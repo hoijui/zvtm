@@ -127,11 +127,12 @@ public class Matrix {
 	    {
     		nodes.get(i).repositionLabels(Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
                     				 Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)));
-	    }
+    		nodes.get(i).repositionRelations();
+ 	    }
     	
-    	for(NTIntraEdgeSet ies : this.intraEdgeSets){
-    		ies.reposition();
-    	}
+//    	for(NTIntraEdgeSet ies : this.intraEdgeSets){
+//    		ies.reposition();
+//    	}
     }
     
     void finishCreateNodeGraphics(VirtualSpace vs){
@@ -635,7 +636,7 @@ public class Matrix {
 	
 	public HashMap<String, Matrix> split(VirtualSpace vs, AnimationManager am)
 	{
-//		if(!name.equals("[0]")) return new HashMap<String, Matrix>();
+		if(!name.equals("[1]")) return new HashMap<String, Matrix>();
 		System.out.println("[MATRIX] split " + this.name + "- "+ bkg.vx + "," + bkg.vy);
 		if(nodes.size() <= 1) return new HashMap<String, Matrix>();
 		
@@ -712,14 +713,16 @@ public class Matrix {
 //			Object[] incomingOld = nn.getIncomingEdges().toArray();
 			
 //			nn.incomingEdges = new Vector<NTEdge>();
-			nn.outgoingEdges = new Vector<NTEdge>();
+//			nn.outgoingEdges = new Vector<NTEdge>();
 			
 			for(Object o : outgoingOld)
 			{
 				NTEdge edgeOld = (NTEdge)o;
+//				edgeOld.move(0,0);
 				NTEdge edgeNew;
 				NTNode head = edgeOld.head;
 				head.removeIncomingEdge(edgeOld);
+				nn.removeOutgoingEdge(edgeOld);
 				if(nn.getMatrix().equals(head.getMatrix()))
 				{
 					edgeNew = new NTIntraEdge(nn, head, edgeOld.edgeColor);

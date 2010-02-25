@@ -450,4 +450,16 @@ public class NTNode extends LinLogNode{
 	}
 
 
+
+	public void repositionRelations() {
+		for(NTEdge e : this.outgoingEdges){
+			e.reposition();
+		}
+		for(NTIntraEdgeSet es : this.intraEdgeSets){
+			es.reposition();
+		}
+		
+	}
+
+
 }

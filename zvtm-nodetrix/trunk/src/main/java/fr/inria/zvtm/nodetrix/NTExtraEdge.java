@@ -21,7 +21,6 @@ public class NTExtraEdge extends NTEdge {
     private int state = NodeTrixViz.IA_STATE_DEFAULT;
     static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
     private float alpha = 1f;
-    private boolean isdrawn = false;
     
     public NTExtraEdge(NTNode t, NTNode h, Color c){
     	super(t,h,1);
@@ -58,6 +57,7 @@ public class NTExtraEdge extends NTEdge {
      */
     public void assignAlpha()
     {
+    	
     	alpha = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
     	edgePath.setTranslucencyValue(alpha);
     }
@@ -66,9 +66,7 @@ public class NTExtraEdge extends NTEdge {
 
 
     void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs){
-    	System.out.println("DRAW EXTRA EDGE");
-
-    	this.isdrawn = true;
+    	    		System.out.println("DRAW EXTRA EDGE");
         // initial values of x1, y1, x2, y2 are ignored (should be 0 anyway)
     	
 //    	System.out.println("[NT_EXTRA_EDGE] create graphics ");
@@ -146,11 +144,17 @@ public class NTExtraEdge extends NTEdge {
         // see moveHeadTo() and moveTailTo()
     }
     
+    /**Respositioning the node after changing the position of one of the nodes.
+     **/
+    public void reposition(){
+    	moveTo(0,0);
+    }
+    
     void move(long x, long y){
-    	System.out.println("[NT_EXTRA_EDGE] HEAD " + head.getMatrix().name + ", "+ head.name);
-    	System.out.println("[NT_EXTRA_EDGE] TAIL " + tail.getMatrix().name + ", "+ tail.name);
-    	System.out.println("[NT_EXTRA_EDGE] is Drawn: " + this.isdrawn );
-    	try{
+//    	System.out.println("[NT_EXTRA_EDGE] HEAD " + head.getMatrix().name + ", "+ head.name);
+//    	System.out.println("[NT_EXTRA_EDGE] TAIL " + tail.getMatrix().name + ", "+ tail.name);
+    	if(this.edgePath == null) return;
+//    	try{
     		
     	// x & y are actually ignored, computing new path geometry from matrix position
         LongPoint tmp = this.getTail().getMatrix().getPosition();
@@ -208,7 +212,7 @@ public class NTExtraEdge extends NTEdge {
             npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         edgePath.edit(npos, true);
-    	}catch(Exception e){e.printStackTrace();}
+//    	}catch(Exception e){e.printStackTrace();}
     }
     
     void moveHeadTo(long x, long y){

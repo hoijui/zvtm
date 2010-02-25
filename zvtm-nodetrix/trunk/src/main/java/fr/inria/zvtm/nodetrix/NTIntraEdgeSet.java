@@ -173,8 +173,8 @@ public class NTIntraEdgeSet {
     public void reposition() {
 		this.moveTo( this.intraEdges.firstElement().getHead().ndx,
 					 this.intraEdges.firstElement().getTail().wdy);	
-		this.g.moveTo( this.intraEdges.firstElement().getHead().ndx,
-					this.intraEdges.firstElement().getTail().wdy);	
+		this.g.moveTo(mp.x + this.intraEdges.firstElement().getHead().ndx,
+				mp.y + this.intraEdges.firstElement().getTail().wdy);	
 	}
     
     public void onTop(VirtualSpace vs){
