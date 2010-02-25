@@ -93,13 +93,16 @@ def generateTile(req, z=-1, col=-1, row=-1):
     map_path = "%s/%s/%s/%s.png" % (CACHE_DIR, z, col, row)
     if not os.path.exists("%s/%s/%s" % (CACHE_DIR, z, col)):
         if not os.path.exists("%s/%s" % (CACHE_DIR, z)):
+            if not os.path.exists(CACHE_DIR):
+                os.mkdir(CACHE_DIR)
             os.mkdir("%s/%s" % (CACHE_DIR, z))
         os.mkdir("%s/%s/%s" % (CACHE_DIR, z, col))
     m = mapnik.Map(TS_I, TS_I)
     try:
         mapfile = os.environ['MAPNIK_MAP_FILE']
     except KeyError:
-        mapfile = "/home/osm/mapnik/osm.xml"
+        mapfile = "/home/osm/mapnik/zuist_osm.xml"
+    mapnik.load_map(m, mapfile, True)
     prj = mapnik.Projection(m.srs)
     gprj = GoogleProjection(MAX_ZOOM+1)
     # Calculate pixel positions of bottom-left & top-right

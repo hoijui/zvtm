@@ -11,8 +11,7 @@ import mapnik
 
 import sys, os, math
 
-TILE_DIR = "/var/www/tiles"
-CACHE_DIR = "%s/cache" % TILE_DIR
+TILE_DIR = "/home/osm/tiles"
 
 DEG_TO_RAD = math.pi / 180
 RAD_TO_DEG = 180 / math.pi
@@ -57,17 +56,16 @@ class GoogleProjection:
 # Tile generation
 ###############################################################################
 def generateTile(z=-1, col=-1, row=-1):
-    map_path = "%s/%s/%s/%s.png" % (CACHE_DIR, z, col, row)
-    if not os.path.exists("%s/%s/%s" % (CACHE_DIR, z, col)):
-        if not os.path.exists("%s/%s" % (CACHE_DIR, z)):
-            os.mkdir("%s/%s" % (CACHE_DIR, z))
-        os.mkdir("%s/%s/%s" % (CACHE_DIR, z, col))
+    map_path = "%s/%s/%s/%s.png" % (TILE_DIR, z, col, row)
+    if not os.path.exists("%s/%s/%s" % (TILE_DIR, z, col)):
+        if not os.path.exists("%s/%s" % (TILE_DIR, z)):
+            os.mkdir("%s/%s" % (TILE_DIR, z))
+        os.mkdir("%s/%s/%s" % (TILE_DIR, z, col))
     m = mapnik.Map(TS_I, TS_I)
     try:
         mapfile = os.environ['MAPNIK_MAP_FILE']
     except KeyError:
-        mapfile = "/home/osm/mapnik/osm.xml"
-    mapnik.load_map(m, mapfile)
+        mapfile = "/home/osm/mapnik/zuist_osm.xml"
     prj = mapnik.Projection(m.srs)
     gprj = GoogleProjection(MAX_ZOOM+1)
     # Calculate pixel positions of bottom-left & top-right
@@ -88,9 +86,13 @@ def generateTile(z=-1, col=-1, row=-1):
     m.zoom_to_box(bbox)
     m.buffer_size = 256
     im = mapnik.Image(TS_I, TS_I)
-    mapnik.render(m, im)    
-    view = im.view(0, 0, TS_I, TS_I) # x,y,width,height
-    view.save(map_path, 'png')
+    print im
+    mapnik.render(m, im)
+    #view = im.view(0, 0, TS_I, TS_I) # x,y,width,height
+    #print map_path
+    #view.save(map_path, 'png')
+    print map_path
+    im.save(map_path, 'png256')
 
 ###############################################################################
 # MAIN
