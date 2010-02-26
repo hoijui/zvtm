@@ -17,7 +17,7 @@ import shutil
 import hashlib
 
 CMD_LINE_HELP = "OSM ZUIST Scene Generator for WILD\n\nUsage:\n\n" + \
-    " \tosm2wild [options]\n\n" + \
+    " \tosm2zuist [options]\n\n" + \
     "Options:\n\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"+\
     "\t-log\t\tlog log exec to osm2zuist.log\n"+\
@@ -36,11 +36,12 @@ TS_I = 512
 # camera focal distance
 F = 100.0
 # camera max altitude
-MAX_ALT = "100000"
+MAX_ALT = "100000000"
 
 # OSM zoom levels to be generated [0..18]
 MIN_ZOOM = 0
-MAX_ZOOM = 4
+MAX_ZOOM = 6
+HIGHEST_ZOOM = 18
 
 EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae",]
 EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea"]
@@ -50,6 +51,8 @@ LOG_FILE = None
 TRACE_LEVEL = 1
 
 INTERPOLATION = "bilinear"
+
+FRAG_DEPTH = 6
 
 et = {}
 
@@ -190,10 +193,10 @@ class RenderThread:
                     self.printLock.release()
                     self.render_tile(tile_uri, x, y, z)
                 # compute coords and size of this tile
-                ilc = MAX_ZOOM - MIN_ZOOM + 1 - z
+                ilc = HIGHEST_ZOOM - MIN_ZOOM + 1 - z
                 ts = TS_I * math.pow(2, ilc-1)
-                x = (x*ts + ts/2.0)
-                y = -(y*ts + ts/2.0)
+                vx = (x*ts + ts/2.0)
+                vy = -(y*ts + ts/2.0)
                 w = h = ts
                 # z-index
                 if z == 0:
@@ -216,10 +219,10 @@ class RenderThread:
                             shutil.move(tile_uri, self.sea_path)
                         else:
                             os.remove(tile_uri)
-                        levels = "%s;%s" % (z, MAX_ZOOM)
+                        levels = "%s;%s" % (z, HIGHEST_ZOOM)
                         self.xmlLock.acquire()
-                        self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, x, y, w, h))
-                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"http://data.wild.lri.fr/tiles/sea.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, x, y, w, h, zi))
+                        self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, vx, vy, w, h))
+                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"sea.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, vx, vy, w, h, zi))
                         self.zf.write("  </region>\n")
                         self.xmlLock.release()
                         et[ID] = None
@@ -235,10 +238,10 @@ class RenderThread:
                             shutil.move(tile_uri, self.lnd_path)
                         else:
                             os.remove(tile_uri)
-                        levels = "%s;%s" % (z, MAX_ZOOM)
+                        levels = "%s;%s" % (z, HIGHEST_ZOOM)
                         self.xmlLock.acquire()
-                        self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, x, y, w, h))
-                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"http://data.wild.lri.fr/tiles/lnd.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, x, y, w, h, zi))
+                        self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, vx, vy, w, h))
+                        self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"lnd.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, vx, vy, w, h, zi))
                         self.zf.write("  </region>\n")
                         self.xmlLock.release()
                         et[ID] = None
@@ -249,20 +252,24 @@ class RenderThread:
                         self.printLock.release()
                 else:
                     # non-empty tile
-                    #src = tile_uri[len(tile_dir):]
-                    src = "http://data.wild.lri.fr/tiles/%s/%s/%s.png" % (z, x, y)
+                    src = tile_uri[len(tile_dir):]
                     if z == 0:
-                        levels = "0;%s" % MAX_ZOOM
+                        levels = "0;%s" % HIGHEST_ZOOM
                         ci = ""
                     else :
                         levels = z
                         ci = "containedIn=\"R%s\"" % parentID
                     self.xmlLock.acquire()
-                    self.zf.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, x, y, w, h))
-                    self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, x, y, w, h, zi))
+                    self.zf.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
+                    self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
+                    if z == MAX_ZOOM:
+                        frag_src = "%ssf%s.xml" % (src[:src.rfind("/")+1], src[src.rfind("/")+1:src.rfind(".")])
+                        self.zf.write("    <resource type=\"scn\" id=\"F%s\" src=\"%s\" x=\"%d\" y=\"%d\" />\n" % (ID, frag_src, vx, vy))
                     self.zf.write("  </region>\n")
                     self.xmlLock.release()
-            
+                    if z == MAX_ZOOM:
+                        # frag_src will have been initialized in the above same test
+                        generateSceneFragment("%s%s" % (tile_dir, frag_src), x, y, MAX_ZOOM+1)
             self.zf.flush()
             self.q.task_done()
 
@@ -270,7 +277,7 @@ class RenderThread:
 # Generate ZUIST levels
 ################################################################################
 def generateLevels(zf):
-    levelCount = MAX_ZOOM - MIN_ZOOM + 1
+    levelCount = HIGHEST_ZOOM - MIN_ZOOM + 1
     altitudes = [0,]
     for i in range(levelCount):
         depth = int(levelCount-i-1)
@@ -281,7 +288,18 @@ def generateLevels(zf):
             ceiling = altitudes[-1]
         floor = altitudes[-2]
         zf.write("  <level depth=\"%s\" ceiling=\"%s\" floor=\"%s\"/>\n" % (str(depth), str(ceiling), str(floor)))
+    
 
+def generateSceneFragment(src, x, y, z):
+    log("Generating scene fragment %s" % src, 2)
+    ff = open(src, 'w')
+    ff.write("<?xml version=\"1.0\"?>\n")
+    ff.write("<scene background=\"white\">\n")
+    generateLevels(ff)
+    ff.write("</scene>\n")
+    ff.flush()
+    ff.close()
+    
 ################################################################################
 #
 ################################################################################
@@ -397,5 +415,5 @@ if __name__ == "__main__":
     except KeyError:
         tile_dir = home + "/zuist/tiles/"
     
-    bbox = (-5.24, -41.25, 10.16, 51.11)
+    bbox = (-180.0,-90.0, 180.0,90.0)
     render_tiles(bbox, mapfile, tile_dir, MIN_ZOOM, MAX_ZOOM, "World")
