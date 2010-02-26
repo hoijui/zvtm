@@ -132,8 +132,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		previousLocations = new Vector();
 		ovm.initConsole();
         if (xmlSceneFile != null){
+            sm.enableRegionUpdater(false);
 			loadScene(xmlSceneFile);
-			getGlobalView();
+			EndAction ea  = new EndAction(){
+                   public void execute(Object subject, Animation.Dimension dimension){
+                       sm.setUpdateLevel(true);
+                       sm.enableRegionUpdater(true);
+                   }
+               };
+			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
     }
@@ -261,7 +268,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (index != -1){
 			String label = mainPieMenu.getLabels()[index].getText();
 			if (label == Messages.PM_BACK){moveBack();}
-			else if (label == Messages.PM_GLOBALVIEW){getGlobalView();}
+			else if (label == Messages.PM_GLOBALVIEW){getGlobalView(null);}
 			else if (label == Messages.PM_OPEN){openFile();}
 			else if (label == Messages.PM_RELOAD){reload();}
 		}
@@ -295,8 +302,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		    final SwingWorker worker = new SwingWorker(){
 			    public Object construct(){
 					reset();
+					sm.enableRegionUpdater(false);
 					loadScene(fc.getSelectedFile());
-					getGlobalView();
+					EndAction ea  = new EndAction(){
+                           public void execute(Object subject, Animation.Dimension dimension){
+                               sm.setUpdateLevel(true);
+                               sm.enableRegionUpdater(true);
+                           }
+                       };
+					getGlobalView(ea);
 					return null; 
 			    }
 			};
@@ -339,7 +353,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     
     /*-------------     Navigation       -------------*/
 
-    void getGlobalView(){
+    void getGlobalView(EndAction ea){
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
 			l++;
@@ -351,7 +365,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (l > -1){
 			rememberLocation(mCamera.getLocation());
 			long[] wnes = sm.getLevel(l).getBounds();
-	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
+	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 		}
     }
 

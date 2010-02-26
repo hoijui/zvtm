@@ -152,6 +152,8 @@ public class SceneManager implements CameraListener {
         private boolean active;
         private static final int DEFAULT_PERIOD = 200; //milliseconds
         private int period;
+        
+        private boolean enabled = true;
 
         RegionUpdater(){
             toUpdate = new HashMap<Camera, Location>();
@@ -168,8 +170,13 @@ public class SceneManager implements CameraListener {
         void setPeriod(int period){
             this.period = period;
         }
+        
+        void setEnabled(boolean b){
+            enabled = b;
+        }
 
         void addEntry(Camera cam, Location loc){
+            if (!enabled){return;}
             //add or overwrite update target 
             toUpdate.put(cam, loc);
 
@@ -461,9 +468,9 @@ public class SceneManager implements CameraListener {
         regionName2containerRegionName.clear();
         //    	printLevelInfo();
         //   	printRegionInfo();
-        setUpdateLevel(true);
+        //setUpdateLevel(true);
         System.gc();
-        glyphLoader.setEnabled(true);
+        //glyphLoader.setEnabled(true);
         if (pl != null){
             pl.setLabel("Scene file loaded successfully");
             pl.setValue(100);
@@ -890,9 +897,9 @@ public class SceneManager implements CameraListener {
     
 
     /* ----------- level / region visibility update ----------- */
-
-    public void enableGlyphLoader(boolean b){
-        glyphLoader.setEnabled(b);
+    
+    public void enableRegionUpdater(boolean b){
+        regUpdater.setEnabled(b);
     }
 
     int previousLevel = -2;

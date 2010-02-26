@@ -19,7 +19,6 @@ class GlyphLoader {
     private final SceneManager sceneManager;
     private final ConcurrentHashMap<ObjectDescription, LoadAction> tasks;
     private final ExecutorService loader;
-    private volatile boolean enabled = true;
 
     private enum LoadAction {LOAD, UNLOAD};
 
@@ -37,11 +36,6 @@ class GlyphLoader {
         if(tasks.remove(od, LoadAction.UNLOAD)){
             return;
         }
-
-        if(!enabled){
-            return;
-        }
-
         tasks.put(od, LoadAction.LOAD);
 
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
@@ -58,10 +52,6 @@ class GlyphLoader {
             return;
         }
 
-        if(!enabled){
-            return;
-        }
-
         tasks.put(od, LoadAction.UNLOAD);
 
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
@@ -70,15 +60,6 @@ class GlyphLoader {
             return;
         }
         loader.submit(new Request(target, od, transition));
-    }
-
-    /**
-     * Enables or disables this GlyphLoader.
-     * A disabled GlyphLoader silently discards requests.
-     * (i.e. addLoadRequest and addUnloadRequest have no effect).
-     */
-    public void setEnabled(boolean enable){
-        this.enabled = enable;
     }
 
     private class Request implements Runnable {
