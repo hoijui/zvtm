@@ -165,6 +165,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mView.setEventHandler(eh, 0);
         mView.setEventHandler(eh, 1);
         mView.setEventHandler(ovm, 2);
+		mCamera.addListener(eh);
         mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
@@ -175,7 +176,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 				updatePanelSize();
 			}
 		};
-		mView.getFrame().addComponentListener(ca0);		
+		mView.getFrame().addComponentListener(ca0);
     }
 
     JMenuItem infoMI, consoleMI;

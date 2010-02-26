@@ -27,13 +27,14 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.engine.CameraListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewEventHandler, ComponentListener {
+class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -206,6 +207,9 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener {
         application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
+    
+    public void cameraMoved(Camera cam, LongPoint coord, float alt){
+        application.altitudeChanged();
+    }
+    
 }
-
-
