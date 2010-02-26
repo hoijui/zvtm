@@ -11,6 +11,8 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import javax.swing.SwingUtilities;
@@ -68,9 +70,24 @@ public class SlaveUpdater {
 	 * @return the value to which this SlaveUpdater maps the specified key, 
 	 * or null if the SlaveUpdater contains no mapping for this key.
 	 */
-	<T> T getSlaveObject(ObjId<T> id){
+	public <T> T getSlaveObject(ObjId<T> id){
 		return (T)(slaveObjects.get(id));
 	}
+
+    /**
+     * Returns an array containing the matching slave object for each
+     * reference in the given array 'idarray'.
+     * References to non-existing objects (ObjId instances that
+     * do not have a mapping) translate to null values in the
+     * returned array.
+     */
+    public <T> ArrayList<T> getSlaveObjectArrayList(final List<ObjId<T>> idList){
+        ArrayList<T> retval = new ArrayList<T>();
+        for(ObjId<T> id: idList){
+            retval.add(getSlaveObject(id));
+        }
+        return retval; 
+    }
 
 	/**
 	 * Associates 'id' with 'object' in this SlaveUpdater.
@@ -79,14 +96,14 @@ public class SlaveUpdater {
 	 * @return previous value associated with specified key, 
 	 * or null  if there was no mapping for key.
 	 */
-	<T> T putSlaveObject(ObjId<T> id, T object){
+	public <T> T putSlaveObject(ObjId<T> id, T object){
 		return (T)slaveObjects.put(id, object);
 	}
 
 	/**
 	 * Removes the mapping for 'id' if it exists.
 	 */
-	Object removeSlaveObject(ObjId id){
+	public Object removeSlaveObject(ObjId id){
 		return slaveObjects.remove(id);
 	}
 
