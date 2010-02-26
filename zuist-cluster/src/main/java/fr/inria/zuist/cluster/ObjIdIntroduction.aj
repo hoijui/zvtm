@@ -13,13 +13,12 @@ import fr.inria.zvtm.cluster.Identifiable;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
 
 aspect ObjIdIntroduction {
-    //SceneManager does not implement Identifiable:
-    //we assume the presence of a single SceneManager in
-    //the application, which is the zuist entry point
-    //(i.e. Levels, Regions and ObjectDescriptions are created
-    //there)
+    declare parents: SceneManager implements Identifiable;
+    private final ObjId<SceneManager> SceneManager.id = ObjIdFactory.next();
+    public final ObjId<SceneManager> SceneManager.getObjId(){ return id; }
 
     declare parents: Region implements Identifiable;
     private final ObjId<Region> Region.id = ObjIdFactory.next();
