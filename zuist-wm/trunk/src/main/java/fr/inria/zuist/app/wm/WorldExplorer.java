@@ -47,6 +47,7 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.widgets.TranslucentTextArea;
 import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
@@ -132,7 +133,13 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(9000.0f);
-        getGlobalView();
+        EndAction ea  = new EndAction(){
+               public void execute(Object subject, Animation.Dimension dimension){
+                   sm.setUpdateLevel(true);
+                   sm.enableRegionUpdater(true);
+               }
+           };
+        getGlobalView(ea);
         eh.cameraMoved(null, null, 0);
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
 		nm.updateOverview();
@@ -245,8 +252,8 @@ public class WorldExplorer implements Java2DPainter {
     
     /*-------------     Navigation       -------------*/
 
-    void getGlobalView(){
-        sm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION);
+    void getGlobalView(EndAction ea){
+        sm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION, ea);
     }
 
     /* Higher view */
