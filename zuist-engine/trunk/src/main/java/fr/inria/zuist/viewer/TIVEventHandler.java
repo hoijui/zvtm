@@ -241,7 +241,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.nm.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.nm.getLowerView();}
-    	else if (code==KeyEvent.VK_HOME){application.nm.getGlobalView();}
+    	else if (code==KeyEvent.VK_HOME){application.nm.getGlobalView(null);}
     	else if (code==KeyEvent.VK_UP){application.nm.translateView(TIVNavigationManager.MOVE_UP);}
     	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(TIVNavigationManager.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(TIVNavigationManager.MOVE_LEFT);}

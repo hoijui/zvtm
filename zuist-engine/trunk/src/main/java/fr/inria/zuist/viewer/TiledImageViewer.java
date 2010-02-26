@@ -62,6 +62,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.RImage;
 import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.RepaintListener;
 
@@ -120,13 +121,12 @@ public class TiledImageViewer {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        if (xmlSceneFile != null){
+		if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			HashMap sa = sm.getSceneAttributes();
 			if (sa.containsKey(SceneManager._background)){
 			    BACKGROUND_COLOR = (Color)sa.get(SceneManager._background);
 			}
-			nm.getGlobalView();
 		}
         if (BACKGROUND_COLOR.getRGB() == -1){
             mView.getCursor().setColor(Color.BLACK);
@@ -137,7 +137,7 @@ public class TiledImageViewer {
     		mView.getCursor().setHintColor(Color.WHITE);
         }
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
-		nm.updateOverview();
+        nm.updateOverview();
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -230,10 +230,10 @@ public class TiledImageViewer {
 		if (returnVal == JFileChooser.APPROVE_OPTION){
 		    final SwingWorker worker = new SwingWorker(){
 			    public Object construct(){
+			        sm.setUpdateLevel(false);
+                    sm.enableRegionUpdater(false);
 					reset();
 					loadScene(fc.getSelectedFile());
-					nm.getGlobalView();
-					nm.updateOverview();
 					return null; 
 			    }
 			};
@@ -247,7 +247,6 @@ public class TiledImageViewer {
 		    public Object construct(){
 				reset();
 				loadScene(SCENE_FILE);
-				nm.getGlobalView();
 				return null; 
 		    }
 		};
@@ -271,6 +270,13 @@ public class TiledImageViewer {
 	    gp.setVisible(false);
 	    gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
+        EndAction ea  = new EndAction(){
+               public void execute(Object subject, Animation.Dimension dimension){
+                   sm.setUpdateLevel(true);
+                   sm.enableRegionUpdater(true);
+               }
+           };
+		nm.getGlobalView(ea);
 	}
     
     void updatePanelSize(){

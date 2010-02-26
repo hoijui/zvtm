@@ -79,8 +79,8 @@ class TIVNavigationManager {
     	ssTimer.scheduleAtFixedRate(ss, SCREEN_SAVER_INTERVAL, SCREEN_SAVER_INTERVAL);
     }
 
-    void getGlobalView(){
-		application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION);		
+    void getGlobalView(EndAction ea){
+		application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, ea);		
     }
 
     /* Higher view */
@@ -404,7 +404,7 @@ class ScreenSaver extends TimerTask {
 	void move(){
 	    int r = (int)Math.round(Math.random()*20);
 	    if (r < 6){
-	        nm.getGlobalView();
+	        nm.getGlobalView(null);
 	    }
 	    else if (r < 8){
 	        nm.getHigherView();

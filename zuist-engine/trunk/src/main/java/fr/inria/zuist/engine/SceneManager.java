@@ -46,6 +46,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.svg.SVGReader;
 import fr.inria.zvtm.engine.Location;
 
@@ -1055,7 +1056,7 @@ public class SceneManager implements CameraListener {
      *@param d duration of animation from current location to global view
      @return bounds in virtual space, null if none
      */
-    public long[] getGlobalView(Camera c, int d){
+    public long[] getGlobalView(Camera c, int d, EndAction ea){
 		int l = 0;
 		while (getRegionsAtLevel(l) == null){
 			l++;
@@ -1066,7 +1067,7 @@ public class SceneManager implements CameraListener {
 		}
 		if (l > -1){
 			long[] wnes = getLevel(l).getBounds();
-	        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3]);
+	        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 	        return wnes;
 		}
 		else {

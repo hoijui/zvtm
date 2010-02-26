@@ -302,6 +302,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		    final SwingWorker worker = new SwingWorker(){
 			    public Object construct(){
 					reset();
+					sm.setUpdateLevel(false);
 					sm.enableRegionUpdater(false);
 					loadScene(fc.getSelectedFile());
 					EndAction ea  = new EndAction(){
