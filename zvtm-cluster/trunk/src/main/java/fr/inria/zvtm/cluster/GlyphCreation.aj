@@ -198,7 +198,7 @@ aspect GlyphCreation {
 
 		abstract Glyph createGlyph();
 
-		void stateTransferHook(Glyph glyph){
+		protected void stateTransferHook(Glyph glyph){
 			//left empty. subclasses may use this to transfer
 			//additional state information to the glyph.
 			//'glyph' may be downcast to the type of the object
@@ -233,7 +233,7 @@ aspect GlyphCreation {
 			this.borderDrawn = source.isBorderDrawn(); 
 		}
 
-		@Override void stateTransferHook(Glyph glyph){
+		@Override protected void stateTransferHook(Glyph glyph){
 			//note that overrides should chain to their parent
 			super.stateTransferHook(glyph);
 			ClosedShape dest = (ClosedShape)glyph;
