@@ -128,8 +128,12 @@ public class PDFViewer {
 		        loadScene(inputFile);
 		    }
 		}
-        mCamera.addListener(eh);
-		getGlobalView();        
+		getGlobalView(new EndAction(){
+               public void execute(Object subject, Animation.Dimension dimension){
+                   sm.setUpdateLevel(true);
+                   sm.enableRegionUpdater(true);
+               }
+           });
     }
 
     void initGUI(boolean fullscreen, boolean opengl){
@@ -186,6 +190,8 @@ public class PDFViewer {
 		catch (IOException ex){}
 		gp.setValue(0);
 		gp.setVisible(true);
+	    sm.setUpdateLevel(false);
+        sm.enableRegionUpdater(false);
 		try {
     		URL pdfURL = pdfFile.toURI().toURL();
     		PDFFile pf = PDFResourceHandler.getPDF(pdfURL);
@@ -199,9 +205,9 @@ public class PDFViewer {
     		    alts[i+1] = Camera.DEFAULT_FOCAL * (float)Math.pow(2, i+1) - Camera.DEFAULT_FOCAL;
                 sm.createLevel(depth, alts[i+1], alts[i]);
                 Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i)), Math.round(bbox.getHeight()*Math.pow(2, i)), depth, depth,
-                                "R"+String.valueOf(depth), "Page "+String.valueOf(depth+1),
+                                "R"+String.valueOf(depth+1), "Page "+String.valueOf(depth+1),
                                 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
-                sm.createResourceDescription(0, 0, "P"+String.valueOf(depth), 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
+                sm.createResourceDescription(0, 0, "P"+String.valueOf(depth+1), 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
                                              false, Color.BLACK, "im=bilinear;pg="+(depth+1)+";sc="+Math.pow(2, i));
                 if (prevRegion != null){
                     prevRegion.setContainingRegion(r);
@@ -212,7 +218,7 @@ public class PDFViewer {
     		// last level
     		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumPages()-1]);
 		    Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumPages()-1)), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumPages()-1)), 0, 0,
-                                       "R0", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
+                                       "R1", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
             sm.createResourceDescription(0, 0, "P1", 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
                                          false, Color.BLACK, "im=bilinear;pg=1;sc="+Math.pow(2, pf.getNumPages()-1));
             if (prevRegion != null){
@@ -223,12 +229,11 @@ public class PDFViewer {
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
 		// important SM init calls
-        sm.enableGlyphLoader(true);
         sm.setUpdateLevel(true);
+        sm.enableRegionUpdater(true);
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
-        eh.cameraMoved(null, null, 0);
 	}
 	
 	void loadScene(File xmlFile){
@@ -236,19 +241,19 @@ public class PDFViewer {
 			mView.setTitle(mViewName + " - " + xmlFile.getCanonicalPath());
 		}
 		catch (IOException ex){}
-	    sm.loadScene(SceneManager.parseXML(xmlFile), xmlFile.getParentFile(), true, null);
+	    sm.setUpdateLevel(false);
+        sm.enableRegionUpdater(false);
+        sm.loadScene(SceneManager.parseXML(xmlFile), xmlFile.getParentFile(), true, null);
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){
 	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
 	    }
-	    sm.setUpdateLevel(true);
         mCamera.setAltitude(0.0f);
-        eh.cameraMoved(null, null, 0);
 	}
     
     /*-------------     Navigation       -------------*/
     
-    void getGlobalView(){
+    void getGlobalView(EndAction ea){
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
 			l++;
@@ -259,7 +264,7 @@ public class PDFViewer {
 		}
 		if (l > -1){
 			long[] wnes = sm.getLevel(l).getBounds();
-	        mCamera.getOwningView().centerOnRegion(mCamera, PDFViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3]);		
+	        mCamera.getOwningView().centerOnRegion(mCamera, PDFViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);		
 		}
     }
 
@@ -426,7 +431,7 @@ class ConfigManager {
 
 }
 
-class PDFViewerEventHandler implements ViewEventHandler, CameraListener, ComponentListener {
+class PDFViewerEventHandler implements ViewEventHandler, ComponentListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -481,13 +486,11 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			cameraMoved(null, null, 0);
 			VirtualSpaceManager.INSTANCE.repaintNow();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			cameraMoved(null, null, 0);
 			VirtualSpaceManager.INSTANCE.repaintNow();
 		}
 	}
@@ -499,7 +502,7 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
-    	else if (code==KeyEvent.VK_HOME){application.getGlobalView();}
+    	else if (code==KeyEvent.VK_HOME){application.getGlobalView(null);}
     	else if (code==KeyEvent.VK_UP){application.translateView(Viewer.MOVE_UP);}
     	else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
@@ -530,6 +533,4 @@ class PDFViewerEventHandler implements ViewEventHandler, CameraListener, Compone
     }
     public void componentShown(ComponentEvent e){}
     
-    public void cameraMoved(Camera cam, LongPoint coord, float a){}
-
 }
