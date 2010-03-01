@@ -601,6 +601,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!SHOW_MISC_INFO){return;}
+        g2d.setFont(ConfigManager.DEBUG_FONT);
 		g2d.setComposite(acST);
 		showMemoryUsage(g2d, viewWidth, viewHeight);
 		showReqQueueStatus(g2d, viewWidth, viewHeight);
@@ -746,6 +747,8 @@ class ConfigManager {
 	static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
 	
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
+
+	static final Font DEBUG_FONT = new Font("Dialog", Font.PLAIN, 10);
 
     static final Font PIEMENU_FONT = DEFAULT_FONT;
 
