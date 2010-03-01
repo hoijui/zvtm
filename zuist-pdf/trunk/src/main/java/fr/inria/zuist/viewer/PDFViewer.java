@@ -229,8 +229,6 @@ public class PDFViewer {
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
 		// important SM init calls
-        sm.setUpdateLevel(true);
-        sm.enableRegionUpdater(true);
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
