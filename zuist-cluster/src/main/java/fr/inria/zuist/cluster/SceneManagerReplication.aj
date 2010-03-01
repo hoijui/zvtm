@@ -6,6 +6,7 @@ import java.util.List;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.cluster.Delta;
+import fr.inria.zvtm.cluster.Identifiables;
 import fr.inria.zvtm.cluster.ObjId;
 import fr.inria.zvtm.cluster.SlaveUpdater;
 import fr.inria.zuist.engine.SceneManager;
@@ -24,8 +25,8 @@ aspect SceneManagerReplication {
 
         SceneManagerCreateDelta(ObjId<SceneManager> smId, List<VirtualSpace> spaces, List<Camera> cameras){
             this.smId = smId;
-            this.spaceRefs = new ArrayList<ObjId<VirtualSpace>>();
-            this.cameraRefs = new ArrayList<ObjId<Camera>>();
+            this.spaceRefs = Identifiables.getRefList(spaces);
+            this.cameraRefs = Identifiables.getRefList(cameras);
         }
 
         public void apply(SlaveUpdater su){
