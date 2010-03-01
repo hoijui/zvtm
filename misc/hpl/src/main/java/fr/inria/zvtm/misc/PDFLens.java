@@ -111,6 +111,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		pdfView.setBackgroundColor(Color.BLACK);
 		pdfView.getPanel().addComponentListener(this);
 		pdfView.setJava2DPainter(this, AFTER_LENSES);
+		pdfView.getCursor().setColor(Color.WHITE);
 		eh = new PDFLensEventHandler(this);
 		pdfView.setEventHandler(eh);
 		pdfView.setAntialiasing(true);
