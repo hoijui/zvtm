@@ -47,8 +47,8 @@ public class PDFLens implements ComponentListener, Java2DPainter {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 800;
-    static int VIEW_MAX_H = 450;
+    static int VIEW_MAX_W = 1024;
+    static int VIEW_MAX_H = 768;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -108,7 +108,7 @@ public class PDFLens implements ComponentListener, Java2DPainter {
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
 		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "High precision lenses on PDF", View.STD_VIEW, VIEW_W, VIEW_H, false, true, false, null);
-		pdfView.setBackgroundColor(Color.WHITE);
+		pdfView.setBackgroundColor(Color.BLACK);
 		pdfView.getPanel().addComponentListener(this);
 		pdfView.setJava2DPainter(this, AFTER_LENSES);
 		eh = new PDFLensEventHandler(this);
@@ -599,7 +599,7 @@ class PDFLensEventHandler implements ViewEventHandler {
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	    if (mod == CTRL_MOD){
-	        VirtualSpaceManager.INSTANCE.stickToMouse(v.lastGlyphEntered());
+	        //VirtualSpaceManager.INSTANCE.stickToMouse(v.lastGlyphEntered());
 	    }
         else {
             lastJPX=jpx;
@@ -610,7 +610,7 @@ class PDFLensEventHandler implements ViewEventHandler {
     }
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    VirtualSpaceManager.INSTANCE.unstickFromMouse();
+	    //VirtualSpaceManager.INSTANCE.unstickFromMouse();
 		VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
         VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
         VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
@@ -621,7 +621,7 @@ class PDFLensEventHandler implements ViewEventHandler {
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		Glyph g = v.lastGlyphEntered();
 		if (g != null){
-			application.pdfView.centerOnGlyph(g, application.mCamera, PDFLens.NAV_ANIM_DURATION);
+			//VirtualSpaceManager.INSTANCE.centerOnGlyph(g, application.mCamera, PDFLens.NAV_ANIM_DURATION);
 		}
 		else {
 			application.pdfView.getGlobalView(application.mCamera, PDFLens.NAV_ANIM_DURATION);
