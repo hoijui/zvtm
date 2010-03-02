@@ -1,5 +1,6 @@
 package fr.inria.zuist.cluster;
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +13,11 @@ import fr.inria.zvtm.cluster.Identifiables;
 import fr.inria.zvtm.cluster.ObjId;
 import fr.inria.zvtm.cluster.SlaveUpdater;
 import fr.inria.zuist.engine.Level;
+import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 
 aspect SceneManagerReplication {
-    //instrument *createLevel, createRegion, destroyRegion,
+    //instrument *createLevel, *createRegion, destroyRegion,
     //createImageDescription, createTextDescription
     
     pointcut sceneManagerCreation(SceneManager sceneManager, 
@@ -95,6 +97,98 @@ aspect SceneManagerReplication {
             SceneManager sm = su.getSlaveObject(smId);
             Level level = sm.createLevel(depth, ceilingAlt, floorAlt);
             su.putSlaveObject(levelId, level);
+        }
+    }
+
+    pointcut createRegion(SceneManager sceneManager, 
+            long x, long y, long w, long h,
+            int highestLevel, int lowestLevel, 
+            String id, String title, int li, short[] transitions, 
+            short requestOrdering, boolean sensitivity, Color fill, 
+            Color stroke) : 
+        execution(public Region SceneManager.createRegion(long, long, long, long,
+                    int, int, String, String, int, short[], short, boolean, 
+                    Color, Color)) &&
+        this(sceneManager) && 
+        args(x, y, w, h, 
+            highestLevel, lowestLevel, 
+            id, title, li, transitions, 
+            requestOrdering, sensitivity, fill, 
+            stroke);
+
+    after(SceneManager sceneManager, long x, long y, long w, long h, 
+            int highestLevel, int lowestLevel, 
+            String id, String title, int li, short[] transitions, 
+            short requestOrdering, boolean sensitivity, Color fill, 
+            Color stroke) returning(Region region): 
+        createRegion(sceneManager, x, y, w, h, highestLevel, lowestLevel, 
+                id, title, li, transitions, 
+                requestOrdering, sensitivity, fill, 
+                stroke) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(createRegion(SceneManager, long, long, long, long, int, int, 
+                String, String, int, short[], short, boolean, Color, Color)){
+            RegionCreateDelta delta = new RegionCreateDelta(
+                    sceneManager.getObjId(),
+                    region.getObjId(),
+                    x, y, w, h, 
+                    highestLevel, lowestLevel, 
+                    id, title, li, transitions, 
+                    requestOrdering, sensitivity, fill, 
+                    stroke);
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+        }
+
+    private static class RegionCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<Region> regionId;
+        private final long x;
+        private final long y;
+        private final long w;
+        private final long h;
+        private final int highestLevel;
+        private final int lowestLevel;
+        private final String id;
+        private final String title;
+        private final int li;
+        private final short[] transitions;
+        private final short requestOrdering;
+        private final boolean sensitivity;
+        private final Color fill;
+        private final Color stroke;
+
+        RegionCreateDelta(ObjId<SceneManager> smId, ObjId<Region> regionId,
+                long x, long y, long w, long h, 
+                int highestLevel, int lowestLevel, 
+                String id, String title, int li, short[] transitions, 
+                short requestOrdering, boolean sensitivity, Color fill, 
+                Color stroke){
+            this.smId = smId;
+            this.regionId = regionId;
+            this.x = x; 
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.highestLevel = highestLevel;
+            this.lowestLevel = lowestLevel;
+            this.id = id;
+            this.title = title;
+            this.li = li;
+            this.transitions = transitions;
+            this.requestOrdering = requestOrdering;
+            this.sensitivity = sensitivity;
+            this.fill = fill;
+            this.stroke = stroke;
+        }
+
+        public void apply(SlaveUpdater su){
+            SceneManager sm = su.getSlaveObject(smId);
+            Region region = sm.createRegion(x, y, w, h, 
+                    highestLevel, lowestLevel, 
+                    id, title, li, transitions, 
+                    requestOrdering, sensitivity, fill, 
+                    stroke);
+            su.putSlaveObject(regionId, region);
         }
     }
 }
