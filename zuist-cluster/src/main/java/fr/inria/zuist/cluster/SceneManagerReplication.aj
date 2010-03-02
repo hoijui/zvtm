@@ -1,6 +1,7 @@
 package fr.inria.zuist.cluster;
 
 import java.awt.Color;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +13,16 @@ import fr.inria.zvtm.cluster.Delta;
 import fr.inria.zvtm.cluster.Identifiables;
 import fr.inria.zvtm.cluster.ObjId;
 import fr.inria.zvtm.cluster.SlaveUpdater;
+import fr.inria.zuist.engine.ImageDescription;
+import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
-    //createImageDescription, createTextDescription
+    //*createImageDescription, createTextDescription, createClosedShapeDescription
+
     
     pointcut sceneManagerCreation(SceneManager sceneManager, 
             VirtualSpace[] spaces, Camera[] cameras) : 
@@ -222,6 +226,97 @@ aspect SceneManagerReplication {
             sm.destroyRegion(region);
             su.removeSlaveObject(regionId);
         }
+    }
+
+    pointcut createImageDescription(
+            SceneManager sceneManager,
+            long x, long y, long w, long h, 
+            String id, int zindex, Region region,
+            URL imageURL, boolean sensitivity, 
+            Color stroke, String params) : 
+        execution(public ImageDescription SceneManager.createImageDescription(
+                    long, long, long, long, 
+                    String, int, Region,
+                    URL, boolean, 
+                    Color, String)) &&
+        this(sceneManager) && 
+        args(x, y, w, h, 
+            id, zindex, region,
+            imageURL, sensitivity, 
+            stroke, params);
+    
+    after(SceneManager sceneManager,
+            long x, long y, long w, long h, 
+            String id, int zindex, Region region,
+            URL imageURL, boolean sensitivity, 
+            Color stroke, String params
+            ) returning(ObjectDescription imageDesc):
+        createImageDescription(sceneManager,
+                x, y, w, h, 
+                id, zindex, region,
+                imageURL, sensitivity, 
+                stroke, params) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(createImageDescription(SceneManager,
+                long, long, long, long, 
+                String, int, Region,
+                URL, boolean, 
+                Color, String)) {
+            Delta delta = new ImageCreateDelta(sceneManager.getObjId(),
+                    imageDesc.getObjId(),
+                    x, y, w, h,
+                    id, zindex, region.getObjId(),
+                    imageURL, sensitivity,
+                    stroke, params);
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+        }
+
+    private static class ImageCreateDelta implements Delta {
+       private final ObjId<SceneManager> smId;
+       private final ObjId<ObjectDescription> descId;
+       private final long x;
+       private final long y;
+       private final long w;
+       private final long h;
+       private final String id;
+       private final int zindex;
+       private final ObjId<Region> regionId;
+       private final URL imageURL;
+       private final boolean sensitivity;
+       private final Color stroke;
+       private final String params;
+
+       ImageCreateDelta(ObjId<SceneManager> smId,
+               ObjId<ObjectDescription> descId,
+               long x, long y, long w, long h, 
+               String id, int zindex, ObjId<Region> regionId,
+               URL imageURL, boolean sensitivity, 
+               Color stroke, String params){
+           this.smId = smId;
+           this.descId = descId;
+           this.x = x; 
+           this.y = y; 
+           this.w = w; 
+           this.h = h; 
+           this.id = id; 
+           this.zindex = zindex; 
+           this.regionId = regionId;
+           this.imageURL = imageURL; 
+           this.sensitivity = sensitivity; 
+           this.stroke = stroke; 
+           this.params = params;
+       }
+
+       public void apply(SlaveUpdater su){
+           SceneManager sm = su.getSlaveObject(smId);
+           Region region = su.getSlaveObject(regionId);
+           ImageDescription desc = sm.createImageDescription(
+                   x, y, w, h,
+                   id, zindex, region,
+                   imageURL, sensitivity,
+                   stroke, params);
+           su.putSlaveObject(descId, desc);
+       }
     }
 }
 
