@@ -17,7 +17,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 
 aspect SceneManagerReplication {
-    //instrument *createLevel, *createRegion, destroyRegion,
+    //instrument *createLevel, *createRegion, *destroyRegion,
     //createImageDescription, createTextDescription
     
     pointcut sceneManagerCreation(SceneManager sceneManager, 
@@ -189,6 +189,38 @@ aspect SceneManagerReplication {
                     requestOrdering, sensitivity, fill, 
                     stroke);
             su.putSlaveObject(regionId, region);
+        }
+    }
+
+    pointcut destroyRegion(SceneManager sceneManager, Region region) : 
+        execution(public void SceneManager.destroyRegion(Region)) &&
+        this(sceneManager) &&
+        args(region);
+
+    after(SceneManager sceneManager, Region region) returning() : 
+        destroyRegion(sceneManager, region) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(destroyRegion(SceneManager, Region)) {
+            RegionDestroyDelta delta = new RegionDestroyDelta(
+                    sceneManager.getObjId(),
+                    region.getObjId());
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+        }
+
+    private static class RegionDestroyDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<Region> regionId;
+
+        RegionDestroyDelta(ObjId<SceneManager> smId, ObjId<Region> regionId){
+            this.smId = smId;
+            this.regionId = regionId;
+        }
+
+        public void apply(SlaveUpdater su){
+            SceneManager sm = su.getSlaveObject(smId);
+            Region region = su.getSlaveObject(regionId);
+            sm.destroyRegion(region);
+            su.removeSlaveObject(regionId);
         }
     }
 }
