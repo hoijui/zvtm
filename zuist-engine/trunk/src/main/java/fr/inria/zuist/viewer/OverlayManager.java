@@ -24,6 +24,7 @@ import java.awt.Insets;
 import java.awt.BorderLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.View;
@@ -46,6 +47,7 @@ class OverlayManager implements ViewEventHandler {
 
     Viewer application;
 
+    JScrollPane consoleSP;
 	TranslucentTextArea console;
 
 	// west, east and south margins of console (north bound depends on frame's height)
@@ -63,12 +65,13 @@ class OverlayManager implements ViewEventHandler {
 		console = new TranslucentTextArea("");
 		console.setEditable(false);
 		console.setMargin(new Insets(consolePaddingWNES[1], consolePaddingWNES[0], consolePaddingWNES[3], consolePaddingWNES[2]));
-		lp.add(console, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
+		consoleSP = new JScrollPane(console);
+		lp.add(consoleSP, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
 		updateConsoleBounds();
 	}
 	
 	void updateConsoleBounds(){
-		console.setBounds(consoleMarginsWES[0], Math.round(application.panelHeight*.8f),
+		consoleSP.setBounds(consoleMarginsWES[0], Math.round(application.panelHeight*.8f),
 		                  application.panelWidth-consoleMarginsWES[1]-consoleMarginsWES[0], Math.round(application.panelHeight*.2f-consoleMarginsWES[2]));
 	}
 	
@@ -84,6 +87,7 @@ class OverlayManager implements ViewEventHandler {
 	
 	void sayInConsole(String text){
 		console.setText(console.getText()+text);
+		console.setCaretPosition(console.getDocument().getLength());
 	}
     
     boolean showingAbout = false;
