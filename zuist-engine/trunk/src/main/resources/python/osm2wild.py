@@ -46,13 +46,13 @@ HIGHEST_ZOOM = 18
 EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae",]
 EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea"]
 
-LOG_FILE_NAME = "osm2zuist.log"
-LOG_FILE = None
 TRACE_LEVEL = 1
 
 INTERPOLATION = "bilinear"
 
-FRAG_DEPTH = 6
+FRAG_DEPTH = 1
+
+BBOX = (-180.0,-90.0, 180.0,90.0)
 
 et = {}
 
@@ -121,7 +121,7 @@ class GoogleProjection:
 # Render Thread
 ################################################################################
 class RenderThread:
-    def __init__(self, tile_dir, mapfile, q, printLock, xmlLock, maxZoom, zf):
+    def __init__(self, tile_dir, mapfile, q, printLock, xmlLock, zf):
         self.tile_dir = tile_dir
         self.sea_path = "%ssea.png" % tile_dir
         self.lnd_path = "%slnd.png" % tile_dir
@@ -135,7 +135,7 @@ class RenderThread:
         # Obtain <Map> projection
         self.prj = mapnik.Projection(self.m.srs)
         # Projects between tile pixel co-ordinates and LatLong (EPSG:4326)
-        self.tileproj = GoogleProjection(maxZoom+1)
+        self.tileproj = GoogleProjection(HIGHEST_ZOOM+1)
 
     def render_tile(self, tile_uri, x, y, z):
         # Calculate pixel positions of bottom-left & top-right
@@ -262,14 +262,14 @@ class RenderThread:
                     self.xmlLock.acquire()
                     self.zf.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
                     self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
-                    if z == MAX_ZOOM:
-                        frag_src = "%ssf%s.xml" % (src[:src.rfind("/")+1], src[src.rfind("/")+1:src.rfind(".")])
-                        self.zf.write("    <resource type=\"scn\" id=\"F%s\" src=\"%s\" x=\"%d\" y=\"%d\" />\n" % (ID, frag_src, vx, vy))
                     self.zf.write("  </region>\n")
-                    self.xmlLock.release()
                     if z == MAX_ZOOM:
-                        # frag_src will have been initialized in the above same test
+                        self.zf.write("  <region id=\"RF%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, z+1, vx, vy, w, h))
+                        frag_src = "%ssf%s.xml" % (src[:src.rfind("/")+1], src[src.rfind("/")+1:src.rfind(".")])
                         generateSceneFragment("%s%s" % (tile_dir, frag_src), x, y, MAX_ZOOM+1)
+                        self.zf.write("    <resource type=\"scn\" id=\"F%s\" src=\"%s\" x=\"%d\" y=\"%d\" />\n" % (ID, frag_src, vx, vy))
+                        self.zf.write("  </region>\n")
+                    self.xmlLock.release()
             self.zf.flush()
             self.q.task_done()
 
@@ -288,22 +288,63 @@ def generateLevels(zf):
             ceiling = altitudes[-1]
         floor = altitudes[-2]
         zf.write("  <level depth=\"%s\" ceiling=\"%s\" floor=\"%s\"/>\n" % (str(depth), str(ceiling), str(floor)))
-    
 
-def generateSceneFragment(src, x, y, z):
+################################################################################
+#
+################################################################################
+def generateSceneFragment(src, xl, yl, zl):
     log("Generating scene fragment %s" % src, 2)
     ff = open(src, 'w')
     ff.write("<?xml version=\"1.0\"?>\n")
     ff.write("<scene background=\"white\">\n")
+    gprj = GoogleProjection(HIGHEST_ZOOM+1)
+    ll0 = (BBOX[0], BBOX[3])
+    ll1 = (BBOX[2], BBOX[1])
     generateLevels(ff)
+    for z in range(zl, zl + FRAG_DEPTH):
+        px0 = gprj.fromLLtoPixel(ll0, z)
+        px1 = gprj.fromLLtoPixel(ll1, z)
+        zoom = "%s" % z
+        # check if we have directories in place
+        for x in range(xl*2, xl*2+2):
+            # Validate x co-ordinate
+            if (x < 0) or (x >= 2**z):
+                continue
+            # check if we have directories in place
+            str_x = "%s" % x
+            for y in range(yl*2, yl*2+2):
+                # Validate x co-ordinate
+                if (y < 0) or (y >= 2**z):
+                    continue
+                str_y = "%s" % y
+                tile_uri = "http://192.168.0.5/py/zuistServer/getTile?z=%s&amp;col=%s&amp;row=%s" % (zoom, str_x, str_y)
+                generateTileInFragment(tile_uri, z, x, y, ff)
     ff.write("</scene>\n")
     ff.flush()
     ff.close()
+
+################################################################################
+#
+################################################################################
+def generateTileInFragment(src, z, x, y, ff):
+    ID = "%s-%s-%s" % (z, x, y)
+    parentID = "%s-%s-%s" % (z-1, x/2, y/2)
+    ilc = HIGHEST_ZOOM - MIN_ZOOM + 1 - z
+    ts = TS_I * math.pow(2, ilc-1)
+    vx = (x*ts + ts/2.0)
+    vy = -(y*ts + ts/2.0)
+    w = h = ts
+    zi = 1
+    levels = z
+    ci = "containedIn=\"R%s\"" % parentID
+    ff.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
+    ff.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
+    ff.write("  </region>\n")
     
 ################################################################################
 #
 ################################################################################
-def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", num_threads=NUM_THREADS):
+def render_tiles(mapfile, tile_dir, name="unknown", num_threads=NUM_THREADS):
     log("Rendering levels %s to %s ..." % (MIN_ZOOM, MAX_ZOOM))
     # Launch rendering threads
     queue = Queue(32)
@@ -315,23 +356,22 @@ def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", 
     # ZUIST XML scene file
     zf = open("%sscene.xml" % tile_dir, 'w')
     for i in range(num_threads):
-        renderer = RenderThread(tile_dir, mapfile, queue, printLock, xmlLock, maxZoom, zf)
+        renderer = RenderThread(tile_dir, mapfile, queue, printLock, xmlLock, zf)
         render_thread = threading.Thread(target=renderer.loop)
         render_thread.start()
         #print "Started render thread %s" % render_thread.getName()
         renderers[i] = render_thread
 
+    gprj = GoogleProjection(HIGHEST_ZOOM+1)
 
-    gprj = GoogleProjection(maxZoom+1) 
-
-    ll0 = (bbox[0],bbox[3])
-    ll1 = (bbox[2],bbox[1])
+    ll0 = (BBOX[0], BBOX[3])
+    ll1 = (BBOX[2], BBOX[1])
     
     zf.write("<?xml version=\"1.0\"?>\n")
     zf.write("<scene background=\"white\">\n")
     generateLevels(zf)
 
-    for z in range(minZoom,maxZoom + 1):
+    for z in range(MIN_ZOOM, MAX_ZOOM+1):
         px0 = gprj.fromLLtoPixel(ll0,z)
         px1 = gprj.fromLLtoPixel(ll1,z)
 
@@ -368,9 +408,6 @@ def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", 
     zf.write("</scene>\n")
     zf.flush()
     zf.close()
-    if LOG_FILE is not None:
-        LOG_FILE.flush()
-        LOG_FILE.close()    
 
 ################################################################################
 # Trace exec on std output and log file
@@ -378,13 +415,6 @@ def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", 
 def log(msg, level=0):
     if level <= TRACE_LEVEL:
         print msg
-        if LOG_FILE is not None:
-            LOG_FILE.write(msg+"\n")
-            LOG_FILE.flush()
-        
-def initLogFile():
-    global LOG_FILE
-    LOG_FILE = open(LOG_FILE_NAME, 'w')
         
 ################################################################################
 #
@@ -399,8 +429,6 @@ if __name__ == "__main__":
                 MIN_ZOOM = int(arg[5:])
             elif arg.startswith("-max="):
                 MAX_ZOOM = int(arg[5:])
-            elif arg.startswith("-log"):
-                initLogFile()
             elif arg.startswith("-h"):
                 log(CMD_LINE_HELP)
                 sys.exit(0)
@@ -415,5 +443,4 @@ if __name__ == "__main__":
     except KeyError:
         tile_dir = home + "/zuist/tiles/"
     
-    bbox = (-180.0,-90.0, 180.0,90.0)
-    render_tiles(bbox, mapfile, tile_dir, MIN_ZOOM, MAX_ZOOM, "World")
+    render_tiles(mapfile, tile_dir, "World")
