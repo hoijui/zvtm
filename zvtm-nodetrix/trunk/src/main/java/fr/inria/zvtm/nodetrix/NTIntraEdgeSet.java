@@ -13,33 +13,33 @@ import fr.inria.zvtm.glyphs.VText;
 
 public class NTIntraEdgeSet {
 
-	private Vector<NTIntraEdge> intraEdges = new Vector<NTIntraEdge>();
-	private LongPoint mp;
-	Glyph g;
-	LongPoint offset;
+	private Vector<NTEdge> intraEdges = new Vector<NTEdge>();
+	private Glyph g;
+	private Matrix m;
+	private VirtualSpace vs;
 	
 	public NTIntraEdgeSet()
 	{
 	}
 	
-    void createGraphics(long noMeaning1, long y, long x, long noMeaning2, VirtualSpace vs, Matrix m)
+    void createGraphics(VirtualSpace vs, Matrix m)
     {
-    	this.offset = new LongPoint(x, y);
-    	this.mp = m.getPosition();
-    	long h = (NodeTrixViz.CELL_SIZE) / this.intraEdges.size();
-//		long csHalf = NodeTrixViz.CELL_SIZE/2;
-		
-		int i = 0;
-		for(NTIntraEdge ie : this.intraEdges)
-		{ 
-			ie.createGraphics(h, y,  x, i, vs);
+    	this.vs = vs;
+    	int i = 0;
+		this.m = m;
+		for(NTEdge ie : this.intraEdges)
+		{
+			ie.setEdgeSetPosition(i, intraEdges.size());
+			ie.createGraphics(vs);
 			i++;
 		}
 		
 		//adding invisible rectangle triggering events
+		long x = intraEdges.firstElement().head.ndx;
+		long y = intraEdges.firstElement().tail.wdy;
 		g = new VRectangle(m.bkg.vx + x, m.bkg.vy + y,0, NodeTrixViz.CELL_SIZE_HALF - 3, NodeTrixViz.CELL_SIZE_HALF - 3, Color.BLACK);
-//		g.setVisible(false);
-		g.setTranslucencyValue(.5f);
+		g.setVisible(false);
+//		g.setTranslucencyValue(.5f);
 		g.setOwner(intraEdges.firstElement());
 		vs.addGlyph(g);
 		m.bkg.stick(g);
@@ -170,35 +170,39 @@ public class NTIntraEdgeSet {
 //		
 	}
     
-    public void reposition() {
-		this.moveTo( this.intraEdges.firstElement().getHead().ndx,
-					 this.intraEdges.firstElement().getTail().wdy);	
-		this.g.moveTo(mp.x + this.intraEdges.firstElement().getHead().ndx,
-				mp.y + this.intraEdges.firstElement().getTail().wdy);	
+    public void cleanGraphics(){
+    	if(vs == null) return;
+    	vs.removeGlyph(g);
+    }
+    
+    public void updatePosition() {
+    	for(NTEdge ie: this.intraEdges){ ie.updatePosition();}
+		this.g.moveTo(m.bkg.vx + this.intraEdges.firstElement().getHead().ndx,
+				m.bkg.vy + this.intraEdges.firstElement().getTail().wdy);	
 	}
     
     public void onTop(VirtualSpace vs){
-    	for(NTIntraEdge ie: this.intraEdges){ ie.onTop(vs);}
+    	for(NTEdge ie: this.intraEdges){ ie.onTop();}
     	vs.onTop(g);
     }
     
     public void move(long x, long y)
     {
-    	for(NTIntraEdge ie: this.intraEdges){ ie.move(x, y);}
+    	for(NTEdge ie: this.intraEdges){ ie.move(x, y);}
     }
     
-    public void moveTo(long x, long y)
-    {
-    	for(NTIntraEdge ie: this.intraEdges){ ie.moveTo(x, y);}
-    }
+//    public void moveTo(long x, long y)
+//    {
+//    	for(NTEdge ie: this.intraEdges){ ie.moveTo(x, y);}
+//    }
     
-    public Vector<NTIntraEdge> getIntraEdges()
+    public Vector<NTEdge> getIntraEdges()
     {
     	return this.intraEdges;
     }
  
    
-	public void addIntraEdge(NTIntraEdge e)
+	public void addEdge(NTEdge e)
 	{
 		this.intraEdges.add(e);
 	}

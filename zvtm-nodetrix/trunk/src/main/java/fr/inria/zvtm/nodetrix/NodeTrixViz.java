@@ -70,7 +70,10 @@ public class NodeTrixViz {
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
 	public static final float EXTRA_ALPHA_MIN = .25f;
 	
-	public static final double LINLOG_QUALITY = 10;  
+	public static final double LINLOG_QUALITY = 10;
+	
+	public static final int APPEARANCE_EXTRA_EDGE = 0;  
+	public static final int APPEARANCE_INTRA_EDGE = 1;  
     /* Matrices in this visualization */
 //    Matrix[] matrices;
 	Vector<Matrix> matrices;
@@ -136,53 +139,62 @@ public class NodeTrixViz {
 //		System.out.println("[NODETRIXVIZ] " + matrices.size() + " MATRICES IN TOTAL");
 		//Create Internal Edges
 		for(Matrix m : matrices){
-			m.adjustEdges();
+			m.adjustEdgeAppearance();
+			m.performEdgeAppearanceChange();
 		}
 	}
 	
-    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head){
-        return addExtraEdge(tail, head, EXTRA_LINK_COLOR, null);
-    }
-    
-    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
-        return addIntraEdge(tail, head, INTRA_LINK_COLOR, null);
-    }
+//    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head){
+//        return addExtraEdge(tail, head, EXTRA_LINK_COLOR, null);
+//    }
+//    
+//    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head){
+//        return addIntraEdge(tail, head, INTRA_LINK_COLOR, null);
+//    }
     
     /** Method is used if inputfile is passed directly to zvtm-ontotrix*/
     public NTEdge addEdge(NTNode tail, NTNode head){
-        if (tail.getMatrix() == head.getMatrix()){
-            return addIntraEdge(tail, head);
-        }
-        else {
-            return addExtraEdge(tail, head);
-        }
+    	return addEdge(tail, head, INTRA_LINK_COLOR, null);
+//        if (tail.getMatrix() == head.getMatrix()){
+//            return addIntraEdge(tail, head);
+//        }
+//        else {
+//            return addExtraEdge(tail, head);
+//        }
     }
     
-    /**Creates a new External edge between the two nodes.
-     * @param NTNode tail, NTNode head
-     * @pararm Color c - colour of the edge
-     * @param Object owner - can be null, but can be used to attach an arbitrary object to this edge.
-     **/
-    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head, Color c, Object owner){
-        NTExtraEdge e = new NTExtraEdge(tail, head, c);
-        e.setOwner(owner);
-        tail.addOutgoingEdge(e);
-        head.addIncomingEdge(e);
-        return e;
+    public NTEdge addEdge(NTNode tail, NTNode head, Color c, Object owner){
+    	NTEdge e = new NTEdge(tail, head, c);
+    	e.setOwner(owner);
+    	tail.addOutgoingEdge(e);
+    	head.addIncomingEdge(e);
+    	return e;
     }
-    
-    /**Creates a new matrix-internal edge between the two nodes.
-     * @param NTNode tail, NTNode head
-     * @pararm Color c - colour of the edge
-     * @param Object owner - can be null, but can be used to attach an arbitrary object to this edge.
-     **/
-    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c, Object owner){
-        NTIntraEdge e = new NTIntraEdge(tail, head, c);
-        e.setOwner(owner);
-       tail.addOutgoingEdge(e);
-       	head.addIncomingEdge(e);
-        return e;
-    }
+//    /**Creates a new External edge between the two nodes.
+//     * @param NTNode tail, NTNode head
+//     * @pararm Color c - colour of the edge
+//     * @param Object owner - can be null, but can be used to attach an arbitrary object to this edge.
+//     **/
+//    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head, Color c, Object owner){
+//        NTExtraEdge e = new NTExtraEdge(tail, head, c);
+//        e.setOwner(owner);
+//        tail.addOutgoingEdge(e);
+//        head.addIncomingEdge(e);
+//        return e;
+//    }
+//    
+//    /**Creates a new matrix-internal edge between the two nodes.
+//     * @param NTNode tail, NTNode head
+//     * @pararm Color c - colour of the edge
+//     * @param Object owner - can be null, but can be used to attach an arbitrary object to this edge.
+//     **/
+//    public NTIntraEdge addIntraEdge(NTNode tail, NTNode head, Color c, Object owner){
+//        NTIntraEdge e = new NTIntraEdge(tail, head, c);
+//        e.setOwner(owner);
+//       tail.addOutgoingEdge(e);
+//       	head.addIncomingEdge(e);
+//        return e;
+//    }
     
     /**
      *@return all matrices in this visualization
@@ -258,7 +270,7 @@ public class NodeTrixViz {
         
         Collections.sort(matrices, new MatrixSizeComparator());
         for (Matrix m:matrices){
-		    m.toFront(vs);
+		    m.onTop(vs);
 		}
     }
     
@@ -329,25 +341,30 @@ public class NodeTrixViz {
     	HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
     	Vector<Matrix> toRemove = new Vector<Matrix>();
     	for(Matrix m : matrices){
-    		newMatrices.putAll(m.split(vs, am));
+    		newMatrices.putAll(m.split(am));
     		toRemove.add(m);
     	}
  
     	for(Matrix m : toRemove){
     		matrices.remove(m);
     	}
-    	
+
     	matrices.addAll(newMatrices.values());
+    	reorderMatricesCMK();
+   	
+//     	for(Matrix m : matrices){
+//    		m.applyRandomOffset();
+//    	}
     }
     
     /**
-     * Runs over all matrices and group their nodes according to their assigned
+     * Iterates over all matrices and group their nodes according to their assigned
      * groupname.
      */
-    public void regroupMatrices(VirtualSpace vs)
+    public void regroupMatrices()
     {
     	for(Matrix m : matrices){
-    		m.regroup(vs);
+    		m.regroup();
     	}
     }
     

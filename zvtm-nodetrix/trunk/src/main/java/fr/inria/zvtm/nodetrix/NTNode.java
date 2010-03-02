@@ -356,7 +356,7 @@ public class NTNode extends LinLogNode{
 		return this.widthHalf;
 	}
     public void addOutgoingEdge(NTEdge e){
-    	if(e instanceof NTIntraEdge){internalRelations.add(e);}
+    	if(e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){internalRelations.add(e);}
     	outgoingEdges.add(e);
     }
     
@@ -425,7 +425,7 @@ public class NTNode extends LinLogNode{
 
 
 	public void removeOutgoingEdge(NTEdge ee) {
-		if(ee instanceof NTIntraEdge) internalRelations.remove(ee);
+		if(ee.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE) internalRelations.remove(ee);
 		outgoingEdges.remove(ee);	
 	}
 	public void removeIncomingEdge(NTEdge ee) {
@@ -453,12 +453,20 @@ public class NTNode extends LinLogNode{
 
 	public void repositionRelations() {
 		for(NTEdge e : this.outgoingEdges){
-			e.reposition();
+			if(e.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE)
+				e.updatePosition();
 		}
 		for(NTIntraEdgeSet es : this.intraEdgeSets){
-			es.reposition();
+			es.updatePosition();
 		}
 		
+	}
+
+	public void cleanIntraEdgeSets() {
+		for(NTIntraEdgeSet ie : intraEdgeSets){
+			ie.cleanGraphics();
+		}
+		intraEdgeSets = new Vector<NTIntraEdgeSet>();
 	}
 
 
