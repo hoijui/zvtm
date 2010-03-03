@@ -337,7 +337,6 @@ public class NodeTrixViz {
     //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
     
     public void splitMatrices(VirtualSpace vs, AnimationManager am){
-//    	System.out.println("[NODE_TRIX_VIZ] SPLIT MATRICES");
     	HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
     	Vector<Matrix> toRemove = new Vector<Matrix>();
     	for(Matrix m : matrices){
@@ -351,10 +350,11 @@ public class NodeTrixViz {
 
     	matrices.addAll(newMatrices.values());
     	reorderMatricesCMK();
-   	
-//     	for(Matrix m : matrices){
-//    		m.applyRandomOffset();
-//    	}
+    }
+    
+    
+    public void mergeMatrices(VirtualSpace vs, AnimationManager am){
+    	//TODO
     }
     
     /**
