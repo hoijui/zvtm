@@ -299,7 +299,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].cw>1) && (pc[i].ch>1)) {
+        if ((pc[i].cw>=1) || (pc[i].ch>=1)) {
             //repaint only if object is visible
             if (alphaC != null){
                 g.setComposite(alphaC);
@@ -335,28 +335,6 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
                     else {
                         g.drawRoundRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1,pc[i].aw,pc[i].ah);
                     }
-                }
-            }
-        }
-        else if ((pc[i].cw<=1) ^ (pc[i].ch<=1)) {
-            //repaint only if object is visible  (^ means xor)
-            g.setColor(this.color);
-            if (alphaC != null){
-                g.setComposite(alphaC);
-                if (pc[i].cw<=1){
-                    g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
-                }
-                else if (pc[i].ch<=1){
-                    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
-                }
-                g.setComposite(acO);
-            }
-            else {
-                if (pc[i].cw<=1){
-                    g.fillRect(dx+pc[i].cx,dy+pc[i].cy-pc[i].ch,1,2*pc[i].ch);
-                }
-                else if (pc[i].ch<=1){
-                    g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy,2*pc[i].cw,1);
                 }
             }
         }
@@ -375,7 +353,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].lcw>1) && (pc[i].lch>1)) {
+        if ((pc[i].lcw>=1) || (pc[i].lch>=1)) {
             //repaint only if object is visible
             if (alphaC != null){
                 g.setComposite(alphaC);
@@ -411,28 +389,6 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
                     else {
                         g.drawRoundRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw-1,2*pc[i].lch-1,pc[i].law,pc[i].lah);
                     }
-                }
-            }
-        }
-        else if ((pc[i].lcw<=1) ^ (pc[i].lch<=1)) {
-            //repaint only if object is visible  (^ means xor)
-            g.setColor(this.color);
-            if (alphaC != null){
-                g.setComposite(alphaC);
-                if (pc[i].lcw<=1){
-                    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
-                }
-                else if (pc[i].lch<=1){
-                    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
-                }
-                g.setComposite(acO);
-            }
-            else {
-                if (pc[i].lcw<=1){
-                    g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy-pc[i].lch,1,2*pc[i].lch);
-                }
-                else if (pc[i].lch<=1){
-                    g.fillRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy,2*pc[i].lcw,1);
                 }
             }
         }

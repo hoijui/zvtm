@@ -264,7 +264,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].cw>1) && (pc[i].ch>1)){
+        if ((pc[i].cw>=1) || (pc[i].ch>=1)){
             //repaint only if object is visible
             if (alphaC != null){
                 g.setComposite(alphaC);
@@ -332,7 +332,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].lcw>1) && (pc[i].lch>1)){
+        if ((pc[i].lcw>=1) || (pc[i].lch>=1)){
             //repaint only if object is visible
             if (alphaC != null){
                 g.setComposite(alphaC);

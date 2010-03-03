@@ -178,7 +178,7 @@ public class VImageOr extends VImage {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].cw>1) && (pc[i].ch>1)){
+        if ((pc[i].cw>=1) || (pc[i].ch>=1)){
             if (zoomSensitive){
                 trueCoef = scaleFactor*coef;
             }
@@ -281,7 +281,7 @@ public class VImageOr extends VImage {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].lcw>1) && (pc[i].lch>1)){
+        if ((pc[i].lcw>=1) || (pc[i].lch>=1)){
             if (zoomSensitive){
                 trueCoef=scaleFactor*coef;
             }

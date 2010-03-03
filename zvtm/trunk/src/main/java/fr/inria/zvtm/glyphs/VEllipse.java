@@ -259,7 +259,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].ellipse.getBounds().width>2) && (pc[i].ellipse.getBounds().height>2)){
+        if ((pc[i].ellipse.getBounds().width>2) || (pc[i].ellipse.getBounds().height>2)){
             if (alphaC != null){
                 g.setComposite(alphaC);
                 if (filled){
@@ -324,7 +324,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].lellipse.getBounds().width>2) && (pc[i].lellipse.getBounds().height>2)){
+        if ((pc[i].lellipse.getBounds().width>2) || (pc[i].lellipse.getBounds().height>2)){
             if (alphaC != null){
                 g.setComposite(alphaC);
                 if (filled){
