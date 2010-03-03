@@ -143,8 +143,8 @@ public class VRectangleOr extends VRectangle {
 	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
 	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
 	//project width and height
-	pc[i].cw=Math.round(vw*coef);
-	pc[i].ch=Math.round(vh*coef);
+	pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
+    pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
 	if (orient!=0){
 	    float x1=-pc[i].cw;
 	    float y1=-pc[i].ch;
@@ -209,7 +209,18 @@ public class VRectangleOr extends VRectangle {
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].cw>=1) || (pc[i].ch>=1)){
+        if ((pc[i].cw==1) && (pc[i].ch==1)){
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }            
+        }
+        else {
             //repaint only if object is visible
             if (orient==0) {
                 if (alphaC != null){
@@ -300,24 +311,24 @@ public class VRectangleOr extends VRectangle {
                         }
                     }
                 }
-            }
-        }
-        else {
-            g.setColor(this.color);
-            if (alphaC != null){
-                g.setComposite(alphaC);
-                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-                g.setComposite(acO);
-            }
-            else {
-                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
             }
         }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].lcw>=1) || (pc[i].lch>=1)){
+        if ((pc[i].lcw==1) || (pc[i].lch==1)){
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
+        else {
             //repaint only if object is visible
             if (orient==0) {
                 if (alphaC != null){
@@ -402,17 +413,6 @@ public class VRectangleOr extends VRectangle {
                         }
                     }
                 }
-            }
-        }
-        else {
-            g.setColor(this.color);
-            if (alphaC != null){
-                g.setComposite(alphaC);
-                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-                g.setComposite(acO);
-            }
-            else {
-                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
             }
         }
     }

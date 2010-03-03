@@ -239,32 +239,43 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
-	//translate in JPanel coords
-	pc[i].cx = (d.width/2) + Math.round((vx-c.posx)*coef);
-	pc[i].cy = (d.height/2) - Math.round((vy-c.posy)*coef);
-	//project width and height
-	pc[i].cw=Math.round(vw*coef);
-	pc[i].ch=Math.round(vh*coef);
+        int i=c.getIndex();
+        coef=(float)(c.focal/(c.focal+c.altitude));
+        //find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
+        //translate in JPanel coords
+        pc[i].cx = (d.width/2) + Math.round((vx-c.posx)*coef);
+        pc[i].cy = (d.height/2) - Math.round((vy-c.posy)*coef);
+        //project width and height
+        pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
+        pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i = c.getIndex();
-	coef = (float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
-	//translate in JPanel coords
-	pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
-	//project width and height
-	pc[i].lcw = Math.round(vw*coef);
-	pc[i].lch = Math.round(vh*coef);
+        int i = c.getIndex();
+        coef = (float)(c.focal/(c.focal+c.altitude)) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
+        //translate in JPanel coords
+        pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
+        pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
+        //project width and height
+        pc[i].lcw = (int)Math.round(Math.ceil(vw*coef));
+        pc[i].lch = (int)Math.round(Math.ceil(vh*coef));
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].cw>=1) || (pc[i].ch>=1)){
+        if ((pc[i].cw == 1) && (pc[i].ch==1)){
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
+        else {
             //repaint only if object is visible
             if (alphaC != null){
                 g.setComposite(alphaC);
@@ -315,24 +326,24 @@ public class VRectangle extends ClosedShape implements RectangularShape {
                         g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
                     }
                 }
-            }
-        }
-        else {
-            g.setColor(this.color);
-            if (alphaC != null){
-                g.setComposite(alphaC);
-                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-                g.setComposite(acO);
-            }
-            else {
-                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
             }
         }
     }
 
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        if ((pc[i].lcw>=1) || (pc[i].lch>=1)){
+        if ((pc[i].lcw==1) && (pc[i].lch==1)){
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
+        else {
             //repaint only if object is visible
             if (alphaC != null){
                 g.setComposite(alphaC);
@@ -377,17 +388,6 @@ public class VRectangle extends ClosedShape implements RectangularShape {
                         g.drawRect(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch,2*pc[i].lcw,2*pc[i].lch);
                     }
                 }
-            }
-        }
-        else {
-            g.setColor(this.color);
-            if (alphaC != null){
-                g.setComposite(alphaC);
-                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-                g.setComposite(acO);
-            }
-            else {
-                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
             }
         }
     }

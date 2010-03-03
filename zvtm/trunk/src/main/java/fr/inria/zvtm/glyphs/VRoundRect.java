@@ -270,31 +270,31 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     }
     
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project width and height
-	pc[i].cw=Math.round(vw*coef);
-	pc[i].ch=Math.round(vh*coef);
-	pc[i].aw=Math.round(arcWidth*coef);
-	pc[i].ah=Math.round(arcHeight*coef);
+        int i=c.getIndex();
+        coef=(float)(c.focal/(c.focal+c.altitude));
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
+        pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
+        //project width and height
+        pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
+        pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].aw=Math.round(arcWidth*coef);
+        pc[i].ah=Math.round(arcHeight*coef);
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
-	//project width and height
-	pc[i].lcw=Math.round(vw*coef);
-	pc[i].lch=Math.round(vh*coef);
-	pc[i].law=Math.round(arcWidth*coef);
-	pc[i].lah=Math.round(arcHeight*coef);
+        int i=c.getIndex();
+        coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
+        pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
+        //project width and height
+        pc[i].lcw = (int)Math.round(Math.ceil(vw*coef));
+        pc[i].lch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].law=Math.round(arcWidth*coef);
+        pc[i].lah=Math.round(arcHeight*coef);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
