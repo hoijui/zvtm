@@ -37,6 +37,10 @@ aspect SceneManagerReplication {
         returning() : 
         sceneManagerCreation(sceneManager, spaces, cameras) &&
         !cflowbelow(sceneManagerCreation(SceneManager, VirtualSpace[], Camera[])){
+            for(VirtualSpace vs: spaces){
+                vs.setMirrored(false);
+            }
+            
             SceneManagerCreateDelta delta = 
                 new SceneManagerCreateDelta(sceneManager.getObjId(),
                         Arrays.asList(spaces), Arrays.asList(cameras));
