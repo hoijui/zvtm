@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */ 
@@ -49,8 +49,8 @@ aspect GlyphCreation {
 		execution(public * VirtualSpace.addGlyph(Glyph, boolean, boolean)) 
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
-		&& this(virtualSpace); 
-
+		&& this(virtualSpace);
+        
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		(execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) ||
 		 execution(public * VirtualSpace.removeGlyph(Glyph)))
@@ -59,7 +59,8 @@ aspect GlyphCreation {
 		&& this(virtualSpace);
 
 	before(Glyph glyph, VirtualSpace virtualSpace):
-		glyphAdd(glyph, virtualSpace){
+		glyphAdd(glyph, virtualSpace)
+    && if(virtualSpace.isMirrored()){
 			if(glyph == null){
 				return;
 			}
@@ -69,7 +70,8 @@ aspect GlyphCreation {
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) &&
-		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
+		!cflowbelow(glyphAdd(Glyph, VirtualSpace))
+        && if(virtualSpace.isMirrored()){
 			Delta createDelta = glyph.getCreateDelta();
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
 		}
@@ -77,7 +79,8 @@ aspect GlyphCreation {
 	//advise VirtualSpace.removeGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning:
 		glyphRemove(glyph, virtualSpace) &&
-		!cflowbelow(glyphRemove(Glyph, VirtualSpace)){
+		!cflowbelow(glyphRemove(Glyph, VirtualSpace))
+        && if(virtualSpace.isMirrored()){
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
 			VirtualSpaceManager.INSTANCE.sendDelta(delta);
