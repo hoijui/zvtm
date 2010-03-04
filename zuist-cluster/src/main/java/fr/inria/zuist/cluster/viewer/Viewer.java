@@ -162,6 +162,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        Vector<Camera> sceneCam = new Vector<Camera>();
+        sceneCam.add(mCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
                 1700,
@@ -173,7 +175,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                     3, //origin (block number)
                     8, //use complete
                     4, //cluster surface
-                    cameras);
+                    sceneCam);
         cv.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(cv);
         if (fullscreen){
