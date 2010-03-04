@@ -31,7 +31,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
     // serializable (primitive types are okay)
     // - exercise caution when adding non-public methods to the 
     // join points, because these methods will be invoked reflectively.
-    pointcut autoReplayMethods(Identifiable replayTarget) :
+    public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
         (
          //Glyph methods

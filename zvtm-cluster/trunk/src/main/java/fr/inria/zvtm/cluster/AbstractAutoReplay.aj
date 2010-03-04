@@ -21,7 +21,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * Use only for "atomic" operations (change one attribute at a time).
  */
 public abstract aspect AbstractAutoReplay {
-    abstract pointcut autoReplayMethods(Identifiable replayTarget);
+    public abstract pointcut autoReplayMethods(Identifiable replayTarget);
 
     pointcut masterAutoReplay(Identifiable replayTarget) :
         autoReplayMethods(replayTarget) && 
