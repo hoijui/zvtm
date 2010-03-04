@@ -336,11 +336,20 @@ public class NodeTrixViz {
     
     //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
     
-    public void splitMatrices(VirtualSpace vs, AnimationManager am){
+    public void reorganiseAllMatrices(AnimationManager am)
+    {
+    	regroupMatrices();
+    	splitAllMatrices(am);
+    	mergeAllMatrices();
+    }
+    
+    public void splitAllMatrices(AnimationManager am){
     	HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
     	Vector<Matrix> toRemove = new Vector<Matrix>();
     	for(Matrix m : matrices){
-    		newMatrices.putAll(m.split(am));
+    		HashMap<String, Matrix> currentNew = m.splitMatrix(am);
+    		if(currentNew == null) continue;
+    		newMatrices.putAll(currentNew);
     		toRemove.add(m);
     	}
  
@@ -352,6 +361,40 @@ public class NodeTrixViz {
     	reorderMatricesCMK();
     }
     
+    public void mergeAllMatrices()
+    {
+    	HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
+    	for(Matrix m : matrices){
+    		String name = m.getName();
+    		if(!mergeMap.containsKey(name)){
+    			mergeMap.put(name, new Vector<Matrix>());
+    		}
+    		mergeMap.get(name).add(m);
+    	}	
+    	
+    	for(Vector<Matrix> vector : mergeMap.values()){
+    		if(vector.size() < 2) continue;
+    		mergeParticulaMatrices((Vector<Matrix>)vector.clone());
+    	}
+    }
+    
+    public void mergeParticulaMatrices(Vector<Matrix> mergeMatrices)
+    {
+    	long xCenter = 0;
+    	long yCenter = 0;
+    	for(Matrix m : mergeMatrices){
+    		xCenter += m.getPosition().x;
+       		yCenter += m.getPosition().y;
+    	}
+    	xCenter /= mergeMatrices.size();
+       	yCenter /= mergeMatrices.size();
+           	
+       	long offset = 0;
+    	for(Matrix m : mergeMatrices){
+    		m.move(xCenter + offset, yCenter- offset);
+    		offset += m.bkg.getWidth();
+    	}
+    }
     
     public void mergeMatrices(VirtualSpace vs, AnimationManager am){
     	//TODO

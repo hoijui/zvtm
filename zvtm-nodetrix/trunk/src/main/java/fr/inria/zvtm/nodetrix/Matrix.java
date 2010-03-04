@@ -475,6 +475,9 @@ public class Matrix {
 //    		return;
 //    	}
 
+//    	if(animated){
+//    		Animation a = am.getAnimationFactory().createGlyphTranslatei
+//    	}
     	bkg.move(x, y);
         long[] p = new long[2];
         long offset = 0;
@@ -667,9 +670,10 @@ public class Matrix {
 		}
 	}
 	
-	public HashMap<String, Matrix> split(AnimationManager am)
+	public HashMap<String, Matrix> splitMatrix(AnimationManager am)
 	{
 		if(nodes.size() <= 1 || !grouped) return new HashMap<String, Matrix>();
+		
 		
 		// 1. CREATE MATRICES
 		HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
@@ -800,6 +804,7 @@ public class Matrix {
 	}
 	
 	public void cleanGraphics(AnimationManager am){
+		cleanGroupLabels();
 		Animation a;
 		int duration = 3000;
 		a = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
