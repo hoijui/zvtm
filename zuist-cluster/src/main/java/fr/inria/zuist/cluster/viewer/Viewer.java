@@ -115,6 +115,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
     View mView;
+    ClusteredView clusteredView;
     ViewerEventHandler eh;
 
     SceneManager sm;
@@ -167,17 +168,17 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
                 1700,
-                8,
-                4);
-		ClusteredView cv = 
+                1,
+                1);
+		clusteredView = 
             new ClusteredView(
                     clGeom,
-                    3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
+                    0, //origin (block number)
+                    1, //use complete
+                    1, //cluster surface
                     sceneCam);
-        cv.setBackgroundColor(Color.GRAY);
-        vsm.addClusteredView(cv);
+        clusteredView.setBackgroundColor(Color.GRAY);
+        vsm.addClusteredView(clusteredView);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -364,6 +365,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){
 	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+            clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
 	    }
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
 	    gp.setVisible(false);
