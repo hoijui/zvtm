@@ -469,9 +469,7 @@ public class SceneManager implements CameraListener {
         regionName2containerRegionName.clear();
         //    	printLevelInfo();
         //   	printRegionInfo();
-        //setUpdateLevel(true);
         System.gc();
-        //glyphLoader.setEnabled(true);
         if (pl != null){
             pl.setLabel("Scene file loaded successfully");
             pl.setValue(100);
