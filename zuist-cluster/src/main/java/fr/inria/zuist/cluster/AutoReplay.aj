@@ -5,6 +5,11 @@ import fr.inria.zvtm.cluster.Identifiable;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 
+/**
+ * Add methods that should be replay by the generic Delta here.
+ * See the AbstractAutoReplay aspect in ZVTM-cluster for more details.
+ * @see fr.inria.zvtm.AbstractAutoReplay
+ */
 aspect AutoReplay extends AbstractAutoReplay {
     public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
