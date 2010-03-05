@@ -434,6 +434,7 @@ public class NTNode extends LinLogNode{
 	}
 	
 	public void setGroup(String name){
+//		if(name.equals("Thing"))
 		group = name;
 	}
 	public String getGroupName(){

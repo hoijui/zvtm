@@ -645,7 +645,7 @@ public class Matrix {
 		HashMap<String, Vector<NTNode>> groups = new HashMap<String, Vector<NTNode>>();
 		for(NTNode n : nodes){
 			String name = n.getGroupName();
-			if(name == null) name = "null";
+			if(name == null) name = "Thing";
 			
 			Vector<NTNode> v = groups.get(name); 
 			if(v == null){
