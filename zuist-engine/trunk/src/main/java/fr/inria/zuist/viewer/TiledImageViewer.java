@@ -175,7 +175,6 @@ public class TiledImageViewer {
 		final JMenuItem reloadMI = new JMenuItem("Reload");
 		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem exitMI = new JMenuItem("Exit");
-		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){

@@ -194,13 +194,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		final JMenuItem reloadMI = new JMenuItem("Reload");
 		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem exitMI = new JMenuItem("Exit");
-		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		infoMI = new JMenuItem(Messages.INFO_SHOW);
-		infoMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
 		consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
-		consoleMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
 		final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
-		gcMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){

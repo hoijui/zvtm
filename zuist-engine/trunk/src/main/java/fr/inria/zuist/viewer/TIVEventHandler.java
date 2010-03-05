@@ -8,6 +8,7 @@
 package fr.inria.zuist.viewer;
 
 import java.awt.Cursor;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -251,6 +252,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
         else if (code == KeyEvent.VK_U){application.toggleUpdateTiles();}
         else if (code == KeyEvent.VK_O){application.nm.toggleOverview();}
         else if (code == KeyEvent.VK_S){application.nm.toggleScreenSaver();}
+        else if (code == KeyEvent.VK_Q && Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() == e.getModifiers()){application.exit();}
         else if (c == '?'){application.ovm.showAbout();}
     }
 
