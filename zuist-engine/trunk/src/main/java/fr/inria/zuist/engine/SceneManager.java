@@ -1052,6 +1052,7 @@ public class SceneManager implements CameraListener {
     /** Get a global view of the scene.
      *@param c camera that should show a global view
      *@param d duration of animation from current location to global view
+     *@param end action to be perfomed after camera has reached its new position (can be null)
      @return bounds in virtual space, null if none
      */
     public long[] getGlobalView(Camera c, int d, EndAction ea){
