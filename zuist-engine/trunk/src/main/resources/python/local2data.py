@@ -18,10 +18,14 @@ def translate(i,o):
             srcStartQuote = srcStart + 4
             srcEndQuote = line.find("\"", srcStartQuote+1)
             src = line[srcStartQuote+1:srcEndQuote]
-            if not (src == "lnd.png" or src == "sea.png"):
+            if src == "lnd.png":
+                src = "http://data.wild.lri.fr/tiles/lnd.png"
+            elif src == "sea.png":
+                src = "http://data.wild.lri.fr/tiles/sea.png"                
+            else:
                 src = src.split("/")
                 src = "http://data.wild.lri.fr/py/zuistServer/getTile?z=%s&amp;col=%s&amp;row=%s" % (src[0], src[1], src[2][:-4])
-                line = "%ssrc=\"%s\"%s" % (line[:srcStart],src,line[srcEndQuote+1:])
+            line = "%ssrc=\"%s\"%s" % (line[:srcStart],src,line[srcEndQuote+1:])
         fo.write(line)
     fo.flush()
     fo.close()
