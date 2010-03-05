@@ -334,7 +334,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
 
     void getGlobalView(){
-        sm.getGlobalView(mCamera, Viewer.ANIM_MOVE_LENGTH);
+        sm.getGlobalView(mCamera, Viewer.ANIM_MOVE_LENGTH, null);
     }
 
     /* Higher view */

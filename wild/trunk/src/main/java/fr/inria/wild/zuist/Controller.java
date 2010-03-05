@@ -294,7 +294,7 @@ public class Controller implements Java2DPainter {
     /* ------------------ Local Navigation ----------------- */
 
     void getGlobalView(Camera c){
-        sm.getGlobalView(c, Viewer.ANIM_MOVE_LENGTH);
+        sm.getGlobalView(c, Viewer.ANIM_MOVE_LENGTH, null);
     }
     
     void altitudeChanged(){}
