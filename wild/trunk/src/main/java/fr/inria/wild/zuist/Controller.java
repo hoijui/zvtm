@@ -539,6 +539,7 @@ public class Controller implements Java2DPainter {
         int OSCportIn = DEFAULT_OSC_LISTENING_PORT;
         boolean ogl = false;
         boolean aa = true;
+        // pixels behind bezels
         boolean pbb = true;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
@@ -587,7 +588,7 @@ public class Controller implements Java2DPainter {
         System.out.println("\t-port=N: OSC commands listening port");
         System.out.println("\t-noaa: no antialiasing");
         System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
-        System.out.println("\t-nopbb: confugre viewports so that there are no pixels behind bezels (distorts image, but shows all pixels)");
+        System.out.println("\t-nopbb: configure viewports so that there are no pixels behind bezels (distorts image, but shows all pixels)");
     }
     
 }
