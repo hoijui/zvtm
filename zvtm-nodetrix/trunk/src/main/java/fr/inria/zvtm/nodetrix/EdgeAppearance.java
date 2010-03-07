@@ -19,7 +19,6 @@ public abstract class EdgeAppearance {
 	public EdgeAppearance(NTEdge edge){
 		this.edge = edge;
 	}
-//	public abstract void createGraphics(long height, long y, long x, long index, VirtualSpace vs);
 	public abstract void createGraphics(VirtualSpace vs);
 	public abstract void createGraphics();	
 	protected abstract void clearGraphics();
@@ -33,6 +32,7 @@ public abstract class EdgeAppearance {
 //	public abstract void moveTo(long x, long y);
 	public abstract void onTop();
 	public abstract void updatePosition();
+	public abstract void updateColor();
 	
 	//INTERACTION
 	public abstract void reset();

@@ -131,5 +131,9 @@ public class NTEdge extends LinLogEdge{
     	appearance.clearGraphics();
     }
 	
+    public void setColor(Color c){
+    	this.edgeColor = c;
+    	appearance.updateColor();
+    }
 	
 }

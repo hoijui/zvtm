@@ -19,6 +19,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 		super(edge);
 	}
 
+	public void updateColor(){
+		edgePath.setColor(edge.edgeColor);
+	}
+	
 	@Override
 	protected void clearGraphics() 
 	{

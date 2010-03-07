@@ -17,15 +17,20 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		super(edge);
 	}
 
-	Glyph mainGlyph, glyphTranslucent;
+	Glyph mainGlyph, symmetricGlyph;
 //	LongPoint offset;
+	
+	public void updateColor(){
+		mainGlyph.setColor(edge.edgeColor);
+		symmetricGlyph.setColor(edge.edgeColor);
+	}
 	
 	@Override
 	protected void clearGraphics() 
 	{
 		if(vs == null) return;
 		vs.removeGlyph(mainGlyph);
-    	vs.removeGlyph(glyphTranslucent);
+    	vs.removeGlyph(symmetricGlyph);
 	}
 	
 	@Override
@@ -65,11 +70,11 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	p[1] = new LongPoint(west + index*height, north - index*height);
     	p[2] = new LongPoint(west + (index+1)*height, north - (index+1)*height);
     	p[3] = new LongPoint(west, north - (index+1)*height );
-    	glyphTranslucent = new VPolygon(p, 0, edge.edgeColor, edge.edgeColor, NodeTrixViz.INTRA_TRANSLUCENCY);
-    	glyphTranslucent.setStrokeWidth(0);
-    	glyphTranslucent.setSensitivity(false);
-    	mainGlyph.stick(glyphTranslucent);
-    	vs.addGlyph(glyphTranslucent);
+    	symmetricGlyph = new VPolygon(p, 0, edge.edgeColor, edge.edgeColor, NodeTrixViz.INTRA_TRANSLUCENCY);
+    	symmetricGlyph.setStrokeWidth(0);
+    	symmetricGlyph.setSensitivity(false);
+    	mainGlyph.stick(symmetricGlyph);
+    	vs.addGlyph(symmetricGlyph);
     	this.vs = vs;
     	onTop();
 	}
@@ -84,7 +89,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 				null);	
 		animManager.startAnimation(a, true);
     	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
-				glyphTranslucent,
+				symmetricGlyph,
 				NodeTrixViz.INTRA_TRANSLUCENCY * NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
 				false, 
 				SlowInSlowOutInterpolator2.getInstance(), 
@@ -96,7 +101,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void highlight(Color c) 
 	{
-		glyphTranslucent.setColor(c);
+		symmetricGlyph.setColor(c);
 	}
 
 	@Override
@@ -122,13 +127,13 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	{
 		if(vs == null) return;
 		vs.onTop(this.mainGlyph);
-		vs.onTop(this.glyphTranslucent);
+		vs.onTop(this.symmetricGlyph);
 	}
 
 	@Override
 	public void reset() 
 	{
-		glyphTranslucent.setColor(edge.edgeColor);
+		symmetricGlyph.setColor(edge.edgeColor);
 	}
 
 	@Override
