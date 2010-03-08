@@ -28,8 +28,6 @@ public class NTNode extends LinLogNode{
     /* Owning matrix */
     public Matrix matrix;
     Vector<NTEdge> outgoingEdges, incomingEdges;
-    private Vector <NTIntraEdgeSet> intraEdgeSets = new Vector<NTIntraEdgeSet>();
-    private Vector<NTEdge> internalRelations = new Vector<NTEdge>();
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
@@ -356,7 +354,6 @@ public class NTNode extends LinLogNode{
 		return this.widthHalf;
 	}
     public void addOutgoingEdge(NTEdge e){
-    	if(e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){internalRelations.add(e);}
     	outgoingEdges.add(e);
     }
     
@@ -365,10 +362,10 @@ public class NTNode extends LinLogNode{
     	incomingEdges.add(e);
     }
     
-    public void addIntraEdgeSet(NTIntraEdgeSet ies)
-    {
-    	this.intraEdgeSets.add(ies);
-    }
+//    public void addIntraEdgeSet(NTIntraEdgeSet ies)
+//    {
+//    	this.intraEdgeSets.add(ies);
+//    }
     
     /**
      *@return null if empty
@@ -409,23 +406,28 @@ public class NTNode extends LinLogNode{
     }
 
 
-	public Vector<NTIntraEdgeSet> getIntraEdgeSets() {
-		return this.intraEdgeSets;
-	}
+//	public Vector<NTIntraEdgeSet> getIntraEdgeSets() {
+//		return this.intraEdgeSets;
+//	}
 
 
-	public Object getInternalRelations() {
-		return internalRelations;
-	}
+//	public Vector<NTEdge> getInternalRelations() {
+//		return internalRelations;
+//	}
 
 
 	public int getDegree() {
-		return internalRelations.size();
+		int degree = 0;
+		for(NTEdge e : outgoingEdges){
+			if(e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+				degree++;
+			}
+		}
+		return degree;
 	}
 
 
 	public void removeOutgoingEdge(NTEdge ee) {
-		if(ee.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE) internalRelations.remove(ee);
 		outgoingEdges.remove(ee);	
 	}
 	public void removeIncomingEdge(NTEdge ee) {
@@ -454,20 +456,26 @@ public class NTNode extends LinLogNode{
 
 	public void repositionRelations() {
 		for(NTEdge e : this.outgoingEdges){
-			if(e.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE)
-				e.updatePosition();
+			e.updatePosition();
 		}
-		for(NTIntraEdgeSet es : this.intraEdgeSets){
-			es.updatePosition();
-		}
+//		for(NTEdge e : internalRelations){ e.updatePosition();}
+////		for(NTIntraEdgeSet es : this.intraEdgeSets){
+////			es.updatePosition();
+////		}
 		
 	}
 
-	public void cleanIntraEdgeSets() {
-		for(NTIntraEdgeSet ie : intraEdgeSets){
-			ie.cleanGraphics();
+	public void cleanInternalRelations() {
+		for(NTEdge e : outgoingEdges){
+			if(e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+			e.cleanGraphics();
+			}
 		}
-		intraEdgeSets = new Vector<NTIntraEdgeSet>();
+			
+//		for(NTIntraEdgeSet ie : intraEdgeSets){
+//			ie.cleanGraphics();
+//		}
+//		intraEdgeSets = new Vector<NTIntraEdgeSet>();
 	}
 
 

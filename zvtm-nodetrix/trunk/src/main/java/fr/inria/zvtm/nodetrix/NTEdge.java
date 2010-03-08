@@ -24,6 +24,7 @@ public class NTEdge extends LinLogEdge{
     private EdgeAppearance newAppearance;
     
     Object owner;
+    boolean symmetric = false;
     
     
     public NTEdge(NTNode startNode, NTNode endNode, Color c) {
@@ -134,6 +135,9 @@ public class NTEdge extends LinLogEdge{
     public void setColor(Color c){
     	this.edgeColor = c;
     	appearance.updateColor();
+    }
+    public void setSymmetric(boolean sym){
+    	symmetric = sym;
     }
 	
 }

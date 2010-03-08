@@ -31,7 +31,7 @@ public class Matrix {
     
     String name;
     Vector<NTNode> nodes = new Vector<NTNode>();
-    Vector<NTIntraEdgeSet> intraEdgeSets = new Vector<NTIntraEdgeSet>();
+//    Vector<NTIntraEdgeSet> intraEdgeSets = new Vector<NTIntraEdgeSet>();
 	static int CELL_SIZE = 10;
 
     //GLYPHS
@@ -210,54 +210,112 @@ public class Matrix {
     
     
     void createEdgeGraphics(VirtualSpace vs){
-        long reflexiveProp4SingleNodeMatOffset = NodeTrixViz.CELL_SIZE / 2;
-      	
-        for (NTNode n : nodes)
-        {
-        	// FINISH RELATIONS
-    		if (n.getOutgoingEdges() != null)
-            {
-    			HashMap<NTNode, NTIntraEdgeSet> intraEdgeSetMap = new HashMap<NTNode, NTIntraEdgeSet>();
-            	//Instantiate
-            	for(NTEdge edge : n.getOutgoingEdges()){
-            		 if (edge.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
-            			 NTIntraEdgeSet ies = new NTIntraEdgeSet();
-            			 intraEdgeSets.add(ies);
-            			 n.addIntraEdgeSet(ies);
-            			 intraEdgeSetMap.put(edge.head, ies);
-            		 }
-            	}
-            	
-            	for (NTEdge e : n.getOutgoingEdges()){
-                    // values that are 0 is because we do not care (not used)
-            		if (e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
-                		if (e.tail == e.head && nodes.size() == 1){
-//                            e.createGraphics(NodeTrixViz.CELL_SIZE/2, e.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
-//                                              e.getHead().ndx-bkg.getWidth()+reflexiveProp4SingleNodeMatOffset, 0, vs);
-                			e.createGraphics(vs);
+    	
+    	 long reflexiveProp4SingleNodeMatOffset = NodeTrixViz.CELL_SIZE / 2;
+       	
+         for (NTNode n : nodes)
+         {
+         	// FINISH RELATIONS
+     		if (n.getOutgoingEdges() != null)
+             {
+     			HashMap<NTNode, Vector<NTEdge>> intraEdgeSetMap = new HashMap<NTNode, Vector<NTEdge>>();
+             	//Instantiate
+             	for(NTEdge edge : n.getOutgoingEdges()){
+             		 if (edge.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+             			 Vector<NTEdge> ies = new Vector<NTEdge>();
+//             			 intraEdgeSets.add(ies);
+//             			 n.addIntraEdgeSet(ies);
+             			 intraEdgeSetMap.put(edge.head, ies);
+             		 }
+             	}
+             	
+             	for (NTEdge e : n.getOutgoingEdges()){
+                     // values that are 0 is because we do not care (not used)
+             		if (e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+                 		if (e.tail == e.head && nodes.size() == 1){
+//                             e.createGraphics(NodeTrixViz.CELL_SIZE/2, e.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
+//                                               e.getHead().ndx-bkg.getWidth()+reflexiveProp4SingleNodeMatOffset, 0, vs);
+                 			e.createGraphics(vs);
 
-                            // remember
-                            reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
-                    	}else {
-                    		// add intraedge to edgeset
-                        	intraEdgeSetMap.get(e.head).addEdge(e);
-                        }
-                    }else {
-                        // instanceof NTExtraEdge
-//                        e.createGraphics(0, 0, 0, 0, vs);
-                    	e.createGraphics(vs);
-                    }
-                }
-            	
-            	// DRAW RELATIONS
-            	for(NTNode nRel : intraEdgeSetMap.keySet())
-            	{
-//            		intraEdgeSetMap.get(nRel).createGraphics(0, n.wdy, nRel.ndx, 0 , vs, this);
-            		intraEdgeSetMap.get(nRel).createGraphics(vs, this);
-            	}
-            }
+                             // remember
+                             reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
+                     	}else {
+                     		// add intraedge to edgeset
+                         	intraEdgeSetMap.get(e.head).add(e);
+                         }
+                     }else {
+                         // instanceof NTExtraEdge
+//                         e.createGraphics(0, 0, 0, 0, vs);
+                     	e.createGraphics(vs);
+                     }
+                 }
+             	
+             	// DRAW RELATIONS
+             	for(NTNode nRel : intraEdgeSetMap.keySet())
+             	{
+             		Vector<NTEdge> v = intraEdgeSetMap.get(nRel);
+             		int size = v.size();
+             		int i = 0;
+             		for(NTEdge e : v){
+             			e.setEdgeSetPosition(i++, size);
+             			e.createGraphics(vs);
+             		}
+             	}
+             }
+     		
+     		//draw Edge Sets
 
-         }
+          }
+//        long reflexiveProp4SingleNodeMatOffset = NodeTrixViz.CELL_SIZE / 2;
+//      	
+//        for (NTNode n : nodes)
+//        {
+//        	// FINISH RELATIONS
+//    		if (n.getOutgoingEdges() != null)
+//            {
+//    			HashMap<NTNode, NTIntraEdgeSet> intraEdgeSetMap = new HashMap<NTNode, NTIntraEdgeSet>();
+//            	//Instantiate
+//            	for(NTEdge edge : n.getOutgoingEdges()){
+//            		 if (edge.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+//            			 NTIntraEdgeSet ies = new NTIntraEdgeSet();
+//            			 intraEdgeSets.add(ies);
+//            			 n.addIntraEdgeSet(ies);
+//            			 intraEdgeSetMap.put(edge.head, ies);
+//            		 }
+//            	}
+//            	
+//            	for (NTEdge e : n.getOutgoingEdges()){
+//                    // values that are 0 is because we do not care (not used)
+//            		if (e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+//                		if (e.tail == e.head && nodes.size() == 1){
+////                            e.createGraphics(NodeTrixViz.CELL_SIZE/2, e.getTail().wdy-bkg.getHeight()-NodeTrixViz.CELL_SIZE/2,
+////                                              e.getHead().ndx-bkg.getWidth()+reflexiveProp4SingleNodeMatOffset, 0, vs);
+//                			e.createGraphics(vs);
+//
+//                            // remember
+//                            reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
+//                    	}else {
+//                    		// add intraedge to edgeset
+//                        	intraEdgeSetMap.get(e.head).addEdge(e);
+//                        }
+//                    }else {
+//                        // instanceof NTExtraEdge
+////                        e.createGraphics(0, 0, 0, 0, vs);
+//                    	e.createGraphics(vs);
+//                    }
+//                }
+//            	
+//            	// DRAW RELATIONS
+//            	for(NTNode nRel : intraEdgeSetMap.keySet())
+//            	{
+//////            		intraEdgeSetMap.get(nRel).createGraphics(0, n.wdy, nRel.ndx, 0 , vs, this);
+//            		intraEdgeSetMap.get(nRel).createGraphics(vs, this);
+//            	}
+//            }
+//    		
+//    		//draw Edge Sets
+//
+//         }
     }
     
 
@@ -407,13 +465,12 @@ public class Matrix {
     	for(Glyph g : gridBarsH){ vs.onTop(g); }
     	for(Glyph g : gridBarsV){ vs.onTop(g); }
     	for(Glyph g : gridReflexiveSquares){ vs.onTop(g); }
-    
-    	for(NTIntraEdgeSet e : intraEdgeSets){
-    		e.onTop(vs); //virtual space is not known in NTEdge
-    	}
+    	
     	for(NTNode n : this.nodes){
-    		n.onTop(); //Vitrtual space is already known in NTNode
+    		n.onTop(); //Virtual space is already known in NTNode
+    		for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
     	}
+    	
     	vs.onTop(gOverview);
     }
    
@@ -513,37 +570,44 @@ public class Matrix {
     			node.matrixMoved(x, y);
     		}
         	
-        	if (node.getIntraEdgeSets() != null){
-                for (NTIntraEdgeSet edge : node.getIntraEdgeSets()){
-                    edge.move(x, y);
+    		if (node.getOutgoingEdges() != null){
+                for (NTEdge edge : node.getOutgoingEdges()){
+//                    edge.move(x, y);
+                	edge.updatePosition();
                 }
             }
+//        	if (node.getIntraEdgeSets() != null){
+//                for (NTIntraEdgeSet edge : node.getIntraEdgeSets()){
+//                    edge.move(x, y);
+//                }
+//            }
             
         	if (node.getIncomingEdges() != null){
                 for (NTEdge edge : node.getIncomingEdges()){
-                    if (edge.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE){
+//                    if (edge.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE){
                         // do it only for extra edges because for intra edges
                         // we have already moved them in the above loop
                         // (intra edges connect nodes within the same matrix)
 //                    	System.out.println("[MATRIX] move incomming edge HEAD " + edge.head.getMatrix().name);
 //                    	System.out.println("[MATRIX] move incomming edge HEAD " + edge.tail.getMatrix().name);
-                    	edge.move(x,y);
+//                    	edge.move(x,y);
+                    	edge.updatePosition();
                     }
                 }
             }
             
-        	if (node.getOutgoingEdges() != null){
-                for (NTEdge edge : node.getOutgoingEdges()){
-                    if (edge.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE){
-                    	// do it only for extra edges because for intra edges
-                        // we have already moved them in the above loop
-                        // (intra edges connect nodes within the same matrix)
-//                    	System.out.println("[MATRIX] move outgoing edge");
-                        edge.move(x,y);
-                    }
-                }
-            }
-        }
+//        	if (node.getOutgoingEdges() != null){
+//                for (NTEdge edge : node.getOutgoingEdges()){
+//                    if (edge.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE){
+//                    	// do it only for extra edges because for intra edges
+//                        // we have already moved them in the above loop
+//                        // (intra edges connect nodes within the same matrix)
+////                    	System.out.println("[MATRIX] move outgoing edge");
+//                        edge.move(x,y);
+//                    }
+//                }
+//            }
+//        }
     }
     
 
@@ -754,7 +818,7 @@ public class Matrix {
 	public void performEdgeAppearanceChange()
 	{
 		for(NTNode nn : nodes){
-			nn.cleanIntraEdgeSets();
+			nn.cleanInternalRelations();
 			for(NTEdge e : nn.getOutgoingEdges()){
 				e.performAppearanceStateChange(); 
 			}
@@ -784,10 +848,10 @@ public class Matrix {
 	public static void setCellSize(int cs){
 		CELL_SIZE = cs;
 	}
-	public Vector<NTIntraEdgeSet>getNTIntraEdgeSets()
-	{
-		return this.intraEdgeSets;
-	}
+//	public Vector<NTIntraEdgeSet>getNTIntraEdgeSets()
+//	{
+//		return this.intraEdgeSets;
+//	}
 	
 	public boolean isExploringMode(){return exploringModeGlobal;}
 	
