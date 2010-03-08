@@ -83,13 +83,19 @@ public class SlaveApp {
 				options.openGl? View.OPENGL_VIEW : View.STD_VIEW,
 				cv.getClusterGeometry().getBlockWidth(), 
 				cv.getClusterGeometry().getBlockHeight(), 
-                false, false, true, null);
+                false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setEventHandler(new SlaveEventHandler());
 
         //move cameras to their 'proper' location
         for(Camera cam: clusteredView.getCameras()){
             setCameraLocation(cam.getLocation(), cam);
+        }
+
+        if(!options.fullscreen){
+            ((JFrame)view.getFrame()).setLocation(
+            options.xOffset,
+            options.yOffset);
         }
 
 		// inputs: block width, block height, fullscreen
@@ -220,5 +226,14 @@ class SlaveOptions {
 
 	@Option(name = "-h", aliases = {"--help"}, usage = "print this help message and exit")
 		boolean help = false;
+
+    @Option(name = "-u", aliases = {"--undecorated"}, usage = "remove window decorations (borders)")
+        boolean undecorated = false;
+
+    @Option(name = "-x", aliases = {"--x-offset"}, usage = "window x offset (ignored if fullscreen set)")
+        int xOffset = 0;
+
+    @Option(name = "-y", aliases = {"--y-offset"}, usage = "window y offset (ignored if fullscreen set)")
+        int yOffset = 0;
 }
 
