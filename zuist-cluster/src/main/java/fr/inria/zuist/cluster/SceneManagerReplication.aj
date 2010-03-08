@@ -15,6 +15,7 @@ import fr.inria.zvtm.cluster.ObjId;
 import fr.inria.zvtm.cluster.SlaveUpdater;
 import fr.inria.zuist.engine.ImageDescription;
 import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.engine.TextDescription;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
@@ -319,6 +320,90 @@ aspect SceneManagerReplication {
                    id, zindex, region,
                    imageURL, sensitivity,
                    stroke, params);
+           su.putSlaveObject(descId, desc);
+       }
+    }
+
+    pointcut createTextDescription(SceneManager sceneManager, 
+            long x, long y, String id, int zindex, Region region, float scale, 
+            String text, short anchor, Color fill, String family, 
+            int style, int size, boolean sensitivity) :
+        execution(public TextDescription SceneManager.createTextDescription(
+                    long, long, String, int, Region, float, String,
+                    short, Color, String, int, int, boolean)) &&
+        this(sceneManager) && 
+        args(x, y, id, zindex, region, scale, 
+            text, anchor, fill, family, 
+            style, size, sensitivity);
+
+    after(SceneManager sceneManager, 
+            long x, long y, String id, int zindex, Region region, float scale, 
+            String text, short anchor, Color fill, String family, 
+            int style, int size, boolean sensitivity) 
+        returning(ObjectDescription textDesc) :
+            createTextDescription(sceneManager, x, y, id, 
+                    zindex, region, scale, 
+                    text, anchor, fill, family, 
+                    style, size, sensitivity) &&
+            if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+            !cflowbelow(createTextDescription(SceneManager, long, long, 
+                        String, int, Region, float, String,
+                        short, Color, String, int, int, boolean)) {
+                Delta delta = new TextCreateDelta(sceneManager.getObjId(),
+                        textDesc.getObjId(),
+                        x, y, id, zindex, region.getObjId(), scale, 
+                        text, anchor, fill, family, 
+                        style, size, sensitivity );
+                VirtualSpaceManager.INSTANCE.sendDelta(delta);
+            }
+
+    private static class TextCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<ObjectDescription> descId;
+        private final long x; 
+        private final long y;
+        private final String id;
+        private final int zindex;
+        private final ObjId<Region> regionId;
+        private final float scale;
+        private final String text;
+        private final short anchor;
+        private final Color fill;
+        private final String family;
+        private final int style;
+        private final int size;
+        private final boolean sensitivity;
+
+        TextCreateDelta(ObjId<SceneManager> smId, 
+                ObjId<ObjectDescription> descId,
+                long x, long y, String id, int zindex, ObjId<Region> regionId, 
+                float scale, String text, short anchor, 
+                Color fill, String family, 
+                int style, int size, boolean sensitivity){
+            this.smId = smId;
+            this.descId = descId;
+            this.x = x;
+            this.y = y;
+            this.id = id;
+            this.zindex = zindex;
+            this.regionId = regionId;
+            this.scale = scale;
+            this.text = text;
+            this.anchor = anchor;
+            this.fill = fill;
+            this.family = family;
+            this.style = style;
+            this.size = size;
+            this.sensitivity = sensitivity;
+        }
+
+       public void apply(SlaveUpdater su){
+           SceneManager sm = su.getSlaveObject(smId);
+           Region region = su.getSlaveObject(regionId);
+           TextDescription desc = sm.createTextDescription(
+                   x, y, id, zindex, region, scale, 
+                   text, anchor, fill, family, 
+                   style, size, sensitivity);
            su.putSlaveObject(descId, desc);
        }
     }
