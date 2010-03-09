@@ -22,7 +22,7 @@ import fr.inria.zuist.engine.SceneManager;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
-    //*createImageDescription, createTextDescription, createClosedShapeDescription
+    //*createImageDescription, *createTextDescription, createClosedShapeDescription
 
     
     pointcut sceneManagerCreation(SceneManager sceneManager, 
