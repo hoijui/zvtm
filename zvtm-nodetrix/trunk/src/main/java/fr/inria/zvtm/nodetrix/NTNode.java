@@ -50,6 +50,8 @@ public class NTNode extends LinLogNode{
 	
 	/**Stores the half width, since double width is never used */
 	private long widthHalf = 0;
+
+	private long heightHalf = 0;
 	
 	/* interaction*/
 	AnimationManager animManager; 
@@ -333,6 +335,9 @@ public class NTNode extends LinLogNode{
      */
 	public void setBackgroundBox(long maxLength) {
 		if(widthHalf == 0) this.widthHalf = maxLength/2;
+		if (heightHalf == 0){
+		    this.heightHalf = gBackgroundW.getHeight();
+		}
 		wdx -= widthHalf;
 		ndy += widthHalf;
 		this.gBackgroundW.setWidth(widthHalf);
@@ -357,6 +362,11 @@ public class NTNode extends LinLogNode{
 	{
 		return this.widthHalf;
 	}
+
+	public long getHeight(){
+		return this.heightHalf;
+	}
+
     public void addOutgoingEdge(NTEdge e){
     	outgoingEdges.add(e);
     }

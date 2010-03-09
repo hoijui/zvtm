@@ -58,6 +58,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         double angle = Math.atan2(edge.tail.getMatrix().bkg.vy-edge.head.getMatrix().bkg.vy, edge.tail.getMatrix().bkg.vx-edge.head.getMatrix().bkg.vx) + Math.PI;       
            
         if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
+            // eastward
             x1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : edge.tail.getWidth();
             y1 = edge.tail.wdy;
             x2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2-2*edge.head.getMatrix().nodes.firstElement().getBoxWidth(true) : -edge.head.getWidth();
@@ -70,10 +71,11 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
                                 hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
         }
         else if (angle > 5*Math.PI/4.0){
+            // southward
             x1 = edge.tail.ndx;
-            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getWidth();
+            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getHeight();
             x2 = edge.head.ndx;
-            y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.head.getWidth();
+            y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.head.getHeight();
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.edgeColor);
@@ -82,6 +84,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET, true);
         }
         else if (angle > 3*Math.PI/4.0){
+            // westward
             x1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2-2*edge.tail.getMatrix().nodes.firstElement().getBoxWidth(true) : -edge.tail.getWidth();
             y1 = edge.tail.wdy;
             x2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : edge.head.getWidth();
@@ -95,10 +98,11 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         }
         else {
             // angle >= Math.PI/4.0
+            // northward
             x1 = edge.tail.ndx;
-            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.tail.getWidth();
+            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.tail.getHeight();
             x2 = edge.head.ndx;
-            y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getWidth();
+            y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight();
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.edgeColor);
@@ -135,7 +139,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         LongPoint hmp = edge.getHead().getMatrix().getPosition();
         LongPoint[] npos = new LongPoint[4];        
         double angle = Math.atan2(edge.tail.getMatrix().bkg.vy-edge.head.getMatrix().bkg.vy, edge.tail.getMatrix().bkg.vx-edge.head.getMatrix().bkg.vx) + Math.PI;        
-        if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){	
+        if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
+            // eastward
             offsets[0].
             setLocation((edge.tail.
             		getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : edge.tail.getWidth(),
@@ -149,18 +154,20 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else if (angle > 5*Math.PI/4.0){
+            // southward
             offsets[0].
             setLocation(edge.tail.ndx,
-                                   (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getWidth());
+                                   (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getHeight());
             offsets[1].
             setLocation(edge.head.ndx,
-                                   (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.head.getWidth());
+                                   (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.head.getHeight());
             npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET);
             npos[2] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET);
             npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else if (angle > 3*Math.PI/4.0){
+            // westward
             offsets[0].
             setLocation((edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2-2*edge.tail.getMatrix().nodes.firstElement().getBoxWidth(true) : -edge.tail.getWidth(),
                                    edge.tail.wdy);
@@ -174,12 +181,13 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         }
         else {
             // angle >= Math.PI/4.0
+            // northward
             offsets[0].
             setLocation(edge.tail.ndx,
-                                   (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.tail.getWidth());
+                                   (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getBoxWidth(true) : edge.tail.getHeight());
             offsets[1].
             setLocation(edge.head.ndx,
-                                   (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getWidth());
+                                   (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight());
             npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET);
             npos[2] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET);
