@@ -249,7 +249,7 @@ public class NodeTrixViz {
 		new MinimizerBarnesHut(llnodes, lledges, -1.0, 2.0, 0.05).minimizeEnergy(nodeToPosition, LINLOG_ITERATIONS);
 		// following might actually be useless, not sure yet...
 		//Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
-		// EOU
+		// EOU		
         for (Node node : nodeToPosition.keySet()) {
 			double[] position = nodeToPosition.get(node);
 			node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
@@ -261,6 +261,10 @@ public class NodeTrixViz {
 	 *  before instantiating the remaining graphical elements
 	 */
     public void finishCreateViz(VirtualSpace vs){
+        for(Matrix m : matrices){
+			m.adjustEdgeAppearance();
+			m.performEdgeAppearanceChange();
+		}
         for (Matrix m:matrices){
             m.finishCreateNodeGraphics(vs);
         }
