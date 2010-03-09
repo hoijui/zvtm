@@ -108,7 +108,7 @@ public class NodeTrixViz {
 	 * It returns a HashMap mapping each NTNode to an integer depicting its cluster.
 	 * Use this method as an alternative to <code>addMatrix(String name, Vector<NTNode> nodes)</code>
 	 **/
-	public void createMatrixesByClustering(Collection<NTNode> nodes, List<LinLogEdge> edges)
+	public void createMatricesByClustering(Collection<NTNode> nodes, List<LinLogEdge> edges)
 	{ 
 		LinLogOptimizerModularity llalgo = new LinLogOptimizerModularity();
 		ArrayList<LinLogNode> llNodes = new ArrayList<LinLogNode>();
