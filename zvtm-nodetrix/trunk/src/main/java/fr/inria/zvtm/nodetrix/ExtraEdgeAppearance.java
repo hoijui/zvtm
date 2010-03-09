@@ -108,7 +108,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         }
         vs.addGlyph(edgePath);
 //        edgePath.setColor(edgeColor);
-        edgePath.setStrokeWidth(3);
+        edgePath.setStrokeWidth(2);
         edgePath.setOwner(edge);
         assignAlpha();
         this.vs = vs;

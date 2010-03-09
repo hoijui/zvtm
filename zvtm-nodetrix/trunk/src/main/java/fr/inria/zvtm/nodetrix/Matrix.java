@@ -81,7 +81,7 @@ public class Matrix {
                                  nodes.size()*NodeTrixViz.CELL_SIZE/2, nodes.size()*NodeTrixViz.CELL_SIZE/2,
                                  NodeTrixViz.MATRIX_FILL_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
             vs.addGlyph(bkg);
-            bkg.setOwner(this);
+            
             // matrix label
     	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1*nodes.size()));
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()+.5+Math.sqrt(2*nodes.size())));
@@ -89,7 +89,6 @@ public class Matrix {
     	    vs.addGlyph(matrixLabel);
     	    matrixLabel.setOwner(this);
     	    bkg.stick(matrixLabel);
-    	    
     	    // node labels
     	    Color c;
         	float b;
@@ -116,7 +115,7 @@ public class Matrix {
     	    nodes.firstElement().moveTo(x, y);
     	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, Color.white,  Color.white, 0f);
 	    }
-    	
+    	bkg.setOwner(this);
     	//Creating and disabling the overview glyph
     	gOverview = new VRectangle(0,0,0, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, Color.white );
     	vs.addGlyph(gOverview);

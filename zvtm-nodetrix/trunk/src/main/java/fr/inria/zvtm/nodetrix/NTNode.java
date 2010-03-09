@@ -91,8 +91,10 @@ public class NTNode extends LinLogNode{
 	    this.single = single;
 	    
 	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
+	    	labelW.setSensitivity(false);
 	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
 	    	gBackgroundW.setDrawBorder(false);
+	    	gBackgroundW.setSensitivity(false);
 	    	gBackgroundW.stick(this.labelW);
 	    	vs.addGlyph(gBackgroundW);
 	    	vs.addGlyph(labelW);
@@ -105,8 +107,10 @@ public class NTNode extends LinLogNode{
 	    
 		    if (!single){
 	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+    	    	labelN.setSensitivity(false);
 	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
 	    	    gBackgroundN.setDrawBorder(false);
+	    	    gBackgroundN.setSensitivity(false);
 	    	    gBackgroundN.stick(this.labelN);
 	    		vs.addGlyph(gBackgroundN);
 	    		vs.addGlyph(labelN);
@@ -403,6 +407,10 @@ public class NTNode extends LinLogNode{
     
     long getLabelWidth(){
     	return (labelW == null) ? 0 : labelW.getBounds(0).x;
+    }
+    
+    public boolean isParentMatrixSingle(){
+        return this.single;
     }
 
 
