@@ -50,7 +50,7 @@ TRACE_LEVEL = 1
 
 INTERPOLATION = "bilinear"
 
-FRAG_DEPTH = 1
+FRAG_DEPTH = 6
 
 BBOX = (-180.0,-90.0, 180.0,90.0)
 
@@ -261,10 +261,12 @@ class RenderThread:
                         ci = "containedIn=\"R%s\"" % parentID
                     self.xmlLock.acquire()
                     self.zf.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
+                    #self.zf.write("    <text id=\"TTX%s\" x=\"%d\" y=\"%d\" z-index=\"10\" scale=\"%d\">%s</text>\n" % (ID, vx, vy, 2**(18-z+1), ID))
                     self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
                     self.zf.write("  </region>\n")
                     if z == MAX_ZOOM:
-                        self.zf.write("  <region id=\"RF%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, z+1, vx, vy, w, h))
+                        levels = "%s;%s" % (z+1, z+FRAG_DEPTH)
+                        self.zf.write("  <region id=\"RF%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
                         frag_src = "%ssf%s.xml" % (src[:src.rfind("/")+1], src[src.rfind("/")+1:src.rfind(".")])
                         generateSceneFragment("%s%s" % (tile_dir, frag_src), x, y, MAX_ZOOM+1)
                         self.zf.write("    <resource type=\"scn\" id=\"F%s\" src=\"%s\" x=\"%d\" y=\"%d\" />\n" % (ID, frag_src, vx, vy))
@@ -301,24 +303,26 @@ def generateSceneFragment(src, xl, yl, zl):
     ll0 = (BBOX[0], BBOX[3])
     ll1 = (BBOX[2], BBOX[1])
     generateLevels(ff)
+    z0 = 1
     for z in range(zl, zl + FRAG_DEPTH):
         px0 = gprj.fromLLtoPixel(ll0, z)
         px1 = gprj.fromLLtoPixel(ll1, z)
         zoom = "%s" % z
         # check if we have directories in place
-        for x in range(xl*2, xl*2+2):
+        for x in range(xl*(2**z0), (xl+1)*(2**z0)):
             # Validate x co-ordinate
             if (x < 0) or (x >= 2**z):
                 continue
             # check if we have directories in place
             str_x = "%s" % x
-            for y in range(yl*2, yl*2+2):
+            for y in range(yl*(2**z0), (yl+1)*(2**z0)):
                 # Validate x co-ordinate
                 if (y < 0) or (y >= 2**z):
                     continue
                 str_y = "%s" % y
                 tile_uri = "http://192.168.0.5/py/zuistServer/getTile?z=%s&amp;col=%s&amp;row=%s" % (zoom, str_x, str_y)
                 generateTileInFragment(tile_uri, z, x, y, ff)
+        z0 += 1
     ff.write("</scene>\n")
     ff.flush()
     ff.close()
@@ -337,7 +341,9 @@ def generateTileInFragment(src, z, x, y, ff):
     zi = 1
     levels = z
     ci = "containedIn=\"R%s\"" % parentID
+    #ci = ""
     ff.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
+    #ff.write("    <text id=\"TX%s\" x=\"%d\" y=\"%d\" z-index=\"%d\" scale=\"%d\">%s</text>\n" % (ID, vx, vy, zi+1, 2**(18-z+1), ID))
     ff.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
     ff.write("  </region>\n")
     
