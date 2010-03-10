@@ -76,8 +76,8 @@ class OverlayManager implements ViewEventHandler {
 	}
 	
 	void toggleConsole(){
-		console.setVisible(!console.isVisible());
-		if (console.isVisible()){
+		consoleSP.setVisible(!consoleSP.isVisible());
+		if (consoleSP.isVisible()){
 		    application.consoleMI.setText(Messages.CONSOLE_HIDE);
 		}
 		else {
