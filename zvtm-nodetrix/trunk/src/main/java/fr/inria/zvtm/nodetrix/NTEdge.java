@@ -17,14 +17,14 @@ public class NTEdge extends LinLogEdge{
 
 
 	NTNode tail, head;
-    Color edgeColor;
+    private Color edgeColor;
     int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
     int newInteractionState = NodeTrixViz.IA_STATE_HIGHLIGHTED;
     private EdgeAppearance appearance;	//responsible for graphical rendering.
     private EdgeAppearance newAppearance;
-    
     Object owner;
-    boolean symmetric = false;
+    private NTEdge inverse;
+    private boolean symmetric = false;
     
     
     public NTEdge(NTNode startNode, NTNode endNode, Color c) {
@@ -139,5 +139,15 @@ public class NTEdge extends LinLogEdge{
     public void setSymmetric(boolean sym){
     	symmetric = sym;
     }
+    public boolean isSymmetric(){
+    	return symmetric;
+    }
 	
+	public void setinverse(NTEdge e){
+		inverse = e;
+	}
+	public boolean hasInverse(){ return inverse != null; }
+	public NTEdge getInverse(){ return inverse; }
+	
+	public Color getColor(){ return edgeColor; }
 }

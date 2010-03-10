@@ -26,15 +26,19 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	private VPolygon gMain, gSymmetry;
 	private DPath gLeftFrameFragment, gRightFrameFragment;
 	private DPath gLowerFrameFragment, gUpperFrameFragment;
-	private VRectangle gSensitive;
+	private VRectangle gSensitive, gHighlight;
 	
 	public IntraEdgeAppearance(NTEdge edge) {
 		super(edge);
 	}
 	
 	public void updateColor(){
-		gMain.setColor(edge.edgeColor);
-		if(gSymmetry != null)gSymmetry.setColor(edge.edgeColor);
+		gMain.setColor(edge.getColor());
+		gLeftFrameFragment.setColor(edge.getColor());
+		gRightFrameFragment.setColor(edge.getColor());
+		if(gUpperFrameFragment != null)gUpperFrameFragment.setColor(edge.getColor());
+		if(gUpperFrameFragment != null)gUpperFrameFragment.setColor(edge.getColor());
+		if(gSymmetry != null)gSymmetry.setColor(edge.getColor());
 	}
 	
 	@Override
@@ -70,27 +74,37 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		long north =  mp.y + edge.tail.wdy + NodeTrixViz.CELL_SIZE_HALF;
 		long east = mp.x + edge.head.ndx + NodeTrixViz.CELL_SIZE_HALF -1;
 		
-		//non translucent glyph part
+		//SENSITIE RECTANGLE
+    	gHighlight = new VRectangle(mp.x + edge.head.ndx, (long)((north-2) - (index+.5)*height),0 ,NodeTrixViz.CELL_SIZE_HALF, (long) height/2, NodeTrixViz.EXTRA_EDGE_HIGHLIGHT_COLOR);
+    	gHighlight.setDrawBorder(false);
+    	gHighlight.setVisible(false);
+    	gHighlight.setOwner(edge);
+    	vs.addGlyph(gHighlight);
+		
+		
+		//MAIN GLYPH
     	LongPoint[] p = new LongPoint[4];
     	p[0] = new LongPoint(east, (north-2) - index*height);
     	p[1] = new LongPoint(east, (north-2) - (index+1)*height);
     	p[2] = new LongPoint((west-1) + (index+1)*height, (north-2) - (index+1)*height );
     	p[3] = new LongPoint(west + index*height, (north-2) - index*height);
-    	gMain = new VPolygon(p, 0, edge.edgeColor, edge.edgeColor);
+    	gMain = new VPolygon(p, 0, edge.getColor(), edge.getColor());
     	gMain.setDrawBorder(false);
     	gMain.setSensitivity(false);
+    	gMain.stick(gHighlight);
     	vs.addGlyph(gMain);
     	
     	//SYMMETRIC GLYPH
-    	System.out.println("[INTAR_EDGE_APP] symmetric " + edge.symmetric);
-    	if(edge.symmetric)
+    	if(edge.isSymmetric() || edge.hasInverse())
     	{
     		p = new LongPoint[4];
     		p[0] = new LongPoint(west, (north-2) - index*height );
     		p[1] = new LongPoint(west + index*height, (north-2) - index*height );
     		p[2] = new LongPoint((west-1) + (index+1)*height, (north-2) - (index+1)*height );
     		p[3] = new LongPoint(west, (north-2) - (index+1)*height);
-    		gSymmetry = new VPolygon(p, 0, edge.edgeColor, edge.edgeColor);
+    		
+    		Color co = edge.isSymmetric() ? edge.getColor() : edge.getInverse().getColor();
+    		gSymmetry = new VPolygon(p, 0, co, co);
     		gSymmetry.setDrawBorder(false);
     		gSymmetry.setSensitivity(false);
     		gMain.stick(gSymmetry);
@@ -98,17 +112,17 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	}
     	
     	//FRAMEGLYPHS
-    	gLeftFrameFragment = new DPath(west-2, (long) (north - index*height)-2, 0, edge.edgeColor);
+    	gLeftFrameFragment = new DPath(west-2, (long) (north - index*height)-2, 0, edge.getColor());
     	gLeftFrameFragment.addSegment(west-2, (long) (north - (index+1)*height)-2, true);
     	gMain.stick(gLeftFrameFragment);
     	vs.addGlyph(gLeftFrameFragment);
-    	gRightFrameFragment = new DPath(east+1, (long) (north - index*height)-2, 0, edge.edgeColor);
+    	gRightFrameFragment = new DPath(east+1, (long) (north - index*height)-2, 0, edge.getColor());
     	gRightFrameFragment.addSegment(east+1, (long) (north - (index+1)*height)-2, true);
     	gMain.stick(gRightFrameFragment);
     	vs.addGlyph(gRightFrameFragment);
 
     	if(index == 0){
-    		gUpperFrameFragment = new DPath(west-2, north-2, 0, edge.edgeColor);
+    		gUpperFrameFragment = new DPath(west-2, north-2, 0, edge.getColor());
         	gUpperFrameFragment.addSegment(west-2, north, true);
         	gUpperFrameFragment.addSegment(east+1, north, true);
         	gUpperFrameFragment.addSegment(east+1, north-2, true);
@@ -116,7 +130,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
         	vs.addGlyph(gUpperFrameFragment);
     	}
     	if(index == amount-1){
-    		gLowerFrameFragment = new DPath(west-2, (long) ((north) - (index+1)*height), 0, edge.edgeColor);
+    		gLowerFrameFragment = new DPath(west-2, (long) ((north) - (index+1)*height), 0, edge.getColor());
         	gLowerFrameFragment.addSegment(west-2, (long) ((north-3) - (index+1)*height), true);
         	gLowerFrameFragment.addSegment(east+1, (long) ((north-3) - (index+1)*height), true);
         	gLowerFrameFragment.addSegment(east+1, (long) ((north) - (index+1)*height), true);
@@ -127,7 +141,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	//SENSITIE RECTANGLE
     	gSensitive = new VRectangle(mp.x + edge.head.ndx, (long)((north-2) - (index+.5)*height),0 ,NodeTrixViz.CELL_SIZE_HALF, (long) height/2 - 1, Color.black);
     	gSensitive.setTranslucencyValue(.2f);
-    	gSensitive.setVisible(true);
+    	gSensitive.setVisible(false);
     	gSensitive.setOwner(edge);
     	gMain.stick(gSensitive);
     	vs.addGlyph(gSensitive);
@@ -179,6 +193,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	public void onTop() 
 	{
 		if(vs == null) return;
+		vs.onTop(gHighlight);
 		vs.onTop(this.gMain);
 		if(gSymmetry != null) vs.onTop(this.gSymmetry);
 		vs.onTop(this.gLeftFrameFragment);
@@ -196,17 +211,21 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	{
 //		gLeftFrameFragment.setColor(c);
 //		gRightFrameFragment.setColor(c);
+//		gMain.setColor(c);
 //     	if(gUpperFrameFragment != null) gUpperFrameFragment.setColor(c);
 //     	if(gLowerFrameFragment != null) gLowerFrameFragment.setColor(c);
+		gHighlight.setVisible(true);
 	}
+	
 	@Override
 	public void reset() 
 	{
 //		gLeftFrameFragment.setColor(edge.edgeColor);
 //		gRightFrameFragment.setColor(edge.edgeColor);
+//		gMain.setColor(edge.edgeColor);
 //     	if(gUpperFrameFragment != null) gUpperFrameFragment.setColor(edge.edgeColor);
 //     	if(gLowerFrameFragment != null) gLowerFrameFragment.setColor(edge.edgeColor);
-
+		gHighlight.setVisible(false);
 	}
 
 	@Override
