@@ -82,7 +82,8 @@ public class SceneFragmentDescription extends ResourceDescription {
                             regions.add(sm.processRegion(e, regionName2containerRegionName, sceneFileDirectory));
                         }
                     }
-                }            
+                }
+                sm.updateVisibleRegions();
             }
             catch (URISyntaxException ex){System.err.println();ex.printStackTrace();}            
         }
