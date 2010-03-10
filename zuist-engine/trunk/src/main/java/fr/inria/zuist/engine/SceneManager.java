@@ -1006,6 +1006,13 @@ public class SceneManager implements CameraListener {
         }
     }
 
+    /** Update visible regions for all cameras. */
+    public void updateVisibleRegions(){
+        for (Camera cam:sceneCameras){
+            updateVisibleRegions(getLayerIndex(cam), cam.getOwningView().getVisibleRegion(cam));
+        }
+    }
+    
     public void setFadeInDuration(int d){
 	glyphLoader.FADE_IN_DURATION = d;
     }
