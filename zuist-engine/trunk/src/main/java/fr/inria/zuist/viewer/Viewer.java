@@ -580,7 +580,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         g2d.drawRect(viewWidth-REQ_QUEUE_BAR_WIDTH-10, 7, REQ_QUEUE_BAR_WIDTH, REQ_QUEUE_BAR_HEIGHT);
     }
     
-    void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){        
+    String ccStr = "0, 0";
+    
+    void setCursorCoords(long x, long y){
+        ccStr = String.valueOf(x) + Messages.COORD_SEP + String.valueOf(y);
+    }
+    
+    void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){
         g2d.setColor(Color.DARK_GRAY);
         g2d.fillRect(240,
             3,
@@ -594,7 +600,21 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         g2d.drawString(levelStr, 250, 14);
         g2d.drawString(mCameraAltStr, 310, 14);
     }
-
+    
+    void showCursorCoords(Graphics2D g2d, int viewWidth, int viewHeight){
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.fillRect(550,
+            3,
+            300,
+            13);
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect(550,
+            3,
+            300,
+            13);
+        g2d.drawString(ccStr, 560, 14);
+    }
+    
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!SHOW_MISC_INFO){return;}
         g2d.setFont(ConfigManager.DEBUG_FONT);
@@ -602,6 +622,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		showMemoryUsage(g2d, viewWidth, viewHeight);
 		showReqQueueStatus(g2d, viewWidth, viewHeight);
 		showAltitude(g2d, viewWidth, viewHeight);
+		showCursorCoords(g2d, viewWidth, viewHeight);
 		g2d.setComposite(Translucent.acO);
     }
 

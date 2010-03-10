@@ -29,6 +29,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -128,7 +129,10 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
         
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        application.setCursorCoords(v.getVCursor().vx, v.getVCursor().vy);
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (dragging){

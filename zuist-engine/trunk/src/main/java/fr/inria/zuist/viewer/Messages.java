@@ -27,6 +27,8 @@ class Messages {
     
     static final String ALTITUDE = "Altitude: ";
     static final String LEVEL = "Level: ";
+    
+    static final String COORD_SEP = ", ";
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
     static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(10, 0), new LongPoint(0, 0),
