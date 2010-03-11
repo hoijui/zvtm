@@ -38,16 +38,14 @@ import fr.inria.zuist.engine.TextDescription;
 
 class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
 
-    static final float MAIN_SPEED_FACTOR = 50.0f;
-
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
     
+    static float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    static double PAN_SPEED_COEF = 50.0;
+    
     static float WHEEL_MM_STEP = 1.0f;
     
-	// update scene when panned from overview every 0.5s
-	static final int DELAYED_UPDATE_FREQUENCY = 500;
-
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
     int currentJPX, currentJPY;
@@ -60,7 +58,12 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     TIVNavigationManager nm;
     
     boolean cursorNearBorder = false;
-    boolean panning = false;
+    
+    boolean zero_order_dragging = false;
+    boolean first_order_dragging = false;
+	static final short ZERO_ORDER = 0;
+	static final short FIRST_ORDER = 1;
+	short navMode = ZERO_ORDER;
     
 	// region selection
 	boolean selectingRegion = false;
@@ -95,13 +98,27 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
             v.setDrawRect(true);
         }
         else {
-            panning = true;
+            if (navMode == FIRST_ORDER){
+                first_order_dragging = true;
+                v.setDrawDrag(true);
+            }
+            else {
+                // ZERO_ORDER
+                zero_order_dragging = true;
+            }
         }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		regionStickedToMouse = false;
-		panning = false;
+		zero_order_dragging = false;
+        if (first_order_dragging){
+            application.vsm.getAnimationManager().setXspeed(0);
+            application.vsm.getAnimationManager().setYspeed(0);
+            application.vsm.getAnimationManager().setZspeed(0);
+            v.setDrawDrag(false);
+            first_order_dragging = false;
+        }
 	    if (selectingRegion){
 			v.setDrawRect(false);
 			x2 = v.getVCursor().vx;
@@ -188,20 +205,33 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-	    if (panning){
-		    float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-		    application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
-		    lastJPX = jpx;
-		    lastJPY = jpy;
+	    Camera c = application.mCamera;
+        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        if (zero_order_dragging){
+            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            lastJPX = jpx;
+            lastJPY = jpy;
 		    if (nm.lensType != 0 && nm.lens != null){
 			    nm.moveLens(jpx, jpy, e.getWhen());
 		    }
-	    }
+        }
+        else if (first_order_dragging){
+            if (mod == SHIFT_MOD){
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+            }
+            else {
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+            }
+		    if (nm.lensType != 0 && nm.lens != null){
+			    nm.moveLens(jpx, jpy, e.getWhen());
+		    }
+        }
 	    else if (regionStickedToMouse){
-			float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
-			application.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
-			lastJPX = jpx;
-			lastJPY = jpy;
+			c.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
 		}
     }
 
@@ -247,6 +277,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(TIVNavigationManager.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(TIVNavigationManager.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(TIVNavigationManager.MOVE_RIGHT);}
+    	else if (code==KeyEvent.VK_N){toggleNavMode();}
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateTiles();}
@@ -292,4 +323,12 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
+	
+	void toggleNavMode(){
+        switch(navMode){
+            case FIRST_ORDER:{navMode = ZERO_ORDER;application.ovm.say(Messages.ZON);break;}
+            case ZERO_ORDER:{navMode = FIRST_ORDER;application.ovm.say(Messages.FON);break;}
+        }
+    }
+    
 }

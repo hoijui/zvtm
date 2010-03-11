@@ -33,5 +33,8 @@ class Messages {
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
     static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(10, 0), new LongPoint(0, 0),
 						     new LongPoint(-10, 0), new LongPoint(0, -10)};
+						     
+	static final String ZON = "Zero-Order Navigation";
+	static final String FON = "First-Order Navigation";
 
 }
