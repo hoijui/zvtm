@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: ViewerEventHandler.java 2984 2010-02-26 16:00:44Z epietrig $
@@ -22,6 +22,7 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -35,30 +36,29 @@ import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
 class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
-
-    static final float MAIN_SPEED_FACTOR = 50.0f;
-
+    
+    static float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    static double PAN_SPEED_COEF = 50.0;
+    
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
-    
-    static float WHEEL_MM_STEP = 1.0f;
-    
-    static final int CAMERA_MOTION_NOTIFICATION_PERIOD = 50;
-    
-    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+            
+    //remember last mouse coords to compute translation  (dragging)
+    int lastJPX,lastJPY;
     long lastVX, lastVY;
-    int currentJPX, currentJPY;
-
-    boolean mCamStickedToMouse = false;
 
     Viewer application;
     
     Glyph g;
     
-    boolean cursorNearBorder = false;
-    boolean dragging = false;
+    boolean zero_order_dragging = false;
+    boolean first_order_dragging = false;
+	static final short ZERO_ORDER = 0;
+	static final short FIRST_ORDER = 1;
+	short navMode = ZERO_ORDER;
 
 	Glyph objectJustSelected = null;
+	
 	
     ViewerEventHandler(Viewer app){
         this.application = app;
@@ -67,11 +67,25 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        dragging = true;
+        if (navMode == FIRST_ORDER){
+            first_order_dragging = true;
+            v.setDrawDrag(true);
+        }
+        else {
+            // ZERO_ORDER
+            zero_order_dragging = true;
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        dragging = false;
+        zero_order_dragging = false;
+        if (first_order_dragging){
+            application.vsm.getAnimationManager().setXspeed(0);
+            application.vsm.getAnimationManager().setYspeed(0);
+            application.vsm.getAnimationManager().setZspeed(0);
+            v.setDrawDrag(false);
+            first_order_dragging = false;
+        }
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -130,11 +144,24 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (dragging){
-            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-            application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+        Camera c = application.mCamera;
+        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        if (zero_order_dragging){
+            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
             lastJPX = jpx;
             lastJPY = jpy;
+        }
+        else if (first_order_dragging){
+            if (mod == SHIFT_MOD){
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+            }
+            else {
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+            }
         }
     }
 
@@ -179,6 +206,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     	else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
+    	else if (code==KeyEvent.VK_N){toggleNavMode();}
 //		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
 //        else if (code == KeyEvent.VK_F7){application.gc();}
 //        else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
@@ -210,6 +238,13 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     
     public void cameraMoved(Camera cam, LongPoint coord, float alt){
         application.altitudeChanged();
+    }
+    
+    void toggleNavMode(){
+        switch(navMode){
+            case FIRST_ORDER:{navMode = ZERO_ORDER;break;}
+            case ZERO_ORDER:{navMode = FIRST_ORDER;break;}
+        }
     }
     
 }
