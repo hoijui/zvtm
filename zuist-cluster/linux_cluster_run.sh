@@ -1,5 +1,7 @@
 #!/bin/bash                                                                    
 
+# SAMPLE run script. Edit and adapt to your needs.
+
 # usage example: ./cluster_run.sh -n AnimCircles will run slaves for
 # each cluster screen, joining the application named 'AnimCircles'  
 
