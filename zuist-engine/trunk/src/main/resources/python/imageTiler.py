@@ -92,7 +92,7 @@ ID_PREFIX = ""
 
 PDF_SCALE_FACTOR = 5
 
-COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB)
+COLOR_SPACE = None
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -315,7 +315,9 @@ if len(sys.argv) > 2:
                 TRACE_LEVEL = int(arg[4:])
             elif arg == "-cg":
                 USE_CG = True
-                if not SUCCEEDED_IMPORTING_CG:
+                if SUCCEEDED_IMPORTING_CG:
+                    COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB)
+                else:
                     log("CoreGraphics not available")
                     sys.exit(0)
             elif arg == "-im":
