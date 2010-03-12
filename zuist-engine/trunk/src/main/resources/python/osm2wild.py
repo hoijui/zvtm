@@ -40,8 +40,9 @@ MAX_ALT = "100000000"
 
 # OSM zoom levels to be generated [0..18]
 MIN_ZOOM = 0
-MAX_ZOOM = 6
-HIGHEST_ZOOM = 18
+MAX_ZOOM_BEFORE_FRAGS = 6
+HIGHEST_WANTED_ZOOM = 14
+HIGHEST_AVAILABLE_ZOOM = 18
 
 EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae",]
 EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea"]
@@ -135,7 +136,7 @@ class RenderThread:
         # Obtain <Map> projection
         self.prj = mapnik.Projection(self.m.srs)
         # Projects between tile pixel co-ordinates and LatLong (EPSG:4326)
-        self.tileproj = GoogleProjection(HIGHEST_ZOOM+1)
+        self.tileproj = GoogleProjection(HIGHEST_AVAILABLE_ZOOM+1)
 
     def render_tile(self, tile_uri, x, y, z):
         # Calculate pixel positions of bottom-left & top-right
@@ -193,7 +194,7 @@ class RenderThread:
                     self.printLock.release()
                     self.render_tile(tile_uri, x, y, z)
                 # compute coords and size of this tile
-                ilc = HIGHEST_ZOOM - MIN_ZOOM + 1 - z
+                ilc = HIGHEST_AVAILABLE_ZOOM - MIN_ZOOM + 1 - z
                 ts = TS_I * math.pow(2, ilc-1)
                 vx = (x*ts + ts/2.0)
                 vy = -(y*ts + ts/2.0)
@@ -219,7 +220,7 @@ class RenderThread:
                             shutil.move(tile_uri, self.sea_path)
                         else:
                             os.remove(tile_uri)
-                        levels = "%s;%s" % (z, HIGHEST_ZOOM)
+                        levels = "%s;%s" % (z, HIGHEST_AVAILABLE_ZOOM)
                         self.xmlLock.acquire()
                         self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, vx, vy, w, h))
                         self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"sea.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, vx, vy, w, h, zi))
@@ -238,7 +239,7 @@ class RenderThread:
                             shutil.move(tile_uri, self.lnd_path)
                         else:
                             os.remove(tile_uri)
-                        levels = "%s;%s" % (z, HIGHEST_ZOOM)
+                        levels = "%s;%s" % (z, HIGHEST_AVAILABLE_ZOOM)
                         self.xmlLock.acquire()
                         self.zf.write("  <region id=\"R%s\" containedIn=\"R%s\" levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, parentID, levels, vx, vy, w, h))
                         self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"lnd.png\" params=\"im=nearestNeighbor\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, vx, vy, w, h, zi))
@@ -254,7 +255,7 @@ class RenderThread:
                     # non-empty tile
                     src = tile_uri[len(tile_dir):]
                     if z == 0:
-                        levels = "0;%s" % HIGHEST_ZOOM
+                        levels = "0;%s" % HIGHEST_AVAILABLE_ZOOM
                         ci = ""
                     else :
                         levels = z
@@ -264,11 +265,11 @@ class RenderThread:
                     #self.zf.write("    <text id=\"TTX%s\" x=\"%d\" y=\"%d\" z-index=\"10\" scale=\"%d\">%s</text>\n" % (ID, vx, vy, 2**(18-z+1), ID))
                     self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
                     self.zf.write("  </region>\n")
-                    if z == MAX_ZOOM:
+                    if z == MAX_ZOOM_BEFORE_FRAGS:
                         levels = "%s;%s" % (z+1, z+FRAG_DEPTH)
                         self.zf.write("  <region id=\"RF%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
                         frag_src = "%ssf%s.xml" % (src[:src.rfind("/")+1], src[src.rfind("/")+1:src.rfind(".")])
-                        generateSceneFragment("%s%s" % (tile_dir, frag_src), x, y, MAX_ZOOM+1)
+                        generateSceneFragment("%s%s" % (tile_dir, frag_src), x, y, MAX_ZOOM_BEFORE_FRAGS+1)
                         self.zf.write("    <resource type=\"scn\" id=\"F%s\" src=\"%s\" x=\"%d\" y=\"%d\" />\n" % (ID, frag_src, vx, vy))
                         self.zf.write("  </region>\n")
                     self.xmlLock.release()
@@ -279,7 +280,7 @@ class RenderThread:
 # Generate ZUIST levels
 ################################################################################
 def generateLevels(zf):
-    levelCount = HIGHEST_ZOOM - MIN_ZOOM + 1
+    levelCount = HIGHEST_AVAILABLE_ZOOM - MIN_ZOOM + 1
     altitudes = [0,]
     for i in range(levelCount):
         depth = int(levelCount-i-1)
@@ -295,19 +296,20 @@ def generateLevels(zf):
 #
 ################################################################################
 def generateSceneFragment(src, xl, yl, zl):
-    log("Generating scene fragment %s" % src, 2)
+    log("Generating scene fragment %s" % src, 1)
     ff = open(src, 'w')
     ff.write("<?xml version=\"1.0\"?>\n")
     ff.write("<scene background=\"white\">\n")
-    gprj = GoogleProjection(HIGHEST_ZOOM+1)
+    gprj = GoogleProjection(HIGHEST_AVAILABLE_ZOOM+1)
     ll0 = (BBOX[0], BBOX[3])
     ll1 = (BBOX[2], BBOX[1])
     generateLevels(ff)
     z0 = 1
     for z in range(zl, zl + FRAG_DEPTH):
+        if z > HIGHEST_WANTED_ZOOM:
+            break
         px0 = gprj.fromLLtoPixel(ll0, z)
         px1 = gprj.fromLLtoPixel(ll1, z)
-        zoom = "%s" % z
         # check if we have directories in place
         for x in range(xl*(2**z0), (xl+1)*(2**z0)):
             # Validate x co-ordinate
@@ -320,8 +322,17 @@ def generateSceneFragment(src, xl, yl, zl):
                 if (y < 0) or (y >= 2**z):
                     continue
                 str_y = "%s" % y
-                tile_uri = "http://192.168.0.5/py/zuistServer/getTile?z=%s&amp;col=%s&amp;row=%s" % (zoom, str_x, str_y)
-                generateTileInFragment(tile_uri, z, x, y, ff)
+                tile_uri = "http://192.168.0.5/py/zuistServer/getTile?z=%d&amp;col=%s&amp;row=%s" % (z, str_x, str_y)
+                lowestLevelInFragmentAndLevelsBelow = (z == zl + FRAG_DEPTH - 1) and (z < HIGHEST_AVAILABLE_ZOOM)
+                frag_src = "%s/%s/sf%s.xml" % (z+1, x, y)
+                if lowestLevelInFragmentAndLevelsBelow:
+                    frag_path = "%s%s" % (tile_dir, frag_src)
+                    if not os.path.isdir("%s%s/%s" % (tile_dir, z+1, x)):
+                        if not os.path.isdir("%s%s" % (tile_dir, z+1)):
+                            os.mkdir("%s%s" % (tile_dir, z+1))
+                        os.mkdir("%s%s/%s" % (tile_dir, z+1, x))
+                    generateSceneFragment(frag_path, x, y, z+1)
+                generateTileInFragment(tile_uri, z, x, y, ff, lowestLevelInFragmentAndLevelsBelow, frag_src)
         z0 += 1
     ff.write("</scene>\n")
     ff.flush()
@@ -329,11 +340,13 @@ def generateSceneFragment(src, xl, yl, zl):
 
 ################################################################################
 #
+# llif means lowest level in fragment and levels below
+# flr means fragment level range
 ################################################################################
-def generateTileInFragment(src, z, x, y, ff):
+def generateTileInFragment(src, z, x, y, ff, llifalb, frag_src):
     ID = "%s-%s-%s" % (z, x, y)
     parentID = "%s-%s-%s" % (z-1, x/2, y/2)
-    ilc = HIGHEST_ZOOM - MIN_ZOOM + 1 - z
+    ilc = HIGHEST_AVAILABLE_ZOOM - MIN_ZOOM + 1 - z
     ts = TS_I * math.pow(2, ilc-1)
     vx = (x*ts + ts/2.0)
     vy = -(y*ts + ts/2.0)
@@ -341,17 +354,23 @@ def generateTileInFragment(src, z, x, y, ff):
     zi = 1
     levels = z
     ci = "containedIn=\"R%s\"" % parentID
-    #ci = ""
     ff.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, vx, vy, w, h))
-    #ff.write("    <text id=\"TX%s\" x=\"%d\" y=\"%d\" z-index=\"%d\" scale=\"%d\">%s</text>\n" % (ID, vx, vy, zi+1, 2**(18-z+1), ID))
-    ff.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, zi))
+    ff.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, vx, vy, w, h, 1))
     ff.write("  </region>\n")
+    if llifalb:
+        lowest_level = z+1+FRAG_DEPTH
+        if lowest_level > HIGHEST_AVAILABLE_ZOOM:
+            lowest_level = HIGHEST_AVAILABLE_ZOOM
+        flr = "%d;%d" % (z+1, lowest_level)
+        ff.write("  <region id=\"RF%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, flr, vx, vy, w, h))
+        ff.write("    <resource type=\"scn\" id=\"F%s\" src=\"../../%s\" x=\"%d\" y=\"%d\" />\n" % (ID, frag_src, vx, vy))
+        ff.write("  </region>\n")
     
 ################################################################################
 #
 ################################################################################
 def render_tiles(mapfile, tile_dir, name="unknown", num_threads=NUM_THREADS):
-    log("Rendering levels %s to %s ..." % (MIN_ZOOM, MAX_ZOOM))
+    log("Rendering levels %s to %s ..." % (MIN_ZOOM, MAX_ZOOM_BEFORE_FRAGS))
     # Launch rendering threads
     queue = Queue(32)
     printLock = threading.Lock()
@@ -368,7 +387,7 @@ def render_tiles(mapfile, tile_dir, name="unknown", num_threads=NUM_THREADS):
         #print "Started render thread %s" % render_thread.getName()
         renderers[i] = render_thread
 
-    gprj = GoogleProjection(HIGHEST_ZOOM+1)
+    gprj = GoogleProjection(HIGHEST_AVAILABLE_ZOOM+1)
 
     ll0 = (BBOX[0], BBOX[3])
     ll1 = (BBOX[2], BBOX[1])
@@ -377,7 +396,7 @@ def render_tiles(mapfile, tile_dir, name="unknown", num_threads=NUM_THREADS):
     zf.write("<scene background=\"white\">\n")
     generateLevels(zf)
 
-    for z in range(MIN_ZOOM, MAX_ZOOM+1):
+    for z in range(MIN_ZOOM, MAX_ZOOM_BEFORE_FRAGS+1):
         px0 = gprj.fromLLtoPixel(ll0,z)
         px1 = gprj.fromLLtoPixel(ll1,z)
 
@@ -434,7 +453,9 @@ if __name__ == "__main__":
             elif arg.startswith("-min="):
                 MIN_ZOOM = int(arg[5:])
             elif arg.startswith("-max="):
-                MAX_ZOOM = int(arg[5:])
+                MAX_ZOOM_BEFORE_FRAGS = int(arg[5:])
+            elif arg.startswith("-hwz="):
+                HIGHEST_WANTED_ZOOM = int(arg[5:])
             elif arg.startswith("-h"):
                 log(CMD_LINE_HELP)
                 sys.exit(0)
