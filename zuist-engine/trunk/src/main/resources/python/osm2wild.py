@@ -370,7 +370,7 @@ def generateTileInFragment(src, z, x, y, ff, llifalb, frag_src):
 #
 ################################################################################
 def render_tiles(mapfile, tile_dir, name="unknown", num_threads=NUM_THREADS):
-    log("Rendering levels %s to %s ..." % (MIN_ZOOM, MAX_ZOOM_BEFORE_FRAGS))
+    log("Rendering levels %s to %s and generating fragments down to %s..." % (MIN_ZOOM, MAX_ZOOM_BEFORE_FRAGS, HIGHEST_WANTED_ZOOM))
     # Launch rendering threads
     queue = Queue(32)
     printLock = threading.Lock()
