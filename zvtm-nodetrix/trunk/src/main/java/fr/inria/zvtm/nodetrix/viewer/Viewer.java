@@ -280,7 +280,7 @@ public class Viewer {
     /* --------------- Main/exit ------------------*/
     
     void exit(){
-        System.exit(0);
+    	System.exit(0);
     }
     
     public static void main(String[] args){
