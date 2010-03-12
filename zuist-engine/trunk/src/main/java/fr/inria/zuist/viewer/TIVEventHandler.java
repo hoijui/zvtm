@@ -206,8 +206,8 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	    Camera c = application.mCamera;
-        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
+            float a = (c.focal+Math.abs(c.altitude)) / c.focal;
             c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
             lastJPX = jpx;
             lastJPY = jpy;
@@ -222,6 +222,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
+                float a = (c.focal+Math.abs(c.altitude)) / c.focal;
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
@@ -231,7 +232,10 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 		    }
         }
 	    else if (regionStickedToMouse){
+	        float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
 			c.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+			lastJPX = jpx;
+            lastJPY = jpy;
 		}
     }
 
