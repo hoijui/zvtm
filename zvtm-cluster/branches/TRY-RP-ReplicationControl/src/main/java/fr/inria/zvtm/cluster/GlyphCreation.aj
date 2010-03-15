@@ -35,7 +35,7 @@ import fr.inria.zvtm.glyphs.VTriangleOr;
 //Replicates Glyph subtypes creation on slaves
 //(in fact, waits for the glyphs to be added to a virtual
 //space to replicate them on slaves)
-aspect GlyphCreation {
+public aspect GlyphCreation {
 	//introduce Glyph.getCreateDelta
 	private Delta Glyph.getCreateDelta(){
 		String poison = System.getProperty("poisonNopDelta");
@@ -45,7 +45,7 @@ aspect GlyphCreation {
 		return new NopDelta();
 	}
 
-	pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
+	public pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
 		execution(public * VirtualSpace.addGlyph(Glyph, boolean, boolean)) 
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
