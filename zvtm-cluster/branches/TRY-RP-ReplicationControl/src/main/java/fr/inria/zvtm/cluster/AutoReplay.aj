@@ -19,7 +19,7 @@ import java.awt.Font;
 
 /**
  * Define methods that will be replayed automatically
- * on remote virtual spaces.
+ * on replicated objects.
  * Autoreplay is a quick way of propagating changes to
  * remote objects without writing Delta classes.
  * Use only for "atomic" operations (change one attribute at a time).
@@ -33,6 +33,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
     // join points, because these methods will be invoked reflectively.
     public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
+        if(replayTarget.isReplicated()) &&
         (
          //Glyph methods
          execution(public void Glyph.move(long, long))	||
