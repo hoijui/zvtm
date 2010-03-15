@@ -69,6 +69,7 @@ aspect GlyphCreation {
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) &&
+        if(glyph.isReplicated()) &&
 		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
 			Delta createDelta = glyph.getCreateDelta();
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
@@ -77,6 +78,7 @@ aspect GlyphCreation {
 	//advise VirtualSpace.removeGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning:
 		glyphRemove(glyph, virtualSpace) &&
+        if(glyph.isReplicated()) &&
 		!cflowbelow(glyphRemove(Glyph, VirtualSpace)){
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
