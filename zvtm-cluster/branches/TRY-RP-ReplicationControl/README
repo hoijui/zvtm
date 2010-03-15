@@ -1,0 +1,18 @@
+=================
+A few quick notes
+=================
+
+When executing a program based on zvtm-cluster, do put the
+zvtm-cluster jar file in your classpath, *not* the vanilla zvtm 
+jar.
+
+Building: zvtm-cluster is built using maven2 (2.2.0+ recommended). 
+To compile and package the sources, execute:
+  mvn package
+
+Dependencies:
+zvtm-cluster depends on
+  zvtm
+  aspectJ
+  jgroups
+
