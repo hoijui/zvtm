@@ -16,16 +16,8 @@ import fr.inria.zvtm.glyphs.Glyph;
  * a shared VirtualSpace state across different address spaces
  */
 aspect ObjIdIntroduction {
-	declare parents: VirtualSpace implements Identifiable;
-	private final ObjId<VirtualSpace> VirtualSpace.id = ObjIdFactory.next();
-	public final ObjId<VirtualSpace> VirtualSpace.getObjId(){ return id; }
-
-    declare parents: Glyph implements Identifiable;
-	private final ObjId<Glyph> Glyph.id = ObjIdFactory.next();
-	public final ObjId<Glyph> Glyph.getObjId(){ return id; }
-
-	declare parents: Camera implements Identifiable;
-	private final ObjId<Camera> Camera.id = ObjIdFactory.next();
-	public final ObjId<Camera> Camera.getObjId(){ return id; }
+	declare parents: VirtualSpace extends DefaultIdentifiable;
+    declare parents: Glyph extends  DefaultIdentifiable;
+	declare parents: Camera extends DefaultIdentifiable;
 	}
 

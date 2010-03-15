@@ -19,7 +19,7 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
-public class ClusteredView implements Identifiable {
+public class ClusteredView extends DefaultIdentifiable {
 	private final ObjId objId = ObjIdFactory.next();
 	private final int origin; //bottom-left block number
 	private final int viewCols;

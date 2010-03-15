@@ -59,8 +59,7 @@ aspect GlyphCreation {
 		&& this(virtualSpace);
 
 	before(Glyph glyph, VirtualSpace virtualSpace):
-		glyphAdd(glyph, virtualSpace)
-    && if(virtualSpace.isMirrored()){
+		glyphAdd(glyph, virtualSpace){
 			if(glyph == null){
 				return;
 			}
@@ -70,8 +69,7 @@ aspect GlyphCreation {
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) &&
-		!cflowbelow(glyphAdd(Glyph, VirtualSpace))
-        && if(virtualSpace.isMirrored()){
+		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
 			Delta createDelta = glyph.getCreateDelta();
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
 		}
@@ -79,8 +77,7 @@ aspect GlyphCreation {
 	//advise VirtualSpace.removeGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning:
 		glyphRemove(glyph, virtualSpace) &&
-		!cflowbelow(glyphRemove(Glyph, VirtualSpace))
-        && if(virtualSpace.isMirrored()){
+		!cflowbelow(glyphRemove(Glyph, VirtualSpace)){
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
 			VirtualSpaceManager.INSTANCE.sendDelta(delta);
