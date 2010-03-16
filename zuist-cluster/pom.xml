@@ -42,7 +42,11 @@
 							<groupId>fr.inria.zvtm</groupId>
 							<artifactId>zuist-engine</artifactId>
 						</weaveDependency>
-					</weaveDependencies>	
+                        <weaveDependency>
+							<groupId>fr.inria.zvtm</groupId>
+							<artifactId>zvtm-cluster</artifactId>
+						</weaveDependency>
+                    </weaveDependencies>	
 					<source>1.5</source>
 					<target>1.5</target>
 					<showWeaveInfo>true</showWeaveInfo>

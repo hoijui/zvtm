@@ -10,9 +10,11 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.cluster.Delta;
+import fr.inria.zvtm.cluster.GlyphCreation;
 import fr.inria.zvtm.cluster.Identifiables;
 import fr.inria.zvtm.cluster.ObjId;
 import fr.inria.zvtm.cluster.SlaveUpdater;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zuist.engine.ImageDescription;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
@@ -22,9 +24,16 @@ import fr.inria.zuist.engine.SceneManager;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
-    //*createImageDescription, *createTextDescription, createClosedShapeDescription
+    //*createImageDescription, *createTextDescription, 
+    //createClosedShapeDescription, createSceneFragmentDescription
 
-    
+    before(Glyph glyph, VirtualSpace virtualSpace): 
+        GlyphCreation.glyphAdd(glyph, virtualSpace) &&
+        if(virtualSpace.isZuistOwned()) &&
+        !cflowbelow(GlyphCreation.glyphAdd(Glyph, VirtualSpace)){
+            glyph.setReplicated(false);
+        }
+
     pointcut sceneManagerCreation(SceneManager sceneManager, 
             VirtualSpace[] spaces, Camera[] cameras) : 
         execution(public SceneManager.new(VirtualSpace[], Camera[])) && 
@@ -39,8 +48,10 @@ aspect SceneManagerReplication {
         sceneManagerCreation(sceneManager, spaces, cameras) &&
         !cflowbelow(sceneManagerCreation(SceneManager, VirtualSpace[], Camera[])){
             for(VirtualSpace vs: spaces){
-                vs.setMirrored(false);
+                vs.setZuistOwned(true);
             }
+
+            sceneManager.setReplicated(true);
             
             SceneManagerCreateDelta delta = 
                 new SceneManagerCreateDelta(sceneManager.getObjId(),
@@ -79,6 +90,8 @@ aspect SceneManagerReplication {
         returning(Level level) : 
         createLevel(sceneManager, depth, ceilingAlt, floorAlt) &&
         !cflowbelow(createLevel(SceneManager, int, float, float)){
+            level.setReplicated(true);
+
             LevelCreateDelta delta = new LevelCreateDelta(
                     sceneManager.getObjId(),
                     level.getObjId(),
@@ -118,6 +131,7 @@ aspect SceneManagerReplication {
         execution(public Region SceneManager.createRegion(long, long, long, long,
                     int, int, String, String, int, short[], short, boolean, 
                     Color, Color)) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         this(sceneManager) && 
         args(x, y, w, h, 
             highestLevel, lowestLevel, 
@@ -137,6 +151,8 @@ aspect SceneManagerReplication {
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         !cflowbelow(createRegion(SceneManager, long, long, long, long, int, int, 
                 String, String, int, short[], short, boolean, Color, Color)){
+            region.setReplicated(true);
+
             RegionCreateDelta delta = new RegionCreateDelta(
                     sceneManager.getObjId(),
                     region.getObjId(),
@@ -267,6 +283,8 @@ aspect SceneManagerReplication {
                 String, int, Region,
                 URL, boolean, 
                 Color, String)) {
+            imageDesc.setReplicated(true);
+
             Delta delta = new ImageCreateDelta(sceneManager.getObjId(),
                     imageDesc.getObjId(),
                     x, y, w, h,
@@ -349,6 +367,8 @@ aspect SceneManagerReplication {
             !cflowbelow(createTextDescription(SceneManager, long, long, 
                         String, int, Region, float, String,
                         short, Color, String, int, int, boolean)) {
+                textDesc.setReplicated(true);
+
                 Delta delta = new TextCreateDelta(sceneManager.getObjId(),
                         textDesc.getObjId(),
                         x, y, id, zindex, region.getObjId(), scale, 

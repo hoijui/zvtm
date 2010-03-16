@@ -13,6 +13,7 @@ import fr.inria.zuist.engine.SceneManager;
 aspect AutoReplay extends AbstractAutoReplay {
     public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
+        if(replayTarget.isReplicated()) &&
         (
          execution(public void SceneManager.setUpdateLevel(boolean)) ||
          execution(public void SceneManager.enableRegionUpdater(boolean)) ||
