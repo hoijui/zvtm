@@ -33,7 +33,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
     // join points, because these methods will be invoked reflectively.
     public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
-        if(replayTarget.isReplicated()) &&
+        if(replayTarget.isReplicated()) && 
         (
          //Glyph methods
          execution(public void Glyph.move(long, long))	||

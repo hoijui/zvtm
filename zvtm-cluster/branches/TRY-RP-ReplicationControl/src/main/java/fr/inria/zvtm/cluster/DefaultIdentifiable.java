@@ -12,7 +12,7 @@ package fr.inria.zvtm.cluster;
  */
 public class DefaultIdentifiable implements Identifiable {
     private final ObjId objId = ObjIdFactory.next();
-    private boolean replicated = true;
+    private boolean replicated = false;
 
     public ObjId getObjId(){ return objId; }
     public boolean isReplicated() { return replicated; }

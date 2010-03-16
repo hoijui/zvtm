@@ -53,7 +53,6 @@ public aspect GlyphCreation {
         
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		(execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) ||
-		 execution(public * VirtualSpace.removeGlyph(Glyph)))
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
 		&& this(virtualSpace);
@@ -69,8 +68,8 @@ public aspect GlyphCreation {
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) &&
-        if(glyph.isReplicated()) &&
 		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
+            glyph.setReplicated(true);
 			Delta createDelta = glyph.getCreateDelta();
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
 		}

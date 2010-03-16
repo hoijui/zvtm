@@ -23,6 +23,7 @@ aspect VirtualSpaceReplication {
 
 	after(VirtualSpace vs) returning(Camera cam):
 	   cameraAdd(vs) && !cflowbelow(cameraAdd(VirtualSpace)){
+           cam.setReplicated(true);
 		   Delta delta = new CameraCreateDelta(vs.getObjId(),
 				   cam.getObjId());
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);

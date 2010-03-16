@@ -19,6 +19,7 @@ aspect VsmReplication {
 	after(VirtualSpaceManager vsm) returning(VirtualSpace vs):
 		target(vsm) && execution(VirtualSpace addVirtualSpace(String)) 
 		&& if(VirtualSpaceManager.INSTANCE.isMaster()) {
+            vs.setReplicated(true);
 			vsm.sendDelta(
 					new VsCreateDelta(vs.getName(),	vs.getObjId())
 					);
