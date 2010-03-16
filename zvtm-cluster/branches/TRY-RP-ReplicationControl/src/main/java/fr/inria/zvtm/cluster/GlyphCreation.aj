@@ -53,6 +53,7 @@ public aspect GlyphCreation {
         
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		(execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) ||
+         execution(public * VirtualSpace.removeGlyph(Glyph)))
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
 		&& this(virtualSpace);
