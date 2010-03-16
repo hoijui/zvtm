@@ -17,6 +17,7 @@ import fr.inria.zvtm.cluster.SlaveUpdater;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zuist.engine.ImageDescription;
 import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.engine.SceneFragmentDescription;
 import fr.inria.zuist.engine.TextDescription;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.Region;
@@ -426,6 +427,61 @@ aspect SceneManagerReplication {
                    style, size, sensitivity);
            su.putSlaveObject(descId, desc);
        }
+    }
+
+    pointcut createSceneFragmentDescription(SceneManager sceneManager,
+            long x, long y, String id, Region region, URL resourceURL) : 
+        execution(public SceneFragmentDescription 
+                SceneManager.createSceneFragmentDescription(long, long, String, Region, URL)) &&
+        this(sceneManager) &&
+        args(x, y, id, region, resourceURL);
+
+    after(SceneManager sceneManager, long x, long y, 
+            String id, Region region, URL resourceURL) 
+        returning(SceneFragmentDescription fragDesc) : 
+            createSceneFragmentDescription(sceneManager, x, y, id, 
+                    region, resourceURL)  &&
+            if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+            !cflowbelow(createSceneFragmentDescription(SceneManager, long, long, String, Region, URL)){
+                fragDesc.setReplicated(true);
+
+                Delta delta = new SceneFragmentCreateDelta(
+                        sceneManager.getObjId(),
+                        fragDesc.getObjId(),
+                        x,y,id,region.getObjId(),
+                        resourceURL);
+                VirtualSpaceManager.INSTANCE.sendDelta(delta);
+    }
+
+    private static class SceneFragmentCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<SceneFragmentDescription> descId;
+        private final long x;
+        private final long y;
+        private final String id;
+        private final ObjId<Region> regionId;
+        private final URL resourceURL;
+
+        SceneFragmentCreateDelta(ObjId<SceneManager> smId,
+                ObjId<SceneFragmentDescription> descId,
+                long x, long y, String id, 
+                ObjId<Region> regionId, URL resourceURL){
+            this.smId = smId;
+            this.descId = descId;
+            this.x = x;
+            this.y = y;
+            this.id = id;
+            this.regionId = regionId;
+            this.resourceURL = resourceURL;
+        }
+
+        public void apply(SlaveUpdater su){
+            SceneManager sm = su.getSlaveObject(smId);
+            Region region = su.getSlaveObject(regionId);
+            SceneFragmentDescription desc = sm.createSceneFragmentDescription(
+                    x,y,id,region,resourceURL);
+            su.putSlaveObject(descId, desc);
+        }
     }
 }
 
