@@ -1,3 +1,9 @@
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+ *
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */ 
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
@@ -13,7 +19,7 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
-public class ClusteredView implements Identifiable {
+public class ClusteredView extends DefaultIdentifiable {
 	private final ObjId objId = ObjIdFactory.next();
 	private final int origin; //bottom-left block number
 	private final int viewCols;

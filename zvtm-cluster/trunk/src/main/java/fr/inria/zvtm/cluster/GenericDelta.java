@@ -57,7 +57,8 @@ public class GenericDelta implements Delta {
             }
 			method.invoke(target, arguments);
 		} catch (Exception e){
-			logger.error("Could not invoke remote method", e);
+            logger.error("Could not invoke remote method: {}. methodName: {}",
+                    e, methodName);
 		}
 	}
 

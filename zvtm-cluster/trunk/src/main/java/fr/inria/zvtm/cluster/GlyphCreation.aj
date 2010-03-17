@@ -35,7 +35,7 @@ import fr.inria.zvtm.glyphs.VTriangleOr;
 //Replicates Glyph subtypes creation on slaves
 //(in fact, waits for the glyphs to be added to a virtual
 //space to replicate them on slaves)
-aspect GlyphCreation {
+public aspect GlyphCreation {
 	//introduce Glyph.getCreateDelta
 	private Delta Glyph.getCreateDelta(){
 		String poison = System.getProperty("poisonNopDelta");
@@ -45,7 +45,7 @@ aspect GlyphCreation {
 		return new NopDelta();
 	}
 
-	pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
+	public pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
 		execution(public * VirtualSpace.addGlyph(Glyph, boolean, boolean)) 
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
@@ -53,14 +53,13 @@ aspect GlyphCreation {
         
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		(execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) ||
-		 execution(public * VirtualSpace.removeGlyph(Glyph)))
+         execution(public * VirtualSpace.removeGlyph(Glyph)))
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
 		&& this(virtualSpace);
 
 	before(Glyph glyph, VirtualSpace virtualSpace):
-		glyphAdd(glyph, virtualSpace)
-    && if(virtualSpace.isMirrored()){
+		glyphAdd(glyph, virtualSpace){
 			if(glyph == null){
 				return;
 			}
@@ -70,8 +69,8 @@ aspect GlyphCreation {
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) &&
-		!cflowbelow(glyphAdd(Glyph, VirtualSpace))
-        && if(virtualSpace.isMirrored()){
+		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
+            glyph.setReplicated(true);
 			Delta createDelta = glyph.getCreateDelta();
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
 		}
@@ -79,8 +78,8 @@ aspect GlyphCreation {
 	//advise VirtualSpace.removeGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning:
 		glyphRemove(glyph, virtualSpace) &&
-		!cflowbelow(glyphRemove(Glyph, VirtualSpace))
-        && if(virtualSpace.isMirrored()){
+        if(glyph.isReplicated()) &&
+		!cflowbelow(glyphRemove(Glyph, VirtualSpace)){
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
 			VirtualSpaceManager.INSTANCE.sendDelta(delta);

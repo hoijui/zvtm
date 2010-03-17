@@ -23,6 +23,7 @@ aspect VirtualSpaceReplication {
 
 	after(VirtualSpace vs) returning(Camera cam):
 	   cameraAdd(vs) && !cflowbelow(cameraAdd(VirtualSpace)){
+           cam.setReplicated(true);
 		   Delta delta = new CameraCreateDelta(vs.getObjId(),
 				   cam.getObjId());
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -97,7 +98,9 @@ aspect VirtualSpaceReplication {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster());
 
 	after(VirtualSpace vs, Glyph g1, Glyph g2) returning:
-	   glyphAbove(vs, g1, g2) && !cflowbelow(glyphAbove(VirtualSpace, Glyph, Glyph)){
+	   glyphAbove(vs, g1, g2) && 
+       !cflowbelow(glyphAbove(VirtualSpace, Glyph, Glyph)) &&
+       if(g1.isReplicated()){
 		   Delta delta = new GlyphAboveDelta(vs.getObjId(),
                    g1.getObjId(), g2.getObjId());
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -110,7 +113,9 @@ aspect VirtualSpaceReplication {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster());
 
 	after(VirtualSpace vs, Glyph g1, Glyph g2) returning:
-	   glyphBelow(vs, g1, g2) && !cflowbelow(glyphBelow(VirtualSpace, Glyph, Glyph)){
+	   glyphBelow(vs, g1, g2) && 
+       !cflowbelow(glyphBelow(VirtualSpace, Glyph, Glyph)) &&
+       if(g1.isReplicated()){
 		   Delta delta = new GlyphBelowDelta(vs.getObjId(),
                    g1.getObjId(), g2.getObjId());
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -163,7 +168,9 @@ aspect VirtualSpaceReplication {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster());
 
 	after(VirtualSpace vs, Glyph glyph) returning:
-	   glyphOnTop(vs, glyph) && !cflowbelow(glyphOnTop(VirtualSpace, Glyph)){
+	   glyphOnTop(vs, glyph) && 
+       !cflowbelow(glyphOnTop(VirtualSpace, Glyph)) &&
+       if(glyph.isReplicated()){
 		   Delta delta = new GlyphOnTopDelta(vs.getObjId(), glyph.getObjId());
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
 	   }
@@ -175,8 +182,9 @@ aspect VirtualSpaceReplication {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster());
 
 	after(VirtualSpace vs, Glyph glyph, int index) returning:
-	   glyphOnTopIndex(vs, glyph, index) 
-       && !cflowbelow(glyphOnTopIndex(VirtualSpace, Glyph, int)){
+	   glyphOnTopIndex(vs, glyph, index) && 
+       !cflowbelow(glyphOnTopIndex(VirtualSpace, Glyph, int)) && 
+       if(glyph.isReplicated()){
 		   Delta delta = new GlyphOnTopDelta(vs.getObjId(), glyph.getObjId(), index);
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
 	   }
@@ -216,8 +224,9 @@ aspect VirtualSpaceReplication {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster());
 
 	after(VirtualSpace vs, Glyph glyph) returning:
-	   glyphAtBottom(vs, glyph) 
-       && !cflowbelow(glyphAtBottom(VirtualSpace, Glyph)){
+	   glyphAtBottom(vs, glyph) && 
+       !cflowbelow(glyphAtBottom(VirtualSpace, Glyph)) &&
+       if(glyph.isReplicated()){
 		   Delta delta = new GlyphAtBottomDelta(vs.getObjId(), glyph.getObjId());
 		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
 	   }
@@ -229,8 +238,9 @@ aspect VirtualSpaceReplication {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster());
 
 	after(VirtualSpace vs, Glyph glyph, int index) returning:
-	   glyphAtBottomIndex(vs, glyph, index) 
-       && !cflowbelow(glyphAtBottomIndex(VirtualSpace, Glyph, int)){
+	   glyphAtBottomIndex(vs, glyph, index) && 
+       !cflowbelow(glyphAtBottomIndex(VirtualSpace, Glyph, int)) &&
+       if(glyph.isReplicated()){
            Delta delta = new GlyphAtBottomDelta(vs.getObjId(), glyph.getObjId(), index);
            VirtualSpaceManager.INSTANCE.sendDelta(delta);
        }
