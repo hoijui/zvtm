@@ -206,7 +206,7 @@ public class SlaveApp {
 }
 
 class SlaveOptions {
-	@Option(name = "-b", aliases = {"--block"}, usage = "metacamera block number (slave index)")
+	@Option(name = "-b", aliases = {"--block"}, usage = "view block number (slave index)")
 		int blockNumber = 0;
 
 	@Option(name = "-n", aliases = {"--app-name"}, usage = "application name (should match master program)")
