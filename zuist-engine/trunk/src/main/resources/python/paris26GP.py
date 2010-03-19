@@ -34,7 +34,7 @@ def processSrc():
     # source image
     outputSceneFile = "%s/scene.xml" % SRC_TGT_DIR
     outputroot = ET.Element("scene")
-    generateLevels(outputroot, SCENE_DEPTH)
+    levelCount = generateLevels(outputroot, SCENE_DEPTH)
     generateTilePyramid(outputroot, SCENE_DEPTH)
     log("Writing scene file %s" % outputSceneFile, 1)
     tree = ET.ElementTree(outputroot)
@@ -63,8 +63,79 @@ def generateLevels(parentEL, levelCount):
 # Generate tile pyramid
 ################################################################################
 def generateTilePyramid(parentEL, levelCount):
-    return
-            
+    for d in os.listdir(SRC_TGT_DIR):
+        if not os.path.isdir("%s/%s" % (SRC_TGT_DIR, d)):
+            continue
+        generateTilesAtLevel(parentEL, d, levelCount)
+        
+def generateTilesAtLevel(parentEL, leveldir, levelCount):
+    level = int(leveldir[leveldir.find("_")+1:])
+    # scale factor
+    sc = 2**(levelCount-level-1)
+    # region size at this level
+    rs = TILE_SIZE * sc
+    log("Generating level %d" % level, 2)
+    cols = []
+    for f in os.listdir("%s/l_%d" % (SRC_TGT_DIR, level)):
+        if os.path.isdir("%s/l_%d/%s" % (SRC_TGT_DIR, level, f)):
+            cols.append(f)
+    cols.sort(strColSorter)
+    vx = 0
+    for colf in cols:
+        vy = 0
+        col = int(colf[colf.find("_")+1:])
+        rows = []
+        for f in os.listdir("%s/l_%d/%s" % (SRC_TGT_DIR, level, colf)):
+            if f.startswith("tile_"):
+                rows.append(f)
+        rows.sort(strTileSorter)
+        for rowf in rows:
+            row = int(rowf[rowf.find("_")+1:rowf.find(".jpg")])
+            regionEL = ET.SubElement(parentEL, "region")
+            regionEL.set("id", "R-%s-%s-%s" % (level, col, row))
+            regionEL.set("levels", "%d" % level)
+            regionEL.set("x", "%d" % vx)
+            regionEL.set("y", "%d" % vy)
+            regionEL.set("w", "%d" % rs)
+            regionEL.set("h", "%d" % rs)
+            objectEL = ET.SubElement(regionEL, "resource")
+            objectEL.set("id", "I-%s-%s-%s" % (level, col, row))
+            objectEL.set("type", "img")
+            objectEL.set("x", "%d" % vx)
+            objectEL.set("y", "%d" % vy)
+            objectEL.set("w", "%d" % rs)
+            objectEL.set("h", "%d" % rs)
+            objectEL.set("scale", "%d" % sc)
+            objectEL.set("src", "%s/%s/%s" % (leveldir, colf, rowf))
+            vy -= TILE_SIZE * sc
+        vx += TILE_SIZE * sc
+
+#################################################################################
+## nums as strings sorter
+#################################################################################
+def strColSorter(sn1, sn2):
+    n1 = int(sn1[sn1.find("_")+1:])
+    n2 = int(sn2[sn2.find("_")+1:])
+    if  n1 < n2:
+        return -1
+    elif n1 > n2:
+        return 1
+    else:
+        return 0
+
+#################################################################################
+## nums as strings sorter
+#################################################################################
+def strTileSorter(sn1, sn2):
+    n1 = int(sn1[sn1.find("_")+1:sn1.find(".jpg")])
+    n2 = int(sn2[sn2.find("_")+1:sn2.find(".jpg")])
+    if  n1 < n2:
+        return -1
+    elif n1 > n2:
+        return 1
+    else:
+        return 0
+                
 ################################################################################
 # Trace exec on std output
 ################################################################################
