@@ -56,6 +56,11 @@ $Id$
       <artifactId>zvtm</artifactId>
       <version>0.10.1-SNAPSHOT</version>
     </dependency>
+	<dependency>
+      <groupId>nom.tam.fits</groupId>
+      <artifactId>fits</artifactId>
+      <version>1.04.0</version>
+    </dependency>
   </dependencies>
   
   <!-- Build -->
