@@ -23,7 +23,7 @@ public class NTEdge extends LinLogEdge{
     private EdgeAppearance appearance;	//responsible for graphical rendering.
     private EdgeAppearance newAppearance;
     Object owner;
-    private NTEdge inverse;
+    private Color inverseColor;
     private boolean symmetric = false;
     
     
@@ -34,10 +34,10 @@ public class NTEdge extends LinLogEdge{
     	this.head = endNode;
     }
 
-    public void setNodes(NTNode t, NTNode h){
-    	this.tail = t;
-        this.head = h;
-    }
+//    public void setNodes(NTNode t, NTNode h){
+//    	this.tail = t;
+//        this.head = h;
+//    }
     
     public void adjustAppearanceState(){
     	if(tail.matrix == null || head.matrix == null){
@@ -143,11 +143,12 @@ public class NTEdge extends LinLogEdge{
     	return symmetric;
     }
 	
-	public void setinverse(NTEdge e){
-		inverse = e;
+	public void setInverseColor(Color c){
+		inverseColor = c;
 	}
-	public boolean hasInverse(){ return inverse != null; }
-	public NTEdge getInverse(){ return inverse; }
+	public boolean hasInverse(){ return inverseColor != null; }
+	
+	public Color getInverseColor(){ return inverseColor; }
 	
 	public Color getColor(){ return edgeColor; }
 }

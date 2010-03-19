@@ -23,7 +23,7 @@ import fr.inria.zvtm.nodetrix.lll.LinLogNode;
 
 public class NTNode extends LinLogNode{
 
-     String name;
+     private String name;
     
     /* Owning matrix */
     public Matrix matrix;
@@ -72,7 +72,7 @@ public class NTNode extends LinLogNode{
 	
 	public NTNode(String name){
 		super(name, 1);
-        this.name = name;
+		this.name =  name;
         animManager = VirtualSpaceManager.INSTANCE.getAnimationManager();
         outgoingEdges = new Vector<NTEdge>();
       	incomingEdges = new Vector<NTEdge>();
@@ -92,7 +92,7 @@ public class NTNode extends LinLogNode{
 	    this.backgroundColor = colour;
 	    this.single = single;
 	    
-	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
+	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, getName(), (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    	labelW.setSensitivity(false);
 	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
 	    	gBackgroundW.setDrawBorder(false);
@@ -108,7 +108,7 @@ public class NTNode extends LinLogNode{
 	    	vs.addGlyph(gBackgroundWSensitive);
 	    
 		    if (!single){
-	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    	labelN.setSensitivity(false);
 	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
 	    	    gBackgroundN.setDrawBorder(false);
@@ -404,7 +404,7 @@ public class NTNode extends LinLogNode{
     }
     
     public String toString(){
-    	return "N::"+name+"@"+hashCode();
+    	return "N::"+getName()+"@"+hashCode();
     }
     
     public void setOwner(Object o){
@@ -494,6 +494,14 @@ public class NTNode extends LinLogNode{
 //			ie.cleanGraphics();
 //		}
 //		intraEdgeSets = new Vector<NTIntraEdgeSet>();
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 
