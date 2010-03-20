@@ -10,6 +10,8 @@
 import os, sys, math
 # http://effbot.org/zone/element-index.htm
 import elementtree.ElementTree as ET
+# http://www.pythonware.com/products/pil/
+from PIL import Image
 
 CMD_LINE_HELP = "ZUIST Paris 26GP Scene Script\n\nUsage:\n\n" + \
     " \tparis26GP <target_path> [options]\n\n" + \
@@ -20,6 +22,7 @@ CMD_LINE_HELP = "ZUIST Paris 26GP Scene Script\n\nUsage:\n\n" + \
 TRACE_LEVEL = 1
 
 TILE_SIZE = 1024
+# edit if TILE_SIZE is not 1024 to match number of l_* directories
 SCENE_DEPTH = 8
 
 # camera focal distance
@@ -34,7 +37,7 @@ def processSrc():
     # source image
     outputSceneFile = "%s/scene.xml" % SRC_TGT_DIR
     outputroot = ET.Element("scene")
-    levelCount = generateLevels(outputroot, SCENE_DEPTH)
+    generateLevels(outputroot, SCENE_DEPTH)
     generateTilePyramid(outputroot, SCENE_DEPTH)
     log("Writing scene file %s" % outputSceneFile, 1)
     tree = ET.ElementTree(outputroot)
@@ -73,8 +76,7 @@ def generateTilesAtLevel(parentEL, leveldir, levelCount):
     # scale factor
     sc = 2**(levelCount-level-1)
     # region size at this level
-    rs = TILE_SIZE * sc
-    log("Generating level %d" % level, 2)
+    log("Generating level %d %d" % (level, sc), 2)
     cols = []
     for f in os.listdir("%s/l_%d" % (SRC_TGT_DIR, level)):
         if os.path.isdir("%s/l_%d/%s" % (SRC_TGT_DIR, level, f)):
@@ -82,33 +84,51 @@ def generateTilesAtLevel(parentEL, leveldir, levelCount):
     cols.sort(strColSorter)
     vx = 0
     for colf in cols:
-        vy = 0
         col = int(colf[colf.find("_")+1:])
         rows = []
         for f in os.listdir("%s/l_%d/%s" % (SRC_TGT_DIR, level, colf)):
             if f.startswith("tile_"):
                 rows.append(f)
         rows.sort(strTileSorter)
+        vy = 0
         for rowf in rows:
             row = int(rowf[rowf.find("_")+1:rowf.find(".jpg")])
+            im = Image.open("%s/%s/%s/%s" % (SRC_TGT_DIR, leveldir, colf, rowf))
+            src_sz = im.size
+            if src_sz[1] < TILE_SIZE:
+                vh = src_sz[1] * sc
+            else:
+                vh = TILE_SIZE * sc
+            vy -= vh / 2
+            # adjust x only when going through first row in column
+            if row == 0:
+                if src_sz[0] < TILE_SIZE:
+                    vw = src_sz[0] * sc
+                else:
+                    vw = TILE_SIZE * sc
+                vx += vw / 2
             regionEL = ET.SubElement(parentEL, "region")
-            regionEL.set("id", "R-%s-%s-%s" % (level, col, row))
-            regionEL.set("levels", "%d" % level)
+            regionEL.set("id", "R%s-%s-%s" % (level, col, row))
+            if level == 0:
+                regionEL.set("levels", "0;%d" % (SCENE_DEPTH-1))
+            else:
+                regionEL.set("levels", "%d" % level)
+                regionEL.set("containedIn", "R%s-%s-%s" % (level-1, col/2, row/2))
             regionEL.set("x", "%d" % vx)
             regionEL.set("y", "%d" % vy)
-            regionEL.set("w", "%d" % rs)
-            regionEL.set("h", "%d" % rs)
+            regionEL.set("w", "%d" % vw)
+            regionEL.set("h", "%d" % vh)
             objectEL = ET.SubElement(regionEL, "resource")
-            objectEL.set("id", "I-%s-%s-%s" % (level, col, row))
+            objectEL.set("id", "I%s-%s-%s" % (level, col, row))
             objectEL.set("type", "img")
             objectEL.set("x", "%d" % vx)
             objectEL.set("y", "%d" % vy)
-            objectEL.set("w", "%d" % rs)
-            objectEL.set("h", "%d" % rs)
-            objectEL.set("scale", "%d" % sc)
+            objectEL.set("w", "%d" % vw)
+            objectEL.set("h", "%d" % vh)
             objectEL.set("src", "%s/%s/%s" % (leveldir, colf, rowf))
-            vy -= TILE_SIZE * sc
-        vx += TILE_SIZE * sc
+            vy -= vh / 2
+            log("%s %s %s" % (level, col, row), 3)
+        vx += vw / 2
 
 #################################################################################
 ## nums as strings sorter
@@ -150,8 +170,6 @@ if len(sys.argv) > 1:
     for arg in sys.argv[1:]:
         if arg.startswith("-ts="):
             TILE_SIZE = int(arg[len("-ts="):])
-            if TILE_SIZE == 256:
-                SCENE_DEPTH = 9
         elif arg.startswith("-tl="):
             TRACE_LEVEL = int(arg[len("-tl="):])
         elif arg.startswith("-h"):
@@ -160,8 +178,8 @@ if len(sys.argv) > 1:
         else:
             SRC_TGT_DIR = os.path.realpath(arg)
             
-log("--------------------")
+log("--------------------", 1)
 log("Saving to %s" % SRC_TGT_DIR, 1)
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 processSrc()
-log("--------------------")
+log("--------------------", 1)
