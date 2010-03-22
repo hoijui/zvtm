@@ -53,6 +53,7 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
@@ -155,7 +156,14 @@ public class Controller implements Java2DPainter {
         Camera[] sceneCameras = {cCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         if (zuistFile != null){
+            sm.enableRegionUpdater(false);
 			loadScene(zuistFile);
+			EndAction ea  = new EndAction(){
+                   public void execute(Object subject, Animation.Dimension dimension){
+                       sm.setUpdateLevel(true);
+                       sm.enableRegionUpdater(true);
+                   }
+               };
 			getGlobalView(cCamera);
 			getGlobalView(oCamera);
 		}
@@ -281,7 +289,12 @@ public class Controller implements Java2DPainter {
 	    }
 	    gp.setVisible(false);
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
-        cCamera.setAltitude(0.0f);
+	    
+	    System.out.println(sm.getLevelCount()+" "+sm.getObjectCount());
+	    for (int i=0;i<sm.getLevelCount();i++){
+	        System.out.println(sm.getLevel(i));
+	    }
+        cCamera.setAltitude(10.0f);
         ceh.cameraMoved(null, null, 0);
 	}
     

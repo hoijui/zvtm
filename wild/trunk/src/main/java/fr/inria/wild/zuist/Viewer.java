@@ -134,7 +134,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         sm.setLevelListener(this);
 		previousLocations = new Vector();
         if (xmlSceneFile != null){
+            sm.enableRegionUpdater(false);
 			loadScene(xmlSceneFile);
+			EndAction ea  = new EndAction(){
+                   public void execute(Object subject, Animation.Dimension dimension){
+                       sm.setUpdateLevel(true);
+                       sm.enableRegionUpdater(true);
+                   }
+               };
 		}
         mCamera.addListener(eh);
     }
