@@ -907,7 +907,7 @@ public class SceneManager implements CameraListener {
     
     /** Enable/disable level updating.
      * Calls to updateLevel(altitude) have no effect if level updating is disabled.
-     *@see #updateLevel(float altitude)
+     *@see #updateLevel(int layerIndex, long[] cameraBounds, float altitude)
      */
     public void setUpdateLevel(boolean b){
 	updateLevel = b;
@@ -1059,7 +1059,7 @@ public class SceneManager implements CameraListener {
     /** Get a global view of the scene.
      *@param c camera that should show a global view
      *@param d duration of animation from current location to global view
-     *@param end action to be perfomed after camera has reached its new position (can be null)
+     *@param ea action to be perfomed after camera has reached its new position (can be null)
      @return bounds in virtual space, null if none
      */
     public long[] getGlobalView(Camera c, int d, EndAction ea){
