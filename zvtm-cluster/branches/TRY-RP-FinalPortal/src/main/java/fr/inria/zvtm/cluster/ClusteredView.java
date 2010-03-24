@@ -20,7 +20,6 @@ import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class ClusteredView extends DefaultIdentifiable {
-	private final ObjId objId = ObjIdFactory.next();
 	private final int origin; //bottom-left block number
 	private final int viewCols;
 	private final int viewRows;
@@ -60,8 +59,6 @@ public class ClusteredView extends DefaultIdentifiable {
 			throw new IllegalArgumentException("View column(s) outside of cluster");
 		}
 	}
-
-	public ObjId getObjId(){ return objId; }
 
 	/** 
 	 * Sets the background color for this ClusteredView.
