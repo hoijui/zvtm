@@ -312,6 +312,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         return mCamera;
     }
 
+    public void setCursorPosition(int x, int y){
+        throw new Error("not implemented");
+    }
+
 	void reset(){
 		sm.reset();
 		mSpace.removeAllGlyphs();
