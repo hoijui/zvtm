@@ -85,7 +85,7 @@ public class Matrix {
             // matrix label
     	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1*nodes.size()));
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()+.5+Math.sqrt(2*nodes.size())));
-    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
+    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.COLOR_MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
     	    vs.addGlyph(matrixLabel);
     	    matrixLabel.setOwner(this);
     	    bkg.stick(matrixLabel);
@@ -163,7 +163,7 @@ public class Matrix {
         	if(this.nodes.size() == 1) break;
         	
         	//GRID PATTERN
-        	VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE/2, bkg.getWidth(), NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
+        	VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE/2, bkg.getWidth(), NodeTrixViz.COLOR_GRID, NodeTrixViz.COLOR_GRID, NodeTrixViz.GRID_TRANSLUCENCY);
         	gGridV.setDrawBorder(false);
         	gGridV.setSensitivity(false);
         	gGridV.setVisible(false);
@@ -172,7 +172,7 @@ public class Matrix {
         	bkg.stick(gGridV);
         	gridBarsV[i] = gGridV;
         	
-        	VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
+        	VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE/2, NodeTrixViz.COLOR_GRID, NodeTrixViz.COLOR_GRID, NodeTrixViz.GRID_TRANSLUCENCY);
         	gGridH.setDrawBorder(false);
         	gGridH.setSensitivity(false);
            	gGridH.setVisible(false);
@@ -183,9 +183,9 @@ public class Matrix {
         	
         	if(i % 2 == 0)
         	{
-        		gGridV.setColor(NodeTrixViz.GRID_COLOR);
+        		gGridV.setColor(NodeTrixViz.COLOR_GRID);
         		gGridV.setVisible(true);
-        		gGridH.setColor(NodeTrixViz.GRID_COLOR);
+        		gGridH.setColor(NodeTrixViz.COLOR_GRID);
         		gGridH.setVisible(true);
         		
         	}else if(i % 10 == 0){
@@ -414,7 +414,7 @@ public class Matrix {
     	highlightedEdges = new Vector<NTEdge>();
     	for(NTEdge e : n.getOutgoingEdges()){
     		e.getHead().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
-    		e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHTED);
+    		e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
     		e.performInteractionStateChange();
     		highlightedNodes.add(e.getHead());
     		highlightedEdges.add(e);
@@ -422,19 +422,19 @@ public class Matrix {
     	
     	for(NTEdge e : n.getIncomingEdges()){
     		e.getTail().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
-			e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHTED);
+			e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING);
 			e.performInteractionStateChange();
     		highlightedNodes.add(e.getHead());
     		highlightedEdges.add(e);
     	}
     	    
     	for(NTNode nn : highlightedNodes){
-    		highlightGrid(n, nn, NodeTrixViz.MATRIX_NODE_RELATED_COLOR);
+    		highlightGrid(n, nn, NodeTrixViz.COLOR_MATRIX_NODE_RELATED_COLOR);
     		nn.perfomStateChange();
     	}
     
     	n.perfomStateChange();
-    	highlightGrid(n, n, NodeTrixViz.MATRIX_NODE_HIGHLIGHT_COLOR);
+    	highlightGrid(n, n, NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
     }
     
     public void resetNodeContext()
@@ -498,14 +498,14 @@ public class Matrix {
     	int i1 = nodes.indexOf(tail);
     	if(i1 > -1){
     		Glyph g1 = gridBarsH[i1];
-    		g1.setColor(NodeTrixViz.GRID_COLOR);
+    		g1.setColor(NodeTrixViz.COLOR_GRID);
     		if(i1 % 2 != 0) g1.setVisible(false);
     	}
 
     	int i2 = nodes.indexOf(head);
     	if(i2 > -1){
     		Glyph g2 = gridBarsV[i2];
-    		g2.setColor(NodeTrixViz.GRID_COLOR);
+    		g2.setColor(NodeTrixViz.COLOR_GRID);
     		if(i2 % 2 != 0) g2.setVisible(false);
     	}
     }
@@ -699,6 +699,7 @@ public class Matrix {
 	}
 	
 	public void regroup(){
+		System.out.println("[MATRIX] REGROUP " + this.getName());
 		grouped = true;
 		//removing old groupLabels
 		if(vs == null) return;

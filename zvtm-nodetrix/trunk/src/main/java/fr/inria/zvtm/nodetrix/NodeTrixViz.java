@@ -29,10 +29,6 @@ import fr.inria.zvtm.nodetrix.MatrixSizeComparator;
 
 public class NodeTrixViz {
     
-    public static final Color GRID_COLOR = Color.getHSBColor(1f, 0.0f, 0.9f);
-	public static final float GRID_TRANSLUCENCY = .5f;
-	public static final float INTRA_TRANSLUCENCY = .7f;
-	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
     public static final long CELL_SIZE = 20;
     public static final long CELL_SIZE_HALF = CELL_SIZE/2;
     public static final int LINLOG_ITERATIONS = 20;
@@ -43,11 +39,19 @@ public class NodeTrixViz {
 
     public static final int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     public static final int MATRIX_NODE_LABEL_OCCLUSION_WIDTH = 150; //half of the width/lenght in pixel that can be occupied by labels when enabling local exploration
-    public static final Color MATRIX_NODE_LABEL_COLOR = Color.DARK_GRAY;
-    public static final Color MATRIX_NODE_BKG_COLOR = new Color(250,205,155);
+    
+    //COLORS AND TRANSLUNCENCIES
+    public static final Color COLOR_GRID = Color.getHSBColor(1f, 0.0f, 0.9f);
+    public static final float GRID_TRANSLUCENCY = .5f;
+    public static final float INTRA_TRANSLUCENCY = .7f;
+    public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
+    public static final Color COLOR_MATRIX_NODE_LABEL_COLOR = Color.DARK_GRAY;
+    public static final Color COLOR_MATRIX_NODE_BKG_COLOR = new Color(250,205,155);
     public static final float MATRIX_NODE_BKG_TRANSLUCENCY = .8f;
-    public static final Color MATRIX_NODE_HIGHLIGHT_COLOR = Color.yellow;
-    public static final Color MATRIX_NODE_RELATED_COLOR = Color.orange;
+    public static final Color COLOR_MATRIX_NODE_HIGHLIGHT_COLOR = Color.yellow;
+    public static final Color COLOR_MATRIX_NODE_RELATED_COLOR = Color.orange;
+    public static final Color COLOR_EDGE_HIGHLIGHT_INCOMING = Color.orange.brighter();
+    public static final Color COLOR_EDGE_HIGHLIGHT_OUTGOING = Color.orange;
      
     
     //ANIMATION DURATIOS in msec
@@ -57,15 +61,17 @@ public class NodeTrixViz {
 	//INTERACTION STATES
 	public static final int IA_STATE_DEFAULT = 0;
 	public static final int IA_STATE_HIGHLIGHTED = 1;
-	public static final int IA_STATE_SELECTED = 2;
-	public static final int IA_STATE_FADE = 3;
-	public static final int IA_STATE_RELATED = 4;
+	public static final int IA_STATE_HIGHLIGHT_INCOMING = 2;
+	public static final int IA_STATE_HIGHLIGHT_OUTGOING = 3;
+	public static final int IA_STATE_SELECTED = 4;
+	public static final int IA_STATE_FADE = 5;
+	public static final int IA_STATE_RELATED = 6;
+	public static final int IA_STATE_EXPAND = 7;
+	public static final int IA_STATE_COLLAPSE = 8;
 
     /* Links between matrices */
     static Color INTER_LINK_COLOR = Color.BLACK;
 	
-    public final static Color EXTRA_EDGE_HIGHLIGHT_COLOR = Color.orange;
-    public final static Color EXTRA_EDGE_RELATED_COLOR = Color.yellow;
 	public static final float EXTRA_ALPHA_MAX_LENGHT = 1500;  
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
 	public static final float EXTRA_ALPHA_MIN = .25f;
