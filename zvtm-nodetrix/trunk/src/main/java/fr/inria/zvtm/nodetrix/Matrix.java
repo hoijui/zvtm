@@ -10,9 +10,12 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import fr.inria.zvtm.animation.Animation;
@@ -87,7 +90,8 @@ public class Matrix {
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()+.5+Math.sqrt(2*nodes.size())));
     	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.COLOR_MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
     	    vs.addGlyph(matrixLabel);
-    	    matrixLabel.setOwner(this);
+//    	    matrixLabel.setOwner(this);
+    	    matrixLabel.setSensitivity(false);
     	    bkg.stick(matrixLabel);
     	    // node labels
     	    Color c;
@@ -409,7 +413,7 @@ public class Matrix {
     		}
     	}
 
-    	n.setNewState(NodeTrixViz.IA_STATE_HIGHLIGHTED, true, true);
+    	n.setNewState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
     	highlightedNodes = new Vector<NTNode>();
     	highlightedEdges = new Vector<NTEdge>();
     	for(NTEdge e : n.getOutgoingEdges()){
@@ -611,7 +615,13 @@ public class Matrix {
     
 
     public void cleanGroupLabels(){
+    	for(Glyph g : groupLabelsN){
+    		vs.removeGlyph(g);
+    	}
 		groupLabelsN = new Vector<Glyph>();
+		for(Glyph g : groupLabelsW){
+    		vs.removeGlyph(g);
+    	}
 		groupLabelsW = new Vector<Glyph>();
 	}
 	
@@ -640,9 +650,9 @@ public class Matrix {
 	public void addGroupLabel(Vector<NTNode> v, String label){
 		if(vs == null) return;
 		if(nodes.size() > 1){
-			long x = -this.bkg.getWidth() - labelWidth - NodeTrixViz.CELL_SIZE_HALF;
-			VRectangle groupLabelW = new VRectangle(bkg.vx + x, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, NodeTrixViz.CELL_SIZE, v.size()*NodeTrixViz.CELL_SIZE_HALF,Color.orange);
-			VTextOr groupTextW = new VTextOr(bkg.vx + x, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, Color.black, label,  (float)Math.PI/2);
+			long dx = - this.bkg.getWidth() - labelWidth - NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
+			VRectangle groupLabelW = new VRectangle(bkg.vx + dx, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, NodeTrixViz.GROUP_LABEL_HALF_WIDTH, v.size()*NodeTrixViz.CELL_SIZE_HALF,Color.DARK_GRAY);
+			VTextOr groupTextW = new VTextOr(bkg.vx + dx, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, Color.white, label, 0);
 			groupTextW.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			vs.addGlyph(groupLabelW);
 			vs.addGlyph(groupTextW);
@@ -651,9 +661,9 @@ public class Matrix {
 			this.groupLabelsW.add(groupLabelW);
 			this.groupLabelsW.add(groupTextW);
 				
-			long y = this.bkg.getWidth() + labelWidth + NodeTrixViz.CELL_SIZE_HALF;
-			VRectangle groupLabelN = new VRectangle(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + y, 0, v.size()*NodeTrixViz.CELL_SIZE_HALF, NodeTrixViz.CELL_SIZE,Color.orange);
-			VText groupTextN = new VText(bkg.vx + v.firstElement().ndx - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + y, 0, Color.black, label);
+			long dy = this.bkg.getWidth() + labelWidth + NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
+			VRectangle groupLabelN = new VRectangle(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + dy, 0, v.size()*NodeTrixViz.CELL_SIZE_HALF, NodeTrixViz.GROUP_LABEL_HALF_WIDTH,Color.DARK_GRAY);
+			VTextOr groupTextN = new VTextOr(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF , bkg.vy + dy, 0, Color.white, label, (float)Math.PI/2);
 			groupTextN.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			vs.addGlyph(groupLabelN);
 			vs.addGlyph(groupTextN);
@@ -698,19 +708,17 @@ public class Matrix {
 		nodes = finalOrdering;
 	}
 	
-	public void regroup(){
-		System.out.println("[MATRIX] REGROUP " + this.getName());
+	public void regroup(int limitLevel){
 		grouped = true;
 		//removing old groupLabels
 		if(vs == null) return;
 		cleanGroupLabels();
-
+		
 		//grouping Nodes
 		HashMap<String, Vector<NTNode>> groups = new HashMap<String, Vector<NTNode>>();
 		for(NTNode n : nodes){
 			String name = n.getGroupName();
 			if(name == null) name = "Thing";
-			
 			Vector<NTNode> v = groups.get(name); 
 			if(v == null){
 				v = new Vector<NTNode>();
@@ -718,11 +726,21 @@ public class Matrix {
 			}
 			v.add(n);
 		}
+
+		//if the current hierarchyLevel is 0, that dont show any labels and regroup the matrices 
+		//using an algorithm
+		if(limitLevel == 0){
+			this.reorderCutHillMcKee();
+			return;
+		} 
 		
 		//putting nodes back into matrix
+		List<String> orderedGroups = new ArrayList<String>();
+		orderedGroups.addAll(groups.keySet());
+		Collections.sort(orderedGroups);
 		nodes = new Vector<NTNode>();
-		for(Vector<NTNode> v : groups.values()){
-			nodes.addAll(v);
+		for(String s : orderedGroups){
+			nodes.addAll(groups.get(s));
 		}
 		
 		//repositioning nodes
@@ -905,7 +923,6 @@ public class Matrix {
 	
 	public void applyRandomOffset(){
 		long v = (long)(Math.random() * 100);
-		System.out.println("++++++++++" + name + " - " + + v);
 		move(v,v);
 	}
 	

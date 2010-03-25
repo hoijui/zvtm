@@ -252,7 +252,7 @@ public class NTNode extends LinLogNode{
 //    	if(newInteractionState == interactionState) return;
 
     	if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHTED) highlight(NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) highlight(NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(NodeTrixViz.COLOR_MATRIX_NODE_RELATED_COLOR);
 	    else reset();

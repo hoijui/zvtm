@@ -31,12 +31,8 @@ public class NodeTrixViz {
     
     public static final long CELL_SIZE = 20;
     public static final long CELL_SIZE_HALF = CELL_SIZE/2;
+    public static final int GROUP_LABEL_HALF_WIDTH = 50;
     public static final int LINLOG_ITERATIONS = 20;
-    public static final Color MATRIX_FILL_COLOR = Color.WHITE;
-    public static final Color MATRIX_STROKE_COLOR = Color.BLACK;
-    public static final Color INTRA_LINK_COLOR = new Color(160,202,254);
-    public static final Color EXTRA_LINK_COLOR = new Color(118,98,252);
-
     public static final int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     public static final int MATRIX_NODE_LABEL_OCCLUSION_WIDTH = 150; //half of the width/lenght in pixel that can be occupied by labels when enabling local exploration
     
@@ -50,8 +46,12 @@ public class NodeTrixViz {
     public static final float MATRIX_NODE_BKG_TRANSLUCENCY = .8f;
     public static final Color COLOR_MATRIX_NODE_HIGHLIGHT_COLOR = Color.yellow;
     public static final Color COLOR_MATRIX_NODE_RELATED_COLOR = Color.orange;
-    public static final Color COLOR_EDGE_HIGHLIGHT_INCOMING = Color.orange.brighter();
-    public static final Color COLOR_EDGE_HIGHLIGHT_OUTGOING = Color.orange;
+    public static final Color COLOR_EDGE_HIGHLIGHT_INCOMING = Color.orange;
+    public static final Color COLOR_EDGE_HIGHLIGHT_OUTGOING = Color.orange.brighter();
+    public static final Color MATRIX_FILL_COLOR = Color.WHITE;
+    public static final Color MATRIX_STROKE_COLOR = Color.BLACK;
+    public static final Color INTRA_LINK_COLOR = new Color(160,202,254);
+    public static final Color EXTRA_LINK_COLOR = new Color(118,98,252);
      
     
     //ANIMATION DURATIOS in msec
@@ -60,7 +60,7 @@ public class NodeTrixViz {
 
 	//INTERACTION STATES
 	public static final int IA_STATE_DEFAULT = 0;
-	public static final int IA_STATE_HIGHLIGHTED = 1;
+	public static final int IA_STATE_HIGHLIGHT = 1;
 	public static final int IA_STATE_HIGHLIGHT_INCOMING = 2;
 	public static final int IA_STATE_HIGHLIGHT_OUTGOING = 3;
 	public static final int IA_STATE_SELECTED = 4;
@@ -348,7 +348,7 @@ public class NodeTrixViz {
     
     public void reorganiseAllMatrices(AnimationManager am)
     {
-    	regroupMatrices();
+    	regroupMatrices(0);
     	splitAllMatrices(am);
     	mergeAllMatrices();
     }
@@ -414,10 +414,10 @@ public class NodeTrixViz {
      * Iterates over all matrices and group their nodes according to their assigned
      * groupname.
      */
-    public void regroupMatrices()
+    public void regroupMatrices(int limitLevel)
     {
     	for(Matrix m : matrices){
-    		m.regroup();
+    		m.regroup(limitLevel);
     	}
     }
     

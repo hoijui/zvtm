@@ -20,6 +20,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 
 public class IntraEdgeAppearance extends EdgeAppearance{
 
@@ -29,6 +30,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	private DPath gLowerFrameFragment, gUpperFrameFragment;
 	private VRectangle gSensitive;
 	private VCircle gHighlight;
+	private VText gLabel;
 	
 	public IntraEdgeAppearance(NTEdge edge) {
 		super(edge);
@@ -75,16 +77,18 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	long west = mp.x + edge.head.ndx - NodeTrixViz.CELL_SIZE_HALF + 2;
 		long north =  mp.y + edge.tail.wdy + NodeTrixViz.CELL_SIZE_HALF;
 		long east = mp.x + edge.head.ndx + NodeTrixViz.CELL_SIZE_HALF -2;
+		long south = mp.y + edge.head.wdy - NodeTrixViz.CELL_SIZE_HALF;
 		
 		//SENSITIE RECTANGLE
 		int radius = (int) NodeTrixViz.CELL_SIZE_HALF + 5;
     	gHighlight = new VCircle(mp.x + edge.head.ndx, mp.y + edge.tail.wdy, 0, radius, NodeTrixViz.COLOR_EDGE_HIGHLIGHT_INCOMING);
     	gHighlight.setDrawBorder(false);
     	gHighlight.setVisible(false);
-//    	gHighlight.setOwner(edge);
     	vs.addGlyph(gHighlight);
 		
-		
+		//LABEL
+//    	gLabel = new VText(mp.x + edge.head.ndx, south - 10, 0, Color.black, edge.owner));
+    	
 		//MAIN GLYPH
     	LongPoint[] p = new LongPoint[4];
     	p[0] = new LongPoint(east, (north-2) - index*height);
@@ -225,7 +229,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 //     	if(gUpperFrameFragment != null) gUpperFrameFragment.setColor(c);
 //     	if(gLowerFrameFragment != null) gLowerFrameFragment.setColor(c);
 		gHighlight.setVisible(true);
-		gHighlight.setBorderColor(c);
+		gHighlight.setColor(c);
 	}
 	
 	@Override

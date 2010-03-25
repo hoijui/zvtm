@@ -19,7 +19,7 @@ public class NTEdge extends LinLogEdge{
 	NTNode tail, head;
     private Color edgeColor;
     int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
-    int newInteractionState = NodeTrixViz.IA_STATE_HIGHLIGHTED;
+    int newInteractionState = NodeTrixViz.IA_STATE_HIGHLIGHT;
     private EdgeAppearance appearance;	//responsible for graphical rendering.
     private EdgeAppearance newAppearance;
     Object owner;
@@ -67,6 +67,7 @@ public class NTEdge extends LinLogEdge{
     	if(newInteractionState == interactionState) return;
     	
 	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) appearance.fade();
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_INCOMING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) appearance.select();
