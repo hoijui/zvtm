@@ -443,9 +443,9 @@ public class NodeTrixViz {
         	xCentre /= (mergeMatrices.size() + 2);
            	yCentre /= (mergeMatrices.size() + 2);
            	
+
            	//draw new matrix;                                                              
 			newMatrix.createNodeGraphics(xCentre, yCentre, vs);
-			System.out.println("-----");
 			newMatrix.finishCreateNodeGraphics(vs);
 
 			// set node labels to old positions
@@ -462,11 +462,11 @@ public class NodeTrixViz {
     		}
     		
     		System.out.println("[NODE_TRIX_VIZ] FADE OUT OLD MATRICES");
-    		
     		//fade out old matrices
     		for(Matrix m : mergeMatrices){
     			m.cleanGraphics(am);
     		}
+    		
 
     		//reset nodes to original places
     		for(NTNode n : newMatrix.nodes){

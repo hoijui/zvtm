@@ -78,7 +78,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	long west = mp.x + edge.head.ndx - NodeTrixViz.CELL_SIZE_HALF + 2;
 		long north =  mp.y + edge.tail.wdy + NodeTrixViz.CELL_SIZE_HALF;
 		long east = mp.x + edge.head.ndx + NodeTrixViz.CELL_SIZE_HALF -2;
-		long south = mp.y + edge.head.wdy - NodeTrixViz.CELL_SIZE_HALF;
+//		long south = mp.y + edge.head.wdy - NodeTrixViz.CELL_SIZE_HALF;
 		
 		//SENSITIE RECTANGLE
 		int radius = (int) NodeTrixViz.CELL_SIZE_HALF + 5;

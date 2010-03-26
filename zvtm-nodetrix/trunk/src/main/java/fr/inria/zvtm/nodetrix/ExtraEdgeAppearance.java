@@ -35,7 +35,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	{
 		if(vs == null) return;
 		vs.removeGlyph(edgePath);
-    	edgePath = null;
+//    	edgePath = null;
 //    	offsets = new LongPoint[0];
 	}
 

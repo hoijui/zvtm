@@ -11,7 +11,6 @@ import java.awt.Color;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.nodetrix.lll.LinLogEdge;
-import fr.inria.zvtm.nodetrix.lll.LinLogNode;
 
 public class NTEdge extends LinLogEdge{
 

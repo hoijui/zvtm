@@ -896,6 +896,7 @@ public class Matrix {
 		if(nodes.size() < 2) return;
 		
 		cleanGroupLabels();
+	
 		
 		Animation a;
 		int duration = 3000;

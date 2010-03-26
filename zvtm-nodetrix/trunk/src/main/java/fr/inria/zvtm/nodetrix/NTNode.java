@@ -38,8 +38,8 @@ public class NTNode extends LinLogNode{
 	/* Horizontal label */
 	VText labelW;
 	/* Background box*/
-	VRectangle gBackgroundW, gBackgroundWSensitive;
-	VRectangleOr gBackgroundN, gBackgroundNSensitive;
+	VRectangle gBackgroundW, gSensitiveW;
+	VRectangleOr gBackgroundN, gSensitiveN;
 	Color backgroundColor;
 	/* If this node has no matrix*/
 	boolean single;
@@ -101,11 +101,11 @@ public class NTNode extends LinLogNode{
 	    	vs.addGlyph(gBackgroundW);
 	    	vs.addGlyph(labelW);
 	    	
-	    	gBackgroundWSensitive = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
-	    	gBackgroundWSensitive.setTranslucencyValue(0f);
-	    	gBackgroundW.stick(this.gBackgroundWSensitive);
-	    	gBackgroundWSensitive.setOwner(this);
-	    	vs.addGlyph(gBackgroundWSensitive);
+	    	gSensitiveW = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
+	    	gSensitiveW.setVisible(false);
+	    	gBackgroundW.stick(this.gSensitiveW);
+	    	gSensitiveW.setOwner(this);
+	    	vs.addGlyph(gSensitiveW);
 	    
 		    if (!single){
 	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
@@ -116,11 +116,11 @@ public class NTNode extends LinLogNode{
 	    	    gBackgroundN.stick(this.labelN);
 	    		vs.addGlyph(gBackgroundN);
 	    		vs.addGlyph(labelN);
-	    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2,  Color.red,  (float)Math.PI/2f);
-	    	    gBackgroundNSensitive.setTranslucencyValue(0f);
-	    	    gBackgroundN.stick(this.gBackgroundNSensitive);
-	    	    gBackgroundNSensitive.setOwner(this);
-	    		vs.addGlyph(gBackgroundNSensitive);
+	    		gSensitiveN = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2,  Color.red,  (float)Math.PI/2f);
+	    	    gSensitiveN.setVisible(false);
+	    	    gBackgroundN.stick(this.gSensitiveN);
+	    	    gSensitiveN.setOwner(this);
+	    		vs.addGlyph(gSensitiveN);
 		   }
     }
     
@@ -315,11 +315,11 @@ public class NTNode extends LinLogNode{
     
     public void onTop() {
     	vs.onTop(gBackgroundW);
-    	vs.onTop(gBackgroundWSensitive);
+    	vs.onTop(gSensitiveW);
     	vs.onTop(labelW);
     	if(!single){
     		vs.onTop(gBackgroundN);
-    		vs.onTop(gBackgroundNSensitive);
+    		vs.onTop(gSensitiveN);
     		vs.onTop(labelN);
     	}
     }
@@ -343,12 +343,12 @@ public class NTNode extends LinLogNode{
 		ndy += widthHalf;
 		this.gBackgroundW.setWidth(widthHalf);
 
-		gBackgroundWSensitive.setWidth(widthHalf-2);
+		gSensitiveW.setWidth(widthHalf-2);
 		if (!this.single){
 			this.gBackgroundW.move(-widthHalf, 0);
 			this.labelW.move(widthHalf, 0);
 			gBackgroundN.setWidth(widthHalf);
-			gBackgroundNSensitive.setWidth(widthHalf-2);
+			gSensitiveN.setWidth(widthHalf-2);
 			this.gBackgroundN.move(0, widthHalf);
 			this.labelN.move(0,-widthHalf);
 		}
@@ -467,8 +467,10 @@ public class NTNode extends LinLogNode{
 	void cleanGraphics(VirtualSpace vs) {
 		if(this.gBackgroundW != null) vs.removeGlyph(this.gBackgroundW);
 		if(this.labelW != null) vs.removeGlyph(this.labelW);
+		if(gSensitiveW != null) vs.removeGlyph(gSensitiveW);
 		if(this.gBackgroundN != null) vs.removeGlyph(this.gBackgroundN);
 		if(this.labelN != null) vs.removeGlyph(this.labelN);
+		if(gSensitiveN != null) vs.removeGlyph(gSensitiveN);
 	}
 
 
