@@ -752,13 +752,13 @@ public class Matrix {
 		}
 	}
 	
-	public HashMap<String, Matrix> splitMatrix(AnimationManager am)
+	public Vector<Matrix> splitMatrix(AnimationManager am)
 	{
-		if(nodes.size() <= 1 || !grouped) return new HashMap<String, Matrix>();
+		if(nodes.size() <= 1 || !grouped) return new Vector<Matrix>();
 		
 		
 		// 1. CREATE MATRICES
-		HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
+		Vector<Matrix> newMatrices = new Vector<Matrix>();
 		String groupname = "";
 		Matrix mNew = null;
 		long x = 0, y = 0;
@@ -774,7 +774,7 @@ public class Matrix {
 				//-- create new matrix
 				groupname = n.getGroupName();
 				mNew = new Matrix(groupname, new Vector<NTNode>());
-				newMatrices.put(mNew.name, mNew);
+				newMatrices.add(mNew);
 			}
 			mNew.addNode(n);
 			x += n.ndx;
@@ -784,7 +784,7 @@ public class Matrix {
 		mNew.finishCreateNodeGraphics(vs);
 		
 		// 2. SHIFT LABELS TO OLD PLACES
-		for(Matrix m : newMatrices.values()){
+		for(Matrix m : newMatrices){
 			for(NTNode n : m.nodes){
 				n.shiftNorthernLabels(bkg.vy + bkg.vw, false);
 				n.shiftWesternLabels(bkg.vx - bkg.vw, false);
@@ -797,7 +797,7 @@ public class Matrix {
 		cleanGraphics(am);
 		
 		// 6. RESET NEW NODE LABELS 
-		for(Matrix m : newMatrices.values()){
+		for(Matrix m : newMatrices){
 			for(NTNode n : m.nodes){
 				n.resetNorthernLabels(true);
 				n.resetWesternLabels(true);
@@ -806,7 +806,7 @@ public class Matrix {
 		}
 		
 		// 6. DISPLACE MATRICES 
-		for(Matrix m : newMatrices.values())
+		for(Matrix m : newMatrices)
 		{
 			// 7. CREATE NEW EDGE GRAPHICS
 			m.createEdgeGraphics(vs);

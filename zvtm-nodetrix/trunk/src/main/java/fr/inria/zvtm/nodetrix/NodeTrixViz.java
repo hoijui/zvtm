@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -346,20 +347,23 @@ public class NodeTrixViz {
     
     //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
     
-    public void reorganiseAllMatrices(AnimationManager am)
-    {
-    	regroupMatrices(0);
-    	splitAllMatrices(am);
-    	mergeAllMatrices();
-    }
+//    public void reorganiseAllMatrices(AnimationManager am)
+//    {
+//    	regroupMatrices(0);
+//    	splitAllMatrices(am);
+//    	mergeAllMatrices();
+//    }
+//    
+//    
     
-    public void splitAllMatrices(AnimationManager am){
-    	HashMap<String, Matrix> newMatrices = new HashMap<String, Matrix>();
+    public void splitMatrices(AnimationManager am){
+    	Vector<Matrix> newMatrices = new Vector<Matrix>();
     	Vector<Matrix> toRemove = new Vector<Matrix>();
+    	
     	for(Matrix m : matrices){
-    		HashMap<String, Matrix> currentNew = m.splitMatrix(am);
+    		Vector<Matrix> currentNew = m.splitMatrix(am);
     		if(currentNew == null) continue;
-    		newMatrices.putAll(currentNew);
+    		newMatrices.addAll(currentNew);
     		toRemove.add(m);
     	}
  
@@ -367,42 +371,47 @@ public class NodeTrixViz {
     		matrices.remove(m);
     	}
 
-    	matrices.addAll(newMatrices.values());
+    	matrices.addAll(newMatrices);
     	reorderMatricesCMK();
     }
     
-    public void mergeAllMatrices()
+    public void mergeMatrices()
     {
-    	HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
+    	System.out.println("[NODE_TRIX_VIZ] -- MERGE "+ matrices.size() +" MATRICES ");
+    	// grouping matrices with equal names
+		HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
     	for(Matrix m : matrices){
+    		System.out.println("[NODE_TRIX_VIZ] GROUING " + m.getName());
     		String name = m.getName();
     		if(!mergeMap.containsKey(name)){
     			mergeMap.put(name, new Vector<Matrix>());
     		}
     		mergeMap.get(name).add(m);
     	}	
-    	
-    	for(Vector<Matrix> vector : mergeMap.values()){
-    		if(vector.size() < 2) continue;
-    		mergeParticulaMatrices((Vector<Matrix>)vector.clone());
-    	}
-    }
-    
-    public void mergeParticulaMatrices(Vector<Matrix> mergeMatrices)
-    {
-    	long xCenter = 0;
-    	long yCenter = 0;
-    	for(Matrix m : mergeMatrices){
-    		xCenter += m.getPosition().x;
-       		yCenter += m.getPosition().y;
-    	}
-    	xCenter /= mergeMatrices.size();
-       	yCenter /= mergeMatrices.size();
-           	
-       	long offset = 0;
-    	for(Matrix m : mergeMatrices){
-    		m.move(xCenter + offset, yCenter- offset);
-    		offset += m.bkg.getWidth();
+       	
+        // positioning matrices that tend to be merged
+//    	System.out.println("[NODE_TRIX_VIZ] -- CREATING NEW MATRICES " + mergeMap.size());
+    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet()){
+    		Vector<Matrix> mergeMatrices = entry.getValue();
+//        	System.out.println("[NODE_TRIX_VIZ] " + entry.getKey() + " CONTAINIG " + mergeMatrices.size());
+        	if(mergeMatrices.size() < 2) continue;
+
+    		long xCenter = 0;	//center of new matrix
+        	long yCenter = 0;	//center of new matrix
+        	for(Matrix m : mergeMatrices){
+        		xCenter += m.getPosition().x;
+           		yCenter += m.getPosition().y;
+        	}
+        	xCenter /= mergeMatrices.size();
+           	yCenter /= mergeMatrices.size();
+        	System.out.println("[NODE_TRIX_VIZ]\tNEW CENTRE: " + xCenter + ", " + yCenter);
+               	
+           	long offset = 0; // offset to next matrix for layouting
+        	for(Matrix m : mergeMatrices){
+//        		System.out.println("[NODE_TRIX_VIZ] MOVE MATRIX " + m.getName());
+        		m.move(xCenter + offset - m.getPosition().x , yCenter - offset +  m.getPosition().y);
+//        		offset += m.bkg.getWidth();
+        	}
     	}
     }
     
