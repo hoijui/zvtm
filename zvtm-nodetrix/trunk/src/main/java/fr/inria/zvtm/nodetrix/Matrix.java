@@ -86,9 +86,9 @@ public class Matrix {
             vs.addGlyph(bkg);
             
             // matrix label
-    	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1*nodes.size()));
-    	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()+.5+Math.sqrt(2*nodes.size())));
-    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.COLOR_MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
+    	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1 * nodes.size()));
+    	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size() + .5 + Math.sqrt(2*nodes.size())));
+    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.COLOR_MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(4*nodes.size()));
     	    vs.addGlyph(matrixLabel);
 //    	    matrixLabel.setOwner(this);
     	    matrixLabel.setSensitivity(false);
