@@ -44,8 +44,9 @@ public class NTEdge extends LinLogEdge{
     		newAppearance = new ExtraEdgeAppearance(this);
     		return;
     	}
+
     	if(tail.matrix.getName().equals(head.matrix.getName())){
-        	newAppearance = new IntraEdgeAppearance(this);
+    		newAppearance = new IntraEdgeAppearance(this);
         }else{
         	newAppearance = new ExtraEdgeAppearance(this);
         }

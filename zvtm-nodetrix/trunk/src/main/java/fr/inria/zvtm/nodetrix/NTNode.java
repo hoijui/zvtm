@@ -331,9 +331,10 @@ public class NTNode extends LinLogNode{
     //GETTER/SETTER--------------------------------------------------------------------------------------------
     
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
-     * the matrix. A gradiant is applied according to the position of the node in the list.
+     * the matrix. A gradient is also applied according to the position of the node in the list.
      */
 	public void setBackgroundBox(long maxLength) {
+		System.out.println(maxLength);
 		if(widthHalf == 0) this.widthHalf = maxLength/2;
 		if (heightHalf == 0){
 		    this.heightHalf = gBackgroundW.getHeight();

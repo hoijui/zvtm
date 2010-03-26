@@ -147,7 +147,7 @@ public class Matrix {
     
     void finishCreateNodeGraphics(VirtualSpace vs){
         //estimating maximal length of node labels
-    	labelWidth = nodes.firstElement().getLabelWidth();
+    	labelWidth = 0;
         for (NTNode n : nodes){
         	if (n.getLabelWidth() > labelWidth){
                 labelWidth = n.getLabelWidth();
@@ -615,14 +615,18 @@ public class Matrix {
     
 
     public void cleanGroupLabels(){
-    	for(Glyph g : groupLabelsN){
-    		vs.removeGlyph(g);
+    	if(groupLabelsN.size() > 0){
+    		for(Glyph g : groupLabelsN){
+    			vs.removeGlyph(g);
+    		}
+    		groupLabelsN = new Vector<Glyph>();
     	}
-		groupLabelsN = new Vector<Glyph>();
-		for(Glyph g : groupLabelsW){
-    		vs.removeGlyph(g);
+    	if(groupLabelsW.size() > 0){
+        	for(Glyph g : groupLabelsW){
+        		vs.removeGlyph(g);
+        	}
+        	groupLabelsW = new Vector<Glyph>();
     	}
-		groupLabelsW = new Vector<Glyph>();
 	}
 	
 	
@@ -851,6 +855,8 @@ public class Matrix {
 	//----------------------------GETTER-SETTER------------------------------------GETTER-SETTER------------------------------------GETTER-SETTER--------
 	
 	public LongPoint getPosition(){
+		if(this.nodes.size() < 2)
+			return new LongPoint( nodes.firstElement().mx, nodes.firstElement().my);
 		return bkg.getLocation();
 	}
 	
@@ -875,6 +881,7 @@ public class Matrix {
 	
 	public boolean isNodeVisibleNorth(){return !this.nodesUnvisibleN;}
 	public boolean isNodesVisibleWest(){return !this.nodesUnvisibleW;}
+	
 	public void addNode(NTNode n){
 		nodes.add(n);
 		n.setMatrix(this);
@@ -886,18 +893,22 @@ public class Matrix {
 	}
 	
 	public void cleanGraphics(AnimationManager am){
+		if(nodes.size() < 2) return;
+		
 		cleanGroupLabels();
+		
 		Animation a;
 		int duration = 3000;
 		a = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 				new EndAction(){
-					public void execute(Object o, Animation.Dimension dimension){
-						vs.removeGlyph((Glyph)o);}});
+			public void execute(Object o, Animation.Dimension dimension){
+				vs.removeGlyph((Glyph)o);}});
 		am.startAnimation(a, true);
 		a = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-						vs.removeGlyph((Glyph)o);}});
+					vs.removeGlyph((Glyph)o);}});
 		am.startAnimation(a, true);
+		
 		for(Glyph g : this.gridBarsH){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
 					vs.removeGlyph((Glyph)o);}});
@@ -924,6 +935,15 @@ public class Matrix {
 	public void applyRandomOffset(){
 		long v = (long)(Math.random() * 100);
 		move(v,v);
+	}
+	
+	public long getLabelWidth(){
+		return labelWidth;
+	}
+	public long getBackgroundWidth(){
+		if(nodes.size() < 2)
+			return NodeTrixViz.CELL_SIZE_HALF;
+		return bkg.getWidth();
 	}
 	
 }

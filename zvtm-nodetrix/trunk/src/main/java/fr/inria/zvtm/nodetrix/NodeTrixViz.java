@@ -375,10 +375,11 @@ public class NodeTrixViz {
     	reorderMatricesCMK();
     }
     
-    public void mergeMatrices()
+    public void mergeMatrices(VirtualSpace vs, AnimationManager am)
     {
     	System.out.println("[NODE_TRIX_VIZ] -- MERGE "+ matrices.size() +" MATRICES ");
-    	// grouping matrices with equal names
+    	
+    	// GROUP MATRICES ACCORDING NAMES MATRIX
 		HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
     	for(Matrix m : matrices){
     		System.out.println("[NODE_TRIX_VIZ] GROUING " + m.getName());
@@ -389,35 +390,113 @@ public class NodeTrixViz {
     		mergeMap.get(name).add(m);
     	}	
        	
-        // positioning matrices that tend to be merged
-//    	System.out.println("[NODE_TRIX_VIZ] -- CREATING NEW MATRICES " + mergeMap.size());
-    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet()){
+        // POSITION MATRICES THAT TEND TO BE MERGED IN A ROW 
+    	System.out.println("[NODE_TRIX_VIZ] -- CREATING NEW MATRICES " + mergeMap.size());
+    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet())
+    	{
     		Vector<Matrix> mergeMatrices = entry.getValue();
-//        	System.out.println("[NODE_TRIX_VIZ] " + entry.getKey() + " CONTAINIG " + mergeMatrices.size());
+        	System.out.println("[NODE_TRIX_VIZ] " + entry.getKey() + " CONTAINIG " + mergeMatrices.size());
         	if(mergeMatrices.size() < 2) continue;
 
-    		long xCenter = 0;	//center of new matrix
-        	long yCenter = 0;	//center of new matrix
-        	for(Matrix m : mergeMatrices){
-        		xCenter += m.getPosition().x;
-           		yCenter += m.getPosition().y;
-        	}
-        	xCenter /= mergeMatrices.size();
-           	yCenter /= mergeMatrices.size();
-        	System.out.println("[NODE_TRIX_VIZ]\tNEW CENTRE: " + xCenter + ", " + yCenter);
-               	
-           	long offset = 0; // offset to next matrix for layouting
+        	//compute centre of new matrix
+        	// and put nodes into lists
+        	Matrix firstMatrix =  mergeMatrices.firstElement();
+        	long xStart = firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth();	//center of new matrix
+        	long yStart = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth();	//center of new matrix
+
+        	//position matrix to be merged together
+
+        	long offset = 0; // offset to next matrix for lay-outing
         	for(Matrix m : mergeMatrices){
 //        		System.out.println("[NODE_TRIX_VIZ] MOVE MATRIX " + m.getName());
-        		m.move(xCenter + offset - m.getPosition().x , yCenter - offset +  m.getPosition().y);
-//        		offset += m.bkg.getWidth();
+        		offset += m.getBackgroundWidth();
+        		m.move(xStart + offset - m.getPosition().x , yStart - offset - m.getPosition().y);
+        		offset += m.getBackgroundWidth();
         	}
     	}
+    	
+    	//CREATE NEW MATRICES
+    	Vector<Matrix> newMatrices = new Vector<Matrix>();
+    	int clusterNumber = 0;
+    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet()){
+    		Vector<Matrix> mergeMatrices = entry.getValue();
+    		//put nodes in new matrix
+    		Matrix newMatrix = new Matrix(entry.getKey(), new Vector<NTNode>());
+    		clusterNumber++;
+    		
+    		newMatrices.add(newMatrix);
+    		for(Matrix m : mergeMatrices){
+    			for(NTNode n : m.nodes){
+    				newMatrix.addNode(n);
+    			}
+    		}
+    		
+    		//compute centre of new matrix
+    		Matrix firstMatrix =  mergeMatrices.firstElement();
+    		Matrix lastMatrix =  mergeMatrices.lastElement();
+        	long xCentre = (firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth()) + (lastMatrix.getPosition().x + lastMatrix.getBackgroundWidth());	//center of new matrix
+        	long yCentre = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth() + (lastMatrix.getPosition().x - lastMatrix.getBackgroundWidth());	//center of new matrix
+        	for(Matrix m : mergeMatrices){
+        		xCentre += m.getPosition().x;
+           		yCentre += m.getPosition().y;
+        	}
+        	xCentre /= (mergeMatrices.size() + 2);
+           	yCentre /= (mergeMatrices.size() + 2);
+           	
+           	//draw new matrix;                                                              
+			newMatrix.createNodeGraphics(xCentre, yCentre, vs);
+			System.out.println("-----");
+			newMatrix.finishCreateNodeGraphics(vs);
+
+			// set node labels to old positions
+			// and put old matrices to front
+			for(Matrix m : mergeMatrices){
+				m.onTop(vs);
+    			//shift labels to old places
+    			int xNew = (int) (m.getPosition().x - (m.getBackgroundWidth() + m.getLabelWidth()));
+    			int yNew = (int) (m.getPosition().y + m.getBackgroundWidth() + m.getLabelWidth());
+    			for(NTNode n : m.nodes){
+    				n.shiftNorthernLabels(yNew, false);
+    				n.shiftWesternLabels(xNew, false);
+    			}
+    		}
+    		
+    		System.out.println("[NODE_TRIX_VIZ] FADE OUT OLD MATRICES");
+    		
+    		//fade out old matrices
+    		for(Matrix m : mergeMatrices){
+    			m.cleanGraphics(am);
+    		}
+
+    		//reset nodes to original places
+    		for(NTNode n : newMatrix.nodes){
+    			n.resetNorthernLabels(true);
+    			n.resetWesternLabels(true);
+    		}
+    		
+    		//adjust edge appearance
+    		newMatrix.adjustEdgeAppearance();
+    		newMatrix.performEdgeAppearanceChange();
+    		matrices.removeAll(mergeMatrices);
+    	}
+    		
+    	//create edge graphics
+    	for(Matrix newMatrix : newMatrices){
+    		newMatrix.createEdgeGraphics(vs);
+    		newMatrix.onTop(vs);
+    		matrices.add(newMatrix);
+    		
+    	}
+    	
+    	
+    	//put nodes into new matrix (not possible before, since there are problems with the positioning)
+    	
+    	
+    	
+    	// VISUAL MERGING
+    	
     }
-    
-    public void mergeMatrices(VirtualSpace vs, AnimationManager am){
-    	//TODO
-    }
+
     
     /**
      * Iterates over all matrices and group their nodes according to their assigned

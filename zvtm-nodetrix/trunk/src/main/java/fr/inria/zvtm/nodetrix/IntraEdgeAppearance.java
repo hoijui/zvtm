@@ -30,7 +30,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	private DPath gLowerFrameFragment, gUpperFrameFragment;
 	private VRectangle gSensitive;
 	private VCircle gHighlight;
-	private VText gLabel;
+//	private VText gLabel;
 	
 	public IntraEdgeAppearance(NTEdge edge) {
 		super(edge);
@@ -49,6 +49,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	protected void clearGraphics() 
 	{
 		if(vs == null) return;
+		vs.removeGlyph(gHighlight);
 		vs.removeGlyph(gPrimary);
     	if(gSecondary != null) vs.removeGlyph(gSecondary);
      	vs.removeGlyph(gLeftFrameFragment);
