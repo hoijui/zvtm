@@ -39,7 +39,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * Cubic Curve: a curved segment that has two endpoints and two control points.
  * Each control point determines the shape of the curve by controlling one of the endpoint tangent vectors. <br> For this particular glyph, vx and vy correspond to the center of the imaginary segment linking the curve's start and end points. <br> The coordinates of the control points are expressed respectively w.r.t start and end points in polar coordinates (orient=0 on segment linking start and end points, meaning that if orient=0 for both control points, start control1 control2 and end points are aligned). See <a href="ftp://ftp.inria.fr/INRIA/publication/Theses/TU-0769.pdf">ftp://ftp.inria.fr/INRIA/publication/Theses/TU-0769.pdf</a>, page 147 for a diagramatic explaination.
  *@see fr.inria.zvtm.glyphs.VQdCurve
- *@see fr.inria.zvtm.glyphs.VPath
+ *@see fr.inria.zvtm.glyphs.DPath
  * @author Emmanuel Pietriga
  **/
 

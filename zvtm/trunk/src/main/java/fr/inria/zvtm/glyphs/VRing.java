@@ -183,7 +183,7 @@ public class VRing extends VSlice {
     /**
      * Returns the inner radius ratio, as a percentage
      * of the outer radius.
-     * @returns the inner radius ratio
+     * @return the inner radius ratio
      */
     public float getInnerRatio(){
         return irr_p;
