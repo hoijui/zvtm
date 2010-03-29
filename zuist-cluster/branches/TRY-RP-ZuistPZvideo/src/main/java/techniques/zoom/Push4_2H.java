@@ -19,7 +19,7 @@ import com.illposed.osc.OSCPortIn;
  *
  */
 
-public class Push4_2H extends AbstractViewerTechnique {
+public class Push4_2H extends AbstractZoomTechnique {
 
 	public static final String IN_CMD_ZOOM_FIRSTVALUE_MEMORY = "zoomfvm"; 
 	public static final String CMD_STOP = "stop";

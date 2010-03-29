@@ -15,6 +15,7 @@ import java.awt.GradientPaint;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
@@ -29,6 +30,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.ImageIcon;
 import java.awt.Container;
 import javax.swing.JComboBox;
@@ -84,9 +86,26 @@ import org.xml.sax.SAXException;
  */
 
 public class Viewer implements Java2DPainter, RegionListener, LevelListener {
-    
+   	public static final int DEFAULT_ZOOM_OSC_LISTENING_PORT = 52510 ;
+	public static final int DEFAULT_POINT_OSC_LISTENING_PORT = 52511;
+	public static final int DEFAULT_PAN_OSC_LISTENING_PORT = 52512;
+	
+	public static final int IPOD_ZOOM_OSC_LISTENING_PORT = 52513 ;
+	public static final int IPOD_POINT_OSC_LISTENING_PORT = 52514;
+	public static final int IPOD_PAN_OSC_LISTENING_PORT = 52515;
+	
+	public static final int IPOD_DEFAULT_OSC_LISTENING_PORT = 52516;
+
+	public static final String MOVE_CAMERA = "/moveMCam";
+	public static final String TILT_OBJECT = "/WILDPointing/inclinaison";
+	public static final String MOVE_OBJECT = "/WildPointing/moveTo";
+	static final String CMD_NOSIGNAL = "noSignal";
+	static final String IN_CMD_PAN1 = "pan";
+	static final String IN_CMD_PAN0 = "pan0";
+	static final String IN_CMD_NOSIGNAL = CMD_NOSIGNAL;
+ 
     //XXX hack for zuist video
-    private Viewer INSTANCE = null;
+    private static Viewer INSTANCE = null;
 
     File SCENE_FILE, SCENE_FILE_DIR;
         
@@ -115,7 +134,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     VirtualSpace mSpace, ovSpace;
     VirtualSpace cursorSpace;
     Camera mCamera;
-    Camera cursorCam;
+    Camera cursorCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -128,7 +147,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	OverlayManager ovm;
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
-    
+
+   	private long zoX = 0;
+	private long zoY = 0;
+ 
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
 		initGUI(fullscreen, opengl, antialiased);
@@ -164,7 +186,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
         cursorSpace = vsm.addVirtualSpace("cursor");
-        cursorCam = cursorSpace.addCamera();
+        cursorCamera = cursorSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
@@ -172,7 +194,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
-        sceneCam.add(cursorCam);
+        sceneCam.add(cursorCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
                 1700,
@@ -315,7 +337,37 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
 
 	/*-------------  Scene management    -------------*/
-public void zeroOrderZoom(float z){
+
+    public void startPan(){}
+    public void stopPan(){}
+    public void startZoom(){}
+    public void stopZoom(){}
+	public void setCursorPosition(long x, long y) {
+	  //XXX empty: pzwild stuff
+	}
+
+	public JPanel getZVTMPanel()
+	{
+		return mView.getPanel();
+	}
+
+    public void setZoomOrigin(long x, long y, boolean updateCursor) {
+        this.zoX = x;
+        this.zoY = y;
+        Point pointLocation;
+        pointLocation = clusteredView.spaceToViewCoords(mCamera, (long)x, (long)y);
+        LongPoint pl = clusteredView.viewToSpaceCoords(cursorCamera,pointLocation.x,pointLocation.y);
+
+        if (updateCursor) {
+            zoomCenter.moveTo(pl.x,pl.y);
+        }
+    }
+
+    public void setZoomOrigin(long x, long y) {
+        setZoomOrigin(x, y, true);
+    }
+
+    public void zeroOrderZoom(float z){
 		
 		Location cgl = mCamera.getLocation();
 		double a = (mCamera.focal+Math.abs(mCamera.altitude))/mCamera.focal;
@@ -350,6 +402,24 @@ public void zeroOrderZoom(float z){
 		}
 	}
 
+	public void zeroOrderTranslate(long x, long y){
+
+		// Je laisse l'ancien code
+		
+		double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+
+		Location l = mCamera.getLocation();
+		long newx = Math.round((long)l.getX()+a*x);
+		long newy = Math.round((long)l.getY()+a*y);
+					       
+		mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+
+		if (currentPointTechnique == null)
+		{
+			setZoomOrigin(newx, newy);
+		}
+	}
+
     public static Viewer getInstance(){
         return INSTANCE;
     }
@@ -359,7 +429,7 @@ public void zeroOrderZoom(float z){
     }
 
     public Camera getCursorCamera(){
-        return cursorCam;
+        return cursorCamera;
     }
    
     public ClusteredView getClusteredView(){
@@ -794,7 +864,6 @@ class VWGlassPane extends JComponent implements ProgressListener {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
     public void setLabel(String m){
         msg = m;
         msgX = application.panelWidth/2-BAR_WIDTH/2;

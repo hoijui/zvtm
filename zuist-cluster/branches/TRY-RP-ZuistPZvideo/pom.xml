@@ -34,7 +34,12 @@
             <artifactId>javaOSC</artifactId>
             <version>20060402</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>fr.inria</groupId>
+            <artifactId>WildInputServer</artifactId>
+            <version>1.0</version>
+        </dependency>
+</dependencies>
     <build>
 		<plugins>
 			<plugin>

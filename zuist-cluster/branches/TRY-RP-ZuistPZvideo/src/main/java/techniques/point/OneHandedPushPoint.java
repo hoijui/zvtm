@@ -208,7 +208,7 @@ public class OneHandedPushPoint extends AbstractPointTechnique {
 		//						); 
 								
 								// Viewer.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
-								Viewer.getInstance().setViewerOrigin(pointLocation.x, pointLocation.y);
+								Viewer.getInstance().setZoomOrigin(pointLocation.x, pointLocation.y);
 								
 								//System.out.println("point : " + pointLocation.x + ", " + pointLocation.y);
 							

@@ -7,7 +7,7 @@ import fr.inria.zuist.cluster.viewer.Viewer;
 import techniques.AbstractTechnique;
 import fr.inria.zvtm.glyphs.VText;
 
-public abstract class AbstractViewerTechnique extends AbstractTechnique {
+public abstract class AbstractZoomTechnique extends AbstractTechnique {
 	
 	public enum ViewerTechnique {Push4_2H, Push4, Push3, Push2, Knob, Wheel,Wheel2Handed, Wheel2, Fist, Push, Mouse, TurningIPod, LinearIPod}
 	
@@ -54,12 +54,12 @@ public abstract class AbstractViewerTechnique extends AbstractTechnique {
 	/* 1-order zoom with absolute values from the VICON*/
 	protected Point2D.Float refPoint = new Point2D.Float(0,0);
 	
-	public AbstractViewerTechnique(String id, ORDER o, boolean c) {
+	public AbstractZoomTechnique(String id, ORDER o, boolean c) {
 		super(id, o, c);
 		
 	}
 	
-	public static AbstractViewerTechnique createTechnique(String xmlName) {
+	public static AbstractZoomTechnique createTechnique(String xmlName) {
 		
 		// TODO the names need to be cleaned
 		

@@ -9,7 +9,7 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 
 
-public class Knob extends AbstractViewerTechnique {
+public class Knob extends AbstractZoomTechnique {
 	
 	/**
 	 * Maximum difference between the previous glove 'angle' and the current one. Angles are computed from glove coordinates.

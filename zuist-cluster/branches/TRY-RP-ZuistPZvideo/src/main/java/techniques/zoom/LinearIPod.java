@@ -25,7 +25,7 @@ import com.illposed.osc.OSCPortIn;
  * @author mathieunancel
  *
  */
-public class LinearIPod extends AbstractViewerTechnique {
+public class LinearIPod extends AbstractZoomTechnique {
 	
 	public static final int ID = 0, X = 1, Y = 2, PRESS = 3;
 	

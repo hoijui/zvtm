@@ -49,7 +49,7 @@ public class DesktopMouse extends AbstractPointTechnique {
 			long x = (long)(evt.getX());
 			long y = (long)(evt.getY());
 			// should convert in zvtm coordinate !
-			// Viewer.getInstance().setViewerOriginByMasterScreenCoor(x, y);
+			// Viewer.getInstance().setZoomOriginByMasterScreenCoor(x, y);
 			//System.out.println("MOUSE Moved motion");
 		    }
 		    public void mouseDragged(MouseEvent evt) {

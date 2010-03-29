@@ -25,7 +25,7 @@ import com.illposed.osc.OSCPortIn;
 import fr.inria.zvtm.engine.LongPoint;
 
 
-public class TurningWheel2Handed extends AbstractViewerTechnique {
+public class TurningWheel2Handed extends AbstractZoomTechnique {
 
 	/*
 	 * TODO
@@ -350,7 +350,7 @@ public class TurningWheel2Handed extends AbstractViewerTechnique {
 				if(e.getButton() == MouseEvent.BUTTON3) 
 				{
 					zoomMouseEvent = true;
-					Viewer.getInstance().startViewer();
+					Viewer.getInstance().startZoom();
 				}
 				
 				/*
@@ -374,7 +374,7 @@ public class TurningWheel2Handed extends AbstractViewerTechnique {
 					points.clear();
 					directionObservationFrame.clear();
 					turningCW = -1;
-					Viewer.getInstance().stopViewer();
+					Viewer.getInstance().stopZoom();
 					//smoothingStepsBuffer.clear();
 			}
 

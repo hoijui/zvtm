@@ -19,7 +19,7 @@ import com.illposed.osc.OSCPortIn;
  *
  */
 
-public class Push4 extends AbstractViewerTechnique {
+public class Push4 extends AbstractZoomTechnique {
 	
 	public static final float MULT_ZOOM = 3;
 	
@@ -177,7 +177,7 @@ public class Push4 extends AbstractViewerTechnique {
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					pressed = true;
-					Viewer.getInstance().startViewer();
+					Viewer.getInstance().startZoom();
 				}
 			}
 			
@@ -185,7 +185,7 @@ public class Push4 extends AbstractViewerTechnique {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					pressed = false;
-					Viewer.getInstance().stopViewer();
+					Viewer.getInstance().stopZoom();
 				}
 			}
 			

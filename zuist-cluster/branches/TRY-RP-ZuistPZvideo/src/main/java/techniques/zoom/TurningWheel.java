@@ -25,7 +25,7 @@ import com.illposed.osc.OSCPortIn;
 import fr.inria.zvtm.engine.LongPoint;
 
 
-public class TurningWheel extends AbstractViewerTechnique {
+public class TurningWheel extends AbstractZoomTechnique {
 
 	/*
 	 * TODO
@@ -216,7 +216,7 @@ public class TurningWheel extends AbstractViewerTechnique {
 						(int)ellipse.cy
 				); 
 				
-				Viewer.getInstance().setViewerOrigin(pointLocation.x, pointLocation.y, false);
+				Viewer.getInstance().setZoomOrigin(pointLocation.x, pointLocation.y, false);
 	
 				Angle = ellipse.computeAngle(closestPoint);
 
@@ -386,7 +386,7 @@ public class TurningWheel extends AbstractViewerTechnique {
 				if(e.getButton() == MouseEvent.BUTTON3) 
 				{
 					zoomMouseEvent = true;
-					Viewer.getInstance().startViewer();
+					Viewer.getInstance().startZoom();
 					System.out.println("Press 3");
 				}
 				
@@ -411,7 +411,7 @@ public class TurningWheel extends AbstractViewerTechnique {
 					points.clear();
 					directionObservationFrame.clear();
 					turningCW = -1;
-					Viewer.getInstance().stopViewer();
+					Viewer.getInstance().stopZoom();
 					//smoothingStepsBuffer.clear();
 			}
 

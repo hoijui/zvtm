@@ -11,7 +11,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 
 
-public class TurningWheel2 extends AbstractViewerTechnique {
+public class TurningWheel2 extends AbstractZoomTechnique {
 	
 	
 	public static final double TWO_PI = 2 * Math.PI;

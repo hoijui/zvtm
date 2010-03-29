@@ -10,7 +10,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 
 
-public class Tilt extends AbstractViewerTechnique {
+public class Tilt extends AbstractZoomTechnique {
 	
 	public static final String IN_CMD_ZOOM = "zoom"; //
 	
@@ -69,7 +69,7 @@ public class Tilt extends AbstractViewerTechnique {
 				} 
 				else if (cmd.equals(IN_CMD_ZORIG))
 				{
-					// Viewer.getInstance().setViewerOriginCG(
+					// Viewer.getInstance().setZoomOriginCG(
 							//((Integer)parts[1]).intValue(), ((Integer)parts[2]).intValue());
 					System.out.println(
 							"set zom origin "+((Integer)parts[1]).intValue()+" "+

@@ -16,11 +16,7 @@ public abstract class AbstractPanTechnique extends AbstractTechnique {
 	public static AbstractPanTechnique createTechnique(String name)
 	{
 
-		if (name.equals("DesktopMouse"))
-		{
-			return new DesktopMouse("DesktopMouse", ORDER.ZERO);
-			
-		} else if (name.equals("MouseButtonLaserPan")) {
+		if (name.equals("MouseButtonLaserPan")) {
 			
 			return new MouseButtonLaserPan("MouseButtonLaserPan", ORDER.ZERO, Viewer.DEFAULT_PAN_OSC_LISTENING_PORT);
 			

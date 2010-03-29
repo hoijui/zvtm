@@ -20,7 +20,7 @@ import com.illposed.osc.OSCPortIn;
  *
  */
 
-public class Push2 extends AbstractViewerTechnique {
+public class Push2 extends AbstractZoomTechnique {
 
 	public static final String IN_CMD_ZOOM_FIRSTVALUE_MEMORY = "zoomfvm"; 
 	public static final String CMD_STOP = "stop";
@@ -185,7 +185,7 @@ public class Push2 extends AbstractViewerTechnique {
 			public void mousePressed(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					pressed = true;
-					Viewer.getInstance().startViewer();
+					Viewer.getInstance().startZoom();
 				}
 			}
 			
@@ -193,7 +193,7 @@ public class Push2 extends AbstractViewerTechnique {
 			public void mouseReleased(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON3) {
 					pressed = false;
-					Viewer.getInstance().stopViewer();
+					Viewer.getInstance().stopZoom();
 				}
 			}
 			

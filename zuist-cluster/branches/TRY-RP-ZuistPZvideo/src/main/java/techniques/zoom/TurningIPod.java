@@ -18,7 +18,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 
 
-public class TurningIPod extends AbstractViewerTechnique {
+public class TurningIPod extends AbstractZoomTechnique {
 	
 	public static final int ID = 0, X = 1, Y = 2, PRESS = 3;
 	

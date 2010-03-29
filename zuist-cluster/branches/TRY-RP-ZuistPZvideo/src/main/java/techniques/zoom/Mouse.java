@@ -15,7 +15,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
 
-public class Mouse extends AbstractViewerTechnique {
+public class Mouse extends AbstractZoomTechnique {
 	
 	public static final float WHEEL_ZOOMIN_FACTOR = 2*5f;
 	public static final float WHEEL_ZOOMOUT_FACTOR = 2*5f;
@@ -115,7 +115,7 @@ public class Mouse extends AbstractViewerTechnique {
 					{
 						myx = 0;
 						myy = 0;
-						Viewer.getInstance().setViewerOrigin(0, 0);
+						Viewer.getInstance().setZoomOrigin(0, 0);
 						getFirstMouseMove = true;
 						recenterCursor(jpx,jpy,e);
 						wait_robot = true;
@@ -125,8 +125,8 @@ public class Mouse extends AbstractViewerTechnique {
 					{
 						myx = myx - dragCDRX*(robX-jpx);
 						myy = myy - dragCDRY*(jpy-robY);
-						//setViewerOrigin(v.getVCursor().vx, v.getVCursor().vy);
-						Viewer.getInstance().setViewerOrigin(myx, myy);
+						//setZoomOrigin(v.getVCursor().vx, v.getVCursor().vy);
+						Viewer.getInstance().setZoomOrigin(myx, myy);
 						recenterCursor(jpx,jpy,e);
 						wait_robot = true;
 					}
@@ -137,7 +137,7 @@ public class Mouse extends AbstractViewerTechnique {
 				}
 				else
 				{
-					//setViewerOrigin(v.getVCursor().vx, v.getVCursor().vy); 
+					//setZoomOrigin(v.getVCursor().vx, v.getVCursor().vy); 
 					//firstOrderTranslate(jpx-lastJPX, lastJPY-jpy);
 					//lastJPX = jpx;
 					//lastJPY = jpy;
