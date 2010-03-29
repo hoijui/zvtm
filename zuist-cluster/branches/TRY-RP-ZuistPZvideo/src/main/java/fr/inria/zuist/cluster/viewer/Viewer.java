@@ -47,6 +47,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FilenameFilter;
 
+import techniques.AbstractTechnique;
+import techniques.pan.AbstractPanTechnique;
+import techniques.point.AbstractPointTechnique;
+import techniques.zoom.AbstractZoomTechnique;
+import utils.settings.TechniqueSettings;
+import utils.settings.TechniqueSettingsManager;
+import utils.settings.TechniqueSettingsManager.Dimensions;
+import utils.settings.TechniqueSettingsManager.GestureType;
+import utils.settings.TechniqueSettingsManager.Hands;
+
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
@@ -150,8 +160,30 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
    	private long zoX = 0;
 	private long zoY = 0;
+
+	private WallCursor zoomCenter;
+
+    private AbstractPanTechnique currentPanTechnique;
+    private AbstractPointTechnique currentPointTechnique;
+    private AbstractZoomTechnique currentZoomTechnique;
  
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile, String nbHands, String gesture, String dimension){
+        TechniqueSettingsManager setMgr = new TechniqueSettingsManager();
+        Hands hands = Hands.valueOf(nbHands);
+        GestureType gestureType = GestureType.valueOf(gesture);
+        Dimensions dimensions = Dimensions.valueOf(dimension);
+
+        TechniqueSettings settings = setMgr.getSetting(hands, gestureType, dimensions);
+
+        String techName = settings.getZoomTechnique();
+        String panTechName = settings.getPanTechnique();
+        String pointTechName = settings.getPointTechnique();
+
+        currentPanTechnique = AbstractPanTechnique.createTechnique(panTechName);
+        currentPointTechnique = AbstractPointTechnique.createTechnique(pointTechName);
+        currentZoomTechnique = AbstractZoomTechnique.createTechnique(techName);
+
+
 		ovm = new OverlayManager(this);
 		initGUI(fullscreen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
@@ -173,6 +205,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
+    }
+
+    public static VirtualSpaceManager getVirtualSpaceManager(){
+        return VirtualSpaceManager.INSTANCE;
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -209,6 +245,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
+        zoomCenter = new WallCursor(cursorSpace,  20, 160, Color.BLUE);
+
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -783,6 +821,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+        String hands = "One";
+        String gesture = "Linear";
+        String dimension = "OneD";
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
@@ -814,7 +855,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        INSTANCE = new Viewer(fs, ogl, aa, xmlSceneFile);
+        INSTANCE = new Viewer(fs, ogl, aa, xmlSceneFile, hands, gesture, dimension);
     }
     
     private static void printCmdLineHelp(){

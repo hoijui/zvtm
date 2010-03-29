@@ -1,4 +1,4 @@
-package pzwallzoom;
+package fr.inria.zuist.cluster.viewer;
 
 import java.awt.Color;
 
