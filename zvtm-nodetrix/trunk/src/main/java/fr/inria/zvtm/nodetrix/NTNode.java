@@ -63,12 +63,13 @@ public class NTNode extends LinLogNode{
 	
 	/*Name of the the group this node belongs to, null if no group is assigned*/
 	private String group = null;
-	private boolean reDraw = true;
+//	private boolean reDraw = true;
 
 	private long yOld;
 
 	private long xOld;
 	
+	private NTInfoBox infoBox;
 	
 	public NTNode(String name){
 		super(name, 1);
@@ -330,11 +331,19 @@ public class NTNode extends LinLogNode{
     
     //GETTER/SETTER--------------------------------------------------------------------------------------------
     
+    
+    public void setInfoBox(NTInfoBox ib){
+    	infoBox = ib;
+    }
+    public NTInfoBox getInfoBox(){
+    	return infoBox;
+    }
+    
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
      * the matrix. A gradient is also applied according to the position of the node in the list.
      */
 	public void setBackgroundBox(long maxLength) {
-		System.out.println(maxLength);
+//		System.out.println(maxLength);
 		if(widthHalf == 0) this.widthHalf = maxLength/2;
 		if (heightHalf == 0){
 		    this.heightHalf = gBackgroundW.getHeight();

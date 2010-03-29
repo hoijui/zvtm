@@ -30,7 +30,13 @@ import fr.inria.zvtm.nodetrix.MatrixSizeComparator;
 
 public class NodeTrixViz {
     
-    public static final long CELL_SIZE = 20;
+	// COLOR SCHEMES
+    public static int CS_SCREEN = 0;
+    public static int CS_PRINT = 1;
+    public static int COLOR_SCHEME = CS_SCREEN;
+    
+    
+	public static final long CELL_SIZE = 20;
     public static final long CELL_SIZE_HALF = CELL_SIZE/2;
     public static final int GROUP_LABEL_HALF_WIDTH = 50;
     public static final int LINLOG_ITERATIONS = 20;
@@ -38,7 +44,7 @@ public class NodeTrixViz {
     public static final int MATRIX_NODE_LABEL_OCCLUSION_WIDTH = 150; //half of the width/lenght in pixel that can be occupied by labels when enabling local exploration
     
     //COLORS AND TRANSLUNCENCIES
-    public static final Color COLOR_GRID = Color.getHSBColor(1f, 0.0f, 0.9f);
+    public static final Color COLOR_GRID = Color.getHSBColor(1f, 0.0f, 0.9f) ;
     public static final float GRID_TRANSLUCENCY = .5f;
     public static final float INTRA_TRANSLUCENCY = .7f;
     public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
@@ -53,7 +59,10 @@ public class NodeTrixViz {
     public static final Color MATRIX_STROKE_COLOR = Color.BLACK;
     public static final Color INTRA_LINK_COLOR = new Color(160,202,254);
     public static final Color EXTRA_LINK_COLOR = new Color(118,98,252);
-     
+    public static final Color INTER_LINK_COLOR = Color.BLACK;
+    public static final Color COLOR_INFO_BOX = COLOR_MATRIX_NODE_BKG_COLOR;
+    public static final Color COLOR_INFO_BOX_TEXT = COLOR_MATRIX_NODE_LABEL_COLOR;
+      
     
     //ANIMATION DURATIOS in msec
     public static final int DURATION_GENERAL = 300;
@@ -71,8 +80,6 @@ public class NodeTrixViz {
 	public static final int IA_STATE_COLLAPSE = 8;
 
     /* Links between matrices */
-    static Color INTER_LINK_COLOR = Color.BLACK;
-	
 	public static final float EXTRA_ALPHA_MAX_LENGHT = 1500;  
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
 	public static final float EXTRA_ALPHA_MIN = .25f;
@@ -268,7 +275,7 @@ public class NodeTrixViz {
 	 *  before instantiating the remaining graphical elements
 	 */
     public void finishCreateViz(VirtualSpace vs){
-        for(Matrix m : matrices){
+    	for(Matrix m : matrices){
 			m.adjustEdgeAppearance();
 			m.performEdgeAppearanceChange();
 		}
@@ -278,11 +285,12 @@ public class NodeTrixViz {
         for (Matrix m:matrices){
 		    m.createEdgeGraphics(vs);
 		}
-        
+
         Collections.sort(matrices, new MatrixSizeComparator());
         for (Matrix m:matrices){
 		    m.onTop(vs);
 		}
+//        System.out.println("[NODE_TRIX_VIZ] FINISHED ");
     }
     
     
@@ -382,7 +390,7 @@ public class NodeTrixViz {
     	// GROUP MATRICES ACCORDING NAMES MATRIX
 		HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
     	for(Matrix m : matrices){
-    		System.out.println("[NODE_TRIX_VIZ] GROUING " + m.getName());
+//    		System.out.println("[NODE_TRIX_VIZ] GROUING " + m.getName());
     		String name = m.getName();
     		if(!mergeMap.containsKey(name)){
     			mergeMap.put(name, new Vector<Matrix>());
@@ -395,7 +403,7 @@ public class NodeTrixViz {
     	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet())
     	{
     		Vector<Matrix> mergeMatrices = entry.getValue();
-        	System.out.println("[NODE_TRIX_VIZ] " + entry.getKey() + " CONTAINIG " + mergeMatrices.size());
+//        	System.out.println("[NODE_TRIX_VIZ] " + entry.getKey() + " CONTAINIG " + mergeMatrices.size());
         	if(mergeMatrices.size() < 2) continue;
 
         	//compute centre of new matrix
@@ -461,7 +469,7 @@ public class NodeTrixViz {
     			}
     		}
     		
-    		System.out.println("[NODE_TRIX_VIZ] FADE OUT OLD MATRICES");
+//    		System.out.println("[NODE_TRIX_VIZ] FADE OUT OLD MATRICES");
     		//fade out old matrices
     		for(Matrix m : mergeMatrices){
     			m.cleanGraphics(am);
@@ -487,14 +495,6 @@ public class NodeTrixViz {
     		matrices.add(newMatrix);
     		
     	}
-    	
-    	
-    	//put nodes into new matrix (not possible before, since there are problems with the positioning)
-    	
-    	
-    	
-    	// VISUAL MERGING
-    	
     }
 
     

@@ -111,12 +111,14 @@ public class Matrix {
         	                            NodeTrixViz.CELL_SIZE/2*nodes.size(),
         	                            vs, false, c);
         	    nodes.get(i).moveTo(x, y);
-            }	        
+        	    nodes.get(i).getInfoBox().createGraphics(vs); // not yet on the right position. 
+    	    }	        
 	    }
 	    else {
 	        // if matrix contains a single node, only show a horizontal label
 	        nodes.firstElement().createGraphics(0, 0, 0, 0, vs, true, Color.getHSBColor(0.1f, 0.8f, 1.0f));
     	    nodes.firstElement().moveTo(x, y);
+//    	    nodes.firstElement().getInfoBox().createGraphics(vs); // not yet on the right position. 
     	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, Color.white,  Color.white, 0f);
 	    }
     	bkg.setOwner(this);
@@ -163,6 +165,7 @@ public class Matrix {
         
         for(NTNode n : nodes)
         {
+//        	System.out.println("[MATRIX] FINISH NODE GRAPHICS " + name);
         	n.setBackgroundBox(labelWidth);
         	if(this.nodes.size() == 1) break;
         	
@@ -208,6 +211,8 @@ public class Matrix {
         	gridReflexiveSquares[i] = r;
 
         	i++;
+//        	System.out.println("[MATRIX] FINISHED NODE GRAPHICS " + name);
+
         }
     }
     
