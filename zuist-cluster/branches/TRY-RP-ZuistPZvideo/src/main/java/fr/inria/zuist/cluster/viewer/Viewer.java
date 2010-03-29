@@ -106,11 +106,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
-    static final String mSpaceName = "Scene Space";
+    static final String mSpaceName = "testSpace";
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
     VirtualSpace mSpace, ovSpace;
+    VirtualSpace cursorSpace;
     Camera mCamera;
+    Camera cursorCam;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -158,6 +160,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
+        cursorSpace = vsm.addVirtualSpace("cursor");
+        cursorCam = cursorSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
@@ -165,6 +169,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
+        sceneCam.add(cursorCam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
                 1700,
@@ -312,8 +317,12 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         return mCamera;
     }
 
-    public void setCursorPosition(int x, int y){
-        throw new Error("not implemented");
+    public Camera getCursorCamera(){
+        return cursorCam;
+    }
+   
+    public ClusteredView getClusteredView(){
+        return clusteredView;
     }
 
 	void reset(){
