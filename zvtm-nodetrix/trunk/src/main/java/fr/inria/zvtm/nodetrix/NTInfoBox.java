@@ -10,6 +10,10 @@ import fr.inria.zvtm.glyphs.VText;
 /**Infobox that shows additional information about a matix node.
  * The information is stored simply in a list containing a configurable 
  * amount of fields for each entry. The contained data is shown as a table.
+ * 
+ * The box appears when it is clicked on a node. It can be dragged and by clicking
+ * directly on the box, in disappears. A mouse-over causes the corresponding node
+ * to be highlighted.
  **/
 public class NTInfoBox {
 
