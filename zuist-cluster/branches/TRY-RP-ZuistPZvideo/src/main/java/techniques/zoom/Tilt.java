@@ -61,7 +61,7 @@ public class Tilt extends AbstractViewerTechnique {
 						addAltitudeSample();
 						
 					} else if (order.equals(ORDER.ZERO)) {
-						Viewer.getInstance().zeroOrderViewer(((Float)parts[1]).floatValue());
+						Viewer.getInstance().zeroOrderZoom(((Float)parts[1]).floatValue());
 						System.out.println("zoom0 "+((Float)parts[1]).floatValue());
 						
 						addAltitudeSample();

@@ -11,7 +11,7 @@ import java.util.Date;
 import javax.swing.Timer;
 
 import fr.inria.zuist.cluster.viewer.Viewer;
-import package techniques.VICONLaserListener;
+import techniques.VICONLaserListener;
 
 import com.illposed.osc.OSCListener;
 import com.illposed.osc.OSCMessage;

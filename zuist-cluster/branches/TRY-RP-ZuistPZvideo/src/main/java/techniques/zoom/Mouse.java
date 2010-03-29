@@ -200,7 +200,7 @@ public class Mouse extends AbstractViewerTechnique {
 					
 				}
 				
-				Viewer.getInstance().zeroOrderViewer(currentDirection * accel * WHEEL_ZOOMIN_FACTOR);
+				Viewer.getInstance().zeroOrderZoom(currentDirection * accel * WHEEL_ZOOMIN_FACTOR);
 				addAltitudeSample();
 				prevTime3 = prevTime2;
 				prevTime2 = prevTime;

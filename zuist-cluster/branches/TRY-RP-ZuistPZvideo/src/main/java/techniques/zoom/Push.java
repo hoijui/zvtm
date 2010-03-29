@@ -63,8 +63,8 @@ public class Push extends AbstractViewerTechnique {
 						
 					} else if (order.equals(ORDER.ZERO)) {
 						
-						System.out.println("zeroOrderViewerValue: " + zoomValue);
-						Viewer.getInstance().zeroOrderViewer(zoomValue);
+						System.out.println("zeroOrderZoomValue: " + zoomValue);
+						Viewer.getInstance().zeroOrderZoom(zoomValue);
 						
 						refPoint = new Point2D.Float(xValue, yValue);
 					}

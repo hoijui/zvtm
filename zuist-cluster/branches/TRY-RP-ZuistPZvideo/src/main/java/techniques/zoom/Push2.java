@@ -139,7 +139,7 @@ public class Push2 extends AbstractViewerTechnique {
 									// Right movement amplitude and direction
 									if (movementY > ZOOM_MIN_MVT) { // TODO to be tested
 										
-										Viewer.getInstance().zeroOrderViewer(direction * movementY); // That too
+										Viewer.getInstance().zeroOrderZoom(direction * movementY); // That too
 										
 									} else {
 										// System.out.println("Movement shoud be higher : " + movementY);
@@ -151,7 +151,7 @@ public class Push2 extends AbstractViewerTechnique {
 									// Right movement amplitude and direction
 									if (movementY < -ZOOM_MIN_MVT) { // TODO to be tested
 										
-										Viewer.getInstance().zeroOrderViewer(direction * movementY); // That too
+										Viewer.getInstance().zeroOrderZoom(direction * movementY); // That too
 										
 									} else {
 										// System.out.println("Movement shoud be lower : " + movementY);

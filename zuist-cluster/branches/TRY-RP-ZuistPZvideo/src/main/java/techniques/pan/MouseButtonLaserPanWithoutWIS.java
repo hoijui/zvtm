@@ -9,8 +9,8 @@ import java.net.SocketException;
 import java.util.Date;
 
 import fr.inria.zuist.cluster.viewer.Viewer;
-import package techniques.VICONLaserListener;
-import package techniques.zoom.Push2;
+import techniques.VICONLaserListener;
+import techniques.zoom.Push2;
 import utils.pointedscreen.PointedScreen;
 
 import com.illposed.osc.OSCListener;

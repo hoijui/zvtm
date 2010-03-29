@@ -258,7 +258,7 @@ public class TurningIPod extends AbstractViewerTechnique {
 					if (turningCW == 1) {
 						
 						zoomValue = transferFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-						Viewer.getInstance().zeroOrderViewer(zoomValue);
+						Viewer.getInstance().zeroOrderZoom(zoomValue);
 						// System.out.println("zoom in "+ zoomValue);
 						
 						addAltitudeSample();
@@ -267,7 +267,7 @@ public class TurningIPod extends AbstractViewerTechnique {
 					else if (turningCW == 0) {
 						
 						zoomValue = -transferFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-						Viewer.getInstance().zeroOrderViewer(zoomValue);
+						Viewer.getInstance().zeroOrderZoom(zoomValue);
 						// System.out.println("zoom out "+ zoomValue);
 						
 						addAltitudeSample();

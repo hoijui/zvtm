@@ -61,7 +61,7 @@ public class Knob extends AbstractViewerTechnique {
 				int clicks = e.getWheelRotation();
 				int sens = -(int)Math.signum(clicks);
 				
-				Viewer.getInstance().zeroOrderViewer( sens * transferFunction.compute(clicks) );
+				Viewer.getInstance().zeroOrderZoom( sens * transferFunction.compute(clicks) );
 				
 			}
 		};

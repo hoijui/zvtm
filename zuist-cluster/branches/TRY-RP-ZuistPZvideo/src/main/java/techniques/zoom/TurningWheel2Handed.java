@@ -286,7 +286,7 @@ public class TurningWheel2Handed extends AbstractViewerTechnique {
 				
 				if (turningCW==1) {
 					zoomValue = -MultiplierFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-					Viewer.getInstance().zeroOrderViewer(zoomValue);
+					Viewer.getInstance().zeroOrderZoom(zoomValue);
 					//System.out.println("zoom in "+ zoomValue);
 					
 					addAltitudeSample();
@@ -295,7 +295,7 @@ public class TurningWheel2Handed extends AbstractViewerTechnique {
 				else if (turningCW==0) {
 					
 					zoomValue = MultiplierFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-					Viewer.getInstance().zeroOrderViewer(zoomValue);
+					Viewer.getInstance().zeroOrderZoom(zoomValue);
 					//System.out.println("zoom out "+ zoomValue);
 					
 					addAltitudeSample();

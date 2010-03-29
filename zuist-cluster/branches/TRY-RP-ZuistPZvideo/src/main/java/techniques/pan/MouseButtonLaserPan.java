@@ -9,7 +9,7 @@ import java.net.SocketException;
 import java.util.Date;
 
 import fr.inria.zuist.cluster.viewer.Viewer;
-import package techniques.VICONLaserListener;
+import techniques.VICONLaserListener;
 
 import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;

@@ -315,12 +315,46 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
 
 	/*-------------  Scene management    -------------*/
+public void zeroOrderZoom(float z){
+		
+		Location cgl = mCamera.getLocation();
+		double a = (mCamera.focal+Math.abs(mCamera.altitude))/mCamera.focal;
+		double zz = (double)z;
+		
+		if (zz < 0)
+		{
+		    if ((double)mCamera.getAltitude()+a*zz < 0)
+			{
+				zz = - ((double)mCamera.getAltitude()/a);
+			}
+
+		    long newx = mCamera.posx+
+			Math.round(
+			    (mCamera.posx-zoX)*a*zz/(mCamera.getAltitude()+mCamera.focal));
+		    long newy = mCamera.posy+
+			Math.round(
+			    (mCamera.posy-zoY)*a*zz/(mCamera.getAltitude()+mCamera.focal));
+		    double newz = mCamera.getAltitude()+a*zz;
+		    mCamera.setLocation(new Location(newx, newy, (float)newz));
+
+		}
+		else
+		{
+			// zooming out
+			long newx = mCamera.posx+Math.round(
+			(mCamera.posx-zoX)*a*zz/(mCamera.getAltitude()+mCamera.focal));
+		    long newy = mCamera.posy+Math.round(
+			(mCamera.posy-zoY)*a*zz/(mCamera.getAltitude()+mCamera.focal));
+		    double newz = mCamera.getAltitude()+a*zz;
+		    mCamera.setLocation(new Location(newx, newy, (float)newz));
+		}
+	}
 
     public static Viewer getInstance(){
         return INSTANCE;
     }
 	
-    public Camera getMainCamera(){
+    public Camera getMCamera(){
         return mCamera;
     }
 
@@ -330,6 +364,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
    
     public ClusteredView getClusteredView(){
         return clusteredView;
+    }
+
+    public View getView(){
+        return mView;
     }
 
 	void reset(){

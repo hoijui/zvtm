@@ -117,7 +117,7 @@ public class LinearIPod extends AbstractViewerTechnique {
 			
 			// System.out.println("\t" + ponctualSens);
 			
-			Viewer.getInstance().zeroOrderViewer( currentSens * transferFunction.compute(currentY - previousY) );
+			Viewer.getInstance().zeroOrderZoom( currentSens * transferFunction.compute(currentY - previousY) );
 			
 		}
 		

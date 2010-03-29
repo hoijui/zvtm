@@ -225,7 +225,7 @@ public class TurningWheel2 extends AbstractViewerTechnique {
 						
 						// Calling the zoom method
 						
-						Viewer.getInstance().zeroOrderViewer( (float)zoomFactor );
+						Viewer.getInstance().zeroOrderZoom( (float)zoomFactor );
 						
 						// Stats stuff
 						
