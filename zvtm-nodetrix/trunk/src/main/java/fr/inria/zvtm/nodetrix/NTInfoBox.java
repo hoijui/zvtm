@@ -1,5 +1,6 @@
 package fr.inria.zvtm.nodetrix;
 
+import java.awt.Color;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -21,7 +22,7 @@ public class NTInfoBox {
 	Object owner;
 	Vector<String[]> sEntries = new Vector<String[]>();
 	int fields = 0;
-	String title = "???";
+	NTNode node;
 	
 	//GRAPHICS
 	VirtualSpace vs;
@@ -30,20 +31,20 @@ public class NTInfoBox {
 	Vector<VText[]> gEntries = new Vector<VText[]>();
 	boolean visible = false;
 	
-	public NTInfoBox(int fields, String title)
+	public NTInfoBox(NTNode node, int fields)
 	{
+		this.node = node;
 		this.fields = fields;
-		this.title = title;
 	}
 	
 	//----GRAPHICS----
 	public void createGraphics(VirtualSpace vs){
 		this.vs = vs;
 		
-		// title
-		
+		//title
 		long currentRowIntend = -INFO_BOX_PADDING*2;
-		gTitle = new VText(INFO_BOX_PADDING, currentRowIntend+3, 0, NodeTrixViz.COLOR_MATRIX_NODE_LABEL_COLOR.darker(), title);
+		gTitle = new VText(INFO_BOX_PADDING, currentRowIntend+3, 0, Color.black.darker(), node.getName());
+		gTitle.setSensitivity(false);
 		vs.addGlyph(gTitle);
 		currentRowIntend -= INFO_BOX_LINE_HEIGHT*2; 
 		
@@ -53,6 +54,7 @@ public class NTInfoBox {
 			int i = 0;
 			for(String s : sEntry){
 				gText = new VText(INFO_BOX_PADDING, currentRowIntend,0 ,NodeTrixViz.COLOR_INFO_BOX_TEXT, s);
+				gText.setSensitivity(false);
 				vs.addGlyph(gText);
 				gEntry[i] = gText;
 				i++;
@@ -66,9 +68,11 @@ public class NTInfoBox {
 		long width = INFO_BOX_WIDTH;
 		gBox = new VRectangle(width, -height,0,width, height, NodeTrixViz.COLOR_INFO_BOX);
 		gBox.stick(gTitle);
+		gBox.setOwner(this);
 		vs.addGlyph(gBox);
 		
 		gTitleBox = new VRectangle(width, -INFO_BOX_LINE_HEIGHT,0, width, INFO_BOX_LINE_HEIGHT, NodeTrixViz.COLOR_INFO_BOX);
+		gTitleBox.setSensitivity(false);
 		vs.addGlyph(gTitleBox);
 		gBox.stick(gTitleBox);
 		
@@ -102,8 +106,8 @@ public class NTInfoBox {
 	public void alignToNorthernLabel(long x, long y){
 		gBox.moveTo(x + gBox.getWidth(), y - gBox.getHeight());
 	}
-	public void moveTo(long x, long y){
-		gBox.moveTo(x, y);
+	public void move(long x, long y){
+		gBox.move(x, y);
 	}
 	
 	public void hide(){
@@ -147,6 +151,9 @@ public class NTInfoBox {
 	}
 	public boolean isVisible(){
 		return visible;
+	}
+	public NTNode getNode(){
+		return node;
 	}
 	
 
