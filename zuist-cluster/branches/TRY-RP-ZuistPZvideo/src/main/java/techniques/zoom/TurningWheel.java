@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Vector;
 
-import pzwallzoom.FitEllipse;
+import techniques.FitEllipse;
 import fr.inria.zuist.cluster.viewer.Viewer;
 import utils.transfer.SigmoidTF;
 import utils.transfer.MultTF;
@@ -25,7 +25,7 @@ import com.illposed.osc.OSCPortIn;
 import fr.inria.zvtm.engine.LongPoint;
 
 
-public class TurningWheel extends AbstractZoomTechnique {
+public class TurningWheel extends AbstractViewerTechnique {
 
 	/*
 	 * TODO
@@ -210,13 +210,13 @@ public class TurningWheel extends AbstractZoomTechnique {
 				ellipse.computeDistance(x, y, closestPoint);
 				//System.out.println(ellipse.toString());
 				
-				LongPoint pointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getMCamera(), 
+				LongPoint pointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getMCamera(), 
 						(int)ellipse.cx,
 						(int)ellipse.cy
 				); 
 				
-				Zoom.getInstance().setZoomOrigin(pointLocation.x, pointLocation.y, false);
+				Viewer.getInstance().setViewerOrigin(pointLocation.x, pointLocation.y, false);
 	
 				Angle = ellipse.computeAngle(closestPoint);
 
@@ -293,7 +293,7 @@ public class TurningWheel extends AbstractZoomTechnique {
 				
 				if (turningCW==1) {
 					zoomValue = MultiplierFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-					Zoom.getInstance().zeroOrderZoom(zoomValue);
+					Viewer.getInstance().zeroOrderViewer(zoomValue);
 					//System.out.println("zoom in "+ zoomValue);
 					
 					addAltitudeSample();
@@ -302,7 +302,7 @@ public class TurningWheel extends AbstractZoomTechnique {
 				else if (turningCW==0) {
 					
 					zoomValue = -MultiplierFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-					Zoom.getInstance().zeroOrderZoom(zoomValue);
+					Viewer.getInstance().zeroOrderViewer(zoomValue);
 					//System.out.println("zoom out "+ zoomValue);
 					
 					addAltitudeSample();
@@ -386,7 +386,7 @@ public class TurningWheel extends AbstractZoomTechnique {
 				if(e.getButton() == MouseEvent.BUTTON3) 
 				{
 					zoomMouseEvent = true;
-					Zoom.getInstance().startZoom();
+					Viewer.getInstance().startViewer();
 					System.out.println("Press 3");
 				}
 				
@@ -411,14 +411,14 @@ public class TurningWheel extends AbstractZoomTechnique {
 					points.clear();
 					directionObservationFrame.clear();
 					turningCW = -1;
-					Zoom.getInstance().stopZoom();
+					Viewer.getInstance().stopViewer();
 					//smoothingStepsBuffer.clear();
 			}
 
 		};
 		
 		System.out.println(dataReceiver + ", " + VICONListener);
-		System.out.println(Zoom.MOVE_CAMERA);
+		System.out.println(Viewer.MOVE_CAMERA);
 		
 		if (dataReceiver == null) {
 			
@@ -442,7 +442,7 @@ public class TurningWheel extends AbstractZoomTechnique {
 		
 		dataReceiver.startListening();
 		
-		Zoom.getInstance().getView().getPanel().addMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().addMouseListener(mouseListener);
 		
 		System.out.println("Listeners listening");
 		
@@ -452,7 +452,7 @@ public class TurningWheel extends AbstractZoomTechnique {
 	public void stopListening() {
 		
 		dataReceiver.stopListening();
-		Zoom.getInstance().getView().getPanel().removeMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().removeMouseListener(mouseListener);
 		// dataReceiver.close();
 		
 	}

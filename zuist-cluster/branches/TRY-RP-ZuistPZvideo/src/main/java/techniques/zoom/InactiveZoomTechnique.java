@@ -10,13 +10,13 @@ package techniques.zoom;
  * @author mathieunancel
  *
  */
-public class InactiveZoomTechnique extends AbstractZoomTechnique {
+public class InactiveViewerTechnique extends AbstractViewerTechnique {
 
 	/**
 	 * @param id
 	 * @param o
 	 */
-	public InactiveZoomTechnique(String id, ORDER o) {
+	public InactiveViewerTechnique(String id, ORDER o) {
 		super(id, o, false);
 		// TODO Auto-generated constructor stub
 	}

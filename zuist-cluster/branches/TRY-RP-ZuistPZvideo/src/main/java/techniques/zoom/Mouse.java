@@ -15,7 +15,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
 
-public class Mouse extends AbstractZoomTechnique {
+public class Mouse extends AbstractViewerTechnique {
 	
 	public static final float WHEEL_ZOOMIN_FACTOR = 2*5f;
 	public static final float WHEEL_ZOOMOUT_FACTOR = 2*5f;
@@ -48,7 +48,7 @@ public class Mouse extends AbstractZoomTechnique {
 		
 		/* ---------------------- Mouse Event handler -------------------*/
 
-		class ZoomEventHandler implements ViewEventHandler{
+		class ViewerEventHandler implements ViewEventHandler{
 
 			private int lastJPX = -1;
 			private int lastJPY = -1;
@@ -72,16 +72,16 @@ public class Mouse extends AbstractZoomTechnique {
 				lastJPX = jpx;
 				lastJPY = jpy;
 				v.setDrawDrag(true);
-				Zoom.getInstance().getVirtualSpaceManager().activeView.mouse.setSensitivity(false);
-				// Zoom.getInstance().getCheckTargetTimer().start();
+				Viewer.getInstance().getVirtualSpaceManager().activeView.mouse.setSensitivity(false);
+				// Viewer.getInstance().getCheckTargetTimer().start();
 			}
 
 			public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-				// Zoom.getInstance().firstOrderStop();
+				// Viewer.getInstance().firstOrderStop();
 				v.setDrawDrag(false);
-				Zoom.getInstance().getVirtualSpaceManager().activeView.mouse.setSensitivity(true);
-				// Zoom.getInstance().getCheckTargetTimer().stop();
-				// Zoom.getInstance().checkTargetHit(true);
+				Viewer.getInstance().getVirtualSpaceManager().activeView.mouse.setSensitivity(true);
+				// Viewer.getInstance().getCheckTargetTimer().stop();
+				// Viewer.getInstance().checkTargetHit(true);
 			}
 
 			public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -115,7 +115,7 @@ public class Mouse extends AbstractZoomTechnique {
 					{
 						myx = 0;
 						myy = 0;
-						Zoom.getInstance().setZoomOrigin(0, 0);
+						Viewer.getInstance().setViewerOrigin(0, 0);
 						getFirstMouseMove = true;
 						recenterCursor(jpx,jpy,e);
 						wait_robot = true;
@@ -125,8 +125,8 @@ public class Mouse extends AbstractZoomTechnique {
 					{
 						myx = myx - dragCDRX*(robX-jpx);
 						myy = myy - dragCDRY*(jpy-robY);
-						//setZoomOrigin(v.getVCursor().vx, v.getVCursor().vy);
-						Zoom.getInstance().setZoomOrigin(myx, myy);
+						//setViewerOrigin(v.getVCursor().vx, v.getVCursor().vy);
+						Viewer.getInstance().setViewerOrigin(myx, myy);
 						recenterCursor(jpx,jpy,e);
 						wait_robot = true;
 					}
@@ -137,7 +137,7 @@ public class Mouse extends AbstractZoomTechnique {
 				}
 				else
 				{
-					//setZoomOrigin(v.getVCursor().vx, v.getVCursor().vy); 
+					//setViewerOrigin(v.getVCursor().vx, v.getVCursor().vy); 
 					//firstOrderTranslate(jpx-lastJPX, lastJPY-jpy);
 					//lastJPX = jpx;
 					//lastJPY = jpy;
@@ -149,7 +149,7 @@ public class Mouse extends AbstractZoomTechnique {
 				if (buttonNumber == 1){
 				}
 				else if (buttonNumber == 3){
-				   //  Zoom.getInstance().firstOrderZoom(jpy-lastJPY);
+				   //  Viewer.getInstance().firstOrderViewer(jpy-lastJPY);
 				    addAltitudeSample();
 				}
 			}
@@ -200,7 +200,7 @@ public class Mouse extends AbstractZoomTechnique {
 					
 				}
 				
-				Zoom.getInstance().zeroOrderZoom(currentDirection * accel * WHEEL_ZOOMIN_FACTOR);
+				Viewer.getInstance().zeroOrderViewer(currentDirection * accel * WHEEL_ZOOMIN_FACTOR);
 				addAltitudeSample();
 				prevTime3 = prevTime2;
 				prevTime2 = prevTime;
@@ -236,7 +236,7 @@ public class Mouse extends AbstractZoomTechnique {
 
 		}
 		
-		Zoom.getInstance().getView().setEventHandler(new ZoomEventHandler());
+		Viewer.getInstance().getView().setEventHandler(new ViewerEventHandler());
 
 	}
 

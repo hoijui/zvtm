@@ -10,7 +10,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 
 
-public class Tilt extends AbstractZoomTechnique {
+public class Tilt extends AbstractViewerTechnique {
 	
 	public static final String IN_CMD_ZOOM = "zoom"; //
 	
@@ -55,13 +55,13 @@ public class Tilt extends AbstractZoomTechnique {
 				if (cmd.equals(IN_CMD_ZOOM))
 				{
 					if (order.equals(ORDER.FIRST)) {
-						//Zoom.getInstance().firstOrderZoom(((Float)parts[1]).floatValue());
+						//Viewer.getInstance().firstOrderViewer(((Float)parts[1]).floatValue());
 						System.out.println("zoom1 "+((Float)parts[1]).floatValue());
 						
 						addAltitudeSample();
 						
 					} else if (order.equals(ORDER.ZERO)) {
-						Zoom.getInstance().zeroOrderZoom(((Float)parts[1]).floatValue());
+						Viewer.getInstance().zeroOrderViewer(((Float)parts[1]).floatValue());
 						System.out.println("zoom0 "+((Float)parts[1]).floatValue());
 						
 						addAltitudeSample();
@@ -69,7 +69,7 @@ public class Tilt extends AbstractZoomTechnique {
 				} 
 				else if (cmd.equals(IN_CMD_ZORIG))
 				{
-					// Zoom.getInstance().setZoomOriginCG(
+					// Viewer.getInstance().setViewerOriginCG(
 							//((Integer)parts[1]).intValue(), ((Integer)parts[2]).intValue());
 					System.out.println(
 							"set zom origin "+((Integer)parts[1]).intValue()+" "+
@@ -77,28 +77,28 @@ public class Tilt extends AbstractZoomTechnique {
 				}
 				else if (cmd.equals(IN_CMD_STOP))
 				{
-					//Zoom.getInstance().firstOrderStop();
+					//Viewer.getInstance().firstOrderStop();
 					System.out.println("stop");
 				}
 				else if (cmd.equals(IN_CMD_ZORIG_ENABLED))
 				{
-					//Zoom.getInstance().enableZoomOrigin(true);
+					//Viewer.getInstance().enableViewerOrigin(true);
 					System.out.println("Mode: zoom to origin");
 				}        
 				else if (cmd.equals(IN_CMD_ZORIG_DISABLED))
 				{
-					//Zoom.getInstance().enableZoomOrigin(false);
+					//Viewer.getInstance().enableViewerOrigin(false);
 					System.out.println("Mode: zoom to center of screen");
 				}        
 				else if (cmd.equals(IN_CMD_GGV))
 				{
-					//Zoom.getInstance().getGlobalView();
+					//Viewer.getInstance().getGlobalView();
 					System.out.println("ggv");
 				}
 			}
 		};
 		
-		dataReceiver.addListener(Zoom.MOVE_CAMERA, VICONListener);
+		dataReceiver.addListener(Viewer.MOVE_CAMERA, VICONListener);
 		
 		System.out.println("Listeners initialized");
 	}

@@ -11,7 +11,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 
 
-public class TurningWheel2 extends AbstractZoomTechnique {
+public class TurningWheel2 extends AbstractViewerTechnique {
 	
 	
 	public static final double TWO_PI = 2 * Math.PI;
@@ -225,12 +225,12 @@ public class TurningWheel2 extends AbstractZoomTechnique {
 						
 						// Calling the zoom method
 						
-						Zoom.getInstance().zeroOrderZoom( (float)zoomFactor );
+						Viewer.getInstance().zeroOrderViewer( (float)zoomFactor );
 						
 						// Stats stuff
 						
 						addAltitudeSample();
-						addZoomSample( (float)zoomFactor );
+						addViewerSample( (float)zoomFactor );
 						
 						// Updating previous_step
 						

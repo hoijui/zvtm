@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 
-import pzwallzoom.FitEllipse;
+import techniques.FitEllipse;
 import fr.inria.zuist.cluster.viewer.Viewer;
 import techniques.pan.IPodPressLaserPan;
 import utils.dispatchOSC.OSCDispatcher;
@@ -18,7 +18,7 @@ import com.illposed.osc.OSCMessage;
 import com.illposed.osc.OSCPortIn;
 
 
-public class TurningIPod extends AbstractZoomTechnique {
+public class TurningIPod extends AbstractViewerTechnique {
 	
 	public static final int ID = 0, X = 1, Y = 2, PRESS = 3;
 	
@@ -104,11 +104,11 @@ public class TurningIPod extends AbstractZoomTechnique {
 	// protected MultTF transferFunction = new MultTF(MIN_STEP, MAX_STEP, MIN_ZOOM_FACTOR, MAX_ZOOM_FACTOR);
 	
 	protected OSCDispatcher dispatcher = new OSCDispatcher(
-			Zoom.IPOD_DEFAULT_OSC_LISTENING_PORT, 
+			Viewer.IPOD_DEFAULT_OSC_LISTENING_PORT, 
 			new int[] {
-					Zoom.IPOD_ZOOM_OSC_LISTENING_PORT, 
-					Zoom.IPOD_POINT_OSC_LISTENING_PORT, 
-					Zoom.IPOD_PAN_OSC_LISTENING_PORT
+					Viewer.IPOD_ZOOM_OSC_LISTENING_PORT, 
+					Viewer.IPOD_POINT_OSC_LISTENING_PORT, 
+					Viewer.IPOD_PAN_OSC_LISTENING_PORT
 			}
 	);
 	
@@ -117,7 +117,7 @@ public class TurningIPod extends AbstractZoomTechnique {
 		super(id, o, false);
 		
 		try {
-			this.dataReceiver = new OSCPortIn(Zoom.IPOD_ZOOM_OSC_LISTENING_PORT);
+			this.dataReceiver = new OSCPortIn(Viewer.IPOD_ZOOM_OSC_LISTENING_PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -258,7 +258,7 @@ public class TurningIPod extends AbstractZoomTechnique {
 					if (turningCW == 1) {
 						
 						zoomValue = transferFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-						Zoom.getInstance().zeroOrderZoom(zoomValue);
+						Viewer.getInstance().zeroOrderViewer(zoomValue);
 						// System.out.println("zoom in "+ zoomValue);
 						
 						addAltitudeSample();
@@ -267,7 +267,7 @@ public class TurningIPod extends AbstractZoomTechnique {
 					else if (turningCW == 0) {
 						
 						zoomValue = -transferFunction.compute(smoothedStepValue.floatValue()); // * ZOOM_MULTIPLIER;
-						Zoom.getInstance().zeroOrderZoom(zoomValue);
+						Viewer.getInstance().zeroOrderViewer(zoomValue);
 						// System.out.println("zoom out "+ zoomValue);
 						
 						addAltitudeSample();

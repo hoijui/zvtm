@@ -26,11 +26,11 @@ public abstract class AbstractPointTechnique extends AbstractTechnique {
 			
 		} else if (name.equals("DefaultLaserPoint")) {
 			
-			return new DefaultLaserPoint("DefaultLaserPoint", ORDER.ZERO, Zoom.DEFAULT_POINT_OSC_LISTENING_PORT);
+			return new DefaultLaserPoint("DefaultLaserPoint", ORDER.ZERO, Viewer.DEFAULT_POINT_OSC_LISTENING_PORT);
 			
 		}else if (name.equals("OneHandedCircularLaserPoint")) {
 			
-			return new DefaultLaserPoint("OneHandedCircularLaserPoint", ORDER.ZERO, Zoom.DEFAULT_POINT_OSC_LISTENING_PORT);
+			return new DefaultLaserPoint("OneHandedCircularLaserPoint", ORDER.ZERO, Viewer.DEFAULT_POINT_OSC_LISTENING_PORT);
 			
 		}
 		

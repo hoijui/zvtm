@@ -49,7 +49,7 @@ public class DesktopMouse extends AbstractPointTechnique {
 			long x = (long)(evt.getX());
 			long y = (long)(evt.getY());
 			// should convert in zvtm coordinate !
-			// Zoom.getInstance().setZoomOriginByMasterScreenCoor(x, y);
+			// Viewer.getInstance().setViewerOriginByMasterScreenCoor(x, y);
 			//System.out.println("MOUSE Moved motion");
 		    }
 		    public void mouseDragged(MouseEvent evt) {
@@ -61,15 +61,15 @@ public class DesktopMouse extends AbstractPointTechnique {
 
 	@Override
 	public void startListening() {
-	    Zoom.getInstance().getZVTMPanel().addMouseListener(mouseAdapter);
-	    Zoom.getInstance().getZVTMPanel().addMouseMotionListener(mouseMotionAdapter);
+	    Viewer.getInstance().getZVTMPanel().addMouseListener(mouseAdapter);
+	    Viewer.getInstance().getZVTMPanel().addMouseMotionListener(mouseMotionAdapter);
 	}
 
 	@Override
 	public void stopListening() {
 		// TODO Auto-generated method stub
-	    Zoom.getInstance().getZVTMPanel().removeMouseListener(mouseAdapter);
-	    Zoom.getInstance().getZVTMPanel().removeMouseMotionListener(mouseMotionAdapter);
+	    Viewer.getInstance().getZVTMPanel().removeMouseListener(mouseAdapter);
+	    Viewer.getInstance().getZVTMPanel().removeMouseMotionListener(mouseMotionAdapter);
 
 	}
 

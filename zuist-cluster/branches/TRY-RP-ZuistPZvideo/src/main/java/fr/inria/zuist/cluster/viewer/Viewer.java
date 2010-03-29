@@ -85,6 +85,9 @@ import org.xml.sax.SAXException;
 
 public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     
+    //XXX hack for zuist video
+    private Viewer INSTANCE = null;
+
     File SCENE_FILE, SCENE_FILE_DIR;
         
     /* screen dimensions, actual dimensions of windows */
@@ -312,6 +315,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
 
 	/*-------------  Scene management    -------------*/
+
+    public static Viewer getInstance(){
+        return INSTANCE;
+    }
 	
     public Camera getMainCamera(){
         return mCamera;
@@ -699,7 +706,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new Viewer(fs, ogl, aa, xmlSceneFile);
+        INSTANCE = new Viewer(fs, ogl, aa, xmlSceneFile);
     }
     
     private static void printCmdLineHelp(){

@@ -59,8 +59,8 @@ public class IPodZoneLaserPan extends AbstractPanTechnique {
 		super(id, o);
 		
 		try {
-			VICONPort = new OSCPortIn(Zoom.DEFAULT_PAN_OSC_LISTENING_PORT);
-			IPodPort = new OSCPortIn(Zoom.IPOD_PAN_OSC_LISTENING_PORT);
+			VICONPort = new OSCPortIn(Viewer.DEFAULT_PAN_OSC_LISTENING_PORT);
+			IPodPort = new OSCPortIn(Viewer.IPOD_PAN_OSC_LISTENING_PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -68,7 +68,7 @@ public class IPodZoneLaserPan extends AbstractPanTechnique {
 		releaseTimer = new Timer(TIME_LAP, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				Zoom.getInstance().stopPan();
+				Viewer.getInstance().stopPan();
 				panning = false;
 				
 				System.out.println("Not panning");
@@ -106,30 +106,30 @@ public class IPodZoneLaserPan extends AbstractPanTechnique {
 				if (panning) {
 					
 					// au sens de zvtm
-					cursorLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-							Zoom.getInstance().getCursorCamera(),
+					cursorLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+							Viewer.getInstance().getCursorCamera(),
 							(int)currentCoords.x,
 							(int)currentCoords.y
 					); 
 					
-					pointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-							Zoom.getInstance().getMCamera(), 
+					pointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+							Viewer.getInstance().getMCamera(), 
 							(int)currentCoords.x,
 							(int)currentCoords.y
 					); 
 					
-					previousPointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-							Zoom.getInstance().getCursorCamera(), 
+					previousPointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+							Viewer.getInstance().getCursorCamera(), 
 							(int)previousCoords.x,
 							(int)previousCoords.y
 					); 
 					
-					Zoom.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
+					Viewer.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
 					// System.out.println("cursor : " + cursorLocation.x + ", " + cursorLocation.y);
 					
 					if (pressed) {
 						
-						Zoom.getInstance().zeroOrderTranslate((int)(previousPointLocation.x - cursorLocation.x), (int)(previousPointLocation.y - cursorLocation.y));
+						Viewer.getInstance().zeroOrderTranslate((int)(previousPointLocation.x - cursorLocation.x), (int)(previousPointLocation.y - cursorLocation.y));
 						
 					}
 					
@@ -180,7 +180,7 @@ public class IPodZoneLaserPan extends AbstractPanTechnique {
 					// System.out.println("Received y = " + y + ", " + Math.abs(System.currentTimeMillis() - lastRelease) );
 					
 					if (y > Y_LIMIT) {
-						Zoom.getInstance().startPan();
+						Viewer.getInstance().startPan();
 						panning = true;
 						
 						System.out.println("Panning");

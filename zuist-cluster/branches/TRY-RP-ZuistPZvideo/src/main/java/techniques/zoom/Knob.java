@@ -9,7 +9,7 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 
 
-public class Knob extends AbstractZoomTechnique {
+public class Knob extends AbstractViewerTechnique {
 	
 	/**
 	 * Maximum difference between the previous glove 'angle' and the current one. Angles are computed from glove coordinates.
@@ -61,12 +61,12 @@ public class Knob extends AbstractZoomTechnique {
 				int clicks = e.getWheelRotation();
 				int sens = -(int)Math.signum(clicks);
 				
-				Zoom.getInstance().zeroOrderZoom( sens * transferFunction.compute(clicks) );
+				Viewer.getInstance().zeroOrderViewer( sens * transferFunction.compute(clicks) );
 				
 			}
 		};
 		
-		Zoom.getInstance().getView().setEventHandler(eventHandler);
+		Viewer.getInstance().getView().setEventHandler(eventHandler);
 		
 		
 		System.out.println("Listeners initialized");
@@ -85,7 +85,7 @@ public class Knob extends AbstractZoomTechnique {
 	@Override
 	public void close() {
 		
-		Zoom.getInstance().getView().setEventHandler(null);
+		Viewer.getInstance().getView().setEventHandler(null);
 		
 	}
 	

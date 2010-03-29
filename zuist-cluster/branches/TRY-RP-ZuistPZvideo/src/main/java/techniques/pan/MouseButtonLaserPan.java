@@ -55,7 +55,7 @@ public class MouseButtonLaserPan extends AbstractPanTechnique {
 	@Override
 	public void close() {
 		
-		Zoom.getInstance().getView().getPanel().removeMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().removeMouseListener(mouseListener);
 		VICONPort.close();
 		
 	}
@@ -75,29 +75,29 @@ public class MouseButtonLaserPan extends AbstractPanTechnique {
 				//System.out.println("New message to " + msg.getAddress() + ", " + msg.getArguments().length + " arguments.");
 				
 				// au sens de zvtm
-				cursorLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getCursorCamera(),
+				cursorLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getCursorCamera(),
 						(int)currentCoords.x,
 						(int)currentCoords.y
 				); 
 				
-				pointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getMCamera(), 
+				pointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getMCamera(), 
 						(int)currentCoords.x,
 						(int)currentCoords.y
 				); 
 				
-				previousPointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getCursorCamera(), 
+				previousPointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getCursorCamera(), 
 						(int)previousCoords.x,
 						(int)previousCoords.y
 				); 
 				
-				Zoom.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
+				Viewer.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
 				//System.out.println("cursor : " + cursorLocation.x + ", " + cursorLocation.y);
 				
 				if (pressed) {
-					Zoom.getInstance().zeroOrderTranslate((int)(previousPointLocation.x - cursorLocation.x), (int)(previousPointLocation.y - cursorLocation.y));
+					Viewer.getInstance().zeroOrderTranslate((int)(previousPointLocation.x - cursorLocation.x), (int)(previousPointLocation.y - cursorLocation.y));
 				}
 			}
 		};
@@ -113,7 +113,7 @@ public class MouseButtonLaserPan extends AbstractPanTechnique {
 				if(e.getButton() == MouseEvent.BUTTON1)
 				{
 					pressed = true;
-					Zoom.getInstance().startPan();
+					Viewer.getInstance().startPan();
 				}
 			
 			}
@@ -125,7 +125,7 @@ public class MouseButtonLaserPan extends AbstractPanTechnique {
 				if(e.getButton() == MouseEvent.BUTTON1)
 				{ 
 					pressed = false;
-					Zoom.getInstance().stopPan();
+					Viewer.getInstance().stopPan();
 				}
 			}
 
@@ -140,7 +140,7 @@ public class MouseButtonLaserPan extends AbstractPanTechnique {
 	public void startListening() {
 		
 		VICONPort.startListening();
-		Zoom.getInstance().getView().getPanel().addMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().addMouseListener(mouseListener);
 
 	}
 
@@ -151,7 +151,7 @@ public class MouseButtonLaserPan extends AbstractPanTechnique {
 	public void stopListening() {
 		
 		VICONPort.stopListening();
-		Zoom.getInstance().getView().getPanel().removeMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().removeMouseListener(mouseListener);
 
 	}
 

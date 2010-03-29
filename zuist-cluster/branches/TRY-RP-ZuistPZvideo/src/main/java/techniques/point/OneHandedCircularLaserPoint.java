@@ -75,26 +75,26 @@ public class OneHandedCircularLaserPoint extends AbstractPointTechnique {
 				super.acceptMessage(time, message);
 				//System.out.println("message");
 				// au sens de zvtm
-				cursorLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getCursorCamera(),
+				cursorLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getCursorCamera(),
 						(int)currentCoords.x,
 						(int)currentCoords.y
 				); 
 				
-				pointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getMCamera(), 
+				pointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getMCamera(), 
 						(int)currentCoords.x,
 						(int)currentCoords.y
 				); 
 				
-				previousPointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-						Zoom.getInstance().getMCamera(), 
+				previousPointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+						Viewer.getInstance().getMCamera(), 
 						(int)previousCoords.x,
 						(int)previousCoords.y
 				); 
 				
-				//Zoom.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
-				//Zoom.getInstance().setZoomOrigin(pointLocation.x, pointLocation.y);
+				//Viewer.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
+				//Viewer.getInstance().setViewerOrigin(pointLocation.x, pointLocation.y);
 				
 				// System.out.println("point : " + pointLocation.x + ", " + pointLocation.y);
 				

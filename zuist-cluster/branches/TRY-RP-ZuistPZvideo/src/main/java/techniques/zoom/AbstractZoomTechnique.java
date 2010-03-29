@@ -7,9 +7,9 @@ import fr.inria.zuist.cluster.viewer.Viewer;
 import techniques.AbstractTechnique;
 import fr.inria.zvtm.glyphs.VText;
 
-public abstract class AbstractZoomTechnique extends AbstractTechnique {
+public abstract class AbstractViewerTechnique extends AbstractTechnique {
 	
-	public enum ZoomTechnique {Push4_2H, Push4, Push3, Push2, Knob, Wheel,Wheel2Handed, Wheel2, Fist, Push, Mouse, TurningIPod, LinearIPod}
+	public enum ViewerTechnique {Push4_2H, Push4, Push3, Push2, Knob, Wheel,Wheel2Handed, Wheel2, Fist, Push, Mouse, TurningIPod, LinearIPod}
 	
 	/* ========================  STATS VARIABLES  =========================== */
 	
@@ -39,9 +39,9 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 	protected static VText[] minAltLabels;
 	protected static VText[] maxAltLabels;
 	
-	protected static VText[] averageZoomLabels;
-	protected static VText[] minZoomLabels;
-	protected static VText[] maxZoomLabels;
+	protected static VText[] averageViewerLabels;
+	protected static VText[] minViewerLabels;
+	protected static VText[] maxViewerLabels;
 	
 	protected static VText altLabel;
 	protected static VText zoomLabel;
@@ -54,12 +54,12 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 	/* 1-order zoom with absolute values from the VICON*/
 	protected Point2D.Float refPoint = new Point2D.Float(0,0);
 	
-	public AbstractZoomTechnique(String id, ORDER o, boolean c) {
+	public AbstractViewerTechnique(String id, ORDER o, boolean c) {
 		super(id, o, c);
 		
 	}
 	
-	public static AbstractZoomTechnique createTechnique(String xmlName) {
+	public static AbstractViewerTechnique createTechnique(String xmlName) {
 		
 		// TODO the names need to be cleaned
 		
@@ -79,61 +79,61 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 
 		//System.err.println("XML NAME: " + xmlName); 
 		
-		if (xmlName.contains(ZoomTechnique.Push4_2H.toString())) {
+		if (xmlName.contains(ViewerTechnique.Push4_2H.toString())) {
 			
-			return new Push4_2H(ZoomTechnique.Push4_2H.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
+			return new Push4_2H(ViewerTechnique.Push4_2H.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
 			
-		} else if (xmlName.contains(ZoomTechnique.Push4.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Push4.toString())) {
 			
-			return new Push4(ZoomTechnique.Push4.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
+			return new Push4(ViewerTechnique.Push4.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
 			
-		} else if (xmlName.contains(ZoomTechnique.Push3.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Push3.toString())) {
 			
-			return new Push3(ZoomTechnique.Push3.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
+			return new Push3(ViewerTechnique.Push3.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
 			
-		} else if (xmlName.contains(ZoomTechnique.Push2.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Push2.toString())) {
 			
-			return new Push2(ZoomTechnique.Push2.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
+			return new Push2(ViewerTechnique.Push2.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT, true);
 			
-		} else if (xmlName.contains(ZoomTechnique.Knob.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Knob.toString())) {
 			
-			return new Knob(ZoomTechnique.Knob.toString(), order);
+			return new Knob(ViewerTechnique.Knob.toString(), order);
 			
-		}else if (xmlName.contains(ZoomTechnique.Wheel2Handed.toString())) {
+		}else if (xmlName.contains(ViewerTechnique.Wheel2Handed.toString())) {
 			
-			return new TurningWheel2Handed(ZoomTechnique.Wheel2Handed.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			return new TurningWheel2Handed(ViewerTechnique.Wheel2Handed.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
 			
-		}else if (xmlName.contains(ZoomTechnique.Wheel2.toString())) {
+		}else if (xmlName.contains(ViewerTechnique.Wheel2.toString())) {
 			
-			return new TurningWheel2(ZoomTechnique.Wheel2.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			return new TurningWheel2(ViewerTechnique.Wheel2.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
 			
-		} else if (xmlName.contains(ZoomTechnique.Wheel.toString()) && 
-			   !xmlName.contains(ZoomTechnique.Mouse.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Wheel.toString()) && 
+			   !xmlName.contains(ViewerTechnique.Mouse.toString())) {
 			
-			System.out.println("Creating TurningWheel with port " + Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
-			return new TurningWheel(ZoomTechnique.Wheel.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			System.out.println("Creating TurningWheel with port " + Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			return new TurningWheel(ViewerTechnique.Wheel.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
 			
-		} else if (xmlName.contains(ZoomTechnique.Fist.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Fist.toString())) {
 			
-			return new Tilt(ZoomTechnique.Fist.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			return new Tilt(ViewerTechnique.Fist.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
 			
-		} else if (xmlName.contains(ZoomTechnique.Push.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Push.toString())) {
 			
-			return new Push(ZoomTechnique.Push.toString(), order, Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			return new Push(ViewerTechnique.Push.toString(), order, Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
 			
-		} else if (xmlName.contains(ZoomTechnique.Mouse.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.Mouse.toString())) {
 			
-		    //System.err.println("Mouse: " + xmlName +"/"+ ZoomTechnique.Mouse.toString());
-			return new Mouse(ZoomTechnique.Mouse.toString(), order);
+		    //System.err.println("Mouse: " + xmlName +"/"+ ViewerTechnique.Mouse.toString());
+			return new Mouse(ViewerTechnique.Mouse.toString(), order);
 			
-		} else if (xmlName.contains(ZoomTechnique.TurningIPod.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.TurningIPod.toString())) {
 			
 			// System.out.println("TurningIPod !!");
-			return new TurningIPod(ZoomTechnique.TurningIPod.toString(), order);
+			return new TurningIPod(ViewerTechnique.TurningIPod.toString(), order);
 			
-		} else if (xmlName.contains(ZoomTechnique.LinearIPod.toString())) {
+		} else if (xmlName.contains(ViewerTechnique.LinearIPod.toString())) {
 			
-			return new LinearIPod(ZoomTechnique.LinearIPod.toString(), order, true);
+			return new LinearIPod(ViewerTechnique.LinearIPod.toString(), order, true);
 			
 		}
 		
@@ -144,7 +144,7 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 	
 	protected void addAltitudeSample() {
 		
-		float alt = Zoom.getInstance().getMCamera().altitude;
+		float alt = Viewer.getInstance().getMCamera().altitude;
 		
 		if (SHOW_STATS) {
 			
@@ -163,7 +163,7 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 
 	}
 	
-	protected void addZoomSample(float zoom) {
+	protected void addViewerSample(float zoom) {
 		
 		if (SHOW_STATS) {
 		
@@ -175,8 +175,8 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 			zoomTimestamps[ current_zoom_stat_index % NB_SAMPLES_STATS ] = System.currentTimeMillis();
 			zooms[ current_zoom_stat_index % NB_SAMPLES_STATS ] = zoom;
 			
-			computeZoomAverages();
-			computeZoomMinMaxSpeeds();
+			computeViewerAverages();
+			computeViewerMinMaxSpeeds();
 			
 			updateVisibleStats();
 			
@@ -290,7 +290,7 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 		
 	}
 	
-	protected void computeZoomAverages() {
+	protected void computeViewerAverages() {
 		
 		if (SHOW_STATS) {
 			
@@ -335,7 +335,7 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 		
 	}
 	
-	protected void computeZoomMinMaxSpeeds() {
+	protected void computeViewerMinMaxSpeeds() {
 		
 		if (SHOW_STATS) {
 			
@@ -402,7 +402,7 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 			for (int i = 0 ; i < STATS_AVG_WINDOWS.length ; i++) {
 				
 				averageAltLabels[i].setText( "AVG(" + STATS_AVG_WINDOWS[i] + ") : " + Float.toString(avg_altitudes[i]) );
-				averageZoomLabels[i].setText( "AVG(" + STATS_AVG_WINDOWS[i] + ") : " + Float.toString(avg_zooms[i]) );
+				averageViewerLabels[i].setText( "AVG(" + STATS_AVG_WINDOWS[i] + ") : " + Float.toString(avg_zooms[i]) );
 				
 			}
 			
@@ -411,8 +411,8 @@ public abstract class AbstractZoomTechnique extends AbstractTechnique {
 				minAltLabels[i].setText( "MIN(" + STATS_MIN_MAX_WINDOWS[i] + ") : " + Float.toString(min_altitudes[i]) );
 				maxAltLabels[i].setText( "MAX(" + STATS_MIN_MAX_WINDOWS[i] + ") : " + Float.toString(max_altitudes[i]) );
 				
-				minZoomLabels[i].setText( "MIN(" + STATS_MIN_MAX_WINDOWS[i] + ") : " + Float.toString(min_zooms[i]) );
-				maxZoomLabels[i].setText( "MAX(" + STATS_MIN_MAX_WINDOWS[i] + ") : " + Float.toString(max_zooms[i]) );
+				minViewerLabels[i].setText( "MIN(" + STATS_MIN_MAX_WINDOWS[i] + ") : " + Float.toString(min_zooms[i]) );
+				maxViewerLabels[i].setText( "MAX(" + STATS_MIN_MAX_WINDOWS[i] + ") : " + Float.toString(max_zooms[i]) );
 				
 			}
 		}

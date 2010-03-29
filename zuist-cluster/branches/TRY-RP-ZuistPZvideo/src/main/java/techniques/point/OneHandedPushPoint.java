@@ -54,7 +54,7 @@ public class OneHandedPushPoint extends AbstractPointTechnique {
 		super(id, o);
 		
 		try {
-			VICONPort = new OSCPortIn(Zoom.DEFAULT_POINT_OSC_LISTENING_PORT); // TODO pas propre
+			VICONPort = new OSCPortIn(Viewer.DEFAULT_POINT_OSC_LISTENING_PORT); // TODO pas propre
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -189,26 +189,26 @@ public class OneHandedPushPoint extends AbstractPointTechnique {
 								//coordinates[Y] -= 3500;
 							
 								// au sens de zvtm
-								LongPoint cursorLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-										Zoom.getInstance().getCursorCamera(),
+								LongPoint cursorLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+										Viewer.getInstance().getCursorCamera(),
 										(int)coordinates[X],
 										(int)coordinates[Y]
 								);
 								
-								LongPoint pointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-										Zoom.getInstance().getMCamera(), 
+								LongPoint pointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+										Viewer.getInstance().getMCamera(), 
 										(int)coordinates[X],
 										(int)coordinates[Y]
 								); 
 								
-		//						LongPoint previousPointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-		//								Zoom.getInstance().getMCamera(), 
+		//						LongPoint previousPointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+		//								Viewer.getInstance().getMCamera(), 
 		//								(int)previousCoords.x,
 		//								(int)previousCoords.y
 		//						); 
 								
-								// Zoom.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
-								Zoom.getInstance().setZoomOrigin(pointLocation.x, pointLocation.y);
+								// Viewer.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
+								Viewer.getInstance().setViewerOrigin(pointLocation.x, pointLocation.y);
 								
 								//System.out.println("point : " + pointLocation.x + ", " + pointLocation.y);
 							

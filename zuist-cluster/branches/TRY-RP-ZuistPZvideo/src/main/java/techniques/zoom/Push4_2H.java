@@ -19,7 +19,7 @@ import com.illposed.osc.OSCPortIn;
  *
  */
 
-public class Push4_2H extends AbstractZoomTechnique {
+public class Push4_2H extends AbstractViewerTechnique {
 
 	public static final String IN_CMD_ZOOM_FIRSTVALUE_MEMORY = "zoomfvm"; 
 	public static final String CMD_STOP = "stop";
@@ -64,7 +64,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 		try {
 			
 			// this.tiltReceiver = new OSCPortIn(57110); 
-			this.positionReceiver = new OSCPortIn(Zoom.DEFAULT_ZOOM_OSC_LISTENING_PORT);
+			this.positionReceiver = new OSCPortIn(Viewer.DEFAULT_ZOOM_OSC_LISTENING_PORT);
 			
 		} catch (SocketException e) { 
 			e.printStackTrace() ;
@@ -79,7 +79,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 			
 			public void acceptMessage(Date date, OSCMessage msg) {
 				
-				if (msg != null && msg.getAddress().equals(Zoom.TILT_OBJECT)) {
+				if (msg != null && msg.getAddress().equals(Viewer.TILT_OBJECT)) {
 					
 					// System.out.println("New message to " + msg.getAddress() + ", " + msg.getArguments().length + " arguments.");
 					
@@ -104,7 +104,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 		positionListener = new OSCListener() {
 			public void acceptMessage(Date date, OSCMessage msg) {
 				
-				if (msg != null && msg.getAddress().equals(Zoom.MOVE_OBJECT)) {
+				if (msg != null && msg.getAddress().equals(Viewer.MOVE_OBJECT)) {
 					
 					//System.out.println("New message to " + msg.getAddress() + ", " + msg.getArguments().length + " arguments.");
 					
@@ -145,7 +145,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 									// Right movement amplitude and direction
 									if (movementY > ZOOM_MIN_MVT) { // TODO to be tested
 										
-										Zoom.getInstance().zeroOrderZoom(direction * movementY * MULT_ZOOM); // That too
+										Viewer.getInstance().zeroOrderViewer(direction * movementY * MULT_ZOOM); // That too
 										
 									} else {
 										System.out.println("Movement shoud be higher : " + movementY);
@@ -157,7 +157,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 									// Right movement amplitude and direction
 									if (movementY < -ZOOM_MIN_MVT) { // TODO to be tested
 										
-										Zoom.getInstance().zeroOrderZoom(direction * movementY * MULT_ZOOM); // That too
+										Viewer.getInstance().zeroOrderViewer(direction * movementY * MULT_ZOOM); // That too
 										
 									} else {
 										System.out.println("Movement shoud be lower : " + movementY);
@@ -213,8 +213,8 @@ public class Push4_2H extends AbstractZoomTechnique {
 			
 		};
 		
-		positionReceiver.addListener(Zoom.MOVE_OBJECT, positionListener);
-		positionReceiver.addListener(Zoom.TILT_OBJECT, tiltListener);
+		positionReceiver.addListener(Viewer.MOVE_OBJECT, positionListener);
+		positionReceiver.addListener(Viewer.TILT_OBJECT, tiltListener);
 		
 		// tiltReceiver.addListener(".*", debugListener);
 		
@@ -226,7 +226,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 		
 		// tiltReceiver.startListening();
 		positionReceiver.startListening();
-		Zoom.getInstance().getView().getPanel().addMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().addMouseListener(mouseListener);
 		
 	}
 	
@@ -235,7 +235,7 @@ public class Push4_2H extends AbstractZoomTechnique {
 		
 		// tiltReceiver.stopListening();
 		positionReceiver.stopListening();
-		Zoom.getInstance().getView().getPanel().removeMouseListener(mouseListener);
+		Viewer.getInstance().getView().getPanel().removeMouseListener(mouseListener);
 		
 	}
 	

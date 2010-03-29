@@ -17,7 +17,7 @@ import com.illposed.osc.OSCPortIn;
  *
  */
 
-public class Push extends AbstractZoomTechnique {
+public class Push extends AbstractViewerTechnique {
 
 	public static final String IN_CMD_ZOOM_FIRSTVALUE_MEMORY = "zoomfvm"; 
 	public static final String CMD_STOP = "stop";
@@ -51,20 +51,20 @@ public class Push extends AbstractZoomTechnique {
 					float xValue = ((Float) parts[1]).floatValue();
 					float yValue = ((Float)parts[2]).floatValue();
 					
-					//if(!Zoom.getInstance().isZooming()) { 
+					//if(!Viewer.getInstance().isViewering()) { 
 						refPoint = new Point2D.Float(xValue, yValue);
 					//}
 					float zoomValue = (yValue - ((float)refPoint.getY()));
 					
 					if (order.equals(ORDER.FIRST)) {
 						
-						System.out.println("firstOrderZoomValue: " + zoomValue);
-						//Zoom.getInstance().firstOrderZoom(zoomValue);
+						System.out.println("firstOrderViewerValue: " + zoomValue);
+						//Viewer.getInstance().firstOrderViewer(zoomValue);
 						
 					} else if (order.equals(ORDER.ZERO)) {
 						
-						System.out.println("zeroOrderZoomValue: " + zoomValue);
-						Zoom.getInstance().zeroOrderZoom(zoomValue);
+						System.out.println("zeroOrderViewerValue: " + zoomValue);
+						Viewer.getInstance().zeroOrderViewer(zoomValue);
 						
 						refPoint = new Point2D.Float(xValue, yValue);
 					}
@@ -72,14 +72,14 @@ public class Push extends AbstractZoomTechnique {
 				}
 				else if (cmd.equals(IN_CMD_STOP))
 				{
-					//Zoom.getInstance().firstOrderStop();
+					//Viewer.getInstance().firstOrderStop();
 					System.out.println("stop");
 				}
 				
 			}
 		};
 		
-		dataReceiver.addListener(Zoom.MOVE_CAMERA, VICONListener);
+		dataReceiver.addListener(Viewer.MOVE_CAMERA, VICONListener);
 	}
 	
 	@Override

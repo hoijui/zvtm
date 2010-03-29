@@ -22,7 +22,7 @@ public abstract class AbstractPanTechnique extends AbstractTechnique {
 			
 		} else if (name.equals("MouseButtonLaserPan")) {
 			
-			return new MouseButtonLaserPan("MouseButtonLaserPan", ORDER.ZERO, Zoom.DEFAULT_PAN_OSC_LISTENING_PORT);
+			return new MouseButtonLaserPan("MouseButtonLaserPan", ORDER.ZERO, Viewer.DEFAULT_PAN_OSC_LISTENING_PORT);
 			
 		} else if (name.equals("MouseButtonLaserPanWithoutWIS")) {
 			

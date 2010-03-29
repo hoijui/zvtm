@@ -25,7 +25,7 @@ import com.illposed.osc.OSCPortIn;
  * @author mathieunancel
  *
  */
-public class LinearIPod extends AbstractZoomTechnique {
+public class LinearIPod extends AbstractViewerTechnique {
 	
 	public static final int ID = 0, X = 1, Y = 2, PRESS = 3;
 	
@@ -70,11 +70,11 @@ public class LinearIPod extends AbstractZoomTechnique {
 	
 	
 	protected OSCDispatcher dispatcher = new OSCDispatcher(
-			Zoom.IPOD_DEFAULT_OSC_LISTENING_PORT, 
+			Viewer.IPOD_DEFAULT_OSC_LISTENING_PORT, 
 			new int[] {
-					Zoom.IPOD_ZOOM_OSC_LISTENING_PORT, 
-					Zoom.IPOD_POINT_OSC_LISTENING_PORT, 
-					Zoom.IPOD_PAN_OSC_LISTENING_PORT
+					Viewer.IPOD_ZOOM_OSC_LISTENING_PORT, 
+					Viewer.IPOD_POINT_OSC_LISTENING_PORT, 
+					Viewer.IPOD_PAN_OSC_LISTENING_PORT
 			}
 	);
 	
@@ -88,7 +88,7 @@ public class LinearIPod extends AbstractZoomTechnique {
 		super(id, o, c);
 		
 		try {
-			this.dataReceiver = new OSCPortIn(Zoom.IPOD_ZOOM_OSC_LISTENING_PORT);
+			this.dataReceiver = new OSCPortIn(Viewer.IPOD_ZOOM_OSC_LISTENING_PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +117,7 @@ public class LinearIPod extends AbstractZoomTechnique {
 			
 			// System.out.println("\t" + ponctualSens);
 			
-			Zoom.getInstance().zeroOrderZoom( currentSens * transferFunction.compute(currentY - previousY) );
+			Viewer.getInstance().zeroOrderViewer( currentSens * transferFunction.compute(currentY - previousY) );
 			
 		}
 		

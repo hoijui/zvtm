@@ -40,46 +40,46 @@ public class DesktopMouse extends AbstractPanTechnique {
 			//System.out.println("MOUSE PRESSED");
 			lastJPX = evt.getX();
 			lastJPY = evt.getY();
-			Zoom.getInstance().startPan();
+			Viewer.getInstance().startPan();
 		    }
 
 		    public void mouseReleased (MouseEvent evt){
 			//System.out.println("MOUSE Released");
-			Zoom.getInstance().stopPan();
+			Viewer.getInstance().stopPan();
 		    }
 		};
 		
 	    mouseMotionAdapter = new MouseMotionAdapter() {
 		    public void mouseMoved(MouseEvent evt) {
 			//System.out.println("MOUSE Moved motion");
-			// Zoom.getInstance().setCursorPositionByMasterScreenCoor(evt.getX(), evt.getY());
+			// Viewer.getInstance().setCursorPositionByMasterScreenCoor(evt.getX(), evt.getY());
 			
 		    }
 		    public void mouseDragged(MouseEvent evt) {
 			//System.out.println("MOUSE draged motion");
-			// Zoom.getInstance().setCursorPositionByMasterScreenCoor(evt.getX(), evt.getY());
+			// Viewer.getInstance().setCursorPositionByMasterScreenCoor(evt.getX(), evt.getY());
 			int jpx = evt.getX();
 			int jpy = evt.getY();
-			Zoom.getInstance().zeroOrderTranslate((long)(-(jpx-lastJPX)*(long)Zoom.getInstance().getMasterToWildWidthFact()), (long)(-(lastJPY-jpy))*(long)Zoom.getInstance().getMasterToWildHeightFact());
+			Viewer.getInstance().zeroOrderTranslate((long)(-(jpx-lastJPX)*(long)Viewer.getInstance().getMasterToWildWidthFact()), (long)(-(lastJPY-jpy))*(long)Viewer.getInstance().getMasterToWildHeightFact());
 			lastJPX = jpx;
 			lastJPY = jpy;
 		    }
 		};
-	    //Zoom.getInstance().getZVTMPanel().addMouseListener(mouseAdapter);
+	    //Viewer.getInstance().getZVTMPanel().addMouseListener(mouseAdapter);
 
 	}
 
 	@Override
 	public void startListening() {
-	    Zoom.getInstance().getZVTMPanel().addMouseListener(mouseAdapter);
-	    Zoom.getInstance().getZVTMPanel().addMouseMotionListener(mouseMotionAdapter);
+	    Viewer.getInstance().getZVTMPanel().addMouseListener(mouseAdapter);
+	    Viewer.getInstance().getZVTMPanel().addMouseMotionListener(mouseMotionAdapter);
 	}
 
 	@Override
 	public void stopListening() {
 		// TODO Auto-generated method stub
-	    Zoom.getInstance().getZVTMPanel().removeMouseListener(mouseAdapter);
-	    Zoom.getInstance().getZVTMPanel().removeMouseMotionListener(mouseMotionAdapter);
+	    Viewer.getInstance().getZVTMPanel().removeMouseListener(mouseAdapter);
+	    Viewer.getInstance().getZVTMPanel().removeMouseMotionListener(mouseMotionAdapter);
 
 	}
 

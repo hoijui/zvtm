@@ -50,8 +50,8 @@ public class IPodPressLaserPan extends AbstractPanTechnique {
 		super(id, o);
 		
 		try {
-			VICONPort = new OSCPortIn(Zoom.DEFAULT_PAN_OSC_LISTENING_PORT);
-			IPodPort = new OSCPortIn(Zoom.IPOD_PAN_OSC_LISTENING_PORT);
+			VICONPort = new OSCPortIn(Viewer.DEFAULT_PAN_OSC_LISTENING_PORT);
+			IPodPort = new OSCPortIn(Viewer.IPOD_PAN_OSC_LISTENING_PORT);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -84,30 +84,30 @@ public class IPodPressLaserPan extends AbstractPanTechnique {
 				if (panning) {
 					
 					// au sens de zvtm
-					cursorLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-							Zoom.getInstance().getCursorCamera(),
+					cursorLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+							Viewer.getInstance().getCursorCamera(),
 							(int)currentCoords.x,
 							(int)currentCoords.y
 					); 
 					
-					pointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-							Zoom.getInstance().getMCamera(), 
+					pointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+							Viewer.getInstance().getMCamera(), 
 							(int)currentCoords.x,
 							(int)currentCoords.y
 					); 
 					
-					previousPointLocation = Zoom.getInstance().getClusteredView().viewToSpaceCoords(
-							Zoom.getInstance().getCursorCamera(), 
+					previousPointLocation = Viewer.getInstance().getClusteredView().viewToSpaceCoords(
+							Viewer.getInstance().getCursorCamera(), 
 							(int)previousCoords.x,
 							(int)previousCoords.y
 					); 
 					
-					Zoom.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
+					Viewer.getInstance().setCursorPosition(cursorLocation.x, cursorLocation.y);
 					// System.out.println("cursor : " + cursorLocation.x + ", " + cursorLocation.y);
 					
 					if (panning) {
 						
-						Zoom.getInstance().zeroOrderTranslate((int)(previousPointLocation.x - cursorLocation.x), (int)(previousPointLocation.y - cursorLocation.y));
+						Viewer.getInstance().zeroOrderTranslate((int)(previousPointLocation.x - cursorLocation.x), (int)(previousPointLocation.y - cursorLocation.y));
 						
 					}
 					
@@ -128,7 +128,7 @@ public class IPodPressLaserPan extends AbstractPanTechnique {
 					if ( new Integer(parts[PRESS]).intValue() == 1 ) {
 						
 						panning = true;
-						Zoom.getInstance().startPan();
+						Viewer.getInstance().startPan();
 						
 						System.out.println("Panning");
 						
@@ -136,7 +136,7 @@ public class IPodPressLaserPan extends AbstractPanTechnique {
 					} else {
 						
 						panning = false;
-						Zoom.getInstance().stopPan();
+						Viewer.getInstance().stopPan();
 						
 						System.out.println("Not Panning");
 						
