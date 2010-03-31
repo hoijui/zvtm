@@ -182,7 +182,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         currentPanTechnique = AbstractPanTechnique.createTechnique(panTechName);
         currentPointTechnique = AbstractPointTechnique.createTechnique(pointTechName);
         currentZoomTechnique = AbstractZoomTechnique.createTechnique(techName);
-
+        currentPanTechnique.initListeners();
+        currentPanTechnique.startListening();
+        currentPointTechnique.initListeners();
+        currentPointTechnique.startListening();
+        currentZoomTechnique.initListeners();
+        currentZoomTechnique.startListening();
+        settings.callCommands();
 
 		ovm = new OverlayManager(this);
 		initGUI(fullscreen, opengl, antialiased);
