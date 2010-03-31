@@ -46,9 +46,11 @@ public class GLEView extends View implements KeyListener{
      *@param panelHeight height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
+     *@param decorated should the view be decorated with the underlying window manager's window frame or not
      */
-    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible){
+    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible, boolean decorated){
 	frame=new JFrame();
+	if (!decorated){frame.setUndecorated(true);}
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	mouse=new VCursor(this);
 	name=t;
@@ -104,9 +106,11 @@ public class GLEView extends View implements KeyListener{
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view)
+     *@param decorated should the view be decorated with the underlying window manager's window frame or not
      */
-    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible,JMenuBar mnb){
+    protected GLEView(Vector v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible, boolean decorated, JMenuBar mnb){
 	frame=new JFrame();
+	if (!decorated){frame.setUndecorated(true);}
 	frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	frame.setJMenuBar(mnb);
 	this.jmb=mnb;

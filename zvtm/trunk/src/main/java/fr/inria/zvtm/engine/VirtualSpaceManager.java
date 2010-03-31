@@ -236,7 +236,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	    break;
 	}
 	case View.OPENGL_VIEW:{
-	    v = (mnb != null) ? new GLEView(c, name, w, h, bar, visible, mnb) : new GLEView(c, name, w, h, bar, visible);
+	    v = (mnb != null) ? new GLEView(c, name, w, h, bar, visible, decorated, mnb) : new GLEView(c, name, w, h, bar, visible, decorated);
 	    addView(v);
 	    v.setRepaintPolicy(generalRepaintPolicy);
 	    break;
