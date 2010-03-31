@@ -1,3 +1,4 @@
+
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
@@ -385,7 +386,7 @@ public class NodeTrixViz {
     
     public void mergeMatrices(VirtualSpace vs, AnimationManager am)
     {
-    	System.out.println("[NODE_TRIX_VIZ] -- MERGE "+ matrices.size() +" MATRICES ");
+//    	System.out.println("[NODE_TRIX_VIZ] -- MERGE "+ matrices.size() +" MATRICES ");
     	
     	// GROUP MATRICES ACCORDING NAMES MATRIX
 		HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
@@ -399,7 +400,7 @@ public class NodeTrixViz {
     	}	
        	
         // POSITION MATRICES THAT TEND TO BE MERGED IN A ROW 
-    	System.out.println("[NODE_TRIX_VIZ] -- CREATING NEW MATRICES " + mergeMap.size());
+//    	System.out.println("[NODE_TRIX_VIZ] -- CREATING NEW MATRICES " + mergeMap.size());
     	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet())
     	{
     		Vector<Matrix> mergeMatrices = entry.getValue();

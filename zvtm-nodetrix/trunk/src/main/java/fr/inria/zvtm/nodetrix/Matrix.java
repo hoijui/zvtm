@@ -151,6 +151,7 @@ public class Matrix {
         //estimating maximal length of node labels
     	labelWidth = 0;
         for (NTNode n : nodes){
+        	System.out.println(n.getLabelWidth());
         	if (n.getLabelWidth() > labelWidth){
                 labelWidth = n.getLabelWidth();
             }
@@ -485,14 +486,14 @@ public class Matrix {
     
     public void highlightGrid(NTNode tail, NTNode head, Color c)
     {
-    	int i1 = nodes.indexOf(tail);
+    	int i1 = tail.matrix.nodes.indexOf(tail);
     	if(i1 > -1){
     		Glyph g1 = gridBarsH[nodes.indexOf(tail)];
     		g1.setColor(c);
     		g1.setVisible(true);
     	}
  
-    	int i2 = nodes.indexOf(head);
+    	int i2 = head.matrix.nodes.indexOf(head);
     	if(i2 > -1){
     		Glyph g2 = gridBarsV[nodes.indexOf(head)];
     		g2.setColor(c);
@@ -504,14 +505,14 @@ public class Matrix {
     
     public void resetGrid(NTNode tail, NTNode head)
     {
-    	int i1 = nodes.indexOf(tail);
+    	int i1 = tail.matrix.nodes.indexOf(tail);
     	if(i1 > -1){
     		Glyph g1 = gridBarsH[i1];
     		g1.setColor(NodeTrixViz.COLOR_GRID);
     		if(i1 % 2 != 0) g1.setVisible(false);
     	}
 
-    	int i2 = nodes.indexOf(head);
+    	int i2 = head.matrix.nodes.indexOf(head);
     	if(i2 > -1){
     		Glyph g2 = gridBarsV[i2];
     		g2.setColor(NodeTrixViz.COLOR_GRID);
@@ -738,10 +739,10 @@ public class Matrix {
 
 		//if the current hierarchyLevel is 0, that dont show any labels and regroup the matrices 
 		//using an algorithm
-		if(limitLevel == 0){
-			this.reorderCutHillMcKee();
-			return;
-		} 
+//		if(limitLevel == 0){
+//			this.reorderCutHillMcKee();
+//			return;
+//		} 
 		
 		//putting nodes back into matrix
 		List<String> orderedGroups = new ArrayList<String>();

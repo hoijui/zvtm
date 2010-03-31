@@ -101,6 +101,7 @@ public class NTNode extends LinLogNode{
 	    	gBackgroundW.stick(this.labelW);
 	    	vs.addGlyph(gBackgroundW);
 	    	vs.addGlyph(labelW);
+	    	System.out.println("[NTNODE] LABELWIDTH " + getName() +", "+ labelW.getBounds(0).x);
 	    	
 	    	gSensitiveW = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
 	    	gSensitiveW.setVisible(false);
@@ -270,14 +271,14 @@ public class NTNode extends LinLogNode{
 //		if(!matrix.isNodesVisibleNorth()) gBackgroundN.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
 //		if(!matrix.isNodesVisibleWest()) gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
 		
-		affectNorth = false;
-		affectWest = false;
 		
 		if(!single)
 		{
 			gBackgroundN.setColor(backgroundColor);
 			gBackgroundN.setTranslucencyValue(1);
 		}
+		affectNorth = false;
+		affectWest = false;
 	}
     
     
@@ -343,15 +344,17 @@ public class NTNode extends LinLogNode{
      * the matrix. A gradient is also applied according to the position of the node in the list.
      */
 	public void setBackgroundBox(long maxLength) {
-//		System.out.println(maxLength);
-		if(widthHalf == 0) this.widthHalf = maxLength/2;
-		if (heightHalf == 0){
+//		maxLength /=3;
+//		System.out.println("[NTNODE] LENGHT: ------------------------------------------> " + maxLength);
+//		if(widthHalf == 0) 
+			this.widthHalf = maxLength/2;
+//		if (heightHalf == 0){
 		    this.heightHalf = gBackgroundW.getHeight();
-		}
+//		}
 		wdx -= widthHalf;
 		ndy += widthHalf;
 		this.gBackgroundW.setWidth(widthHalf);
-
+		
 		gSensitiveW.setWidth(widthHalf-2);
 		if (!this.single){
 			this.gBackgroundW.move(-widthHalf, 0);
