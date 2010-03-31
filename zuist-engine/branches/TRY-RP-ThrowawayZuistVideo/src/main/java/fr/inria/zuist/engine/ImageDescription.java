@@ -38,6 +38,7 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.config.CacheConfiguration;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.Status;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 
 /** Description of image objects to be loaded/unloaded in the scene.
@@ -59,15 +60,15 @@ public class ImageDescription extends ResourceDescription {
     private static int N_THREADS = 20;
     private static int CAPACITY = 2000;
 
-    private static final Cache cache;
+    private static final CacheManager manager;
     static {   
         imageLoader = new ThreadPoolExecutor(N_THREADS, N_THREADS, 
                 0L, TimeUnit.MILLISECONDS, 
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         imageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
-        CacheManager manager = CacheManager.create();
-        cache = new Cache("imageCache", 5000, false, true, 3600, 3600, false, 200);
+        manager = CacheManager.create();
+        Cache cache = new Cache("imageCache", 5000, MemoryStoreEvictionPolicy.LRU, false, "", true, 120, 200, false, 120, null);
         manager.addCache(cache);
     }
 
@@ -108,11 +109,17 @@ public class ImageDescription extends ResourceDescription {
                     }
                 }
                 else {
-                    Image img = (Image)(cache.get(src).getObjectValue());
-                    if(img == null){
+                    Cache cache = manager.getCache("imageCache");
+                    assert(cache.getStatus() == Status.STATUS_ALIVE);
+                    Element imgElem = cache.get(src.toString());
+                    Image img = null;
+                    if(imgElem == null){
                         img = new ImageIcon(src).getImage();
-                        cache.put(new Element(src, img));
+                        cache.put(new Element(src.toString(), img));
+                    } else {
+                        img = (Image)(imgElem.getObjectValue());
                     }
+                    assert(img != null);
                     finishCreatingObject(vs, img, null, fadeIn);                    
                 }
             }     
