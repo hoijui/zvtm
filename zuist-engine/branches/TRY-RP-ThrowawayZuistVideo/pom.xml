@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id$
+-->
+
+<!--
+mvn install:install-file -DgroupId=net.sf.ehcache -DartifactId=ehcache -Dversion=2.0.0 -Dpackaging=jar -Dfile=/path/to/file
+-->
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zuist-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>ZUIST</name>
+  <version>0.3.0-SNAPSHOT</version>
+  <description>ZUIST is a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to develop multi-scale interfaces in which objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera. Multi-scale scenes can be built through the ZUIST API (see javadoc) or can be loaded from files using a dedicated XML vocabulary.</description>
+  <url>http://zvtm.sourceforge.net/zuist/</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm/zuist-engine/</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+    </repositories>
+  
+  <!-- Distribution - Deploy to FTP -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+  
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm</artifactId>
+      <version>0.10.1-SNAPSHOT</version>
+    </dependency>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-svg</artifactId>
+      <version>0.1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+    <groupId>ehcache</groupId>
+    <artifactId>ehcache</artifactId>
+    <version>1.2.3</version>
+</dependency>
+    </dependencies>
+  
+  <!-- Build -->
+  <build>
+	<resources> 
+	  <resource>
+        <directory>src/main/resources</directory> 
+          <excludes> 
+		    <exclude>*.dtd</exclude>
+		    <exclude>python/**</exclude>
+		</excludes> 
+      </resource>
+	</resources>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+		  <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zuist.viewer.Launcher</mainClass>
+              <packageName>fr.inria.zuist.viewer</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <!-- Reporting -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <code>javadoc:aggregate</code>
+          <overview>${basedir}/overview.html</overview>
+          <doctitle><![CDATA[<h1>ZUIST API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[<i>Copyright &#169; 2007-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <links> 
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
