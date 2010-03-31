@@ -194,6 +194,7 @@ public class SceneManager implements CameraListener {
                             return;
                         }
                         long[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
+                        applyFact(cameraBounds, 1f);
                         //update regions
                         if(alt != prevAlts[layerIndex]){
                             prevAlts[layerIndex] = alt;
@@ -213,6 +214,17 @@ public class SceneManager implements CameraListener {
         t.start();
     }
 }
+
+  private void applyFact(long[] wnes, float fact){
+      long w = wnes[0];
+      long n = wnes[1];
+      long e = wnes[2];
+      long s = wnes[3];
+      wnes[0] -= (long)((e-w)*fact);
+      wnes[1] += (long)((n-s)*fact);
+      wnes[2] += (long)((e-w)*fact);
+      wnes[3] -= (long)((n-s)*fact);
+  }
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vss virtual spaces in which the scene will be loaded
