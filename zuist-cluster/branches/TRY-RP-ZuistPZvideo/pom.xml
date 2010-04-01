@@ -39,7 +39,32 @@
             <artifactId>WildInputServer</artifactId>
             <version>1.0</version>
         </dependency>
-</dependencies>
+        <dependency>
+            <groupId>com.feketeries</groupId>
+            <artifactId>colt</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.feketeries</groupId>
+            <artifactId>beanutils</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.feketeries</groupId>
+            <artifactId>infovis</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.feketeries</groupId>
+            <artifactId>intset</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.feketeries</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.0</version>
+        </dependency>
+ </dependencies>
     <build>
 		<plugins>
 			<plugin>

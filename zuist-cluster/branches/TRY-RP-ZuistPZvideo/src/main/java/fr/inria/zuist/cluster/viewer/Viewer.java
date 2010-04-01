@@ -70,6 +70,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.PieMenu;
 import fr.inria.zvtm.glyphs.PieMenuFactory;
+import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.animation.EndAction;
@@ -166,8 +167,12 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     private AbstractPanTechnique currentPanTechnique;
     private AbstractPointTechnique currentPointTechnique;
     private AbstractZoomTechnique currentZoomTechnique;
+
+    private boolean atc;
+    private VirtualSpace routes;
  
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile, String nbHands, String gesture, String dimension){
+    public Viewer(boolean atc, boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile, String nbHands, String gesture, String dimension){
+        this.atc = atc;
         TechniqueSettingsManager setMgr = new TechniqueSettingsManager();
         Hands hands = Hands.valueOf(nbHands);
         GestureType gestureType = GestureType.valueOf(gesture);
@@ -191,7 +196,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         settings.callCommands();
 
 		ovm = new OverlayManager(this);
-		initGUI(fullscreen, opengl, antialiased);
+		initGUI(atc, fullscreen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -217,7 +222,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         return VirtualSpaceManager.INSTANCE;
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    void initGUI(boolean atc, boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("ZuistCluster");
@@ -229,13 +234,23 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		ovSpace.addCamera();
         cursorSpace = vsm.addVirtualSpace("cursor");
         cursorCamera = cursorSpace.addCamera();
+        Camera routeCamera = null;
+        if(atc){
+            routes = vsm.addVirtualSpace("routes");
+            routeCamera = routes.addCamera();
+            mCamera.stick(routeCamera);
+        }
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+        if(atc){ 
+            cameras.add(routeCamera);
+        }
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
+        if(atc){ sceneCam.add(routeCamera);}
         sceneCam.add(cursorCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
@@ -528,6 +543,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	}
 
 	void loadScene(File xmlSceneFile){
+        if(atc){
+            new GraphManager(routes);
+        }
 		try {
 			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
 			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());			
@@ -827,6 +845,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+        boolean atc = true;
         String hands = "One";
         String gesture = "Linear";
         String dimension = "TwoD";
@@ -834,6 +853,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
+				else if (args[i].substring(1).equals("atc")){atc = true;}
 				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
@@ -861,7 +881,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        INSTANCE = new Viewer(fs, ogl, aa, xmlSceneFile, hands, gesture, dimension);
+        INSTANCE = new Viewer(atc, fs, ogl, aa, xmlSceneFile, hands, gesture, dimension);
     }
     
     private static void printCmdLineHelp(){
