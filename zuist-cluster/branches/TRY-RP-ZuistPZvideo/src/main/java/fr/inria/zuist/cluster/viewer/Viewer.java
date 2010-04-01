@@ -238,7 +238,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         if(atc){
             routes = vsm.addVirtualSpace("routes");
             routeCamera = routes.addCamera();
-            mCamera.stick(routeCamera);
         }
         Vector cameras = new Vector();
         cameras.add(mCamera);
@@ -250,7 +249,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
-        if(atc){ sceneCam.add(routeCamera);}
+        if(atc){
+            sceneCam.add(routeCamera);
+            mCamera.stick(routeCamera);
+        }
         sceneCam.add(cursorCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
