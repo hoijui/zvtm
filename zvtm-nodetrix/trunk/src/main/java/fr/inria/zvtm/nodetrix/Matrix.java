@@ -488,14 +488,14 @@ public class Matrix {
     {
     	int i1 = tail.matrix.nodes.indexOf(tail);
     	if(i1 > -1){
-    		Glyph g1 = gridBarsH[nodes.indexOf(tail)];
+    		Glyph g1 = tail.matrix.gridBarsH[i1];
     		g1.setColor(c);
     		g1.setVisible(true);
     	}
  
     	int i2 = head.matrix.nodes.indexOf(head);
     	if(i2 > -1){
-    		Glyph g2 = gridBarsV[nodes.indexOf(head)];
+    		Glyph g2 = head.matrix.gridBarsV[i2];
     		g2.setColor(c);
     		g2.setVisible(true);
     	}
@@ -507,14 +507,14 @@ public class Matrix {
     {
     	int i1 = tail.matrix.nodes.indexOf(tail);
     	if(i1 > -1){
-    		Glyph g1 = gridBarsH[i1];
+    		Glyph g1 = tail.matrix.gridBarsH[i1];
     		g1.setColor(NodeTrixViz.COLOR_GRID);
     		if(i1 % 2 != 0) g1.setVisible(false);
     	}
 
     	int i2 = head.matrix.nodes.indexOf(head);
     	if(i2 > -1){
-    		Glyph g2 = gridBarsV[i2];
+    		Glyph g2 = head.matrix.gridBarsV[i2];
     		g2.setColor(NodeTrixViz.COLOR_GRID);
     		if(i2 % 2 != 0) g2.setVisible(false);
     	}

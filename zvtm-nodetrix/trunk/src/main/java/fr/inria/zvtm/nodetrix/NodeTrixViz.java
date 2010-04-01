@@ -455,7 +455,6 @@ public class NodeTrixViz {
 
            	//draw new matrix;                                                              
 			newMatrix.createNodeGraphics(xCentre, yCentre, vs);
-			newMatrix.finishCreateNodeGraphics(vs);
 
 			// set node labels to old positions
 			// and put old matrices to front
@@ -476,6 +475,7 @@ public class NodeTrixViz {
     			m.cleanGraphics(am);
     		}
     		
+    		newMatrix.finishCreateNodeGraphics(vs);
 
     		//reset nodes to original places
     		for(NTNode n : newMatrix.nodes){
