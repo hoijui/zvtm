@@ -829,7 +829,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		boolean aa = true;
         String hands = "One";
         String gesture = "Linear";
-        String dimension = "OneD";
+        String dimension = "TwoD";
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
