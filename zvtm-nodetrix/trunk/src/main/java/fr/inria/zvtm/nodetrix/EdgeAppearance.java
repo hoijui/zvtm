@@ -36,7 +36,6 @@ public abstract class EdgeAppearance {
 	
 	//GENERAL BEHAVIOUR
 	public abstract void move(long x, long y);
-//	public abstract void moveTo(long x, long y);
 	public abstract void onTop();
 	public abstract void updatePosition();
 	public abstract void updateColor();
@@ -46,6 +45,7 @@ public abstract class EdgeAppearance {
 	public abstract void highlight(Color c);
 	public abstract void select();
 	public abstract void fade();
+	public abstract void show();
 	
 	//GETTER, SETTER
 	public NTEdge getEdge(){

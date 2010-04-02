@@ -101,7 +101,7 @@ public class NTNode extends LinLogNode{
 	    	gBackgroundW.stick(this.labelW);
 	    	vs.addGlyph(gBackgroundW);
 	    	vs.addGlyph(labelW);
-	    	System.out.println("[NTNODE] LABELWIDTH " + getName() +", "+ labelW.getBounds(0).x);
+//	    	System.out.println("[NTNODE] LABELWIDTH " + getName() +", "+ labelW.getBounds(0).x);
 	    	
 	    	gSensitiveW = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
 	    	gSensitiveW.setVisible(false);

@@ -17,13 +17,14 @@ public class NTEdge extends LinLogEdge{
 
 	NTNode tail, head;
     private Color edgeColor;
-    int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
-    int newInteractionState = NodeTrixViz.IA_STATE_HIGHLIGHT;
+    protected int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
+    protected int newInteractionState = NodeTrixViz.IA_STATE_HIGHLIGHT;
     private EdgeAppearance appearance;	//responsible for graphical rendering.
     private EdgeAppearance newAppearance;
     Object owner;
     private Color inverseColor;
     private boolean symmetric = false;
+    private boolean visible = true;
     
     
     public NTEdge(NTNode startNode, NTNode endNode, Color c) {
@@ -58,21 +59,28 @@ public class NTEdge extends LinLogEdge{
 
     public void setInteractionState(int newState)
     {
-//    	if(interactionState == NodeTrixViz.IA_STATE_SELECTED && newState == NodeTrixViz.IA_STATE_FADE) return;
-    	this.newInteractionState = newState;
+     	this.newInteractionState = newState;
     }
     
     public void performInteractionStateChange()
     {
     	if(newInteractionState == interactionState) return;
+    	if(!visible && newInteractionState != NodeTrixViz.IA_STATE_FADE){appearance.show();}
     	
-	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) appearance.fade();
+	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) {
+	    	appearance.fade();
+	    	visible = false;
+	    }
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_INCOMING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) appearance.select();
-	    else appearance.reset();
-	    
+	    else{
+	    	if(!visible)
+	    		appearance.fade();
+	    	else
+	    		appearance.reset();
+	    }
 	    interactionState = newInteractionState;
     }
     
@@ -80,18 +88,17 @@ public class NTEdge extends LinLogEdge{
     {
     	if(appearance == null) return;
     	appearance.createGraphics(vs);
+    	 if(!visible){
+    		 System.out.println("NOT VISIBLE");
+ 			 setInteractionState(NodeTrixViz.IA_STATE_FADE);
+ 			 performInteractionStateChange();
+ 		 }
     }
 
     public void setEdgeSetPosition(int index, int amount){
     	appearance.setEdgeSetPosition(index, amount);
     }
-    
-    
-//    public void moveTo(long x, long y)
-//    {
-//    	if(appearance == null) return;
-//    	appearance.moveTo(x,y);
-//    }
+
     
     public void move(long x, long y){
     	if(appearance == null) return;
@@ -153,4 +160,8 @@ public class NTEdge extends LinLogEdge{
 	public Color getInverseColor(){ return inverseColor; }
 	
 	public Color getColor(){ return edgeColor; }
+	
+	public boolean isVisible(){
+		return visible;
+	}
 }

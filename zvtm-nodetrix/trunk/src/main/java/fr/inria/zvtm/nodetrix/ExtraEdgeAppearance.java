@@ -12,6 +12,7 @@ import java.awt.Color;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.GPath;
+import fr.inria.zvtm.glyphs.Glyph;
 
 public class ExtraEdgeAppearance extends EdgeAppearance {
 
@@ -121,8 +122,14 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	@Override
 	public void fade() {
-		// TODO Auto-generated method stub
-
+		edgePath.setVisible(false);
+		edgePath.setSensitivity(false);
+	}
+	
+	@Override
+	public void show(){
+		edgePath.setVisible(true);
+		edgePath.setSensitivity(true);
 	}
 
 	@Override

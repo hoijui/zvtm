@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -89,9 +90,10 @@ public class NodeTrixViz {
 	
 	public static final int APPEARANCE_EXTRA_EDGE = 0;  
 	public static final int APPEARANCE_INTRA_EDGE = 1;  
-    /* Matrices in this visualization */
-//    Matrix[] matrices;
-	Vector<Matrix> matrices;
+	private VirtualSpace vs;
+	
+	
+    Vector<Matrix> matrices;
 	/**Vector that stores all edges considered by the linLog cluster algorithm*
      * @author benjamin bach bbach@lri.fr
      */
@@ -224,9 +226,13 @@ public class NodeTrixViz {
     // have to find something better than this constant...
     double SCALE = 40;
     
+    
+    
+    
     //---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE
     
     public void createViz(VirtualSpace vs){
+    	this.vs = vs;
         Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
         // keep trace of matrices tha are not part of the graph ; we still want to display them
         HashMap<Matrix,Object> orphanMatrices = new HashMap();
@@ -354,16 +360,30 @@ public class NodeTrixViz {
 	}
     
     
-    //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
+    public void hideEdges(Set<NTEdge> disappearingEdges){
+    	for(NTEdge n : disappearingEdges){	
+    		n.setInteractionState(IA_STATE_FADE);
+    		n.performInteractionStateChange();
+    	}
+    }
     
-//    public void reorganiseAllMatrices(AnimationManager am)
-//    {
-//    	regroupMatrices(0);
-//    	splitAllMatrices(am);
-//    	mergeAllMatrices();
-//    }
-//    
-//    
+    public void showEdges(List<LinLogEdge> edges){
+    	for(LinLogEdge lle : edges){
+    		((NTEdge)lle).setInteractionState(IA_STATE_DEFAULT);
+    		((NTEdge)lle).performInteractionStateChange();
+    	}
+    }
+    
+    public void cleanMatrices(AnimationManager am){
+    	for(Matrix m : matrices){
+    		m.cleanGraphics(am);
+    	}
+    	matrices.clear();
+    }
+    
+    //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
+
+    
     
     public void splitMatrices(AnimationManager am){
     	Vector<Matrix> newMatrices = new Vector<Matrix>();

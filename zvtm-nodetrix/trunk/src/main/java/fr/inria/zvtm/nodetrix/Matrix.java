@@ -151,7 +151,6 @@ public class Matrix {
         //estimating maximal length of node labels
     	labelWidth = 0;
         for (NTNode n : nodes){
-        	System.out.println(n.getLabelWidth());
         	if (n.getLabelWidth() > labelWidth){
                 labelWidth = n.getLabelWidth();
             }
@@ -230,6 +229,7 @@ public class Matrix {
      			HashMap<NTNode, Vector<NTEdge>> intraEdgeSetMap = new HashMap<NTNode, Vector<NTEdge>>();
              	//Instantiate
              	for(NTEdge edge : n.getOutgoingEdges()){
+//             		if(!edge.isVisible()) continue;
              		 if (edge.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
              			 Vector<NTEdge> ies = new Vector<NTEdge>();
 //             			 intraEdgeSets.add(ies);
@@ -406,23 +406,27 @@ public class Matrix {
     public void highlightNodeContext(NTNode n)
     {
     	//set related nodes
-    	for(NTNode nn : nodes){
-    		nn.setNewState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
-    		nn.perfomStateChange();
-    		for(NTEdge e : nn.outgoingEdges){
-    			e.setInteractionState(NodeTrixViz.IA_STATE_DEFAULT);
-    			e.performInteractionStateChange();
-    		}
-    		for(NTEdge e : nn.incomingEdges){
-    			e.setInteractionState(NodeTrixViz.IA_STATE_DEFAULT);
-    			e.performInteractionStateChange();
-    		}
-    	}
+//    	for(NTNode nn : nodes){
+//    		nn.setNewState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
+//    		nn.perfomStateChange();
+//    		for(NTEdge e : nn.outgoingEdges){
+//    			if(!e.isVisible()) continue;
+//    			e.setInteractionState(NodeTrixViz.IA_STATE_DEFAULT);
+//    			e.performInteractionStateChange();
+//    		}
+//    		for(NTEdge e : nn.incomingEdges){
+//    			if(!e.isVisible()) continue;
+//    			e.setInteractionState(NodeTrixViz.IA_STATE_DEFAULT);
+//    			e.performInteractionStateChange();
+//    		}
+//    	}
+    	resetNodeContext();
 
     	n.setNewState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
     	highlightedNodes = new Vector<NTNode>();
     	highlightedEdges = new Vector<NTEdge>();
     	for(NTEdge e : n.getOutgoingEdges()){
+    		if(!e.isVisible()) continue;
     		e.getHead().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
     		e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
     		e.performInteractionStateChange();
@@ -431,6 +435,7 @@ public class Matrix {
     	}
     	
     	for(NTEdge e : n.getIncomingEdges()){
+    		if(!e.isVisible()) continue;
     		e.getTail().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
 			e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING);
 			e.performInteractionStateChange();
@@ -454,11 +459,13 @@ public class Matrix {
     		n.setNewState(NodeTrixViz.IA_STATE_DEFAULT, true, true);
     		n.perfomStateChange();
     		for(NTEdge e : n.outgoingEdges){
+    			if(!e.isVisible()) continue;
     			resetGrid(n,e.head);
     			e.setInteractionState(NodeTrixViz.IA_STATE_DEFAULT);
     			e.performInteractionStateChange();
     		}
     		for(NTEdge e : n.incomingEdges){
+    			if(!e.isVisible()) continue;
     			resetGrid(e.tail, n);
         		e.setInteractionState(NodeTrixViz.IA_STATE_DEFAULT);
     			e.performInteractionStateChange();

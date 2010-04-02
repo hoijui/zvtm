@@ -30,6 +30,9 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	private DPath gLowerFrameFragment, gUpperFrameFragment;
 	private VRectangle gSensitive;
 	private VCircle gHighlight;
+	private Glyph[] allGlyphs = new Glyph[8];
+	private LongPoint mp;
+
 //	private VText gLabel;
 	
 	public IntraEdgeAppearance(NTEdge edge) {
@@ -45,19 +48,6 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		if(gSecondary != null) gSecondary.setColor(edge.isSymmetric() ? edge.getColor() : edge.getInverseColor());
 	}
 	
-	@Override
-	protected void clearGraphics() 
-	{
-		if(vs == null) return;
-		vs.removeGlyph(gHighlight);
-		vs.removeGlyph(gPrimary);
-    	if(gSecondary != null) vs.removeGlyph(gSecondary);
-     	vs.removeGlyph(gLeftFrameFragment);
-     	vs.removeGlyph(gRightFrameFragment);
-     	if(gUpperFrameFragment != null) vs.removeGlyph(gUpperFrameFragment);
-     	if(gLowerFrameFragment != null) vs.removeGlyph(gLowerFrameFragment);
-     	vs.removeGlyph(gSensitive);
-   }
 	
 	@Override
 	public void createGraphics(VirtualSpace vs){
@@ -65,6 +55,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		createGraphics();
 	}
 	
+
 	@Override
 //	public void createGraphics(long height, long y, long x, long index, VirtualSpace vs)  {
 	public void createGraphics() {
@@ -72,13 +63,11 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		double height = (NodeTrixViz.CELL_SIZE-3) / amount;
 			
 		this.animManager = VirtualSpaceManager.INSTANCE.getAnimationManager();
-//    	this.offset = new LongPoint(x, y);
-    	LongPoint mp = edge.tail.getMatrix().getPosition();
+    	mp = edge.tail.getMatrix().getPosition();
     	
     	long west = mp.x + edge.head.ndx - NodeTrixViz.CELL_SIZE_HALF + 2;
 		long north =  mp.y + edge.tail.wdy + NodeTrixViz.CELL_SIZE_HALF;
 		long east = mp.x + edge.head.ndx + NodeTrixViz.CELL_SIZE_HALF -2;
-//		long south = mp.y + edge.head.wdy - NodeTrixViz.CELL_SIZE_HALF;
 		
 		//SENSITIE RECTANGLE
 		int radius = (int) NodeTrixViz.CELL_SIZE_HALF + 5;
@@ -86,6 +75,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	gHighlight.setDrawBorder(false);
     	gHighlight.setVisible(false);
     	vs.addGlyph(gHighlight);
+    	allGlyphs[0] = gHighlight;
 		
 		//LABEL
 //    	gLabel = new VText(mp.x + edge.head.ndx, south - 10, 0, Color.black, edge.owner));
@@ -99,10 +89,12 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	gPrimary = new VPolygon(p, 0, edge.getColor(), edge.getColor());
     	gPrimary.setDrawBorder(false);
     	gPrimary.setSensitivity(false);
-    	gPrimary.stick(gHighlight);
+//    	gPrimary.stick(gHighlight);
+    	gHighlight.stick(gPrimary);
+    	allGlyphs[1] = gPrimary;
     	gPrimary.setOwner(edge);
     	vs.addGlyph(gPrimary);
-    	
+   	
     	//SYMMETRIC GLYPH
     	if(edge.isSymmetric() || edge.hasInverse())
     	{
@@ -118,8 +110,10 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     		gSecondary = new VPolygon(p, 0, co, co);
     		gSecondary.setDrawBorder(false);
     		gSecondary.setSensitivity(false);
-    		gPrimary.stick(gSecondary);
-    		vs.addGlyph(gSecondary);
+//    		gPrimary.stick(gSecondary);
+    	   	gHighlight.stick(gSecondary);
+        	allGlyphs[2] = gSecondary;
+     		vs.addGlyph(gSecondary);
     	}
     	
     	//FRAMEGLYPHS
@@ -127,11 +121,17 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	gLeftFrameFragment.addSegment(west-2, (long) (north - (index+1)*height)-2, true);
     	gLeftFrameFragment.setSensitivity(false);
     	vs.addGlyph(gLeftFrameFragment);
+      	gHighlight.stick(gLeftFrameFragment);
+    	allGlyphs[3] = gLeftFrameFragment;
+    	
     	gRightFrameFragment = new DPath(east+1, (long) (north - index*height)-2, 0, edge.getColor());
     	gRightFrameFragment.addSegment(east+1, (long) (north - (index+1)*height)-2, true);
     	gRightFrameFragment.setSensitivity(false);
-    	gPrimary.stick(gRightFrameFragment);
+//    	gPrimary.stick(gRightFrameFragment);
     	vs.addGlyph(gRightFrameFragment);
+       	gHighlight.stick(gRightFrameFragment);
+    	allGlyphs[4] = gRightFrameFragment;
+ 
 
     	if(index == 0){
     		gUpperFrameFragment = new DPath(west-2, north-2, 0, edge.getColor());
@@ -139,8 +139,10 @@ public class IntraEdgeAppearance extends EdgeAppearance{
         	gUpperFrameFragment.addSegment(east+1, north, true);
         	gUpperFrameFragment.addSegment(east+1, north-2, true);
         	gUpperFrameFragment.setSensitivity(false);
-        	gPrimary.stick(gUpperFrameFragment);
+//        	gPrimary.stick(gUpperFrameFragment);
         	vs.addGlyph(gUpperFrameFragment);
+           	gHighlight.stick(gUpperFrameFragment);
+        	allGlyphs[5] = gUpperFrameFragment;        	
     	}
     	if(index == amount-1){
     		gLowerFrameFragment = new DPath(west-2, (long) ((north) - (index+1)*height), 0, edge.getColor());
@@ -148,8 +150,10 @@ public class IntraEdgeAppearance extends EdgeAppearance{
         	gLowerFrameFragment.addSegment(east+1, (long) ((north-3) - (index+1)*height), true);
         	gLowerFrameFragment.addSegment(east+1, (long) ((north) - (index+1)*height), true);
         	gLowerFrameFragment.setSensitivity(false);
-        	gPrimary.stick(gLowerFrameFragment);
+//        	gPrimary.stick(gLowerFrameFragment);
         	vs.addGlyph(gLowerFrameFragment);
+        	gHighlight.stick(gLowerFrameFragment);
+        	allGlyphs[6] = gLowerFrameFragment;        
         	
     	}
     	
@@ -158,49 +162,59 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	gSensitive.setTranslucencyValue(.2f);
     	gSensitive.setVisible(false);
     	gSensitive.setOwner(edge);
-    	gPrimary.stick(gSensitive);
+//    	gPrimary.stick(gSensitive);
     	vs.addGlyph(gSensitive);
+    	gHighlight.stick(gSensitive);
+    	allGlyphs[7] = gSensitive;        
     	
     	onTop();
 	}
 
 	@Override
-	public void fade() {
-//		Animation a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
-//				mainGlyph,
-//				NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
-//				false, 
-//				SlowInSlowOutInterpolator2.getInstance(), 
-//				null);	
-//		animManager.startAnimation(a, true);
-//    	a = animManager.getAnimationFactory().createTranslucencyAnim(NodeTrixViz.DURATION_GENERAL,
-//				symmetricGlyph,
-//				NodeTrixViz.INTRA_TRANSLUCENCY * NodeTrixViz.INTRA_TRANSLUCENCY_DIMMFACTOR,
-//				false, 
-//				SlowInSlowOutInterpolator2.getInstance(), 
-//				null);	
-//		animManager.startAnimation(a, true);
+	protected void clearGraphics() 
+	{
+		if(vs == null) return;
+		for(Glyph g : allGlyphs){
+			if(g == null) continue;
+			vs.removeGlyph(g);
+		}
 	}
-
 	
+	@Override
+	public void fade() {
+		for(Glyph g : allGlyphs){
+			if(g == null) continue;
+			g.setVisible(false);
+			g.setSensitivity(false);
+		}	
+	}
+	
+	@Override
+	public void show(){
+		for(Glyph g : allGlyphs){
+			if(g == null) continue;
+			g.setVisible(true);
+			g.setSensitivity(true);
+		}	
+		gSensitive.setVisible(false);
+	}
 
 	@Override
 	/**Updates the position according to the position of tail and head node.
 	 * */
 	public void updatePosition(){
-//		LongPoint mp = edge.tail.getMatrix().getPosition();
-		clearGraphics();
-		createGraphics();
-//		mainGlyph.moveTo(mp.x + edge.head.ndx, mp.y + edge.tail.wdy);
-//		if(symmetricGlyph != null) symmetricGlyph.moveTo(mp.x + edge.head.ndx + 3, mp.y + edge.tail.wdy + 3);
+		mp = edge.tail.getMatrix().getPosition();
+		long x = (mp.x + edge.head.ndx) - gHighlight.vx; 
+ 		long y = (mp.y + edge.tail.wdy) - gHighlight.vy;
+ 		move(x,y);	
     }
 	
 	@Override
-	/**moves the edge relativly
+	/**moves the edge relatively
 	 * */
 	public void move(long x, long y) 
 	{
-		 gPrimary.move(x, y);
+		 gHighlight.move(x, y);
 	}
 
 
@@ -224,11 +238,6 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void highlight(Color c) 
 	{
-//		gLeftFrameFragment.setColor(c);
-//		gRightFrameFragment.setColor(c);
-//		gMain.setColor(c);
-//     	if(gUpperFrameFragment != null) gUpperFrameFragment.setColor(c);
-//     	if(gLowerFrameFragment != null) gLowerFrameFragment.setColor(c);
 		gHighlight.setVisible(true);
 		gHighlight.setColor(c);
 	}
@@ -236,13 +245,9 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void reset() 
 	{
-//		gLeftFrameFragment.setColor(edge.edgeColor);
-//		gRightFrameFragment.setColor(edge.edgeColor);
-//		gMain.setColor(edge.edgeColor);
-//     	if(gUpperFrameFragment != null) gUpperFrameFragment.setColor(edge.edgeColor);
-//     	if(gLowerFrameFragment != null) gLowerFrameFragment.setColor(edge.edgeColor);
 		gHighlight.setVisible(false);
 	}
+	
 
 	@Override
 	public void select() {
