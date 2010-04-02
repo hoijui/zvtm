@@ -146,6 +146,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     VirtualSpace cursorSpace;
     Camera mCamera;
     Camera cursorCamera;
+    Camera routeCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -234,7 +235,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		ovSpace.addCamera();
         cursorSpace = vsm.addVirtualSpace("cursor");
         cursorCamera = cursorSpace.addCamera();
-        Camera routeCamera = null;
+        routeCamera = null;
         if(atc){
             routes = vsm.addVirtualSpace("routes");
             routeCamera = routes.addCamera();
@@ -251,7 +252,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         sceneCam.add(mCamera);
         if(atc){
             sceneCam.add(routeCamera);
-            mCamera.stick(routeCamera);
         }
         sceneCam.add(cursorCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
@@ -268,7 +268,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
-        zoomCenter = new WallCursor(cursorSpace,  20, 160, Color.BLUE);
+        zoomCenter = new WallCursor(cursorSpace,  10, 160, Color.RED);
 
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
@@ -449,6 +449,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			    (mCamera.posy-zoY)*a*zz/(mCamera.getAltitude()+mCamera.focal));
 		    double newz = mCamera.getAltitude()+a*zz;
 		    mCamera.setLocation(new Location(newx, newy, (float)newz));
+		    if(atc){
+                routeCamera.setLocation(new Location(newx, newy, (float)newz));
+            }
 
 		}
 		else
@@ -459,7 +462,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		    long newy = mCamera.posy+Math.round(
 			(mCamera.posy-zoY)*a*zz/(mCamera.getAltitude()+mCamera.focal));
 		    double newz = mCamera.getAltitude()+a*zz;
-		    mCamera.setLocation(new Location(newx, newy, (float)newz));
+            mCamera.setLocation(new Location(newx, newy, (float)newz));
+            if(atc){
+                routeCamera.setLocation(new Location(newx, newy, (float)newz));
+            }
 		}
 	}
 
@@ -474,6 +480,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		long newy = Math.round((long)l.getY()+a*y);
 					       
 		mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+        if(atc){
+            routeCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+        }
 
 		if (currentPointTechnique == null)
 		{
@@ -847,7 +856,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
-        boolean atc = true;
+        boolean atc = false;
         String hands = "One";
         String gesture = "Linear";
         String dimension = "TwoD";
