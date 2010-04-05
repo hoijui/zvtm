@@ -62,23 +62,34 @@ public class NTEdge extends LinLogEdge{
      	this.newInteractionState = newState;
     }
     
+    public void setVisibility(boolean b){
+    	if(visible == b || appearance == null) return;
+    	
+    	if(b) appearance.show();
+    	else appearance.fade();
+    	
+    	visible = b;
+    }
+    
+    
     public void performInteractionStateChange()
     {
-    	if(newInteractionState == interactionState) return;
-    	if(!visible && newInteractionState != NodeTrixViz.IA_STATE_FADE){appearance.show();}
-    	
-	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) {
-	    	appearance.fade();
-	    	visible = false;
-	    }
+    	if(!visible 
+    			|| newInteractionState == interactionState) return;
+//    	if(!visible && newInteractionState != NodeTrixViz.IA_STATE_FADE){appearance.show();}
+//    	
+//	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) {
+//	    	appearance.fade();
+//	    	visible = false;
+//	    }
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_INCOMING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) appearance.select();
 	    else{
-	    	if(!visible)
-	    		appearance.fade();
-	    	else
+//	    	if(!visible)
+//	    		appearance.fade();
+//	    	else
 	    		appearance.reset();
 	    }
 	    interactionState = newInteractionState;
@@ -88,11 +99,15 @@ public class NTEdge extends LinLogEdge{
     {
     	if(appearance == null) return;
     	appearance.createGraphics(vs);
-    	 if(!visible){
-    		 System.out.println("NOT VISIBLE");
- 			 setInteractionState(NodeTrixViz.IA_STATE_FADE);
- 			 performInteractionStateChange();
- 		 }
+    	interactionState = NodeTrixViz.IA_STATE_DEFAULT;
+    	newInteractionState = NodeTrixViz.IA_STATE_DEFAULT;
+    	performInteractionStateChange();
+    	
+    	if(!visible){
+    		System.out.println("NOT VISIBLE");
+//    		setVisibility(false);
+    		appearance.fade();
+    	}
     }
 
     public void setEdgeSetPosition(int index, int amount){

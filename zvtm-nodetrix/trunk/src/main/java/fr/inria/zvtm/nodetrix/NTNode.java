@@ -36,6 +36,7 @@ public class NTNode extends LinLogNode{
 	/* Vertical label, can be null if matrix contains this node only */
 	VTextOr labelN;
 	/* Horizontal label */
+//	int labelWidth; //Stores the first time the label is drawn. The second time it saves performance.
 	VText labelW;
 	/* Background box*/
 	VRectangle gBackgroundW, gSensitiveW;
@@ -346,11 +347,14 @@ public class NTNode extends LinLogNode{
 	public void setBackgroundBox(long maxLength) {
 //		maxLength /=3;
 //		System.out.println("[NTNODE] LENGHT: ------------------------------------------> " + maxLength);
+//		if(maxLength < 5) maxLength = 100;
 //		if(widthHalf == 0) 
-			this.widthHalf = maxLength/2;
-//		if (heightHalf == 0){
+		this.widthHalf = maxLength/2;
+		System.out.println("[NODE] " + this.widthHalf);
+		if (heightHalf == 0){
 		    this.heightHalf = gBackgroundW.getHeight();
-//		}
+		}
+		    
 		wdx -= widthHalf;
 		ndy += widthHalf;
 		this.gBackgroundW.setWidth(widthHalf);
@@ -388,11 +392,7 @@ public class NTNode extends LinLogNode{
 //    	if(e instanceof NTIntraEdge){internalRelations.add(e);}
     	incomingEdges.add(e);
     }
-    
-//    public void addIntraEdgeSet(NTIntraEdgeSet ies)
-//    {
-//    	this.intraEdgeSets.add(ies);
-//    }
+
     
     /**
      *@return null if empty
@@ -429,7 +429,8 @@ public class NTNode extends LinLogNode{
     }
     
     long getLabelWidth(){
-    	return (labelW == null) ? 0 : labelW.getBounds(0).x;
+    	return (widthHalf == 0) ? ((labelW == null) ? 0 : labelW.getBounds(0).x ): widthHalf;
+//    	return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
     
     public boolean isParentMatrixSingle(){
@@ -477,11 +478,11 @@ public class NTNode extends LinLogNode{
 
 
 	void cleanGraphics(VirtualSpace vs) {
-		if(this.gBackgroundW != null) vs.removeGlyph(this.gBackgroundW);
-		if(this.labelW != null) vs.removeGlyph(this.labelW);
+		if(gBackgroundW != null) vs.removeGlyph(this.gBackgroundW);
+		if(labelW != null) vs.removeGlyph(this.labelW);
 		if(gSensitiveW != null) vs.removeGlyph(gSensitiveW);
-		if(this.gBackgroundN != null) vs.removeGlyph(this.gBackgroundN);
-		if(this.labelN != null) vs.removeGlyph(this.labelN);
+		if(gBackgroundN != null) vs.removeGlyph(this.gBackgroundN);
+		if(labelN != null) vs.removeGlyph(this.labelN);
 		if(gSensitiveN != null) vs.removeGlyph(gSensitiveN);
 	}
 

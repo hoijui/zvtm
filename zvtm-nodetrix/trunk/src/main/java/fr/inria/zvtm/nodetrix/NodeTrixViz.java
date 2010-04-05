@@ -359,18 +359,24 @@ public class NodeTrixViz {
 		return result;
 	}
     
-    
-    public void hideEdges(Set<NTEdge> disappearingEdges){
-    	for(NTEdge n : disappearingEdges){	
-    		n.setInteractionState(IA_STATE_FADE);
-    		n.performInteractionStateChange();
+    /**Causes the passed NTEdges to be "invible". Internally it is 
+     * actually called the fade() or the show() method of the
+     * NTEdgeAppearance class.
+     * */
+    public void hideEdges(Set<NTEdge> non_visibleEdges){
+    	for(NTEdge n : non_visibleEdges){	
+//    		n.setInteractionState(IA_STATE_FADE);
+//    		n.performInteractionStateChange();
+    		n.setVisibility(false);
     	}
     }
     
-    public void showEdges(List<LinLogEdge> edges){
-    	for(LinLogEdge lle : edges){
-    		((NTEdge)lle).setInteractionState(IA_STATE_DEFAULT);
-    		((NTEdge)lle).performInteractionStateChange();
+    public void showEdges(List<LinLogEdge> visibleEdges){
+    	for(LinLogEdge lle : visibleEdges){
+//    		((NTEdge)lle).setInteractionState(IA_STATE_DEFAULT);
+//    		((NTEdge)lle).performInteractionStateChange();
+    		((NTEdge)lle).setVisibility(true);
+
     	}
     }
     
@@ -445,6 +451,8 @@ public class NodeTrixViz {
     	}
     	
     	//CREATE NEW MATRICES
+//		System.out.println("[NTV] MERGE --------");
+
     	Vector<Matrix> newMatrices = new Vector<Matrix>();
     	int clusterNumber = 0;
     	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet()){
@@ -494,7 +502,6 @@ public class NodeTrixViz {
     		for(Matrix m : mergeMatrices){
     			m.cleanGraphics(am);
     		}
-    		
     		newMatrix.finishCreateNodeGraphics(vs);
 
     		//reset nodes to original places
@@ -526,7 +533,7 @@ public class NodeTrixViz {
     public void regroupMatrices(int limitLevel)
     {
     	for(Matrix m : matrices){
-    		m.regroup(limitLevel);
+    		m.group(limitLevel);
     	}
     }
     

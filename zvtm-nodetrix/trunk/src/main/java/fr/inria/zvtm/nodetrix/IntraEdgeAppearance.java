@@ -182,21 +182,35 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	
 	@Override
 	public void fade() {
-		for(Glyph g : allGlyphs){
-			if(g == null) continue;
-			g.setVisible(false);
-			g.setSensitivity(false);
-		}	
+//		for(Glyph g : allGlyphs){
+//			if(g == null) continue;
+//			g.setVisible(false);
+//			g.setSensitivity(false);
+//		}	
+		this.gHighlight.setVisible(false);
+		this.gPrimary.setColor(Color.LIGHT_GRAY.brighter());
+		if(gSecondary != null) this.gSecondary.setColor(Color.LIGHT_GRAY.brighter());
+		this.gLeftFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
+		this.gRightFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
+		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
+		if(gUpperFrameFragment != null ) gLowerFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
 	}
 	
 	@Override
 	public void show(){
-		for(Glyph g : allGlyphs){
-			if(g == null) continue;
-			g.setVisible(true);
-			g.setSensitivity(true);
-		}	
-		gSensitive.setVisible(false);
+//		for(Glyph g : allGlyphs){
+//			if(g == null) continue;
+//			g.setVisible(true);
+//			g.setSensitivity(true);
+//		}	
+//		gSensitive.setVisible(false);
+	
+		this.gPrimary.setColor(edge.getColor());
+		if(gSecondary != null) this.gSecondary.setColor(edge.getColor());
+		this.gLeftFrameFragment.setColor(edge.getColor());
+		this.gRightFrameFragment.setColor(edge.getColor());
+		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(edge.getColor());
+		if(gUpperFrameFragment != null ) gLowerFrameFragment.setColor(edge.getColor());
 	}
 
 	@Override

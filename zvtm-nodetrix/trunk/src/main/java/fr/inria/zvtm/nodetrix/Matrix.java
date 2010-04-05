@@ -155,6 +155,7 @@ public class Matrix {
                 labelWidth = n.getLabelWidth();
             }
         }
+        System.out.println("[MATRIX] MAX_LENGHT " + labelWidth);
         labelWidth += (NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2);
         
         //creating grid for each node
@@ -427,7 +428,7 @@ public class Matrix {
     	highlightedEdges = new Vector<NTEdge>();
     	for(NTEdge e : n.getOutgoingEdges()){
     		if(!e.isVisible()) continue;
-    		e.getHead().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
+    		e.getHead().setNewState(NodeTrixViz.IA_STATE_RELATED, false, true);
     		e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
     		e.performInteractionStateChange();
     		highlightedNodes.add(e.getHead());
@@ -436,7 +437,7 @@ public class Matrix {
     	
     	for(NTEdge e : n.getIncomingEdges()){
     		if(!e.isVisible()) continue;
-    		e.getTail().setNewState(NodeTrixViz.IA_STATE_RELATED, true, true);
+    		e.getTail().setNewState(NodeTrixViz.IA_STATE_RELATED, true, false);
 			e.setInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING);
 			e.performInteractionStateChange();
     		highlightedNodes.add(e.getHead());
@@ -725,7 +726,7 @@ public class Matrix {
 		nodes = finalOrdering;
 	}
 	
-	public void regroup(int limitLevel){
+	public void group(int limitLevel){
 		grouped = true;
 		//removing old groupLabels
 		if(vs == null) return;
@@ -744,10 +745,11 @@ public class Matrix {
 			v.add(n);
 		}
 
-		//if the current hierarchyLevel is 0, that dont show any labels and regroup the matrices 
-		//using an algorithm
+//		if the current hierarchyLevel is 0, that dont show any labels and regroup the matrices 
+////		using an algorithm
 //		if(limitLevel == 0){
-//			this.reorderCutHillMcKee();
+////			this.reorderCutHillMcKee();
+//			this.
 //			return;
 //		} 
 		
@@ -772,7 +774,7 @@ public class Matrix {
 	public Vector<Matrix> splitMatrix(AnimationManager am)
 	{
 		if(nodes.size() <= 1 || !grouped) return new Vector<Matrix>();
-		
+		try{
 		
 		// 1. CREATE MATRICES
 		Vector<Matrix> newMatrices = new Vector<Matrix>();
@@ -829,8 +831,9 @@ public class Matrix {
 			m.createEdgeGraphics(vs);
 			m.onTop(vs);
 		}
-			
 		return newMatrices;
+		} catch(Exception e) {e.printStackTrace();}
+		return null;
 	}
 	
 	
@@ -842,9 +845,9 @@ public class Matrix {
 			for(NTEdge e : nn.getOutgoingEdges()){
 				e.adjustAppearanceState(); 
 			}
-			for(NTEdge e : nn.getIncomingEdges()){
-				e.adjustAppearanceState(); 
-			}
+//			for(NTEdge e : nn.getIncomingEdges()){
+//				e.adjustAppearanceState(); 
+//			}
 		}
 	}
 
@@ -857,9 +860,9 @@ public class Matrix {
 			for(NTEdge e : nn.getOutgoingEdges()){
 				e.performAppearanceStateChange(); 
 			}
-			for(NTEdge e : nn.getIncomingEdges()){
-				e.performAppearanceStateChange(); 
-			}
+//			for(NTEdge e : nn.getIncomingEdges()){
+//				e.performAppearanceStateChange(); 
+//			}
 		}
 	}
 	

@@ -115,21 +115,24 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 //        edgePath.setColor(getColor());
         edgePath.setStrokeWidth(2);
         edgePath.setOwner(edge);
-//        assignAlpha();
-        this.vs = vs;
+        assignAlpha();
         onTop();
 	}
 
 	@Override
 	public void fade() {
-		edgePath.setVisible(false);
+//		System.out.println("[EXTRA_EDGE] FADE");
+//		edgePath.setVisible(false);
+		edgePath.setColor(Color.DARK_GRAY.darker());
 		edgePath.setSensitivity(false);
 	}
 	
 	@Override
 	public void show(){
-		edgePath.setVisible(true);
+//		edgePath.setVisible(true);
+		edgePath.setColor(edge.getColor());
 		edgePath.setSensitivity(true);
+		assignAlpha();
 	}
 
 	@Override
@@ -209,8 +212,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
      */
     private void assignAlpha()
     {
-//    	alpha = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
-//    	edgePath.setTranslucencyValue(alpha);
+    	alpha = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
+    	edgePath.setTranslucencyValue(alpha);
     }
     
     @Override
