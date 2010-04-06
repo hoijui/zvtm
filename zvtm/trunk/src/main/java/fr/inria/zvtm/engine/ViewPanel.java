@@ -649,7 +649,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**Set the maximum view refresh rate by giving the minimum refresh period (below which ZVTM won't go even if it can) 
      *@param r positive integer in milliseconds
      */
-    protected void setRefreshRate(int r){
+    public void setRefreshRate(int r){
 	if (r>0){
 	    frameTime=r;
 	}
@@ -661,7 +661,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**Get the maximum view refresh rate as the minimum refresh period (below which ZVTM won't go even if it can) 
      *@return positive integer in milliseconds
      */
-    protected int getRefreshRate(){
+    public int getRefreshRate(){
 	return frameTime;
     }
 
