@@ -86,6 +86,7 @@ public class SlaveApp {
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setEventHandler(new SlaveEventHandler());
+        view.getPanel().setRefreshRate(options.refreshPeriod);
 
         //move cameras to their 'proper' location
         for(Camera cam: clusteredView.getCameras()){
@@ -235,5 +236,8 @@ class SlaveOptions {
 
     @Option(name = "-y", aliases = {"--y-offset"}, usage = "window y offset (ignored if fullscreen set)")
         int yOffset = 0;
+
+    @Option(name = "-r", aliases = {"--refresh-period"}, usage = "time between two scene repaints (milliseconds)")
+        int refreshPeriod = 25;
 }
 
