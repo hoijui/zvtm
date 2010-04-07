@@ -185,8 +185,9 @@ class TIVNavigationManager {
 		}
 	}
 
-    void toggleOverview(){
-        ovPortal.setVisible(!ovPortal.isVisible());
+    void showOverview(boolean b){
+        if (b == ovPortal.isVisible()){return;}
+        ovPortal.setVisible(b);
         vsm.repaintNow(application.mView);
     }
     

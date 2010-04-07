@@ -36,6 +36,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.KeyStroke;
 
 import javax.swing.JComponent;
@@ -170,33 +171,39 @@ public class TiledImageViewer {
     }
 
 	private JMenuBar initMenu(){
-		final JMenuItem openMI = new JMenuItem("Open...");
+		final JMenuItem openMI = new JMenuItem(Messages.OPEN);
 		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		final JMenuItem reloadMI = new JMenuItem("Reload");
+		final JMenuItem reloadMI = new JMenuItem(Messages.RELOAD);
 		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		final JMenuItem exitMI = new JMenuItem("Exit");
-		final JMenuItem aboutMI = new JMenuItem("About...");
+		final JMenuItem exitMI = new JMenuItem(Messages.EXIT);
+		final JCheckBoxMenuItem overviewMI = new JCheckBoxMenuItem(Messages.OVERVIEW, true);
+		final JMenuItem aboutMI = new JMenuItem(Messages.ABOUT);
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (e.getSource()==openMI){openFile();}
 				else if (e.getSource()==reloadMI){reload();}
 				else if (e.getSource()==exitMI){exit();}
+				else if (e.getSource()==overviewMI){nm.showOverview(overviewMI.isSelected());}
 				else if (e.getSource()==aboutMI){ovm.showAbout();}
 			}
 		};
 		JMenuBar jmb = new JMenuBar();
-		JMenu fileM = new JMenu("File");
-		JMenu helpM = new JMenu("Help");
+		JMenu fileM = new JMenu(Messages.FILE);
+		JMenu viewM = new JMenu(Messages.VIEW);
+		JMenu helpM = new JMenu(Messages.HELP);
 		fileM.add(openMI);
 		fileM.add(reloadMI);
 		fileM.addSeparator();
 		fileM.add(exitMI);
+		viewM.add(overviewMI);
 		helpM.add(aboutMI);
 		jmb.add(fileM);
+		jmb.add(viewM);
 		jmb.add(helpM);
 		openMI.addActionListener(a0);
 		reloadMI.addActionListener(a0);
 		exitMI.addActionListener(a0);
+		overviewMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
 		return jmb;
 	}

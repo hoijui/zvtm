@@ -13,6 +13,15 @@ class Messages {
 		
 	static final String VERSION = "0.3.0-SNAPSHOT";
 
+    static final String OPEN = "Open...";
+    static final String EXIT = "Exit";
+    static final String RELOAD = "Reload";
+    static final String OVERVIEW = "Overview";
+    static final String ABOUT = "About...";
+    static final String FILE = "File";
+    static final String VIEW = "View";
+    static final String HELP = "Help"; 
+
 	static final String PM_ENTRY = "mpmE";
 
     static final String PM_BACK = "Back";

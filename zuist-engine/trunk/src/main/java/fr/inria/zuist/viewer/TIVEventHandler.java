@@ -285,7 +285,6 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateTiles();}
-        else if (code == KeyEvent.VK_O){application.nm.toggleOverview();}
         else if (code == KeyEvent.VK_S){application.nm.toggleScreenSaver();}
         else if (code == KeyEvent.VK_Q && Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() == e.getModifiers()){application.exit();}
         else if (c == '?'){application.ovm.showAbout();}
