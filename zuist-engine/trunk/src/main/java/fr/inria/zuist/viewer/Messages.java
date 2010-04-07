@@ -45,5 +45,8 @@ class Messages {
 						     
 	static final String ZON = "Zero-Order Navigation";
 	static final String FON = "First-Order Navigation";
+	
+	static final String SCB = "Speed-coupled Blending Lens";
+	static final String FISHEYE = "Fisheye Lens";
 
 }
