@@ -21,7 +21,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VTextOr;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -68,7 +68,8 @@ public class TextExample {
         view.setBackgroundColor(Color.GRAY);
         view.setEventHandler(new PanZoomEventHandler());
 
-        VText hi = new VText(0,0,0,Color.GREEN,"Hello Clustered ZVTM");
+        VTextOr hi = new VTextOr(0,0,0,Color.GREEN,"Hello Clustered ZVTM", 0f);
+        hi.orientTo((float)Math.PI / 4f);
         vs.addGlyph(hi, false);	
         hi.setSpecialFont(new Font("Serif", Font.PLAIN, 20));
     }

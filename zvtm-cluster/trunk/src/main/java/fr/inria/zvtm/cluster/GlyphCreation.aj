@@ -30,6 +30,7 @@ import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VSlice;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VTextOr;
 import fr.inria.zvtm.glyphs.VTriangleOr;
 
 //Replicates Glyph subtypes creation on slaves
@@ -110,6 +111,11 @@ public aspect GlyphCreation {
 		return new VTextCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
+
+    @Override private Delta VTextOr.getCreateDelta(){
+        return new VTextOrCreateDelta(this,
+                this.getParentSpace().getObjId());
+    }
 
 	@Override private Delta RectangleNR.getCreateDelta(){
 		return new RectangleNRCreateDelta(this,
@@ -316,9 +322,9 @@ public aspect GlyphCreation {
 	}
 
 	private static class VTextCreateDelta extends AbstractGlyphCreateDelta {
-		private final String text;
-		private final float scaleFactor;
-		private final short textAnchor;
+		protected final String text;
+		protected final float scaleFactor;
+		protected final short textAnchor;
 
 		VTextCreateDelta(VText source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
@@ -332,6 +338,16 @@ public aspect GlyphCreation {
 			return new VText(0,0,0,Color.BLACK,text,textAnchor,scaleFactor);
 		}
 	}
+
+    private static class VTextOrCreateDelta extends VTextCreateDelta{
+        VTextOrCreateDelta(VTextOr source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+        }
+
+        @Override Glyph createGlyph(){
+            return new VTextOr(0,0,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
+        }
+    }
 
 	private static class RectangleNRCreateDelta extends ClosedShapeCreateDelta {
 		private final long halfWidth;
