@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -93,72 +94,97 @@ public class NodeTrixViz {
 	private VirtualSpace vs;
 	
 	
-    Vector<Matrix> matrices;
-	/**Vector that stores all edges considered by the linLog cluster algorithm*
-     * @author benjamin bach bbach@lri.fr
+    private Vector<Matrix> matrices = new Vector<Matrix>();
+    private HashSet<NTNode> nodes = new HashSet<NTNode>();
+    private HashSet<NTEdge> edges = new HashSet<NTEdge>();
+    
+	private Vector<NTNode> highlightedNodes = new Vector<NTNode>();
+	private Vector<NTEdge> highlightedEdges = new Vector<NTEdge>();
+
+	
+    /**Vector that stores all edges considered by the linLog cluster algorithm*
+     * @author benjamin bach
      */
     
     public NodeTrixViz(){
-//        matrices = new Matrix[0];
-    	matrices = new Vector<Matrix>();
+
     }
     
     //-------------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------
     
-    public Matrix addMatrix(String name, Vector<NTNode> nodes){
-//        Matrix res = new Matrix(name, nodes.toArray(new NTNode[nodes.size()]));
-        Matrix res = new Matrix(name, nodes);
-//    	Matrix[] na = new Matrix[matrices.length+1];
-//        System.arraycopy(matrices, 0, na, 0, matrices.length);
-//        na[matrices.length] = res;
-//        matrices = na;
-        matrices.add(res);
-        return res;
+    public Matrix createAddMatrix(String name, Vector<NTNode> nodes){
+        Matrix m = new Matrix(name, nodes);
+//      for(NTNode 	n : nodes){
+//      	n.setMatrix(m);
+//      }
+        nodes.addAll(nodes);
+        matrices.add(m);
+        return m;
     }
     
-    public Matrix addMatrix(Matrix res){
-      matrices.add(res);
-      return res;
+    
+    public void addMatrices(Matrix[] v){
+    	for(Matrix m : v){
+    		matrices.add(m);
+    	}
     }
+    
+//    public Matrix addMatrix(Matrix res){
+//      matrices.add(res);
+//      return res;
+//    }
 	
-	/**This method causes the NTNodes to be clustered using the LinLog Algorithm. 
+	/**This method causes the NTNodes to be clustered using the LinLog Algorithm.
 	 * It returns a HashMap mapping each NTNode to an integer depicting its cluster.
+	 * The created matrices are returned but not added to the global matrix list.As
+	 * soon as the nodes are added to the new matrix, they are not longer aware of 
+	 * their old matrix.
 	 * Use this method as an alternative to <code>addMatrix(String name, Vector<NTNode> nodes)</code>
 	 **/
-	public void createMatricesByClustering(Collection<NTNode> nodes, List<LinLogEdge> edges)
+	public Matrix[] createMatricesByClustering(Collection<NTNode> nodes, List<LinLogEdge> edges)
 	{ 
+		//Initialise
 		LinLogOptimizerModularity llalgo = new LinLogOptimizerModularity();
 		ArrayList<LinLogNode> llNodes = new ArrayList<LinLogNode>();
-		for(NTNode nn : nodes){llNodes.add(nn);}
-		Map<LinLogNode, Integer> resultMap = llalgo.execute(llNodes, edges , false);
-		int i = 0;
-		//Obtaining clusters and creating matrices
-		HashMap<Integer, Vector<NTNode>> temp = new HashMap<Integer, Vector<NTNode>>();
-		for(LinLogNode lln : resultMap.keySet()){
-			NTNode nn = (NTNode)lln;
-			int cluster = resultMap.get(lln);
-			Vector<NTNode> v = temp.get(cluster);
-			if(v == null){
-				v = new Vector<NTNode>();
-				temp.put(cluster, v);
+		llNodes.addAll(nodes);
+		Map<LinLogNode, Integer> clusterMap = llalgo.execute(llNodes, edges , false);
+		
+		//Obtain clusters and create matrices
+		HashMap<Integer, Matrix> newMatrices = new HashMap<Integer, Matrix>();
+		for(LinLogNode lln : clusterMap.keySet()){
+			NTNode n = (NTNode)lln;
+			int cluster = clusterMap.get(lln);
+			Matrix m = newMatrices.get(cluster);
+			if(m == null){
+				m = new Matrix("[" + cluster + "]", new Vector<NTNode>());
+				newMatrices.put(cluster, m);
 			}
-			v.add(nn);
-			i++;
+			m.addNode(n);
+//			n.setMatrix(m);
+			
 		}
-		
-//		System.out.println("[NODETRIXVIZ] " + i + " MATRICES CREATED");
-		i = 0;
-		for(Vector<NTNode> v : temp.values()){
-			matrices.add(new Matrix("[" + i + "]", v));
-			i++;
-		}
-		
-//		System.out.println("[NODETRIXVIZ] " + matrices.size() + " MATRICES IN TOTAL");
-		//Create Internal Edges
-		for(Matrix m : matrices){
-			m.adjustEdgeAppearance();
-			m.performEdgeAppearanceChange();
-		}
+		return newMatrices.values().toArray(new Matrix[0]);
+//		
+////		System.out.println("[NODETRIXVIZ] " + i + " MATRICES CREATED");
+//		i = 0;
+//		for(Vector<NTNode> v : temp.values()){
+//			Matrix m = new Matrix("[" + i + "]", v);
+//			matrices.add(m);
+//			for(NTNode n : v){
+//				nodes.add(n);
+//				matrixOfNode.put(n, m);
+//			}
+//			i++;
+//		}
+//
+//		return matrices;
+//		
+////		System.out.println("[NODETRIXVIZ] " + matrices.size() + " MATRICES IN TOTAL");
+//		//Create Internal Edges
+//		for(Matrix m : matrices){
+//			m.adjustEdgeAppearance();
+//			m.performEdgeAppearanceChange();
+//		}
 	}
 	
 //    public NTExtraEdge addExtraEdge(NTNode tail, NTNode head){
@@ -219,9 +245,9 @@ public class NodeTrixViz {
 //    public Matrix[] getMatrices(){
 //        return matrices;
 //    }
-    public Vector<Matrix> getMatrices(){
-        return matrices;
-    }
+//    public Vector<Matrix> getMatrices(){
+//        return matrices;
+//    }
     
     // have to find something better than this constant...
     double SCALE = 40;
@@ -231,7 +257,7 @@ public class NodeTrixViz {
     
     //---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE
     
-    public void createViz(VirtualSpace vs){
+    public void createVisualisation(VirtualSpace vs){
     	this.vs = vs;
         Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
         // keep trace of matrices tha are not part of the graph ; we still want to display them
@@ -387,6 +413,92 @@ public class NodeTrixViz {
     	matrices.clear();
     }
     
+    public void highlightNodeContext(NTNode n, boolean context){
+    	//care about node.
+    	Matrix m = n.getMatrix();
+    	m.resetGrid();
+    	m.highlightGrid(n, n, NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
+    	n.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
+    	n.perfomStateChange();
+    	
+    	//care about related if necessary.
+    	if(context){
+    		//highlight outgoing relations and nodes.
+    		Vector<NTNode> highlightedNodes = new Vector<NTNode>();
+    		Vector<NTEdge> highlightedEdges = new Vector<NTEdge>();
+    		for(NTEdge e : n.getOutgoingEdges()){
+    			if(!e.isVisible()) continue;
+	    		e.getHead().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
+	    		if(!e.isIntraEdge()){
+					e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
+					e.performInteractionStateChange();
+					highlightedEdges.add(e);
+				}
+    			highlightedNodes.add(e.getHead());
+    		}
+    		//highlight incomming relations and nodes.
+    		for(NTEdge e : n.getIncomingEdges()){
+    			if(!e.isVisible()) continue;
+    			e.getTail().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
+    			if(!e.isIntraEdge()){
+    				e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING);
+    				e.performInteractionStateChange();
+    				highlightedEdges.add(e);
+    			}
+    			highlightedNodes.add(e.getHead());
+    		}
+    		
+    		Matrix mRel;
+    		for(NTNode nRel : highlightedNodes){
+    			mRel = nRel.getMatrix();
+    			//only if the related node is in the same matrix, then highlight the grid.
+//    			if(mRel.equals(m))
+//    				m.highlightGrid(n, nRel, NodeTrixViz.COLOR_MATRIX_NODE_RELATED_COLOR);
+    			nRel.perfomStateChange();
+    		}
+    		
+    		this.highlightedEdges.addAll(highlightedEdges);
+    		this.highlightedNodes.addAll(highlightedNodes);
+    	}
+    }
+    
+    public void resetAllContext(){
+    	for(NTNode n : highlightedNodes){
+    		n.setNewInteractionState(IA_STATE_DEFAULT, true, true);
+    		n.perfomStateChange();
+    		n.getMatrix().resetGrid();
+    	}
+    	for(NTEdge e : highlightedEdges){
+    		e.setNewInteractionState(IA_STATE_DEFAULT);
+    		e.performInteractionStateChange();
+    		if(e.isIntraEdge()){
+//    			e.head.getMatrix().resetGrid(e.tail, e.head);
+    		}
+    	}
+    }
+    
+    
+    public void highlightEdgeContext(NTEdge e){
+    	highlightedEdges.add(e);
+    	e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
+    	e.performInteractionStateChange();
+    	
+    	NTNode head = e.getHead();
+		highlightedNodes.add(head);
+    	NTNode tail = e.getTail();
+		highlightedNodes.add(tail);
+		head.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, false, true);
+		head.perfomStateChange();
+		tail.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, false);
+		tail.perfomStateChange();
+
+		if(e.isIntraEdge()){
+			tail.getMatrix().highlightGrid(tail, head, NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
+		}
+    }
+    
+
+    
     //---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS---------------ORGANISING COMPONENTS
 
     
@@ -410,6 +522,9 @@ public class NodeTrixViz {
     	reorderMatricesCMK();
     }
     
+    
+    /** Causes matrices to merge according their name. So matrices with 
+     * */
     public void mergeMatrices(VirtualSpace vs, AnimationManager am)
     {
 //    	System.out.println("[NODE_TRIX_VIZ] -- MERGE "+ matrices.size() +" MATRICES ");
@@ -450,6 +565,7 @@ public class NodeTrixViz {
         	}
     	}
     	
+    	
     	//CREATE NEW MATRICES
 //		System.out.println("[NTV] MERGE --------");
 
@@ -483,7 +599,7 @@ public class NodeTrixViz {
 
            	//draw new matrix;                                                              
 			newMatrix.createNodeGraphics(xCentre, yCentre, vs);
-
+			newMatrix.finishCreateNodeGraphics(vs);
 			// set node labels to old positions
 			// and put old matrices to front
 			for(Matrix m : mergeMatrices){
@@ -497,12 +613,11 @@ public class NodeTrixViz {
     			}
     		}
     		
-//    		System.out.println("[NODE_TRIX_VIZ] FADE OUT OLD MATRICES");
-    		//fade out old matrices
-    		for(Matrix m : mergeMatrices){
-    			m.cleanGraphics(am);
-    		}
-    		newMatrix.finishCreateNodeGraphics(vs);
+			//fade out old matrices
+			for(Matrix m : mergeMatrices){
+				m.cleanGraphics(am);
+			}
+    		
 
     		//reset nodes to original places
     		for(NTNode n : newMatrix.nodes){
@@ -530,11 +645,11 @@ public class NodeTrixViz {
      * Iterates over all matrices and group their nodes according to their assigned
      * groupname.
      */
-    public void regroupMatrices(int limitLevel)
+    public void regroupMatrices()
     {
-    	for(Matrix m : matrices){
-    		m.group(limitLevel);
-    	}
+   		for(Matrix m : matrices){
+   			m.group();
+   		}
     }
     
     public void reorderMatricesCMK()
@@ -544,5 +659,14 @@ public class NodeTrixViz {
 			m.reorderCutHillMcKee();
 		}	
 	}
+    
+    
+    // ----GETTER SETTER---
+    public HashSet<NTNode> getNodes(){
+    	return nodes;
+    }
+    public HashSet<NTEdge> getEdges(){
+    	return edges;
+    }
     
 }

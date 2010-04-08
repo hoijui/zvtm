@@ -21,38 +21,42 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 import fr.inria.zvtm.nodetrix.lll.LinLogNode;
 
+/**
+ * 
+ * @author emmanuel pietriga
+ * @author benjamin bach
+ */
 public class NTNode extends LinLogNode{
 
      private String name;
     
-    /* Owning matrix */
-    public Matrix matrix;
+    /** Owning matrix */
+    Matrix matrix;
     Vector<NTEdge> outgoingEdges, incomingEdges;
-    
-    /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
+    /** relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
-	/* stores the matrix centre coordinates*/
+	/** stores the matrix centre coordinates*/
 	long mx, my; 
-	/* Vertical label, can be null if matrix contains this node only */
+	/** Vertical label, can be null if matrix contains this node only */
 	VTextOr labelN;
-	/* Horizontal label */
-//	int labelWidth; //Stores the first time the label is drawn. The second time it saves performance.
+	/** Horizontal label */
 	VText labelW;
-	/* Background box*/
+	/**Stores the half width of the whole label (not only the text!), since double width is never used */
+	private long widthHalf = 0;
+	private long heightHalf = 0;
+	/**Width of the text glyph only*/
+	private long textWidth = -1; //-1 means that it is not yet set.
+	/** Background box*/
 	VRectangle gBackgroundW, gSensitiveW;
 	VRectangleOr gBackgroundN, gSensitiveN;
 	Color backgroundColor;
-	/* If this node has no matrix*/
+	/** If this node has no matrix*/
 	boolean single;
-	/* The Virtual Space this NTNode belongs to - stored here to simplify interaction*/
+	/** The Virtual Space this NTNode belongs to - stored here to simplify interaction*/
 	VirtualSpace vs;
 	
 	private Object owner;
 	
-	/**Stores the half width, since double width is never used */
-	private long widthHalf = 0;
-
-	private long heightHalf = 0;
 	
 	/* interaction*/
 	AnimationManager animManager; 
@@ -136,7 +140,7 @@ public class NTNode extends LinLogNode{
     /** Moves booth labels to differentLocations along the matrix side.
      * This method is used for label reordering. 
      */
-	public void repositionLabels(long wdy, long ndx){
+	public void updateLabelPosition(long wdy, long ndx){
 		gBackgroundW.move(0, wdy - this.wdy);
 		this.wdy = wdy;
 		if(!single) {
@@ -154,7 +158,7 @@ public class NTNode extends LinLogNode{
     }
     
     //INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------
-    public void setNewState(int newState, boolean west, boolean north)
+    public void setNewInteractionState(int newState, boolean west, boolean north)
     {
     	newInteractionState = newState;
     	this.affectNorth = affectNorth || north;
@@ -344,22 +348,19 @@ public class NTNode extends LinLogNode{
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
      * the matrix. A gradient is also applied according to the position of the node in the list.
      */
-	public void setBackgroundBox(long maxLength) {
-//		maxLength /=3;
-//		System.out.println("[NTNODE] LENGHT: ------------------------------------------> " + maxLength);
-//		if(maxLength < 5) maxLength = 100;
-//		if(widthHalf == 0) 
+	public void setLabelWidth(long maxLength) {
 		this.widthHalf = maxLength/2;
-		System.out.println("[NODE] " + this.widthHalf);
 		if (heightHalf == 0){
 		    this.heightHalf = gBackgroundW.getHeight();
 		}
 		    
 		wdx -= widthHalf;
 		ndy += widthHalf;
-		this.gBackgroundW.setWidth(widthHalf);
 		
+		this.gBackgroundW.setWidth(widthHalf);
 		gSensitiveW.setWidth(widthHalf-2);
+		
+		System.out.println("[NODE] " + this.widthHalf);
 		if (!this.single){
 			this.gBackgroundW.move(-widthHalf, 0);
 			this.labelW.move(widthHalf, 0);
@@ -370,14 +371,16 @@ public class NTNode extends LinLogNode{
 		}
 	}
 
-	public int getBoxWidth(boolean west) {
-//		return west ? this.gBackgroundW.getBounds().length : ((this.gBackgroundN != null) ? this.gBackgroundN.getBounds().length : 0);
-		return (int)this.widthHalf;
-	}
-
-	public long getWidth() 
+	public long getLabelHalfWidth() 
 	{
 		return this.widthHalf;
+	}
+	
+	public long getTextWidth(){
+		if (textWidth == -1){
+			textWidth = this.labelW.getBounds(0).x;
+		}
+		return textWidth;	
 	}
 
 	public long getHeight(){
@@ -389,7 +392,6 @@ public class NTNode extends LinLogNode{
     }
     
     public void addIncomingEdge(NTEdge e){
-//    	if(e instanceof NTIntraEdge){internalRelations.add(e);}
     	incomingEdges.add(e);
     }
 
@@ -428,10 +430,9 @@ public class NTNode extends LinLogNode{
     	return owner;
     }
     
-    long getLabelWidth(){
-    	return (widthHalf == 0) ? ((labelW == null) ? 0 : labelW.getBounds(0).x ): widthHalf;
-//    	return (labelW == null) ? 0 : labelW.getBounds(0).x;
-    }
+//    long getLabelWidth(){
+//    	return (widthHalf == 0) ? ((labelW == null) ? 0 : labelW.getBounds(0).x ): widthHalf;
+//    }
     
     public boolean isParentMatrixSingle(){
         return this.single;
@@ -488,7 +489,7 @@ public class NTNode extends LinLogNode{
 
 
 
-	public void repositionRelations() {
+	public void updataRelationPositions() {
 		for(NTEdge e : this.outgoingEdges){
 			e.updatePosition();
 		}

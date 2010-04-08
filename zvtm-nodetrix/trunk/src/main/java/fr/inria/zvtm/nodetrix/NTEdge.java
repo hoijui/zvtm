@@ -57,7 +57,7 @@ public class NTEdge extends LinLogEdge{
     	appearance = newAppearance;
     }
 
-    public void setInteractionState(int newState)
+    public void setNewInteractionState(int newState)
     {
      	this.newInteractionState = newState;
     }
@@ -128,6 +128,10 @@ public class NTEdge extends LinLogEdge{
     public int getState(){
     	if(appearance instanceof ExtraEdgeAppearance) return NodeTrixViz.APPEARANCE_EXTRA_EDGE;
     	else return NodeTrixViz.APPEARANCE_INTRA_EDGE;
+    }
+    
+    public boolean isIntraEdge(){
+    	return tail.matrix.equals(head.getMatrix());
     }
     
     public void onTop(){
