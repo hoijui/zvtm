@@ -98,8 +98,8 @@ public class NodeTrixViz {
     private HashSet<NTNode> nodes = new HashSet<NTNode>();
     private HashSet<NTEdge> edges = new HashSet<NTEdge>();
     
-	private Vector<NTNode> highlightedNodes = new Vector<NTNode>();
-	private Vector<NTEdge> highlightedEdges = new Vector<NTEdge>();
+	private HashSet<NTNode> highlightedNodes = new HashSet<NTNode>();
+	private HashSet<NTEdge> highlightedEdges = new HashSet<NTEdge>();
 
 	
     /**Vector that stores all edges considered by the linLog cluster algorithm*
@@ -418,14 +418,15 @@ public class NodeTrixViz {
     	Matrix m = n.getMatrix();
     	m.resetGrid();
     	m.highlightGrid(n, n, NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
-    	n.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
+    	highlightedNodes.add(n);
+    	n.setNewInteractionState(IA_STATE_HIGHLIGHT, true, true);
     	n.perfomStateChange();
     	
     	//care about related if necessary.
     	if(context){
     		//highlight outgoing relations and nodes.
-    		Vector<NTNode> highlightedNodes = new Vector<NTNode>();
-    		Vector<NTEdge> highlightedEdges = new Vector<NTEdge>();
+    		HashSet<NTNode> highlightedNodes = new HashSet<NTNode>();
+    		HashSet<NTEdge> highlightedEdges = new HashSet<NTEdge>();
     		for(NTEdge e : n.getOutgoingEdges()){
     			if(!e.isVisible()) continue;
 	    		e.getHead().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
@@ -436,6 +437,7 @@ public class NodeTrixViz {
 				}
     			highlightedNodes.add(e.getHead());
     		}
+    		
     		//highlight incomming relations and nodes.
     		for(NTEdge e : n.getIncomingEdges()){
     			if(!e.isVisible()) continue;
@@ -460,21 +462,24 @@ public class NodeTrixViz {
     		this.highlightedEdges.addAll(highlightedEdges);
     		this.highlightedNodes.addAll(highlightedNodes);
     	}
-    }
+   }
     
     public void resetAllContext(){
+    	System.out.println("[NTV] RESET " + highlightedNodes.size());
     	for(NTNode n : highlightedNodes){
     		n.setNewInteractionState(IA_STATE_DEFAULT, true, true);
     		n.perfomStateChange();
     		n.getMatrix().resetGrid();
     	}
+    	highlightedNodes.clear();
     	for(NTEdge e : highlightedEdges){
     		e.setNewInteractionState(IA_STATE_DEFAULT);
     		e.performInteractionStateChange();
-    		if(e.isIntraEdge()){
-//    			e.head.getMatrix().resetGrid(e.tail, e.head);
-    		}
+//    		if(e.isIntraEdge()){
+////    			e.head.getMatrix().resetGrid(e.tail, e.head);
+//    		}
     	}
+    	highlightedEdges.clear();
     }
     
     

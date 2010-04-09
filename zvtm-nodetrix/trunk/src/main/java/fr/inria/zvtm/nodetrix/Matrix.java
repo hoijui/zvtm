@@ -144,10 +144,6 @@ public class Matrix {
                     				 Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)));
     		nodes.get(i).updataRelationPositions();
  	    }
-    	
-//    	for(NTIntraEdgeSet ies : this.intraEdgeSets){
-//    		ies.reposition();
-//    	}
     }
     
     void finishCreateNodeGraphics(VirtualSpace vs){
@@ -158,7 +154,7 @@ public class Matrix {
                 maxLabelWidth = n.getTextWidth();
             }
         }
-        System.out.println("[MATRIX] MAX_LENGHT " + maxLabelWidth);
+//        System.out.println("[MATRIX] MAX_LENGHT " + maxLabelWidth);
         maxLabelWidth += (NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2);
         
         //creating grid for each node
@@ -429,7 +425,7 @@ public class Matrix {
     	if(nodes.contains(tail))
     	{
     		int i1 = nodes.indexOf(tail);
-    		System.out.println("[MATRIX] i1 : " + i1);
+//    		System.out.println("[MATRIX] i1 : " + i1);
     		Glyph g1 = tail.matrix.gridBarsH[i1];
     		g1.setColor(c);
     		g1.setVisible(true);
@@ -437,7 +433,7 @@ public class Matrix {
     	if(nodes.contains(head))
     	{
     		int i2 = nodes.indexOf(head);
-    		System.out.println("[MATRIX] i2 : " + i2);
+//    		System.out.println("[MATRIX] i2 : " + i2);
     		Glyph g2 = tail.matrix.gridBarsV[i2];
     		g2.setColor(c);
     		g2.setVisible(true);
@@ -586,13 +582,14 @@ public class Matrix {
     
 
     public void cleanGroupLabels(){
-    	if(groupLabelsN.size() > 0){
+    	if(groupLabelsN.size() > 0){ 
     		for(Glyph g : groupLabelsN){
     			vs.removeGlyph(g);
     		}
     		groupLabelsN = new Vector<Glyph>();
     	}
     	if(groupLabelsW.size() > 0){
+//    		this.maxLabelWidth  -= NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
         	for(Glyph g : groupLabelsW){
         		vs.removeGlyph(g);
         	}
@@ -714,6 +711,7 @@ public class Matrix {
 			nodes.addAll(groups.get(s));
 		}
 		
+		
 		//repositioning nodes
 		updateNodePosition();
 		
@@ -721,6 +719,9 @@ public class Matrix {
 		for(Vector<NTNode> v : groups.values()){
 			addGroupLabel(v, v.firstElement().getGroupName());
 		}
+
+//		//update labelsize of matrix
+//		this.maxLabelWidth  += NodeTrixViz.GROUP_LABEL_HALF_WIDTH*2;
 	}
 	
 	public Vector<Matrix> splitMatrix(AnimationManager am)
@@ -797,9 +798,6 @@ public class Matrix {
 			for(NTEdge e : nn.getOutgoingEdges()){
 				e.adjustAppearanceState(); 
 			}
-//			for(NTEdge e : nn.getIncomingEdges()){
-//				e.adjustAppearanceState(); 
-//			}
 		}
 	}
 
@@ -812,9 +810,6 @@ public class Matrix {
 			for(NTEdge e : nn.getOutgoingEdges()){
 				e.performAppearanceStateChange(); 
 			}
-//			for(NTEdge e : nn.getIncomingEdges()){
-//				e.performAppearanceStateChange(); 
-//			}
 		}
 	}
 	

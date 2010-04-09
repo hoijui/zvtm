@@ -194,6 +194,7 @@ public class NTNode extends LinLogNode{
      **/
     public void shiftNorthernLabels(long yNew, boolean animated)
     {
+    	if(single) return;
     	yOld = gBackgroundN.vy;
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
@@ -216,6 +217,7 @@ public class NTNode extends LinLogNode{
      **/
     public void resetNorthernLabels(boolean animated)
     {
+    	if(single) return;
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
     				.createGlyphTranslation(
@@ -269,6 +271,8 @@ public class NTNode extends LinLogNode{
     
     public void reset()
     {
+    	System.out.println("[NTNODE] RESET " + this.name);
+    	
 		//COLOR
 		gBackgroundW.setColor(backgroundColor);
 		gBackgroundW.setTranslucencyValue(1);
@@ -289,6 +293,8 @@ public class NTNode extends LinLogNode{
     
     private void highlight(Color c)
     {
+    	System.out.println("[NTNODE] HIGHLIGHT " + this.name);
+
 //    	boolean oldNorth = this.permanentNorth;
 //    	boolean oldWest = this.permanentWest;
 		
