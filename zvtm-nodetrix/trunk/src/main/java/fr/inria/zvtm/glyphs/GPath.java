@@ -14,15 +14,15 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-//import java.awt.RadialGradientPaint;
-//import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.RadialGradientPaint;
+import java.awt.MultipleGradientPaint.CycleMethod;
 
 public class GPath extends DPath {
     
     Color[] gradientColors = {new Color(118,98,252), Color.WHITE};
     float[] gradientDist = {0.0f, 1.0f};
     Point2D gradientCenter = new Point2D.Float();
-    //RadialGradientPaint p;
+    RadialGradientPaint p;
     
     public GPath(){
 		super();
@@ -75,12 +75,12 @@ public class GPath extends DPath {
     
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
-        //gradientCenter.setLocation(pc[i].cx, pc[i].cy);
-        //p = new RadialGradientPaint(gradientCenter,
-        //                            (float)Math.sqrt(Math.pow(elements[elements.length-1].getX(i)-pc[i].cx,2) + Math.pow(elements[elements.length-1].getY(i)-pc[i].cy,2)),
-        //                            gradientDist, gradientColors, CycleMethod.NO_CYCLE);
-        //g.setPaint(p);
-        g.setColor(this.color);
+        gradientCenter.setLocation(pc[i].cx, pc[i].cy);
+        p = new RadialGradientPaint(gradientCenter,
+                                    (float)Math.sqrt(Math.pow(elements[elements.length-1].getX(i)-pc[i].cx,2) + Math.pow(elements[elements.length-1].getY(i)-pc[i].cy,2)),
+                                    gradientDist, gradientColors, CycleMethod.NO_CYCLE);
+        g.setPaint(p);
+        //g.setColor(this.color);
         if (stroke!=null) {
             g.setStroke(stroke);
             g.translate(dx,dy);
@@ -127,12 +127,12 @@ public class GPath extends DPath {
     
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
-        //gradientCenter.setLocation(pc[i].lcx, pc[i].lcy);
-        //p = new RadialGradientPaint(gradientCenter,
-        //                            (float)Math.sqrt(Math.pow(elements[elements.length-1].getlX(i)-pc[i].lcx,2) + Math.pow(elements[elements.length-1].getlY(i)-pc[i].lcy,2)),
-        //                            gradientDist, gradientColors, CycleMethod.NO_CYCLE);
-        //g.setPaint(p);
-        g.setColor(this.color);
+        gradientCenter.setLocation(pc[i].lcx, pc[i].lcy);
+        p = new RadialGradientPaint(gradientCenter,
+                                    (float)Math.sqrt(Math.pow(elements[elements.length-1].getlX(i)-pc[i].lcx,2) + Math.pow(elements[elements.length-1].getlY(i)-pc[i].lcy,2)),
+                                    gradientDist, gradientColors, CycleMethod.NO_CYCLE);
+        g.setPaint(p);
+        //g.setColor(this.color);
         if (stroke!=null) {
             g.setStroke(stroke);
             g.translate(dx,dy);
