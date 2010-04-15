@@ -7,7 +7,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
-/**Infobox that shows additional information about a matix node.
+/**Infobox that shows additional information about a matrix node.
  * The information is stored simply in a list containing a configurable 
  * amount of fields for each entry. The contained data is shown as a table.
  * 

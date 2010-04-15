@@ -114,7 +114,9 @@ public class Matrix {
         	                            NodeTrixViz.CELL_SIZE/2*nodes.size(),
         	                            vs, false, c);
         	    nodes.get(i).moveTo(x, y);
-        	    nodes.get(i).getInfoBox().createGraphics(vs); // not yet on the right position. 
+                if (nodes.get(i).getInfoBox() != null){
+            	    nodes.get(i).getInfoBox().createGraphics(vs); // not yet on the right position.                     
+                }
     	    }	        
 	    }
 	    else {

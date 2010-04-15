@@ -1,4 +1,3 @@
-
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
@@ -103,7 +102,6 @@ public class NodeTrixViz {
 
 	
     /**Vector that stores all edges considered by the linLog cluster algorithm*
-     * @author benjamin bach
      */
     
     public NodeTrixViz(){
