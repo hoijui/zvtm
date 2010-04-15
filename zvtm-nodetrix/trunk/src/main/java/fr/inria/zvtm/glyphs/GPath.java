@@ -68,6 +68,30 @@ public class GPath extends DPath {
 		super(pi, z, c, alpha);
     }
     
+    /** Set colors defining gradient.
+     *@param gc array containing colors defining the gradient.
+     *@see #setGradientDist(float[] gd)
+     *@see #setGradient(Color[] gc, float[] gd)
+     */
+    public void setGradientColors(Color[] gc){
+        this.gradientColors = gc;        
+    }
+    
+    /** Set gradient distribution.
+     *@param gd array containing as many floats in [0;1.0] as there are colors defining the gradient.
+     *@see #setGradientColors(Color[] gc)
+     *@see #setGradient(Color[] gc, float[] gd)
+     */
+    public void setGradientDist(float[] gd){
+        this.gradientDist = gd;        
+    }
+    
+    /** Set gradient color and distribution.
+     *@param gc array containing colors defining the gradient.
+     *@param gd array containing as many floats in [0;1.0] as there are colors defining the gradient.
+     *@see #setGradientDist(float[] gd)
+     *@see #setGradientColors(Color[] gc)
+     */
     public void setGradient(Color[] gc, float[] gd){
         this.gradientColors = gc;
         this.gradientDist = gd;
