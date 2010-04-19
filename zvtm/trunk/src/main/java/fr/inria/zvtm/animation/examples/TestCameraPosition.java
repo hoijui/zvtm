@@ -186,8 +186,8 @@ public class TestCameraPosition {
 							    c.setAltitude((float)(initZ + 0.25*initZ*Math.sin(Math.PI * fraction)));
 							}
 
-							public void end(float fraction, 
-									Object subject, Animation.Dimension dim){
+							@Override public void end(Object subject, 
+                                Animation.Dimension dim){
 							    Camera c = (Camera)subject;
 							    c.setAltitude(initZ);
 							}
