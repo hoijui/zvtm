@@ -79,7 +79,7 @@ public class CircleNR extends VCircle {
 		pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
 		pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
 		//project height and construct polygon
-		pc[i].cr=Math.round(vr);
+		pc[i].cr=(int)vr;
 	}
 
 	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
@@ -90,7 +90,7 @@ public class CircleNR extends VCircle {
 		pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
 		pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
 		//project height and construct polygon
-		pc[i].lcr = Math.round(vr);
+		pc[i].lcr = (int)vr;
 	}
 
 	public Object clone(){
