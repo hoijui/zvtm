@@ -33,5 +33,5 @@ public class ConstantAccInterpolator{
 	return INSTANCE;
     }
 
-    private static Interpolator INSTANCE = new SplineInterpolator(.5f, 0f, 1f, .5f);
+    private static final Interpolator INSTANCE = new SplineInterpolator(.5f, 0f, 1f, .5f);
 }

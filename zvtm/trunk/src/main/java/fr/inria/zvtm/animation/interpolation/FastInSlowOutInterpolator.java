@@ -33,5 +33,5 @@ public class FastInSlowOutInterpolator{
 	return INSTANCE;
     }
 
-    private static Interpolator INSTANCE = new SplineInterpolator(0f, 1f, 0f, 1f);
+    private static final Interpolator INSTANCE = new SplineInterpolator(0f, 1f, 0f, 1f);
 }
