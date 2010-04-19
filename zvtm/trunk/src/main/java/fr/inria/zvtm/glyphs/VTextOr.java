@@ -41,9 +41,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VTextOr extends VText {
 
-    /*half width and height in virtual space (of String when horizontal)*/
-    float vw,vh;
-
     public VTextOr(String t,float or){
 	    this(0, 0, 0, Color.BLACK, t, or, TEXT_ANCHOR_START, 1f, 1f);
     }
