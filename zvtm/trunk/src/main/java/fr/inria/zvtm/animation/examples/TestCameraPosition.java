@@ -211,7 +211,6 @@ public class TestCameraPosition {
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    //application.vsm.setSync(false);
 	    lastJPX=jpx;
 	    lastJPY=jpy;
 
