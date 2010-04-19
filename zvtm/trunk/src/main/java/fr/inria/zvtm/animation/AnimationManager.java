@@ -379,7 +379,7 @@ public class AnimationManager {
      * camera animation. The user interacts with this 
      * animation by providing instantaneous camera speeds.
      */
-    class InteractiveCameraAnimation extends DefaultTimingHandler {
+    private static class InteractiveCameraAnimation extends DefaultTimingHandler {
 	InteractiveCameraAnimation(VirtualSpaceManager vsm){
 	    this.vsm = vsm;
 	    dx = 0d;
