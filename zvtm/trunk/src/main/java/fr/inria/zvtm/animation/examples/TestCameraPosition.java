@@ -132,7 +132,7 @@ public class TestCameraPosition {
     class MyEventHandler implements ViewEventHandler{
 	TestCameraPosition application;
 
-	long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+	long lastX,lastY;    //remember last mouse coords to compute translation  (dragging)
 
 	MyEventHandler(TestCameraPosition appli){
 	    application=appli;
@@ -211,9 +211,6 @@ public class TestCameraPosition {
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    lastJPX=jpx;
-	    lastJPY=jpy;
-
 	    v.setDrawDrag(true);
 	    application.vsm.activeView.mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
