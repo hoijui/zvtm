@@ -327,5 +327,9 @@ public class ZPDFPageImg extends ZPDFPage {
 	        pageImage = null;
 	    }
 	}
-
+	
+	public Image getpageImage() {
+		
+		return pageImage;
+	}
 }
