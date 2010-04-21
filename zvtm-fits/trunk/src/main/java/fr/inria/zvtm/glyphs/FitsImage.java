@@ -53,8 +53,11 @@ public class FitsImage extends VImage {
         abstract int toIvoaValue();
     }
 
+    private URL imgUrl;
+
     public FitsImage(long x, long y, int z, URL imgUrl) throws IOException {
         super(x,y,z,ImageIO.read(imgUrl));
+        this.imgUrl = imgUrl;
     }
 
     public void setScaleMethod(ScaleMethod scaleMethod){
