@@ -57,9 +57,9 @@ $Id$
       <version>0.10.1-SNAPSHOT</version>
     </dependency>
 	<dependency>
-      <groupId>nom.tam.fits</groupId>
+      <groupId>ivoa.fits</groupId>
       <artifactId>fits</artifactId>
-      <version>1.04.0</version>
+      <version>0.3.0</version>
     </dependency>
   </dependencies>
   

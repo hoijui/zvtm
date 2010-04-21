@@ -1,148 +1,66 @@
 package fr.inria.zvtm.glyphs;
 
-import fr.inria.zvtm.engine.Camera;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
+import javax.imageio.ImageIO;
+import javax.imageio.spi.IIORegistry;
 
-import nom.tam.fits.BasicHDU;
-import nom.tam.fits.Fits;
-import nom.tam.fits.FitsException;
-import nom.tam.fits.ImageHDU;
+import edu.jhu.pha.sdss.fits.FITSImage;  
+import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
 
-public class FitsImage extends Glyph{
-    //current representation
-    private BufferedImage repr;
+/**
+ * Basic FITS image support. Use the IVOA FITS library internally.
+ */
+public class FitsImage extends VImage {
+    static {
+        IIORegistry.getDefaultInstance().
+            registerServiceProvider(new FITSReaderSpi());
+    }
 
-    //color transfer function
-
-    //FITS data proper
-    private Fits fits;
-
-    public FitsImage(String filename){
-        try{
-            fits = new Fits(filename);
-            BasicHDU hdu;
-            while((hdu = fits.readHDU()) != null){
-                if(hdu instanceof ImageHDU){
-                }
+    public enum ScaleMethod {
+        ASINH {
+            @Override int toIvoaValue(){
+                return FITSImage.SCALE_ASINH;
             }
-        } catch(FitsException fe){
-            System.err.println("Could not load FITS data: " + fe);
-        } catch(IOException ioe){
-            System.err.println("Could not load FITS data: " + ioe);
+        },
+        HISTOGRAM_EQUALIZATION {
+            @Override int toIvoaValue(){
+                return FITSImage.SCALE_HISTOGRAM_EQUALIZATION;
+            }
+        },
+        LINEAR {
+            @Override int toIvoaValue(){
+                return FITSImage.SCALE_LINEAR;
+            }
+        },
+        LOG {
+            @Override int toIvoaValue(){
+                return FITSImage.SCALE_LOG;
+            }
+        },
+        SQUARE {
+            @Override int toIvoaValue(){
+                return FITSImage.SCALE_SQUARE;
+            }
+        },
+        SQUARE_ROOT {
+            @Override int toIvoaValue(){
+                return FITSImage.SCALE_SQUARE_ROOT;
+            }
         }
-
+        ;
+        abstract int toIvoaValue();
     }
 
-    //Rebuild the representation to be displayed
-    private void rebuildRepr(){
+    public FitsImage(long x, long y, int z, URL imgUrl) throws IOException {
+        super(x,y,z,ImageIO.read(imgUrl));
     }
 
-    public void initCams(int nbCams){
-    }
-
-    public void addCamera(int verifIndex){
-    }
-
-    public void removeCamera(int index){
-    }
-
-    public boolean coordInside(int jpx,
-            int jpy,
-            int camIndex,
-            long cvx,
-            long cvy){
-        return false;
-    }
-
-    public void resetMouseIn(){
-
-    }
-
-    public void resetMouseIn(int i){
-
-    }
-
-    public boolean fillsView(long w,
-            long h,
-            int camIndex){
-        return false;
-    }
-
-    public short mouseInOut(int jpx,
-                                 int jpy,
-                                 int camIndex,
-                                 long cvx,
-                                 long cvy){
-        return 0;
-    }
-
-    public Object clone(){
-        return null;
-    }
-
-    public void draw(Graphics2D g,
-            int vW,
-            int vH,
-            int i,
-            Stroke stdS,
-            AffineTransform stdT,
-            int dx,
-            int dy){
-
-    }
-
-    public void drawForLens(Graphics2D g,
-            int vW,
-            int vH,
-            int i,
-            Stroke stdS,
-            AffineTransform stdT,
-            int dx,
-            int dy){
-
-    }
-
-    public void project(Camera c,
-            Dimension d){
-
-    }
-
-    public void projectForLens(Camera c,
-            int lensWidth,
-            int lensHeight,
-            float lensMag,
-            long lensx,
-            long lensy){
-
-    }
-
-    public void highlight(boolean b,
-            Color selectedColor){
-        
-    }
-
-    public void orientTo(float angle){
-    }
-
-    public float getOrient(){
-        return 0;
-    }
-
-    public void reSize(float size){
-    }
-
-    public void sizeTo(float size){
-    }
-
-    public float getSize(){
-        return 1;
+    public void setScaleMethod(ScaleMethod scaleMethod){
+        if(image instanceof FITSImage){
+            ((FITSImage)image).setScaleMethod(scaleMethod.toIvoaValue());
+        }
     }
 
 }
