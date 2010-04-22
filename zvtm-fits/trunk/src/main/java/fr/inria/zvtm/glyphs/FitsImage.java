@@ -1,3 +1,8 @@
+/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
+ *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */
 package fr.inria.zvtm.glyphs;
 
 import java.awt.image.BufferedImage;
