@@ -38,7 +38,7 @@ import fr.inria.zvtm.glyphs.VTriangleOr;
 //space to replicate them on slaves)
 public aspect GlyphCreation {
 	//introduce Glyph.getCreateDelta
-	private Delta Glyph.getCreateDelta(){
+	Delta Glyph.getCreateDelta(){
 		String poison = System.getProperty("poisonNopDelta");
 		if((poison != null) && (poison.toLowerCase().equals("true"))){
 			throw new Error("NopDelta not allowed");
@@ -87,82 +87,82 @@ public aspect GlyphCreation {
 		}
 	
 	//overrides for various Glyph subclasses
-	@Override private Delta VRectangle.getCreateDelta(){
+	@Override Delta VRectangle.getCreateDelta(){
 		return new VRectangleCreateDelta(this, 
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta VCircle.getCreateDelta(){
+	@Override Delta VCircle.getCreateDelta(){
 		return new VCircleCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta VTriangleOr.getCreateDelta(){
+	@Override Delta VTriangleOr.getCreateDelta(){
 		return new VTriangleOrCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta VSegment.getCreateDelta(){
+	@Override Delta VSegment.getCreateDelta(){
 		return new VSegmentCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta VText.getCreateDelta(){
+	@Override Delta VText.getCreateDelta(){
 		return new VTextCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-    @Override private Delta VTextOr.getCreateDelta(){
+    @Override Delta VTextOr.getCreateDelta(){
         return new VTextOrCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
-	@Override private Delta RectangleNR.getCreateDelta(){
+	@Override Delta RectangleNR.getCreateDelta(){
 		return new RectangleNRCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta CircleNR.getCreateDelta(){
+	@Override Delta CircleNR.getCreateDelta(){
 		return new CircleNRCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta ClusteredImage.getCreateDelta(){
+	@Override Delta ClusteredImage.getCreateDelta(){
 		return new ClusteredImageCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-	@Override private Delta DPath.getCreateDelta(){
+	@Override Delta DPath.getCreateDelta(){
 		return new DPathCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
-    @Override private Delta VEllipse.getCreateDelta(){
+    @Override Delta VEllipse.getCreateDelta(){
         return new VEllipseCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
-    @Override private Delta VPoint.getCreateDelta(){
+    @Override Delta VPoint.getCreateDelta(){
         return new VPointCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
-    @Override private Delta VRing.getCreateDelta(){
+    @Override Delta VRing.getCreateDelta(){
         return new VRingCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
-    @Override private Delta VSlice.getCreateDelta(){
+    @Override Delta VSlice.getCreateDelta(){
         return new VSliceCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
-    @Override private Delta VPolygon.getCreateDelta(){
+    @Override Delta VPolygon.getCreateDelta(){
         return new VPolygonCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
 
-    @Override private Delta VDiamond.getCreateDelta(){
+    @Override Delta VDiamond.getCreateDelta(){
         return new VDiamondCreateDelta(this,
                 this.getParentSpace().getObjId());
     }
@@ -227,7 +227,7 @@ public aspect GlyphCreation {
 		}
 	}
 
-	private static abstract class ClosedShapeCreateDelta extends AbstractGlyphCreateDelta {
+	static abstract class ClosedShapeCreateDelta extends AbstractGlyphCreateDelta {
 		private final Color borderColor;
 		private final Color mouseInsideFillColor;
 		private final boolean filled;
