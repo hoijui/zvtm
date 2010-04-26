@@ -60,11 +60,22 @@ public class FitsImage extends VImage {
 
     private final URL imgUrl;
 
+    /**
+     * Creates a new FitsImage.
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z-index
+     * @param imgUrl image location
+     */
     public FitsImage(long x, long y, int z, URL imgUrl) throws IOException {
         super(x,y,z,ImageIO.read(imgUrl));
         this.imgUrl = imgUrl;
     }
 
+    /**
+     * Sets the image scale method.
+     * @param scaleMethod the new scale method.
+     */
     public void setScaleMethod(ScaleMethod scaleMethod){
         if(image instanceof FITSImage){
             ((FITSImage)image).setScaleMethod(scaleMethod.toIvoaValue());
