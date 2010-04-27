@@ -12,7 +12,6 @@ aspect VirtualSpaceIntroduction {
     after(Glyph glyph, VirtualSpace virtualSpace) : 
         GlyphCreation.glyphAdd(glyph, virtualSpace) &&
         !cflowbelow(GlyphCreation.glyphAdd(Glyph, VirtualSpace)){
-        System.err.println("zuist-cluster: after glyphAdd");
         if(virtualSpace.isZuistOwned()){
             glyph.setReplicated(false);
         }
