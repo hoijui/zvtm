@@ -66,10 +66,22 @@ public class FitsImage extends VImage {
      * @param y y coordinate
      * @param z z-index
      * @param imgUrl image location
+     * @param scaleFactor scale factor
+     */
+    public FitsImage(long x, long y, int z, URL imgUrl, float scaleFactor) throws IOException {
+        super(x,y,z,ImageIO.read(imgUrl), scaleFactor);
+        this.imgUrl = imgUrl;
+    }
+
+    /**
+     * Creates a new FitsImage.
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z-index
+     * @param imgUrl image location
      */
     public FitsImage(long x, long y, int z, URL imgUrl) throws IOException {
-        super(x,y,z,ImageIO.read(imgUrl));
-        this.imgUrl = imgUrl;
+        this(x,y,z,imgUrl,1);
     }
 
     /**
