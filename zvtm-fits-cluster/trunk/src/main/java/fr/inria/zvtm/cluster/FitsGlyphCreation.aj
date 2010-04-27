@@ -24,9 +24,9 @@ public aspect FitsGlyphCreation {
 
         Glyph createGlyph(){
             try{
-                return new FitsImage(0,0,0,imageLocation);
-                //XXX scale factor
+                return new FitsImage(0,0,0,imageLocation, scaleFactor);
             } catch(Exception e){
+                //XXX error handling
                 throw new Error(e);
             }
         }
