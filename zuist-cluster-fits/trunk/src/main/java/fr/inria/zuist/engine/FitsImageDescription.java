@@ -1,5 +1,6 @@
 package fr.inria.zuist.engine;
 
+import java.io.IOException;
 import java.net.URL;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.FitsImage;
@@ -15,8 +16,17 @@ public class FitsImageDescription extends ResourceDescription {
 
     transient FitsImage glyph; //the actual FITS image
 
-    FitsImageDescription(String id, long x, long y, int z, URL location, 
-            Region parentRegion){
+    FitsImageDescription(String id, long x, long y, int z, URL src, 
+            Region parentRegion, 
+            float scaleFactor, FitsImage.ScaleMethod scaleMethod){
+        this.id = id;
+        this.vx = x;
+        this.vy = y;
+        this.zindex = z;
+        this.src = src;
+
+        this.scaleFactor = scaleFactor;
+        this.scaleMethod = scaleMethod;
     }
 
     public String getType(){
@@ -24,7 +34,13 @@ public class FitsImageDescription extends ResourceDescription {
     }
 
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
-        
+        try{
+            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
+        } catch(IOException ioe){
+            throw new Error("Could not create FitsImage");
+        }
+        glyph.setScaleMethod(scaleMethod);
+        vs.addGlyph(glyph); 
     }
 
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
