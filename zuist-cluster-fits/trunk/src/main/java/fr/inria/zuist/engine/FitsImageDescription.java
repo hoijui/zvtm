@@ -44,6 +44,7 @@ public class FitsImageDescription extends ResourceDescription {
     }
 
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
+        vs.removeGlyph(glyph);
         glyph = null;
     }
 
