@@ -16,7 +16,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     transient FitsImage glyph; //the actual FITS image
 
-    FitsImageDescription(String id, long x, long y, int z, URL src, 
+    public FitsImageDescription(String id, long x, long y, int z, URL src, 
             Region parentRegion, 
             float scaleFactor, FitsImage.ScaleMethod scaleMethod){
         this.id = id;
