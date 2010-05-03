@@ -23,7 +23,7 @@ import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 
-aspect SceneManagerReplication {
+public aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
     //*createImageDescription, *createTextDescription, 
     //createClosedShapeDescription, createSceneFragmentDescription
@@ -35,7 +35,7 @@ aspect SceneManagerReplication {
             glyph.setReplicated(false);
         }
 
-    pointcut sceneManagerCreation(SceneManager sceneManager, 
+    public pointcut sceneManagerCreation(SceneManager sceneManager, 
             VirtualSpace[] spaces, Camera[] cameras) : 
         execution(public SceneManager.new(VirtualSpace[], Camera[])) && 
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
