@@ -12,8 +12,11 @@ public class FitsResourceHandler implements ResourceHandler {
             URL resourceURL, boolean sensitivity, Color stroke, String params){
         //TODO scaleFactor (hardcoded to 1 at the moment)
         //TODO scaleMethod (hardcoded to ASINH)
-        return new FitsImageDescription(id, x, y, zindex, resourceURL, region, 
+        FitsImageDescription desc = new FitsImageDescription(
+                id, x, y, zindex, resourceURL, region, 
                 1, FitsImage.ScaleMethod.ASINH);
+        region.addObject(desc);
+        return desc;             
             }
 }
 
