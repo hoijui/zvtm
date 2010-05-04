@@ -5,6 +5,9 @@
  */
 package fr.inria.zvtm.glyphs;
 
+import java.awt.Graphics;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -18,6 +21,9 @@ import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
  * Basic FITS image support. Use the IVOA FITS library internally.
  */
 public class FitsImage extends VImage {
+    //original image (dataset preserved)
+    private final FITSImage fitsImage;
+
     static {
         IIORegistry.getDefaultInstance().
             registerServiceProvider(new FITSReaderSpi());
@@ -69,8 +75,11 @@ public class FitsImage extends VImage {
      * @param scaleFactor scale factor
      */
     public FitsImage(long x, long y, int z, URL imgUrl, float scaleFactor) throws IOException {
-        super(x,y,z,ImageIO.read(imgUrl), scaleFactor);
+        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
+        //create compatible image and use this for display
+        fitsImage = (FITSImage)(ImageIO.read(imgUrl));
+        recreateDisplayImage();
     }
 
     /**
@@ -89,14 +98,23 @@ public class FitsImage extends VImage {
      * @param scaleMethod the new scale method.
      */
     public void setScaleMethod(ScaleMethod scaleMethod){
-        if(image instanceof FITSImage){
-            ((FITSImage)image).setScaleMethod(scaleMethod.toIvoaValue());
-        }
+            fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
+            recreateDisplayImage();
     }
 
     public URL getImageLocation(){
         return imgUrl;
     }
 
+    private void recreateDisplayImage(){
+        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().
+            getDefaultScreenDevice().getDefaultConfiguration();
+        BufferedImage compatibleImage = gc.createCompatibleImage(fitsImage.getWidth(),
+                fitsImage.getHeight(), fitsImage.getTransparency());
+        Graphics g = compatibleImage.getGraphics();
+        g.drawImage(fitsImage,0,0,null);
+        g.dispose();
+        setImage(compatibleImage);
+    }
 }
 
