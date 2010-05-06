@@ -46,6 +46,7 @@ aspect FitsImageDescReplication {
                         id, sceneManager.getObjId(), rdesc.getObjId(),
                         x,y,zindex,region.getObjId(), imageURL);
                 VirtualSpaceManager.INSTANCE.sendDelta(delta);
+                System.err.println("fitsImageCreateDelta sent: id = " + id);
             }
 
     private static class FitsImageCreateDelta implements Delta {
@@ -76,9 +77,8 @@ aspect FitsImageDescReplication {
             Region region = su.getSlaveObject(regionId);
             //TODO scale factor
             //TODO scale method
-            FitsImageDescription desc = new FitsImageDescription(
-                    id, x, y, z, 
-                    location, region, 1, FitsImage.ScaleMethod.ASINH);
+            ResourceDescription desc = sm.createResourceDescription(x,y,id,z,region,
+                    location,FitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.BLACK,"");
             su.putSlaveObject(descId, desc);
         }
     }
