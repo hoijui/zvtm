@@ -4,7 +4,7 @@
     <groupId>fr.inria.zvtm</groupId>
     <artifactId>zuist-cluster-fits</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.0</version>
+    <version>0.1.1-SNAPSHOT</version>
     <name>zuist-cluster-fits</name>
     <url>http://maven.apache.org</url>
     <dependencies>
