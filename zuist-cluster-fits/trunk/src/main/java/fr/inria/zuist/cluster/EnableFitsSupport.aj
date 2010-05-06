@@ -8,12 +8,16 @@ import fr.inria.zvtm.engine.VirtualSpace;
 //set a resource handler for FITS files whenever a SceneManager is
 //instantiated
 aspect EnableZuistSupport {
-    //sceneManagerCreation defined in zuist-cluster aspects
-    
+    pointcut sceneManagerCreation(SceneManager sceneManager, 
+            VirtualSpace[] spaces, Camera[] cameras) : 
+        execution(public SceneManager.new(VirtualSpace[], Camera[])) && 
+        this(sceneManager) &&
+        args(spaces, cameras);
+
     after(SceneManager sceneManager, 
             VirtualSpace[] spaces,
             Camera[] cameras) returning(): 
-        SceneManagerReplication.sceneManagerCreation(sceneManager,
+        sceneManagerCreation(sceneManager,
                 spaces, cameras){
         sceneManager.setResourceHandler(
                 FitsResourceHandler.RESOURCE_TYPE_FITS, 
