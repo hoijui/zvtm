@@ -35,7 +35,7 @@ except ImportError:
 try:
     from PIL import Image
 except ImportError:
-    SUCCEEDED_IMPORTING_PIL = True
+    SUCCEEDED_IMPORTING_PIL = False
 
 # Tile IDs are generated following this pattern:
 # ---------
