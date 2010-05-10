@@ -13,9 +13,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import java.io.File;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+//import java.io.RandomAccessFile;
+//import java.nio.ByteBuffer;
+//import java.nio.channels.FileChannel;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import java.util.Vector;
 
@@ -26,11 +28,20 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.glyphs.ZPDFPageImg;
-import fr.inria.zvtm.glyphs.ZPDFPageG2D;
+import fr.inria.zvtm.glyphs.IcePDFPageImg;
+//import fr.inria.zvtm.glyphs.ZPDFPageImg;
+//import fr.inria.zvtm.glyphs.ZPDFPageG2D;
 
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
+//import com.sun.pdfview.PDFFile;
+//import com.sun.pdfview.PDFPage;
+
+import org.icepdf.core.pobjects.Document;
+import org.icepdf.core.pobjects.Page;
+import org.icepdf.core.pobjects.PDimension;
+import org.icepdf.core.exceptions.PDFException;
+import org.icepdf.core.exceptions.PDFSecurityException;
+import org.icepdf.core.util.GraphicsRenderingHints;
+
 
 public class PDFViewer {
 	
@@ -69,27 +80,27 @@ public class PDFViewer {
 
 	void load(File f, float detailFactor){
 		try {
-			RandomAccessFile raf = new RandomAccessFile(f, "r");
-			FileChannel channel = raf.getChannel();
-			ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-			PDFFile pdfFile = new PDFFile(buf);
-			int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
-			for (int i=0;i<pdfFile.getNumPages();i++){
-				try {
-				    if (rendering_technique == DIRECT_G2D_RENDERING){
-				        vs.addGlyph(new ZPDFPageG2D(i*Math.round(page_width*1.1f), i*Math.round(page_width*1.1f), 0, pdfFile.getPage(i+1), detailFactor));
-				    }
-				    else {
-				        // OFFSCREEN_IMAGE_RENDERING
-				        vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, pdfFile.getPage(i+1), detailFactor, 1));
-				    }
-				}
-				catch ( Exception e) {
-					e.printStackTrace();
-				}
-			}
+			Document document = new Document();
+            try {
+                document.setFile(f.getAbsolutePath());
+            } catch (PDFException ex) {
+                System.out.println("Error parsing PDF document " + ex);
+            } catch (PDFSecurityException ex) {
+                System.out.println("Error encryption not supported " + ex);
+            } catch (FileNotFoundException ex) {
+                System.out.println("Error file not found " + ex);
+            } catch (IOException ex) {
+                System.out.println("Error handling PDF document " + ex);
+            }            
+            int page_width = (int)document.getPageDimension(0, 0).getWidth();
+            // Paint each pages content to an image and write the image to file
+            for (int i = 0; i < document.getNumberOfPages(); i++) {
+                vs.addGlyph(new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, document, i, detailFactor, 1));
+            }
+            // clean up resources
+            document.dispose();
 		}
-		catch ( Exception e) { 
+		catch (Exception e) { 
 			e.printStackTrace();
 		}
 	}

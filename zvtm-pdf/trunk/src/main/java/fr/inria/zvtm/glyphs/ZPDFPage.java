@@ -1,5 +1,5 @@
 /*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -27,9 +27,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
-import com.sun.pdfview.PDFPage;
-
-/** Glyph encapsulating a PDFPage from <a href="https://pdf-renderer.dev.java.net/">SwingLabs' PDFRenderer</a>.
+/** Glyph encapsulating a PDF Page.
  *@author Emmanuel Pietriga
  */
 

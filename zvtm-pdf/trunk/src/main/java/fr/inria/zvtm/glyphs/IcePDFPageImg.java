@@ -1,13 +1,13 @@
 /*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$
+ * $Id:  $
  */
 
 package fr.inria.zvtm.glyphs;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
@@ -28,15 +28,21 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 
-import com.sun.pdfview.PDFPage;
+import org.icepdf.core.exceptions.PDFException;
+import org.icepdf.core.exceptions.PDFSecurityException;
+import org.icepdf.core.pobjects.Document;
+import org.icepdf.core.pobjects.Page;
+import org.icepdf.core.util.GraphicsRenderingHints;
 
-/** Glyph encapsulating a PDFPage from <a href="https://pdf-renderer.dev.java.net/">SwingLabs' PDFRenderer</a>.
+/** Glyph encapsulating a PDF page from <a href="http://www.icepdf.org/">ICEpdf</a>.
+ * ICEpdf API documentation available at <a href="http://www.icepdf.org/docs/v4_0_0/core/javadocs/index.html">http://www.icepdf.org/docs/v4_0_0/core/javadocs/index.html</a>.
+ * ICEpdf developer's guide available at <a href="http://wiki.icefaces.org/display/PDF/ICEpdf+Developer's+Guide">http://wiki.icefaces.org/display/PDF/ICEpdf+Developer's+Guide</a>.
  *@author Emmanuel Pietriga
  */
 
-public class ZPDFPageImg extends ZPDFPage {
+public class IcePDFPageImg extends ZPDFPage {
 
-	Image pageImage;
+	BufferedImage pageImage;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public float trueCoef = 1.0f;
@@ -45,81 +51,23 @@ public class ZPDFPageImg extends ZPDFPage {
     public AffineTransform at;
     
 	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
-	 *@param page the PDF page from pdf-renderer
+	 *@param pdfDoc the PDF document from ICEpdf
+	 *@param pageNumber page number starting from 0 (for page 1)
+	 *@param detailFactor multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis
+     *@param scale scaleFactor in virtual space w.r.t specified image size (default is 1.0)
 	 */
-	public ZPDFPageImg(long x, long y, int z, PDFPage page){
+	public IcePDFPageImg(long x, long y, int z, Document pdfDoc, int pageNumber, float detailFactor, double scale){
 		vx = x;
 		vy = y;
 		vz = z;
-		// get the width and height for the doc at the default zoom 
-		Rectangle rect = new Rectangle(0, 0, (int)page.getBBox().getWidth(), (int)page.getBBox().getHeight());
-		// generate the image
-		pageImage = page.getImage(rect.width, rect.height,
-		 	rect,   // clip rect
-			null,   // null for the ImageObserver
-			true,   // fill background with white
-			true);  // block until drawing is done
-		vw = Math.round(rect.width/2.0);
-		vh = Math.round(rect.height/2.0);
+        pageImage = (BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, (float)scale);
+		vw = Math.round(detailFactor*pageImage.getWidth()*scale/2.0);
+		vh = Math.round(detailFactor*pageImage.getHeight()*scale/2.0);
 		if (vw==0 && vh==0){ar = 1.0f;}
 		else {ar = (float)vw/(float)vh;}
 		computeSize();
 		orient = 0;
-	}
-
-	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
-	 *@param page the PDF page from pdf-renderer
-	 *@param detailFactor multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis
-     *@param scale scaleFactor in virtual space w.r.t specified image size (default is 1.0)
-	 */
-	public ZPDFPageImg(long x, long y, int z, PDFPage page, float detailFactor, double scale){
-		vx = x;
-		vy = y;
-		vz = z;
-		// get the width and height for the doc at the default zoom 
-		Rectangle rect = new Rectangle(0, 0, (int)(page.getBBox().getWidth()), (int)(page.getBBox().getHeight()));
-		// generate the image
-		pageImage = page.getImage((int)(detailFactor*rect.width), (int)(detailFactor*rect.height),
-		 	rect,   // clip rect
-			null,   // null for the ImageObserver
-			true,   // fill background with white
-			true);  // block until drawing is done
-		vw = Math.round(detailFactor*rect.width*scale/2.0);
-		vh = Math.round(detailFactor*rect.height*scale/2.0);
-		if (vw==0 && vh==0){ar = 1.0f;}
-		else {ar = (float)vw/(float)vh;}
-		computeSize();
-		orient = 0;		
 		scaleFactor = (float)scale;
-	}
-
-	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
-	 *@param page the PDF page from pdf-renderer
-	 *@param w width of bitmap image in which to render the page
-	 *@param h height of bitmap image in which to render the page
-     *@param scale scaleFactor in virtual space w.r.t specified image size (default is 1.0)
-	 */
-	public ZPDFPageImg(long x, long y, int z, PDFPage page, int w, int h, double scale){
-		vx = x;
-		vy = y;
-		vz = z;
-		// get the width and height for the doc at the default zoom
-		//XXX:TBW would probably be a good idea to throw some kind of warning if 
-		//        w and h are smaller than default scale ? not sure... depends on how page.getImage() behaves in this case
-		Rectangle rect = new Rectangle(0, 0, w, h);
-		// generate the image
-		pageImage = page.getImage(rect.width, rect.height,
-		 	rect,   // clip rect
-			null,   // null for the ImageObserver
-			true,   // fill background with white
-			true);  // block until drawing is done
-		vw = Math.round(rect.width*scale/2.0);
-		vh = Math.round(rect.height*scale/2.0);
-		if (vw==0 && vh==0){ar = 1.0f;}
-		else {ar = (float)vw/(float)vh;}
-		computeSize();
-		orient = 0;		
-		scaleFactor = (float)scale;		
 	}
 	
 	/** For internal use. Made public for easier outside package subclassing. */
@@ -328,8 +276,8 @@ public class ZPDFPageImg extends ZPDFPage {
 	    }
 	}
 	
-	public Image getpageImage() {
-		
+	public BufferedImage getpageImage() {
 		return pageImage;
 	}
+	
 }

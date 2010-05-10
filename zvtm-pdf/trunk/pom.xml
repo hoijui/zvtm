@@ -11,7 +11,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <artifactId>zvtm-pdf</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-PDF</name>
-  <version>0.1.0</version>
+  <version>0.2.0-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
     <license>
@@ -56,18 +56,55 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <artifactId>zvtm</artifactId>
       <version>0.10.1-SNAPSHOT</version>
     </dependency>
+	
+    <!-- ICEpdf 4.0.x -->
 	<!--
 
-		SwingLab's PRDFRenderer is not available in any Maven repository.
-		Build it and install the JAR file in your local repository using the following command line:
-	        mvn install:install-file -Dfile=PDFRenderer.jar -DgroupId=com.sun.pdfrenderer -DartifactId=pdfRenderer -Dversion=1.0 -Dpackaging=jar	
+		ICEpdf is not available in any Maven repository for now.
+		Install the JAR file in your local repository using the following command line:
+	        mvn install:install-file -Dfile=icepdf-core.jar -DgroupId=org.icepdf -DartifactId=icepdf-core -Dversion=4.0.1 -Dpackaging=jar	
 
 	-->
 	<dependency>
-		<groupId>com.sun.pdfrenderer</groupId>
-		<artifactId>pdfRenderer</artifactId>
-		<version>1.0</version>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-core</artifactId>
+		<version>4.0.1</version>
 	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-awt-util</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-dom</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-svg-dom</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-svggen</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-util</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-xml</artifactId>
+		<version>1.6</version>
+	</dependency>
+	
+	
+	
+	
+	
   </dependencies>
   
   <!-- Build -->
