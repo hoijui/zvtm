@@ -11,7 +11,7 @@ $Id$
   <artifactId>zvtm-fits</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-FITS</name>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
     <license>
