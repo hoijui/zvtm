@@ -5,6 +5,7 @@
  */
 package fr.inria.zvtm.glyphs;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -22,6 +23,8 @@ import javax.imageio.spi.IIORegistry;
 
 import edu.jhu.pha.sdss.fits.FITSImage;  
 import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
+
+import fr.inria.zvtm.fits.NopFilter;
 
 /**
  * Basic FITS image support. Use the IVOA FITS library internally.
@@ -133,27 +136,5 @@ public class FitsImage extends VImage {
         setImage(compatibleImage);
     }
 
-    private static class NopFilter extends RGBImageFilter {
-        public NopFilter(){
-            canFilterIndexColorModel = true;
-        }
-
-        public int filterRGB(int x, int y, int rgb) {
-            return rgb;
-        }
-    }
-
-    private static class RedFilter extends RGBImageFilter {
-            public RedFilter() {
-                // The filter's operation does not depend on the
-                // pixel's location, so IndexColorModels can be
-                // filtered directly.
-                canFilterIndexColorModel = true;
-            }
-
-            public int filterRGB(int x, int y, int rgb) {
-                return rgb & 0xffff0000; //ARGB?
-            }
-        }
 }
 
