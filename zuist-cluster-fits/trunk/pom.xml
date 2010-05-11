@@ -21,8 +21,8 @@
         </dependency>
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
-            <artifactId>zvtm-cluster-fits</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <artifactId>zvtm-fits</artifactId>
+            <version>0.1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
