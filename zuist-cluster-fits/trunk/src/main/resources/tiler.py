@@ -13,11 +13,18 @@ DEFAULT_TILE_SIZE=1024 #use power of two
 #TODO complete
 #TODO add dry-run option (only generate xml info, do not tile images)
 
-def print_zuist_level_info(level):
+def print_zuist_level_info(levels, level, cam_focal=100, max_ceiling=100000):
     """
     Prints the <level> sections
+    levels: total number of levels (at least 1)
+    level: current level, 0-based
     """
-    print "<level ceiling=\"%d\" depth=\"%d\" floor=\"%d\"/>" % (0,level,0)
+    ceiling = cam_focal * (2**(levels - level) - 1)
+    floor = cam_focal * (2**(levels - level - 1) - 1)
+    if(level == 0):
+        ceiling = max_ceiling
+
+    print "<level ceiling=\"%d\" depth=\"%d\" floor=\"%d\"/>" % (ceiling,level,floor)
 
 def tile_image(filename, image_width, image_height, tile_width, tile_height, levels):
     """
@@ -25,7 +32,7 @@ def tile_image(filename, image_width, image_height, tile_width, tile_height, lev
     levels: number of levels in the pyramid (1 for a flat pyramid)
     """
     for i in reversed(range(levels)):
-        print_zuist_level_info(i)
+        print_zuist_level_info(levels, i)
 
     for i in reversed(range(levels)):
         print "<!-- starting level %d -->" % i
@@ -54,8 +61,9 @@ def tile_level(filename, image_width, image_height, tile_width, tile_height, lev
    
    for i in range(xcount):
        for j in range(ycount):
-           print "echo fitscopy %s[%d:%d:%d,%d:%d:%d]" % (filename, i * tile_width * skip_factor + 1, (i + 1) * tile_width * skip_factor, skip_factor, j * tile_height * skip_factor + 1, (j + 1) * tile_height * skip_factor, skip_factor)
-           #subprocess.Popen("echo fitscopy %s[%d:%d:%d,%d:%d:%d]" % (filename, i * tile_width * skip_factor + 1, (i + 1) * tile_width * skip_factor, skip_factor, j * tile_height * skip_factor + 1, (j + 1) * tile_height * skip_factor, skip_factor))
+           tile_name = ""
+           print "fitscopy %s[%d:%d:%d,%d:%d:%d]" % (filename, i * tile_width * skip_factor + 1, (i + 1) * tile_width * skip_factor, skip_factor, j * tile_height * skip_factor + 1, (j + 1) * tile_height * skip_factor, skip_factor)
+           #subprocess.Popen("fitscopy %s[%d:%d:%d,%d:%d:%d]" % (filename, i * tile_width * skip_factor + 1, (i + 1) * tile_width * skip_factor, skip_factor, j * tile_height * skip_factor + 1, (j + 1) * tile_height * skip_factor, skip_factor))
            print_zuist_resource_info(os.path.basename(filename), i, j, tile_width, tile_height, level)
 
 if __name__ == "__main__":
