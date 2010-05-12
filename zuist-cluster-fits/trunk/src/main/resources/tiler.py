@@ -7,12 +7,18 @@
 import os.path
 import subprocess
 import sys
+from optparse import OptionParser
 
 DEFAULT_LEVEL_COUNT=3
 DEFAULT_TILE_SIZE=1024 #use power of two
 
 #TODO complete
 #TODO add dry-run option (only generate xml info, do not tile images)
+
+parser = OptionParser()
+parser.add_option("-d", "--dry-run", action="store_true", dest="dry_run", default=False, help="dry run (generate the scene xml description, but do not tile image)")
+options = None
+args = None
 
 def print_zuist_level_info(levels, level, cam_focal=100, max_ceiling=100000):
     """
@@ -69,9 +75,11 @@ def tile_level(srcpath, image_width, image_height, tile_width, tile_height, leve
            tile_name = "%s_level%d_%d_%d.fits" % (os.path.splitext(os.path.basename(srcpath))[0], level, i, j)
            command = "fitscopy %s[%d:%d:%d,%d:%d:%d] tiles/%s" % (srcpath, i * tile_width * skip_factor + 1, (i + 1) * tile_width * skip_factor, skip_factor, j * tile_height * skip_factor + 1, (j + 1) * tile_height * skip_factor, skip_factor, tile_name) 
            #print command 
-           subprocess.Popen(command, shell=True)
+           if not options.dry_run:
+                subprocess.Popen(command, shell=True)
            print_zuist_resource_info(tile_name, i, j, tile_width, tile_height, levels, level)
 
 if __name__ == "__main__":
-   tile_image(sys.argv[1], 8192, 8192, 1024, 1024, 3)
+    options, args = parser.parse_args()
+    tile_image(args[0], 8192, 8192, 1024, 1024, 3)
 
