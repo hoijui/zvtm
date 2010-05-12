@@ -39,28 +39,28 @@ def tile_image(srcpath, image_width, image_height, tile_width, tile_height, leve
 
     for i in reversed(range(levels)):
         print "<!-- starting level %d -->" % i
-        tile_level(srcpath, image_width, image_height, tile_width, tile_height, i)
+        tile_level(srcpath, image_width, image_height, tile_width, tile_height, levels, i)
     print "</scene>"
 
-def print_zuist_resource_info(source_name, i, j, tile_width, tile_height, level):
+def print_zuist_resource_info(source_name, i, j, tile_width, tile_height, levels, level):
     """
     Prints the relevant <region> and <resource> sections.
     i: tile index in the x-axis
     j: tile index in the y-axis
     """
-    skip_factor = 2**level
+    skip_factor = 2**(levels - level - 1)
     id="tile_level%d_%d_%d" % (level, i, j)
     print "<region h=\"%d\" w=\"%d\" id=\"%s\" levels=\"%d\" x=\"%d\" y=\"%d\">" % (tile_height * skip_factor, tile_width * skip_factor, id, level, ((i - 0.5) * tile_width) * skip_factor, (-(j - 0.5) * tile_height) * skip_factor)
     print "<resource h=\"%d\" w=\"%d\" id=\"%s\" src=\"%s\" type=\"fits\" x=\"%d\" y=\"%d\" z-index=\"0\" params=\"scaleFactor=%d\"/>" % (tile_height, tile_width, id, source_name, i * tile_width * skip_factor, (-j * tile_height) * skip_factor, skip_factor)
     print "</region>"
 
-def tile_level(srcpath, image_width, image_height, tile_width, tile_height, level):
+def tile_level(srcpath, image_width, image_height, tile_width, tile_height, levels, level):
    """
    skip_factor should be a power of two (sf = 2^level), level 0
    has the resolution of the original image, level 1 has one fourth etc.
    called internally by tile_image. not for public consumption.
    """
-   skip_factor = 2**level
+   skip_factor = 2**(levels - level - 1)
    xcount = image_width / (tile_width * skip_factor) 
    ycount = image_height / (tile_height * skip_factor)
    
@@ -68,9 +68,9 @@ def tile_level(srcpath, image_width, image_height, tile_width, tile_height, leve
        for j in range(ycount):
            tile_name = "%s_level%d_%d_%d.fits" % (os.path.splitext(os.path.basename(srcpath))[0], level, i, j)
            command = "fitscopy %s[%d:%d:%d,%d:%d:%d] tiles/%s" % (srcpath, i * tile_width * skip_factor + 1, (i + 1) * tile_width * skip_factor, skip_factor, j * tile_height * skip_factor + 1, (j + 1) * tile_height * skip_factor, skip_factor, tile_name) 
-           print command 
-           #subprocess.Popen(command, shell=True)
-           print_zuist_resource_info(tile_name, i, j, tile_width, tile_height, level)
+           #print command 
+           subprocess.Popen(command, shell=True)
+           print_zuist_resource_info(tile_name, i, j, tile_width, tile_height, levels, level)
 
 if __name__ == "__main__":
    tile_image(sys.argv[1], 8192, 8192, 1024, 1024, 3)
