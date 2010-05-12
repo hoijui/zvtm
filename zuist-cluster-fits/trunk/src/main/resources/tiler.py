@@ -32,12 +32,15 @@ def tile_image(srcpath, image_width, image_height, tile_width, tile_height, leve
     Creates a pyramid from an image
     levels: number of levels in the pyramid (1 for a flat pyramid)
     """
+    print "<?xml version="1.0"?>"
+    print "<scene>"
     for i in reversed(range(levels)):
         print_zuist_level_info(levels, i)
 
     for i in reversed(range(levels)):
         print "<!-- starting level %d -->" % i
         tile_level(srcpath, image_width, image_height, tile_width, tile_height, i)
+    print "</scene>"
 
 def print_zuist_resource_info(source_name, i, j, tile_width, tile_height, level):
     """
@@ -46,7 +49,7 @@ def print_zuist_resource_info(source_name, i, j, tile_width, tile_height, level)
     j: tile index in the y-axis
     """
     id="tile_level%d_%d_%d" % (level, i, j)
-    print "<region h=\"%d\" w=\"%d\" id=\"%s\" layer=\"%s\" levels=\"%d\" x=\"%d\" y=\"%d\">" % (tile_height, tile_width, id, "imageLayer", level, (i - 0.5) * tile_width, -(j - 0.5) * tile_height)
+    print "<region h=\"%d\" w=\"%d\" id=\"%s\" levels=\"%d\" x=\"%d\" y=\"%d\">" % (tile_height, tile_width, id, level, (i - 0.5) * tile_width, -(j - 0.5) * tile_height)
     print "<resource h=\"%d\" w=\"%d\" id=\"%s\" src=\"%s\" type=\"fits\" x=\"%d\" y=\"%d\" z-index=\"0\"/>" % (tile_height, tile_width, id, source_name, i * tile_width, -j * tile_height)
     print "</region>"
 
