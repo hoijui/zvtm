@@ -61,6 +61,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<!--
 
 		ICEpdf is not available in any Maven repository for now.
+		Get icepdf-core.jar from http://www.icepdf.org/downloads.html
 		Install the JAR file in your local repository using the following command line:
 	        mvn install:install-file -Dfile=icepdf-core.jar -DgroupId=org.icepdf -DartifactId=icepdf-core -Dversion=4.0.1 -Dpackaging=jar	
 
