@@ -50,24 +50,47 @@ public class IcePDFPageImg extends ZPDFPage {
     /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;
     
-	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
+    /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
 	 *@param pdfDoc the PDF document from ICEpdf
 	 *@param pageNumber page number starting from 0 (for page 1)
-	 *@param detailFactor multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis
-     *@param scale scaleFactor in virtual space w.r.t specified image size (default is 1.0)
 	 */
-	public IcePDFPageImg(long x, long y, int z, Document pdfDoc, int pageNumber, float detailFactor, double scale){
-		vx = x;
-		vy = y;
-		vz = z;
-        pageImage = (BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, (float)scale);
-		vw = Math.round(detailFactor*pageImage.getWidth()*scale/2.0);
-		vh = Math.round(detailFactor*pageImage.getHeight()*scale/2.0);
-		if (vw==0 && vh==0){ar = 1.0f;}
-		else {ar = (float)vw/(float)vh;}
+	public IcePDFPageImg(Document pdfDoc, int pageNumber){
+		this(0, 0, 0, pdfDoc, pageNumber, 1f, 1f);
+	}
+	
+    /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+	 *@param pdfDoc the PDF document from ICEpdf
+	 *@param pageNumber page number starting from 0 (for page 1)
+	 */
+	public IcePDFPageImg(long x, long y, int z, Document pdfDoc, int pageNumber){
+		this(x, y, z, pdfDoc, pageNumber, 1f, 1f);
+	}
+	
+	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+	 *@param pdfDoc the PDF document from ICEpdf
+	 *@param pageNumber page number starting from 0 (for page 1)
+	 *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
+	                      This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
+     *@param scaleFactor glyph size multiplication factor in virtual space w.r.t specified image size (default is 1.0). This has not impact on the PDF page rendering quality (a posteriori rescaling in ZVTM).
+	 */
+	public IcePDFPageImg(long x, long y, int z, Document pdfDoc, int pageNumber, float detailFactor, float scaleFactor){
+		this.vx = x;
+		this.vy = y;
+		this.vz = z;
+        this.pageImage = (BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor);
+		this.vw = Math.round(pageImage.getWidth()*scaleFactor/2.0);
+		this.vh = Math.round(pageImage.getHeight()*scaleFactor/2.0);
+		if (vw==0 && vh==0){this.ar = 1.0f;}
+		else {this.ar = (float)vw/(float)vh;}
 		computeSize();
-		orient = 0;
-		scaleFactor = (float)scale;
+		this.orient = 0;
+		this.scaleFactor = scaleFactor;
 	}
 	
 	/** For internal use. Made public for easier outside package subclassing. */
@@ -276,7 +299,7 @@ public class IcePDFPageImg extends ZPDFPage {
 	    }
 	}
 	
-	public BufferedImage getpageImage() {
+	public BufferedImage getPageImage() {
 		return pageImage;
 	}
 	

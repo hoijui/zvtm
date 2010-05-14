@@ -1,5 +1,5 @@
 /*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -8,14 +8,12 @@
 package fr.inria.zvtm.demo;
 
 import java.awt.Color;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import java.io.File;
-//import java.io.RandomAccessFile;
-//import java.nio.ByteBuffer;
-//import java.nio.channels.FileChannel;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -29,11 +27,6 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
-//import fr.inria.zvtm.glyphs.ZPDFPageImg;
-//import fr.inria.zvtm.glyphs.ZPDFPageG2D;
-
-//import com.sun.pdfview.PDFFile;
-//import com.sun.pdfview.PDFPage;
 
 import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.pobjects.Page;
@@ -41,7 +34,6 @@ import org.icepdf.core.pobjects.PDimension;
 import org.icepdf.core.exceptions.PDFException;
 import org.icepdf.core.exceptions.PDFSecurityException;
 import org.icepdf.core.util.GraphicsRenderingHints;
-
 
 public class PDFViewer {
 	
@@ -95,7 +87,8 @@ public class PDFViewer {
             int page_width = (int)document.getPageDimension(0, 0).getWidth();
             // Paint each pages content to an image and write the image to file
             for (int i = 0; i < document.getNumberOfPages(); i++) {
-                vs.addGlyph(new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, document, i, detailFactor, 1));
+                IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, document, i, detailFactor, 1.0f);
+                vs.addGlyph(g);
             }
             // clean up resources
             document.dispose();
@@ -105,7 +98,17 @@ public class PDFViewer {
 		}
 	}
 
-	public static void main(String[] args){
+	public static void main(String[] args){	    
+	    System.getProperties().put("org.icepdf.core.screen.alphaInterpolation", RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        System.getProperties().put("org.icepdf.core.screen.antiAliasing", RenderingHints.VALUE_ANTIALIAS_ON);
+        System.getProperties().put("org.icepdf.core.screen.textAntiAliasing", RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        System.getProperties().put("org.icepdf.core.screen.colorRender", RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        System.getProperties().put("org.icepdf.core.screen.dither", RenderingHints.VALUE_DITHER_ENABLE);
+        System.getProperties().put("org.icepdf.core.screen.fractionalmetrics", RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        System.getProperties().put("org.icepdf.core.screen.interpolation", RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        System.getProperties().put("org.icepdf.core.screen.render", RenderingHints.VALUE_RENDER_QUALITY);
+        System.getProperties().put("org.icepdf.core.screen.stroke", RenderingHints.VALUE_STROKE_PURE);
+	    
 		System.out.println("-----------------");
 		System.out.println("General information");
 		System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
