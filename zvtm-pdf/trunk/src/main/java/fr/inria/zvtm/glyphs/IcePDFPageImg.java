@@ -292,6 +292,7 @@ public class IcePDFPageImg extends ZPDFPage {
 		return null;
 	}
 
+    /** Flush image resource. */
 	public void flush(){
 	    if (pageImage != null){
 	        pageImage.flush();
