@@ -61,7 +61,7 @@ public class PDFViewer {
 		mCamera = vs.addCamera();
 		Vector cameras = new Vector();
 		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 800, 600, false, true, true, null);
+		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 1024, 768, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		eh = new PDFViewerEventHandler(this);
 		pdfView.setEventHandler(eh);
@@ -87,7 +87,7 @@ public class PDFViewer {
             int page_width = (int)document.getPageDimension(0, 0).getWidth();
             // Paint each pages content to an image and write the image to file
             for (int i = 0; i < document.getNumberOfPages(); i++) {
-                IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), i*Math.round(page_width*1.1f*detailFactor), 0, document, i, detailFactor, 1.0f);
+                IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0, document, i, detailFactor, 1.0f);
                 vs.addGlyph(g);
             }
             // clean up resources
