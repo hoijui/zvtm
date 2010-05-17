@@ -56,7 +56,7 @@ def print_zuist_resource_info(source_name, i, j, tile_width, tile_height, levels
     skip_factor = 2**(levels - level - 1)
     id="tile_level%d_%d_%d" % (level, i, j)
     print "<region h=\"%d\" w=\"%d\" id=\"%s\" levels=\"%d\" x=\"%d\" y=\"%d\">" % (tile_height * skip_factor, tile_width * skip_factor, id, level, ((i - 0.5) * tile_width) * skip_factor, (-(j - 0.5) * tile_height) * skip_factor)
-    print "<resource h=\"%d\" w=\"%d\" id=\"%s\" src=\"%s\" type=\"fits\" x=\"%d\" y=\"%d\" z-index=\"0\" params=\"sc=%d\"/>" % (tile_height, tile_width, id, source_name, i * tile_width * skip_factor, (-j * tile_height) * skip_factor, skip_factor)
+    print "<resource h=\"%d\" w=\"%d\" id=\"%s\" src=\"%s\" type=\"fits\" x=\"%d\" y=\"%d\" z-index=\"0\" params=\"sc=%d;sm=ASINH\"/>" % (tile_height, tile_width, id, source_name, i * tile_width * skip_factor, (-j * tile_height) * skip_factor, skip_factor)
     print "</region>"
 
 def tile_level(srcpath, image_width, image_height, tile_width, tile_height, levels, level):
