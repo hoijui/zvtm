@@ -13,12 +13,14 @@ import fr.inria.zvtm.glyphs.Glyph;
 public class FitsImageDescription extends ResourceDescription {
     private float scaleFactor = 1;
     private FitsImage.ScaleMethod scaleMethod;
+    private FitsImage.ColorFilter colorFilter;
 
     transient FitsImage glyph; //the actual FITS image
 
     public FitsImageDescription(String id, long x, long y, int z, URL src, 
             Region parentRegion, 
-            float scaleFactor, FitsImage.ScaleMethod scaleMethod){
+            float scaleFactor, FitsImage.ScaleMethod scaleMethod,
+            FitsImage.ColorFilter colorFilter){
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -27,6 +29,7 @@ public class FitsImageDescription extends ResourceDescription {
 
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
+        this.colorFilter = colorFilter;
     }
 
     public String getType(){
@@ -40,6 +43,7 @@ public class FitsImageDescription extends ResourceDescription {
             throw new Error("Could not create FitsImage");
         }
         glyph.setScaleMethod(scaleMethod);
+        glyph.setColorFilter(colorFilter);
         vs.addGlyph(glyph); 
     }
 
