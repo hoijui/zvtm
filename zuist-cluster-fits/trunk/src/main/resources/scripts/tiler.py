@@ -13,7 +13,6 @@ DEFAULT_LEVEL_COUNT=3
 DEFAULT_TILE_SIZE=1024 #use power of two
 
 #TODO complete
-#TODO add dry-run option (only generate xml info, do not tile images)
 
 parser = OptionParser()
 parser.add_option("-d", "--dry-run", action="store_true", dest="dry_run", default=False, help="dry run (generate the scene xml description, but do not tile image)")
