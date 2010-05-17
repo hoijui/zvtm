@@ -24,7 +24,9 @@ import javax.imageio.spi.IIORegistry;
 import edu.jhu.pha.sdss.fits.FITSImage;  
 import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
 
+import fr.inria.zvtm.fits.HeatFilter;
 import fr.inria.zvtm.fits.NopFilter;
+import fr.inria.zvtm.fits.RainbowFilter;
 
 /**
  * Basic FITS image support. Use the IVOA FITS library internally.
@@ -74,6 +76,31 @@ public class FitsImage extends VImage {
         abstract int toIvoaValue();
     }
 
+    //Default color filters. For more control use
+    //FitsImage.setColorFilter(ImageFilter)
+    public enum ColorFilter {
+        HEAT{
+            private final ImageFilter INSTANCE = new HeatFilter();
+            @Override ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        RAINBOW{
+            private final ImageFilter INSTANCE = new RainbowFilter();
+            @Override ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        NOP{
+            private final ImageFilter INSTANCE = new NopFilter();
+            @Override ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        };
+
+        abstract ImageFilter getFilter();
+    }
+
     private final URL imgUrl;
 
     /**
@@ -117,9 +144,19 @@ public class FitsImage extends VImage {
         return imgUrl;
     }
 
+    /**
+     * Flexible version.
+     */
     public void setColorFilter(ImageFilter filter){
         this.filter = filter;
         recreateDisplayImage();
+    }
+
+    /**
+     * Preset defaults version.
+     */
+    public void setColorFilter(ColorFilter filter){
+        setColorFilter(filter.getFilter());
     }
 
     private void recreateDisplayImage(){
