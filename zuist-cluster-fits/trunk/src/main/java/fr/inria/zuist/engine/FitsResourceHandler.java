@@ -13,8 +13,9 @@ public class FitsResourceHandler implements ResourceHandler {
     public ResourceDescription createResourceDescription(
             long x, long y, String id, int zindex, Region region, 
             URL resourceURL, boolean sensitivity, Color stroke, String params){
-        //TODO scaleMethod (hardcoded to ASINH)
         float scaleFactor = 1;
+        FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.ASINH;
+
         if (params != null){
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
@@ -22,7 +23,11 @@ public class FitsResourceHandler implements ResourceHandler {
                     scaleFactor = Float.parseFloat(paramTokens[i].substring(SC_ID.length()));
                 }
                 else if (paramTokens[i].startsWith(SM_ID)){
-                    //TODO 
+                    try{
+                        scaleMethod = FitsImage.ScaleMethod.valueOf(paramTokens[i].substring(SM_ID.length()));
+                    } catch(IllegalArgumentException ignored){
+                        System.err.println("incorrect scale method, using default instead");
+                    }
                 }
                 else {
                     System.err.println("Uknown type of resource parameter: "+paramTokens[i]);
@@ -32,7 +37,7 @@ public class FitsResourceHandler implements ResourceHandler {
 
         FitsImageDescription desc = new FitsImageDescription(
                 id, x, y, zindex, resourceURL, region, 
-                scaleFactor, FitsImage.ScaleMethod.ASINH);
+                scaleFactor, scaleMethod);
         region.addObject(desc);
         return desc;             
             }
