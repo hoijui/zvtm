@@ -3,6 +3,7 @@
 #images are assumed to be rectangular, and image dimensions
 #should be powers of two. Image dimensions should be greater or
 #equal than tile_size.
+#this script depends on fitscopy (http://heasarc.nasa.gov/docs/software/fitsio/cexamples.html)
 
 import os.path
 import subprocess
