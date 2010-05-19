@@ -35,6 +35,7 @@ public class FitsImage extends VImage {
     //original image (dataset preserved)
     private final FITSImage fitsImage;
     private ImageFilter filter;
+    private ScaleMethod scaleMethod = ScaleMethod.LINEAR;
 
     static {
         IIORegistry.getDefaultInstance().
@@ -117,6 +118,7 @@ public class FitsImage extends VImage {
         filter = new NopFilter();
         //create compatible image and use this for display
         fitsImage = (FITSImage)(ImageIO.read(imgUrl));
+        fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         recreateDisplayImage();
     }
 
@@ -136,8 +138,13 @@ public class FitsImage extends VImage {
      * @param scaleMethod the new scale method.
      */
     public void setScaleMethod(ScaleMethod scaleMethod){
+            this.scaleMethod = scaleMethod;
             fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
             recreateDisplayImage();
+    }
+
+    public ScaleMethod getScaleMethod(){
+        return scaleMethod; 
     }
 
     public URL getImageLocation(){
@@ -157,6 +164,13 @@ public class FitsImage extends VImage {
      */
     public void setColorFilter(ColorFilter filter){
         setColorFilter(filter.getFilter());
+    }
+
+    /** 
+     * Returns the color filter used by this FitsImage
+     */
+    public ImageFilter getColorFilter(){
+        return filter;
     }
 
     private void recreateDisplayImage(){
