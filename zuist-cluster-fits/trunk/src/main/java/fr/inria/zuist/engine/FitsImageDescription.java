@@ -36,6 +36,20 @@ public class FitsImageDescription extends ResourceDescription {
         return FitsResourceHandler.RESOURCE_TYPE_FITS;
     }
 
+    public void setColorFilter(FitsImage.ColorFilter colorFilter){
+        this.colorFilter = colorFilter;
+        if(glyph != null){
+            glyph.setColorFilter(colorFilter);
+        }
+    }
+
+    public void setScaleMethod(FitsImage.ScaleMethod scaleMethod){
+        this.scaleMethod = scaleMethod;
+        if(glyph != null){
+            glyph.setScaleMethod(scaleMethod); 
+        }
+    }
+
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
         try{
             glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
