@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.HashMap;
@@ -259,6 +261,15 @@ public class SceneManager implements CameraListener {
         return RESOURCE_HANDLERS.get(rType);
     }
     
+
+    /**
+     * Gets an unmodifiable view of every ObjectDescription known 
+     * to this SceneManager
+     */
+    public Collection<ObjectDescription> getObjectDescriptions(){
+        return Collections.unmodifiableCollection(id2object.values());
+    }
+
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
     public void setOrigin(LongPoint p){
         origin = p;
