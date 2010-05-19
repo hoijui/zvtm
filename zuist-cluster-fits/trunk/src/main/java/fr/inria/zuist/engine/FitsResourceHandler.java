@@ -28,18 +28,18 @@ public class FitsResourceHandler implements ResourceHandler {
                     try{
                         scaleMethod = FitsImage.ScaleMethod.valueOf(paramTokens[i].substring(SM_ID.length()));
                     } catch(IllegalArgumentException ignored){
-                        System.err.println("incorrect scale method, using default instead");
+                        System.err.println("Incorrect scale method, using default instead");
                     }
                 }
                 else if (paramTokens[i].startsWith(CF_ID)){
                     try{
                         colorFilter = FitsImage.ColorFilter.valueOf(paramTokens[i].substring(CF_ID.length()));
                     } catch(IllegalArgumentException ignored){
-                        System.err.println("incorrect color filter, using default instead");
+                        System.err.println("Incorrect color filter, using default instead");
                     }
                 }
                 else {
-                    System.err.println("Uknown type of resource parameter: "+paramTokens[i]);
+                    System.err.println("Unknown type of resource parameter: "+paramTokens[i]);
                 }
             }            
         }
