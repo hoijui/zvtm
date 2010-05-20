@@ -202,7 +202,6 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
     }
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        System.err.println("keypress, event = " + e);
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
     	else if (code==KeyEvent.VK_HOME){application.getGlobalView(null);}
