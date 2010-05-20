@@ -70,35 +70,30 @@ public class PDFViewer {
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
-	void load(File f, float detailFactor){
-		try {
-			Document document = new Document();
-            try {
-                document.setFile(f.getAbsolutePath());
-            } catch (PDFException ex) {
-                System.out.println("Error parsing PDF document " + ex);
-            } catch (PDFSecurityException ex) {
-                System.out.println("Error encryption not supported " + ex);
-            } catch (FileNotFoundException ex) {
-                System.out.println("Error file not found " + ex);
-            } catch (IOException ex) {
-                System.out.println("Error handling PDF document " + ex);
-            }            
-            int page_width = (int)document.getPageDimension(0, 0).getWidth();
-            // Paint each pages content to an image and write the image to file
-            for (int i = 0; i < document.getNumberOfPages(); i++) {
-                IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0, document, i, detailFactor, 1.0f);
-                vs.addGlyph(g);
-            }
-            // clean up resources
-            document.dispose();
-		}
-		catch (Exception e) { 
-			e.printStackTrace();
-		}
-	}
+    void load(File f, float detailFactor){
+        Document document = new Document();
+        try {
+            document.setFile(f.getAbsolutePath());
+        } catch (PDFException ex) {
+            System.out.println("Error parsing PDF document " + ex);
+        } catch (PDFSecurityException ex) {
+            System.out.println("Error encryption not supported " + ex);
+        } catch (FileNotFoundException ex) {
+            System.out.println("Error file not found " + ex);
+        } catch (IOException ex) {
+            System.out.println("Error handling PDF document " + ex);
+        }
+        int page_width = (int)document.getPageDimension(0, 0).getWidth();
+        // Paint each pages content to an image and write the image to file
+        for (int i = 0; i < document.getNumberOfPages(); i++) {
+            IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0, document, i, detailFactor, 1.0f);
+            vs.addGlyph(g);
+        }
+        // clean up resources
+        document.dispose();
+    }
 
-	public static void main(String[] args){	    
+	public static void main(String[] args){
 	    System.getProperties().put("org.icepdf.core.screen.alphaInterpolation", RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
         System.getProperties().put("org.icepdf.core.screen.antiAliasing", RenderingHints.VALUE_ANTIALIAS_ON);
         System.getProperties().put("org.icepdf.core.screen.textAntiAliasing", RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
