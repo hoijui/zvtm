@@ -1,4 +1,6 @@
-
+Added FitsImageDescription params replication (scale factor, color map,
+  transfer function)
+Added dry-run and border draw options to the tiler script
 Added support for default color filters in zuist fits descriptions. 
 Added support for scale factor and scale method in zuist fits descriptions.
 
