@@ -13,10 +13,9 @@ from optparse import OptionParser
 DEFAULT_LEVEL_COUNT=3
 DEFAULT_TILE_SIZE=1024 #use power of two
 
-#TODO complete
-
 parser = OptionParser()
 parser.add_option("-d", "--dry-run", action="store_true", dest="dry_run", default=False, help="dry run (generate the scene xml description, but do not tile image)")
+parser.add_option("-b", "--draw-border", action="store_true", dest="draw_border", default=False, help="draw red borders around regions (for debug purposes)")
 options = None
 args = None
 
@@ -55,8 +54,9 @@ def print_zuist_resource_info(source_name, i, j, tile_width, tile_height, levels
     j: tile index in the y-axis
     """
     skip_factor = 2**(levels - level - 1)
+    stroke = options.draw_border and "stroke=red" or ""
     id="tile_level%d_%d_%d" % (level, i, j)
-    print "<region h=\"%d\" w=\"%d\" id=\"%s\" levels=\"%d\" x=\"%d\" y=\"%d\">" % (tile_height * skip_factor, tile_width * skip_factor, id, level, (i + 0.5) * tile_width * skip_factor, (-j - 0.5) * tile_height * skip_factor)
+    print "<region %s h=\"%d\" w=\"%d\" id=\"%s\" levels=\"%d\" x=\"%d\" y=\"%d\">" % (stroke, tile_height * skip_factor, tile_width * skip_factor, id, level, (i + 0.5) * tile_width * skip_factor, (-j - 0.5) * tile_height * skip_factor)
     print "<resource h=\"%d\" w=\"%d\" id=\"%s\" src=\"%s\" type=\"fits\" x=\"%d\" y=\"%d\" z-index=\"0\" params=\"sc=%d;sm=ASINH;cf=HEAT\"/>" % (tile_height, tile_width, id, source_name, (i+0.5) * tile_width * skip_factor, (-j - 0.5) * tile_height * skip_factor, skip_factor)
     print "</region>"
 
