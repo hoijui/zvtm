@@ -44,7 +44,7 @@ aspect FitsImageDescReplication {
                 rdesc.setReplicated(true);
                 FitsImageCreateDelta delta = new FitsImageCreateDelta(
                         id, sceneManager.getObjId(), rdesc.getObjId(),
-                        x,y,zindex,region.getObjId(), imageURL);
+                        x,y,zindex,region.getObjId(), imageURL, params);
                 VirtualSpaceManager.INSTANCE.sendDelta(delta);
             }
 
@@ -57,10 +57,11 @@ aspect FitsImageDescReplication {
         private final long y;
         private final int z;
         private final URL location;
+        private final String params;
 
         FitsImageCreateDelta(String id, ObjId<SceneManager> smId, 
                 ObjId<ResourceDescription> descId, long x, long y,
-                int z, ObjId<Region> regionId, URL location){
+                int z, ObjId<Region> regionId, URL location, String params){
             this.id = id;
             this.smId = smId;
             this.regionId = regionId;
@@ -69,14 +70,14 @@ aspect FitsImageDescReplication {
             this.y = y;
             this.z = z;
             this.location = location;
+            this.params = params;
         }
 
         public void apply(SlaveUpdater su){
             SceneManager sm = su.getSlaveObject(smId);
             Region region = su.getSlaveObject(regionId);
-            //TODO params 
             ResourceDescription desc = sm.createResourceDescription(x,y,id,z,region,
-                    location,FitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.BLACK,"");
+                    location,FitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.BLACK,params);
             su.putSlaveObject(descId, desc);
         }
     }
