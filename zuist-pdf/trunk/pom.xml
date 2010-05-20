@@ -11,7 +11,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
   <artifactId>zuist-pdf</artifactId>
   <packaging>jar</packaging>
   <name>ZUIST-PDF</name>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.2.0</version>
   <description>This package adds PDF rendering support for ZUIST, a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to develop multi-scale interfaces in which objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera. Multi-scale scenes can be built through the ZUIST API (see javadoc) or can be loaded from files using a dedicated XML vocabulary.</description>
   <url>http://zvtm.sourceforge.net/zuist/</url>
   <licenses>
@@ -55,12 +55,12 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
-      <version>0.3.0-SNAPSHOT</version>
+      <version>[0.3.0,)</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-pdf</artifactId>
-      <version>[0.2.0-SNAPSHOT,)</version>
+      <version>[0.2.0,)</version>
     </dependency>
   </dependencies>
   
