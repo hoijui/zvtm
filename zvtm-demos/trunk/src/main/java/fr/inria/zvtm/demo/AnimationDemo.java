@@ -306,32 +306,6 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 				     IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
-	// composite 1
-	if (composite1.vx != COL1_X || composite1.vy != ROW3_Y){
-	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, composite1, new LongPoint(COL1_X, ROW3_Y), false,
-					IdentityInterpolator.getInstance(), null);
-	    vsm.getAnimationManager().startAnimation(anim, false);
-	}
-	if (composite1.getSize() != COMPOSITE_SIZE){
-	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphSizeAnim(500, composite1, COMPOSITE_SIZE, false,
-				     IdentityInterpolator.getInstance(), null);
-	    vsm.getAnimationManager().startAnimation(anim, false);
-	}
-	// composite 2
-	if (composite2.vx != COL2_X || composite2.vy != ROW3_Y){
-	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, composite2, new LongPoint(COL2_X, ROW3_Y), false,
-					IdentityInterpolator.getInstance(), null);
-	    vsm.getAnimationManager().startAnimation(anim, false);
-	}
-	if (composite2.getSize() != COMPOSITE_SIZE){
-	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphSizeAnim(500, composite2, COMPOSITE_SIZE, false,
-				     IdentityInterpolator.getInstance(), null);
-	    vsm.getAnimationManager().startAnimation(anim, false);
-	}
 	// segment
 	if (segment.vx != COL3_X || segment.vy != ROW3_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
@@ -362,7 +336,6 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     static final float ROTATE_DATA = -4*(float)Math.PI;
 
     void rotate(Glyph g, int d){
-	if (g.getCGlyph() != null){g = g.getCGlyph();}
 	switch(cmdPanel.getPacingFunction()){
 	case PACING_FUNCTION_LIN:{
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
@@ -393,7 +366,6 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     /* ------------------     SIZE    ------------------------ */
 
     void resize(Glyph g, int d){
-	if (g.getCGlyph() != null){g = g.getCGlyph();}
 	switch(cmdPanel.getPacingFunction()){
 	case PACING_FUNCTION_LIN:{
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
@@ -424,7 +396,6 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     static final LongPoint TRANSLATE_DATA = new LongPoint(100, 50);
 
     void translate(Glyph g, int d){
-	if (g.getCGlyph() != null){g = g.getCGlyph();}
 	switch(cmdPanel.getPacingFunction()){
 	case PACING_FUNCTION_LIN:{
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
@@ -650,8 +621,8 @@ class AnimationDemoEventHandler implements ViewEventHandler {
 	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 		underCursor = getGlyph(v.getMouse());
 		if (underCursor != null){
-			application.mSpace.onTop((underCursor.getCGlyph() != null) ? underCursor.getCGlyph() : underCursor);
-			v.getVCursor().stickGlyph((underCursor.getCGlyph() != null) ? underCursor.getCGlyph() : underCursor);
+			application.mSpace.onTop(underCursor);
+			v.getVCursor().stickGlyph(underCursor);
 		}
 	}
 

@@ -339,50 +339,6 @@ public class Introduction {
 	float[] vs={1f,0.4f,1f,0.4f,0.8f,0.5f,0.3f,1f};
 	VShape s1=new VShape(-400,-900,0,100,vs,ANIM_OBJECT_COLOR,0);vs1.addGlyph(s1);s1.setType("an");
 
-	//will be the primary glyph of a CGlyph
-	VRectangleOr cg1=new VRectangleOr(-400,-1200,0,200,100,Color.black,0);
-	//and 4 secondary glyphs (init coordinates of secondary glyphs do not matter as they will be changed to match the position offset defined in the associated SGlyph)
-	VTriangleOr cg2=new VTriangleOr(0,0,0,50,Color.black,0);
-	VRectangleOr cg3=new VRectangleOr(0,0,0,50,50,Color.black,Color.BLACK,0.404f, 0.5f);
-	VTriangleOr cg4=new VTriangleOr(0,0,0,50,Color.black,Color.BLACK,0.404f, 0.5f);
-	VRectangleOr cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
-	vs1.addGlyph(cg1);vs1.addGlyph(cg2);vs1.addGlyph(cg3);vs1.addGlyph(cg4);vs1.addGlyph(cg5);
-	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
-	cg1.setColor(Introduction.ANIM_OBJECT_COLOR);
-	cg2.setColor(Introduction.ANIM_OBJECT_COLOR);
-	cg3.setColor(Introduction.ANIM_BUTTON_COLOR);
-	cg4.setColor(Introduction.ANIM_OBJECT_COLOR);
-	cg5.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
-	SGlyph[] sgs={
-	    new SGlyph(cg2,200,0,SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(cg3,0,100,SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(cg4,-200,0,SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(cg5,0,-100,SGlyph.FULL_ROTATION,SGlyph.RESIZE)
-	};
-	CGlyph cg=new CGlyph(cg1,sgs);
-
-
-	//will be the primary glyph of a CGlyph
-	cg1=new VRectangleOr(-400,-1600,0,200,100,Color.black,0);
-	//and 4 secondary glyphs (init coordinates of secondary glyphs do not matter as they will be changed to match the position offset defined in the associated SGlyph)
-	cg2=new VTriangleOr(0,0,0,50,Color.black,0);
-	cg3=new VRectangleOr(0,0,0,50,50,Color.black,Color.BLACK,0.404f, 0.5f);
-	cg4=new VTriangleOr(0,0,0,50,Color.black,Color.BLACK, 0.404f, 0.5f);
-	cg5=new VRectangleOr(0,0,0,50,50,Color.black,0);
-	vs1.addGlyph(cg1);vs1.addGlyph(cg2);vs1.addGlyph(cg3);vs1.addGlyph(cg4);vs1.addGlyph(cg5);
-	cg1.setType("an");cg2.setType("an");cg3.setType("an");cg4.setType("an");cg5.setType("an");
-	cg1.setColor(Introduction.ANIM_OBJECT_COLOR);
-	cg2.setColor(Introduction.ANIM_OBJECT_COLOR);
-	cg3.setColor(Introduction.ANIM_BUTTON_COLOR);
-	cg4.setColor(Introduction.ANIM_OBJECT_COLOR);
-	cg5.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
-	SGlyph[] sgs2={
-	    new SGlyph(cg2,200,0,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(cg3,0,100,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(cg4,-200,0,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(cg5,0,-100,SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
-	};
-	cg=new CGlyph(cg1,sgs2);
 	reveal(true);
     }
 
@@ -441,6 +397,7 @@ public class Introduction {
 	vs2.addCamera();
 	Vector vc1=new Vector();vc1.add(vs1.getCamera(0));vc1.add(vsm.getVirtualSpace(VS_2).getCamera(0));
 	vsm.addFrameView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
+	demoView = vsm.getView("Demo");
 	demoView.setLocation(IntroPanel.PANEL_WIDTH, 0);
 	eh=new MultiLayerEvtHdlr(this);
 	demoView.setEventHandler(eh, 0);
@@ -565,12 +522,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	try {
 	    Glyph g=v.lastGlyphEntered();
 	    if (g!=null && g.getType().equals("an")){
-		if (g.getCGlyph()!=null){
-		    v.getVCursor().stickGlyph(g.getCGlyph());
-		}
-		else {
 		    v.getVCursor().stickGlyph(g);
-		}
 	    }
 	}
 	catch (NullPointerException ex){}
@@ -587,8 +539,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	if ((a=v.lastGlyphEntered())!=null){
 	    String t=a.getType();
 	    if (t.equals("an")){
-		if (a.getCGlyph()!=null){application.animate(a.getCGlyph());}
-		else {application.animate(a);}
+		    application.animate(a);
 	    }
 	    else if (t.equals("orient")){
 		if (application.animType.equals("orient")){
@@ -791,13 +742,8 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 	try {
 	    Glyph g=v.lastGlyphEntered();
 	    if (g!=null){
-		if (g.getCGlyph()!=null){
-		    v.getVCursor().stickGlyph(g.getCGlyph());
-		}
-		else {
 		    v.getVCursor().stickGlyph(g);
 		    application.vsm.getVirtualSpace("vs1").onTop(g);
-		}
 	    }
 	}
 	catch (NullPointerException ex){}
