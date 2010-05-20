@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id$
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-demos</artifactId>
+  <packaging>jar</packaging>
+  <name>ZVTM Demos</name>
+  <version>0.10.0</version>
+  <description>The ZVTM is a Zoomable User Interface (ZUI) toolkit implemented in Java, designed to ease the task of creating complex visual editors in which large amounts of objects have to be displayed, or which contain complex geometrical shapes that need to be animated. It is based on the metaphor of universes that can be observed through smart movable/zoomable cameras, and offers features such as perceptual continuity in object animations and camera movements, which should make the end-user's overall experience more pleasing.</description>
+  <url>http://zvtm.sourceforge.net</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+  </scm>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+  
+  <!-- Distribution - Deploy to FTP -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+  
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm</artifactId>
+      <version>(,0.10.0]</version>
+    </dependency>
+  </dependencies>
+  
+  <!-- Build -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zvtm.demo.Introduction</mainClass>
+              <packageName>fr.inria.zvtm.demo</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+       </plugin>
+    </plugins>
+  </build>
+  
+</project>
