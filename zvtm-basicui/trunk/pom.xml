@@ -54,7 +54,7 @@ $Id$
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>0.10.0</version>
+      <version>[0.10.0,)</version>
     </dependency>
   </dependencies>
   
