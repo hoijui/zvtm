@@ -11,7 +11,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
   <artifactId>zuist-pdf</artifactId>
   <packaging>jar</packaging>
   <name>ZUIST-PDF</name>
-  <version>0.1.0</version>
+  <version>0.2.0-SNAPSHOT</version>
   <description>This package adds PDF rendering support for ZUIST, a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to develop multi-scale interfaces in which objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera. Multi-scale scenes can be built through the ZUIST API (see javadoc) or can be loaded from files using a dedicated XML vocabulary.</description>
   <url>http://zvtm.sourceforge.net/zuist/</url>
   <licenses>
@@ -60,20 +60,8 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-pdf</artifactId>
-      <version>0.1.0</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
-	<!--
-
-		SwingLab's PRDFRenderer is not available in any Maven repository.
-		Build it and install the JAR file in your local repository using the following command line:
-	        mvn install:install-file -Dfile=PDFRenderer.jar -DgroupId=com.sun.pdfrenderer -DartifactId=pdfRenderer -Dversion=1.0 -Dpackaging=jar	
-
-	-->
-	<dependency>
-		<groupId>com.sun.pdfrenderer</groupId>
-		<artifactId>pdfRenderer</artifactId>
-		<version>1.0</version>
-	</dependency>
   </dependencies>
   
   <!-- Build -->

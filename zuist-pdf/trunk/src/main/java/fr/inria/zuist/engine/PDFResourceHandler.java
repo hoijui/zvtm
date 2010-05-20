@@ -20,8 +20,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import com.sun.pdfview.PDFFile;
-import com.sun.pdfview.PDFPage;
+import org.icepdf.core.pobjects.Document;
 
 /** ResourceHandler implementation for PDF documents.
  *@author Emmanuel Pietriga
@@ -36,6 +35,8 @@ public class PDFResourceHandler implements ResourceHandler {
     public static final String _pg = "pg=";
     /** Scale factor */
     public static final String _sc = "sc=";
+    /** Detail factor */
+    public static final String _df = "df=";
     
     /* PDFFile cache management */
     static HashMap URL_2_PDF_FILE = new HashMap();
@@ -51,25 +52,26 @@ public class PDFResourceHandler implements ResourceHandler {
         return URL_2_PDF_FILE.size();
     }
     
-    public static PDFFile getPDF(URL pdfURL){
+    public static Document getDocument(URL pdfURL){
         synchronized(URL_2_PDF_FILE){
-            PDFFile pf = null;
+            Document pf = null;
 			int n;
             if (URL_2_PDF_FILE.containsKey(pdfURL)){
-                pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
+                pf = (Document)URL_2_PDF_FILE.get(pdfURL);
             }
             else {
                 try {
 					InputStream is = pdfURL.openStream();					
-					byte[] buffer = new byte[4096];
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					while ((n = is.read(buffer)) != -1) {
-						baos.write(buffer, 0, n);
-					}
-					is.close();
-					
-        			ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
-        			pf = new PDFFile(buf);
+					//byte[] buffer = new byte[4096];
+					//ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					//while ((n = is.read(buffer)) != -1) {
+					//	baos.write(buffer, 0, n);
+					//}
+					//is.close();
+					//
+        			//ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
+        			pf = new Document();
+        			pf.setInputStream(is, pdfURL.toString());
                     URL_2_PDF_FILE.put(pdfURL, pf);
                 }
                 catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
@@ -78,32 +80,32 @@ public class PDFResourceHandler implements ResourceHandler {
         }
     }
     
-    public static PDFPage getPage(URL pdfURL, int page) {
-        synchronized(URL_2_PDF_FILE){
-            PDFFile pf = null;
-			int n;
-            if (URL_2_PDF_FILE.containsKey(pdfURL)){
-                pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
-            }
-            else {
-                try {    
-        			InputStream is = pdfURL.openStream();					
-					byte[] buffer = new byte[4096];
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					while ((n = is.read(buffer)) != -1) {
-						baos.write(buffer, 0, n);
-					}
-					is.close();
-					
-        			ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
-        			pf = new PDFFile(buf);
-                    URL_2_PDF_FILE.put(pdfURL, pf);
-                }
-                catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
-            }
-            return (pf != null && page <= pf.getNumPages()) ? pf.getPage(page) : null;
-        }
-    }
+    //public static PDFPage getPage(URL pdfURL, int page) {
+    //    synchronized(URL_2_PDF_FILE){
+    //        PDFFile pf = null;
+	//		int n;
+    //        if (URL_2_PDF_FILE.containsKey(pdfURL)){
+    //            pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
+    //        }
+    //        else {
+    //            try {    
+    //    			InputStream is = pdfURL.openStream();					
+	//				byte[] buffer = new byte[4096];
+	//				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	//				while ((n = is.read(buffer)) != -1) {
+	//					baos.write(buffer, 0, n);
+	//				}
+	//				is.close();
+	//				
+    //    			ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
+    //    			pf = new PDFFile(buf);
+    //                URL_2_PDF_FILE.put(pdfURL, pf);
+    //            }
+    //            catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
+    //        }
+    //        return (pf != null && page <= pf.getNumPages()) ? pf.getPage(page) : null;
+    //    }
+    //}
     
     /* PDF Resource Handler */
 
@@ -113,7 +115,8 @@ public class PDFResourceHandler implements ResourceHandler {
                                                         URL resourceURL, boolean sensitivity, Color stroke, String params){
         Object im = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         int page = 1;
-        double scale = 1.0;
+        float scale = 1f;
+        float detail = 1f;
         if (params != null){
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
@@ -121,7 +124,10 @@ public class PDFResourceHandler implements ResourceHandler {
                     page = Integer.parseInt(paramTokens[i].substring(3));
                 }
                 else if (paramTokens[i].startsWith(PDFResourceHandler._sc)){
-                    scale = Double.parseDouble(paramTokens[i].substring(3));
+                    scale = Float.parseFloat(paramTokens[i].substring(3));
+                }
+                else if (paramTokens[i].startsWith(PDFResourceHandler._df)){
+                    detail = Float.parseFloat(paramTokens[i].substring(3));
                 }
                 else if (paramTokens[i].startsWith(SceneManager._im)){
                     im = SceneManager.parseInterpolation(params.substring(3));
@@ -131,7 +137,7 @@ public class PDFResourceHandler implements ResourceHandler {
                 }
             }            
         }
-        PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, scale, resourceURL, page, stroke, im, region);
+        PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, detail, scale, resourceURL, page, stroke, im, region);
         pdfd.setSensitive(sensitivity);
         region.addObject(pdfd);
         return pdfd;

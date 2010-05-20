@@ -16,7 +16,6 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -62,7 +61,7 @@ import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.glyphs.ZPDFPageImg;
+import fr.inria.zvtm.glyphs.IcePDFPageImg;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -73,8 +72,9 @@ import fr.inria.zuist.engine.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.PDFResourceHandler;
 
-import com.sun.pdfview.PDFPage;
-import com.sun.pdfview.PDFFile;
+import org.icepdf.core.pobjects.Document;
+import org.icepdf.core.pobjects.PDimension;
+
 
 /**
  * @author Emmanuel Pietriga
@@ -194,21 +194,21 @@ public class PDFViewer {
         sm.enableRegionUpdater(false);
 		try {
     		URL pdfURL = pdfFile.toURI().toURL();
-    		PDFFile pf = PDFResourceHandler.getPDF(pdfURL);
-    		float[] alts = new float[pf.getNumPages()];
-    		Rectangle2D bbox = PDFResourceHandler.getPage(pdfURL, 0).getBBox();
+    		Document pf = PDFResourceHandler.getDocument(pdfURL);
+    		float[] alts = new float[pf.getNumberOfPages()];
+    		PDimension bbox = pf.getPageDimension(0, 0);
     		alts[0] = 0;
     		Region prevRegion = null;
     		// all but last level
-    		for (int i=0;i<pf.getNumPages()-1;i++){
-    		    int depth = pf.getNumPages() - i - 1;
+    		for (int i=0;i<pf.getNumberOfPages()-1;i++){
+    		    int depth = pf.getNumberOfPages() - i - 1;
     		    alts[i+1] = Camera.DEFAULT_FOCAL * (float)Math.pow(2, i+1) - Camera.DEFAULT_FOCAL;
                 sm.createLevel(depth, alts[i+1], alts[i]);
                 Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i)), Math.round(bbox.getHeight()*Math.pow(2, i)), depth, depth,
                                 "R"+String.valueOf(depth+1), "Page "+String.valueOf(depth+1),
-                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
+                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.RED);
                 sm.createResourceDescription(0, 0, "P"+String.valueOf(depth+1), 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
-                                             false, Color.BLACK, "im=bilinear;pg="+(depth+1)+";sc="+Math.pow(2, i));
+                                             false, Color.BLACK, "im=bilinear;pg="+(depth)+";sc="+Math.pow(2, i));
                 if (prevRegion != null){
                     prevRegion.setContainingRegion(r);
                     r.addContainedRegion(prevRegion);
@@ -216,16 +216,16 @@ public class PDFViewer {
                 prevRegion = r;
     		}
     		// last level
-    		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumPages()-1]);
-		    Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumPages()-1)), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumPages()-1)), 0, 0,
-                                       "R1", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
+    		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumberOfPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumberOfPages()-1]);
+		    Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumberOfPages()-1)), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumberOfPages()-1)), 0, 0,
+                                       "R1", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.RED);
             sm.createResourceDescription(0, 0, "P1", 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
-                                         false, Color.BLACK, "im=bilinear;pg=1;sc="+Math.pow(2, pf.getNumPages()-1));
+                                         false, Color.BLACK, "im=bilinear;pg=0;sc="+Math.pow(2, pf.getNumberOfPages()-1));
             if (prevRegion != null){
                 r.addContainedRegion(prevRegion);
                 prevRegion.setContainingRegion(r);
             }
-                            
+            pf.dispose();               
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
 		// important SM init calls
