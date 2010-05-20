@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -33,8 +33,6 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 import org.icepdf.core.pobjects.Document;
-
-//import com.sun.pdfview.PDFPage;
 
 /** Description of image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -141,11 +139,11 @@ public class PDFPageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
-        loadTask = pageLoader.submit(new PageLoadTask(vs, fadeIn)); 
+        loadTask = pageLoader.submit(new PageLoadTask(vs, fadeIn));
     }
     
-    private void finishCreatingObject(final VirtualSpace vs, Document doc, VRectProgress vrp, boolean fadeIn){
-        glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);
+    private void finishCreatingObject(final VirtualSpace vs, final Document doc, VRectProgress vrp, boolean fadeIn){
+        glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);        
         if (strokeColor != null){
             glyph.setBorderColor(strokeColor);
             glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
@@ -164,8 +162,8 @@ public class PDFPageDescription extends ResourceDescription {
                         vs.addGlyph(glyph);
                     }
                 });
-            }  catch(InterruptedException ie){ /* swallow */ }
-            catch(InvocationTargetException ite){ /* swallow */ }
+            }  catch(InterruptedException ie){/* swallow */ }
+            catch(InvocationTargetException ite){/* swallow */ }
 
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
@@ -207,7 +205,6 @@ public class PDFPageDescription extends ResourceDescription {
         catch(ExecutionException ee){ /* swallow */ }
 
         if (glyph != null){
-            System.out.println("Destroying page"+page);
             if (fadeOut){
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));

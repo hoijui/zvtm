@@ -35,6 +35,7 @@ import javax.swing.JFrame;
 import javax.swing.ImageIcon;
 import java.awt.Container;
 import javax.swing.KeyStroke;
+import java.awt.RenderingHints;
 
 import java.util.Vector;
 import java.util.HashMap;
@@ -74,7 +75,6 @@ import fr.inria.zuist.engine.PDFResourceHandler;
 
 import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.pobjects.PDimension;
-
 
 /**
  * @author Emmanuel Pietriga
@@ -129,6 +129,15 @@ public class PDFViewer {
 		    }
 		}
 		getGlobalView(new EndAction(){
+               public void execute(Object subject, Animation.Dimension dimension){
+                   sm.setUpdateLevel(true);
+                   sm.enableRegionUpdater(true);
+               }
+           });
+    }
+    
+    void finish(){
+        getGlobalView(new EndAction(){
                public void execute(Object subject, Animation.Dimension dimension){
                    sm.setUpdateLevel(true);
                    sm.enableRegionUpdater(true);
@@ -206,7 +215,7 @@ public class PDFViewer {
                 sm.createLevel(depth, alts[i+1], alts[i]);
                 Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, i)), Math.round(bbox.getHeight()*Math.pow(2, i)), depth, depth,
                                 "R"+String.valueOf(depth+1), "Page "+String.valueOf(depth+1),
-                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.RED);
+                                0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
                 sm.createResourceDescription(0, 0, "P"+String.valueOf(depth+1), 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
                                              false, Color.BLACK, "im=bilinear;pg="+(depth)+";sc="+Math.pow(2, i));
                 if (prevRegion != null){
@@ -218,14 +227,14 @@ public class PDFViewer {
     		// last level
     		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumberOfPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumberOfPages()-1]);
 		    Region r = sm.createRegion(0, 0, Math.round(bbox.getWidth()*Math.pow(2, pf.getNumberOfPages()-1)), Math.round(bbox.getHeight()*Math.pow(2, pf.getNumberOfPages()-1)), 0, 0,
-                                       "R1", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, Color.RED);
+                                       "R1", "Page 1", 0, TRANSITIONS, Region.ORDERING_ARRAY, true, null, null);
             sm.createResourceDescription(0, 0, "P1", 0, r, pdfURL, PDFResourceHandler.RESOURCE_TYPE_PDF,
                                          false, Color.BLACK, "im=bilinear;pg=0;sc="+Math.pow(2, pf.getNumberOfPages()-1));
             if (prevRegion != null){
                 r.addContainedRegion(prevRegion);
                 prevRegion.setContainingRegion(r);
             }
-            pf.dispose();               
+            //pf.dispose();               
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
 		// important SM init calls
@@ -323,6 +332,16 @@ public class PDFViewer {
     }
 
     public static void main(String[] args){
+        System.getProperties().put("org.icepdf.core.screen.alphaInterpolation", RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+        System.getProperties().put("org.icepdf.core.screen.antiAliasing", RenderingHints.VALUE_ANTIALIAS_ON);
+        System.getProperties().put("org.icepdf.core.screen.textAntiAliasing", RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        System.getProperties().put("org.icepdf.core.screen.colorRender", RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+        System.getProperties().put("org.icepdf.core.screen.dither", RenderingHints.VALUE_DITHER_ENABLE);
+        System.getProperties().put("org.icepdf.core.screen.fractionalmetrics", RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        System.getProperties().put("org.icepdf.core.screen.interpolation", RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        System.getProperties().put("org.icepdf.core.screen.render", RenderingHints.VALUE_RENDER_QUALITY);
+        System.getProperties().put("org.icepdf.core.screen.stroke", RenderingHints.VALUE_STROKE_PURE);
+	    
         File inputFile = null;
 		boolean fs = false;
 		boolean ogl = false;

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -13,14 +13,11 @@ import java.awt.RenderingHints;
 import java.util.HashMap;
 
 import java.net.URL;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-
+import java.io.IOException;
 import org.icepdf.core.pobjects.Document;
+
+import org.icepdf.core.exceptions.PDFException;
+import org.icepdf.core.exceptions.PDFSecurityException;
 
 /** ResourceHandler implementation for PDF documents.
  *@author Emmanuel Pietriga
@@ -38,74 +35,19 @@ public class PDFResourceHandler implements ResourceHandler {
     /** Detail factor */
     public static final String _df = "df=";
     
-    /* PDFFile cache management */
-    static HashMap URL_2_PDF_FILE = new HashMap();
-    
-    public static void emptyCache(){
-        synchronized(URL_2_PDF_FILE){
-            URL_2_PDF_FILE.clear();
-        }
-        System.gc();
-    }
-    
-    public static int getCacheEntryCount(){
-        return URL_2_PDF_FILE.size();
-    }
-    
     public static Document getDocument(URL pdfURL){
-        synchronized(URL_2_PDF_FILE){
-            Document pf = null;
-			int n;
-            if (URL_2_PDF_FILE.containsKey(pdfURL)){
-                pf = (Document)URL_2_PDF_FILE.get(pdfURL);
-            }
-            else {
-                try {
-					InputStream is = pdfURL.openStream();					
-					//byte[] buffer = new byte[4096];
-					//ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					//while ((n = is.read(buffer)) != -1) {
-					//	baos.write(buffer, 0, n);
-					//}
-					//is.close();
-					//
-        			//ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
-        			pf = new Document();
-        			pf.setInputStream(is, pdfURL.toString());
-                    URL_2_PDF_FILE.put(pdfURL, pf);
-                }
-                catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
-            }
-            return pf;
+        Document document = new Document();
+        try {
+            document.setInputStream(pdfURL.openStream(), pdfURL.toString());
+        } catch (PDFException ex) {
+            System.out.println("Error parsing PDF document " + ex);
+        } catch (PDFSecurityException ex) {
+            System.out.println("Error encryption not supported " + ex);
+        } catch (IOException ex) {
+            System.out.println("Error handling PDF document " + ex);
         }
+        return document;
     }
-    
-    //public static PDFPage getPage(URL pdfURL, int page) {
-    //    synchronized(URL_2_PDF_FILE){
-    //        PDFFile pf = null;
-	//		int n;
-    //        if (URL_2_PDF_FILE.containsKey(pdfURL)){
-    //            pf = (PDFFile)URL_2_PDF_FILE.get(pdfURL);
-    //        }
-    //        else {
-    //            try {    
-    //    			InputStream is = pdfURL.openStream();					
-	//				byte[] buffer = new byte[4096];
-	//				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	//				while ((n = is.read(buffer)) != -1) {
-	//					baos.write(buffer, 0, n);
-	//				}
-	//				is.close();
-	//				
-    //    			ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
-    //    			pf = new PDFFile(buf);
-    //                URL_2_PDF_FILE.put(pdfURL, pf);
-    //            }
-    //            catch (Exception ex){System.err.println("Error reading PDF file at "+pdfURL.toString());}
-    //        }
-    //        return (pf != null && page <= pf.getNumPages()) ? pf.getPage(page) : null;
-    //    }
-    //}
     
     /* PDF Resource Handler */
 
