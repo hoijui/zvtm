@@ -180,11 +180,11 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         <configuration>
           <aggregate>true</aggregate>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
-          <bottom><![CDATA[Copyright &#169; 2008-2009 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <bottom><![CDATA[Copyright &#169; 2008-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
           <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
             <link>http://zvtm.sourceforge.net/apidocs</link>
-            <link>https://pdf-renderer.dev.java.net/nonav/demos/latest/javadoc</link>
+			<link>http://www.icepdf.org/docs/v4_0_0/core/javadocs</link>
           </links>
         </configuration>
       </plugin>
