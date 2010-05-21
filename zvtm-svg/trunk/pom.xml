@@ -126,6 +126,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
           <bottom><![CDATA[<i>Copyright &#169; 2000-2002 Xerox Corporation. All Rights Reserved<br />Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs/</link>
           </links>
         </configuration>
       </plugin>
