@@ -52,7 +52,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
         try{
-            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
+            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,true);
         } catch(IOException ioe){
             throw new Error("Could not create FitsImage");
         }
