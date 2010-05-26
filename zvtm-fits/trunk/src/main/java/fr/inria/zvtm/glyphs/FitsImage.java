@@ -42,6 +42,9 @@ public class FitsImage extends VImage {
             registerServiceProvider(new FITSReaderSpi());
     }
 
+    /**
+     * Scale methods (transfer functions).
+     */
     public enum ScaleMethod {
         ASINH {
             @Override int toIvoaValue(){
@@ -77,8 +80,10 @@ public class FitsImage extends VImage {
         abstract int toIvoaValue();
     }
 
-    //Default color filters. For more control use
-    //FitsImage.setColorFilter(ImageFilter)
+    /** 
+     * Default color filters. For more control use
+     * FitsImage.setColorFilter(ImageFilter).
+     */
     public enum ColorFilter {
         HEAT{
             private final ImageFilter INSTANCE = new HeatFilter();
@@ -111,15 +116,34 @@ public class FitsImage extends VImage {
      * @param z z-index
      * @param imgUrl image location
      * @param scaleFactor scale factor
+     * @param useDataMinMax use the FITS header items DATAMIN and DATAMAX to
+     * scale images (will produce a blank image if undefined).
      */
-    public FitsImage(long x, long y, int z, URL imgUrl, float scaleFactor) throws IOException {
+    public FitsImage(long x, long y, int z, URL imgUrl, float scaleFactor,
+            boolean useDataMinMax) throws IOException {
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
         filter = new NopFilter();
         //create compatible image and use this for display
         fitsImage = (FITSImage)(ImageIO.read(imgUrl));
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
+        if(useDataMinMax){
+            try{
+                double min = fitsImage.getImageHDU().getMinimumValue();
+                double max = fitsImage.getImageHDU().getMaximumValue();
+                fitsImage.rescale(min, max, min/2. + max/2.); 
+            } catch (Exception fe){
+                System.err.println("image rescale failed: " + fe);
+            }
+        }
         recreateDisplayImage();
+    }
+
+    /**
+     * Creates a new FitsImage
+     */
+    public FitsImage(long x, long y, int z, URL imgUrl, float scaleFactor) throws IOException{
+        this(x,y,z,imgUrl,scaleFactor,false);
     }
 
     /**
@@ -129,7 +153,7 @@ public class FitsImage extends VImage {
      * @param z z-index
      * @param imgUrl image location
      */
-    public FitsImage(long x, long y, int z, URL imgUrl) throws IOException {
+    public FitsImage(long x, long y, int z, URL imgUrl) throws IOException{
         this(x,y,z,imgUrl,1);
     }
 
