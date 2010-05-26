@@ -17,7 +17,6 @@ public abstract class EdgeAppearance {
 	protected NTEdge edge;
 	protected AnimationManager animManager;
 	protected VirtualSpace vs;
-//	protected Color color;
 	protected long amount = 1;
 	protected int index = 0;
 

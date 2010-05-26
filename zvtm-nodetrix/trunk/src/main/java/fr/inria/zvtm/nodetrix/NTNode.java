@@ -36,7 +36,7 @@ public class NTNode extends LinLogNode{
     /** relative offset of horizontal and vertical labels w.r.t matrix's center*/
 	long wdx, wdy, ndx, ndy;
 	/** stores the matrix centre coordinates*/
-	long mx, my; 
+	long matrixX, matrixY; 
 	/** Vertical label, can be null if matrix contains this node only */
 	VTextOr labelN;
 	/** Horizontal label */
@@ -98,7 +98,7 @@ public class NTNode extends LinLogNode{
 	    this.backgroundColor = colour;
 	    this.single = single;
 	    
-	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, getName(), (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
+	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    	labelW.setSensitivity(false);
 	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
 	    	gBackgroundW.setDrawBorder(false);
@@ -115,7 +115,7 @@ public class NTNode extends LinLogNode{
 	    	vs.addGlyph(gSensitiveW);
 	    
 		    if (!single){
-	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    	labelN.setSensitivity(false);
 	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
 	    	    gBackgroundN.setDrawBorder(false);
@@ -133,7 +133,7 @@ public class NTNode extends LinLogNode{
     
     public void moveTo(long mx, long my){
         gBackgroundW.moveTo(mx+wdx, my+wdy);
-        this.mx = mx; this.my = my;
+        this.matrixX = mx; this.matrixY = my;
         if (gBackgroundN != null)	gBackgroundN.moveTo(mx+ndx, my+ndy);            
     }
 	
@@ -151,8 +151,8 @@ public class NTNode extends LinLogNode{
 	
 
     public void matrixMoved(long mx, long my){
-    	this.mx += mx; 
-    	this.my += my;
+    	this.matrixX += mx; 
+    	this.matrixY += my;
     	gBackgroundW.move(mx, my);
         if (gBackgroundN != null)	gBackgroundN.move(mx,my);        
     }
@@ -261,9 +261,9 @@ public class NTNode extends LinLogNode{
 //    	if(newInteractionState == interactionState) return;
 
     	if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) highlight(NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) highlight(ProjectColors.NODE_BACKGROUND_HIGHLIGHT);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(NodeTrixViz.COLOR_MATRIX_NODE_RELATED_COLOR);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(ProjectColors.NODE_RELATED_HIGHLIGHT);
 	    else reset();
 	    
         interactionState = newInteractionState;
@@ -271,7 +271,7 @@ public class NTNode extends LinLogNode{
     
     public void reset()
     {
-    	System.out.println("[NTNODE] RESET " + this.name);
+//    	System.out.println("[NTNODE] RESET " + this.name);
     	
 		//COLOR
 		gBackgroundW.setColor(backgroundColor);
@@ -293,7 +293,7 @@ public class NTNode extends LinLogNode{
     
     private void highlight(Color c)
     {
-    	System.out.println("[NTNODE] HIGHLIGHT " + this.name);
+    	//System.out.println("[NTNODE] HIGHLIGHT " + this.name);
 
 //    	boolean oldNorth = this.permanentNorth;
 //    	boolean oldWest = this.permanentWest;
@@ -366,7 +366,7 @@ public class NTNode extends LinLogNode{
 		this.gBackgroundW.setWidth(widthHalf);
 		gSensitiveW.setWidth(widthHalf-2);
 		
-		System.out.println("[NODE] " + this.widthHalf);
+//		System.out.println("[NODE] " + this.widthHalf);
 		if (!this.single){
 			this.gBackgroundW.move(-widthHalf, 0);
 			this.labelW.move(widthHalf, 0);

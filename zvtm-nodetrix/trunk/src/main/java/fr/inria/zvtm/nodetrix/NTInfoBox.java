@@ -47,7 +47,7 @@ public class NTInfoBox {
 		
 		//title
 		long currentRowIntend = -INFO_BOX_PADDING*2;
-		gTitle = new VText(INFO_BOX_PADDING, currentRowIntend+3, 0, Color.black.darker(), node.getName());
+		gTitle = new VText(INFO_BOX_PADDING, currentRowIntend+3, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], node.getName());
 		gTitle.setSensitivity(false);
 		vs.addGlyph(gTitle);
 		currentRowIntend -= INFO_BOX_LINE_HEIGHT*2; 
@@ -57,7 +57,7 @@ public class NTInfoBox {
 			VText gEntry[] = new VText[fields];
 			int i = 0;
 			for(String s : sEntry){
-				gText = new VText(INFO_BOX_PADDING, currentRowIntend,0 ,NodeTrixViz.COLOR_INFO_BOX_TEXT, s);
+				gText = new VText(INFO_BOX_PADDING, currentRowIntend,0 ,ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], s);
 				gText.setSensitivity(false);
 				vs.addGlyph(gText);
 				gEntry[i] = gText;
@@ -70,12 +70,12 @@ public class NTInfoBox {
 		
 		long height = (currentRowIntend - INFO_BOX_PADDING) / -2; 
 		long width = INFO_BOX_WIDTH;
-		gBox = new VRectangle(width, -height,0,width, height, NodeTrixViz.COLOR_INFO_BOX);
+		gBox = new VRectangle(width, -height,0,width, height, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 		gBox.stick(gTitle);
 		gBox.setOwner(this);
 		vs.addGlyph(gBox);
 		
-		gTitleBox = new VRectangle(width, -INFO_BOX_LINE_HEIGHT,0, width, INFO_BOX_LINE_HEIGHT, NodeTrixViz.COLOR_INFO_BOX);
+		gTitleBox = new VRectangle(width, -INFO_BOX_LINE_HEIGHT,0, width, INFO_BOX_LINE_HEIGHT, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 		gTitleBox.setSensitivity(false);
 		vs.addGlyph(gTitleBox);
 		gBox.stick(gTitleBox);

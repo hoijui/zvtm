@@ -31,40 +31,13 @@ import fr.inria.zvtm.nodetrix.lll.Node;
 import fr.inria.zvtm.nodetrix.MatrixSizeComparator;
 
 public class NodeTrixViz {
-    
-	// COLOR SCHEMES
-    public static int CS_SCREEN = 0;
-    public static int CS_PRINT = 1;
-    public static int COLOR_SCHEME = CS_SCREEN;
-    
-    
+
 	public static final long CELL_SIZE = 20;
     public static final long CELL_SIZE_HALF = CELL_SIZE/2;
     public static final int GROUP_LABEL_HALF_WIDTH = 50;
     public static final int LINLOG_ITERATIONS = 20;
     public static final int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     public static final int MATRIX_NODE_LABEL_OCCLUSION_WIDTH = 150; //half of the width/lenght in pixel that can be occupied by labels when enabling local exploration
-    
-    //COLORS AND TRANSLUNCENCIES
-    public static final Color COLOR_GRID = Color.getHSBColor(1f, 0.0f, 0.9f) ;
-    public static final float GRID_TRANSLUCENCY = .5f;
-    public static final float INTRA_TRANSLUCENCY = .7f;
-    public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
-    public static final Color COLOR_MATRIX_NODE_LABEL_COLOR = Color.DARK_GRAY;
-    public static final Color COLOR_MATRIX_NODE_BKG_COLOR = new Color(250,205,155);
-    public static final float MATRIX_NODE_BKG_TRANSLUCENCY = .8f;
-    public static final Color COLOR_MATRIX_NODE_HIGHLIGHT_COLOR = Color.yellow;
-    public static final Color COLOR_MATRIX_NODE_RELATED_COLOR = Color.orange;
-    public static final Color COLOR_EDGE_HIGHLIGHT_INCOMING = Color.orange;
-    public static final Color COLOR_EDGE_HIGHLIGHT_OUTGOING = Color.orange.brighter();
-    public static final Color MATRIX_FILL_COLOR = Color.WHITE;
-    public static final Color MATRIX_STROKE_COLOR = Color.BLACK;
-    public static final Color INTRA_LINK_COLOR = new Color(160,202,254);
-    public static final Color EXTRA_LINK_COLOR = new Color(118,98,252);
-    public static final Color INTER_LINK_COLOR = Color.BLACK;
-    public static final Color COLOR_INFO_BOX = COLOR_MATRIX_NODE_BKG_COLOR;
-    public static final Color COLOR_INFO_BOX_TEXT = COLOR_MATRIX_NODE_LABEL_COLOR;
-      
     
     //ANIMATION DURATIOS in msec
     public static final int DURATION_GENERAL = 300;
@@ -195,7 +168,7 @@ public class NodeTrixViz {
     
     /** Method is used if inputfile is passed directly to zvtm-ontotrix*/
     public NTEdge addEdge(NTNode tail, NTNode head){
-    	return addEdge(tail, head, INTRA_LINK_COLOR, null);
+    	return addEdge(tail, head, ProjectColors.INTRA_DEFAULT, null);
 //        if (tail.getMatrix() == head.getMatrix()){
 //            return addIntraEdge(tail, head);
 //        }
@@ -415,7 +388,7 @@ public class NodeTrixViz {
     	//care about node.
     	Matrix m = n.getMatrix();
     	m.resetGrid();
-    	m.highlightGrid(n, n, NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
+    	m.highlightGrid(n, n, ProjectColors.NODE_BACKGROUND_HIGHLIGHT);
     	highlightedNodes.add(n);
     	n.setNewInteractionState(IA_STATE_HIGHLIGHT, true, true);
     	n.perfomStateChange();
@@ -496,7 +469,7 @@ public class NodeTrixViz {
 		tail.perfomStateChange();
 
 		if(e.isIntraEdge()){
-			tail.getMatrix().highlightGrid(tail, head, NodeTrixViz.COLOR_MATRIX_NODE_HIGHLIGHT_COLOR);
+			tail.getMatrix().highlightGrid(tail, head, ProjectColors.NODE_BACKGROUND_HIGHLIGHT);
 		}
     }
     

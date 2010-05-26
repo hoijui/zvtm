@@ -16,11 +16,12 @@ import fr.inria.zvtm.glyphs.Glyph;
 
 public class ExtraEdgeAppearance extends EdgeAppearance {
 
-	GPath edgePath;
+	private GPath edgePath;
 	// start and end point offsets w.r.t respective matrices
 	LongPoint[] offsets;
 	static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
 	private float alpha = 1f;
+	private static Color[] gradientColors = new Color[2];
 	    
 	
 	public ExtraEdgeAppearance(NTEdge edge) {
@@ -28,6 +29,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	}
 
 	public void updateColor(){
+		if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_FADE_OUT[ProjectColors.COLOR_SCHEME])) return;
 		edgePath.setColor(edge.getColor());
 	}
 	
@@ -36,8 +38,6 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	{
 		if(vs == null) return;
 		vs.removeGlyph(edgePath);
-//    	edgePath = null;
-//    	offsets = new LongPoint[0];
 	}
 
 	@Override 
@@ -50,7 +50,6 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 //	public void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs) {
 	public void createGraphics() {
 		if(vs == null) return;
-
 		long x1, y1, x2, y2;
 		
         offsets = new LongPoint[2];
@@ -112,7 +111,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
         }
         vs.addGlyph(edgePath);
-//        edgePath.setColor(getColor());
+        edgePath.setColor(edge.getColor());
         edgePath.setStrokeWidth(2);
         edgePath.setOwner(edge);
         assignAlpha();
@@ -121,15 +120,17 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	@Override
 	public void fade() {
-//		System.out.println("[EXTRA_EDGE] FADE");
+		System.out.println("[EXTRA_EDGE] FADE");
 //		edgePath.setVisible(false);
-		edgePath.setColor(Color.DARK_GRAY.darker());
+		gradientColors[0] = ProjectColors.EXTRA_FADE_OUT[ProjectColors.COLOR_SCHEME];
+		gradientColors[1] = ProjectColors.EXTRA_FADE_OUT[ProjectColors.COLOR_SCHEME];	
+		edgePath.setGradientColors(gradientColors);
 		edgePath.setSensitivity(false);
 	}
 	
 	@Override
 	public void show(){
-//		edgePath.setVisible(true);
+		edgePath.setVisible(true);
 		edgePath.setColor(edge.getColor());
 		edgePath.setSensitivity(true);
 		assignAlpha();

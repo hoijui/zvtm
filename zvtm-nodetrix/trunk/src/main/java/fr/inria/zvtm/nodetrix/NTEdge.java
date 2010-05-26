@@ -82,9 +82,9 @@ public class NTEdge extends LinLogEdge{
 //	    	appearance.fade();
 //	    	visible = false;
 //	    }
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_INCOMING);
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(NodeTrixViz.COLOR_EDGE_HIGHLIGHT_OUTGOING);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(ProjectColors.EDGE_HIGHLIGHT_OUTGOING);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(ProjectColors.EDGE_HIGHLIGHT_INCOMING);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(ProjectColors.EDGE_HIGHLIGHT_OUTGOING);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) appearance.select();
 	    else{
 //	    	if(!visible)
@@ -104,7 +104,7 @@ public class NTEdge extends LinLogEdge{
     	performInteractionStateChange();
     	
     	if(!visible){
-    		System.out.println("NOT VISIBLE");
+//    		System.out.println("NOT VISIBLE");
 //    		setVisibility(false);
     		appearance.fade();
     	}
@@ -160,10 +160,13 @@ public class NTEdge extends LinLogEdge{
     	appearance.clearGraphics();
     }
 	
-    public void setColor(Color c){
-    	this.edgeColor = c;
-    	appearance.updateColor();
+    public void setColor(Color c, Color inverseColor){
+//    	if(this.edgeColor != c) System.out.println("[NTEDGE] color differs!");
+    	if(c != null) this.edgeColor = c;
+    	if(inverseColor != null) this.inverseColor = inverseColor;
+    	if(appearance != null)appearance.updateColor();
     }
+    
     public void setSymmetric(boolean sym){
     	symmetric = sym;
     }
@@ -171,14 +174,12 @@ public class NTEdge extends LinLogEdge{
     	return symmetric;
     }
 	
-	public void setInverseColor(Color c){
-		inverseColor = c;
-	}
+	
 	public boolean hasInverse(){ return inverseColor != null; }
 	
 	public Color getInverseColor(){ return inverseColor; }
 	
-	public Color getColor(){ return edgeColor; }
+	public Color getColor(){ return this.edgeColor; }
 	
 	public boolean isVisible(){
 		return visible;

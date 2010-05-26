@@ -17,17 +17,22 @@ import java.awt.geom.Rectangle2D;
 import java.awt.RadialGradientPaint;
 import java.awt.MultipleGradientPaint.CycleMethod;
 
+import fr.inria.zvtm.nodetrix.ProjectColors;
+
 public class GPath extends DPath {
     
-    Color[] gradientColors = {new Color(118,98,252), Color.WHITE};
-    float[] gradientDist = {0.0f, 1.0f};
+//    Color[] gradientColors = {new Color(118,98,252), Color.WHITE};
+    private Color[] gradientColors = new Color[2];
+    float[] gradientDist = {0.2f, 0.8f};
     Point2D gradientCenter = new Point2D.Float();
     RadialGradientPaint p;
     
     public GPath(){
 		super();
-	}
-
+        gradientColors[0] = ProjectColors.EXTRA_GRADIENT_START[ProjectColors.COLOR_SCHEME];
+        gradientColors[1] = ProjectColors.EXTRA_GRADIENT_END[ProjectColors.COLOR_SCHEME];;
+    }
+    
 	/**
 		*@param x start coordinate in virtual space
 		*@param y start coordinate in virtual space
@@ -75,6 +80,22 @@ public class GPath extends DPath {
      */
     public void setGradientColors(Color[] gc){
         this.gradientColors = gc;        
+    }
+    @Override
+    /** Is just a <i>delegate</i> for <code>setGradientColors</code>. The one color passed
+     * to this method is the second gradient value, whether the first one is a darker 
+     * version of the second one.
+     * @author benjamin bach
+     * @param Color c
+     */
+    public void setColor(Color c){
+    	this.gradientColors = new Color[2];
+//    	if(ProjectColors.COLOR_SCHEME == ProjectColors.CS_PRINT)
+//    		this.gradientColors[0] = c.brighter();
+//    	else
+//    		this.gradientColors[0] = c.darker();
+    	this.gradientColors[1] = ProjectColors.EXTRA_GRADIENT_END[ProjectColors.COLOR_SCHEME];
+        this.gradientColors[0] = c;        
     }
     
     /** Set gradient distribution.

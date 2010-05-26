@@ -40,6 +40,8 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	}
 	
 	public void updateColor(){
+		System.out.println("[INTRA_EDGE_APP] old Color " + gPrimary.getColor() + " is changed to " + edge.getColor());
+//		if(!gPrimary.getColor().equals(edge.getColor())) System.out.println("[INTRA_EDGE_APP] update color to " + edge.getColor());
 		gPrimary.setColor(edge.getColor());
 		gLeftFrameFragment.setColor(edge.getColor());
 		gRightFrameFragment.setColor(edge.getColor());
@@ -71,7 +73,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		
 		//SENSITIE RECTANGLE
 		int radius = (int) NodeTrixViz.CELL_SIZE_HALF + 5;
-    	gHighlight = new VCircle(mp.x + edge.head.ndx, mp.y + edge.tail.wdy, 0, radius, NodeTrixViz.COLOR_EDGE_HIGHLIGHT_INCOMING);
+    	gHighlight = new VCircle(mp.x + edge.head.ndx, mp.y + edge.tail.wdy, 0, radius, ProjectColors.EDGE_HIGHLIGHT_INCOMING);
     	gHighlight.setDrawBorder(false);
     	gHighlight.setVisible(false);
     	vs.addGlyph(gHighlight);
@@ -188,12 +190,12 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 //			g.setSensitivity(false);
 //		}	
 		this.gHighlight.setVisible(false);
-		this.gPrimary.setColor(Color.LIGHT_GRAY.brighter());
-		if(gSecondary != null) this.gSecondary.setColor(Color.LIGHT_GRAY.brighter());
-		this.gLeftFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
-		this.gRightFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
-		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
-		if(gUpperFrameFragment != null ) gLowerFrameFragment.setColor(Color.LIGHT_GRAY.brighter());
+		this.gPrimary.setColor(ProjectColors.INTRA_FADE);
+		if(gSecondary != null) this.gSecondary.setColor(ProjectColors.INTRA_FADE);
+		this.gLeftFrameFragment.setColor(ProjectColors.INTRA_FADE);
+		this.gRightFrameFragment.setColor(ProjectColors.INTRA_FADE);
+		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(ProjectColors.INTRA_FADE);
+		if(gUpperFrameFragment != null ) gLowerFrameFragment.setColor(ProjectColors.INTRA_FADE);
 	}
 	
 	@Override
