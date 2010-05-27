@@ -9,7 +9,9 @@ package fr.inria.zuist.engine;
 
 import fr.inria.zvtm.engine.LongPoint;
 
-/** Information about a level in the scene. Levels contain regions which themselves contain objects.
+/** A level in the scene. Levels correspond to ranges of altitude (defined by a floor and ceiling).
+ * Levels cannot overlap.
+ * Levels contain regions which themselves contain objects.
  *@author Emmanuel Pietriga
  */
 

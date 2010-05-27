@@ -14,28 +14,44 @@ import java.util.Vector;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
-/** Information about a region in the scene. Regions contain objects. They span one or more contiguous level(s).
+/** A region in the scene. Regions contain objects. Regions belong to levels, and can span one or more contiguous level(s).
  *@author Emmanuel Pietriga
  */
 
 public class Region {
 
+    /** Objects appear gradually (animated fade-in transition). */
     public static final short FADE_IN = 0;
+    /** Objects disappear gradually (animated fade-out transition). */
     public static final short FADE_OUT = 1;
+    /** Objects appear immediately (no animated transition). */
     public static final short APPEAR = 2;
+    /** Objects disappear immediately (no animated transition). */
     public static final short DISAPPEAR = 3;
+    /** Objects appear gradually (animated fade-in transition), keyword in ZUIST XML vocabulary. */
     public static final String FADE_IN_STR = "fadein";
+    /** Objects disappear gradually (animated fade-out transition), keyword in ZUIST XML vocabulary.. */
     public static final String FADE_OUT_STR = "fadeout";
+    /** Objects disappear immediately (no animated transition), keyword in ZUIST XML vocabulary. */
     public static final String APPEAR_STR = "appear";
+    /** Objects disappear immediately (no animated transition), keyword in ZUIST XML vocabulary. */
     public static final String DISAPPEAR_STR = "disappear";
 
-    public static final short TFUL = 0;  // transition from upper level
-    public static final short TFLL = 1;  // transition from lower level
-    public static final short TTUL = 2;  // transition to upper level
-    public static final short TTLL = 3;  // transition to lower level
-    public static final short TASL = 4;  // transition at same level - not stored, always appear/disappear as this is always off screen
+    /** Entering region: approaching from upper level. */
+    public static final short TFUL = 0;
+    /** Entering region: approaching from lower level. */
+    public static final short TFLL = 1;
+    /** Leaving region: going to upper level. */
+    public static final short TTUL = 2;
+    /** Leaving region: going to lower level. */
+    public static final short TTLL = 3;
+    /** Entering/leaving region: already in level range (transition at same level).
+     Not stored, always appear/disappear as this is always off screen. */
+    public static final short TASL = 4;
     
+    /** Default transition when leaving region. */
     static short DEFAULT_T_TRANSITION = DISAPPEAR;
+    /** Default transition when entering region. */
     static short DEFAULT_F_TRANSITION = APPEAR;
     
     /* Set default transition when none specified.

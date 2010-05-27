@@ -24,7 +24,7 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
-/** Description of image objects to be loaded/unloaded in the scene.
+/** Description of external resource objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
  */
 

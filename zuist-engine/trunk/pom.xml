@@ -156,6 +156,7 @@ $Id$
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
             <link>http://zvtm.sourceforge.net/apidocs</link>
           </links>
+         <excludePackageNames>fr.inria.zuist.viewer</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>

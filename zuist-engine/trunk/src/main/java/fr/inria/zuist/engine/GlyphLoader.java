@@ -16,7 +16,9 @@ import java.util.concurrent.ThreadFactory;
 /**
  * Thread safety: GlyphLoader public methods should be invoked
  * from the same thread, normally the Swing EDT.
+ *@author Romain Primet, Emmanuel Pietriga
  */
+ 
 class GlyphLoader {
 
     private final SceneManager sceneManager;

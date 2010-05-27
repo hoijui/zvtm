@@ -19,7 +19,7 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
-/** Description of any ZVTM glyph to be loaded/unloaded in the scene.
+/** Description of any ZVTM glyph sibclass of ClosedShape to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
  */
 
@@ -28,11 +28,12 @@ public class ClosedShapeDescription extends ObjectDescription {
     private volatile ClosedShape glyph;
     boolean inSpace = false;
 
-    /** Constructs the description of an image (VImageST).
-        *@param id ID of object in scene
-        *@param g any ClosedShape. It must implement fr.inria.zvtm.glyphs.Translucent if fade in/out transitions are used in the parent region.
+    /** Constructs the description of a ZVTM ClosedShape.
+        *@param id ID of object in scene.
+        *@param g any ZVTM ClosedShape instance. Must implement fr.inria.zvtm.glyphs.Translucent if fade in/out transitions are used in the parent region.
         *@param z z-index (layer). Feed 0 if you don't know.
-        *@param pr parent Region in scene
+        *@param pr parent Region in scene.
+        *@param sensitive should the glyph be made sensitive to cursor events or not.
         */
     ClosedShapeDescription(String id, ClosedShape g, int z, Region pr, boolean sensitive){
         this.id = id;
@@ -43,7 +44,7 @@ public class ClosedShapeDescription extends ObjectDescription {
         this.sensitive = sensitive;
     }
 
-    /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
+    /** Called automatically by scene manager, but can be called by client application to force loading of objects not actually visible. */
     @Override
     public void createObject(final VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
@@ -77,7 +78,7 @@ public class ClosedShapeDescription extends ObjectDescription {
         }
     }
 
-    /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
+    /** Called automatically by scene manager, but can be called by client application to force unloading of objects still visible. */
     @Override
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
         if (inSpace){
@@ -106,14 +107,17 @@ public class ClosedShapeDescription extends ObjectDescription {
         }
     }
 
+    /** Get actual ClosedShape instance wrapped in this ZUIST object description. */
     public Glyph getGlyph(){
 	    return glyph;
     }
     
+    /** Get x-coordinate of object in virtual space. */
     public long getX(){
         return glyph.vx;
     }
     
+    /** Get y-coordinate of object in virtual space. */
     public long getY(){
         return glyph.vy;
     }
