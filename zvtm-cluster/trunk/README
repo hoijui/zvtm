@@ -8,11 +8,16 @@ jar.
 
 Building: zvtm-cluster is built using maven2 (2.2.0+ recommended). 
 To compile and package the sources, execute:
-  mvn package
+  $ mvn package
 
 Dependencies:
 zvtm-cluster depends on
   zvtm
   aspectJ
   jgroups
+  args4j 
+  slf4j
+
+It is possible to generate a jar file containing the library and its dependencies: 
+  $ mvn assembly:assembly
 

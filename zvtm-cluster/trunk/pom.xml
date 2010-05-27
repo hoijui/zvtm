@@ -57,6 +57,7 @@
 			<groupId>fr.inria.zvtm</groupId>
 			<artifactId>zvtm</artifactId>
 			<version>0.10.1-SNAPSHOT</version>
+            <scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -135,11 +136,11 @@
 					</execution>
 				</executions>
 			</plugin>			
-			<plugin>
+            <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>dependency-maven-plugin</artifactId>
 				<executions>
-					<execution>
+                     <execution>
 						<id>copy-dependencies</id>
 						<phase>package</phase>
 						<goals>
@@ -148,10 +149,18 @@
 						<configuration>
 							<outputDirectory>${project.build.directory}</outputDirectory>
 						</configuration>
-					</execution>
+                    </execution> 
 				</executions>
-			</plugin>
-			<plugin>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin> 
+            <plugin>
 				<inherited>true</inherited>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
