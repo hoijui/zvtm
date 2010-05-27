@@ -123,7 +123,7 @@ public class FitsImage extends VImage {
             boolean useDataMinMax) throws IOException {
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
-        filter = new NopFilter();
+        filter = ColorFilter.NOP.getFilter();
         //create compatible image and use this for display
         fitsImage = (FITSImage)(ImageIO.read(imgUrl));
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
