@@ -388,7 +388,7 @@ public class NodeTrixViz {
     	//care about node.
     	Matrix m = n.getMatrix();
     	m.resetGrid();
-    	m.highlightGrid(n, n, ProjectColors.NODE_BACKGROUND_HIGHLIGHT);
+    	m.highlightGrid(n, n, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
     	highlightedNodes.add(n);
     	n.setNewInteractionState(IA_STATE_HIGHLIGHT, true, true);
     	n.perfomStateChange();
@@ -436,7 +436,7 @@ public class NodeTrixViz {
    }
     
     public void resetAllContext(){
-    	System.out.println("[NTV] RESET " + highlightedNodes.size());
+//    	System.out.println("[NTV] RESET " + highlightedNodes.size());
     	for(NTNode n : highlightedNodes){
     		n.setNewInteractionState(IA_STATE_DEFAULT, true, true);
     		n.perfomStateChange();
@@ -469,7 +469,7 @@ public class NodeTrixViz {
 		tail.perfomStateChange();
 
 		if(e.isIntraEdge()){
-			tail.getMatrix().highlightGrid(tail, head, ProjectColors.NODE_BACKGROUND_HIGHLIGHT);
+			tail.getMatrix().highlightGrid(tail, head, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
 		}
     }
     

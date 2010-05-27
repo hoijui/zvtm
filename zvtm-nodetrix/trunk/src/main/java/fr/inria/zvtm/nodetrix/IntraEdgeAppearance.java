@@ -73,7 +73,8 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		
 		//SENSITIE RECTANGLE
 		int radius = (int) NodeTrixViz.CELL_SIZE_HALF + 5;
-    	gHighlight = new VCircle(mp.x + edge.head.ndx, mp.y + edge.tail.wdy, 0, radius, ProjectColors.EDGE_HIGHLIGHT_INCOMING);
+		//this glyph is never shown.
+    	gHighlight = new VCircle(mp.x + edge.head.ndx, mp.y + edge.tail.wdy, 0, radius, Color.red);
     	gHighlight.setDrawBorder(false);
     	gHighlight.setVisible(false);
     	vs.addGlyph(gHighlight);
@@ -189,7 +190,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 //			g.setVisible(false);
 //			g.setSensitivity(false);
 //		}	
-		this.gHighlight.setVisible(false);
+//		this.gHighlight.setVisible(false);
 		this.gPrimary.setColor(ProjectColors.INTRA_FADE);
 		if(gSecondary != null) this.gSecondary.setColor(ProjectColors.INTRA_FADE);
 		this.gLeftFrameFragment.setColor(ProjectColors.INTRA_FADE);
@@ -254,14 +255,14 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void highlight(Color c) 
 	{
-		gHighlight.setVisible(true);
-		gHighlight.setColor(c);
+//		gHighlight.setVisible(true);
+//		gHighlight.setColor(c);
 	}
 	
 	@Override
 	public void reset() 
 	{
-		gHighlight.setVisible(false);
+//		gHighlight.setVisible(false);
 	}
 	
 

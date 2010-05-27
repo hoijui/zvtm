@@ -74,22 +74,12 @@ public class NTEdge extends LinLogEdge{
     
     public void performInteractionStateChange()
     {
-    	if(!visible 
-    			|| newInteractionState == interactionState) return;
-//    	if(!visible && newInteractionState != NodeTrixViz.IA_STATE_FADE){appearance.show();}
-//    	
-//	    if(newInteractionState == NodeTrixViz.IA_STATE_FADE) {
-//	    	appearance.fade();
-//	    	visible = false;
-//	    }
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(ProjectColors.EDGE_HIGHLIGHT_OUTGOING);
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(ProjectColors.EDGE_HIGHLIGHT_INCOMING);
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(ProjectColors.EDGE_HIGHLIGHT_OUTGOING);
+    	if(!visible || newInteractionState == interactionState) return;
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) appearance.select();
 	    else{
-//	    	if(!visible)
-//	    		appearance.fade();
-//	    	else
 	    		appearance.reset();
 	    }
 	    interactionState = newInteractionState;
