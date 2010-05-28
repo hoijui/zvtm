@@ -1,0 +1,3 @@
+Moved to JGroups 2.8.0GA, mainly because it figures out which network interface
+and protocol to use in a smarter way.
+
