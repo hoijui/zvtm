@@ -2,10 +2,10 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.inria.zvtm</groupId>
-    <artifactId>zuist-cluster</artifactId>
+    <artifactId>zuist-cluster-msrdemo</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
-    <name>zuist-cluster</name>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>zuist-cluster-msrdemo</name>
     <url>http://maven.apache.org</url>
     <dependencies>
         <dependency>
@@ -17,12 +17,12 @@
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zuist-engine</artifactId>
-            <version>0.3.0-SNAPSHOT</version>
+            <version>0.3.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-cluster</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
+            <version>0.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
