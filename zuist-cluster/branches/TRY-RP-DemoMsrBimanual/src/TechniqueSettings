@@ -1,0 +1,96 @@
+
+[One] [Circular] [OneD]						// OK
+	Zoom class 	: Knob
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : iPhod_ext
+	xml file : iPhod.xml
+
+[Two] [Circular] [OneD]						// OK
+	Zoom class 	: Knob
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : point_glove
+	xml file : point_glove.xml
+
+[One] [Linear] [OneD]							// OK
+	Zoom class 	: Mouse
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : iPhod_ext
+	xml file : iPhod.xml
+
+[Two] [Linear] [OneD]							// OK
+	Zoom class 	: Mouse
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : point_glove
+	xml file : point_glove.xml
+
+[One] [Circular] [TwoD]						// OK
+	Zoom class 	: TurningIPod
+	Point class : DefaultLaserPoint
+	Pan class	: IPodPressLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : iPhod_ext
+	xml file : iPhod.xml
+
+[Two] [Circular] [TwoD] 						// OK
+	Zoom class 	: TurningIPod
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : point_glove
+	xml file : point_glove.xml
+
+[One] [Linear] [TwoD]							// Ok
+	Zoom class 	: LinearIPod
+	Point class : DefaultLaserPoint
+	Pan class	: IPodPressLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : iPhod_ext
+	xml file : iPhod.xml
+
+[Two] [Linear] [TwoD] 							// OK
+	Zoom class 	: LinearIPod
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : BasicLaserPointer
+	Tracked object(s) : point_glove
+	xml file : point_glove.xml
+
+[One] [Circular] [ThreeD]
+	Zoom class 	: TurningWheel
+	Point class : OneHandedCircularLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : TurningWheelVerticalAxis
+	Tracked object(s) : point_glove
+	xml file : point_glove.xml
+
+[Two] [Circular] [ThreeD]
+	Zoom class 	: TurningWheel2Handed
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : TurningWheelHorizontalAxis
+	Tracked object(s) : point_glove, pan-glove
+	xml file : point_glove.xml, palm.xml 
+
+[One] [Linear] [ThreeD]							// To be tested
+	Zoom class 	: Push4
+	Point class : OneHandedPushPoint
+	Pan class	: MouseButtonLaserPanWithoutWIS
+	WildInputServer conf : OneHandPush2
+	Tracked object(s) : point_glove
+	xml file : point_glove2.xml
+
+[Two] [Linear] [ThreeD] 							// OK
+	Zoom class 	: Push4
+	Point class : DefaultLaserPoint
+	Pan class	: MouseButtonLaserPan
+	WildInputServer conf : TwoHandPush
+	Tracked object(s) : point_glove, pan_glove
+	xml file : point_glove.xml, palm.xml
