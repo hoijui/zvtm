@@ -173,7 +173,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     private VirtualSpace routes;
  
     public Viewer(boolean atc, boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile, String nbHands, String gesture, String dimension){
+        INSTANCE = this;
         this.atc = atc;
+        ovm = new OverlayManager(this);
+		initGUI(atc, fullscreen, opengl, antialiased);
         TechniqueSettingsManager setMgr = new TechniqueSettingsManager();
         Hands hands = Hands.valueOf(nbHands);
         GestureType gestureType = GestureType.valueOf(gesture);
@@ -195,9 +198,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         currentZoomTechnique.initListeners();
         currentZoomTechnique.startListening();
         settings.callCommands();
-
-		ovm = new OverlayManager(this);
-		initGUI(atc, fullscreen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -898,7 +898,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        INSTANCE = new Viewer(atc, fs, ogl, aa, xmlSceneFile, hands, gesture, dimension);
+        new Viewer(atc, fs, ogl, aa, xmlSceneFile, hands, gesture, dimension);
     }
     
     private static void printCmdLineHelp(){
