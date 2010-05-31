@@ -862,8 +862,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         System.err.println("[dbg] hands = " + hands);
         String gesture = System.getProperty("zuist.viewer.gesture");
         if(gesture.equals("")) gesture = "Linear";
+        System.err.println("[dbg] gesture = " + gesture);
         String dimension = System.getProperty("zuist.viewer.dimension");
         if(dimension.equals("")) dimension = "TwoD";
+        System.err.println("[dbg] dimension = " + dimension);
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
