@@ -124,8 +124,8 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		v.parent.setActiveLayer(1);
-		application.displayMainPieMenu(true);
+		//v.parent.setActiveLayer(1);
+		//application.displayMainPieMenu(true);
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){

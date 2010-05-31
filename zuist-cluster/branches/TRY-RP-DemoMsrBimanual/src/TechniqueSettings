@@ -51,7 +51,7 @@
 	Zoom class 	: LinearIPod
 	Point class : DefaultLaserPoint
 	Pan class	: IPodPressLaserPan
-	WildInputServer conf : BasicLaserPointer
+	WildInputServer conf : DemoMSR_IPod
 	Tracked object(s) : iPhod_ext
 	xml file : iPhod.xml
 
@@ -91,6 +91,6 @@
 	Zoom class 	: Push4
 	Point class : DefaultLaserPoint
 	Pan class	: MouseButtonLaserPan
-	WildInputServer conf : TwoHandPush
+	WildInputServer conf : DemoMSR_BiMan
 	Tracked object(s) : point_glove, pan_glove
 	xml file : point_glove.xml, palm.xml
