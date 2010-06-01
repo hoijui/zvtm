@@ -14,7 +14,13 @@ public class DefaultIdentifiable implements Identifiable {
     private final ObjId objId = ObjIdFactory.next();
     private boolean replicated = false;
 
+    /**
+     * {@inheritDoc}
+     */
     public ObjId getObjId(){ return objId; }
+    /**
+     * {@inheritDoc}
+     */
     public boolean isReplicated() { return replicated; }
     public void setReplicated(boolean val) { this.replicated = val; }
 }
