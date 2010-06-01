@@ -62,8 +62,31 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
       <artifactId>zvtm-pdf</artifactId>
       <version>[0.2.0,)</version>
     </dependency>
+
+	<!-- ICEpdf Pro 4.0.x (if available) -->
+	<!--
+
+		ICEpdf Pro is not available in any Maven repository for now.
+		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
+		Install the JAR files in your local repository using the following command line:
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.0.1 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.0.1 -Dpackaging=jar	
+	-->
+	
+	<!--
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-pro</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-pro-intl</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+    -->
   </dependencies>
-  
+
   <!-- Build -->
   <build>
     <plugins>
