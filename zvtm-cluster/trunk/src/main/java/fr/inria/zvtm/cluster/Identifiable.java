@@ -6,7 +6,14 @@
  */ 
 package fr.inria.zvtm.cluster;
 
+/**
+ * Identifiable objects may be replicated: the master instance
+ * has logical equivalents on slave instances.
+ */
 public interface Identifiable {
+    /**
+     * Returns the ObjId of this Identifiable.
+     */
     public ObjId getObjId();
     public boolean isReplicated();
 }
