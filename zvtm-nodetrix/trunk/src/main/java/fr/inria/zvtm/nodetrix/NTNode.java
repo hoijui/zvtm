@@ -57,7 +57,6 @@ public class NTNode extends LinLogNode{
 	
 	private Object owner;
 	
-	
 	/* interaction*/
 	AnimationManager animManager; 
 	int interactionState = NodeTrixViz.IA_STATE_DEFAULT;
@@ -150,11 +149,17 @@ public class NTNode extends LinLogNode{
 	}
 	
 
-    public void matrixMoved(long mx, long my){
-    	this.matrixX += mx; 
-    	this.matrixY += my;
-    	gBackgroundW.move(mx, my);
-        if (gBackgroundN != null)	gBackgroundN.move(mx,my);        
+    public void matrixMoved(long dmx, long dmy){
+    	this.matrixX += dmx; 
+    	this.matrixY += dmy;
+    	gBackgroundW.move(dmx, dmy);
+//    	this.yOld += dmy;
+    	
+        if (!single){
+        	gBackgroundN.move(dmx,dmy);        
+//        	this.xOld += dmy;
+        	
+        }
     }
     
     //INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------INTERACTION------------------
@@ -171,13 +176,14 @@ public class NTNode extends LinLogNode{
      **/
     public void shiftWesternLabels(long xNew, boolean animated)
     {
+    	if(single) return;
     	xOld = gBackgroundW.vx;
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
     				.createGlyphTranslation(
     						NodeTrixViz.DURATION_NODEMOVE,
     						gBackgroundW, 
-    						new LongPoint(xNew,	gBackgroundW.vy ),
+    						new LongPoint(xNew,	gBackgroundW.vy),
     						false, 
     						SlowInSlowOutInterpolator2.getInstance(), 
     						null),
@@ -263,7 +269,7 @@ public class NTNode extends LinLogNode{
     	if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(ProjectColors.HIGHLIGHT_RELATED[ProjectColors.COLOR_SCHEME]);
 	    else reset();
 	    
         interactionState = newInteractionState;
@@ -276,15 +282,16 @@ public class NTNode extends LinLogNode{
 		//COLOR
 		gBackgroundW.setColor(backgroundColor);
 		gBackgroundW.setTranslucencyValue(1);
+		labelW.setColor(ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME]);
 		
 //		if(!matrix.isNodesVisibleNorth()) gBackgroundN.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
 //		if(!matrix.isNodesVisibleWest()) gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
-		
 		
 		if(!single)
 		{
 			gBackgroundN.setColor(backgroundColor);
 			gBackgroundN.setTranslucencyValue(1);
+			labelN.setColor(ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME]);
 		}
 		affectNorth = false;
 		affectWest = false;
@@ -300,11 +307,12 @@ public class NTNode extends LinLogNode{
 		
     	if(affectNorth && !single){
     		this.gBackgroundN.setColor(c);
-    		
+    		this.labelN.setColor(Color.black);
 //    		if(!matrix.isNodesVisibleNorth()) this.shiftNorth(p[1] - Math.min(widthHalf, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2), true);
     	}
     	if(affectWest || single){
     		this.gBackgroundW.setColor(c);
+    		this.labelW.setColor(Color.black);
 //    		if(!matrix.isNodesVisibleWest()) this.shiftWest(p[0] + Math.min(widthHalf, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2), true);
     	}
     	

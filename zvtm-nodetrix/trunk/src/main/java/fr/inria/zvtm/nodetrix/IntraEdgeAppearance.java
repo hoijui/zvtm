@@ -40,12 +40,10 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	}
 	
 	public void updateColor(){
-		System.out.println("[INTRA_EDGE_APP] old Color " + gPrimary.getColor() + " is changed to " + edge.getColor());
-//		if(!gPrimary.getColor().equals(edge.getColor())) System.out.println("[INTRA_EDGE_APP] update color to " + edge.getColor());
 		gPrimary.setColor(edge.getColor());
 		gLeftFrameFragment.setColor(edge.getColor());
 		gRightFrameFragment.setColor(edge.getColor());
-		if(gUpperFrameFragment != null)gUpperFrameFragment.setColor(edge.getColor());
+		if(gLowerFrameFragment != null)gLowerFrameFragment.setColor(edge.getColor());
 		if(gUpperFrameFragment != null)gUpperFrameFragment.setColor(edge.getColor());
 		if(gSecondary != null) gSecondary.setColor(edge.isSymmetric() ? edge.getColor() : edge.getInverseColor());
 	}
