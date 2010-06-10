@@ -45,7 +45,7 @@ $Id$
     </repository>
   </repositories>
   
-  <!-- Distribution - Deploy to FTP -->
+  <!-- Deployment -->
   <distributionManagement>
 	<repository>
       <id>zvtm.sf.net</id>
