@@ -581,7 +581,7 @@ public class VCursor {
     }
 
     /**compute list of glyphs currently overlapped by the mouse*/
-    boolean computeMouseOverList(ViewEventHandler eh,Camera c){
+    public boolean computeMouseOverList(ViewEventHandler eh,Camera c){
 	return this.computeMouseOverList(eh, c, mx, my);
     }
 
