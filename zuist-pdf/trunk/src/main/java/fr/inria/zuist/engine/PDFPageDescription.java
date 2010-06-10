@@ -75,9 +75,9 @@ public class PDFPageDescription extends ResourceDescription {
                 // open connection to data
                 if (showFeedbackWhenFetching){
                     final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale),
-                            Color.LIGHT_GRAY, Color.DARK_GRAY, Color.BLACK, vs);
+                            Color.WHITE, Color.BLACK, Color.BLACK);
                     vs.addGlyph(vrp);
-                    vrp.setProgress(10, 100);
+                    vrp.setProgress(20, 100);
                     finishCreatingObject(vs, PDFResourceHandler.getDocument(src), vrp, fadeIn);
                 }
                 else {
