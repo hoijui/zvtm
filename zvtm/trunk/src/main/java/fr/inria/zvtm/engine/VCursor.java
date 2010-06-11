@@ -581,23 +581,23 @@ public class VCursor {
     }
 
     /**compute list of glyphs currently overlapped by the mouse*/
-    public boolean computeMouseOverList(ViewEventHandler eh,Camera c){
-	return this.computeMouseOverList(eh, c, mx, my);
+    public boolean computeCursorOverList(ViewEventHandler eh,Camera c){
+	return this.computeCursorOverList(eh, c, mx, my);
     }
 
     /**compute list of glyphs currently overlapped by the mouse (take into account lens l when unprojecting)*/
-    boolean computeMouseOverList(ViewEventHandler eh,Camera c, ViewPanel v){
+    boolean computeCursorOverList(ViewEventHandler eh,Camera c, ViewPanel v){
         if (v.lens != null){
             // following use of cx,cy implies that VCursor.unProject() has been called before this method
-            return this.computeMouseOverList(eh, c, Math.round(cx + v.size.width/2), Math.round(v.size.height/2 - cy));
+            return this.computeCursorOverList(eh, c, Math.round(cx + v.size.width/2), Math.round(v.size.height/2 - cy));
         }
         else {
-            return this.computeMouseOverList(eh, c, mx, my);
+            return this.computeCursorOverList(eh, c, mx, my);
         }
     }
     
     /** Compute list of glyphs currently overlapped by the mouse. */
-    boolean computeMouseOverList(ViewEventHandler eh,Camera c, int x, int y){
+    boolean computeCursorOverList(ViewEventHandler eh,Camera c, int x, int y){
         boolean res=false;
         Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
                 try {
@@ -610,13 +610,13 @@ public class VCursor {
                 }
                 catch (java.util.NoSuchElementException e){
                     if (VirtualSpaceManager.debugModeON()){
-                        System.err.println("vcursor.computemouseoverlist "+e);
+                        System.err.println("vcursor.computeCursorOverList "+e);
                         e.printStackTrace();
                     }
                 }
                 catch (NullPointerException e2){
                     if (VirtualSpaceManager.debugModeON()){
-                        System.err.println("vcursor.computemouseoverlist null "+e2+
+                        System.err.println("vcursor.computeCursorOverList null "+e2+
                             " (This might be caused by an error in enterGlyph/exitGlyph in your event handler)");
                         e2.printStackTrace();
                     }

@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -543,7 +543,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
                     if (parent.mouse.isSensitive()){
-                        if (parent.mouse.computeMouseOverList(evHs[activeLayer], cams[activeLayer], this)){
+                        if (parent.mouse.computeCursorOverList(evHs[activeLayer], cams[activeLayer], this)){
                             parent.repaintNow();
                         }
                     }
@@ -593,7 +593,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();  
                 parent.repaintNow();
-                if (parent.mouse.isSensitive()){parent.mouse.computeMouseOverList(evHs[activeLayer],cams[activeLayer],this);}
+                if (parent.mouse.isSensitive()){parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer],this);}
             }
         }	
         catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);}}
