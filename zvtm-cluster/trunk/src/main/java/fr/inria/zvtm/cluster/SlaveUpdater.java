@@ -117,6 +117,7 @@ public class SlaveUpdater {
 
 	void stop(){
 		networkDelegate.stop();
+        appDelegate.stop();
 	}
 
 	void createLocalView(ClusteredView cv){

@@ -167,6 +167,10 @@ public class SlaveApp {
 		slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
 	}
 
+    void stop(){
+        System.exit(0);
+    }
+
     void setBackgroundColor(ClusteredView cv, Color bgColor){
         //find if cv owns the local view. 	
         if(!cv.ownsBlock(options.blockNumber)){

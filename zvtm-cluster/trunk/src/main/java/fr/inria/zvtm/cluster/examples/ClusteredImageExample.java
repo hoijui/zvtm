@@ -169,7 +169,10 @@ public class ClusteredImageExample {
 
 		public void viewDeiconified(View v){}
 
-		public void viewClosing(View v){System.exit(0);}
+		public void viewClosing(View v){
+            vsm.stop();
+            System.exit(0);
+        }
 
 	}
 }

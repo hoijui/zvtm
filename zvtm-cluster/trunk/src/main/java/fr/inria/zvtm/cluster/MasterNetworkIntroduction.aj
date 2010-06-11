@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */ 
@@ -46,8 +46,11 @@ aspect MasterNetworkIntroduction {
 		}
 	}
 
-	void VirtualSpaceManager.stop(){
-		networkDelegate.stop();
+	public void VirtualSpaceManager.stop(){
+        if(isMaster()){
+            sendDelta(new StopDelta());
+            networkDelegate.stop();
+        }
 	}
 
 	private void VirtualSpaceManager.startOperation(){
@@ -69,6 +72,18 @@ aspect MasterNetworkIntroduction {
 		}
 
 		void stop(){
+            //Flush the channel and do not restart it
+            if(channel.flushSupported()){
+                channel.startFlush(false);
+            } else {
+                //we cannot flush, so try to allow the close message
+                //to reach its recipients
+                System.err.println("Flush not supported, slaves might not receive quit message");
+                try{
+                    Thread.sleep(1000);
+                } catch (InterruptedException swallow){}
+            }
+            channel.disconnect();
 			channel.close();
 		}
 
