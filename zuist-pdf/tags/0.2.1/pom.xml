@@ -72,7 +72,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.0.1 -Dpackaging=jar	
 	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.0.1 -Dpackaging=jar	
 	-->
-	
+	<!--
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-pro</artifactId>
@@ -83,6 +83,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 		<artifactId>icepdf-pro-intl</artifactId>
 		<version>4.0.1</version>
 	</dependency>
+	-->
 	
 	<dependency>
 	  <groupId>net.sf.ehcache</groupId>
