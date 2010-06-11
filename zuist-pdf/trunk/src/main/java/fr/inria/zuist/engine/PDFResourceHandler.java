@@ -19,6 +19,11 @@ import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.exceptions.PDFException;
 import org.icepdf.core.exceptions.PDFSecurityException;
 
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
+import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
+
 /** ResourceHandler implementation for PDF documents.
  *@author Emmanuel Pietriga
  */
@@ -35,18 +40,16 @@ public class PDFResourceHandler implements ResourceHandler {
     /** Detail factor */
     public static final String _df = "df=";
     
+    /** Memory Cache*/
+    static SelfPopulatingCache documentCache = new SelfPopulatingCache((new CacheManager()).getCache("zuistPDFCache"), new CachedDocumentFactory());
+    
+    /** Reset memory cache*/
+    public static void resetCache(){
+        documentCache.removeAll();
+    }
+    
     public static Document getDocument(URL pdfURL){
-        Document document = new Document();
-        try {
-            document.setInputStream(pdfURL.openStream(), pdfURL.toString());
-        } catch (PDFException ex) {
-            System.out.println("Error parsing PDF document " + ex);
-        } catch (PDFSecurityException ex) {
-            System.out.println("Error encryption not supported " + ex);
-        } catch (IOException ex) {
-            System.out.println("Error handling PDF document " + ex);
-        }
-        return document;
+        return (Document)documentCache.get(pdfURL).getObjectValue();
     }
     
     /* PDF Resource Handler */
@@ -83,6 +86,25 @@ public class PDFResourceHandler implements ResourceHandler {
         pdfd.setSensitive(sensitivity);
         region.addObject(pdfd);
         return pdfd;
+    }
+    
+}
+
+class CachedDocumentFactory implements CacheEntryFactory {
+    
+    public Object createEntry(Object key){
+        URL pdfURL = (URL)key;
+        Document document = new Document();
+        try {
+            document.setInputStream(pdfURL.openStream(), pdfURL.toString());
+        } catch (PDFException ex) {
+            System.out.println("Error parsing PDF document " + ex);
+        } catch (PDFSecurityException ex) {
+            System.out.println("Error encryption not supported " + ex);
+        } catch (IOException ex) {
+            System.out.println("Error handling PDF document " + ex);
+        }
+        return document;
     }
     
 }
