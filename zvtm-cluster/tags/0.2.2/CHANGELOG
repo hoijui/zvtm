@@ -1,0 +1,10 @@
+0.2.2
+
+Added graceful shutdown capabilities 
+Moved back to JGroups 2.7.0.GA due to a bug / puzzling behavior in JGroups 2.8.0.
+
+0.2.0
+
+Moved to JGroups 2.8.0GA, mainly because it figures out which network interface
+and protocol to use in a smarter way.
+
