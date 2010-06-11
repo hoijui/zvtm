@@ -144,7 +144,7 @@ public class SlaveUpdater {
 		//handle incoming messages (optionnally post reply
 		//or error messages)
 		void startOperation() throws ChannelException {
-			channel = new JChannel();
+			channel = ChannelFactory.makeChannel();
 			channel.connect(appName);
 			channel.setReceiver(new ReceiverAdapter(){
 				@Override public void viewAccepted(View newView){

@@ -65,7 +65,7 @@ aspect MasterNetworkIntroduction {
 		private JChannel channel;
 
 		void startOperation(String appName) throws ChannelException {
-			channel = new JChannel();
+			channel = ChannelFactory.makeChannel();
 			//disable local echo
 			channel.setOpt(Channel.LOCAL, Boolean.FALSE); 
 			channel.connect(appName);
@@ -89,7 +89,7 @@ aspect MasterNetworkIntroduction {
 
 		void sendDelta(Delta delta) throws ChannelException {
 			Message msg = new Message(null, null, delta);
-				channel.send(msg);
+            channel.send(msg);
 		}
 
 	}
