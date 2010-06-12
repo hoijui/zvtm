@@ -55,7 +55,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
-      <version>[0.3.0,)</version>
+      <version>[0.3.1,)</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
