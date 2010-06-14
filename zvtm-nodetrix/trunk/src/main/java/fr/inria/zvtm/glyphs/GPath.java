@@ -29,8 +29,8 @@ public class GPath extends DPath {
     
     public GPath(){
 		super();
-        gradientColors[0] = ProjectColors.EXTRA_GRADIENT_START[ProjectColors.COLOR_SCHEME];
-        gradientColors[1] = ProjectColors.EXTRA_GRADIENT_END[ProjectColors.COLOR_SCHEME];;
+        gradientColors[0] = ProjectColors.EXTRA_COLOR_GRADIENT_START[ProjectColors.COLOR_SCHEME];
+        gradientColors[1] = ProjectColors.EXTRA_COLOR_GRADIENT_END[ProjectColors.COLOR_SCHEME];;
     }
     
 	/**
@@ -94,7 +94,7 @@ public class GPath extends DPath {
 //    		this.gradientColors[0] = c.brighter();
 //    	else
 //    		this.gradientColors[0] = c.darker();
-    	this.gradientColors[1] = ProjectColors.EXTRA_GRADIENT_END[ProjectColors.COLOR_SCHEME];
+    	this.gradientColors[1] = ProjectColors.EXTRA_COLOR_GRADIENT_END[ProjectColors.COLOR_SCHEME];
         this.gradientColors[0] = c;        
     }
     

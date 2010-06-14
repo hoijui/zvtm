@@ -25,14 +25,14 @@ public class ProjectColors {
 	public static final Color[] MATRIX_GRID = {Color.LIGHT_GRAY, new Color(235,235,235)};	
 	public static final float MATRIX_GRID_TRANSLUCENCY = .5f;
 	
-	public static final Color[] EXTRA_GRADIENT_END = {new Color(50,50,50), new Color(245,245,245)};
-	public static final Color[] EXTRA_GRADIENT_START = {Color.GRAY, Color.LIGHT_GRAY};
-	public static final Color[] EXTRA_FADE_OUT = {Color.GRAY.darker(), new Color(245,245,245)};
+	public static final Color[] EXTRA_COLOR_GRADIENT_END = {new Color(50,50,50), new Color(245,245,245)};
+	public static final Color[] EXTRA_COLOR_GRADIENT_START = {Color.GRAY, Color.LIGHT_GRAY};
+	public static final Color[] EXTRA_COLOR_FADE_OUT = {Color.GRAY.darker(), new Color(245,245,245)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
 	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
 	public static final Color INTRA_FADE = Color.LIGHT_GRAY.brighter();
-	public static final Color INTRA_DEFAULT = Color.BLUE;
+	public static final Color INTRA_COLOR_DEFAULT = Color.BLUE;
 	
 	public static final Color[] NODE_TEXT = {Color.LIGHT_GRAY, Color.BLACK};
 	public static final Color[] NODE_BACKGROUND = {Color.DARK_GRAY.darker(), Color.LIGHT_GRAY};

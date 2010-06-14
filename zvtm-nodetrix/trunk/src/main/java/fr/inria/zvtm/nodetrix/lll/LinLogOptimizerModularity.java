@@ -147,7 +147,7 @@ public class LinLogOptimizerModularity {
      */
     private Map<LinLogNode,Integer> cluster(final Collection<LinLogNode> nodes, final List<LinLogEdge> edges, 
             final double atedges, final double atpairs) {
-        System.out.println("Contracting " + nodes.size() + " nodes, " + edges.size() + " edges");
+//        System.out.println("Contracting " + nodes.size() + " nodes, " + edges.size() + " edges");
         
         // contract nodes
         Collections.sort(edges, new Comparator<LinLogEdge>() { 

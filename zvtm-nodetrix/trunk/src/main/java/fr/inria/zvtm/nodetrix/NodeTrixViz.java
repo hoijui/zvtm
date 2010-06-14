@@ -57,7 +57,7 @@ public class NodeTrixViz {
     /* Links between matrices */
 	public static final float EXTRA_ALPHA_MAX_LENGHT = 1500;  
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
-	public static final float EXTRA_ALPHA_MIN = .25f;
+	public static final float EXTRA_ALPHA_MIN = .5f;
 	
 	public static final double LINLOG_QUALITY = 10;
 	
@@ -168,7 +168,7 @@ public class NodeTrixViz {
     
     /** Method is used if inputfile is passed directly to zvtm-ontotrix*/
     public NTEdge addEdge(NTNode tail, NTNode head){
-    	return addEdge(tail, head, ProjectColors.INTRA_DEFAULT, null);
+    	return addEdge(tail, head, ProjectColors.INTRA_COLOR_DEFAULT, null);
 //        if (tail.getMatrix() == head.getMatrix()){
 //            return addIntraEdge(tail, head);
 //        }

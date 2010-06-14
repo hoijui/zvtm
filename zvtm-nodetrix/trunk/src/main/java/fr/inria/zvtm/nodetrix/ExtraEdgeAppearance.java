@@ -29,8 +29,9 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	}
 
 	public void updateColor(){
-		if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_FADE_OUT[ProjectColors.COLOR_SCHEME])) return;
+		if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME])) return;
 		edgePath.setColor(edge.getColor());
+//		edgePath.set
 	}
 	
 	@Override
@@ -122,8 +123,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	public void fade() {
 		System.out.println("[EXTRA_EDGE] FADE");
 //		edgePath.setVisible(false);
-		gradientColors[0] = ProjectColors.EXTRA_FADE_OUT[ProjectColors.COLOR_SCHEME];
-		gradientColors[1] = ProjectColors.EXTRA_FADE_OUT[ProjectColors.COLOR_SCHEME];	
+		gradientColors[0] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];
+		gradientColors[1] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];	
 		edgePath.setGradientColors(gradientColors);
 		edgePath.setSensitivity(false);
 	}
