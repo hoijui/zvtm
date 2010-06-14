@@ -408,19 +408,25 @@ public class Matrix {
     
     
     /** Brings all glyphs of this matrix to the top of the drawing stack*/
-    public void onTop(VirtualSpace vs)
+    public void onTop(final VirtualSpace vs)
     {	
-    	vs.onTop(bkg);
-    	for(Glyph g : gridBarsH){ vs.onTop(g); }
-    	for(Glyph g : gridBarsV){ vs.onTop(g); }
-    	for(Glyph g : gridReflexiveSquares){ vs.onTop(g); }
-    	
-    	for(NTNode n : this.nodes){
-    		n.onTop(); //Virtual space is already known in NTNode
-    		for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
-    	}
-    	
-    	vs.onTop(gOverview);
+
+        try {
+            javax.swing.SwingUtilities.invokeAndWait(new Runnable(){
+            public void run(){
+                vs.onTop(bkg);
+            	for(Glyph g : gridBarsH){ vs.onTop(g); }
+            	for(Glyph g : gridBarsV){ vs.onTop(g); }
+            	for(Glyph g : gridReflexiveSquares){ vs.onTop(g); }
+            	for(NTNode n : Matrix.this.nodes){
+            		n.onTop(); //Virtual space is already known in NTNode
+            		for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
+            	}
+            	vs.onTop(gOverview);
+            }
+            });
+        } catch(InterruptedException ie){ /* swallow */ }
+        catch(java.lang.reflect.InvocationTargetException ite){ /* swallow */ }
     }
    
     public void highlightGrid(NTNode tail, NTNode head, Color c)
