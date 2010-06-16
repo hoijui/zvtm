@@ -244,6 +244,9 @@ public class NTNode extends LinLogNode{
      **/
     public void resetWesternLabels(boolean animated)
     {
+    	if(single){
+    		return;
+    	}
     	if(animated){
     		animManager.startAnimation(animManager.getAnimationFactory()
 	        		.createGlyphTranslation(

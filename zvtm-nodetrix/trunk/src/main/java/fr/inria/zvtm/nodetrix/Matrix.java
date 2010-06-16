@@ -779,12 +779,13 @@ public class Matrix {
 		}
 		
 		// 6. DISPLACE MATRICES 
+		// 7. CREATE NEW EDGE GRAPHICS
 		for(Matrix m : newMatrices)
 		{
-			// 7. CREATE NEW EDGE GRAPHICS
 			m.createEdgeGraphics(vs);
 			m.onTop(vs);
 		}
+
 		return newMatrices;
 		} catch(Exception e) {e.printStackTrace();}
 		return null;
