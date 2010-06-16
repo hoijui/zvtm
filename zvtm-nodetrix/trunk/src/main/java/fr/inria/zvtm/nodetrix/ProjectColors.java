@@ -14,8 +14,6 @@ public class ProjectColors {
     
     public static final Color[] HIGHLIGHT = {Color.yellow, Color.yellow};
     public static final Color[] HIGHLIGHT_RELATED = {Color.yellow.darker(), Color.orange.brighter()};
-//    public static final Color[] EDGE_HIGHLIGHT_INCOMING = {Color.orange};
-//    public static final Color[] EDGE_HIGHLIGHT_OUTGOING = {Color.orange.brighter()};
     
     //COLOR DEFINITIONS
     public static final Color MATRIX_BACKGROUND = Color.WHITE;	
@@ -26,7 +24,7 @@ public class ProjectColors {
 	public static final float MATRIX_GRID_TRANSLUCENCY = .5f;
 	
 	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(50,50,50), new Color(245,245,245)};
-	public static final Color[] EXTRA_COLOR_GRADIENT_END = {new Color(70,70,70), new Color(210,210,210)};
+	public static final Color[] EXTRA_COLOR_GRADIENT_END = {new Color(70,70,70), new Color(30,30,30)};
 	public static final Color[] EXTRA_COLOR_FADE_OUT = {Color.GRAY.darker(), new Color(245,245,245)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
