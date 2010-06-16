@@ -12,7 +12,7 @@ public class ProjectColors {
     public static int CS_PRINT = 1;
     public static int COLOR_SCHEME = CS_SCREEN;
     
-    public static final Color[] HIGHLIGHT = {Color.yellow, Color.orange};
+    public static final Color[] HIGHLIGHT = {Color.yellow, Color.yellow};
     public static final Color[] HIGHLIGHT_RELATED = {Color.yellow.darker(), Color.orange.brighter()};
 //    public static final Color[] EDGE_HIGHLIGHT_INCOMING = {Color.orange};
 //    public static final Color[] EDGE_HIGHLIGHT_OUTGOING = {Color.orange.brighter()};
@@ -20,13 +20,13 @@ public class ProjectColors {
     //COLOR DEFINITIONS
     public static final Color MATRIX_BACKGROUND = Color.WHITE;	
 	public static final Color[] MATRIX_SYMMETRY_FIELDS = {Color.LIGHT_GRAY, new Color(245,245,245)};	
-	public static final Color[] MATRIX_GROUP_LABEL_BACKGROUND = {Color.DARK_GRAY, Color.GRAY}	;	
+	public static final Color[] MATRIX_GROUP_LABEL_BACKGROUND = {Color.DARK_GRAY, Color.LIGHT_GRAY}	;	
 	public static final Color[] MATRIX_GROUP_LABEL_TEXT = {Color.LIGHT_GRAY, Color.BLACK};	
 	public static final Color[] MATRIX_GRID = {Color.LIGHT_GRAY, new Color(235,235,235)};	
 	public static final float MATRIX_GRID_TRANSLUCENCY = .5f;
 	
-	public static final Color[] EXTRA_COLOR_GRADIENT_END = {new Color(50,50,50), new Color(245,245,245)};
-	public static final Color[] EXTRA_COLOR_GRADIENT_START = {Color.GRAY, Color.LIGHT_GRAY};
+	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(50,50,50), new Color(245,245,245)};
+	public static final Color[] EXTRA_COLOR_GRADIENT_END = {new Color(70,70,70), new Color(210,210,210)};
 	public static final Color[] EXTRA_COLOR_FADE_OUT = {Color.GRAY.darker(), new Color(245,245,245)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
