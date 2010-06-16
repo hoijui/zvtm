@@ -106,6 +106,29 @@ public class OverviewPortal extends CameraPortal {
 	}
     }
 
+    public double getObservedRegionX() {
+	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+	return (double)x+ (double)w/2.0 + (double)(observedRegion[0]-camera.posx)*orcoef;
+    }
+    public double getObservedRegionY() {
+	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+	return (double)y+ h/2.0 - (double)(observedRegion[1]-camera.posy)*orcoef;
+    }
+    public double getObservedRegionW() {
+	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+	return (double)(observedRegion[2]-observedRegion[0])*orcoef;
+    }
+    public double getObservedRegionH() {
+	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+	return (double)(observedRegion[1]-observedRegion[3])*orcoef;
+    }
+    public double getObservedRegionCX() {
+	return getObservedRegionX() + getObservedRegionW()/2.0;
+    }
+    public double getObservedRegionCY() {
+	return getObservedRegionY() + getObservedRegionH()/2.0;
+    }
+    
     /**returns null if translucency is 1.0f*/
     public AlphaComposite getObservedRegionTranslucency(){
 	return acST;
