@@ -84,7 +84,7 @@ public class GPath extends DPath {
     @Override
     /** Is just a <i>delegate</i> for <code>setGradientColors</code>. The one color passed
      * to this method is the second gradient value, whether the first one is a darker 
-     * version of the second one.
+     * version of the second one. Hence the edge goes gray->color.
      * @author benjamin bach
      * @param Color c
      */
@@ -94,8 +94,8 @@ public class GPath extends DPath {
 //    		this.gradientColors[0] = c.brighter();
 //    	else
 //    		this.gradientColors[0] = c.darker();
-    	this.gradientColors[1] = ProjectColors.EXTRA_COLOR_GRADIENT_END[ProjectColors.COLOR_SCHEME];
-        this.gradientColors[0] = c;        
+    	this.gradientColors[0] = ProjectColors.EXTRA_COLOR_GRADIENT_START[ProjectColors.COLOR_SCHEME];
+        this.gradientColors[1] = c;        
     }
     
     /** Set gradient distribution.

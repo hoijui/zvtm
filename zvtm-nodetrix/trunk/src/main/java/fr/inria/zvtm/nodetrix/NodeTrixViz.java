@@ -395,30 +395,27 @@ public class NodeTrixViz {
     	
     	//care about related if necessary.
     	if(context){
+    		System.out.println("[NTV] highlighht node context");
     		//highlight outgoing relations and nodes.
     		HashSet<NTNode> highlightedNodes = new HashSet<NTNode>();
     		HashSet<NTEdge> highlightedEdges = new HashSet<NTEdge>();
     		for(NTEdge e : n.getOutgoingEdges()){
+        		System.out.println("[NTV] outgoing edge");
     			if(!e.isVisible()) continue;
 	    		e.getHead().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
-	    		if(!e.isIntraEdge()){
-					e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
-					e.performInteractionStateChange();
-					highlightedEdges.add(e);
-				}
-    			highlightedNodes.add(e.getHead());
+	    		e.performInteractionStateChange();
+				highlightedEdges.add(e);
+				highlightedNodes.add(e.getHead());
     		}
     		
     		//highlight incomming relations and nodes.
     		for(NTEdge e : n.getIncomingEdges()){
+        		System.out.println("[NTV] incomming edge");
     			if(!e.isVisible()) continue;
     			e.getTail().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
-    			if(!e.isIntraEdge()){
-    				e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING);
-    				e.performInteractionStateChange();
-    				highlightedEdges.add(e);
-    			}
-    			highlightedNodes.add(e.getHead());
+    			e.performInteractionStateChange();
+    			highlightedEdges.add(e);
+    			highlightedNodes.add(e.getTail());
     		}
     		
     		Matrix mRel;
@@ -459,13 +456,14 @@ public class NodeTrixViz {
     	e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
     	e.performInteractionStateChange();
     	
+    	System.out.println("[NTV] highlight Edge context");
     	NTNode head = e.getHead();
 		highlightedNodes.add(head);
     	NTNode tail = e.getTail();
 		highlightedNodes.add(tail);
 		head.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, false, true);
 		head.perfomStateChange();
-		tail.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, false);
+		tail.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, false, true);
 		tail.perfomStateChange();
 
 		if(e.isIntraEdge()){

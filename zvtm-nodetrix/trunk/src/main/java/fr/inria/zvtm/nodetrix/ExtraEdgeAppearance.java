@@ -31,7 +31,6 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	public void updateColor(){
 		if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME])) return;
 		edgePath.setColor(edge.getColor());
-//		edgePath.set
 	}
 	
 	@Override

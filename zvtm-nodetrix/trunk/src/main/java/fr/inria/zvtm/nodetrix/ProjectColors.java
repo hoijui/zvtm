@@ -23,8 +23,8 @@ public class ProjectColors {
 	public static final Color[] MATRIX_GRID = {Color.LIGHT_GRAY, new Color(235,235,235)};	
 	public static final float MATRIX_GRID_TRANSLUCENCY = .5f;
 	
-	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(50,50,50), new Color(245,245,245)};
-	public static final Color[] EXTRA_COLOR_GRADIENT_END = {new Color(70,70,70), new Color(30,30,30)};
+	public static final Color[] EXTRA_COLOR_GRADIENT_END = {Color.gray, Color.gray};
+	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(70,70,70), new Color(220,220,220)};
 	public static final Color[] EXTRA_COLOR_FADE_OUT = {Color.GRAY.darker(), new Color(245,245,245)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
