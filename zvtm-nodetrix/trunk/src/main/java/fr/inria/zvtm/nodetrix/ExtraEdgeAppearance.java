@@ -19,10 +19,13 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	private GPath edgePath;
 	// start and end point offsets w.r.t respective matrices
 	LongPoint[] offsets;
-	static final long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
+	static long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
 	private float alpha = 1f;
 	private static Color[] gradientColors = new Color[2];
-	    
+	
+	public static void setControlPointOffset(double s){
+	    CONTROL_POINT_OFFSET = Math.round(NodeTrixViz.CELL_SIZE * s);
+	}
 	
 	public ExtraEdgeAppearance(NTEdge edge) {
 		super(edge);
