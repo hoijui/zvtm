@@ -105,12 +105,15 @@ public class NTInfoBox {
 	/**Must be called before showing the box.
 	 * */
 	public void alignToWesternLabel(long x, long y){
+	    if (gBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
 		gBox.moveTo(x - gBox.getWidth(), y - gBox.getHeight());
 	}
 	public void alignToNorthernLabel(long x, long y){
+	    if (gBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
 		gBox.moveTo(x + gBox.getWidth(), y - gBox.getHeight());
 	}
 	public void move(long x, long y){
+	    if (gBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
 		gBox.move(x, y);
 	}
 	
