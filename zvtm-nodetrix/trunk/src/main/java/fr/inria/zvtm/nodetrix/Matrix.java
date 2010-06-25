@@ -411,9 +411,15 @@ public class Matrix {
     public void onTop(final VirtualSpace vs)
     {	
         vs.onTop(bkg);
-        for(Glyph g : gridBarsH){ vs.onTop(g); }
-        for(Glyph g : gridBarsV){ vs.onTop(g); }
-        for(Glyph g : gridReflexiveSquares){ vs.onTop(g); }
+        for(Glyph g : gridBarsH){
+            if (g!=null){vs.onTop(g); }
+        }
+        for(Glyph g : gridBarsV){
+            if (g!=null){vs.onTop(g); }
+        }
+        for(Glyph g : gridReflexiveSquares){
+            if (g!=null){vs.onTop(g); }
+        }
         for(NTNode n : this.nodes){
             n.onTop(); //Virtual space is already known in NTNode
             for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
