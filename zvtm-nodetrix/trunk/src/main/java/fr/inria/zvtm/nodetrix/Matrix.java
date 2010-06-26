@@ -429,10 +429,10 @@ public class Matrix {
    
     public void highlightGrid(NTNode tail, NTNode head, Color c)
     {
+    	if(nodes.size() == 1) return;
     	if(nodes.contains(tail))
     	{
     		int i1 = nodes.indexOf(tail);
-//    		System.out.println("[MATRIX] i1 : " + i1);
     		Glyph g1 = tail.matrix.gridBarsH[i1];
     		g1.setColor(c);
     		g1.setVisible(true);
@@ -440,7 +440,6 @@ public class Matrix {
     	if(nodes.contains(head))
     	{
     		int i2 = nodes.indexOf(head);
-//    		System.out.println("[MATRIX] i2 : " + i2);
     		Glyph g2 = tail.matrix.gridBarsV[i2];
     		g2.setColor(c);
     		g2.setVisible(true);
@@ -470,6 +469,7 @@ public class Matrix {
     {
     	int i = 0;
     	if(nodes.size() == 1) return;
+    	
     	for(Glyph g : gridBarsH)
     	{
     		g.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);

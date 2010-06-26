@@ -387,21 +387,25 @@ public class NodeTrixViz {
     public void highlightNodeContext(NTNode n, boolean context){
     	//care about node.
     	Matrix m = n.getMatrix();
+//    	System.out.println("[NTV] 1");
     	m.resetGrid();
+//    	System.out.println("[NTV] 2");
     	m.highlightGrid(n, n, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+//    	System.out.println("[NTV] 3");
     	highlightedNodes.add(n);
+//    	System.out.println("[NTV] 4");
     	n.setNewInteractionState(IA_STATE_HIGHLIGHT, true, true);
+//    	System.out.println("[NTV] 5");
     	n.perfomStateChange();
-    	
+//    	System.out.println("[NTV] 6-");
+
     	//care about related if necessary.
     	if(context){
-    		System.out.println("[NTV] highlighht node context");
     		//highlight outgoing relations and nodes.
     		HashSet<NTNode> highlightedNodes = new HashSet<NTNode>();
     		HashSet<NTEdge> highlightedEdges = new HashSet<NTEdge>();
     		for(NTEdge e : n.getOutgoingEdges()){
-        		System.out.println("[NTV] outgoing edge");
-    			if(!e.isVisible()) continue;
+       		if(!e.isVisible()) continue;
 	    		e.getHead().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
 	    		e.performInteractionStateChange();
 				highlightedEdges.add(e);
@@ -410,7 +414,6 @@ public class NodeTrixViz {
     		
     		//highlight incomming relations and nodes.
     		for(NTEdge e : n.getIncomingEdges()){
-        		System.out.println("[NTV] incomming edge");
     			if(!e.isVisible()) continue;
     			e.getTail().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
     			e.performInteractionStateChange();
@@ -456,7 +459,6 @@ public class NodeTrixViz {
     	e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
     	e.performInteractionStateChange();
     	
-    	System.out.println("[NTV] highlight Edge context");
     	NTNode head = e.getHead();
 		highlightedNodes.add(head);
     	NTNode tail = e.getTail();
