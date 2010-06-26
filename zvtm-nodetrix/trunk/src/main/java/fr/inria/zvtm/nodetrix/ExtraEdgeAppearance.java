@@ -11,12 +11,12 @@ import java.awt.Color;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.GPath;
 import fr.inria.zvtm.glyphs.Glyph;
 
 public class ExtraEdgeAppearance extends EdgeAppearance {
 
-	private DPath edgePath;
+	private GPath edgePath;
 	// start and end point offsets w.r.t respective matrices
 	LongPoint[] offsets;
 	static long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
@@ -68,7 +68,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y2 = edge.head.wdy;
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
                                 hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
@@ -81,7 +81,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getHeight();
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET, true);
@@ -94,7 +94,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y2 = edge.head.wdy;
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
                                 hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
@@ -108,7 +108,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight();
             offsets[0] = new LongPoint(x1, y1);
             offsets[1] = new LongPoint(x2, y2);
-            edgePath = new DPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
