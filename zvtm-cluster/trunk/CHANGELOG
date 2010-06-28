@@ -1,5 +1,6 @@
 Added VirtualSpace.show and VirtualSpace.hide to Autoreplay methods.
 Added DPath.edit to Autoreplay methods.
+Added local_slave and local_master example scripts
 
 0.2.2
 
