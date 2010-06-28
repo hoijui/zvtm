@@ -7,6 +7,8 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
@@ -54,6 +56,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void DPath.addSegment(long, long, boolean)) ||  
          execution(public void DPath.addCbCurve(long, long, long, long, long, long, boolean)) ||  
          execution(public void DPath.addQdCurve(long, long, long, long, boolean)) ||  
+         execution(public void DPath.edit(LongPoint[], boolean)) ||  
          execution(public void RectangularShape.setHeight(long)) ||  
          execution(public void RectangularShape.setWidth(long)) ||
          execution(public void VirtualSpace.show(Glyph)) ||
