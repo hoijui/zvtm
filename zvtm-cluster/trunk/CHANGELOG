@@ -1,3 +1,5 @@
+Added VirtualSpace.show and VirtualSpace.hide to Autoreplay methods.
+
 0.2.2
 
 Added graceful shutdown capabilities 

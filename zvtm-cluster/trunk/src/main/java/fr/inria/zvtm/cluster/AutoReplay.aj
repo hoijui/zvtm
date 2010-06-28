@@ -56,6 +56,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void DPath.addQdCurve(long, long, long, long, boolean)) ||  
          execution(public void RectangularShape.setHeight(long)) ||  
          execution(public void RectangularShape.setWidth(long)) ||
+         execution(public void VirtualSpace.show(Glyph)) ||
+         execution(public void VirtualSpace.hide(Glyph)) ||
 
         //Camera methods
          execution(public void Camera.setZoomFloor(float))
