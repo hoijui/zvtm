@@ -14,6 +14,7 @@ import org.kohsuke.args4j.Option;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -79,6 +80,17 @@ public class DPathExample {
 
         VRectangle rect = new VRectangle(0,0,0,100,200,Color.YELLOW);
         vs.addGlyph(rect);
+
+        DPath pathEdit = new DPath(0,0,0,Color.RED);
+        pathEdit.addSegment(0,30,true);
+        pathEdit.addSegment(30,30,true);
+        pathEdit.addSegment(30,0,true);
+        pathEdit.addSegment(0,0,true);
+        //turn the square into a triangle
+        pathEdit.edit(new LongPoint[]{new LongPoint(0,0), new LongPoint(0,0),
+        new LongPoint(0,0), new LongPoint(-30,0), new LongPoint(0,0)},
+                false);
+        vs.addGlyph(pathEdit);
     }
 
 	public static void main(String[] args){
