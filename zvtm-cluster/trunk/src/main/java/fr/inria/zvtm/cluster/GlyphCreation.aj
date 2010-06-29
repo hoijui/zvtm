@@ -9,8 +9,8 @@ package fr.inria.zvtm.cluster;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-
 import java.net.URL;
+import javax.swing.ImageIcon;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -23,6 +23,7 @@ import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
+import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -124,6 +125,11 @@ public aspect GlyphCreation {
 
 	@Override Delta CircleNR.getCreateDelta(){
 		return new CircleNRCreateDelta(this,
+				this.getParentSpace().getObjId());
+	}
+
+	@Override Delta VImage.getCreateDelta(){
+		return new VImageCreateDelta(this,
 				this.getParentSpace().getObjId());
 	}
 
@@ -376,6 +382,25 @@ public aspect GlyphCreation {
 			return new CircleNR(0,0,0,radius,Color.BLACK);
 		}
 	}
+
+    private static class VImageCreateDelta extends ClosedShapeCreateDelta {
+        //Note that serialized ImageIcon instances (as most AWT objects)
+        //are not guaranteed to be portable across toolkits.
+        //If this becomes a practical concern, then another serialization 
+        //mechanism is to be used.
+        private final ImageIcon serImage; 
+        private final double scaleFactor;
+
+        VImageCreateDelta(VImage source, ObjId<VirtualSpace> virtualSpaceId){
+            super(source, virtualSpaceId);
+            this.serImage = new ImageIcon(source.getImage());
+            this.scaleFactor = source.scaleFactor;
+        }
+
+        Glyph createGlyph(){
+            return new VImage(0,0,0,serImage.getImage(), scaleFactor);
+        }
+    }
 
 	private static class ClusteredImageCreateDelta extends ClosedShapeCreateDelta {
 		private final double scaleFactor;

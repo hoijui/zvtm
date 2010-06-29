@@ -1,6 +1,8 @@
 Added VirtualSpace.show and VirtualSpace.hide to Autoreplay methods.
 Added DPath.edit to Autoreplay methods.
 Added local_slave and local_master example scripts
+Added serialization of raw images (i.e. VImage in complement to the already-existing
+ClusteredImage class)
 
 0.2.2
 
