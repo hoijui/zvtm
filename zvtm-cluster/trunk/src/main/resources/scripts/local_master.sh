@@ -4,7 +4,7 @@
 DEPS_CP=`mvn org.apache.maven.plugins:maven-dependency-plugin:2.0:build-classpath -DexcludeArtifactIds="zvtm" | grep jgroups`
 
 ZVTM_CLUSTER_VERSION="0.2.3-SNAPSHOT"
-CLASSNAME="fr.inria.zvtm.cluster.examples.AnimCircles"
+CLASSNAME="fr.inria.zvtm.cluster.examples.VImageExample"
 
-java -cp target/zvtm-cluster-"$ZVTM_CLUSTER_VERSION".jar:$DEPS_CP "$CLASSNAME" "$@"
+java -Djgroups.bind_addr="127.0.0.1" -Djava.net.preferIPv4Stack=true -cp .:target/zvtm-cluster-"$ZVTM_CLUSTER_VERSION".jar:$DEPS_CP "$CLASSNAME" "$@"
 
