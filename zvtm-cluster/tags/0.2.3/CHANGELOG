@@ -1,0 +1,18 @@
+0.2.3 
+
+Added VirtualSpace.show and VirtualSpace.hide to Autoreplay methods.
+Added DPath.edit to Autoreplay methods.
+Added local_slave and local_master example scripts
+Added serialization of raw images (i.e. VImage in complement to the already-existing
+ClusteredImage class)
+
+0.2.2
+
+Added graceful shutdown capabilities 
+Moved back to JGroups 2.7.0.GA due to a bug / puzzling behavior in JGroups 2.8.0.
+
+0.2.0
+
+Moved to JGroups 2.8.0GA, mainly because it figures out which network interface
+and protocol to use in a smarter way.
+
