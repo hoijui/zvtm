@@ -247,7 +247,7 @@ class PDFPageHideAction implements EndAction {
             ((ZPDFPage)subject).flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying PDF page " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying PDF page " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
@@ -258,7 +258,7 @@ class PDFPageHideAction implements EndAction {
             ((ZPDFPage)subject).flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
         }	
     }
 
