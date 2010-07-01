@@ -92,8 +92,10 @@ public class ImageDescription extends ResourceDescription {
                         finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
                     }
                     catch(IOException e){
-                        System.err.println("Error fetching Image resource "+src.toString());
-                        e.printStackTrace();
+                        if (SceneManager.getDebugMode()){
+                            System.err.println("Error fetching Image resource "+src.toString());
+                            e.printStackTrace();
+                        }
                     }
                 }
                 else {
@@ -259,7 +261,7 @@ class ImageHideAction implements EndAction {
             ((VImage)subject).getImage().flush();
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
@@ -270,7 +272,7 @@ class ImageHideAction implements EndAction {
             ((VImage)subject).getImage().flush();                
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
         }	
     }
 
@@ -289,7 +291,7 @@ class FeedbackHideAction implements EndAction {
             vs.removeGlyph((Glyph)subject);
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
@@ -299,7 +301,7 @@ class FeedbackHideAction implements EndAction {
             vs.removeGlyph((Glyph)subject);
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Giving up.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
         }	
     }
 

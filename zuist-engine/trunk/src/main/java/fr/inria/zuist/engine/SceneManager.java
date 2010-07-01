@@ -192,7 +192,7 @@ public class SceneManager implements CameraListener {
                         float alt = entry.getValue().alt;
                         int layerIndex = getLayerIndex(cam);
                         if(layerIndex == -1){
-                            System.err.println("Camera " + cam + "is not tracked by ZUIST");
+                            if (DEBUG_MODE){System.err.println("Camera " + cam + "is not tracked by ZUIST");}
                             return;
                         }
                         long[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
@@ -451,9 +451,11 @@ public class SceneManager implements CameraListener {
                     r.setContainingRegion(cr);                    
                 }
                 else {
-                    System.err.println("Warning: trying to set a containedIn relationship between:\n" +
+                    if (DEBUG_MODE){
+                        System.err.println("Warning: trying to set a containedIn relationship between:\n" +
                         rn + " => " + r + "\n" +
                         regionName2containerRegionName.get(rn) + " => " + cr);
+                    }
                 }
             }
         }
@@ -558,7 +560,7 @@ public class SceneManager implements CameraListener {
             id2region.put(id, region);
         }
         else {
-            System.err.println("Error: ID "+id+" used to identify more than one region.");
+            if (DEBUG_MODE){System.err.println("Error: ID "+id+" used to identify more than one region.");}
             return null;
         }
         for (int i=highestLevel;i<=lowestLevel;i++){
@@ -657,7 +659,7 @@ public class SceneManager implements CameraListener {
         String id = e.getAttribute(_id);
         int zindex = (e.hasAttribute(_zindex)) ? Integer.parseInt(e.getAttribute(_zindex)) : 0;
         if (id == null || id.length() == 0){
-            System.err.println("Warning: object "+e+" has no ID");
+            if (DEBUG_MODE){System.err.println("Warning: object "+e+" has no ID");}
         }
         // process element-specific attributes
         if (e.getTagName().equals(_resource)){
@@ -673,7 +675,7 @@ public class SceneManager implements CameraListener {
             od = processPolygon(e, id, zindex, region);
         }
         else {
-            System.err.println("Error: failed to process object declaration: "+id);
+            if (DEBUG_MODE){System.err.println("Error: failed to process object declaration: "+id);}
             return null;
         }
         String tto = e.getAttribute(_takesToO);
@@ -731,12 +733,12 @@ public class SceneManager implements CameraListener {
                 id2object.put(id, rd);
             }
             else {
-                System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+                if (DEBUG_MODE)System.err.println("Warning: ID: "+id+" used to identify more than one object.");
             }
             return rd;
         }
         else {
-            System.err.println("Error: failed to process resource declaration "+id+" : no appropriate handler for this type of resource");
+            if (DEBUG_MODE){System.err.println("Error: failed to process resource declaration "+id+" : no appropriate handler for this type of resource");}
             return null;
         }
     }
@@ -764,7 +766,7 @@ public class SceneManager implements CameraListener {
             id2object.put(id, imd);
         }
         else {
-            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+            if (DEBUG_MODE)System.err.println("Warning: ID: "+id+" used to identify more than one object.");
         }
         return imd;
     }
@@ -791,7 +793,7 @@ public class SceneManager implements CameraListener {
             id2object.put(id, gd);
         }
         else {
-            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+            if (DEBUG_MODE)System.err.println("Warning: ID: "+id+" used to identify more than one object.");
         }
         return gd;
     }
@@ -887,7 +889,7 @@ public class SceneManager implements CameraListener {
             id2object.put(id, td);
         }
         else {
-            System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+            if (DEBUG_MODE)System.err.println("Warning: ID: "+id+" used to identify more than one object.");
         }
         return td;
     }
@@ -1012,8 +1014,10 @@ public class SceneManager implements CameraListener {
 	        }
         }
         catch ( Exception e) { 
-	        System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level.");
-            e.printStackTrace();
+	        if (DEBUG_MODE){
+	            System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1115,7 +1119,7 @@ public class SceneManager implements CameraListener {
     		try {
     			return new URL(src);
     		}
-    		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+src);}
+    		catch(MalformedURLException ex){if (DEBUG_MODE)System.err.println("Error: malformed resource URL: "+src);}
 		}
     	else {
     		// probably a local file URL
@@ -1124,7 +1128,7 @@ public class SceneManager implements CameraListener {
     			               (((new File(src)).isAbsolute()) ? src
     			                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
     		}
-    		catch(MalformedURLException ex){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}			
+    		catch(MalformedURLException ex){if (DEBUG_MODE){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}}		
     	}
     	return null;
     }
@@ -1147,4 +1151,16 @@ public class SceneManager implements CameraListener {
         }
         return -1;
     }
+    
+    /* ------------------ DEBUGGING --------------------- */
+    private static boolean DEBUG_MODE = false;
+    
+    public static void setDebugMode(boolean b){
+        DEBUG_MODE = b;
+    }
+    
+    public static boolean getDebugMode(){
+        return DEBUG_MODE;
+    }
+    
 }

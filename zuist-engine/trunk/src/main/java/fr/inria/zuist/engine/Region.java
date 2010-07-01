@@ -76,7 +76,7 @@ public class Region {
             return ORDERING_ARRAY;
         }
         else {
-            System.err.println("Error: unknown load/unload request ordering declaration: "+o);
+            if (SceneManager.getDebugMode()){System.err.println("Error: unknown load/unload request ordering declaration: "+o);}
             return -1;
         }
     }
@@ -87,7 +87,7 @@ public class Region {
         else if (t.equals(APPEAR_STR)){return APPEAR;}
         else if (t.equals(DISAPPEAR_STR)){return DISAPPEAR;}
         else {
-            System.err.println("Error: incorrect transition value: "+t);
+            if (SceneManager.getDebugMode()){System.err.println("Error: incorrect transition value: "+t);}
             return -1;
         }
     }

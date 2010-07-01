@@ -45,7 +45,7 @@ class GlyphLoader {
 
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
         if(target == null){
-            System.err.println("addLoadRequest: could not retrieve virtual space");
+            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+layerIndex);}
             return;
         }
         loader.submit(new Request(target, od, transition));	
@@ -61,7 +61,7 @@ class GlyphLoader {
 
         final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
         if(target == null){
-            System.err.println("addLoadRequest: could not retrieve virtual space");
+            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+layerIndex);}
             return;
         }
         loader.submit(new Request(target, od, transition));

@@ -137,7 +137,7 @@ class ClosedShapeHideAction implements EndAction {
             vs.removeGlyph((Glyph)subject);
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
@@ -147,7 +147,7 @@ class ClosedShapeHideAction implements EndAction {
             vs.removeGlyph((Glyph)subject);
         }
         catch(ArrayIndexOutOfBoundsException ex){
-            System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");
+            if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
             recoverFailingAnimationEnded(subject, dimension);
         }
     }

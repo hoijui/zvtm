@@ -85,7 +85,7 @@ public class SceneFragmentDescription extends ResourceDescription {
                 }
                 sm.updateVisibleRegions();
             }
-            catch (URISyntaxException ex){System.err.println();ex.printStackTrace();}            
+            catch (URISyntaxException ex){if (SceneManager.getDebugMode()){ex.printStackTrace();}}            
         }
     }
 
