@@ -55,7 +55,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
-      <version>[0.3.1,)</version>
+      <version>[0.3.2-SNAPSHOT,)</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
@@ -114,19 +114,6 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
             <configuration>
               <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <inherited>true</inherited>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
