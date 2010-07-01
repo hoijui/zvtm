@@ -57,6 +57,22 @@ public class LongPoint{
 	this.y+=dy;
     }
 
+    public double distance(LongPoint p){
+        return distance(p.x, p.y);
+    }
+
+    public double distance(double px, double py){
+        return Math.sqrt(distanceSq(px, py));
+    }
+
+    public double distanceSq(LongPoint p){
+        return distanceSq(p.x, p.y);
+    }
+
+    public double distanceSq(double px, double py){
+        return (this.x - px)*(this.x - px) + (this.y - py)*(this.y - py);
+    }
+
     public String toString(){
 	return "("+x+","+y+")";
     }
