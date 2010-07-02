@@ -56,6 +56,13 @@ $Id$
       <artifactId>zvtm</artifactId>
       <version>0.10.1-SNAPSHOT</version>
     </dependency>
+
+<!--
+	ivoa fits is not available in any Maven repository for now.
+	Get it from http://skyservice.pha.jhu.edu/develop/vo/ivoafits/
+	Install the JAR files in your local repository using the following command line:
+        mvn install:install-file -Dfile=ivoafits-0.3.jar -DgroupId=ivoa.fits -DartifactId=fits -Dversion=0.3.0 -Dpackaging=jar
+-->
 	<dependency>
       <groupId>ivoa.fits</groupId>
       <artifactId>fits</artifactId>
