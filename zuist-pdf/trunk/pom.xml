@@ -100,6 +100,15 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 
   <!-- Build -->
   <build>
+	<resources> 
+	  <resource>
+        <directory>src/main/resources</directory> 
+          <excludes> 
+		    <exclude>images/*.ai</exclude>
+		    <exclude>images/cprogress/**</exclude>
+		</excludes> 
+      </resource>
+	</resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>

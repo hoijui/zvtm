@@ -11,6 +11,7 @@ import java.awt.Image;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import javax.swing.SwingUtilities;
+import javax.swing.ImageIcon;
 
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
@@ -27,7 +28,6 @@ import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.ZPDFPage;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
 import fr.inria.zvtm.glyphs.VImage;
-import fr.inria.zvtm.glyphs.VRectProgress;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -75,10 +75,11 @@ public class PDFPageDescription extends ResourceDescription {
             if (glyph == null){
                 // open connection to data
                 if (showFeedbackWhenFetching){
-                    final VRectProgress vrp = new VRectProgress(vx, vy, zindex, Math.round(200*scale), Math.round(14*scale),
-                            Color.WHITE, Color.BLACK, Color.BLACK);
+                    final VImage vrp = new VImage(vx, vy, zindex, (new ImageIcon(this.getClass().getResource("/images/cprogress_32.gif"))).getImage(), 1);
+                    vrp.setZoomSensitive(false);
+                    //vrp.setBorderColor(Color.WHITE);
+                    //vrp.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
                     vs.addGlyph(vrp);
-                    vrp.setProgress(20, 100);
                     finishCreatingObject(vs, PDFResourceHandler.getDocument(src), vrp, fadeIn);
                 }
                 else {
@@ -144,7 +145,7 @@ public class PDFPageDescription extends ResourceDescription {
         loadTask = pageLoader.submit(new PageLoadTask(vs, fadeIn));
     }
     
-    private void finishCreatingObject(final VirtualSpace vs, final Document doc, VRectProgress vrp, boolean fadeIn){
+    private void finishCreatingObject(final VirtualSpace vs, final Document doc, Glyph vrp, boolean fadeIn){
         glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);        
         if(!display){
             glyph.setVisible(false);
