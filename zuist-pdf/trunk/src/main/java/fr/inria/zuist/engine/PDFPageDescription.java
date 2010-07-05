@@ -50,6 +50,7 @@ public class PDFPageDescription extends ResourceDescription {
     int page = 0;
     private static final ThreadPoolExecutor pageLoader;
     private Future loadTask;
+    private volatile boolean display = true;
     private static int CORE_THREADS = 5;
     private static int MAX_THREADS = 20;
     private static int CAPACITY = 2000;
@@ -139,6 +140,7 @@ public class PDFPageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
+        display = true;
         loadTask = pageLoader.submit(new PageLoadTask(vs, fadeIn));
     }
     
@@ -184,6 +186,9 @@ public class PDFPageDescription extends ResourceDescription {
             try {
                 SwingUtilities.invokeAndWait(new Runnable(){
                     public void run(){
+                        if(!display){
+                            glyph.setVisible(false);
+                        }
                         vs.addGlyph(glyph);
                     }
                 });
@@ -198,6 +203,7 @@ public class PDFPageDescription extends ResourceDescription {
         //if(loadTask.cancel(false)){
         //    return;
         //}
+        display = false;
         try {
         loadTask.get();
         } 
