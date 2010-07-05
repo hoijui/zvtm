@@ -146,6 +146,9 @@ public class PDFPageDescription extends ResourceDescription {
     
     private void finishCreatingObject(final VirtualSpace vs, final Document doc, VRectProgress vrp, boolean fadeIn){
         glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);        
+        if(!display){
+            glyph.setVisible(false);
+        }
         if (strokeColor != null){
             glyph.setBorderColor(strokeColor);
             glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
@@ -186,9 +189,6 @@ public class PDFPageDescription extends ResourceDescription {
             try {
                 SwingUtilities.invokeAndWait(new Runnable(){
                     public void run(){
-                        if(!display){
-                            glyph.setVisible(false);
-                        }
                         vs.addGlyph(glyph);
                     }
                 });
