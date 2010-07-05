@@ -641,6 +641,13 @@ public class SceneManager implements CameraListener {
         return region;
     }
     
+    public void destroyRegionsAtLevel(int l){
+        Region[] ral = getRegionsAtLevel(l);
+        for (int i=0;i<ral.length;i++){
+            destroyRegion(ral[i]);
+        }
+    }
+    
     public void destroyRegion(Region r){
         r.forceHide(Region.DISAPPEAR, r.x, r.y);
         ObjectDescription[] ods = r.getObjectsInRegion();
