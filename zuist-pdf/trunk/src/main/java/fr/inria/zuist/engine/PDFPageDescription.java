@@ -88,6 +88,50 @@ public class PDFPageDescription extends ResourceDescription {
             }
         }
     }
+    
+    private class PageUnloadTask implements Runnable {
+        private final VirtualSpace vs;
+        private final boolean fadeOut;
+        
+        PageUnloadTask(VirtualSpace vs, boolean fadeOut){
+            this.vs = vs;
+            this.fadeOut = fadeOut;
+        }
+        
+        public void run(){
+            //if(loadTask.cancel(false)){
+                //    return;
+                //}
+                display = false;
+                try {
+                    loadTask.get();
+                } 
+            catch(InterruptedException ie){ /* swallow */ }
+        catch(ExecutionException ee){ /* swallow */ }
+
+        if (glyph != null){
+            if (fadeOut){
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                    0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                glyph = null;
+            }
+            else {
+                assert(!SwingUtilities.isEventDispatchThread());
+                try {
+                    SwingUtilities.invokeAndWait(new Runnable(){
+                        public void run(){
+                            vs.removeGlyph(glyph);
+                            glyph.flush();
+                            glyph = null;
+                        }
+                        });
+                    } catch(InterruptedException ie){ /* swallow */ }
+                catch(InvocationTargetException ite){ /* swallow */ }
+            }
+        }
+    }
+}
 
     /** Constructs the description of an image (VImageST).
      *@param id ID of object in scene
@@ -199,39 +243,8 @@ public class PDFPageDescription extends ResourceDescription {
         glyph.setOwner(this);
     }
     
-    /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
-        //if(loadTask.cancel(false)){
-        //    return;
-        //}
-        display = false;
-        try {
-        loadTask.get();
-        } 
-        catch(InterruptedException ie){ /* swallow */ }
-        catch(ExecutionException ee){ /* swallow */ }
-
-        if (glyph != null){
-            if (fadeOut){
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                    0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-                glyph = null;
-            }
-            else {
-                assert(!SwingUtilities.isEventDispatchThread());
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable(){
-                        public void run(){
-                            vs.removeGlyph(glyph);
-                            glyph.flush();
-                            glyph = null;
-                        }
-                    });
-                } catch(InterruptedException ie){ /* swallow */ }
-                catch(InvocationTargetException ite){ /* swallow */ }
-            }
-        }
+        pageLoader.submit(new PageUnloadTask(vs, fadeOut));
     }
 
     public Glyph getGlyph(){
