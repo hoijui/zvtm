@@ -48,16 +48,21 @@ public class ImageDescription extends ResourceDescription {
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
     private volatile VImage glyph;
-    private static final ThreadPoolExecutor imageLoader;
+    private static final ThreadPoolExecutor imageLoader, imageUnloader;
     private Future loadTask;
-    private static int N_THREADS = 20;
+    private volatile boolean display = true;
+    private static int N_THREADS = 10;
     private static int CAPACITY = 2000;
 
     static {   
-        imageLoader = new ThreadPoolExecutor(N_THREADS, N_THREADS, 
-                0L, TimeUnit.MILLISECONDS, 
+        imageLoader = new ThreadPoolExecutor(5, N_THREADS, 
+                10000L, TimeUnit.MILLISECONDS, 
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         imageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        imageUnloader = new ThreadPoolExecutor(5, N_THREADS, 
+                10000L, TimeUnit.MILLISECONDS, 
+                new LinkedBlockingQueue<Runnable>(CAPACITY));
+        imageUnloader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     private class ImageLoadTask implements Runnable {
@@ -102,6 +107,46 @@ public class ImageDescription extends ResourceDescription {
                     finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
                 }
             }     
+        }
+    }
+
+    private class ImageUnloadTask implements Runnable {
+        private final VirtualSpace vs;
+        private final boolean fadeOut;
+
+        ImageUnloadTask(VirtualSpace vs, boolean fadeOut){
+            this.vs = vs;
+            this.fadeOut = fadeOut;
+        }
+
+        public void run(){
+            display = false;
+            try {
+                loadTask.get();
+            } 
+            catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
+            catch(ExecutionException ee){ /*ee.printStackTrace();*/ }
+            if (glyph != null){
+                if (fadeOut){
+                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                        0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
+                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                    glyph = null;
+                }
+                else {
+                    assert(!SwingUtilities.isEventDispatchThread());
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable(){
+                        public void run(){
+    	                    vs.removeGlyph(glyph);
+                            glyph.getImage().flush();
+                            glyph = null;
+                        }
+                        });
+                    } catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
+                    catch(InvocationTargetException ite){ /*ite.printStackTrace();*/ }
+                }
+            }
         }
     }
 
@@ -154,6 +199,7 @@ public class ImageDescription extends ResourceDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
+        display = true;
         loadTask = imageLoader.submit(new ImageLoadTask(vs, fadeIn));
     }
     
@@ -162,6 +208,9 @@ public class ImageDescription extends ResourceDescription {
         double sf = vh / ((double)ih);
         if (fadeIn){
             glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
+            if(!display){
+                glyph.setVisible(false);
+            }
             if (strokeColor != null){
                 glyph.setBorderColor(strokeColor);
                 glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
@@ -184,6 +233,9 @@ public class ImageDescription extends ResourceDescription {
                 vs.removeGlyph(vrp);
             }
             glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
+            if(!display){
+                glyph.setVisible(false);
+            }
             if (strokeColor != null){
                 glyph.setBorderColor(strokeColor);
                 glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
@@ -191,56 +243,23 @@ public class ImageDescription extends ResourceDescription {
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
         }
-    assert(!SwingUtilities.isEventDispatchThread());
-    try{
-	SwingUtilities.invokeAndWait(new Runnable(){
-            public void run(){
-                vs.addGlyph(glyph);
-                glyph.setOwner(ImageDescription.this);
-            }
-	});
-    } catch(InterruptedException ie)
-    { /* swallow */ 
-    } 
-    catch(InvocationTargetException ite)
-    { 
-     /* swallow */
-    }
+        assert(!SwingUtilities.isEventDispatchThread());
+        try{
+            SwingUtilities.invokeAndWait(new Runnable(){
+                public void run(){
+                    vs.addGlyph(glyph);
+                    glyph.setOwner(ImageDescription.this);
+                }
+                });
+        } catch(InterruptedException ie){ /*ie.printStackTrace();*/} 
+        catch(InvocationTargetException ite){ /*ite.printStackTrace();*/}
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
-        if(loadTask.cancel(false)){
-            return;
-        }
-        try {
-        loadTask.get();
-        } 
-        catch(InterruptedException ie){ /* swallow */ }
-        catch(ExecutionException ee){ /* swallow */ }
-        if (glyph != null){
-            if (fadeOut){
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                    0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-                glyph = null;
-            }
-            else {
-                assert(!SwingUtilities.isEventDispatchThread());
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable(){
-                    public void run(){
-	                    vs.removeGlyph(glyph);
-                        glyph.getImage().flush();
-                        glyph = null;
-                    }
-                    });
-                } catch(InterruptedException ie){ /* swallow */ }
-                catch(InvocationTargetException ite){ /* swallow */ }
-            }
-        }
+        imageUnloader.submit(new ImageUnloadTask(vs, fadeOut));        
     }
-
+    
     public Glyph getGlyph(){
 	    return glyph;
     }
