@@ -48,11 +48,11 @@ public class PDFPageDescription extends ResourceDescription {
 
     private volatile IcePDFPageImg glyph;
     int page = 0;
-    private static final ThreadPoolExecutor pageLoader;
+    private static final ThreadPoolExecutor pageLoader, pageUnloader;
     private Future loadTask;
     private volatile boolean display = true;
     private static int CORE_THREADS = 5;
-    private static int MAX_THREADS = 20;
+    private static int MAX_THREADS = 10;
     private static int CAPACITY = 2000;
 
     static {   
@@ -60,6 +60,10 @@ public class PDFPageDescription extends ResourceDescription {
                 10000L, TimeUnit.MILLISECONDS, 
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         pageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        pageUnloader = new ThreadPoolExecutor(CORE_THREADS, MAX_THREADS, 
+                10000L, TimeUnit.MILLISECONDS, 
+                new LinkedBlockingQueue<Runnable>(CAPACITY));
+        pageUnloader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     private class PageLoadTask implements Runnable {
@@ -237,7 +241,7 @@ public class PDFPageDescription extends ResourceDescription {
     }
     
     public void destroyObject(final VirtualSpace vs, boolean fadeOut){
-        pageLoader.submit(new PageUnloadTask(vs, fadeOut));
+        pageUnloader.submit(new PageUnloadTask(vs, fadeOut));
     }
 
     public Glyph getGlyph(){
