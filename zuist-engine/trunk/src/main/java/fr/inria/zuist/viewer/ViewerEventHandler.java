@@ -15,8 +15,6 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
 import java.util.Vector;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.LongPoint;
