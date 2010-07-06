@@ -73,12 +73,9 @@ public class PDFPageDescription extends ResourceDescription {
 
         public void run(){
             if (glyph == null){
-                // open connection to data
                 if (showFeedbackWhenFetching){
                     final VImage vrp = new VImage(vx, vy, zindex, (new ImageIcon(this.getClass().getResource("/images/cprogress_32.gif"))).getImage(), 1);
                     vrp.setZoomSensitive(false);
-                    //vrp.setBorderColor(Color.WHITE);
-                    //vrp.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
                     vs.addGlyph(vrp);
                     finishCreatingObject(vs, PDFResourceHandler.getDocument(src), vrp, fadeIn);
                 }
@@ -99,39 +96,35 @@ public class PDFPageDescription extends ResourceDescription {
         }
         
         public void run(){
-            //if(loadTask.cancel(false)){
-                //    return;
-                //}
-                display = false;
-                try {
-                    loadTask.get();
-                } 
+            display = false;
+            try {
+                loadTask.get();
+            } 
             catch(InterruptedException ie){ /* swallow */ }
-        catch(ExecutionException ee){ /* swallow */ }
-
-        if (glyph != null){
-            if (fadeOut){
-                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                    0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-                glyph = null;
-            }
-            else {
-                assert(!SwingUtilities.isEventDispatchThread());
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable(){
-                        public void run(){
-                            vs.removeGlyph(glyph);
-                            glyph.flush();
-                            glyph = null;
-                        }
-                        });
-                    } catch(InterruptedException ie){ /* swallow */ }
-                catch(InvocationTargetException ite){ /* swallow */ }
+            catch(ExecutionException ee){ /* swallow */ }
+            if (glyph != null){
+                if (fadeOut){
+                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                        0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
+                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+                    glyph = null;
+                }
+                else {
+                    assert(!SwingUtilities.isEventDispatchThread());
+                    try {
+                        SwingUtilities.invokeAndWait(new Runnable(){
+                            public void run(){
+                                vs.removeGlyph(glyph);
+                                glyph.flush();
+                                glyph = null;
+                            }
+                            });
+                        } catch(InterruptedException ie){ /* swallow */ }
+                    catch(InvocationTargetException ite){ /* swallow */ }
+                }
             }
         }
     }
-}
 
     /** Constructs the description of an image (VImageST).
      *@param id ID of object in scene
