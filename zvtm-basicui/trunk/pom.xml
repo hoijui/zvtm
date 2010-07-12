@@ -7,11 +7,22 @@ $Id$
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.inria.mlsn</groupId>
-  <artifactId>mlsn-viewer</artifactId>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-basicui</artifactId>
   <packaging>jar</packaging>
-  <name>MLSN-Viewer</name>
-  <version>0.1</version>
+  <name>ZVTM-BASICUI</name>
+  <version>1.0</version>
+  <url>http://zvtm.sourceforge.net</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+  </scm>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,13 +40,21 @@ $Id$
       <url>http://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
-    
+  
+  <!-- Distribution - Deploy to FTP -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+  
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>[0.10.1,)</version>
+      <version>[0.10.0,)</version>
     </dependency>
   </dependencies>
   
@@ -55,6 +74,19 @@ $Id$
             <configuration>
               <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
@@ -79,8 +111,8 @@ $Id$
         <configuration>
           <archive>
             <manifest>
-              <mainClass>fr.inria.mlsn.MLSNViewer</mainClass>
-              <packageName>fr.inria.mlsn</packageName>
+              <mainClass>fr.inria.zvtm.basicui.Viewer</mainClass>
+              <packageName>fr.inria.zvtm.basicui</packageName>
               <addClasspath>true</addClasspath>
             </manifest>
             <manifestEntries>
