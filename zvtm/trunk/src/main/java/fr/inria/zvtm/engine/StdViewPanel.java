@@ -135,7 +135,8 @@ public class StdViewPanel extends ViewPanel {
 		}
 		if (backBuffer == null){
 			gconf = getGraphicsConfiguration();
-			backBuffer = gconf.createCompatibleImage(size.width,size.height);
+			// assign minimal size of 1
+			backBuffer = gconf.createCompatibleImage((size.width > 0) ? size.width : 1, (size.height > 0) ? size.height : 1);
 			backBufferW = backBuffer.getWidth();
 			backBufferH = backBuffer.getHeight();
 			if (backBufferGraphics != null){
