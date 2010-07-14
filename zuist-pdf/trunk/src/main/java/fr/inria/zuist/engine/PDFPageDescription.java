@@ -67,10 +67,12 @@ public class PDFPageDescription extends ResourceDescription {
     }
 
     private class PageLoadTask implements Runnable {
+        private final SceneManager sm;
         private final VirtualSpace vs;
         private final boolean fadeIn;
 
-        PageLoadTask(VirtualSpace vs, boolean fadeIn){
+        PageLoadTask(SceneManager sm, VirtualSpace vs, boolean fadeIn){
+            this.sm = sm;
             this.vs = vs;
             this.fadeIn = fadeIn;
         }
@@ -81,20 +83,22 @@ public class PDFPageDescription extends ResourceDescription {
                     final VImage vrp = new VImage(vx, vy, zindex, (new ImageIcon(this.getClass().getResource("/images/cprogress_32.gif"))).getImage(), 1);
                     vrp.setZoomSensitive(false);
                     vs.addGlyph(vrp);
-                    finishCreatingObject(vs, PDFResourceHandler.getDocument(src), vrp, fadeIn);
+                    finishCreatingObject(sm, vs, PDFResourceHandler.getDocument(src), vrp, fadeIn);
                 }
                 else {
-                    finishCreatingObject(vs, PDFResourceHandler.getDocument(src), null, fadeIn);
+                    finishCreatingObject(sm, vs, PDFResourceHandler.getDocument(src), null, fadeIn);
                 }
             }
         }
     }
     
     private class PageUnloadTask implements Runnable {
+        private final SceneManager sm;
         private final VirtualSpace vs;
         private final boolean fadeOut;
         
-        PageUnloadTask(VirtualSpace vs, boolean fadeOut){
+        PageUnloadTask(SceneManager sm, VirtualSpace vs, boolean fadeOut){
+            this.sm = sm;
             this.vs = vs;
             this.fadeOut = fadeOut;
         }
@@ -109,7 +113,7 @@ public class PDFPageDescription extends ResourceDescription {
             if (glyph != null){
                 if (fadeOut){
                     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                        0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(vs));
+                        0.0f, false, IdentityInterpolator.getInstance(), new PDFPageHideAction(sm, vs));
                     VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
                     glyph = null;
                 }
@@ -121,6 +125,7 @@ public class PDFPageDescription extends ResourceDescription {
                                 vs.removeGlyph(glyph);
                                 glyph.flush();
                                 glyph = null;
+                                sm.objectDestroyed(PDFPageDescription.this);
                             }
                             });
                         } catch(InterruptedException ie){ /* swallow */ }
@@ -181,12 +186,12 @@ public class PDFPageDescription extends ResourceDescription {
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public void createObject(final VirtualSpace vs, final boolean fadeIn){
+    public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         display = true;
-        loadTask = pageLoader.submit(new PageLoadTask(vs, fadeIn));
+        loadTask = pageLoader.submit(new PageLoadTask(sm, vs, fadeIn));
     }
     
-    private void finishCreatingObject(final VirtualSpace vs, final Document doc, Glyph vrp, boolean fadeIn){
+    private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, final Document doc, Glyph vrp, boolean fadeIn){
         glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);        
         if(!display){
             glyph.setVisible(false);
@@ -207,6 +212,7 @@ public class PDFPageDescription extends ResourceDescription {
                 SwingUtilities.invokeAndWait(new Runnable(){
                     public void run(){
                         vs.addGlyph(glyph);
+                        sm.objectCreated(PDFPageDescription.this);
                     }
                 });
             }  catch(InterruptedException ie){/* swallow */ }
@@ -232,6 +238,7 @@ public class PDFPageDescription extends ResourceDescription {
                 SwingUtilities.invokeAndWait(new Runnable(){
                     public void run(){
                         vs.addGlyph(glyph);
+                        sm.objectCreated(PDFPageDescription.this);
                     }
                 });
             } catch(InterruptedException ie){ /* swallow */ }
@@ -240,8 +247,8 @@ public class PDFPageDescription extends ResourceDescription {
         glyph.setOwner(this);
     }
     
-    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
-        pageUnloader.submit(new PageUnloadTask(vs, fadeOut));
+    public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
+        pageUnloader.submit(new PageUnloadTask(sm, vs, fadeOut));
     }
 
     public Glyph getGlyph(){
@@ -252,9 +259,11 @@ public class PDFPageDescription extends ResourceDescription {
 
 class PDFPageHideAction implements EndAction {
     
+    SceneManager sm;
     VirtualSpace vs;
     
-    PDFPageHideAction(VirtualSpace vs){
+    PDFPageHideAction(SceneManager sm, VirtualSpace vs){
+        this.sm = sm;
 	    this.vs = vs;
     }
     
@@ -262,6 +271,7 @@ class PDFPageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((ZPDFPage)subject).flush();
+            sm.objectDestroyed((PDFPageDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying PDF page " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -273,6 +283,7 @@ class PDFPageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((ZPDFPage)subject).flush();
+            sm.objectDestroyed((PDFPageDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
