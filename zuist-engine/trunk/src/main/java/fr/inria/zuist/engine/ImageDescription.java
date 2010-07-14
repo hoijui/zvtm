@@ -68,8 +68,10 @@ public class ImageDescription extends ResourceDescription {
     private class ImageLoadTask implements Runnable {
         private final VirtualSpace vs;
         private final boolean fadeIn;
+        private final SceneManager sm;
 
-        ImageLoadTask(VirtualSpace vs, boolean fadeIn){
+        ImageLoadTask(SceneManager sm, VirtualSpace vs, boolean fadeIn){
+            this.sm = sm;
             this.vs = vs;
             this.fadeIn = fadeIn;
         }
@@ -94,7 +96,7 @@ public class ImageDescription extends ResourceDescription {
                                 vrp.setProgress(bytesRead, dataLength);                                    
                             }
                         }
-                        finishCreatingObject(vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
+                        finishCreatingObject(sm, vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
                     }
                     catch(IOException e){
                         if (SceneManager.getDebugMode()){
@@ -104,17 +106,19 @@ public class ImageDescription extends ResourceDescription {
                     }
                 }
                 else {
-                    finishCreatingObject(vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
+                    finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
                 }
             }     
         }
     }
 
     private class ImageUnloadTask implements Runnable {
+        private final SceneManager sm;
         private final VirtualSpace vs;
         private final boolean fadeOut;
 
-        ImageUnloadTask(VirtualSpace vs, boolean fadeOut){
+        ImageUnloadTask(SceneManager sm, VirtualSpace vs, boolean fadeOut){
+            this.sm = sm;
             this.vs = vs;
             this.fadeOut = fadeOut;
         }
@@ -129,7 +133,7 @@ public class ImageDescription extends ResourceDescription {
             if (glyph != null){
                 if (fadeOut){
                     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                        0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(vs));
+                        0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(sm, vs));
                     VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
                     glyph = null;
                 }
@@ -141,6 +145,7 @@ public class ImageDescription extends ResourceDescription {
     	                    vs.removeGlyph(glyph);
                             glyph.getImage().flush();
                             glyph = null;
+                            sm.objectDestroyed(ImageDescription.this);
                         }
                         });
                     } catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
@@ -198,12 +203,12 @@ public class ImageDescription extends ResourceDescription {
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
-    public void createObject(final VirtualSpace vs, final boolean fadeIn){
+    public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         display = true;
-        loadTask = imageLoader.submit(new ImageLoadTask(vs, fadeIn));
+        loadTask = imageLoader.submit(new ImageLoadTask(sm, vs, fadeIn));
     }
     
-    private void finishCreatingObject(final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
+    private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
         int ih = i.getHeight(null);
         double sf = vh / ((double)ih);
         if (fadeIn){
@@ -249,6 +254,7 @@ public class ImageDescription extends ResourceDescription {
                 public void run(){
                     vs.addGlyph(glyph);
                     glyph.setOwner(ImageDescription.this);
+                    sm.objectCreated(ImageDescription.this);
                 }
                 });
         } catch(InterruptedException ie){ /*ie.printStackTrace();*/} 
@@ -256,8 +262,8 @@ public class ImageDescription extends ResourceDescription {
     }
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
-    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
-        imageUnloader.submit(new ImageUnloadTask(vs, fadeOut));        
+    public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
+        imageUnloader.submit(new ImageUnloadTask(sm, vs, fadeOut));        
     }
     
     public Glyph getGlyph(){
@@ -268,16 +274,19 @@ public class ImageDescription extends ResourceDescription {
 
 class ImageHideAction implements EndAction {
     
+    SceneManager sm;
     VirtualSpace vs;
     
-    ImageHideAction(VirtualSpace vs){
-	this.vs = vs;
+    ImageHideAction(SceneManager sm, VirtualSpace vs){
+	    this.sm = sm;
+	    this.vs = vs;
     }
     
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
             ((VImage)subject).getImage().flush();
+            sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -289,6 +298,7 @@ class ImageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((VImage)subject).getImage().flush();                
+            sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}

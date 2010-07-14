@@ -67,6 +67,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.RegionListener;
 import fr.inria.zuist.engine.LevelListener;
+import fr.inria.zuist.engine.ObjectListener;
 import fr.inria.zuist.engine.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
 
@@ -81,7 +82,7 @@ import org.xml.sax.SAXException;
  * @author Emmanuel Pietriga
  */
 
-public class Viewer implements Java2DPainter, RegionListener, LevelListener {
+public class Viewer implements Java2DPainter, RegionListener, LevelListener, ObjectListener {
     
     File SCENE_FILE, SCENE_FILE_DIR;
         
@@ -129,7 +130,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setRegionListener(this);
         sm.setLevelListener(this);
-		previousLocations = new Vector();
+		sm.setObjectListener(this);
+        previousLocations = new Vector();
 		ovm.initConsole();
         if (xmlSceneFile != null){
             sm.enableRegionUpdater(false);
@@ -515,6 +517,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	public void exitedLevel(int depth){
 	    ovm.sayInConsole("Exited level "+depth+"\n");
 	}
+	
+	public void objectCreated(ObjectDescription od){
+	    ovm.sayInConsole("Created object "+od.getID()+"\n");
+	}
+
+    public void objectDestroyed(ObjectDescription od){
+	    ovm.sayInConsole("Destroyed object "+od.getID()+"\n");        
+    }
 	
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;	

@@ -46,7 +46,7 @@ public class ClosedShapeDescription extends ObjectDescription {
 
     /** Called automatically by scene manager, but can be called by client application to force loading of objects not actually visible. */
     @Override
-    public void createObject(final VirtualSpace vs, boolean fadeIn){
+    public void createObject(final SceneManager sm, final VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
             if (fadeIn){
                 glyph.setTranslucencyValue(0.0f);
@@ -68,6 +68,7 @@ public class ClosedShapeDescription extends ObjectDescription {
                     public void run(){
                         vs.addGlyph(glyph);
                         glyph.setOwner(ClosedShapeDescription.this);
+                        sm.objectCreated(ClosedShapeDescription.this);
                     }
                 });
             } catch(InterruptedException ie) {
@@ -80,14 +81,14 @@ public class ClosedShapeDescription extends ObjectDescription {
 
     /** Called automatically by scene manager, but can be called by client application to force unloading of objects still visible. */
     @Override
-    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         if (inSpace){
             if (fadeOut){
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
 //                    new ClosedShapeHideAction(vs));
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                    0.0f, false, IdentityInterpolator.getInstance(), new ClosedShapeHideAction(vs));
+                    0.0f, false, IdentityInterpolator.getInstance(), new ClosedShapeHideAction(sm, vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
@@ -95,6 +96,7 @@ public class ClosedShapeDescription extends ObjectDescription {
                     SwingUtilities.invokeAndWait(new Runnable(){
                         public void run(){
                             vs.removeGlyph(glyph);
+                            sm.objectDestroyed(ClosedShapeDescription.this);
                         }
                     });
                 } catch(InterruptedException ie) {
@@ -127,14 +129,17 @@ public class ClosedShapeDescription extends ObjectDescription {
 class ClosedShapeHideAction implements EndAction {
     
     VirtualSpace vs;
+    SceneManager sm;
     
-    ClosedShapeHideAction(VirtualSpace vs){
-	this.vs = vs;
+    ClosedShapeHideAction(SceneManager sm, VirtualSpace vs){
+	    this.sm = sm;
+	    this.vs = vs;
     }
     
     public void	execute(Object subject, Animation.Dimension dimension) {
         try {
             vs.removeGlyph((Glyph)subject);
+            sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -145,6 +150,7 @@ class ClosedShapeHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
+            sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");}

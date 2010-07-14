@@ -48,7 +48,7 @@ class GlyphLoader {
             if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+layerIndex);}
             return;
         }
-        loader.submit(new Request(target, od, transition));	
+        loader.submit(new Request(this.sceneManager, target, od, transition));	
     }
 
     //layerIndex maps to a VirtualSpace
@@ -64,15 +64,17 @@ class GlyphLoader {
             if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+layerIndex);}
             return;
         }
-        loader.submit(new Request(target, od, transition));
+        loader.submit(new Request(this.sceneManager, target, od, transition));
     }
 
     private class Request implements Runnable {
         final VirtualSpace target;
         final ObjectDescription od;
         final boolean transition;
+        final SceneManager sm;
 
-        Request(VirtualSpace target, ObjectDescription od, boolean transition){
+        Request(SceneManager sm, VirtualSpace target, ObjectDescription od, boolean transition){
+            this.sm = sm;
             this.target = target;
             this.od = od;
             this.transition = transition;
@@ -83,9 +85,9 @@ class GlyphLoader {
            if(action == null){
                return;
            } else if(action.equals(LoadAction.LOAD)){
-               od.createObject(target, transition);
+               od.createObject(sm, target, transition);
            } else {
-               od.destroyObject(target, transition);
+               od.destroyObject(sm, target, transition);
            }
         }
     }

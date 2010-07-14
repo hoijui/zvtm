@@ -142,6 +142,7 @@ public class SceneManager implements CameraListener {
     
     LevelListener levelListener;
     RegionListener regionListener;
+    ObjectListener objectListener;
 
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
     LongPoint origin = new LongPoint(0, 0);
@@ -371,6 +372,26 @@ public class SceneManager implements CameraListener {
     public int getPendingRequestQueueSize(){
         //return glyphLoader.requestQueue.size();
 	    return 0; //XXX fix or drop the method
+    }
+    
+    public void setObjectListener(ObjectListener ol){
+        objectListener = ol;
+    }
+
+    public ObjectListener getObjectListener(){
+        return objectListener;
+    }
+    
+    void objectCreated(ObjectDescription od){
+        if (objectListener != null){
+            objectListener.objectCreated(od);
+        }
+    }
+
+    void objectDestroyed(ObjectDescription od){
+        if (objectListener != null){
+            objectListener.objectDestroyed(od);
+        }
     }
 
     /* ----------- level / region / object creation (API and XML) ----------- */

@@ -80,7 +80,7 @@ public class TextDescription extends ObjectDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     @Override
-    public void createObject(final VirtualSpace vs, boolean fadeIn){
+    public void createObject(final SceneManager sm, final VirtualSpace vs, boolean fadeIn){
         if (glyph == null){
             if (fadeIn){
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
@@ -103,6 +103,7 @@ public class TextDescription extends ObjectDescription {
                     public void run(){
                         vs.addGlyph(glyph);
                         glyph.setOwner(TextDescription.this);
+                        sm.objectCreated(TextDescription.this);
                     }
                 });
             } catch(InterruptedException ie) {
@@ -115,14 +116,14 @@ public class TextDescription extends ObjectDescription {
 
     /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     @Override
-    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
 //                    new TextHideAction(vs));
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                    0.0f, false, IdentityInterpolator.getInstance(), new TextHideAction(vs));
+                    0.0f, false, IdentityInterpolator.getInstance(), new TextHideAction(sm, vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
                 glyph = null;
             }
@@ -133,6 +134,7 @@ public class TextDescription extends ObjectDescription {
                         public void run(){
                             vs.removeGlyph(glyph);
                             glyph = null;
+                            sm.objectDestroyed(TextDescription.this);
                         }
                     });
                 } catch(InterruptedException ie) {
@@ -183,14 +185,17 @@ public class TextDescription extends ObjectDescription {
 class TextHideAction implements EndAction {
     
     VirtualSpace vs;
+    SceneManager sm;
     
-    TextHideAction(VirtualSpace vs){
-	this.vs = vs;
+    TextHideAction(SceneManager sm, VirtualSpace vs){
+	    this.sm = sm;
+	    this.vs = vs;
     }
     
     public void	execute(Object subject, Animation.Dimension dimension) {
         try {
             vs.removeGlyph((Glyph)subject);
+            sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -201,6 +206,7 @@ class TextHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
+            sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
