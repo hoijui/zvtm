@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -192,8 +192,21 @@ public class VText extends Glyph {
     /** Cannot be reoriented. */
     public void orientTo(float angle){}
 
-    /** Always returns 1. */
-    public float getSize(){return 1.0f;}
+    /** Get glyph's size (radius of bounding circle).
+     * Will return 0 if bounds of this VText have never been validated (through painting).
+     *@see #getBounds(int i)
+     *@see #validBounds(int i)
+     *@see #invalidate()
+     */
+    public float getSize(){
+        for (int i=0;i<pc.length;i++){
+            if (pc[i] != null & pc[i].valid){
+                return (float)Math.sqrt(Math.pow(pc[i].cw,2) + Math.pow(pc[i].ch,2));
+            }
+        }
+        // return 0 if could not find any valid bounds for any camera
+        return 0;
+    }
 
     public float getOrient(){return orient;}
 
@@ -464,7 +477,10 @@ public class VText extends Glyph {
 	return scaleFactor;
     }
 
-    /** Force computation of text's bounding box at next call to draw(). */
+    /** Force computation of text's bounding box at next call to draw().
+     *@see #validBounds(int i)
+     *@see #getBounds(int i)
+     */
     public void invalidate(){
 	try {
 	    for (int i=0;i<pc.length;i++){
@@ -477,6 +493,8 @@ public class VText extends Glyph {
 
     /** Get the width and height of the bounding box in virtual space.
      *@param i index of camera (Camera.getIndex())
+     *@see #validBounds(int i)
+     *@see #invalidate()
      *@return the width and height of the text's bounding box, as a LongPoint
      */
     public LongPoint getBounds(int i){
@@ -485,7 +503,9 @@ public class VText extends Glyph {
 
     /** Indicates whether the bounds of the text are valid at this time or not.
      * The bounds can be invalid if the thread in charge of painting has not dealt with this glyph since invalidate() was last called on it.
-     * It is advisable to test this before calling getBounds()
+     * It is advisable to test this before calling getBounds(int i)
+     *@see #getBounds(int i)
+     *@see #invalidate()
      */
     public boolean validBounds(int i){
 	return pc[i].valid;
