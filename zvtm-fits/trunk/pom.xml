@@ -10,7 +10,7 @@ $Id$
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-fits</artifactId>
   <packaging>jar</packaging>
-  <name>ZVTM-FITS</name>
+  <name>zvtm-fits</name>
   <version>0.1.1-SNAPSHOT</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
@@ -23,11 +23,9 @@ $Id$
   <scm>
     <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
   </scm>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
   <!-- Repositories -->
   <repositories>
 	<repository>
