@@ -14,6 +14,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
+import fr.inria.zvtm.fits.FitsHistogram;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -39,8 +40,6 @@ public class FitsExample {
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(cam);	
         
-        //the view below is just a standard, non-clustered view
-        //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         view.setBackgroundColor(Color.GRAY);
@@ -49,6 +48,9 @@ public class FitsExample {
         FitsImage hi = new FitsImage(0,0,0,new URL(imgUrl));
         hi.setScaleMethod(FitsImage.ScaleMethod.ASINH);
         vs.addGlyph(hi, false);	
+        FitsHistogram hist = FitsHistogram.fromFitsImage(hi);
+        hist.reSize(0.9f);
+        vs.addGlyph(hist);
     }
 
 	public static void main(String[] args) throws IOException{

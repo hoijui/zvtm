@@ -176,6 +176,13 @@ public class FitsImage extends VImage {
     }
 
     /**
+     * Returns the IVOA Fits image object that underlies this image.
+     */
+    public FITSImage getUnderlyingImage(){
+        return fitsImage;
+    }
+
+    /**
      * Flexible version.
      */
     public void setColorFilter(ImageFilter filter){
