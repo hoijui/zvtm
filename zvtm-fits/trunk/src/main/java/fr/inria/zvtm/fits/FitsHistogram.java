@@ -1,10 +1,13 @@
 package fr.inria.zvtm.fits;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.List;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.VRectangle;
+import edu.jhu.pha.sdss.fits.Histogram;
 
 /**
  * Graphical representation of an histogram
@@ -21,6 +24,15 @@ public class FitsHistogram extends Composite {
             addChild(bar);
             i += DEFAULT_BIN_WIDTH;
         }
+    }
+
+    public static FitsHistogram fromFitsImage(FitsImage image){
+        Histogram hist = image.getUnderlyingImage().getHistogram();
+        int[] data = new int[256];
+        for(int i=0; i<hist.getCounts().length; ++i){
+            data[i/256] += hist.getCounts()[i];
+        }
+        return new FitsHistogram(data);
     }
 
 }
