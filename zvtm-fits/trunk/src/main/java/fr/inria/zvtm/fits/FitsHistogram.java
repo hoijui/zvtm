@@ -15,11 +15,12 @@ import edu.jhu.pha.sdss.fits.Histogram;
 public class FitsHistogram extends Composite {
     private static final int DEFAULT_BIN_WIDTH = 6;
 
-    public FitsHistogram(int[] data){
+    public FitsHistogram(int[] data, int min, int max){
         int i = 0;
+        int height = 100;
         for(int val: data){
-            VRectangle bar = new VRectangle(i, val, 0, DEFAULT_BIN_WIDTH/2, val, 
-                        new Color(0,0,255,127));
+            VRectangle bar = new VRectangle(i, val, 0, DEFAULT_BIN_WIDTH/2, (val * height) / (max - min), 
+                    new Color(0,0,255,127));
             bar.setBorderColor(new Color(0,0,255,180));
             addChild(bar);
             i += DEFAULT_BIN_WIDTH;
@@ -32,7 +33,17 @@ public class FitsHistogram extends Composite {
         for(int i=0; i<hist.getCounts().length; ++i){
             data[i/256] += hist.getCounts()[i];
         }
-        return new FitsHistogram(data);
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for(int j=0; j<data.length; ++j){
+            if (data[j] < min){
+                min = data[j];
+            }
+            if(data[j] > max){
+                max = data[j];
+            }
+        }
+        return new FitsHistogram(data, min, max);
     }
 
 }
