@@ -23,6 +23,7 @@ import fr.inria.zvtm.glyphs.projection.ProjSlice;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
  * Slice. This version is the most efficient, but it cannot be made translucent (see VSliceST).<br>
@@ -206,6 +207,7 @@ public class VSlice extends ClosedShape {
         computeOrient();
         computeAngle();
         computePolygonEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	public void move(long x, long y){
@@ -216,6 +218,7 @@ public class VSlice extends ClosedShape {
         computeOrient();
         computeAngle();
         computePolygonEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** FOR INTERNAL USE ONLY */
@@ -321,6 +324,7 @@ public class VSlice extends ClosedShape {
 	vr = Math.round(size);
 	computeSliceEdges();
 	computePolygonEdges();
+    VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(float factor){
@@ -328,6 +332,7 @@ public class VSlice extends ClosedShape {
 	vr = Math.round(size);
 	computeSliceEdges();
 	computePolygonEdges();
+    VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the slice's orientation.
@@ -338,6 +343,7 @@ public class VSlice extends ClosedShape {
 	orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
 	computeSliceEdges();
 	computePolygonEdges();
+    VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the arc angle.
@@ -348,6 +354,7 @@ public class VSlice extends ClosedShape {
 	angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
 	computeSliceEdges();
 	computePolygonEdges();
+    VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the arc angle.
