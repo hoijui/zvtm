@@ -59,22 +59,22 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
     <dependency>
       <groupId>net.sf.jung</groupId>
       <artifactId>jung-api</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>net.sf.jung</groupId>
       <artifactId>jung-algorithms</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>net.sf.jung</groupId>
       <artifactId>jung-graph-impl</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>net.sf.jung</groupId>
       <artifactId>jung-io</artifactId>
-      <version>2.0</version>
+      <version>2.0.1</version>
     </dependency>
   </dependencies>
   
