@@ -13,13 +13,13 @@ import edu.jhu.pha.sdss.fits.Histogram;
  * Graphical representation of an histogram
  */
 public class FitsHistogram extends Composite {
-    private static final int DEFAULT_BIN_WIDTH = 6;
+    private static final int DEFAULT_BIN_WIDTH = 8;
 
     public FitsHistogram(int[] data, int min, int max){
         int i = 0;
         int height = 100;
         for(int val: data){
-            int h = (val * height) / (max - min); 
+            int h = ((int)Math.sqrt(val) * height) / (int)Math.sqrt(max - min); 
             VRectangle bar = new VRectangle(i, h, 0, DEFAULT_BIN_WIDTH/2, h, 
                     new Color(0,0,255,127));
             bar.setBorderColor(new Color(0,0,255,180));
@@ -32,7 +32,7 @@ public class FitsHistogram extends Composite {
         Histogram hist = image.getUnderlyingImage().getHistogram();
         int[] data = new int[256];
         for(int i=0; i<hist.getCounts().length; ++i){
-            data[i/256] += hist.getCounts()[i];
+            data[i/data.length] += hist.getCounts()[i];
         }
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;

@@ -49,7 +49,7 @@ public class FitsExample {
         hi.setScaleMethod(FitsImage.ScaleMethod.ASINH);
         vs.addGlyph(hi, false);	
         FitsHistogram hist = FitsHistogram.fromFitsImage(hi);
-        hist.reSize(0.9f);
+        hist.reSize(0.8f);
         vs.addGlyph(hist);
     }
 
