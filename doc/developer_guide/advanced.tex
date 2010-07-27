@@ -197,7 +197,7 @@ There is a single callback method, \cd{glyphSelected(Glyph g, boolean b)} which 
 \subsection{PDF Documents}
 \label{sec:pdf}
 
-PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. This module depends on Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}; pdf-renderer is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
+PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. Earlier versions used Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}. Since v0.2.0 this module uses ICEpdf\fref{http://www.icepdf.org/} to render PDF pages. ICepdf is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
 
 Dependency on \cd{zvtm-pdf} si declared as follows:
 
@@ -205,40 +205,57 @@ Dependency on \cd{zvtm-pdf} si declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-pdf</artifactId>
-  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+  <version>0.2.1</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 \vspace{1em}
-There are two rendering techniques for displaying a PDF page. Either it is rendered once in an offscreen \cd{BufferedImage} that then gets painted to the screen; or it is rendered each time ZVTM paints the glyph, directly in the corresponding Graphics2D.
+PDF pages are rendered once in an offscreen \cd{BufferedImage} that then gets painted to the screen.
 
 \subsubsection{Offscreen Rendering}
 
-This is the preferred method. Rendering of the PDF page only happens once in the offscreen \cd{BufferedImage}. It is this image that gets painted in the rendering loop. Instantiate the PDF page as a \cd{ZPDFPageImg} glyph.
-
-\subsubsection{Direct rendering to ZVTM's Graphics2D}
-
-This method is experimental. Rendering of the PDF page happens each time the glyph is rendered on screen. Instantiate the PDF page as a \cd{ZPDFPageG2D} glyph.
+This is the preferred method. Rendering of the PDF page only happens once in the offscreen \cd{BufferedImage}. It is this image that gets painted in the rendering loop. Instantiate the PDF page as a \cd{IcePDFPageImg} glyph.
 
 \subsubsection{Example}
 
 The following code sample puts all pages of PDF document \cd{pdfF} in a virtual space. They are laid out horizontally with a small gap between them.
 
+\begin{small}
 \begin{SaveVerbatim}{CodeVerb}
+import org.icepdf.core.pobjects.Document;
+import org.icepdf.core.pobjects.Page;
+import org.icepdf.core.pobjects.PDimension;
+import org.icepdf.core.exceptions.PDFException;
+import org.icepdf.core.exceptions.PDFSecurityException;
+
+import fr.inria.zvtm.glyphs.IcePDFPageImg;
+
+...
+
 VirtualSpace vs = ...;
-RandomAccessFile raf = new RandomAccessFile(pdfF, "r");
-FileChannel channel = raf.getChannel();
-ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-PDFFile pdfFile = new PDFFile(buf);
-int page_width = (int)pdfFile.getPage(0).getBBox().getWidth();
-for (int i=0;i<pdfFile.getNumPages();i++){
-    vs.addGlyph(new ZPDFPageImg(i*Math.round(page_width*1.1f),
-                                i*Math.round(page_width*1.1f),
-                                0, pdfFile.getPage(i+1), 1, 1));
+Document document = new Document();
+try {
+    document.setFile(pdfF.getAbsolutePath());
+} catch (PDFException ex) {
+    System.out.println("Error parsing PDF document " + ex);
+} catch (PDFSecurityException ex) {
+    System.out.println("Error encryption not supported " + ex);
+} catch (FileNotFoundException ex) {
+    System.out.println("Error file not found " + ex);
+} catch (IOException ex) {
+    System.out.println("Error handling PDF document " + ex);
 }
+int page_width = (int)document.getPageDimension(0, 0).getWidth();
+for (int i = 0; i < document.getNumberOfPages(); i++) {
+    IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0,
+                                        document, i, detailFactor, 1.0f);
+    vs.addGlyph(g);
+}
+document.dispose();
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
 
 \subsubsection{Advanced Functionalities}
 
@@ -252,7 +269,7 @@ Dependency on \cd{zvtm-svg} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-svg</artifactId>
-  <version>0.1.1-SNAPSHOT</version> <!-- or any newer version -->
+  <version>0.1.1</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -267,7 +284,7 @@ Dependency on \cd{zvtm-fits} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-fits</artifactId>
-  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+  <version>0.1.1-SNAPSHOT</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -305,7 +322,7 @@ Dependency on \cd{zvtm-nodetrix} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-nodetrix</artifactId>
-  <version>0.1.0-SNAPSHOT</version> <!-- or any newer version -->
+  <version>0.2.0</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}

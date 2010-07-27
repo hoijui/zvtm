@@ -1,6 +1,7 @@
 \newpage
 %%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%
 \section{Animations}
 \label{sec:animations}
 
@@ -28,6 +29,7 @@ Animations are specified with a single instruction and do not require much more 
 
 Animations are managed by a dedicated thread that controls their timing precisely, skipping steps on the computed animation path if necessary. This mechanism ensures that an animation lasts the specified duration, and runs as smoothly as the system and hardware performance allow. Until v0.9.8, ZVTM was using its own animation engine. Since v0.10.0, the animation engine has been completely rewritten and is now based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/}, and now features additional capabilities in terms of animation management. The use of this more generic API should also make it easy for people already familiar with the Timing Framework to write animations in ZVTM. We only describe the new API in the following.
 
+%%%%%%%%%%
 \subsection{Animation Module: Overview}
 The Animation module in ZVTM is heavily based upon the Timing Framework.
 
@@ -53,6 +55,7 @@ This class provides a number of Animation creation methods.
 The TimingHandler interface defines a number of callbacks that custom animation developers
 need to implement.
 It looks like this:
+\begin{small}
 \begin{SaveVerbatim}{CodeVerb}
 public interface TimingHandler {
     public void begin(Object subject, Animation.Dimension dim);
@@ -66,16 +69,23 @@ public interface TimingHandler {
 }
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
 \cd{begin} and \cd{end} are called once, respectively when the animation starts and ends. They are, of course, the ideal place for setup and teardown logic.
 \cd{repeat} is called each time the animation loops.
 \cd{timingEvent} is the "workhorse" method that implements most of the 
 animation's behavior. It is called repetitively during the animation and provides the elapsed fraction of the animation, between 0 and 1.
+
+%%%%%%%%%%
 \subsection{Creating an Animation: the Flexible Way}
+\label{sec:animflex}
+
 The generic way to create an Animation is to use one of the three createAnimation() methods
 of AnimationFactory. Here is an example:
 
+\begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-Animation cameraAlt = am.getAnimationManager().getAnimationFactory().createAnimation(
+Animation cameraAlt =
+  am.getAnimationManager().getAnimationFactory().createAnimation(
    4000, 
    2f,
    Animator.RepeatBehavior.REVERSE,
@@ -83,11 +93,11 @@ Animation cameraAlt = am.getAnimationManager().getAnimationFactory().createAnima
    Animation.Dimension.ALTITUDE,
    new DefaultTimingHandler(){
       public void timingEvent(float fraction, 
-                                            Object subject, 
-                                            Animation.Dimension dim){
+                              Object subject, 
+                              Animation.Dimension dim){
          Camera c = (Camera)subject;
          c.setAltitude(25+Float.valueOf(fraction*50).longValue());
-   }
+      }
                                              
       public void end(Object subject, Animation.Dimension dim){
          circle2.setColor(Color.RED);
@@ -97,6 +107,7 @@ Animation cameraAlt = am.getAnimationManager().getAnimationFactory().createAnima
 );
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
 
 Creating an animation this way gives programmers freedom to implement 
 any animation path, side-effect... in their TimingHandler-derived class.
@@ -104,6 +115,7 @@ any animation path, side-effect... in their TimingHandler-derived class.
 For convenience, a \cd{DefaultTimingHandler} class is provided that overrides 
 the \cd{begin}, \cd{end} and \cd{repeat} methods with empty stubs, leaving only the \cd{timingEvent} method to implement.
 
+%%%%%%%%%%
 \subsection{Creating an Animation: the Easy Way}
 Ready-made Animation factory methods are provided to cover the most common
 cases as part of the \cd{AnimationFactory} class. 
@@ -132,25 +144,24 @@ The target/type combinations provided are:
 \end{itemize}
 
 An example of animation created in this way is:
+\begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
-		.createLensMagAnim(LENS_ANIM_TIME,
-				(FixedSizeLens)lens, 
-				-2.0f, 
-				true,
-				IdentityInterpolator.getInstance(), 
-				new EndAction(){
-		public void execute(Object subject,
-			Animation.Dimension dimension){
-		application.vsm.getOwningView(((Lens)subject).getID()).setLens(null);
-		((Lens)subject).dispose();
-		}
-		}); 
-application.vsm.getAnimationManager().startAnimation(anim, true);
-		
+Animation anim = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(
+         LENS_ANIM_TIME, (FixedSizeLens)lens, -2.0f, 
+         true, IdentityInterpolator.getInstance(), 
+         new EndAction(){
+             public void execute(Object subject,
+                 Animation.Dimension dimension){
+                 vsm.getOwningView(((Lens)subject).getID()).setLens(null);
+                 ((Lens)subject).dispose();
+             }
+        }); 
+vsm.getAnimationManager().startAnimation(anim, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
 
+%%%%%%%%%%
 \subsection{Controlling Animations}
 Animations are controlled from the AnimationManager.
 There is a unique animation manager per VirtualSpaceManager.
@@ -194,6 +205,7 @@ The relevant AnimationManager methods are \cd{pauseAnimation} and \cd{resumeAnim
 both of which take the animation to pause or resume as their only parameter, and return a boolean
 indicating whether the animation was successfully paused or resumed.
 
+%%%%%%%%%%
 \subsection{Current Camera Animation}  
 Parallel to the animation mechanism described above, the AnimationManager has a 
 built-in mechanism to animate the current Camera in an interactive fashion. This is
@@ -211,3 +223,33 @@ package \cd{fr.inria.zvtm.animation.examples}) implements it.
 
 The current camera animation never conflicts with animations in the queue system
 (i.e. it will run concurrently with any animation in the queue system).
+
+%%%%%%%%%%
+\subsection{Example of Custom Glyph Variable Animation}
+
+Ready-made animation factory methods only cover the generic visual variables that apply to all types of glyphs. To animate visual variables defined only for some specific type of glyph, one can use the \cd{createAnimation()} methods of \cd{AnimationFactory}. The following example shows how to animate a \cd{VRing} so that it behaves like a circular progress indicator:
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+Animation anim = 
+    vsm.getAnimationManager().getAnimationFactory().createAnimation(
+        timeout, glyphs[0], Dimension.PATH, new DefaultTimingHandler() {
+          @Override
+          public void timingEvent(float fraction, Object target, Dimension dim) {
+              ((VRing)target).setAngle(fraction * 2*Math.PI);
+              ((VRing)target).orientTo((float)(fraction * Math.PI + Math.PI / 2));
+          }
+
+          @Override
+          public void begin(Object subject, Dimension dim) {
+              super.begin(subject, dim);
+              ((VRing) subject).setAngle(0);
+          }
+    });
+
+    vsm.getAnimationManager().startAnimation(anim, false);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+
+
