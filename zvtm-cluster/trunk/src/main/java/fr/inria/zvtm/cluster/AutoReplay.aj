@@ -14,6 +14,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.RectangularShape;
+import fr.inria.zvtm.glyphs.VSlice;
 import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
@@ -49,6 +50,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public static void Glyph.stickToGlyph(Glyph, Glyph)) ||
          execution(public void Glyph.orientTo(float)) ||
          execution(public void Glyph.setSensitivity(boolean)) ||
+         execution(public void VSlice.setAngle(double)) || 
          execution(public void VText.setSpecialFont(Font)) || 
          execution(public void VText.setText(String)) || 
          execution(public void VText.setScale(float)) || 
