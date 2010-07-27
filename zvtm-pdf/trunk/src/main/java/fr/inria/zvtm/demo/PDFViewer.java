@@ -33,7 +33,6 @@ import org.icepdf.core.pobjects.Page;
 import org.icepdf.core.pobjects.PDimension;
 import org.icepdf.core.exceptions.PDFException;
 import org.icepdf.core.exceptions.PDFSecurityException;
-import org.icepdf.core.util.GraphicsRenderingHints;
 
 public class PDFViewer {
 	
@@ -84,7 +83,6 @@ public class PDFViewer {
             System.out.println("Error handling PDF document " + ex);
         }
         int page_width = (int)document.getPageDimension(0, 0).getWidth();
-        // Paint each pages content to an image and write the image to file
         for (int i = 0; i < document.getNumberOfPages(); i++) {
             IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0, document, i, detailFactor, 1.0f);
             vs.addGlyph(g);
