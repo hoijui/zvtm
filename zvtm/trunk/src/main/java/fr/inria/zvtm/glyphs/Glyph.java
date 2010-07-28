@@ -254,7 +254,7 @@ public abstract class Glyph implements Cloneable, Translucent {
 	protected Color fColor = Color.white;
 
     // Highlight color of this glyph when cursor is inside it. Null if same as default border color. 
-    protected Color cursorInsideColor;
+    protected Color cursorInsideColor = DEFAULT_MOUSE_INSIDE_COLOR;
 
     /** Indicates whether this glyph's interior is filled or not.
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments (returns true in those cases).
