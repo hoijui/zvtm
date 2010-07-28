@@ -282,7 +282,7 @@ public class VDiamondOr extends VDiamond {
     public Object clone(){
         VDiamondOr res=new VDiamondOr(vx,vy,0,vs,color,getBorderColor(), orient,(alphaC != null) ? alphaC.getAlpha() : 1f);
         res.borderColor=this.borderColor;
-        res.mouseInsideColor=this.mouseInsideColor;
+        res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;
         return res;
     }

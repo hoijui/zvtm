@@ -160,7 +160,7 @@ public class VirtualSpace {
     /**add glyph g to this space*/
     public void addGlyph(Glyph g, boolean initColors, boolean repaint){
         if (g == null){return;}
-        if (initColors){g.setMouseInsideHighlightColor(Glyph.getDefaultMouseInsideColor());}
+        if (initColors){g.setCursorInsideHighlightColor(Glyph.getDefaultCursorInsideHighlightColor());}
         g.initCams(cm.cameraList.length);
         visualEnts.add(g);
         addGlyphToDrawingList(g);

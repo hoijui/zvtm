@@ -594,7 +594,7 @@ public class DPath extends Glyph implements RectangularShape {
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){
-            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+            if (cursorInsideColor != null){color = cursorInsideColor;update = true;}
         }
         else {
             if (isSelected() && selectedColor != null){
@@ -602,7 +602,7 @@ public class DPath extends Glyph implements RectangularShape {
                 update = true;
             }
             else {
-                if (mouseInsideColor != null){color = fColor;update = true;}
+                if (cursorInsideColor != null){color = fColor;update = true;}
             }
         }
         if (update){

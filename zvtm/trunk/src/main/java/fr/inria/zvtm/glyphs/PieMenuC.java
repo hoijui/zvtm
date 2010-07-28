@@ -67,8 +67,8 @@ public class PieMenuC extends PieMenu {
             else {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
             }
-            items[i].setMouseInsideFillColor(fillSColor);
-            items[i].setMouseInsideHighlightColor(borderSColor);
+            items[i].setCursorInsideFillColor(fillSColor);
+            items[i].setCursorInsideHighlightColor(borderSColor);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -149,8 +149,8 @@ public class PieMenuC extends PieMenu {
             else {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
             }
-            items[i].setMouseInsideFillColor(fillSColors[i]);
-            items[i].setMouseInsideHighlightColor(borderSColors[i]);
+            items[i].setCursorInsideFillColor(fillSColors[i]);
+            items[i].setCursorInsideHighlightColor(borderSColors[i]);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -232,8 +232,8 @@ public class PieMenuC extends PieMenu {
             else {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColor, borderColor, alphaT);
             }
-            items[i].setMouseInsideFillColor(fillSColor);
-            items[i].setMouseInsideHighlightColor(borderSColor);
+            items[i].setCursorInsideFillColor(fillSColor);
+            items[i].setCursorInsideHighlightColor(borderSColor);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -315,8 +315,8 @@ public class PieMenuC extends PieMenu {
             else {
                 items[i] = new VSlice(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, angle, fillColors[i], borderColors[i], alphaT);
             }
-            items[i].setMouseInsideFillColor(fillSColors[i]);
-            items[i].setMouseInsideHighlightColor(borderSColors[i]);
+            items[i].setCursorInsideFillColor(fillSColors[i]);
+            items[i].setCursorInsideHighlightColor(borderSColors[i]);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){

@@ -59,8 +59,8 @@ public class PieMenuR extends PieMenu {
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
-            items[i].setMouseInsideFillColor(fillSColor);
-            items[i].setMouseInsideHighlightColor(borderSColor);
+            items[i].setCursorInsideFillColor(fillSColor);
+            items[i].setCursorInsideHighlightColor(borderSColor);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -137,8 +137,8 @@ public class PieMenuR extends PieMenu {
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
-            items[i].setMouseInsideFillColor(fillSColors[i]);
-            items[i].setMouseInsideHighlightColor(borderSColors[i]);
+            items[i].setCursorInsideFillColor(fillSColors[i]);
+            items[i].setCursorInsideHighlightColor(borderSColors[i]);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -216,8 +216,8 @@ public class PieMenuR extends PieMenu {
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
-            items[i].setMouseInsideFillColor(fillSColor);
-            items[i].setMouseInsideHighlightColor(borderSColor);
+            items[i].setCursorInsideFillColor(fillSColor);
+            items[i].setCursorInsideHighlightColor(borderSColor);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -295,8 +295,8 @@ public class PieMenuR extends PieMenu {
         for (int i=0;i<labels.length;i++){
             angle += angleDelta;
             items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
-            items[i].setMouseInsideFillColor(fillSColors[i]);
-            items[i].setMouseInsideHighlightColor(borderSColors[i]);
+            items[i].setCursorInsideFillColor(fillSColors[i]);
+            items[i].setCursorInsideHighlightColor(borderSColors[i]);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){

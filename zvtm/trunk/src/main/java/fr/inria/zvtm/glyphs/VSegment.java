@@ -406,7 +406,7 @@ public class VSegment extends Glyph implements RectangularShape {
 
     public Object clone(){
         VSegment res = new VSegment(vx,vy,0,vw,vh,color, (alphaC != null) ? alphaC.getAlpha() : 1f);
-        res.mouseInsideColor = this.mouseInsideColor;
+        res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }
 
@@ -414,7 +414,7 @@ public class VSegment extends Glyph implements RectangularShape {
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){
-            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+            if (cursorInsideColor != null){color = cursorInsideColor;update = true;}
         }
         else {
             if (isSelected() && selectedColor != null){
@@ -422,7 +422,7 @@ public class VSegment extends Glyph implements RectangularShape {
                 update = true;
             }
             else {
-                if (mouseInsideColor != null){color = fColor;update = true;}
+                if (cursorInsideColor != null){color = fColor;update = true;}
             }
         }
         if (update){

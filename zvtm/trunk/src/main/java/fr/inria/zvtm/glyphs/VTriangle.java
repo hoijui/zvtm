@@ -400,7 +400,7 @@ public class VTriangle extends ClosedShape {
 
     public Object clone(){
         VTriangle res = new VTriangle(vx, vy, 0, vh, color, borderColor, (alphaC != null) ? alphaC.getAlpha(): 1f);
-        res.mouseInsideColor = this.mouseInsideColor;
+        res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }
 

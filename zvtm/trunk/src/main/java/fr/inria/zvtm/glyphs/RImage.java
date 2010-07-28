@@ -128,7 +128,7 @@ public class RImage extends VImage {
     	res.setWidth(vw);
     	res.setHeight(vh);
     	res.borderColor = this.borderColor;
-    	res.mouseInsideColor = this.mouseInsideColor;
+    	res.cursorInsideColor = this.cursorInsideColor;
     	res.bColor = this.bColor;
     	res.setDrawBorderPolicy(drawBorder);
     	res.setZoomSensitive(zoomSensitive);

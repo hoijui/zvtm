@@ -61,8 +61,8 @@ public class PieMenuP extends PieMenu {
             angle += angleDelta;
             coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
             items[i] = new VPolygon(coords, 0, fillColor, borderColor, alphaT);
-            items[i].setMouseInsideFillColor(fillSColor);
-            items[i].setMouseInsideHighlightColor(borderSColor);
+            items[i].setCursorInsideFillColor(fillSColor);
+            items[i].setCursorInsideHighlightColor(borderSColor);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -139,8 +139,8 @@ public class PieMenuP extends PieMenu {
             angle += angleDelta;
             coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
             items[i] = new VPolygon(coords, 0, fillColors[i], borderColors[i], alphaT);
-            items[i].setMouseInsideFillColor(fillSColors[i]);
-            items[i].setMouseInsideHighlightColor(borderSColors[i]);
+            items[i].setCursorInsideFillColor(fillSColors[i]);
+            items[i].setCursorInsideHighlightColor(borderSColors[i]);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -211,8 +211,8 @@ public class PieMenuP extends PieMenu {
             angle += angleDelta;
             coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
             items[i] = new VPolygon(coords, 0, fillColor, borderColor, alphaT);
-            items[i].setMouseInsideFillColor(fillSColor);
-            items[i].setMouseInsideHighlightColor(borderSColor);
+            items[i].setCursorInsideFillColor(fillSColor);
+            items[i].setCursorInsideHighlightColor(borderSColor);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
@@ -290,8 +290,8 @@ public class PieMenuP extends PieMenu {
             angle += angleDelta;
             coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
             items[i] = new VPolygon(coords, 0, fillColors[i], borderColors[i], alphaT);
-            items[i].setMouseInsideFillColor(fillSColors[i]);
-            items[i].setMouseInsideHighlightColor(borderSColors[i]);
+            items[i].setCursorInsideFillColor(fillSColors[i]);
+            items[i].setCursorInsideHighlightColor(borderSColors[i]);
             vs.addGlyph(items[i], false, false);
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){

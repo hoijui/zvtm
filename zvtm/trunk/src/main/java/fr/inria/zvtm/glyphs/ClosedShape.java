@@ -35,7 +35,7 @@ public abstract class ClosedShape extends Glyph {
     public Color bColor = Color.BLACK;
 
     /** Fill color of this glyph when cursor is inside it. Null if same as default fill color. */
-    public Color mouseInsideFColor;
+    public Color cursorInsideFColor;
 
     /** Indicates whether this glyph's interior is filled or not.
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
@@ -83,8 +83,8 @@ public abstract class ClosedShape extends Glyph {
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      *@param c set to null to keep the original color.
      */
-    public void setMouseInsideFillColor(Color c){
-	this.mouseInsideFColor = c;
+    public void setCursorInsideFillColor(Color c){
+	this.cursorInsideFColor = c;
     }
 
     /** Set the glyph's border color (use setColor for text, paths, segments, etc.).
@@ -160,8 +160,8 @@ public abstract class ClosedShape extends Glyph {
     public void highlight(boolean b, Color selectedColor){
 	boolean update = false;
 	if (b){
-	    if (mouseInsideFColor != null){color = mouseInsideFColor;update = true;}
-	    if (mouseInsideColor != null){borderColor = mouseInsideColor;update = true;}
+	    if (cursorInsideFColor != null){color = cursorInsideFColor;update = true;}
+	    if (cursorInsideColor != null){borderColor = cursorInsideColor;update = true;}
 	}
 	else {
 	    if (isSelected() && selectedColor != null){
@@ -169,8 +169,8 @@ public abstract class ClosedShape extends Glyph {
 		update = true;
 	    }
 	    else {
-		if (mouseInsideFColor != null){color = fColor;update = true;}
-		if (mouseInsideColor != null){borderColor = bColor;update = true;}
+		if (cursorInsideFColor != null){color = fColor;update = true;}
+		if (cursorInsideColor != null){borderColor = bColor;update = true;}
 	    }
 	}
 	if (update){

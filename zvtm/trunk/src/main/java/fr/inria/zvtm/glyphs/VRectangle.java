@@ -394,7 +394,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 
     public Object clone(){
 	VRectangle res=new VRectangle(vx, vy, 0, vw, vh, color, borderColor);
-	res.mouseInsideColor=this.mouseInsideColor;
+	res.cursorInsideColor=this.cursorInsideColor;
 	return res;
     }
 

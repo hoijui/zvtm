@@ -485,7 +485,7 @@ public class FPolygon extends ClosedShape {
 	}
 	FPolygon res=new FPolygon(lps,color);
 	res.borderColor=this.borderColor;
-	res.mouseInsideColor=this.mouseInsideColor;
+	res.cursorInsideColor=this.cursorInsideColor;
 	res.bColor=this.bColor;
 	return res;
     }

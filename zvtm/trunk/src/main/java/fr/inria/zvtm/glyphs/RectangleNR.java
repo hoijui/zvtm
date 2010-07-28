@@ -406,7 +406,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
     public Object clone(){
         RectangleNR res = new RectangleNR(vx,vy,0,vw,vh,color);
         res.borderColor = this.borderColor;
-        res.mouseInsideColor = this.mouseInsideColor;
+        res.cursorInsideColor = this.cursorInsideColor;
         res.bColor = this.bColor;
         res.setTranslucencyValue(getTranslucencyValue());
         return res;

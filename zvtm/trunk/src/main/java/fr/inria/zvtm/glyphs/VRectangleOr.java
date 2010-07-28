@@ -419,7 +419,7 @@ public class VRectangleOr extends VRectangle {
 
     public Object clone(){
 	VRectangleOr res=new VRectangleOr(vx, vy, 0, vw, vh, color, borderColor, orient);
-	res.mouseInsideColor=this.mouseInsideColor;
+	res.cursorInsideColor=this.cursorInsideColor;
 	return res;
     }
 

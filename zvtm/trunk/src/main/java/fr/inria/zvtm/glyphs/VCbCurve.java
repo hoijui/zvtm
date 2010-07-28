@@ -333,7 +333,7 @@ public class VCbCurve extends Glyph {
 
     public Object clone(){
         VCbCurve res = new VCbCurve(vx,vy,0,vs,color,orient,vrad1,ang1,vrad2,ang2);
-        res.mouseInsideColor = this.mouseInsideColor;
+        res.cursorInsideColor = this.cursorInsideColor;
         res.setTranslucencyValue(getTranslucencyValue());
         return res;
     }

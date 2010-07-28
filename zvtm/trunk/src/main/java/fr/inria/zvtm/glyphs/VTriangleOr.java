@@ -269,7 +269,7 @@ public class VTriangleOr extends VTriangle {
     
     public Object clone(){
         VTriangleOr res = new VTriangleOr(vx, vy, 0, vh, color, borderColor, orient, (alphaC != null) ? alphaC.getAlpha() : 1f);
-        res.mouseInsideColor = this.mouseInsideColor;
+        res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }
 

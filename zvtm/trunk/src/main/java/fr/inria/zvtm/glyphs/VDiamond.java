@@ -393,7 +393,7 @@ public class VDiamond extends ClosedShape {
 
     public Object clone(){
         VDiamond res=new VDiamond(vx,vy,0,vs,color, getBorderColor(), (alphaC != null) ? alphaC.getAlpha(): 1f);
-        res.mouseInsideColor=this.mouseInsideColor;
+        res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;
         return res;
     }

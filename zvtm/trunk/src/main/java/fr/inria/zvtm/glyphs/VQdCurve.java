@@ -307,7 +307,7 @@ public class VQdCurve extends Glyph {
 
     public Object clone(){
         VQdCurve res=new VQdCurve(vx,vy,0,vs,color,orient,vrad,ang);
-        res.mouseInsideColor=this.mouseInsideColor;
+        res.cursorInsideColor=this.cursorInsideColor;
         res.setTranslucencyValue(getTranslucencyValue());
         return res;
     }

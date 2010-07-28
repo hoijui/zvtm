@@ -515,7 +515,7 @@ public class VShape extends ClosedShape {
 
     public Object clone(){
 	VShape res=new VShape(vx, vy, 0, vs, (float[])vertices.clone(), color, borderColor, orient);
-	res.mouseInsideColor=this.mouseInsideColor;
+	res.cursorInsideColor=this.cursorInsideColor;
 	return res;
     }
 

@@ -517,7 +517,7 @@ public class VPolygon extends ClosedShape {
 	}
 	VPolygon res = new VPolygon(lps, getZindex(), color, borderColor, (alphaC != null ) ? alphaC.getAlpha() : 1.0f);
 	res.borderColor=this.borderColor;
-	res.mouseInsideColor=this.mouseInsideColor;
+	res.cursorInsideColor=this.cursorInsideColor;
 	res.bColor=this.bColor;
 	return res;
     }

@@ -270,7 +270,7 @@ public class ZSegment extends VRectangle {
     public Object clone(){
 	ZSegment res = new ZSegment(vx,vy,0,vw,vh,color);
 	res.borderColor = this.borderColor;
-	res.mouseInsideColor = this.mouseInsideColor;
+	res.cursorInsideColor = this.cursorInsideColor;
 	res.bColor = this.bColor;
 	return res;
     }

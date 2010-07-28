@@ -232,7 +232,7 @@ public class VPoint extends Glyph {
 
     public Object clone(){
         VPoint res = new VPoint(vx, vy, 0, color, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
-        res.mouseInsideColor = this.mouseInsideColor;
+        res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }
 
@@ -240,7 +240,7 @@ public class VPoint extends Glyph {
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){
-            if (mouseInsideColor != null){color = mouseInsideColor;update = true;}
+            if (cursorInsideColor != null){color = cursorInsideColor;update = true;}
         }
         else {
             if (isSelected() && selectedColor != null){
@@ -248,7 +248,7 @@ public class VPoint extends Glyph {
                 update = true;
             }
             else {
-                if (mouseInsideColor != null){color = fColor;update = true;}
+                if (cursorInsideColor != null){color = fColor;update = true;}
             }
         }
         if (update){

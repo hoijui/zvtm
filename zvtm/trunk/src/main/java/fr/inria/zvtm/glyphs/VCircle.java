@@ -355,7 +355,7 @@ public class VCircle extends ClosedShape {
 
     public Object clone(){
         VCircle res=new VCircle(vx,vy,0,vr,color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
-        res.mouseInsideColor=this.mouseInsideColor;
+        res.cursorInsideColor=this.cursorInsideColor;
         return res;
     }
 
