@@ -235,14 +235,14 @@ public aspect GlyphCreation {
 
 	static abstract class ClosedShapeCreateDelta extends AbstractGlyphCreateDelta {
 		private final Color borderColor;
-		private final Color mouseInsideFillColor;
+		private final Color cursorInsideFillColor;
 		private final boolean filled;
 		private final boolean borderDrawn;
 
 		ClosedShapeCreateDelta(ClosedShape source, ObjId<VirtualSpace> virtualSpaceId){
 			super(source, virtualSpaceId);
 			this.borderColor = source.getDefaultBorderColor();
-			this.mouseInsideFillColor = source.mouseInsideFColor;
+			this.cursorInsideFillColor = source.cursorInsideFColor;
 			this.filled = source.isFilled();
 			this.borderDrawn = source.isBorderDrawn(); 
 		}
@@ -252,7 +252,7 @@ public aspect GlyphCreation {
 			super.stateTransferHook(glyph);
 			ClosedShape dest = (ClosedShape)glyph;
 			dest.bColor = borderColor;
-			dest.setMouseInsideFillColor(mouseInsideFillColor);
+			dest.setCursorInsideFillColor(cursorInsideFillColor);
 			dest.setFilled(filled);
 			dest.setDrawBorder(borderDrawn);
 		}
