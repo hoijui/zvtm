@@ -122,6 +122,20 @@ public class VRectangleOr extends VRectangle {
     		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);		    
 		}
 	}
+	
+    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+            /* Glyph hotspot is in the region. The glyph is obviously visible */
+            return true;
+        }
+        else if (((vx-size)<=eb) && ((vx+size)>=wb) && ((vy-size)<=nb) && ((vy+size)>=sb)){
+            /* Glyph is at least partially in region.
+            We approximate using the glyph bounding box, meaning that some glyphs not
+            actually visible can be projected and drawn (but they won't be displayed)) */
+            return true;
+        }
+        return false;
+    }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
         if (orient==0){
