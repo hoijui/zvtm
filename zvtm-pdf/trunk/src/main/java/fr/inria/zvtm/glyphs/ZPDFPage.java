@@ -159,6 +159,24 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
 		else {return false;}
 	}
+	
+	public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+            /* Glyph hotspot is in the region. The glyph is obviously visible */
+            return true;
+        }
+        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+            /* Glyph is at least partially in region.
+            We approximate using the glyph bounding box, meaning that some glyphs not
+            actually visible can be projected and drawn (but they won't be displayed)) */
+            return true;
+        }
+        return false;
+    }
+    
+	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+	}
 
 	public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
 		if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
