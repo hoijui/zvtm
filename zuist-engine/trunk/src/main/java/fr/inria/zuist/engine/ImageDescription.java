@@ -209,8 +209,8 @@ public class ImageDescription extends ResourceDescription {
     }
     
     private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
-        int ih = i.getHeight(null);
-        double sf = vh / ((double)ih);
+        // fit image in declared "bounding box"
+        double sf = Math.min(vw / ((double)i.getWidth(null)), vh / ((double)i.getHeight(null)));
         if (fadeIn){
             glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
             if(!display){
