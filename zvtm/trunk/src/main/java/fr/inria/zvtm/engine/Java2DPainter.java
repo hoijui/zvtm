@@ -25,7 +25,8 @@ public interface Java2DPainter {
     /** Also painted when view is in blank mode. */
     public static final short AFTER_PORTALS = 3;
     
-    /**painting instructions (called by the associated view at each repaint)<br>This method is called at one of the following two times depending on how this painter was registered with the View: before ZVTM glyphs are painted (BACKGROUND), after ZVTM glyphs have been painted (FOREGROUND), after a distortion lens has been applied (AFTER_DISTORTION), after portals have been painted (AFTER_PORTALS).
+    /**Painting instructions, called by the associated view at each repaint.
+     * This method is called at one of the following four times depending on how this painter was registered with the View: before ZVTM glyphs are painted (BACKGROUND), after ZVTM glyphs have been painted (FOREGROUND), after a distortion lens has been applied (AFTER_DISTORTION), after portals have been painted (AFTER_PORTALS).
      *@param g2d the Graphics context on which to paint
      *@param viewWidth the associated View's width
      *@param viewHeight the associated View's height
