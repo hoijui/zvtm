@@ -91,7 +91,7 @@ public class GeoNamesParser {
                 ClosedShape g = new RectangleNR(Math.round(GeoToolsManager.CC*toponym.getLongitude()), Math.round(GeoToolsManager.CC*toponym.getLatitude()),
                                                 1, 3, 3, FEATURE_COLOR);
                 application.bSpace.addGlyph(g);
-                g.setMouseInsideFillColor(Color.RED);
+                g.setCursorInsideFillColor(Color.RED);
                 g.setOwner(toponym);
             }
         }
