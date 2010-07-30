@@ -21,24 +21,24 @@ import fr.inria.zvtm.engine.Camera;
 public class Composite extends Glyph {
     private ArrayList<Glyph> children;
 
-    private transient float radius; //radius of the bounding circle
+    private transient long[] bbox; //wnes
 
     public Composite(){
         vx = 0;
         vy = 0;
         children = new ArrayList<Glyph>();
-        radius = 0;
+        bbox = new long[4];
     }
 
     /**
      * Adds a child Glyph to this Composite.
-     * Contrary to CGlyph, you do not need to add the children 
+     * Contrary to CGlyph, you should <i>not</i> add the children 
      * to the virtual space.
      * @param child Glyph to add
      */
     public void addChild(Glyph child){
         children.add(child);
-        computeRadius(); 
+        computeBoundingBox();
     }
 
     /**
@@ -50,9 +50,16 @@ public class Composite extends Glyph {
     public boolean removeChild(Glyph child){
         boolean removed = children.remove(child);
         if(removed){
-            computeRadius(); 
+            computeBoundingBox();
         }
         return removed;
+    }
+
+    //mainly for debug purposes
+    public long[] getBoundingBox(){
+        long[] retval = new long[bbox.length];
+        System.arraycopy(bbox, 0, retval, 0, bbox.length);
+        return retval;
     }
 
     /**
@@ -109,6 +116,8 @@ public class Composite extends Glyph {
         //XXX implement
         return true;
     }
+
+    //XXX implement visibleInRegion (clipping)
 
     @Override 
     public void removeCamera(int index){
@@ -199,23 +208,23 @@ public class Composite extends Glyph {
 
     @Override 
     public void reSize(float factor){
-        radius *= factor;
         for(Glyph child: children){
             child.reSize(factor);
 
             child.move((long)((vx - child.vx) * (1. - factor)), 
                     (long)((vy - child.vy) * (1. - factor)));
         }
+        computeBoundingBox();
     }
 
     @Override
-    public void sizeTo(float radius){
-        reSize(radius/this.radius); 
+    public void sizeTo(float newRadius){
+        reSize(newRadius/radius()); 
     }
 
     @Override
     public float getSize(){
-        return radius;
+        return radius();
     }
 
     @Override 
@@ -225,6 +234,7 @@ public class Composite extends Glyph {
         for(Glyph child: children){
             child.move(dx, dy);
         } 
+        translateBoundingBox(dx, dy);
     }
 
     @Override
@@ -232,16 +242,53 @@ public class Composite extends Glyph {
         move(x - vx, y - vy);
     }
 
-    private void computeRadius(){
-        float maxRad = 0f;
-        for(Glyph child: children){
-            maxRad = Math.max(maxRad, distance(child) + child.getSize());
-        }
-        radius = maxRad;
+    @Override
+    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+        long vw = (bbox[2] - bbox[0])/2;
+        long vh = (bbox[1] - bbox[3])/2; 
+        long cx = bbox[0] + vw;
+        long cy = bbox[3] + vh; 
+        return ((cx-vw)<=eb) && ((cx+vw)>=wb) && 
+            ((cy-vh)<=nb) && ((cy+vh)>=sb);
     }
 
-    private float distance(Glyph g){
-        return (float)Math.sqrt((g.vx - vx) * (g.vx - vx) + (g.vy - vy) * (g.vy - vy));
+    private void translateBoundingBox(long dx, long dy){
+        bbox[0] += dx;
+        bbox[1] += dy;
+        bbox[2] += dx;
+        bbox[3] += dy;
+    }
+
+    private void computeBoundingBox(){
+        bbox[0] = Long.MAX_VALUE;
+        bbox[1] = Long.MIN_VALUE;
+        bbox[2] = Long.MIN_VALUE;
+        bbox[3] = Long.MAX_VALUE;
+
+        for(Glyph child: children){
+            long[] glBounds = child.getBounds();
+
+            if(glBounds[0] < bbox[0]){
+                bbox[0] = glBounds[0];
+            }
+
+            if(glBounds[1] > bbox[1]){
+                bbox[1] = glBounds[1];
+            }
+
+            if(glBounds[2] > bbox[2]){
+                bbox[2] = glBounds[2];
+            }
+
+            if(glBounds[3] < bbox[3]){
+                bbox[3] = glBounds[3];
+            }
+        }
+    }
+
+    private float radius(){
+        return (float)(0.5*Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
+                (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
     }
 }
 
