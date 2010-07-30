@@ -277,7 +277,6 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        System.out.print(".");
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].cw == 1) && (pc[i].ch==1)){
             g.setColor(this.color);
