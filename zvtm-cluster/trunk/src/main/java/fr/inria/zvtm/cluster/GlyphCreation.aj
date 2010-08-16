@@ -9,8 +9,10 @@ package fr.inria.zvtm.cluster;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.io.Serializable;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import java.util.ArrayList;
 
 import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -18,6 +20,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.CircleNR;
 import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
@@ -34,17 +37,21 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 import fr.inria.zvtm.glyphs.VTriangleOr;
 
+interface GlyphReplicator extends Serializable {
+   public Glyph createGlyph();
+}
+
 //Replicates Glyph subtypes creation on slaves
 //(in fact, waits for the glyphs to be added to a virtual
 //space to replicate them on slaves)
 public aspect GlyphCreation {
-	//introduce Glyph.getCreateDelta
-	Delta Glyph.getCreateDelta(){
-		String poison = System.getProperty("poisonNopDelta");
+        //introduce Glyph.getReplicator
+	GlyphReplicator Glyph.getReplicator(){
+		String poison = System.getProperty("poisonNopReplicator");
 		if((poison != null) && (poison.toLowerCase().equals("true"))){
-			throw new Error("NopDelta not allowed");
+			throw new Error("NopReplicator not allowed");
 		}
-		return new NopDelta();
+		return new NopReplicator();
 	}
 
 	public pointcut glyphAdd(Glyph glyph, VirtualSpace virtualSpace): 
@@ -73,7 +80,9 @@ public aspect GlyphCreation {
 		glyphAdd(glyph, virtualSpace) &&
 		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
             glyph.setReplicated(true);
-			Delta createDelta = glyph.getCreateDelta();
+			//Delta createDelta = glyph.getCreateDelta();
+            Delta createDelta = new GlyphCreateDelta(glyph.getReplicator(),
+                    glyph.getObjId(), glyph.getParentSpace().getObjId());
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
 		}
 
@@ -88,97 +97,82 @@ public aspect GlyphCreation {
 		}
 	
 	//overrides for various Glyph subclasses
-	@Override Delta VRectangle.getCreateDelta(){
-		return new VRectangleCreateDelta(this, 
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator VRectangle.getReplicator(){
+		return new VRectangleReplicator(this);
 	}
 
-	@Override Delta VCircle.getCreateDelta(){
-		return new VCircleCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator VCircle.getReplicator(){
+		return new VCircleReplicator(this);
 	}
 
-	@Override Delta VTriangleOr.getCreateDelta(){
-		return new VTriangleOrCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator VTriangleOr.getReplicator(){
+		return new VTriangleOrReplicator(this);
 	}
 
-	@Override Delta VSegment.getCreateDelta(){
-		return new VSegmentCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator VSegment.getReplicator(){
+		return new VSegmentReplicator(this);
 	}
 
-	@Override Delta VText.getCreateDelta(){
-		return new VTextCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator VText.getReplicator(){
+		return new VTextReplicator(this);
 	}
 
-    @Override Delta VTextOr.getCreateDelta(){
-        return new VTextOrCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VTextOr.getReplicator(){
+        return new VTextOrReplicator(this);
     }
 
-	@Override Delta RectangleNR.getCreateDelta(){
-		return new RectangleNRCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator RectangleNR.getReplicator(){
+		return new RectangleNRReplicator(this);
 	}
 
-	@Override Delta CircleNR.getCreateDelta(){
-		return new CircleNRCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator CircleNR.getReplicator(){
+		return new CircleNRReplicator(this);
 	}
 
-	@Override Delta VImage.getCreateDelta(){
-		return new VImageCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator VImage.getReplicator(){
+		return new VImageReplicator(this);
 	}
 
-	@Override Delta ClusteredImage.getCreateDelta(){
-		return new ClusteredImageCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator ClusteredImage.getReplicator(){
+		return new ClusteredImageReplicator(this);
 	}
 
-	@Override Delta DPath.getCreateDelta(){
-		return new DPathCreateDelta(this,
-				this.getParentSpace().getObjId());
+	@Override GlyphReplicator DPath.getReplicator(){
+		return new DPathReplicator(this);
 	}
 
-    @Override Delta VEllipse.getCreateDelta(){
-        return new VEllipseCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VEllipse.getReplicator(){
+        return new VEllipseReplicator(this);
     }
 
-    @Override Delta VPoint.getCreateDelta(){
-        return new VPointCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VPoint.getReplicator(){
+        return new VPointReplicator(this);
     }
 
-    @Override Delta VRing.getCreateDelta(){
-        return new VRingCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VRing.getReplicator(){
+        return new VRingReplicator(this);
     }
 
-    @Override Delta VSlice.getCreateDelta(){
-        return new VSliceCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VSlice.getReplicator(){
+        return new VSliceReplicator(this);
     }
 
-    @Override Delta VPolygon.getCreateDelta(){
-        return new VPolygonCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VPolygon.getReplicator(){
+        return new VPolygonReplicator(this);
     }
 
-    @Override Delta VDiamond.getCreateDelta(){
-        return new VDiamondCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator VDiamond.getReplicator(){
+        return new VDiamondReplicator(this);
     }
 
-	private static class NopDelta implements Delta {
-		public void apply(SlaveUpdater su){}
+    @Override GlyphReplicator Composite.getReplicator(){
+        return new CompositeReplicator(this);
+    }
 
-		@Override public String toString(){
-			return "NopDelta";
-		}
+	private static class NopReplicator implements GlyphReplicator {
+        public Glyph createGlyph(){
+            return null;
+        }
 	}
 
 	private static class GlyphRemoveDelta implements Delta {
@@ -199,48 +193,60 @@ public aspect GlyphCreation {
 
 	}
 
-	private static abstract class AbstractGlyphCreateDelta implements Delta {
+    private static class GlyphCreateDelta implements Delta {
+        private final GlyphReplicator replicator;
+        private final ObjId<Glyph> glyphId;
+        private final ObjId<VirtualSpace> parentSpaceId;
+
+        GlyphCreateDelta(GlyphReplicator replicator, ObjId<Glyph> glyphId, ObjId<VirtualSpace> parentSpaceId){
+            this.replicator = replicator;
+            this.glyphId = glyphId;
+            this.parentSpaceId = parentSpaceId;
+        }
+
+        public void apply(SlaveUpdater su){
+            Glyph glyph = replicator.createGlyph();
+
+            su.putSlaveObject(glyphId, glyph);
+            VirtualSpace vs = su.getSlaveObject(parentSpaceId);
+            vs.addGlyph(glyph);
+        }
+    }
+
+	private static abstract class AbstractGlyphReplicator implements GlyphReplicator {
 		private final GlyphAttributes baseAttr;
-		private final ObjId<Glyph> glyphId;
-		private final ObjId<VirtualSpace> virtualSpaceId;
 
-		AbstractGlyphCreateDelta(Glyph source, ObjId<VirtualSpace> virtualSpaceId){
+		AbstractGlyphReplicator(Glyph source){
 			this.baseAttr = GlyphAttributes.fromGlyph(source);
-			this.glyphId = source.getObjId();
-			this.virtualSpaceId = virtualSpaceId;	
 		}
-
-		abstract Glyph createGlyph();
 
 		protected void stateTransferHook(Glyph glyph){
 			//left empty. subclasses may use this to transfer
 			//additional state information to the glyph.
 			//'glyph' may be downcast to the type of the object
-			//that was passed to the AbstractGlyphCreateDelta ctor
+			//that was passed to the AbstractGlyphReplicator ctor
 			//Important: overrides should chain to their parents
+            //(i.e. call super.stateTransferHook())
 		}
 
-		public final void apply(SlaveUpdater su){
-			//template method pattern: calls abstract method.
-			//In principle, not meant for inheritance
-			Glyph glyph = createGlyph();
-			baseAttr.moveAttributesToGlyph(glyph);
-			stateTransferHook(glyph);
-
-			su.putSlaveObject(glyphId, glyph);
-			VirtualSpace vs = su.getSlaveObject(virtualSpaceId);
-			vs.addGlyph(glyph);
-		}
+        public final Glyph createGlyph(){
+            Glyph glyph = doCreateGlyph();
+            baseAttr.moveAttributesToGlyph(glyph);
+            stateTransferHook(glyph);
+            return glyph;
+        }
+        
+        abstract Glyph doCreateGlyph();
 	}
 
-	static abstract class ClosedShapeCreateDelta extends AbstractGlyphCreateDelta {
+	static abstract class ClosedShapeReplicator extends AbstractGlyphReplicator {
 		private final Color borderColor;
 		private final Color cursorInsideFillColor;
 		private final boolean filled;
 		private final boolean borderDrawn;
 
-		ClosedShapeCreateDelta(ClosedShape source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		ClosedShapeReplicator(ClosedShape source){
+			super(source);
 			this.borderColor = source.getDefaultBorderColor();
 			this.cursorInsideFillColor = source.cursorInsideFColor;
 			this.filled = source.isFilled();
@@ -258,132 +264,132 @@ public aspect GlyphCreation {
 		}
 	}
 
-	private static class VRectangleCreateDelta extends ClosedShapeCreateDelta {
+	private static class VRectangleReplicator extends ClosedShapeReplicator {
 		private final long halfWidth;
 		private final long halfHeight;
 
-		VRectangleCreateDelta(VRectangle source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		VRectangleReplicator(VRectangle source){
+			super(source);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			//beware of z-index
 			return new VRectangle(0,0,0,halfWidth,halfHeight,Color.BLACK);
 		}
 
 		@Override public String toString(){
-			return "VRectangleCreateDelta, halfWidth=" + halfWidth
+			return "VRectangleReplicator, halfWidth=" + halfWidth
 				+ ", halfHeight=" + halfHeight;
 		}
 	}
 
-	private static class VCircleCreateDelta extends ClosedShapeCreateDelta {
+	private static class VCircleReplicator extends ClosedShapeReplicator {
 		private final long radius;
 
-		VCircleCreateDelta(VCircle source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		VCircleReplicator(VCircle source){
+			super(source);
 			this.radius = (long)(source.getSize());
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			//beware of z-index
 			return new VCircle(0,0,0,radius,Color.BLACK);
 		}
 
 		@Override public String toString(){
-			return "VCircleCreateDelta, radius=" + radius;
+			return "VCircleReplicator, radius=" + radius;
 		}
 	}
 	
-	private static class VTriangleOrCreateDelta extends ClosedShapeCreateDelta {
+	private static class VTriangleOrReplicator extends ClosedShapeReplicator {
 		private final long height;
 
-		VTriangleOrCreateDelta(VTriangleOr source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		VTriangleOrReplicator(VTriangleOr source){
+			super(source);
 			this.height = (long)(source.getSize());
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			//beware of z-index
 			return new VTriangleOr(0,0,0,height,Color.BLACK, 0);
 		}
 	}
 
-	private static class VSegmentCreateDelta extends AbstractGlyphCreateDelta {
+	private static class VSegmentReplicator extends AbstractGlyphReplicator {
 		private final long halfWidth;
 		private final long halfHeight;
 
-		VSegmentCreateDelta(VSegment source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		VSegmentReplicator(VSegment source){
+			super(source);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			//beware of z-index
 			return new VSegment(0,0,0,halfWidth,halfHeight,Color.BLACK);
 		}
 	}
 
-	private static class VTextCreateDelta extends AbstractGlyphCreateDelta {
+	private static class VTextReplicator extends AbstractGlyphReplicator {
 		protected final String text;
 		protected final float scaleFactor;
 		protected final short textAnchor;
 
-		VTextCreateDelta(VText source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		VTextReplicator(VText source){
+			super(source);
 			this.text = source.getText();
 			this.scaleFactor = source.getScale();
 			this.textAnchor = source.getTextAnchor();
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			//beware of z-index
 			return new VText(0,0,0,Color.BLACK,text,textAnchor,scaleFactor);
 		}
 	}
 
-    private static class VTextOrCreateDelta extends VTextCreateDelta{
-        VTextOrCreateDelta(VTextOr source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+    private static class VTextOrReplicator extends VTextReplicator{
+        VTextOrReplicator(VTextOr source){
+            super(source);
         }
 
-        @Override Glyph createGlyph(){
+        @Override public Glyph doCreateGlyph(){
             return new VTextOr(0,0,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
         }
     }
 
-	private static class RectangleNRCreateDelta extends ClosedShapeCreateDelta {
+	private static class RectangleNRReplicator extends ClosedShapeReplicator {
 		private final long halfWidth;
 		private final long halfHeight;
 
-		RectangleNRCreateDelta(RectangleNR source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		RectangleNRReplicator(RectangleNR source){
+			super(source);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			return new RectangleNR(0,0,0,halfWidth,halfHeight,Color.BLACK);
 		}
 	}
 
-	private static class CircleNRCreateDelta extends ClosedShapeCreateDelta {
+	private static class CircleNRReplicator extends ClosedShapeReplicator {
 		private final long radius;
 		
-		CircleNRCreateDelta(CircleNR source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		CircleNRReplicator(CircleNR source){
+			super(source);
 			this.radius = (long)(source.getSize());
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			return new CircleNR(0,0,0,radius,Color.BLACK);
 		}
 	}
 
-    private static class VImageCreateDelta extends ClosedShapeCreateDelta {
+    private static class VImageReplicator extends ClosedShapeReplicator {
         //Note that serialized ImageIcon instances (as most AWT objects)
         //are not guaranteed to be portable across toolkits.
         //If this becomes a practical concern, then another serialization 
@@ -391,135 +397,157 @@ public aspect GlyphCreation {
         private final ImageIcon serImage; 
         private final double scaleFactor;
 
-        VImageCreateDelta(VImage source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VImageReplicator(VImage source){
+            super(source);
             this.serImage = new ImageIcon(source.getImage());
             this.scaleFactor = source.scaleFactor;
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VImage(0,0,0,serImage.getImage(), scaleFactor);
         }
     }
 
-	private static class ClusteredImageCreateDelta extends ClosedShapeCreateDelta {
+	private static class ClusteredImageReplicator extends ClosedShapeReplicator {
 		private final double scaleFactor;
 		private final URL imageLocation;
 
-		ClusteredImageCreateDelta(ClusteredImage source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		ClusteredImageReplicator(ClusteredImage source){
+			super(source);
 			this.scaleFactor = source.scaleFactor;
 			this.imageLocation = source.getImageLocation();
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			return new ClusteredImage(0,0,0,imageLocation,scaleFactor);
 		}
 	}
 
-	private static class DPathCreateDelta extends AbstractGlyphCreateDelta {
+	private static class DPathReplicator extends AbstractGlyphReplicator {
 		//note that GeneralPath is only serializable
 		//starting with Java 1.6
 		private final GeneralPath path;
 
-		DPathCreateDelta(DPath source, ObjId<VirtualSpace> virtualSpaceId){
-			super(source, virtualSpaceId);
+		DPathReplicator(DPath source){
+			super(source);
 			this.path = source.getJava2DGeneralPath();
 		}
 
-		Glyph createGlyph(){
+		public Glyph doCreateGlyph(){
 			return new DPath(path.getPathIterator(null), 
 					0, Color.BLACK);
 		}
 	}
 
-    private static class VEllipseCreateDelta extends ClosedShapeCreateDelta {
+    private static class VEllipseReplicator extends ClosedShapeReplicator {
         private final long sx;
         private final long sy;
         
-        VEllipseCreateDelta(VEllipse source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VEllipseReplicator(VEllipse source){
+            super(source);
             this.sx = source.getWidth();
             this.sy = source.getHeight();
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VEllipse(0,0,0,sx,sy,Color.BLACK);
         }
     }
 
-    private static class VPointCreateDelta extends AbstractGlyphCreateDelta {
+    private static class VPointReplicator extends AbstractGlyphReplicator {
 
-        VPointCreateDelta(VPoint source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VPointReplicator(VPoint source){
+            super(source);
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VPoint();
         }
     }
 
-    private static class VRingCreateDelta extends ClosedShapeCreateDelta {
+    private static class VRingReplicator extends ClosedShapeReplicator {
         private final long arcRadius;
         private final double arcAngle;
         private final float irRad; //inner ring radius (%outer ring radius)
         private final double sliceOrient;
 
-        VRingCreateDelta(VRing source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VRingReplicator(VRing source){
+            super(source);
             this.arcRadius = source.vr;
             this.arcAngle = source.angle;
             this.irRad = source.getInnerRatio();
             this.sliceOrient = source.orient;
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VRing(0,0,0,arcRadius,arcAngle,irRad,sliceOrient,
                     Color.BLACK, Color.BLACK);
         }
     }
 
-    private static class VSliceCreateDelta extends ClosedShapeCreateDelta {
+    private static class VSliceReplicator extends ClosedShapeReplicator {
         private final long arcRadius;
         private final double arcAngle;
         private final double sliceOrient; 
 
-        VSliceCreateDelta(VSlice source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VSliceReplicator(VSlice source){
+            super(source);
             this.arcRadius = source.vr;
             this.arcAngle = source.angle;
             this.sliceOrient = source.orient;
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VSlice(0,0,0,arcRadius,arcAngle,sliceOrient,
                     Color.BLACK,Color.BLACK);
         }
     }
 
-    private static class VPolygonCreateDelta extends ClosedShapeCreateDelta {
+    private static class VPolygonReplicator extends ClosedShapeReplicator {
         private final LongPoint[] coords;
 
-        VPolygonCreateDelta(VPolygon source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VPolygonReplicator(VPolygon source){
+            super(source);
             this.coords = source.getAbsoluteVertices();
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VPolygon(coords, 0, Color.BLACK);
         }
     }
 
-    private static class VDiamondCreateDelta extends ClosedShapeCreateDelta {
+    private static class VDiamondReplicator extends ClosedShapeReplicator {
         private final long size; //width = height
 
-        VDiamondCreateDelta(VDiamond source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        VDiamondReplicator(VDiamond source){
+            super(source);
             this.size = (long)source.getSize();
         }
 
-        Glyph createGlyph(){
+        public Glyph doCreateGlyph(){
             return new VDiamond(0,0,0,size,Color.BLACK);
+        }
+    }
+
+    private static class CompositeReplicator extends AbstractGlyphReplicator{
+		private final GlyphAttributes baseAttr;
+        private final ArrayList<GlyphReplicator> replicators;
+
+        CompositeReplicator(Composite source){
+            super(source);
+			baseAttr = GlyphAttributes.fromGlyph(source);
+            replicators = new ArrayList<GlyphReplicator>();
+            for(Glyph glyph: source.peekAtChildren()){
+                replicators.add(glyph.getReplicator());
+            } 
+        }
+        
+        public Glyph doCreateGlyph(){
+            Composite retval = new Composite();
+            for(GlyphReplicator rep: replicators){
+                retval.addChild(rep.createGlyph());
+            }
+            return retval;
         }
     }
 }
