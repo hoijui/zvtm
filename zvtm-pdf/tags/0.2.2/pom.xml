@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-pdf</artifactId>
+  <packaging>jar</packaging>
+  <name>ZVTM-PDF</name>
+  <version>0.3.0-SNAPSHOT</version>
+  <url>http://zvtm.sourceforge.net</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+  
+  <!-- Deployment -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+  
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm</artifactId>
+      <version>[0.11.0-SNAPSHOT,)</version>
+    </dependency>
+	
+    <!-- ICEpdf 4.0.x -->
+	<!--
+
+		ICEpdf is not available in any Maven repository for now.
+		Get icepdf-core.jar from http://www.icepdf.org/downloads.html
+		Install the JAR file in your local repository using the following command line:
+	        mvn install:install-file -Dfile=icepdf-core.jar -DgroupId=org.icepdf -DartifactId=icepdf-core -Dversion=4.0.1 -Dpackaging=jar	
+
+	-->
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-core</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+    
+    <!-- ICEpdf Pro 4.0.x (if available) -->
+	<!--
+
+		ICEpdf Pro is not available in any Maven repository for now.
+		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
+		Install the JAR files in your local repository using the following command line:
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.0.1 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.0.1 -Dpackaging=jar	
+	-->
+    <!--
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-pro</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-pro-intl</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+	-->
+	
+	<!-- ICEpdf's dependency on Batik for SVG export is not used for now -->
+	<!-- <dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-awt-util</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-dom</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-svg-dom</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-svggen</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-util</artifactId>
+		<version>1.6</version>
+	</dependency>
+	<dependency>
+		<groupId>batik</groupId>
+		<artifactId>batik-xml</artifactId>
+		<version>1.6</version>
+	</dependency> -->
+  </dependencies>
+  
+  <!-- Build -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zvtm.demo.PDFViewer</mainClass>
+              <packageName>fr.inria.zvtm.demo</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <!-- Reporting -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+          <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[Copyright &#169; 2008-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <links>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs</link>
+			<link>http://www.icepdf.org/docs/v4_0_0/core/javadocs</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
