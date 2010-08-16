@@ -760,7 +760,7 @@ class PrefWindow extends JFrame implements ActionListener, MouseListener {
 	    if (newCol != null){
 		ConfigManager.HIGHLIGHT_COLOR = newCol;
 		highlightColor.setColor(ConfigManager.HIGHLIGHT_COLOR);
-		Glyph.setDefaultMouseInsideColor(ConfigManager.HIGHLIGHT_COLOR);
+		Glyph.setDefaultCursorInsideHighlightColor(ConfigManager.HIGHLIGHT_COLOR);
 	    }
 	}
     }

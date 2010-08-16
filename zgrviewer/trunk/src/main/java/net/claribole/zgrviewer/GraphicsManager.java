@@ -185,7 +185,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Vector createZVTMelements(boolean applet){
         vsm = VirtualSpaceManager.INSTANCE;
         VText.setMainFont(ConfigManager.defaultFont);
-        Glyph.setDefaultMouseInsideColor(ConfigManager.HIGHLIGHT_COLOR);
+        Glyph.setDefaultCursorInsideHighlightColor(ConfigManager.HIGHLIGHT_COLOR);
         animator = vsm.getAnimationManager();
         //vsm.setDebug(true);
         mSpace = vsm.addVirtualSpace(mainSpaceName);
