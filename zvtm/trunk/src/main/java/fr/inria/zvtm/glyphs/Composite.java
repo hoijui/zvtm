@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.inria.zvtm.engine.Camera;
 
@@ -53,6 +54,14 @@ public class Composite extends Glyph {
             computeBoundingBox();
         }
         return removed;
+    }
+
+    /**
+     * Returns part of the internal state of this Composite.
+     * Look, but do not touch!
+     */
+    public List<Glyph> peekAtChildren(){
+        return children;
     }
 
     //mainly for debug purposes
@@ -199,6 +208,7 @@ public class Composite extends Glyph {
     @Override
     public void orientTo(float angle){
         //XXX ?
+        //At the moment, a Composite glyph's orientation may not be changed.
     }
 
     @Override
