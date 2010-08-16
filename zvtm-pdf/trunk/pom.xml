@@ -11,7 +11,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <artifactId>zvtm-pdf</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-PDF</name>
-  <version>0.2.2-SNAPSHOT</version>
+  <version>0.2.2</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
     <license>
@@ -54,7 +54,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>[0.10.0,)</version>
+      <version>[0.10.0,0.10.2]</version>
     </dependency>
 	
     <!-- ICEpdf 4.0.x -->
