@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */ 
 
 package fr.inria.zvtm.tests;
@@ -17,9 +17,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VTriangle;
-
-import fr.inria.zvtm.glyphs.CGlyph;
-import fr.inria.zvtm.glyphs.SGlyph;
 
 import java.awt.Color;
 
@@ -178,20 +175,11 @@ public class ZOrderTest extends TestCase {
 
 	Glyph g3 = new VCircle(10, 30, 40, 30, Color.BLACK);
 	Glyph g4 = new VCircle(10, 10, 43, 30, Color.BLACK);
-	
-	CGlyph cg1 = new CGlyph(g1, new SGlyph[]{new SGlyph(g2, 10, 23)});
-	CGlyph cg2 = new CGlyph(g3, new SGlyph[]{new SGlyph(g4, -42, 314)});
-	
+		
 	vs.addGlyph(g1, false);
 	vs.addGlyph(g2, false);
 	vs.addGlyph(g3, false);
 	vs.addGlyph(g4, false);
-	vs.addGlyph(cg1, false);
-	vs.addGlyph(cg2, false);
-
-	vs.above(cg2, cg1);
-
-	assertTrue(cg2.getZindex() >= cg1.getZindex());
     }
 
 	//this just tests an implementation detail
