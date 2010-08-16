@@ -50,7 +50,7 @@ public class FPolygon extends ClosedShape {
      *@param c fill color
      */
     public FPolygon(LongPoint[] v,Color c){
-	    this(v, Color.WHITE, Color.BLACK, 1.0f);
+	    this(v, c, Color.BLACK, 1.0f);
     }
 
     public FPolygon(LongPoint[] v, Color c, Color bc){
