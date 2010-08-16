@@ -42,7 +42,7 @@ public class AllGlyphsTest {
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
-        testView = vsm.addFrameView(cameras, "All Glyphs Test", vt, 1024, 768, false, true, false, null);
+        testView = vsm.addFrameView(cameras, "All Glyphs Test", vt, 1024, 768, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
@@ -52,7 +52,22 @@ public class AllGlyphsTest {
     }
 
     void populate(){
-        vs.addGlyph(new VCircle(0,200,0,100,Color.RED));
+        // circles
+        VCircle c = new VCircle(0,0,0,20,Color.WHITE);
+        vs.addGlyph(c);
+        c = new VCircle(40,0,0,10,Color.WHITE);
+        c.sizeTo(20);
+        vs.addGlyph(c);
+        // rectangles
+        VRectangle r = new VRectangle(0,40,0,20,10,Color.WHITE);
+        vs.addGlyph(r);
+        r = new VRectangle(40,40,0,10,5,Color.WHITE);
+        r.sizeTo(22.36f);
+        vs.addGlyph(r);
+        r = new VRectangle(80,40,0,10,5,Color.WHITE);
+        r.setWidth(20);
+        r.setHeight(10);
+        vs.addGlyph(r);
     }
 
     public static void main(String[] args){
