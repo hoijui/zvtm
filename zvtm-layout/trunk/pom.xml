@@ -11,7 +11,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   <artifactId>zvtm-layout</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM-LAYOUT</name>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.3.0</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
     <license>
@@ -54,7 +54,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>[0.10.1,)</version>
+      <version>[0.10.1,0.10.2]</version>
     </dependency>
     <dependency>
       <groupId>net.sf.jung</groupId>
