@@ -260,7 +260,7 @@ public class VCursor {
      *@deprecated As of zvtm 0.9.2, replaced by getStickedGlyphArray
      *@see #getStickedGlyphArray()
      */
-    public Vector getStickedGlyphs(){
+    public Vector<Glyph> getStickedGlyphs(){
 	Vector res = new Vector();
 	for (int i=0;i<stickedGlyphs.length;i++){
 	    res.add(stickedGlyphs[i]);
@@ -288,7 +288,7 @@ public class VCursor {
 		*@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
 		*@see #getIntersectingPaths(Camera c)
 		*/
-	public Vector getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY){
+	public Vector<DPath> getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY){
 			Vector res=new Vector();
 			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 			Object glyph;
@@ -303,7 +303,7 @@ public class VCursor {
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
      */
-    public Vector getIntersectingPaths(Camera c){
+    public Vector<DPath> getIntersectingPaths(Camera c){
 	return getIntersectingPaths(c, 5, vx, vy);
     }
 
@@ -312,7 +312,7 @@ public class VCursor {
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
      */
-    public Vector getIntersectingPaths(Camera c, int tolerance){
+    public Vector<DPath> getIntersectingPaths(Camera c, int tolerance){
 		return getIntersectingPaths(c, tolerance, vx, vy);
     }
 
@@ -352,7 +352,7 @@ public class VCursor {
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@see #getIntersectingTexts(Camera c, long cursorX, long cursorY)
      */
-    public Vector getIntersectingTexts(Camera c){
+    public Vector<VText> getIntersectingTexts(Camera c){
 	return getIntersectingTexts(c, vx, vy);
     }
 
@@ -362,7 +362,7 @@ public class VCursor {
      *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
      *@see #getIntersectingTexts(Camera c)
      */
-    public Vector getIntersectingTexts(Camera c, long cursorX, long cursorY){
+    public Vector<VText> getIntersectingTexts(Camera c, long cursorX, long cursorY){
 	    Vector res=new Vector();
 	    int index=c.getIndex();
 	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
@@ -418,7 +418,7 @@ public class VCursor {
      *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
      *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
      */
-    public Vector getIntersectingSegments(Camera c, int tolerance){
+    public Vector<VSegment> getIntersectingSegments(Camera c, int tolerance){
 	return getIntersectingSegments(c, mx, my, tolerance);
     }
 
@@ -430,7 +430,7 @@ public class VCursor {
      *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
      *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
      */
-    public Vector getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance){
+    public Vector<VSegment> getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance){
 	    Vector res = new Vector();
 	    int index = c.getIndex();
 	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
@@ -473,7 +473,7 @@ public class VCursor {
 		*@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
 		*@see #getGlyphsUnderMouseList()
 		*/
-	public Vector getIntersectingGlyphs(Camera c){
+	public Vector<Glyph> getIntersectingGlyphs(Camera c){
 			Vector res=new Vector();
 			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 			Glyph glyph;
@@ -531,7 +531,7 @@ public class VCursor {
      *@see #getGlyphsUnderMouseList()
      *@see #getIntersectingGlyphs(Camera c)
      */
-    public Vector getGlyphsUnderMouse(){
+    public Vector<Glyph> getGlyphsUnderMouse(){
 	Vector res=new Vector();
 	for (int i=0;i<=maxIndex;i++){
 	    res.add(glyphsUnderMouse[i]);

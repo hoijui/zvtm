@@ -639,7 +639,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
      *@deprecated As of zvtm 0.9.3, replaced by getGlyphsUnderMouseList()
      *@see #getGlyphsUnderMouseList()
      */
-    public Vector getGlyphsUnderMouse(){
+    public Vector<Glyph> getGlyphsUnderMouse(){
 	return parent.mouse.getGlyphsUnderMouse();
     }
 

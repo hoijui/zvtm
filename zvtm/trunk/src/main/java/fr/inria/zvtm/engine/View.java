@@ -924,7 +924,7 @@ public abstract class View {
      *@param vsn name of virtual space
      *@param wg which glyphs in the region should be returned (among VIS_AND_SENS_GLYPHS (default), VISIBLE_GLYPHS, SENSIBLE_GLYPHS, ALL_GLYPHS)
      */
-    public Vector getGlyphsInRegion(long x1,long y1,long x2,long y2,String vsn,int wg){
+    public Vector<Glyph> getGlyphsInRegion(long x1,long y1,long x2,long y2,String vsn,int wg){
         Vector res=new Vector();
         VirtualSpace vs = VirtualSpaceManager.INSTANCE.getVirtualSpace(vsn);
         long minX=Math.min(x1,x2);
