@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -81,6 +82,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import fr.inria.vit.config.Config;
+import fr.inria.vit.pan.PanListener;
+import fr.inria.vit.pan.IPhodPan;
+import fr.inria.vit.zoom.ZoomListener;
+import fr.inria.vit.zoom.IPhodZoom;
+
+import com.illposed.osc.OSCPortIn;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -98,6 +107,13 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
+
+    /* pan, point, zoom sources and listeners (vit) */
+    OSCPortIn iphodIn;
+    IPhodPan pan;
+    IPhodZoom zoom;
+    PanListener panListener;
+    ZoomListener zoomListener;
     
     /* Navigation constants */
     static final int ANIM_MOVE_LENGTH = 300;
@@ -133,6 +149,35 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new FitsOverlayManager(this);
 		initGUI(fullscreen, opengl, antialiased);
+        try{
+            iphodIn = new OSCPortIn(Config.IPOD_DEFAULT_OSC_LISTENING_PORT);
+        } catch(Exception ex){
+            throw new Error("Could not initialize iphod port");
+        }
+        pan = new IPhodPan(iphodIn);
+        pan.start();
+        zoom = new IPhodZoom(iphodIn);
+        panListener = new PanListener(){
+            public void coordsChanged(double x, double y){
+                System.err.println("Pan coordinates: " + x + ", " + y);
+                Point camCoordsInView = clusteredView.spaceToViewCoords(mCamera,
+                        mCamera.posx, mCamera.posy);
+                Point targetInView = new Point(camCoordsInView.x - (int)x, 
+                        camCoordsInView.y - (int)y);
+                LongPoint targetInSpace = clusteredView.viewToSpaceCoords(mCamera,
+                        targetInView.x, targetInView.y);
+                mCamera.moveTo(targetInSpace.x, targetInSpace.y);
+            }
+        };
+        pan.addListener(panListener);
+        zoomListener = new ZoomListener(){
+            public void altitudeChanged(double dAlt){
+                System.err.println("alt changed: " + dAlt);
+                mCamera.altitudeOffset((float)dAlt);
+            }
+        };
+        zoom.addListener(zoomListener);
+        zoom.start();
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
