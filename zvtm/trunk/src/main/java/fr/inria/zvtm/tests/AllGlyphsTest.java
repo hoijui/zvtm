@@ -12,6 +12,7 @@ package fr.inria.zvtm.tests;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import javax.swing.ImageIcon;
 
 import java.util.Vector;
 
@@ -232,6 +233,28 @@ public class AllGlyphsTest {
         rg = new VRing(60, 460, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.GREEN, Color.BLACK);
         rg.moveTo(100, 460);
         vs.addGlyph(rg);
+        // images
+        VImage im = new VImage(0, 520, 0, (new ImageIcon("src/main/resources/test.jpg")).getImage());
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        vs.addGlyph(im);
+        im = new VImage(0, 520, 0, (new ImageIcon("src/main/resources/test.jpg")).getImage());
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        im.moveTo(40, 520);
+        vs.addGlyph(im);
+        im = new VImageOr(80, 520, 0, (new ImageIcon("src/main/resources/test.jpg")).getImage(), (float)Math.PI/2f);
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        vs.addGlyph(im);
+        im = new VImageOr(80, 520, 0, (new ImageIcon("src/main/resources/test.jpg")).getImage(), (float)Math.PI/2f);
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        im.moveTo(120, 520);
+        vs.addGlyph(im);
+        im = new RImage(160, 520, 0, (new ImageIcon("src/main/resources/test.jpg")).getImage(), 1f);
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        vs.addGlyph(im);
+        im = new RImage(160, 520, 0, (new ImageIcon("src/main/resources/test.jpg")).getImage(), 1f);
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        im.moveTo(200, 520);
+        vs.addGlyph(im);
     }
 
     public static void main(String[] args){

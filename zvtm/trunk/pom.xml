@@ -84,6 +84,14 @@ $Id$
 
   <!-- Build -->
   <build>
+	<resources> 
+	  <resource>
+        <directory>src/main/resources</directory> 
+          <excludes> 
+		    <exclude>test.jpg</exclude>
+		</excludes> 
+      </resource>
+	</resources>
     <plugins>
     <plugin>
         <groupId>org.codehaus.mojo</groupId>
