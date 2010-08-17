@@ -267,6 +267,14 @@ public class AllGlyphsTest {
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
         }
     }
+    
+    void rotate(){
+        AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
+        for (Glyph g:vs.getAllGlyphs()){
+            Animation a = af.createGlyphOrientationAnim(1000, g, (float)Math.PI, true, SlowInSlowOutInterpolator.getInstance(), null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
+        }
+    }
 
     public static void main(String[] args){
         System.out.println("-----------------");
@@ -337,7 +345,8 @@ class TestEventHandler extends DefaultEventHandler {
     }
     
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (c == 't'){test.translate();}        
+        if (c == 't'){test.translate();}
+        else if (c == 'r'){test.rotate();}
     }
     
     public void viewClosing(View v){
