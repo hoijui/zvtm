@@ -37,39 +37,6 @@ public class VRing extends VSlice {
 	/** Radius of inner ring, from center of ring.*/
 	float irr_p;
 
-    /** Construct a slice by giving its 3 vertices
-        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param irr inner ring radius as a percentage of outer ring radius
-		*@param z z-index (pass 0 if you do not use z-ordering)
-        *@param c fill color
-        *@param bc border color
-        */
-    public VRing(LongPoint[] v, float irr, int z, Color c, Color bc){
-        this(v, irr, z, c, bc, 1.0f);
-    }
-            
-    /** Construct a slice by giving its 3 vertices
-        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param irr inner ring radius as a percentage of outer ring radius
-		*@param z z-index (pass 0 if you do not use z-ordering)
-        *@param c fill color
-        *@param bc border color
-        *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
-        */
-    public VRing(LongPoint[] v, float irr, int z, Color c, Color bc, float alpha){
-		initCoordArray(4);
-        vx = v[0].x;
-        vy = v[0].y;
-        vz = z;
-		irr_p = irr;
-        computeSize();
-        computeOrient();
-        computeAngle();
-        setColor(c);
-        setBorderColor(bc);
-        setTranslucencyValue(alpha);
-    }
-
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
