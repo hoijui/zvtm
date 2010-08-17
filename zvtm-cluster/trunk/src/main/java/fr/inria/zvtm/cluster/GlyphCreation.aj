@@ -80,7 +80,6 @@ public aspect GlyphCreation {
 		glyphAdd(glyph, virtualSpace) &&
 		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
             glyph.setReplicated(true);
-			//Delta createDelta = glyph.getCreateDelta();
             Delta createDelta = new GlyphCreateDelta(glyph.getReplicator(),
                     glyph.getObjId(), glyph.getParentSpace().getObjId());
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
