@@ -81,8 +81,9 @@ public class FitsViewer {
 			throw new Error("Malformed URL");
 		}
 		FitsImage cImg = new FitsImage(0,0,0,imgURL);
-        cImg.zRescale();
+        assert(cImg.isReplicated());
 		vs.addGlyph(cImg);
+        cImg.zRescale();
         RangeSelection rs = new RangeSelection();
         //rs.reSize(4);
         vs.addGlyph(rs);
