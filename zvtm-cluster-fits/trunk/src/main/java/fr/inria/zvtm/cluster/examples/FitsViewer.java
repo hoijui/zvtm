@@ -19,6 +19,7 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
 
@@ -72,7 +73,7 @@ public class FitsViewer {
 		URL imgURL = null;
 		try {
 			if(options.source.equals("")){
-				imgURL = new URL("http://www.urban.youvox.fr/IMG/png/WildSe1.png");
+				imgURL = new URL("http://fits.gsfc.nasa.gov/samples/FOCx38i0101t_c0f.fits");
 			} else {
 				imgURL = new URL(options.source);
 			}
@@ -80,7 +81,11 @@ public class FitsViewer {
 			throw new Error("Malformed URL");
 		}
 		FitsImage cImg = new FitsImage(0,0,0,imgURL);
+        cImg.zRescale();
 		vs.addGlyph(cImg);
+        RangeSelection rs = new RangeSelection();
+        //rs.reSize(4);
+        vs.addGlyph(rs);
 	}
 
 	public static void main(String[] args) throws Exception{
