@@ -68,6 +68,10 @@ public class AllGlyphsTest {
         c = new VCircle(40,0,0,10,Color.RED);
         c.sizeTo(20);
         vs.addGlyph(c);
+        c = new VCircle(0,0,0,10,Color.BLUE);
+        c.sizeTo(20);
+        c.moveTo(80, 0);
+        vs.addGlyph(c);
         // rectangles
         VRectangle r = new VRectangle(0,40,0,20,10,Color.WHITE);
         vs.addGlyph(r);
@@ -147,6 +151,54 @@ public class AllGlyphsTest {
         tr.sizeTo(20);
         tr.moveTo(120, 240);
         vs.addGlyph(tr);
+        // ellipses
+        VEllipse e = new VEllipse(0, 280, 0, 20, 10, Color.WHITE);
+        vs.addGlyph(e);
+        e = new VEllipse(40, 280, 0, 10, 5, Color.RED);
+        e.setWidth(20);
+        e.setHeight(10);
+        vs.addGlyph(e);
+        e = new VEllipse(0, 0, 0, 10, 5, Color.BLUE);
+        e.moveTo(80, 280);
+        e.setWidth(20);
+        e.setHeight(10);
+        vs.addGlyph(e);
+        // text
+        String txt = "Test";
+        VText tx = new VText(0, 302, 0, Color.WHITE, txt, VText.TEXT_ANCHOR_START);
+        vs.addGlyph(tx);
+        tx = new VText(0, 315, 0, Color.WHITE, txt, VText.TEXT_ANCHOR_MIDDLE);
+        vs.addGlyph(tx);
+        tx = new VText(0, 328, 0, Color.WHITE, txt, VText.TEXT_ANCHOR_END);
+        vs.addGlyph(tx);
+        tx = new VText(0, 302, 0, Color.RED, txt, VText.TEXT_ANCHOR_START);
+        tx.moveTo(40, 302);
+        vs.addGlyph(tx);
+        tx = new VText(0, 315, 0, Color.RED, txt, VText.TEXT_ANCHOR_MIDDLE);
+        tx.moveTo(40, 315);
+        vs.addGlyph(tx);
+        tx = new VText(0, 328, 0, Color.RED, txt, VText.TEXT_ANCHOR_END);
+        tx.moveTo(40, 328);
+        vs.addGlyph(tx);
+        tx = new VTextOr(0, 320, 0, Color.BLUE, txt, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+        tx.moveTo(67, 302);
+        vs.addGlyph(tx);
+        tx = new VTextOr(0, 320, 0, Color.BLUE, txt, (float)Math.PI/2f, VText.TEXT_ANCHOR_MIDDLE);
+        tx.moveTo(80, 315);
+        vs.addGlyph(tx);
+        tx = new VTextOr(0, 320, 0, Color.BLUE, txt, (float)Math.PI/2f, VText.TEXT_ANCHOR_END);
+        tx.moveTo(93, 328);
+        vs.addGlyph(tx);
+        // shapes
+        float[] vertices6 = {1f, .5f, 1f, .5f, 1f, .5f, 1f, .5f};
+        VShape s = new VShape(0, 360, 0, 20, vertices6, Color.WHITE, 0);
+        vs.addGlyph(s);
+        s = new VShape(40, 360, 0, 20, vertices6, Color.RED, (float)Math.PI);
+        vs.addGlyph(s);
+        s = new VShape(0, 360, 0, 10, vertices6, Color.RED, (float)Math.PI);
+        s.sizeTo(20);
+        s.moveTo(80, 360);
+        vs.addGlyph(s);
     }
 
     public static void main(String[] args){
@@ -206,15 +258,19 @@ class TestEventHandler extends DefaultEventHandler {
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
         Camera c = test.mCam;
         float a=(c.focal+Math.abs(c.altitude))/c.focal;
-        if (wheelDirection == WHEEL_UP){
+        if (wheelDirection == WHEEL_DOWN){
             c.altitudeOffset(-a*5);
             VirtualSpaceManager.INSTANCE.repaintNow();
         }
         else {
-            //wheelDirection == WHEEL_DOWN
+            //wheelDirection == WHEEL_UP
             c.altitudeOffset(a*5);
             VirtualSpaceManager.INSTANCE.repaintNow();
         }
+    }
+    
+    public void viewClosing(View v){
+        System.exit(0);
     }
     
 }
