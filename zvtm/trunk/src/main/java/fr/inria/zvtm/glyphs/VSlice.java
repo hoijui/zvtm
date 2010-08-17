@@ -73,39 +73,6 @@ public class VSlice extends ClosedShape {
         setColor(Color.WHITE);
         setBorderColor(Color.BLACK);
     }
-    
-    /** Construct a slice by giving its 3 vertices
-        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param c fill color
-        *@param bc border color
-        */
-    public VSlice(LongPoint[] v, int z, Color c, Color bc){
-        this(v, z, c, bc, 1.0f);
-    }
-    
-    /** Construct a slice by giving its 3 vertices
-        *@param v array of 3 points representing the absolute coordinates of the slice's vertices. The first element must be the point that is not an endpoint of the arc 
-        *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param c fill color
-        *@param bc border color
-        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
-        */
-    public VSlice(LongPoint[] v, int z, Color c, Color bc, float alpha){
-		initCoordArray(3);	
-        vx = v[0].x;
-        vy = v[0].y;
-        vz = z;
-        p1 = v[1];
-        p2 = v[2];
-        computeSize();
-        computeOrient();
-        computeAngle();
-        computePolygonEdges();
-        setColor(c);
-        setBorderColor(bc);
-        setTranslucencyValue(alpha);
-    }
 
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
