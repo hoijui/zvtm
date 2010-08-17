@@ -10,6 +10,7 @@
 package fr.inria.zvtm.tests;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.ImageIcon;
@@ -257,6 +258,15 @@ public class AllGlyphsTest {
         im.moveTo(200, 520);
         vs.addGlyph(im);
     }
+    
+    void translate(){
+        LongPoint translation = new LongPoint(400, -200);
+        AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
+        for (Glyph g:vs.getAllGlyphs()){
+            Animation a = af.createGlyphTranslation(1000, g, translation, true, SlowInSlowOutInterpolator.getInstance(), null);
+            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
+        }
+    }
 
     public static void main(String[] args){
         System.out.println("-----------------");
@@ -324,6 +334,10 @@ class TestEventHandler extends DefaultEventHandler {
             c.altitudeOffset(a*5);
             VirtualSpaceManager.INSTANCE.repaintNow();
         }
+    }
+    
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (c == 't'){test.translate();}        
     }
     
     public void viewClosing(View v){
