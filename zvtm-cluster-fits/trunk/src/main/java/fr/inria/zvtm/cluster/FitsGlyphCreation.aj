@@ -7,22 +7,21 @@ import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
 public aspect FitsGlyphCreation {
-    @Override Delta FitsImage.getCreateDelta(){
-        return new FitsImageCreateDelta(this,
-                this.getParentSpace().getObjId());
+    @Override GlyphReplicator FitsImage.getReplicator(){
+        return new FitsImageReplicator(this);
     }
 
-    private static class FitsImageCreateDelta extends GlyphCreation.ClosedShapeCreateDelta {
+    private static class FitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
         private final URL imageLocation;
         private final float scaleFactor;
 
-        FitsImageCreateDelta(FitsImage source, ObjId<VirtualSpace> virtualSpaceId){
-            super(source, virtualSpaceId);
+        FitsImageReplicator(FitsImage source){
+            super(source);
             this.scaleFactor = source.scaleFactor;
             this.imageLocation = source.getImageLocation();
         }
 
-        Glyph createGlyph(){
+        Glyph doCreateGlyph(){
             try{
                 return new FitsImage(0,0,0,imageLocation, scaleFactor);
             } catch(Exception e){
