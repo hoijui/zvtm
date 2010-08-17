@@ -37,8 +37,6 @@ import java.util.Arrays;
  * All of these can be dynamically modified and animated through AnimManager's createPathAnimation method.
  * This class implements RectangularShape even though it is not, just to give easy access to the path's bounding box dimensions.
  *@author Emmanuel Pietriga, Boris Trofimov
- *@see fr.inria.zvtm.glyphs.VQdCurve
- *@see fr.inria.zvtm.glyphs.VCbCurve
  *@see fr.inria.zvtm.glyphs.VSegment
  */
 
