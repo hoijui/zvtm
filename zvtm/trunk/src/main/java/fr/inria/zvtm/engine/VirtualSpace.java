@@ -69,7 +69,7 @@ public class VirtualSpace {
     CameraManager cm;
 
     /** All glyphs in this virtual space, visible or not. Glyph instances. */
-    Vector visualEnts;
+    Vector<Glyph> visualEnts;
 
     /** Visible glyphs. Ordering is important: biggest index gets drawn on top.<br>
         Shared by all cameras in the virtual space as it is the same for all of them. */
@@ -84,7 +84,7 @@ public class VirtualSpace {
      */
     VirtualSpace(String n){
 	cm=new CameraManager(this);
-	visualEnts=new Vector();
+	visualEnts=new Vector<Glyph>();
 	camera2drawnList=new Vector[0];
   	drawingList = new Glyph[0];
 	spaceName=n;
@@ -100,7 +100,7 @@ public class VirtualSpace {
      *@deprecated As of zvtm 0.9.0, replaced by getCameraListAsArray
      *@see #getCameraListAsArray()
      */
-    public Vector getCameraList(){
+    public Vector<Camera> getCameraList(){
 	Vector res=new Vector();
 	for (int i=0;i<cm.cameraList.length;i++){
 	    res.add(cm.cameraList[i]);
@@ -120,8 +120,8 @@ public class VirtualSpace {
         newDrawnListList[camera2drawnList.length]=new Vector();
         camera2drawnList=newDrawnListList;
         c.setOwningSpace(this);
-        for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
-            Glyph g=(Glyph)e.nextElement();
+        for (Enumeration<Glyph> e=visualEnts.elements();e.hasMoreElements();){
+            Glyph g=e.nextElement();
             g.addCamera(c.getIndex());
         }
         return c;
@@ -194,7 +194,7 @@ public class VirtualSpace {
      * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
      * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
      */
-    public Vector getAllGlyphs(){
+    public Vector<Glyph> getAllGlyphs(){
 	return visualEnts;
     }
 
@@ -202,7 +202,7 @@ public class VirtualSpace {
      *@deprecated as of zvtm 0.9.2
      *@see #getDrawnGlyphs(int cameraIndex)
      */
-    public Vector getVisibleGlyphs(){
+    public Vector<Glyph> getVisibleGlyphs(){
 	Vector res = new Vector();
 	for (int i=0;i<drawingList.length;i++){
 	    res.add(drawingList[i]);
@@ -226,7 +226,7 @@ public class VirtualSpace {
      *@deprecated as of zvtm 0.9.0
      *@see #getDrawnGlyphs(int cameraIndex)
      */
-    public Vector getDrawnGlyphs(){
+    public Vector<Glyph> getDrawnGlyphs(){
 	if (camera2drawnList.length>0){
 	    return camera2drawnList[0];
 	}
@@ -236,7 +236,7 @@ public class VirtualSpace {
     /**
      *get all glyphs actually drawn for a given camera in this virtual space
      */
-    public Vector getDrawnGlyphs(int cameraIndex){
+    public Vector<Glyph> getDrawnGlyphs(int cameraIndex){
 	if (cameraIndex<camera2drawnList.length){
 	    return camera2drawnList[cameraIndex];
 	}
@@ -251,7 +251,7 @@ public class VirtualSpace {
     }
 
     /**get selected glyphs*/
-    public Vector getSelectedGlyphs(){
+    public Vector<Glyph> getSelectedGlyphs(){
 	Vector v=new Vector();
 	Glyph g;
 	for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
@@ -278,7 +278,7 @@ public class VirtualSpace {
     }
 
     /**get all glyphs of type t - if t=="" then select all glyphs (means ANY type)*/
-    public Vector getGlyphsOfType(String t){//
+    public Vector<Glyph> getGlyphsOfType(String t){//
 	Vector v=new Vector();
 	Glyph g;
 	for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
