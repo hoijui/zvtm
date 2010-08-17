@@ -514,14 +514,6 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		if (previousLocations.size()>0){
 			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
 			sm.setUpdateLevel(false);
-//			vsm.animator.createCameraAnimation(FitsViewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
-//				animParams, mSpace.getCamera(0).getID(),
-//				new PostAnimationAdapter(){
-//                    public void animationEnded(Object target, short type, String dimension){
-//                        sm.setUpdateLevel(true);
-//                        sm.updateLevel(mCamera.altitude);
-//                    }
-//                    });                    
             class LevelUpdater implements EndAction {
                 public void execute(Object subject, Animation.Dimension dimension){
                     sm.setUpdateLevel(true);
