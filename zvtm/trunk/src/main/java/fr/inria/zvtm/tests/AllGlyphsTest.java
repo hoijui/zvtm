@@ -52,14 +52,14 @@ public class AllGlyphsTest {
         testView.setNotifyMouseMoved(true);
         vs.getCamera(0).setAltitude(0);
         populate();
-        vsm.repaintNow();
+        testView.getGlobalView(mCam, 500, 1.5f);
     }
 
     void populate(){
         // reference frame
         for (int i=0;i<6;i++){
-            for (int j=0;j<10;j++){
-                vs.addGlyph(new VRectangle(i*40,j*40,0,20,20,Color.GRAY));
+            for (int j=0;j<15;j++){
+                vs.addGlyph(new VRectangle(i*40,j*40,0,20,20,Color.GRAY, Color.LIGHT_GRAY));
             }
         }
         // circles
@@ -84,9 +84,7 @@ public class AllGlyphsTest {
         vs.addGlyph(r);
         FRectangle fr = new FRectangle(120,40,0,20,10,Color.GREEN,1f,0f);
         vs.addGlyph(fr);
-        VRectangleOr or = new VRectangleOr(160,40,0,20,10,Color.YELLOW,(float)Math.PI/2f);
-        vs.addGlyph(or);
-        or = new VRectangleOr(160,40,0,10,5,Color.YELLOW,(float)Math.PI/2f);
+        VRectangleOr or = new VRectangleOr(160,40,0,10,5,Color.YELLOW,(float)Math.PI/2f);
         or.sizeTo(22.36f);
         vs.addGlyph(or);
         or = new VRectangleOr(200,40,0,10,5,Color.ORANGE,(float)Math.PI/2f);
@@ -195,10 +193,45 @@ public class AllGlyphsTest {
         vs.addGlyph(s);
         s = new VShape(40, 360, 0, 20, vertices6, Color.RED, (float)Math.PI);
         vs.addGlyph(s);
-        s = new VShape(0, 360, 0, 10, vertices6, Color.RED, (float)Math.PI);
+        s = new VShape(0, 360, 0, 10, vertices6, Color.BLUE, (float)Math.PI);
         s.sizeTo(20);
         s.moveTo(80, 360);
         vs.addGlyph(s);
+        // round rectangles
+        VRoundRect rr = new VRoundRect(0, 400, 0, 20, 10, Color.WHITE, 4, 4);
+        vs.addGlyph(rr);
+        rr = new VRoundRect(40, 400, 0, 10, 5, Color.RED, 4, 4);
+        rr.setWidth(20);
+        rr.setHeight(10);
+        vs.addGlyph(rr);
+        rr = new VRoundRect(0, 0, 0, 10, 5, Color.BLUE, 4, 4);
+        rr.moveTo(80, 400);
+        rr.setWidth(20);
+        rr.setHeight(10);
+        vs.addGlyph(rr);
+        // segments
+        VSegment sg = new VSegment(-20, 420, 0, Color.WHITE, 20, 460);
+        vs.addGlyph(sg);
+        sg = new VSegment(-20, 420, 0, Color.RED, 20, 460);
+        sg.moveTo(40, 440);
+        vs.addGlyph(sg);
+        sg = new VSegment(80, 440, 0, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f, Color.BLUE);
+        vs.addGlyph(sg);
+        sg = new VSegment(0, 0, 0, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f, Color.GREEN);
+        sg.moveTo(120, 440);
+        vs.addGlyph(sg);
+        // slices and rings
+        //XXX: this one is actually buggy (bad rendering)
+        VSlice sl = new VSlice(-20, 460, 0, 40, Math.PI/2d, Math.PI/4d, Color.WHITE, Color.BLACK);
+        vs.addGlyph(sl);
+        sl = new VSlice(-20, 460, 0, 40, Math.PI/2d, Math.PI/4d, Color.RED, Color.BLACK);
+        sl.moveTo(20, 460);
+        vs.addGlyph(sl);
+        VRing rg = new VRing(60, 460, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.BLUE, Color.BLACK);
+        vs.addGlyph(rg);
+        rg = new VRing(60, 460, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.GREEN, Color.BLACK);
+        rg.moveTo(100, 460);
+        vs.addGlyph(rg);
     }
 
     public static void main(String[] args){
