@@ -37,6 +37,12 @@ public class Utilities {
 
     private static Hashtable colorsByKeyword;
 
+    /**
+     * Disallow instanciation (this class provides static utility methods
+     * only)
+     */
+    private Utilities(){}
+
     /** 
      *get the Java AWT color which corresponds to a color keyword as defined in <a href="http://www.w3.org/TR/SVG/types.html#ColorKeywords">http://www.w3.org/TR/SVG/types.html#ColorKeywords</a>
      *@param keyword a color keyword name such as black, blue, lime, darkorchid, etc...
