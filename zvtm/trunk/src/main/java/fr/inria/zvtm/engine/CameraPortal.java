@@ -8,7 +8,7 @@
  * $Id$
  */ 
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.engine.portals;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;

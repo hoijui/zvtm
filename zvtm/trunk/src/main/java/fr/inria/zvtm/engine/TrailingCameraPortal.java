@@ -8,13 +8,14 @@
  * $Id$
  */
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.engine.portals;
 
 import java.awt.geom.Point2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.LowPassFilter;
 
 /**A portal showing what is seen through a camera, with parameterable alpha channel (translucency).
    The portal behaves like a trailing widget.

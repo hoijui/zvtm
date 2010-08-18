@@ -19,7 +19,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
 
-import fr.inria.zvtm.engine.Portal;
+import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.lens.FixedSizeLens;
 

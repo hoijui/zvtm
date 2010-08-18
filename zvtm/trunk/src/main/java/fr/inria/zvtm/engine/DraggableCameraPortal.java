@@ -8,7 +8,7 @@
  * $Id$
  */ 
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.engine.portals;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

@@ -43,13 +43,13 @@ import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.Java2DPainter;
-import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.engine.RepaintListener;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.lens.Lens;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.RectangularShape;
+import fr.inria.zvtm.engine.portals.Portal;
 
   /**
    * A view is a window and can be composed of one or several cameras superimposed - use EView or IView <BR>

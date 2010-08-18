@@ -8,7 +8,7 @@
  * $Id$
  */
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.engine.portals;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -20,6 +20,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.engine.ObservedRegionListener;
 
 /**A portal behaving as a trailing widget and showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/

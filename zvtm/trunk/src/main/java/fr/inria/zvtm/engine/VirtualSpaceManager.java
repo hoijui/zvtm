@@ -42,8 +42,8 @@ import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.Location;
-import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.engine.RepaintListener;
+import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.lens.Lens;
 
 import fr.inria.zvtm.glyphs.Glyph;
