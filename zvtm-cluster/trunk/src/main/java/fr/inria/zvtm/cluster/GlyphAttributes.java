@@ -1,17 +1,17 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 
 //a serializable vessel to move the main Glyph attributes
 class GlyphAttributes implements Serializable {
-	private final long x;
-	private final long y;
+	private final double x;
+	private final double y;
 	//private final int z; ??
-	private final float orientation;
+	private final double orientation;
 	private final Color borderColor;
 	private final Color mainColor;
 	private final boolean sensitive;
@@ -19,8 +19,8 @@ class GlyphAttributes implements Serializable {
 	private final float strokeWidth;
 	private final float translucency;
 
-	private GlyphAttributes(long x, long y, 
-			float orientation,
+	private GlyphAttributes(double x, double y, 
+			double orientation,
 			Color borderColor, Color mainColor,
 			boolean sensitive,
 			boolean visible,
@@ -38,7 +38,7 @@ class GlyphAttributes implements Serializable {
 	}
 
 	static GlyphAttributes fromGlyph(Glyph glyph){
-		LongPoint loc = glyph.getLocation();
+		Point2D.Double loc = glyph.getLocation();
 		return new GlyphAttributes(loc.x, loc.y,
 				glyph.getOrient(),
 				glyph.getBorderColor(), glyph.getDefaultColor(),

@@ -14,7 +14,6 @@ import org.kohsuke.args4j.Option;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -25,6 +24,7 @@ import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import java.awt.event.KeyEvent;
@@ -87,8 +87,8 @@ public class DPathExample {
         pathEdit.addSegment(30,0,true);
         pathEdit.addSegment(0,0,true);
         //turn the square into a triangle
-        pathEdit.edit(new LongPoint[]{new LongPoint(0,0), new LongPoint(0,0),
-        new LongPoint(0,0), new LongPoint(-30,0), new LongPoint(0,0)},
+        pathEdit.edit(new Point2D.Double[]{new Point2D.Double(0,0), new Point2D.Double(0,0),
+        new Point2D.Double(0,0), new Point2D.Double(-30,0), new Point2D.Double(0,0)},
                 false);
         vs.addGlyph(pathEdit);
     }
@@ -146,16 +146,16 @@ public class DPathExample {
 		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 				Camera c=vsm.getActiveCamera();
-				float a=(c.focal+Math.abs(c.altitude))/c.focal;
+				double a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
-					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 				}
 			}
 		}

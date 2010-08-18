@@ -9,12 +9,12 @@ package fr.inria.zvtm.cluster;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -264,8 +264,8 @@ public aspect GlyphCreation {
 	}
 
 	private static class VRectangleReplicator extends ClosedShapeReplicator {
-		private final long halfWidth;
-		private final long halfHeight;
+		private final double halfWidth;
+		private final double halfHeight;
 
 		VRectangleReplicator(VRectangle source){
 			super(source);
@@ -275,7 +275,7 @@ public aspect GlyphCreation {
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VRectangle(0,0,0,halfWidth,halfHeight,Color.BLACK);
+			return new VRectangle(0d,0d,0,halfWidth,halfHeight,Color.BLACK);
 		}
 
 		@Override public String toString(){
@@ -285,16 +285,16 @@ public aspect GlyphCreation {
 	}
 
 	private static class VCircleReplicator extends ClosedShapeReplicator {
-		private final long radius;
+		private final double radius;
 
 		VCircleReplicator(VCircle source){
 			super(source);
-			this.radius = (long)(source.getSize());
+			this.radius = source.getSize();
 		}
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VCircle(0,0,0,radius,Color.BLACK);
+			return new VCircle(0d,0d,0,radius,Color.BLACK);
 		}
 
 		@Override public String toString(){
@@ -303,22 +303,22 @@ public aspect GlyphCreation {
 	}
 	
 	private static class VTriangleOrReplicator extends ClosedShapeReplicator {
-		private final long height;
+		private final double height;
 
 		VTriangleOrReplicator(VTriangleOr source){
 			super(source);
-			this.height = (long)(source.getSize());
+			this.height = source.getSize();
 		}
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VTriangleOr(0,0,0,height,Color.BLACK, 0);
+			return new VTriangleOr(0d,0d,0,height,Color.BLACK, 0);
 		}
 	}
 
 	private static class VSegmentReplicator extends AbstractGlyphReplicator {
-		private final long halfWidth;
-		private final long halfHeight;
+		private final double halfWidth;
+		private final double halfHeight;
 
 		VSegmentReplicator(VSegment source){
 			super(source);
@@ -328,7 +328,7 @@ public aspect GlyphCreation {
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VSegment(0,0,0,halfWidth,halfHeight,Color.BLACK);
+			return new VSegment(0d,0d,halfWidth,halfHeight,0,Color.BLACK);
 		}
 	}
 
@@ -346,7 +346,7 @@ public aspect GlyphCreation {
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VText(0,0,0,Color.BLACK,text,textAnchor,scaleFactor);
+			return new VText(0d,0d,0,Color.BLACK,text,textAnchor,scaleFactor);
 		}
 	}
 
@@ -356,13 +356,13 @@ public aspect GlyphCreation {
         }
 
         @Override public Glyph doCreateGlyph(){
-            return new VTextOr(0,0,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
+            return new VTextOr(0d,0d,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
         }
     }
 
 	private static class RectangleNRReplicator extends ClosedShapeReplicator {
-		private final long halfWidth;
-		private final long halfHeight;
+		private final double halfWidth;
+		private final double halfHeight;
 
 		RectangleNRReplicator(RectangleNR source){
 			super(source);
@@ -371,20 +371,20 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			return new RectangleNR(0,0,0,halfWidth,halfHeight,Color.BLACK);
+			return new RectangleNR(0d,0d,0,halfWidth,halfHeight,Color.BLACK);
 		}
 	}
 
 	private static class CircleNRReplicator extends ClosedShapeReplicator {
-		private final long radius;
+		private final double radius;
 		
 		CircleNRReplicator(CircleNR source){
 			super(source);
-			this.radius = (long)(source.getSize());
+			this.radius = source.getSize();
 		}
 
 		public Glyph doCreateGlyph(){
-			return new CircleNR(0,0,0,radius,Color.BLACK);
+			return new CircleNR(0d,0d,0,radius,Color.BLACK);
 		}
 	}
 
@@ -403,7 +403,7 @@ public aspect GlyphCreation {
         }
 
         public Glyph doCreateGlyph(){
-            return new VImage(0,0,0,serImage.getImage(), scaleFactor);
+            return new VImage(0d,0d,0,serImage.getImage(), scaleFactor);
         }
     }
 
@@ -418,7 +418,7 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			return new ClusteredImage(0,0,0,imageLocation,scaleFactor);
+			return new ClusteredImage(0d,0d,0,imageLocation,scaleFactor);
 		}
 	}
 
@@ -439,8 +439,8 @@ public aspect GlyphCreation {
 	}
 
     private static class VEllipseReplicator extends ClosedShapeReplicator {
-        private final long sx;
-        private final long sy;
+        private final double sx;
+        private final double sy;
         
         VEllipseReplicator(VEllipse source){
             super(source);
@@ -449,7 +449,7 @@ public aspect GlyphCreation {
         }
 
         public Glyph doCreateGlyph(){
-            return new VEllipse(0,0,0,sx,sy,Color.BLACK);
+            return new VEllipse(0d,0d,0,sx,sy,Color.BLACK);
         }
     }
 
@@ -465,7 +465,7 @@ public aspect GlyphCreation {
     }
 
     private static class VRingReplicator extends ClosedShapeReplicator {
-        private final long arcRadius;
+        private final double arcRadius;
         private final double arcAngle;
         private final float irRad; //inner ring radius (%outer ring radius)
         private final double sliceOrient;
@@ -479,13 +479,13 @@ public aspect GlyphCreation {
         }
 
         public Glyph doCreateGlyph(){
-            return new VRing(0,0,0,arcRadius,arcAngle,irRad,sliceOrient,
+            return new VRing(0d,0d,0,arcRadius,arcAngle,irRad,sliceOrient,
                     Color.BLACK, Color.BLACK);
         }
     }
 
     private static class VSliceReplicator extends ClosedShapeReplicator {
-        private final long arcRadius;
+        private final double arcRadius;
         private final double arcAngle;
         private final double sliceOrient; 
 
@@ -497,13 +497,13 @@ public aspect GlyphCreation {
         }
 
         public Glyph doCreateGlyph(){
-            return new VSlice(0,0,0,arcRadius,arcAngle,sliceOrient,
+            return new VSlice(0d,0d,0,arcRadius,arcAngle,sliceOrient,
                     Color.BLACK,Color.BLACK);
         }
     }
 
     private static class VPolygonReplicator extends ClosedShapeReplicator {
-        private final LongPoint[] coords;
+        private final Point2D.Double[] coords;
 
         VPolygonReplicator(VPolygon source){
             super(source);
@@ -516,15 +516,15 @@ public aspect GlyphCreation {
     }
 
     private static class VDiamondReplicator extends ClosedShapeReplicator {
-        private final long size; //width = height
+        private final double size; //width = height
 
         VDiamondReplicator(VDiamond source){
             super(source);
-            this.size = (long)source.getSize();
+            this.size = source.getSize();
         }
 
         public Glyph doCreateGlyph(){
-            return new VDiamond(0,0,0,size,Color.BLACK);
+            return new VDiamond(0d,0d,0,size,Color.BLACK);
         }
     }
 

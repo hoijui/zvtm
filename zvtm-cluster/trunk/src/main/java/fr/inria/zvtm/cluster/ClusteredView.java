@@ -9,6 +9,7 @@ package fr.inria.zvtm.cluster;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class ClusteredView extends DefaultIdentifiable {
@@ -98,18 +98,18 @@ public class ClusteredView extends DefaultIdentifiable {
 	 *         coordinates (ie (0,0) top-left, x increases to the
 	 *         right, y increases downwards)
 	 */
-	public Point spaceToViewCoords(Camera cam, long xPos, long yPos){  
+	public Point spaceToViewCoords(Camera cam, double xPos, double yPos){  
 		if(!this.ownsCamera(cam)){
 			throw new IllegalArgumentException("this view does not own Camera 'cam'");
 		} 
 
 		Location camLoc = cam.getLocation();
 
-		float focal = cam.getFocal();
-		float altCoef = (focal + camLoc.alt) / focal;
+		double focal = cam.getFocal();
+		double altCoef = (focal + camLoc.alt) / focal;
 		Dimension viewSize = getSize();
 
-		return new Point(viewSize.width/2+Math.round((xPos-camLoc.vx)/altCoef), viewSize.height/2-Math.round((yPos-camLoc.vy)/altCoef));
+		return new Point(viewSize.width/2+(int)Math.round((xPos-camLoc.vx)/altCoef), viewSize.height/2-(int)Math.round((yPos-camLoc.vy)/altCoef));
 	}
 
 	/**
@@ -120,23 +120,23 @@ public class ClusteredView extends DefaultIdentifiable {
 	 * @param xPos point x-coodinate, in View coords
 	 * @param yPos point y-coordinate, in View coords
 	 */
-	public LongPoint viewToSpaceCoords(Camera cam, int xPos, int yPos){
+	public Point2D.Double viewToSpaceCoords(Camera cam, int xPos, int yPos){
 		if(!this.ownsCamera(cam)){
 			throw new IllegalArgumentException("this view does not own Camera 'cam'");
 		}
 
 		Location camLoc = cam.getLocation();
-		float focal = cam.getFocal();
-		float altCoef = (focal + camLoc.alt) / focal;
+		double focal = cam.getFocal();
+		double altCoef = (focal + camLoc.alt) / focal;
 		Dimension viewSize = getSize();
 
 		//find coords of view origin in the virtual space
-		long viewOrigX = camLoc.vx - (long)(0.5*viewSize.width*altCoef);
-		long viewOrigY = camLoc.vy + (long)(0.5*viewSize.height*altCoef);
+		double viewOrigX = camLoc.vx - (0.5*viewSize.width*altCoef);
+		double viewOrigY = camLoc.vy + (0.5*viewSize.height*altCoef);
 
-		return new LongPoint(
-				viewOrigX + (long)(altCoef*xPos),
-				viewOrigY - (long)(altCoef*yPos));
+		return new Point2D.Double(
+				viewOrigX + (altCoef*xPos),
+				viewOrigY - (altCoef*yPos));
 	}
 
 	/**
@@ -195,25 +195,25 @@ public class ClusteredView extends DefaultIdentifiable {
 	 * @param x2 second point x-coordinate, in VirtualSpace coords
 	 * @param y2 second point y-coordinate, in VirtualSpace coords
 	 */
-    public Location centerOnRegion(Camera cam, long x1, long y1, long x2, long y2){
+    public Location centerOnRegion(Camera cam, double x1, double y1, double x2, double y2){
        if(!this.ownsCamera(cam)){
            throw new IllegalArgumentException("this view does not own Camera 'cam'");
        } 
 
-       long west = Math.min(x1,x2);
-       long north = Math.max(y1,y2);
-       long east = Math.max(x1,x2);
-       long south = Math.min(y1,y2);
+       double west = Math.min(x1,x2);
+       double north = Math.max(y1,y2);
+       double east = Math.max(x1,x2);
+       double south = Math.min(y1,y2);
 
-       long newX = (west + east) / 2;
-       long newY = (north + south) / 2;
+       double newX = (west + east) / 2;
+       double newY = (north + south) / 2;
 
        Dimension viewSize = getSize();
        //new altitude to fit horizontally
-       float nah = (east-newX)*2*cam.getFocal() / viewSize.width - cam.getFocal();
+       double nah = (east-newX)*2*cam.getFocal() / viewSize.width - cam.getFocal();
        //new altitude to fit vertically
-       float nav = (north-newY)*2*cam.getFocal()/ viewSize.height - cam.getFocal();
-       float newAlt = Math.max(nah, nav);
+       double nav = (north-newY)*2*cam.getFocal()/ viewSize.height - cam.getFocal();
+       double newAlt = Math.max(nah, nav);
 
        return new Location(newX, newY, newAlt);
     }

@@ -14,7 +14,6 @@ import org.kohsuke.args4j.Option;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -131,16 +130,16 @@ public class CompositeExample {
 		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 				Camera c=vsm.getActiveCamera();
-				float a=(c.focal+Math.abs(c.altitude))/c.focal;
+				double a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
-					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 				}
 			}
 		}

@@ -7,7 +7,6 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.ClosedShape;
@@ -19,6 +18,7 @@ import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.Point2D.Double;
 
 /**
  * Define methods that will be replayed automatically
@@ -39,8 +39,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
         if(replayTarget.isReplicated()) && 
         (
          //Glyph methods
-         execution(public void Glyph.move(long, long))	||
-         execution(public void Glyph.moveTo(long, long))	||
+         execution(public void Glyph.move(double, double))	||
+         execution(public void Glyph.moveTo(double, double))	||
          execution(public void Glyph.setColor(Color))	||
          execution(public void Glyph.setStrokeWidth(float))	||
          execution(public void Glyph.setTranslucencyValue(float)) || 
@@ -56,17 +56,17 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void VText.setScale(float)) || 
          execution(public void ClosedShape.setDrawBorder(boolean)) || 
          execution(public void ClosedShape.setFilled(boolean)) || 
-         execution(public void DPath.addSegment(long, long, boolean)) ||  
-         execution(public void DPath.addCbCurve(long, long, long, long, long, long, boolean)) ||  
-         execution(public void DPath.addQdCurve(long, long, long, long, boolean)) ||  
-         execution(public void DPath.edit(LongPoint[], boolean)) ||  
-         execution(public void RectangularShape.setHeight(long)) ||  
-         execution(public void RectangularShape.setWidth(long)) ||
+         execution(public void DPath.addSegment(double, double, boolean)) ||  
+         execution(public void DPath.addCbCurve(double, double, double, double, double, double, boolean)) ||  
+         execution(public void DPath.addQdCurve(double, double, double, double, boolean)) ||  
+         execution(public void DPath.edit(Point2D.Double[], boolean)) ||  
+         execution(public void RectangularShape.setHeight(double)) ||  
+         execution(public void RectangularShape.setWidth(double)) ||
          execution(public void VirtualSpace.show(Glyph)) ||
          execution(public void VirtualSpace.hide(Glyph)) ||
 
         //Camera methods
-         execution(public void Camera.setZoomFloor(float))
+         execution(public void Camera.setZoomFloor(double))
         );
     }
 

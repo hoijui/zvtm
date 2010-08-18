@@ -38,7 +38,7 @@ public class ClusteredImage extends VImage {
         DEFAULT_IMAGE = new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB);
     }
 
-    public ClusteredImage(long x, long y, int z, URL location, double scale){
+    public ClusteredImage(double x, double y, int z, URL location, double scale){
         super(x,y,z,DEFAULT_IMAGE,scale);
 
         this.location = location;

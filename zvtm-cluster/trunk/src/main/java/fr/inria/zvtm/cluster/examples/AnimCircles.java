@@ -72,10 +72,10 @@ public class AnimCircles {
 
 		Random rnd = new Random();
 		AnimationManager am = vsm.getAnimationManager();
-		long sceneWidth = options.width;
-		long sceneHeight = (long)(0.6*sceneWidth);
-		long posIncr = (long)(sceneHeight / options.numGlyphs);
-		long radius = (long)(0.45 * posIncr);
+		double sceneWidth = options.width;
+		double sceneHeight = 0.6*sceneWidth;
+		double posIncr = sceneHeight / options.numGlyphs;
+		double radius = 0.45 * posIncr;
 		for(int i=0; i<options.numGlyphs; ++i){
 		  final Glyph glyph;
             final Color nextColor = Color.getHSBColor(
@@ -102,14 +102,13 @@ public class AnimCircles {
 					glyph,
 					Animation.Dimension.POSITION,
 					new DefaultTimingHandler(){
-						final long initX = glyph.vx;
-						final long initY = glyph.vy;
+						final double initX = glyph.vx;
+						final double initY = glyph.vy;
 
 						public void timingEvent(float fraction, 
 							Object subject, Animation.Dimension dim){
 							Glyph g = (Glyph)subject;
-							g.moveTo(initX,
-								Float.valueOf((1-fraction)*initY).longValue());
+							g.moveTo(initX, (1-fraction)*initY);
 						}
 					},
 					new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -177,16 +176,16 @@ public class AnimCircles {
 		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 				Camera c=vsm.getActiveCamera();
-				float a=(c.focal+Math.abs(c.altitude))/c.focal;
+				double a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
-					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 				}
 			}
 		}

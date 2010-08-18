@@ -17,7 +17,6 @@ import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -28,6 +27,7 @@ import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VPolygon;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.Random;
 import java.util.Vector;
 
@@ -73,10 +73,10 @@ public class AnimEllipses {
 
 		Random rnd = new Random();
 		AnimationManager am = vsm.getAnimationManager();
-		long sceneWidth = options.width;
-		long sceneHeight = (long)(0.6*sceneWidth);
-		long posIncr = (long)(sceneHeight / options.numGlyphs);
-		long radius = (long)(0.45 * posIncr);
+		double sceneWidth = options.width;
+		double sceneHeight = 0.6*sceneWidth;
+		double posIncr = sceneHeight / options.numGlyphs;
+		double radius = 0.45 * posIncr;
         for(int i=0; i<options.numGlyphs; ++i){
             final Glyph glyph;
             final Color nextColor = Color.getHSBColor(
@@ -87,13 +87,13 @@ public class AnimEllipses {
                 glyph = new VEllipse(i*posIncr,i*posIncr,
                         0,
                         radius,
-                        (long)(0.3*radius),
+                        0.3*radius,
                         nextColor);
             } else {
-                LongPoint[] coords = new LongPoint[3];
-                coords[0] = new LongPoint(i*posIncr, i*posIncr);
-                coords[1] = new LongPoint(i*posIncr, (i+0.9)*posIncr);
-                coords[2] = new LongPoint((i+0.9)*posIncr, i*posIncr);
+                Point2D.Double[] coords = new Point2D.Double[3];
+                coords[0] = new Point2D.Double(i*posIncr, i*posIncr);
+                coords[1] = new Point2D.Double(i*posIncr, (i+0.9)*posIncr);
+                coords[2] = new Point2D.Double((i+0.9)*posIncr, i*posIncr);
 
                 glyph = new VPolygon(coords, 0, nextColor);
             }
@@ -106,14 +106,13 @@ public class AnimEllipses {
 					glyph,
 					Animation.Dimension.POSITION,
 					new DefaultTimingHandler(){
-						final long initX = glyph.vx;
-						final long initY = glyph.vy;
+						final double initX = glyph.vx;
+						final double initY = glyph.vy;
 
 						public void timingEvent(float fraction, 
 							Object subject, Animation.Dimension dim){
 							Glyph g = (Glyph)subject;
-							g.moveTo(initX,
-								Float.valueOf((1-fraction)*initY).longValue());
+							g.moveTo(initX, (1-fraction)*initY);
 						}
 					},
 					new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -181,16 +180,16 @@ public class AnimEllipses {
 		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 				Camera c=vsm.getActiveCamera();
-				float a=(c.focal+Math.abs(c.altitude))/c.focal;
+				double a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
-					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 				}
 			}
 		}
