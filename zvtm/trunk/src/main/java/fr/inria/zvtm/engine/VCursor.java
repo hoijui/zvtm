@@ -256,18 +256,6 @@ public class VCursor {
 	return stickedGlyphs;
     }
 
-    /**get glyphs sticked to mouse
-     *@deprecated As of zvtm 0.9.2, replaced by getStickedGlyphArray
-     *@see #getStickedGlyphArray()
-     */
-    public Vector<Glyph> getStickedGlyphs(){
-	Vector res = new Vector();
-	for (int i=0;i<stickedGlyphs.length;i++){
-	    res.add(stickedGlyphs[i]);
-	}
-	return res;
-    }
-
     /**tells whether a cross should be drawn at cursor pos or not*/
     public void setVisibility(boolean b){
 	isVisible=b;
@@ -522,21 +510,6 @@ public class VCursor {
                         }
                     }
                 }
-    }
-
-    /**get the list of glyphs currently under mouse (last entry is last glyph entered)
-     * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called
-     * (in other words, the array returned by this method is not synchronized with the actual list over time)
-     *@deprecated As of zvtm 0.9.3, replaced by getGlyphsUnderMouseList()
-     *@see #getGlyphsUnderMouseList()
-     *@see #getIntersectingGlyphs(Camera c)
-     */
-    public Vector<Glyph> getGlyphsUnderMouse(){
-	Vector res=new Vector();
-	for (int i=0;i<=maxIndex;i++){
-	    res.add(glyphsUnderMouse[i]);
-	}
-	return res;
     }
 
     /** Get the list of glyphs currently under the cursor. Last entry is last glyph entered.
