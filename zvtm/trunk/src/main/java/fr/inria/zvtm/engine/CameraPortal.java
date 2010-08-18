@@ -13,6 +13,7 @@ package fr.inria.zvtm.engine;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.AlphaComposite;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Vector;
@@ -22,6 +23,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.Translucent;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -68,14 +70,51 @@ public class CameraPortal extends Portal {
      *@param c camera associated with the portal
      */
     public CameraPortal(int x, int y, int w, int h, Camera c){
-	this.x = x;
-	this.y = y;
-	this.w = w;
-	this.h = h;
-	updateDimensions();
-	this.camera = c;
-	this.cameraSpace = this.camera.getOwningSpace();
-	this.camIndex = this.camera.getIndex();
+        this(x, y, w, h, c, 1f);
+    }
+    
+    /** Builds a new possibly translucent portal displaying what is seen through a camera
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param c camera associated with the portal
+     *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
+     */
+    public CameraPortal(int x, int y, int w, int h, Camera c, float a){
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+        updateDimensions();
+        this.camera = c;
+        this.cameraSpace = this.camera.getOwningSpace();
+        this.camIndex = this.camera.getIndex();
+        setTranslucencyValue(a);
+    }
+
+    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. Temporarily made public until all glyphs get into the same package.*/
+    public AlphaComposite alphaC;
+    
+    /**
+     * Set alpha channel value (translucency).
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */    
+    public void setTranslucencyValue(float alpha){
+        if (alpha == 1.0f){
+            alphaC = null;
+        }
+        else {
+            alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);            
+        }
+        VirtualSpaceManager.INSTANCE.repaintNow();
+    }
+
+    /** Get alpha channel value (translucency).
+     *@return a value in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public float getTranslucencyValue(){
+        return (alphaC != null) ? alphaC.getAlpha() : 1.0f;
     }
 
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
@@ -248,6 +287,14 @@ public class CameraPortal extends Portal {
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!visible){return;}
+        if (alphaC != null){
+            // portal is not is not opaque
+            if (alphaC.getAlpha() == 0){
+                // portal is totally transparent
+                return;
+            }
+            g2d.setComposite(alphaC);
+        }
         g2d.setClip(x, y, w, h);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
@@ -286,6 +333,9 @@ public class CameraPortal extends Portal {
         if (borderColor != null){
             g2d.setColor(borderColor);
             g2d.drawRect(x, y, w, h);
+        }
+        if (alphaC != null){
+            g2d.setComposite(Translucent.acO);
         }
     }
 

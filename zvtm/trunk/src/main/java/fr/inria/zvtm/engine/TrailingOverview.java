@@ -19,11 +19,12 @@ import java.util.TimerTask;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.Translucent;
 
 /**A portal behaving as a trailing widget and showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
 
-public class TrailingOverview extends TrailingCameraPortalST {
+public class TrailingOverview extends TrailingCameraPortal {
 
     AlphaComposite orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
 
@@ -61,7 +62,7 @@ public class TrailingOverview extends TrailingCameraPortalST {
     public void setTransparencyValue(float a){
         if (a < 0){a = 0;}
         try {
-            acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
+            alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
             alpha = a;
             orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a/2.0f);  //transparency set to alpha
         }
@@ -95,7 +96,7 @@ public class TrailingOverview extends TrailingCameraPortalST {
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         g2d.setClip(x, y, w, h);
-        g2d.setComposite(acST);
+        g2d.setComposite(alphaC);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
             g2d.fillRect(x, y, w, h);
@@ -138,7 +139,7 @@ public class TrailingOverview extends TrailingCameraPortalST {
             (int)(y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef)),
             (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
             (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
-        g2d.setComposite(acST);
+        g2d.setComposite(alphaC);
         g2d.drawRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef)),
             (int)(y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef)),
             (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
@@ -149,7 +150,7 @@ public class TrailingOverview extends TrailingCameraPortalST {
             g2d.setColor(borderColor);
             g2d.drawRect(x, y, w, h);
         }
-        g2d.setComposite(acO);
+        g2d.setComposite(Translucent.acO);
     }
 
     public void dispose(){

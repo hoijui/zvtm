@@ -1,4 +1,4 @@
-/*   FILE: TrailingCameraPortalST.java
+/*   FILE: TrailingCameraPortal.java
  *   DATE OF CREATION:  Wed Jul 05 15:00:06 2006
  *   AUTHOR :           Caroline Appert (appert@lri.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -20,7 +20,7 @@ import fr.inria.zvtm.engine.Camera;
    The portal behaves like a trailing widget.
    The Camera should not be used in any other View or Portal.*/
 
-public class TrailingCameraPortalST extends CameraPortalST {
+public class TrailingCameraPortal extends CameraPortal {
 
     double frequency = -1;
     long mLastSampleTime = -1;
@@ -49,7 +49,7 @@ public class TrailingCameraPortalST extends CameraPortalST {
      *@param xo horizontal offset (in pixels) between cursor and portal (trailing widget)
      *@param yo vertical offset (in pixels) between cursor and portal (trailing widget)
      */
-    public TrailingCameraPortalST(int x, int y, int w, int h, Camera c, float a, int xo, int yo){
+    public TrailingCameraPortal(int x, int y, int w, int h, Camera c, float a, int xo, int yo){
 	super(x, y, w, h, c, a);
 	xOffset = xo;
 	yOffset = yo;
@@ -132,10 +132,10 @@ public class TrailingCameraPortalST extends CameraPortalST {
 
 class TrailingTimer extends TimerTask {
 
-    TrailingCameraPortalST portal;
+    TrailingCameraPortal portal;
     private boolean enabled = true;
 
-    TrailingTimer(TrailingCameraPortalST p){
+    TrailingTimer(TrailingCameraPortal p){
 	super();
 	this.portal = p;
     }

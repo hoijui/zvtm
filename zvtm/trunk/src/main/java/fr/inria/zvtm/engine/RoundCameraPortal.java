@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.glyphs.Translucent;
 
 /**A portal showing what is seen through a camera. Shape: circular.
    The Camera should not be used in any other View or Portal.*/
@@ -30,8 +31,20 @@ public class RoundCameraPortal extends CameraPortal {
      *@param c camera associated with the portal
      */
     public RoundCameraPortal(int x, int y, int w, int h, Camera c){
-	super(x, y, w, h, c);
- 	clippingShape = new Ellipse2D.Float(x, y, w, h);
+        this(x, y, w, h, c, 1f);
+    }
+    
+    /** Builds a new portal displaying what is seen through a camera
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param c camera associated with the portal
+     *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
+     */
+    public RoundCameraPortal(int x, int y, int w, int h, Camera c, float a){
+        super(x, y, w, h, c);
+        clippingShape = new Ellipse2D.Float(x, y, w, h);
     }
 
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south].
@@ -68,6 +81,14 @@ public class RoundCameraPortal extends CameraPortal {
     
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 		if (!visible){return;}
+		if (alphaC != null){
+            // portal is not is not opaque
+            if (alphaC.getAlpha() == 0){
+                // portal is totally transparent
+                return;
+            }
+            g2d.setComposite(alphaC);
+        }
         g2d.setClip(clippingShape);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
@@ -106,6 +127,9 @@ public class RoundCameraPortal extends CameraPortal {
         if (borderColor != null){
             g2d.setColor(borderColor);
             g2d.draw(clippingShape);
+        }
+        if (alphaC != null){
+            g2d.setComposite(Translucent.acO);
         }
     }
 
