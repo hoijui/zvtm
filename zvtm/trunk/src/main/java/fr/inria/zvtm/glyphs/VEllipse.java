@@ -42,9 +42,9 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class VEllipse extends ClosedShape implements RectangularShape {
 
     /*half width and height in virtual space*/
-    long vw,vh;
+    double vw,vh;
     /*aspect ratio (width divided by height)*/
-    float ar;
+    double ar;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjEllipse[] pc;
@@ -64,7 +64,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *@param sy vertical axis radius in virtual space
      *@param c fill color
      */
-    public VEllipse(long x,long y, int z,long sx,long sy,Color c){
+    public VEllipse(double x,double y, int z,double sx,double sy,Color c){
         this(x, y, z, sx, sy, c, Color.BLACK, 1.0f);
     }
 
@@ -77,7 +77,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *@param c fill color
      *@param bc border color
      */
-    public VEllipse(long x, long y, int z, long sx, long sy, Color c, Color bc){
+    public VEllipse(double x, double y, int z, double sx, double sy, Color c, Color bc){
         this(x, y, z, sx, sy, c, bc, 1.0f);
     }
 
@@ -91,7 +91,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *@param bc border color
      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VEllipse(long x, long y, int z, long sx, long sy, Color c, Color bc, float alpha){
+    public VEllipse(double x, double y, int z, double sx, double sy, Color c, Color bc, float alpha){
         vx=x;
         vy=y;
         vz=z;
@@ -148,70 +148,70 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     }
 
     /** Cannot be reoriented. */
-    public float getOrient(){return 0;}
+    public double getOrient(){return 0;}
 
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
     void computeSize(){
-	size=Math.max(vw,vh);
-	ar=(float)vw/(float)vh;
+        size = Math.max(vw,vh);
+        ar = vw / vh;
     }
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
-    public void sizeTo(float radius){
-	size=radius;
-	if (vw>=vh){vw=(long)size;vh=(long)(vw/ar);}
-	else {vh=(long)size;vw=(long)(vh*ar);}
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        size=radius;
+        if (vw>=vh){vw=size;vh=(vw/ar);}
+        else {vh=size;vw=(vh*ar);}
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setWidth(long w){ 
-	vw=w;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setWidth(double w){ 
+        vw=w;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setHeight(long h){
-	vh=h;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setHeight(double h){
+        vh=h;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public long getWidth(){return vw;}
+    public double getWidth(){return vw;}
 
-    public long getHeight(){return vh;}
+    public double getHeight(){return vh;}
 
-    public void reSize(float factor){
-	size*=factor;
-	if (vw>=vh){vw=(long)size;vh=(long)(vw/ar);}
-	else {vh=(long)size;vw=(long)(vh*ar);}
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size*=factor;
+        if (vw>=vh){vw=size;vh=(vw/ar);}
+        else {vh=size;vw=(vh*ar);}
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public long[] getBounds(){
-		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+	public double[] getBounds(){
+		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
 	}
 
-    public boolean fillsView(long w,long h,int camIndex){//would be too complex: just say no
+    public boolean fillsView(double w,double h,int camIndex){//would be too complex: just say no
 	return false;
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (pc[camIndex].ellipse.contains(jpx, jpy)){return true;}
         else {return false;}
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return pc[camIndex].ellipse.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -234,27 +234,27 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	pc[i].cvw=vw*coef;
-	pc[i].cvh=vh*coef;
-	pc[i].ellipse.setFrame(pc[i].cx-vw*coef,pc[i].cy-vh*coef,2*pc[i].cvw,2*pc[i].cvh);
+        int i=c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        pc[i].cvw = (int)Math.round(vw*coef);
+        pc[i].cvh = (int)Math.round(vh*coef);
+        pc[i].ellipse.setFrame(pc[i].cx-vw*coef,pc[i].cy-vh*coef,2*pc[i].cvw,2*pc[i].cvh);
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
-	pc[i].lcvw=vw*coef;
-	pc[i].lcvh=vh*coef;
-	pc[i].lellipse.setFrame(pc[i].lcx-vw*coef,pc[i].lcy-vh*coef,2*pc[i].lcvw,2*pc[i].lcvh);
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
+        pc[i].lcvw = (int)Math.round(vw*coef);
+        pc[i].lcvh = (int)Math.round(vh*coef);
+        pc[i].lellipse.setFrame(pc[i].lcx-vw*coef,pc[i].lcy-vh*coef,2*pc[i].lcvw,2*pc[i].lcvh);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){

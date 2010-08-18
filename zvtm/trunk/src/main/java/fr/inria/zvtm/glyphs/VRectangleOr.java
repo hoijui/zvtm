@@ -57,7 +57,7 @@ public class VRectangleOr extends VRectangle {
         *@param c fill color
         *@param or orientation
         */
-    public VRectangleOr(long x,long y, int z,long w,long h,Color c,float or){
+    public VRectangleOr(double x,double y, int z,double w,double h,Color c,double or){
         this(x, y, z, w, h, c, Color.BLACK, or, 1.0f);
     }
     
@@ -71,7 +71,7 @@ public class VRectangleOr extends VRectangle {
         *@param bc border color
         *@param or orientation
         */
-    public VRectangleOr(long x, long y, int z, long w, long h, Color c, Color bc, float or){
+    public VRectangleOr(double x, double y, int z, double w, double h, Color c, Color bc, double or){
         this(x, y, z, w, h, c, bc, or, 1.0f);
     }
     
@@ -86,23 +86,23 @@ public class VRectangleOr extends VRectangle {
         *@param or orientation
          *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
-    public VRectangleOr(long x, long y, int z, long w, long h, Color c, Color bc, float or, float alpha){
+    public VRectangleOr(double x, double y, int z, double w, double h, Color c, Color bc, double or, float alpha){
         super(x, y, z, w, h, c);
         orient = or;
         setTranslucencyValue(alpha);
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
-    public void orientTo(float angle){
+    public void orientTo(double angle){
 	orient=angle;
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
 	if (orient==0){
 	    if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
 	    else {return false;}
@@ -114,7 +114,7 @@ public class VRectangleOr extends VRectangle {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		if (orient == 0){
     		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
 		}
@@ -123,7 +123,7 @@ public class VRectangleOr extends VRectangle {
 		}
 	}
 	
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -137,7 +137,7 @@ public class VRectangleOr extends VRectangle {
         return false;
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (orient==0){
             if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
                 (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
@@ -150,75 +150,75 @@ public class VRectangleOr extends VRectangle {
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project width and height
-	pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
-    pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
-	if (orient!=0){
-	    float x1=-pc[i].cw;
-	    float y1=-pc[i].ch;
-	    float x2=pc[i].cw;
-	    float y2=pc[i].ch;
-	    xcoords[0] = (int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx);
-	    ycoords[0] = (int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy);
-	    xcoords[1] = (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx);
-	    ycoords[1] = (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy);
-	    xcoords[2] = (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx);
-	    ycoords[2] = (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy);
-	    xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx);
-	    ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy);
-	    if (pc[i].p == null){
-		pc[i].p = new Polygon(xcoords, ycoords, 4);
-	    }
-	    else {
-		for (int j=0;j<xcoords.length;j++){
-		    pc[i].p.xpoints[j] = xcoords[j];
-		    pc[i].p.ypoints[j] = ycoords[j];
-		}
-		pc[i].p.invalidate();
-	    }
-	}
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project width and height
+        pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
+        pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
+        if (orient!=0){
+            float x1=-pc[i].cw;
+            float y1=-pc[i].ch;
+            float x2=pc[i].cw;
+            float y2=pc[i].ch;
+            xcoords[0] = (int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx);
+            ycoords[0] = (int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy);
+            xcoords[1] = (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].cx);
+            ycoords[1] = (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy);
+            xcoords[2] = (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx);
+            ycoords[2] = (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].cy);
+            xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].cx);
+            ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].cy);
+            if (pc[i].p == null){
+                pc[i].p = new Polygon(xcoords, ycoords, 4);
+            }
+            else {
+                for (int j=0;j<xcoords.length;j++){
+                    pc[i].p.xpoints[j] = xcoords[j];
+                    pc[i].p.ypoints[j] = ycoords[j];
+                }
+                pc[i].p.invalidate();
+            }
+        }
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
-	//project width and height
-	pc[i].lcw=Math.round(vw*coef);
-	pc[i].lch=Math.round(vh*coef);
-	if (orient!=0){
-	    float x1=-pc[i].lcw;
-	    float y1=-pc[i].lch;
-	    float x2=pc[i].lcw;
-	    float y2=pc[i].lch;
-	    xcoords[0] = (int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx);
-	    ycoords[0] = (int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
-	    xcoords[1] = (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx);
-	    ycoords[1] = (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy);
-	    xcoords[2] = (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
-	    ycoords[2] = (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy);
-	    xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
-	    ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
-	    if (pc[i].lp == null){
-		pc[i].lp = new Polygon(xcoords, ycoords, 4);
-	    }
-	    else {
-		for (int j=0;j<xcoords.length;j++){
-		    pc[i].lp.xpoints[j] = xcoords[j];
-		    pc[i].lp.ypoints[j] = ycoords[j];
-		}
-		pc[i].lp.invalidate();
-	    }
-	}
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
+        //project width and height
+        pc[i].lcw = (int)Math.round(vw*coef);
+        pc[i].lch = (int)Math.round(vh*coef);
+        if (orient!=0){
+            float x1=-pc[i].lcw;
+            float y1=-pc[i].lch;
+            float x2=pc[i].lcw;
+            float y2=pc[i].lch;
+            xcoords[0] = (int)Math.round((x2*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx);
+            ycoords[0] = (int)Math.round((y1*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
+            xcoords[1] = (int)Math.round((x1*Math.cos(orient)+y1*Math.sin(orient))+pc[i].lcx);
+            ycoords[1] = (int)Math.round((y1*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy);
+            xcoords[2] = (int)Math.round((x1*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
+            ycoords[2] = (int)Math.round((y2*Math.cos(orient)-x1*Math.sin(orient))+pc[i].lcy);
+            xcoords[3] = (int)Math.round((x2*Math.cos(orient)+y2*Math.sin(orient))+pc[i].lcx);
+            ycoords[3] = (int)Math.round((y2*Math.cos(orient)-x2*Math.sin(orient))+pc[i].lcy);
+            if (pc[i].lp == null){
+                pc[i].lp = new Polygon(xcoords, ycoords, 4);
+            }
+            else {
+                for (int j=0;j<xcoords.length;j++){
+                    pc[i].lp.xpoints[j] = xcoords[j];
+                    pc[i].lp.ypoints[j] = ycoords[j];
+                }
+                pc[i].lp.invalidate();
+            }
+        }
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -432,9 +432,9 @@ public class VRectangleOr extends VRectangle {
     }
 
     public Object clone(){
-	VRectangleOr res=new VRectangleOr(vx, vy, 0, vw, vh, color, borderColor, orient);
-	res.cursorInsideColor=this.cursorInsideColor;
-	return res;
+        VRectangleOr res=new VRectangleOr(vx, vy, 0, vw, vh, color, borderColor, orient);
+        res.cursorInsideColor=this.cursorInsideColor;
+        return res;
     }
 
 }

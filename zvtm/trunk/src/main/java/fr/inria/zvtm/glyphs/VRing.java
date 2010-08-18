@@ -20,7 +20,6 @@ import java.awt.Shape;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.VSlice;
 import fr.inria.zvtm.glyphs.projection.ProjRing;
 
@@ -48,7 +47,7 @@ public class VRing extends VSlice {
         *@param c fill color
         *@param bc border color
         */
-    public VRing(long x, long y, int z, long vs, double ag, float irr, double or, Color c, Color bc){
+    public VRing(double x, double y, int z, double vs, double ag, float irr, double or, Color c, Color bc){
         this(x, y, z, vs, ag, irr, or, c, bc, 1.0f);
     }
     
@@ -64,7 +63,7 @@ public class VRing extends VSlice {
         *@param bc border color
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
-    public VRing(long x, long y, int z, long vs, double ag, float irr, double or, Color c, Color bc, float alpha){
+    public VRing(double x, double y, int z, double vs, double ag, float irr, double or, Color c, Color bc, float alpha){
 		initCoordArray(4);	
         vx = x;
         vy = y;
@@ -92,7 +91,7 @@ public class VRing extends VSlice {
         *@param c fill color
         *@param bc border color
         */
-    public VRing(long x, long y, int z, long vs, int ag, float irr, int or, Color c, Color bc){
+    public VRing(double x, double y, int z, double vs, int ag, float irr, int or, Color c, Color bc){
         this(x, y, z, vs, ag, irr, or, c, bc, 1.0f);
     }
     
@@ -108,7 +107,7 @@ public class VRing extends VSlice {
         *@param bc border color
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
-    public VRing(long x, long y, int z, long vs, int ag, float irr, int or, Color c, Color bc, float alpha){
+    public VRing(double x, double y, int z, double vs, int ag, float irr, int or, Color c, Color bc, float alpha){
 		initCoordArray(4);	
         vx = x;
         vy = y;
@@ -125,14 +124,14 @@ public class VRing extends VSlice {
         setTranslucencyValue(alpha);
     }
 
-    public void move(long x, long y){
+    public void move(double x, double y){
         vx += x;
         vy += y;
         propagateMove(x, y);
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void moveTo(long x, long y){
+    public void moveTo(double x, double y){
         propagateMove(x-vx, y-vy);
         vx = x;
         vy = y;
@@ -178,7 +177,7 @@ public class VRing extends VSlice {
 		}
 	}
 
-	public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 		if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx, 2)+Math.pow(jpy-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
 			if (pr[camIndex].ring.contains(jpx, jpy)){
 				return true;
@@ -188,7 +187,7 @@ public class VRing extends VSlice {
 	}
     
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr)){
 		    return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 		}
@@ -197,28 +196,28 @@ public class VRing extends VSlice {
 	
 	public void project(Camera c, Dimension d){
 		int i = c.getIndex();
-		coef = (float)(c.focal / (c.focal + c.altitude));
+		coef = c.focal / (c.focal+c.altitude);
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
 		int hw = d.width/2;
 		int hh = d.height/2;
-		pc[i].cx = hw + Math.round((vx-c.posx) * coef);
-		pc[i].cy = hh - Math.round((vy-c.posy) * coef);
-		pc[i].outerCircleRadius = Math.round(size * coef);
-		pr[i].innerRingRadius = Math.round(size * irr_p * coef);
+		pc[i].cx = hw + (int)Math.round((vx-c.posx) * coef);
+		pc[i].cy = hh - (int)Math.round((vy-c.posy) * coef);
+		pc[i].outerCircleRadius = (int)Math.round(size * coef);
+		pr[i].innerRingRadius = (int)Math.round(size * irr_p * coef);
 	}
 
-	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
+	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 		int i = c.getIndex();
-		coef = (float)(c.focal / (c.focal + c.altitude)) * lensMag;
+		coef = c.focal/(c.focal+c.altitude) * lensMag;
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
-		int hw = lensWidth/2;
-		int hh = lensHeight/2;
-		pc[i].lcx = hw + Math.round((vx-lensx) * coef);
-		pc[i].lcy = hh - Math.round((vy-lensy) * coef);
-		pc[i].louterCircleRadius = Math.round(size * coef);
-		pr[i].linnerRingRadius = Math.round(size * irr_p * coef);
+		int hw = (int)lensWidth/2;
+		int hh = (int)lensHeight/2;
+		pc[i].lcx = hw + (int)Math.round((vx-lensx) * coef);
+		pc[i].lcy = hh - (int)Math.round((vy-lensy) * coef);
+		pc[i].louterCircleRadius = (int)Math.round(size * coef);
+		pr[i].linnerRingRadius = (int)Math.round(size * irr_p * coef);
 	}
 	
 	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);

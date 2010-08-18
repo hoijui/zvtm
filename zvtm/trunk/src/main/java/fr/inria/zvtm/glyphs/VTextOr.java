@@ -41,7 +41,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VTextOr extends VText {
 
-    public VTextOr(String t,float or){
+    public VTextOr(String t,double or){
 	    this(0, 0, 0, Color.BLACK, t, or, TEXT_ANCHOR_START, 1f, 1f);
     }
 
@@ -53,7 +53,7 @@ public class VTextOr extends VText {
      *@param t text string
      *@param or orientation
      */
-    public VTextOr(long x,long y, int z,Color c,String t,float or){
+    public VTextOr(double x,double y, int z,Color c,String t,double or){
 	    this(x, y, z, c, t, or, TEXT_ANCHOR_START, 1f, 1f);
     }
 
@@ -66,7 +66,7 @@ public class VTextOr extends VText {
      *@param or orientation
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
      */
-    public VTextOr(long x,long y, int z,Color c,String t,float or,short ta){
+    public VTextOr(double x,double y, int z,Color c,String t,double or,short ta){
 	    this(x, y, z, c, t, or, ta, 1f, 1f);
     }
 
@@ -80,7 +80,7 @@ public class VTextOr extends VText {
      *@param ta text-anchor (for alignment: one of VText.TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size
      */
-    public VTextOr(long x, long y, int z, Color c, String t, float or, short ta, float scale){
+    public VTextOr(double x, double y, int z, Color c, String t, double or, short ta, float scale){
         this(x, y, z, c, t, or, ta, scale, 1f);
     }
     
@@ -95,20 +95,20 @@ public class VTextOr extends VText {
      *@param scale scaleFactor w.r.t original image size
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VTextOr(long x, long y, int z, Color c, String t, float or, short ta, float scale, float alpha){
+    public VTextOr(double x, double y, int z, Color c, String t, double or, short ta, float scale, float alpha){
         super(x, y, z, c, t, ta);
         orient = or;
         scaleFactor = scale;
         setTranslucencyValue(alpha);
     }
 
-    public void orientTo(float angle){
+    public void orientTo(double angle){
 	orient = angle;
 	invalidate();
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
 	return false;
     }
 
@@ -123,7 +123,7 @@ public class VTextOr extends VText {
 		}
 		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		g.setColor(this.color);
-		float trueCoef = scaleFactor * coef;
+		double trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
@@ -170,7 +170,7 @@ public class VTextOr extends VText {
 		}
 		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		g.setColor(this.color);
-		float trueCoef = scaleFactor * coef;
+		double trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
@@ -208,9 +208,9 @@ public class VTextOr extends VText {
 
 
     public Object clone(){
-	VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
-	res.cursorInsideColor=this.cursorInsideColor;
-	return res;
+        VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
+        res.cursorInsideColor=this.cursorInsideColor;
+        return res;
     }
 
 }

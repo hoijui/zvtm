@@ -12,8 +12,8 @@ package fr.inria.zvtm.widgets;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.Point2D;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VCircle;
@@ -25,7 +25,7 @@ public class PieMenuP extends PieMenu {
 
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a LongPoint)
+        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
         *@param vsName name of the virtual space in which to create the pie menu
         *@param vsm instance of VirtualSpaceManager
         *@param radius radius of pie menu
@@ -39,27 +39,27 @@ public class PieMenuP extends PieMenu {
         *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
         *@param font font used for menu labels
         */
-    public PieMenuP(String[] stringLabels, LongPoint menuCenterCoordinates, 
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
                     String vsName, VirtualSpaceManager vsm,
-                    long radius, double startAngle,
+                    double radius, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
                     double sensitRadius, Font font){
         this.vs = vsm.getVirtualSpace(vsName);
-        long vx = menuCenterCoordinates.x;
-        long vy = menuCenterCoordinates.y;
-        LongPoint[] coords;
+        double vx = menuCenterCoordinates.x;
+        double vy = menuCenterCoordinates.y;
+        Point2D.Double[] coords;
         items = new VPolygon[stringLabels.length];
         labels = new VTextOr[stringLabels.length];
         double angle = startAngle;
         double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        long pieMenuRadius = radius;
+        double pieMenuRadius = radius;
         double textAngle;
         for (int i=0;i<labels.length;i++){
-            coords = new LongPoint[3];
-            coords[0] = new LongPoint(vx, vy);
-            coords[1] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords = new Point2D.Double[3];
+            coords[0] = new Point2D.Double(vx, vy);
+            coords[1] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             angle += angleDelta;
-            coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords[2] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             items[i] = new VPolygon(coords, 0, fillColor, borderColor, alphaT);
             items[i].setCursorInsideFillColor(fillSColor);
             items[i].setCursorInsideHighlightColor(borderSColor);
@@ -73,9 +73,9 @@ public class PieMenuP extends PieMenu {
                         }
                         else {textAngle +=Math.PI;}
                     }
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2),
-                        0, labelColor, stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2,
+                        0, labelColor, stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 else {
                     textAngle = angle - angleDelta / ((float)2);
@@ -85,8 +85,8 @@ public class PieMenuP extends PieMenu {
                         }
                         else {textAngle +=Math.PI;}
                     }
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2),
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2,
                         0, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 labels[i].setBorderColor(borderColor);
@@ -95,7 +95,7 @@ public class PieMenuP extends PieMenu {
                 vs.addGlyph(labels[i]);
             }
         }
-        boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
+        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius, Color.white);
         boundary.setVisible(false);
         vs.addGlyph(boundary);
         vs.atBottom(boundary);
@@ -103,7 +103,7 @@ public class PieMenuP extends PieMenu {
 
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a LongPoint)
+        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
         *@param vsName name of the virtual space in which to create the pie menu
         *@param vsm instance of VirtualSpaceManager
         *@param radius radius of pie menu
@@ -117,27 +117,27 @@ public class PieMenuP extends PieMenu {
         *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
         *@param font font used for menu labels
         */
-    public PieMenuP(String[] stringLabels, LongPoint menuCenterCoordinates, 
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
                     String vsName, VirtualSpaceManager vsm,
-                    long radius, double startAngle,
+                    double radius, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
                     double sensitRadius, Font font){
         this.vs = vsm.getVirtualSpace(vsName);
-        long vx = menuCenterCoordinates.x;
-        long vy = menuCenterCoordinates.y;
-        LongPoint[] coords;
+        double vx = menuCenterCoordinates.x;
+        double vy = menuCenterCoordinates.y;
+        Point2D.Double[] coords;
         items = new VPolygon[stringLabels.length];
         labels = new VTextOr[stringLabels.length];
         double angle = startAngle;
         double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        long pieMenuRadius = radius;
+        double pieMenuRadius = radius;
         double textAngle;
         for (int i=0;i<labels.length;i++){
-            coords = new LongPoint[3];
-            coords[0] = new LongPoint(vx, vy);
-            coords[1] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords = new Point2D.Double[3];
+            coords[0] = new Point2D.Double(vx, vy);
+            coords[1] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             angle += angleDelta;
-            coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords[2] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             items[i] = new VPolygon(coords, 0, fillColors[i], borderColors[i], alphaT);
             items[i].setCursorInsideFillColor(fillSColors[i]);
             items[i].setCursorInsideHighlightColor(borderSColors[i]);
@@ -151,13 +151,13 @@ public class PieMenuP extends PieMenu {
                         }
                         else {textAngle +=Math.PI;}
                     }
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2),
-                        0, labelColors[i], stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2,
+                        0, labelColors[i], stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 else {
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2),
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2,
                         0, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 labels[i].setBorderColor(borderColors[i]);
@@ -166,7 +166,7 @@ public class PieMenuP extends PieMenu {
                 vs.addGlyph(labels[i]);
             }
         }
-        boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
+        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius, Color.white);
         boundary.setVisible(false);
         vs.addGlyph(boundary);
         vs.atBottom(boundary);
@@ -174,7 +174,7 @@ public class PieMenuP extends PieMenu {
 
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a LongPoint)
+        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
         *@param vsName name of the virtual space in which to create the pie menu
         *@param vsm instance of VirtualSpaceManager
         *@param radius radius of pie menu
@@ -189,27 +189,27 @@ public class PieMenuP extends PieMenu {
         *@param font font used for menu labels
         *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
         */
-    public PieMenuP(String[] stringLabels, LongPoint menuCenterCoordinates, 
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
                     String vsName, VirtualSpaceManager vsm,
-                    long radius, double startAngle,
+                    double radius, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
-                    double sensitRadius, Font font, LongPoint[] labelOffsets){
+                    double sensitRadius, Font font, Point2D.Double[] labelOffsets){
         this.vs = vsm.getVirtualSpace(vsName);
-        long vx = menuCenterCoordinates.x;
-        long vy = menuCenterCoordinates.y;
-        LongPoint[] coords;
+        double vx = menuCenterCoordinates.x;
+        double vy = menuCenterCoordinates.y;
+        Point2D.Double[] coords;
         items = new VPolygon[stringLabels.length];
         labels = new VTextOr[stringLabels.length];
         double angle = startAngle;
         double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        long pieMenuRadius = radius;
+        double pieMenuRadius = radius;
         double textAngle;
         for (int i=0;i<labels.length;i++){
-            coords = new LongPoint[3];
-            coords[0] = new LongPoint(vx, vy);
-            coords[1] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords = new Point2D.Double[3];
+            coords[0] = new Point2D.Double(vx, vy);
+            coords[1] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             angle += angleDelta;
-            coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords[2] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             items[i] = new VPolygon(coords, 0, fillColor, borderColor, alphaT);
             items[i].setCursorInsideFillColor(fillSColor);
             items[i].setCursorInsideHighlightColor(borderSColor);
@@ -223,9 +223,9 @@ public class PieMenuP extends PieMenu {
                         }
                         else {textAngle +=Math.PI;}
                     }
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y),
-                        0, labelColor, stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y,
+                        0, labelColor, stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 else {
                     textAngle = angle - angleDelta / ((float)2);
@@ -235,8 +235,8 @@ public class PieMenuP extends PieMenu {
                         }
                         else {textAngle +=Math.PI;}
                     }
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y),
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y,
                         0, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 labels[i].setBorderColor(borderColor);
@@ -245,7 +245,7 @@ public class PieMenuP extends PieMenu {
                 vs.addGlyph(labels[i]);
             }
         }
-        boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
+        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius, Color.white);
         boundary.setVisible(false);
         vs.addGlyph(boundary);
         vs.atBottom(boundary);
@@ -253,7 +253,7 @@ public class PieMenuP extends PieMenu {
 
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a LongPoint)
+        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
         *@param vsName name of the virtual space in which to create the pie menu
         *@param vsm instance of VirtualSpaceManager
         *@param radius radius of pie menu
@@ -268,27 +268,27 @@ public class PieMenuP extends PieMenu {
         *@param font font used for menu labels
         *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
         */
-    public PieMenuP(String[] stringLabels, LongPoint menuCenterCoordinates, 
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
                     String vsName, VirtualSpaceManager vsm,
-                    long radius, double startAngle,
+                    double radius, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
-                    double sensitRadius, Font font, LongPoint[] labelOffsets){
+                    double sensitRadius, Font font, Point2D.Double[] labelOffsets){
         this.vs = vsm.getVirtualSpace(vsName);
-        long vx = menuCenterCoordinates.x;
-        long vy = menuCenterCoordinates.y;
-        LongPoint[] coords;
+        double vx = menuCenterCoordinates.x;
+        double vy = menuCenterCoordinates.y;
+        Point2D.Double[] coords;
         items = new VPolygon[stringLabels.length];
         labels = new VTextOr[stringLabels.length];
         double angle = startAngle;
         double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        long pieMenuRadius = radius;
+        double pieMenuRadius = radius;
         double textAngle;
         for (int i=0;i<labels.length;i++){
-            coords = new LongPoint[3];
-            coords[0] = new LongPoint(vx, vy);
-            coords[1] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords = new Point2D.Double[3];
+            coords[0] = new Point2D.Double(vx, vy);
+            coords[1] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             angle += angleDelta;
-            coords[2] = new LongPoint(vx+Math.round(Math.cos(angle)*pieMenuRadius), vy+Math.round(Math.sin(angle)*pieMenuRadius));
+            coords[2] = new Point2D.Double(vx+Math.cos(angle)*pieMenuRadius, vy+Math.sin(angle)*pieMenuRadius);
             items[i] = new VPolygon(coords, 0, fillColors[i], borderColors[i], alphaT);
             items[i].setCursorInsideFillColor(fillSColors[i]);
             items[i].setCursorInsideHighlightColor(borderSColors[i]);
@@ -302,13 +302,13 @@ public class PieMenuP extends PieMenu {
                         }
                         else {textAngle +=Math.PI;}
                     }
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y),
-                        0, labelColors[i], stringLabels[i], (float)textAngle, VText.TEXT_ANCHOR_MIDDLE);
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y,
+                        0, labelColors[i], stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 else {
-                    labels[i] = new VTextOr(Math.round(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x),
-                        Math.round(vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y),
+                    labels[i] = new VTextOr(vx+Math.cos(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].x,
+                        vy+Math.sin(angle-angleDelta/2.0)*pieMenuRadius/2 + labelOffsets[i].y,
                         0, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 labels[i].setBorderColor(borderColors[i]);
@@ -317,7 +317,7 @@ public class PieMenuP extends PieMenu {
                 vs.addGlyph(labels[i]);
             }
         }
-        boundary = new VCircle(vx, vy, 0, Math.round(pieMenuRadius*sensitRadius), Color.white);
+        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius, Color.white);
         boundary.setVisible(false);
         vs.addGlyph(boundary);
         vs.atBottom(boundary);

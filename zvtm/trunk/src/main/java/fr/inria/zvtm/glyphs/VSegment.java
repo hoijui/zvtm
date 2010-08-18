@@ -30,11 +30,11 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoords;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 
@@ -46,45 +46,11 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class VSegment extends Glyph implements RectangularShape {
 
     /*half width and height in virtual space*/
-    long vw,vh;
+    double vw,vh;
 
     RProjectedCoords[] pc;
 
     /**
-     *give the centre of segment and half its projected length on X & Y axis
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space (can be negative)
-     *@param h half height in virtual space (can be negative)
-     *@param c fill color
-     */
-    public VSegment(long x, long y, int z, long w, long h, Color c){
-        this(x, y, z, w, h, c, 1f);
-    }
-    
-    /**
-     *give the centre of segment and half its projected length on X & Y axis
-     *@param x coordinate in virtual space
-     *@param y coordinate in virtual space
-     *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space (can be negative)
-     *@param h half height in virtual space (can be negative)
-     *@param c fill color
-      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */
-    public VSegment(long x, long y, int z, long w, long h, Color c, float alpha){
-        vx = x;
-        vy = y;
-        vz = z;
-        vw = w;
-        vh = h;
-        computeSize();
-        setColor(c);
-        setTranslucencyValue(alpha);
-    }
-
-    /**
      *give the end points of segment
      *@param x1 coordinate of endpoint 1 in virtual space
      *@param y1 coordinate of endpoint 1 in virtual space
@@ -93,8 +59,8 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c fill color
      */
-    public VSegment(long x1, long y1, int z, Color c, long x2, long y2){
-        this(x1, y1, z, c, x2, y2, 1f);
+    public VSegment(double x1, double y1, double x2, double y2, int z, Color c){
+        this(x1, y1, x2, y2, z, c, 1f);
     }
     
     /**
@@ -107,7 +73,7 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param c fill color
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSegment(long x1, long y1, int z, Color c, long x2, long y2, float alpha){
+    public VSegment(double x1, double y1, double x2, double y2, int z, Color c, float alpha){
         vx = (x1 + x2) / 2;
         vy = (y1 + y2) / 2;
         vz = z;
@@ -127,8 +93,8 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param angle orientation
      *@param c fill color
      */
-    public VSegment(long x, long y, int z, float lgth, float angle, Color c){
-        this(x, y, z, lgth, angle, c, 1f);
+    public VSegment(double x, double y, int z, Color c, double lgth, double angle){
+        this(x, y, z, c, 1f, lgth, angle);
     }
     
     /**
@@ -141,7 +107,7 @@ public class VSegment extends Glyph implements RectangularShape {
      *@param c fill color
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VSegment(long x, long y, int z, float lgth, float angle, Color c, float alpha){
+    public VSegment(double x, double y, int z, Color c, float alpha, double lgth, double angle){
         vx = x;
         vy = y;
         vz = z;
@@ -194,106 +160,106 @@ public class VSegment extends Glyph implements RectangularShape {
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
-    public void orientTo(float angle){
-	orient=angle;
-	computeEdges();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void orientTo(double angle){
+        orient = angle;
+        computeEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public long[] getBounds(){
-		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+	public double[] getBounds(){
+		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
 	}
 
     /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
-    public void setEndPoints(long x1, long y1, long x2, long y2){
-	vx = (x1 + x2) / 2;
-	vy = (y1 + y2) / 2;
-	vw = (x2 - x1) / 2;
-	vh = (y2 - y1) / 2;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setEndPoints(double x1, double y1, double x2, double y2){
+        vx = (x1 + x2) / 2;
+        vy = (y1 + y2) / 2;
+        vw = (x2 - x1) / 2;
+        vh = (y2 - y1) / 2;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the segment's two endpoints
      *@return absolute coordinates.
      */
-    public LongPoint[] getEndPoints(){
-	LongPoint[] res = new LongPoint[2];
-	res[0] = new LongPoint(vx+vw, vy+vh);
-	res[1] = new LongPoint(vx-vw, vy-vh);
-	return res;
+    public Point2D.Double[] getEndPoints(){
+        Point2D.Double[] res = new Point2D.Double[2];
+        res[0] = new Point2D.Double(vx+vw, vy+vh);
+        res[1] = new Point2D.Double(vx-vw, vy-vh);
+        return res;
     }
     
-    void computeSize(){  
-	size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
-	if (vw!=0){orient=(float)Math.atan((vh/(float)vw));}
-	else {
-	    orient=(vh>0) ? (float)Math.PI/2.0f : (float)-Math.PI/2.0f ;
-	}
-	if (orient<0){
-	    if (vh>0){orient=(float)Math.PI-orient;} 
-	    else {orient=-orient;}
-	}
-	else if(orient>0){
-	    if (vh>0){orient=2*(float)Math.PI-orient;}
-	    else {orient=(float)Math.PI-orient;}
-	}
-	else if(orient==0 && vw<0){orient=(float)Math.PI;}	    
+    void computeSize(){
+        size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+        if (vw!=0){orient=Math.atan((vh/(double)vw));}
+        else {
+            orient=(vh>0) ? Math.PI/2.0f : -Math.PI/2.0f ;
+        }
+        if (orient<0){
+            if (vh>0){orient=Math.PI-orient;} 
+            else {orient=-orient;}
+        }
+        else if(orient>0){
+            if (vh>0){orient=2*Math.PI-orient;}
+            else {orient=Math.PI-orient;}
+        }
+        else if(orient==0 && vw<0){orient=Math.PI;}	    
     }
 
-    public long getWidth(){return vw;}
+    public double getWidth(){return vw;}
 
-    public long getHeight(){return vh;}
+    public double getHeight(){return vh;}
 
-    public void sizeTo(float radius){
-	size=radius;
-	computeEdges();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        size=radius;
+        computeEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){
-	size*=factor;
-	computeEdges();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size*=factor;
+        computeEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setWidth(long w){ 
-	vw=w;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setWidth(double w){
+        vw=w;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setHeight(long h){
-	vh=h;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setHeight(double h){
+        vh=h;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setWidthHeight(long w,long h){
-	this.vw=w;
-	this.vh=h;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setWidthHeight(double w,double h){
+        this.vw=w;
+        this.vh=h;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
-	return false;
+    public boolean fillsView(double w,double h,int camIndex){
+        return false;
     }
 
     void computeEdges(){
-	vw=(long)Math.round(size*Math.cos(orient));
-	vh=(long)Math.round(size*Math.sin(orient));
+        vw=(double)Math.round(size*Math.cos(orient));
+        vh=(double)Math.round(size*Math.sin(orient));
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return false;
     }
 
@@ -318,38 +284,38 @@ public class VSegment extends Glyph implements RectangularShape {
 	                            x, y) <= tolerance;
     }
     
-    public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Line2D.ptSegDist(vx-vw, vy-vh, vx+vw, vy+vh, dvx, dvy) <= dvr;
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return Glyph.NO_CURSOR_EVENT;
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project width and height
-	pc[i].cw=Math.round(vw*coef);
-	pc[i].ch=Math.round(vh*coef);
+        int i=c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project width and height
+        pc[i].cw = (int)Math.round(vw*coef);
+        pc[i].ch = (int)Math.round(vh*coef);
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i = c.getIndex();
-	coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
-	//project width and height
-	pc[i].lcw = Math.round(vw*coef);
-	pc[i].lch = Math.round(vh*coef);
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i = c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
+        pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
+        //project width and height
+        pc[i].lcw = (int)Math.round(vw*coef);
+        pc[i].lch = (int)Math.round(vh*coef);
     }
-    
+
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         g.setColor(this.color);
@@ -405,7 +371,8 @@ public class VSegment extends Glyph implements RectangularShape {
     }
 
     public Object clone(){
-        VSegment res = new VSegment(vx,vy,0,vw,vh,color, (alphaC != null) ? alphaC.getAlpha() : 1f);
+        Point2D.Double[] ep = getEndPoints();
+        VSegment res = new VSegment(ep[0].x, ep[0].y, ep[1].x, ep[1].y, 0, color, (alphaC != null) ? alphaC.getAlpha() : 1f);
         res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }

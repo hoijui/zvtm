@@ -7,8 +7,9 @@
  */ 
 package fr.inria.zvtm.engine;
 
+import java.awt.geom.Point2D;
+
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 
 public interface CameraListener {
 
@@ -25,6 +26,6 @@ public interface CameraListener {
      * @see Camera#addListener
      * @see Camera#removeListener
      */
-    public void cameraMoved(Camera cam, LongPoint coord, float alt);
+    public void cameraMoved(Camera cam, Point2D.Double coord, double alt);
 
 }

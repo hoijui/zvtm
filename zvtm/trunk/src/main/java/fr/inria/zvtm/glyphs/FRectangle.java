@@ -40,7 +40,7 @@ public class FRectangle extends VRectangle {
 		*@param ta gradient top alpha value
 		*@param ba gradient bottom alpha value
 		*/
-	public FRectangle(long x,long y, int z,long w,long h,Color c, float ta, float ba){
+	public FRectangle(double x,double y, int z,double w,double h,Color c, float ta, float ba){
 		this(x, y, z, w, h, c, Color.BLACK, ta, ba);
 	}
 
@@ -55,7 +55,7 @@ public class FRectangle extends VRectangle {
 		*@param ta gradient top alpha value
 		*@param ba gradient bottom alpha value
 		*/
-	public FRectangle(long x, long y, int z, long w, long h, Color c, Color bc, float ta, float ba){
+	public FRectangle(double x, double y, int z, double w, double h, Color c, Color bc, float ta, float ba){
 		super(x, y, z, w, h, c, bc);
 		MASK_ALPHA_TOP = ta;
 		MASK_ALPHA_BOTTOM = ba;
@@ -81,7 +81,7 @@ public class FRectangle extends VRectangle {
 	
 	void createMask(){
 		GradientPaint mask = new GradientPaint(0, 0, new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_TOP),
-			0, 2*vh, new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_BOTTOM));
+			0, (float)(2*vh), new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_BOTTOM));
 		image = new BufferedImage((int)(2*vw), (int)(2*vh), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = image.createGraphics();
 		// Paints original image
@@ -95,7 +95,7 @@ public class FRectangle extends VRectangle {
 		g2.dispose();
 	}
 
-	public boolean fillsView(long w,long h,int camIndex){
+	public boolean fillsView(double w,double h,int camIndex){
 		return false;
 	}
 	

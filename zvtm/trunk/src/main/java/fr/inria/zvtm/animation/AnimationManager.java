@@ -264,11 +264,11 @@ public class AnimationManager {
      * Sets the active camera Z speed
      * @param dz active camera Z speed
      */
-    public void setZspeed(float dz){
+    public void setZspeed(double dz){
 	currentCamAnim.setZspeed(dz);
     }
     
-    public void setZoomInvariantLocation(long x, long y){
+    public void setZoomInvariantLocation(double x, double y){
         currentCamAnim.setZoomInvariantLocation(x,y);
     }
     
@@ -438,7 +438,7 @@ public class AnimationManager {
 	    this.dy = dy;
 	}
 
-	public void setZspeed(float dz){
+	public void setZspeed(double dz){
 	    this.dz = dz;
 	}
 
@@ -450,11 +450,11 @@ public class AnimationManager {
 	    return dy;
 	}
 
-	public float getZspeed(){
+	public double getZspeed(){
 	    return dz;
 	}
 
-    public void setZoomInvariantLocation(long x, long y){
+    public void setZoomInvariantLocation(double x, double y){
         zilX = x;
         zilY = y;
     }
@@ -466,10 +466,10 @@ public class AnimationManager {
 	private final VirtualSpaceManager vsm;
 	private volatile double dx;
 	private volatile double dy;
-	private volatile float dz;
+	private volatile double dz;
 	
 	private boolean zile = false;
-	private long zilX, zilY;
+	private double zilX, zilY;
 
 	
     }

@@ -11,11 +11,11 @@ package fr.inria.zvtm.glyphs;
 
 import java.awt.Polygon;
 import java.awt.Shape;
+import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VDiamond;
@@ -56,15 +56,15 @@ public class GlyphUtils {
 	}
 	else if (g instanceof VShape){
 	    VShape sh1=(VShape)g;
-	    float vertexAngle=sh1.getOrient();
+	    double vertexAngle=sh1.getOrient();
 	    float[] vertices=sh1.getVertices();
 	    int[] xcoords=new int[vertices.length];
 	    int[] ycoords=new int[vertices.length];
-	    float size=g.getSize();
+	    double size=g.getSize();
 	    for (int j=0;j<vertices.length-1;j++){
-		xcoords[j]=(int)Math.round(sh1.vx+size*Math.cos(vertexAngle)*vertices[j]);
-		ycoords[j]=(int)Math.round(sh1.vy+size*Math.sin(vertexAngle)*vertices[j]);
-		vertexAngle+=2*Math.PI/vertices.length;
+		    xcoords[j]=(int)Math.round(sh1.vx+size*Math.cos(vertexAngle)*vertices[j]);
+		    ycoords[j]=(int)Math.round(sh1.vy+size*Math.sin(vertexAngle)*vertices[j]);
+		    vertexAngle+=2*Math.PI/vertices.length;
 	    }//last iteration outside to loop to avoid one vertexAngle computation too many
 	    xcoords[vertices.length-1]=(int)Math.round(sh1.vx+size*Math.cos(vertexAngle)*vertices[vertices.length-1]);
 	    ycoords[vertices.length-1]=(int)Math.round(sh1.vy+size*Math.sin(vertexAngle)*vertices[vertices.length-1]);
@@ -72,7 +72,7 @@ public class GlyphUtils {
 	}
 	else if (g instanceof VPolygon){
 	    VPolygon pg1=(VPolygon)g;
-	    LongPoint[] vertices=pg1.getVertices();
+	    Point2D.Double[] vertices=pg1.getVertices();
 	    int[] xcoords=new int[vertices.length];
 	    int[] ycoords=new int[vertices.length];
 	    for (int j=0;j<vertices.length;j++){
@@ -82,11 +82,11 @@ public class GlyphUtils {
 	    return new Polygon(xcoords,ycoords,vertices.length);
 	}
 	else if (g instanceof VTriangle){
-	    int size=Math.round(g.getSize());
-	    int halfEdge=Math.round(0.866f*g.getSize());
-	    int thirdHeight=Math.round(0.5f*g.getSize());
+	    double size=Math.round(g.getSize());
+	    double halfEdge=Math.round(0.866f*g.getSize());
+	    double thirdHeight=Math.round(0.5f*g.getSize());
 	    if (g instanceof VTriangleOr){
-		float orient=g.getOrient();
+		double orient=g.getOrient();
 		int[] xcoords=new int[3];
 		int[] ycoords=new int[3];
 		xcoords[0]=(int)Math.round(g.vx-size*Math.sin(orient));
@@ -98,15 +98,15 @@ public class GlyphUtils {
 		return new Polygon(xcoords,ycoords,3);
 	    }
 	    else {
-		int[] xcoords={(int)g.vx,(int)g.vx-halfEdge,(int)g.vx+halfEdge};
-		int[] ycoords={(int)g.vy+size,(int)g.vy-thirdHeight,(int)g.vy-thirdHeight};
+		int[] xcoords={(int)g.vx,(int)(g.vx-halfEdge),(int)(g.vx+halfEdge)};
+		int[] ycoords={(int)(g.vy+size),(int)(g.vy-thirdHeight),(int)(g.vy-thirdHeight)};
 		return new Polygon(xcoords,ycoords,3);
 	    }
 	}
 	else if (g instanceof VDiamond){
-	    int size=Math.round(g.getSize());
-	    int[] xcoords={(int)g.vx+size,(int)g.vx,(int)g.vx-size,(int)g.vx};
-	    int[] ycoords={(int)g.vy,(int)g.vy-size,(int)g.vy,(int)g.vy+size};
+	    double size=Math.round(g.getSize());
+	    int[] xcoords={(int)(g.vx+size),(int)g.vx,(int)(g.vx-size),(int)g.vx};
+	    int[] ycoords={(int)g.vy,(int)(g.vy-size),(int)g.vy,(int)(g.vy+size)};
 	    return new Polygon(xcoords,ycoords,4);
 	}
 	else if (g instanceof VImage){

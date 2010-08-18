@@ -117,14 +117,14 @@ public class GLViewPanel extends ViewPanel {
 			camIndex=cams[nbcam].getIndex();
 			drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
 			    drawnGlyphs.removeAllElements();
-			    float uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+			    double uncoef = (cams[nbcam].focal+cams[nbcam].altitude) / cams[nbcam].focal;
 			    //compute region seen from this view through camera
-				long viewW = size.width;
-				long viewH = size.height;
-			    long viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
-			    long viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
-			    long viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
-			    long viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
+				double viewW = size.width;
+				double viewH = size.height;
+			    double viewWC = cams[nbcam].posx - (viewW/2-visibilityPadding[0]) * uncoef;
+			    double viewNC = cams[nbcam].posy + (viewH/2-visibilityPadding[1]) * uncoef;
+			    double viewEC = cams[nbcam].posx + (viewW/2-visibilityPadding[2]) * uncoef;
+			    double viewSC = cams[nbcam].posy - (viewH/2-visibilityPadding[3]) * uncoef;
 			    gll = cams[nbcam].parentSpace.getDrawingList();
 			    for (int i=0;i<gll.length;i++){
 				if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){

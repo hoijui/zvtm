@@ -95,7 +95,7 @@ class IcShape extends GlyphIcon implements Icon {
     Polygon p;
     int[] xcoords;
     int[] ycoords;
-    float vertexAngle;
+    double vertexAngle;
     float[] vertices;
     
     IcShape(VShape g,int w,int h){
@@ -381,7 +381,7 @@ class IcTriangle extends GlyphIcon implements Icon {
     int halfEdge,thirdHeight;
     int[] xcoords=new int[3];
     int[] ycoords=new int[3];
-    float orient;
+    double orient;
     
     IcTriangle(VTriangle g,int w,int h){
 	this.glyph=g;
@@ -448,7 +448,7 @@ class IcDiamond extends GlyphIcon implements Icon {
     Polygon p;
     int[] xcoords=new int[4];
     int[] ycoords=new int[4];
-    float orient;
+    double orient;
     
     IcDiamond(VDiamond g,int w,int h){
 	this.glyph=g;

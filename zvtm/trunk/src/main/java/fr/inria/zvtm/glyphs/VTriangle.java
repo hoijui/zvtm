@@ -51,8 +51,8 @@ public class VTriangle extends ClosedShape {
     protected static final float halfEdgeFactor=0.866f;
     protected static final float thirdHeightFactor=0.5f;
 
-    /*height in virtual space (equal to bounding circle radius)*/
-    long vh;
+    /*size in virtual space (equal to bounding circle radius)*/
+    double vs;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjTriangle[] pc;
@@ -65,38 +65,38 @@ public class VTriangle extends ClosedShape {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param h height in virtual space
+        *@param s size in virtual space
         *@param c fill color
         */
-    public VTriangle(long x,long y, int z,long h,Color c){
-        this(x, y, z, h, c, Color.BLACK, 1f);
+    public VTriangle(double x,double y, int z,double s,Color c){
+        this(x, y, z, s, c, Color.BLACK, 1f);
     }
 
     /**
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param h height in virtual space
+        *@param s size in virtual space
         *@param c fill color
         *@param bc border color
         */
-    public VTriangle(long x, long y, int z, long h, Color c, Color bc){
-        this(x, y, z, h, c, bc, 1f);
+    public VTriangle(double x, double y, int z, double s, Color c, Color bc){
+        this(x, y, z, s, c, bc, 1f);
     }
     
     /**
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param h height in virtual space
+        *@param s size in virtual space
         *@param c fill color
         *@param bc border color
         */
-    public VTriangle(long x, long y, int z, long h, Color c, Color bc, float alpha){
+    public VTriangle(double x, double y, int z, double s, Color c, Color bc, float alpha){
         vx = x;
         vy = y;
         vz = z;
-        vh = h;
+        vs = s;
         computeSize();
         orient = 0;
         setColor(c);
@@ -147,46 +147,46 @@ public class VTriangle extends ClosedShape {
 	borderColor = bColor;
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
     void computeSize(){
-	size=(float)vh;
+	    size = vs;
     }
 
-    public void sizeTo(float radius){
-	size=radius;
-	vh=(long)Math.round(size);
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        size = radius;
+        vs = size;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){
-	size*=factor;
-	vh=(long)Math.round(size);
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size *= factor;
+        vs = size;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
         return ((alphaC == null) &&
             (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) &&
             (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h)));
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -209,61 +209,61 @@ public class VTriangle extends ClosedShape {
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project height and construct polygon
-	pc[i].cr=Math.round(vh*coef);
-	pc[i].halfEdge=Math.round(halfEdgeFactor*pc[i].cr);
-	pc[i].thirdHeight=Math.round(thirdHeightFactor*pc[i].cr);
-	xcoords[0] = pc[i].cx;
-	ycoords[0] = pc[i].cy-pc[i].cr;
-	xcoords[1] = pc[i].cx-pc[i].halfEdge;
-	ycoords[1] = pc[i].cy+pc[i].thirdHeight;
-	xcoords[2] = pc[i].cx+pc[i].halfEdge;
-	ycoords[2] = pc[i].cy+pc[i].thirdHeight;
-	if (pc[i].p == null){
-	    pc[i].p = new Polygon(xcoords, ycoords, 3);
-	}
-	else {
-	    for (int j=0;j<xcoords.length;j++){
-		pc[i].p.xpoints[j] = xcoords[j];
-		pc[i].p.ypoints[j] = ycoords[j];
-	    }
-	    pc[i].p.invalidate();
-	}
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project height and construct polygon
+        pc[i].cr = (int)Math.round(vs*coef);
+        pc[i].halfEdge = (int)Math.round(halfEdgeFactor*pc[i].cr);
+        pc[i].thirdHeight = (int)Math.round(thirdHeightFactor*pc[i].cr);
+        xcoords[0] = pc[i].cx;
+        ycoords[0] = pc[i].cy-pc[i].cr;
+        xcoords[1] = pc[i].cx-pc[i].halfEdge;
+        ycoords[1] = pc[i].cy+pc[i].thirdHeight;
+        xcoords[2] = pc[i].cx+pc[i].halfEdge;
+        ycoords[2] = pc[i].cy+pc[i].thirdHeight;
+        if (pc[i].p == null){
+            pc[i].p = new Polygon(xcoords, ycoords, 3);
+        }
+        else {
+            for (int j=0;j<xcoords.length;j++){
+                pc[i].p.xpoints[j] = xcoords[j];
+                pc[i].p.ypoints[j] = ycoords[j];
+            }
+            pc[i].p.invalidate();
+        }
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
-	//project height and construct polygon
-	pc[i].lcr=Math.round(vh*coef);
-	pc[i].lhalfEdge=Math.round(halfEdgeFactor*pc[i].lcr);
-	pc[i].lthirdHeight=Math.round(thirdHeightFactor*pc[i].lcr);
-	xcoords[0] = pc[i].lcx;
-	ycoords[0] = pc[i].lcy-pc[i].lcr;
-	xcoords[1] = pc[i].lcx-pc[i].lhalfEdge;
-	ycoords[1] = pc[i].lcy+pc[i].lthirdHeight;
-	xcoords[2] = pc[i].lcx+pc[i].lhalfEdge;
-	ycoords[2] = pc[i].lcy+pc[i].lthirdHeight;
-	if (pc[i].lp == null){
-	    pc[i].lp = new Polygon(xcoords, ycoords, 3);
-	}
-	else {
-	    for (int j=0;j<xcoords.length;j++){
-		pc[i].lp.xpoints[j] = xcoords[j];
-		pc[i].lp.ypoints[j] = ycoords[j];
-	    }
-	    pc[i].lp.invalidate();
-	}
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
+        //project height and construct polygon
+        pc[i].lcr = (int)Math.round(vs*coef);
+        pc[i].lhalfEdge = (int)Math.round(halfEdgeFactor*pc[i].lcr);
+        pc[i].lthirdHeight = (int)Math.round(thirdHeightFactor*pc[i].lcr);
+        xcoords[0] = pc[i].lcx;
+        ycoords[0] = pc[i].lcy-pc[i].lcr;
+        xcoords[1] = pc[i].lcx-pc[i].lhalfEdge;
+        ycoords[1] = pc[i].lcy+pc[i].lthirdHeight;
+        xcoords[2] = pc[i].lcx+pc[i].lhalfEdge;
+        ycoords[2] = pc[i].lcy+pc[i].lthirdHeight;
+        if (pc[i].lp == null){
+            pc[i].lp = new Polygon(xcoords, ycoords, 3);
+        }
+        else {
+            for (int j=0;j<xcoords.length;j++){
+                pc[i].lp.xpoints[j] = xcoords[j];
+                pc[i].lp.ypoints[j] = ycoords[j];
+            }
+            pc[i].lp.invalidate();
+        }
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -399,7 +399,7 @@ public class VTriangle extends ClosedShape {
     }
 
     public Object clone(){
-        VTriangle res = new VTriangle(vx, vy, 0, vh, color, borderColor, (alphaC != null) ? alphaC.getAlpha(): 1f);
+        VTriangle res = new VTriangle(vx, vy, 0, vs, color, borderColor, (alphaC != null) ? alphaC.getAlpha(): 1f);
         res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }

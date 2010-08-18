@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@
  */
 
 package fr.inria.zvtm.engine;
+
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.RectangularShape;
@@ -41,25 +43,25 @@ public class VirtualSpace {
      *computes the geometrical center of a set of glyphs (takes glyph sizes into account)  (0,0 if list is empty)
      *@param gl a list of Glyph instances
      */
-    public static LongPoint getGlyphSetGeometricalCenter(Glyph[] gl){
-	if (gl!=null && gl.length>0){
-	    long[] tmpC=new long[4];
-	    long size=(long)gl[0].getSize();
-	    tmpC[0]=gl[0].vx-size;
-	    tmpC[1]=gl[0].vy+size;
-	    tmpC[2]=gl[0].vx+size;
-	    tmpC[3]=gl[0].vy-size;
-	    long tmp;
-	    for (int i=1;i<gl.length;i++){
-		size=(long)gl[i].getSize();
-		tmp=gl[i].vx-size; if (tmp<tmpC[0]){tmpC[0]=tmp;}
-		tmp=gl[i].vy+size; if (tmp>tmpC[1]){tmpC[1]=tmp;}
-		tmp=gl[i].vx+size; if (tmp>tmpC[2]){tmpC[2]=tmp;}
-		tmp=gl[i].vy-size; if (tmp<tmpC[3]){tmpC[3]=tmp;}
-	    }
-	    return new LongPoint((tmpC[2]+tmpC[0])/2,(tmpC[1]+tmpC[3])/2);
-	}
-	else {return new LongPoint(0,0);}
+    public static Point2D.Double getGlyphSetGeometricalCenter(Glyph[] gl){
+        if (gl!=null && gl.length>0){
+            double[] tmpC = new double[4];
+            double size = gl[0].getSize();
+            tmpC[0]=gl[0].vx-size;
+            tmpC[1]=gl[0].vy+size;
+            tmpC[2]=gl[0].vx+size;
+            tmpC[3]=gl[0].vy-size;
+            double tmp;
+            for (int i=1;i<gl.length;i++){
+                size=gl[i].getSize();
+                tmp=gl[i].vx-size; if (tmp<tmpC[0]){tmpC[0]=tmp;}
+                tmp=gl[i].vy+size; if (tmp>tmpC[1]){tmpC[1]=tmp;}
+                tmp=gl[i].vx+size; if (tmp>tmpC[2]){tmpC[2]=tmp;}
+                tmp=gl[i].vy-size; if (tmp<tmpC[3]){tmpC[3]=tmp;}
+            }
+            return new Point2D.Double((tmpC[2]+tmpC[0])/2,(tmpC[1]+tmpC[3])/2);
+        }
+        else {return new Point2D.Double(0,0);}
     }
 
     /**name of virtual space*/
@@ -95,7 +97,7 @@ public class VirtualSpace {
 
     /**get virtual space's i-th camera*/
     public Camera getCamera(int i){return cm.getCamera(i);}
-    
+
     /**returns the list of all cameras in this virtual space*/
     public Camera[] getCameraListAsArray(){return cm.cameraList;}
 
@@ -432,17 +434,17 @@ public class VirtualSpace {
     }
 
     /**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
-    public long[] findFarmostGlyphCoords(){
-	long[] res = new long[4];
-	return findFarmostGlyphCoords(res);
+    public double[] findFarmostGlyphCoords(){
+        double[] res = new double[4];
+        return findFarmostGlyphCoords(res);
     }
     
 	/**returns the leftmost Glyph x-pos, upmost Glyph y-pos, rightmost Glyph x-pos, downmost Glyph y-pos visible in this virtual space*/
-	public long[] findFarmostGlyphCoords(long[] res){
+	public double[] findFarmostGlyphCoords(double[] res){
 		Glyph[] gl = this.getVisibleGlyphList();
 		if (gl.length > 0){
 			RectangularShape rs;
-			long size;
+			double size;
 			//init result with first glyph found
 			if (gl[0] instanceof RectangularShape){
 				rs = (RectangularShape)gl[0];
@@ -458,7 +460,7 @@ public class VirtualSpace {
 				res[2] = gl[0].vx + size;
 				res[3] = gl[0].vy - size;
 			}
-			long tmp;
+			double tmp;
 			for (int i=1;i<gl.length;i++){
 				if (gl[i] instanceof RectangularShape){
 					rs = (RectangularShape)gl[i];
@@ -487,66 +489,66 @@ public class VirtualSpace {
         int zindex = g.getZindex();
         // insert at bottom of list if no other glyph has a lower z-index
         int insertAt = 0;
-            // insert glyph in the drawing list so that 
-            // it is the last glyph to be drawn for a given z-index
-            for (int i=drawingList.length-1;i>=0;i--){
-                if (drawingList[i].getZindex() <= zindex){
-                    insertAt = i + 1;
-                    break;
-                }
+        // insert glyph in the drawing list so that 
+        // it is the last glyph to be drawn for a given z-index
+        for (int i=drawingList.length-1;i>=0;i--){
+            if (drawingList[i].getZindex() <= zindex){
+                insertAt = i + 1;
+                break;
             }
-            insertGlyphInDrawingList(g, insertAt);
+        }
+        insertGlyphInDrawingList(g, insertAt);
     }
 
-	protected void addGlyphsToDrawingList(Glyph[] glyphs){
-			//create a new drawingList array of the right size
-			Glyph[] newDrawingList = new Glyph[drawingList.length + glyphs.length];
-			//merge glyphs and drawingList into the new array
-			System.arraycopy(drawingList,0,newDrawingList,0,drawingList.length);
-			System.arraycopy(glyphs,0,newDrawingList,drawingList.length,
-					glyphs.length);
-			Arrays.sort(newDrawingList,
-					new java.util.Comparator<Glyph>(){
-						public int compare(Glyph g1, Glyph g2){
-							if(g1.getZindex() < g2.getZindex()){
-								return -1;
-							} else if (g1.getZindex() > g2.getZindex()){
-								return 1;
-							} else {
-								return 0;
-							}
-						}
-					});
-			//overwrite drawingList
-			drawingList = newDrawingList;
-	}
+    protected void addGlyphsToDrawingList(Glyph[] glyphs){
+        //create a new drawingList array of the right size
+        Glyph[] newDrawingList = new Glyph[drawingList.length + glyphs.length];
+        //merge glyphs and drawingList into the new array
+        System.arraycopy(drawingList,0,newDrawingList,0,drawingList.length);
+        System.arraycopy(glyphs,0,newDrawingList,drawingList.length,
+            glyphs.length);
+        Arrays.sort(newDrawingList,
+        new java.util.Comparator<Glyph>(){
+            public int compare(Glyph g1, Glyph g2){
+                if(g1.getZindex() < g2.getZindex()){
+                    return -1;
+                } else if (g1.getZindex() > g2.getZindex()){
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+            });
+        //overwrite drawingList
+        drawingList = newDrawingList;
+    }
 
     protected void insertGlyphInDrawingList(Glyph g, int index){
-            Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
-            System.arraycopy(drawingList, 0, newDrawingList, 0, index);
-            newDrawingList[index] = g;
-            System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
-            drawingList = newDrawingList;
+        Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
+        System.arraycopy(drawingList, 0, newDrawingList, 0, index);
+        newDrawingList[index] = g;
+        System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
+        drawingList = newDrawingList;
     }
 
     protected void removeGlyphFromDrawingList(Glyph g){
-            for (int i=0;i<drawingList.length;i++){
-                if (drawingList[i] == g){
-                    Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
-                    System.arraycopy(drawingList, 0, newDrawingList, 0, i);
-                    System.arraycopy(drawingList, i+1, newDrawingList, i, drawingList.length-i-1);
-                    drawingList = newDrawingList;
-                    break;
-                }
+        for (int i=0;i<drawingList.length;i++){
+            if (drawingList[i] == g){
+                Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
+                System.arraycopy(drawingList, 0, newDrawingList, 0, i);
+                System.arraycopy(drawingList, i+1, newDrawingList, i, drawingList.length-i-1);
+                drawingList = newDrawingList;
+                break;
             }
+        }
     }
 
     protected int glyphIndexInDrawingList(Glyph g){
-            for (int i=0;i<drawingList.length;i++){
-                if (drawingList[i] == g){
-                    return i;
-                }
+        for (int i=0;i<drawingList.length;i++){
+            if (drawingList[i] == g){
+                return i;
             }
+        }
         return -1;
     }
 

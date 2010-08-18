@@ -31,11 +31,11 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjText;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
@@ -91,7 +91,7 @@ public class VText extends Glyph {
      *@param c fill color
      *@param t text string
      */
-    public VText(long x,long y, int z,Color c,String t){
+    public VText(double x, double y, int z, Color c, String t){
 		this(x, y, z, c, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
@@ -103,7 +103,7 @@ public class VText extends Glyph {
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
-    public VText(long x,long y, int z,Color c,String t,short ta){
+    public VText(double x,double y, int z,Color c,String t,short ta){
 		this(x, y, z, c, t, ta, 1f, 1f);
     }
 
@@ -116,7 +116,7 @@ public class VText extends Glyph {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size
      */
-    public VText(long x, long y, int z, Color c, String t, short ta, float scale){
+    public VText(double x, double y, int z, Color c, String t, short ta, float scale){
         this(x, y, z, c, t, ta, scale, 1.0f);
     }
 
@@ -130,7 +130,7 @@ public class VText extends Glyph {
      *@param scale scaleFactor w.r.t original image size
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VText(long x, long y, int z, Color c, String t, short ta, float scale, float alpha){
+    public VText(double x, double y, int z, Color c, String t, short ta, float scale, float alpha){
         vx = x;
         vy = y;
         vz = z;
@@ -184,13 +184,13 @@ public class VText extends Glyph {
     }
 
     /** Cannot be resized. */
-    public void sizeTo(float factor){}
+    public void sizeTo(double factor){}
 
     /** Cannot be resized. */
-    public void reSize(float factor){}
+    public void reSize(double factor){}
 
     /** Cannot be reoriented. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
     /** Get glyph's size (radius of bounding circle).
      * Will return 0 if bounds of this VText have never been validated (through painting).
@@ -198,7 +198,7 @@ public class VText extends Glyph {
      *@see #validBounds(int i)
      *@see #invalidate()
      */
-    public float getSize(){
+    public double getSize(){
         for (int i=0;i<pc.length;i++){
             if (pc[i] != null & pc[i].valid){
                 return (float)Math.sqrt(Math.pow(pc[i].cw,2) + Math.pow(pc[i].ch,2));
@@ -208,7 +208,7 @@ public class VText extends Glyph {
         return 0;
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Set to false if the text should not be scaled according to camera's altitude. Its apparent size will always be the same, no matter the camera's altitude.
      *@see #isZoomSensitive()
@@ -227,7 +227,7 @@ public class VText extends Glyph {
 	return zoomSensitive;
     }
 
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if (!validBounds(i)){return true;}
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             //if glyph hotspot is in the region, it is obviously visible
@@ -266,7 +266,7 @@ public class VText extends Glyph {
         }
     }
 
-    public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region.
 	       There is a good chance the glyph is contained in the region, but this is not sufficient. */
@@ -293,11 +293,11 @@ public class VText extends Glyph {
 	return false;
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
 	return false;
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         boolean res=false;
         switch (text_anchor){
             case VText.TEXT_ANCHOR_START:{
@@ -315,7 +315,7 @@ public class VText extends Glyph {
         return res;
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 	    if (text_anchor==TEXT_ANCHOR_START){
     		return dvs.intersects(vx, vy, pc[camIndex].cw, pc[camIndex].ch);
         }
@@ -328,7 +328,7 @@ public class VText extends Glyph {
         }	    
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
              //if the mouse is inside the glyph
              if (!pc[camIndex].prevMouseIn){
@@ -351,21 +351,21 @@ public class VText extends Glyph {
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx=(d.width/2)+(int)Math.round((vx-c.posx)*coef);
+        pc[i].cy=(d.height/2)-(int)Math.round((vy-c.posy)*coef);
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = lensWidth/2 + (int)Math.round((vx-lensx)*coef);
+        pc[i].lcy = lensHeight/2 - (int)Math.round((vy-lensy)*coef);
     }
 
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -378,7 +378,7 @@ public class VText extends Glyph {
 			pc[i].valid=true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-		float trueCoef = scaleFactor * coef;
+		double trueCoef = scaleFactor * coef;
 		g.setColor(this.color);
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
@@ -421,7 +421,7 @@ public class VText extends Glyph {
 			pc[i].lvalid=true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-		float trueCoef = scaleFactor * coef;
+		double trueCoef = scaleFactor * coef;
 		g.setColor(this.color);
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			g.setFont((font!=null) ? font : getMainFont());
@@ -497,8 +497,8 @@ public class VText extends Glyph {
      *@see #invalidate()
      *@return the width and height of the text's bounding box, as a LongPoint
      */
-    public LongPoint getBounds(int i){
-	return new LongPoint(pc[i].cw,pc[i].ch);
+    public Point2D.Double getBounds(int i){
+	    return new Point2D.Double(pc[i].cw, pc[i].ch);
     }
 
     /** Indicates whether the bounds of the text are valid at this time or not.

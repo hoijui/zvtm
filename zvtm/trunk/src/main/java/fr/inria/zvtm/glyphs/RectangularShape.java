@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Thu Jan 24 10:31:58 2002 by Emmanuel Pietriga
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,15 +30,15 @@ package fr.inria.zvtm.glyphs;
 public interface RectangularShape {
 
     /** Set absolute half width. */
-    public void setWidth(long w);
+    public void setWidth(double w);
 
     /** Set absolute half height. */
-    public void setHeight(long h);
+    public void setHeight(double h);
     
     /** Get absolute half width. */
-    public long getWidth();
+    public double getWidth();
     
     /** Get absolute half width. */
-    public long getHeight();
+    public double getHeight();
 
 }

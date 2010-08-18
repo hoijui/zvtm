@@ -89,14 +89,14 @@ public class TestCameraAnim {
 					    circle,
 					    Animation.Dimension.POSITION,
 					    new DefaultTimingHandler(){
-						final long initX = circle.vx;
-						final long initY = circle.vy;
+						final double initX = circle.vx;
+						final double initY = circle.vy;
 						
 						public void timingEvent(float fraction, 
 									Object subject, Animation.Dimension dim){
 						    Glyph g = (Glyph)subject;
 						    g.moveTo(initX,
-							     Float.valueOf((1-fraction)*initY).longValue());
+							     Double.valueOf((1-fraction)*initY).doubleValue());
 						}
 					    },
 					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -107,14 +107,14 @@ public class TestCameraAnim {
 					     circle2,
 					     Animation.Dimension.POSITION,
 					     new DefaultTimingHandler(){
-						 final long initX = circle2.vx;
-						 final long initY = circle2.vy;
+						 final double initX = circle2.vx;
+						 final double initY = circle2.vy;
 						 
 						 public void timingEvent(float fraction, 
 									 Object subject, Animation.Dimension dim){
 						     Glyph g = (Glyph)subject;
 						     g.moveTo(initX,
-							      Float.valueOf((1-fraction)*initY).longValue());
+							      Double.valueOf((1-fraction)*initY).doubleValue());
 						 }
 					     },
 					     new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -130,8 +130,8 @@ public class TestCameraAnim {
 									     Object subject, Animation.Dimension dim){
 							   Camera c = (Camera)subject;
 							   
-							   c.moveTo(Double.valueOf(180*Math.cos(2*Math.PI*fraction)).longValue(),
-								    Double.valueOf(120*Math.sin(2*Math.PI*fraction)).longValue());
+							   c.moveTo(Double.valueOf(180*Math.cos(2*Math.PI*fraction)).doubleValue(),
+								    Double.valueOf(120*Math.sin(2*Math.PI*fraction)).doubleValue());
 						     }
 
 						     public void end(Object subject, Animation.Dimension dim){
@@ -150,7 +150,7 @@ public class TestCameraAnim {
 						     public void timingEvent(float fraction, 
 									     Object subject, Animation.Dimension dim){
 							 Camera c = (Camera)subject;
-							 c.setAltitude(25+Float.valueOf(fraction*50).longValue());
+							 c.setAltitude(25+Double.valueOf(fraction*50).doubleValue());
 						     }
 
 						     public void end(Object subject, Animation.Dimension dim){
@@ -197,13 +197,11 @@ public class TestCameraAnim {
     class MyEventHandler implements ViewEventHandler{
 	TestCameraAnim application;
 
-	long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+	int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
 
 	MyEventHandler(TestCameraAnim appli){
 	    application=appli;
 	}
-
-	long x1,x2,y1,y2;
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 
@@ -254,16 +252,16 @@ public class TestCameraAnim {
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	    if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 		Camera c=application.vsm.getActiveCamera();
-		float a=(c.focal+Math.abs(c.altitude))/c.focal;
+		double a=(c.focal+Math.abs(c.altitude))/c.focal;
 		if (mod == META_SHIFT_MOD) {
 		    application.vsm.getAnimationManager().setXspeed(0);
 		    application.vsm.getAnimationManager().setYspeed(0);
-		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
 		    //50 is just a speed factor (too fast otherwise)
 		}
 		else {
-		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/50.0f)) : ((jpx-lastJPX)/(a*50)));
+		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
 		    application.vsm.getAnimationManager().setZspeed(0);
 		}
 	    }
@@ -271,7 +269,7 @@ public class TestCameraAnim {
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	    Camera c=application.vsm.getActiveCamera();
-	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	    double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (wheelDirection == WHEEL_UP){
 		c.altitudeOffset(-a*5);
 		application.vsm.repaintNow();

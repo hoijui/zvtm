@@ -44,11 +44,11 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class VRectangle extends ClosedShape implements RectangularShape {
 
     /** For internal use. Made public for easier outside package subclassing. Half width in virtual space.*/
-    public long vw;
+    public double vw;
     /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
-    public long vh;
+    public double vh;
     /* For internal use. Made public for easier outside package subclassing. Aspect ratio (width divided by height). */
-    public float ar;
+    public double ar;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public RProjectedCoordsP[] pc;
@@ -65,7 +65,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         *@param h half height in virtual space
         *@param c fill color
         */
-    public VRectangle(long x, long y, int z, long w, long h, Color c){
+    public VRectangle(double x, double y, int z, double w, double h, Color c){
         this(x, y, z, w, h, c, Color.BLACK, 1.0f);
     }
 
@@ -78,7 +78,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         *@param c fill color
         *@param bc border color
         */
-    public VRectangle(long x, long y, int z, long w, long h, Color c, Color bc){
+    public VRectangle(double x, double y, int z, double w, double h, Color c, Color bc){
         this(x, y, z, w, h, c, bc, 1.0f);
     }
 
@@ -92,7 +92,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         *@param bc border color
         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
-    public VRectangle(long x, long y, int z, long w, long h, Color c, Color bc, float alpha){
+    public VRectangle(double x, double y, int z, double w, double h, Color c, Color bc, float alpha){
         vx=x;
         vy=y;
         vz=z;
@@ -150,61 +150,62 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	borderColor = bColor;
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
-    public long getWidth(){return vw;}
+    public double getWidth(){return vw;}
 
-    public long getHeight(){return vh;}
+    public double getHeight(){return vh;}
 
     void computeSize(){
-	size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+	    size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    public void sizeTo(float radius){  //new bounding circle radius
-	size=radius;
-	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
-	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        //new bounding circle radius
+        size=radius;
+        vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
+        vh = (size) / Math.sqrt(Math.pow(ar,2)+1);
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setWidth(long w){ 
-	vw=w;
-	ar=(float)vw/(float)vh;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setWidth(double w){ 
+        vw=w;
+        ar=(float)vw/(float)vh;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setHeight(long h){
-	vh=h;
-	ar=(float)vw/(float)vh;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setHeight(double h){
+        vh=h;
+        ar=(float)vw/(float)vh;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){ //resizing factor
-	size*=factor;
-	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
-	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){ //resizing factor
+        size *= factor;
+        vw = (size*ar)/(Math.sqrt(Math.pow(ar,2)+1));
+        vh = (size)/(Math.sqrt(Math.pow(ar,2)+1));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
         return ((alphaC == null) &&
             (w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) &&
             (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch));
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         return ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
             (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch)));
     }
 
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -218,19 +219,19 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         return false;
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
 	}
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public long[] getBounds(){
-		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+	public double[] getBounds(){
+		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
     }
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -254,23 +255,23 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
-        coef=(float)(c.focal/(c.focal+c.altitude));
+        coef = c.focal/(c.focal+c.altitude);
         //find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
         //translate in JPanel coords
-        pc[i].cx = (d.width/2) + Math.round((vx-c.posx)*coef);
-        pc[i].cy = (d.height/2) - Math.round((vy-c.posy)*coef);
+        pc[i].cx = (int)Math.round((d.width/2) + (vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2) - (vy-c.posy)*coef);
         //project width and height
         pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
         pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i = c.getIndex();
-        coef = (float)(c.focal/(c.focal+c.altitude)) * lensMag;
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
         //find coordinates of object's geom center wrt to camera center and project and translate in JPanel coords
         //translate in JPanel coords
-        pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-        pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
+        pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
         //project width and height
         pc[i].lcw = (int)Math.round(Math.ceil(vw*coef));
         pc[i].lch = (int)Math.round(Math.ceil(vh*coef));
@@ -407,9 +408,9 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-	VRectangle res=new VRectangle(vx, vy, 0, vw, vh, color, borderColor);
-	res.cursorInsideColor=this.cursorInsideColor;
-	return res;
+        VRectangle res=new VRectangle(vx, vy, 0, vw, vh, color, borderColor);
+        res.cursorInsideColor=this.cursorInsideColor;
+        return res;
     }
 
 }

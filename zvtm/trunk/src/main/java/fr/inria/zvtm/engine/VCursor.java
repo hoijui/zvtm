@@ -49,10 +49,11 @@ import java.util.TimerTask;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
+import java.awt.Point;
+
 import fr.inria.zvtm.engine.DynaSpotListener;
 import fr.inria.zvtm.engine.SelectionListener;
 import fr.inria.zvtm.glyphs.Translucency;
-import java.awt.Point;
 
 /**
  * Glyph representing mouse cursor
@@ -74,8 +75,6 @@ import java.awt.Point;
 
 public class VCursor {
 
-    Long ID;
-
     /**cursor color*/
     Color color;
 
@@ -94,9 +93,9 @@ public class VCursor {
     /**coord in camera space (same as jpanel coords, but conventional coord sys at center of view panel, upward)*/
     float cx,cy;
     /**coord in virtual space*/
-    public long vx,vy;
+    public double vx,vy;
     /**previous coords in virtual space*/
-    long pvx,pvy;
+    double pvx,pvy;
     /**coords in JPanel*/
     int mx,my;
     /**gain for cursor unprojection w.r.t lens (if any lens is set)*/
@@ -149,18 +148,8 @@ public class VCursor {
 	return size;
     }
 
-    /**get mouse cursor ID*/
-    public Long getID(){
-	return ID;
-    }
-
-    /**set mouse cursor ID - should always be 0*/
-    public void setID(Long ident){
-	ID=ident;
-    }
-
     /**get the mouse location in virtual space (active layer)*/
-    public LongPoint getLocation(){return new LongPoint(vx,vy);}
+    public Point2D.Double getLocation(){return new Point2D.Double(vx,vy);}
 
     /**get the view to which this cursor belongs*/
     public View getOwningView(){return owningView;}
@@ -276,7 +265,7 @@ public class VCursor {
 		*@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
 		*@see #getIntersectingPaths(Camera c)
 		*/
-	public Vector<DPath> getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY){
+	public Vector<DPath> getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY){
 			Vector res=new Vector();
 			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
 			Object glyph;
@@ -311,7 +300,7 @@ public class VCursor {
      *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
      *@see #intersectsPath(DPath p)
      */
-	public boolean intersectsPath(DPath p, int tolerance, long cursorX, long cursorY){
+	public boolean intersectsPath(DPath p, int tolerance, double cursorX, double cursorY){
 		if (!p.coordsInsideBoundingBox(cursorX, cursorY)){return false;}
 		int dtol = tolerance * 2;
 		GeneralPath gp = p.getJava2DGeneralPath();
@@ -350,7 +339,7 @@ public class VCursor {
      *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
      *@see #getIntersectingTexts(Camera c)
      */
-    public Vector<VText> getIntersectingTexts(Camera c, long cursorX, long cursorY){
+    public Vector<VText> getIntersectingTexts(Camera c, double cursorX, double cursorY){
 	    Vector res=new Vector();
 	    int index=c.getIndex();
 	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
@@ -378,23 +367,23 @@ public class VCursor {
      *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
      *@see #intersectsVText(VText t,int camIndex)
      */
-    public boolean intersectsVText(VText t,int camIndex, long cursorX, long cursorY){
-	boolean res=false;
-	LongPoint p=t.getBounds(camIndex);
-	switch (t.getTextAnchor()){
-	case VText.TEXT_ANCHOR_START:{
-	    if ((cursorX>=t.vx) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
-	    break;
-	}
-	case VText.TEXT_ANCHOR_MIDDLE:{
-	    if ((cursorX>=t.vx-p.x/2) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x/2)) && (cursorY<=(t.vy+p.y))){res=true;}
-	    break;
-	}
-	default:{
-	    if ((cursorX<=t.vx) && (cursorY>=t.vy) && (cursorX>=(t.vx-p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
-	}
-	}
-	return res;
+    public boolean intersectsVText(VText t,int camIndex, double cursorX, double cursorY){
+        boolean res=false;
+        Point2D.Double p = t.getBounds(camIndex);
+        switch (t.getTextAnchor()){
+            case VText.TEXT_ANCHOR_START:{
+                if ((cursorX>=t.vx) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
+                break;
+            }
+            case VText.TEXT_ANCHOR_MIDDLE:{
+                if ((cursorX>=t.vx-p.x/2) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x/2)) && (cursorY<=(t.vy+p.y))){res=true;}
+                break;
+            }
+            default:{
+                if ((cursorX<=t.vx) && (cursorY>=t.vy) && (cursorX>=(t.vx-p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
+            }
+        }
+        return res;
     }
 
     /** Returns a list of all VSegment instances under the mouse cursor.
@@ -655,18 +644,18 @@ public class VCursor {
                 cx = mx - v.size.width/2;
                 cy = v.size.height/2 - my;
             }
-            float ucoef = ((c.focal+c.altitude) / c.focal);
+            double ucoef = (c.focal+c.altitude) / c.focal;
             //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
             pvx = vx;
             pvy = vy;
-            vx = Math.round((cx*ucoef) + c.posx);
-            vy = Math.round((cy*ucoef) + c.posy);
+            vx = (cx*ucoef) + c.posx;
+            vy = (cy*ucoef) + c.posy;
         }
     }
 
-    public LongPoint getVSCoordinates(Camera c, ViewPanel v){
+    public Point2D.Double getVSCoordinates(Camera c, ViewPanel v){
         //translate from JPanel coords
-        float tcx,tcy;
+        double tcx,tcy;
         if (v.lens != null){
             //take lens into account (if set)
             v.lens.gf(mx, my, gain);
@@ -680,9 +669,9 @@ public class VCursor {
             tcx = mx - v.size.width/2;
             tcy = v.size.height/2 - my;
         }
-        float ucoef = ((c.focal+c.altitude) / c.focal);
+        double ucoef = (c.focal+c.altitude) / c.focal;
         // find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
-        return new LongPoint(Math.round((tcx*ucoef) + c.posx), Math.round((tcy*ucoef) + c.posy));
+        return new Point2D.Double((tcx*ucoef) + c.posx, (tcy*ucoef) + c.posy);
     }
 
     /**returns the cursor's X JPanel coordinate*/
@@ -822,7 +811,7 @@ public class VCursor {
 
 	double opacity = 1.0f;
 
-	long[] dynawnes = new long[4];
+	double[] dynawnes = new double[4];
 	
 	Ellipse2D dynaspotVSshape = new Ellipse2D.Double(0, 0, 1, 1);
 	
@@ -1018,7 +1007,7 @@ public class VCursor {
 		Glyph g;
 		int gumIndex = -1;
 		int cgumIndex = -1;
-	    long unprojectedDSRadius = Math.round((((double)c.focal+(double)c.altitude) / (double)c.focal) * dynaSpotRadius);
+	    double unprojectedDSRadius = ((c.focal+c.altitude) / c.focal) * dynaSpotRadius;
 		dynawnes[0] = vx - unprojectedDSRadius; // west bound
 		dynawnes[1] = vy + unprojectedDSRadius; // north bound
 		dynawnes[2] = vx + unprojectedDSRadius; // east bound

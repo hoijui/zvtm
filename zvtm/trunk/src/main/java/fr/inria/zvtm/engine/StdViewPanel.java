@@ -200,28 +200,27 @@ public class StdViewPanel extends ViewPanel {
 				camIndex=cams[nbcam].getIndex();
 				drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
 				drawnGlyphs.removeAllElements();
-				float uncoef=(float)((cams[nbcam].focal+cams[nbcam].altitude)/cams[nbcam].focal);
+				double uncoef = (cams[nbcam].focal+cams[nbcam].altitude) / cams[nbcam].focal;
 				//compute region seen from this view through camera
-				long viewW = size.width;
-				long viewH = size.height;
-				long viewWC = (long)(cams[nbcam].posx-(viewW/2-visibilityPadding[0])*uncoef);
-				long viewNC = (long)(cams[nbcam].posy+(viewH/2-visibilityPadding[1])*uncoef);
-				long viewEC = (long)(cams[nbcam].posx+(viewW/2-visibilityPadding[2])*uncoef);
-				long viewSC = (long)(cams[nbcam].posy-(viewH/2-visibilityPadding[3])*uncoef);
-				long lviewWC = 0;
-				long lviewNC = 0;
-				long lviewEC = 0;
-				long lviewSC = 0;
-				long lensVx = 0;
-				long lensVy = 0;
+				double viewW = size.width;
+				double viewH = size.height;
+				double viewWC = cams[nbcam].posx - (viewW/2-visibilityPadding[0]) * uncoef;
+				double viewNC = cams[nbcam].posy + (viewH/2-visibilityPadding[1]) * uncoef;
+				double viewEC = cams[nbcam].posx + (viewW/2-visibilityPadding[2]) * uncoef;
+				double viewSC = cams[nbcam].posy - (viewH/2-visibilityPadding[3]) * uncoef;
+				double lviewWC = 0;
+				double lviewNC = 0;
+				double lviewEC = 0;
+				double lviewSC = 0;
+				double lensVx = 0;
+				double lensVy = 0;
 				if(drawLens){
-					lviewWC = (long)(cams[nbcam].posx + (lens.lx-lens.lensWidth/2)*uncoef);
-					lviewNC = (long)(cams[nbcam].posy + (-lens.ly+lens.lensHeight/2)*uncoef);
-					lviewEC = (long)(cams[nbcam].posx + (lens.lx+lens.lensWidth/2)*uncoef);
-					lviewSC = (long)(cams[nbcam].posy + (-lens.ly-lens.lensHeight/2)*uncoef);
-					lensVx = (lviewWC+lviewEC)/2;
-					lensVy = (lviewSC+lviewNC)/2;
-
+					lviewWC = cams[nbcam].posx + (lens.lx-lens.lensWidth/2) * uncoef;
+					lviewNC = cams[nbcam].posy + (-lens.ly+lens.lensHeight/2) * uncoef;
+					lviewEC = cams[nbcam].posx + (lens.lx+lens.lensWidth/2) * uncoef;
+					lviewSC = cams[nbcam].posy + (-lens.ly-lens.lensHeight/2) * uncoef;
+					lensVx = (lviewWC+lviewEC) / 2d;
+					lensVy = (lviewSC+lviewNC) / 2d;
 				}
 				gll = cams[nbcam].parentSpace.getDrawingList();
 				for (int i=0;i<gll.length;i++){

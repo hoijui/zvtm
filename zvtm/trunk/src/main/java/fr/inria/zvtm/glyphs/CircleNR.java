@@ -29,7 +29,7 @@ public class CircleNR extends VCircle {
 		*@param r radius in virtual space
 		*@param c fill color
 		*/
-	public CircleNR(long x,long y, int z,long r,Color c){
+	public CircleNR(double x,double y, int z,double r,Color c){
 		super(x, y, z, r, c);
 	}
 
@@ -41,7 +41,7 @@ public class CircleNR extends VCircle {
 		*@param c fill color
 		*@param bc border color
 		*/
-	public CircleNR(long x, long y, int z, long r, Color c, Color bc){
+	public CircleNR(double x, double y, int z, double r, Color c, Color bc){
 		super(x, y, z, r, c, bc);
 	}
 
@@ -54,16 +54,16 @@ public class CircleNR extends VCircle {
 		*@param bc border color
 		*@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 		*/
-	public CircleNR(long x, long y, int z, long r, Color c, Color bc, float alpha){
+	public CircleNR(double x, double y, int z, double r, Color c, Color bc, float alpha){
 		super(x, y, z, r, c, bc, alpha);
 	}
 	
-	public boolean visibleInViewport(long wb, long nb, long eb, long sb, Camera c){
+	public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             return true;
         }
         else {
-            long trueSize = Math.round(size * (c.focal+c.altitude) / c.focal);
+            double trueSize = Math.round(size * (c.focal+c.altitude) / c.focal);
             if (((vx-trueSize)<=eb) && ((vx+trueSize)>=wb) && ((vy-trueSize)<=nb) && ((vy+trueSize)>=sb)){
                 return true;
             }
@@ -73,22 +73,22 @@ public class CircleNR extends VCircle {
     
 	public void project(Camera c, Dimension d){
 		int i=c.getIndex();
-		coef=(float)(c.focal/(c.focal+c.altitude));
+		coef = c.focal / (c.focal+c.altitude);
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
-		pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-		pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
+		pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+		pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
 		//project height and construct polygon
-		pc[i].cr=(int)vr;
+		pc[i].cr = (int)vr;
 	}
 
-	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
+	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 		int i = c.getIndex();
-		coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
+		coef = c.focal/(c.focal+c.altitude) * lensMag;
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
-		pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-		pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
+		pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-lensx)*coef);
+		pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-lensy)*coef);
 		//project height and construct polygon
 		pc[i].lcr = (int)vr;
 	}

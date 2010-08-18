@@ -44,7 +44,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class VCircle extends ClosedShape {
 
     /**radius in virtual space (equal to bounding circle radius since this is a circle)*/
-    public long vr;
+    public double vr;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     public BProjectedCoords[] pc;
@@ -60,7 +60,7 @@ public class VCircle extends ClosedShape {
      *@param r radius in virtual space
      *@param c fill color
      */
-    public VCircle(long x,long y, int z,long r,Color c){
+    public VCircle(double x,double y, int z,double r,Color c){
 	    this(x, y, z, r, c, Color.BLACK, 1);
     }
 
@@ -72,7 +72,7 @@ public class VCircle extends ClosedShape {
      *@param c fill color
      *@param bc border color
      */
-    public VCircle(long x, long y, int z, long r, Color c, Color bc){
+    public VCircle(double x, double y, int z, double r, Color c, Color bc){
         this(x, y, z, r, c, bc, 1);
     }
     
@@ -85,7 +85,7 @@ public class VCircle extends ClosedShape {
      *@param bc border color
      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VCircle(long x, long y, int z, long r, Color c, Color bc, float alpha){
+    public VCircle(double x, double y, int z, double r, Color c, Color bc, float alpha){
         vx = x;
         vy = y;
         vz = z;
@@ -140,39 +140,30 @@ public class VCircle extends ClosedShape {
 	borderColor = bColor;
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Cannot be reoriented (it makes no sense). */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public void orientToNS(float angle){}
-
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
     void computeSize(){
-	size=(float)vr;
+	    size = vr;
     }
 
-    public void sizeTo(float radius){
-	size=radius;
-	vr=(long)Math.round(size);
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        size = radius;
+        vr = size;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void sizeTo(long radius){
-	size = (float)radius;
-	vr = radius;
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size*=factor;
+        vr = size;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){
-	size*=factor;
-	vr=(long)Math.round(size);
-	VirtualSpaceManager.INSTANCE.repaintNow();
-    }
-
-
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
         if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
             && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
             && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr) 
@@ -180,12 +171,12 @@ public class VCircle extends ClosedShape {
         else {return false;}
     }
     
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr){return true;}
         else {return false;}
     }
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -207,30 +198,30 @@ public class VCircle extends ClosedShape {
         }
     }
 
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) <= (dvr + vr);
 	}
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project height and construct polygon
-	pc[i].cr=Math.round(vr*coef);
+        int i=c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project height and construct polygon
+        pc[i].cr = (int)Math.round(vr*coef);
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i = c.getIndex();
-	coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
-	//project height and construct polygon
-	pc[i].lcr = Math.round(vr*coef);
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i = c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
+        pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
+        //project height and construct polygon
+        pc[i].lcr = (int)Math.round(vr*coef);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){

@@ -47,7 +47,7 @@ public class VDiamondOr extends VDiamond {
         *@param c fill color
         *@param or orientation
         */
-    public VDiamondOr(long x,long y, int z,long s,Color c,float or){
+    public VDiamondOr(double x,double y, int z,double s,Color c,double or){
         this(x, y, z, s, c, Color.BLACK, or, 1f);
     }
 
@@ -60,7 +60,7 @@ public class VDiamondOr extends VDiamond {
         *@param bc border color
         *@param or orientation
         */
-    public VDiamondOr(long x, long y, int z, long s, Color c, Color bc, float or){
+    public VDiamondOr(double x, double y, int z, double s, Color c, Color bc, double or){
         this(x, y, z, s, c, bc, or, 1f);
     }
 
@@ -74,77 +74,77 @@ public class VDiamondOr extends VDiamond {
         *@param or orientation
         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
-    public VDiamondOr(long x, long y, int z, long s, Color c, Color bc, float or, float alpha){
+    public VDiamondOr(double x, double y, int z, double s, Color c, Color bc, double or, float alpha){
         super(x, y, z, s, c, bc);
         orient=or;
     }
     
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
-    public void orientTo(float angle){
+    public void orientTo(double angle){
 	orient=angle;
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project height and construct polygon
-	pc[i].cr=Math.round(vs*coef);
-	xcoords[0]=(int)Math.round(pc[i].cx+pc[i].cr*Math.cos(orient));
-	xcoords[1]=(int)Math.round(pc[i].cx-pc[i].cr*Math.sin(orient));
-	xcoords[2]=(int)Math.round(pc[i].cx-pc[i].cr*Math.cos(orient));
-	xcoords[3]=(int)Math.round(pc[i].cx+pc[i].cr*Math.sin(orient));
-	ycoords[0]=(int)Math.round(pc[i].cy-pc[i].cr*Math.sin(orient));
-	ycoords[1]=(int)Math.round(pc[i].cy-pc[i].cr*Math.cos(orient));
-	ycoords[2]=(int)Math.round(pc[i].cy+pc[i].cr*Math.sin(orient));
-	ycoords[3]=(int)Math.round(pc[i].cy+pc[i].cr*Math.cos(orient));
-	if (pc[i].p == null){
-	    pc[i].p = new Polygon(xcoords, ycoords, 4);
-	}
-	else {
-	    for (int j=0;j<xcoords.length;j++){
-		pc[i].p.xpoints[j] = xcoords[j];
-		pc[i].p.ypoints[j] = ycoords[j];
-	    }
-	    pc[i].p.invalidate();
-	}
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project height and construct polygon
+        pc[i].cr = (int)Math.round(vs*coef);
+        xcoords[0]=(int)Math.round(pc[i].cx+pc[i].cr*Math.cos(orient));
+        xcoords[1]=(int)Math.round(pc[i].cx-pc[i].cr*Math.sin(orient));
+        xcoords[2]=(int)Math.round(pc[i].cx-pc[i].cr*Math.cos(orient));
+        xcoords[3]=(int)Math.round(pc[i].cx+pc[i].cr*Math.sin(orient));
+        ycoords[0]=(int)Math.round(pc[i].cy-pc[i].cr*Math.sin(orient));
+        ycoords[1]=(int)Math.round(pc[i].cy-pc[i].cr*Math.cos(orient));
+        ycoords[2]=(int)Math.round(pc[i].cy+pc[i].cr*Math.sin(orient));
+        ycoords[3]=(int)Math.round(pc[i].cy+pc[i].cr*Math.cos(orient));
+        if (pc[i].p == null){
+            pc[i].p = new Polygon(xcoords, ycoords, 4);
+        }
+        else {
+            for (int j=0;j<xcoords.length;j++){
+                pc[i].p.xpoints[j] = xcoords[j];
+                pc[i].p.ypoints[j] = ycoords[j];
+            }
+            pc[i].p.invalidate();
+        }
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
-	//project height and construct polygon
-	pc[i].lcr=Math.round(vs*coef);
-	xcoords[0]=(int)Math.round(pc[i].lcx+pc[i].lcr*Math.cos(orient));
-	xcoords[1]=(int)Math.round(pc[i].lcx-pc[i].lcr*Math.sin(orient));
-	xcoords[2]=(int)Math.round(pc[i].lcx-pc[i].lcr*Math.cos(orient));
-	xcoords[3]=(int)Math.round(pc[i].lcx+pc[i].lcr*Math.sin(orient));
-	ycoords[0]=(int)Math.round(pc[i].lcy-pc[i].lcr*Math.sin(orient));
-	ycoords[1]=(int)Math.round(pc[i].lcy-pc[i].lcr*Math.cos(orient));
-	ycoords[2]=(int)Math.round(pc[i].lcy+pc[i].lcr*Math.sin(orient));
-	ycoords[3]=(int)Math.round(pc[i].lcy+pc[i].lcr*Math.cos(orient));
-	if (pc[i].lp == null){
-	    pc[i].lp = new Polygon(xcoords, ycoords, 4);
-	}
-	else {
-	    for (int j=0;j<xcoords.length;j++){
-		pc[i].lp.xpoints[j] = xcoords[j];
-		pc[i].lp.ypoints[j] = ycoords[j];
-	    }
-	    pc[i].lp.invalidate();
-	}
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
+        pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
+        //project height and construct polygon
+        pc[i].lcr = (int)Math.round(vs*coef);
+        xcoords[0]=(int)Math.round(pc[i].lcx+pc[i].lcr*Math.cos(orient));
+        xcoords[1]=(int)Math.round(pc[i].lcx-pc[i].lcr*Math.sin(orient));
+        xcoords[2]=(int)Math.round(pc[i].lcx-pc[i].lcr*Math.cos(orient));
+        xcoords[3]=(int)Math.round(pc[i].lcx+pc[i].lcr*Math.sin(orient));
+        ycoords[0]=(int)Math.round(pc[i].lcy-pc[i].lcr*Math.sin(orient));
+        ycoords[1]=(int)Math.round(pc[i].lcy-pc[i].lcr*Math.cos(orient));
+        ycoords[2]=(int)Math.round(pc[i].lcy+pc[i].lcr*Math.sin(orient));
+        ycoords[3]=(int)Math.round(pc[i].lcy+pc[i].lcr*Math.cos(orient));
+        if (pc[i].lp == null){
+            pc[i].lp = new Polygon(xcoords, ycoords, 4);
+        }
+        else {
+            for (int j=0;j<xcoords.length;j++){
+                pc[i].lp.xpoints[j] = xcoords[j];
+                pc[i].lp.ypoints[j] = ycoords[j];
+            }
+            pc[i].lp.invalidate();
+        }
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){

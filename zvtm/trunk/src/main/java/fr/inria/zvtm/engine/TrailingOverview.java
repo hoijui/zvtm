@@ -29,7 +29,7 @@ public class TrailingOverview extends TrailingCameraPortalST {
 
     Camera observedRegionCamera;
     View observedRegionView;
-    long[] observedRegion;
+    double[] observedRegion;
     float orcoef;
 
     Timer borderTimer;
@@ -46,12 +46,12 @@ public class TrailingOverview extends TrailingCameraPortalST {
      *@param yo vertical offset (in pixels) between cursor and portal (trailing widget)
      */
     public TrailingOverview(int x, int y, int w, int h, Camera pc, Camera orc, float a, int xo, int yo){
-	super(x, y, w, h, pc, a, xo, yo);
-	this.observedRegionCamera = orc;
-	this.observedRegionView = orc.getOwningView();
-	observedRegion = new long[4];
-	borderTimer = new Timer();
-	borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
+        super(x, y, w, h, pc, a, xo, yo);
+        this.observedRegionCamera = orc;
+        this.observedRegionView = orc.getOwningView();
+        observedRegion = new double[4];
+        borderTimer = new Timer();
+        borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
     }
 
     /**
@@ -59,15 +59,15 @@ public class TrailingOverview extends TrailingCameraPortalST {
      *@param a [0;1.0] 0 is fully transparent, 1 is opaque
      */
     public void setTransparencyValue(float a){
-	if (a < 0){a = 0;}
-	try {
-	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
-	    alpha = a;
-	    orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a/2.0f);  //transparency set to alpha
-	}
-	catch (IllegalArgumentException ex){
-	    if (VirtualSpaceManager.debugModeON()){System.err.println("Error animating translucency of "+this.toString()+": "+a);}
-	}
+        if (a < 0){a = 0;}
+        try {
+            acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);  //transparency set to alpha
+            alpha = a;
+            orST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a/2.0f);  //transparency set to alpha
+        }
+        catch (IllegalArgumentException ex){
+            if (VirtualSpaceManager.debugModeON()){System.err.println("Error animating translucency of "+this.toString()+": "+a);}
+        }
     }
 
     /**detects whether the given point is inside the observed region rectangle depicting what is seen through the main camera 
@@ -87,69 +87,69 @@ public class TrailingOverview extends TrailingCameraPortalST {
 	this.observedRegionListener = orl;
     }
 
-    void observedRegionIntersects(long[] wnes){
-	if (observedRegionListener != null){
-	    observedRegionListener.intersectsParentRegion(wnes);
-	}
+    void observedRegionIntersects(double[] wnes){
+        if (observedRegionListener != null){
+            observedRegionListener.intersectsParentRegion(wnes);
+        }
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	g2d.setClip(x, y, w, h);
-	g2d.setComposite(acST);
-	if (bkgColor != null){
-	    g2d.setColor(bkgColor);
-	    g2d.fillRect(x, y, w, h);
-	}
-	standardStroke = g2d.getStroke();
-	// be sure to call the translate instruction before getting the standard transform
-	// as the latter's matrix is preconcatenated to the translation matrix of glyphs
-	// that use AffineTransforms for translation
-	standardTransform = g2d.getTransform();
-	drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
-	synchronized(drawnGlyphs){
-	    drawnGlyphs.removeAllElements();
-	    uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
-	    //compute region seen from this view through camera
-	    viewWC = (long)(camera.posx - (w/2)*uncoef);
-	    viewNC = (long)(camera.posy + (h/2)*uncoef);
-	    viewEC = (long)(camera.posx + (w/2)*uncoef);
-	    viewSC = (long)(camera.posy - (h/2)*uncoef);
-	    gll = cameraSpace.getDrawingList();
-	    for (int i=0;i<gll.length;i++){
-		if (gll[i] != null){
-		    synchronized(gll[i]){
-			if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
-			    //if glyph is at least partially visible in the reg. seen from this view, display
-			    gll[i].project(camera, size); // an invisible glyph should still be projected
-			    if (gll[i].isVisible()){      // as it can be sensitive
-				gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
-			    }
-			}
-		    }
-		}
-	    }
-	}
-	// paint region observed through observedRegionCamera
-	observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
-	g2d.setColor(Color.GREEN);
- 	g2d.setComposite(orST);
-	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
-	g2d.fillRect(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef),
-		     y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef),
-		     Math.round((observedRegion[2]-observedRegion[0])*orcoef),
-		     Math.round((observedRegion[1]-observedRegion[3])*orcoef));
-	g2d.setComposite(acST);
-	g2d.drawRect(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef),
-		     y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef),
-		     Math.round((observedRegion[2]-observedRegion[0])*orcoef),
-		     Math.round((observedRegion[1]-observedRegion[3])*orcoef));
-	// reset Graphics2D
-	g2d.setClip(0, 0, viewWidth, viewHeight);
-	if (borderColor != null){
-	    g2d.setColor(borderColor);
-	    g2d.drawRect(x, y, w, h);
-	}
-	g2d.setComposite(acO);
+        g2d.setClip(x, y, w, h);
+        g2d.setComposite(acST);
+        if (bkgColor != null){
+            g2d.setColor(bkgColor);
+            g2d.fillRect(x, y, w, h);
+        }
+        standardStroke = g2d.getStroke();
+        // be sure to call the translate instruction before getting the standard transform
+        // as the latter's matrix is preconcatenated to the translation matrix of glyphs
+        // that use AffineTransforms for translation
+        standardTransform = g2d.getTransform();
+        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
+        synchronized(drawnGlyphs){
+            drawnGlyphs.removeAllElements();
+            uncoef = (camera.focal+camera.altitude) / camera.focal;
+            //compute region seen from this view through camera
+            viewWC = camera.posx - (w/2)*uncoef;
+            viewNC = camera.posy + (h/2)*uncoef;
+            viewEC = camera.posx + (w/2)*uncoef;
+            viewSC = camera.posy - (h/2)*uncoef;
+            gll = cameraSpace.getDrawingList();
+            for (int i=0;i<gll.length;i++){
+                if (gll[i] != null){
+                    synchronized(gll[i]){
+                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
+                            //if glyph is at least partially visible in the reg. seen from this view, display
+                            gll[i].project(camera, size); // an invisible glyph should still be projected
+                            if (gll[i].isVisible()){      // as it can be sensitive
+                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // paint region observed through observedRegionCamera
+        observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
+        g2d.setColor(Color.GREEN);
+        g2d.setComposite(orST);
+        orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+        g2d.fillRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef)),
+            (int)(y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef)),
+            (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
+            (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
+        g2d.setComposite(acST);
+        g2d.drawRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef)),
+            (int)(y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef)),
+            (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
+            (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
+        // reset Graphics2D
+        g2d.setClip(0, 0, viewWidth, viewHeight);
+        if (borderColor != null){
+            g2d.setColor(borderColor);
+            g2d.drawRect(x, y, w, h);
+        }
+        g2d.setComposite(acO);
     }
 
     public void dispose(){
@@ -161,8 +161,8 @@ public class TrailingOverview extends TrailingCameraPortalST {
     protected class BorderTimer extends TimerTask {
 	
 	TrailingOverview portal;
-	long[] portalRegion = new long[4];
-	long[] intersection = new long[4];
+	double[] portalRegion = new double[4];
+	double[] intersection = new double[4];
 	
 	BorderTimer(TrailingOverview p){
 	    super();

@@ -55,7 +55,7 @@ public class TransitionManager {
 	// get the region of virtual space seen through the
 	// camera belonging to the top layer in this view
 	final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
-	long[] wnes = v.getVisibleRegion(c);
+	double[] wnes = v.getVisibleRegion(c);
 	// position the fade rectangle so that it covers this region
 	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
 						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
@@ -107,7 +107,7 @@ public class TransitionManager {
 	// get the region of virtual space seen through the
 	// camera belonging to the top layer in this view
 	final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
-	long[] wnes = v.getVisibleRegion(c);
+	double[] wnes = v.getVisibleRegion(c);
 	// position the fade rectangle so that it covers this region
 	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
 						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,

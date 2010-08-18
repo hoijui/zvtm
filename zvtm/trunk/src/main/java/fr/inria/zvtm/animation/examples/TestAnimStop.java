@@ -83,15 +83,15 @@ public class TestAnimStop {
 					    circle,
 					    Animation.Dimension.POSITION,
 					    new DefaultTimingHandler(){
-						final long initX = circle.vx;
-						final long initY = circle.vy;
+						final double initX = circle.vx;
+						final double initY = circle.vy;
 						
 						public void timingEvent(float fraction, 
 									Object subject, Animation.Dimension dim){
 						    Glyph g = (Glyph)subject;
 						    
 						    g.moveTo(initX,
-							     Float.valueOf((1-fraction)*initY).longValue());
+							     Double.valueOf((1-fraction)*initY).doubleValue());
 						}
 					    },
 					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -102,15 +102,15 @@ public class TestAnimStop {
 					     circle2,
 					     Animation.Dimension.POSITION,
 					     new DefaultTimingHandler(){
-						 final long initX = circle2.vx;
-						 final long initY = circle2.vy;
+						 final double initX = circle2.vx;
+						 final double initY = circle2.vy;
 						 
 						 public void timingEvent(float fraction, 
 									 Object subject, Animation.Dimension dim){
 						     Glyph g = (Glyph)subject;
 						     
 						     g.moveTo(initX,
-							      Float.valueOf((1-fraction)*initY).longValue());
+							      Double.valueOf((1-fraction)*initY).doubleValue());
 						 }
 					     },
 					     new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -149,13 +149,11 @@ public class TestAnimStop {
     class MyEventHandler implements ViewEventHandler{
 	TestAnimStop application;
 
-	long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+	int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
 
 	MyEventHandler(TestAnimStop appli){
 	    application=appli;
 	}
-
-	long x1,x2,y1,y2;
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 
@@ -206,16 +204,16 @@ public class TestAnimStop {
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	    if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 		Camera c=application.vsm.getActiveCamera();
-		float a=(c.focal+Math.abs(c.altitude))/c.focal;
+		double a=(c.focal+Math.abs(c.altitude))/c.focal;
 		if (mod == META_SHIFT_MOD) {
 		    application.vsm.getAnimationManager().setXspeed(0);
 		    application.vsm.getAnimationManager().setYspeed(0);
-		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
 		    //50 is just a speed factor (too fast otherwise)
 		}
 		else {
-		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/50.0f)) : ((jpx-lastJPX)/(a*50)));
+		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
 		    application.vsm.getAnimationManager().setZspeed(0);
 		}
 	    }
@@ -223,7 +221,7 @@ public class TestAnimStop {
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	    Camera c=application.vsm.getActiveCamera();
-	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	    double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (wheelDirection == WHEEL_UP){
 		c.altitudeOffset(-a*5);
 		application.vsm.repaintNow();

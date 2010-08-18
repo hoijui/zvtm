@@ -69,7 +69,7 @@ public class RImage extends VImage {
      *@param img image to be displayed
      *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public RImage(long x,long y, int z,Image img, float alpha){
+    public RImage(double x,double y, int z,Image img, float alpha){
         super(x, y, z, img, 1.0, alpha);
         this.image = createReflection(img);
     }
@@ -82,7 +82,7 @@ public class RImage extends VImage {
      *@param scale scaleFactor w.r.t original image size
      *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      */
-    public RImage(long x, long y, int z, Image img, double scale, float alpha){
+    public RImage(double x, double y, int z, Image img, double scale, float alpha){
         super(x, y, z, img, scale, alpha);
         this.image = createReflection(img);
     }
@@ -96,7 +96,7 @@ public class RImage extends VImage {
      *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
      *@param hir true if height measurement should include mirrored version of the image (doubles the image's height) - defaults to false
      */
-    public RImage(long x, long y, int z, Image img, double scale, float alpha, boolean hir){
+    public RImage(double x, double y, int z, Image img, double scale, float alpha, boolean hir){
         super(x, y, z, img, scale, alpha);
         this.image = createReflection(img);
         this.irihc = hir;
@@ -119,7 +119,7 @@ public class RImage extends VImage {
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
     
-    public long getHeight(){
+    public double getHeight(){
         return (irihc) ? vh : vh/2;
     }
     

@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.ImageIcon;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
@@ -61,7 +62,9 @@ public class AllGlyphsTest {
         // reference frame
         for (int i=0;i<6;i++){
             for (int j=0;j<15;j++){
-                vs.addGlyph(new VRectangle(i*40,j*40,0,20,20,Color.GRAY, Color.LIGHT_GRAY));
+                Glyph g = new VRectangle(i*40,j*40,0,20,20,Color.GRAY, Color.LIGHT_GRAY);
+                g.setSensitivity(false);
+                vs.addGlyph(g);
             }
         }
         // circles
@@ -100,21 +103,21 @@ public class AllGlyphsTest {
         d.addCbCurve(-40, 20, -40, 0, 0, 20, false);
         vs.addGlyph(d);
         // polygons
-        LongPoint[] vertices = {new LongPoint(-20,120), new LongPoint(0,140), new LongPoint(20,120), new LongPoint(0,100)};
+        Point2D.Double[] vertices = {new Point2D.Double(-20,120), new Point2D.Double(0,140), new Point2D.Double(20,120), new Point2D.Double(0,100)};
         FPolygon fp = new FPolygon(vertices, Color.WHITE);
         vs.addGlyph(fp);
-        LongPoint[] vertices2 = {new LongPoint(0,0), new LongPoint(20,20), new LongPoint(40,0), new LongPoint(20,-20)};
+        Point2D.Double[] vertices2 = {new Point2D.Double(0,0), new Point2D.Double(20,20), new Point2D.Double(40,0), new Point2D.Double(20,-20)};
         fp = new FPolygon(vertices2, Color.RED);
         fp.moveTo(40, 120);
         vs.addGlyph(fp);
-        LongPoint[] vertices3 = {new LongPoint(60,120), new LongPoint(80,140), new LongPoint(100,120), new LongPoint(80,100)};
+        Point2D.Double[] vertices3 = {new Point2D.Double(60,120), new Point2D.Double(80,140), new Point2D.Double(100,120), new Point2D.Double(80,100)};
         VPolygon vp = new VPolygon(vertices3, 0, Color.BLUE);
         vs.addGlyph(vp);
-        LongPoint[] vertices4 = {new LongPoint(0,0), new LongPoint(20,20), new LongPoint(40,0), new LongPoint(20,-20)};
+        Point2D.Double[] vertices4 = {new Point2D.Double(0,0), new Point2D.Double(20,20), new Point2D.Double(40,0), new Point2D.Double(20,-20)};
         vp = new VPolygon(vertices4, 0, Color.GREEN);
         vp.moveTo(120, 120);
         vs.addGlyph(vp);
-        LongPoint[] vertices5 = {new LongPoint(0,0), new LongPoint(10,10), new LongPoint(20,0), new LongPoint(10,-10)};
+        Point2D.Double[] vertices5 = {new Point2D.Double(0,0), new Point2D.Double(10,10), new Point2D.Double(20,0), new Point2D.Double(10,-10)};
         vp = new VPolygon(vertices5, 0, Color.YELLOW);
         vp.moveTo(160, 120);
         vp.sizeTo(20);
@@ -212,14 +215,14 @@ public class AllGlyphsTest {
         rr.setHeight(10);
         vs.addGlyph(rr);
         // segments
-        VSegment sg = new VSegment(-20, 420, 0, Color.WHITE, 20, 460);
+        VSegment sg = new VSegment(-20, 420, 20, 460, 0, Color.WHITE);
         vs.addGlyph(sg);
-        sg = new VSegment(-20, 420, 0, Color.RED, 20, 460);
+        sg = new VSegment(-20, 420, 20, 460, 0, Color.RED);
         sg.moveTo(40, 440);
         vs.addGlyph(sg);
-        sg = new VSegment(80, 440, 0, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f, Color.BLUE);
+        sg = new VSegment(80, 440, 0, Color.BLUE, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f);
         vs.addGlyph(sg);
-        sg = new VSegment(0, 0, 0, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f, Color.GREEN);
+        sg = new VSegment(0, 0, 0, Color.GREEN, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f);
         sg.moveTo(120, 440);
         vs.addGlyph(sg);
         // slices and rings
@@ -260,7 +263,7 @@ public class AllGlyphsTest {
     }
     
     void translate(){
-        LongPoint translation = new LongPoint(400, -200);
+        Point2D.Double translation = new Point2D.Double(400, -200);
         AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
         for (Glyph g:vs.getAllGlyphs()){
             Animation a = af.createGlyphTranslation(1000, g, translation, true, SlowInSlowOutInterpolator.getInstance(), null);
@@ -324,7 +327,7 @@ class TestEventHandler extends DefaultEventHandler {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
             Camera c = test.mCam;
-            float a=(c.focal+Math.abs(c.altitude))/c.focal;
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
             VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
             VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
         }
@@ -332,7 +335,7 @@ class TestEventHandler extends DefaultEventHandler {
     
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
         Camera c = test.mCam;
-        float a=(c.focal+Math.abs(c.altitude))/c.focal;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (wheelDirection == WHEEL_DOWN){
             c.altitudeOffset(-a*5);
             VirtualSpaceManager.INSTANCE.repaintNow();
@@ -342,6 +345,14 @@ class TestEventHandler extends DefaultEventHandler {
             c.altitudeOffset(a*5);
             VirtualSpaceManager.INSTANCE.repaintNow();
         }
+    }
+    
+    public void enterGlyph(Glyph g){
+        g.highlight(true, null);
+    }
+
+    public void exitGlyph(Glyph g){
+        g.highlight(false, null);
     }
     
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){

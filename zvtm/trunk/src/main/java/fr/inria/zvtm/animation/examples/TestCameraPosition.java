@@ -91,15 +91,15 @@ public class TestCameraPosition {
 						circle,
 						Animation.Dimension.POSITION,
 						new DefaultTimingHandler(){
-						    final long initX = circle.vx;
-						    final long initY = circle.vy;
+						    final double initX = circle.vx;
+						    final double initY = circle.vy;
 
 						    public void timingEvent(float fraction, 
 									    Object subject, Animation.Dimension dim){
 							Glyph g = (Glyph)subject;
 							
 							g.moveTo(initX,
-								 Float.valueOf((1-fraction)*initY).longValue());
+								 Double.valueOf((1-fraction)*initY).doubleValue());
 						    }
 						},
 						new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
@@ -132,13 +132,9 @@ public class TestCameraPosition {
     class MyEventHandler implements ViewEventHandler{
 	TestCameraPosition application;
 
-	long lastX,lastY;    //remember last mouse coords to compute translation  (dragging)
-
 	MyEventHandler(TestCameraPosition appli){
 	    application=appli;
 	}
-
-	long x1,x2,y1,y2;
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 
@@ -151,26 +147,26 @@ public class TestCameraPosition {
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	    //Animate from the current position to the target position 
 	    //over the course of a second
-	    final long sx = vsm.getVirtualSpace("src").getCamera(0).posx;
-	    final long sy = vsm.getVirtualSpace("src").getCamera(0).posy;
-	    final long ex = v.getVCursor().vx;
-	    final long ey = v.getVCursor().vy;
+	    final double sx = vsm.getVirtualSpace("src").getCamera(0).posx;
+	    final double sy = vsm.getVirtualSpace("src").getCamera(0).posy;
+	    final double ex = v.getVCursor().vx;
+	    final double ey = v.getVCursor().vy;
 
 	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animation.RepeatBehavior.LOOP,
 						 vsm.getVirtualSpace("src").getCamera(0),
 						 Animation.Dimension.POSITION,
 						  new DefaultTimingHandler(){
-						      final long startX = sx;
-						      final long startY = sy;
-						      final long endX = ex;
-						      final long endY = ey;
+						      final double startX = sx;
+						      final double startY = sy;
+						      final double endX = ex;
+						      final double endY = ey;
 
 						      public void timingEvent(float fraction, 
 									      Object subject, Animation.Dimension dim){
 							  Camera c = (Camera)subject;
 							  
-							  c.moveTo((long)(fraction*(endX-startX))+startX,
-								   (long)(fraction*(endY-startY))+startY);
+							  c.moveTo((fraction*(endX-startX))+startX,
+								   (fraction*(endY-startY))+startY);
 						      }},
 						 SlowInSlowOutInterpolator.getInstance());
 
@@ -178,12 +174,12 @@ public class TestCameraPosition {
 						    vsm.getVirtualSpace("src").getCamera(0),
 						    Animation.Dimension.ALTITUDE,
 						    new DefaultTimingHandler(){
-							final float initZ = vsm.getVirtualSpace("src").getCamera(0).getAltitude();
+							final double initZ = vsm.getVirtualSpace("src").getCamera(0).getAltitude();
 							public void timingEvent(float fraction, 
 										Object subject, Animation.Dimension dim){
 							    Camera c = (Camera)subject;
 							    
-							    c.setAltitude((float)(initZ + 0.25*initZ*Math.sin(Math.PI * fraction)));
+							    c.setAltitude((initZ + 0.25*initZ*Math.sin(Math.PI * fraction)));
 							}
 
 							@Override public void end(Object subject, 
@@ -236,7 +232,7 @@ public class TestCameraPosition {
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	    Camera c=application.vsm.getActiveCamera();
-	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	    double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (wheelDirection == WHEEL_UP){
 		c.altitudeOffset(-a*5);
 		application.vsm.repaintNow();

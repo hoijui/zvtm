@@ -49,11 +49,11 @@ public class VImage extends ClosedShape implements RectangularShape {
     public static final short DRAW_BORDER_ALWAYS = 2;
 
     /** Half width in virtual space (read-only). */
-    public long vw;
+    public double vw;
     /** Half height in virtual space (read-only). */
-    public long vh;
+    public double vh;
     /** Aspect ratio: width divided by height (read-only). */
-    public float ar;
+    public double ar;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;
@@ -73,10 +73,10 @@ public class VImage extends ClosedShape implements RectangularShape {
     public boolean zoomSensitive = true;
 
     /** For internal use. Made public for easier outside package subclassing. */
-    public float scaleFactor = 1.0f;
+    public double scaleFactor = 1.0f;
     
     /** For internal use. Made public for easier outside package subclassing. */
-    public float trueCoef = 1.0f;
+    public double trueCoef = 1.0f;
 
     /** Construct an image at (0, 0) with original scale.
      *@param img image to be displayed
@@ -91,7 +91,7 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param img image to be displayed
      */
-    public VImage(long x,long y, int z,Image img){
+    public VImage(double x,double y, int z,Image img){
         this(x, y, z, img, 1.0, 1.0f);
     }
 
@@ -102,7 +102,7 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@param img image to be displayed
      *@param scale scaleFactor w.r.t original image size
      */
-    public VImage(long x, long y, int z, Image img, double scale){
+    public VImage(double x, double y, int z, Image img, double scale){
         this(x, y, z, img, scale, 1.0f);
     }
     
@@ -114,19 +114,19 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@param scale scaleFactor w.r.t original image size
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VImage(long x, long y, int z, Image img, double scale, float alpha){
+    public VImage(double x, double y, int z, Image img, double scale, float alpha){
         vx = x;
         vy = y;
         vz = z;
         image = img;
-        vw = Math.round(image.getWidth(null) * scale / 2.0);
-        vh = Math.round(image.getHeight(null) * scale / 2.0);
+        vw = image.getWidth(null) * scale / 2.0d;
+        vh = image.getHeight(null) * scale / 2.0d;
         if (vw==0 && vh==0){ar = 1.0f;}
-        else {ar = (float)vw/(float)vh;}
+        else {ar = vw/vh;}
         computeSize();
         orient = 0;
         setBorderColor(Color.black);
-        scaleFactor = (float)scale;
+        scaleFactor = scale;
         setTranslucencyValue(alpha);
     }
 
@@ -173,75 +173,75 @@ public class VImage extends ClosedShape implements RectangularShape {
 	borderColor = bColor;
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
     /** For internal use. */
     public void computeSize(){
-        size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+        size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    public void setWidth(long w){
-	vw=w;
-	vh=Math.round((float)vw/ar);
-	computeSize();
-	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setWidth(double w){
+        vw = w;
+        vh = vw / ar;
+        computeSize();
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setHeight(long h){
-	vh=h;
-	vw=Math.round(vh*ar);
-	computeSize();
-	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setHeight(double h){
+        vh = h;
+        vw = vh * ar;
+        computeSize();
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public long getWidth(){return vw;}
+    public double getWidth(){return vw;}
 
-    public long getHeight(){return vh;}
+    public double getHeight(){return vh;}
 
-    public void sizeTo(float radius){
-	size=radius;
-	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
-	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        size = radius;
+        vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
+        vh = size / (Math.sqrt(Math.pow(ar,2)+1));
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){
-	size*=factor;
-	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
-	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	scaleFactor=(float)(size/Math.sqrt(Math.pow(image.getWidth(null)/2,2)+Math.pow(image.getHeight(null)/2,2)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size *= factor;
+        vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
+        vh = size / (Math.sqrt(Math.pow(ar,2)+1));
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public long[] getBounds(){
-		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+	public double[] getBounds(){
+		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
 	}
 
     /** Set bitmap image to be displayed. */
     public void setImage(Image i){
-	image=i;
-	vw = Math.round(image.getWidth(null) * scaleFactor / 2.0);
-	vh = Math.round(image.getHeight(null) * scaleFactor / 2.0);
-	ar=(float)vw/(float)vh;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+        image=i;
+        vw = image.getWidth(null) * scaleFactor / 2.0;
+        vh = image.getHeight(null) * scaleFactor / 2.0;
+        ar = vw / vh;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the bitmap image displayed. */
     public Image getImage(){
-	return image;
+	    return image;
     }
 
     /** Set to false if the image should not be scaled according to camera's altitude. Its size can still be changed, but its apparent size will always be the same, no matter the camera's altitude.
@@ -258,30 +258,31 @@ public class VImage extends ClosedShape implements RectangularShape {
      *@see #setZoomSensitive(boolean b)
      */
     public boolean isZoomSensitive(){
-	return zoomSensitive;
+	    return zoomSensitive;
     }
 
     /** Should a border be drawn around the bitmap image.
      *@param p one of DRAW_BORDER_*
      */
     public void setDrawBorderPolicy(short p){
-	if (drawBorder!=p){
-	    drawBorder=p;
-	    VirtualSpaceManager.INSTANCE.repaintNow();
-	}
+        if (drawBorder!=p){
+            drawBorder=p;
+            VirtualSpaceManager.INSTANCE.repaintNow();
+        }
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
-	return false; //can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
+    public boolean fillsView(double w,double h,int camIndex){
+        //can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
+	    return false;
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
             (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
         else {return false;}
     }
 
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -295,11 +296,11 @@ public class VImage extends ClosedShape implements RectangularShape {
         return false;
     }
     
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -322,39 +323,39 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project width and height
-	if (zoomSensitive){
-	    pc[i].cw = Math.round(vw*coef);
-	    pc[i].ch = Math.round(vh*coef);
-	}
-	else{
-	    pc[i].cw = (int)vw;
-	    pc[i].ch = (int)vh;
-	}
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project width and height
+        if (zoomSensitive){
+            pc[i].cw = (int)Math.round(vw*coef);
+            pc[i].ch = (int)Math.round(vh*coef);
+        }
+        else{
+            pc[i].cw = (int)vw;
+            pc[i].ch = (int)vh;
+        }
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i = c.getIndex();
-	coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-	pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
-	//project width and height
-	if (zoomSensitive){
-	    pc[i].lcw = Math.round(vw*coef);
-	    pc[i].lch = Math.round(vh*coef);
-	}
-	else {
-	    pc[i].lcw = (int)vw;
-	    pc[i].lch = (int)vh;
-	}
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i = c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
+        //project width and height
+        if (zoomSensitive){
+            pc[i].lcw = (int)Math.round(vw*coef);
+            pc[i].lch = (int)Math.round(vh*coef);
+        }
+        else {
+            pc[i].lcw = (int)vw;
+            pc[i].lch = (int)vh;
+        }
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -524,15 +525,15 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-	VImage res=new VImage(vx,vy,0,image);
-	res.setWidth(vw);
-	res.setHeight(vh);
-	res.borderColor=this.borderColor;
-	res.cursorInsideColor=this.cursorInsideColor;
-	res.bColor=this.bColor;
-	res.setDrawBorderPolicy(drawBorder);
-	res.setZoomSensitive(zoomSensitive);
-	return res;
+        VImage res=new VImage(vx,vy,0,image);
+        res.setWidth(vw);
+        res.setHeight(vh);
+        res.borderColor=this.borderColor;
+        res.cursorInsideColor=this.cursorInsideColor;
+        res.bColor=this.bColor;
+        res.setDrawBorderPolicy(drawBorder);
+        res.setZoomSensitive(zoomSensitive);
+        return res;
     }
 
 }

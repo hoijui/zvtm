@@ -71,48 +71,48 @@ public class DraggableCameraPortal extends CameraPortal {
     }
 
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-		if (!visible){return;}
- 	g2d.setClip(x, y, w, h);
-	if (bkgColor != null){
-	    g2d.setColor(bkgColor);
-	    g2d.fillRect(x, y, w, h);
-	}
-	standardStroke = g2d.getStroke();
-	// be sure to call the translate instruction before getting the standard transform
-	// as the latter's matrix is preconcatenated to the translation matrix of glyphs
-	// that use AffineTransforms for translation
-	standardTransform = g2d.getTransform();
-	drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
-	synchronized(drawnGlyphs){
-	    drawnGlyphs.removeAllElements();
-	    uncoef = (float)((camera.focal+camera.altitude) / camera.focal);
-	    //compute region seen from this view through camera
-	    viewWC = (long)(camera.posx - (w/2)*uncoef);
-	    viewNC = (long)(camera.posy + (h/2)*uncoef);
-	    viewEC = (long)(camera.posx + (w/2)*uncoef);
-	    viewSC = (long)(camera.posy - (h/2)*uncoef);
-	    gll = cameraSpace.getDrawingList();
-	    for (int i=0;i<gll.length;i++){
-		if (gll[i] != null){
-		    synchronized(gll[i]){
-			if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
-			    //if glyph is at least partially visible in the reg. seen from this view, display
-			    gll[i].project(camera, size); // an invisible glyph should still be projected
-			    if (gll[i].isVisible()){      // as it can be sensitive
-				gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
-			    }
-			}
-		    }
-		}
-	    }
-	}
- 	g2d.setClip(0, 0, viewWidth, viewHeight);
-	g2d.setColor(barColor);
-	g2d.fillRect(x, y, w, barHeight);
-	if (borderColor != null){
-	    g2d.setColor(borderColor);
-	    g2d.drawRect(x, y, w, h);
-	}
+        if (!visible){return;}
+        g2d.setClip(x, y, w, h);
+        if (bkgColor != null){
+            g2d.setColor(bkgColor);
+            g2d.fillRect(x, y, w, h);
+        }
+        standardStroke = g2d.getStroke();
+        // be sure to call the translate instruction before getting the standard transform
+        // as the latter's matrix is preconcatenated to the translation matrix of glyphs
+        // that use AffineTransforms for translation
+        standardTransform = g2d.getTransform();
+        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
+        synchronized(drawnGlyphs){
+            drawnGlyphs.removeAllElements();
+            uncoef = (camera.focal+camera.altitude) / camera.focal;
+            //compute region seen from this view through camera
+            viewWC = camera.posx - (w/2) * uncoef;
+            viewNC = camera.posy + (h/2) * uncoef;
+            viewEC = camera.posx + (w/2) * uncoef;
+            viewSC = camera.posy - (h/2) * uncoef;
+            gll = cameraSpace.getDrawingList();
+            for (int i=0;i<gll.length;i++){
+                if (gll[i] != null){
+                    synchronized(gll[i]){
+                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
+                            //if glyph is at least partially visible in the reg. seen from this view, display
+                            gll[i].project(camera, size); // an invisible glyph should still be projected
+                            if (gll[i].isVisible()){      // as it can be sensitive
+                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        g2d.setClip(0, 0, viewWidth, viewHeight);
+        g2d.setColor(barColor);
+        g2d.fillRect(x, y, w, barHeight);
+        if (borderColor != null){
+            g2d.setColor(borderColor);
+            g2d.drawRect(x, y, w, h);
+        }
     }
 
 }

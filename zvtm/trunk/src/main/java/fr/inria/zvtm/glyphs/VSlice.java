@@ -17,11 +17,11 @@ import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjSlice;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
@@ -42,16 +42,16 @@ public class VSlice extends ClosedShape {
     public static final double DEG2RAD_FACTOR = Utilities.TWO_PI / 360.0;
 
     /*2nd point (arc end point)*/
-    public LongPoint p1 = new LongPoint(0,0);
+    public Point2D.Double p1 = new Point2D.Double(0,0);
     /*3rd point (arc end point)*/
-    public LongPoint p2 = new LongPoint(0,0);
+    public Point2D.Double p2 = new Point2D.Double(0,0);
     /*1st point corresponding to the outer triangle (near 2nd point)*/
-    public LongPoint p3 = new LongPoint(0,0);
+    public Point2D.Double p3 = new Point2D.Double(0,0);
     /*2nd point corresponding to the outer triangle (near 3rd point)*/
-    public LongPoint p4 = new LongPoint(0,0);
+    public Point2D.Double p4 = new Point2D.Double(0,0);
 
     /*radius in virtual space (equal to bounding circle radius since this is a circle)*/
-    public long vr;
+    public double vr;
 
     public double angle;
     public double orient;
@@ -64,8 +64,8 @@ public class VSlice extends ClosedShape {
         vx = 0;
         vy = 0;
         vz = 0;
-        p1 = new LongPoint(10, 10);
-        p2 = new LongPoint(-10, 10);
+        p1 = new Point2D.Double(10, 10);
+        p2 = new Point2D.Double(-10, 10);
         computeSize();
         computeOrient();
         computeAngle();
@@ -84,7 +84,7 @@ public class VSlice extends ClosedShape {
         *@param c fill color
         *@param bc border color
         */
-    public VSlice(long x, long y, int z, long vs, double ag, double or, Color c, Color bc){
+    public VSlice(double x, double y, int z, double vs, double ag, double or, Color c, Color bc){
         this(x, y, z, vs, ag, or, c, bc, 1.0f);
     }
     
@@ -99,7 +99,7 @@ public class VSlice extends ClosedShape {
         *@param bc border color
         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
-    public VSlice(long x, long y, int z, long vs, double ag, double or, Color c, Color bc, float alpha){
+    public VSlice(double x, double y, int z, double vs, double ag, double or, Color c, Color bc, float alpha){
 		initCoordArray(3);	
         vx = x;
         vy = y;
@@ -127,7 +127,7 @@ public class VSlice extends ClosedShape {
         *@param c fill color
         *@param bc border color
         */
-    public VSlice(long x, long y, int z, long vs, int ag, int or, Color c, Color bc){
+    public VSlice(double x, double y, int z, double vs, int ag, int or, Color c, Color bc){
         this(x, y, z, vs, ag, or, c, bc, 1.0f);
     }
     
@@ -142,7 +142,7 @@ public class VSlice extends ClosedShape {
         *@param bc border color
         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
-    public VSlice(long x, long y, int z, long vs, int ag, int or, Color c, Color bc, float alpha){
+    public VSlice(double x, double y, int z, double vs, int ag, int or, Color c, Color bc, float alpha){
 		initCoordArray(3);	
         vx = x;
         vy = y;
@@ -166,9 +166,9 @@ public class VSlice extends ClosedShape {
 	    ypcoords = new int[n];
 	}
 	
-	public void moveTo(long x, long y){
-	    p1.translate(x-vx, y-vy);
-	    p2.translate(x-vx, y-vy);
+	public void moveTo(double x, double y){
+	    p1.setLocation(x, y);
+	    p2.setLocation(x, y);
 	    super.moveTo(x, y);
 	    computeSize();
         computeOrient();
@@ -177,9 +177,9 @@ public class VSlice extends ClosedShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-	public void move(long x, long y){
-	    p1.translate(x, y);
-	    p2.translate(x, y);
+	public void move(double x, double y){
+	    p1.setLocation(x+vx, y+vy);
+	    p2.setLocation(x+vx, y+vy);
 	    super.move(x, y);
 	    computeSize();
         computeOrient();
@@ -188,61 +188,63 @@ public class VSlice extends ClosedShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-	/** FOR INTERNAL USE ONLY */
+    /** FOR INTERNAL USE ONLY */
     public void computeSize(){
-	size = (float)Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
-	vr = Math.round(size);
+        size = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
+        vr = size;
     }
 
-	/** FOR INTERNAL USE ONLY */
+    /** FOR INTERNAL USE ONLY */
     public void computeOrient(){
-	double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
-	double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
-	double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
-	// was initially (360/(4*Math.PI)) * (a1 + a2) / 2.0
-	orient = (a1 + a2) / 2.0;
-	orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
+        double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
+        double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
+        double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
+        // was initially (360/(4*Math.PI)) * (a1 + a2) / 2.0
+        orient = (a1 + a2) / 2.0;
+        orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
     }
 
-	/** FOR INTERNAL USE ONLY */
-	public void computeAngle(){
-	double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
-	double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
-	double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
-	angle = a2 - a1;
-	angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
+    /** FOR INTERNAL USE ONLY */
+    public void computeAngle(){
+        double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
+        double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
+        double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
+        angle = a2 - a1;
+        angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
     }
 
-	/** FOR INTERNAL USE ONLY */
+    /** FOR INTERNAL USE ONLY */
     public void computeSliceEdges(){
-	p1.x = Math.round(Math.cos(orient-angle/2.0)*size) + vx;
-	p1.y = Math.round(Math.sin(orient-angle/2.0)*size) + vy;
-	p2.x = Math.round(Math.cos(orient+angle/2.0)*size) + vx;
-	p2.y = Math.round(Math.sin(orient+angle/2.0)*size) + vy;
+        p1.x = Math.cos(orient-angle/2.0)*size + vx;
+        p1.y = Math.sin(orient-angle/2.0)*size + vy;
+        p2.x = Math.cos(orient+angle/2.0)*size + vx;
+        p2.y = Math.sin(orient+angle/2.0)*size + vy;
     }
 
-	/** FOR INTERNAL USE ONLY */
+    /** FOR INTERNAL USE ONLY */
     public void computePolygonEdges(){
-	if (angle < Math.PI){
-	    p3.x = vx + Math.round((p1.x-vx)/Math.cos(angle/2.0));
-	    p3.y = vy + Math.round((p1.y-vy)/Math.cos(angle/2.0));
-	    p4.x = vx + Math.round((p2.x-vx)/Math.cos(angle/2.0));
-	    p4.y = vy + Math.round((p2.y-vy)/Math.cos(angle/2.0));
-	}
-	else if (angle > Math.PI){// if angle >= PI a triangle cannot be used to model the bounding polygon
-	    p3.x = vx - Math.round((p1.x-vx)/Math.cos(angle/2.0)); // compute coordInside by checking that 
-	    p3.y = vy - Math.round((p1.y-vy)/Math.cos(angle/2.0)); // point is in circle and *not* inside triangle
-	    p4.x = vx - Math.round((p2.x-vx)/Math.cos(angle/2.0)); // (triangle modeling the part not covered by
-	    p4.y = vy - Math.round((p2.y-vy)/Math.cos(angle/2.0)); // the slice)
-	}
-	else {// angle == Math.PI  - case of zero division
-	    p3.x = p1.x;
-	    p3.y = p1.y;
-	    p4.x = p2.x;
-	    p4.y = p2.y;
-	}
+        if (angle < Math.PI){
+            p3.x = vx + (p1.x-vx)/Math.cos(angle/2.0);
+            p3.y = vy + (p1.y-vy)/Math.cos(angle/2.0);
+            p4.x = vx + (p2.x-vx)/Math.cos(angle/2.0);
+            p4.y = vy + (p2.y-vy)/Math.cos(angle/2.0);
+        }
+        else if (angle > Math.PI){
+            // if angle >= PI a triangle cannot be used to model the bounding polygon
+            p3.x = vx - (p1.x-vx)/Math.cos(angle/2.0); // compute coordInside by checking that 
+            p3.y = vy - (p1.y-vy)/Math.cos(angle/2.0); // point is in circle and *not* inside triangle
+            p4.x = vx - (p2.x-vx)/Math.cos(angle/2.0); // (triangle modeling the part not covered by
+            p4.y = vy - (p2.y-vy)/Math.cos(angle/2.0); // the slice)
+        }
+        else {
+            // angle == Math.PI  - case of zero division
+            p3.x = p1.x;
+            p3.y = p1.y;
+            p4.x = p2.x;
+            p4.y = p2.y;
+        }
     }
-    
+
     public void initCams(int nbCam){
 	pc = new ProjSlice[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -286,42 +288,42 @@ public class VSlice extends ClosedShape {
 	borderColor = bColor;
     }
 
-    public void sizeTo(float sz){
-	size = sz;
-	vr = Math.round(size);
-	computeSliceEdges();
-	computePolygonEdges();
-    VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double sz){
+        size = sz;
+        vr = size;
+        computeSliceEdges();
+        computePolygonEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){
-	size *= factor;
-	vr = Math.round(size);
-	computeSliceEdges();
-	computePolygonEdges();
-    VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size *= factor;
+        vr = size;
+        computeSliceEdges();
+        computePolygonEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the slice's orientation.
      *@param ag slice orientation in virtual space, interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc (bisector of the main angle). In [0:2Pi[
      */
-    public void orientTo(float ag){
-	orient = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
-	orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
-	computeSliceEdges();
-	computePolygonEdges();
-    VirtualSpaceManager.INSTANCE.repaintNow();
+    public void orientTo(double ag){
+        orient = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
+        orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
+        computeSliceEdges();
+        computePolygonEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Set the arc angle.
      *@param ag in [0:2Pi[
      */
     public void setAngle(double ag){
-	angle = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
-	angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
-	computeSliceEdges();
-	computePolygonEdges();
-    VirtualSpaceManager.INSTANCE.repaintNow();
+        angle = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
+        angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
+        computeSliceEdges();
+        computePolygonEdges();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the arc angle.
@@ -331,21 +333,21 @@ public class VSlice extends ClosedShape {
 	return angle;
     }
 
-    public float getSize(){
+    public double getSize(){
 	return size;
     }
 
     /** Get the slice's orientation.
      *@return slice's orientation in virtual space, interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc (bisector of the main angle). In [0:2Pi[
      */
-    public float getOrient(){return (float)orient;}
+    public double getOrient(){return orient;}
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
 	//XXX: TBW (call coordInside() for the four view corners)
 	return false;
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx, 2)+Math.pow(jpy-pc[camIndex].cy, 2)) <= pc[camIndex].outerCircleRadius){
             // see computePolygonEdges() for an explanation of the following tests
             if (angle < Math.PI && pc[camIndex].boundingPolygon.contains(jpx, jpy) ||
@@ -378,7 +380,7 @@ public class VSlice extends ClosedShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr)){
 		    if (angle < Math.PI && pc[camIndex].boundingPolygon.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr) ||
     		    angle > Math.PI && !pc[camIndex].boundingPolygon.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr) ||
@@ -390,7 +392,7 @@ public class VSlice extends ClosedShape {
 	    return false;
 	}
 	
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -415,69 +417,69 @@ public class VSlice extends ClosedShape {
     //XXX: visibleInRegion() could be slightly optimized for VSlice (what about containedInRegion() ?)
 
     public void project(Camera c, Dimension d){
-	int i = c.getIndex();
-	coef = (float)(c.focal / (c.focal + c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	int hw = d.width/2;
-	int hh = d.height/2;
-	pc[i].cx = hw + Math.round((vx-c.posx) * coef);
-	pc[i].cy = hh - Math.round((vy-c.posy) * coef);
-	// do the same for other points
-	pc[i].p1x = hw + Math.round((p1.x-c.posx) * coef);
-	pc[i].p1y = hh - Math.round((p1.y-c.posy) * coef);
-	pc[i].p2x = hw + Math.round((p2.x-c.posx) * coef);
-	pc[i].p2y = hh - Math.round((p2.y-c.posy) * coef);
-	xpcoords[0] = pc[i].cx;
-	ypcoords[0] = pc[i].cy;
-	xpcoords[1] = hw + Math.round((p3.x-c.posx) * coef);
-	ypcoords[1] = hh - Math.round((p3.y-c.posy) * coef);
-	xpcoords[2] = hw + Math.round((p4.x-c.posx) * coef);
-	ypcoords[2] = hh - Math.round((p4.y-c.posy) * coef);
-	if (pc[i].boundingPolygon == null){
-	    pc[i].boundingPolygon = new Polygon(xpcoords, ypcoords, 3);
-	}
-	else {
-	    for (int j=0;j<xpcoords.length;j++){
-		pc[i].boundingPolygon.xpoints[j] = xpcoords[j];
-		pc[i].boundingPolygon.ypoints[j] = ypcoords[j];
-	    }
-	    pc[i].boundingPolygon.invalidate();
-	}
-	pc[i].outerCircleRadius = Math.round(size * coef);
+        int i = c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        int hw = d.width/2;
+        int hh = d.height/2;
+        pc[i].cx = hw + (int)Math.round((vx-c.posx) * coef);
+        pc[i].cy = hh - (int)Math.round((vy-c.posy) * coef);
+        // do the same for other points
+        pc[i].p1x = hw + (int)Math.round((p1.x-c.posx) * coef);
+        pc[i].p1y = hh - (int)Math.round((p1.y-c.posy) * coef);
+        pc[i].p2x = hw + (int)Math.round((p2.x-c.posx) * coef);
+        pc[i].p2y = hh - (int)Math.round((p2.y-c.posy) * coef);
+        xpcoords[0] = pc[i].cx;
+        ypcoords[0] = pc[i].cy;
+        xpcoords[1] = hw + (int)Math.round((p3.x-c.posx) * coef);
+        ypcoords[1] = hh - (int)Math.round((p3.y-c.posy) * coef);
+        xpcoords[2] = hw + (int)Math.round((p4.x-c.posx) * coef);
+        ypcoords[2] = hh - (int)Math.round((p4.y-c.posy) * coef);
+        if (pc[i].boundingPolygon == null){
+            pc[i].boundingPolygon = new Polygon(xpcoords, ypcoords, 3);
+        }
+        else {
+            for (int j=0;j<xpcoords.length;j++){
+                pc[i].boundingPolygon.xpoints[j] = xpcoords[j];
+                pc[i].boundingPolygon.ypoints[j] = ypcoords[j];
+            }
+            pc[i].boundingPolygon.invalidate();
+        }
+        pc[i].outerCircleRadius = (int)Math.round(size * coef);
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i = c.getIndex();
-	coef = (float)(c.focal / (c.focal + c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	int hw = lensWidth/2;
-	int hh = lensHeight/2;
-	pc[i].lcx = hw + Math.round((vx-lensx) * coef);
-	pc[i].lcy = hh - Math.round((vy-lensy) * coef);
-	// do the same for other points
-	pc[i].lp1x = hw + Math.round((p1.x-lensx) * coef);
-	pc[i].lp1y = hh - Math.round((p1.y-lensy) * coef);
-	pc[i].lp2x = hw + Math.round((p2.x-lensx) * coef);
-	pc[i].lp2y = hh - Math.round((p2.y-lensy) * coef);
-	xpcoords[0] = pc[i].lcx;
-	ypcoords[0] = pc[i].lcy;
-	xpcoords[1] = hw + Math.round((p3.x-lensx) * coef);
-	ypcoords[1] = hh - Math.round((p3.y-lensy) * coef);
-	xpcoords[2] = hw + Math.round((p4.x-lensx) * coef);
-	ypcoords[2] = hh - Math.round((p4.y-lensy) * coef);
-	if (pc[i].lboundingPolygon == null){
-	    pc[i].lboundingPolygon = new Polygon(xpcoords, ypcoords, 3);
-	}
-	else {
-	    for (int j=0;j<xpcoords.length;j++){
-		pc[i].lboundingPolygon.xpoints[j] = xpcoords[j];
-		pc[i].lboundingPolygon.ypoints[j] = ypcoords[j];
-	    }
-	    pc[i].lboundingPolygon.invalidate();
-	}
-	pc[i].louterCircleRadius = Math.round(size * coef);
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i = c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        int hw = lensWidth/2;
+        int hh = lensHeight/2;
+        pc[i].lcx = hw + (int)Math.round((vx-lensx) * coef);
+        pc[i].lcy = hh - (int)Math.round((vy-lensy) * coef);
+        // do the same for other points
+        pc[i].lp1x = hw + (int)Math.round((p1.x-lensx) * coef);
+        pc[i].lp1y = hh - (int)Math.round((p1.y-lensy) * coef);
+        pc[i].lp2x = hw + (int)Math.round((p2.x-lensx) * coef);
+        pc[i].lp2y = hh - (int)Math.round((p2.y-lensy) * coef);
+        xpcoords[0] = pc[i].lcx;
+        ypcoords[0] = pc[i].lcy;
+        xpcoords[1] = hw + (int)Math.round((p3.x-lensx) * coef);
+        ypcoords[1] = hh - (int)Math.round((p3.y-lensy) * coef);
+        xpcoords[2] = hw + (int)Math.round((p4.x-lensx) * coef);
+        ypcoords[2] = hh - (int)Math.round((p4.y-lensy) * coef);
+        if (pc[i].lboundingPolygon == null){
+            pc[i].lboundingPolygon = new Polygon(xpcoords, ypcoords, 3);
+        }
+        else {
+            for (int j=0;j<xpcoords.length;j++){
+                pc[i].lboundingPolygon.xpoints[j] = xpcoords[j];
+                pc[i].lboundingPolygon.ypoints[j] = ypcoords[j];
+            }
+            pc[i].lboundingPolygon.invalidate();
+        }
+        pc[i].louterCircleRadius = (int)Math.round(size * coef);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){

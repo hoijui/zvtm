@@ -23,7 +23,6 @@ import java.awt.geom.Point2D;
 import fr.inria.zvtm.glyphs.projection.ProjPolygon;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
@@ -35,7 +34,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class VPolygon extends ClosedShape {
 
     /*height=width in virtual space*/
-    long vs;
+    double vs;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjPolygon[] pc;
@@ -51,7 +50,7 @@ public class VPolygon extends ClosedShape {
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param c fill color
         */
-    public VPolygon(LongPoint[] v, int z, Color c){
+    public VPolygon(Point2D.Double[] v, int z, Color c){
         this(v, z, c, Color.BLACK, 1.0f);
     }
 
@@ -61,7 +60,7 @@ public class VPolygon extends ClosedShape {
         *@param c fill color
         *@param bc border color
         */
-    public VPolygon(LongPoint[] v, int z, Color c, Color bc){
+    public VPolygon(Point2D.Double[] v, int z, Color c, Color bc){
         this(v, z, c, bc, 1.0f);
     }
     
@@ -72,7 +71,7 @@ public class VPolygon extends ClosedShape {
         *@param bc border color
          *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         */
-    public VPolygon(LongPoint[] v, int z, Color c, Color bc, float alpha){
+    public VPolygon(Point2D.Double[] v, int z, Color c, Color bc, float alpha){
         //should be zero here first as this is assumed when calling getCentroid
         // later to compute the centroid's coordinates several lines below
         vx = 0;
@@ -87,7 +86,7 @@ public class VPolygon extends ClosedShape {
             ycoords[i] = v[i].y;
         }
         orient = 0;
-        LongPoint ct = getCentroid();
+        Point2D.Double ct = getCentroid();
         vx = ct.x;
         vy = ct.y;
         for (int i=0;i<xcoords.length;i++){
@@ -144,67 +143,68 @@ public class VPolygon extends ClosedShape {
 	borderColor = bColor;
     }
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
     synchronized void computeSize(){
- 	size=0;
-	double f;
-	for (int i=0;i<xcoords.length;i++){//at this point, the xcoords,ycoords should contain relative vertices coordinates (w.r.t vx/vy=centroid)
-	    f=Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-	    if (f>size){size=(float)f;}
-	}
-	vs=Math.round(size);
+        size=0;
+        double f;
+        for (int i=0;i<xcoords.length;i++){
+            //at this point, the xcoords,ycoords should contain relative vertices coordinates (w.r.t vx/vy=centroid)
+            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
+            if (f>size){size=(float)f;}
+        }
+        vs = size;
     }
 
-    public synchronized void sizeTo(float radius){
-	double ratio=radius/((double)size);
- 	size=0;
-	double f;
-	for (int i=0;i<xcoords.length;i++){
-	    xcoords[i]=xcoords[i]*ratio;
-	    ycoords[i]=ycoords[i]*ratio;
-	    f=Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-	    if (f>size){size=(float)f;}
-	}
-	vs=Math.round(size);
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public synchronized void sizeTo(double radius){
+        double ratio = radius / size;
+        size = 0;
+        double f;
+        for (int i=0;i<xcoords.length;i++){
+            xcoords[i]=xcoords[i]*ratio;
+            ycoords[i]=ycoords[i]*ratio;
+            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
+            if (f>size){size=(float)f;}
+        }
+        vs = size;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public synchronized void reSize(float factor){
- 	size=0;
-	double f;
-	for (int i=0;i<xcoords.length;i++){
-	    xcoords[i]=xcoords[i]*factor;
-	    ycoords[i]=ycoords[i]*factor;
-	    f=Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-	    if (f>size){size=(float)f;}
-	}
-	vs=Math.round(size);
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public synchronized void reSize(double factor){
+        size = 0;
+        double f;
+        for (int i=0;i<xcoords.length;i++){
+            xcoords[i]=xcoords[i]*factor;
+            ycoords[i]=ycoords[i]*factor;
+            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
+            if (f>size){size=(float)f;}
+        }
+        vs = size;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
         return ((alphaC == null) &&
             (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) &&
             (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h)));
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -229,10 +229,10 @@ public class VPolygon extends ClosedShape {
     /** Get this polygon's list of vertices (relative coordinates).
      *@return relative coordinates (w.r.t polygon's centroid)
      */
-    public LongPoint[] getVertices(){
-	LongPoint[] res=new LongPoint[xcoords.length];
+    public Point2D.Double[] getVertices(){
+	Point2D.Double[] res=new Point2D.Double[xcoords.length];
 	for (int i=0;i<xcoords.length;i++){
-	    res[i]=new LongPoint(Math.round(xcoords[i]),Math.round(ycoords[i]));
+	    res[i]=new Point2D.Double(Math.round(xcoords[i]),Math.round(ycoords[i]));
 	}
 	return res;
     }
@@ -240,10 +240,10 @@ public class VPolygon extends ClosedShape {
     /** Get this polygon's list of vertices (absolute coordinates).
      *@return absolute coordinates
      */
-    public LongPoint[] getAbsoluteVertices(){
-	LongPoint[] res=new LongPoint[xcoords.length];
+    public Point2D.Double[] getAbsoluteVertices(){
+	Point2D.Double[] res=new Point2D.Double[xcoords.length];
 	for (int i=0;i<xcoords.length;i++){
-	    res[i]=new LongPoint(Math.round(xcoords[i]+vx),Math.round(ycoords[i]+vy));
+	    res[i]=new Point2D.Double(Math.round(xcoords[i]+vx),Math.round(ycoords[i]+vy));
 	}
 	return res;
     }
@@ -252,64 +252,64 @@ public class VPolygon extends ClosedShape {
      *@return a semicolon-separated string representation of all vertex absolute coordinates (x and y coordinates seperated by commas, e.g. x1,y1;x2,y2;x3,y3 etc.)
      */
     public String getVerticesAsText(){
-	StringBuffer res=new StringBuffer();
-	for (int i=0;i<xcoords.length-1;i++){
-	    res.append(Math.round(xcoords[i]+vx)+","+Math.round(ycoords[i]+vy)+";");
-	}
-	res.append(Math.round(xcoords[xcoords.length-1]+vx)+","+Math.round(ycoords[ycoords.length-1]+vy));
-	return res.toString();
+        StringBuffer res=new StringBuffer();
+        for (int i=0;i<xcoords.length-1;i++){
+            res.append(xcoords[i]+vx+","+ycoords[i]+vy+";");
+        }
+        res.append(xcoords[xcoords.length-1]+vx+","+ycoords[ycoords.length-1]+vy);
+        return res.toString();
     }
 
     public void project(Camera c, Dimension d){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude));
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-	pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
-	//project height and construct polygon
- 	pc[i].cr=Math.round(vs*coef);	
-	for (int j=0;j<xcoords.length;j++){
-	    pc[i].xpcoords[j]=(int)Math.round(pc[i].cx+xcoords[j]*coef);
-	    pc[i].ypcoords[j]=(int)Math.round(pc[i].cy-ycoords[j]*coef);
-	}
-	if (pc[i].p == null){
-	    pc[i].p = new Polygon(pc[i].xpcoords,pc[i].ypcoords,xcoords.length);
-	}
-	else {
-	    pc[i].p.npoints = xcoords.length;
-	    for (int j=0;j<xcoords.length;j++){
-		pc[i].p.xpoints[j] = pc[i].xpcoords[j];
-		pc[i].p.ypoints[j] = pc[i].ypcoords[j];
-	    }
-	    pc[i].p.invalidate();
-	}
+        int i=c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        //project height and construct polygon
+        pc[i].cr = (int)Math.round(vs*coef);	
+        for (int j=0;j<xcoords.length;j++){
+            pc[i].xpcoords[j]=(int)Math.round(pc[i].cx+xcoords[j]*coef);
+            pc[i].ypcoords[j]=(int)Math.round(pc[i].cy-ycoords[j]*coef);
+        }
+        if (pc[i].p == null){
+            pc[i].p = new Polygon(pc[i].xpcoords,pc[i].ypcoords,xcoords.length);
+        }
+        else {
+            pc[i].p.npoints = xcoords.length;
+            for (int j=0;j<xcoords.length;j++){
+                pc[i].p.xpoints[j] = pc[i].xpcoords[j];
+                pc[i].p.ypoints[j] = pc[i].ypcoords[j];
+            }
+            pc[i].p.invalidate();
+        }
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
-	int i=c.getIndex();
-	coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
-	//find coordinates of object's geom center wrt to camera center and project
-	//translate in JPanel coords
-	pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-	pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
-	//project height and construct polygon
- 	pc[i].lcr=Math.round(vs*coef);	
-	for (int j=0;j<xcoords.length;j++){
-	    pc[i].lxpcoords[j]=(int)Math.round(pc[i].lcx+xcoords[j]*coef);
-	    pc[i].lypcoords[j]=(int)Math.round(pc[i].lcy-ycoords[j]*coef);
-	}
-	if (pc[i].lp == null){
-	    pc[i].lp = new Polygon(pc[i].lxpcoords,pc[i].lypcoords,xcoords.length);
-	}
-	else {
-	    pc[i].lp.npoints = xcoords.length;
-	    for (int j=0;j<xcoords.length;j++){
-		pc[i].lp.xpoints[j] = pc[i].lxpcoords[j];
-		pc[i].lp.ypoints[j] = pc[i].lypcoords[j];
-	    }
-	    pc[i].lp.invalidate();
-	}
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
+        pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
+        //project height and construct polygon
+        pc[i].lcr = (int)Math.round(vs*coef);	
+        for (int j=0;j<xcoords.length;j++){
+            pc[i].lxpcoords[j]=(int)Math.round(pc[i].lcx+xcoords[j]*coef);
+            pc[i].lypcoords[j]=(int)Math.round(pc[i].lcy-ycoords[j]*coef);
+        }
+        if (pc[i].lp == null){
+            pc[i].lp = new Polygon(pc[i].lxpcoords,pc[i].lypcoords,xcoords.length);
+        }
+        else {
+            pc[i].lp.npoints = xcoords.length;
+            for (int j=0;j<xcoords.length;j++){
+                pc[i].lp.xpoints[j] = pc[i].lxpcoords[j];
+                pc[i].lp.ypoints[j] = pc[i].lypcoords[j];
+            }
+            pc[i].lp.invalidate();
+        }
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -446,80 +446,71 @@ public class VPolygon extends ClosedShape {
 
     /** Get the polygon's area. */
     public double getArea(){
-	double[] xcoordsForArea=new double[xcoords.length];
-	double[] ycoordsForArea=new double[ycoords.length];
-	for (int i=0;i<xcoords.length;i++){
-	    xcoordsForArea[i]=vx+xcoords[i];
-	    ycoordsForArea[i]=vy+ycoords[i];
-	}
-	int j,k;
-	double res=0;
-	for (j=0;j<xcoords.length;j++){
-	    k=(j+1) % xcoords.length;
-	    res+=(xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
-	}
-	res=res/2.0;
-	return ((res<0) ? -res : res);
+        double[] xcoordsForArea=new double[xcoords.length];
+        double[] ycoordsForArea=new double[ycoords.length];
+        for (int i=0;i<xcoords.length;i++){
+            xcoordsForArea[i]=vx+xcoords[i];
+            ycoordsForArea[i]=vy+ycoords[i];
+        }
+        int j,k;
+        double res=0;
+        for (j=0;j<xcoords.length;j++){
+            k=(j+1) % xcoords.length;
+            res+=(xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
+        }
+        res=res/2.0;
+        return ((res<0) ? -res : res);
     }
 
     /** Get the double precision coordinates of this polygon's centroid.
-     *@see #getCentroid()
-     */
-    public Point2D.Double getPreciseCentroid(){
-	//compute polygon vertices
-	double[] xcoordsForArea=new double[xcoords.length];
-	double[] ycoordsForArea=new double[ycoords.length];
-	for (int i=0;i<xcoords.length;i++){
-	    xcoordsForArea[i]=vx+xcoords[i];
-	    ycoordsForArea[i]=vy+ycoords[i];
-	}
-	//compute polygon area
-	int j,k;
-	double area=0;
-	for (j=0;j<xcoords.length;j++){
-	    k=(j+1) % xcoords.length;
-	    area+=(xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
-	}
-	area=area/2.0;
-	//area=((area<0) ? -area : area);  //do not do that!!! it can change the centroid's coordinates
-	                                   //(-x,-y instead of x,y) depending on the order in which the
-	                                   //sequence of vertex coords
-	//compute centroid
-	double factor=0;
-	double cx=0;
-	double cy=0;
-	for (j=0;j<xcoords.length;j++){
-	    k=(j+1) % xcoords.length;
-	    factor=xcoordsForArea[j]*ycoordsForArea[k]-xcoordsForArea[k]*ycoordsForArea[j];
-	    cx+=(xcoordsForArea[j]+xcoordsForArea[k])*factor;
-	    cy+=(ycoordsForArea[j]+ycoordsForArea[k])*factor;
-	}
-	area*=6.0;
-	factor=1/area;
-	cx*=factor;
-	cy*=factor;
-	Point2D.Double res=new Point2D.Double(cx,cy);
-	return res;
-    }
-
-    /** Get the coordinates of this polygon's centroid in virtual space.
-     *@see #getPreciseCentroid()
-     */
-    public LongPoint getCentroid(){
-	Point2D.Double p2dd=this.getPreciseCentroid();
-	return new LongPoint(Math.round(p2dd.getX()),Math.round(p2dd.getY()));
+    *@see #getCentroid()
+    */
+    public Point2D.Double getCentroid(){
+        //compute polygon vertices
+        double[] xcoordsForArea=new double[xcoords.length];
+        double[] ycoordsForArea=new double[ycoords.length];
+        for (int i=0;i<xcoords.length;i++){
+            xcoordsForArea[i]=vx+xcoords[i];
+            ycoordsForArea[i]=vy+ycoords[i];
+        }
+        //compute polygon area
+        int j,k;
+        double area=0;
+        for (j=0;j<xcoords.length;j++){
+            k=(j+1) % xcoords.length;
+            area+=(xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
+        }
+        area=area/2.0;
+        //area=((area<0) ? -area : area);  //do not do that!!! it can change the centroid's coordinates
+        //(-x,-y instead of x,y) depending on the order in which the
+        //sequence of vertex coords
+        //compute centroid
+        double factor=0;
+        double cx=0;
+        double cy=0;
+        for (j=0;j<xcoords.length;j++){
+            k=(j+1) % xcoords.length;
+            factor=xcoordsForArea[j]*ycoordsForArea[k]-xcoordsForArea[k]*ycoordsForArea[j];
+            cx+=(xcoordsForArea[j]+xcoordsForArea[k])*factor;
+            cy+=(ycoordsForArea[j]+ycoordsForArea[k])*factor;
+        }
+        area*=6.0;
+        factor=1/area;
+        cx*=factor;
+        cy*=factor;
+        return new Point2D.Double(cx,cy);
     }
 
     public Object clone(){
-	LongPoint[] lps=new LongPoint[xcoords.length];
-	for (int i=0;i<lps.length;i++){
-	    lps[i]=new LongPoint(Math.round(xcoords[i]+vx),Math.round(ycoords[i]+vy));
-	}
-	VPolygon res = new VPolygon(lps, getZindex(), color, borderColor, (alphaC != null ) ? alphaC.getAlpha() : 1.0f);
-	res.borderColor=this.borderColor;
-	res.cursorInsideColor=this.cursorInsideColor;
-	res.bColor=this.bColor;
-	return res;
+        Point2D.Double[] lps=new Point2D.Double[xcoords.length];
+        for (int i=0;i<lps.length;i++){
+            lps[i] = new Point2D.Double(xcoords[i]+vx,ycoords[i]+vy);
+        }
+        VPolygon res = new VPolygon(lps, getZindex(), color, borderColor, (alphaC != null ) ? alphaC.getAlpha() : 1.0f);
+        res.borderColor=this.borderColor;
+        res.cursorInsideColor=this.cursorInsideColor;
+        res.bColor=this.bColor;
+        return res;
     }
 
 }

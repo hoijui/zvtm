@@ -58,9 +58,9 @@ public class ScrollLayer implements ComponentListener {
     RectangularShape rightBtRS;
 
     /** Bounds of region observed through controlled camera. */
-    long[] observedRegionBounds = new long[4];
+    double[] observedRegionBounds = new double[4];
     /** Bounds of smallest region of virtual space containing all glyphs. */
-    long[] populatedRegionBounds = new long[4];
+    double[] populatedRegionBounds = new double[4];
 
     int panelWidth;
     int panelHeight;
@@ -206,16 +206,16 @@ public class ScrollLayer implements ComponentListener {
      *@see #updateHorizontalScrollBar()
      */
     public void updateVerticalScrollBar(){
-	long observedHeight = observedRegionBounds[1] - observedRegionBounds[3];
-	long totalHeight = populatedRegionBounds[1] - populatedRegionBounds[3];
+	double observedHeight = observedRegionBounds[1] - observedRegionBounds[3];
+	double totalHeight = populatedRegionBounds[1] - populatedRegionBounds[3];
 	if (totalHeight < observedHeight){observedHeight = totalHeight;}
 	double ratio = observedHeight / ((double)totalHeight);
-	long sliderSize = Math.round(ratio * vgutterRS.getHeight());
+	double sliderSize = Math.round(ratio * vgutterRS.getHeight());
 	if (sliderSize < MIN_SLIDER_SIZE){
 	    sliderSize = MIN_SLIDER_SIZE;
 	}
 	vsliderRS.setHeight(sliderSize);
-	long y = Math.round(2*(controlledCamera.posy-(populatedRegionBounds[1]+populatedRegionBounds[3])/2.0)/(populatedRegionBounds[1] - populatedRegionBounds[3]) * vgutterRS.getHeight());
+	double y = Math.round(2*(controlledCamera.posy-(populatedRegionBounds[1]+populatedRegionBounds[3])/2.0)/(populatedRegionBounds[1] - populatedRegionBounds[3]) * vgutterRS.getHeight());
 	if (y > upBt.vy-upBtRS.getHeight()-sliderSize){
 	    y = upBt.vy-upBtRS.getHeight()-sliderSize;
 	}
@@ -232,16 +232,16 @@ public class ScrollLayer implements ComponentListener {
      *@see #updateVerticalScrollBar()
      */
     public void updateHorizontalScrollBar(){
-	long observedWidth = observedRegionBounds[2] - observedRegionBounds[0];
-	long totalWidth = populatedRegionBounds[2] - populatedRegionBounds[0];
+	double observedWidth = observedRegionBounds[2] - observedRegionBounds[0];
+	double totalWidth = populatedRegionBounds[2] - populatedRegionBounds[0];
 	if (totalWidth < observedWidth){observedWidth = totalWidth;}
 	double ratio = observedWidth / ((double)totalWidth);
-	long sliderSize = Math.round(ratio * hgutterRS.getWidth());
+	double sliderSize = Math.round(ratio * hgutterRS.getWidth());
 	if (sliderSize < MIN_SLIDER_SIZE){
 	    sliderSize = MIN_SLIDER_SIZE;
 	}
 	hsliderRS.setWidth(sliderSize);
-	long x = Math.round(2*(controlledCamera.posx-(populatedRegionBounds[2]+populatedRegionBounds[0])/2.0)/(populatedRegionBounds[2] - populatedRegionBounds[0]) * hgutterRS.getWidth());
+	double x = Math.round(2*(controlledCamera.posx-(populatedRegionBounds[2]+populatedRegionBounds[0])/2.0)/(populatedRegionBounds[2] - populatedRegionBounds[0]) * hgutterRS.getWidth());
 	if (x > rightBt.vx-rightBtRS.getWidth()-sliderSize){
 	    x = rightBt.vx-rightBtRS.getWidth()-sliderSize;
 	}
@@ -265,8 +265,8 @@ public class ScrollLayer implements ComponentListener {
      */
     public boolean cursorInside(int cx, int cy){
 	double coef = (((double)slC.focal+(double)slC.altitude) / (double)slC.focal);
-	long vx = Math.round(((cx - (panelWidth/2)) * coef) + slC.posx);
-	long vy = Math.round((((panelHeight/2) - cy) * coef) + slC.posy);
+	double vx = Math.round(((cx - (panelWidth/2)) * coef) + slC.posx);
+	double vy = Math.round((((panelHeight/2) - cy) * coef) + slC.posy);
 	return (vx > vgutter.vx-vgutterRS.getWidth()) || (vy < hgutter.vy+hgutterRS.getHeight());
     }
 
@@ -307,7 +307,7 @@ public class ScrollLayer implements ComponentListener {
 
     /** Call this method when the UP button of the vertical scrollbar is actuated.*/
     public void moveUp(){
-	long dy = vsliderRS.getHeight();
+	double dy = vsliderRS.getHeight();
 	if (vslider.vy + dy + vsliderRS.getHeight() < upBt.vy - upBtRS.getHeight() &&
 	    vslider.vy + dy - vsliderRS.getHeight() > downBt.vy + downBtRS.getHeight()){
 	    vslider.move(0, dy);
@@ -321,7 +321,7 @@ public class ScrollLayer implements ComponentListener {
 
     /** Call this method when the DOWN button of the vertical scrollbar is actuated.*/
     public void moveDown(){
-	long dy = -vsliderRS.getHeight();
+	double dy = -vsliderRS.getHeight();
 	if (vslider.vy + dy + vsliderRS.getHeight() < upBt.vy - upBtRS.getHeight() &&
 	    vslider.vy + dy - vsliderRS.getHeight() > downBt.vy + downBtRS.getHeight()){
 	    vslider.move(0, dy);
@@ -335,7 +335,7 @@ public class ScrollLayer implements ComponentListener {
 
     /** Call this method when the LEFT button of the horizontal scrollbar is actuated.*/
     public void moveLeft(){
-	long dx = -hsliderRS.getWidth();
+	double dx = -hsliderRS.getWidth();
 	if (hslider.vx + dx + hsliderRS.getWidth() < rightBt.vx - rightBtRS.getWidth() &&
 	    hslider.vx + dx - hsliderRS.getWidth() > leftBt.vx + leftBtRS.getWidth()){
 	    hslider.move(dx, 0);
@@ -349,7 +349,7 @@ public class ScrollLayer implements ComponentListener {
 
     /** Call this method when the RIGHT button of the horizontal scrollbar is actuated.*/
     public void moveRight(){
-	long dx = hsliderRS.getWidth();
+	double dx = hsliderRS.getWidth();
 	if (hslider.vx + dx + hsliderRS.getWidth() < rightBt.vx - rightBtRS.getWidth() &&
 	    hslider.vx + dx - hsliderRS.getWidth() > leftBt.vx + leftBtRS.getWidth()){
 	    hslider.move(dx, 0);

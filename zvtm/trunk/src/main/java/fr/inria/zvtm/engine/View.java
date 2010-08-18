@@ -30,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.GridBagConstraints;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
@@ -213,32 +214,32 @@ public abstract class View {
     }
 
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
-    public long[] getVisibleRegion(Camera c){
-	return getVisibleRegion(c, new long[4]);
+    public double[] getVisibleRegion(Camera c){
+	return getVisibleRegion(c, new double[4]);
     }
 
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]
      *@param c camera
      *@param res array which will contain the result */
-    public long[] getVisibleRegion(Camera c, long[] res){
+    public double[] getVisibleRegion(Camera c, double[] res){
 	if (cameras.contains(c)){
-	    float uncoef=(float)((c.focal+c.altitude)/c.focal);  //compute region seen from this view through camera
+	    double uncoef = (c.focal+c.altitude)/c.focal;  //compute region seen from this view through camera
 		Dimension panelSize = panel.getSize();
-	    res[0] = (long)(c.posx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef);
-	    res[1] = (long)(c.posy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef);
-	    res[2] = (long)(c.posx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef);
-	    res[3] = (long)(c.posy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef);
+	    res[0] = c.posx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef;
+	    res[1] = c.posy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef;
+	    res[2] = c.posx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef;
+	    res[3] = c.posy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef;
 	    return res;
 	}
 	return null;
     }
 
-    public long getVisibleRegionWidth(Camera c){
-	return (long)(panel.getSize().width * ((c.focal+c.altitude) / c.focal));
+    public double getVisibleRegionWidth(Camera c){
+	return panel.getSize().width * ((c.focal+c.altitude) / c.focal);
     }
 
-    public long getVisibleRegionHeight(Camera c){
-	return (long)(panel.getSize().height * ((c.focal+c.altitude) / c.focal));
+    public double getVisibleRegionHeight(Camera c){
+	return panel.getSize().height * ((c.focal+c.altitude) / c.focal);
     }
 
     /**returns a BufferedImage representation of this view (this is actually a COPY of the original) that can be used for instance with ImageIO.ImageWriter*/
@@ -635,25 +636,25 @@ public abstract class View {
      *@see #getGlobalView(Camera c)
      *@see #getGlobalView(Camera c, int d, float mFactor)
      */
-    public Location getGlobalView(Camera c, float mFactor){
+    public Location getGlobalView(Camera c, double mFactor){
         if (c.getOwningView() != this){return null;}
         //wnes=west north east south
-        long[] wnes = c.parentSpace.findFarmostGlyphCoords();
+        double[] wnes = c.parentSpace.findFarmostGlyphCoords();
         //new coords where camera should go
-        long dx = (wnes[2]+wnes[0])/2;
-        long dy = (wnes[1]+wnes[3])/2;
-        long[] regBounds = this.getVisibleRegion(c);
+        double dx = (wnes[2]+wnes[0])/2d;
+        double dy = (wnes[1]+wnes[3])/2d;
+        double[] regBounds = this.getVisibleRegion(c);
         /*region that will be visible after translation, but before zoom/unzoom (need to
         compute zoom) ; we only take left and down because we only need horizontal and
         vertical ratios, which are equals for left and right, up and down*/
-        long[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
-        float currentAlt = c.getAltitude()+c.getFocal();
-        float ratio = 0;
+        double[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
+        double currentAlt = c.getAltitude()+c.getFocal();
+        double ratio = 0;
         //compute the mult factor for altitude to see all stuff on X
-        if (trRegBounds[0]!=0){ratio = (dx-wnes[0])/((float)(dx-trRegBounds[0]));}
+        if (trRegBounds[0]!=0){ratio = (dx-wnes[0]) / (dx-trRegBounds[0]);}
         //same for Y ; take the max of both
         if (trRegBounds[1]!=0){
-            float tmpRatio = (dy-wnes[3])/((float)(dy-trRegBounds[1]));
+            double tmpRatio = (dy-wnes[3]) / (dy-trRegBounds[1]);
             if (tmpRatio>ratio){ratio = tmpRatio;}
         }
         ratio *= mFactor;
@@ -688,7 +689,7 @@ public abstract class View {
 		if (l != null){
 		    Animation trans = 
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(d,c,
-										       new LongPoint(l.vx,l.vy),
+										       new Point2D.Double(l.vx,l.vy),
 										       false,
 										       SlowInSlowOutInterpolator.getInstance(),
 										       null);
@@ -730,11 +731,11 @@ public abstract class View {
         */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor, EndAction endAction){
         if (c.getOwningView() != this){return null;}
-        long dx;
-        long dy;
+        double dx;
+        double dy;
         if (g instanceof VText){
             VText t=(VText)g;
-            LongPoint p=t.getBounds(c.getIndex());
+            Point2D.Double p = t.getBounds(c.getIndex());
             if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){
                 dx=g.vx+p.x/2-c.posx;
                 dy=g.vy+p.y/2-c.posy;
@@ -752,52 +753,51 @@ public abstract class View {
             dx=g.vx-c.posx;
             dy=g.vy-c.posy;
         }
-
         //relative translation
         Animation trans = 
             VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
             createCameraTranslation(d, c,
-            new LongPoint(dx,dy),
+            new Point2D.Double(dx,dy),
             true,
             SlowInSlowOutInterpolator.getInstance(),
             endAction);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
 
-        float currentAlt=c.getAltitude()+c.getFocal();
+        double currentAlt=c.getAltitude()+c.getFocal();
         if (z){
-            long[] regBounds = this.getVisibleRegion(c);
+            double[] regBounds = this.getVisibleRegion(c);
             // region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
             // we only take left and down because ratios are equals for left and right, up and down
-            long[] trRegBounds={regBounds[0]+dx,regBounds[3]+dy};
-            float ratio=0;
+            double[] trRegBounds = {regBounds[0]+dx, regBounds[3]+dy};
+            double ratio = 0;
             //compute the mult factor for altitude to see glyph g entirely
             if (trRegBounds[0]!=0){
                 if (g instanceof VText){
-                    ratio = ((float)(((VText)g).getBounds(c.getIndex()).x)) / ((float)(g.vx-trRegBounds[0]));
+                    ratio = (((VText)g).getBounds(c.getIndex()).x) / (g.vx-trRegBounds[0]);
                 }
                 else if (g instanceof RectangularShape){
-                    ratio = ((float)(((RectangularShape)g).getWidth())) / ((float)(g.vx-trRegBounds[0]));
+                    ratio = (((RectangularShape)g).getWidth()) / (g.vx-trRegBounds[0]);
                 }
                 else {
-                    ratio = g.getSize() / ((float)(g.vx-trRegBounds[0]));
+                    ratio = g.getSize() / (g.vx-trRegBounds[0]);
                 }
             }
             //same for Y ; take the max of both
             if (trRegBounds[1]!=0){
-                float tmpRatio;
+                double tmpRatio;
                 if (g instanceof VText){
-                    tmpRatio = ((float)(((VText)g).getBounds(c.getIndex()).y)) / ((float)(g.vy-trRegBounds[1]));
+                    tmpRatio = (((VText)g).getBounds(c.getIndex()).y) / (g.vy-trRegBounds[1]);
                 }
                 else if (g instanceof RectangularShape){
-                    tmpRatio = ((float)(((RectangularShape)g).getHeight())) / ((float)(g.vy-trRegBounds[1]));
+                    tmpRatio = (((RectangularShape)g).getHeight()) / (g.vy-trRegBounds[1]);
                 }
                 else {
-                    tmpRatio = (g.getSize())/((float)(g.vy-trRegBounds[1]));
+                    tmpRatio = g.getSize() / (g.vy-trRegBounds[1]);
                 }
                 if (tmpRatio>ratio){ratio=tmpRatio;}
             }
             ratio *= mFactor;
-            float newAlt=currentAlt*Math.abs(ratio);
+            double newAlt=currentAlt*Math.abs(ratio);
 
             Animation altAnim = 
                 VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
@@ -862,7 +862,7 @@ public abstract class View {
 		*@param y2 y coord of opposite point
 		*@return the final camera location, null if the camera is not associated with this view.
 		*/
-	public Location centerOnRegion(Camera c, int d, long x1, long y1, long x2, long y2){
+	public Location centerOnRegion(Camera c, int d, double x1, double y1, double x2, double y2){
 	    return centerOnRegion(c, d, x1, y1, x2, y2, null);
     }
     
@@ -877,28 +877,28 @@ public abstract class View {
 		*@param ea action to be performed at end of animation
 		*@return the final camera location, null if the camera is not associated with this view.
 		*/
-	public Location centerOnRegion(Camera c, int d, long x1, long y1, long x2, long y2, EndAction ea){
+	public Location centerOnRegion(Camera c, int d, double x1, double y1, double x2, double y2, EndAction ea){
         if (c.getOwningView() != this){return null;}
-        long minX = Math.min(x1,x2);
-        long minY = Math.min(y1,y2);
-        long maxX = Math.max(x1,x2);
-        long maxY = Math.max(y1,y2);
+        double minX = Math.min(x1,x2);
+        double minY = Math.min(y1,y2);
+        double maxX = Math.max(x1,x2);
+        double maxY = Math.max(y1,y2);
         //wnes=west north east south
-        long[] wnes = {minX, maxY, maxX, minY};
+        double[] wnes = {minX, maxY, maxX, minY};
         //new coords where camera should go
-        long dx = (wnes[2]+wnes[0]) / 2; 
-        long dy = (wnes[1]+wnes[3]) / 2;
+        double dx = (wnes[2]+wnes[0]) / 2d; 
+        double dy = (wnes[1]+wnes[3]) / 2d;
         // new alt to fit horizontally
 		Dimension panelSize = this.getPanel().getSize();
-        float nah = (wnes[2]-dx) * 2 * c.getFocal() / panelSize.width - c.getFocal();
+        double nah = (wnes[2]-dx) * 2 * c.getFocal() / panelSize.width - c.getFocal();
         // new alt to fit vertically
-        float nav = (wnes[1]-dy) * 2 * c.getFocal() / panelSize.height - c.getFocal();
+        double nav = (wnes[1]-dy) * 2 * c.getFocal() / panelSize.height - c.getFocal();
         // take max of both
-        float na = Math.max(nah, nav);
+        double na = Math.max(nah, nav);
         if (d > 0){
             Animation trans =
                 VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-                createCameraTranslation(d, c, new LongPoint(dx, dy), false,
+                createCameraTranslation(d, c, new Point2D.Double(dx, dy), false,
                 SlowInSlowOutInterpolator.getInstance(),
                 ea);
             Animation altAnim = 
@@ -924,13 +924,13 @@ public abstract class View {
      *@param vsn name of virtual space
      *@param wg which glyphs in the region should be returned (among VIS_AND_SENS_GLYPHS (default), VISIBLE_GLYPHS, SENSIBLE_GLYPHS, ALL_GLYPHS)
      */
-    public Vector<Glyph> getGlyphsInRegion(long x1,long y1,long x2,long y2,String vsn,int wg){
-        Vector res=new Vector();
+    public Vector<Glyph> getGlyphsInRegion(double x1,double y1,double x2,double y2,String vsn,int wg){
+        Vector res = new Vector();
         VirtualSpace vs = VirtualSpaceManager.INSTANCE.getVirtualSpace(vsn);
-        long minX=Math.min(x1,x2);
-        long minY=Math.min(y1,y2);
-        long maxX=Math.max(x1,x2);
-        long maxY=Math.max(y1,y2);
+        double minX = Math.min(x1,x2);
+        double minY = Math.min(y1,y2);
+        double maxX = Math.max(x1,x2);
+        double maxY = Math.max(y1,y2);
         if (vs!=null){
             Vector allG=vs.getAllGlyphs();
             Glyph g;

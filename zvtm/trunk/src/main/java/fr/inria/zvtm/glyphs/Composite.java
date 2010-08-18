@@ -22,13 +22,13 @@ import fr.inria.zvtm.engine.Camera;
 public class Composite extends Glyph {
     private ArrayList<Glyph> children;
 
-    private transient long[] bbox; //wnes
+    private transient double[] bbox; //wnes
 
     public Composite(){
         vx = 0;
         vy = 0;
         children = new ArrayList<Glyph>();
-        bbox = new long[4];
+        bbox = new double[4];
     }
 
     /**
@@ -88,7 +88,7 @@ public class Composite extends Glyph {
      * {@inheritDoc}
      */
     @Override
-    public boolean fillsView(long w, long h, int camIndex){
+    public boolean fillsView(double w, double h, int camIndex){
         return false; //safe option
     }
 
@@ -96,7 +96,7 @@ public class Composite extends Glyph {
      * {@inheritDoc}
      */
     @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         //XXX implement
         return NO_CURSOR_EVENT;
     }
@@ -121,7 +121,7 @@ public class Composite extends Glyph {
      * {@inheritDoc}
      */
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         //XXX implement
         return true;
     }
@@ -182,8 +182,8 @@ public class Composite extends Glyph {
                                     int lensWidth,
                                     int lensHeight,
                                     float lensMag,
-                                    long lensx,
-                                    long lensy){
+                                    double lensx,
+                                    double lensy){
         for(Glyph child: children){
             child.projectForLens(c,lensWidth,lensHeight,lensMag,lensx,lensy);
         }
@@ -206,18 +206,18 @@ public class Composite extends Glyph {
     }
 
     @Override
-    public void orientTo(float angle){
+    public void orientTo(double angle){
         //XXX ?
         //At the moment, a Composite glyph's orientation may not be changed.
     }
 
     @Override
-    public float getOrient(){
+    public double getOrient(){
         return 0f;
     }
 
     @Override 
-    public void reSize(float factor){
+    public void reSize(double factor){
         for(Glyph child: children){
             child.reSize(factor);
 
@@ -228,17 +228,17 @@ public class Composite extends Glyph {
     }
 
     @Override
-    public void sizeTo(float newRadius){
+    public void sizeTo(double newRadius){
         reSize(newRadius/radius()); 
     }
 
     @Override
-    public float getSize(){
+    public double getSize(){
         return radius();
     }
 
     @Override 
-    public void move(long dx, long dy){
+    public void move(double dx, double dy){
         vx += dx;
         vy += dy;
         for(Glyph child: children){
@@ -248,21 +248,21 @@ public class Composite extends Glyph {
     }
 
     @Override
-    public void moveTo(long x, long y){
+    public void moveTo(double x, double y){
         move(x - vx, y - vy);
     }
 
     @Override
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
-        long vw = (bbox[2] - bbox[0])/2;
-        long vh = (bbox[1] - bbox[3])/2; 
-        long cx = bbox[0] + vw;
-        long cy = bbox[3] + vh; 
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+        double vw = (bbox[2] - bbox[0])/2d;
+        double vh = (bbox[1] - bbox[3])/2d; 
+        double cx = bbox[0] + vw;
+        double cy = bbox[3] + vh; 
         return ((cx-vw)<=eb) && ((cx+vw)>=wb) && 
             ((cy-vh)<=nb) && ((cy+vh)>=sb);
     }
 
-    private void translateBoundingBox(long dx, long dy){
+    private void translateBoundingBox(double dx, double dy){
         bbox[0] += dx;
         bbox[1] += dy;
         bbox[2] += dx;
@@ -276,7 +276,7 @@ public class Composite extends Glyph {
         bbox[3] = Long.MAX_VALUE;
 
         for(Glyph child: children){
-            long[] glBounds = child.getBounds();
+            double[] glBounds = child.getBounds();
 
             if(glBounds[0] < bbox[0]){
                 bbox[0] = glBounds[0];
@@ -296,7 +296,7 @@ public class Composite extends Glyph {
         }
     }
 
-    private float radius(){
+    private double radius(){
         return (float)(0.5*Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
                 (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
     }

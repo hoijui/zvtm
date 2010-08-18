@@ -8,6 +8,7 @@
 package fr.inria.zvtm.animation;
 
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import net.jcip.annotations.*;
 
@@ -15,7 +16,6 @@ import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.interpolation.Interpolator;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
 
@@ -140,17 +140,17 @@ public class AnimationFactory {
      * @see EndAction
      */
     public Animation createCameraTranslation(final int duration, final Camera camera, 
-					     final LongPoint data, final boolean relative,
+					     final Point2D.Double data, final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
 	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       camera,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
-				   private long startX = Long.MIN_VALUE;
-				   private long startY = Long.MIN_VALUE;
-				   private long endX = Long.MIN_VALUE;
-				   private long endY = Long.MIN_VALUE;
+				   private double startX = Double.MIN_VALUE;
+				   private double startY = Double.MIN_VALUE;
+				   private double endX = Double.MIN_VALUE;
+				   private double endY = Double.MIN_VALUE;
 				   
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
@@ -170,8 +170,8 @@ public class AnimationFactory {
 				   @Override
 				   public void timingEvent(float fraction, 
 							   Object subject, Animation.Dimension dim){
-				       camera.moveTo(startX + (long)(fraction*(endX - startX)),
-						     startY + (long)(fraction*(endY - startY)));
+				       camera.moveTo(startX + fraction*(endX - startX),
+						     startY + fraction*(endY - startY));
 				   }
 			       },
 			       interpolator);
@@ -193,7 +193,7 @@ public class AnimationFactory {
      * ends. May be set to null, in which case it is ignored.
      */
     public Animation createCameraAltAnim(final int duration, final Camera camera, 
-					 final float data, final boolean relative,
+					 final double data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
 	
@@ -201,8 +201,8 @@ public class AnimationFactory {
 			       camera,
 			       Animation.Dimension.ALTITUDE,
 			       new DefaultTimingHandler(){
-				   private float startZ = Float.MIN_VALUE;
-				   private float endZ = Float.MAX_VALUE;
+				   private double startZ = Double.MIN_VALUE;
+				   private double endZ = Double.MAX_VALUE;
 				   
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
@@ -242,17 +242,17 @@ public class AnimationFactory {
      * ends. May be set to null, in which case it is ignored.
      */
     public Animation createGlyphTranslation(final int duration, final Glyph glyph,
-					    final LongPoint data, final boolean relative,
+					    final Point2D.Double data, final boolean relative,
 					    final Interpolator interpolator,
 					    final EndAction endAction){
 	 return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 				glyph,
 				Animation.Dimension.POSITION,
 				new DefaultTimingHandler(){
-				    private long startX = Long.MIN_VALUE;
-				    private long startY = Long.MIN_VALUE;
-				    private long endX = Long.MIN_VALUE;
-				    private long endY = Long.MIN_VALUE;
+				    private double startX = Double.MIN_VALUE;
+				    private double startY = Double.MIN_VALUE;
+				    private double endX = Double.MIN_VALUE;
+				    private double endY = Double.MIN_VALUE;
 
 				    @Override
 				    public void begin(Object subject, Animation.Dimension dim){
@@ -272,8 +272,8 @@ public class AnimationFactory {
 				    @Override
 				    public void timingEvent(float fraction, 
 							    Object subject, Animation.Dimension dim){
-					glyph.moveTo(startX + (long)(fraction*(endX - startX)),
-						     startY + (long)(fraction*(endY - startY)));
+					glyph.moveTo(startX + fraction*(endX - startX),
+						     startY + fraction*(endY - startY));
 				    }
 				    
 				},
@@ -296,15 +296,15 @@ public class AnimationFactory {
      * ends. May be set to null, in which case it is ignored.
      */
     public Animation createGlyphSizeAnim(final int duration, final Glyph glyph,
-					 final float data, final boolean relative,
+					 final double data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
 	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
-				   private float startSize = Float.MIN_VALUE;
-				   private float endSize = Float.MIN_VALUE;
+				   private double startSize = Double.MIN_VALUE;
+				   private double endSize = Double.MIN_VALUE;
 
 				   @Override
 		        	   public void begin(Object subject, Animation.Dimension dim){
@@ -351,15 +351,15 @@ public class AnimationFactory {
      * ends. May be set to null, in which case it is ignored.
      */
     public Animation createGlyphOrientationAnim(final int duration, final Glyph glyph,
-						final float data, final boolean relative,
+						final double data, final boolean relative,
 						final Interpolator interpolator,
 						final EndAction endAction){
 	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.ORIENTATION,
 			       new DefaultTimingHandler(){
-				   private float startAngle = Float.MIN_VALUE;
-				   private float endAngle = Float.MIN_VALUE;
+				   private double startAngle = Double.MIN_VALUE;
+				   private double endAngle = Double.MIN_VALUE;
 				   
 				   @Override
 		        	   public void begin(Object subject, Animation.Dimension dim){
@@ -905,7 +905,7 @@ public class AnimationFactory {
      * ends. May be set to null, in which case it is ignored.
      */
     public Animation createPathAnim(final int duration, final DPath path,
-				    final LongPoint[] data, final boolean relative,
+				    final Point2D.Double[] data, final boolean relative,
 				    final Interpolator interpolator,
 				    final EndAction endAction){
 
@@ -913,26 +913,25 @@ public class AnimationFactory {
 			       path,
 			       Animation.Dimension.PATH,
 			       new DefaultTimingHandler(){
-				   private LongPoint[] startPoints; 
-				   private LongPoint[] endPoints; 
-				   private LongPoint[] coords; 
-				   private LongPoint[] tempPoints; 
-
+				   private Point2D.Double[] startPoints; 
+				   private Point2D.Double[] endPoints; 
+				   private Point2D.Double[] coords; 
+				   private Point2D.Double[] tempPoints;
 				   @Override
 				   public void begin(Object subject, Animation.Dimension dim){
 				       if(data.length != path.getNumberOfPoints()){
 					   throw new IllegalStateException("'data' element count must be equal to the path element count");
 				       }
 
-				       startPoints = new LongPoint[path.getNumberOfPoints()];
-				       endPoints = new LongPoint[startPoints.length];
-				       tempPoints = new LongPoint[startPoints.length];
+				       startPoints = new Point2D.Double[path.getNumberOfPoints()];
+				       endPoints = new Point2D.Double[startPoints.length];
+				       tempPoints = new Point2D.Double[startPoints.length];
                        coords = path.getAllPointsCoordinates();
                        System.arraycopy(coords, 0, startPoints, 0, coords.length);
                        for(int i=0; i<startPoints.length; ++i){
-                           endPoints[i] = new LongPoint(relative ? startPoints[i].x + data[i].x : data[i].x,
+                           endPoints[i] = new Point2D.Double(relative ? startPoints[i].x + data[i].x : data[i].x,
                                                         relative ? startPoints[i].y + data[i].y : data[i].y);
-                           tempPoints[i] = new LongPoint();
+                           tempPoints[i] = new Point2D.Double();
                        }
 				   }
 
@@ -948,8 +947,8 @@ public class AnimationFactory {
 							   Object subject, Animation.Dimension dim){
 				       
 				       for(int i=0; i<tempPoints.length; ++i){
-					   tempPoints[i].x = startPoints[i].x + (long)(fraction*(endPoints[i].x - startPoints[i].x));
-					   tempPoints[i].y = startPoints[i].y + (long)(fraction*(endPoints[i].y - startPoints[i].y));
+					   tempPoints[i].x = startPoints[i].x + fraction*(endPoints[i].x - startPoints[i].x);
+					   tempPoints[i].y = startPoints[i].y + fraction*(endPoints[i].y - startPoints[i].y);
 					   path.edit(tempPoints, true); //absolute coordinates
 				       }
 				   }

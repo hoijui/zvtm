@@ -30,11 +30,11 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.Shape;
 import java.awt.AlphaComposite;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /** Parent class of all graphical objects.
@@ -102,14 +102,14 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@see #move(long x, long y)
      *@see #getLocation()
      */
-    public long vx;
+    public double vx;
 
     /** Vertical coordinate of the glyph's geomatrical center, in virtual space.
      *@see #moveTo(long x, long y)
      *@see #move(long x, long y)
      *@see #getLocation()
      */
-    public long vy;
+    public double vy;
 
     /** z-index */
     protected int vz;
@@ -119,59 +119,59 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@see #reSize(float factor)
      *@see #getSize()
      */
-    protected float size;
+    protected double size;
 
     /** Glyph's orientation in [0:2Pi[ (read-only).
      *@see #getOrient()
      *@see #orientTo(float angle)
      */
-    protected float orient = 0.0f;
+    protected double orient = 0.0f;
 
     /** Translate the glyph by (x,y) - relative translation.
      *@see #moveTo(long x, long y)
      */
-    public void move(long x, long y){
-	vx+=x;
-	vy+=y;
-	propagateMove(x,y);  //take care of sticked glyphs
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void move(double x, double y){
+        vx+=x;
+        vy+=y;
+        propagateMove(x,y);  //take care of sticked glyphs
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Translate the glyph to (x,y) - absolute translation.
      *@see #move(long x, long y)
      */
-    public void moveTo(long x, long y){
-	propagateMove(x-vx,y-vy);  //take care of sticked glyphs
-	vx=x;
-	vy=y;
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void moveTo(double x, double y){
+        propagateMove(x-vx,y-vy);  //take care of sticked glyphs
+        vx=x;
+        vy=y;
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     /** Get the coordinates of the glyph's geometrical center.
-     *@return a copy of the glyph's location. Changing the x,y coordinates of the returned LongPoint will not have any effect on the glyph's position.
+     *@return a copy of the glyph's location. Changing the x,y coordinates of the returned point will not have any effect on the glyph's position.
      */
-    public LongPoint getLocation(){return new LongPoint(vx,vy);}
+    public Point2D.Double getLocation(){return new Point2D.Double(vx, vy);}
 
     /** Get glyph's size (radius of bounding circle). */
-    public abstract float getSize();    
+    public abstract double getSize();
 
     /** Set glyph's size by setting its bounding circle's radius.
      *@see #reSize(float factor)
      */
-    public abstract void sizeTo(float radius);
+    public abstract void sizeTo(double radius);
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
      *@see #sizeTo(float radius)
      */
-    public abstract void reSize(float factor);
+    public abstract void reSize(double factor);
 
     /** Get the glyph's orientation. */
-    public abstract float getOrient();
+    public abstract double getOrient();
 
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
-    public abstract void orientTo(float angle);
+    public abstract void orientTo(double angle);
     
     /** Get this object's z-index.
      *@return the default value, 0 if a z-index was not specified
@@ -517,12 +517,12 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Propagate this glyph's movement to all glyphs constrained by this one.
      * Called automatically by ZVTM when translating this glyph. 
      */
-    public void propagateMove(long x,long y){
-	if (stickedGlyphs != null){
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		stickedGlyphs[i].move(x,y);
-	    }
-	}
+    public void propagateMove(double x, double y){
+        if (stickedGlyphs != null){
+            for (int i=0;i<stickedGlyphs.length;i++){
+                stickedGlyphs[i].move(x,y);
+            }
+        }
     }
 
     /** Attach a glyph to this one. Translations of this glyph will be propagated to g.
@@ -604,7 +604,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     public static final short NO_CURSOR_EVENT = 0;
 
     // Projection coefficient. Computed internally. Do not tamper with. 
-    protected float coef=1.0f;
+    protected double coef=1.0f;
 
     /** Project glyph w.r.t a given camera's coordinate system, prior to actual painting. Called internally.
      *@param c camera
@@ -620,7 +620,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@param lensx horizontal coordinateof lens activated in View using this camera
      *@param lensy vertical coordinate of lens activated in View using this camera
      */
-    public abstract void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy);
+    public abstract void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy);
 
     /** Draw this glyph.
      *@param g graphics context in which the glyph should be drawn 
@@ -672,10 +672,10 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Detect whether the given point is inside this glyph or not.
      *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param cvx provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param cvy provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param cvx virtual space coordinates
+     *@param cvy virtual space coordinates
      */
-    public abstract boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy);
+    public abstract boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy);
 
     /** Reset memory of cursor being inside the glyph. */
     public abstract void resetMouseIn();
@@ -686,11 +686,11 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Method used internally for firing picking-related events.
      *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param cvx provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param cvy provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param cvx virtual space coordinates
+     *@param cvy virtual space coordinates 
      *@return VCurcor.ENTERED_GLYPH if cursor has entered the glyph, VCurcor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
      */
-    public abstract short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy);
+    public abstract short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy);
 
     /** Method used internally to find out if it is necessary to project and draw this glyph for a given camera.
      *@return true if the glyph is currently visible in the region delimited by wb, nb, eb, sb, symbolising the region seen through a camera
@@ -700,7 +700,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@param sb south region boundary (virtual space coordinates)
      *@param i camera index (useuful only for some glyph classes redefining this method)
      */
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -714,7 +714,7 @@ public abstract class Glyph implements Cloneable, Translucent {
         return false;
     }
     
-    public boolean visibleInViewport(long wb, long nb, long eb, long sb, Camera c){
+    public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
         return visibleInRegion(wb, nb, eb, sb, c.getIndex());
     }
     
@@ -726,7 +726,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@param i camera index (useuful only for some glyph classes redefining this method)
      *@return true if the glyph intersects the region delimited by wb, nb, eb, sb
      */
-    public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region.
 	       There is a good chance the glyph is
@@ -745,20 +745,20 @@ public abstract class Glyph implements Cloneable, Translucent {
      * Until now it has only been implemented for non-reorientable rectangles and was activated only for 
      * treemap-like representations in which a lot of rectangles can potentially overlap each other.
      */
-    public abstract boolean fillsView(long w,long h,int camIndex);
+    public abstract boolean fillsView(double w,double h,int camIndex);
 
 	/** Find out if a glyph is visible in a circular area. Not implemented yet for most glyph classes.
 	 * Used for instance to implement DynaSpot picking.
 	 */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return false;
 	}
 	
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public long[] getBounds(){
-		long[] res = {vx-Math.round(size),vy+Math.round(size),vx+Math.round(size),vy-Math.round(size)};
+	public double[] getBounds(){
+		double[] res = {vx-size, vy+size, vx+size,vy-size};
 		return res;
 	}
 	

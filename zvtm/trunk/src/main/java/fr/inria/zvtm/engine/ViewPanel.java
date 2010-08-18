@@ -716,7 +716,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     public void componentHidden(ComponentEvent e){}
     
-    //  ---------------- End Resize handling -----------------
+    //---------------- End Resize handling -----------------
 
 	protected final void drawPortals(){
 		// paint portals associated with this view

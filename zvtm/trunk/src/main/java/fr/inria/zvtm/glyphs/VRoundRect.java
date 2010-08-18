@@ -32,9 +32,9 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class VRoundRect extends ClosedShape implements RectangularShape  {
 
     /* Half width and height in virtual space. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING. */
-    public long vw,vh;
+    public double vw,vh;
     /*aspect ratio (width divided by height)*/
-    float ar;
+    double ar;
 
     /**MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING.*/
     public ProjRoundRect[] pc;
@@ -42,11 +42,11 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     /**
      * Horizontal diameter of the arc at the four corners. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING.
      */
-    public int arcWidth;
+    public double arcWidth;
     /**
      * Vertical diameter of the arc at the four corners. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING.
      */
-    public int arcHeight;
+    public double arcHeight;
 
     public VRoundRect(){
         this(0, 0, 0, 10, 10, Color.WHITE, Color.BLACK, 1.0f, 10, 10);
@@ -62,7 +62,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         *@param aw arc width in virtual space
         *@param ah arc height in virtual space
         */
-    public VRoundRect(long x,long y, int z,long w,long h,Color c,int aw,int ah){
+    public VRoundRect(double x,double y, int z,double w,double h,Color c,double aw,double ah){
         this(x, y, z, w, h, c, Color.BLACK, 1.0f, aw, ah);
     }
 
@@ -77,7 +77,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         *@param aw arc width in virtual space
         *@param ah arc height in virtual space
         */
-    public VRoundRect(long x, long y, int z, long w, long h, Color c, Color bc, int aw, int ah){
+    public VRoundRect(double x, double y, int z, double w, double h, Color c, Color bc, double aw, double ah){
         this(x, y, z, w, h, c, bc, 1.0f, aw, ah);
     }
 
@@ -92,7 +92,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         *@param aw arc width in virtual space
         *@param ah arc height in virtual space
         */
-    public VRoundRect(long x, long y, int z, long w, long h, Color c, Color bc, float alpha, int aw, int ah){
+    public VRoundRect(double x, double y, int z, double w, double h, Color c, Color bc, float alpha, double aw, double ah){
         vx = x;
         vy = y;
         vz = z;
@@ -100,7 +100,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         vh = h;
         computeSize();
         if (vw==0 && vh==0){ar = 1.0f;}
-        else {ar = (float)vw / (float)vh;}
+        else {ar = vw / vh;}
         orient = 0;
         setColor(c);
         setBorderColor(bc);
@@ -151,99 +151,99 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 	borderColor = bColor;
     }
 
-    public float getOrient(){return 0;}
+    public double getOrient(){return 0;}
 
     /** Cannot be reoriented. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
-    public long getWidth(){return vw;}
+    public double getWidth(){return vw;}
 
-    public long getHeight(){return vh;}
+    public double getHeight(){return vh;}
 
     void computeSize(){
-	size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+	    size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    public void sizeTo(float radius){  //new bounding circle radius
-	size=radius;
-	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
-	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void sizeTo(double radius){
+        size=radius;
+        vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
+        vh = size / (Math.sqrt(Math.pow(ar,2)+1));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setWidth(long w){ 
-	vw=w;
-	ar=(float)vw/(float)vh;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setWidth(double w){ 
+        vw=w;
+        ar = vw / vh;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void setHeight(long h){
-	vh=h;
-	ar=(float)vw/(float)vh;
-	computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void setHeight(double h){
+        vh=h;
+        ar = vw / vh;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-    public void reSize(float factor){ //resizing factor
-	size*=factor;
-	vw=(long)Math.round((size*ar)/(Math.sqrt(Math.pow(ar,2)+1)));
-	vh=(long)Math.round((size)/(Math.sqrt(Math.pow(ar,2)+1)));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+    public void reSize(double factor){
+        size*=factor;
+        vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
+        vh = size / (Math.sqrt(Math.pow(ar,2)+1));
+        VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	public long[] getBounds(){
-		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+    *@return west, north, east and south bounds in virtual space.
+    */
+	public double[] getBounds(){
+		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
 	}
 
     /**
      * set horizontal diameter of the arc at the four corners
      */
-    public void setArcWidth(int w){
-	arcWidth=(w>=0) ? w : 0;
+    public void setArcWidth(double w){
+	    arcWidth=(w>=0) ? w : 0;
     }
 
     /**
      * set vertical diameter of the arc at the four corners
      */
-    public void setArcHeight(int h){
-	arcHeight=(h>=0) ? h : 0;
+    public void setArcHeight(double h){
+	    arcHeight=(h>=0) ? h : 0;
     }
 
     /**
      * get horizontal diameter of the arc at the four corners
      */
-    public int getArcWidth(){
-	return arcWidth;
+    public double getArcWidth(){
+	    return arcWidth;
     }
 
     /**
      * get vertical diameter of the arc at the four corners
      */
-    public int getArcHeight(){
-	return arcHeight;
+    public double getArcHeight(){
+	    return arcHeight;
     }
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
         if ((alphaC == null) &&
             (w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) &&
             (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
         else {return false;}
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
             (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
         else {return false;}
     }
 
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -257,11 +257,11 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         return false;
     }
     
-    public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
 	}
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
             if (!pc[camIndex].prevMouseIn){
@@ -285,30 +285,30 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
-        coef=(float)(c.focal/(c.focal+c.altitude));
+        coef = c.focal / (c.focal+c.altitude);
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
-        pc[i].cx=(d.width/2)+Math.round((vx-c.posx)*coef);
-        pc[i].cy=(d.height/2)-Math.round((vy-c.posy)*coef);
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project width and height
         pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
         pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
-        pc[i].aw=Math.round(arcWidth*coef);
-        pc[i].ah=Math.round(arcHeight*coef);
+        pc[i].aw = (int)Math.round(arcWidth*coef);
+        pc[i].ah = (int)Math.round(arcHeight*coef);
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
-        coef=(float)(c.focal/(c.focal+c.altitude)) * lensMag;
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
-        pc[i].lcx = (lensWidth/2) + Math.round((vx-(lensx))*coef);
-        pc[i].lcy = (lensHeight/2) - Math.round((vy-(lensy))*coef);
+        pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-lensy)*coef);
         //project width and height
         pc[i].lcw = (int)Math.round(Math.ceil(vw*coef));
         pc[i].lch = (int)Math.round(Math.ceil(vh*coef));
-        pc[i].law=Math.round(arcWidth*coef);
-        pc[i].lah=Math.round(arcHeight*coef);
+        pc[i].law = (int)Math.round(arcWidth*coef);
+        pc[i].lah = (int)Math.round(arcHeight*coef);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){

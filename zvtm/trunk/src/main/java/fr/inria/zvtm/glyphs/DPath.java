@@ -1,7 +1,7 @@
 /*   FILE: DPath.java
  *   DATE OF CREATION:   Thu Mar 29 19:33 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -10,7 +10,6 @@
 package fr.inria.zvtm.glyphs;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
@@ -53,17 +52,17 @@ public class DPath extends Glyph implements RectangularShape {
     PathElement[] elements;
 	
     /* endPoint contains the coordinates of the last element's endpoint */
-    LongPoint endPoint;
+    Point2D.Double endPoint;
 
 	/* vx,vy represent the path's hotspot, i.e., the center of the bounding box, not necessarily on the path itself */
 
 	/* Path start point */
-	long spx, spy;
+	double spx, spy;
 
     /** For internal use. Made public for easier outside package subclassing. Half width in virtual space.*/
-    public long vw;
+    public double vw;
     /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
-    public long vh;
+    public double vh;
     
     /** Java2D general path that represents this DPath */
     GeneralPath gp;
@@ -78,7 +77,7 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param z z-index (pass 0 if you do not use z-ordering)
 		*@param c color
 		*/
-	public DPath(long x, long y, int z, Color c){
+	public DPath(double x, double y, int z, Color c){
 	    this(x, y, z, c, 1.0f);
     }
     
@@ -89,11 +88,11 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param c color
 		*@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 		*/
-	public DPath(long x, long y, int z, Color c, float alpha){
+	public DPath(double x, double y, int z, Color c, float alpha){
 		spx = x;
 		spy = y;
 		vz = z;
-		endPoint = new LongPoint(spx, spy);
+		endPoint = new Point2D.Double(spx, spy);
 		vx = spx;
 		vy = spy;
 		elements = new PathElement[0];
@@ -124,15 +123,15 @@ public class DPath extends Glyph implements RectangularShape {
 		double[] cds = new double[6];
 		// if first instruction is a jump, make it the start point
 		if (pi.currentSegment(cds) == PathIterator.SEG_MOVETO){
-			spx = (long)cds[0];
-			spy = (long)cds[1];
+			spx = cds[0];
+			spy = cds[1];
 			pi.next();
 		}
 		else {
 			spx = 0;
 			spy = 0;
 		}
-		endPoint = new LongPoint(spx, spy);
+		endPoint = new Point2D.Double(spx, spy);
 		vx = spx;
 		vy = spy;
 		elements = new PathElement[0];
@@ -141,19 +140,19 @@ public class DPath extends Glyph implements RectangularShape {
 			type = pi.currentSegment(cds);
 			switch (type){
 			case PathIterator.SEG_CUBICTO:{
-				addCbCurve((long)cds[4],(long)cds[5],(long)cds[0],(long)cds[1],(long)cds[2],(long)cds[3],true);
+				addCbCurve(cds[4],cds[5],cds[0],cds[1],cds[2],cds[3],true);
 				break;
 			}
 			case PathIterator.SEG_QUADTO:{
-				addQdCurve((long)cds[2],(long)cds[3],(long)cds[0],(long)cds[1],true);
+				addQdCurve(cds[2],cds[3],cds[0],cds[1],true);
 				break;
 			}
 			case PathIterator.SEG_LINETO:{
-				addSegment((long)cds[0],(long)cds[1],true);
+				addSegment(cds[0],cds[1],true);
 				break;
 			}
 			case PathIterator.SEG_MOVETO:{
-				jump((long)cds[0],(long)cds[1],true);
+				jump(cds[0],cds[1],true);
 				break;
 			}
 			}
@@ -175,7 +174,7 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param y2 y coordinate of 2nd control point in virtual space
 		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
 		*/
-	public void addCbCurve(long x, long y, long x1, long y1, long x2, long y2, boolean abs){
+	public void addCbCurve(double x, double y, double x1, double y1, double x2, double y2, boolean abs){
 		CBCElement e;
 		if (abs){
 		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
@@ -185,7 +184,7 @@ public class DPath extends Glyph implements RectangularShape {
 		else {
 		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
 			e = new CBCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, endPoint.x+x2, endPoint.y+y2, (pc!=null) ? pc.length : 0);
-			endPoint.translate(x, y);
+			endPoint.setLocation(endPoint.x+x, endPoint.y+y);
 		}
 		PathElement[] tmp = new PathElement[elements.length+1];
 		System.arraycopy(elements, 0, tmp, 0, elements.length);
@@ -203,7 +202,7 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param y1 y coordinate of control point in virtual space
 		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
 		*/
-	public void addQdCurve(long x, long y, long x1, long y1, boolean abs){
+	public void addQdCurve(double x, double y, double x1, double y1, boolean abs){
 		QDCElement e;
 		if (abs){
 		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
@@ -213,7 +212,7 @@ public class DPath extends Glyph implements RectangularShape {
 		else {
 		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
 			e = new QDCElement(endPoint.x+x, endPoint.y+y, endPoint.x+x1, endPoint.y+y1, (pc!=null) ? pc.length : 0);
-			endPoint.translate(x, y);
+			endPoint.setLocation(endPoint.x+x, endPoint.y+y);
 		}
 		PathElement[] tmp = new PathElement[elements.length+1];
 		System.arraycopy(elements, 0, tmp, 0, elements.length);
@@ -229,9 +228,9 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param y y coordinate of end point in virtual space
 		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
 		*/
-	public void addSegment(long x, long y, boolean abs){
+	public void addSegment(double x, double y, boolean abs){
 		if (abs){endPoint.setLocation(x, y);}
-		else {endPoint.translate(x, y);}
+		else {endPoint.setLocation(endPoint.x+x, endPoint.y+y);}
 		PathElement[] tmp = new PathElement[elements.length+1];
 		System.arraycopy(elements, 0, tmp, 0, elements.length);
 	    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
@@ -247,9 +246,9 @@ public class DPath extends Glyph implements RectangularShape {
 		*@param y y coordinate of end point in virtual space
 		*@param abs true if coordinates should be interpreted as absolute coordinates, false if coordinates should be interpreted as relative coordinates (w.r.t last point)
 		*/
-	public void jump(long x, long y, boolean abs){
+	public void jump(double x, double y, boolean abs){
 		if (abs){endPoint.setLocation(x, y);}
-		else {endPoint.translate(x, y);}
+		else {endPoint.setLocation(endPoint.x+x, endPoint.y+y);}
 		if (elements.length == 0){
 			// ignore jump if first command (instead, locate start point at jump coordinates)
 			// this will work even if there are multiple jump commands at the start of the path
@@ -271,23 +270,23 @@ public class DPath extends Glyph implements RectangularShape {
 	/* ------------- implementation of RectangularShape --------------- */
 
 	/** Get the horizontal distance from western-most point to the eastern-most one. */
-    public long getWidth(){return 2 * vw;}
+    public double getWidth(){return 2 * vw;}
 
 	/** Get the vertical distance from northern-most point to the southern-most one. */
-    public long getHeight(){return 2 * vh;}
+    public double getHeight(){return 2 * vh;}
 
 	/** Not implemented yet. */
-    public void setWidth(long w){}
+    public void setWidth(double w){}
 
 	/** Not implemented yet. */
-    public void setHeight(long h){}
+    public void setHeight(double h){}
 
-	public LongPoint getStartPoint(){
-		return new LongPoint(spx, spy);
+	public Point2D.Double getStartPoint(){
+		return new Point2D.Double(spx, spy);
 	}
 
-	public LongPoint getEndPoint(){
-		return new LongPoint(endPoint.x, endPoint.y);
+	public Point2D.Double getEndPoint(){
+		return new Point2D.Double(endPoint.x, endPoint.y);
 	}
 
     public void initCams(int nbCam){
@@ -334,46 +333,46 @@ public class DPath extends Glyph implements RectangularShape {
     public void resetMouseIn(int i){}
     
 	/** No effect. */
-    public void sizeTo(float factor){}
+    public void sizeTo(double factor){}
 
 	/** No effect. */
-    public void reSize(float factor){}
+    public void reSize(double factor){}
 
 	/** Translate the glyph by (x,y) - relative translation.
-		*@see #moveTo(long x, long y)
+		*@see #moveTo(double x, double y)
 		*/
-	public void move(long x, long y){
-		LongPoint[] t = new LongPoint[getNumberOfPoints()];
-		Arrays.fill(t, new LongPoint(x, y));
+	public void move(double x, double y){
+		Point2D.Double[] t = new Point2D.Double[getNumberOfPoints()];
+		Arrays.fill(t, new Point2D.Double(x, y));
 		this.edit(t, false);
 		propagateMove(x,y);  //take care of sticked glyphs
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	/** Translate the glyph to (x,y) - absolute translation.
-		*@see #move(long x, long y)
+		*@see #move(double x, double y)
 		*/
-	public void moveTo(long x, long y){
+	public void moveTo(double x, double y){
 		propagateMove(x-vx, y-vy);  //take care of sticked glyphs
-		LongPoint[] t = new LongPoint[getNumberOfPoints()];
-		Arrays.fill(t, new LongPoint(x-vx, y-vy));
+		Point2D.Double[] t = new Point2D.Double[getNumberOfPoints()];
+		Arrays.fill(t, new Point2D.Double(x-vx, y-vy));
 		this.edit(t, false);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	/** No effect. */
-    public void orientTo(float angle){}
+    public void orientTo(double angle){}
 
-    public float getSize(){
-	return size;
+    public double getSize(){
+	    return size;
     }
 
     void computeSize(){
-		size = (float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+		size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
 	public void computeBounds(){
-		LongPoint[] allPoints = getAllPointsCoordinates();
+		Point2D.Double[] allPoints = getAllPointsCoordinates();
 		if (allPoints.length == 0){
 			vx = spx;
 			vy = spy;
@@ -382,7 +381,7 @@ public class DPath extends Glyph implements RectangularShape {
 			return;
 		}
 		// identify western/northern/eastern/southern-most points
-		long[] wnes = {allPoints[0].x, allPoints[0].y, allPoints[0].x, allPoints[0].y};
+		double[] wnes = {allPoints[0].x, allPoints[0].y, allPoints[0].x, allPoints[0].y};
 		for (int i=1;i<allPoints.length;i++){
 			if (allPoints[i].x < wnes[0]){wnes[0] = allPoints[i].x;}
 			if (allPoints[i].x > wnes[2]){wnes[2] = allPoints[i].x;}
@@ -401,27 +400,27 @@ public class DPath extends Glyph implements RectangularShape {
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public long[] getBounds(){
-		long[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+	public double[] getBounds(){
+		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
 		return res;
 	}
 	
-	public boolean coordsInsideBoundingBox(long x, long y){
+	public boolean coordsInsideBoundingBox(double x, double y){
 		return (x >= vx-vw) && (x <= vx+vw) &&
 		       (y >= vy-vh) && (y <= vy+vh);
 	}
 
-    public float getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
-    public boolean fillsView(long w,long h,int camIndex){
+    public boolean fillsView(double w,double h,int camIndex){
 	return false;
     }
 
-    public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return false;
     }
 
-    public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return Glyph.NO_CURSOR_EVENT;
     }
 
@@ -429,11 +428,11 @@ public class DPath extends Glyph implements RectangularShape {
 
     public void project(Camera c, Dimension d){
 	int i = c.getIndex();
-	coef = (float)(c.focal / (c.focal+c.altitude));
+	coef = c.focal / (c.focal+c.altitude);
 	hw = d.width/2;
 	hh = d.height/2;
-	pc[i].cx = hw + Math.round((spx-c.posx)*coef);
-	pc[i].cy = hh - Math.round((spy-c.posy)*coef);
+	pc[i].cx = hw + (int)Math.round((spx-c.posx)*coef);
+	pc[i].cy = hh - (int)Math.round((spy-c.posy)*coef);
 	if (elements.length == 0){return;}
 	elements[0].project(i, hw, hh, c, coef, pc[i].cx, pc[i].cy);
 	for (int j=1;j<elements.length;j++){
@@ -441,13 +440,13 @@ public class DPath extends Glyph implements RectangularShape {
 	}
     }
 
-    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 	int i = c.getIndex();
-	coef = (float)(c.focal / (c.focal+c.altitude)) * lensMag;
+	coef = c.focal / (c.focal+c.altitude) * lensMag;
 	lhw = lensWidth/2;
 	lhh = lensHeight/2;
-	pc[i].lcx = lhw + Math.round((spx-(lensx))*coef);
-	pc[i].lcy = lhh - Math.round((spy-(lensy))*coef);
+	pc[i].lcx = lhw + (int)Math.round((spx-(lensx))*coef);
+	pc[i].lcy = lhh - (int)Math.round((spy-(lensy))*coef);
 	if (elements.length == 0){return;}
 	elements[0].projectForLens(i, lhw, lhh, lensx, lensy, coef, pc[i].lcx, pc[i].lcy);
 	for (int j=1;j<elements.length;j++){
@@ -550,7 +549,7 @@ public class DPath extends Glyph implements RectangularShape {
         }
     }
 
-    public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
 	    if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
 			// if glyph hotspot is in the region, we consider it is visible
 			return true;
@@ -564,7 +563,7 @@ public class DPath extends Glyph implements RectangularShape {
 		return false;
     }
 
-    public boolean containedInRegion(long wb, long nb, long eb, long sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
 	    if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
 			// if glyph hotspot is in the region, we consider it is visible
 			return true;
@@ -579,7 +578,7 @@ public class DPath extends Glyph implements RectangularShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return gp.intersects(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr) && !gp.contains(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr);
 	}
 	
@@ -615,10 +614,10 @@ public class DPath extends Glyph implements RectangularShape {
 		* @param sy y coordinate of the element's start point
 		* @param ex x coordinate of the element's end point
 		* @param ey y coordinate of the element's end point
-		* @param ctrlPoints list of the LongPoints that contain coordinates of the control point(s) (in case of QD/CB curve)
+		* @param ctrlPoints list of the points that contain coordinates of the control point(s) (in case of QD/CB curve)
 		* @param abs indicates whether to use absolute coordinates or relative
 		*/
-	public void editElement(int index, long sx, long sy, long ex, long ey, LongPoint[] ctrlPoints, boolean abs){
+	public void editElement(int index, double sx, double sy, double ex, double ey, Point2D.Double[] ctrlPoints, boolean abs){
 		if (index > -1 && index < elements.length && elements[index] != null){
 			if (index > 0){
 				if (abs){
@@ -683,7 +682,7 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 			if (index == elements.length - 1){
 				// if this is last element
-				endPoint = new LongPoint(el.x, el.y);
+				endPoint = new Point2D.Double(el.x, el.y);
 			}
 		}
 		computeBounds();
@@ -696,7 +695,7 @@ public class DPath extends Glyph implements RectangularShape {
 		* @param points List of new coordinates for each point. Example order could be: startPoint, controlPoint1, controlPoint2, endPoint, controlPoint1, endPoint, endPoint ...
 		* @param abs  whether to use absolute coordinates or relative
 		*/
-	public void edit(LongPoint[] points, boolean abs){
+	public void edit(Point2D.Double[] points, boolean abs){
 		// check consistensy
 		int totalPointsCount = 1;
 		for (int i=0; i < elements.length; i++){
@@ -770,7 +769,7 @@ public class DPath extends Glyph implements RectangularShape {
 				}
 				if (i == elements.length - 1){
 					// if this is last element
-					endPoint = new LongPoint(elements[i].x, elements[i].y);
+					endPoint = new Point2D.Double(elements[i].x, elements[i].y);
 				}
 			}
 		}
@@ -808,44 +807,44 @@ public class DPath extends Glyph implements RectangularShape {
      * @param index index of the element in the DPath
      * @return List of element's points ordered as startPoint, controlPoint1, controlPoint2, endPoint
      */    
-    public LongPoint[] getElementPointsCoordinates(int index){
-	LongPoint[] result = null;
+    public Point2D.Double[] getElementPointsCoordinates(int index){
+	Point2D.Double[] result = null;
 	if (elements != null && index > -1 && index < elements.length && elements[index] != null){
 	    switch (elements[index].type){
 	    case DPath.CBC:{
-		result = new LongPoint[4];
+		result = new Point2D.Double[4];
 		if (index == 0){
-		    result[0] = new LongPoint(this.spx, this.spy);
+		    result[0] = new Point2D.Double(this.spx, this.spy);
 		}
 		else{
-		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
+		    result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
 		}
-		result[3] = new LongPoint(elements[index].x, elements[index].y);
-		result[1] = new LongPoint(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
-		result[2] = new LongPoint(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
+		result[3] = new Point2D.Double(elements[index].x, elements[index].y);
+		result[1] = new Point2D.Double(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
+		result[2] = new Point2D.Double(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
 		break;
 	    }
 	    case DPath.QDC:{
-		result = new LongPoint[3];
+		result = new Point2D.Double[3];
 		if (index == 0){
-		    result[0] = new LongPoint(this.spx, this.spy);
+		    result[0] = new Point2D.Double(this.spx, this.spy);
 		}
 		else{
-		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
+		    result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
 		}
-		result[2] = new LongPoint(elements[index].x, elements[index].y);
-		result[1] = new LongPoint(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
+		result[2] = new Point2D.Double(elements[index].x, elements[index].y);
+		result[1] = new Point2D.Double(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
 		break;
 	    }
 	    default:{
-		result = new LongPoint[2];
+		result = new Point2D.Double[2];
 		if (index == 0){
-		    result[0] = new LongPoint(this.spx, this.spy);
+		    result[0] = new Point2D.Double(this.spx, this.spy);
 		}
 		else{
-		    result[0] = new LongPoint(elements[index - 1].x, elements[index - 1].y);
+		    result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
 		}
-		result[1] = new LongPoint(elements[index].x, elements[index].y);
+		result[1] = new Point2D.Double(elements[index].x, elements[index].y);
 		break;
 	    }
 	    }
@@ -870,30 +869,30 @@ public class DPath extends Glyph implements RectangularShape {
 		* Get coordinates of each point in the path including control points
 		* @return list of points in following format: startPoint, controlPoint1, controlPoint2, endPoint ...
 		*/
-	public LongPoint[] getAllPointsCoordinates(){
+	public Point2D.Double[] getAllPointsCoordinates(){
 		int totalNumberOfPoints = getNumberOfPoints();
-		LongPoint[] result = new LongPoint[totalNumberOfPoints];
+		Point2D.Double[] result = new Point2D.Double[totalNumberOfPoints];
 		int offset = 0;
-		result[0] = new LongPoint(this.spx, this.spy);
+		result[0] = new Point2D.Double(this.spx, this.spy);
 		for (int i=0; i < elements.length; i++){
 			switch(elements[i].type){
 				case DPath.CBC:{
 					CBCElement el = (CBCElement)elements[i];
-					result[i+1+offset] = new LongPoint(el.ctrlx1, el.ctrly1);
-					result[i+2+offset] = new LongPoint(el.ctrlx2, el.ctrly2);
-					result[i+3+offset] = new LongPoint(el.x, el.y);
+					result[i+1+offset] = new Point2D.Double(el.ctrlx1, el.ctrly1);
+					result[i+2+offset] = new Point2D.Double(el.ctrlx2, el.ctrly2);
+					result[i+3+offset] = new Point2D.Double(el.x, el.y);
 					offset += 2;
 					break;
 				}
 				case DPath.QDC:{
 					QDCElement el = (QDCElement)elements[i];
-					result[i+1+offset] = new LongPoint(el.ctrlx, el.ctrly);
-					result[i+2+offset] = new LongPoint(el.x, el.y);
+					result[i+1+offset] = new Point2D.Double(el.ctrlx, el.ctrly);
+					result[i+2+offset] = new Point2D.Double(el.x, el.y);
 					offset += 1;
 					break;
 				}
 				default:{
-					result[i+1+offset] = new LongPoint(elements[i].x, elements[i].y);
+					result[i+1+offset] = new Point2D.Double(elements[i].x, elements[i].y);
 				}
 			}
 		}
@@ -908,14 +907,14 @@ public class DPath extends Glyph implements RectangularShape {
      * @param abs whether to use absolute values
      * @return List of LongPoint absolute coordinates that can be passed to the edit(LongPoint[], boolean) method or to the AnimManager
      */
-    public static LongPoint[] getFlattenedCoordinates(DPath path, LongPoint startPoint, LongPoint endPoint, boolean abs){
-	LongPoint[] result = path.getAllPointsCoordinates();
+    public static Point2D.Double[] getFlattenedCoordinates(DPath path, Point2D.Double startPoint, Point2D.Double endPoint, boolean abs){
+	Point2D.Double[] result = path.getAllPointsCoordinates();
 	if (!abs){
-	    startPoint = new LongPoint(result[0].x + startPoint.x, result[0].y + startPoint.y);
-	    endPoint = new LongPoint(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);            
+	    startPoint = new Point2D.Double(result[0].x + startPoint.x, result[0].y + startPoint.y);
+	    endPoint = new Point2D.Double(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);            
 	}
-	long dx = Math.round((double)(endPoint.x - startPoint.x) / (double)result.length);
-	long dy = Math.round((double)(endPoint.y - startPoint.y) / (double)result.length);
+	double dx = (endPoint.x - startPoint.x) / (double)result.length;
+	double dy = (endPoint.y - startPoint.y) / (double)result.length;
 	
 	for (int i = 0; i < result.length - 1; i++){
             result[i].x = startPoint.x + i * dx;
@@ -933,7 +932,7 @@ public class DPath extends Glyph implements RectangularShape {
 		res.moveTo(spx, -spy);
 		for (int i = 0; i < this.getElementsCount(); i++){
 			int elType = this.getElementType(i);
-			LongPoint[] pts = this.getElementPointsCoordinates(i);
+			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
 			switch(elType){
 				case DPath.CBC:{
 					res.curveTo(pts[1].x, -pts[1].y, pts[2].x, -pts[2].y, pts[3].x, -pts[3].y);
@@ -962,7 +961,7 @@ public class DPath extends Glyph implements RectangularShape {
         gp.moveTo(spx, spy);
 		for (int i = 0; i < this.getElementsCount(); i++){
 			int elType = this.getElementType(i);
-			LongPoint[] pts = this.getElementPointsCoordinates(i);
+			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
 			switch(elType){
 				case DPath.CBC:{
 					gp.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
@@ -998,12 +997,12 @@ public class DPath extends Glyph implements RectangularShape {
      * Get orientation of the tangent to the start of the path.
      * @return radians between 0..2*Pi
      */
-    public float getStartTangentOrientation(){
-	float res = 0;
+    public double getStartTangentOrientation(){
+	    double res = 0;
 	if (elements.length > 0){
 	    PathElement el = elements[0];
-	    long sx = 0;
-	    long sy = 0;
+	    double sx = 0;
+	    double sy = 0;
 	    switch(el.type){
 	    case DPath.CBC:{
 		sx = ((CBCElement)el).ctrlx1;
@@ -1029,7 +1028,7 @@ public class DPath extends Glyph implements RectangularShape {
 	    }
 	    else {
 		double tan = (double)(spy - sy) / (double)(spx - sx);
-		res = (float)Math.atan(tan);
+		res = Math.atan(tan);
 		if (spx < sx) { // x < 0 
 		    res += Math.PI;
 		}
@@ -1045,12 +1044,12 @@ public class DPath extends Glyph implements RectangularShape {
      * Get orientation of the tangent to the end of the path.
      * @return radians between 0..2*Pi
      */
-    public float getEndTangentOrientation(){
-	float res = 0;
+    public double getEndTangentOrientation(){
+        double res = 0;
 	if (elements.length > 0){
 	    PathElement el = elements[elements.length-1];
-	    long sx = 0;
-	    long sy = 0;
+	    double sx = 0;
+	    double sy = 0;
 	    switch(el.type){
 	    case DPath.CBC:{
 		sx = ((CBCElement)el).ctrlx2;
@@ -1082,7 +1081,7 @@ public class DPath extends Glyph implements RectangularShape {
 	    }
 	    else {
 		double tan = (double)(el.y - sy) / (double)(el.x - sx);
-		res = (float)Math.atan(tan);
+		res = Math.atan(tan);
 		if (el.x < sx) { // x < 0 
 		    res += Math.PI;
 		}
@@ -1099,8 +1098,8 @@ abstract class PathElement {
 
     short type;
 
-    long x;
-    long y;
+    double x;
+    double y;
 
     abstract void initCams(int nbCam);
 
@@ -1108,9 +1107,9 @@ abstract class PathElement {
 
     abstract void removeCamera(int index);
     
-    abstract void project(int i, int hw, int hh, Camera c, float coef, double px, double py);
+    abstract void project(int i, int hw, int hh, Camera c, double coef, double px, double py);
 
-    abstract void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py);
+    abstract void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py);
 
     abstract double getX(int i);
 
@@ -1134,7 +1133,7 @@ class MOVElement extends PathElement {
     Point2D[] pc;
     Point2D[] lpc;
 
-    MOVElement(long x, long y, int nbCam){
+    MOVElement(double x, double y, int nbCam){
         type = DPath.MOV;
         this.x = x;
         this.y = y;
@@ -1182,11 +1181,11 @@ class MOVElement extends PathElement {
  	lpc[index] = null;
     }
 
-    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+    void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setLocation(hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
-    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+    void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setLocation(hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
@@ -1223,7 +1222,7 @@ class SEGElement extends PathElement {
     Line2D[] pc;
     Line2D[] lpc;
 
-    SEGElement(long x, long y, int nbCam){
+    SEGElement(double x, double y, int nbCam){
         type = DPath.SEG;
         this.x = x;
         this.y = y;
@@ -1271,11 +1270,11 @@ class SEGElement extends PathElement {
  	lpc[index] = null;
     }
 
-    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+    void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setLine(px, py, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
-    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+    void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setLine(px, py, hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
@@ -1310,13 +1309,13 @@ class QDCElement extends PathElement {
     /* Draw a quadratic curve from previous point to (x,y) in virtual space,
        controlled by point (ctrlx, ctrly) */
 
-    long ctrlx;
-    long ctrly;
+    double ctrlx;
+    double ctrly;
 
     QuadCurve2D[] pc;
     QuadCurve2D[] lpc;
 
-    QDCElement(long x, long y, long ctrlx, long ctrly, int nbCam){
+    QDCElement(double x, double y, double ctrlx, double ctrly, int nbCam){
         type = DPath.QDC;
         this.x = x;
         this.y = y;
@@ -1366,11 +1365,11 @@ class QDCElement extends PathElement {
  	lpc[index] = null;
     }
     
-    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+    void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setCurve(px, py, hw+(ctrlx-c.posx)*coef, hh-(ctrly-c.posy)*coef, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
-    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+    void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setCurve(px, py, hw+(ctrlx-lx)*coef, hh-(ctrly-ly)*coef, hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
@@ -1405,15 +1404,15 @@ class CBCElement extends PathElement {
     /* Draw a cubic curve from previous point to (x,y) in virtual space,
        controlled by points (ctrlx1, ctrly1) and (ctrlx2, ctrly2) */
 
-    long ctrlx1;
-    long ctrly1;
-    long ctrlx2;
-    long ctrly2;
+    double ctrlx1;
+    double ctrly1;
+    double ctrlx2;
+    double ctrly2;
 
     CubicCurve2D[] pc;
     CubicCurve2D[] lpc;
 
-    CBCElement(long x, long y, long ctrlx1, long ctrly1, long ctrlx2, long ctrly2, int nbCam){
+    CBCElement(double x, double y, double ctrlx1, double ctrly1, double ctrlx2, double ctrly2, int nbCam){
         type = DPath.CBC;
         this.x = x;
         this.y = y;
@@ -1465,14 +1464,14 @@ class CBCElement extends PathElement {
  	lpc[index] = null;
     }
 
-    void project(int i, int hw, int hh, Camera c, float coef, double px, double py){
+    void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setCurve(px, py,
 		       hw+(ctrlx1-c.posx)*coef, hh-(ctrly1-c.posy)*coef,
 		       hw+(ctrlx2-c.posx)*coef, hh-(ctrly2-c.posy)*coef,
 		       hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
-    void projectForLens(int i, int hw, int hh, long lx, long ly, float coef, double px, double py){
+    void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setCurve(px, py,
 		       hw+(ctrlx1-lx)*coef, hh-(ctrly1-ly)*coef,
 		       hw+(ctrlx2-lx)*coef, hh-(ctrly2-ly)*coef,
