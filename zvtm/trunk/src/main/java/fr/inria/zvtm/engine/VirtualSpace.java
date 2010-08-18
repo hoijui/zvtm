@@ -96,18 +96,6 @@ public class VirtualSpace {
     /**get virtual space's i-th camera*/
     public Camera getCamera(int i){return cm.getCamera(i);}
     
-    /**
-     *@deprecated As of zvtm 0.9.0, replaced by getCameraListAsArray
-     *@see #getCameraListAsArray()
-     */
-    public Vector<Camera> getCameraList(){
-	Vector res=new Vector();
-	for (int i=0;i<cm.cameraList.length;i++){
-	    res.add(cm.cameraList[i]);
-	}
-	return res;
-    }
-
     /**returns the list of all cameras in this virtual space*/
     public Camera[] getCameraListAsArray(){return cm.cameraList;}
 
@@ -198,18 +186,6 @@ public class VirtualSpace {
 	return visualEnts;
     }
 
-    /**get all visible glyphs
-     *@deprecated as of zvtm 0.9.2
-     *@see #getDrawnGlyphs(int cameraIndex)
-     */
-    public Vector<Glyph> getVisibleGlyphs(){
-	Vector res = new Vector();
-	for (int i=0;i<drawingList.length;i++){
-	    res.add(drawingList[i]);
-	}
-	return res;
-    }
-
     /** Get all visible glyphs (not cloned). */
 	public Glyph[] getDrawingList(){
 		return drawingList;
@@ -220,17 +196,6 @@ public class VirtualSpace {
 		Glyph[] res = new Glyph[drawingList.length];
 		System.arraycopy(drawingList, 0, res, 0, drawingList.length);
 		return res;
-    }
-
-    /**
-     *@deprecated as of zvtm 0.9.0
-     *@see #getDrawnGlyphs(int cameraIndex)
-     */
-    public Vector<Glyph> getDrawnGlyphs(){
-	if (camera2drawnList.length>0){
-	    return camera2drawnList[0];
-	}
-	else return null;
     }
 
     /**
@@ -351,23 +316,6 @@ public class VirtualSpace {
             System.err.println("ZVTM Error: VirtualSpace.removeGlyph(): the glyph you are trying to delete might not be a member of this virtual space ("+spaceName+") or might be null");
             ex.printStackTrace();
         }
-    }
-
-	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
-		*@deprecated as of zvtm 0.9.8
-		*@see #removeGlyph(Glyph g)
-		*/
-	public void destroyGlyph(Glyph g){
-        removeGlyph(g, true);
-    }
-
-	/** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
-		*@param repaint should the view be updated automatically or not
-		*@deprecated as of zvtm 0.9.8
-		*@see #removeGlyph(Glyph g, boolean repaint)
-		*/
-    public void destroyGlyph(Glyph g, boolean repaint){
-		removeGlyph(g, repaint);
     }
 
     /**show Glyph g
