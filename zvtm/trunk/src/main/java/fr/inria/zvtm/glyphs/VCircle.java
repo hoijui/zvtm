@@ -36,7 +36,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Circle. This version is the most efficient, but it cannot be made translucent (see VCircleST). Cannot be reoriented (it makes no sense).
+ * Circle. 
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VEllipse
  */

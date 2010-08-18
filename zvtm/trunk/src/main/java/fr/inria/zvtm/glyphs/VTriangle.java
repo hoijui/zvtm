@@ -36,7 +36,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Equilateral Triangle. This version is the most efficient, but it can neither be reoriented (see VTriangleOr*) nor made translucent (see VTriangle*ST).
+ * Equilateral Triangle. This version is the most efficient, but it cannot be reoriented (see VTriangleOr).
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VTriangleOr
  */

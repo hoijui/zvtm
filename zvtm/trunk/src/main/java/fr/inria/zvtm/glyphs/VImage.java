@@ -37,7 +37,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Bitmap Image. This version is the most efficient, but it can neither be reoriented (see VImageOr*) nor made translucent (see VImage*ST).
+ * Bitmap Image. This version is the most efficient, but it cannot be reoriented (see VImageOr).
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VImageOr
  */

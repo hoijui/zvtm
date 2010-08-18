@@ -35,7 +35,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Diamond (losange with height equal to width). This version is the most efficient, but it can neither be reoriented (see VDiamondOr*) nor made translucent (see VDiamond*ST).
+ * Diamond (losange with height equal to width). This version is the most efficient, but it cannot be reoriented (see VDiamondOr).
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VDiamondOr
  */
