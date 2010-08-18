@@ -609,12 +609,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}
     }
 
-    /** Get VCursor instance associated with the parent view.
-        *@deprecated As of ZVTM 0.9.8, use getVCursor()
-        *@see #getVCursor()
-        */
-    public VCursor getMouse(){return parent.getCursor();}
-
     /** Get VCursor instance associated with the parent view.*/
     public VCursor getVCursor(){
         return parent.getCursor();
@@ -631,16 +625,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
      */
     public Glyph[] getGlyphsUnderMouseList(){
 	return parent.mouse.getGlyphsUnderMouseList();
-    }
-
-    /**get the list of glyphs currently under mouse (last entry is last glyph entered)
-     * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called
-     * (in other words, the array returned by this method is not synchronized with the actual list over time)
-     *@deprecated As of zvtm 0.9.3, replaced by getGlyphsUnderMouseList()
-     *@see #getGlyphsUnderMouseList()
-     */
-    public Vector<Glyph> getGlyphsUnderMouse(){
-	return parent.mouse.getGlyphsUnderMouse();
     }
 
     //get the BufferedImage or VolatileImage for this view
