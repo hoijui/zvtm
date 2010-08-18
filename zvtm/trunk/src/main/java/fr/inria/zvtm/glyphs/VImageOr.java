@@ -32,7 +32,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Re-orientable Bitmap Image. This version is less efficient than VImage, but it can be reoriented. It cannot be made translucent (see VImage*ST).
+ * Re-orientable Bitmap Image. This version is less efficient than VImage, but it can be reoriented.
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VImage
  */

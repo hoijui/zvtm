@@ -34,7 +34,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Ellipse. This version is the most efficient, but it can not be made translucent (see VEllipseST).
+ * Ellipse. 
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VCircle
  */

@@ -26,7 +26,7 @@ import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Slice. This version is the most efficient, but it cannot be made translucent (see VSliceST).<br>
+ * Slice.<br>
  * Slices are useful e.g. to draw pie menus.
  * @author Emmanuel Pietriga
  */

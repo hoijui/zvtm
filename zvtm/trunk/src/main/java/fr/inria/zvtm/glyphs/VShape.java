@@ -39,7 +39,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
  * Custom shape implementing Jean-Yves Vion-Dury's graphical object model. Defined by its N vertices (every vertex is between 0 (distance from shape's center=0) and 1.0 (distance from shape's center equals bounding circle radius)). Angle between each vertices is 2*Pi/N - can be reoriented.<br>
- * This version is the most efficient, but it can not be made translucent (see VShapeST).
  * @author Emmanuel Pietriga
  **/
 

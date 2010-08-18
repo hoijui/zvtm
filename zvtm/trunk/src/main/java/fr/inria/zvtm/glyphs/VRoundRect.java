@@ -24,7 +24,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Round Rectangle. This version is the most efficient, but it cannot be made translucent (see VRoundRectST).<br>Corners are approximated to right angles for some operations such as cursor entry/exit events.
+ * Round Rectangle. <br>Corners are approximated to right angles for some operations such as cursor entry/exit events.
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VRectangle
  */
