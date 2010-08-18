@@ -28,10 +28,10 @@ cam.move(-10, 10);
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
 // set the camera's altitude
-cam.setAltitude(150.0f)
+cam.setAltitude(150.0)
 
 // relative altitude change
-cam.altitudeOffset(-10.0f);
+cam.altitudeOffset(-10.0);
 
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -41,7 +41,7 @@ Position and altitude can be set with a single method call.
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-cam.setLocation(new Location(100,-200,150f));
+cam.setLocation(new Location(100,-200,150));
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
@@ -82,9 +82,9 @@ public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy,
                          MouseEvent e){
     if (buttonNumber == 1){
         Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-        float a = (c.focal + Math.abs(c.altitude)) / c.focal;
+        double a = (c.focal + Math.abs(c.altitude)) / c.focal;
         synchronized(c){
-            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
             lastJPX = jpx;
             lastJPY = jpy;
         }
@@ -128,11 +128,11 @@ public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy,
     if (buttonNumber == 3){
         Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
         VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(
-            (c.altitude>0) ? (long)((jpx-lastJPX)*(a/RBSSF))
-                           : (long)((jpx-lastJPX)/(a*RBSSF)));
+            (c.altitude>0) ? (jpx-lastJPX)*(a/RBSSF)
+                           : (jpx-lastJPX)/(a*RBSSF));
         VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(
-            (c.altitude>0) ? (long)((lastJPY-jpy)*(a/RBSSF))
-                           : (long)((lastJPY-jpy)/(a*RBSSF)));
+            (c.altitude>0) ? (lastJPY-jpy)*(a/RBSSF)
+                           : (lastJPY-jpy)/(a*RBSSF));
         VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
     }
 }
@@ -157,7 +157,7 @@ static final float WSF = 5f;
 public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy,
                             MouseWheelEvent e){
     Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-    float a = (c.focal + Math.abs(c.altitude)) / c.focal;
+    double a = (c.focal + Math.abs(c.altitude)) / c.focal;
     if (wheelDirection == WHEEL_UP){
         c.altitudeOffset(-a*WSF);
         VirtualSpaceManager.INSTANCE.repaintNow();

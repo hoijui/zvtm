@@ -96,7 +96,7 @@ Animation cameraAlt =
                               Object subject, 
                               Animation.Dimension dim){
          Camera c = (Camera)subject;
-         c.setAltitude(25+Float.valueOf(fraction*50).longValue());
+         c.setAltitude(25+Double.valueOf(fraction*50).doubleValue());
       }
                                              
       public void end(Object subject, Animation.Dimension dim){
@@ -236,7 +236,7 @@ Animation anim =
           @Override
           public void timingEvent(float fraction, Object target, Dimension dim) {
               ((VRing)target).setAngle(fraction * 2*Math.PI);
-              ((VRing)target).orientTo((float)(fraction * Math.PI + Math.PI / 2));
+              ((VRing)target).orientTo(fraction * Math.PI + Math.PI / 2);
           }
 
           @Override

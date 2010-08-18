@@ -205,7 +205,7 @@ Dependency on \cd{zvtm-pdf} si declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-pdf</artifactId>
-  <version>0.2.1</version> <!-- or any newer version -->
+  <version>0.3.0</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -248,7 +248,7 @@ try {
 }
 int page_width = (int)document.getPageDimension(0, 0).getWidth();
 for (int i = 0; i < document.getNumberOfPages(); i++) {
-    IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0,
+    IcePDFPageImg g = new IcePDFPageImg(i*page_width*1.1f*detailFactor, 0, 0,
                                         document, i, detailFactor, 1.0f);
     vs.addGlyph(g);
 }
@@ -269,7 +269,7 @@ Dependency on \cd{zvtm-svg} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-svg</artifactId>
-  <version>0.1.1</version> <!-- or any newer version -->
+  <version>0.2.0</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
