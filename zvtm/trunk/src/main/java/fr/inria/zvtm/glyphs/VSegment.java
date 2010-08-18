@@ -39,7 +39,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 
 /**
- * Segment (straight line). This version is the most efficient, but it cannot be made translucent (see VSegmentST).
+ * Segment (straight line). 
  * @author Emmanuel Pietriga
  */
 
