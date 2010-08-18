@@ -181,7 +181,7 @@ class PDFViewerEventHandler implements ViewEventHandler {
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (buttonNumber == 1){
 			Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-			float a = (c.focal+Math.abs(c.altitude))/c.focal;
+			double a = (c.focal+Math.abs(c.altitude))/c.focal;
 			if (mod == SHIFT_MOD) {
 			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
@@ -198,7 +198,7 @@ class PDFViewerEventHandler implements ViewEventHandler {
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-		float a = (c.focal+Math.abs(c.altitude))/c.focal;
+		double a = (c.focal+Math.abs(c.altitude))/c.focal;
 		if (wheelDirection == WHEEL_UP){
 			c.altitudeOffset(-a*5);
 			VirtualSpaceManager.INSTANCE.repaintNow();

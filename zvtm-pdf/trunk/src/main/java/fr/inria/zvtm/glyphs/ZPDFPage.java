@@ -12,7 +12,6 @@ import java.awt.Rectangle;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VImage;
@@ -34,11 +33,11 @@ import java.awt.geom.AffineTransform;
 public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 
 	/** Page width in virtual space. */
-	long vw;
+	double vw;
 	/** Page height in virtual space. */
-	long vh;
+	double vh;
 	/** Aspect ratio: width divided by height (read-only). */
-    public float ar;
+    public double ar;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public RProjectedCoordsP[] pc;
@@ -47,7 +46,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
     public boolean zoomSensitive = true;
 
     /** For internal use. Made public for easier outside package subclassing. */
-    public float scaleFactor = 1.0f;
+    public double scaleFactor = 1.0f;
     
     /** Indicates when a border is drawn around the image (read-only).
      * One of DRAW_BORDER_*
@@ -88,39 +87,39 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 
     /** For internal use. */
     public void computeSize(){
-        size=(float)Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+        size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
     /** Get glyph's size (radius of bounding circle). */
-    public float getSize(){return size;}
+    public double getSize(){return size;}
 
     /** Set glyph's size by setting its bounding circle's radius.
      *@see #reSize(float factor)
      */
-    public void sizeTo(float radius){/*XXX:TBW*/}
+    public void sizeTo(double radius){/*XXX:TBW*/}
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
      *@see #sizeTo(float radius)
      */
-    public void reSize(float factor){/*XXX:TBW*/}
+    public void reSize(double factor){/*XXX:TBW*/}
 
     /** Get the glyph's orientation. */
-    public float getOrient(){/*XXX:TBW*/return 0;}
+    public double getOrient(){/*XXX:TBW*/return 0;}
 
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
-    public void orientTo(float angle){/*XXX:TBW*/}
+    public void orientTo(double angle){/*XXX:TBW*/}
 
 	public void highlight(boolean b, Color selectedColor){}
 
-	public void setWidth(long w){}
+	public void setWidth(double w){}
 
-	public void setHeight(long h){}
+	public void setHeight(double h){}
 
-	public long getWidth(){return vw;}
+	public double getWidth(){return vw;}
 
-	public long getHeight(){return vh;}
+	public double getHeight(){return vh;}
 
 	/** Set to false if the image should not be scaled according to camera's altitude. Its size can still be changed, but its apparent size will always be the same, no matter the camera's altitude.
 		*@see #isZoomSensitive()
@@ -149,18 +148,18 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 	
-	public boolean fillsView(long w,long h,int camIndex){
+	public boolean fillsView(double w,double h,int camIndex){
 		//can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
 		return false; 
 	}
 
-	public boolean coordInside(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 		if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
 		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
 		else {return false;}
 	}
 	
-	public boolean visibleInRegion(long wb, long nb, long eb, long sb, int i){
+	public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -174,11 +173,11 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
         return false;
     }
     
-	public boolean visibleInDisc(long dvx, long dvy, long dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
 	}
 
-	public short mouseInOut(int jpx, int jpy, int camIndex, long cvx, long cvy){
+	public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 		if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
 			//if the mouse is inside the glyph
 			if (!pc[camIndex].prevMouseIn){
@@ -218,15 +217,15 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	
 	public void project(Camera c, Dimension d){
 		int i = c.getIndex();
-		coef = (float)(c.focal/(c.focal+c.altitude));
+		coef = c.focal/(c.focal+c.altitude);
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
-		pc[i].cx = (d.width/2)+Math.round((vx-c.posx)*coef);
-		pc[i].cy = (d.height/2)-Math.round((vy-c.posy)*coef);
+		pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
+		pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
 		//project width and height
 		if (zoomSensitive){
-			pc[i].cw = Math.round(vw*coef);
-			pc[i].ch = Math.round(vh*coef);
+			pc[i].cw = (int)Math.round(vw*coef);
+			pc[i].ch = (int)Math.round(vh*coef);
 		}
 		else{
 			pc[i].cw = (int)vw;
@@ -234,17 +233,17 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 
-	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, long lensx, long lensy){
+	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 		int i = c.getIndex();
-		coef = ((float)(c.focal/(c.focal+c.altitude))) * lensMag;
+		coef = c.focal/(c.focal+c.altitude) * lensMag;
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
-		pc[i].lcx = lensWidth/2 + Math.round((vx-lensx)*coef);
-		pc[i].lcy = lensHeight/2 - Math.round((vy-lensy)*coef);
+		pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+		pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
 		//project width and height
 		if (zoomSensitive){
-			pc[i].lcw = Math.round(vw*coef);
-			pc[i].lch = Math.round(vh*coef);
+			pc[i].lcw = (int)Math.round(vw*coef);
+			pc[i].lch = (int)Math.round(vh*coef);
 		}
 		else {
 			pc[i].lcw = (int)vw;

@@ -13,7 +13,6 @@ import java.awt.RenderingHints;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VImage;
@@ -45,7 +44,7 @@ public class IcePDFPageImg extends ZPDFPage {
 	BufferedImage pageImage;
 
     /** For internal use. Made public for easier outside package subclassing. */
-    public float trueCoef = 1.0f;
+    public double trueCoef = 1.0f;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;
@@ -65,7 +64,7 @@ public class IcePDFPageImg extends ZPDFPage {
 	 *@param pdfDoc the PDF document from ICEpdf
 	 *@param pageNumber page number starting from 0 (for page 1)
 	 */
-	public IcePDFPageImg(long x, long y, int z, Document pdfDoc, int pageNumber){
+	public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber){
 		this(x, y, z, pdfDoc, pageNumber, 1f, 1f);
 	}
 	
@@ -79,17 +78,17 @@ public class IcePDFPageImg extends ZPDFPage {
 	                      This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
      *@param scaleFactor glyph size multiplication factor in virtual space w.r.t specified image size (default is 1.0). This has not impact on the PDF page rendering quality (a posteriori rescaling in ZVTM).
 	 */
-	public IcePDFPageImg(long x, long y, int z, Document pdfDoc, int pageNumber, float detailFactor, float scaleFactor){
+	public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber, float detailFactor, double scaleFactor){
 		this.vx = x;
 		this.vy = y;
 		this.vz = z;
 		synchronized(pdfDoc){
             this.pageImage = (BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor);		    
 		}
-		this.vw = Math.round(pageImage.getWidth()*scaleFactor/2.0);
-		this.vh = Math.round(pageImage.getHeight()*scaleFactor/2.0);
+		this.vw = pageImage.getWidth()*scaleFactor/2d;
+		this.vh = pageImage.getHeight()*scaleFactor/2d;
 		if (vw==0 && vh==0){this.ar = 1.0f;}
-		else {this.ar = (float)vw/(float)vh;}
+		else {this.ar = vw / vh;}
 		computeSize();
 		this.orient = 0;
 		this.scaleFactor = scaleFactor;
