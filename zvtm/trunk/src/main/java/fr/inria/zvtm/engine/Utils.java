@@ -25,6 +25,11 @@ import javax.imageio.stream.ImageInputStream;
 
 public class Utils {
 
+    /**
+     * Disallow instanciation (this class provides static utility methods)
+     */
+    private Utils(){}
+
     public static void tile(String src, String targetPattern, int tileSize){
 	try {
 	    File source = new File(src);
