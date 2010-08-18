@@ -14,16 +14,20 @@ import org.kohsuke.args4j.Option;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.fits.RangeSelection;
+import fr.inria.zvtm.fits.ZScale;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.util.Vector;
 import java.io.IOException;
 
@@ -35,13 +39,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 /*
  * A simple clustered FITS viewer example.
- * No support for complexes scenes, this will 
+ * No support for complex scenes, this will 
  * come as an extension to ZUIST.
  * At the moment, it simply loads and displays a single image.
  */
 public class FitsViewer {
 	//shortcut
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private FitsImage image;
+    private RangeSelection rsel;
+    private double[] scaleBounds;
+    private boolean dragLeft = false, dragRight = false;
+    private View view;
 
     FitsViewer(ImOptions options) throws IOException{
         vsm.setMaster("FitsViewer");
@@ -66,9 +75,10 @@ public class FitsViewer {
 
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
-        View view = vsm.addFrameView(cameras, "Master View",
+        view = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
 		view.setEventHandler(new PanZoomEventHandler());
+        view.getCursor().setColor(Color.GREEN);
 
 		URL imgURL = null;
 		try {
@@ -80,13 +90,16 @@ public class FitsViewer {
 		} catch (MalformedURLException e){
 			throw new Error("Malformed URL");
 		}
-		FitsImage cImg = new FitsImage(0,0,0,imgURL);
-        assert(cImg.isReplicated());
-		vs.addGlyph(cImg);
-        cImg.zRescale();
-        RangeSelection rs = new RangeSelection();
-        //rs.reSize(4);
-        vs.addGlyph(rs);
+		image = new FitsImage(0,0,0,imgURL);
+		vs.addGlyph(image);
+        image.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
+        scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
+        image.rescale(scaleBounds[0], scaleBounds[1], 1);
+        rsel = new RangeSelection();
+        double min = image.getUnderlyingImage().getHistogram().getMin();
+        double max = image.getUnderlyingImage().getHistogram().getMax();
+        rsel.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
+        vs.addGlyph(rsel);
 	}
 
 	public static void main(String[] args) throws Exception{
@@ -103,13 +116,43 @@ public class FitsViewer {
 		new FitsViewer(options);
 	}
 
+    private LongPoint viewToSpace(Camera cam, int jpx, int jpy){
+        Location camLoc = cam.getLocation();
+        float focal = cam.getFocal();
+        float altCoef = (focal + camLoc.alt) / focal;
+        Dimension viewSize = view.getPanelSize();
+
+        //find coords of view origin in the virtual space
+        long viewOrigX = camLoc.vx - (long)(0.5*viewSize.width*altCoef);
+        long viewOrigY = camLoc.vy + (long)(0.5*viewSize.height*altCoef);
+
+        return new LongPoint(
+                viewOrigX + (long)(altCoef*jpx),
+                viewOrigY - (long)(altCoef*jpy));
+    }
+
 	private class PanZoomEventHandler implements ViewEventHandler{
 		private int lastJPX;
 		private int lastJPY;
 
-		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+        public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            LongPoint cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+            if(rsel.overLeftTick(cursorPos.x, cursorPos.y)){
+                dragLeft = true;
+            } else if(rsel.overRightTick(cursorPos.x, cursorPos.y)){
+                dragRight = true;
+            }
+        }
 
-		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+        public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            dragLeft = false;
+            dragRight = false;
+            double min = image.getUnderlyingImage().getHistogram().getMin();
+            double max = image.getUnderlyingImage().getHistogram().getMax();
+            image.rescale(min + rsel.getLeftValue()*(max - min),
+                    min + rsel.getRightValue()*(max - min),
+                    1);
+        }
 
 		public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -139,10 +182,18 @@ public class FitsViewer {
 
 		public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
-		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-				Camera c=vsm.getActiveCamera();
-				float a=(c.focal+Math.abs(c.altitude))/c.focal;
+        public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+            if(buttonNumber == 1){
+                if(dragLeft) {
+                    rsel.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+                } else if(dragRight){
+                    rsel.setRightTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+                }
+            }
+
+            if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+                Camera c=vsm.getActiveCamera();
+                float a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
