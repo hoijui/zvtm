@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,19 +40,13 @@ public class Test {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewEventHandler eh;
 
     View testView;
-
-    static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
-    static final int LENS_ANIM_TIME = 300;
-    static double MAG_FACTOR = 8.0;
     
     Test(short ogl){
         vsm=VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
-        //vsm.setDefaultMultiFills(true);
         initTest(ogl);
     }
 
@@ -70,49 +65,10 @@ public class Test {
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
         testView.setNotifyMouseMoved(true);
-        vsm.getVirtualSpace("src").getCamera(0).setAltitude(1000);
-        
-        vs.addGlyph(new CircleNR(0,0,0,100,Color.RED));
-        vs.addGlyph(new VCircle(0,200,0,100,Color.RED));
-        vsm.repaintNow();
-    }
-    
-    FixedSizeLens lens;
-    
-    void setLens(int x, int y){
-        lens = (FixedSizeLens)testView.setLens(getLensDefinition(x, y));
-        lens.setBufferThreshold(1.5f);
-        lens.setInnerRadiusColor(Color.RED);
-        lens.setOuterRadiusColor(Color.RED);
-    }
-
-    Lens getLensDefinition(int x, int y){
-        return new FSLinearLens(4.0f, LENS_R1, LENS_R2, x - 400, y - 300);
-    }
-    
-    void moveLens(int x, int y){
-        if (lens == null){return;}
-        lens.setAbsolutePosition(x, y);
-        vsm.repaintNow();
-    }
-    
-    void incX(){
-        lens.setXfocusOffset(lens.getXfocusOffset()-1);
-        vsm.repaintNow();
-    }
-
-    void incY(){
-        lens.setYfocusOffset(lens.getYfocusOffset()-1);
         vsm.repaintNow();
     }
 
     public static void main(String[] args){
-//		try{UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");}
-//		catch (Exception ex){ex.printStackTrace();}
-//com.sun.java.swing.plaf.gtk.GTKLookAndFeel
-//com.sun.java.swing.plaf.motif.MotifLookAndFeel
-//com.sun.java.swing.plaf.windows.WindowsLookAndFeel
-//javax.swing.plaf.metal.MetalLookAndFeel
         System.out.println("-----------------");
         System.out.println("General information");
         System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
