@@ -26,6 +26,7 @@ package fr.inria.zvtm.svg;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.Point2D;
 import javax.swing.ImageIcon;
 
 import java.io.File;
@@ -49,7 +50,6 @@ import org.w3c.dom.NodeList;
 
 import org.xml.sax.SAXException;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -150,8 +150,8 @@ public class SVGReader {
 
     static Hashtable fontCache = new Hashtable();
 
-    static long xoffset=0;
-    static long yoffset=0;
+    static double xoffset=0;
+    static double yoffset=0;
     static double scale=1.0;
 
     public static float RRARCR=0.4f;
@@ -167,16 +167,16 @@ public class SVGReader {
     protected static Hashtable strokes = new Hashtable();
     protected static String SOLID_DASH_PATTERN = "solid";
 
-    /** When this is set to something different than 0, all SVG objects will be translated by (dx,dy) in their VTM virtual space.
+    /** When this is set to something different than 0, all SVG objects will be translated by (dx,dy) in their ZVTM virtual space.
      * This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space (SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t VTM's coordinate system)*/
-    public static void setPositionOffset(long dx,long dy){
-	xoffset=dx;
-	yoffset=dy;
+    public static void setPositionOffset(double dx, double dy){
+	    xoffset=dx;
+	    yoffset=dy;
     }
 
     /** Get the position offset (0,0 means no offset).*/
-    public static LongPoint getPositionOffset(){
-	return new LongPoint(xoffset,yoffset);
+    public static Point2D.Double getPositionOffset(){
+	    return new Point2D.Double(xoffset, yoffset);
     }
 
     /** Check that an SVG path value is supported by ZVTM.
@@ -213,127 +213,123 @@ public class SVGReader {
         return res;
     }
 
-    public static long getLong(String s){
-	    return Math.round(Double.parseDouble(s));
-    }
-
     private static void processNextSVGPathCommand(StringBuffer svg,DPath ph,StringBuffer lastCommand){
         if (svg.length()>0) {
             switch (svg.charAt(0)){
                 case 'M':{
                     svg.deleteCharAt(0);
-                    long x=getNextNumber(svg)+xoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.jump(x,-y,true);
                     lastCommand.setCharAt(0,'M');
                     break;
                 }
                 case 'm':{
                     svg.deleteCharAt(0);
-                    long x=getNextNumber(svg)+xoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.jump(x,-y,false);
                     lastCommand.setCharAt(0,'m');
                     break;
                 }
                 case 'L':{
                     svg.deleteCharAt(0);
-                    long x=getNextNumber(svg)+xoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addSegment(x,-y,true);
                     lastCommand.setCharAt(0,'L');
                     break;
                 }
                 case 'l':{
                     svg.deleteCharAt(0);
-                    long x=getNextNumber(svg)+xoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addSegment(x,-y,false);
                     lastCommand.setCharAt(0,'l');
                     break;
                 }
                 case 'H':{
                     svg.deleteCharAt(0);
-                    long x=getNextNumber(svg)+xoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     ph.addSegment(x,0,true);
                     lastCommand.setCharAt(0,'H');
                     break;
                 }
                 case 'h':{
                     svg.deleteCharAt(0);
-                    long x=getNextNumber(svg)+xoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     ph.addSegment(x,0,false);
                     lastCommand.setCharAt(0,'h');
                     break;
                 }
                 case 'V':{
                     svg.deleteCharAt(0);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addSegment(0,-y,true);
                     lastCommand.setCharAt(0,'V');
                     break;
                 }
                 case 'v':{
                     svg.deleteCharAt(0);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addSegment(0,-y,false);
                     lastCommand.setCharAt(0,'v');
                     break;
                 }
                 case 'C':{
                     svg.deleteCharAt(0);
-                    long x1=getNextNumber(svg)+xoffset;
+                    double x1=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y1=getNextNumber(svg)+yoffset;
-                    long x2=getNextNumber(svg)+xoffset;
+                    double y1=getNextNumber(svg)+yoffset;
+                    double x2=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y2=getNextNumber(svg)+yoffset;
-                    long x=getNextNumber(svg)+xoffset;
+                    double y2=getNextNumber(svg)+yoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addCbCurve(x,-y,x1,-y1,x2,-y2,true);
                     lastCommand.setCharAt(0,'C');
                     break;
                 }
                 case 'c':{
                     svg.deleteCharAt(0);
-                    long x1=getNextNumber(svg)+xoffset;
+                    double x1=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y1=getNextNumber(svg)+yoffset;
-                    long x2=getNextNumber(svg)+xoffset;
+                    double y1=getNextNumber(svg)+yoffset;
+                    double x2=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y2=getNextNumber(svg)+yoffset;
-                    long x=getNextNumber(svg)+xoffset;
+                    double y2=getNextNumber(svg)+yoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addCbCurve(x,-y,x1,-y1,x2,-y2,false);
                     lastCommand.setCharAt(0,'c');
                     break;
                 }
                 case 'Q':{
                     svg.deleteCharAt(0);
-                    long x1=getNextNumber(svg)+xoffset;
+                    double x1=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y1=getNextNumber(svg)+yoffset;
-                    long x=getNextNumber(svg)+xoffset;
+                    double y1=getNextNumber(svg)+yoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addQdCurve(x,-y,x1,-y1,true);
                     lastCommand.setCharAt(0,'Q');
                     break;
                 }
                 case 'q':{
                     svg.deleteCharAt(0);
-                    long x1=getNextNumber(svg)+xoffset;
+                    double x1=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y1=getNextNumber(svg)+yoffset;
-                    long x=getNextNumber(svg)+xoffset;
+                    double y1=getNextNumber(svg)+yoffset;
+                    double x=getNextNumber(svg)+xoffset;
                     //seekSecondCoord(svg);
-                    long y=getNextNumber(svg)+yoffset;
+                    double y=getNextNumber(svg)+yoffset;
                     ph.addQdCurve(x,-y,x1,-y1,false);
                     lastCommand.setCharAt(0,'q');
                     break;
@@ -343,96 +339,96 @@ public class SVGReader {
                     //the string has been checked by checkSVGPath, therefore only possible chars are digits 1234567890 and -
                     switch (lastCommand.charAt(0)){
                         case 'M':{
-                            long x=getNextNumber(svg)+xoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.jump(x,-y,true);
                             break;
                         }
                         case 'm':{
-                            long x=getNextNumber(svg)+xoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.jump(x,-y,false);
                             break;
                         }
                         case 'L':{
-                            long x=getNextNumber(svg)+xoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addSegment(x,-y,true);
                             break;
                         }
                         case 'l':{
-                            long x=getNextNumber(svg)+xoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addSegment(x,-y,false);
                             break;
                         }
                         case 'H':{
-                            long x=getNextNumber(svg)+xoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             ph.addSegment(x,0,true);
                             break;
                         }
                         case 'h':{
-                            long x=getNextNumber(svg)+xoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             ph.addSegment(x,0,false);
                             break;
                         }
                         case 'V':{
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addSegment(0,-y,true);
                             break;
                         }
                         case 'v':{
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addSegment(0,-y,false);
                             break;
                         }
                         case 'C':{
-                            long x1=getNextNumber(svg)+xoffset;
+                            double x1=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y1=getNextNumber(svg)+yoffset;
-                            long x2=getNextNumber(svg)+xoffset;
+                            double y1=getNextNumber(svg)+yoffset;
+                            double x2=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y2=getNextNumber(svg)+yoffset;
-                            long x=getNextNumber(svg)+xoffset;
+                            double y2=getNextNumber(svg)+yoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addCbCurve(x,-y,x1,-y1,x2,-y2,true);
                             break;
                         }
                         case 'c':{
-                            long x1=getNextNumber(svg)+xoffset;
+                            double x1=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y1=getNextNumber(svg)+yoffset;
-                            long x2=getNextNumber(svg)+xoffset;
+                            double y1=getNextNumber(svg)+yoffset;
+                            double x2=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y2=getNextNumber(svg)+yoffset;
-                            long x=getNextNumber(svg)+xoffset;
+                            double y2=getNextNumber(svg)+yoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addCbCurve(x,-y,x1,-y1,x2,-y2,false);
                             break;
                         }
                         case 'Q':{
-                            long x1=getNextNumber(svg)+xoffset;
+                            double x1=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y1=getNextNumber(svg)+yoffset;
-                            long x=getNextNumber(svg)+xoffset;
+                            double y1=getNextNumber(svg)+yoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addQdCurve(x,-y,x1,-y1,true);
                             break;
                         }
                         case 'q':{
-                            long x1=getNextNumber(svg)+xoffset;
+                            double x1=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y1=getNextNumber(svg)+yoffset;
-                            long x=getNextNumber(svg)+xoffset;
+                            double y1=getNextNumber(svg)+yoffset;
+                            double x=getNextNumber(svg)+xoffset;
                             //seekSecondCoord(svg);
-                            long y=getNextNumber(svg)+yoffset;
+                            double y=getNextNumber(svg)+yoffset;
                             ph.addQdCurve(x,-y,x1,-y1,false);
                             break;
                         }
@@ -601,11 +597,11 @@ public class SVGReader {
         return (ss.hasStylingInformation()) ? ss : null;
     }
 
-    /** Translate an SVG polygon coordinates from the SVG space to the VTM space, taking position offset into account.
+    /** Translate an SVG polygon coordinates from the SVG space to the ZVTM space, taking position offset into account.
      *@param s the SVG list of coordinates (value of attribute <i>points</i> in <i>polygon</i> elements)
-     *@param res a Vector in which the result will be stored (this will be a vector of VTM LongPoint)
+     *@param res a Vector in which the result will be stored (this will be a vector of Point2D.Double)
      */
-    public static void translateSVGPolygon(String s,Vector res){
+    public static void translateSVGPolygon(String s, Vector<Point2D.Double> res){
         StringBuffer svg=new StringBuffer(s);
         while (svg.length()>0){
             Utilities.delLeadingSpaces(svg);
@@ -614,22 +610,22 @@ public class SVGReader {
     }
 
     //seek and consume next pair of numerical coordinates in a string
-    private static void processNextSVGCoords(StringBuffer svg,Vector res){
+    private static void processNextSVGCoords(StringBuffer svg, Vector<Point2D.Double> res){
         if (svg.length()>0){
-            long x=getNextNumber(svg);
+            double x=getNextNumber(svg);
 
             //seekSecondCoord(svg);
-            long y=getNextNumber(svg);
+            double y=getNextNumber(svg);
 
             if (scale != 1.0) {
-                x = (long)(Math.floor((double)x * scale));
-                y = (long)(Math.floor((double)y * scale));
+                x = x * scale;
+                y = y * scale;
             }
 
             x += xoffset;
             y += yoffset;
 
-            res.add(new LongPoint(x,y));
+            res.add(new Point2D.Double(x,y));
         }
     }
 
@@ -642,15 +638,15 @@ public class SVGReader {
     }
 
     //utility method used by processNextSVGCoords()
-    static long getNextNumber(StringBuffer sb){
-        long res=0;
+    static double getNextNumber(StringBuffer sb){
+        double res=0;
         seekSecondCoord(sb);
         StringBuffer dgb=new StringBuffer();
         while ((sb.length()>0) && ((Character.isDigit(sb.charAt(0))) || (sb.charAt(0)=='-') || (sb.charAt(0)=='.') || (sb.charAt(0)=='e') || (sb.charAt(0)=='E') || (sb.charAt(0)=='+'))){
             dgb.append(sb.charAt(0));
             sb.deleteCharAt(0);
         }
-        if (dgb.length()>0){res = getLong(dgb.toString());}
+        if (dgb.length()>0){res = Double.parseDouble(dgb.toString());}
         return res;
     }
 
@@ -703,16 +699,16 @@ public class SVGReader {
         g.setStroke(bs);
     }
 
-    /** Tells whether the 4 LongPoint values contained in a Vector form a rectangle or not.
-     *@param v a vector of 4 LongPoint. For this to return true, points 2 &amp; 3 and points 1 &amp; 4 have to be horizontally aligned. Moreother, points 1 &amp; 2 and points 3 &amp; 4 have to be vertically aligned.
+    /** Tells whether the 4 points contained in a Vector form a rectangle or not.
+     *@param v a vector of 4 Point2D.Double For this to return true, points 2 &amp; 3 and points 1 &amp; 4 have to be horizontally aligned. Moreother, points 1 &amp; 2 and points 3 &amp; 4 have to be vertically aligned.
      */
-    public static boolean isRectangle(Vector v){
+    public static boolean isRectangle(Vector<Point2D.Double> v){
         if (v.size()==4 || v.size()==5){
             //should be 5, since the polygon has to be closed (first_point==last_point)
-            LongPoint p1=(LongPoint)v.elementAt(0);
-            LongPoint p2=(LongPoint)v.elementAt(1);
-            LongPoint p3=(LongPoint)v.elementAt(2);
-            LongPoint p4=(LongPoint)v.elementAt(3);
+            Point2D.Double p1 = v.elementAt(0);
+            Point2D.Double p2 = v.elementAt(1);
+            Point2D.Double p3 = v.elementAt(2);
+            Point2D.Double p4 = v.elementAt(3);
             if (((p2.x==p3.x) && (p1.y==p2.y) && (p3.y==p4.y) && (p1.x==p4.x)) || ((p2.y==p3.y) && (p1.x==p2.x) && (p3.x==p4.x) && (p1.y==p4.y))){return true;}
             else {return false;}
         }
@@ -740,10 +736,10 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VEllipse createEllipse(Element e,Context ctx,boolean meta){
-        long x = getLong(e.getAttribute(_cx));
-        long y = getLong(e.getAttribute(_cy));
-        long w = getLong(e.getAttribute(_rx));
-        long h = getLong(e.getAttribute(_ry));
+        double x = Double.parseDouble(e.getAttribute(_cx));
+        double y = Double.parseDouble(e.getAttribute(_cy));
+        double w = Double.parseDouble(e.getAttribute(_rx));
+        double h = Double.parseDouble(e.getAttribute(_ry));
         if (scale != 1.0) {
             x = (long)(Math.floor((double)x * scale));
             y = (long)(Math.floor((double)y * scale));
@@ -819,9 +815,9 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VCircle createCircle(Element e,Context ctx,boolean meta){
-        long x = getLong(e.getAttribute(_cx));
-        long y = getLong(e.getAttribute(_cy));
-        long r = getLong(e.getAttribute(_r));
+        double x = Double.parseDouble(e.getAttribute(_cx));
+        double y = Double.parseDouble(e.getAttribute(_cy));
+        double r = Double.parseDouble(e.getAttribute(_r));
         if (scale != 1.0) {
             x = (long)(Math.floor((double)x * scale));
             y = (long)(Math.floor((double)y * scale));
@@ -884,8 +880,8 @@ public class SVGReader {
 		*/
 	public static VText createText(Element e,Context ctx,boolean meta){
         String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
-        long x = getLong(e.getAttribute(_x));
-        long y = getLong(e.getAttribute(_y));
+        double x = Double.parseDouble(e.getAttribute(_x));
+        double y = Double.parseDouble(e.getAttribute(_y));
 
         if (scale != 1.0) {
             x = (long)(Math.floor((double)x * scale));
@@ -973,37 +969,37 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VRectangleOr createRectangleFromPolygon(Element e,Context ctx,boolean meta){
-        Vector coords=new Vector();
+        Vector<Point2D.Double> coords=new Vector<Point2D.Double>();
         translateSVGPolygon(e.getAttribute(_points),coords);
         if (isRectangle(coords)){
-            LongPoint p1=(LongPoint)coords.elementAt(0);
-            LongPoint p2=(LongPoint)coords.elementAt(1);
-            LongPoint p3=(LongPoint)coords.elementAt(2);
-            LongPoint p4=(LongPoint)coords.elementAt(3);
+            Point2D.Double p1 = coords.elementAt(0);
+            Point2D.Double p2 = coords.elementAt(1);
+            Point2D.Double p3 = coords.elementAt(2);
+            Point2D.Double p4 = coords.elementAt(3);
             //the ordering of points may vary, so we must identify what point stands for what corner
-            LongPoint pNW,pNE,pSE,pSW;
-            long l=Math.min(p1.x,Math.min(p2.x,Math.min(p3.x,p4.x)));
-            long u=Math.max(p1.y,Math.max(p2.y,Math.max(p3.y,p4.y)));
-            long r=Math.max(p1.x,Math.max(p2.x,Math.max(p3.x,p4.x)));
-            long d=Math.min(p1.y,Math.min(p2.y,Math.min(p3.y,p4.y)));
-            pNW=new LongPoint(l,u);
-            pNE=new LongPoint(r,u);
-            pSE=new LongPoint(r,d);
-            pSW=new LongPoint(l,d);
-            long h=Math.abs(pSE.y-pNE.y);
-            long w=Math.abs(pNW.x-pNE.x);
-            long x=pNE.x-w/2;
-            long y=pNE.y-h/2;
+            Point2D.Double pNW,pNE,pSE,pSW;
+            double l=Math.min(p1.x,Math.min(p2.x,Math.min(p3.x,p4.x)));
+            double u=Math.max(p1.y,Math.max(p2.y,Math.max(p3.y,p4.y)));
+            double r=Math.max(p1.x,Math.max(p2.x,Math.max(p3.x,p4.x)));
+            double d=Math.min(p1.y,Math.min(p2.y,Math.min(p3.y,p4.y)));
+            pNW=new Point2D.Double(l,u);
+            pNE=new Point2D.Double(r,u);
+            pSE=new Point2D.Double(r,d);
+            pSW=new Point2D.Double(l,d);
+            double h=Math.abs(pSE.y-pNE.y);
+            double w=Math.abs(pNW.x-pNE.x);
+            double x=pNE.x-w/2d;
+            double y=pNE.y-h/2d;
             VRectangleOr res;
             SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
             if (ss != null){
                 if (ss.hasTransparencyInformation()){
-                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
+                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
                 }
                 else {
-                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
+                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
                 }
                 Color border=ss.getStrokeColor();
                 if (border != null){
@@ -1019,12 +1015,12 @@ public class SVGReader {
             }
             else if (ctx!=null){
                 if (ctx.hasTransparencyInformation()){
-                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
+                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
                 }
                 else {
-                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
+                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
                 }
                 Color border=ctx.getStrokeColor();
                 if (border != null){
@@ -1035,7 +1031,7 @@ public class SVGReader {
                     res.setDrawBorder(false);
                 }
             }
-            else {res=new VRectangleOr(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 0, 1.0f);}
+            else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, 1.0f);}
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
@@ -1069,46 +1065,46 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VRoundRect createRoundRectFromPolygon(Element e,Context ctx,boolean meta){
-        Vector coords=new Vector();
+        Vector<Point2D.Double> coords = new Vector<Point2D.Double>();
         translateSVGPolygon(e.getAttribute(_points),coords);
         if (isRectangle(coords)){
-            LongPoint p1=(LongPoint)coords.elementAt(0);
-            LongPoint p2=(LongPoint)coords.elementAt(1);
-            LongPoint p3=(LongPoint)coords.elementAt(2);
-            LongPoint p4=(LongPoint)coords.elementAt(3);
+            Point2D.Double p1 = coords.elementAt(0);
+            Point2D.Double p2 = coords.elementAt(1);
+            Point2D.Double p3 = coords.elementAt(2);
+            Point2D.Double p4 = coords.elementAt(3);
             //the ordering of points may vary, so we must identify what point stands for what corner
-            LongPoint pNW,pNE,pSE,pSW;
-            long l=Math.min(p1.x,Math.min(p2.x,Math.min(p3.x,p4.x)));
-            long u=Math.max(p1.y,Math.max(p2.y,Math.max(p3.y,p4.y)));
-            long r=Math.max(p1.x,Math.max(p2.x,Math.max(p3.x,p4.x)));
-            long d=Math.min(p1.y,Math.min(p2.y,Math.min(p3.y,p4.y)));
-            pNW=new LongPoint(l,u);
-            pNE=new LongPoint(r,u);
-            pSE=new LongPoint(r,d);
-            pSW=new LongPoint(l,d);
-            long h=Math.abs(pSE.y-pNE.y);
-            long w=Math.abs(pNW.x-pNE.x);
-            long x=pNE.x-w/2;
-            long y=pNE.y-h/2;
+            Point2D.Double pNW,pNE,pSE,pSW;
+            double l=Math.min(p1.x,Math.min(p2.x,Math.min(p3.x,p4.x)));
+            double u=Math.max(p1.y,Math.max(p2.y,Math.max(p3.y,p4.y)));
+            double r=Math.max(p1.x,Math.max(p2.x,Math.max(p3.x,p4.x)));
+            double d=Math.min(p1.y,Math.min(p2.y,Math.min(p3.y,p4.y)));
+            pNW=new Point2D.Double(l,u);
+            pNE=new Point2D.Double(r,u);
+            pSE=new Point2D.Double(r,d);
+            pSW=new Point2D.Double(l,d);
+            double h=Math.abs(pSE.y-pNE.y);
+            double w=Math.abs(pNW.x-pNE.x);
+            double x=pNE.x-w/2d;
+            double y=pNE.y-h/2d;
             VRoundRect res;
             SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
             if (ss != null){
                 if (ss.hasTransparencyInformation()){
                     if (ss.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 else {
                     if (ss.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2,h/2,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 Color border=ss.getStrokeColor();
@@ -1126,20 +1122,20 @@ public class SVGReader {
             else if (ctx!=null){
                 if (ctx.hasTransparencyInformation()){
                     if (ctx.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 else {
                     if (ctx.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2,h/2,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 Color border=ctx.getStrokeColor();
@@ -1152,7 +1148,7 @@ public class SVGReader {
                 }
             }
             else {
-                res = new VRoundRect(x,-y,0,w/2,h/2,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
             }
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
@@ -1184,15 +1180,15 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VRectangleOr createRectangle(Element e,Context ctx,boolean meta){
-        long x = getLong(e.getAttribute(_x));
-        long y = getLong(e.getAttribute(_y));
-        long w = getLong(e.getAttribute(_width))/2;
-        long h = getLong(e.getAttribute(_height))/2;
+        double x = Double.parseDouble(e.getAttribute(_x));
+        double y = Double.parseDouble(e.getAttribute(_y));
+        double w = Double.parseDouble(e.getAttribute(_width))/2d;
+        double h = Double.parseDouble(e.getAttribute(_height))/2d;
         if (scale != 1.0) {
-            x = (long)(Math.floor((double)x * scale));
-            y = (long)(Math.floor((double)y * scale));
-            w = (long)(Math.floor((double)w * scale));
-            h = (long)(Math.floor((double)h * scale));
+            x = x * scale;
+            y = y * scale;
+            w = w * scale;
+            h = h * scale;
         }
         x += xoffset;
         y += yoffset;
@@ -1276,8 +1272,8 @@ public class SVGReader {
      *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL)
      */
     public static VImage createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL, String fallbackParentURL){
-        long x = getLong(e.getAttribute(_x)) + xoffset;
-        long y = getLong(e.getAttribute(_y)) + yoffset;
+        double x = Double.parseDouble(e.getAttribute(_x)) + xoffset;
+        double y = Double.parseDouble(e.getAttribute(_y)) + yoffset;
         String width = e.getAttribute(_width);
         // remove "px" from width and height
         if (width.endsWith("px")) {
@@ -1287,10 +1283,10 @@ public class SVGReader {
         if (height.endsWith("px")) {
             height = height.substring(0,height.length()-2);
         }
-        long w = getLong(width);
-        long h = getLong(height);
-        long hw = w / 2;
-        long hh = h / 2;
+        double w = Double.parseDouble(width);
+        double h = Double.parseDouble(height);
+        double hw = w / 2;
+        double hh = h / 2;
         VImage res = null;
         if (e.hasAttributeNS(xlinkURI, _href)){
             String imagePath = e.getAttributeNS(xlinkURI, _href);
@@ -1343,13 +1339,13 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VPolygon createPolygon(Element e,Context ctx,boolean meta){
-        Vector coords=new Vector();
+        Vector<Point2D.Double> coords = new Vector<Point2D.Double>();
         translateSVGPolygon(e.getAttribute(_points),coords);
-        LongPoint[] coords2=new LongPoint[coords.size()];
-        LongPoint lp;
+        Point2D.Double[] coords2=new Point2D.Double[coords.size()];
+        Point2D.Double lp;
         for (int i=0;i<coords2.length;i++){
-            lp=(LongPoint)coords.elementAt(i);
-            coords2[i]=new LongPoint(lp.x,-lp.y);
+            lp = coords.elementAt(i);
+            coords2[i] = new Point2D.Double(lp.x,-lp.y);
         }
         VPolygon res;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
@@ -1421,7 +1417,7 @@ public class SVGReader {
      *@param meta store metadata associated with this node (URL, title) in glyph's associated object
      */
     public static VSegment[] createPolyline(Element e,Context ctx,boolean meta){
-        Vector coords=new Vector();
+        Vector<Point2D.Double> coords = new Vector<Point2D.Double>();
         translateSVGPolygon(e.getAttribute(_points),coords);
         VSegment[] res=new VSegment[coords.size()-1];        
         Color border=Color.black;
@@ -1434,11 +1430,11 @@ public class SVGReader {
             if (ctx.getStrokeColor() != null){border = ctx.getStrokeColor();}
             else {border = (ctx.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
         }
-        LongPoint lp1,lp2;
+        Point2D.Double lp1,lp2;
         for (int i=0;i<coords.size()-1;i++){
-            lp1=(LongPoint)coords.elementAt(i);
-            lp2=(LongPoint)coords.elementAt(i+1);
-            res[i] = new VSegment(lp1.x, -lp1.y, 0, border, lp2.x, -lp2.y, 1f);
+            lp1 = coords.elementAt(i);
+            lp2 = coords.elementAt(i+1);
+            res[i] = new VSegment(lp1.x, -lp1.y, lp2.x, -lp2.y, 0, border, 1f);
             if (ss != null && ss.requiresSpecialStroke()){
                 assignStroke(res[i], ss);
             }
@@ -1472,15 +1468,15 @@ public class SVGReader {
 		*/
 	public static VSegment createLine(Element e, Context ctx, boolean meta){
 		VSegment res;		
-		long x1 = getLong(e.getAttribute(_x1));
-		long y1 = getLong(e.getAttribute(_y1));
-		long x2 = getLong(e.getAttribute(_x2));
-		long y2 = getLong(e.getAttribute(_y2));
+		double x1 = Double.parseDouble(e.getAttribute(_x1));
+		double y1 = Double.parseDouble(e.getAttribute(_y1));
+		double x2 = Double.parseDouble(e.getAttribute(_x2));
+		double y2 = Double.parseDouble(e.getAttribute(_y2));
 		if (scale != 1.0) {
-			x1 = (long)(Math.floor((double)x1 * scale));
-			y1 = (long)(Math.floor((double)y1 * scale));
-			x2 = (long)(Math.floor((double)x2 * scale));
-			y2 = (long)(Math.floor((double)y2 * scale));
+			x1 = x1 * scale;
+			y1 = y1 * scale;
+			x2 = x2 * scale;
+			y2 = y2 * scale;
 		}
 		x1 += xoffset;
 		y1 += yoffset;
@@ -1492,24 +1488,24 @@ public class SVGReader {
 			border = ss.getStrokeColor();
 			if (border == null){border = (ss.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ss.hasTransparencyInformation()){
-			    res = new VSegment(x1, -y1, 0, border, x2, -y2, ss.getAlphaTransparencyValue());
+			    res = new VSegment(x1, -y1, x2, -y2, 0, border, ss.getAlphaTransparencyValue());
 			}
 			else {
-			    res = new VSegment(x1, -y1, 0, border, x2, -y2, 1f);
+			    res = new VSegment(x1, -y1, x2, -y2, 0, border, 1f);
 			}
 		}
 		else if (ctx != null){
 			if (ctx.getStrokeColor() != null){border = ctx.getStrokeColor();}
 			else {border = (ctx.hasStrokeColorInformation()) ? Color.WHITE : Color.BLACK;}
 			if (ctx.hasTransparencyInformation()){
-			    res = new VSegment(x1, -y1, 0, border, x2, -y2, ctx.getAlphaTransparencyValue());
+			    res = new VSegment(x1, -y1, x2, -y2, 0, border, ctx.getAlphaTransparencyValue());
 			}
 			else {
-			    res = new VSegment(x1, -y1, 0, border, x2, -y2, 1f);
+			    res = new VSegment(x1, -y1, x2, -y2, 0, border, 1f);
 			}
 		}
 		else {
-			res = new VSegment(x1, -y1, 0, border, x2, -y2, 1f);			
+			res = new VSegment(x1, -y1, x2, -y2, 0, border, 1f);			
 		}
 		if (ss != null && ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
@@ -1727,12 +1723,12 @@ public class SVGReader {
                 if (height.endsWith("px")) {
                     height = height.substring(0,height.length()-2);
                 }
-                long w = getLong(width);
-                long h = getLong(height);
-                long x = getLong(e.getAttribute(_x));
-                long y = getLong(e.getAttribute(_y));
-                long xos = xoffset;
-                long yos = yoffset;
+                double w = Double.parseDouble(width);
+                double h = Double.parseDouble(height);
+                double x = Double.parseDouble(e.getAttribute(_x));
+                double y = Double.parseDouble(e.getAttribute(_y));
+                double xos = xoffset;
+                double yos = yoffset;
                 xoffset += x;
                 yoffset += y;
                 String imPath = imageURL.toString();
@@ -1744,13 +1740,13 @@ public class SVGReader {
                 String yorigin = vbs[1];
                 String iwidth = vbs[2];
                 String iheight = vbs[3];
-                long xor = getLong(xorigin);
-                long yor = getLong(yorigin);
-                long iw = getLong(iwidth);
-                long ih = getLong(iheight);
+                double xor = Double.parseDouble(xorigin);
+                double yor = Double.parseDouble(yorigin);
+                double iw = Double.parseDouble(iwidth);
+                double ih = Double.parseDouble(iheight);
                 scale = (double)w / iw;
-                xoffset -= (long)Math.floor((double)xor * scale);
-                yoffset -= (long)Math.floor((double)yor * scale);
+                xoffset -= xor * scale;
+                yoffset -= yor * scale;
                 load(imageDoc, vs, meta, imPath);
                 scale = 1.0;
                 xoffset = xos;
@@ -1765,8 +1761,8 @@ public class SVGReader {
         }
         else if (tagName.equals(_g)){
             if (ctx==null){ctx=new Context();}
-            long xos = xoffset;
-            long yos = yoffset;
+            double xos = xoffset;
+            double yos = yoffset;
             if (e.hasAttribute(SVGReader._transform)){
                 String transform = e.getAttribute(_transform);
                 if (transform.startsWith(_translate)){
@@ -1784,8 +1780,8 @@ public class SVGReader {
                         tx = split[0].trim();
                         ty = split[1].trim();
                     }
-                    xoffset += (long)Math.floor((double)getLong(tx) * scale);
-                    yoffset += (long)Math.floor((double)getLong(ty) * scale);                    
+                    xoffset += Double.valueOf(tx) * scale;
+                    yoffset += Double.valueOf(ty) * scale;                    
                 }
             }
             NodeList objects=e.getChildNodes();
