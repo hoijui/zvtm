@@ -278,7 +278,7 @@ public class VCursor {
     
     /**returns a list of all DPaths under the mouse cursor (default tolerance, 5) - returns null if none
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
-     *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
+     *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
      */
     public Vector<DPath> getIntersectingPaths(Camera c){
 	return getIntersectingPaths(c, 5, vx, vy);
@@ -287,7 +287,7 @@ public class VCursor {
     /**returns a list of all DPaths under the mouse cursor (default tolerance, 5) - returns null if none
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@see #getIntersectingPaths(Camera c, int tolerance, long cursorX, long cursorY)
+     *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
      */
     public Vector<DPath> getIntersectingPaths(Camera c, int tolerance){
 		return getIntersectingPaths(c, tolerance, vx, vy);
@@ -310,7 +310,7 @@ public class VCursor {
     /**tells if the mouse is above DPath p (default tolerance, 5)
      *@param p DPath instance to be tested
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@see #intersectsPath(DPath p, int tolerance, long cursorX, long cursorY)
+     *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
      */
     public boolean intersectsPath(DPath p, int tolerance){
 		return intersectsPath(p, tolerance, vx, vy);
@@ -318,7 +318,7 @@ public class VCursor {
 
     /**tells if the mouse is above DPath p (default tolerance, 5)
      *@param p DPath instance to be tested
-     *@see #intersectsPath(DPath p, int tolerance, long cursorX, long cursorY)
+     *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
      */
     public boolean intersectsPath(DPath p){
 		return intersectsPath(p, 5, vx, vy);
@@ -327,7 +327,7 @@ public class VCursor {
     /**returns a list of all VTexts under the mouse cursor - returns null if none<br>
      * (mouse cursor coordinates are taken from the active layer's camera space)
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
-     *@see #getIntersectingTexts(Camera c, long cursorX, long cursorY)
+     *@see #getIntersectingTexts(Camera c, double cursorX, double cursorY)
      */
     public Vector<VText> getIntersectingTexts(Camera c){
 	return getIntersectingTexts(c, vx, vy);
@@ -355,7 +355,7 @@ public class VCursor {
     /**tells if the mouse is above VText t<br>
      * camera is supposed to be the active one (mouse cursor coordinates are taken from the active layer's camera space)
      *@param camIndex should be the active camera's index (active camera can be obtained by VirtualSpaceManager.getActiveCamera(), available through Camera.getIndex())
-     *@see #intersectsVText(VText t,int camIndex, long cursorX, long cursorY)
+     *@see #intersectsVText(VText t,int camIndex, double cursorX, double cursorY)
      */
     public boolean intersectsVText(VText t,int camIndex){
 	return intersectsVText(t, camIndex, vx, vy);

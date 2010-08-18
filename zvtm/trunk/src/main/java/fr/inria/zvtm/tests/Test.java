@@ -59,7 +59,7 @@ public class Test {
         vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90f);
         short vt = View.STD_VIEW;
         switch(ogl){
-            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
+            case View.OPENGL_VIEW:{System.out.println("OpenGL");vt = View.OPENGL_VIEW;break;}
         }
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true, false, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);

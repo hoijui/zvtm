@@ -636,7 +636,7 @@ public abstract class View {
      *@see #getGlobalView(Camera c)
      *@see #getGlobalView(Camera c, int d, float mFactor)
      */
-    public Location getGlobalView(Camera c, double mFactor){
+    public Location getGlobalView(Camera c, float mFactor){
         if (c.getOwningView() != this){return null;}
         //wnes=west north east south
         double[] wnes = c.parentSpace.findFarmostGlyphCoords();

@@ -98,15 +98,15 @@ public abstract class Glyph implements Cloneable, Translucent {
     /*------------Geometry---------------------------------------*/
 
     /** Horizontal coordinate of the glyph's geomatrical center, in virtual space.
-     *@see #moveTo(long x, long y)
-     *@see #move(long x, long y)
+     *@see #moveTo(double x, double y)
+     *@see #move(double x, double y)
      *@see #getLocation()
      */
     public double vx;
 
     /** Vertical coordinate of the glyph's geomatrical center, in virtual space.
-     *@see #moveTo(long x, long y)
-     *@see #move(long x, long y)
+     *@see #moveTo(double x, double y)
+     *@see #move(double x, double y)
      *@see #getLocation()
      */
     public double vy;
@@ -115,20 +115,20 @@ public abstract class Glyph implements Cloneable, Translucent {
     protected int vz;
 
     /** Radius of bounding circle (read-only).
-     *@see #sizeTo(float radius)
-     *@see #reSize(float factor)
+     *@see #sizeTo(double radius)
+     *@see #reSize(double factor)
      *@see #getSize()
      */
     protected double size;
 
     /** Glyph's orientation in [0:2Pi[ (read-only).
      *@see #getOrient()
-     *@see #orientTo(float angle)
+     *@see #orientTo(double angle)
      */
     protected double orient = 0.0f;
 
     /** Translate the glyph by (x,y) - relative translation.
-     *@see #moveTo(long x, long y)
+     *@see #moveTo(double x, double y)
      */
     public void move(double x, double y){
         vx+=x;
@@ -138,7 +138,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     }
 
     /** Translate the glyph to (x,y) - absolute translation.
-     *@see #move(long x, long y)
+     *@see #move(double x, double y)
      */
     public void moveTo(double x, double y){
         propagateMove(x-vx,y-vy);  //take care of sticked glyphs
@@ -156,12 +156,12 @@ public abstract class Glyph implements Cloneable, Translucent {
     public abstract double getSize();
 
     /** Set glyph's size by setting its bounding circle's radius.
-     *@see #reSize(float factor)
+     *@see #reSize(double factor)
      */
     public abstract void sizeTo(double radius);
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
-     *@see #sizeTo(float radius)
+     *@see #sizeTo(double radius)
      */
     public abstract void reSize(double factor);
 
