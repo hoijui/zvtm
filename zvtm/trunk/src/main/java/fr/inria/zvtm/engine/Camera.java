@@ -133,22 +133,6 @@ public class Camera {
 	return zoomFloor;
     }
 
-    /**
-     * set camera position (absolute value) - will trigger a repaint, whereas directly assigning values to posx,posy will not
-     *@deprecated As of zvtm 0.9.2, replaced by moveTo
-     *@see #moveTo(long x,long y)
-     */
-    public void setLocation(long x,long y){
-	propagateMove(x-posx, y-posy);  //take care of sticked glyphs
-	posx = x;
-	posy = y;
-	updatePrecisePosition();
-	if (view != null){
-		VirtualSpaceManager.INSTANCE.repaintNow(view);
-	}
-	notifyMoved();
-    }
-
     /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
     public void move(long x,long y){
 	posx += x;
