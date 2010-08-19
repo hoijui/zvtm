@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Vector;
+import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -99,12 +100,24 @@ public class Viewer {
     /* --------------- init ------------------*/
 
     public Viewer(File svgF, boolean fullscreen, boolean opengl, boolean antialiased){
+        init();
         initGUI(fullscreen, opengl, antialiased);
         if (svgF != null){
             loadSVG(svgF);            
         }
     }
     
+    void init(){
+        // parse properties
+        Scanner sc = new Scanner(Viewer.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Messages.VERSION = sc.next();
+            }
+        }
+    }
+        
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         Glyph.setDefaultCursorInsideHighlightColor(Config.HIGHLIGHT_COLOR);
@@ -802,7 +815,7 @@ class Messages {
 	static final String EMPTY_STRING = "";
 
 	static final String V = "v";
-	static final String VERSION = "0.2.0-SNAPSHOT";
+	static String VERSION;
     static final String AUTHORS = "Author: Emmanuel Pietriga";
     static final String APP_NAME = "ZVTM SVG Viewer";
     static final String CREDITS_NAMES = "Based on: ZVTM";
