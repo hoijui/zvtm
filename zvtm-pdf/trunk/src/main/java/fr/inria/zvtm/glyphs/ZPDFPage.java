@@ -94,12 +94,12 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
     public double getSize(){return size;}
 
     /** Set glyph's size by setting its bounding circle's radius.
-     *@see #reSize(float factor)
+     *@see #reSize(double factor)
      */
     public void sizeTo(double radius){/*XXX:TBW*/}
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
-     *@see #sizeTo(float radius)
+     *@see #sizeTo(double radius)
      */
     public void reSize(double factor){/*XXX:TBW*/}
 
