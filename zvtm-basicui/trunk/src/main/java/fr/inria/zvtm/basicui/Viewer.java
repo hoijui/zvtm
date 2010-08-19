@@ -63,7 +63,7 @@ public class Viewer {
     EView mView;
     
     MainEventHandler eh;
-    NavigationManager nm;
+    Navigation nm;
     Overlay ovm;
     
     VWGlassPane gp;
@@ -78,7 +78,7 @@ public class Viewer {
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         ovm = new Overlay(this);
-        nm = new NavigationManager(this);
+        nm = new Navigation(this);
         mSpace = vsm.addVirtualSpace(Messages.mSpaceName);
         Camera mCamera = mSpace.addCamera();
         nm.ovCamera = mSpace.addCamera();
@@ -89,7 +89,7 @@ public class Viewer {
         nm.setCamera(mCamera);
         cameras.add(aboutSpace.getCamera(0));
         mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
-                                        false, false, !fullscreen, (!fullscreen) ? ConfigManager.initMenu(this) : null);
+                                        false, false, !fullscreen, (!fullscreen) ? Config.initMenu(this) : null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -105,7 +105,7 @@ public class Viewer {
         mView.setEventHandler(ovm, 1);
         mView.setNotifyMouseMoved(true);
         mView.setAntialiasing(antialiased);
-        mView.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
+        mView.setBackgroundColor(Config.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
@@ -218,7 +218,7 @@ class VWGlassPane extends JComponent {
         g2.setComposite(AlphaComposite.Src);
         if (msg != Messages.EMPTY_STRING && msg.length() > 0){
             g2.setColor(MSG_COLOR);
-            g2.setFont(ConfigManager.GLASSPANE_FONT);
+            g2.setFont(Config.GLASSPANE_FONT);
             g2.drawString(msg, msgX, msgY);
         }
         g2.setPaint(PROGRESS_GRADIENT);
@@ -246,11 +246,11 @@ class Overlay implements ViewEventHandler {
     }
 
     void init(){
-        fadedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
+        fadedRegion = new VRectangle(0, 0, 0, 10, 10, Config.FADE_REGION_FILL, Config.FADE_REGION_STROKE, 0.85f);
         application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
-        sayGlyph = new VText(0, -10, 0, ConfigManager.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
-        sayGlyph.setSpecialFont(ConfigManager.SAY_MSG_FONT);
+        sayGlyph = new VText(0, -10, 0, Config.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
+        sayGlyph.setSpecialFont(Config.SAY_MSG_FONT);
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
@@ -258,16 +258,16 @@ class Overlay implements ViewEventHandler {
     void showAbout(){
         if (!showingAbout){
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
-                ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
+                Config.FADE_REGION_FILL, Config.FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[4];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, Messages.APP_NAME, VText.TEXT_ANCHOR_MIDDLE, 4.0f);
             aboutLines[1] = new VText(0, 110, 0, Color.WHITE, Messages.V+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[2] = new VText(0, 40, 0, Color.WHITE, Messages.AUTHORS, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
-            inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INRIA_LOGO_PATH))).getImage(), 1.0f);
-            insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INSITU_LOGO_PATH))).getImage(), 1.0f);
+            inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(Config.INRIA_LOGO_PATH))).getImage(), 1.0f);
+            insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(Config.INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -200, 0, Color.WHITE, Messages.ABOUT_DEPENDENCIES, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[3].setSpecialFont(ConfigManager.MONOSPACE_ABOUT_FONT);
+            aboutLines[3].setSpecialFont(Config.MONOSPACE_ABOUT_FONT);
             application.aboutSpace.addGlyph(fadeAbout);
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
@@ -310,7 +310,7 @@ class Overlay implements ViewEventHandler {
     	final SwingWorker worker = new SwingWorker(){
     		public Object construct(){
     		    showMessage(msg);
-    		    sleep(ConfigManager.SAY_DURATION);
+    		    sleep(Config.SAY_DURATION);
     		    hideMessage();
     		    return null;
     		}

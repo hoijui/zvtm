@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: ConfigManager.java 2769 2010-01-15 10:17:58Z epietrig $
+ * $Id: Config.java 2769 2010-01-15 10:17:58Z epietrig $
  */
 
 package fr.inria.zvtm.basicui;
@@ -18,7 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-class ConfigManager {
+class Config {
     
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);

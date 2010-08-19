@@ -83,7 +83,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 			x2 = v.getVCursor().vx;
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, ConfigManager.ANIM_MOVE_LENGTH,
+				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, Config.ANIM_MOVE_LENGTH,
 				                                                      x1, y1, x2, y2);
 			}
 			selectingRegion = false;
@@ -115,7 +115,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
 		}
     }
         
@@ -177,10 +177,10 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
         if (code==KeyEvent.VK_PAGE_UP){application.nm.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.nm.getLowerView();}
     	else if (code==KeyEvent.VK_HOME){application.nm.getGlobalView();}
-    	else if (code==KeyEvent.VK_UP){application.nm.translateView(NavigationManager.MOVE_UP);}
-    	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(NavigationManager.MOVE_DOWN);}
-    	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(NavigationManager.MOVE_LEFT);}
-    	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(NavigationManager.MOVE_RIGHT);}
+    	else if (code==KeyEvent.VK_UP){application.nm.translateView(Navigation.MOVE_UP);}
+    	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(Navigation.MOVE_DOWN);}
+    	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(Navigation.MOVE_LEFT);}
+    	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(Navigation.MOVE_RIGHT);}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -210,13 +210,13 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 	/* Overview Portal */
 	public void enterPortal(Portal p){
 		inPortal = true;
-		((OverviewPortal)p).setBorder(ConfigManager.OV_INSIDE_BORDER_COLOR);
+		((OverviewPortal)p).setBorder(Config.OV_INSIDE_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	public void exitPortal(Portal p){
 		inPortal = false;
-		((OverviewPortal)p).setBorder(ConfigManager.OV_BORDER_COLOR);
+		((OverviewPortal)p).setBorder(Config.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 	

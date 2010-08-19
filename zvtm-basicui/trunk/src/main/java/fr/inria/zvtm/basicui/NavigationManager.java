@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: NavigationManager.java 2769 2010-01-15 10:17:58Z epietrig $
+ * $Id: Navigation.java 2769 2010-01-15 10:17:58Z epietrig $
  */
 
 package fr.inria.zvtm.basicui;
@@ -18,7 +18,7 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.EndAction;
 
-class NavigationManager {
+class Navigation {
 
     /* Navigation constants */
 
@@ -33,7 +33,7 @@ class NavigationManager {
     Camera mCamera;
     Camera ovCamera;
     
-    NavigationManager(Viewer app){
+    Navigation(Viewer app){
         this.application = app;
         vsm = VirtualSpaceManager.INSTANCE;
     }
