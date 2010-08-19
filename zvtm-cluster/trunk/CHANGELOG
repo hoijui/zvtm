@@ -1,3 +1,5 @@
+Changed coordinates system to match the new zvtm coordinate system (0.11.0+).
+The new system uses double precision floating point coordinates.
 Added Composite support (requires a recent zvtm trunk checkout). Adding support
 for Composite glyph required a fairly large rework of the GlyphCreation aspect.
 Some things may break.
