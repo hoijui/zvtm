@@ -11,7 +11,7 @@ $Id$
   <artifactId>zuist-wm</artifactId>
   <packaging>jar</packaging>
   <name>World Explorer</name>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.1</version>
   <url>http://zvtm.sourceforge.net/zuist/</url>
   
   <properties>
@@ -61,7 +61,7 @@ $Id$
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zuist-engine</artifactId>
-      <version>0.3.2-SNAPSHOT</version>
+      <version>0.3.2</version>
     </dependency>
     <!-- for GeoTools -->
 	<dependency>
