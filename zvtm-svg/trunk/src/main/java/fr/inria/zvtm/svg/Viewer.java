@@ -111,6 +111,7 @@ public class Viewer {
         nm = new Navigation(this);
         svgSpace = vsm.addVirtualSpace(Messages.svgSpaceName);
         Camera mCamera = svgSpace.addCamera();
+        mCamera.setZoomFloor(-99.0);
         nm.ovCamera = svgSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
 		aboutSpace.addCamera();
