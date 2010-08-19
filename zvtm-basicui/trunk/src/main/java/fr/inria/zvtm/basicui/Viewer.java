@@ -30,6 +30,7 @@ import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 
 import java.util.Vector;
+import java.util.Scanner;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -71,7 +72,19 @@ public class Viewer {
     /* --------------- init ------------------*/
 
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased){
+        init();
         initGUI(fullscreen, opengl, antialiased);
+    }
+    
+    void init(){
+        // parse properties
+        Scanner sc = new Scanner(Viewer.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Messages.VERSION = sc.next();
+            }
+        }
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
