@@ -147,7 +147,7 @@ public class PDFPageDescription extends ResourceDescription {
         *@param sc border color
         *@param pr parent Region in scene
         */
-    PDFPageDescription(String id, long x, long y, int z, float df, float sf, URL p, int pg, Color sc, Region pr){
+    PDFPageDescription(String id, double x, double y, int z, float df, float sf, URL p, int pg, Color sc, Region pr){
         this(id,x,y,z,df,sf,p,pg,sc,null,pr);
     }
     
@@ -164,7 +164,7 @@ public class PDFPageDescription extends ResourceDescription {
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    PDFPageDescription(String id, long x, long y, int z, float df, float sf, URL p, int pg, Color sc, Object im, Region pr){
+    PDFPageDescription(String id, double x, double y, int z, float df, float sf, URL p, int pg, Color sc, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;

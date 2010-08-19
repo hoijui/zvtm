@@ -9,6 +9,7 @@ package fr.inria.zuist.viewer;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
@@ -48,7 +49,6 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.Java2DPainter;
@@ -270,7 +270,7 @@ public class PDFViewer {
 			}
 		}
 		if (l > -1){
-			long[] wnes = sm.getLevel(l).getBounds();
+			double[] wnes = sm.getLevel(l).getBounds();
 	        mCamera.getOwningView().centerOnRegion(mCamera, PDFViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);		
 		}
     }
@@ -291,27 +291,28 @@ public class PDFViewer {
         vsm.getAnimationManager().startAnimation(a, false);
     }
 
-    /* Direction should be one of Viewer.MOVE_* */
+    /* Direction should be one of TiledImageViewer.MOVE_* */
     void translateView(short direction){
-        LongPoint trans;
-        long[] rb = mView.getVisibleRegion(mCamera);
+        Point2D.Double trans;
+        double[] rb = mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = Math.round((rb[1]-rb[3])/4.0);
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = Math.round((rb[3]-rb[1])/4.0);
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = Math.round((rb[2]-rb[0])/4.0);
+            trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = Math.round((rb[0]-rb[2])/4.0);
+            trans = new Point2D.Double(qt,0);
         }
+        //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(PDFViewer.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -458,12 +459,12 @@ class PDFViewerEventHandler implements ViewEventHandler, ComponentListener {
     static float WHEEL_MM_STEP = 1.0f;
     
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    long lastVX, lastVY;
+    double lastVX, lastVY;
     int currentJPX, currentJPY;
 
     /* bounds of region in virtual space currently observed through mCamera */
-    long[] wnes = new long[4];
-    float oldCameraAltitude;
+    double[] wnes = new double[4];
+    double oldCameraAltitude;
 
     PDFViewer application;
     
@@ -499,7 +500,7 @@ class PDFViewerEventHandler implements ViewEventHandler, ComponentListener {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
