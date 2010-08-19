@@ -105,6 +105,7 @@ public class Viewer {
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
+        Glyph.setDefaultCursorInsideHighlightColor(Config.HIGHLIGHT_COLOR);
         vsm = VirtualSpaceManager.INSTANCE;
         ovm = new Overlay(this);
         nm = new Navigation(this);
@@ -118,7 +119,7 @@ public class Viewer {
         nm.setCamera(mCamera);
         cameras.add(aboutSpace.getCamera(0));
         mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
-                                        false, false, !fullscreen, (!fullscreen) ? ConfigManager.initMenu(this) : null);
+                                        false, false, !fullscreen, (!fullscreen) ? Config.initMenu(this) : null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -134,7 +135,7 @@ public class Viewer {
         mView.setEventHandler(ovm, 1);
         mView.setNotifyMouseMoved(true);
         mView.setAntialiasing(antialiased);
-        mView.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
+        mView.setBackgroundColor(Config.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
@@ -182,6 +183,8 @@ public class Viewer {
             Document xmlSVG = builder.parse(svgURL);
             gp.setValue(60);
             SVGReader.load(xmlSVG, svgSpace, true, svgURL);
+            nm.getGlobalView();
+            nm.updateOverview();
         }
         catch (FactoryConfigurationError e){e.printStackTrace();}
         catch (ParserConfigurationException e){e.printStackTrace();}
@@ -279,7 +282,7 @@ class VWGlassPane extends JComponent {
         g2.setComposite(AlphaComposite.Src);
         if (msg != Messages.EMPTY_STRING && msg.length() > 0){
             g2.setColor(MSG_COLOR);
-            g2.setFont(ConfigManager.GLASSPANE_FONT);
+            g2.setFont(Config.GLASSPANE_FONT);
             g2.drawString(msg, msgX, msgY);
         }
         g2.setPaint(PROGRESS_GRADIENT);
@@ -307,11 +310,11 @@ class Overlay implements ViewEventHandler {
     }
 
     void init(){
-        fadedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
+        fadedRegion = new VRectangle(0, 0, 0, 10, 10, Config.FADE_REGION_FILL, Config.FADE_REGION_STROKE, 0.85f);
         application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
-        sayGlyph = new VText(0, -10, 0, ConfigManager.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
-        sayGlyph.setSpecialFont(ConfigManager.SAY_MSG_FONT);
+        sayGlyph = new VText(0, -10, 0, Config.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
+        sayGlyph.setSpecialFont(Config.SAY_MSG_FONT);
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
@@ -319,16 +322,16 @@ class Overlay implements ViewEventHandler {
     void showAbout(){
         if (!showingAbout){
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
-                ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
+                Config.FADE_REGION_FILL, Config.FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[4];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, Messages.APP_NAME, VText.TEXT_ANCHOR_MIDDLE, 4.0f);
             aboutLines[1] = new VText(0, 110, 0, Color.WHITE, Messages.V+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[2] = new VText(0, 40, 0, Color.WHITE, Messages.AUTHORS, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
-            inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INRIA_LOGO_PATH))).getImage(), 1.0f);
-            insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INSITU_LOGO_PATH))).getImage(), 1.0f);
+            inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(Config.INRIA_LOGO_PATH))).getImage(), 1.0f);
+            insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(Config.INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -200, 0, Color.WHITE, Messages.ABOUT_DEPENDENCIES, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[3].setSpecialFont(ConfigManager.MONOSPACE_ABOUT_FONT);
+            aboutLines[3].setSpecialFont(Config.MONOSPACE_ABOUT_FONT);
             application.aboutSpace.addGlyph(fadeAbout);
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
@@ -371,7 +374,7 @@ class Overlay implements ViewEventHandler {
     	final SwingWorker worker = new SwingWorker(){
     		public Object construct(){
     		    showMessage(msg);
-    		    sleep(ConfigManager.SAY_DURATION);
+    		    sleep(Config.SAY_DURATION);
     		    hideMessage();
     		    return null;
     		}
@@ -497,25 +500,41 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
             y1 = v.getVCursor().vy;
             v.setDrawRect(true);
         }
+        else {
+            lastJPX = jpx;
+            lastJPY = jpy;
+            panning = true;
+            v.setDrawDrag(true);
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	    regionStickedToMouse = false;
 	    pcameraStickedToMouse = false;
-	    panning = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
 			x2 = v.getVCursor().vx;
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, ConfigManager.ANIM_MOVE_LENGTH,
+				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, Config.ANIM_MOVE_LENGTH,
 				                                                      x1, y1, x2, y2);
 			}
 			selectingRegion = false;
 		}
+        else if (panning){	    
+            application.vsm.getAnimationManager().setXspeed(0);
+            application.vsm.getAnimationManager().setYspeed(0);
+            application.vsm.getAnimationManager().setZspeed(0);
+            v.setDrawDrag(false);
+            panning = false;
+        }
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        if (v.lastGlyphEntered() != null){
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
+		}
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -523,26 +542,11 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        lastJPX = jpx;
-        lastJPY = jpy;
-        panning = true;
-        v.setDrawDrag(true);
-    }
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
-        v.setDrawDrag(false);
-        panning = false;
-	}
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
-		}
-    }
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
@@ -635,13 +639,13 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 	/* Overview Portal */
 	public void enterPortal(Portal p){
 		inPortal = true;
-		((OverviewPortal)p).setBorder(ConfigManager.OV_INSIDE_BORDER_COLOR);
+		((OverviewPortal)p).setBorder(Config.OV_INSIDE_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 
 	public void exitPortal(Portal p){
 		inPortal = false;
-		((OverviewPortal)p).setBorder(ConfigManager.OV_BORDER_COLOR);
+		((OverviewPortal)p).setBorder(Config.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaintNow();
 	}
 	
@@ -674,13 +678,13 @@ class Navigation {
     /*-------------     Navigation       -------------*/
     
     void getGlobalView(){
-		application.mView.getGlobalView(mCamera, ConfigManager.ANIM_MOVE_LENGTH, 1.05f);
+		application.mView.getGlobalView(mCamera, Config.ANIM_MOVE_LENGTH, 1.05f);
     }
 
     /* Higher view */
     void getHigherView(){
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mCamera,
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Config.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
@@ -688,7 +692,7 @@ class Navigation {
     /* Higher view */
     void getLowerView(){
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mCamera,
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Config.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
@@ -714,7 +718,7 @@ class Navigation {
             double qt = (rb[0]-rb[2])/4.0;
             trans = new Point2D.Double(qt,0);
         }
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mCamera,
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Config.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
@@ -724,12 +728,12 @@ class Navigation {
 	OverviewPortal ovPortal;
 	
 	void createOverview(){
-		ovPortal = new OverviewPortal(application.panelWidth-ConfigManager.OVERVIEW_WIDTH-1, application.panelHeight-ConfigManager.OVERVIEW_HEIGHT-1,
-		                              ConfigManager.OVERVIEW_WIDTH, ConfigManager.OVERVIEW_HEIGHT, ovCamera, mCamera);
+		ovPortal = new OverviewPortal(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1,
+		                              Config.OVERVIEW_WIDTH, Config.OVERVIEW_HEIGHT, ovCamera, mCamera);
 		ovPortal.setPortalEventHandler(application.eh);
-		ovPortal.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
-		ovPortal.setObservedRegionColor(ConfigManager.OBSERVED_REGION_COLOR);
-		ovPortal.setObservedRegionTranslucency(ConfigManager.OBSERVED_REGION_ALPHA);
+		ovPortal.setBackgroundColor(Config.BACKGROUND_COLOR);
+		ovPortal.setObservedRegionColor(Config.OBSERVED_REGION_COLOR);
+		ovPortal.setObservedRegionTranslucency(Config.OBSERVED_REGION_ALPHA);
 		VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
 		ovPortal.setBorder(Color.GREEN);
 		updateOverview();
@@ -743,7 +747,7 @@ class Navigation {
 	
 	void updateOverviewLocation(){
 	    if (ovPortal != null){
-	        ovPortal.moveTo(application.panelWidth-ConfigManager.OVERVIEW_WIDTH-1, application.panelHeight-ConfigManager.OVERVIEW_HEIGHT-1);
+	        ovPortal.moveTo(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1);
 	    }
 	}
 
@@ -785,7 +789,7 @@ class Messages {
     
 }
 
-class ConfigManager {
+class Config {
     
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
@@ -795,17 +799,18 @@ class ConfigManager {
     
     /* Other colors */
     static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
-    static Color BACKGROUND_COLOR  = Color.LIGHT_GRAY;
+    static Color BACKGROUND_COLOR  = Color.WHITE;
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
+    static final Color HIGHLIGHT_COLOR = Color.RED;
     
     /* Overview */
     static final int OVERVIEW_WIDTH = 200;
 	static final int OVERVIEW_HEIGHT = 200;
 	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
 	static final float OBSERVED_REGION_ALPHA = 0.5f;
-	static final Color OV_BORDER_COLOR = Color.WHITE;
-	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
+	static final Color OV_BORDER_COLOR = Color.BLACK;
+	static final Color OV_INSIDE_BORDER_COLOR = Color.BLACK;
     
     /* Durations/Animations */
     static final int ANIM_MOVE_LENGTH = 300;
