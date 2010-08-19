@@ -94,6 +94,8 @@ public class Viewer {
     
     VWGlassPane gp;
     
+    File SCENE_FILE, SCENE_FILE_DIR;
+    
     /* --------------- init ------------------*/
 
     public Viewer(File svgF, boolean fullscreen, boolean opengl, boolean antialiased){
@@ -168,12 +170,45 @@ public class Viewer {
     
     /* --------------- SVG Parsing ------------------*/
     
+	void reset(){
+		svgSpace.removeAllGlyphs();
+	}
+	
+	void openFile(){
+		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fc.setDialogTitle("Find SVG File");
+		int returnVal= fc.showOpenDialog(mView.getFrame());
+		if (returnVal == JFileChooser.APPROVE_OPTION){
+		    final SwingWorker worker = new SwingWorker(){
+			    public Object construct(){
+					reset();
+					loadSVG(fc.getSelectedFile());
+					return null; 
+			    }
+			};
+		    worker.start();
+		}
+	}
+
+	void reload(){
+		if (SCENE_FILE == null){return;}
+		final SwingWorker worker = new SwingWorker(){
+		    public Object construct(){
+				reset();
+				loadSVG(SCENE_FILE);
+				return null; 
+		    }
+		};
+	    worker.start();
+	}
+    
     static final String LOAD_EXTERNAL_DTD_URL = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
     
     void loadSVG(File svgF){
         gp.setVisible(true);
         gp.setValue(20);
-        gp.setLabel(Messages.LOADING + svgF.getAbsolutePath());
+        gp.setLabel(Messages.LOADING + svgF.getName());
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
@@ -192,6 +227,9 @@ public class Viewer {
         catch (SAXException e){e.printStackTrace();}
         catch (MalformedURLException e){e.printStackTrace();}
         catch (IOException e){e.printStackTrace();}
+		SCENE_FILE = svgF;
+	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+	    mView.setTitle(Messages.mViewName + " - " + SCENE_FILE.getName());
         gp.setVisible(false);
     }
     
@@ -824,20 +862,31 @@ class Config {
  	static JMenuBar initMenu(final Viewer app){
 		final JMenuItem exitMI = new JMenuItem("Exit");
 		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem openMI = new JMenuItem("Open...");
+		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem reloadMI = new JMenuItem("Reload");
+		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (e.getSource()==exitMI){app.exit();}
+				else if (e.getSource()==openMI){app.openFile();}
+				else if (e.getSource()==reloadMI){app.reload();}
 				else if (e.getSource()==aboutMI){app.ovm.showAbout();}
 			}
 		};
 		JMenuBar jmb = new JMenuBar();
 		JMenu fileM = new JMenu("File");
 		JMenu helpM = new JMenu("Help");
+		fileM.add(openMI);
+		fileM.add(reloadMI);
+		fileM.addSeparator();
 		fileM.add(exitMI);
 		helpM.add(aboutMI);
 		jmb.add(fileM);
 		jmb.add(helpM);
+		openMI.addActionListener(a0);
+		reloadMI.addActionListener(a0);
 		exitMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
 		return jmb;
