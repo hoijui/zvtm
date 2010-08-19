@@ -66,7 +66,7 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VImage;
 
 /**
- *An SVG interpreter for VTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
+ *An SVG interpreter for ZVTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
  *@author Emmanuel Pietriga
  */
 
@@ -168,7 +168,7 @@ public class SVGReader {
     protected static String SOLID_DASH_PATTERN = "solid";
 
     /** When this is set to something different than 0, all SVG objects will be translated by (dx,dy) in their ZVTM virtual space.
-     * This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space (SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t VTM's coordinate system)*/
+     * This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space (SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t ZVTM's coordinate system)*/
     public static void setPositionOffset(double dx, double dy){
 	    xoffset=dx;
 	    yoffset=dy;
