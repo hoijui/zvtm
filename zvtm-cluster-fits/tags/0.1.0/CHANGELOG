@@ -1,0 +1,6 @@
+0.1.0
+-----
+Updated to use the new zvtm coordinate system (starting with zvtm 0.11.0)
+Fixed to match glyph replication process in zvtm-cluster (starting 0.2.4-SNAPSHOT)
+
+initial version
