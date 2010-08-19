@@ -260,7 +260,7 @@ public class CameraPortal extends Portal {
 		return new Location(dx, dy, newAlt);
     }
         
-    public Location centerOnRegion(int d, long x1, long y1, long x2, long y2){
+    public Location centerOnRegion(int d, double x1, double y1, double x2, double y2){
         Location l = centerOnRegion(x1, y1, x2, y2);
 		Animation trans = 
 		    VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
