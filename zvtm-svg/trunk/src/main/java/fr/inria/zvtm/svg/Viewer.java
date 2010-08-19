@@ -38,7 +38,17 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Vector;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -75,7 +85,7 @@ public class Viewer {
     int panelWidth, panelHeight;
     
     VirtualSpaceManager vsm;
-    VirtualSpace mSpace, aboutSpace;
+    VirtualSpace svgSpace, aboutSpace;
     EView mView;
     
     MainEventHandler eh;
@@ -86,8 +96,11 @@ public class Viewer {
     
     /* --------------- init ------------------*/
 
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased){
+    public Viewer(File svgF, boolean fullscreen, boolean opengl, boolean antialiased){
         initGUI(fullscreen, opengl, antialiased);
+        if (svgF != null){
+            loadSVG(svgF);            
+        }
     }
     
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -95,9 +108,9 @@ public class Viewer {
         vsm = VirtualSpaceManager.INSTANCE;
         ovm = new Overlay(this);
         nm = new Navigation(this);
-        mSpace = vsm.addVirtualSpace(Messages.mSpaceName);
-        Camera mCamera = mSpace.addCamera();
-        nm.ovCamera = mSpace.addCamera();
+        svgSpace = vsm.addVirtualSpace(Messages.svgSpaceName);
+        Camera mCamera = svgSpace.addCamera();
+        nm.ovCamera = svgSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
 		aboutSpace.addCamera();
         Vector cameras = new Vector();
@@ -151,6 +164,33 @@ public class Viewer {
 		nm.updateOverviewLocation();
 	}
     
+    /* --------------- SVG Parsing ------------------*/
+    
+    static final String LOAD_EXTERNAL_DTD_URL = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
+    
+    void loadSVG(File svgF){
+        gp.setVisible(true);
+        gp.setValue(20);
+        gp.setLabel(Messages.LOADING + svgF.getAbsolutePath());
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setValidating(false);
+            factory.setAttribute(LOAD_EXTERNAL_DTD_URL, Boolean.FALSE);
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            String svgURL = svgF.toURI().toURL().toString();
+            Document xmlSVG = builder.parse(svgURL);
+            gp.setValue(60);
+            SVGReader.load(xmlSVG, svgSpace, true, svgURL);
+        }
+        catch (FactoryConfigurationError e){e.printStackTrace();}
+        catch (ParserConfigurationException e){e.printStackTrace();}
+        catch (SAXException e){e.printStackTrace();}
+        catch (MalformedURLException e){e.printStackTrace();}
+        catch (IOException e){e.printStackTrace();}
+        gp.setVisible(false);
+    }
+    
     /* --------------- Main/exit ------------------*/
     
     void exit(){
@@ -161,6 +201,7 @@ public class Viewer {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+		File svgF = null;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
@@ -171,12 +212,16 @@ public class Viewer {
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("-help")){Messages.printCmdLineHelp();System.exit(0);}
 			}
+			else {
+			    File f = new File(args[i]);
+			    if (f.exists()){svgF = f;}
+			}
 		}
         if (!fs && Utilities.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
-        new Viewer(fs, ogl, aa);
+        new Viewer(svgF, fs, ogl, aa);
     }
     
 }
@@ -723,10 +768,11 @@ class Messages {
     static final String H_4_HELP = "--help for command line options";
     
     static final String LOAD_FILE = "Load file";
+    static final String LOADING = "Loading ";
     
     static final String PROCESSING = "Processing ";
     
-    static final String mSpaceName = "SVG";
+    static final String svgSpaceName = "SVG";
     static final String aboutSpaceName = "About layer";
     static final String mViewName = "SVG Viewer";
     
