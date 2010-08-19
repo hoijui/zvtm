@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import java.util.Vector;
+import java.util.Scanner;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -90,6 +91,17 @@ public class PDFViewer {
         // clean up resources
         document.dispose();
     }
+    
+    static String getVersion(){
+        Scanner sc = new Scanner(PDFViewer.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                return "PDFViewer v" + sc.next();
+            }
+        }
+        return "PDFViewer";
+    }
 
 	public static void main(String[] args){
 	    System.getProperties().put("org.icepdf.core.screen.alphaInterpolation", RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -101,7 +113,8 @@ public class PDFViewer {
         System.getProperties().put("org.icepdf.core.screen.interpolation", RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         System.getProperties().put("org.icepdf.core.screen.render", RenderingHints.VALUE_RENDER_QUALITY);
         System.getProperties().put("org.icepdf.core.screen.stroke", RenderingHints.VALUE_STROKE_PURE);
-	    
+		System.out.println("-----------------");
+	    System.out.print(getVersion());
 		System.out.println("-----------------");
 		System.out.println("General information");
 		System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));

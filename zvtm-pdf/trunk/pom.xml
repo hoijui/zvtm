@@ -129,6 +129,12 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
   
   <!-- Build -->
   <build>
+	<resources>
+	  <resource>
+	    <directory>src/main/resources</directory>
+	    <filtering>true</filtering>
+	  </resource>
+	</resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
