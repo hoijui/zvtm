@@ -13,7 +13,7 @@ public aspect FitsGlyphCreation {
 
     private static class FitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
         private final URL imageLocation;
-        private final float scaleFactor;
+        private final double scaleFactor;
 
         FitsImageReplicator(FitsImage source){
             super(source);
@@ -23,7 +23,7 @@ public aspect FitsGlyphCreation {
 
         Glyph doCreateGlyph(){
             try{
-                return new FitsImage(0,0,0,imageLocation, scaleFactor);
+                return new FitsImage(0.,0.,0,imageLocation, scaleFactor);
             } catch(Exception e){
                 //XXX error handling
                 throw new Error(e);

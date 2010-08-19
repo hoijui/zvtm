@@ -15,7 +15,6 @@ import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -28,6 +27,7 @@ import fr.inria.zvtm.glyphs.FitsImage;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
 import java.util.Vector;
 import java.io.IOException;
 
@@ -116,19 +116,19 @@ public class FitsViewer {
 		new FitsViewer(options);
 	}
 
-    private LongPoint viewToSpace(Camera cam, int jpx, int jpy){
+    private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
         Location camLoc = cam.getLocation();
-        float focal = cam.getFocal();
-        float altCoef = (focal + camLoc.alt) / focal;
+        double focal = cam.getFocal();
+        double altCoef = (focal + camLoc.alt) / focal;
         Dimension viewSize = view.getPanelSize();
 
         //find coords of view origin in the virtual space
-        long viewOrigX = camLoc.vx - (long)(0.5*viewSize.width*altCoef);
-        long viewOrigY = camLoc.vy + (long)(0.5*viewSize.height*altCoef);
+        double viewOrigX = camLoc.vx - 0.5*viewSize.width*altCoef;
+        double viewOrigY = camLoc.vy + 0.5*viewSize.height*altCoef;
 
-        return new LongPoint(
-                viewOrigX + (long)(altCoef*jpx),
-                viewOrigY - (long)(altCoef*jpy));
+        return new Point2D.Double(
+                viewOrigX + altCoef*jpx,
+                viewOrigY - altCoef*jpy);
     }
 
 	private class PanZoomEventHandler implements ViewEventHandler{
@@ -136,7 +136,7 @@ public class FitsViewer {
 		private int lastJPY;
 
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            LongPoint cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+            Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
             if(rsel.overLeftTick(cursorPos.x, cursorPos.y)){
                 dragLeft = true;
             } else if(rsel.overRightTick(cursorPos.x, cursorPos.y)){
@@ -193,16 +193,16 @@ public class FitsViewer {
 
             if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
                 Camera c=vsm.getActiveCamera();
-                float a=(c.focal+Math.abs(c.altitude))/c.focal;
+                double a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
 					vsm.getAnimationManager().setXspeed(0);
 					vsm.getAnimationManager().setYspeed(0);
-					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 				}
 			}
 		}
