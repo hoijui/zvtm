@@ -55,12 +55,12 @@ $Id$
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm</artifactId>
-      <version>[0.10.1,0.10.2]</version>
+      <version>0.10.2</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-svg</artifactId>
-      <version>[0.1.1,)</version>
+      <version>0.1.2</version>
     </dependency>
   </dependencies>
   
