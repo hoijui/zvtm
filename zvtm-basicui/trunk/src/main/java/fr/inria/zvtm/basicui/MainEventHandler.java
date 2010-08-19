@@ -18,10 +18,10 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.OverviewPortal;
-import fr.inria.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
+import fr.inria.zvtm.engine.portals.PortalEventHandler;
 
 class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
 
@@ -45,7 +45,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     
     // region selection
 	boolean selectingRegion = false;
-	long x1, y1, x2, y2;
+	double x1, y1, x2, y2;
 	
 	boolean cursorNearBorder = false;
     
@@ -123,13 +123,13 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (regionStickedToMouse){
-			float a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude)) / application.nm.ovCamera.focal;
+			double a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude)) / application.nm.ovCamera.focal;
 			application.nm.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
 			lastJPX = jpx;
 			lastJPY = jpy;
 		}
 		else if (pcameraStickedToMouse){
-			float a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude))/application.nm.ovCamera.focal;
+			double a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude))/application.nm.ovCamera.focal;
 			application.nm.ovCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
 			application.nm.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
 			lastJPX = jpx;
@@ -137,7 +137,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 		}
 		else if (panning){
             Camera c = v.cams[0];
-            float a = (c.focal+Math.abs(c.altitude))/c.focal;
+            double a = (c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
                 application.vsm.getAnimationManager().setXspeed(0);
                 application.vsm.getAnimationManager().setYspeed(0);
@@ -152,7 +152,7 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        float a = (application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude)) / application.nm.mCamera.focal;
+        double a = (application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude)) / application.nm.mCamera.focal;
         if (wheelDirection  == WHEEL_UP){
             // zooming in
             application.nm.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_COEF);
