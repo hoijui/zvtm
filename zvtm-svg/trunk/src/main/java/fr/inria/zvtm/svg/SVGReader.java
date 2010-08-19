@@ -1612,29 +1612,6 @@ public class SVGReader {
 
     /**
      *Load a DOM-parsed SVG document d in VirtualSpace vs.
-     *@param d SVG document as a DOM tree
-     *@param vs virtual space
-     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpace vs, boolean meta, String documentURL)
-     *@see #load(Document d, VirtualSpace vs, boolean meta, String documentURL)
-     */
-    public static void load(Document d, VirtualSpace vs){
-        load(d, vs, false, "");
-    }
-
-    /**
-     *Load a DOM-parsed SVG document d in VirtualSpace vs.
-     *@param d SVG document as a DOM tree
-     *@param vs virtual space
-     *@param meta store metadata associated with graphical elements (URL, title) in each Glyph's associated object
-     *@deprecated As of zvtm 0.9.5, use load(Document d, VirtualSpace vs, boolean meta, String documentURL)
-     *@see #load(Document d, VirtualSpace vs, boolean meta, String documentURL)
-     */
-    public static void load(Document d, VirtualSpace vs, boolean meta){
-        load(d, vs, meta, "");
-    }
-
-    /**
-     *Load a DOM-parsed SVG document d in VirtualSpace vs.
      * This is a convenience method. An invocation of the form load(d, vs, meta, documentURL) behaves in exactly the same way as the invocation load(d, vs, meta, documentURL, null).
      *@param d SVG document as a DOM tree
      *@param vs virtual space
