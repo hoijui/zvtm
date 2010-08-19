@@ -97,6 +97,23 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
               <downloadSources>true</downloadSources>
           </configuration>
       </plugin>
+ 	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>fr.inria.zvtm.svg.Viewer</mainClass>
+              <packageName>fr.inria.zvtm.svg</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   
