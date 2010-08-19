@@ -18,7 +18,8 @@ import java.util.Vector;
 public class Location {
 
     /**
-     * returns the difference betzeen two locations (l2-l1, how much to go from l1 to l2) as a vector whose first element is the altitude difference and second element is a LongPoint for X,Y difference
+     * returns the difference betzeen two locations (l2-l1, how much to go from l1 to l2).
+     * Returned as a vector whose first element is the altitude difference (as a Double) and second element is a Point2D.Double for X,Y difference
      */
     public static Vector getDifference(Location l1,Location l2){
         Vector res=new Vector();
