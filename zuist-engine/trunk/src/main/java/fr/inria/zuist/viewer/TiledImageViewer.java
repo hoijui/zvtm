@@ -53,7 +53,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.VText;

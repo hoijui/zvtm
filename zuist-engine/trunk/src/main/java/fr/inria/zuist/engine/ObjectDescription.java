@@ -78,8 +78,8 @@ public abstract class ObjectDescription {
 	return id;
     }
     
-    public abstract long getX();
+    public abstract double getX();
     
-    public abstract long getY();
+    public abstract double getY();
 
 }

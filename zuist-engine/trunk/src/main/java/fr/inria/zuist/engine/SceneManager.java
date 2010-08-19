@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Font;
+import java.awt.geom.Point2D;
 import java.awt.RenderingHints;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
@@ -47,7 +48,6 @@ import fr.inria.zvtm.engine.CameraListener;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.svg.SVGReader;
 import fr.inria.zvtm.engine.Location;
@@ -132,7 +132,7 @@ public class SceneManager implements CameraListener {
 
     final VirtualSpace[] sceneLayers;
     final Camera[] sceneCameras;
-    final float[] prevAlts; //previous altitudes
+    final double[] prevAlts; //previous altitudes
     private final RegionUpdater regUpdater = new RegionUpdater();
 
     /** Contains a mapping from region IDs to actual Region objects. */
@@ -145,7 +145,7 @@ public class SceneManager implements CameraListener {
     ObjectListener objectListener;
 
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
-    LongPoint origin = new LongPoint(0, 0);
+    Point2D.Double origin = new Point2D.Double(0, 0);
     
     HashMap sceneAttrs;
     
@@ -190,13 +190,13 @@ public class SceneManager implements CameraListener {
                 public void actionPerformed(ActionEvent event){
                     for(Map.Entry<Camera, Location> entry: toUpdate.entrySet()){
                         Camera cam = entry.getKey();
-                        float alt = entry.getValue().alt;
+                        double alt = entry.getValue().alt;
                         int layerIndex = getLayerIndex(cam);
                         if(layerIndex == -1){
                             if (DEBUG_MODE){System.err.println("Camera " + cam + "is not tracked by ZUIST");}
                             return;
                         }
-                        long[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
+                        double[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
                         //update regions
                         if(alt != prevAlts[layerIndex]){
                             prevAlts[layerIndex] = alt;
@@ -224,13 +224,12 @@ public class SceneManager implements CameraListener {
     public SceneManager(VirtualSpace[] vss, Camera[] cs){
         this.sceneLayers = vss;
         this.sceneCameras = cs;
-        prevAlts = new float[sceneCameras.length];
+        prevAlts = new double[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable();
         id2object = new Hashtable<String, ObjectDescription>();
         sceneAttrs = new HashMap();
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>();
-
         for(Camera cam: sceneCameras){
             cam.addListener(this);
         }
@@ -272,12 +271,12 @@ public class SceneManager implements CameraListener {
     }
 
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
-    public void setOrigin(LongPoint p){
+    public void setOrigin(Point2D.Double p){
         origin = p;
     }
     
     /** Is set to something else than 0,0 when translating a scene to another location than that defined originally. */
-    public LongPoint getOrigin(){
+    public Point2D.Double getOrigin(){
         return origin;
     }
     
@@ -520,7 +519,7 @@ public class SceneManager implements CameraListener {
         }
     }
     
-    public SceneFragmentDescription createSceneFragmentDescription(long x, long y, String id, Region region, URL resourceURL){
+    public SceneFragmentDescription createSceneFragmentDescription(double x, double y, String id, Region region, URL resourceURL){
         //System.out.println("Creating scene fragment "+resourceURL);
         SceneFragmentDescription sd = new SceneFragmentDescription(id, x, y, resourceURL, region, this);
         region.addObject(sd);
@@ -536,7 +535,7 @@ public class SceneManager implements CameraListener {
      *@param calt ceiling altitude
      *@param falt floor altitude
      */
-    public Level createLevel(int depth, float calt, float falt){
+    public Level createLevel(int depth, double calt, double falt){
         if (depth >= levels.length){
             Level[] tmpL = new Level[depth+1];
             System.arraycopy(levels, 0, tmpL, 0, levels.length);
@@ -547,7 +546,8 @@ public class SceneManager implements CameraListener {
     }
     
     Level processLevel(Element levelEL){
-        return createLevel(Integer.parseInt(levelEL.getAttribute(_depth)), Float.parseFloat(levelEL.getAttribute(_ceiling)), Float.parseFloat(levelEL.getAttribute(_floor)));
+        return createLevel(Integer.parseInt(levelEL.getAttribute(_depth)),
+            Double.parseDouble(levelEL.getAttribute(_ceiling)), Double.parseDouble(levelEL.getAttribute(_floor)));
     }
     
     /** Create a new region.
@@ -573,7 +573,7 @@ public class SceneManager implements CameraListener {
      *@see Region#setContainingRegion(Region r)
      *@see Region#addContainedRegion(Region r)
      */
-    public Region createRegion(long x, long y, long w, long h, int highestLevel, int lowestLevel,
+    public Region createRegion(double x, double y, double w, double h, int highestLevel, int lowestLevel,
                                String id, String title, int li, short[] transitions, short requestOrdering,
                                boolean sensitivity, Color fill, Color stroke){
         Region region = new Region(x+origin.x, y+origin.y, w, h, highestLevel, lowestLevel, id, li, transitions, requestOrdering, this);
@@ -614,10 +614,10 @@ public class SceneManager implements CameraListener {
     }
 
     Region processRegion(Element regionEL, Hashtable rn2crn, File sceneFileDirectory){
-        long x = Long.parseLong(regionEL.getAttribute(_x));
-        long y = Long.parseLong(regionEL.getAttribute(_y));
-        long w = Long.parseLong(regionEL.getAttribute(_w));
-        long h = Long.parseLong(regionEL.getAttribute(_h));
+        double x = Double.parseDouble(regionEL.getAttribute(_x));
+        double y = Double.parseDouble(regionEL.getAttribute(_y));
+        double w = Double.parseDouble(regionEL.getAttribute(_w));
+        double h = Double.parseDouble(regionEL.getAttribute(_h));
         Color fill = SVGReader.getColor(regionEL.getAttribute(_fill));
         Color stroke = SVGReader.getColor(regionEL.getAttribute(_stroke));
         String id = regionEL.getAttribute(_id);
@@ -720,16 +720,16 @@ public class SceneManager implements CameraListener {
     /** Process XML description of a resource (image, pdf) object. */
     ResourceDescription processResource(Element resourceEL, String id, int zindex, Region region, File sceneFileDirectory){
         String type = resourceEL.getAttribute(_type);
-        long x = Long.parseLong(resourceEL.getAttribute(_x));
-        long y = Long.parseLong(resourceEL.getAttribute(_y));
+        double x = Double.parseDouble(resourceEL.getAttribute(_x));
+        double y = Double.parseDouble(resourceEL.getAttribute(_y));
         String src = resourceEL.getAttribute(_src);
         String params = resourceEL.getAttribute(_params);
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
 		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
         if (type.equals(ImageDescription.RESOURCE_TYPE_IMG)){
-    		long w = Long.parseLong(resourceEL.getAttribute(_w));
-            long h = Long.parseLong(resourceEL.getAttribute(_h));
+    		double w = Double.parseDouble(resourceEL.getAttribute(_w));
+            double h = Double.parseDouble(resourceEL.getAttribute(_h));
             return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
         }
         else if (type.equals(SceneFragmentDescription.RESOURCE_TYPE_SCENE)){
@@ -752,11 +752,11 @@ public class SceneManager implements CameraListener {
         *@param region parent Region in scene
         *@param params custom parameters for a given type of resource
      */
-    public ResourceDescription createResourceDescription(long x, long y, String id, int zindex, Region region,
+    public ResourceDescription createResourceDescription(double x, double y, String id, int zindex, Region region,
                                                          URL resourceURL, String type, boolean sensitivity, Color stroke, String params){
         if (RESOURCE_HANDLERS.containsKey(type)){
             ResourceDescription rd = (RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
-                                                                                                              resourceURL, sensitivity, stroke, params);            
+                                                                                             resourceURL, sensitivity, stroke, params);            
             if (!id2object.containsKey(id)){
                 id2object.put(id, rd);
             }
@@ -784,7 +784,7 @@ public class SceneManager implements CameraListener {
         *@param params allowed parameters: "im=nearestNeighbor", "im=bilinear", "im=bicubic"
         *@param region parent Region in scene
      */
-    public ImageDescription createImageDescription(long x, long y, long w, long h, String id, int zindex, Region region,
+    public ImageDescription createImageDescription(double x, double y, double w, double h, String id, int zindex, Region region,
                                                    URL imageURL, boolean sensitivity, Color stroke, String params){
         Object interpolation = (params != null && params.startsWith(_im)) ? parseInterpolation(params.substring(3)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, interpolation, region);
@@ -828,10 +828,10 @@ public class SceneManager implements CameraListener {
 
     /** Process XML description of a rectangle object. */
     ClosedShapeDescription processRectangle(Element rectEL, String id, int zindex, Region region){
-        long x = Long.parseLong(rectEL.getAttribute(_x));
-        long y = Long.parseLong(rectEL.getAttribute(_y));
-        long w = Long.parseLong(rectEL.getAttribute(_w));
-        long h = Long.parseLong(rectEL.getAttribute(_h));
+        double x = Double.parseDouble(rectEL.getAttribute(_x));
+        double y = Double.parseDouble(rectEL.getAttribute(_y));
+        double w = Double.parseDouble(rectEL.getAttribute(_w));
+        double h = Double.parseDouble(rectEL.getAttribute(_h));
         Color stroke = SVGReader.getColor(rectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(rectEL.getAttribute(_fill));
         boolean sensitivity = (rectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(rectEL.getAttribute(_sensitive)) : true;
@@ -843,7 +843,7 @@ public class SceneManager implements CameraListener {
 
     /** Process XML description of a polygon object. */
     ClosedShapeDescription processPolygon(Element polygonEL, String id, int zindex, Region region){
-        LongPoint[] vertices = parseVertexCoordinates(polygonEL.getAttribute(_points), origin);
+        Point2D.Double[] vertices = parseVertexCoordinates(polygonEL.getAttribute(_points), origin);
         Color stroke = SVGReader.getColor(polygonEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(polygonEL.getAttribute(_fill));
         boolean sensitivity = (polygonEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(polygonEL.getAttribute(_sensitive)) : true;
@@ -853,21 +853,21 @@ public class SceneManager implements CameraListener {
         return createClosedShapeDescription(g, id, zindex, region, sensitivity);
     }
     
-    public static LongPoint[] parseVertexCoordinates(String s, LongPoint orig){
+    public static Point2D.Double[] parseVertexCoordinates(String s, Point2D.Double orig){
         String[] points = s.split(PARAM_SEPARATOR);
-        LongPoint[] res = new LongPoint[points.length];
+        Point2D.Double[] res = new Point2D.Double[points.length];
         String[] xy;
         for (int i=0;i<points.length;i++){
             xy = points[i].split(COORD_SEPARATOR);
-            res[i] = new LongPoint(SVGReader.getLong(xy[0])+orig.x, SVGReader.getLong(xy[1])+orig.y);
+            res[i] = new Point2D.Double(Double.parseDouble(xy[0])+orig.x, Double.parseDouble(xy[1])+orig.y);
         }
         return res;
     }
     
     /** Process XML description of a text object. */
     TextDescription processText(Element textEL, String id, int zindex, Region region){
-        long x = Long.parseLong(textEL.getAttribute(_x));
-        long y = Long.parseLong(textEL.getAttribute(_y));
+        double x = Double.parseDouble(textEL.getAttribute(_x));
+        double y = Double.parseDouble(textEL.getAttribute(_y));
         float scale = Float.parseFloat(textEL.getAttribute(_scale));
         String text = textEL.getFirstChild().getNodeValue();
         Color fill = SVGReader.getColor(textEL.getAttribute(_fill));
@@ -901,7 +901,7 @@ public class SceneManager implements CameraListener {
     /** Creates a text object and adds it to a region.
      *
      */
-    public TextDescription createTextDescription(long x, long y, String id, int zindex, Region region, float scale, String text,
+    public TextDescription createTextDescription(double x, double y, String id, int zindex, Region region, float scale, String text,
                                                  short anchor, Color fill, 
                                                  String family, int style, int size,
                                                  boolean sensitivity){
@@ -925,14 +925,14 @@ public class SceneManager implements CameraListener {
     /* ---------- inclusions (of other scene files) ----------- */
     
     void processInclude(Element includeEL, File sceneFileDirectory){
-        long x = Long.parseLong(includeEL.getAttribute(_x));
-        long y = Long.parseLong(includeEL.getAttribute(_y));
+        double x = Double.parseDouble(includeEL.getAttribute(_x));
+        double y = Double.parseDouble(includeEL.getAttribute(_y));
         String src = includeEL.getAttribute(_src);
         String absoluteSrc = ((new File(src)).isAbsolute()) ? src : sceneFileDirectory.getAbsolutePath() + File.separatorChar + src;
         File f = new File(absoluteSrc);
-        setOrigin(new LongPoint(x, y));
+        setOrigin(new Point2D.Double(x, y));
         loadScene(parseXML(f), f.getParentFile(), false, null);
-        setOrigin(new LongPoint(0, 0));
+        setOrigin(new Point2D.Double(0, 0));
     }
     
 
@@ -948,7 +948,7 @@ public class SceneManager implements CameraListener {
     
     /** Enable/disable level updating.
      * Calls to updateLevel(altitude) have no effect if level updating is disabled.
-     *@see #updateLevel(int layerIndex, long[] cameraBounds, float altitude)
+     *@see #updateLevel(int layerIndex, double[] cameraBounds, float altitude)
      */
     public void setUpdateLevel(boolean b){
 	updateLevel = b;
@@ -965,7 +965,7 @@ public class SceneManager implements CameraListener {
     /** Notify altitude changes.
      *@param altitude the new camera's altitude
      */
-    private void updateLevel(int layerIndex, long[] cameraBounds, float altitude){
+    private void updateLevel(int layerIndex, double[] cameraBounds, double altitude){
         if (!updateLevel){return;}
         // find out new level
         for (int i=0;i<levels.length;i++){
@@ -995,7 +995,7 @@ public class SceneManager implements CameraListener {
 	return currentLevel;
     }
 
-    private void enterLevel(int layerIndex, long[] cameraBounds, int depth, int prev_depth){
+    private void enterLevel(int layerIndex, double[] cameraBounds, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
 	    updateVisibleRegions(layerIndex, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
 	    if (levelListener != null){
@@ -1019,20 +1019,20 @@ public class SceneManager implements CameraListener {
     }
 
 	/** Get region whose center is closest to a given location at the current level. */
-	public Region getClosestRegionAtCurrentLevel(LongPoint lp){
+	public Region getClosestRegionAtCurrentLevel(Point2D.Double lp){
 		return levels[currentLevel].getClosestRegion(lp);
 	}
 
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-    private void updateVisibleRegions(int layerIndex, long[] cameraBounds){
+    private void updateVisibleRegions(int layerIndex, double[] cameraBounds){
         //called when an x-y movement occurs but no altitude change 
         updateVisibleRegions(layerIndex, cameraBounds, currentLevel, Region.TASL);
     }
 
    
-    private void updateVisibleRegions(int layerIndex, long[] cameraBounds, int level, short transition){
+    private void updateVisibleRegions(int layerIndex, double[] cameraBounds, int level, short transition){
         try {
 	        for (int i=0;i<levels[level].regions.length;i++){
                 if(layerIndex != levels[level].regions[i].li){
@@ -1105,7 +1105,7 @@ public class SceneManager implements CameraListener {
      *@param ea action to be perfomed after camera has reached its new position (can be null)
      @return bounds in virtual space, null if none
      */
-    public long[] getGlobalView(Camera c, int d, EndAction ea){
+    public double[] getGlobalView(Camera c, int d, EndAction ea){
 		int l = 0;
 		while (getRegionsAtLevel(l) == null){
 			l++;
@@ -1115,7 +1115,7 @@ public class SceneManager implements CameraListener {
 			}
 		}
 		if (l > -1){
-			long[] wnes = getLevel(l).getBounds();
+			double[] wnes = getLevel(l).getBounds();
 	        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 	        return wnes;
 		}
@@ -1162,7 +1162,7 @@ public class SceneManager implements CameraListener {
     }
         
     /* Camera events handling */
-    public void cameraMoved(Camera cam, LongPoint loc, float alt){
+    public void cameraMoved(Camera cam, Point2D.Double loc, double alt){
         regUpdater.addEntry(cam, new Location(loc.x, loc.y, alt));
     }
 

@@ -43,7 +43,7 @@ public class ImageDescription extends ResourceDescription {
     public static final String RESOURCE_TYPE_IMG = "img";
 
     /* necessary info about an image for instantiation */
-    long vw, vh;
+    double vw, vh;
     Color strokeColor;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
@@ -166,7 +166,7 @@ public class ImageDescription extends ResourceDescription {
         *@param sc border color
         *@param pr parent Region in scene
         */
-    ImageDescription(String id, long x, long y, int z, long w, long h, URL p, Color sc, Region pr){
+    ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, Region pr){
         this(id,x,y,z,w,h,p,sc,null,pr);
     }
     
@@ -182,7 +182,7 @@ public class ImageDescription extends ResourceDescription {
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    ImageDescription(String id, long x, long y, int z, long w, long h, URL p, Color sc, Object im, Region pr){
+    ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;

@@ -13,11 +13,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VCursor;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -147,7 +147,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         Camera c = application.mCamera;
-        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
             c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
             lastJPX = jpx;
@@ -168,7 +168,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     }
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
@@ -239,7 +239,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     }
     public void componentShown(ComponentEvent e){}
     
-    public void cameraMoved(Camera cam, LongPoint coord, float alt){
+    public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
         application.altitudeChanged();
     }
     

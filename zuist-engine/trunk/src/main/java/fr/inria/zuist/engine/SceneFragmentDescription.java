@@ -44,7 +44,7 @@ public class SceneFragmentDescription extends ResourceDescription {
     *@param sc border color
     *@param pr parent Region in scene
     */
-    SceneFragmentDescription(String id, long x, long y, URL p, Region pr, SceneManager sm){
+    SceneFragmentDescription(String id, double x, double y, URL p, Region pr, SceneManager sm){
         this.id = id;
         this.vx = x;
         this.vy = y;

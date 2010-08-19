@@ -31,12 +31,12 @@ public class VRectProgress extends VRectangle {
 	
 	Color barColor;
 
-	public VRectProgress(long x, long y, int z, long w, long h) {
+	public VRectProgress(double x, double y, int z, double w, double h) {
 		super(x, y, z, w, h, Color.WHITE, Color.BLACK);
 		this.barColor = Color.BLACK;
 	}
 
-	public VRectProgress(long x, long y, int z, long w, long h, Color bkgC, Color borderC, Color barC) {
+	public VRectProgress(double x, double y, int z, double w, double h, Color bkgC, Color borderC, Color barC) {
 		super(x, y, z, w, h, bkgC, borderC);
 		this.barColor = barC;
 	}

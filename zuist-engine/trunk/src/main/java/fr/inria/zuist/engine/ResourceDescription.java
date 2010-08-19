@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -36,13 +36,13 @@ public abstract class ResourceDescription extends ObjectDescription {
 	URL src;
 
     /* necessary info about a resource for instantiation */
-    long vx, vy;
+    double vx, vy;
 
-    public long getX(){
+    public double getX(){
         return vx;
     }
     
-    public long getY(){
+    public double getY(){
         return vy;
     }
 

@@ -7,7 +7,7 @@
 
 package fr.inria.zuist.engine;
 
-import fr.inria.zvtm.engine.LongPoint;
+import java.awt.geom.Point2D;
 
 /** A level in the scene. Levels correspond to ranges of altitude (defined by a floor and ceiling).
  * Levels cannot overlap.
@@ -17,8 +17,8 @@ import fr.inria.zvtm.engine.LongPoint;
 
 public class Level {
 
-    float ceilingAlt;
-    float floorAlt;
+    double ceilingAlt;
+    double floorAlt;
     
     Region[] regions = new Region[0];
 
@@ -26,27 +26,27 @@ public class Level {
      *@param c ceiling altitude
      *@param f floor altitude
      */
-    Level(float c, float f){
+    Level(double c, double f){
 	    ceilingAlt = c;
 	    floorAlt = f;
     }
 
     /** Get ceiling altitude for this level.
      */
-    public float getCeilingAltitude(){
+    public double getCeilingAltitude(){
 	    return ceilingAlt;
     }
     
     /** Get floor altitude for this level.
      */
-    public float getFloorAltitude(){
+    public double getFloorAltitude(){
 	    return floorAlt;
     }
 
 	/** Get region whose center is closest to a given location at this level.
 		*@return null if no region at this level
 		*/
-	public Region getClosestRegion(LongPoint lp){
+	public Region getClosestRegion(Point2D.Double lp){
 		if (regions.length >= 1){
 			Region res = regions[0];
 			for (int i=1;i<regions.length;i++){
@@ -89,7 +89,7 @@ public class Level {
         }
     }
 
-    boolean inRange(float alt){
+    boolean inRange(double alt){
 	    return (alt >= floorAlt) && (alt < ceilingAlt);
     }
 
@@ -101,9 +101,9 @@ public class Level {
 	/** Get the bounding box enclosing all regions at this level.
 	 *@return the west, north, east and south bounds of the box. {0,0,0,0} if no region.
 	 */
-    public long[] getBounds(){
+    public double[] getBounds(){
 		if (regions.length > 0){
-			long[] res = {regions[0].wnes[0], regions[0].wnes[1], regions[0].wnes[2], regions[0].wnes[3]};
+			double[] res = {regions[0].wnes[0], regions[0].wnes[1], regions[0].wnes[2], regions[0].wnes[3]};
 			for (int i=1;i<regions.length;i++){
 				if (regions[i].wnes[0] < res[0]){res[0] = regions[i].wnes[0];}
 				if (regions[i].wnes[1] > res[1]){res[1] = regions[i].wnes[1];}
@@ -113,7 +113,7 @@ public class Level {
 			return res;			
 		}
 		else {
-			long[] res = {0,0,0,0};
+			double[] res = {0,0,0,0};
 			return res;
 		}
     }

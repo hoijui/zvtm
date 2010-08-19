@@ -11,6 +11,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.awt.GradientPaint;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -49,13 +50,12 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
-import fr.inria.zvtm.glyphs.PieMenu;
-import fr.inria.zvtm.glyphs.PieMenuFactory;
+import fr.inria.zvtm.widgets.PieMenu;
+import fr.inria.zvtm.widgets.PieMenuFactory;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.animation.EndAction;
@@ -363,7 +363,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 		}
 		if (l > -1){
 			rememberLocation(mCamera.getLocation());
-			long[] wnes = sm.getLevel(l).getBounds();
+			double[] wnes = sm.getLevel(l).getBounds();
 	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 		}
     }
@@ -390,24 +390,24 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 
     /* Direction should be one of Viewer.MOVE_* */
     void translateView(short direction){
-        LongPoint trans;
-        long[] rb = mView.getVisibleRegion(mCamera);
+        Point2D.Double trans;
+        double[] rb = mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[1]-rb[3])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[3]-rb[1])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[2]-rb[0])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[0]-rb[2])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
 //        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
@@ -477,9 +477,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
                 }
             }
             Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
+                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
             Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
+                (Double)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
             vsm.getAnimationManager().startAnimation(at, false);
             vsm.getAnimationManager().startAnimation(aa, false);
 			previousLocations.removeElementAt(previousLocations.size()-1);
@@ -592,7 +592,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     
     String ccStr = "0, 0";
     
-    void setCursorCoords(long x, long y){
+    void setCursorCoords(double x, double y){
         ccStr = String.valueOf(x) + Messages.COORD_SEP + String.valueOf(y);
     }
     

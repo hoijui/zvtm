@@ -92,11 +92,11 @@ public class Region {
         }
     }
 
-    long x;       // center coordinates of region
-    long y;
-    long w;       // width and height of region
-    long h;
-    long[] wnes;  // west, north, east and south bounds of region
+    double x;       // center coordinates of region
+    double y;
+    double w;       // width and height of region
+    double h;
+    double[] wnes;  // west, north, east and south bounds of region
     // lowest level index
     int lli = 0;
     // highest level index
@@ -138,7 +138,7 @@ public class Region {
      *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
                          transitions from upper level, from lower level, to upper level, to lower level.
      */
-    Region(long x, long y, long w, long h, int highestLevel, int lowestLevel,
+    Region(double x, double y, double w, double h, int highestLevel, int lowestLevel,
            String id, int li, short[] trans, short ro, SceneManager sm){
         this.x = x;
         this.y = y;
@@ -147,7 +147,7 @@ public class Region {
         this.hli = highestLevel;
         this.lli = lowestLevel;
         this.li = li;
-        wnes = new long[4];
+        wnes = new double[4];
         wnes[0] = x - w/2;
         wnes[1] = y + h/2;
         wnes[2] = x + w/2;
@@ -226,19 +226,19 @@ public class Region {
 	return bounds;
     }
 	
-	public long getX(){
+	public double getX(){
 		return x;
 	}
 	
-	public long getY(){
+	public double getY(){
 		return y;
 	}
 
-	public long getWidth(){
+	public double getWidth(){
 		return w;
 	}
 	
-	public long getHeight(){
+	public double getHeight(){
 		return h;
 	}
 
@@ -270,7 +270,7 @@ public class Region {
     }
 
     /*rl can be null*/
-    void updateVisibility(long[] viewportBounds, int atDepth, short transition, RegionListener rl){
+    void updateVisibility(double[] viewportBounds, int atDepth, short transition, RegionListener rl){
         // is visible in viewport
         boolean iviv = (wnes[0] < viewportBounds[2] && wnes[2] > viewportBounds[0]
             && wnes[3] < viewportBounds[1] && wnes[1] > viewportBounds[3]);
@@ -319,7 +319,7 @@ public class Region {
     }
 
     /*rl can be null*/
-    void updateVisibility(boolean visible, long[] viewportBounds, int atDepth, short transition, RegionListener rl){
+    void updateVisibility(boolean visible, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
         if (visible){
             if (wviv){
                 // was visible last time we checked, is still visible
@@ -364,13 +364,13 @@ public class Region {
         }
     }
 
-    void show(short transition, long x, long y){
+    void show(short transition, double  x, double y){
 	if (!wviv){
 	    forceShow(transition, x, y);
 	}
     }
 
-    void forceShow(short transition, long x, long y){
+    void forceShow(short transition, double x, double y){
 	if (requestOrder == ORDERING_DISTANCE){
 	    Arrays.sort(objects, new DistanceComparator(x, y));
 	}
@@ -381,13 +381,13 @@ public class Region {
 	wviv = true;
     }
 
-    void hide(short transition, long x, long y){
+    void hide(short transition, double x, double y){
 	if (wviv){
 	    forceHide(transition, x, y);
 	}
     }
     
-    void forceHide(short transition, long x, long y){
+    void forceHide(short transition, double x, double y){
 	if (requestOrder == ORDERING_DISTANCE){
 	    Arrays.sort(objects, new DistanceComparator(x, y));
 	}
@@ -398,12 +398,12 @@ public class Region {
 	wviv = false;
     }
 
-    int getClosestObjectIndex(long x, long y){
+    int getClosestObjectIndex(double x, double y){
 	int res = 0;
 	if (objects.length > 0){
 	    // do not take the square root to get the actual distance as we are just comparing values
-	    long shortestDistance = Math.round(Math.pow(x-objects[0].getX(),2) + Math.pow(y-objects[0].getY(),2));
-	    long distance;
+	    double shortestDistance = Math.round(Math.pow(x-objects[0].getX(),2) + Math.pow(y-objects[0].getY(),2));
+	    double distance;
 	    for (int i=1;i<objects.length;i++){
 		distance = Math.round(Math.pow(x-objects[i].getX(),2) + Math.pow(y-objects[i].getY(),2));
 		if (distance < shortestDistance){
@@ -428,9 +428,9 @@ public class Region {
 
 class DistanceComparator implements Comparator<ObjectDescription> {
 
-    long x,y;
+    double x,y;
 
-    DistanceComparator(long x, long y){
+    DistanceComparator(double x, double y){
 	this.x = x;
 	this.y = y;
     }

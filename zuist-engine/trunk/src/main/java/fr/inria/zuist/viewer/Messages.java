@@ -7,11 +7,23 @@
 
 package fr.inria.zuist.viewer;
 
-import fr.inria.zvtm.engine.LongPoint;
+import java.awt.geom.Point2D;
+
+import java.util.Scanner;
 
 class Messages {
 		
-	static final String VERSION = "0.3.0-SNAPSHOT";
+	static String VERSION;
+
+	static {
+	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Messages.VERSION = sc.next();
+            }
+        }
+	}
 
     static final String OPEN = "Open...";
     static final String EXIT = "Exit";
@@ -40,8 +52,8 @@ class Messages {
     static final String COORD_SEP = ", ";
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
-    static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(10, 0), new LongPoint(0, 0),
-						     new LongPoint(-10, 0), new LongPoint(0, -10)};
+    static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(10, 0), new Point2D.Double(0, 0),
+						     new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
 						     
 	static final String ZON = "Zero-Order Navigation";
 	static final String FON = "First-Order Navigation";

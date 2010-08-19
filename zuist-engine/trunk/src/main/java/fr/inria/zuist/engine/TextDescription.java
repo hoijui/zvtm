@@ -31,7 +31,7 @@ public class TextDescription extends ObjectDescription {
     public static final String _end = "end";
 
     /* necessary info about a text for instantiation */
-    long vx, vy;
+    double vx, vy;
     float scale;
     String text;
     short anchor = VText.TEXT_ANCHOR_MIDDLE;
@@ -51,7 +51,7 @@ public class TextDescription extends ObjectDescription {
         *@param c text color
         *@param pr parent Region in scene
         */
-    TextDescription(String id, long x, long y, int z, float s, String tx, Color c, Region pr){
+    TextDescription(String id, double x, double y, int z, float s, String tx, Color c, Region pr){
         this(id, x, y, z, s, tx, c, VText.TEXT_ANCHOR_MIDDLE, pr);
     }
 
@@ -66,7 +66,7 @@ public class TextDescription extends ObjectDescription {
         *@param ta text alignment, one of VText.TEXT_ANCHOR_*
         *@param pr parent Region in scene
         */
-    TextDescription(String id, long x, long y, int z, float s, String tx, Color c, short ta, Region pr){
+    TextDescription(String id, double x, double y, int z, float s, String tx, Color c, short ta, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -172,11 +172,11 @@ public class TextDescription extends ObjectDescription {
         else {return VText.TEXT_ANCHOR_MIDDLE;}
     }
     
-    public long getX(){
+    public double getX(){
         return vx;
     }
     
-    public long getY(){
+    public double getY(){
         return vy;
     }
     

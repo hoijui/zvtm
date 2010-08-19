@@ -14,21 +14,21 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Point2D.Double;
 
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.Portal;
-import fr.inria.zvtm.engine.OverviewPortal;
-import fr.inria.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
+import fr.inria.zvtm.engine.portals.PortalEventHandler;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
@@ -47,7 +47,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     static float WHEEL_MM_STEP = 1.0f;
     
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    long lastVX, lastVY;
+    double lastVX, lastVY;
     int currentJPX, currentJPY;
 
     boolean mCamStickedToMouse = false;
@@ -67,7 +67,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     
 	// region selection
 	boolean selectingRegion = false;
-	long x1, y1, x2, y2;
+	double x1, y1, x2, y2;
 
     TIVExplorerEventHandler(TiledImageViewer app){
         this.application = app;
@@ -207,7 +207,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	    Camera c = application.mCamera;
         if (zero_order_dragging){
-            float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
             c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
             lastJPX = jpx;
             lastJPY = jpy;
@@ -222,7 +222,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+                double a = (c.focal+Math.abs(c.altitude)) / c.focal;
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
@@ -232,7 +232,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 		    }
         }
 	    else if (regionStickedToMouse){
-	        float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
+	        double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
 			c.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
 			lastJPX = jpx;
             lastJPY = jpy;
@@ -249,7 +249,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
             }
         }
         else {
-            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+            double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             if (wheelDirection  == WHEEL_UP){
                 // zooming in
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);

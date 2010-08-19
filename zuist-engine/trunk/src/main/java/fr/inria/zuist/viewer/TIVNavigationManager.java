@@ -13,16 +13,16 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
+import java.awt.geom.Point2D;
+
 import java.util.Timer;
 import java.util.TimerTask;
-
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.lens.*;
-import fr.inria.zvtm.engine.OverviewPortal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -103,24 +103,24 @@ class TIVNavigationManager {
 
     /* Direction should be one of TiledImageViewer.MOVE_* */
     void translateView(short direction){
-        LongPoint trans;
-        long[] rb = application.mView.getVisibleRegion(mCamera);
+        Point2D.Double trans;
+        double[] rb = application.mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = Math.round((rb[1]-rb[3])/4.0);
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = Math.round((rb[3]-rb[1])/4.0);
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = Math.round((rb[2]-rb[0])/4.0);
+            trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = Math.round((rb[0]-rb[2])/4.0);
+            trans = new Point2D.Double(qt,0);
         }
         //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(TIVNavigationManager.ANIM_MOVE_DURATION, mCamera,
@@ -143,11 +143,11 @@ class TIVNavigationManager {
 	
 	OverviewPortal ovPortal;
 	
-	long[] scene_bounds = {0, 0, 0, 0};
+	double[] scene_bounds = {0, 0, 0, 0};
 	
 	void createOverview(Region rootRegion){
 	    int ow, oh;
-	    float ar = rootRegion.getWidth()/(float)rootRegion.getHeight();
+	    float ar = (float) (rootRegion.getWidth() / (float)rootRegion.getHeight());
 	    if (ar > 1){
 	        // wider than high
 	        ow = MAX_OVERVIEW_WIDTH;
@@ -230,20 +230,20 @@ class TIVNavigationManager {
         setLens(ZOOMIN_LENS);
     }
     
-    void zoomInPhase2(long mx, long my){
+    void zoomInPhase2(double mx, double my){
         // compute camera animation parameters
-        float cameraAbsAlt = application.mCamera.getAltitude()+application.mCamera.getFocal();
-        long c2x = Math.round(mx - INV_MAG_FACTOR * (mx - application.mCamera.posx));
-        long c2y = Math.round(my - INV_MAG_FACTOR * (my - application.mCamera.posy));
+        double cameraAbsAlt = application.mCamera.getAltitude()+application.mCamera.getFocal();
+        double c2x = mx - INV_MAG_FACTOR * (mx - application.mCamera.posx);
+        double c2y = my - INV_MAG_FACTOR * (my - application.mCamera.posy);
         //Vector cadata = new Vector();
         // -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
-        Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
+        Double deltAlt = new Double((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
         if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
             // animate lens and camera simultaneously (lens will die at the end)
             Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
             Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
-                new LongPoint(c2x-application.mCamera.posx, c2y-application.mCamera.posy), true, IdentityInterpolator.getInstance(), null);
+                new Point2D.Double(c2x-application.mCamera.posx, c2y-application.mCamera.posy), true, IdentityInterpolator.getInstance(), null);
             Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
                 deltAlt, true, IdentityInterpolator.getInstance(), null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(al, false);
@@ -251,13 +251,13 @@ class TIVNavigationManager {
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(aa, false);
         }
         else {
-            Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
-            double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
+            Double actualDeltAlt = new Double(FLOOR_ALTITUDE - cameraAbsAlt);
+            double ratio = actualDeltAlt.doubleValue() / deltAlt.doubleValue();
             // animate lens and camera simultaneously (lens will die at the end)
             Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
             Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
-                new LongPoint(Math.round((c2x-application.mCamera.posx)*ratio), Math.round((c2y-application.mCamera.posy)*ratio)), true, IdentityInterpolator.getInstance(), null);
+                new Point2D.Double(Math.round((c2x-application.mCamera.posx)*ratio), Math.round((c2y-application.mCamera.posy)*ratio)), true, IdentityInterpolator.getInstance(), null);
             Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
                 actualDeltAlt, true, IdentityInterpolator.getInstance(), null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(al, false);
@@ -266,11 +266,11 @@ class TIVNavigationManager {
         }
     }
 
-    void zoomOutPhase1(int x, int y, long mx, long my){
+    void zoomOutPhase1(int x, int y, double mx, double my){
         // compute camera animation parameters
-        float cameraAbsAlt = application.mCamera.getAltitude()+application.mCamera.getFocal();
-        long c2x = Math.round(mx - MAG_FACTOR * (mx - application.mCamera.posx));
-        long c2y = Math.round(my - MAG_FACTOR * (my - application.mCamera.posy));
+        double cameraAbsAlt = application.mCamera.getAltitude()+application.mCamera.getFocal();
+        double c2x = mx - MAG_FACTOR * (mx - application.mCamera.posx);
+        double c2y = my - MAG_FACTOR * (my - application.mCamera.posy);
         // create lens if it does not exist
         if (lens == null){
             lens = application.mView.setLens(getLensDefinition(x, y));
@@ -280,9 +280,9 @@ class TIVNavigationManager {
         Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
         Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
-            new LongPoint(c2x-application.mCamera.posx, c2y-application.mCamera.posy), true, IdentityInterpolator.getInstance(), null);
+            new Point2D.Double(c2x-application.mCamera.posx, c2y-application.mCamera.posy), true, IdentityInterpolator.getInstance(), null);
         Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
-            new Float(cameraAbsAlt*(MAG_FACTOR-1)), true, IdentityInterpolator.getInstance(), null);
+            new Double(cameraAbsAlt*(MAG_FACTOR-1)), true, IdentityInterpolator.getInstance(), null);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(al, false);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(at, false);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(aa, false);
@@ -310,7 +310,7 @@ class TIVNavigationManager {
 			       this means that camera altitude must be adjusted to keep altitude + lens mag
 			       factor constant in the lens focus region. The camera must also be translated
 			       to keep the same region of the virtual space under the focus region */
-			    float a1 = application.mCamera.getAltitude();
+			    double a1 = application.mCamera.getAltitude();
 			    lens.setMaximumMagnification((float)nmf, true);
 			    /* explanation for the altitude offset computation: the projected size of an object
 			       in the focus region (in lens space) should remain the same before and after the
@@ -321,7 +321,7 @@ class TIVNavigationManager {
 move:
 MAG_FACTOR * F / (F + a1) = MAG_FACTOR + magOffset * F / (F + a2)
 From this we can get the altitude difference (a2 - a1)                       */
-			    application.mCamera.altitudeOffset((float)((a1+application.mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset)));
+			    application.mCamera.altitudeOffset((a1+application.mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset));
 			    /* explanation for the X offset computation: the position in X of an object in the
 			       focus region (lens space) should remain the same before and after the change of
 			       magnification factor. This means that the following equation must be true (taken
@@ -335,8 +335,8 @@ From this we can get the altitude difference (a2 - a1)                       */
 			       we eventually have:
 			       Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
 			       JPanel coordinates w.r.t the view's center - see Lens.java)                */
-			    application.mCamera.move(Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.lx),
-					    -Math.round((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly));
+			    application.mCamera.move((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.lx,
+					    -(a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly);
 		    }
 		    else {
 			    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,

@@ -29,7 +29,7 @@ public interface ResourceHandler {
      *@param stroke border color (null if no border)
      *@param params a string of parameters specific to each resource type (see documentation for each resource type).
      */
-    public ResourceDescription createResourceDescription(long x, long y, String id, int zindex, Region region, 
+    public ResourceDescription createResourceDescription(double x, double y, String id, int zindex, Region region, 
                                                          URL resourceURL, boolean sensitivity, Color stroke, String params);
                                                          
 }

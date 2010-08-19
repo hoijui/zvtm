@@ -115,12 +115,12 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
     
     /** Get x-coordinate of object in virtual space. */
-    public long getX(){
+    public double getX(){
         return glyph.vx;
     }
     
     /** Get y-coordinate of object in virtual space. */
-    public long getY(){
+    public double getY(){
         return glyph.vy;
     }
     
