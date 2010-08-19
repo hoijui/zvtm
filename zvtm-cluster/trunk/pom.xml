@@ -4,7 +4,7 @@
 	<groupId>fr.inria.zvtm</groupId>
 	<artifactId>zvtm-cluster</artifactId>
 	<packaging>jar</packaging>
-	<version>0.2.4</version>
+	<version>0.2.5-SNAPSHOT</version>
 	<name>zvtm-cluster</name>
 	<description>Clustering extension to ZVTM</description>
 	<url>http://zvtm.sourceforge.net</url>
