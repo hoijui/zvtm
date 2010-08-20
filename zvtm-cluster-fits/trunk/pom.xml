@@ -21,7 +21,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>fr.inria.zvtm</groupId> 
-                    <artifactId>zvtm</artifactId>
+                    <artifactId>zvtm-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
