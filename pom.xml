@@ -56,6 +56,8 @@ $Id$
     <module>zvtm-pdf/trunk</module>
     <module>zuist-engine/trunk</module>
     <module>zuist-pdf/trunk</module>
+    <module>zvtm-fits/trunk</module>
+    <module>zvtm-cluster/trunk</module>
   </modules>
 
   <!-- Reporting -->
@@ -75,7 +77,7 @@ $Id$
           <links> 
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
-          <excludePackageNames>fr.inria.zvtm.tests,fr.inria.zvtm.glyphs.projection,fr.inria.zvtm.animation.examples,fr.inria.zvtm.demo,fr.inria.zuist.viewer,fr.inria.zuist.viewer</excludePackageNames>
+          <excludePackageNames>fr.inria.zvtm.tests,fr.inria.zvtm.glyphs.projection,fr.inria.zvtm.animation.examples,fr.inria.zvtm.demo,fr.inria.zuist.viewer,fr.inria.zuist.viewer,fr.inria.zvtm.cluster.examples,fr.inria.zvtm.fits.example</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
