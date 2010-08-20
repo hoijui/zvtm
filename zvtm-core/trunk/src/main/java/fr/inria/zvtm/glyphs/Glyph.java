@@ -114,7 +114,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** z-index */
     protected int vz;
 
-    /** Radius of bounding circle (read-only).
+    /** Diameter of bounding circle (read-only).
      *@see #sizeTo(double radius)
      *@see #reSize(double factor)
      *@see #getSize()
@@ -152,13 +152,13 @@ public abstract class Glyph implements Cloneable, Translucent {
      */
     public Point2D.Double getLocation(){return new Point2D.Double(vx, vy);}
 
-    /** Get glyph's size (radius of bounding circle). */
+    /** Get glyph's size (diameter of bounding circle). */
     public abstract double getSize();
 
-    /** Set glyph's size by setting its bounding circle's radius.
+    /** Set glyph's size by setting its bounding circle's diameter.
      *@see #reSize(double factor)
      */
-    public abstract void sizeTo(double radius);
+    public abstract void sizeTo(double s);
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
      *@see #sizeTo(double radius)

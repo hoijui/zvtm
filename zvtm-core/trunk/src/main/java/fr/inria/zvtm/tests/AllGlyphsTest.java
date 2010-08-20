@@ -68,13 +68,13 @@ public class AllGlyphsTest {
             }
         }
         // circles
-        VCircle c = new VCircle(0,0,0,20,Color.WHITE);
+        VCircle c = new VCircle(0,0,0,40,Color.WHITE);
         vs.addGlyph(c);
-        c = new VCircle(40,0,0,10,Color.RED);
-        c.sizeTo(20);
+        c = new VCircle(40,0,0,20,Color.RED);
+        c.sizeTo(40);
         vs.addGlyph(c);
-        c = new VCircle(0,0,0,10,Color.BLUE);
-        c.sizeTo(20);
+        c = new VCircle(0,0,0,20,Color.BLUE);
+        c.sizeTo(40);
         c.moveTo(80, 0);
         vs.addGlyph(c);
         // rectangles

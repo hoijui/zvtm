@@ -43,9 +43,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VCircle extends ClosedShape {
 
-    /**radius in virtual space (equal to bounding circle radius since this is a circle)*/
-    public double vr;
-
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     public BProjectedCoords[] pc;
     
@@ -57,7 +54,7 @@ public class VCircle extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param r radius in virtual space
+     *@param r diameter in virtual space
      *@param c fill color
      */
     public VCircle(double x,double y, int z,double r,Color c){
@@ -68,7 +65,7 @@ public class VCircle extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param r radius in virtual space
+     *@param r diameter in virtual space
      *@param c fill color
      *@param bc border color
      */
@@ -80,17 +77,16 @@ public class VCircle extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param r radius in virtual space
+     *@param d diameter in virtual space
      *@param c fill color
      *@param bc border color
      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VCircle(double x, double y, int z, double r, Color c, Color bc, float alpha){
+    public VCircle(double x, double y, int z, double d, Color c, Color bc, float alpha){
         vx = x;
         vy = y;
         vz = z;
-        vr = r;
-        computeSize();
+        size = d;
         orient = 0;
         setColor(c);
         setBorderColor(bc);
@@ -147,32 +143,26 @@ public class VCircle extends ClosedShape {
 
     public double getSize(){return size;}
 
-    void computeSize(){
-	    size = vr;
-    }
-
-    public void sizeTo(double radius){
-        size = radius;
-        vr = size;
+    public void sizeTo(double s){
+        size = s;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(double factor){
-        size*=factor;
-        vr = size;
+        size *= factor;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public boolean fillsView(double w,double h,int camIndex){
-        if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
-            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr) 
-            && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr) 
-            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr)){return true;}
+        if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
+            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
+            && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
+            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d)){return true;}
         else {return false;}
     }
     
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr){return true;}
+        if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr/2d){return true;}
         else {return false;}
     }
 
@@ -199,7 +189,7 @@ public class VCircle extends ClosedShape {
     }
 
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) <= (dvr + vr);
+		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) <= (dvr + size/2d);
 	}
 
     public void project(Camera c, Dimension d){
@@ -210,7 +200,7 @@ public class VCircle extends ClosedShape {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project height and construct polygon
-        pc[i].cr = (int)Math.round(vr*coef);
+        pc[i].cr = (int)Math.round(size*coef);
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
@@ -221,7 +211,7 @@ public class VCircle extends ClosedShape {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project height and construct polygon
-        pc[i].lcr = (int)Math.round(vr*coef);
+        pc[i].lcr = (int)Math.round(size*coef);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -236,17 +226,17 @@ public class VCircle extends ClosedShape {
                 g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
-                    g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                    g.fillOval(dx+pc[i].cx-pc[i].cr/2,dy+pc[i].cy-pc[i].cr/2,pc[i].cr,pc[i].cr);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null) {
                         g.setStroke(stroke);
-                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                        g.drawOval(dx+pc[i].cx-pc[i].cr/2,dy+pc[i].cy-pc[i].cr/2,pc[i].cr,pc[i].cr);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                        g.drawOval(dx+pc[i].cx-pc[i].cr/2,dy+pc[i].cy-pc[i].cr/2,pc[i].cr,pc[i].cr);
                     }
                 }
                 g.setComposite(acO);
@@ -263,17 +253,17 @@ public class VCircle extends ClosedShape {
             if (pc[i].cr>=1){
                 if (filled){
                     g.setColor(this.color);
-                    g.fillOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                    g.fillOval(dx+pc[i].cx-pc[i].cr/2,dy+pc[i].cy-pc[i].cr/2,pc[i].cr,pc[i].cr);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null) {
                         g.setStroke(stroke);
-                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                        g.drawOval(dx+pc[i].cx-pc[i].cr/2,dy+pc[i].cy-pc[i].cr/2,pc[i].cr,pc[i].cr);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.drawOval(dx+pc[i].cx-pc[i].cr,dy+pc[i].cy-pc[i].cr,2*pc[i].cr,2*pc[i].cr);
+                        g.drawOval(dx+pc[i].cx-pc[i].cr/2,dy+pc[i].cy-pc[i].cr/2,pc[i].cr,pc[i].cr);
                     }
                 }
             }
@@ -296,17 +286,17 @@ public class VCircle extends ClosedShape {
                 g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
-                    g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                    g.fillOval(dx+pc[i].lcx-pc[i].lcr/2,dy+pc[i].lcy-pc[i].lcr/2,pc[i].lcr,pc[i].lcr);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null) {
                         g.setStroke(stroke);
-                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr/2,dy+pc[i].lcy-pc[i].lcr/2,pc[i].lcr,pc[i].lcr);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr/2,dy+pc[i].lcy-pc[i].lcr/2,pc[i].lcr,pc[i].lcr);
                     }
                 }
                 g.setComposite(acO);
@@ -323,17 +313,17 @@ public class VCircle extends ClosedShape {
             if (pc[i].lcr>=1){
                 if (filled){
                     g.setColor(this.color);
-                    g.fillOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                    g.fillOval(dx+pc[i].lcx-pc[i].lcr/2,dy+pc[i].lcy-pc[i].lcr/2,pc[i].lcr,pc[i].lcr);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null) {
                         g.setStroke(stroke);
-                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr/2,dy+pc[i].lcy-pc[i].lcr/2,pc[i].lcr,pc[i].lcr);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.drawOval(dx+pc[i].lcx-pc[i].lcr,dy+pc[i].lcy-pc[i].lcr,2*pc[i].lcr,2*pc[i].lcr);
+                        g.drawOval(dx+pc[i].lcx-pc[i].lcr/2,dy+pc[i].lcy-pc[i].lcr/2,pc[i].lcr,pc[i].lcr);
                     }
                 }
             }
@@ -345,7 +335,7 @@ public class VCircle extends ClosedShape {
     }
 
     public Object clone(){
-        VCircle res=new VCircle(vx,vy,0,vr,color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
+        VCircle res=new VCircle(vx,vy,0,size,color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
         res.cursorInsideColor=this.cursorInsideColor;
         return res;
     }

@@ -25,10 +25,10 @@ package fr.inria.zvtm.glyphs.projection;
 
 public class BProjectedCoords extends ProjectedCoords {
 
-    /**radius in camera space*/
+    /** diameter in camera space*/
     public int cr;
 
-    /**radius in lens space*/
+    /** diameter in lens space*/
     public int lcr;
 
 }
