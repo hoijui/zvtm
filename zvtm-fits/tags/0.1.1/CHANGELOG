@@ -1,0 +1,11 @@
+0.1.1
+-----
+Added a zscale-like transform (linear scaling; the 'transform' simply
+selects appropriate parameters)
+Added default choices for color filters (ColorFilter enum).
+
+0.1.0
+-----
+First tag. Added color filters.
+
+

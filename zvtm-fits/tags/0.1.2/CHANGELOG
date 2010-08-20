@@ -1,0 +1,17 @@
+0.1.2
+-----
+Updated zvtm-fits to use the new zvtm coordinate system (starting
+with zvtm 0.11.0). The new system uses double precision floating point coordinates.
+zvtm-fits now depends on zvtm 0.11.0
+
+0.1.1
+-----
+Added a zscale-like transform (linear scaling; the 'transform' simply
+selects appropriate parameters)
+Added default choices for color filters (ColorFilter enum).
+
+0.1.0
+-----
+First tag. Added color filters.
+
+
