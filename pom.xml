@@ -59,6 +59,9 @@ $Id$
   </modules>
 
   <!-- Reporting -->
+
+  <!-- mvn javadoc:aggregate -->
+
   <reporting>
     <plugins>
       <plugin>
