@@ -202,6 +202,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
             <link>http://zvtm.sourceforge.net/apidocs</link>
 			<link>http://www.icepdf.org/docs/v4_0_0/core/javadocs</link>
           </links>
+          <excludePackageNames>fr.inria.zvtm.demo</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
