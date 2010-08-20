@@ -24,7 +24,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
  *@see fr.inria.zvtm.glyphs.VRectangleOr
  */
 
-public class GRectangle extends VRectangle {
+public class PRectangle extends VRectangle {
 
     Paint gp;
 
@@ -33,7 +33,7 @@ public class GRectangle extends VRectangle {
 	/**
 		*@param gp fill gradient paint
 		*/
-	public GRectangle(Paint gp){
+	public PRectangle(Paint gp){
         this(0, 0, 0, 10, 10, gp);
 	}
 
@@ -45,7 +45,7 @@ public class GRectangle extends VRectangle {
 		*@param h half height in virtual space
 		*@param p gradient or texture paint
 		*/
-	public GRectangle(double x, double y, int z, double w, double h, Paint p){
+	public PRectangle(double x, double y, int z, double w, double h, Paint p){
 		this(x, y, z, w, h, p, Color.BLACK);
 	}
 
@@ -58,7 +58,7 @@ public class GRectangle extends VRectangle {
 		*@param p gradient or texture paint
 		*@param bc border color
 		*/
-	public GRectangle(double x, double y, int z, double w, double h, Paint p, Color bc){
+	public PRectangle(double x, double y, int z, double w, double h, Paint p, Color bc){
 		super(x, y, z, w, h, Color.WHITE, bc);
 		this.gp = p;
 	}
@@ -150,7 +150,7 @@ public class GRectangle extends VRectangle {
 	}
 
 	public Object clone(){
-		GRectangle res = new GRectangle(vx, vy, 0, vw, vh, gp, getBorderColor());
+		PRectangle res = new PRectangle(vx, vy, 0, vw, vh, gp, getBorderColor());
 		res.cursorInsideColor = this.cursorInsideColor;
 		return res;
 	}
