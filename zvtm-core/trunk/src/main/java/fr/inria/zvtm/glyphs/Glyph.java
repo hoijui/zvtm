@@ -115,7 +115,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     protected int vz;
 
     /** Diameter of bounding circle (read-only).
-     *@see #sizeTo(double radius)
+     *@see #sizeTo(double s)
      *@see #reSize(double factor)
      *@see #getSize()
      */
@@ -160,8 +160,8 @@ public abstract class Glyph implements Cloneable, Translucent {
      */
     public abstract void sizeTo(double s);
 
-    /** Set glyph's size by multiplying its bounding circle radius by a factor. 
-     *@see #sizeTo(double radius)
+    /** Set glyph's size by multiplying its bounding circle diameter by a factor. 
+     *@see #sizeTo(double s)
      */
     public abstract void reSize(double factor);
 
