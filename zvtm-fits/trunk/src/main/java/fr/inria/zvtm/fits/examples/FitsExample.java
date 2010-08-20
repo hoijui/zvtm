@@ -19,10 +19,19 @@ import fr.inria.zvtm.fits.FitsHistogram;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.ZScale;
 
+import fr.inria.zvtm.glyphs.GRectangle;
+
+
+
+import java.awt.GradientPaint;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.geom.Point2D;
+
 import java.io.IOException;
 import java.util.Vector;
 
@@ -71,6 +80,14 @@ public class FitsExample {
         rs.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
         vs.addGlyph(rs);
         rs.move(0, -30);
+        
+        // example fake gradient
+        Point2D start = new Point2D.Float(0,0);
+        Point2D end = new Point2D.Float(200,0);
+        float[] dist = {0.0f, 0.5f, 0.7f, 1.0f};
+        Color[] colors = {Color.BLUE, Color.YELLOW, Color.GREEN, Color.RED};
+        MultipleGradientPaint gp = new LinearGradientPaint(start, end, dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
+        vs.addGlyph(new GRectangle(0, -200, 0, 100, 10, gp, Color.BLACK));
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
