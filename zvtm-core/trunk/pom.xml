@@ -32,9 +32,6 @@ $Id$
   <!-- Repositories -->
   <repositories>
 	<repository>
-		<!-- With SF.net's new project web system, it seems to be necessary
-		     to login to the interactive shell and create whatever directory
-		     is necessary before one can actually deploy a new version number -->
       <id>zvtm repository</id>
       <url>http://zvtm.sourceforge.net/maven</url>
     </repository>
