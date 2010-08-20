@@ -25,7 +25,7 @@ public interface ResourceHandler {
      *@param zindex z-index (layer). Feed 0 if you don't know.
      *@param region containing region
      *@param resourceURL path to bitmap resource (any valid absolute URL)
-     *@param sensitive should the glyph representing this resource be made sensitive to cursor events or not.
+     *@param sensitivity should the glyph representing this resource be made sensitive to cursor events or not.
      *@param stroke border color (null if no border)
      *@param params a string of parameters specific to each resource type (see documentation for each resource type).
      */

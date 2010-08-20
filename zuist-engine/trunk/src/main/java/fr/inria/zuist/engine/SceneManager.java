@@ -948,7 +948,7 @@ public class SceneManager implements CameraListener {
     
     /** Enable/disable level updating.
      * Calls to updateLevel(altitude) have no effect if level updating is disabled.
-     *@see #updateLevel(int layerIndex, double[] cameraBounds, float altitude)
+     *@see #updateLevel(int layerIndex, double[] cameraBounds, double altitude)
      */
     public void setUpdateLevel(boolean b){
 	updateLevel = b;
