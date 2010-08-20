@@ -19,7 +19,7 @@ import fr.inria.zvtm.fits.FitsHistogram;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.ZScale;
 
-import fr.inria.zvtm.glyphs.GRectangle;
+import fr.inria.zvtm.glyphs.PRectangle;
 
 
 
@@ -87,7 +87,7 @@ public class FitsExample {
         float[] dist = {0.0f, 0.5f, 0.7f, 1.0f};
         Color[] colors = {Color.BLUE, Color.YELLOW, Color.GREEN, Color.RED};
         MultipleGradientPaint gp = new LinearGradientPaint(start, end, dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
-        vs.addGlyph(new GRectangle(0, -200, 0, 100, 10, gp, Color.BLACK));
+        vs.addGlyph(new PRectangle(0, -200, 0, 100, 10, gp, Color.BLACK));
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
