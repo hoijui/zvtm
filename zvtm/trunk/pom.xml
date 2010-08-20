@@ -8,7 +8,7 @@ $Id$
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
-  <artifactId>zvtm</artifactId>
+  <artifactId>zvtm-core</artifactId>
   <packaging>jar</packaging>
   <name>ZVTM</name>
   <version>0.11.0-SNAPSHOT</version>
