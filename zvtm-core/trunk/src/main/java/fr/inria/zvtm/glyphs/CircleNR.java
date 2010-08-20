@@ -26,36 +26,36 @@ public class CircleNR extends VCircle {
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param r radius in virtual space
+		*@param d diameter in virtual space
 		*@param c fill color
 		*/
-	public CircleNR(double x,double y, int z,double r,Color c){
-		super(x, y, z, r, c);
+	public CircleNR(double x, double y, int z, double d, Color c){
+		super(x, y, z, d, c);
 	}
 
 	/**
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param r radius in virtual space
+		*@param d diameter in virtual space
 		*@param c fill color
 		*@param bc border color
 		*/
-	public CircleNR(double x, double y, int z, double r, Color c, Color bc){
-		super(x, y, z, r, c, bc);
+	public CircleNR(double x, double y, int z, double d, Color c, Color bc){
+		super(x, y, z, d, c, bc);
 	}
 
 	/**
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param r radius in virtual space
+		*@param d diameter in virtual space
 		*@param c fill color
 		*@param bc border color
 		*@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 		*/
-	public CircleNR(double x, double y, int z, double r, Color c, Color bc, float alpha){
-		super(x, y, z, r, c, bc, alpha);
+	public CircleNR(double x, double y, int z, double d, Color c, Color bc, float alpha){
+		super(x, y, z, d, c, bc, alpha);
 	}
 	
 	public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
@@ -63,7 +63,7 @@ public class CircleNR extends VCircle {
             return true;
         }
         else {
-            double trueSize = Math.round(size * (c.focal+c.altitude) / c.focal);
+            double trueSize = size / 2d * (c.focal+c.altitude) / c.focal;
             if (((vx-trueSize)<=eb) && ((vx+trueSize)>=wb) && ((vy-trueSize)<=nb) && ((vy+trueSize)>=sb)){
                 return true;
             }
@@ -79,7 +79,7 @@ public class CircleNR extends VCircle {
 		pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
 		pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
 		//project height and construct polygon
-		pc[i].cr = (int)vr;
+		pc[i].cr = (int)Math.round(size);
 	}
 
 	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
@@ -90,11 +90,11 @@ public class CircleNR extends VCircle {
 		pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-lensx)*coef);
 		pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-lensy)*coef);
 		//project height and construct polygon
-		pc[i].lcr = (int)vr;
+		pc[i].lcr = (int)Math.round(size);
 	}
 
 	public Object clone(){
-		CircleNR res=new CircleNR(vx,vy,0,vr,color);
+		CircleNR res=new CircleNR(vx, vy, 0, size, color);
 		res.borderColor=this.borderColor;
 		res.cursorInsideColor=this.cursorInsideColor;
 		res.bColor=this.bColor;
