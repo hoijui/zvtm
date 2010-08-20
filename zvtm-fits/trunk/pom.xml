@@ -108,8 +108,8 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
         <configuration>
           <archive>
             <manifest>
-              <mainClass>fr.inria.zvtm.demo.FITSViewer</mainClass>
-              <packageName>fr.inria.zvtm.demo</packageName>
+              <mainClass>fr.inria.zvtm.fits.examples.FitsExample</mainClass>
+              <packageName>fr.inria.zvtm.fits.examples</packageName>
               <addClasspath>true</addClasspath>
             </manifest>
             <manifestEntries>
