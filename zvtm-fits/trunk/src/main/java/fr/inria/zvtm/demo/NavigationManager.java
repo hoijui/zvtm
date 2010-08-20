@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.OverviewPortal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;

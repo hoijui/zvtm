@@ -18,10 +18,10 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Portal;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.OverviewPortal;
-import fr.inria.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
+import fr.inria.zvtm.engine.portals.PortalEventHandler;
 
 class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
 
