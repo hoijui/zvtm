@@ -54,23 +54,23 @@ public class VCircle extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param r diameter in virtual space
+     *@param d diameter in virtual space
      *@param c fill color
      */
-    public VCircle(double x,double y, int z,double r,Color c){
-	    this(x, y, z, r, c, Color.BLACK, 1);
+    public VCircle(double x, double y, int z, double d, Color c){
+	    this(x, y, z, d, c, Color.BLACK, 1);
     }
 
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param r diameter in virtual space
+     *@param d diameter in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VCircle(double x, double y, int z, double r, Color c, Color bc){
-        this(x, y, z, r, c, bc, 1);
+    public VCircle(double x, double y, int z, double d, Color c, Color bc){
+        this(x, y, z, d, c, bc, 1);
     }
     
     /**
