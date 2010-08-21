@@ -32,7 +32,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 public class RectangleNR extends ClosedShape implements RectangularShape {
 
     double vw,vh;
-    float ar;
+    double ar;
 
     RProjectedCoords[] pc;
 
@@ -44,8 +44,8 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space
-     *@param h half height in virtual space
+     *@param w width in virtual space
+     *@param h height in virtual space
      *@param c fill color
      */
     public RectangleNR(double x,double y, int z,double w,double h,Color c){
@@ -56,58 +56,57 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param w half width in virtual space
-     *@param h half height in virtual space
+     *@param w width in virtual space
+     *@param h height in virtual space
      *@param c fill color
      *@param bc border color
      */
     public RectangleNR(double x, double y, int z, double w, double h, Color c, Color bc){
-	vx=x;
-	vy=y;
-	vz=z;
-	vw=w;
-	vh=h;
-	computeSize();
-	if (vw==0 && vh==0){ar=1.0f;}
-	else {ar=(float)vw/(float)vh;}
-	//if (vh!=0){ar=vw/vh;}else{ar=0;}
-	orient=0;
-	setColor(c);
-	setBorderColor(bc);
+        vx=x;
+        vy=y;
+        vz=z;
+        vw=w;
+        vh=h;
+        computeSize();
+        if (vw==0 && vh==0){ar = 1.0f;}
+        else {ar = vw / vh;}
+        orient=0;
+        setColor(c);
+        setBorderColor(bc);
     }
 
     public void initCams(int nbCam){
-	pc=new RProjectedCoords[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new RProjectedCoords();
-	    pc[i].cw=(int)vw;
-	    pc[i].ch=(int)vh;
-	}
+        pc = new RProjectedCoords[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i]=new RProjectedCoords();
+            pc[i].cw = (int)(vw / 2d);
+            pc[i].ch = (int)(vh / 2d);
+        }
     }
 
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		RProjectedCoords[] ta=pc;
-		pc=new RProjectedCoords[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new RProjectedCoords();
-		pc[pc.length-1].cw=(int)vw;
-		pc[pc.length-1].ch=(int)vh;
-	    }
-	    else {System.err.println("RectangleNR:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new RProjectedCoords[1];
-		pc[0]=new RProjectedCoords();
-		pc[0].cw=(int)vw;
-		pc[0].ch=(int)vh;
-	    }
-	    else {System.err.println("RectangleNR:Error while adding camera "+verifIndex);}
-	}
+        if (pc!=null){
+            if (verifIndex==pc.length){
+                RProjectedCoords[] ta=pc;
+                pc=new RProjectedCoords[ta.length+1];
+                for (int i=0;i<ta.length;i++){
+                    pc[i]=ta[i];
+                }
+                pc[pc.length-1]=new RProjectedCoords();
+                pc[pc.length-1].cw = (int)(vw / 2d);
+                pc[pc.length-1].ch = (int)(vh / 2d);
+            }
+            else {System.err.println("RectangleNR:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex==0){
+                pc=new RProjectedCoords[1];
+                pc[0]=new RProjectedCoords();
+                pc[0].cw = (int)(vw / 2d);
+                pc[0].ch = (int)(vh / 2d);
+            }
+            else {System.err.println("RectangleNR:Error while adding camera "+verifIndex);}
+        }
     }
 
     public void removeCamera(int index){
@@ -140,8 +139,8 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	    size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    public void sizeTo(double radius){
-        size=radius;
+    public void sizeTo(double s){
+        size = s;
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
         vh = size / Math.sqrt(Math.pow(ar,2)+1);
         updateProjectedWH();
@@ -174,7 +173,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	 *@return west, north, east and south bounds in virtual space.
 	 */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
 
@@ -182,8 +181,8 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
 	if (pc!=null){
 	    for (int i=0;i<pc.length;i++){
 		try {
-		    pc[i].cw=(int)vw;
-		    pc[i].ch=(int)vh;
+		    pc[i].cw=(int)(vw/2d);
+		    pc[i].ch=(int)(vh/2d);
 		}//some pc[i] might be null (if cameras were deleted from the virtual space)
 		catch (NullPointerException e){}
 	    }
@@ -224,7 +223,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
     }
     
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){

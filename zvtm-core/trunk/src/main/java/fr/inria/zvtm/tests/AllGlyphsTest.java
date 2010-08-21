@@ -177,16 +177,16 @@ public class AllGlyphsTest {
         s.moveTo(80, 360);
         vs.addGlyph(s);
         // round rectangles
-        VRoundRect rr = new VRoundRect(0, 400, 0, 20, 10, Color.WHITE, 4, 4);
+        VRoundRect rr = new VRoundRect(0, 400, 0, 40, 20, Color.WHITE, 4, 4);
         vs.addGlyph(rr);
         rr = new VRoundRect(40, 400, 0, 10, 5, Color.RED, 4, 4);
-        rr.setWidth(20);
-        rr.setHeight(10);
+        rr.setWidth(40);
+        rr.setHeight(20);
         vs.addGlyph(rr);
         rr = new VRoundRect(0, 0, 0, 10, 5, Color.BLUE, 4, 4);
         rr.moveTo(80, 400);
-        rr.setWidth(20);
-        rr.setHeight(10);
+        rr.setWidth(40);
+        rr.setHeight(20);
         vs.addGlyph(rr);
         // segments
         VSegment sg = new VSegment(-20, 420, 20, 460, 0, Color.WHITE);

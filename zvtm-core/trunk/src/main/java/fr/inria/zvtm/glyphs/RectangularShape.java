@@ -23,22 +23,22 @@
 package fr.inria.zvtm.glyphs;
 
 /**
- * Rectangular shape interface. Access and manipulate rectangular glyphs's width and height
+ * Rectangular shape. Access and manipulate a rectangular glyph's width and height.
  * @author Emmanuel Pietriga
  **/
 
 public interface RectangularShape {
 
-    /** Set absolute half width. */
+    /** Set width in virtual space. */
     public void setWidth(double w);
 
-    /** Set absolute half height. */
+    /** Set height in virtual space. */
     public void setHeight(double h);
     
-    /** Get absolute half width. */
+    /** Get width in virtual space. */
     public double getWidth();
     
-    /** Get absolute half width. */
+    /** Get width in virtual space. */
     public double getHeight();
 
 }

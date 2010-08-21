@@ -31,8 +31,10 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VRoundRect extends ClosedShape implements RectangularShape  {
 
-    /* Half width and height in virtual space. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING. */
-    public double vw,vh;
+    /* Width in virtual space. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING. */
+    public double vw;
+    /* Height in virtual space. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING. */
+    public double vh;
     /*aspect ratio (width divided by height)*/
     double ar;
 
@@ -56,8 +58,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param aw arc width in virtual space
         *@param ah arc height in virtual space
@@ -70,8 +72,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param bc border color
         *@param aw arc width in virtual space
@@ -85,8 +87,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param bc border color
         *@param aw arc width in virtual space
@@ -166,29 +168,29 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
 	    size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    public void sizeTo(double radius){
-        size=radius;
+    public void sizeTo(double s){
+        size = s;
         vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
         vh = size / (Math.sqrt(Math.pow(ar,2)+1));
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(double w){ 
-        vw=w;
+        vw = w;
         ar = vw / vh;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(double h){
-        vh=h;
+        vh = h;
         ar = vw / vh;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(double factor){
-        size*=factor;
+        size *= factor;
         vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
         vh = size / (Math.sqrt(Math.pow(ar,2)+1));
         VirtualSpaceManager.INSTANCE.repaintNow();
@@ -198,7 +200,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     *@return west, north, east and south bounds in virtual space.
     */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d, vy+vh/2d, vx+vw/2d, vy-vh/2d};
 		return res;
 	}
 
@@ -248,7 +250,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
         }
-        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+        else if (((vx-vw/2d)<=eb) && ((vx+vw/2d)>=wb) && ((vy-vh/2d)<=nb) && ((vy+vh/2d)>=sb)){
             /* Glyph is at least partially in region.
             We approximate using the glyph bounding box, meaning that some glyphs not
             actually visible can be projected and drawn (but they won't be displayed)) */
@@ -258,7 +260,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     }
     
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -291,8 +293,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project width and height
-        pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
-        pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].cw = (int)Math.round(Math.ceil(vw/2d*coef));
+        pc[i].ch = (int)Math.round(Math.ceil(vh/2d*coef));
         pc[i].aw = (int)Math.round(arcWidth*coef);
         pc[i].ah = (int)Math.round(arcHeight*coef);
     }
@@ -305,8 +307,8 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-lensx)*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-lensy)*coef);
         //project width and height
-        pc[i].lcw = (int)Math.round(Math.ceil(vw*coef));
-        pc[i].lch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].lcw = (int)Math.round(Math.ceil(vw/2d*coef));
+        pc[i].lch = (int)Math.round(Math.ceil(vh/2d*coef));
         pc[i].law = (int)Math.round(arcWidth*coef);
         pc[i].lah = (int)Math.round(arcHeight*coef);
     }
