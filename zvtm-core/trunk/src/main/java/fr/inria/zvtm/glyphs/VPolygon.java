@@ -33,9 +33,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VPolygon extends ClosedShape {
 
-    /*height=width in virtual space*/
-    double vs;
-
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjPolygon[] pc;
 
@@ -151,27 +148,27 @@ public class VPolygon extends ClosedShape {
     public double getSize(){return size;}
 
     synchronized void computeSize(){
-        size=0;
-        double f;
-        for (int i=0;i<xcoords.length;i++){
-            //at this point, the xcoords,ycoords should contain relative vertices coordinates (w.r.t vx/vy=centroid)
-            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-            if (f>size){size=(float)f;}
-        }
-        vs = size;
-    }
-
-    public synchronized void sizeTo(double radius){
-        double ratio = radius / size;
         size = 0;
         double f;
         for (int i=0;i<xcoords.length;i++){
-            xcoords[i]=xcoords[i]*ratio;
-            ycoords[i]=ycoords[i]*ratio;
-            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-            if (f>size){size=(float)f;}
+            //at this point, the xcoords,ycoords should contain relative vertices coordinates (w.r.t vx/vy=centroid)
+            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            if (f > size){size = f;}
         }
-        vs = size;
+        size *= 2;
+    }
+
+    public synchronized void sizeTo(double s){
+        double ratio = s / size;
+        size = 0;
+        double f;
+        for (int i=0;i<xcoords.length;i++){
+            xcoords[i] = xcoords[i] * ratio;
+            ycoords[i] = ycoords[i] * ratio;
+            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            if (f > size){size = f;}
+        }
+        size *= 2;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -179,12 +176,12 @@ public class VPolygon extends ClosedShape {
         size = 0;
         double f;
         for (int i=0;i<xcoords.length;i++){
-            xcoords[i]=xcoords[i]*factor;
-            ycoords[i]=ycoords[i]*factor;
-            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-            if (f>size){size=(float)f;}
+            xcoords[i] = xcoords[i] * factor;
+            ycoords[i] = ycoords[i] * factor;
+            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            if (f > size){size = f;}
         }
-        vs = size;
+        size *= 2;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -268,7 +265,7 @@ public class VPolygon extends ClosedShape {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project height and construct polygon
-        pc[i].cr = (int)Math.round(vs*coef);	
+        pc[i].cr = (int)Math.round(size*coef);	
         for (int j=0;j<xcoords.length;j++){
             pc[i].xpcoords[j]=(int)Math.round(pc[i].cx+xcoords[j]*coef);
             pc[i].ypcoords[j]=(int)Math.round(pc[i].cy-ycoords[j]*coef);
@@ -294,7 +291,7 @@ public class VPolygon extends ClosedShape {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project height and construct polygon
-        pc[i].lcr = (int)Math.round(vs*coef);	
+        pc[i].lcr = (int)Math.round(size*coef);	
         for (int j=0;j<xcoords.length;j++){
             pc[i].lxpcoords[j]=(int)Math.round(pc[i].lcx+xcoords[j]*coef);
             pc[i].lypcoords[j]=(int)Math.round(pc[i].lcy-ycoords[j]*coef);

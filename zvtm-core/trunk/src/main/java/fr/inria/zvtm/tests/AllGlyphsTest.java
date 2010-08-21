@@ -120,7 +120,7 @@ public class AllGlyphsTest {
         Point2D.Double[] vertices5 = {new Point2D.Double(0,0), new Point2D.Double(10,10), new Point2D.Double(20,0), new Point2D.Double(10,-10)};
         vp = new VPolygon(vertices5, 0, Color.YELLOW);
         vp.moveTo(160, 120);
-        vp.sizeTo(20);
+        vp.sizeTo(40);
         vs.addGlyph(vp);
         // point
         VPoint pt = new VPoint(0, 160, 0, Color.WHITE);

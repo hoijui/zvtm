@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -34,8 +34,6 @@ import fr.inria.zvtm.engine.Camera;
  **/
 
 public class FPolygon extends ClosedShape {
-
-    double vs;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjPolygon[] pc;
@@ -144,10 +142,10 @@ public class FPolygon extends ClosedShape {
         double f;
         for (int i=0;i<xcoords.length;i++){
             //at this point, the xcoords,ycoords should contain relative vertices coordinates (w.r.t vx/vy=centroid)
-            f = Math.sqrt(Math.pow(xcoords[i],2)+Math.pow(ycoords[i],2));
-            if (f>size){size=f;}
+            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            if (f > size){size = f;}
         }
-        vs = size;
+        size *= 2;
     }
 
     /** Cannot be resized. */
@@ -236,7 +234,7 @@ public class FPolygon extends ClosedShape {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project height and construct polygon
-        pc[i].cr = (int)Math.round(vs*coef);	
+        pc[i].cr = (int)Math.round(size*coef);	
         for (int j=0;j<xcoords.length;j++){
             pc[i].xpcoords[j]=(int)Math.round(pc[i].cx+xcoords[j]*coef);
             pc[i].ypcoords[j]=(int)Math.round(pc[i].cy-ycoords[j]*coef);
@@ -262,7 +260,7 @@ public class FPolygon extends ClosedShape {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project height and construct polygon
-        pc[i].lcr = (int)Math.round(vs*coef);	
+        pc[i].lcr = (int)Math.round(size*coef);	
         for (int j=0;j<xcoords.length;j++){
             pc[i].lxpcoords[j]=(int)Math.round(pc[i].lcx+xcoords[j]*coef);
             pc[i].lypcoords[j]=(int)Math.round(pc[i].lcy-ycoords[j]*coef);
