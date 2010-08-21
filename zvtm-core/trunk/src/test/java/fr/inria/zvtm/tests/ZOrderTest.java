@@ -16,7 +16,6 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VTriangle;
 
 import java.awt.Color;
 
@@ -79,7 +78,7 @@ public class ZOrderTest extends TestCase {
     }
 
     public void testAboveSameGlyph(){
-	Glyph g = new VTriangle(10, 10, 3, 30, Color.BLACK);
+	Glyph g = new VCircle(10, 10, 3, 30, Color.BLACK);
 	vs.addGlyph(g, false);
 	vs.above(g, g);
 
@@ -87,7 +86,7 @@ public class ZOrderTest extends TestCase {
     }
 
     public void testBelowSameGlyph(){
-	Glyph g = new VTriangle(10, 10, 3, 30, Color.BLACK);
+	Glyph g = new VCircle(10, 10, 3, 30, Color.BLACK);
 	vs.addGlyph(g, false);
 	vs.below(g, g);
 
@@ -99,7 +98,7 @@ public class ZOrderTest extends TestCase {
 	final int nbGlyphs = 100;
 
 	for(int i=0; i<nbGlyphs; ++i){
-	    Glyph g = new VTriangle(10, 10, i, 30, Color.BLACK);
+	    Glyph g = new VCircle(10, 10, i, 30, Color.BLACK);
 	    glyphs.add(g);
 	    vs.addGlyph(g, false);
 	}

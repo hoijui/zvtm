@@ -141,19 +141,6 @@ public class AllGlyphsTest {
         di.sizeTo(20);
         di.moveTo(120, 200);
         vs.addGlyph(di);
-        // triangles
-        VTriangle tr = new VTriangle(0, 240, 0, 20, Color.WHITE);
-        vs.addGlyph(tr);
-        tr = new VTriangle(40, 240, 0, 10, Color.RED);
-        tr.sizeTo(20);
-        vs.addGlyph(tr);
-        tr = new VTriangleOr(80, 240, 0, 10, Color.BLUE, (float)Math.PI);
-        tr.sizeTo(20);
-        vs.addGlyph(tr);
-        tr = new VTriangleOr(0, 0, 0, 10, Color.GREEN, (float)Math.PI);
-        tr.sizeTo(20);
-        tr.moveTo(120, 240);
-        vs.addGlyph(tr);
         // ellipses
         VEllipse e = new VEllipse(0, 280, 0, 20, 10, Color.WHITE);
         vs.addGlyph(e);

@@ -60,8 +60,6 @@ import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.VShape;
-import fr.inria.zvtm.glyphs.VTriangle;
-import fr.inria.zvtm.glyphs.VTriangleOr;
 
 
 public class GlyphFactory extends JDialog implements ActionListener,MouseListener,ChangeListener {
@@ -72,12 +70,11 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
     public static String V_Rectangle="VRectangle";
     public static String V_Ellipse="VEllipse";
     public static String V_Circle="VCircle";
-    public static String V_Triangle="VTriangle";
     public static String V_Diamond="VDiamond";
     private static Vector initShapeTypes(){
 	Vector res=new Vector();
 	res.add(V_Shape);res.add(V_Rectangle);res.add(V_Ellipse);res.add(V_Circle);
-	res.add(V_Triangle);res.add(V_Diamond);
+	res.add(V_Diamond);
 	return res;
     }
     private static Vector allowedShapeTypes=initShapeTypes();
@@ -503,7 +500,6 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	else if (glClass.equals(V_Rectangle)){return new VRectPanel(this);}
 	else if (glClass.equals(V_Circle)){return new VCirPanel(this);}
 	else if (glClass.equals(V_Ellipse)){return new VEllPanel(this);}
-	else if (glClass.equals(V_Triangle)){return new VTrgPanel(this);}
 	else if (glClass.equals(V_Diamond)){return new VDiamPanel(this);}
 	else {return new VShapePanel(this);}
     }
@@ -613,20 +609,6 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	}
 	else if (si.equals(V_Circle)){
 	    g = new VCircle(0, 0, 0, size, fillColor, borderColor, (float)alpha);
-	}
-	else if (si.equals(V_Triangle)){
-	    if (angleChk.isSelected()){
-		if (transpChk.isSelected()){
-		    g=new VTriangleOr(0, 0, 0, size, fillColor, borderColor, (float)angle, (float)alpha);
-		}
-		else {g=new VTriangleOr(0, 0, 0, size, fillColor, borderColor, (float)angle, 1f);}
-	    }
-	    else {
-		if (transpChk.isSelected()){
-		    g=new VTriangle(0, 0, 0, size, fillColor, borderColor, (float)alpha);
-		}
-		else {g=new VTriangle(0, 0, 0, size, fillColor, borderColor);}
-	    }
 	}
 	else if (si.equals(V_Diamond)){
 	    if (angleChk.isSelected()){

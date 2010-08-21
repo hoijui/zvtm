@@ -21,7 +21,6 @@ import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRoundRect;
 import fr.inria.zvtm.glyphs.VShape;
-import fr.inria.zvtm.glyphs.VTriangle;
 
   /**
    * Icon representing a Glyph (can be used to represent a Glyph in any Java/Swing component including non-ZVTM components)
@@ -52,9 +51,6 @@ public abstract class GlyphIcon {
 	}
 	else if (g instanceof VEllipse){
 	    return new IcEllipse((VEllipse)g,w,h);
-	}
-	else if (g instanceof VTriangle){
-	    return new IcTriangle((VTriangle)g,w,h);
 	}
 	else if (g instanceof VDiamond){
 	    return new IcDiamond((VDiamond)g,w,h);
@@ -369,74 +365,6 @@ class IcEllipse extends GlyphIcon implements Icon {
 	}
 	g.setColor(glyph.getBorderColor());
 	g.drawOval(cWidth-trW,cHeight-trH,2*trW,2*trH);
-    }
-    
-}
-
-class IcTriangle extends GlyphIcon implements Icon {
-
-    VTriangle glyph;
-    int trS;
-    Polygon p;
-    int halfEdge,thirdHeight;
-    int[] xcoords=new int[3];
-    int[] ycoords=new int[3];
-    double orient;
-    
-    IcTriangle(VTriangle g,int w,int h){
-	this.glyph=g;
-	this.width=w;
-	this.height=h;
-    }
-
-    /**set the glyph that the icon should be representing
-     *@param g glyph to be represented  (should be a VTriangle (or subclass))
-     */
-    public void setGlyph(Glyph g){
-	glyph=(VTriangle)g;
-    }
-
-    /**get the glyph that the icon is representing
-     */
-    public Glyph getGlyph(){return glyph;}
-
-    /**
-     *get the icon's width (Icon interface)
-     */
-    public int getIconHeight(){return height;}
-
-    /**
-     *get the icon's height (Icon interface)
-     */
-    public int getIconWidth(){return width;}
-
-    /**
-     *Icon interface
-     */
-    public void paintIcon(Component c,Graphics g,int x,int y){
-	cWidth=c.getWidth()/2;
-	cHeight=c.getHeight()/2;
-	computePolygon();
-	if (glyph.isFilled()){
-	    g.setColor(glyph.getColor());
-	    g.fillPolygon(p);
-	}
-	g.setColor(glyph.getBorderColor());
-	g.drawPolygon(p);
-    }
-
-    protected void computePolygon(){
-	trS=Math.min(width,height)/2-2;
-	orient=glyph.getOrient();
-	halfEdge=Math.round(0.866f*trS);
-	thirdHeight=Math.round(0.5f*trS);
-	xcoords[0]=(int)Math.round(cWidth-trS*Math.sin(orient));
-	xcoords[1]=(int)Math.round(cWidth-halfEdge*Math.cos(orient)+thirdHeight*Math.sin(orient));
-	xcoords[2]=(int)Math.round(cWidth+halfEdge*Math.cos(orient)+thirdHeight*Math.sin(orient));
-	ycoords[0]=(int)Math.round(cHeight-trS*Math.cos(orient));
-	ycoords[1]=(int)Math.round(cHeight+thirdHeight*Math.cos(orient)+halfEdge*Math.sin(orient));
-	ycoords[2]=(int)Math.round(cHeight+thirdHeight*Math.cos(orient)-halfEdge*Math.sin(orient));
-	p=new Polygon(xcoords,ycoords,3);
     }
     
 }

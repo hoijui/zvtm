@@ -25,8 +25,6 @@ import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRoundRect;
 import fr.inria.zvtm.glyphs.VShape;
-import fr.inria.zvtm.glyphs.VTriangle;
-import fr.inria.zvtm.glyphs.VTriangleOr;
 
   /**
    * Utility functions associated with Glyphs
@@ -80,28 +78,6 @@ public class GlyphUtils {
 		ycoords[j]=(int)Math.round(pg1.vy+vertices[j].y);
 	    }
 	    return new Polygon(xcoords,ycoords,vertices.length);
-	}
-	else if (g instanceof VTriangle){
-	    double size=Math.round(g.getSize());
-	    double halfEdge=Math.round(0.866f*g.getSize());
-	    double thirdHeight=Math.round(0.5f*g.getSize());
-	    if (g instanceof VTriangleOr){
-		double orient=g.getOrient();
-		int[] xcoords=new int[3];
-		int[] ycoords=new int[3];
-		xcoords[0]=(int)Math.round(g.vx-size*Math.sin(orient));
-		xcoords[1]=(int)Math.round(g.vx-halfEdge*Math.cos(orient)+thirdHeight*Math.sin(orient));
-		xcoords[2]=(int)Math.round(g.vx+halfEdge*Math.cos(orient)+thirdHeight*Math.sin(orient));
-		ycoords[0]=(int)Math.round(g.vy+size*Math.cos(orient));
-		ycoords[1]=(int)Math.round(g.vy-thirdHeight*Math.cos(orient)+halfEdge*Math.sin(orient));
-		ycoords[2]=(int)Math.round(g.vy-thirdHeight*Math.cos(orient)-halfEdge*Math.sin(orient));
-		return new Polygon(xcoords,ycoords,3);
-	    }
-	    else {
-		int[] xcoords={(int)g.vx,(int)(g.vx-halfEdge),(int)(g.vx+halfEdge)};
-		int[] ycoords={(int)(g.vy+size),(int)(g.vy-thirdHeight),(int)(g.vy-thirdHeight)};
-		return new Polygon(xcoords,ycoords,3);
-	    }
 	}
 	else if (g instanceof VDiamond){
 	    double size=Math.round(g.getSize());
