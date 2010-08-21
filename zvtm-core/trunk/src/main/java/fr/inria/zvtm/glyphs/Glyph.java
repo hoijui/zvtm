@@ -125,7 +125,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@see #getOrient()
      *@see #orientTo(double angle)
      */
-    protected double orient = 0.0f;
+    protected double orient = 0.0;
 
     /** Translate the glyph by (x,y) - relative translation.
      *@see #moveTo(double x, double y)
