@@ -61,7 +61,7 @@ public class AllGlyphsTest {
     void populate(){
         // reference frame
         for (int i=0;i<6;i++){
-            for (int j=0;j<15;j++){
+            for (int j=0;j<12;j++){
                 Glyph g = new VRectangle(i*40,j*40,0,40,40,Color.GRAY, Color.LIGHT_GRAY);
                 g.setSensitivity(false);
                 vs.addGlyph(g);
@@ -129,14 +129,14 @@ public class AllGlyphsTest {
         pt.moveTo(40, 160);
         vs.addGlyph(pt);
         // ellipses
-        VEllipse e = new VEllipse(0, 280, 0, 20, 10, Color.WHITE);
+        VEllipse e = new VEllipse(0, 200, 0, 20, 10, Color.WHITE);
         vs.addGlyph(e);
-        e = new VEllipse(40, 280, 0, 10, 5, Color.RED);
+        e = new VEllipse(40, 200, 0, 10, 5, Color.RED);
         e.setWidth(20);
         e.setHeight(10);
         vs.addGlyph(e);
         e = new VEllipse(0, 0, 0, 10, 5, Color.BLUE);
-        e.moveTo(80, 280);
+        e.moveTo(80, 200);
         e.setWidth(20);
         e.setHeight(10);
         vs.addGlyph(e);
@@ -168,23 +168,23 @@ public class AllGlyphsTest {
         vs.addGlyph(tx);
         // shapes
         float[] vertices6 = {1f, .5f, 1f, .5f, 1f, .5f, 1f, .5f};
-        VShape s = new VShape(0, 360, 0, 20, vertices6, Color.WHITE, 0);
+        VShape s = new VShape(0, 240, 0, 20, vertices6, Color.WHITE, 0);
         vs.addGlyph(s);
-        s = new VShape(40, 360, 0, 20, vertices6, Color.RED, (float)Math.PI);
+        s = new VShape(40, 240, 0, 20, vertices6, Color.RED, (float)Math.PI);
         vs.addGlyph(s);
-        s = new VShape(0, 360, 0, 10, vertices6, Color.BLUE, (float)Math.PI);
+        s = new VShape(0, 240, 0, 10, vertices6, Color.BLUE, (float)Math.PI);
         s.sizeTo(20);
-        s.moveTo(80, 360);
+        s.moveTo(80, 240);
         vs.addGlyph(s);
         // round rectangles
-        VRoundRect rr = new VRoundRect(0, 400, 0, 40, 20, Color.WHITE, 4, 4);
+        VRoundRect rr = new VRoundRect(0, 280, 0, 40, 20, Color.WHITE, 4, 4);
         vs.addGlyph(rr);
-        rr = new VRoundRect(40, 400, 0, 10, 5, Color.RED, 4, 4);
+        rr = new VRoundRect(40, 280, 0, 10, 5, Color.RED, 4, 4);
         rr.setWidth(40);
         rr.setHeight(20);
         vs.addGlyph(rr);
         rr = new VRoundRect(0, 0, 0, 10, 5, Color.BLUE, 4, 4);
-        rr.moveTo(80, 400);
+        rr.moveTo(80, 280);
         rr.setWidth(40);
         rr.setHeight(20);
         vs.addGlyph(rr);
@@ -201,38 +201,38 @@ public class AllGlyphsTest {
         vs.addGlyph(sg);
         // slices and rings
         //XXX: this one is actually buggy (bad rendering)
-        VSlice sl = new VSlice(-20, 460, 0, 40, Math.PI/2d, Math.PI/4d, Color.WHITE, Color.BLACK);
+        VSlice sl = new VSlice(-20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.WHITE, Color.BLACK);
         vs.addGlyph(sl);
-        sl = new VSlice(-20, 460, 0, 40, Math.PI/2d, Math.PI/4d, Color.RED, Color.BLACK);
-        sl.moveTo(20, 460);
+        sl = new VSlice(20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.RED, Color.BLACK);
+        sl.moveTo(20, 380);
         vs.addGlyph(sl);
-        VRing rg = new VRing(60, 460, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.BLUE, Color.BLACK);
+        VRing rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.BLUE, Color.BLACK);
         vs.addGlyph(rg);
-        rg = new VRing(60, 460, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.GREEN, Color.BLACK);
-        rg.moveTo(100, 460);
+        rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.GREEN, Color.BLACK);
+        rg.moveTo(100, 380);
         vs.addGlyph(rg);
         // images
         String path_to_img = "src/main/resources/test.jpg";
-        VImage im = new VImage(0, 520, 0, (new ImageIcon(path_to_img)).getImage());
+        VImage im = new VImage(0, 360, 0, (new ImageIcon(path_to_img)).getImage());
         im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         vs.addGlyph(im);
-        im = new VImage(0, 520, 0, (new ImageIcon(path_to_img)).getImage());
+        im = new VImage(0, 360, 0, (new ImageIcon(path_to_img)).getImage());
         im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-        im.moveTo(40, 520);
+        im.moveTo(40, 360);
         vs.addGlyph(im);
-        im = new VImageOr(80, 520, 0, (new ImageIcon(path_to_img)).getImage(), (float)Math.PI/2f);
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-        vs.addGlyph(im);
-        im = new VImageOr(80, 520, 0, (new ImageIcon(path_to_img)).getImage(), (float)Math.PI/2f);
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-        im.moveTo(120, 520);
-        vs.addGlyph(im);
-        im = new RImage(160, 520, 0, (new ImageIcon(path_to_img)).getImage(), 1f);
+        im = new VImageOr(80, 360, 0, (new ImageIcon(path_to_img)).getImage(), (float)Math.PI/2f);
         im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         vs.addGlyph(im);
-        im = new RImage(160, 520, 0, (new ImageIcon(path_to_img)).getImage(), 1f);
+        im = new VImageOr(80, 360, 0, (new ImageIcon(path_to_img)).getImage(), (float)Math.PI/2f);
         im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-        im.moveTo(200, 520);
+        im.moveTo(120, 360);
+        vs.addGlyph(im);
+        im = new RImage(160, 360, 0, (new ImageIcon(path_to_img)).getImage(), 1f);
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        vs.addGlyph(im);
+        im = new RImage(160, 360, 0, (new ImageIcon(path_to_img)).getImage(), 1f);
+        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        im.moveTo(200, 360);
         vs.addGlyph(im);
     }
     
