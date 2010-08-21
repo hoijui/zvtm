@@ -41,8 +41,8 @@ public class PRectangle extends VRectangle {
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param w half width in virtual space
-		*@param h half height in virtual space
+		*@param w width in virtual space
+		*@param h height in virtual space
 		*@param p gradient or texture paint
 		*/
 	public PRectangle(double x, double y, int z, double w, double h, Paint p){
@@ -53,8 +53,8 @@ public class PRectangle extends VRectangle {
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param w half width in virtual space
-		*@param h half height in virtual space
+		*@param w width in virtual space
+		*@param h height in virtual space
 		*@param p gradient or texture paint
 		*@param bc border color
 		*/
@@ -85,7 +85,7 @@ public class PRectangle extends VRectangle {
 			//repaint only if object is visible
 			if (isFilled()){
 			    g.setPaint(gp);
-				g.fillRect(0, 0, (int)Math.round(2*vw), (int)Math.round(2*vh));
+				g.fillRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
@@ -97,12 +97,12 @@ public class PRectangle extends VRectangle {
 						// the fact that the rectangle intersects the viewport has already been tested by the main
 						// clipping algorithm
 						g.setStroke(stroke);
-						g.drawRect(0, 0, (int)Math.round(2*vw), (int)Math.round(2*vh));
+						g.drawRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 						g.setStroke(stdS);
 					}
 				}
 				else {
-					g.drawRect(0, 0, (int)Math.round(2*vw), (int)Math.round(2*vh));
+					g.drawRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 				}
 			}
 			g.setTransform(stdT);
@@ -121,7 +121,7 @@ public class PRectangle extends VRectangle {
 			//repaint only if object is visible
 			if (isFilled()){
 			    g.setPaint(gp);
-				g.fillRect(0, 0, (int)Math.round(2*vw), (int)Math.round(2*vh));
+				g.fillRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 			}
 			if (isBorderDrawn()){
 				g.setColor(borderColor);
@@ -133,12 +133,12 @@ public class PRectangle extends VRectangle {
 						// the fact that the rectangle intersects the viewport has already been tested by the main
 						// clipping algorithm
 						g.setStroke(stroke);
-						g.drawRect(0, 0, (int)Math.round(2*vw), (int)Math.round(2*vh));
+						g.drawRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 						g.setStroke(stdS);
 					}
 				}
 				else {
-					g.drawRect(0, 0, (int)Math.round(2*vw), (int)Math.round(2*vh));
+					g.drawRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 				}
 			}
 			g.setTransform(stdT);
