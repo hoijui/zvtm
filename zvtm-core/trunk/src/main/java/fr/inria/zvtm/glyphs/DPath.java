@@ -59,9 +59,9 @@ public class DPath extends Glyph implements RectangularShape {
 	/* Path start point */
 	double spx, spy;
 
-    /** For internal use. Made public for easier outside package subclassing. Half width in virtual space.*/
+    /** Width in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vw;
-    /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
+    /** Height in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vh;
     
     /** Java2D general path that represents this DPath */
@@ -270,10 +270,10 @@ public class DPath extends Glyph implements RectangularShape {
 	/* ------------- implementation of RectangularShape --------------- */
 
 	/** Get the horizontal distance from western-most point to the eastern-most one. */
-    public double getWidth(){return 2 * vw;}
+    public double getWidth(){return vw;}
 
 	/** Get the vertical distance from northern-most point to the southern-most one. */
-    public double getHeight(){return 2 * vh;}
+    public double getHeight(){return vh;}
 
 	/** Not implemented yet. */
     public void setWidth(double w){}
@@ -333,7 +333,7 @@ public class DPath extends Glyph implements RectangularShape {
     public void resetMouseIn(int i){}
     
 	/** No effect. */
-    public void sizeTo(double factor){}
+    public void sizeTo(double s){}
 
 	/** No effect. */
     public void reSize(double factor){}
@@ -392,8 +392,8 @@ public class DPath extends Glyph implements RectangularShape {
 		vx = (wnes[0]+wnes[2]) / 2;
 		vy = (wnes[1]+wnes[3]) / 2;
 		// compute width and height of bounding box
-		vw = (wnes[2]-wnes[0]) / 2;
-		vh = (wnes[1]-wnes[3]) / 2;
+		vw = wnes[2] - wnes[0];
+		vh = wnes[1] - wnes[3];
 		computeSize();
 	}
 
@@ -401,13 +401,13 @@ public class DPath extends Glyph implements RectangularShape {
 	 *@return west, north, east and south bounds in virtual space.
 	 */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
 	
 	public boolean coordsInsideBoundingBox(double x, double y){
-		return (x >= vx-vw) && (x <= vx+vw) &&
-		       (y >= vy-vh) && (y <= vy+vh);
+		return (x >= vx-vw/2d) && (x <= vx+vw/2d) &&
+		       (y >= vy-vh/2d) && (y <= vy+vh/2d);
 	}
 
     public double getOrient(){return orient;}
@@ -554,7 +554,7 @@ public class DPath extends Glyph implements RectangularShape {
 			// if glyph hotspot is in the region, we consider it is visible
 			return true;
 	    }
-		else if ((vx-vw <= eb) && (vx+vw >= wb) && (vy-vh <= nb) && (vy+vh >= sb)){
+		else if ((vx-vw/2d <= eb) && (vx+vw/2d >= wb) && (vy-vh/2d <= nb) && (vy+vh/2d >= sb)){
 			/* Glyph is at least partially in region.
 			   We approximate using the glyph bounding box, meaning that some glyphs not
 			   actually visible can be projected and drawn (but they won't be displayed)) */
@@ -568,7 +568,7 @@ public class DPath extends Glyph implements RectangularShape {
 			// if glyph hotspot is in the region, we consider it is visible
 			return true;
 	    }
-		else if ((vx+vw <= eb) && (vx-vw >= wb) && (vy+vh <= nb) && (vy-vh >= sb)){
+		else if ((vx+vw/2d <= eb) && (vx-vw/2d >= wb) && (vy+vh/2d <= nb) && (vy-vh/2d >= sb)){
 			/* Glyph is at least partially in region.
 			   We approximate using the glyph bounding box, meaning that some glyphs not
 			   actually visible can be projected and drawn (but they won't be displayed)) */
