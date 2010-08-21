@@ -34,8 +34,8 @@ public class FRectangle extends VRectangle {
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param w half width in virtual space
-		*@param h half height in virtual space
+		*@param w width in virtual space
+		*@param h height in virtual space
 		*@param c fill color
 		*@param ta gradient top alpha value
 		*@param ba gradient bottom alpha value
@@ -48,8 +48,8 @@ public class FRectangle extends VRectangle {
 		*@param x coordinate in virtual space
 		*@param y coordinate in virtual space
 		*@param z z-index (pass 0 if you do not use z-ordering)
-		*@param w half width in virtual space
-		*@param h half height in virtual space
+		*@param w width in virtual space
+		*@param h height in virtual space
 		*@param c fill color
 		*@param bc border color
 		*@param ta gradient top alpha value
@@ -81,17 +81,17 @@ public class FRectangle extends VRectangle {
 	
 	void createMask(){
 		GradientPaint mask = new GradientPaint(0, 0, new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_TOP),
-			0, (float)(2*vh), new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_BOTTOM));
-		image = new BufferedImage((int)(2*vw), (int)(2*vh), BufferedImage.TYPE_INT_ARGB);
+			0, (float)(vh), new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_BOTTOM));
+		image = new BufferedImage((int)(vw), (int)(vh), BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = image.createGraphics();
 		// Paints original image
 		g2.setColor(color);
-		g2.fillRect(0, 0, (int)(2*vw), (int)(2*vh));
+		g2.fillRect(0, 0, (int)(vw), (int)(vh));
 		g2.setPaint(mask);
 		// Sets the alpha composite
 		g2.setComposite(java.awt.AlphaComposite.DstIn);
 		// Paints the mask
-		g2.fillRect(0, 0, (int)(2*vw), (int)(2*vh));
+		g2.fillRect(0, 0, (int)(vw), (int)(vh));
 		g2.dispose();
 	}
 

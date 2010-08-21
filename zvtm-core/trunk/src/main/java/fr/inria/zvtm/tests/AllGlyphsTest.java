@@ -62,7 +62,7 @@ public class AllGlyphsTest {
         // reference frame
         for (int i=0;i<6;i++){
             for (int j=0;j<15;j++){
-                Glyph g = new VRectangle(i*40,j*40,0,20,20,Color.GRAY, Color.LIGHT_GRAY);
+                Glyph g = new VRectangle(i*40,j*40,0,40,40,Color.GRAY, Color.LIGHT_GRAY);
                 g.setSensitivity(false);
                 vs.addGlyph(g);
             }
@@ -78,23 +78,23 @@ public class AllGlyphsTest {
         c.moveTo(80, 0);
         vs.addGlyph(c);
         // rectangles
-        VRectangle r = new VRectangle(0,40,0,20,10,Color.WHITE);
+        VRectangle r = new VRectangle(0,40,0,40,20,Color.WHITE);
         vs.addGlyph(r);
         r = new VRectangle(40,40,0,10,5,Color.RED);
-        r.sizeTo(22.36f);
+        r.sizeTo(Math.sqrt(Math.pow(40,2)+Math.pow(20,2)));
         vs.addGlyph(r);
         r = new VRectangle(80,40,0,10,5,Color.BLUE);
-        r.setWidth(20);
-        r.setHeight(10);
+        r.setWidth(40);
+        r.setHeight(20);
         vs.addGlyph(r);
-        FRectangle fr = new FRectangle(120,40,0,20,10,Color.GREEN,1f,0f);
+        FRectangle fr = new FRectangle(120,40,0,40,20,Color.GREEN,1f,0f);
         vs.addGlyph(fr);
-        VRectangleOr or = new VRectangleOr(160,40,0,10,5,Color.YELLOW,(float)Math.PI/2f);
-        or.sizeTo(22.36f);
+        VRectangleOr or = new VRectangleOr(160,40,0,10,5,Color.YELLOW,Math.PI/2f);
+        or.sizeTo(Math.sqrt(Math.pow(40,2)+Math.pow(20,2)));
         vs.addGlyph(or);
-        or = new VRectangleOr(200,40,0,10,5,Color.ORANGE,(float)Math.PI/2f);
-        or.setWidth(20);
-        or.setHeight(10);
+        or = new VRectangleOr(200,40,0,10,5,Color.ORANGE,Math.PI/2f);
+        or.setWidth(40);
+        or.setHeight(20);
         vs.addGlyph(or);
         // path
         DPath d = new DPath(0, 80, 0, Color.WHITE);

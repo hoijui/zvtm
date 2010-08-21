@@ -52,8 +52,8 @@ public class VRectangleOr extends VRectangle {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param or orientation
         */
@@ -65,8 +65,8 @@ public class VRectangleOr extends VRectangle {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param bc border color
         *@param or orientation
@@ -79,8 +79,8 @@ public class VRectangleOr extends VRectangle {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param bc border color
         *@param or orientation
@@ -116,7 +116,7 @@ public class VRectangleOr extends VRectangle {
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		if (orient == 0){
-    		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+    		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 		}
 		else {
     		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);		    
@@ -128,7 +128,7 @@ public class VRectangleOr extends VRectangle {
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
         }
-        else if (((vx-size)<=eb) && ((vx+size)>=wb) && ((vy-size)<=nb) && ((vy+size)>=sb)){
+        else if (((vx-size/2d)<=eb) && ((vx+size/2d)>=wb) && ((vy-size/2d)<=nb) && ((vy+size/2d)>=sb)){
             /* Glyph is at least partially in region.
             We approximate using the glyph bounding box, meaning that some glyphs not
             actually visible can be projected and drawn (but they won't be displayed)) */
@@ -157,8 +157,8 @@ public class VRectangleOr extends VRectangle {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project width and height
-        pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
-        pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].cw = (int)Math.round(Math.ceil(vw/2d*coef));
+        pc[i].ch = (int)Math.round(Math.ceil(vh/2d*coef));
         if (orient!=0){
             float x1=-pc[i].cw;
             float y1=-pc[i].ch;
@@ -193,8 +193,8 @@ public class VRectangleOr extends VRectangle {
         pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
         pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
         //project width and height
-        pc[i].lcw = (int)Math.round(vw*coef);
-        pc[i].lch = (int)Math.round(vh*coef);
+        pc[i].lcw = (int)Math.round(vw/2d*coef);
+        pc[i].lch = (int)Math.round(vh/2d*coef);
         if (orient!=0){
             float x1=-pc[i].lcw;
             float y1=-pc[i].lch;

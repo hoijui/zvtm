@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,6 @@ import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
-
 /**
  * Rectangle. This version is the most efficient, but it cannot be reoriented.
  * @author Emmanuel Pietriga
@@ -43,9 +42,9 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VRectangle extends ClosedShape implements RectangularShape {
 
-    /** For internal use. Made public for easier outside package subclassing. Half width in virtual space.*/
+    /** Width in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vw;
-    /** For internal use. Made public for easier outside package subclassing. Half height in virtual space.*/
+    /** Height in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vh;
     /* For internal use. Made public for easier outside package subclassing. Aspect ratio (width divided by height). */
     public double ar;
@@ -61,8 +60,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         */
     public VRectangle(double x, double y, int z, double w, double h, Color c){
@@ -73,8 +72,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param bc border color
         */
@@ -86,8 +85,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         *@param x coordinate in virtual space
         *@param y coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
-        *@param w half width in virtual space
-        *@param h half height in virtual space
+        *@param w width in virtual space
+        *@param h height in virtual space
         *@param c fill color
         *@param bc border color
         *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
@@ -100,7 +99,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         vh=h;
         computeSize();
         if (vw==0 && vh==0){ar=1.0f;}
-        else {ar=(float)vw/(float)vh;}
+        else {ar = vw / vh;}
         orient=0;
         setColor(c);
         setBorderColor(bc);
@@ -165,32 +164,32 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	    size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    public void sizeTo(double radius){
-        //new bounding circle radius
-        size=radius;
+    public void sizeTo(double s){
+        // return diameter of bounding circle
+        size = s;
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
-        vh = (size) / Math.sqrt(Math.pow(ar,2)+1);
+        vh = size / Math.sqrt(Math.pow(ar,2)+1);
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(double w){ 
-        vw=w;
-        ar=(float)vw/(float)vh;
+        vw = w;
+        ar = vw / vh;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(double h){
-        vh=h;
-        ar=(float)vw/(float)vh;
+        vh = h;
+        ar = vw / vh;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(double factor){ //resizing factor
         size *= factor;
-        vw = (size*ar)/(Math.sqrt(Math.pow(ar,2)+1));
-        vh = (size)/(Math.sqrt(Math.pow(ar,2)+1));
+        vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
+        vh = size / Math.sqrt(Math.pow(ar,2)+1);
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -210,7 +209,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
         }
-        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+        else if (((vx-vw/2d)<=eb) && ((vx+vw/2d)>=wb) && ((vy-vh/2d)<=nb) && ((vy+vh/2d)>=sb)){
             /* Glyph is at least partially in region.
             We approximate using the glyph bounding box, meaning that some glyphs not
             actually visible can be projected and drawn (but they won't be displayed)) */
@@ -220,14 +219,14 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     }
 
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
     }
 
@@ -261,8 +260,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         pc[i].cx = (int)Math.round((d.width/2) + (vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2) - (vy-c.posy)*coef);
         //project width and height
-        pc[i].cw = (int)Math.round(Math.ceil(vw*coef));
-        pc[i].ch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].cw = (int)Math.round(Math.ceil(vw/2d*coef));
+        pc[i].ch = (int)Math.round(Math.ceil(vh/2d*coef));
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
@@ -273,8 +272,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
         pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
         //project width and height
-        pc[i].lcw = (int)Math.round(Math.ceil(vw*coef));
-        pc[i].lch = (int)Math.round(Math.ceil(vh*coef));
+        pc[i].lcw = (int)Math.round(Math.ceil(vw/2d*coef));
+        pc[i].lch = (int)Math.round(Math.ceil(vh/2d*coef));
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
