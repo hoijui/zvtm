@@ -125,7 +125,7 @@ public class VPoint extends Glyph {
     }
 
     /** Cannot be resized (it makes on sense). */
-    public void sizeTo(double factor){}
+    public void sizeTo(double s){}
 
     /** Cannot be resized (it makes on sense). */
     public void reSize(double factor){}
