@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Thu Jul 10 16:10:14 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */
  
@@ -18,7 +18,6 @@ import java.awt.geom.RoundRectangle2D;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VPolygon;
@@ -78,12 +77,6 @@ public class GlyphUtils {
 		ycoords[j]=(int)Math.round(pg1.vy+vertices[j].y);
 	    }
 	    return new Polygon(xcoords,ycoords,vertices.length);
-	}
-	else if (g instanceof VDiamond){
-	    double size=Math.round(g.getSize());
-	    int[] xcoords={(int)(g.vx+size),(int)g.vx,(int)(g.vx-size),(int)g.vx};
-	    int[] ycoords={(int)g.vy,(int)(g.vy-size),(int)g.vy,(int)(g.vy+size)};
-	    return new Polygon(xcoords,ycoords,4);
 	}
 	else if (g instanceof VImage){
 	    VImage im1=(VImage)g;

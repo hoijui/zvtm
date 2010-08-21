@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Thu Feb 20 10:44:34 2003 by Emmanuel Pietriga
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  * $Id$
  */
@@ -54,8 +54,6 @@ import javax.swing.event.ChangeListener;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VDiamond;
-import fr.inria.zvtm.glyphs.VDiamondOr;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
@@ -70,11 +68,9 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
     public static String V_Rectangle="VRectangle";
     public static String V_Ellipse="VEllipse";
     public static String V_Circle="VCircle";
-    public static String V_Diamond="VDiamond";
     private static Vector initShapeTypes(){
 	Vector res=new Vector();
 	res.add(V_Shape);res.add(V_Rectangle);res.add(V_Ellipse);res.add(V_Circle);
-	res.add(V_Diamond);
 	return res;
     }
     private static Vector allowedShapeTypes=initShapeTypes();
@@ -500,7 +496,6 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	else if (glClass.equals(V_Rectangle)){return new VRectPanel(this);}
 	else if (glClass.equals(V_Circle)){return new VCirPanel(this);}
 	else if (glClass.equals(V_Ellipse)){return new VEllPanel(this);}
-	else if (glClass.equals(V_Diamond)){return new VDiamPanel(this);}
 	else {return new VShapePanel(this);}
     }
 
@@ -609,20 +604,6 @@ public class GlyphFactory extends JDialog implements ActionListener,MouseListene
 	}
 	else if (si.equals(V_Circle)){
 	    g = new VCircle(0, 0, 0, size, fillColor, borderColor, (float)alpha);
-	}
-	else if (si.equals(V_Diamond)){
-	    if (angleChk.isSelected()){
-		if (transpChk.isSelected()){
-		    g=new VDiamondOr(0, 0, 0, size, fillColor, borderColor, (float)angle, (float)alpha);
-		}
-		else {g=new VDiamondOr(0, 0, 0, size, fillColor, borderColor, (float)angle);}
-	    }
-	    else {
-		if (transpChk.isSelected()){
-		    g=new VDiamond(0, 0, 0, size, fillColor, borderColor, (float)alpha);
-		}
-		else {g=new VDiamond(0, 0, 0, size, fillColor, borderColor);}
-	    }
 	}
 // 	//border color
 // 	float[] hsv=new float[3];

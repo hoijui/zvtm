@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Fri Aug 01 13:02:13 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */
  
@@ -16,7 +17,6 @@ import javax.swing.Icon;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRoundRect;
@@ -51,9 +51,6 @@ public abstract class GlyphIcon {
 	}
 	else if (g instanceof VEllipse){
 	    return new IcEllipse((VEllipse)g,w,h);
-	}
-	else if (g instanceof VDiamond){
-	    return new IcDiamond((VDiamond)g,w,h);
 	}
 	else if (g instanceof VRoundRect){
 	    return new IcRoundRect((VRoundRect)g,w,h);
@@ -365,73 +362,6 @@ class IcEllipse extends GlyphIcon implements Icon {
 	}
 	g.setColor(glyph.getBorderColor());
 	g.drawOval(cWidth-trW,cHeight-trH,2*trW,2*trH);
-    }
-    
-}
-
-class IcDiamond extends GlyphIcon implements Icon {
-
-    VDiamond glyph;
-    int trS;
-    Polygon p;
-    int[] xcoords=new int[4];
-    int[] ycoords=new int[4];
-    double orient;
-    
-    IcDiamond(VDiamond g,int w,int h){
-	this.glyph=g;
-	this.width=w;
-	this.height=h;
-    }
-
-    /**set the glyph that the icon should be representing
-     *@param g glyph to be represented  (should be a VDiamond (or subclass))
-     */
-    public void setGlyph(Glyph g){
-	glyph=(VDiamond)g;
-    }
-
-    /**get the glyph that the icon is representing
-     */
-    public Glyph getGlyph(){return glyph;}
-
-    /**
-     *get the icon's width (Icon interface)
-     */
-    public int getIconHeight(){return height;}
-
-    /**
-     *get the icon's height (Icon interface)
-     */
-    public int getIconWidth(){return width;}
-
-    /**
-     *Icon interface
-     */
-    public void paintIcon(Component c,Graphics g,int x,int y){
-	cWidth=c.getWidth()/2;
-	cHeight=c.getHeight()/2;
-	computePolygon();
-	if (glyph.isFilled()){
-	    g.setColor(glyph.getColor());
-	    g.fillPolygon(p);
-	}
-	g.setColor(glyph.getBorderColor());
-	g.drawPolygon(p);
-    }
-
-    protected void computePolygon(){
-	trS=Math.min(width,height)/2-2;
-	orient=glyph.getOrient();
-	xcoords[0]=(int)Math.round(cWidth+trS*Math.cos(orient));
-	xcoords[1]=(int)Math.round(cWidth-trS*Math.sin(orient));
-	xcoords[2]=(int)Math.round(cWidth-trS*Math.cos(orient));
-	xcoords[3]=(int)Math.round(cWidth+trS*Math.sin(orient));
-	ycoords[0]=(int)Math.round(cHeight-trS*Math.sin(orient));
-	ycoords[1]=(int)Math.round(cHeight-trS*Math.cos(orient));
-	ycoords[2]=(int)Math.round(cHeight+trS*Math.sin(orient));
-	ycoords[3]=(int)Math.round(cHeight+trS*Math.cos(orient));
-	p=new Polygon(xcoords,ycoords,4);
     }
     
 }

@@ -128,19 +128,6 @@ public class AllGlyphsTest {
         pt = new VPoint(10, 10, 0, Color.RED);
         pt.moveTo(40, 160);
         vs.addGlyph(pt);
-        // diamonds
-        VDiamond di = new VDiamond(0, 200, 0, 20, Color.WHITE);
-        vs.addGlyph(di);
-        di = new VDiamond(40, 200, 0, 10, Color.RED);
-        di.sizeTo(20);
-        vs.addGlyph(di);
-        di = new VDiamondOr(80, 200, 0, 10, Color.BLUE, (float)Math.PI);
-        di.sizeTo(20);
-        vs.addGlyph(di);
-        di = new VDiamondOr(0, 0, 0, 10, Color.GREEN, (float)Math.PI);
-        di.sizeTo(20);
-        di.moveTo(120, 200);
-        vs.addGlyph(di);
         // ellipses
         VEllipse e = new VEllipse(0, 280, 0, 20, 10, Color.WHITE);
         vs.addGlyph(e);
