@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,9 +43,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VShape extends ClosedShape {
 
-    /*height=width in virtual space*/
-    double vs;
-
     BProjectedCoordsP[] pc;
 
     /** Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */
@@ -67,7 +64,7 @@ public class VShape extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param s size (width=height) in virtual space
+     *@param s size in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param or shape's orientation in [0, 2Pi[
@@ -80,7 +77,7 @@ public class VShape extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param s size (width=height) in virtual space
+     *@param s size in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param bc border color
@@ -94,7 +91,7 @@ public class VShape extends ClosedShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param s size (width=height) in virtual space
+     *@param s size in virtual space
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      *@param c fill color
      *@param bc border color
@@ -105,13 +102,12 @@ public class VShape extends ClosedShape {
         vx = x;
         vy = y;
         vz = z;
-        vs = s;
+        size = s;
         vertices = v;
         xcoords = new int[vertices.length];
         ycoords = new int[vertices.length];
         lxcoords = new int[vertices.length];
         lycoords = new int[vertices.length];
-        computeSize();
         orient = or;
         setColor(c);
         setBorderColor(bc);
@@ -170,19 +166,13 @@ public class VShape extends ClosedShape {
 
     public double getSize(){return size;}
 
-    void computeSize(){
-        size = vs;
-    }
-
-    public void sizeTo(double radius){
-        size = radius;
-        vs = size;
+    public void sizeTo(double s){
+        size = s;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(double factor){
         size *= factor;
-        vs = size;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -249,7 +239,7 @@ public class VShape extends ClosedShape {
         pc[i].cx = (int)Math.round((d.width/2) + (vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2) - (vy-c.posy)*coef);
         //project height and construct polygon
-        pc[i].cr = (int)Math.round(vs*coef);
+        pc[i].cr = (int)Math.round(size/2d*coef);
         double vertexAngle=orient;
         for (int j=0;j<vertices.length-1;j++){
             xcoords[j]=(int)Math.round(pc[i].cx+pc[i].cr*Math.cos(vertexAngle)*vertices[j]);
@@ -279,7 +269,7 @@ public class VShape extends ClosedShape {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project height and construct polygon
-        pc[i].lcr = (int)Math.round(vs*coef);
+        pc[i].lcr = (int)Math.round(size/2d*coef);
         double vertexAngle=orient;
         for (int j=0;j<vertices.length-1;j++){
             lxcoords[j]=(int)Math.round(pc[i].lcx+pc[i].lcr*Math.cos(vertexAngle)*vertices[j]);
@@ -443,12 +433,12 @@ public class VShape extends ClosedShape {
         double[] ycoordsForArea = new double[vertices.length];
         double vertexAngle=orient;
         for (int i=0;i<vertices.length-1;i++){
-            xcoordsForArea[i] = vx+vs*Math.cos(vertexAngle)*vertices[i];
-            ycoordsForArea[i] = vy+vs*Math.sin(vertexAngle)*vertices[i];
+            xcoordsForArea[i] = vx+size/2d*Math.cos(vertexAngle)*vertices[i];
+            ycoordsForArea[i] = vy+size/2d*Math.sin(vertexAngle)*vertices[i];
             vertexAngle += 2*Math.PI/vertices.length;
         }//last iteration outside to loop to avoid one vertexAngle computation too many
-        xcoordsForArea[vertices.length-1] = vx+vs*Math.cos(vertexAngle)*vertices[vertices.length-1];
-        ycoordsForArea[vertices.length-1] = vy+vs*Math.sin(vertexAngle)*vertices[vertices.length-1];
+        xcoordsForArea[vertices.length-1] = vx+size/2d*Math.cos(vertexAngle)*vertices[vertices.length-1];
+        ycoordsForArea[vertices.length-1] = vy+size/2d*Math.sin(vertexAngle)*vertices[vertices.length-1];
         int j,k;
         double res=0;
         for (j=0;j<vertices.length;j++){
@@ -468,12 +458,12 @@ public class VShape extends ClosedShape {
         double[] ycoordsForArea=new double[vertices.length];
         double vertexAngle=orient;
         for (int i=0;i<vertices.length-1;i++){
-            xcoordsForArea[i]=vx+vs*Math.cos(vertexAngle)*vertices[i];
-            ycoordsForArea[i]=vy+vs*Math.sin(vertexAngle)*vertices[i];
+            xcoordsForArea[i]=vx+size/2d*Math.cos(vertexAngle)*vertices[i];
+            ycoordsForArea[i]=vy+size/2d*Math.sin(vertexAngle)*vertices[i];
             vertexAngle+=2*Math.PI/vertices.length;
         }//last iteration outside to loop to avoid one vertexAngle computation too many
-        xcoordsForArea[vertices.length-1]=vx+vs*Math.cos(vertexAngle)*vertices[vertices.length-1];
-        ycoordsForArea[vertices.length-1]=vy+vs*Math.sin(vertexAngle)*vertices[vertices.length-1];
+        xcoordsForArea[vertices.length-1]=vx+size/2d*Math.cos(vertexAngle)*vertices[vertices.length-1];
+        ycoordsForArea[vertices.length-1]=vy+size/2d*Math.sin(vertexAngle)*vertices[vertices.length-1];
         //compute polygon area
         int j,k;
         double area=0;
@@ -504,7 +494,7 @@ public class VShape extends ClosedShape {
     }
 
     public Object clone(){
-        VShape res=new VShape(vx, vy, 0, vs, (float[])vertices.clone(), color, borderColor, orient);
+        VShape res=new VShape(vx, vy, 0, size, (float[])vertices.clone(), color, borderColor, orient);
         res.cursorInsideColor=this.cursorInsideColor;
         return res;
     }

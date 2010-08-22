@@ -168,12 +168,12 @@ public class AllGlyphsTest {
         vs.addGlyph(tx);
         // shapes
         float[] vertices6 = {1f, .5f, 1f, .5f, 1f, .5f, 1f, .5f};
-        VShape s = new VShape(0, 240, 0, 20, vertices6, Color.WHITE, 0);
+        VShape s = new VShape(0, 240, 0, 40, vertices6, Color.WHITE, 0);
         vs.addGlyph(s);
-        s = new VShape(40, 240, 0, 20, vertices6, Color.RED, (float)Math.PI);
+        s = new VShape(40, 240, 0, 40, vertices6, Color.RED, (float)Math.PI);
         vs.addGlyph(s);
-        s = new VShape(0, 240, 0, 10, vertices6, Color.BLUE, (float)Math.PI);
-        s.sizeTo(20);
+        s = new VShape(0, 240, 0, 20, vertices6, Color.BLUE, (float)Math.PI);
+        s.sizeTo(40);
         s.moveTo(80, 240);
         vs.addGlyph(s);
         // round rectangles
