@@ -68,8 +68,7 @@ public class VRing extends VSlice {
         vx = x;
         vy = y;
         vz = z;
-        size = (float)vs;
-        vr = vs;
+        size = vs;
 		irr_p = irr;
         orient = or;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
@@ -112,9 +111,8 @@ public class VRing extends VSlice {
         vx = x;
         vy = y;
         vz = z;
-        size = (float)vs;
-        vr = vs;
-		irr_p = irr;
+        size = vs;
+        irr_p = irr;
         orient = or * DEG2RAD_FACTOR;
         orientDeg = or;
         angle = ag * DEG2RAD_FACTOR;
@@ -188,7 +186,7 @@ public class VRing extends VSlice {
     
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr)){
+		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + size)){
 		    return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 		}
 	    return false;

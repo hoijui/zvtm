@@ -50,9 +50,6 @@ public class VSlice extends ClosedShape {
     /*2nd point corresponding to the outer triangle (near 3rd point)*/
     public Point2D.Double p4 = new Point2D.Double(0,0);
 
-    /*radius in virtual space (equal to bounding circle radius since this is a circle)*/
-    public double vr;
-
     public double angle;
     public double orient;
     public int angleDeg;
@@ -104,8 +101,7 @@ public class VSlice extends ClosedShape {
         vx = x;
         vy = y;
         vz = z;
-        size = (float)vs;
-        vr = vs;
+        size = vs;
         orient = or;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         angle = ag;
@@ -147,8 +143,7 @@ public class VSlice extends ClosedShape {
         vx = x;
         vy = y;
         vz = z;
-        size = (float)vs;
-        vr = vs;
+        size = vs;
         orient = or * DEG2RAD_FACTOR;
         orientDeg = or;
         angle = ag * DEG2RAD_FACTOR;
@@ -191,7 +186,6 @@ public class VSlice extends ClosedShape {
     /** FOR INTERNAL USE ONLY */
     public void computeSize(){
         size = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
-        vr = size;
     }
 
     /** FOR INTERNAL USE ONLY */
@@ -288,9 +282,8 @@ public class VSlice extends ClosedShape {
 	borderColor = bColor;
     }
 
-    public void sizeTo(double sz){
-        size = sz;
-        vr = size;
+    public void sizeTo(double s){
+        size = s;
         computeSliceEdges();
         computePolygonEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
@@ -298,7 +291,6 @@ public class VSlice extends ClosedShape {
 
     public void reSize(double factor){
         size *= factor;
-        vr = size;
         computeSliceEdges();
         computePolygonEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
@@ -381,7 +373,7 @@ public class VSlice extends ClosedShape {
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + vr)){
+		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + size)){
 		    if (angle < Math.PI && pc[camIndex].boundingPolygon.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr) ||
     		    angle > Math.PI && !pc[camIndex].boundingPolygon.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr) ||
     		    angle == Math.PI && coordInsideHemisphere(jpx, jpy, camIndex)){
