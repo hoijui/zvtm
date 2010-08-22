@@ -129,16 +129,16 @@ public class AllGlyphsTest {
         pt.moveTo(40, 160);
         vs.addGlyph(pt);
         // ellipses
-        VEllipse e = new VEllipse(0, 200, 0, 20, 10, Color.WHITE);
+        VEllipse e = new VEllipse(0, 200, 0, 40, 20, Color.WHITE);
         vs.addGlyph(e);
-        e = new VEllipse(40, 200, 0, 10, 5, Color.RED);
-        e.setWidth(20);
-        e.setHeight(10);
+        e = new VEllipse(40, 200, 0, 20, 10, Color.RED);
+        e.setWidth(40);
+        e.setHeight(20);
         vs.addGlyph(e);
         e = new VEllipse(0, 0, 0, 10, 5, Color.BLUE);
         e.moveTo(80, 200);
-        e.setWidth(20);
-        e.setHeight(10);
+        e.setWidth(40);
+        e.setHeight(20);
         vs.addGlyph(e);
         // text
         String txt = "Test";

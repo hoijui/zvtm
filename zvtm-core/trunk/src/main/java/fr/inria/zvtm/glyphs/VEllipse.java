@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Oct 14 2001
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,10 +41,12 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VEllipse extends ClosedShape implements RectangularShape {
 
-    /*half width and height in virtual space*/
-    double vw,vh;
-    /*aspect ratio (width divided by height)*/
-    double ar;
+    /** Width in virtual space. For internal use. Made public for easier outside package subclassing. */
+    public double vw;
+    /** Height in virtual space. For internal use. Made public for easier outside package subclassing. */
+    public double vh;
+    /* For internal use. Made public for easier outside package subclassing. Aspect ratio (width divided by height). */
+    public double ar;
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjEllipse[] pc;
@@ -60,43 +62,43 @@ public class VEllipse extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
-     *@param sx horizontal axis radius in virtual space
-     *@param sy vertical axis radius in virtual space
+     *@param w horizontal axis diameter in virtual space
+     *@param h vertical axis diameter in virtual space
      *@param c fill color
      */
-    public VEllipse(double x,double y, int z,double sx,double sy,Color c){
-        this(x, y, z, sx, sy, c, Color.BLACK, 1.0f);
+    public VEllipse(double x, double y, int z, double w, double h, Color c){
+        this(x, y, z, w, h, c, Color.BLACK, 1.0f);
     }
 
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
-     *@param sx horizontal axis radius in virtual space
-     *@param sy vertical axis radius in virtual space
+     *@param w horizontal axis diameter in virtual space
+     *@param h vertical axis diameter in virtual space
      *@param c fill color
      *@param bc border color
      */
-    public VEllipse(double x, double y, int z, double sx, double sy, Color c, Color bc){
-        this(x, y, z, sx, sy, c, bc, 1.0f);
+    public VEllipse(double x, double y, int z, double w, double h, Color c, Color bc){
+        this(x, y, z, w, h, c, bc, 1.0f);
     }
 
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering) in virtual space
-     *@param sx horizontal axis radius in virtual space
-     *@param sy vertical axis radius in virtual space
+     *@param w horizontal axis diameter in virtual space
+     *@param h vertical axis diameter in virtual space
      *@param c fill color
      *@param bc border color
      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public VEllipse(double x, double y, int z, double sx, double sy, Color c, Color bc, float alpha){
+    public VEllipse(double x, double y, int z, double w, double h, Color c, Color bc, float alpha){
         vx=x;
         vy=y;
         vz=z;
-        vw=sx;
-        vh=sy;
+        vw = w;
+        vh = h;
         orient=0;
         setColor(c);
         setBorderColor(bc);
@@ -159,21 +161,27 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 
     public double getSize(){return size;}
 
-    public void sizeTo(double radius){
-        size=radius;
-        if (vw>=vh){vw=size;vh=(vw/ar);}
-        else {vh=size;vw=(vh*ar);}
+    public void sizeTo(double s){
+        size = s;
+        if (vw >= vh){
+            vw = size;
+            vh = vw / ar;
+        }
+        else {
+            vh = size;
+            vw = vh * ar;
+        }
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(double w){ 
-        vw=w;
+        vw = w;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(double h){
-        vh=h;
+        vh = h;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
@@ -183,9 +191,15 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     public double getHeight(){return vh;}
 
     public void reSize(double factor){
-        size*=factor;
-        if (vw>=vh){vw=size;vh=(vw/ar);}
-        else {vh=size;vw=(vh*ar);}
+        size *= factor;
+        if (vw >= vh){
+            vw = size;
+            vh = vw / ar;
+        }
+        else {
+            vh = size;
+            vw = vh*ar;
+        }
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -193,7 +207,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	 *@return west, north, east and south bounds in virtual space.
 	 */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
 
@@ -240,9 +254,9 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         //translate in JPanel coords
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
-        pc[i].cvw = (int)Math.round(vw*coef);
-        pc[i].cvh = (int)Math.round(vh*coef);
-        pc[i].ellipse.setFrame(pc[i].cx-vw*coef,pc[i].cy-vh*coef,2*pc[i].cvw,2*pc[i].cvh);
+        pc[i].cvw = (int)Math.round(vw/2d*coef);
+        pc[i].cvh = (int)Math.round(vh/2d*coef);
+        pc[i].ellipse.setFrame(pc[i].cx-vw/2d*coef,pc[i].cy-vh/2d*coef,2*pc[i].cvw,2*pc[i].cvh);
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
@@ -252,9 +266,9 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         //translate in JPanel coords
         pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
         pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
-        pc[i].lcvw = (int)Math.round(vw*coef);
-        pc[i].lcvh = (int)Math.round(vh*coef);
-        pc[i].lellipse.setFrame(pc[i].lcx-vw*coef,pc[i].lcy-vh*coef,2*pc[i].lcvw,2*pc[i].lcvh);
+        pc[i].lcvw = (int)Math.round(vw/2d*coef);
+        pc[i].lcvh = (int)Math.round(vh/2d*coef);
+        pc[i].lellipse.setFrame(pc[i].lcx-vw/2d*coef,pc[i].lcy-vh/2d*coef,2*pc[i].lcvw,2*pc[i].lcvh);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
