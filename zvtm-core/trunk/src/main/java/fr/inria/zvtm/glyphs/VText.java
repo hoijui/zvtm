@@ -183,16 +183,20 @@ public class VText extends Glyph {
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
-    /** Cannot be resized. */
+    /** No effect. Use the glyph's scale factor.
+     *@see #setScale(float s)
+     */
     public void sizeTo(double factor){}
 
-    /** Cannot be resized. */
+    /** No effect. Use the glyph's scale factor.
+     *@see #setScale(float s)
+     */
     public void reSize(double factor){}
 
     /** Cannot be reoriented. */
     public void orientTo(double angle){}
 
-    /** Get glyph's size (radius of bounding circle).
+    /** Get glyph's size (size of bounding circle).
      * Will return 0 if bounds of this VText have never been validated (through painting).
      *@see #getBounds(int i)
      *@see #validBounds(int i)
@@ -513,25 +517,31 @@ public class VText extends Glyph {
 
     /** Change the Font used to display this specific text object.
      *@param f set to null to use the default font
+     *@see #usesSpecificFont()
+     *@see #getFont()
      */
-    public void setSpecialFont(Font f){
+    public void setFont(Font f){
 	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
 	VirtualSpaceManager.INSTANCE.repaintNow();
 	invalidate();
     }
 
     /** Get the Font used to display this specific text object.
-     *@return the main ZVTM font if no specific Font is used in this object
+     *@see #usesSpecificFont()
+     *@see #setFont(Font f)
+     *@return the main ZVTM font if no specific Font is used to draw this text
      */
     public Font getFont(){
 	if (font!=null){return font;}
 	else return getMainFont();
     }
 
-    /** Indicates whether this glyph is using a special font or not.
-     * Using a special font does not necessarily mean that this font is different from the default font.
+    /** Indicates whether this glyph is using a special font.
+     * Special means different from the default one declared in the VirtualSpaceManager.
+     *@see #setFont(Font f)
+     *@see #getFont()
      */
-    public boolean usesSpecialFont(){
+    public boolean usesSpecificFont(){
 	if (font==null){return false;}
 	else {return true;}
     }

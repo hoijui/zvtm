@@ -102,6 +102,9 @@ public class VTextOr extends VText {
         setTranslucencyValue(alpha);
     }
 
+    /** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
     public void orientTo(double angle){
 	orient = angle;
 	invalidate();
