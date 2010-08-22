@@ -112,9 +112,9 @@ public class RImage extends VImage {
     /** Set bitmap image to be displayed. */
     public void setImage(Image i){
         image = createReflection(i);
-        vw = Math.round(image.getWidth(null)/2.0);
-        vh = Math.round(image.getHeight(null)/4.0);
-        ar = (float)vw/(float)vh;
+        vw = Math.round(image.getWidth(null));
+        vh = Math.round(image.getHeight(null)/2.0);
+        ar = vw / vh;
         computeSize();
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
@@ -175,8 +175,3 @@ public class RImage extends VImage {
     }
 
 }
-
-
-
-
-

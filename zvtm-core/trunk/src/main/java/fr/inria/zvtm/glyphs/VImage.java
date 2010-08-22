@@ -48,9 +48,9 @@ public class VImage extends ClosedShape implements RectangularShape {
     public static final short DRAW_BORDER_MOUSE_INSIDE = 1;
     public static final short DRAW_BORDER_ALWAYS = 2;
 
-    /** Half width in virtual space (read-only). */
+    /** Width in virtual space (read-only). */
     public double vw;
-    /** Half height in virtual space (read-only). */
+    /** Height in virtual space (read-only). */
     public double vh;
     /** Aspect ratio: width divided by height (read-only). */
     public double ar;
@@ -119,8 +119,8 @@ public class VImage extends ClosedShape implements RectangularShape {
         vy = y;
         vz = z;
         image = img;
-        vw = image.getWidth(null) * scale / 2.0d;
-        vh = image.getHeight(null) * scale / 2.0d;
+        vw = image.getWidth(null) * scale;
+        vh = image.getHeight(null) * scale;
         if (vw==0 && vh==0){ar = 1.0f;}
         else {ar = vw/vh;}
         computeSize();
@@ -189,7 +189,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vw = w;
         vh = vw / ar;
         computeSize();
-        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -197,7 +197,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vh = h;
         vw = vh * ar;
         computeSize();
-        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -205,11 +205,11 @@ public class VImage extends ClosedShape implements RectangularShape {
 
     public double getHeight(){return vh;}
 
-    public void sizeTo(double radius){
-        size = radius;
+    public void sizeTo(double s){
+        size = s;
         vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
         vh = size / (Math.sqrt(Math.pow(ar,2)+1));
-        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -217,7 +217,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         size *= factor;
         vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
         vh = size / (Math.sqrt(Math.pow(ar,2)+1));
-        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null)/2d,2)+Math.pow(image.getHeight(null)/2d,2));
+        scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
@@ -225,15 +225,15 @@ public class VImage extends ClosedShape implements RectangularShape {
 	 *@return west, north, east and south bounds in virtual space.
 	 */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
 
     /** Set bitmap image to be displayed. */
     public void setImage(Image i){
         image=i;
-        vw = image.getWidth(null) * scaleFactor / 2.0;
-        vh = image.getHeight(null) * scaleFactor / 2.0;
+        vw = image.getWidth(null) * scaleFactor;
+        vh = image.getHeight(null) * scaleFactor;
         ar = vw / vh;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
@@ -297,7 +297,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
     
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -331,12 +331,12 @@ public class VImage extends ClosedShape implements RectangularShape {
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project width and height
         if (zoomSensitive){
-            pc[i].cw = (int)Math.round(vw*coef);
-            pc[i].ch = (int)Math.round(vh*coef);
+            pc[i].cw = (int)Math.round(vw/2d*coef);
+            pc[i].ch = (int)Math.round(vh/2d*coef);
         }
         else{
-            pc[i].cw = (int)vw;
-            pc[i].ch = (int)vh;
+            pc[i].cw = (int)Math.round(vw/2d);
+            pc[i].ch = (int)Math.round(vh/2d);
         }
     }
 
@@ -349,12 +349,12 @@ public class VImage extends ClosedShape implements RectangularShape {
         pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
         //project width and height
         if (zoomSensitive){
-            pc[i].lcw = (int)Math.round(vw*coef);
-            pc[i].lch = (int)Math.round(vh*coef);
+            pc[i].lcw = (int)Math.round(vw/2d*coef);
+            pc[i].lch = (int)Math.round(vh/2d*coef);
         }
         else {
-            pc[i].lcw = (int)vw;
-            pc[i].lch = (int)vh;
+            pc[i].lcw = (int)Math.round(vw/2d);
+            pc[i].lch = (int)Math.round(vh/2d);
         }
     }
 

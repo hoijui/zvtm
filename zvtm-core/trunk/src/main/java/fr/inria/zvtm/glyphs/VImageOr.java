@@ -126,12 +126,12 @@ public class VImageOr extends VImage {
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project width and height
         if (zoomSensitive){
-            pc[i].cw=(int)Math.round(vw*coef);
-            pc[i].ch=(int)Math.round(vh*coef);
+            pc[i].cw=(int)Math.round(vw/2d*coef);
+            pc[i].ch=(int)Math.round(vh/2d*coef);
         }
         else {
-            pc[i].cw=(int)vw;
-            pc[i].ch=(int)vh;
+            pc[i].cw = (int)Math.round(vw/2d);
+            pc[i].ch = (int)Math.round(vh/2d);
         }
         float x1=-pc[i].cw;
         float y1=-pc[i].ch;
@@ -166,12 +166,12 @@ public class VImageOr extends VImage {
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project width and height
         if (zoomSensitive){
-            pc[i].lcw = (int)Math.round(vw*coef);
-            pc[i].lch = (int)Math.round(vh*coef);
+            pc[i].lcw = (int)Math.round(vw/2d*coef);
+            pc[i].lch = (int)Math.round(vh/2d*coef);
         }
         else {
-            pc[i].lcw=(int)vw;
-            pc[i].lch=(int)vh;
+            pc[i].lcw = (int)Math.round(vw/2d);
+            pc[i].lch = (int)Math.round(vh/2d);
         }
         float x1=-pc[i].lcw;
         float y1=-pc[i].lch;
