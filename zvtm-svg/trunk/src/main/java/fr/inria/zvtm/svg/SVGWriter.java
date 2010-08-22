@@ -496,7 +496,7 @@ public class SVGWriter {
 		double[] ycoords=new double[vertices.length];
 		for (int j=0;j<vertices.length;j++){
 			xcoords[j]=p.vx+vertices[j].x+farWest;
-			ycoords[j]=-p.vy+vertices[j].y+farNorth;
+			ycoords[j]=-p.vy-vertices[j].y+farNorth;
 		}
 		String coords="";
 		for (int j=0;j<vertices.length-1;j++){
