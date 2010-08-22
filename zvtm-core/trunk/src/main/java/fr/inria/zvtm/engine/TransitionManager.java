@@ -58,7 +58,7 @@ public class TransitionManager {
 	double[] wnes = v.getVisibleRegion(c);
 	// position the fade rectangle so that it covers this region
 	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
-						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
+						       (wnes[2]-wnes[0]), (wnes[1]-wnes[3]),
 						       fadeColor, fadeColor, 0.0f);
 	fadeRect.setDrawBorder(false);
 	c.getOwningSpace().addGlyph(fadeRect);
@@ -110,7 +110,7 @@ public class TransitionManager {
 	double[] wnes = v.getVisibleRegion(c);
 	// position the fade rectangle so that it covers this region
 	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
-						       (wnes[2]-wnes[0])/2, (wnes[1]-wnes[3])/2,
+						       (wnes[2]-wnes[0]), (wnes[1]-wnes[3]),
 						       fadeColor, fadeColor, 1.0f);
 	fadeRect.setDrawBorder(false);
 	c.getOwningSpace().addGlyph(fadeRect);
